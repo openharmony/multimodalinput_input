@@ -23,28 +23,28 @@ namespace OHOS {
 namespace MMI {
 enum Direction {
     /**
-     * 显示顺时针旋转了0度
+     * 显示器顺时针旋转了0度
      *
      * @since 9
     */
     Direction0,
 
     /**
-     * 显示顺时针旋转了90度
+     * 显示器顺时针旋转了90度
      *
      * @since 9
     */
     Direction90,
 
     /**
-     * 显示顺时针旋转了180度
+     * 显示器顺时针旋转了180度
      *
      * @since 9
     */
     Direction180,
 
     /**
-     * 显示顺时针旋转了270度
+     * 显示器顺时针旋转了270度
      *
      * @since 9
     */
@@ -82,14 +82,14 @@ struct WindowInfo {
     int32_t uid;
 
     /**
-     * 逻辑显示界面中热点区域窗口左上角的x坐标
+     * 逻辑显示器界面中热区窗口左上角的x坐标
      *
      * @since 9
     */
     int32_t hotZoneTopLeftX;
 
     /**
-     * 逻辑显示界面中热点区域窗口左上角的坐标
+     * 逻辑显示器界面中热区窗口左上角的y坐标
      *
      * @since 9
     */
@@ -110,14 +110,14 @@ struct WindowInfo {
     int32_t hotZoneHeight;
 
     /**
-     * 窗口所属的逻辑显示id
+     * 逻辑显示器id
      *
      * @since 9
     */
     int32_t displayId;
 
     /**
-     * 发送到此窗口的输入事件将被发送到agentwindowid窗口进行处理
+     * 此窗口的输入事件将被发送到代理窗口id进行处理
      *
      * @since 9
     */
@@ -147,7 +147,7 @@ struct WindowInfo {
 
 struct PhysicalDisplayInfo {
     /**
-     * 物理视图的全局唯一id
+     * 物理显示器的全局唯一id
      *
      * @since 9
     */
@@ -168,28 +168,28 @@ struct PhysicalDisplayInfo {
     int32_t upDisplayId;
 
     /**
-     * 显示左上角的x坐标
+     * 显示器左上角的x坐标
      *
      * @since 9
     */
     int32_t topLeftX;
 
     /**
-     * 显示左上角的y坐标
+     * 显示器左上角的y坐标
      *
      * @since 9
     */
     int32_t topLeftY;
 
     /**
-     * 显示宽度
+     * 显示器器宽度
      *
      * @since 9
     */
     int32_t width;
 
     /**
-     * 显示高度
+     * 显示器高度
      *
      * @since 9
     */
