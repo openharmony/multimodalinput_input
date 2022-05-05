@@ -18,7 +18,7 @@
 #include <cinttypes>
 
 #include "ability_manager_client.h"
-#include "bytrace.h"
+#include "hitrace_meter.h"
 #include "input-event-codes.h"
 #include "hisysevent.h"
 

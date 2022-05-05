@@ -24,7 +24,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "bytrace.h"
+#include "hitrace_meter.h"
 #include "libinput.h"
 
 #include "bytrace_adapter.h"
