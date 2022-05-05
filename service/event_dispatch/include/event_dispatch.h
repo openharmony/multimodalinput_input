@@ -79,7 +79,7 @@ private:
     };
     void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler);
     void HandlePointerEventTrace(const std::shared_ptr<PointerEvent> &point);
-    };
+};
 } // namespace MMI
 } // namespace OHOS
 #endif // EVENT_DISPATCH_H
