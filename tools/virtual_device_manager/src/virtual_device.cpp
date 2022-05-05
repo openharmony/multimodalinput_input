@@ -540,7 +540,7 @@ bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::v
     return false;
 }
 
-bool VirtualDevice::FindDevice(std::vector<std::string>& argvList)
+bool VirtualDevice::CommandBranch(std::vector<std::string>& argvList)
 {
     std::vector<std::string> deviceList = BrowseDirectory(g_folderpath);
     if (argvList[1] == "start") {
