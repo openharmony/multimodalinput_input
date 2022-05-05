@@ -210,8 +210,8 @@ public:
      * @return Returns a result indicating whether the specified key codes are supported.
      * @since 9
      */
-    void GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> keyCodes,
-        std::function<void(std::map<int32_t, bool>)> callback);
+    void SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
+        std::function<void(std::vector<bool>&)> callback);
 
     /**
      * @brief Sets whether the pointer icon is visible.

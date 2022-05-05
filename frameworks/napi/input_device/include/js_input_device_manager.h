@@ -23,15 +23,15 @@ namespace OHOS {
 namespace MMI {
 class JsInputDeviceManager : public JsEventTarget {
 public:
-    JsInputDeviceManager();
-    ~JsInputDeviceManager();
+    JsInputDeviceManager() = default;
+    ~JsInputDeviceManager() = default;
     DISALLOW_COPY_AND_MOVE(JsInputDeviceManager);
 
     void ResetEnv();
     napi_value GetDeviceIds(napi_env env, napi_value handle = nullptr);
     napi_value GetDevice(napi_env env, int32_t id, napi_value handle = nullptr);
     napi_value SetPointerVisible(napi_env env, bool visible, napi_value handle = nullptr);
-    napi_value GetKeystrokeAbility(napi_env env, int32_t id, std::vector<int32_t> keyCodes,
+    napi_value SupportKeys(napi_env env, int32_t id, std::vector<int32_t> keyCodes,
                                    napi_value handle = nullptr);
     napi_value GetKeyboardType(napi_env env, int32_t id, napi_value handle = nullptr);
     void RegisterInputDeviceMonitor(napi_env env, std::string type, napi_value handle);

@@ -36,22 +36,17 @@ public:
     ~JsEventTarget();
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
     static void TargetOn(std::string type, int32_t deviceId);
-    static void EmitJsIds(int32_t userData, std::vector<int32_t> ids);
+    static void EmitJsIds(int32_t userData, std::vector<int32_t> &ids);
     static void EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device);
-    static void EmitJsKeystrokeAbility(int32_t userData, std::map<int32_t, bool> keystrokeAbility);
+    static void EmitJsKeystrokeAbility(int32_t userData, std::vector<bool> &keystrokeAbility);
     static void EmitJsKeyboardType(int32_t userData, int32_t keyboardType);
     void AddMonitor(napi_env env, std::string type, napi_value handle);
     void RemoveMonitor(napi_env env, std::string type, napi_value handle);
-    napi_value CreateCallbackInfo(napi_env env, napi_value handle, int32_t userData);
+    napi_value CreateCallbackInfo(napi_env env, napi_value handle, const int32_t userData);
     void ResetEnv();
     inline static int32_t userData_ {0};
     inline static std::map<int32_t, std::unique_ptr<JsUtil::CallbackInfo>> callback_ {};
     inline static std::map<std::string, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>> devMonitor_ {};
-
-    struct DeviceType {
-        std::string deviceTypeName;
-        uint32_t typeBit;
-    };
 
 private:
     static void CallIdsPromiseWork(uv_work_t *work, int32_t status);
@@ -65,6 +60,9 @@ private:
     static void EmitAddedDeviceEvent(uv_work_t *work, int32_t status);
     static void EmitRemoveDeviceEvent(uv_work_t *work, int32_t status);
     static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfo(uv_work_t *work);
+
+private:
+    bool isMonitorProcess_ {false};
 };
 } // namespace MMI
 } // namespace OHOS

@@ -610,10 +610,10 @@ void InputManagerImpl::SendDisplayInfo()
     }
 }
 
-void InputManagerImpl::GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> &keyCodes,
-    std::function<void(std::map<int32_t, bool>)> callback)
+void InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
+    std::function<void(std::vector<bool>&)> callback)
 {
-    InputDevImp.GetKeystrokeAbility(deviceId, keyCodes, callback);
+    InputDevImpl.SupportKeys(deviceId, keyCodes, callback);
 }
 } // namespace MMI
 } // namespace OHOS

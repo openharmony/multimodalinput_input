@@ -31,11 +31,10 @@ public:
     struct CallbackData {
         std::vector<int32_t> ids;
         std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device = nullptr;
-        std::map<int32_t, bool> keystrokeAbility;
+        std::vector<bool> keystrokeAbility;
         int32_t deviceId = 0;
         int32_t keyboardType = 0;
     };
-
     struct CallbackInfo {
         CallbackInfo();
         ~CallbackInfo();
@@ -44,9 +43,16 @@ public:
         napi_deferred deferred = nullptr;
         CallbackData data;
     };
+    struct DeviceType {
+        std::string sourceTypeName;
+        uint32_t typeBit;
+    };
 
-    int32_t GetUserData(uv_work_t *work);
-    bool IsHandleEquals(napi_env env, napi_value handle, napi_ref ref);
+    static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
+    static napi_value GetDeviceInfo(const std::unique_ptr<CallbackInfo> &cb);
+    static bool GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_value &object);
+    static bool GetDeviceSourceType(const std::unique_ptr<CallbackInfo> &cb, napi_value &object);
+    static bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
 };
 
 class AsyncContext : public RefBase {

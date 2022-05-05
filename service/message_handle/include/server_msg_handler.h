@@ -50,7 +50,7 @@ protected:
     int32_t OnMarkConsumed(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputDevice(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputDeviceIds(SessionPtr sess, NetPacket& pkt);
-    int32_t GetKeystrokeAbility(SessionPtr sess, NetPacket& pkt);
+    int32_t OnSupportKeys(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt);
