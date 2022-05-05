@@ -62,7 +62,7 @@ void ClientMsgHandler::Init()
         {MmiMessageId::GET_MMI_INFO_ACK, MsgCallbackBind2(&ClientMsgHandler::GetMultimodeInputInfo, this)},
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ClientMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ClientMsgHandler::OnInputDeviceIds, this)},
-        {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ClientMsgHandler::OnKeyList, this)},
+        {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ClientMsgHandler::OnSupportKeys, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnDevMonitor, this)},
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
@@ -245,7 +245,7 @@ int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& p
         }
         inputDeviceIds.push_back(deviceId);
     }
-    InputDevImp.OnInputDeviceIds(userData, inputDeviceIds);
+    InputDevImpl.OnInputDeviceIds(userData, inputDeviceIds);
     return RET_OK;
 }
 
@@ -253,31 +253,31 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
     int32_t userData;
-    int32_t id;
-    std::string name;
-    int32_t deviceType;
-    if (!pkt.Read(userData)) {
-        MMI_HILOGE("Packet read userData failed");
-        return RET_ERR;
+    size_t size;
+    auto devData = std::make_shared<InputDeviceImpl::InputDeviceInfo>();
+    pkt >> userData >> devData->id >> devData->name >> devData->deviceType >> devData->busType >> devData->product
+        >> devData->vendor >> devData->version >> devData->phys >> devData->uniq >> size;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read basic data failed");
+        return PACKET_READ_FAIL;
     }
-    if (!pkt.Read(id)) {
-        MMI_HILOGE("Packet read id failed");
-        return RET_ERR;
+    std::vector<InputDeviceImpl::AxisInfo> axisInfo;
+    InputDeviceImpl::AxisInfo axis;
+    for (size_t i = 0; i < size; ++i) {
+        pkt >> axis.axisType >> axis.min >> axis.max >> axis.fuzz >> axis.flat >> axis.resolution;
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet read axis data failed");
+            return PACKET_READ_FAIL;
+        }
+        axisInfo.push_back(axis);
     }
-    if (!pkt.Read(name)) {
-        MMI_HILOGE("Packet read name failed");
-        return RET_ERR;
-    }
-    if (!pkt.Read(deviceType)) {
-        MMI_HILOGE("Packet read deviceType failed");
-        return RET_ERR;
-    }
-
-    InputDevImp.OnInputDevice(userData, id, name, deviceType);
+    devData->axis = axisInfo;
+    CHKPR(devData, RET_ERR);
+    InputDevImpl.OnInputDevice(userData, devData);
     return RET_OK;
 }
 
-int32_t ClientMsgHandler::OnKeyList(const UDSClient& client, NetPacket& pkt)
+int32_t ClientMsgHandler::OnSupportKeys(const UDSClient& client, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
     int32_t userData;
@@ -290,22 +290,16 @@ int32_t ClientMsgHandler::OnKeyList(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read size failed");
         return RET_ERR;
     }
-    int32_t keyCode;
-    int32_t isSupport;
-    std::map<int32_t, bool> abilityRet;
-    for (size_t i = 0; i < size;) {
-        if (!pkt.Read(keyCode)) {
-            MMI_HILOGE("Packet read keyCode failed");
+    std::vector<bool> abilityRet;
+    bool ret;
+    for (size_t i = 0; i < size; ++i) {
+        if (!pkt.Read(ret)) {
+            MMI_HILOGE("Packet read ret failed");
             return RET_ERR;
         }
-        if (!pkt.Read(isSupport)) {
-            MMI_HILOGE("Packet read isSupport failed");
-            return RET_ERR;
-        }
-        abilityRet[keyCode] = isSupport == 1 ? true : false;
-        i += 2;
+        abilityRet.push_back(ret);
     }
-    InputDeviceImpl::GetInstance().OnKeystrokeAbility(userData, abilityRet);
+    InputDevImpl.OnSupportKeys(userData, abilityRet);
     return RET_OK;
 }
 

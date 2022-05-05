@@ -64,7 +64,7 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::INJECT_POINTER_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectPointerEvent, this) },
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ServerMsgHandler::OnInputDeviceIds, this)},
-        {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ServerMsgHandler::GetKeystrokeAbility, this)},
+        {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ServerMsgHandler::OnSupportKeys, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputDeviceMontior, this)},
         {MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputDeviceMontior, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
@@ -449,15 +449,13 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
     CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData = 0;
-    if (!pkt.Read(userData)) {
-        MMI_HILOGE("Packet read userData failed");
-        return RET_ERR;
-    }
     int32_t deviceId = 0;
-    if (!pkt.Read(deviceId)) {
-        MMI_HILOGE("Packet read device failed");
-        return RET_ERR;
+    pkt >> userData >> deviceId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read data failed");
+        return PACKET_READ_FAIL;
     }
+
     std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(deviceId);
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE);
     if (inputDevice == nullptr) {
@@ -465,20 +463,16 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
         int32_t id = -1;
         std::string name = "null";
         int32_t deviceType = -1;
-        if (!pkt2.Write(userData)) {
-            MMI_HILOGE("Packet write userData failed");
-            return RET_ERR;
-        }
-        if (!pkt2.Write(id)) {
-            MMI_HILOGE("Packet write data failed");
-            return RET_ERR;
-        }
-        if (!pkt2.Write(name)) {
-            MMI_HILOGE("Packet write name failed");
-            return RET_ERR;
-        }
-        if (!pkt2.Write(deviceType)) {
-            MMI_HILOGE("Packet write deviceType failed");
+        int32_t busType = -1;
+        int32_t product = -1;
+        int32_t vendor = -1;
+        int32_t version = -1;
+        std::string phys = "null";
+        std::string uniq = "null";
+        size_t size = 0;
+        pkt2 << userData << id << name << deviceType << busType << product << vendor << version << phys << uniq << size;
+        if (pkt2.ChkRWError()) {
+            MMI_HILOGE("packet write data failed");
             return RET_ERR;
         }
         if (!sess->SendMsg(pkt2)) {
@@ -487,24 +481,22 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
         }
         return RET_OK;
     }
-    int32_t id = inputDevice->GetId();
-    std::string name = inputDevice->GetName();
-    int32_t deviceType = inputDevice->GetType();
-    if (!pkt2.Write(userData)) {
-        MMI_HILOGE("Packet write userData failed");
+
+    pkt2 << userData << inputDevice->GetId() << inputDevice->GetName() << inputDevice->GetType()
+        << inputDevice->GetBustype() << inputDevice->GetProduct() << inputDevice->GetVendor()
+        << inputDevice->GetVersion() << inputDevice->GetPhys() << inputDevice->GetUniq()
+        << inputDevice->GetAxisInfo().size();
+    if (pkt2.ChkRWError()) {
+        MMI_HILOGE("packet write basic data failed");
         return RET_ERR;
     }
-    if (!pkt2.Write(id)) {
-        MMI_HILOGE("Packet write data failed");
-        return RET_ERR;
-    }
-    if (!pkt2.Write(name)) {
-        MMI_HILOGE("Packet write name failed");
-        return RET_ERR;
-    }
-    if (!pkt2.Write(deviceType)) {
-        MMI_HILOGE("Packet write deviceType failed");
-        return RET_ERR;
+    for (const auto &item : inputDevice->GetAxisInfo()) {
+        pkt2 << item.GetAxisType() << item.GetMinimum() << item.GetMaximum() << item.GetFuzz() << item.GetFlat()
+            << item.GetResolution();
+        if (pkt2.ChkRWError()) {
+            MMI_HILOGE("packet write axis data failed");
+            return RET_ERR;
+        }
     }
     if (!sess->SendMsg(pkt2)) {
         MMI_HILOGE("Sending failed");
@@ -513,7 +505,7 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::GetKeystrokeAbility(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::OnSupportKeys(SessionPtr sess, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
@@ -542,25 +534,18 @@ int32_t ServerMsgHandler::GetKeystrokeAbility(SessionPtr sess, NetPacket& pkt)
         keyCode.push_back(sysKeyValue);
     }
 
-    std::map<int32_t, bool> abilityRet = InputDevMgr->GetKeystrokeAbility(deviceId, keyCode);
-    std::vector<int32_t> keystroke;
-    for (const auto &item : abilityRet) {
-        keystroke.push_back(item.first);
-        keystroke.push_back(item.second ? 1 : 0);
-    }
-
+    std::vector<bool> keystroke = InputDevMgr->SupportKeys(deviceId, keyCode);
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
     if (!pkt2.Write(userData)) {
         MMI_HILOGE("Packet write userData failed");
         return RET_ERR;
     }
-    size = keystroke.size();
-    if (!pkt2.Write(size)) {
+    if (!pkt2.Write(keystroke.size())) {
         MMI_HILOGE("Packet write size failed");
         return RET_ERR;
     }
     for (const auto &item : keystroke) {
-        if (!pkt2.Write(item)) {
+        if (!pkt2.Write(static_cast<bool>(item))) {
             MMI_HILOGE("Packet write keystroke failed");
             return RET_ERR;
         }

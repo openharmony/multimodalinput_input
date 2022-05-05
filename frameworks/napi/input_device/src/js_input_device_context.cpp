@@ -32,7 +32,6 @@ const std::string CREATE_REFERENCE = "napi_create_reference";
 const std::string REFERENCE_REF = "napi_create_reference";
 const std::string GET_CB_INFO = "napi_get_cb_info";
 const std::string HAS_NAMED_PROPERTY = "napi_has_named_property";
-const std::string TYPEOF = "napi_typeof";
 const std::string GET_INT32 = "napi_get_value_int32";
 const std::string DEFINE_PROPERTIES = "napi_define_properties";
 const std::string GET_STRING_UTF8 = "napi_get_value_string_utf8";
@@ -149,10 +148,8 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
         THROWERR(env, "the number of parameters is incorrect");
         return nullptr;
     }
-    napi_valuetype valueType = napi_undefined;
-    CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
-    if (valueType != napi_string) {
-        THROWERR(env, "the first parameter error");
+    if (!JsUtil::TypeOf(env, argv[0], napi_string)) {
+        THROWERR(env, "The first parameter type is wrong");
         return nullptr;
     }
 
@@ -164,10 +161,8 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
         THROWERR(env, "event type is wrong");
         return nullptr;
     }
-
-    CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
-    if (valueType != napi_function) {
-        THROWERR(env, "the second parameter is not a function");
+    if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
+        THROWERR(env, "The second parameter type is wrong");
         return nullptr;
     }
 
@@ -187,11 +182,8 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
         THROWERR(env, "the number of parameters is incorrect");
         return nullptr;
     }
-
-    napi_valuetype valueType = napi_undefined;
-    CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
-    if (valueType != napi_string) {
-        THROWERR(env, "the first parameter type error");
+    if (!JsUtil::TypeOf(env, argv[0], napi_string)) {
+        THROWERR(env, "The first parameter type is wrong");
         return nullptr;
     }
 
@@ -210,9 +202,8 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
         jsInputDeviceMgr->UnRegisterInputDeviceMonitor(env, type);
         return nullptr;
     }
-    CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
-    if (valueType != napi_function) {
-        THROWERR(env, "the first parameter is not a function");
+    if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
+        THROWERR(env, "The second parameter type is wrong");
         return nullptr;
     }
     jsInputDeviceMgr->UnRegisterInputDeviceMonitor(env, type, argv[1]);
@@ -235,11 +226,8 @@ napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info i
     if (argc == 0) {
         return jsInputDeviceMgr->GetDeviceIds(env);
     }
-
-    napi_valuetype valueType = napi_undefined;
-    CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
-    if (valueType != napi_function) {
-        THROWERR(env, "the first parameter is not a functio");
+    if (!JsUtil::TypeOf(env, argv[0], napi_function)) {
+        THROWERR(env, "The first parameter type is wrong");
         return nullptr;
     }
     return jsInputDeviceMgr->GetDeviceIds(env, argv[0]);
@@ -255,11 +243,8 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
         THROWERR(env, "the number of parameters is not as expected");
         return nullptr;
     }
-
-    napi_valuetype valueType = napi_undefined;
-    CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
-    if (valueType != napi_number) {
-        THROWERR(env, "the first parameter is not a number");
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        THROWERR(env, "The first parameter type is wrong");
         return nullptr;
     }
     int32_t id = 0;
@@ -270,9 +255,8 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
     if (argc == 1) {
         return jsInputDeviceMgr->GetDevice(env, id);
     }
-    CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
-    if (valueType != napi_function) {
-        THROWERR(env, "the second parameter is not a function");
+    if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
+        THROWERR(env, "The second parameter type is wrong");
         return nullptr;
     }
     return jsInputDeviceMgr->GetDevice(env, id, argv[1]);
@@ -288,11 +272,8 @@ napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_i
         THROWERR(env, "the number of parameters is not as expected");
         return nullptr;
     }
-
-    napi_valuetype valueType = napi_undefined;
-    CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
-    if (valueType != napi_boolean) {
-        THROWERR(env, "the first parameter is not a boolean");
+    if (!JsUtil::TypeOf(env, argv[0], napi_boolean)) {
+        THROWERR(env, "The first parameter type is wrong");
         return nullptr;
     }
     bool visible = true;
@@ -303,15 +284,14 @@ napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_i
     if (argc == 1) {
         return jsInputDeviceMgr->SetPointerVisible(env, visible);
     }
-    CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
-    if (valueType != napi_function) {
-        THROWERR(env, "the second parameter is not a function");
+    if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
+        THROWERR(env, "The second parameter type is wrong");
         return nullptr;
     }
     return jsInputDeviceMgr->SetPointerVisible(env, visible, argv[1]);
 }
 
-napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback_info info)
+napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
     size_t argc = 3;
@@ -321,15 +301,17 @@ napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback
         THROWERR(env, "parameter number error");
         return nullptr;
     }
-
-    napi_valuetype valueType = napi_undefined;
-    CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
-    if (valueType != napi_number) {
-        THROWERR(env, "the first parameter is not a number");
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        THROWERR(env, "The first parameter type is wrong");
         return nullptr;
     }
     int32_t deviceId = 0;
     CHKRP(env, napi_get_value_int32(env, argv[0], &deviceId), GET_INT32);
+
+    if (!JsUtil::TypeOf(env, argv[1], napi_object)) {
+        THROWERR(env, "The second parameter type is wrong");
+        return nullptr;
+    }
     uint32_t size = 0;
     CHKRP(env, napi_get_array_length(env, argv[1], &size), GET_ARRAY_LENGTH);
     if (size < 1 || size > 5) {
@@ -342,10 +324,8 @@ napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback
     for (uint32_t i = 0; i < size; ++i) {
         napi_value keyValue = nullptr;
         CHKRP(env, napi_get_element(env, argv[1], i, &keyValue), GET_ELEMENT);
-        CHKRP(env, napi_typeof(env, keyValue, &valueType), TYPEOF);
-        if (valueType != napi_number) {
-            MMI_HILOGE("the %{public}u parameter is not a number", ++i);
-            napi_throw_error(env, nullptr, "JsInputDeviceContext: parameter type error");
+        if (!JsUtil::TypeOf(env, keyValue, napi_number)) {
+            THROWERR(env, "Parameter type error");
             return nullptr;
         }
         CHKRP(env, napi_get_value_int32(env, keyValue, &data), GET_INT32);
@@ -355,15 +335,13 @@ napi_value JsInputDeviceContext::GetKeystrokeAbility(napi_env env, napi_callback
     JsInputDeviceContext *jsContext = JsInputDeviceContext::GetInstance(env);
     auto jsInputDeviceMgr = jsContext->GetJsInputDeviceMgr();
     if (argc == 2) {
-        THROWERR(env, "the number of parameters is incorrect");
-        return jsInputDeviceMgr->GetKeystrokeAbility(env, deviceId, keyCode);
+        return jsInputDeviceMgr->SupportKeys(env, deviceId, keyCode);
     }
-    CHKRP(env, napi_typeof(env, argv[2], &valueType), TYPEOF);
-    if (valueType != napi_function) {
-        THROWERR(env, "the last parameter is not a function");
+    if (!JsUtil::TypeOf(env, argv[2], napi_function)) {
+        THROWERR(env, "The third parameter type is wrong");
         return nullptr;
     }
-    return jsInputDeviceMgr->GetKeystrokeAbility(env, deviceId, keyCode, argv[2]);
+    return jsInputDeviceMgr->SupportKeys(env, deviceId, keyCode, argv[2]);
 }
 
 napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_info info)
@@ -377,10 +355,8 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
         return nullptr;
     }
 
-    napi_valuetype valueType = napi_undefined;
-    CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
-    if (valueType != napi_number) {
-        THROWERR(env, "The first parameter is not a number");
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        THROWERR(env, "The first parameter type is wrong");
         return nullptr;
     }
     int32_t id = 0;
@@ -391,9 +367,8 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
     if (argc == 1) {
         return jsInputDeviceMgr->GetKeyboardType(env, id);
     }
-    CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
-    if (valueType != napi_function) {
-        THROWERR(env, "The second parameter is not a function");
+    if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
+        THROWERR(env, "The second parameter type is wrong");
         return nullptr;
     }
     return jsInputDeviceMgr->GetKeyboardType(env, id, argv[1]);
@@ -413,7 +388,7 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getDevice", GetDevice),
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceIds", GetDeviceIds),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerVisible", SetPointerVisible),
-        DECLARE_NAPI_STATIC_FUNCTION("getKeystrokeAbility", GetKeystrokeAbility),
+        DECLARE_NAPI_STATIC_FUNCTION("supportKeys", SupportKeys),
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardType", GetKeyboardType),
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);

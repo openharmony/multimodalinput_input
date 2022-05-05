@@ -41,7 +41,7 @@ namespace MMI {
         } \
     } while (0)
 
-#define CHKRB(env, state, desc) \
+#define CHKRF(env, state, desc) \
     do { \
         if ((state) != napi_ok) { \
             MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \

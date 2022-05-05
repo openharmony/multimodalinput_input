@@ -72,8 +72,8 @@ public:
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
 
-    void GetKeystrokeAbility(int32_t deviceId, std::vector<int32_t> &keyCodes,
-        std::function<void(std::map<int32_t, bool>)> callback);
+    void SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
+        std::function<void(std::vector<bool>&)> callback);
 
     int32_t SetPointerVisible(bool visible);
 
