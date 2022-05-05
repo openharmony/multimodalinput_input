@@ -47,7 +47,6 @@ protected:
     int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);
     int32_t OnKeyList(const UDSClient& client, NetPacket& pkt);
     int32_t OnDevMonitor(const UDSClient& client, NetPacket& pkt);
-    int32_t TouchpadEventInterceptor(const UDSClient& client, NetPacket& pkt);
     int32_t KeyEventInterceptor(const UDSClient& client, NetPacket& pkt);
 
 private:

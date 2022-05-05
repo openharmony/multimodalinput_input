@@ -61,34 +61,6 @@ void InterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
     interceptors_.erase(iter);
 }
 
-bool InterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CALL_LOG_ENTER;
-    CHKPF(pointerEvent);
-    if (interceptors_.empty()) {
-        MMI_HILOGW("%{public}s no interceptor to send msg", __func__);
-        return false;
-    }
-    PointerEvent::PointerItem pointer;
-    if (!(pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointer))) {
-        MMI_HILOGE("The obtained pointer parameter is invalid");
-        return false;
-    }
-    MMI_HILOGD("Interceptor-servereventTouchpad:actionTime:%{public}" PRId64 ","
-               "sourceType:%{public}d,pointerAction:%{public}d,"
-               "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
-               pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
-               pointerEvent->GetPointerId(), pointer.GetGlobalX(), pointer.GetGlobalY(), pointer.IsPressed());
-    for (const auto &item : interceptors_) {
-        NetPacket pkt(MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR);
-        InputEventDataTransformation::Marshalling(pointerEvent, pkt);
-        pkt << item.session->GetPid() << item.id;
-        MMI_HILOGD("server send the interceptor msg to client, pid:%{public}d", item.session->GetPid());
-        item.session->SendMsg(pkt);
-    }
-    return true;
-}
-
 bool InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_LOG_ENTER;

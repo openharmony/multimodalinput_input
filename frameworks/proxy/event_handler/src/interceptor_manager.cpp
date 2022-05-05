@@ -26,27 +26,15 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorManager" };
+constexpr int32_t SOURCETYPE_KEY = 4;
+constexpr int32_t INVALID_INTERCEPTOR_ID = -1;
 } // namespace
 
 InterceptorManager::InterceptorManager() {}
 
-int32_t InterceptorManager::AddInterceptor(int32_t sourceType,
-    std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
-{
-    CHKPR(interceptor, INVALID_INTERCEPTOR_ID);
-    InterceptorItem interceptorItem;
-    interceptorItem.id_ = ++InterceptorItemId;
-    interceptorItem.sourceType = sourceType;
-    interceptorItem.callback = interceptor;
-    interceptor_.push_back(interceptorItem);
-    MMIEventHdl.AddInterceptor(interceptorItem.sourceType, interceptorItem.id_);
-    MMI_HILOGD("Add sourceType:%{public}d Touchpad to InterceptorManager success", sourceType);
-    return interceptorItem.id_;
-}
-
 int32_t InterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
-    CHKPR(interceptor, ERROR_NULL_POINTER);
+    CHKPR(interceptor, INVALID_INTERCEPTOR_ID);
     InterceptorItem interceptorItem;
     interceptorItem.id_ = ++InterceptorItemId;
     interceptorItem.sourceType = SOURCETYPE_KEY;
@@ -73,29 +61,6 @@ void InterceptorManager::RemoveInterceptor(int32_t interceptorId)
     iter = interceptor_.erase(iter);
     MMIEventHdl.RemoveInterceptor(interceptorItem.id_);
     MMI_HILOGD("InterceptorItem id:%{public}d removed success", interceptorId);
-}
-
-int32_t InterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id)
-{
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    PointerEvent::PointerItem item;
-    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
-        MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
-        return RET_ERR;
-    }
-    MMI_HILOGD("Interceptor-clienteventTouchpad:actionTime:%{public}" PRId64 ","
-               "sourceType:%{public}d,pointerAction:%{public}d,"
-               "pointer:%{public}d,point.x:%{public}d,point.y:%{public}d,press:%{public}d",
-               pointerEvent->GetActionTime(), pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(),
-               pointerEvent->GetPointerId(), item.GetGlobalX(), item.GetGlobalY(), item.IsPressed());
-    InterceptorItem interceptorItem;
-    interceptorItem.id_ = id;
-    auto iter = std::find(interceptor_.begin(), interceptor_.end(), interceptorItem);
-    if (iter != interceptor_.end() && iter->callback != nullptr) {
-        MMI_HILOGD("interceptor callback execute");
-        iter->callback(pointerEvent);
-    }
-    return MMI_STANDARD_EVENT_SUCCESS;
 }
 
 int32_t InterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
