@@ -22,128 +22,278 @@
 namespace OHOS {
 namespace MMI {
 enum Direction {
-    // The display rotated 0 degrees clockwise
+    /**
+     * 显示顺时针旋转了0度
+     *
+     * @since 9
+    */
     Direction0,
 
-    // The display rotated 90 degrees clockwise
+    /**
+     * 显示顺时针旋转了90度
+     *
+     * @since 9
+    */
     Direction90,
 
-    // The display rotated 180 degrees clockwise
+    /**
+     * 显示顺时针旋转了180度
+     *
+     * @since 9
+    */
     Direction180,
 
-    // The display rotated 270 degrees clockwise
+    /**
+     * 显示顺时针旋转了270度
+     *
+     * @since 9
+    */
+    
     Direction270
 };
 
 struct WindowInfo {
-    // The Bit0 of the flags field represents Touchable or not state
+    /**
+     * flags字段的Bit0表示是否为可触摸状态
+     *
+     * @since 9
+    */
     static constexpr uint32_t FLAG_BIT_UNTOUCHABLE = 1;
 
-    // The globally unique identifier of the window
+    /**
+     * 窗口的全局唯一标识符
+     *
+     * @since 9
+    */
     int32_t id;
 
-    // The id of the process where the window is located
+    /**
+     * 窗口所在的进程id
+     *
+     * @since 9
+    */
     int32_t pid;
 
-    // The uid of the process where the window is located
+    /**
+     * 窗口所在进程的uid
+     *
+     * @since 9
+    */
     int32_t uid;
 
-    // The x coordinate of the upper left corner of the hot zone window in the logical display
+    /**
+     * 逻辑显示界面中热点区域窗口左上角的x坐标
+     *
+     * @since 9
+    */
     int32_t hotZoneTopLeftX;
 
-    // The y coordinate of the upper left corner of the hot zone window in the logical display
+    /**
+     * 逻辑显示界面中热点区域窗口左上角的坐标
+     *
+     * @since 9
+    */
     int32_t hotZoneTopLeftY;
 
-    // Logical width of the hot zone window
+    /**
+     * 热区窗口的逻辑宽度
+     *
+     * @since 9
+    */
     int32_t hotZoneWidth;
 
-    // Logical height of the hot zone window
+    /**
+     * 热区窗口的逻辑高度
+     *
+     * @since 9
+    */
     int32_t hotZoneHeight;
 
-    // The logical display id to which the window belongs
+    /**
+     * 窗口所属的逻辑显示id
+     *
+     * @since 9
+    */
     int32_t displayId;
 
-    // The input events sent to this window will be sent to the agentwindowid window for processing
+    /**
+     * 发送到此窗口的输入事件将被发送到agentwindowid窗口进行处理
+     *
+     * @since 9
+    */
     int32_t agentWindowId;
 
-    // The x coordinate of the upper left corner of the window in the logical display
+    /**
+     * 逻辑显示窗口左上角的x坐标
+     *
+     * @since 9
+    */
     int32_t winTopLeftX;
 
-    // The y coordinate of the upper left corner of the window in the logical display
+    /**
+     * 逻辑显示窗口左上角的坐标
+     *
+     * @since 9
+    */
     int32_t winTopLeftY;
 
-    // The current state of the window
+    /**
+     * 窗口的当前状态
+     *
+     * @since 9
+    */
     uint32_t flags;
 };
 
 struct PhysicalDisplayInfo {
-    // The globally unique id of the physical display
+    /**
+     * 物理视图的全局唯一id
+     *
+     * @since 9
+    */
     int32_t id;
 
-    // Globally unique id of the physical display on the left
+    /**
+     * 左侧物理显示全局唯一id
+     *
+     * @since 9
+    */
     int32_t leftDisplayId;
 
-    // The globally unique id of the upper physical display
+    /**
+     * 上层物理视图的全局唯一id
+     *
+     * @since 9
+    */
     int32_t upDisplayId;
 
-    // The x coordinate of the upper left corner of the display
+    /**
+     * 显示左上角的x坐标
+     *
+     * @since 9
+    */
     int32_t topLeftX;
 
-    // The y coordinate of the upper left corner of the display
+    /**
+     * 显示左上角的y坐标
+     *
+     * @since 9
+    */
     int32_t topLeftY;
 
-    // Display width
+    /**
+     * 显示宽度
+     *
+     * @since 9
+    */
     int32_t width;
 
-    // Display height
+    /**
+     * 显示高度
+     *
+     * @since 9
+    */
     int32_t height;
 
-    // Display name, for debugging
+    /**
+     * 显示名称，用于调试
+     *
+     * @since 9
+    */
     std::string name;
 
-    // Display seatId, The display associated with the touch screen must be configured with a non-empty seatid
+    /**
+     * 显示座位号，与触摸屏相关联的显示器必须配置非空座位号
+     *
+     * @since 9
+    */
     std::string seatId;
 
     std::string seatName;
 
-    // Display logic width
+    /**
+     * 显示逻辑宽度
+     *
+     * @since 9
+    */
     int32_t logicWidth;
 
-    // Display logic width
+    /**
+     * 显示逻辑高度
+     *
+     * @since 9
+    */
     int32_t logicHeight;
 
-    // Display orientation
+    /**
+     * 显示方向
+     *
+     * @since 9
+    */
     Direction direction;
 };
 
 struct LogicalDisplayInfo {
-    // The globally unique id of the logic display
+    /**
+     * 逻辑显示的全局唯一id
+     *
+     * @since 9
+    */
     int32_t id;
 
-    // The x coordinate of the upper left corner of the logical display
+    /**
+     * 逻辑显示左上角的x坐标
+     *
+     * @since 9
+    */
     int32_t topLeftX;
 
-    // The y coordinate of the upper left corner of the logical display
+    /**
+     * 逻辑显示左上角的y坐标
+     *
+     * @since 9
+    */
     int32_t topLeftY;
 
-    // Logical display width
+    /**
+     * 逻辑显示宽度
+     *
+     * @since 9
+    */
     int32_t width;
 
-    // Logical display height
+    /**
+     * 逻辑显示高度
+     *
+     * @since 9
+    */
     int32_t height;
 
-    // Logical display name, for debugging
+    /**
+     * 逻辑显示名称，用于调试
+     *
+     * @since 9
+    */
     std::string name;
 
-    // Logical display seatId, Displays that are not touch screen-independent use this attribute to associate with input
-    // devices Keep it empty unless you are sure of what you are doing
+    /**
+     * 逻辑显示seatId，不独立于触摸屏的显示使用此属性与输入关联
+     *
+     * 保持它为空，除非你确定你在做什么
+     *
+     * @since 9
+    */
     std::string seatId;
 
     std::string seatName;
 
     int32_t focusWindowId;
 
-    // List of window information arranged in Z order, with the top window at the top
+    /**
+     * 窗口信息按Z顺序排列的列表，顶部窗口在顶部
+     *
+     * @since 9
+    */
     std::vector<WindowInfo> windowsInfo;
 };
 } // namespace MMI
