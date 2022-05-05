@@ -54,7 +54,6 @@ size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_
     std::vector<int32_t> &difList);
 std::string StringFmt(const char* str, ...);
 bool IsFileExists(const std::string& fileName);
-int32_t VerifyFile(const std::string& fileName);
 std::string GetFileExtendName(const std::string& fileName);
 int32_t GetFileSize(const std::string& fileName);
 std::string ReadFile(const std::string &filePath);

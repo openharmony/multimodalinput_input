@@ -437,24 +437,24 @@ std::string StringFmt(const char* str, ...)
 
 bool IsFileExists(const std::string& fileName)
 {
+    char realPath[PATH_MAX] = {};
+    if (realpath(fileName.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("path is error, path:%{public}s", fileName.c_str());
+        return false;
+    }
     if ((access(fileName.c_str(), F_OK)) == 0) {
         return true;
     }
     return false;
 }
 
-int32_t VerifyFile(const std::string& fileName)
-{
-    std::string findcmd = "find /data -name " + fileName;
-    FILE* findJson = popen(findcmd.c_str(), "r");
-    if (!findJson) {
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
 std::string GetFileExtendName(const std::string& fileName)
 {
+    char realPath[PATH_MAX] = {};
+    if (realpath(fileName.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("path is error, path:%{public}s", fileName.c_str());
+        return "";
+    }
     if (fileName.empty()) {
         return "";
     }
@@ -493,6 +493,11 @@ int32_t GetFileSize(const std::string& fileName)
 
 std::string ReadFile(const std::string &filePath)
 {
+    char realPath[PATH_MAX] = {};
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("path is error, path:%{public}s", filePath.c_str());
+        return "";
+    }
     FILE* fp = fopen(filePath.c_str(), "r");
     if (fp == nullptr) {
         MMI_HILOGW("open file: %{pulic}s failed", filePath.c_str());
@@ -506,7 +511,6 @@ std::string ReadFile(const std::string &filePath)
     if (fclose(fp) != 0) {
         MMI_HILOGW("close file: %{pulic}s failed", filePath.c_str());
     }
-
     return dataStr;
 }
 } // namespace MMI

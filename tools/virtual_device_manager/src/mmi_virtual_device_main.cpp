@@ -25,7 +25,9 @@ int32_t main(int32_t argc, const char *argv[])
     if (dir == nullptr) {
         mkdir(OHOS::MMI::g_folderpath.c_str(), SYMBOL_FOLDER_PERMISSIONS);
     } else {
-        closedir(dir);
+        if (closedir(dir) != 0) {
+            printf("close dir: %s failed", OHOS::MMI::g_folderpath.c_str());
+        }
     }
     std::vector<std::string> argvList;
     for (uint16_t i = 0; i < argc; i++) {

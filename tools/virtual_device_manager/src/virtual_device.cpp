@@ -79,6 +79,10 @@ bool CheckFileName(const std::string& fileName)
 
 void RemoveDir(const std::string& filePath)
 {
+    if (!IsFileExists(filePath)) {
+        printf("file path:%s failed", filePath.c_str());
+        return;
+    }
     DIR* dir = opendir(filePath.c_str());
     if (dir == nullptr) {
         printf("Failed to open folder");
@@ -91,10 +95,9 @@ void RemoveDir(const std::string& filePath)
             continue;
         }
         if (ptr->d_type == DT_REG) {
-            std::vector<std::string> pathStr = {  };
             std::string rmFile = filePath + ptr->d_name;
             if (std::remove(rmFile.c_str()) != 0) {
-                printf("delete file: %s failed", rmFile.c_str());
+                printf("remove file: %s failed", rmFile.c_str());
             }
         } else if (ptr->d_type == DT_DIR) {
             RemoveDir((filePath + ptr->d_name + "/"));
@@ -102,9 +105,11 @@ void RemoveDir(const std::string& filePath)
             printf("file name:%s, type is error", ptr->d_name);
         }
     }
-    closedir(dir);
+    if (closedir(dir) != 0) {
+        printf("close dir: %s failed", filePath.c_str());
+    }
     if (std::remove(filePath.c_str()) != 0) {
-        printf("delete file: %s failed", filePath.c_str());
+        printf("remove file: %s failed", filePath.c_str());
     }
     return;
 }
@@ -199,6 +204,37 @@ void StartPen()
     static VirtualPenKeyboard virtualPenKeyboard;
     virtualPenKeyboard.SetUp();
 }
+
+void StartAllDevices()
+{
+    StartMouse();
+    StartKeyboard();
+    StartJoystick();
+    StartTrackball();
+    StartRemoteControl();
+    StartTrackpad();
+    StartKnob();
+    StartGamePad();
+    StartTouchPad();
+    StartTouchScreen();
+    StartPen();
+}
+
+using virtualFun = void (*)();
+std::map<std::string, virtualFun> mapFun = {
+    {"mouse", &StartMouse},
+    {"keyboard", &StartKeyboard},
+    {"joystick", &StartJoystick},
+    {"trackball", &StartTrackball},
+    {"remotecontrol", &StartRemoteControl},
+    {"trackpad", &StartTrackpad},
+    {"knob", &StartKnob},
+    {"gamepad", &StartGamePad},
+    {"touchpad", &StartTouchPad},
+    {"touchscreen", &StartTouchScreen},
+    {"pen", &StartPen},
+    {"all", &StartAllDevices},
+};
 } // namespace
 
 bool VirtualDevice::DoIoctl(int32_t fd, int32_t request, const uint32_t value)
@@ -241,7 +277,9 @@ std::vector<std::string> VirtualDevice::BrowseDirectory(const std::string& fileP
             }
         }
     }
-    closedir(dir);
+    if (closedir(dir) != 0) {
+        printf("close dir: %s failed", filePath.c_str());
+    }
     return fileList;
 }
 
@@ -250,37 +288,48 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
     DIR *dir = nullptr;
     do {
         if (!CheckFileName(fileName)) {
+            printf("file name check error");
             break;
         }
         std::string::size_type pos = fileName.find("_");
+        if (pos ==  std::string::npos) {
+            printf("Failed to create file");
+            break;
+        }
         std::string procressPath =  "/proc/" + fileName.substr(0, pos) + "/";
         dir = opendir(procressPath.c_str());
         if (dir == nullptr) {
+            printf("open dir:%s failed", procressPath.c_str());
             break;
         }
         std::string filePath = procressPath + "cmdline";
         if (!IsFileExists(filePath)) {
+            printf("file path:%s failed", filePath.c_str());
             break;
         }
         if (GetFileSize(filePath) > READ_FILE_SIZE_MAX) {
+            printf("file:%s size exceeds maximum", filePath.c_str());
             break;
         }
         const std::string temp = ReadFile(filePath);
         if (temp.empty()) {
+            printf("temp is empty");
             break;
         }
         std::string processName;
         processName.append(temp);
         if (processName.find(VIRTUAL_DEVICE_NAME.c_str()) != processName.npos) {
+            if (closedir(dir) != 0) {
+                printf("close dir: %s failed", procressPath.c_str());
+            }
             return true;
         }
     } while (0);
-    if (dir != nullptr) {
-        closedir(dir);
-        dir = nullptr;
+    if (closedir(dir) != 0) {
+        printf("close dir failed");
     }
     if (std::remove((g_folderpath + fileName).c_str()) != 0) {
-        printf("delete file: %s failed", (g_folderpath + fileName).c_str());
+        printf("remove file: %s failed", (g_folderpath + fileName).c_str());
     }
     return false;
 }
@@ -433,51 +482,13 @@ void VirtualDevice::Close()
     }
 }
 
-void VirtualDevice::StartAllDevices()
-{
-    StartMouse();
-    StartKeyboard();
-    StartJoystick();
-    StartTrackball();
-    StartRemoteControl();
-    StartTrackpad();
-    StartKnob();
-    StartGamePad();
-    StartTouchPad();
-    StartTouchScreen();
-    StartPen();
-}
-
 bool VirtualDevice::CreateHandle(const std::string& deviceArgv)
 {
-    if (deviceArgv == "mouse") {
-        StartMouse();
-    } else if (deviceArgv == "keyboard") {
-        StartKeyboard();
-    } else if (deviceArgv == "joystick") {
-        StartJoystick();
-    } else if (deviceArgv == "trackball") {
-        StartTrackball();
-    } else if (deviceArgv == "remotecontrol") {
-        StartRemoteControl();
-    } else if (deviceArgv == "trackpad") {
-        StartTrackpad();
-    } else if (deviceArgv == "knob") {
-        StartKnob();
-    } else if (deviceArgv == "gamepad") {
-        StartGamePad();
-    } else if (deviceArgv == "touchpad") {
-        StartTouchPad();
-    } else if (deviceArgv == "touchscreen") {
-        StartTouchScreen();
-    } else if (deviceArgv == "pen") {
-        StartPen();
-    } else if (deviceArgv == "all") {
-        StartAllDevices();
-    } else {
+    if (mapFun.find(deviceArgv) == mapFun.end()) {
         printf("Please enter the device type correctly");
         return false;
     }
+    (*mapFun[deviceArgv])();
     return true;
 }
 
@@ -504,7 +515,7 @@ bool VirtualDevice::AddDevice(const std::string& startDeviceName)
 
 bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::vector<std::string>& deviceList)
 {
-    if (deviceList.size() <= 0) {
+    if (deviceList.size() == 0) {
         RemoveDir(g_folderpath);
         printf("no start device");
         return false;
@@ -519,7 +530,7 @@ bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::v
     for (auto it : deviceList) {
         if (it.find(closeDeviceName) == 0) {
             kill(atoi(it.c_str()), SIGKILL);
-            if (BrowseDirectory(g_folderpath).size() <= 0) {
+            if (BrowseDirectory(g_folderpath).size() == 0) {
                 RemoveDir(g_folderpath);
             }
             return true;

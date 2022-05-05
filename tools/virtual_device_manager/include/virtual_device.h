@@ -33,7 +33,6 @@ public:
     bool SetPhys(const std::string& deviceName);
     bool SetUp();
     void Close();
-    static void StartAllDevices();
     void MakeFolder(const std::string &filePath);
     static bool CreateHandle(const std::string& deviceArgv);
     static bool AddDevice(const std::string& startDeviceName);
