@@ -14,7 +14,7 @@
  */
 
 #include "i_input_interceptor_manager.h"
-#include "input_handler_type.h"
+#include "error_multimodal.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -26,7 +26,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInpu
 int32_t IInputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
     MMI_HILOGD("Add input module dose not support");
-    return INVALID_HANDLER_ID;
+    return ERROR_UNSUPPORT;
 }
 
 void IInputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
