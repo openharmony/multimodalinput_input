@@ -29,15 +29,6 @@ const std::string CREATE_REFERENCE = "napi_create_reference";
 const std::string GET_REFERENCE = "napi_get_reference_value";
 const std::string CALL_FUNCTION = "napi_call_function";
 } // namespace
-
-JsInputDeviceManager::JsInputDeviceManager()
-{
-    CALL_LOG_ENTER;
-    InputDevImpl.RegisterInputDeviceMonitor(TargetOn);
-}
-
-JsInputDeviceManager::~JsInputDeviceManager() {}
-
 void JsInputDeviceManager::RegisterInputDeviceMonitor(napi_env env, std::string type, napi_value handle)
 {
     CALL_LOG_ENTER;
@@ -163,7 +154,6 @@ napi_value JsInputDeviceManager::GetKeyboardType(napi_env env, int32_t id, napi_
 void JsInputDeviceManager::ResetEnv()
 {
     CALL_LOG_ENTER;
-    InputDevImpl.UnRegisterInputDeviceMonitor();
     JsEventTarget::ResetEnv();
 }
 } // namespace MMI

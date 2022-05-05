@@ -483,6 +483,10 @@ void JsEventTarget::AddMonitor(napi_env env, std::string type, napi_value handle
     monitor->env = env;
     monitor->ref = ref;
     iter->second.push_back(std::move(monitor));
+    if (!isMonitorProcess_) {
+        isMonitorProcess_ = true;
+        InputDevImpl.RegisterInputDeviceMonitor(TargetOn);
+    }
 }
 
 void JsEventTarget::RemoveMonitor(napi_env env, std::string type, napi_value handle)
@@ -496,15 +500,20 @@ void JsEventTarget::RemoveMonitor(napi_env env, std::string type, napi_value han
     }
     if (handle == nullptr) {
         iter->second.clear();
-        MMI_HILOGD("clear %{public}s monitor list", type.c_str());
-        return;
+        goto monitorLabel;
     }
     for (auto it = iter->second.begin(); it != iter->second.end(); ++it) {
         if (JsUtil::IsSameHandle(env, handle, (*it)->ref)) {
             MMI_HILOGD("succeeded in removing monitor");
             iter->second.erase(it);
-            return;
+            goto monitorLabel;
         }
+    }
+
+monitorLabel:
+    if (isMonitorProcess_ && iter->second.empty()) {
+        isMonitorProcess_ = false;
+        InputDevImpl.UnRegisterInputDeviceMonitor();
     }
 }
 
@@ -551,6 +560,7 @@ void JsEventTarget::ResetEnv()
     std::lock_guard<std::mutex> guard(mutex_);
     callback_.clear();
     devMonitor_.clear();
+    InputDevImpl.UnRegisterInputDeviceMonitor();
 }
 } // namespace MMI
 } // namespace OHOS

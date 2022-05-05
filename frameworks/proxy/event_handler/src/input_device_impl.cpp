@@ -42,6 +42,7 @@ void InputDeviceImpl::RegisterInputDeviceMonitor(std::function<void(std::string,
 
 void InputDeviceImpl::UnRegisterInputDeviceMonitor()
 {
+    CALL_LOG_ENTER;
     MMIEventHdl.UnRegisterInputDeviceMonitor();
 }
 
