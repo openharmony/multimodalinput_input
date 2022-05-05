@@ -21,6 +21,7 @@
 #include "nocopyable.h"
 #include "pointer_event.h"
 #include "i_event_filter.h"
+#include "i_key_command_manager.h"
 
 namespace OHOS {
 namespace MMI {
