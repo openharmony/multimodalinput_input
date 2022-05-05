@@ -14,10 +14,6 @@
  */
 
 #include "key_command_manager.h"
-#include <fstream>
-#include <sstream>
-#include <iostream>
-#include <algorithm>
 #include "ability_manager_client.h"
 #include "file_ex.h"
 #include "mmi_log.h"
@@ -43,7 +39,7 @@ std::string KeyCommandManager::GenerateKey(const ShortcutKey& key)
 {
     std::set<int32_t> preKeys = key.preKeys;
     std::stringstream oss;
-    for(const auto preKey: preKeys) {
+    for (const auto preKey: preKeys) {
         oss << preKey << ",";
     }
     oss << key.finalKey << ",";
@@ -213,7 +209,7 @@ bool KeyCommandManager::HandlerEvent(const std::shared_ptr<KeyEvent> event)
         }
         MMI_LOGD("eventkey matched, finalKey:%{public}d,bundleName:%{public}s",
             shortcutKey.finalKey, shortcutKey.ability.bundleName.c_str());
-        if(shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
+        if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
             return HandleKeyDown(shortcutKey);
         } else if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_UP) {
             return HandleKeyUp(event, shortcutKey);
@@ -236,7 +232,7 @@ bool KeyCommandManager::IsKeyMatch(const ShortcutKey &shortcutKey, const std::sh
     }
     for (const auto &item : key->GetKeyItems()) {
         int32_t keyCode = item.GetKeyCode();
-        if (keyCode == key->GetKeyCode()) { //finalkey not check
+        if (keyCode == key->GetKeyCode()) {
             continue;
         }
         auto res = shortcutKey.preKeys.find(keyCode);
@@ -297,7 +293,7 @@ bool KeyCommandManager::HandleKeyCancel(ShortcutKey &shortcutKey)
 {
     MMI_LOGD("enter");
     if (shortcutKey.timerId < 0) {
-       MMI_LOGE("Skip, timerid < 0"); 
+        MMI_LOGE("Skip, timerid < 0");
     }
     auto timerId = shortcutKey.timerId;
     shortcutKey.timerId = -1;
