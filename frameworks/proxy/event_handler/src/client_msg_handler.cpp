@@ -66,7 +66,6 @@ void ClientMsgHandler::Init()
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnDevMonitor, this)},
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
-        {MmiMessageId::TOUCHPAD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::TouchpadEventInterceptor, this)},
         {MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR, MsgCallbackBind2(&ClientMsgHandler::KeyEventInterceptor, this)},
     };
     for (auto& it : funs) {
@@ -368,27 +367,6 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
     InputHandlerManager::GetInstance().OnInputEvent(handlerId, pointerEvent);
     return RET_OK;
-}
-
-int32_t ClientMsgHandler::TouchpadEventInterceptor(const UDSClient& client, NetPacket& pkt)
-{
-    auto pointerEvent = PointerEvent::Create();
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    int32_t ret = InputEventDataTransformation::Unmarshalling(pkt, pointerEvent);
-    if (ret != RET_OK) {
-        MMI_HILOGE("read netPacket failed");
-        return RET_ERR;
-    }
-    int32_t pid = 0;
-    int32_t id = 0;
-    pkt >> pid >> id;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read pid failed");
-        return PACKET_READ_FAIL;
-    }
-    MMI_HILOGD("client receive the msg from server: pointId:%{public}d,pid:%{public}d",
-               pointerEvent->GetPointerId(), pid);
-    return InterMgr->OnPointerEvent(pointerEvent, id);
 }
 
 int32_t ClientMsgHandler::KeyEventInterceptor(const UDSClient& client, NetPacket& pkt)

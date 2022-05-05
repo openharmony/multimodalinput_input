@@ -21,27 +21,19 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "i_interceptor_manager.h"
-#include "pointer_event.h"
+#include "i_input_event_consumer.h"
 
 namespace OHOS {
 namespace MMI {
 class InterceptorManager : public DelayedSingleton<InterceptorManager> {
 public:
-    static constexpr int32_t SOURCETYPE_KEY = 4;
-
-public:
     InterceptorManager();
     DISALLOW_COPY_AND_MOVE(InterceptorManager);
     ~InterceptorManager() = default;
-    int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
     void RemoveInterceptor(int32_t interceptorId);
-    int32_t OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id);
-public:
-    static constexpr int32_t INVALID_INTERCEPTOR_ID { -1 };
-    int32_t OnKeyEvent(std::shared_ptr<KeyEvent> pointerEvent);
-    
+    int32_t OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+
 private:
     struct InterceptorItem {
         int32_t id_;
