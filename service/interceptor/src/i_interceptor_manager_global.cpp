@@ -35,12 +35,6 @@ void IInterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
     return;
 }
 
-bool IInterceptorManagerGlobal::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    MMI_HILOGD("Pointer inter module dose not support");
-    return false;
-}
-
 bool IInterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGD("Key inter module dose not support");

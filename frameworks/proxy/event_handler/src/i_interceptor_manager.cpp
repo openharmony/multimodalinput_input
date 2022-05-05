@@ -14,7 +14,7 @@
  */
 
 #include "i_interceptor_manager.h"
-#include "define_multimodal.h"
+#include "error_multimodal.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -23,17 +23,10 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInterceptorManager" };
 } // namespace
 
-int32_t IInterceptorManager::AddInterceptor(int32_t sourceType,
-    std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
-{
-    MMI_HILOGD("Add mgr module dose not support");
-    return RET_ERR;
-}
-
 int32_t IInterceptorManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
     MMI_HILOGD("Add mgr module dose not support");
-    return RET_ERR;
+    return ERROR_UNSUPPORT;
 }
 
 void IInterceptorManager::RemoveInterceptor(int32_t interceptorId)
@@ -42,16 +35,10 @@ void IInterceptorManager::RemoveInterceptor(int32_t interceptorId)
     return;
 }
 
-int32_t IInterceptorManager::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent, int32_t id)
-{
-    MMI_HILOGD("Pointer mgr module dose not support");
-    return RET_ERR;
-}
-
 int32_t IInterceptorManager::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGD("Key mgr module dose not support");
-    return RET_ERR;
+    return ERROR_UNSUPPORT;
 }
 } // namespace MMI
 } // namespace OHOS

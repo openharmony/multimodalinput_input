@@ -13,7 +13,6 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//foundation/appexecfwk/standard/appexecfwk.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 module_output_path = "multimodalinput/unit_out"
 
@@ -31,7 +30,7 @@ config("libmmi_client_config") {
 
 config("libmmi_public_client_config") {
   include_dirs = [
-    "${appexecfwk_path}/interfaces/innerkits/libeventhandler/include",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/libeventhandler/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
@@ -425,15 +424,5 @@ ohos_unittest("PointerEventTest") {
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-  ]
-}
-
-group("ut-mmi-proxy") {
-  testonly = true
-  deps = [
-    ":InputManagerTest",
-    ":KeyEventTest",
-    ":PointerEventTest",
-    ":ut-mmi-proxy-out",
   ]
 }

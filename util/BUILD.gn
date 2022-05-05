@@ -187,11 +187,3 @@ ohos_unittest("RunShellUtilTest") {
     "ipc:ipc_core",
   ]
 }
-
-group("ut-mmi-util") {
-  testonly = true
-  deps = [
-    ":RunShellUtilTest",
-    ":ut-mmi-util-out",
-  ]
-}
