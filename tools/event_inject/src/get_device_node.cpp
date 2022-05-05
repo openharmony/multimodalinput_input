@@ -28,11 +28,13 @@ GetDeviceNode::GetDeviceNode()
 
 int32_t GetDeviceNode::GetDeviceNodeName(const std::string &targetName, uint16_t devIndex, std::string &deviceNode)
 {
-    std::string cmd = "cat /proc/bus/input/devices";
-    std::vector<std::string> cmdResult;
-    ExecuteCmd(cmd, cmdResult);
+    std::vector<std::string> fileStrs = ReadDeviceFile();
+    if (fileStrs.size() == 0) {
+        MMI_HILOGE("fileStrs is faild");
+        return RET_ERR;
+    }
     DeviceList deviceList;
-    GetDeviceCmd(cmdResult, deviceList);
+    AnalyseDevices(fileStrs, deviceList);
     if (deviceList.empty()) {
         MMI_HILOGE("device list is null");
         return RET_ERR;
@@ -77,28 +79,34 @@ void GetDeviceNode::InitDeviceInfo()
     deviceList_["trackpad model2"] = "Virtual Trackpad";
 }
 
-int32_t GetDeviceNode::ExecuteCmd(const std::string cmd, std::vector<std::string> &cmdResult)
+std::vector<std::string> GetDeviceNode::ReadDeviceFile()
 {
-    if (cmd.empty()) {
-        MMI_HILOGE("cmd is null");
-        return RET_ERR;
+    std::string openPath = "/proc/bus/input/devices";
+    char realPath[PATH_MAX] = {};
+    if (realpath(openPath.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("path is error, path:%{public}s", openPath.c_str());
+        return {};
     }
-    FILE* pin = popen(cmd.c_str(), "r");
-    CHKPR(pin, RET_ERR);
-    cmdResult.clear();
-    char buffer[READ_CMD_BUFF_SIZE] = {};
-    while (!feof(pin)) {
-        if (fgets(buffer, sizeof(buffer), pin) != nullptr) {
-            cmdResult.push_back(buffer);
-        }
+    FILE* fp = fopen(openPath.c_str(), "r");
+    if (fp == nullptr) {
+        MMI_HILOGW("open file: %{pulic}s failed", openPath.c_str());
+        return {};
     }
-    return pclose(pin);
+    char buf[READ_CMD_BUFF_SIZE] = {};
+    std::vector<std::string> deviceStrs;
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        deviceStrs.push_back(buf);
+    }
+    if (fclose(fp) != 0) {
+        MMI_HILOGW("close file: %{pulic}s failed", openPath.c_str());
+    }
+    return deviceStrs;
 }
 
-void GetDeviceNode::GetDeviceCmd(const std::vector<std::string>& cmdResult, DeviceList& deviceList) const
+void GetDeviceNode::AnalyseDevices(const std::vector<std::string>& deviceStrs, DeviceList& deviceList) const
 {
     std::string name;
-    for (const auto &item : cmdResult) {
+    for (const auto &item : deviceStrs) {
         if (item.empty()) {
             MMI_HILOGE("device info is none");
             return;

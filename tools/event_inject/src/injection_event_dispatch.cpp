@@ -71,10 +71,6 @@ int32_t InjectionEventDispatch::OnJson()
         MMI_HILOGE("This file does not exist, jsonFile:%{public}s", jsonFile.c_str());
         return RET_ERR;
     }
-    if (VerifyFile(jsonFile)) {
-        MMI_HILOGE("This file is not in data, jsonFile:%{public}s", jsonFile.c_str());
-        return RET_ERR;
-    }
     if (GetFileExtendName(jsonFile) != "json") {
         MMI_HILOGE("Unable to parse files other than json format jsonFile:%{public}s", jsonFile.c_str());
         return RET_ERR;
