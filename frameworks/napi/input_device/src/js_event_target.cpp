@@ -74,7 +74,7 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
         napi_value deviceId = nullptr;
         CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &deviceId), CREATE_INT32);
         napi_value object = nullptr;
-        CHKRV(item->env, napi_create_object(item->env, &object), CREATE_OBJECT);    
+        CHKRV(item->env, napi_create_object(item->env, &object), CREATE_OBJECT);
         CHKRV(item->env, napi_set_named_property(item->env, object, "type", eventType), SET_NAMED_PROPERTY);
         CHKRV(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY);
 
@@ -111,7 +111,7 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
         napi_value deviceId = nullptr;
         CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &deviceId), CREATE_INT32);
         napi_value object = nullptr;
-        CHKRV(item->env, napi_create_object(item->env, &object), CREATE_OBJECT);    
+        CHKRV(item->env, napi_create_object(item->env, &object), CREATE_OBJECT);
         CHKRV(item->env, napi_set_named_property(item->env, object, "type", eventType), SET_NAMED_PROPERTY);
         CHKRV(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY);
 
