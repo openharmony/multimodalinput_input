@@ -222,11 +222,6 @@ public:
      */
     int32_t SetPointerVisible(bool visible);
 
-    /**
-     * @brief 判断鼠标图标是否显示
-     * @return 鼠标图标是否显示, true表示显示，false表示隐藏
-     * @since 9
-     */
     bool IsPointerVisible();
 
 private:
