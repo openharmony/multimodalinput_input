@@ -18,7 +18,6 @@
 #include "error_multimodal.h"
 #include "input_event_monitor_manager.h"
 #include "input_manager_impl.h"
-#include "interceptor_manager.h"
 #include "key_event_input_subscribe_manager.h"
 #include "define_multimodal.h"
 #include "multimodal_event_handler.h"
@@ -102,17 +101,15 @@ void InputManager::MoveMouse(int32_t offsetX, int32_t offsetY)
     InputMgrImpl->MoveMouse(offsetX, offsetY);
 }
 
-int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
+int32_t InputManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
     return InputMgrImpl->AddInterceptor(interceptor);
 }
-
-int32_t InputManager::AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
+int32_t InputManager::AddInterceptor(std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
 {
-    return -1;
+    return InputMgrImpl->AddInterceptor(interceptor);
 }
-
-int32_t InputManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
+int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
     return InputMgrImpl->AddInterceptor(interceptor);
 }
