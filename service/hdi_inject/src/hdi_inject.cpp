@@ -54,6 +54,10 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
         }
         case SET_EVENT_INJECT: {
             pkt >> devIndex >> speechEvent;
+            if (pkt.ChkRWError()) {
+                MMI_HILOGE("Packet read recv massage failed");
+                return RET_ERR;
+            }
             MMI_HILOGI("hdi server recv massage: devIndex:%{public}d", devIndex);
             OnSetEventInject(speechEvent, devIndex);
             break;
@@ -64,6 +68,10 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
         }
         case SET_HOT_PLUGS: {
             pkt >> devIndex >> devSatatus;
+            if (pkt.ChkRWError()) {
+                MMI_HILOGE("Packet read tool hot data failed");
+                return RET_ERR;
+            }
             MMI_HILOGI("recv inject tool hot data, devIndex:%{public}d,status:%{public}d", devIndex, devSatatus);
             OnSetHotPlugs(devIndex, devSatatus);
             break;
