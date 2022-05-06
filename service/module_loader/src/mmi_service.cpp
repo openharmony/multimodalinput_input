@@ -19,16 +19,20 @@
 #include <csignal>
 
 #include <sys/signalfd.h>
+#ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
+#endif
 
 #include "event_dump.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
+#ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
 #include "res_type.h"
 #include "system_ability_definition.h"
+#endif
 #include "timer_manager.h"
 #include "util.h"
 
@@ -218,7 +222,9 @@ void MMIService::OnStart()
     state_ = ServiceRunningState::STATE_RUNNING;
     MMI_HILOGD("Started successfully");
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
+#ifdef OHOS_RSS_CLIENT
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
+#endif
     t_.join();
 }
 
@@ -229,7 +235,9 @@ void MMIService::OnStop()
     InputHandler->Clear();
     libinputAdapter_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;
+#ifdef OHOS_RSS_CLIENT
     RemoveSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
+#endif
 }
 
 void MMIService::OnDump()
@@ -311,6 +319,7 @@ int32_t MMIService::SetPointerVisible(bool visible)
     return RET_OK;
 }
 
+#ifdef OHOS_RSS_CLIENT
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
@@ -321,9 +330,10 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& 
         payload["uid"] = std::to_string(getuid());
         payload["pid"] = std::to_string(getpid());
         ResourceSchedule::ResSchedClient::GetInstance().ReportData(
-            ResourceSchedule::ResType::RES_TYPE_REPORT_MMI_PROCESS, (int64_t)tid, payload);
+            ResourceSchedule::ResType::RES_TYPE_REPORT_MMI_PROCESS, tid, payload);
     }
 }
+#endif
 
 void MMIService::OnTimer()
 {
@@ -338,7 +348,9 @@ void MMIService::OnThread()
     SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadId();
     MMI_HILOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
+#ifdef OHOS_RSS_CLIENT
     tid_.store(tid);
+#endif
 
     int32_t count = 0;
     constexpr int32_t timeOut = 1;
