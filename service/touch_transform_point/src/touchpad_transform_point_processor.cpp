@@ -53,6 +53,10 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(struct libinput_event 
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     PointerEvent::PointerItem item;
     auto pressure = libinput_event_touchpad_get_pressure(data);
+    auto axisLong = libinput_event_touchpad_get_touch_contact_axis_Long(data);
+    auto axisShort = libinput_event_touchpad_get_touch_contact_axis_short(data);
+    item.SetAxisLong(axisLong);
+    item.SetAxisShort(axisShort);
     item.SetPressure(pressure);
     item.SetPointerId(seatSlot);
     item.SetDownTime(time);
@@ -85,6 +89,10 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(struct libinput_even
         return;
     }
     auto pressure = libinput_event_touchpad_get_pressure(data);
+    auto axisLong = libinput_event_touchpad_get_touch_contact_axis_Long(data);
+    auto axisShort = libinput_event_touchpad_get_touch_contact_axis_short(data);
+    item.SetAxisLong(axisLong);
+    item.SetAxisShort(axisShort);
     item.SetPressure(pressure);
     item.SetGlobalX(static_cast<int32_t>(logicalX));
     item.SetGlobalY(static_cast<int32_t>(logicalY));
