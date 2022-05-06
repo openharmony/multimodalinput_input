@@ -68,15 +68,9 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
     CHKPV(asyncContext->env);
     napi_env env = asyncContext->env;
     napi_value resource = nullptr;
-    CHKRV(env, napi_create_string_utf8(env, "asyncWork", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
+    CHKRV(env, napi_create_string_utf8(env, "AsyncCallbackWork", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
     asyncContext->IncStrongRef(nullptr);
-    napi_status status = napi_create_async_work(env, nullptr, resource,
-        [](napi_env env, void* data) {
-            AsyncContext* asyncContext = static_cast<AsyncContext*>(data);
-            bool visible;
-            asyncContext->reserve >> visible;
-            asyncContext->errorCode = InputManager::GetInstance()->SetPointerVisible(visible);
-        },
+    napi_status status = napi_create_async_work(env, nullptr, resource, [](napi_env env, void* data) {},
         [](napi_env env, napi_status status, void* data) {
             sptr<AsyncContext> asyncContext(static_cast<AsyncContext *>(data));
             /**
@@ -87,8 +81,7 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
              * count of the smart pointer is guaranteed to be 1.
              */
             asyncContext->DecStrongRef(nullptr);
-            napi_value result = nullptr;
-            CHKRV(env, napi_get_undefined(env, &result), GET_UNDEFINED);
+            napi_value result = asyncContext->getResult();
             if (asyncContext->deferred) {
                 if (asyncContext->errorCode == RET_OK) {
                     CHKRV(env, napi_resolve_deferred(env, asyncContext->deferred, result), RESOLVE_DEFERRED);
@@ -117,7 +110,33 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
         THROWERR(env, "create AsyncContext failed");
         return nullptr;
     }
-    asyncContext->reserve << visible;
+
+    asyncContext->errorCode = InputManager::GetInstance()->SetPointerVisible(visible);
+    asyncContext->reserve << AsyncContext::RESULT_TYPE::VOID;
+
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(env, napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(env, napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsInputDeviceManager::IsPointerVisible(napi_env env, napi_value handle)
+{
+    CALL_LOG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    if (asyncContext == nullptr) {
+        THROWERR(env, "create AsyncContext failed");
+        return nullptr;
+    }
+
+    bool visible = InputManager::GetInstance()->IsPointerVisible();
+    asyncContext->errorCode = ERR_OK;
+    asyncContext->reserve << AsyncContext::RESULT_TYPE::BOOL << visible;
 
     napi_value promise = nullptr;
     if (handle != nullptr) {
