@@ -17,8 +17,8 @@
 #define JS_UTIL_H
 
 #include <uv.h>
-#include <sstream>
 
+#include "stream_buffer.h"
 #include "input_device_impl.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -62,9 +62,17 @@ public:
     napi_deferred deferred = nullptr;
     napi_ref callback = nullptr;
     int32_t errorCode {-1};
-    std::stringstream reserve;
+    StreamBuffer reserve;
     AsyncContext(napi_env env) : env(env) {}
     ~AsyncContext();
+
+    enum RESULT_TYPE
+    {
+        VOID,
+        BOOL,
+        NUMBER,
+    };
+    napi_value getResult();
 };
 } // namespace MMI
 } // namespace OHOS

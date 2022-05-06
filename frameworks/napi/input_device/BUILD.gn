@@ -19,6 +19,7 @@ config("libinputdevice_config") {
   include_dirs = [
     "//foundation/multimodalinput/input/frameworks/napi/input_device/include",
     "//foundation/multimodalinput/input/util/common/include",
+    "//foundation/multimodalinput/input/util/network/include",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]

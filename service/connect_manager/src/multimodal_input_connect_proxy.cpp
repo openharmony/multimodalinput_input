@@ -134,5 +134,26 @@ int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
     }
     return result;
 }
+
+int32_t MultimodalInputConnectProxy::IsPointerVisible(bool &visible)
+{
+    CALL_LOG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t requestResult = Remote()->SendRequest(IS_POINTER_VISIBLE, data, reply, option);
+    if (requestResult != NO_ERROR) {
+        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
+        return RET_ERR;
+    }
+
+    visible = reply.ReadBool();
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
