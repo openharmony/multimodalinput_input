@@ -78,6 +78,10 @@ config("libmmi_server_config") {
   if (mmi_enable_interceptor) {
     cflags += [ "-DOHOS_BUILD_ENABLE_INTERCEPTOR" ]
   }
+
+  if (resource_schedule_service_enabled) {
+    cflags += [ "-DOHOS_RSS_CLIENT" ]
+  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
@@ -182,6 +186,10 @@ ohos_shared_library("libmmi-server") {
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
+  }
+
+  if (resource_schedule_service_enabled) {
+    deps += [ "//foundation/resourceschedule/resource_schedule_service/ressched/interfaces/innerkits/ressched_client:ressched_client" ]
   }
 
   external_deps = [
