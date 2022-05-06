@@ -58,7 +58,8 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     CHKPP(inputDevice);
     inputDevice->SetId(iter->first);
     inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(iter->second)));
-    inputDevice->SetName(libinput_device_get_name(iter->second));
+    auto name = libinput_device_get_name(iter->second);
+    inputDevice->SetName((name == nullptr) ? ("null") : (name));
     inputDevice->SetBustype(libinput_device_get_id_bustype(iter->second));
     inputDevice->SetVersion(libinput_device_get_id_version(iter->second));
     inputDevice->SetProduct(libinput_device_get_id_product(iter->second));
