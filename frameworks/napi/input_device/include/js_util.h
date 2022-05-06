@@ -66,8 +66,7 @@ public:
     AsyncContext(napi_env env) : env(env) {}
     ~AsyncContext();
 
-    enum RESULT_TYPE
-    {
+    enum RESULT_TYPE {
         VOID,
         BOOL,
         NUMBER,
