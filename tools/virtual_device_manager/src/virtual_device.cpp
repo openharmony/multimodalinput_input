@@ -109,7 +109,7 @@ void RemoveDir(const std::string& filePath)
         printf("close dir: %s failed", filePath.c_str());
     }
     if (std::remove(filePath.c_str()) != 0) {
-        printf("remove file: %s failed", filePath.c_str());
+        printf("remove dir: %s failed", filePath.c_str());
     }
     return;
 }
@@ -515,7 +515,7 @@ bool VirtualDevice::AddDevice(const std::string& startDeviceName)
 
 bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::vector<std::string>& deviceList)
 {
-    if (deviceList.size() == 0) {
+    if (deviceList.empty()) {
         RemoveDir(g_folderpath);
         printf("no start device");
         return false;
