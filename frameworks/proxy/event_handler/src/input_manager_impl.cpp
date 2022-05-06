@@ -475,7 +475,6 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
-
     std::lock_guard<std::mutex> guard(mtx_);
     CHKPR(interceptor, ERROR_NULL_POINTER);
 
