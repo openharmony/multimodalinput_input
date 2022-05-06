@@ -166,6 +166,8 @@ int32_t MMIService::Init()
 
 void MMIService::OnStart()
 {
+    int sleepSeconds = 3;
+    sleep(sleepSeconds);
     auto tid = GetThisThreadIdOfLL();
     MMI_LOGD("Thread tid:%{public}" PRId64 "", tid);
 
