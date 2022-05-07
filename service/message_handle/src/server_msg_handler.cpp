@@ -292,7 +292,6 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 
 int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
 {
-    MMI_HILOGD("gwj --- ServerMsgHandler::OnAddInputHandler");
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t handlerId;
     InputHandlerType handlerType;
