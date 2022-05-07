@@ -55,8 +55,7 @@ public:
     static bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
 };
 
-class AsyncContext : public RefBase {
-public:
+struct AsyncContext : RefBase {
     napi_env env = nullptr;
     napi_async_work work = nullptr;
     napi_deferred deferred = nullptr;
@@ -65,13 +64,6 @@ public:
     StreamBuffer reserve;
     AsyncContext(napi_env env) : env(env) {}
     ~AsyncContext();
-
-    enum RESULT_TYPE {
-        VOID,
-        BOOL,
-        NUMBER,
-    };
-    napi_value getResult();
 };
 } // namespace MMI
 } // namespace OHOS

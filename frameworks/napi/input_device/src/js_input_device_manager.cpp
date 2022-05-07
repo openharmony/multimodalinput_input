@@ -28,6 +28,14 @@ const std::string REJECT_DEFERRED = "napi_reject_deferred";
 const std::string CREATE_REFERENCE = "napi_create_reference";
 const std::string GET_REFERENCE = "napi_get_reference_value";
 const std::string CALL_FUNCTION = "napi_call_function";
+const std::string CREATE_BOOL = "napi_get_boolean";
+const std::string CREATE_INT32 = "napi_create_int32";
+
+enum Return_Type {
+    RETURN_VOID,
+    RETURN_BOOL,
+    RETURN_NUMBER,
+};
 } // namespace
 void JsInputDeviceManager::RegisterInputDeviceMonitor(napi_env env, std::string type, napi_value handle)
 {
@@ -61,6 +69,27 @@ napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value 
     return ret;
 }
 
+napi_value getResult(sptr<AsyncContext> asyncContext)
+{
+    CALL_LOG_ENTER;
+    napi_env env = asyncContext->env;
+    napi_value results;
+    int32_t resultType;
+    asyncContext->reserve >> resultType;
+    if (resultType == RETURN_BOOL) {
+        bool temp;
+        asyncContext->reserve >> temp;
+        CHKRP(env, napi_get_boolean(env, temp, &results), CREATE_BOOL);
+    } else if (resultType == RETURN_NUMBER) {
+        int32_t temp;
+        asyncContext->reserve >> temp;
+        CHKRP(env, napi_create_int32(env, temp, &results), CREATE_INT32);
+    } else {
+        CHKRP(env, napi_get_undefined(env, &results), GET_UNDEFINED);
+    }
+    return results;
+}
+
 void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
 {
     CALL_LOG_ENTER;
@@ -81,7 +110,7 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
              * count of the smart pointer is guaranteed to be 1.
              */
             asyncContext->DecStrongRef(nullptr);
-            napi_value result = asyncContext->getResult();
+            napi_value result = getResult(asyncContext);
             if (asyncContext->deferred) {
                 if (asyncContext->errorCode == RET_OK) {
                     CHKRV(env, napi_resolve_deferred(env, asyncContext->deferred, result), RESOLVE_DEFERRED);
@@ -112,7 +141,7 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
     }
 
     asyncContext->errorCode = InputManager::GetInstance()->SetPointerVisible(visible);
-    asyncContext->reserve << AsyncContext::RESULT_TYPE::VOID;
+    asyncContext->reserve << RETURN_VOID;
 
     napi_value promise = nullptr;
     if (handle != nullptr) {
@@ -136,7 +165,7 @@ napi_value JsInputDeviceManager::IsPointerVisible(napi_env env, napi_value handl
 
     bool visible = InputManager::GetInstance()->IsPointerVisible();
     asyncContext->errorCode = ERR_OK;
-    asyncContext->reserve << AsyncContext::RESULT_TYPE::BOOL << visible;
+    asyncContext->reserve << RETURN_BOOL << visible;
 
     napi_value promise = nullptr;
     if (handle != nullptr) {

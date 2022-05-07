@@ -27,8 +27,6 @@ const std::string STRICT_EQUALS = "napi_strict_equals";
 const std::string DELETE_REFERENCE = "napi_delete_reference";
 const std::string CREATE_ARRAY = "napi_create_array";
 const std::string CREATE_INT32 = "napi_create_int32";
-const std::string CREATE_BOOL = "napi_get_boolean";
-const std::string GET_UNDEFINED = "napi_get_undefined";
 const std::string SET_ELEMENT = "napi_set_element";
 const std::string SET_NAMED_PROPERTY = "napi_set_named_property";
 const std::string CREATE_STRING_UTF8 = "napi_create_string_utf8";
@@ -230,27 +228,6 @@ AsyncContext::~AsyncContext()
         CHKRV(env, napi_delete_reference(env, callback), DELETE_REFERENCE);
         env = nullptr;
     }
-}
-
-napi_value AsyncContext::getResult()
-{
-    CALL_LOG_ENTER;
-    napi_value results;
-    int32_t resultType;
-    reserve >> resultType;
-    if (resultType == RESULT_TYPE::BOOL) {
-        bool temp;
-        reserve >> temp;
-        CHKRP(env, napi_get_boolean(env, temp, &results), CREATE_BOOL);
-    } else if (resultType == RESULT_TYPE::NUMBER) {
-        int32_t temp;
-        reserve >> temp;
-        CHKRP(env, napi_create_int32(env, temp, &results), CREATE_INT32);
-    } else {
-        CHKRP(env, napi_get_undefined(env, &results), GET_UNDEFINED);
-    }
-
-    return results;
 }
 } // namespace MMI
 } // namespace OHOS
