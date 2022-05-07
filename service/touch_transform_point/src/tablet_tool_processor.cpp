@@ -69,7 +69,7 @@ int32_t TabletToolProcessor::GetToolType(struct libinput_event_tablet_tool* tabl
     int32_t toolType = libinput_event_tablet_tool_get_tool_type(tabletEvent);
     if (toolType != 0) {
         return PointerEvent::TOOL_TYPE_PEN;
-    } 
+    }
     auto tool = libinput_event_tablet_tool_get_tool(tabletEvent);
     int32_t type = libinput_tablet_tool_get_type(tool);
     switch (type) {
@@ -87,11 +87,11 @@ int32_t TabletToolProcessor::GetToolType(struct libinput_event_tablet_tool* tabl
         }
         case LIBINPUT_TABLET_TOOL_TYPE_AIRBRUSH: {
             return PointerEvent::TOOL_TYPE_AIRBRUSH;
-        }       
+        }
         case LIBINPUT_TABLET_TOOL_TYPE_MOUSE: {
             return PointerEvent::TOOL_TYPE_MOUSE;
         }
-        case LIBINPUT_TABLET_TOOL_TYPE_LENS:{
+        case LIBINPUT_TABLET_TOOL_TYPE_LENS: {
             return PointerEvent::TOOL_TYPE_LENS;
         }
         case LIBINPUT_TABLET_TOOL_TYPE_TOTEM: {
