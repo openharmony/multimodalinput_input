@@ -245,51 +245,37 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 
     std::vector<PhysicalDisplayInfo> physicalDisplays;
     int32_t num = 0;
-    pkt.Read(num);
+    pkt >> num;
     for (int32_t i = 0; i < num; i++) {
         PhysicalDisplayInfo info;
-        pkt.Read(info.id);
-        pkt.Read(info.leftDisplayId);
-        pkt.Read(info.upDisplayId);
-        pkt.Read(info.topLeftX);
-        pkt.Read(info.topLeftY);
-        pkt.Read(info.width);
-        pkt.Read(info.height);
-        pkt.Read(info.name);
-        pkt.Read(info.seatId);
-        pkt.Read(info.seatName);
-        pkt.Read(info.logicWidth);
-        pkt.Read(info.logicHeight);
-        pkt.Read(info.direction);
+        pkt >> info.id >> info.leftDisplayId >> info.upDisplayId >> info.topLeftX >> info.topLeftY
+            >> info.width >> info.height >> info.name >> info.seatId >> info.seatName >> info.logicWidth
+            >> info.logicHeight >> info.direction;
         physicalDisplays.push_back(info);
     }
 
     std::vector<LogicalDisplayInfo> logicalDisplays;
-    pkt.Read(num);
+    pkt >> num;
     for (int32_t i = 0; i < num; i++) {
         LogicalDisplayInfo info;
-        pkt.Read(info.id);
-        pkt.Read(info.topLeftX);
-        pkt.Read(info.topLeftY);
-        pkt.Read(info.width);
-        pkt.Read(info.height);
-        pkt.Read(info.name);
-        pkt.Read(info.seatId);
-        pkt.Read(info.seatName);
-        pkt.Read(info.focusWindowId);
+        pkt >> info.id >> info.topLeftX >> info.topLeftY >> info.width >> info.height
+            >> info.name >> info.seatId >> info.seatName >> info.focusWindowId;
 
         std::vector<WindowInfo> windowInfos;
         int32_t numWindow = 0;
-        pkt.Read(numWindow);
+        pkt >> numWindow;
         for (int32_t j = 0; j < numWindow; j++) {
             WindowInfo info;
-            pkt.Read(info);
+            pkt >> info;
             windowInfos.push_back(info);
         }
         info.windowsInfo = windowInfos;
         logicalDisplays.push_back(info);
     }
-
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read display info failed");
+        return RET_ERR;
+    }
     InputWindowsManager::GetInstance()->UpdateDisplayInfo(physicalDisplays, logicalDisplays);
     return RET_OK;
 }
@@ -299,12 +285,9 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t handlerId;
     InputHandlerType handlerType;
-    if (!pkt.Read(handlerId)) {
-        MMI_HILOGE("Packet read handler failed");
-        return RET_ERR;
-    }
-    if (!pkt.Read(handlerType)) {
-        MMI_HILOGE("Packet read handlerType failed");
+    pkt >> handlerId >> handlerType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read add input data failed");
         return RET_ERR;
     }
     MMI_HILOGD("OnAddInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
@@ -318,12 +301,9 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t handlerId;
     InputHandlerType handlerType;
-    if (!pkt.Read(handlerId)) {
-        MMI_HILOGE("Packet read handler failed");
-        return RET_ERR;
-    }
-    if (!pkt.Read(handlerType)) {
-        MMI_HILOGE("Packet read handlerType failed");
+    pkt >> handlerId >> handlerType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read remove input data failed");
         return RET_ERR;
     }
     MMI_HILOGD("OnRemoveInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
@@ -334,13 +314,11 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
 
 int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, NetPacket& pkt)
 {
+    CHKPR(sess, ERROR_NULL_POINTER);
     int32_t monitorId, eventId;
-    if (!pkt.Read(monitorId)) {
-        MMI_HILOGE("Packet read monitor failed");
-        return RET_ERR;
-    }
-    if (!pkt.Read(eventId)) {
-        MMI_HILOGE("Packet read event failed");
+    pkt >> monitorId >> eventId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read monitor data failed");
         return RET_ERR;
     }
     InputHandlerManagerGlobal::GetInstance().MarkConsumed(monitorId, eventId, sess);
@@ -353,15 +331,11 @@ int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
     CALL_LOG_ENTER;
     int32_t offsetX = 0;
     int32_t offsetY = 0;
-    if (!pkt.Read(offsetX)) {
-        MMI_HILOGE("Packet read offsetX failed");
+    pkt >> offsetX >> offsetY;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read offset X Y data failed");
         return RET_ERR;
     }
-    if (!pkt.Read(offsetY)) {
-        MMI_HILOGE("Packet read offsetY failed");
-        return RET_ERR;
-    }
-
     if (MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
         auto pointerEvent = MouseEventHdr->GetPointerEvent();
         eventDispatch_.HandlePointerEvent(pointerEvent);
@@ -416,26 +390,17 @@ int32_t ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
     CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData = 0;
-    if (!pkt.Read(userData)) {
+    pkt >> userData;
+    if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read userData failed");
         return RET_ERR;
     }
     std::vector<int32_t> ids = InputDevMgr->GetInputDeviceIds();
     int32_t size = static_cast<int32_t>(ids.size());
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE_IDS);
-    if (!pkt2.Write(userData)) {
-        MMI_HILOGE("Packet write userData failed");
-        return RET_ERR;
-    }
-    if (!pkt2.Write(size)) {
-        MMI_HILOGE("Packet write size failed");
-        return RET_ERR;
-    }
+    pkt2 << userData << size;
     for (const auto& item : ids) {
-        if (!pkt2.Write(item)) {
-            MMI_HILOGE("Packet write item failed");
-            return RET_ERR;
-        }
+        pkt2 << item;
     }
     if (!sess->SendMsg(pkt2)) {
         MMI_HILOGE("Sending failed");
@@ -510,45 +475,22 @@ int32_t ServerMsgHandler::OnSupportKeys(SessionPtr sess, NetPacket& pkt)
     CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData;
-    if (!pkt.Read(userData)) {
-        MMI_HILOGE("Packet read userData failed");
-        return RET_ERR;
-    }
-    int32_t deviceId;
-    if (!pkt.Read(deviceId)) {
-        MMI_HILOGE("Packet read device failed");
-        return RET_ERR;
-    }
-    size_t size;
-    if (!pkt.Read(size)) {
-        MMI_HILOGE("Packet read size failed");
-        return RET_ERR;
-    }
+    pkt >> userData >> deviceId >> size;
     int32_t sysKeyValue;
     std::vector<int32_t> keyCode;
     for (size_t i = 0 ; i < size; ++i) {
-        if (!pkt.Read(sysKeyValue)) {
-            MMI_HILOGE("Packet read nativeKeyValue failed");
-            return RET_ERR;
-        }
+        pkt >> sysKeyValue;
         keyCode.push_back(sysKeyValue);
     }
-
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read key info failed");
+        return RET_ERR;
+    }
     std::vector<bool> keystroke = InputDevMgr->SupportKeys(deviceId, keyCode);
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
-    if (!pkt2.Write(userData)) {
-        MMI_HILOGE("Packet write userData failed");
-        return RET_ERR;
-    }
-    if (!pkt2.Write(keystroke.size())) {
-        MMI_HILOGE("Packet write size failed");
-        return RET_ERR;
-    }
+    pkt2 << userData << keystroke.size();
     for (const auto &item : keystroke) {
-        if (!pkt2.Write(static_cast<bool>(item))) {
-            MMI_HILOGE("Packet write keystroke failed");
-            return RET_ERR;
-        }
+        pkt2 << static_cast<bool>(item);
     }
     if (!sess->SendMsg(pkt2)) {
         MMI_HILOGE("Sending failed");
@@ -565,14 +507,7 @@ int32_t ServerMsgHandler::OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pk
         CALL_LOG_ENTER;
         CHKPV(sess);
         NetPacket pkt2(MmiMessageId::ADD_INPUT_DEVICE_MONITOR);
-        if (!pkt2.Write(type)) {
-            MMI_HILOGE("Packet write type failed");
-            return;
-        }
-        if (!pkt2.Write(deviceId)) {
-            MMI_HILOGE("Packet write deviceId failed");
-            return;
-        }
+        pkt2 << type << deviceId;
         if (!sess->SendMsg(pkt2)) {
             MMI_HILOGE("Sending failed");
             return;

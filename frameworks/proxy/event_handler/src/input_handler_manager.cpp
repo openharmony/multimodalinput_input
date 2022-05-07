@@ -71,10 +71,7 @@ void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::MARK_CONSUMED);
-    if (!pkt.Write(monitorId) || !pkt.Write(eventId)) {
-        MMI_HILOGE("Packet write is error, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
-        return;
-    }
+    pkt << monitorId << eventId;
     if (!client->SendMessage(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
@@ -134,10 +131,7 @@ void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType h
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_HANDLER);
-    if (!pkt.Write(handlerId) || !pkt.Write(handlerType)) {
-        MMI_HILOGE("Packet write is error, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
-        return;
-    }
+    pkt << handlerId << handlerType;
     if (!client->SendMessage(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
