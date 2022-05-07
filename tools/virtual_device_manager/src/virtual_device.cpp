@@ -512,6 +512,10 @@ bool VirtualDevice::AddDevice(const std::string& startDeviceName)
 
 bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::vector<std::string>& deviceList)
 {
+    if (BrowseDirectory(g_folderpath).size() == 0) {
+        printf("no device to off");
+        return false;
+    }
     if (deviceList.empty()) {
         RemoveDir(g_folderpath);
         printf("no start device");
