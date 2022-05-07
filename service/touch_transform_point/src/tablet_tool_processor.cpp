@@ -64,36 +64,43 @@ std::shared_ptr<PointerEvent> TabletToolProcessor::OnEvent(struct libinput_event
     return pointerEvent_;
 }
 
-int32_t TabletToolProcessor::GetToolType(struct libinput_event* event, struct libinput_event_tablet_tool* tabletEvent)
+int32_t TabletToolProcessor::GetToolType(struct libinput_event_tablet_tool* tabletEvent)
 {
-    if (tabletEvent == nullptr) {
-        tabletEvent = libinput_event_get_tablet_tool_event(event);
-    }
     int32_t toolType = libinput_event_tablet_tool_get_tool_type(tabletEvent);
-    if (toolType) {
+    if (toolType != 0) {
         return PointerEvent::TOOL_TYPE_PEN;
     } 
     auto tool = libinput_event_tablet_tool_get_tool(tabletEvent);
     int32_t type = libinput_tablet_tool_get_type(tool);
-    switch(type) {
-        case LIBINPUT_TABLET_TOOL_TYPE_PEN:
+    switch (type) {
+        case LIBINPUT_TABLET_TOOL_TYPE_PEN: {
             return PointerEvent::TOOL_TYPE_PEN;
-        case LIBINPUT_TABLET_TOOL_TYPE_ERASER:
+        }
+        case LIBINPUT_TABLET_TOOL_TYPE_ERASER: {
             return PointerEvent::TOOL_TYPE_RUBBER;
-        case LIBINPUT_TABLET_TOOL_TYPE_BRUSH:
+        }
+        case LIBINPUT_TABLET_TOOL_TYPE_BRUSH: {
             return PointerEvent::TOOL_TYPE_BRUSH;
-        case LIBINPUT_TABLET_TOOL_TYPE_PENCIL:
+        }
+        case LIBINPUT_TABLET_TOOL_TYPE_PENCIL: {
             return PointerEvent::TOOL_TYPE_PENCIL;
-        case LIBINPUT_TABLET_TOOL_TYPE_AIRBRUSH:
+        }
+        case LIBINPUT_TABLET_TOOL_TYPE_AIRBRUSH: {
             return PointerEvent::TOOL_TYPE_AIRBRUSH;
-        case LIBINPUT_TABLET_TOOL_TYPE_MOUSE:
+        }       
+        case LIBINPUT_TABLET_TOOL_TYPE_MOUSE: {
             return PointerEvent::TOOL_TYPE_MOUSE;
-        case LIBINPUT_TABLET_TOOL_TYPE_LENS:
+        }
+        case LIBINPUT_TABLET_TOOL_TYPE_LENS:{
             return PointerEvent::TOOL_TYPE_LENS;
-        case LIBINPUT_TABLET_TOOL_TYPE_TOTEM:
-            return LIBINPUT_TABLET_TOOL_TYPE_TOTEM;
-        default:
-            return -1;
+        }
+        case LIBINPUT_TABLET_TOOL_TYPE_TOTEM: {
+            MMI_HILOGW("Invalid type");
+            return RET_ERR;
+        }
+        default: {
+            return RET_ERR;
+        }
     }
 }
 
@@ -137,8 +144,8 @@ bool TabletToolProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
     auto tiltX = libinput_event_tablet_tool_get_tilt_x(event);
     auto tiltY = libinput_event_tablet_tool_get_tilt_y(event);
     auto pressure = libinput_event_tablet_tool_get_pressure(event);
-    int32_t toolType = GetToolType(nullptr, event);
-    if (toolType < 0 && LIBINPUT_TABLET_TOOL_TYPE_TOTEM == toolType) {
+    int32_t toolType = GetToolType(event);
+    if (toolType == RET_ERR) {
         MMI_HILOGE("GetToolType failed");
     }
     int64_t time = GetSysClockTime();
@@ -185,8 +192,8 @@ bool TabletToolProcessor::OnTipMotion(struct libinput_event* event)
     auto tiltX = libinput_event_tablet_tool_get_tilt_x(tabletEvent);
     auto tiltY = libinput_event_tablet_tool_get_tilt_y(tabletEvent);
     auto pressure = libinput_event_tablet_tool_get_pressure(tabletEvent);
-    int32_t toolType = GetToolType(event);
-    if (toolType < 0 && LIBINPUT_TABLET_TOOL_TYPE_TOTEM == toolType) {
+    int32_t toolType = GetToolType(tabletEvent);
+    if (toolType == RET_ERR) {
         MMI_HILOGE("GetToolType failed");
     }
 
@@ -219,8 +226,8 @@ bool TabletToolProcessor::OnTipUp(struct libinput_event_tablet_tool* event)
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    int32_t toolType = GetToolType(nullptr, event);
-    if (toolType < 0 && LIBINPUT_TABLET_TOOL_TYPE_TOTEM == toolType) {
+    int32_t toolType = GetToolType(event);
+    if (toolType == RET_ERR) {
         MMI_HILOGE("GetToolType failed");
     }
 
