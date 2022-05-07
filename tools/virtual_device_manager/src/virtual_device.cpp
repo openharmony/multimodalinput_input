@@ -205,21 +205,6 @@ void StartPen()
     virtualPenKeyboard.SetUp();
 }
 
-void StartAllDevices()
-{
-    StartMouse();
-    StartKeyboard();
-    StartJoystick();
-    StartTrackball();
-    StartRemoteControl();
-    StartTrackpad();
-    StartKnob();
-    StartGamePad();
-    StartTouchPad();
-    StartTouchScreen();
-    StartPen();
-}
-
 using virtualFun = void (*)();
 std::map<std::string, virtualFun> mapFun = {
     {"mouse", &StartMouse},
@@ -232,9 +217,19 @@ std::map<std::string, virtualFun> mapFun = {
     {"gamepad", &StartGamePad},
     {"touchpad", &StartTouchPad},
     {"touchscreen", &StartTouchScreen},
-    {"pen", &StartPen},
-    {"all", &StartAllDevices},
+    {"pen", &StartPen}
 };
+
+void StartAllDevices()
+{
+    if (mapFun.empty()) {
+        printf("mapFun is empty");
+        return;
+    }
+    for (const auto &item : mapFun) {
+        (*item.second)();
+    }
+}
 } // namespace
 
 bool VirtualDevice::DoIoctl(int32_t fd, int32_t request, const uint32_t value)
@@ -325,8 +320,10 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
             return true;
         }
     } while (0);
-    if (closedir(dir) != 0) {
-        printf("close dir failed");
+    if (dir != nullptr) {
+        if (closedir(dir) != 0) {
+            printf("close dir failed");
+        }
     }
     if (std::remove((g_folderpath + fileName).c_str()) != 0) {
         printf("remove file: %s failed", (g_folderpath + fileName).c_str());
@@ -484,6 +481,10 @@ void VirtualDevice::Close()
 
 bool VirtualDevice::CreateHandle(const std::string& deviceArgv)
 {
+    if (deviceArgv == "all") {
+        StartAllDevices();
+        return true;
+    }
     if (mapFun.find(deviceArgv) == mapFun.end()) {
         printf("Please enter the device type correctly");
         return false;
