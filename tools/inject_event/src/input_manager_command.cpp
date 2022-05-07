@@ -395,28 +395,28 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             if (argc == moveArgcSeven) {
                                 totalTimeMs = 1000;
                                 if ((!StrToInt(optarg, px1)) ||
-                                (!StrToInt(argv[optind], py1)) ||
-                                (!StrToInt(argv[optind + 1], px2)) ||
-                                (!StrToInt(argv[optind + 2], py2))) {
-                                    std::cout << "invalid command to input value" << std::endl;
-                                    ShowUsage();
-                                    return EVENT_REG_FAIL;
+                                    (!StrToInt(argv[optind], py1)) ||
+                                    (!StrToInt(argv[optind + 1], px2)) ||
+                                    (!StrToInt(argv[optind + 2], py2))) {
+                                        std::cout << "invalid command to input value" << std::endl;
+                                        ShowUsage();
+                                        return EVENT_REG_FAIL;
                                 }
                             }
                             if (argc == moveArgcEight) {
                                 if ((!StrToInt(optarg, px1)) ||
-                                (!StrToInt(argv[optind], py1)) ||
-                                (!StrToInt(argv[optind + 1], px2)) ||
-                                (!StrToInt(argv[optind + 2], py2)) ||
-                                (!StrToInt(argv[optind + 3], totalTimeMs))) {
-                                    std::cout << "invalid command to input value" << std::endl;
-                                    ShowUsage();
-                                    return EVENT_REG_FAIL;
+                                    (!StrToInt(argv[optind], py1)) ||
+                                    (!StrToInt(argv[optind + 1], px2)) ||
+                                    (!StrToInt(argv[optind + 2], py2)) ||
+                                    (!StrToInt(argv[optind + 3], totalTimeMs))) {
+                                        std::cout << "invalid command to input value" << std::endl;
+                                        ShowUsage();
+                                        return EVENT_REG_FAIL;
                                 }
                             }
                             const int64_t minTotalTimeMs = 1;
                             const int64_t maxTotalTimeMs = 15000;
-                            if ((minTotalTimeMs > totalTimeMs) || ( maxTotalTimeMs < totalTimeMs)) {
+                            if ((minTotalTimeMs > totalTimeMs) || (maxTotalTimeMs < totalTimeMs)) {
                                 std::cout << "totalTime is out of range. ";
                                 std::cout << minTotalTimeMs << " < totalTimeMs < " << maxTotalTimeMs;
                                 std::cout << std::endl;
