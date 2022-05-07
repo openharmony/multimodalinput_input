@@ -19,9 +19,9 @@
 #include <sys/signalfd.h>
 #include "event_dump.h"
 #include "input_windows_manager.h"
+#include "i_pointer_drawing_manager.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
-#include "pointer_drawing_manager.h"
 #include "safe_keeper.h"
 #include "timer_manager.h"
 #include "util.h"
@@ -154,7 +154,7 @@ int32_t MMIService::Init()
     CHKR(WinMgr->Init(*this), WINDOWS_MSG_INIT_FAIL, WINDOWS_MSG_INIT_FAIL);
 
     MMI_LOGD("PointerDrawingManager Init");
-    CHKR(PointerDrawingManager::GetInstance()->Init(), POINTER_DRAW_INIT_FAIL, POINTER_DRAW_INIT_FAIL);
+    CHKR(IPointerDrawingManager::GetInstance()->Init(), POINTER_DRAW_INIT_FAIL, POINTER_DRAW_INIT_FAIL);
 
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
     CHKR(mmiFd_ >= 0, EPOLL_CREATE_FAIL, EPOLL_CREATE_FAIL);
