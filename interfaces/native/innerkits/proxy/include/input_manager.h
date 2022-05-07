@@ -222,6 +222,8 @@ public:
      */
     int32_t SetPointerVisible(bool visible);
 
+    bool IsPointerVisible();
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

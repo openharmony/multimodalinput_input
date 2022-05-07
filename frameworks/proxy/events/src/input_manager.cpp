@@ -142,5 +142,10 @@ int32_t InputManager::SetPointerVisible(bool visible)
 {
     return InputMgrImpl->GetInstance()->SetPointerVisible(visible);
 }
+
+bool InputManager::IsPointerVisible()
+{
+    return InputMgrImpl->GetInstance()->IsPointerVisible();
+}
 } // namespace MMI
 } // namespace OHOS

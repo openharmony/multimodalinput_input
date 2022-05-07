@@ -584,6 +584,22 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible)
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
+bool InputManagerImpl::IsPointerVisible()
+{
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    CALL_LOG_ENTER;
+    bool visible;
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->IsPointerVisible(visible);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+    }
+    return visible;
+#else
+    MMI_HILOGW("Pointer drawing module dose not support");
+    return false;
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+}
+
 void InputManagerImpl::OnConnected()
 {
     CALL_LOG_ENTER;

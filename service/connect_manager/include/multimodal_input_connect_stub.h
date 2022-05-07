@@ -39,6 +39,7 @@ protected:
     virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) = 0;
     int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
+    int32_t StubIsPointerVisible(MessageParcel& data, MessageParcel& reply);
 
 private:
     static constexpr int32_t SYSTEM_UID = 1000;

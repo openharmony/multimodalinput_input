@@ -35,6 +35,7 @@ public:
     int32_t GetClientSocketFdOfAllocedSocketPair() const;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     int32_t SetPointerVisible(bool visible);
+    int32_t IsPointerVisible(bool &visible);
 private:
     MultimodalInputConnectManager() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);
