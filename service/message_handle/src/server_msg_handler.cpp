@@ -475,6 +475,8 @@ int32_t ServerMsgHandler::OnSupportKeys(SessionPtr sess, NetPacket& pkt)
     CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData;
+    int32_t deviceId;
+    size_t size;
     pkt >> userData >> deviceId >> size;
     int32_t sysKeyValue;
     std::vector<int32_t> keyCode;
