@@ -519,7 +519,8 @@ bool JsInputMonitor::GetPressedKey(const std::vector<int32_t>& pressedKeys, napi
 {
     CALL_LOG_ENTER;
     bool isExists = false;
-    if (CheckExists(pressedKeys, KeyEvent::KEYCODE_CTRL_LEFT) || CheckExists(pressedKeys, KeyEvent::KEYCODE_CTRL_RIGHT)) {
+    if (CheckExists(pressedKeys, KeyEvent::KEYCODE_CTRL_LEFT)
+        || CheckExists(pressedKeys, KeyEvent::KEYCODE_CTRL_RIGHT)) {
         isExists = true;
     } else {
         isExists = false;
@@ -547,7 +548,7 @@ bool JsInputMonitor::GetPressedKey(const std::vector<int32_t>& pressedKeys, napi
         THROWERR(jsEnv_, "Set shiftKey failed");
         return false;
     }
-    if (CheckExists(pressedKeys, KeyEvent::KEYCODE_META_LEFT) 
+    if (CheckExists(pressedKeys, KeyEvent::KEYCODE_META_LEFT)
         || CheckExists(pressedKeys, KeyEvent::KEYCODE_META_RIGHT)) {
         isExists = true;
     } else {
