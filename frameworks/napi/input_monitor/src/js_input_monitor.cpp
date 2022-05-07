@@ -598,7 +598,8 @@ int32_t JsInputMonitor::TransformMousePointerEvent(const std::shared_ptr<Pointer
     return RET_OK;
 }
 
-bool JsInputMonitor::Start() {
+bool JsInputMonitor::Start()
+{
     CALL_LOG_ENTER;
     CHKPF(monitor_);
     if (isMonitoring_) {
@@ -629,7 +630,8 @@ JsInputMonitor::~JsInputMonitor()
     }
 }
 
-void JsInputMonitor::Stop() {
+void JsInputMonitor::Stop()
+{
     CALL_LOG_ENTER;
     CHKPV(monitor_);
     if (isMonitoring_) {
