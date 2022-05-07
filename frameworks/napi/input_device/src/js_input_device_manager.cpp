@@ -31,10 +31,10 @@ const std::string CALL_FUNCTION = "napi_call_function";
 const std::string CREATE_BOOL = "napi_get_boolean";
 const std::string CREATE_INT32 = "napi_create_int32";
 
-enum Return_Type {
-    RETURN_VOID,
-    RETURN_BOOL,
-    RETURN_NUMBER,
+enum class ReturnType {
+    VOID,
+    BOOL,
+    NUMBER,
 };
 } // namespace
 void JsInputDeviceManager::RegisterInputDeviceMonitor(napi_env env, std::string type, napi_value handle)
@@ -74,13 +74,13 @@ napi_value getResult(sptr<AsyncContext> asyncContext)
     CALL_LOG_ENTER;
     napi_env env = asyncContext->env;
     napi_value results;
-    int32_t resultType;
+    ReturnType resultType;
     asyncContext->reserve >> resultType;
-    if (resultType == RETURN_BOOL) {
+    if (resultType == ReturnType::BOOL) {
         bool temp;
         asyncContext->reserve >> temp;
         CHKRP(env, napi_get_boolean(env, temp, &results), CREATE_BOOL);
-    } else if (resultType == RETURN_NUMBER) {
+    } else if (resultType == ReturnType::NUMBER) {
         int32_t temp;
         asyncContext->reserve >> temp;
         CHKRP(env, napi_create_int32(env, temp, &results), CREATE_INT32);
@@ -141,7 +141,7 @@ napi_value JsInputDeviceManager::SetPointerVisible(napi_env env, bool visible, n
     }
 
     asyncContext->errorCode = InputManager::GetInstance()->SetPointerVisible(visible);
-    asyncContext->reserve << RETURN_VOID;
+    asyncContext->reserve << ReturnType::VOID;
 
     napi_value promise = nullptr;
     if (handle != nullptr) {
@@ -165,7 +165,7 @@ napi_value JsInputDeviceManager::IsPointerVisible(napi_env env, napi_value handl
 
     bool visible = InputManager::GetInstance()->IsPointerVisible();
     asyncContext->errorCode = ERR_OK;
-    asyncContext->reserve << RETURN_BOOL << visible;
+    asyncContext->reserve << ReturnType::BOOL << visible;
 
     napi_value promise = nullptr;
     if (handle != nullptr) {
