@@ -38,19 +38,12 @@ public:
     virtual ~InputMonitor() = default;
 
     bool Start();
-
     void Stop();
-
     void MarkConsumed(int32_t eventId);
-
     void SetCallback(std::function<void(std::shared_ptr<PointerEvent>)> callback);
-
     void SetId(int32_t id);
-
     virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override;
-
     virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override;
-
     virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override;
 
 private:
@@ -63,44 +56,35 @@ private:
 
 
 class JsInputMonitor {
+
 public:
     JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, int32_t id);
-
     ~JsInputMonitor();
 
     bool Start();
-
     void Stop();
-
     void MarkConsumed(const int32_t eventId);
-
     int32_t IsMatch(const napi_env jsEnv, napi_value callback);
-
     int32_t IsMatch(napi_env jsEnv);
-
     int32_t GetId() const;
-
     void OnPointerEventInJsThread(const std::string &typeName);
-
     void OnPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
-
     static void JsCallback(uv_work_t *work, int32_t status);
-
     std::string GetTypeName() const;
 private:
-
     void SetCallback(napi_value callback);
-
     int32_t TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
-
-    int32_t TransformMousePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
-
     std::string GetAction(int32_t action) const;
-
     int32_t GetJsPointerItem(const PointerEvent::PointerItem &item, napi_value value) const;
 
+    int32_t TransformMousePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t GetMousePointerItem(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
-
+    bool SetMouseProperty(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item, napi_value result);
+    bool GetAxesValue(const std::shared_ptr<PointerEvent> pointerEvent, napi_value& element);
+    bool GetPressedKeys(const std::vector<int32_t>& pressedKeys, napi_value result);
+    bool GetPressedButtons(const std::set<int32_t>& pressedButtons, napi_value result);
+    bool CheckExist(const std::vector<int32_t>& pressedKeys, int32_t keyCode);
+    bool GetPressedKey(const std::vector<int32_t>& pressedKeys, napi_value result);
 private:
     std::shared_ptr<InputMonitor> monitor_ {nullptr};
     napi_ref receiver_ {nullptr};
