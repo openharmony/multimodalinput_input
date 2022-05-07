@@ -28,6 +28,9 @@ namespace MMI {
 #define InputMgr InputManager::GetInstance()
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitor" };
+constexpr int32_t AXIS_TYPE_SCROLL_VERTICAL = 0;
+constexpr int32_t AXIS_TYPE_SCROLL_HORIZONTAL = 1;
+constexpr int32_t AXIS_TYPE_PINCH = 2;
 constexpr int32_t NAPI_ERR = 3;
 } // namespace
 
@@ -146,7 +149,7 @@ void JsInputMonitor::SetCallback(napi_value callback)
         uint32_t refCount = 1;
         auto status = napi_create_reference(jsEnv_, callback, refCount, &receiver_);
         if (status != napi_ok) {
-            MMI_HILOGE("napi_create_reference is failed");
+            THROWERR(jsEnv_, "napi_create_reference is failed");
             return;
         }
     }
@@ -165,13 +168,13 @@ int32_t JsInputMonitor::IsMatch(napi_env jsEnv, napi_value callback)
         napi_value handlerTemp = nullptr;
         auto status = napi_get_reference_value(jsEnv_, receiver_, &handlerTemp);
         if (status != napi_ok) {
-            MMI_HILOGE("napi_get_reference_value is failed");
+            THROWERR(jsEnv_, "napi_get_reference_value is failed");
             return NAPI_ERR;
         }
         bool isEquals = false;
         status = napi_strict_equals(jsEnv_, handlerTemp, callback, &isEquals);
         if (status != napi_ok) {
-            MMI_HILOGE("napi_strict_equals is failed");
+            THROWERR(jsEnv_, "napi_strict_equals is failed");
             return NAPI_ERR;
         }
         if (isEquals) {
@@ -219,28 +222,28 @@ std::string JsInputMonitor::GetAction(int32_t action) const
 int32_t JsInputMonitor::GetJsPointerItem(const PointerEvent::PointerItem &item, napi_value value) const
 {
     if (SetNameProperty(jsEnv_, value, "globalX", item.GetGlobalX()) != napi_ok) {
-        MMI_HILOGE("Set globalX property failed");
+        THROWERR(jsEnv_, "Set globalX property failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, value, "globalY", item.GetGlobalY()) != napi_ok) {
-        MMI_HILOGE("Set globalY property failed");
+        THROWERR(jsEnv_, "Set globalY property failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, value, "localX", 0) != napi_ok) {
-        MMI_HILOGE("Set localX property failed");
+        THROWERR(jsEnv_, "Set localX property failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, value, "localY", 0) != napi_ok) {
-        MMI_HILOGE("Set localY property failed");
+        THROWERR(jsEnv_, "Set localY property failed");
         return RET_ERR;
     }
     int32_t touchArea = (item.GetWidth() + item.GetHeight()) / 2;
     if (SetNameProperty(jsEnv_, value, "size", touchArea) != napi_ok) {
-        MMI_HILOGE("Set size property failed");
+        THROWERR(jsEnv_, "Set size property failed");
         return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, value, "force", item.GetPressure()) != napi_ok) {
-        MMI_HILOGE("Set force property failed");
+        THROWERR(jsEnv_, "Set force property failed");
         return RET_ERR;
     }
     return RET_OK;
@@ -250,13 +253,13 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (SetNameProperty(jsEnv_, result, "type", GetAction(pointerEvent->GetPointerAction())) != napi_ok) {
-        MMI_HILOGE("Set type property failed");
+        THROWERR(jsEnv_, "Set type property failed");
         return RET_ERR;
     }
     napi_value pointers = nullptr;
     auto status = napi_create_array(jsEnv_, &pointers);
     if (status != napi_ok) {
-        MMI_HILOGE("napi_create_array is failed");
+        THROWERR(jsEnv_, "napi_create_array is failed");
         return RET_ERR;
     }
     std::vector<PointerEvent::PointerItem> pointerItems;
@@ -275,13 +278,13 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
         napi_value element = nullptr;
         status = napi_create_object(jsEnv_, &element);
         if (status != napi_ok) {
-            MMI_HILOGE("napi_create_object is failed");
+            THROWERR(jsEnv_, "napi_create_object is failed");
             return RET_ERR;
         }
         if (currentPointerId == it.GetPointerId()) {
             status = napi_create_object(jsEnv_, &currentPointer);
             if (status != napi_ok) {
-                MMI_HILOGE("napi_create_object is failed");
+                THROWERR(jsEnv_, "napi_create_object is failed");
                 return RET_ERR;
             }
             if (GetJsPointerItem(it, currentPointer) != RET_OK) {
@@ -289,11 +292,11 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
                 return RET_ERR;
             }
             if (SetNameProperty(jsEnv_, result, "timestamp", pointerEvent->GetActionTime()) != napi_ok) {
-                MMI_HILOGE("Set timestamp property failed");
+                THROWERR(jsEnv_, "Set timestamp property failed");
                 return RET_ERR;
             }
             if (SetNameProperty(jsEnv_, result, "deviceId", it.GetDeviceId()) != napi_ok) {
-                MMI_HILOGE("Set deviceId property failed");
+                THROWERR(jsEnv_, "Set deviceId property failed");
                 return RET_ERR;
             }
         }
@@ -303,93 +306,88 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
         }
         status = napi_set_element(jsEnv_, pointers, index, element);
         if (status != napi_ok) {
-            MMI_HILOGE("napi_set_element is failed");
+            THROWERR(jsEnv_, "napi_set_element is failed");
             return RET_ERR;
         }
         ++index;
     }
     if (SetNameProperty(jsEnv_, result, "touches", pointers) != napi_ok) {
-            MMI_HILOGE("Set touches property failed");
+            THROWERR(jsEnv_, "Set touches property failed");
             return RET_ERR;
     }
     if (SetNameProperty(jsEnv_, result, "changedTouches", currentPointer) != napi_ok) {
-            MMI_HILOGE("Set changedTouches property failed");
+            THROWERR(jsEnv_, "Set changedTouches property failed");
             return RET_ERR;
     }
     return RET_OK;
 }
 
-bool JsInputMonitor::SetMouseProperty(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item, napi_value result) {
+bool JsInputMonitor::SetMouseProperty(const std::shared_ptr<PointerEvent> pointerEvent,
+    const PointerEvent::PointerItem& item, napi_value result)
+{
     if (SetNameProperty(jsEnv_, result, "actionTime", pointerEvent->GetActionTime()) != napi_ok) {
-        MMI_HILOGE("Set property of actionTime failed");
+        THROWERR(jsEnv_, "Set property of actionTime failed");
         return false;
     }
     if (SetNameProperty(jsEnv_, result, "button", pointerEvent->GetButtonId()) != napi_ok) {
-        MMI_HILOGE("Set property of button failed");
+        THROWERR(jsEnv_, "Set property of button failed");
         return false;
     }
     if (SetNameProperty(jsEnv_, result, "screenId", pointerEvent->GetTargetDisplayId()) != napi_ok) {
-        MMI_HILOGE("Set property of screenId failed");
+        THROWERR(jsEnv_, "Set property of screenId failed");
         return false;
     }
     if (SetNameProperty(jsEnv_, result, "windowId", pointerEvent->GetTargetWindowId()) != napi_ok) {
-        MMI_HILOGE("Set property of windowId failed");
+        THROWERR(jsEnv_, "Set property of windowId failed");
         return false;
     }
     if (SetNameProperty(jsEnv_, result, "deviceId", item.GetDeviceId()) != napi_ok) {
-        MMI_HILOGE("Set property of deviceId failed");
+        THROWERR(jsEnv_, "Set property of deviceId failed");
         return false;
     }
     if (SetNameProperty(jsEnv_, result, "windowX", item.GetGlobalX()) != napi_ok) {
-        MMI_HILOGE("Set property of windowX failed");
+        THROWERR(jsEnv_, "Set property of windowX failed");
         return false;
     }
     if (SetNameProperty(jsEnv_, result, "windowY", item.GetGlobalY()) != napi_ok) {
-        MMI_HILOGE("Set property of windowY failed");
+        THROWERR(jsEnv_, "Set property of windowY failed");
         return false;
     }
     if (SetNameProperty(jsEnv_, result, "screenX", item.GetLocalX()) != napi_ok) {
-        MMI_HILOGE("Set property of screenX failed");
+        THROWERR(jsEnv_, "Set property of screenX failed");
         return false;
     }
     if (SetNameProperty(jsEnv_, result, "screenY", item.GetLocalY()) != napi_ok) {
-        MMI_HILOGE("Set property of screenY failed");
+        THROWERR(jsEnv_, "Set property of screenY failed");
         return false;
     }
     return true;
 }
 
-bool JsInputMonitor::GetAxesValue(const std::shared_ptr<PointerEvent> pointerEvent, napi_value& element) {
+bool JsInputMonitor::GetAxesValue(const std::shared_ptr<PointerEvent> pointerEvent, napi_value element)
+{
     CALL_LOG_ENTER;
-    if (pointerEvent == nullptr) {
-        MMI_HILOGE("PointerEvent is null");
-        return false;
-    }
+    CHKPF(pointerEvent);
     double axisValue = -1.0;
     int32_t axis = -1;
     if (pointerEvent->HasAxis(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)) {
         axisValue = pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL);
-        axis = 0;
+        axis = AXIS_TYPE_SCROLL_VERTICAL;
     }
     if (pointerEvent->HasAxis(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)) {
         axisValue = pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL);
-        axis = 1;
+        axis = AXIS_TYPE_SCROLL_HORIZONTAL;
     }
     if (pointerEvent->HasAxis(PointerEvent::AXIS_TYPE_PINCH)) {
         axisValue = pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH);
-        axis = 2;
-    }
-    napi_status status = napi_create_object(jsEnv_, &element);
-    if (status != napi_ok) {
-        MMI_HILOGE("napi_create_object is failed");
-        return false;
+        axis = AXIS_TYPE_PINCH;
     }
     if (SetNameProperty(jsEnv_, element, "axis", axis) != napi_ok) {
-        MMI_HILOGE("Set axis property failed");
+        THROWERR(jsEnv_, "Set axis property failed");
         return false;
     }
     if (SetNameProperty(jsEnv_, element, "value", axisValue) != napi_ok) {
-        MMI_HILOGE("Set value property failed");
+        THROWERR(jsEnv_, "Set value property failed");
         return false;
     }
     return true;
@@ -402,7 +400,7 @@ int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> 
     napi_value axes = nullptr;
     napi_status status = napi_create_array(jsEnv_, &axes);
     if (status != napi_ok || axes == nullptr) {
-        MMI_HILOGE("napi_create_array is failed");
+        THROWERR(jsEnv_, "napi_create_array is failed");
         return RET_ERR;
     }
     uint32_t index = 0;
@@ -416,7 +414,7 @@ int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> 
                 return RET_ERR;
             }
             if (SetNameProperty(jsEnv_, result, "id", currentPointerId) != napi_ok) {
-                MMI_HILOGE("Set property of id failed");
+                THROWERR(jsEnv_, "Set property of id failed");
                 return false;
             }
             if (!SetMouseProperty(pointerEvent, item, result)) {
@@ -425,88 +423,90 @@ int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> 
             }
         }
         napi_value element = nullptr;
+        if (napi_create_object(jsEnv_, &element) != napi_ok) {
+            THROWERR(jsEnv_, "napi_create_object is failed");
+            return false;
+        }
         if (!GetAxesValue(pointerEvent, element)) {
             MMI_HILOGE("Get axesValue failed");
             return RET_ERR;
         }
-        CHKPR(element, ERROR_NULL_POINTER);
         status = napi_set_element(jsEnv_, axes, index, element);
         if (status != napi_ok) {
-            MMI_HILOGE("napi_set_element is failed");
+            THROWERR(jsEnv_, "Napi set element in axes failed");
             return RET_ERR;
         }
         ++index;
     }
     if (SetNameProperty(jsEnv_, result, "axes", axes) != napi_ok) {
-        MMI_HILOGE("Set property of axes failed");
+        THROWERR(jsEnv_, "Set property of axes failed");
         return RET_ERR;
     }
     return RET_OK;
 }
 
-bool JsInputMonitor::GetPressedButtons(const std::set<int32_t>& pressedButtons, napi_value result) {
+bool JsInputMonitor::GetPressedButtons(const std::set<int32_t>& pressedButtons, napi_value result)
+{
     CALL_LOG_ENTER;
     napi_value value = nullptr;
     napi_status status = napi_create_array(jsEnv_, &value);
     if (status != napi_ok || value == nullptr) {
-        MMI_HILOGE("napi_create_array is failed");
+        THROWERR(jsEnv_, "napi_create_array is failed");
         return false;
     }
     uint32_t index = 0;
-    if (!pressedButtons.empty()) {
-        for (const auto &it : pressedButtons) {
-            napi_value element = nullptr;
-            if (napi_create_int32(jsEnv_, it, &element) != napi_ok) {
-                MMI_HILOGE("Napi create int32 failed");
-                return false;
-            }
-            status = napi_set_element(jsEnv_, value, index, element);
-            if (status != napi_ok) {
-                MMI_HILOGE("Napi set element failed");
-                return false;
-            }
-            ++index;
+    for (const auto &it : pressedButtons) {
+        napi_value element = nullptr;
+        if (napi_create_int32(jsEnv_, it, &element) != napi_ok) {
+            THROWERR(jsEnv_, "Napi create int32 failed");
+            return false;
         }
+        status = napi_set_element(jsEnv_, value, index, element);
+        if (status != napi_ok) {
+            THROWERR(jsEnv_, "Napi set element failed");
+            return false;
+        }
+        ++index;
     }
     if (SetNameProperty(jsEnv_, result, "pressedButtons", value) != napi_ok) {
-        MMI_HILOGE("Set property of pressedButtons failed");
+        THROWERR(jsEnv_, "Set property of pressedButtons failed");
         return false;
     }
     return true;
 }
 
-bool JsInputMonitor::GetPressedKeys(const std::vector<int32_t>& pressedKeys, napi_value result) {
+bool JsInputMonitor::GetPressedKeys(const std::vector<int32_t>& pressedKeys, napi_value result)
+{
     CALL_LOG_ENTER;
     napi_value value = nullptr;
     napi_status status = napi_create_array(jsEnv_, &value);
     if (status != napi_ok || value == nullptr) {
-        MMI_HILOGE("napi_create_array is failed");
+        THROWERR(jsEnv_, "napi_create_array is failed");
         return false;
     }
     uint32_t index = 0;
-    if (!pressedKeys.empty()) {
-        for (const auto &it : pressedKeys) {
-            napi_value element = nullptr;
-            if (napi_create_int32(jsEnv_, it, &element) != napi_ok) {
-                MMI_HILOGE("Napi create int32 failed");
-                return false;
-            }
-            status = napi_set_element(jsEnv_, value, index, element);
-            if (status != napi_ok) {
-                MMI_HILOGE("Napi set element failed");
-                return false;
-            }
-            ++index;
+    for (const auto &it : pressedKeys) {
+        napi_value element = nullptr;
+        if (napi_create_int32(jsEnv_, it, &element) != napi_ok) {
+            THROWERR(jsEnv_, "Napi create int32 failed");
+            return false;
         }
+        status = napi_set_element(jsEnv_, value, index, element);
+        if (status != napi_ok) {
+            THROWERR(jsEnv_, "Napi set element failed");
+            return false;
+        }
+        ++index;
     }
     if (SetNameProperty(jsEnv_, result, "pressedKeys", value) != napi_ok) {
-        MMI_HILOGE("Set property of pressedKeys failed");
+        THROWERR(jsEnv_, "Set property of pressedKeys failed");
         return false;
     }
     return true;
 }
 
-bool JsInputMonitor::CheckExist(const std::vector<int32_t>& pressedKeys, int32_t keyCode) {
+bool JsInputMonitor::CheckExists(const std::vector<int32_t>& pressedKeys, int32_t keyCode)
+{
     auto it = std::find(pressedKeys.begin(), pressedKeys.end(), keyCode);
     if (it == pressedKeys.end()) {
         return false;
@@ -515,62 +515,56 @@ bool JsInputMonitor::CheckExist(const std::vector<int32_t>& pressedKeys, int32_t
     }
 }
 
-bool JsInputMonitor::GetPressedKey(const std::vector<int32_t>& pressedKeys, napi_value result) {
+bool JsInputMonitor::GetPressedKey(const std::vector<int32_t>& pressedKeys, napi_value result)
+{
     CALL_LOG_ENTER;
-    if (CheckExist(pressedKeys, KeyEvent::KEYCODE_CTRL_LEFT) || CheckExist(pressedKeys, KeyEvent::KEYCODE_CTRL_RIGHT)) {
-        if (SetNameProperty(jsEnv_, result, "ctrlKey", true) != napi_ok) {
-            MMI_HILOGE("Set ctrlKey with true failed");
-            return false;
-        }
+    bool isExists = false;
+    if (CheckExists(pressedKeys, KeyEvent::KEYCODE_CTRL_LEFT) || CheckExists(pressedKeys, KeyEvent::KEYCODE_CTRL_RIGHT)) {
+        isExists = true;
     } else {
-        if (SetNameProperty(jsEnv_, result, "ctrlKey", false) != napi_ok) {
-            MMI_HILOGE("Set ctrlKey with false failed");
-            return false;
-        }
+        isExists = false;
     }
-    if (CheckExist(pressedKeys, KeyEvent::KEYCODE_ALT_LEFT) || CheckExist(pressedKeys, KeyEvent::KEYCODE_ALT_RIGHT)) {
-        if (SetNameProperty(jsEnv_, result, "altKey", true) != napi_ok) {
-            MMI_HILOGE("Set altKey with true failed");
-            return false;
-        }
-    } else {
-        if (SetNameProperty(jsEnv_, result, "altKey", false) != napi_ok) {
-            MMI_HILOGE("Set altKey with false failed");
-            return false;
-        }
+    if (SetNameProperty(jsEnv_, result, "ctrlKey", isExists) != napi_ok) {
+        THROWERR(jsEnv_, "Set ctrlKey with failed");
+        return false;
     }
-    if (CheckExist(pressedKeys, KeyEvent::KEYCODE_SHIFT_LEFT) || CheckExist(pressedKeys, KeyEvent::KEYCODE_SHIFT_RIGHT)) {
-        if (SetNameProperty(jsEnv_, result, "shiftKey", true) != napi_ok) {
-            MMI_HILOGE("Set shiftKey with true failed");
-            return false;
-        }
+    if (CheckExists(pressedKeys, KeyEvent::KEYCODE_ALT_LEFT) || CheckExists(pressedKeys, KeyEvent::KEYCODE_ALT_RIGHT)) {
+        isExists = true;
     } else {
-        if (SetNameProperty(jsEnv_, result, "shiftKey", false) != napi_ok) {
-            MMI_HILOGE("Set shiftKey with false failed");
-            return false;
-        }
+        isExists = false;
     }
-    if (CheckExist(pressedKeys, KeyEvent::KEYCODE_META_LEFT) || CheckExist(pressedKeys, KeyEvent::KEYCODE_META_RIGHT)) {
-        if (SetNameProperty(jsEnv_, result, "logoKey", true) != napi_ok) {
-            MMI_HILOGE("Set logoKey with true failed");
-            return false;
-        }
-    } else {
-        if (SetNameProperty(jsEnv_, result, "logoKey", false) != napi_ok) {
-            MMI_HILOGE("Set logoKey with false failed");
-            return false;
-        }
+    if (SetNameProperty(jsEnv_, result, "altKey", isExists) != napi_ok) {
+        THROWERR(jsEnv_, "Set altKey failed");
+        return false;
     }
-    if (CheckExist(pressedKeys, KeyEvent::KEYCODE_FN)) {
-        if (SetNameProperty(jsEnv_, result, "fnKey", true) != napi_ok) {
-            MMI_HILOGE("Set fnKey with true failed");
-            return false;
-        }
+    if (CheckExists(pressedKeys, KeyEvent::KEYCODE_SHIFT_LEFT)
+        || CheckExists(pressedKeys, KeyEvent::KEYCODE_SHIFT_RIGHT)) {
+        isExists = true;
     } else {
-        if (SetNameProperty(jsEnv_, result, "fnKey", false) != napi_ok) {
-            MMI_HILOGE("Set fnKey with false failed");
-            return false;
-        }
+        isExists = false;
+    }
+    if (SetNameProperty(jsEnv_, result, "shiftKey", isExists) != napi_ok) {
+        THROWERR(jsEnv_, "Set shiftKey failed");
+        return false;
+    }
+    if (CheckExists(pressedKeys, KeyEvent::KEYCODE_META_LEFT) 
+        || CheckExists(pressedKeys, KeyEvent::KEYCODE_META_RIGHT)) {
+        isExists = true;
+    } else {
+        isExists = false;
+    }
+    if (SetNameProperty(jsEnv_, result, "logoKey", isExists) != napi_ok) {
+        THROWERR(jsEnv_, "Set logoKey failed");
+        return false;
+    }
+    if (CheckExists(pressedKeys, KeyEvent::KEYCODE_FN)) {
+        isExists = true;
+    } else {
+        isExists = false;
+    }
+    if (SetNameProperty(jsEnv_, result, "fnKey", isExists) != napi_ok) {
+        THROWERR(jsEnv_, "Set fnKey with true failed");
+        return false;
     }
     return true;
 }
@@ -580,7 +574,7 @@ int32_t JsInputMonitor::TransformMousePointerEvent(const std::shared_ptr<Pointer
     CALL_LOG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (SetNameProperty(jsEnv_, result, "action", pointerEvent->GetPointerAction()) != napi_ok) {
-        MMI_HILOGE("Set property of action failed");
+        THROWERR(jsEnv_, "Set property of action failed");
         return RET_ERR;
     }
     std::vector<int32_t> pressedKeys = pointerEvent->GetPressedKeys();
@@ -630,7 +624,7 @@ JsInputMonitor::~JsInputMonitor()
     uint32_t refCount = 0;
     auto status = napi_reference_unref(jsEnv_, receiver_, &refCount);
     if (status != napi_ok) {
-        MMI_HILOGE("napi_reference_unref is failed");
+        THROWERR(jsEnv_, "napi_reference_unref is failed");
         return;
     }
 }
@@ -679,7 +673,7 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
         uv_loop_s *loop = nullptr;
         auto status = napi_get_uv_event_loop(jsEnv_, &loop);
         if (status != napi_ok) {
-            MMI_HILOGE("napi_get_uv_event_loop is failed");
+            THROWERR(jsEnv_, "napi_get_uv_event_loop is failed");
             return;
         }
         uv_queue_work(loop, work, [](uv_work_t *work){}, &JsInputMonitor::JsCallback);

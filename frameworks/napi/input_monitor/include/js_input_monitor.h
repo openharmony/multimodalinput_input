@@ -56,7 +56,6 @@ private:
 
 
 class JsInputMonitor {
-
 public:
     JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, int32_t id);
     ~JsInputMonitor();
@@ -79,11 +78,12 @@ private:
 
     int32_t TransformMousePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t GetMousePointerItem(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
-    bool SetMouseProperty(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item, napi_value result);
-    bool GetAxesValue(const std::shared_ptr<PointerEvent> pointerEvent, napi_value& element);
+    bool SetMouseProperty(const std::shared_ptr<PointerEvent> pointerEvent,
+        const PointerEvent::PointerItem& item, napi_value result);
+    bool GetAxesValue(const std::shared_ptr<PointerEvent> pointerEvent, napi_value element);
     bool GetPressedKeys(const std::vector<int32_t>& pressedKeys, napi_value result);
     bool GetPressedButtons(const std::set<int32_t>& pressedButtons, napi_value result);
-    bool CheckExist(const std::vector<int32_t>& pressedKeys, int32_t keyCode);
+    bool CheckExists(const std::vector<int32_t>& pressedKeys, int32_t keyCode);
     bool GetPressedKey(const std::vector<int32_t>& pressedKeys, napi_value result);
 private:
     std::shared_ptr<InputMonitor> monitor_ {nullptr};
