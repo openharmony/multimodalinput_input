@@ -281,45 +281,48 @@ std::vector<std::string> VirtualDevice::BrowseDirectory(const std::string& fileP
 bool VirtualDevice::ClearFileResidues(const std::string& fileName)
 {
     DIR *dir = nullptr;
-    do {
-        if (!CheckFileName(fileName)) {
-            printf("file name check error");
-            break;
+    std::string procressPath;
+    std::string filePath;
+    std::string temp;
+    std::string processName;
+    std::string::size_type pos;
+    if (!CheckFileName(fileName)) {
+        printf("file name check error");
+        goto RELEASE_RES;
+    }
+    pos = fileName.find("_");
+    if (pos ==  std::string::npos) {
+        printf("Failed to create file");
+        goto RELEASE_RES;
+    }
+    procressPath =  "/proc/" + fileName.substr(0, pos) + "/";
+    dir = opendir(procressPath.c_str());
+    if (dir == nullptr) {
+        printf("open dir:%s failed", procressPath.c_str());
+        goto RELEASE_RES;
+    }
+    filePath = procressPath + "cmdline";
+    if (!IsFileExists(filePath)) {
+        printf("file path:%s failed", filePath.c_str());
+        goto RELEASE_RES;
+    }
+    if (GetFileSize(filePath) > READ_FILE_SIZE_MAX) {
+        printf("file:%s size exceeds maximum", filePath.c_str());
+        goto RELEASE_RES;
+    }
+    temp = ReadFile(filePath);
+    if (temp.empty()) {
+        printf("temp is empty");
+        goto RELEASE_RES;
+    }
+    processName.append(temp);
+    if (processName.find(VIRTUAL_DEVICE_NAME.c_str()) != processName.npos) {
+        if (closedir(dir) != 0) {
+            printf("close dir: %s failed", procressPath.c_str());
         }
-        std::string::size_type pos = fileName.find("_");
-        if (pos ==  std::string::npos) {
-            printf("Failed to create file");
-            break;
-        }
-        std::string procressPath =  "/proc/" + fileName.substr(0, pos) + "/";
-        dir = opendir(procressPath.c_str());
-        if (dir == nullptr) {
-            printf("open dir:%s failed", procressPath.c_str());
-            break;
-        }
-        std::string filePath = procressPath + "cmdline";
-        if (!IsFileExists(filePath)) {
-            printf("file path:%s failed", filePath.c_str());
-            break;
-        }
-        if (GetFileSize(filePath) > READ_FILE_SIZE_MAX) {
-            printf("file:%s size exceeds maximum", filePath.c_str());
-            break;
-        }
-        const std::string temp = ReadFile(filePath);
-        if (temp.empty()) {
-            printf("temp is empty");
-            break;
-        }
-        std::string processName;
-        processName.append(temp);
-        if (processName.find(VIRTUAL_DEVICE_NAME.c_str()) != processName.npos) {
-            if (closedir(dir) != 0) {
-                printf("close dir: %s failed", procressPath.c_str());
-            }
-            return true;
-        }
-    } while (0);
+        return true;
+    }
+    RELEASE_RES:
     if (dir != nullptr) {
         if (closedir(dir) != 0) {
             printf("close dir failed");
