@@ -35,7 +35,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
     CALL_LOG_ENTER;
-    MMI_HILOGD("request ode:%{public}d", code);
+    MMI_HILOGD("request code:%{public}d", code);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IMultimodalInputConnect::GetDescriptor()) {
@@ -52,6 +52,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         }
         case IMultimodalInputConnect::SET_POINTER_VISIBLE: {
             return StubSetPointerVisible(data, reply);
+        }
+        case IMultimodalInputConnect::IS_POINTER_VISIBLE: {
+            return StubIsPointerVisible(data, reply);
         }
         default: {
             MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
@@ -157,6 +160,24 @@ int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, M
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!CheckPermission()) {
+        MMI_HILOGE("permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+
+    int32_t ret;
+    bool visible;
+    ret = IsPointerVisible(visible);
+    if (!reply.WriteBool(visible)) {
+        MMI_HILOGE("WriteBool:%{public}d fail", ret);
+        return IPC_STUB_WRITE_PARCEL_ERR;
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS
