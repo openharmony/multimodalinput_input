@@ -50,30 +50,37 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
     switch (sendType) {
         case GET_STATUS_INFO: {
             OnInitHdiServerStatus();
-            break;
+            return RET_OK;
         }
         case SET_EVENT_INJECT: {
             pkt >> devIndex >> speechEvent;
+            if (pkt.ChkRWError()) {
+                MMI_HILOGE("Packet read recv massage failed");
+                return RET_ERR;
+            }
             MMI_HILOGI("hdi server recv massage: devIndex:%{public}d", devIndex);
             OnSetEventInject(speechEvent, devIndex);
-            break;
+            return RET_OK;
         }
         case SHOW_DEVICE_INFO: {
             ShowAllDeviceInfo();
-            break;
+            return RET_OK;
         }
         case SET_HOT_PLUGS: {
             pkt >> devIndex >> devSatatus;
+            if (pkt.ChkRWError()) {
+                MMI_HILOGE("Packet read tool hot data failed");
+                return RET_ERR;
+            }
             MMI_HILOGI("recv inject tool hot data, devIndex:%{public}d,status:%{public}d", devIndex, devSatatus);
             OnSetHotPlugs(devIndex, devSatatus);
-            break;
+            return RET_OK;
         }
         default: {
             MMI_HILOGE("The message type:%{public}d cannot be processed", sendType);
             return RET_ERR;
         }
     }
-    return RET_OK;
 }
 
 int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIndex)
