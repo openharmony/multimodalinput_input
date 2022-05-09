@@ -82,14 +82,14 @@ struct WindowInfo {
     int32_t uid;
 
     /**
-     * 逻辑屏幕界面中热区窗口左上角的x坐标
+     * 逻辑屏中热区窗口左上角的x坐标
      *
      * @since 9
     */
     int32_t hotZoneTopLeftX;
 
     /**
-     * 逻辑屏幕界面中热区窗口左上角的y坐标
+     * 逻辑屏中热区窗口左上角的y坐标
      *
      * @since 9
     */
@@ -110,14 +110,14 @@ struct WindowInfo {
     int32_t hotZoneHeight;
 
     /**
-     * 逻辑屏幕id
+     * 逻辑屏id
      *
      * @since 9
     */
     int32_t displayId;
 
     /**
-     * 此窗口的输入事件将被发送到代理窗口id进行处理
+     * 代理窗口id
      *
      * @since 9
     */
@@ -131,14 +131,14 @@ struct WindowInfo {
     int32_t winTopLeftX;
 
     /**
-     * 逻辑显示窗口左上角的坐标
+     * 逻辑显示窗口左上角的y坐标
      *
      * @since 9
     */
     int32_t winTopLeftY;
 
     /**
-     * 窗口的当前状态
+     * 窗口当前状态
      *
      * @since 9
     */
@@ -154,7 +154,7 @@ struct PhysicalDisplayInfo {
     int32_t id;
 
     /**
-     * 左侧物理显示全局唯一id
+     * 左侧物理屏id
      *
      * @since 9
     */
@@ -270,7 +270,7 @@ struct LogicalDisplayInfo {
     int32_t height;
 
     /**
-     * 逻辑显示名称，用于调试
+     * 逻辑屏幕名称，用于调试
      *
      * @since 9
     */
