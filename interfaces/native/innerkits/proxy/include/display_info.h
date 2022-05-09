@@ -23,28 +23,28 @@ namespace OHOS {
 namespace MMI {
 enum Direction {
     /**
-     * 屏幕顺时针旋转了0度
+     * 屏幕顺时针旋转0度
      *
      * @since 9
     */
     Direction0,
 
     /**
-     * 屏幕顺时针旋转了90度
+     * 屏幕顺时针旋转90度
      *
      * @since 9
     */
     Direction90,
 
     /**
-     * 屏幕顺时针旋转了180度
+     * 屏幕顺时针旋转180度
      *
      * @since 9
     */
     Direction180,
 
     /**
-     * 屏幕顺时针旋转了270度
+     * 屏幕顺时针旋转270度
      *
      * @since 9
     */
@@ -96,14 +96,14 @@ struct WindowInfo {
     int32_t hotZoneTopLeftY;
 
     /**
-     * 热区窗口的逻辑宽度
+     * 热区窗口的宽度
      *
      * @since 9
     */
     int32_t hotZoneWidth;
 
     /**
-     * 热区窗口的逻辑高度
+     * 热区窗口的高度
      *
      * @since 9
     */
@@ -124,14 +124,14 @@ struct WindowInfo {
     int32_t agentWindowId;
 
     /**
-     * 逻辑显示窗口左上角的x坐标
+     * 窗口左上角x坐标
      *
      * @since 9
     */
     int32_t winTopLeftX;
 
     /**
-     * 逻辑显示窗口左上角的y坐标
+     * 窗口左上角y坐标
      *
      * @since 9
     */
@@ -270,7 +270,7 @@ struct LogicalDisplayInfo {
     int32_t height;
 
     /**
-     * 逻辑屏幕名称，用于调试
+     * 逻辑屏名称，用于调试
      *
      * @since 9
     */
