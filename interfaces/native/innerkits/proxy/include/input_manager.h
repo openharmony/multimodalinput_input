@@ -222,6 +222,11 @@ public:
      */
     int32_t SetPointerVisible(bool visible);
 
+    /**
+     * @brief Checks whether the pointer icon is visible.
+     * @return Returns <b>true</b> if the pointer icon is visible; returns <b>false</b> otherwise.
+     * @since 9
+     */
     bool IsPointerVisible();
 
 private:
