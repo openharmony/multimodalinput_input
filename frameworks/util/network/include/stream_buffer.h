@@ -64,7 +64,6 @@ public:
     template<typename T>
     bool Write(const T& data);
 
-
     const char *ReadBuf() const;
     const char *WriteBuf() const;
 
@@ -90,7 +89,6 @@ protected:
     int32_t wPos_ = 0;
     char szBuff_[MAX_STREAM_BUF_SIZE+1] = {};
 };
-
 
 template<typename T>
 bool StreamBuffer::Read(T &data)
