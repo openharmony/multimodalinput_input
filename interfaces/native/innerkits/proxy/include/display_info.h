@@ -23,28 +23,28 @@ namespace OHOS {
 namespace MMI {
 enum Direction {
     /**
-     * 显示器顺时针旋转了0度
+     * 屏幕顺时针旋转了0度
      *
      * @since 9
     */
     Direction0,
 
     /**
-     * 显示器顺时针旋转了90度
+     * 屏幕顺时针旋转了90度
      *
      * @since 9
     */
     Direction90,
 
     /**
-     * 显示器顺时针旋转了180度
+     * 屏幕顺时针旋转了180度
      *
      * @since 9
     */
     Direction180,
 
     /**
-     * 显示器顺时针旋转了270度
+     * 屏幕顺时针旋转了270度
      *
      * @since 9
     */
@@ -54,7 +54,7 @@ enum Direction {
 
 struct WindowInfo {
     /**
-     * flags字段的Bit0表示是否为可触摸状态
+     * 表示窗口不可触摸
      *
      * @since 9
     */
@@ -82,14 +82,14 @@ struct WindowInfo {
     int32_t uid;
 
     /**
-     * 逻辑显示器界面中热区窗口左上角的x坐标
+     * 逻辑屏幕界面中热区窗口左上角的x坐标
      *
      * @since 9
     */
     int32_t hotZoneTopLeftX;
 
     /**
-     * 逻辑显示器界面中热区窗口左上角的y坐标
+     * 逻辑屏幕界面中热区窗口左上角的y坐标
      *
      * @since 9
     */
@@ -110,7 +110,7 @@ struct WindowInfo {
     int32_t hotZoneHeight;
 
     /**
-     * 逻辑显示器id
+     * 逻辑屏幕id
      *
      * @since 9
     */
@@ -147,7 +147,7 @@ struct WindowInfo {
 
 struct PhysicalDisplayInfo {
     /**
-     * 物理显示器的全局唯一id
+     * 物理屏幕的全局唯一id
      *
      * @since 9
     */
@@ -168,28 +168,28 @@ struct PhysicalDisplayInfo {
     int32_t upDisplayId;
 
     /**
-     * 显示器左上角的x坐标
+     * 屏幕左上角的x坐标
      *
      * @since 9
     */
     int32_t topLeftX;
 
     /**
-     * 显示器左上角的y坐标
+     * 屏幕左上角的y坐标
      *
      * @since 9
     */
     int32_t topLeftY;
 
     /**
-     * 显示器器宽度
+     * 屏幕宽度
      *
      * @since 9
     */
     int32_t width;
 
     /**
-     * 显示器高度
+     * 屏幕高度
      *
      * @since 9
     */
@@ -203,7 +203,7 @@ struct PhysicalDisplayInfo {
     std::string name;
 
     /**
-     * 显示座位号，与触摸屏相关联的显示器必须配置非空座位号
+     * 显示座位号，与触摸屏相关联的屏幕必须配置非空座位号
      *
      * @since 9
     */
