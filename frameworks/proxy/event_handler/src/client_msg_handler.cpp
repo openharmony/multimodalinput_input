@@ -373,6 +373,10 @@ void ClientMsgHandler::OnEventProcessed(int32_t eventId)
     CHKPV(client);
     NetPacket pkt(MmiMessageId::MARK_PROCESS);
     pkt << eventId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write eventId failed");
+        return;
+    }
     if (!client->SendMessage(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;

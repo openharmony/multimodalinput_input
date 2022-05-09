@@ -58,6 +58,10 @@ int32_t StandardizedEventManager::SubscribeKeyEvent(
     for (const auto &item : preKeys) {
         pkt << item;
     }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write subscribe key event failed");
+        return RET_ERR;
+    }
     if (!SendMsg(pkt)) {
         MMI_HILOGE("Client failed to send message");
         return RET_ERR;
@@ -70,6 +74,10 @@ int32_t StandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
     CALL_LOG_ENTER;
     NetPacket pkt(MmiMessageId::UNSUBSCRIBE_KEY_EVENT);
     pkt << subscribeId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write unsubscribe key event failed");
+        return RET_ERR;
+    }
     if (!SendMsg(pkt)) {
         MMI_HILOGE("Client failed to send message");
         return RET_ERR;
@@ -87,6 +95,10 @@ int32_t StandardizedEventManager::InjectionVirtual(bool isPressed, int32_t keyCo
     virtualEvent.keyDownDuration = keyDownDuration;
     NetPacket pkt(MmiMessageId::ON_VIRTUAL_KEY);
     pkt << virtualEvent;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write virtual event failed");
+        return RET_ERR;
+    }
     if (!SendMsg(pkt)) {
         MMI_HILOGE("Send virtual event Msg error");
         return RET_ERR;
@@ -145,6 +157,10 @@ int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offset
     CALL_LOG_ENTER;
     NetPacket pkt(MmiMessageId::MOVE_MOUSE_BY_OFFSET);
     pkt << offsetX << offsetY;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write move mouse event failed");
+        return RET_ERR;
+    }
     return SendMsg(pkt);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -153,6 +169,10 @@ int32_t StandardizedEventManager::GetDeviceIds(int32_t userData)
 {
     NetPacket pkt(MmiMessageId::INPUT_DEVICE_IDS);
     pkt << userData;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write get deviceIds failed");
+        return RET_ERR;
+    }
     return SendMsg(pkt);
 }
 
@@ -160,6 +180,10 @@ int32_t StandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId)
 {
     NetPacket pkt(MmiMessageId::INPUT_DEVICE);
     pkt << userData << deviceId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write get device failed");
+        return RET_ERR;
+    }
     return SendMsg(pkt);
 }
 
@@ -170,6 +194,10 @@ int32_t StandardizedEventManager::SupportKeys(int32_t userData, int32_t deviceId
     pkt << userData << deviceId << size;
     for (auto item : keyCodes) {
         pkt << item;
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write support keys failed");
+        return RET_ERR;
     }
     return SendMsg(pkt);
 }

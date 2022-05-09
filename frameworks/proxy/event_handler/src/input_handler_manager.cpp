@@ -72,6 +72,10 @@ void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
     CHKPV(client);
     NetPacket pkt(MmiMessageId::MARK_CONSUMED);
     pkt << monitorId << eventId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write monitorId failed");
+        return;
+    }
     if (!client->SendMessage(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
@@ -103,6 +107,10 @@ void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handle
     CHKPV(client);
     NetPacket pkt(MmiMessageId::ADD_INPUT_HANDLER);
     pkt << handlerId << handlerType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write add handlerId failed");
+        return;
+    }
     if (!client->SendMessage(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
@@ -132,6 +140,10 @@ void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType h
     CHKPV(client);
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_HANDLER);
     pkt << handlerId << handlerType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write remove handlerId failed");
+        return;
+    }
     if (!client->SendMessage(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;

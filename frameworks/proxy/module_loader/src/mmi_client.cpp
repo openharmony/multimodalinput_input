@@ -206,6 +206,10 @@ void MMIClient::VirtualKeyIn(RawInputEvent virtualKeyEvent)
 {
     NetPacket pkt(MmiMessageId::ON_VIRTUAL_KEY);
     pkt << virtualKeyEvent;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write virtual key failed");
+        return;
+    }
     SendMsg(pkt);
 }
 

@@ -124,6 +124,10 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Key
     CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
     pkt << id_;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write key event failed");
+        return;
+    }
     if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
         MMI_HILOGE("Packet key event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
@@ -140,6 +144,10 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poi
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
     MMI_HILOGD("Service SendToClient id:%{public}d,InputHandlerType:%{public}d", id_, handlerType_);
     pkt << id_ << handlerType_;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write pointer event failed");
+        return;
+    }
     if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
         MMI_HILOGE("Marshalling pointer event failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
         return;
