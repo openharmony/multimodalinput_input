@@ -161,10 +161,11 @@ void OHOS::MMI::InputWindowsManager::PrintDisplayDebugInfo()
     for (const auto &item : windowInfos_) {
         MMI_LOGD("windowId:%{public}d,id:%{public}d,pid:%{public}d,uid:%{public}d,hotZoneTopLeftX:%{public}d,"
             "hotZoneTopLeftY:%{public}d,hotZoneWidth:%{public}d,hotZoneHeight:%{public}d,display:%{public}d,"
-            "agentWindowId:%{public}d,winTopLeftX:%{public}d,winTopLeftY:%{public}d",
+            "agentWindowId:%{public}d,winTopLeftX:%{public}d,winTopLeftY:%{public}d,flags:%{public}d",
             item.first, item.second.id, item.second.pid, item.second.uid, item.second.hotZoneTopLeftX,
             item.second.hotZoneTopLeftY, item.second.hotZoneWidth, item.second.hotZoneHeight,
-            item.second.displayId, item.second.agentWindowId, item.second.winTopLeftX, item.second.winTopLeftY);
+            item.second.displayId, item.second.agentWindowId, item.second.winTopLeftX, item.second.winTopLeftY,
+            item.second.flags);
     }
 }
 
@@ -438,6 +439,43 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTargetOld(std::shared_ptr<Poi
     return RET_ERR;
 }
 
+void InputWindowsManager::SelectWindowInfo(const int32_t& globalX, const int32_t& globalY,
+    const std::shared_ptr<PointerEvent>& pointerEvent, LogicalDisplayInfo* const logicalDisplayInfo,
+    WindowInfo*& touchWindow)
+{
+    int32_t action = pointerEvent->GetPointerAction();
+    if ((firstBtnDownWindowId_ == -1) ||
+        ((action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) && (pointerEvent->GetPressedButtons().size() == 1)) ||
+        ((action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty()))) {
+        int32_t targetWindowId = pointerEvent->GetTargetWindowId();
+        for (const auto& item : logicalDisplayInfo->windowsInfo_) {
+            if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
+                MMI_LOGD("Skip the untouchable window to continue searching, "
+                    "window:%{public}d, flags:%{public}d", item.id, item.flags);
+                continue;
+            } else if ((targetWindowId < 0) && (IsInsideWindow(globalX, globalY, item))) {
+                firstBtnDownWindowId_ = item.id;
+                MMI_LOGD("find out the dispatch window of this pointerevent when the targetWindowId "
+                    "hasn't been setted up yet, window:%{public}d", firstBtnDownWindowId_);
+                break;
+            } else if ((targetWindowId >= 0) && (targetWindowId == item.id)) {
+                firstBtnDownWindowId_ = targetWindowId;
+                MMI_LOGD("find out the dispatch window of this pointerevent when the targetWindowId "
+                    "has been setted up already, window:%{public}d", firstBtnDownWindowId_);
+                break;
+            } else {
+                MMI_LOGD("Continue searching for the dispatch window of this pointerevent");
+            }
+        }
+    }
+    for (auto &item : logicalDisplayInfo->windowsInfo_) {
+        if (item.id == firstBtnDownWindowId_) {
+            touchWindow = const_cast<WindowInfo*>(&item);
+            break;
+        }
+    }
+}
+
 int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     MMI_LOGD("Enter");
@@ -460,39 +498,25 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, globalX, globalY);
-    int32_t action = pointerEvent->GetPointerAction();
-    bool isFirstBtnDown = (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN)
-        && (pointerEvent->GetPressedButtons().size() == 1);
-    bool isMove = (action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty());
-    if ((firstBtnDownWindowId_ == -1) || isFirstBtnDown || isMove) {
-        for (auto &item : logicalDisplayInfo->windowsInfo_) {
-            if (IsInsideWindow(globalX, globalY, item)) {
-                firstBtnDownWindowId_ = item.id;
-                break;
-            }
-        }
+    WindowInfo* touchWindow = nullptr;
+    SelectWindowInfo(globalX, globalY, pointerEvent, logicalDisplayInfo, touchWindow);
+    if (touchWindow == nullptr) {
+        MMI_LOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
+        return RET_ERR;
     }
-    WindowInfo* firstBtnDownWindow = nullptr;
-    for (auto &item : logicalDisplayInfo->windowsInfo_) {
-        if (item.id == firstBtnDownWindowId_) {
-            firstBtnDownWindow = &item;
-            break;
-        }
-    }
-    CHKPR(firstBtnDownWindow, ERROR_NULL_POINTER);
-    pointerEvent->SetTargetWindowId(firstBtnDownWindow->id);
-    pointerEvent->SetAgentWindowId(firstBtnDownWindow->agentWindowId);
-    int32_t localX = globalX - firstBtnDownWindow->winTopLeftX;
-    int32_t localY = globalY - firstBtnDownWindow->winTopLeftY;
+    pointerEvent->SetTargetWindowId(touchWindow->id);
+    pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
+    int32_t localX = globalX - touchWindow->winTopLeftX;
+    int32_t localY = globalY - touchWindow->winTopLeftY;
     pointerItem.SetLocalX(localX);
     pointerItem.SetLocalY(localY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
-    auto fd = udsServer_->GetClientFd(firstBtnDownWindow->pid);
+    auto fd = udsServer_->GetClientFd(touchWindow->pid);
 
     MMI_LOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
              "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d",
-             fd, firstBtnDownWindow->pid, firstBtnDownWindow->id, firstBtnDownWindow->agentWindowId,
+             fd, touchWindow->pid, touchWindow->id, touchWindow->agentWindowId,
              globalX, globalY, localX, localY);
     return fd;
 }
@@ -529,6 +553,11 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<
     MMI_LOGD("UpdateTouchScreenTarget, targetWindow:%{public}d", targetWindowId);
     WindowInfo *touchWindow = nullptr;
     for (auto item : logicalDisplayInfo->windowsInfo_) {
+        if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
+            MMI_LOGD("Skip the untouchable window to continue searching, "
+                "window:%{public}d, flags:%{public}d", item.id, item.flags);
+            continue;
+        }
         if (targetWindowId < 0) {
             if (IsInsideWindow(globalX, globalY, item)) {
                 touchWindow = &item;
