@@ -309,7 +309,7 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
         goto RELEASE_RES;
     }
     processName.append(temp);
-    if (processName.find(VIRTUAL_DEVICE_NAME.c_str()) != processName.npos) {
+    if (processName.find(VIRTUAL_DEVICE_NAME.c_str()) != std::string::npos) {
         if (closedir(dir) != 0) {
             printf("close dir: %s failed", procressPath.c_str());
         }
@@ -545,7 +545,7 @@ bool VirtualDevice::CommandBranch(std::vector<std::string>& argvList)
 {
     std::vector<std::string> deviceList = BrowseDirectory(g_folderpath);
     if (argvList[1] == "start") {
-        if (argvList.size() != MAXPARAMETER) {
+        if (argvList.size() != PARAMETERS_NUMBER) {
             printf("Invaild Input Para, Plase Check the validity of the para");
             return false;
         }
@@ -555,7 +555,7 @@ bool VirtualDevice::CommandBranch(std::vector<std::string>& argvList)
         }
         return true;
     } else if (argvList[1] == "list") {
-        if (argvList.size() != MAXDELPARAMETER) {
+        if (argvList.size() != PARAMETERS_QUERY_NUMBER) {
             printf("Invaild Input Para, Plase Check the validity of the para");
             return false;
         }
@@ -567,7 +567,7 @@ bool VirtualDevice::CommandBranch(std::vector<std::string>& argvList)
         }
         return false;
     } else if (argvList[1] == "close") {
-        if (argvList.size() != MAXPARAMETER) {
+        if (argvList.size() != PARAMETERS_NUMBER) {
             printf("Invaild Input Para, Plase Check the validity of the para");
             return false;
         }
