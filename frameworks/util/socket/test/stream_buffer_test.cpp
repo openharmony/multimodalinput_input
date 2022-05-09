@@ -56,7 +56,7 @@ HWTEST_F(StreamBufferTest, construct_002, TestSize.Level1)
 HWTEST_F(StreamBufferTest, SetReadIdx_001, TestSize.Level1)
 {
     StreamBuffer bufObj;
-    bool retResult = bufObj.SetReadIdx(1);
+    bool retResult = bufObj.SeekReadPos(1);
     EXPECT_FALSE(retResult);
 }
 
@@ -67,7 +67,7 @@ HWTEST_F(StreamBufferTest, SetReadIdx_002, TestSize.Level1)
 
     StreamBuffer bufObj;
     bufObj.Write(buf, size);
-    bool retResult = bufObj.SetReadIdx(0);
+    bool retResult = bufObj.SeekReadPos(0);
     EXPECT_TRUE(retResult);
 }
 
