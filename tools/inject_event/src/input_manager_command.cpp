@@ -27,13 +27,15 @@
 #include <unistd.h>
 #include <sys/time.h>
 
+#include "util.h"
 #include "mmi_log.h"
-#include "multimodal_event_handler.h"
-#include "error_multimodal.h"
 #include "getopt.h"
 #include "string_ex.h"
 #include "pointer_event.h"
 #include "input_manager.h"
+#include "error_multimodal.h"
+#include "multimodal_event_handler.h"
+
 
 class InputManagerCommand {
 public:
@@ -56,37 +58,34 @@ constexpr int32_t ACTION_TIME = 3000;
 constexpr int32_t BLOCK_TIME_MS = 16;
 } // namespace
 
-int32_t InputManagerCommand::NextPos(int64_t &begTimeMs, int64_t &curtTimeMs, int32_t &totalTimeMs,
-    int32_t &begPos, int32_t &endPos)
+int32_t InputManagerCommand::NextPos(int64_t begTimeMs, int64_t curtTimeMs, int32_t totalTimeMs,
+    int32_t begPos, int32_t endPos)
 {
-    int64_t endTimeMs = begTimeMs + totalTimeMs;
+    int64_t endTimeMs = 0;
+    if (!AddInt64(begTimeMs, totalTimeMs, endTimeMs)) {
+        return begPos;
+    }
     if (curtTimeMs < begTimeMs || curtTimeMs > endTimeMs) {
         return begPos;
     }
-    double tmpTimeMs = static_cast<double>(curtTimeMs - begTimeMs) / static_cast<double>(totalTimeMs);
-    int32_t offsetPos = static_cast<int32_t>(std::ceil(tmpTimeMs * (endPos - begPos)));
+    double tmpTimeMs = static_cast<double>(curtTimeMs - begTimeMs) / totalTimeMs;
+    int32_t offsetPos = std::ceil(tmpTimeMs * (endPos - begPos));
     int32_t retPos = 0;
-    if (offsetPos == 0) {
-        retPos = offsetPos + begPos;
-        if (retPos == 0) {
-            return retPos;
-        }
-        return retPos;
-    } else if (offsetPos < 0) {
-        retPos = offsetPos + begPos;
-        if (retPos == 0) {
-            return retPos;
-        }
-        if (retPos < endPos) {
-            return endPos;
-        }
-        return retPos;
-    } else if (offsetPos > 0) {
+    if (offsetPos > 0) {
         retPos = offsetPos + begPos;
         if (retPos == 0) {
             return retPos;
         }
         if (retPos > endPos) {
+            return endPos;
+        }
+        return retPos;
+    } else {
+        retPos = offsetPos + begPos;
+        if (retPos == 0) {
+            return retPos;
+        }
+        if (retPos < endPos) {
             return endPos;
         }
         return retPos;
@@ -430,10 +429,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetGlobalY(py1);
                             pointerEvent->SetPointerId(0);
                             pointerEvent->AddPointerItem(item);
-                            int64_t startTimeUs = pointerEvent->GetActionStartTime();
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+                            int64_t startTimeUs = pointerEvent->GetActionStartTime();
                             int64_t startTimeMs = startTimeUs / 1000;
                             int64_t endTimeMs = startTimeMs + totalTimeMs;
                             int64_t currentTimeMs = startTimeMs;
