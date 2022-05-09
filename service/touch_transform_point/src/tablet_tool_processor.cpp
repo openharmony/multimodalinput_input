@@ -94,12 +94,9 @@ int32_t TabletToolProcessor::GetToolType(struct libinput_event_tablet_tool* tabl
         case LIBINPUT_TABLET_TOOL_TYPE_LENS: {
             return PointerEvent::TOOL_TYPE_LENS;
         }
-        case LIBINPUT_TABLET_TOOL_TYPE_TOTEM: {
-            MMI_HILOGW("Invalid type");
-            return RET_ERR;
-        }
         default: {
-            return RET_ERR;
+            MMI_HILOGW("Invalid type");
+            return INVALID_TOOL_TYPE;
         }
     }
 }
@@ -145,8 +142,9 @@ bool TabletToolProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
     auto tiltY = libinput_event_tablet_tool_get_tilt_y(event);
     auto pressure = libinput_event_tablet_tool_get_pressure(event);
     int32_t toolType = GetToolType(event);
-    if (toolType == RET_ERR) {
+    if (toolType == INVALID_TOOL_TYPE) {
         MMI_HILOGE("GetToolType failed");
+        return false;
     }
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionStartTime(time);
@@ -193,8 +191,9 @@ bool TabletToolProcessor::OnTipMotion(struct libinput_event* event)
     auto tiltY = libinput_event_tablet_tool_get_tilt_y(tabletEvent);
     auto pressure = libinput_event_tablet_tool_get_pressure(tabletEvent);
     int32_t toolType = GetToolType(tabletEvent);
-    if (toolType == RET_ERR) {
+    if (toolType == INVALID_TOOL_TYPE) {
         MMI_HILOGE("GetToolType failed");
+        return false;
     }
 
     PointerEvent::PointerItem item;
@@ -227,8 +226,9 @@ bool TabletToolProcessor::OnTipUp(struct libinput_event_tablet_tool* event)
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     int32_t toolType = GetToolType(event);
-    if (toolType == RET_ERR) {
+    if (toolType == INVALID_TOOL_TYPE) {
         MMI_HILOGE("GetToolType failed");
+        return false;
     }
 
     PointerEvent::PointerItem item;
