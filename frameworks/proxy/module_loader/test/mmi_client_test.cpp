@@ -128,6 +128,10 @@ public:
                 pkt << winInfo;
             }
         }
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet write random display failed");
+            return false;
+        }
         return true;
     }
 #endif // OHOS_BUILD_MMI_DEBUG

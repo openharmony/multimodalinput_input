@@ -74,6 +74,10 @@ bool InterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
             NetPacket pkt(MmiMessageId::KEYBOARD_EVENT_INTERCEPTOR);
             InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
             pkt << item.session->GetPid();
+            if (pkt.ChkRWError()) {
+                MMI_HILOGE("Packet write interceptor messaage failed");
+                return false;
+            }
             MMI_HILOGD("server send the interceptor msg to client, pid:%{public}d", item.session->GetPid());
             item.session->SendMsg(pkt);
         }

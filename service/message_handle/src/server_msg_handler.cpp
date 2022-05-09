@@ -126,6 +126,10 @@ int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
     const int32_t processingCode = MMIHdiInject->ManageHdfInject(sess, pkt);
     NetPacket pkt(MmiMessageId::HDI_INJECT);
     pkt << processingCode;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write reply messaage failed");
+        return RET_ERR;
+    }
     if (!sess->SendMsg(pkt)) {
         MMI_HILOGE("OnHdiInject reply messaage error");
         return RET_ERR;
@@ -195,6 +199,10 @@ int32_t ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt)
         TagPackHead tagPackHeadAck = { MmiMessageId::INVALID, {fd}};
         NetPacket pkt(MmiMessageId::GET_MMI_INFO_ACK);
         pkt << tagPackHeadAck;
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet write tagPackHeadAck failed");
+            return PACKET_READ_FAIL;
+        }
         if (!udsServer_->SendMsg(fd, pkt)) {
             MMI_HILOGE("Sending message failed");
             return MSG_SEND_FAIL;
@@ -402,6 +410,10 @@ int32_t ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
     for (const auto& item : ids) {
         pkt2 << item;
     }
+    if (pkt2.ChkRWError()) {
+        MMI_HILOGE("Packet write deviceIds failed");
+        return RET_ERR;
+    }
     if (!sess->SendMsg(pkt2)) {
         MMI_HILOGE("Sending failed");
         return MSG_SEND_FAIL;
@@ -494,6 +506,10 @@ int32_t ServerMsgHandler::OnSupportKeys(SessionPtr sess, NetPacket& pkt)
     for (const auto &item : keystroke) {
         pkt2 << static_cast<bool>(item);
     }
+    if (pkt2.ChkRWError()) {
+        MMI_HILOGE("Packet write support keys failed");
+        return RET_ERR;
+    }
     if (!sess->SendMsg(pkt2)) {
         MMI_HILOGE("Sending failed");
         return MSG_SEND_FAIL;
@@ -510,6 +526,10 @@ int32_t ServerMsgHandler::OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pk
         CHKPV(sess);
         NetPacket pkt2(MmiMessageId::ADD_INPUT_DEVICE_MONITOR);
         pkt2 << type << deviceId;
+        if (pkt2.ChkRWError()) {
+            MMI_HILOGE("Packet write deviceId failed");
+            return;
+        }
         if (!sess->SendMsg(pkt2)) {
             MMI_HILOGE("Sending failed");
             return;

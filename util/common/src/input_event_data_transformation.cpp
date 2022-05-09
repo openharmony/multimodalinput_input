@@ -38,6 +38,10 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
         pkt << item.GetKeyCode() << item.GetDownTime()
             << item.GetDeviceId() << item.IsPressed();
     }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write key event failed");
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
