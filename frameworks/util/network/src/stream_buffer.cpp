@@ -107,8 +107,7 @@ bool StreamBuffer::Read(char *buf, size_t size)
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
-    errno_t ret = memcpy_sp(buf, size, ReadBuf(), size);
-    if (ret != EOK) {
+    if (memcpy_sp(buf, size, ReadBuf(), size) != EOK) {
         MMI_LOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
