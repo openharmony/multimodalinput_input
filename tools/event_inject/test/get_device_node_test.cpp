@@ -35,32 +35,19 @@ public:
 };
 
 /**
- * @tc.name:Test_GetDeviceNodeTest
- * @tc.desc:Verify ExecuteCmd function Wrong argument passed in
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(GetDeviceNodeTest, Test_GetDeviceNodeTest, TestSize.Level1)
-{
-    GetDeviceNode getDeviceNode;
-    const std::string cmd = "";
-    std::vector<std::string> cmdResult;
-    auto ret = getDeviceNode.ExecuteCmd(cmd, cmdResult);
-    EXPECT_EQ(ret, RET_ERR);
-}
-
-/**
  * @tc.name:Test_GetDeviceNodeTestCmdError
- * @tc.desc:Verify ExecuteCmd function right argument passed in
+ * @tc.desc:Verify ReadDeviceFile function right argument passed in
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(GetDeviceNodeTest, Test_GetDeviceNodeTestCmdError, TestSize.Level1)
 {
     GetDeviceNode getDeviceNode;
-    const std::string cmd = "temp";
-    std::vector<std::string> cmdResult;
-    auto ret = getDeviceNode.ExecuteCmd(cmd, cmdResult);
+    int32_t ret = 0;
+    if (getDeviceNode.ReadDeviceFile().empty()) {
+        ret = -1;
+        EXPECT_EQ(ret, RET_ERR);
+    }
     EXPECT_GT(ret, 0);
 }
 } // namespace MMI
