@@ -21,6 +21,7 @@
 #include "nocopyable.h"
 #include "pointer_event.h"
 #include "i_event_filter.h"
+#include "i_key_command_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -79,7 +80,7 @@ private:
     };
     void OnKeyboardEventTrace(const std::shared_ptr<KeyEvent> &key, IsEventHandler isEventHandler);
     void HandlePointerEventTrace(const std::shared_ptr<PointerEvent> &point);
-    };
+};
 } // namespace MMI
 } // namespace OHOS
 #endif // EVENT_DISPATCH_H

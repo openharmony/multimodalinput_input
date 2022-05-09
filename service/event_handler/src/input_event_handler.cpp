@@ -30,7 +30,6 @@
 #include "time_cost_chk.h"
 #include "timer_manager.h"
 #include "touch_transform_point_manager.h"
-#include "ability_launch_manager.h"
 #include "util.h"
 
 namespace OHOS {

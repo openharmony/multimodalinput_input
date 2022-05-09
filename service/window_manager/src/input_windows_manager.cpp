@@ -18,7 +18,7 @@
 #include "event_dump.h"
 #include "util.h"
 #include "util_ex.h"
-#include "pointer_drawing_manager.h"
+#include "i_pointer_drawing_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -125,7 +125,8 @@ void OHOS::MMI::InputWindowsManager::UpdateDisplayInfo(const std::vector<Physica
         }
     }
     if (!logicalDisplays.empty()) {
-        PointerDrawMgr->TellDisplayInfo(logicalDisplays[0].id, logicalDisplays[0].width, logicalDisplays_[0].height);
+        IPointerDrawingManager::GetInstance()->TellDisplayInfo(logicalDisplays[0].id,
+            logicalDisplays[0].width, logicalDisplays_[0].height);
     }
     PrintDisplayDebugInfo();
     MMI_LOGD("leave");
@@ -458,7 +459,7 @@ int32_t OHOS::MMI::InputWindowsManager::UpdateMouseTarget(std::shared_ptr<Pointe
     CHKPR(logicalDisplayInfo, ERROR_NULL_POINTER);
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
-    PointerDrawMgr->DrawPointer(displayId, globalX, globalY);
+    IPointerDrawingManager::GetInstance()->DrawPointer(displayId, globalX, globalY);
     int32_t action = pointerEvent->GetPointerAction();
     bool isFirstBtnDown = (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN)
         && (pointerEvent->GetPressedButtons().size() == 1);

@@ -18,8 +18,8 @@
 
 #include <iostream>
 #include <ui/rs_surface_node.h>
-#include "singleton.h"
 #include "../../../common/include/device_observer.h"
+#include "i_pointer_drawing_manager.h"
 #include "struct_multimodal.h"
 #include "pixel_map.h"
 #include "window.h"
@@ -27,10 +27,12 @@
 
 namespace OHOS {
 namespace MMI {
-class PointerDrawingManager : public DelayedSingleton<PointerDrawingManager>, public DeviceObserver {
+class PointerDrawingManager : public IPointerDrawingManager,
+                              public DeviceObserver,
+                              public std::enable_shared_from_this<PointerDrawingManager> {
 public:
-    PointerDrawingManager();
-    ~PointerDrawingManager();
+    PointerDrawingManager() = default;
+    virtual ~PointerDrawingManager() = default;
     void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY);
     void TellDisplayInfo(int32_t displayId, int32_t width, int32_t height);
     void UpdatePointerDevice(bool hasPointerDevice);
@@ -62,5 +64,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#define PointerDrawMgr OHOS::MMI::PointerDrawingManager::GetInstance()
 #endif // POINTER_DRAWING_MANAGER_H

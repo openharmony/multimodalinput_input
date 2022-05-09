@@ -15,7 +15,7 @@
 
 #include "event_dispatch.h"
 #include <cinttypes>
-#include "ability_launch_manager.h"
+
 #include "ability_manager_client.h"
 #include "bytrace.h"
 #include "event_filter_wrap.h"
@@ -195,7 +195,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer,
             return RET_OK;
         }
     }
-    if (AbilityMgr->CheckLaunchAbility(key)) {
+    if (IKeyCommandManager::GetInstance()->HandlerEvent(key)) {
         MMI_LOGD("The keyEvent start launch an ability, keyCode:%{public}d", key->GetKeyCode());
         OnKeyboardEventTrace(key, KEY_CHECKLAUNABILITY_EVENT);
         return RET_OK;

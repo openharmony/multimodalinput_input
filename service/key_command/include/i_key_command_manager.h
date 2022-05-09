@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,22 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_OBSERVER_H
-#define DEVICE_OBSERVER_H
+#ifndef I_KEY_COMMAND_MANAGER_H
+#define I_KEY_COMMAND_MANAGER_H
+
+#include "key_event.h"
 
 namespace OHOS {
 namespace MMI {
-class DeviceObserver {
+class IKeyCommandManager {
 public:
-    virtual void UpdatePointerDevice(bool hasPointerDevice) = 0;
-};
-
-class Subject {
+    IKeyCommandManager() = default;
+    virtual ~IKeyCommandManager() = default;
+    static std::shared_ptr<IKeyCommandManager> GetInstance();
+    virtual bool HandlerEvent(const std::shared_ptr<KeyEvent> key)
+    {
+        return false;
+    }
 public:
-    virtual void Attach(std::shared_ptr<DeviceObserver> observer) = 0;
-    virtual void Detach(std::shared_ptr<DeviceObserver> observer) = 0;
-    virtual void NotifyPointerDevice(bool hasPointerDevice) = 0;
+    static inline std::shared_ptr<IKeyCommandManager> keyCommand_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif
+#endif // I_KEY_COMMAND_MANAGER_H
