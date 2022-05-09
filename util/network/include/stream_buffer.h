@@ -63,6 +63,10 @@ public:
     bool Read(T& data);
     template<typename T>
     bool Write(const T& data);
+    template<typename T>
+    bool Read(std::vector<T> &data);
+    template<typename T>
+    bool Write(const vector<T> &data);
 
     const char *ReadBuf() const;
     const char *WriteBuf() const;
@@ -108,6 +112,46 @@ bool StreamBuffer::Write(const T &data)
         MMI_HILOGE("[%{public}s] size:%{public}zu,count:%{public}d,errCode:%{public}d",
             GetErrorStatusRemark().c_str(), sizeof(data), wCount_ + 1, STREAM_BUF_WRITE_FAIL);
         return false;
+    }
+    return true;
+}
+
+template<typename T>
+bool StreamBuffer::Read(std::vector<T> &data)
+{
+    int32_t size = 0;
+    if (!Read(size)) {
+        MMI_HILOGE("vecotr read size error");
+        return false;
+    }
+    if (size < 0 || size > VECTOR_SIZE) {
+        MMI_HILOGE("vecotr read size:%{public}d error", size);
+        return false;
+    }
+    for (int32_t i = 0; i < size; i++) {
+        T val;
+        if (!Read(val)) {
+            MMI_HILOGE("vecotr read data error");
+            return false;
+        }
+        data.push_back(val);
+    }
+    return true;
+}
+
+template<typename T>
+bool StreamBuffer::Write(const std::vector<T> &data)
+{
+    int32_t size = static_cast<int32_t>(data.size());
+    if (!Write(size)) {
+        MMI_HILOGE("vecotr write size error");
+        return false;
+    }
+    for (const auto &it : data) {
+        if (!Write(it)) {
+            MMI_HILOGE("vecotr write data error");
+            return false;
+        }
     }
     return true;
 }
