@@ -46,8 +46,8 @@
 namespace OHOS {
 namespace MMI {
 #define SYMBOL_FOLDER_PERMISSIONS 775
-#define MAXPARAMETER 3
-#define MAXDELPARAMETER 2
+#define PARAMETERS_NUMBER 3
+#define PARAMETERS_QUERY_NUMBER 2
 #define IS_FILE_JUDGE 8
 #define BIN_NAME "mmi-virtual-device-manger"
 
