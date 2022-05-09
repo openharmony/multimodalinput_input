@@ -54,10 +54,9 @@ size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_
     std::vector<int32_t> &difList);
 std::string StringFmt(const char* str, ...);
 bool IsFileExists(const std::string& fileName);
-int32_t VerifyFile(const std::string& fileName);
 std::string GetFileExtendName(const std::string& fileName);
 int32_t GetFileSize(const std::string& fileName);
-std::string ReadFile(const std::string &filePath, int32_t readLine = 0);
+std::string ReadFile(const std::string &filePath);
 template <typename T>
 bool AddInt(T op1, T op2, T minVal, T maxVal, T &res);
 inline bool AddInt32(int32_t op1, int32_t op2, int32_t &res)

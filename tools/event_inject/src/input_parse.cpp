@@ -26,19 +26,16 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetDeviceNode" };
 struct JsonParser {
     JsonParser() = default;
-
     ~JsonParser()
     {
         if (json_ != nullptr) {
             cJSON_Delete(json_);
         }
     }
-
     operator cJSON *()
     {
         return json_;
     }
-
     cJSON *json_ = nullptr;
 };
 
