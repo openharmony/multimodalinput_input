@@ -490,6 +490,7 @@ int32_t ServerMsgHandler::OnSupportKeys(SessionPtr sess, NetPacket& pkt)
     int32_t deviceId;
     size_t size;
     pkt >> userData >> deviceId >> size;
+    MMI_HILOGE("111111111111Packet read data size:%{public}d111111111111", size);
     int32_t sysKeyValue;
     std::vector<int32_t> keyCode;
     for (size_t i = 0 ; i < size; ++i) {

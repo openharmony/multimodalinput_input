@@ -22,6 +22,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t ERROR_UNSUPPORT = -2;
+constexpr int32_t VECTOR_SIZE = 1000;
 }
 
 enum MmiModuleType {

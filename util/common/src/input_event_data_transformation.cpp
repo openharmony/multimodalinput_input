@@ -58,6 +58,7 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
     key->SetKeyAction(data);
     int32_t size = 0;
     pkt >> size;
+    MMI_HILOGE("111111111111Packet read data size:%{public}d111111111111", size);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read size failed");
         return RET_ERR;
