@@ -56,9 +56,6 @@ void OHOS::MMI::UDSServer::UdsStop()
         item.second->Close();
     }
     sessionsMap_.clear();
-    if (t_.joinable()) {
-        t_.join();
-    }
 }
 
 int32_t OHOS::MMI::UDSServer::GetClientFd(int32_t pid)
@@ -268,7 +265,7 @@ void OHOS::MMI::UDSServer::SetRecvFun(MsgServerFunCallback fun)
     recvFun_ = fun;
 }
 
-void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
+void OHOS::MMI::UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
 {
     auto secPtr = GetSession(fd);
     if (secPtr != nullptr) {
@@ -285,14 +282,14 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     close(fd);
 }
 
-void UDSServer::OnPacket(int32_t fd, NetPacket& pkt)
+void OHOS::MMI::UDSServer::OnPacket(int32_t fd, NetPacket& pkt)
 {
     auto sess = GetSession(fd);
     CHKPV(sess);
     recvFun_(sess, pkt);
 }
 
-void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
+void OHOS::MMI::UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
 {
     if (fd < 0) {
         MMI_LOGE("Invalid input param fd:%{public}d", fd);
@@ -329,7 +326,7 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
     }
 }
 
-void UDSServer::OnEpollEvent(epoll_event& ev)
+void OHOS::MMI::UDSServer::OnEpollEvent(epoll_event& ev)
 {
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int32_t*>(ev.data.ptr);

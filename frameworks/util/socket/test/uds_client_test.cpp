@@ -40,16 +40,6 @@ public:
         return retResult;
     }
 
-    void OnRecvTestUnitTest(const char *buf, size_t size)
-    {
-        OnRecv(buf, size);
-    }
-
-    void OnEventUnitTest(const struct epoll_event& ev, StreamBuffer& buf)
-    {
-        OnEvent(ev, buf);
-    }
-
     void OnThreadUnitTest()
     {
         OnThread();
@@ -186,43 +176,10 @@ HWTEST_F(UDSClientTest, SendMsg_type2_002, TestSize.Level1)
     EXPECT_EQ(0, retResult);
 }
 
-HWTEST_F(UDSClientTest, OnRecv_001, TestSize.Level1)
-{
-    const char *buf = nullptr;
-    size_t size = 0;
-    UDSClientUnitTest udsClientUt;
-    udsClientUt.OnRecvTestUnitTest(buf, size);
-}
-
-HWTEST_F(UDSClientTest, OnRecv_002, TestSize.Level1)
-{
-    const char *buf = "3333&";
-    size_t size = 0;
-    UDSClientUnitTest udsClientUt;
-    udsClientUt.OnRecvTestUnitTest(buf, size);
-}
-
-HWTEST_F(UDSClientTest, OnRecv_003, TestSize.Level1)
-{
-    const char *buf = "1234";
-    size_t size = 3;
-    UDSClientUnitTest udsClientUt;
-    udsClientUt.OnRecvTestUnitTest(buf, size);
-}
-
 HWTEST_F(UDSClientTest, Stop_001, TestSize.Level1)
 {
     UDSClient udsClient;
     udsClient.Stop();
-}
-
-HWTEST_F(UDSClientTest, OnEvent, TestSize.Level1)
-{
-    struct epoll_event ev = {};
-    StreamBuffer buf;
-
-    UDSClientUnitTest udsClientUt;
-    udsClientUt.OnEventUnitTest(ev, buf);
 }
 
 HWTEST_F(UDSClientTest, OnThread, TestSize.Level1)

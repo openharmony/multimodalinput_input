@@ -179,20 +179,6 @@ HWTEST_F(StreamBufferTest, Size_001, TestSize.Level1)
     streamBuffer.Size();
 }
 
-HWTEST_F(StreamBufferTest, operatorLeft, TestSize.Level1)
-{
-    StreamBuffer streamBufferSrc;
-    StreamBuffer streamBufferCopy = streamBufferSrc;
-    streamBufferCopy << streamBufferSrc;
-}
-
-HWTEST_F(StreamBufferTest, operatorRight, TestSize.Level1)
-{
-    StreamBuffer streamBufferSrc;
-    StreamBuffer streamBufferCopy = streamBufferSrc;
-    streamBufferCopy >> streamBufferSrc;
-}
-
 HWTEST_F(StreamBufferTest, ReadBuf, TestSize.Level1)
 {
     StreamBufferUnitTest bufObj;
