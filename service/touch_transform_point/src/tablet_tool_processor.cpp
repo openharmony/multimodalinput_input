@@ -21,7 +21,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TabletToolProcessor" };
 constexpr int32_t DEFAULT_POINTER_ID { 0 };
-static constexpr int32_t INVALID_TOOL_TYPE = -1;
+constexpr int32_t INVALID_TOOL_TYPE = -1;
 } // namespace
 
 TabletToolProcessor::TabletToolProcessor(int32_t deviceId)
