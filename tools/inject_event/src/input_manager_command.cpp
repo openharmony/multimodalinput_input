@@ -106,7 +106,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
     int32_t c;
     int32_t optionIndex;
     optind = 0;
-    /* parse the first word of the command */
     if ((c = getopt_long(argc, argv, "MKT?", headOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'M': {
@@ -114,7 +113,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t py;
                 int32_t buttonId;
                 int32_t scrollValue;
-                /* parse commands for virtual mouse */
                 while ((c = getopt_long(argc, argv, "m:d:u:c:s:", mouseSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
@@ -273,7 +271,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 }
                 break;
             }
-            /* parse commands for keyboard */
             case 'K': {
                 std::vector<int32_t> downKey;
                 int32_t keyCode;
@@ -355,7 +352,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 }
                 break;
             }
-            /* parse commands for touch */
             case 'T': {
                 int32_t px1 = 0;
                 int32_t py1 = 0;
@@ -534,7 +530,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             return EVENT_REG_FAIL;
                         }
                     }
-                    /* sleep for a short time after every step to give the divice some time to react */
                     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
                 }
                 break;
