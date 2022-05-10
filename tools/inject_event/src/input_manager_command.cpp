@@ -15,17 +15,17 @@
 
 #include "input_manager_command.h"
 
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
-#include <thread>
 #include <limits>
-#include <algorithm>
-#include <unistd.h>
 #include <sys/time.h>
+#include <thread>
+#include <unistd.h>
 
 #include "error_multimodal.h"
 #include "getopt.h"
