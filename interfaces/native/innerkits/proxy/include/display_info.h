@@ -82,28 +82,28 @@ struct WindowInfo {
     int32_t uid;
 
     /**
-     * 逻辑屏中热区窗口左上角的x坐标
+     * 热区窗口左上角的x坐标
      *
      * @since 9
     */
     int32_t hotZoneTopLeftX;
 
     /**
-     * 逻辑屏中热区窗口左上角的y坐标
+     * 热区窗口左上角的y坐标
      *
      * @since 9
     */
     int32_t hotZoneTopLeftY;
 
     /**
-     * 热区窗口的宽度
+     * 热区窗口宽度
      *
      * @since 9
     */
     int32_t hotZoneWidth;
 
     /**
-     * 热区窗口的高度
+     * 热区窗口高度
      *
      * @since 9
     */
@@ -147,7 +147,7 @@ struct WindowInfo {
 
 struct PhysicalDisplayInfo {
     /**
-     * 物理屏幕的全局唯一id
+     * 物理屏全局唯一id
      *
      * @since 9
     */
@@ -161,7 +161,7 @@ struct PhysicalDisplayInfo {
     int32_t leftDisplayId;
 
     /**
-     * 上层物理视图的全局唯一id
+     * 上层物理屏id
      *
      * @since 9
     */
@@ -196,37 +196,42 @@ struct PhysicalDisplayInfo {
     int32_t height;
 
     /**
-     * 显示名称，用于调试
+     * 物理屏名称，用于调试
      *
      * @since 9
     */
     std::string name;
 
     /**
-     * 显示座位号，与触摸屏相关联的屏幕必须配置非空座位号
+     * 座位id,用于触摸屏和显示屏的匹配
      *
      * @since 9
     */
     std::string seatId;
 
+    /**
+     * 座位名，用于触摸屏和显示屏的匹配
+     *
+     * @since 9
+    */
     std::string seatName;
 
     /**
-     * 显示逻辑宽度
+     * 物理屏逻辑宽度
      *
      * @since 9
     */
     int32_t logicWidth;
 
     /**
-     * 显示逻辑高度
+     * 物理屏逻辑高度
      *
      * @since 9
     */
     int32_t logicHeight;
 
     /**
-     * 显示方向
+     * 物理屏方向
      *
      * @since 9
     */
@@ -235,35 +240,35 @@ struct PhysicalDisplayInfo {
 
 struct LogicalDisplayInfo {
     /**
-     * 逻辑显示的全局唯一id
+     * 逻辑屏全局唯一id
      *
      * @since 9
     */
     int32_t id;
 
     /**
-     * 逻辑显示左上角的x坐标
+     * 逻辑屏左上角的x坐标
      *
      * @since 9
     */
     int32_t topLeftX;
 
     /**
-     * 逻辑显示左上角的y坐标
+     * 逻辑屏左上角的y坐标
      *
      * @since 9
     */
     int32_t topLeftY;
 
     /**
-     * 逻辑显示宽度
+     * 逻辑屏宽度
      *
      * @since 9
     */
     int32_t width;
 
     /**
-     * 逻辑显示高度
+     * 逻辑屏高度
      *
      * @since 9
     */
@@ -277,20 +282,28 @@ struct LogicalDisplayInfo {
     std::string name;
 
     /**
-     * 逻辑显示seatId，不独立于触摸屏的显示使用此属性与输入关联
-     *
-     * 保持它为空，除非你确定你在做什么
+     * 座位id,用于触摸屏和显示屏的匹配
      *
      * @since 9
     */
     std::string seatId;
 
+    /**
+     * 座位名,用于触摸屏和显示屏的匹配
+     * 
+     * @since 9
+    */
     std::string seatName;
 
+    /**
+     * 焦点窗口id
+     *
+     * @since 9
+    */
     int32_t focusWindowId;
 
     /**
-     * 窗口信息按Z顺序排列的列表，顶部窗口在顶部
+     * 逻辑屏的窗口信息按Z顺序排列，顶部窗口在顶部
      *
      * @since 9
     */
