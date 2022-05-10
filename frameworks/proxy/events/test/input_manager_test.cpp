@@ -1117,7 +1117,7 @@ HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_004, TestSize.Level1)
 
     std::string command {
         "InputWindowsManager: in UpdateTouchScreenTarget, "
-        "Can.t find pointer item, pointer:[[:digit:]]\\{1,\\}"
+        "Can.t find pointer item, pointer:"
     };
     std::vector<std::string> sLogs { SearchLog(command, true) };
 

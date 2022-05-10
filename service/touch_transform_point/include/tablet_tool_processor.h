@@ -28,6 +28,7 @@ public:
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
 
 private:
+    int32_t GetToolType(struct libinput_event_tablet_tool* tabletEvent);
     bool OnTip(struct libinput_event* event);
     bool OnTipDown(struct libinput_event_tablet_tool* event);
     bool OnTipMotion(struct libinput_event* event);
