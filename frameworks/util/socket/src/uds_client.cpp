@@ -180,9 +180,9 @@ void UDSClient::OnEvent(const struct epoll_event& ev)
         return;
     }
 
-    char szBuf[MAX_PACKET_BUF_SIZE] = {};
+    char szBuff[MAX_PACKET_BUF_SIZE] = {};
     for (size_t j = 0; j < MAX_RECV_LIMIT; j++) {
-        auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
+        auto size = recv(fd, szBuff, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {
             OnRecvMsg(szBuff, size);
         } else if (size < 0) {
@@ -194,7 +194,7 @@ void UDSClient::OnEvent(const struct epoll_event& ev)
             MMI_LOGE("recv return %{public}zu errno:%{public}d", size, errno);
             break;
         } else {
-            MMI_HILOGE("The server side disconnect with the client. size:0 errno:%{public}d", errno);
+            MMI_LOGE("The server side disconnect with the client. size:0 errno:%{public}d", errno);
             Disconnected(fd);
             break;
         }
@@ -210,15 +210,13 @@ void UDSClient::OnThread()
     MMI_LOGD("begin");
     SetThreadName("uds_client");
     isThreadHadRun_ = true;
-    StreamBuffer streamBuf;
     struct epoll_event events[MAX_EVENT_SIZE] = {};
-
     while (isRunning_) {
         if (isConnected_) {
             streamBuf.Clean();
-            auto count = EpollWait(*events, MAX_EVENT_SIZE, DEFINE_EPOLL_TIMEOUT);
+            auto count = EpollWait(&events[0], MAX_EVENT_SIZE, DEFINE_EPOLL_TIMEOUT);
             for (auto i = 0; i < count; i++) {
-                OnEvent(events[i], streamBuf);
+                OnEvent(events[i]);
             }
         } else {
             if (ConnectTo() < 0) {

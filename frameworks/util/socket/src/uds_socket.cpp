@@ -14,8 +14,11 @@
  */
 
 #include "uds_socket.h"
+
 #include <cinttypes>
+
 #include "mmi_log.h"
+#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
@@ -96,7 +99,7 @@ int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isBlock)
     return flags;
 }
 
-void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, UDSSocket::PacketCallBackFun callbackFun)
+void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, PacketCallBackFun callbackFun)
 {
     constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
     for (int32_t i = 0; i < ONCE_PROCESS_NETPACKET_LIMIT; i++) {

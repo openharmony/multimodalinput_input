@@ -334,7 +334,7 @@ void UDSServer::OnEpollEvent(epoll_event& ev)
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int32_t*>(ev.data.ptr);
     if (fd < 0) {
-        MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
+        MMI_LOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
         return;
     }
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
