@@ -227,15 +227,8 @@ int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& p
 {
     CALL_LOG_ENTER;
     int32_t userData;
-    int32_t size;
     std::vector<int32_t> inputDeviceIds;
-    pkt >> userData >> size;
-    MMI_HILOGE("111111111111Packet read data size:%{public}d111111111111", size);
-    for (int32_t i = 0; i < size; i++) {
-        int32_t deviceId = 0;
-        pkt >> deviceId;
-        inputDeviceIds.push_back(deviceId);
-    }
+    pkt >> userData >> inputDeviceIds;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read device Data failed");
         return RET_ERR;
@@ -252,7 +245,6 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
     auto devData = std::make_shared<InputDeviceImpl::InputDeviceInfo>();
     pkt >> userData >> devData->id >> devData->name >> devData->deviceType >> devData->busType >> devData->product
         >> devData->vendor >> devData->version >> devData->phys >> devData->uniq >> size;
-    MMI_HILOGE("111111111111Packet read data size:%{public}d111111111111", size);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read basic data failed");
         return PACKET_READ_FAIL;
@@ -277,15 +269,8 @@ int32_t ClientMsgHandler::OnSupportKeys(const UDSClient& client, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
     int32_t userData;
-    size_t size;
-    pkt >> userData >> size;
-    MMI_HILOGE("111111111111Packet read data size:%{public}d111111111111", size);
     std::vector<bool> abilityRet;
-    bool ret;
-    for (size_t i = 0; i < size; ++i) {
-        pkt >> ret;
-        abilityRet.push_back(ret);
-    }
+    pkt >> userData >> abilityRet;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read key Data failed");
         return RET_ERR;

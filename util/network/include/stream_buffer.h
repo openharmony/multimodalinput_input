@@ -124,7 +124,7 @@ bool StreamBuffer::Read(std::vector<T> &data)
         MMI_HILOGE("vecotr read size error");
         return false;
     }
-    if (size < 0 || size > VECTOR_SIZE) {
+    if (size < 0 || size > MAX_VECTOR_SIZE) {
         MMI_HILOGE("vecotr read size:%{public}d error", size);
         return false;
     }
@@ -147,8 +147,8 @@ bool StreamBuffer::Write(const std::vector<T> &data)
         MMI_HILOGE("vecotr write size error");
         return false;
     }
-    for (const auto &it : data) {
-        if (!Write(it)) {
+    for (const auto &item : data) {
+        if (!Write(item)) {
             MMI_HILOGE("vecotr write data error");
             return false;
         }
