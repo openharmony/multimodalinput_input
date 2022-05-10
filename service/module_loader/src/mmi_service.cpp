@@ -281,7 +281,7 @@ void MMIService::OnTimer()
 void MMIService::OnThread()
 {
     SetThreadName(std::string("mmi_service"));
-    uint64_t tid = GetThisThreadId();
+    uint64_t tid = GetThisThreadIdOfLL();
     MMI_LOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
 
     int32_t count = 0;
