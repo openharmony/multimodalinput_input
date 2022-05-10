@@ -37,9 +37,6 @@ private:
 private:
     int32_t deviceId_ { -1 };
     std::shared_ptr<PointerEvent> pointerEvent_  { nullptr };
-
-private:
-    static constexpr int32_t INVALID_TOOL_TYPE = -1;
 };
 } // namespace MMI
 } // namespace OHOS
