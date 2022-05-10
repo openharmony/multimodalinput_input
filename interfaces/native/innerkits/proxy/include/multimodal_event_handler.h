@@ -30,7 +30,7 @@ enum RES_STATUS : uint8_t {
 
 class MultimodalEventHandler : public Singleton<OHOS::MMI::MultimodalEventHandler> {
 public:
-    MultimodalEventHandler();
+    MultimodalEventHandler() = default;
     ~MultimodalEventHandler() = default;
     int32_t GetMultimodeInputInfo();
     MMIClientPtr GetMMIClient();

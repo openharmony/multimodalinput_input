@@ -26,9 +26,6 @@ namespace MMI {
 int32_t main(int32_t argc, const char *argv[])
 {
     using namespace OHOS::MMI;
-#ifdef OHOS_BUILD_MMI_DEBUG
-    VerifyLogManagerRun();
-#endif
     auto service = OHOS::DelayedSingleton<MMIService>::GetInstance();
     service->OnStart();
     constexpr int32_t sleepTime = 10 * 60;
