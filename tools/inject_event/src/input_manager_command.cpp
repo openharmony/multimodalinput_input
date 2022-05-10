@@ -27,14 +27,14 @@
 #include <unistd.h>
 #include <sys/time.h>
 
-#include "util.h"
-#include "mmi_log.h"
-#include "getopt.h"
-#include "string_ex.h"
-#include "pointer_event.h"
-#include "input_manager.h"
 #include "error_multimodal.h"
+#include "getopt.h"
+#include "input_manager.h"
+#include "mmi_log.h"
 #include "multimodal_event_handler.h"
+#include "pointer_event.h"
+#include "string_ex.h"
+#include "util.h"
 
 
 class InputManagerCommand {
@@ -72,23 +72,15 @@ int32_t InputManagerCommand::NextPos(int64_t begTimeMs, int64_t curtTimeMs, int3
     int32_t offsetPos = std::ceil(tmpTimeMs * (endPos - begPos));
     int32_t retPos = 0;
     if (offsetPos > 0) {
-        retPos = offsetPos + begPos;
-        if (retPos == 0) {
-            return retPos;
+        if (!AddInt32(offsetPos, begPos, retPos)) {
+            return begPos;
         }
-        if (retPos > endPos) {
-            return endPos;
-        }
-        return retPos;
+        return retPos > endPos ? endPos : retPos;
     } else {
-        retPos = offsetPos + begPos;
-        if (retPos == 0) {
-            return retPos;
+        if (!AddInt32(offsetPos, begPos, retPos)) {
+            return begPos;
         }
-        if (retPos < endPos) {
-            return endPos;
-        }
-        return retPos;
+        return retPos < endPos ? endPos : retPos;
     }
     return begPos;
 }
@@ -435,7 +427,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
                             int64_t startTimeUs = pointerEvent->GetActionStartTime();
                             int64_t startTimeMs = startTimeUs / 1000;
-                            int64_t endTimeMs = startTimeMs + totalTimeMs;
+                            int64_t endTimeMs = 0;
+                            if (!AddInt64(startTimeMs, totalTimeMs, endTimeMs)) {
+                                std::cout << "system time error." << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
                             int64_t currentTimeMs = startTimeMs;
                             int64_t nowSysTimeUs = 0;
                             int64_t nowSysTimeMs = 0;
