@@ -66,7 +66,7 @@ public:
     template<typename T>
     bool Read(std::vector<T> &data);
     template<typename T>
-    bool Write(const vector<T> &data);
+    bool Write(const std::vector<T> &data);
 
     const char *ReadBuf() const;
     const char *WriteBuf() const;
