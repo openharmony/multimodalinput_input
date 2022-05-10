@@ -15,6 +15,8 @@
 
 #include "input_manager_command.h"
 
+#include <getopt.h>
+
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -23,19 +25,19 @@
 #include <ctime>
 #include <iostream>
 #include <limits>
-#include <sys/time.h>
 #include <thread>
+
+#include <sys/time.h>
 #include <unistd.h>
 
+#include "string_ex.h"
+
 #include "error_multimodal.h"
-#include "getopt.h"
 #include "input_manager.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "pointer_event.h"
-#include "string_ex.h"
 #include "util.h"
-
 
 class InputManagerCommand {
 public:
