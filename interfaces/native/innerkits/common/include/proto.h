@@ -174,6 +174,10 @@ enum class MmiMessageId : int32_t {
     INJECT_KEY_EVENT = 14000,
     INJECT_POINTER_EVENT,
 
+#ifdef OHOS_BUILD_MMI_DEBUG
+    BIGPACKET_TEST = 91000,
+#endif // OHOS_BUILD_MMI_DEBUG
+
     END,
 };
 

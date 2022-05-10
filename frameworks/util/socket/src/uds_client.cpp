@@ -213,8 +213,7 @@ void UDSClient::OnThread()
     struct epoll_event events[MAX_EVENT_SIZE] = {};
     while (isRunning_) {
         if (isConnected_) {
-            streamBuf.Clean();
-            auto count = EpollWait(&events[0], MAX_EVENT_SIZE, DEFINE_EPOLL_TIMEOUT);
+            auto count = EpollWait(events[0], MAX_EVENT_SIZE, DEFINE_EPOLL_TIMEOUT);
             for (auto i = 0; i < count; i++) {
                 OnEvent(events[i]);
             }
