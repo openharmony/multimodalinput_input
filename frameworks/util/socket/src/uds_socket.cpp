@@ -18,7 +18,6 @@
 #include <cinttypes>
 
 #include "mmi_log.h"
-#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {

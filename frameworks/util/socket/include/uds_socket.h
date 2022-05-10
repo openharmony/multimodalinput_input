@@ -27,6 +27,7 @@
 
 #include "circle_stream_buffer.h"
 #include "libmmi_util.h"
+#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
