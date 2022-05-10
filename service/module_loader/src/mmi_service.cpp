@@ -282,7 +282,7 @@ void MMIService::OnThread()
 {
     SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadId();
-    MMI_HILOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
+    MMI_LOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
 
     int32_t count = 0;
     constexpr int32_t timeOut = 1;
