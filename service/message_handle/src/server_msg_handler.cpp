@@ -266,17 +266,10 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     pkt >> num;
     for (int32_t i = 0; i < num; i++) {
         LogicalDisplayInfo info;
-        pkt >> info.id >> info.topLeftX >> info.topLeftY >> info.width >> info.height
-            >> info.name >> info.seatId >> info.seatName >> info.focusWindowId;
-
         std::vector<WindowInfo> windowInfos;
-        int32_t numWindow = 0;
-        pkt >> numWindow;
-        for (int32_t j = 0; j < numWindow; j++) {
-            WindowInfo info;
-            pkt >> info;
-            windowInfos.push_back(info);
-        }
+        pkt >> info.id >> info.topLeftX >> info.topLeftY >> info.width >> info.height
+            >> info.name >> info.seatId >> info.seatName >> info.focusWindowId
+            >> windowInfos;
         info.windowsInfo = windowInfos;
         logicalDisplays.push_back(info);
     }
@@ -404,12 +397,8 @@ int32_t ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     std::vector<int32_t> ids = InputDevMgr->GetInputDeviceIds();
-    int32_t size = static_cast<int32_t>(ids.size());
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE_IDS);
-    pkt2 << userData << size;
-    for (const auto& item : ids) {
-        pkt2 << item;
-    }
+    pkt2 << userData << ids;
     if (pkt2.ChkRWError()) {
         MMI_HILOGE("Packet write deviceIds failed");
         return RET_ERR;
@@ -488,25 +477,15 @@ int32_t ServerMsgHandler::OnSupportKeys(SessionPtr sess, NetPacket& pkt)
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData;
     int32_t deviceId;
-    size_t size;
-    pkt >> userData >> deviceId >> size;
-    MMI_HILOGE("111111111111Packet read data size:%{public}d111111111111", size);
-    int32_t sysKeyValue;
     std::vector<int32_t> keyCode;
-    for (size_t i = 0 ; i < size; ++i) {
-        pkt >> sysKeyValue;
-        keyCode.push_back(sysKeyValue);
-    }
+    pkt >> userData >> deviceId >> keyCode;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read key info failed");
         return RET_ERR;
     }
     std::vector<bool> keystroke = InputDevMgr->SupportKeys(deviceId, keyCode);
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
-    pkt2 << userData << keystroke.size();
-    for (const auto &item : keystroke) {
-        pkt2 << static_cast<bool>(item);
-    }
+    pkt2 << userData << keystroke;
     if (pkt2.ChkRWError()) {
         MMI_HILOGE("Packet write support keys failed");
         return RET_ERR;

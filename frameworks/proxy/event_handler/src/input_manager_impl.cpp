@@ -275,12 +275,8 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
     for (int32_t i = 0; i < num; i++) {
         pkt << logicalDisplays_[i].id << logicalDisplays_[i].topLeftX << logicalDisplays_[i].topLeftY
             << logicalDisplays_[i].width << logicalDisplays_[i].height << logicalDisplays_[i].name
-            << logicalDisplays_[i].seatId << logicalDisplays_[i].seatName << logicalDisplays_[i].focusWindowId;
-        int32_t numWindow = static_cast<int32_t>(logicalDisplays_[i].windowsInfo.size());
-        pkt << numWindow;
-        for (int32_t j = 0; j < numWindow; j++) {
-            pkt << logicalDisplays_[i].windowsInfo[j];
-        }
+            << logicalDisplays_[i].seatId << logicalDisplays_[i].seatName << logicalDisplays_[i].focusWindowId
+            << logicalDisplays_[i].windowsInfo;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write logical data failed");
