@@ -36,6 +36,9 @@ enum Direction {
 };
 
 struct WindowInfo {
+    // The Bit0 of the flags field represents Touchable or not state
+    static constexpr uint32_t FLAG_BIT_UNTOUCHABLE = 1;
+
     // The globally unique identifier of the window
     int32_t id;
 
@@ -68,6 +71,9 @@ struct WindowInfo {
 
     // The y coordinate of the upper left corner of the window in the logical display
     int32_t winTopLeftY;
+
+    // The current state of the window
+    uint32_t flags;
 };
 
 struct PhysicalDisplayInfo {

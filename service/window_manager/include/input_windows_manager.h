@@ -133,6 +133,9 @@ private:
     PhysicalDisplayInfo* GetPhysicalDisplay(int32_t id);
     PhysicalDisplayInfo* FindPhysicalDisplayInfo(const std::string seatId, const std::string seatName);
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent);
+    void SelectWindowInfo(const int32_t& globalX, const int32_t& globalY,
+        const std::shared_ptr<PointerEvent>& pointerEvent, LogicalDisplayInfo * const logicalDisplayInfo,
+        WindowInfo*& touchWindow);
 
 private:
     std::mutex mu_;
