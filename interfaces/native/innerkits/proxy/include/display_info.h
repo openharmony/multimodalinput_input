@@ -282,7 +282,7 @@ struct LogicalDisplayInfo {
     std::string name;
 
     /**
-     * 座位id,用于触摸屏和显示屏的匹配
+     * 座位id,用于触摸屏和显示屏的匹配 
      *
      * @since 9
     */
@@ -290,7 +290,7 @@ struct LogicalDisplayInfo {
 
     /**
      * 座位名,用于触摸屏和显示屏的匹配
-     * 
+     *
      * @since 9
     */
     std::string seatName;
