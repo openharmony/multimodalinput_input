@@ -269,8 +269,14 @@ int32_t ClientMsgHandler::OnSupportKeys(const UDSClient& client, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
     int32_t userData;
+    size_t size;
+    pkt >> userData >> size;
     std::vector<bool> abilityRet;
-    pkt >> userData >> abilityRet;
+    bool ret;
+    for (size_t i = 0; i < size; ++i) {
+        pkt >> ret;
+        abilityRet.push_back(ret);
+    }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read key Data failed");
         return RET_ERR;
