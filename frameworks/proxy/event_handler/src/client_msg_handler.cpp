@@ -229,6 +229,11 @@ int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& p
     int32_t userData;
     std::vector<int32_t> inputDeviceIds;
     pkt >> userData >> inputDeviceIds;
+    size_t size = inputDeviceIds.size();
+    if (size > MAX_INPUT_DEVICE) {
+        MMI_HILOGE("Data exceeds the max range");
+        return RET_ERR;
+    }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read device Data failed");
         return RET_ERR;
@@ -271,6 +276,10 @@ int32_t ClientMsgHandler::OnSupportKeys(const UDSClient& client, NetPacket& pkt)
     int32_t userData;
     size_t size;
     pkt >> userData >> size;
+    if (size > MAX_SUPPORT_KEY) {
+        MMI_HILOGE("Data exceeds the max range");
+        return RET_ERR;
+    }
     std::vector<bool> abilityRet;
     bool ret;
     for (size_t i = 0; i < size; ++i) {
