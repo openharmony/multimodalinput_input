@@ -138,8 +138,8 @@ struct WindowInfo {
     int32_t winTopLeftY;
 
     /**
-     * A 32-bit flag that represents the window status. If the 0th bit is 1, 
-     * the window is untouchable; if the 0th bit is 0, the window is touchable. 
+     * A 32-bit flag that represents the window status. If the 0th bit is 1,
+     * the window is untouchable; if the 0th bit is 0, the window is touchable.
      *
      * @since 9
     */
