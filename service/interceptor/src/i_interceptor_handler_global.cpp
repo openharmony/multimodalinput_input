@@ -26,26 +26,26 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInte
 int32_t IInterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
-    MMI_HILOGW("Add interceptor module dose not support");
+    MMI_HILOGW("Add interceptor module does not support");
     return RET_ERR;
 }
 
 void IInterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
-    MMI_HILOGW("Remove interceptor module dose not support");
+    MMI_HILOGW("Remove interceptor module does not support");
     return;
 }
 
 bool IInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_HILOGW("Key interceptor module dose not support");
+    MMI_HILOGW("Key interceptor module does not support");
     return false;
 }
 
 bool IInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_HILOGW("Pointer interceptor module dose not support");
+    MMI_HILOGW("Pointer interceptor module does not support");
     return false;
 }
 } // namespace MMI
