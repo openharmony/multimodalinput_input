@@ -28,7 +28,6 @@ public:
     int32_t Socket() override;
     virtual bool SendMessage(const NetPacket& pkt) const override;
     virtual bool GetCurrentConnectedStatus() const override;
-
     bool Start(IClientMsgHandlerPtr msgHdl, bool detachMode) override;
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;

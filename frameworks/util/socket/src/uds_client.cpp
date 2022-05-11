@@ -54,32 +54,43 @@ int32_t UDSClient::ConnectTo()
 bool UDSClient::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
-    CHKF(size > 0 && size <= MAX_PACKET_BUF_SIZE, PARAM_INPUT_INVALID);
-    CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
-    int32_t retryTimes = 32;
-    while (size > 0 && retryTimes > 0) {
-        retryTimes--;
-        auto count = send(fd_, buf, size, MSG_DONTWAIT | MSG_NOSIGNAL);
+    if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
+        MMI_LOGE("Stream buffer size out of range");
+        return false;
+    }
+    if (fd_ < 0) {
+        MMI_LOGE("fd_ is less than 0");
+        return false;
+    }
+
+    int32_t idx = 0;
+    int32_t retryCount = 0;
+    const int32_t bufSize = static_cast<int32_t>(size);
+    int32_t remSize = bufSize;
+    while (remSize > 0 && retryCount < SEND_RETRY_LIMIT) {
+        retryCount += 1;
+        auto count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_LOGW("send msg failed, errno:%{public}d", errno);
+                MMI_LOGW("continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
+                usleep(SEND_RETRY_SLEEP_TIME);
                 continue;
             }
             MMI_LOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
             return false;
         }
-
-        size_t ucount = static_cast<size_t>(count);
-        if (ucount >= size) {
-            return true;
+        idx += count;
+        remSize -= count;
+        if (remSize > 0) {
+            usleep(SEND_RETRY_SLEEP_TIME);
         }
-        size -= ucount;
-        buf += ucount;
-        int32_t sleepTime = 10000;
-        usleep(sleepTime);
     }
-    MMI_LOGE("send msg failed");
-    return false;
+    if (retryCount >= SEND_RETRY_LIMIT || remSize != 0) {
+        MMI_LOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
+            retryCount, SEND_RETRY_LIMIT, idx, bufSize, fd_);
+        return false;
+    }
+    return true;
 }
 
 bool UDSClient::SendMsg(const NetPacket& pkt) const
@@ -115,6 +126,16 @@ bool UDSClient::StartClient(MsgClientFunCallback fun, bool detachMode)
     return true;
 }
 
+void UDSClient::Disconnected(int32_t fd)
+{
+    OnDisconnected();
+    struct epoll_event event = {};
+    EpollCtl(fd, EPOLL_CTL_DEL, event);
+    close(fd);
+    fd_ = -1;
+    isConnected_ = false;
+}
+
 void UDSClient::Stop()
 {
     MMI_LOGD("enter");
@@ -132,80 +153,55 @@ void UDSClient::Stop()
     MMI_LOGD("leave");
 }
 
-void UDSClient::OnRecv(const char *buf, size_t size)
+void UDSClient::OnPacket(NetPacket& pkt)
 {
-    CHKPV(buf);
-    int32_t readIdx = 0;
-    int32_t packSize = 0;
-    int32_t bufSize = static_cast<int32_t>(size);
-    const int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
-    if (bufSize < headSize) {
-        MMI_LOGE("The in parameter size is error, errCode:%{public}d", VAL_NOT_EXP);
-        return;
-    }
-    while (bufSize > 0 && recvFun_) {
-        if (bufSize < headSize) {
-            MMI_LOGE("The size is less than headSize, errCode:%{public}d", VAL_NOT_EXP);
-            return;
-        }
-        auto head = reinterpret_cast<PackHead *>(const_cast<char *>(&buf[readIdx]));
-        if (head->size[0] < 0 || head->size[0] >= bufSize) {
-            MMI_LOGE("Head size[0] is error, head->size[0]:%{public}d, errCode:%{public}d", head->size[0], VAL_NOT_EXP);
-            return;
-        }
-        packSize = headSize + head->size[0];
-
-        NetPacket pkt(head->idMsg);
-        if (head->size[0] > 0) {
-            if (!pkt.Write(&buf[readIdx + headSize], static_cast<size_t>(head->size[0]))) {
-                MMI_LOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
-                return;
-            }
-        }
-        recvFun_(*this, pkt);
-        bufSize -= packSize;
-        readIdx += packSize;
-    }
+    recvFun_(*this, pkt);
 }
 
-void UDSClient::OnEvent(const struct epoll_event& ev, StreamBuffer& buf)
+void UDSClient::OnRecvMsg(const char *buf, size_t size)
+{
+    CHKPV(buf);
+    if (size == 0 || size > MAX_PACKET_BUF_SIZE) {
+        MMI_LOGE("Invalid input param size. size:%{public}zu", size);
+        return;
+    }
+    if (!circBuf_.Write(buf, size)) {
+        MMI_LOGW("Write data faild. size:%{public}zu", size);
+    }
+    OnReadPackets(circBuf_, std::bind(&UDSClient::OnPacket, this, std::placeholders::_1));
+}
+
+void UDSClient::OnEvent(const struct epoll_event& ev)
 {
     auto fd = ev.data.fd;
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
         MMI_LOGI("ev.events:0x%{public}x,fd:%{public}d same as fd_:%{public}d", ev.events, fd, fd_);
-        OnDisconnected();
-        struct epoll_event event = {};
-        EpollCtl(fd, EPOLL_CTL_DEL, event);
-        close(fd);
-        fd_ = -1;
-        isConnected_ = false;
+        Disconnected(fd);
         return;
     }
 
-    char szBuf[MAX_PACKET_BUF_SIZE] = {};
-    const size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
-    CHK(maxCount > 0, VAL_NOT_EXP);
-    auto isoverflow = false;
-    for (size_t j = 0; j < maxCount; j++) {
-        auto size = recv(fd, static_cast<void *>(szBuf), MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
-        if (size < 0) {
-            MMI_LOGE("size:%{public}zu", size);
-        }
+    char szBuff[MAX_PACKET_BUF_SIZE] = {};
+    for (size_t j = 0; j < MAX_RECV_LIMIT; j++) {
+        auto size = recv(fd, szBuff, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {
-            if (!buf.Write(szBuf, size)) {
-                isoverflow = true;
-                break;
+            OnRecvMsg(szBuff, size);
+        } else if (size < 0) {
+            if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
+                MMI_LOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
+                    size, errno);
+                continue;
             }
+            MMI_LOGE("recv return %{public}zu errno:%{public}d", size, errno);
+            break;
+        } else {
+            MMI_LOGE("The server side disconnect with the client. size:0 errno:%{public}d", errno);
+            Disconnected(fd);
+            break;
         }
+
         if (size < MAX_PACKET_BUF_SIZE) {
             break;
         }
-        if (isoverflow) {
-            break;
-        }
-    }
-    if (!isoverflow && buf.Size() > 0) {
-        OnRecv(buf.Data(), buf.Size());
     }
 }
 
@@ -214,15 +210,12 @@ void UDSClient::OnThread()
     MMI_LOGD("begin");
     SetThreadName("uds_client");
     isThreadHadRun_ = true;
-    StreamBuffer streamBuf;
     struct epoll_event events[MAX_EVENT_SIZE] = {};
-
     while (isRunning_) {
         if (isConnected_) {
-            streamBuf.Clean();
-            auto count = EpollWait(*events, MAX_EVENT_SIZE, DEFINE_EPOLL_TIMEOUT);
+            auto count = EpollWait(events[0], MAX_EVENT_SIZE, DEFINE_EPOLL_TIMEOUT);
             for (auto i = 0; i < count; i++) {
-                OnEvent(events[i], streamBuf);
+                OnEvent(events[i]);
             }
         } else {
             if (ConnectTo() < 0) {

@@ -56,7 +56,7 @@ HWTEST_F(StreamBufferTest, construct_002, TestSize.Level1)
 HWTEST_F(StreamBufferTest, SetReadIdx_001, TestSize.Level1)
 {
     StreamBuffer bufObj;
-    bool retResult = bufObj.SetReadIdx(1);
+    bool retResult = bufObj.SeekReadPos(1);
     EXPECT_FALSE(retResult);
 }
 
@@ -67,7 +67,7 @@ HWTEST_F(StreamBufferTest, SetReadIdx_002, TestSize.Level1)
 
     StreamBuffer bufObj;
     bufObj.Write(buf, size);
-    bool retResult = bufObj.SetReadIdx(0);
+    bool retResult = bufObj.SeekReadPos(0);
     EXPECT_TRUE(retResult);
 }
 
@@ -177,20 +177,6 @@ HWTEST_F(StreamBufferTest, Size_001, TestSize.Level1)
 {
     StreamBuffer streamBuffer;
     streamBuffer.Size();
-}
-
-HWTEST_F(StreamBufferTest, operatorLeft, TestSize.Level1)
-{
-    StreamBuffer streamBufferSrc;
-    StreamBuffer streamBufferCopy = streamBufferSrc;
-    streamBufferCopy << streamBufferSrc;
-}
-
-HWTEST_F(StreamBufferTest, operatorRight, TestSize.Level1)
-{
-    StreamBuffer streamBufferSrc;
-    StreamBuffer streamBufferCopy = streamBufferSrc;
-    streamBufferCopy >> streamBufferSrc;
 }
 
 HWTEST_F(StreamBufferTest, ReadBuf, TestSize.Level1)

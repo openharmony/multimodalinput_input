@@ -30,36 +30,6 @@ class UDSSocketUnitTest : public UDSSocket {
 public:
     UDSSocketUnitTest() {}
     virtual ~UDSSocketUnitTest() {}
-
-    size_t ReadUnitTest(char *buf, size_t size)
-    {
-        return Read(buf, size);
-    }
-
-    size_t WriteUnitTest(const char *buf, size_t size)
-    {
-        return Write(buf, size);
-    }
-
-    size_t SendUnitTest(const char *buf, size_t size, int32_t flags = 0)
-    {
-        return Send(buf, size, flags);
-    }
-
-    size_t RecvUnitTest(char *buf, size_t size, int32_t flags = 0)
-    {
-        return Recv(buf, size, flags);
-    }
-
-    size_t RecvfromUnitTest(char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t *addrlen)
-    {
-        return Recvfrom(buf, size, flags, addr, addrlen);
-    }
-
-    size_t SendtoUnitTest(const char *buf, size_t size, uint32_t flags, sockaddr *addr, size_t addrlen)
-    {
-        return Sendto(buf, size, flags, addr, addrlen);
-    }
 };
 
 #if BINDER_TODO

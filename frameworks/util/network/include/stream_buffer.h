@@ -17,26 +17,29 @@
 
 #include <cstdint>
 #include <string>
+
+#include "nocopyable.h"
+#include "securec.h"
+
 #include "config_multimodal.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "mmi_log.h"
-#include "nocopyable.h"
-#include "securec.h"
 
 namespace OHOS {
 namespace MMI {
 class StreamBuffer {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "StreamBuffer"};
 public:
-    StreamBuffer() {}
-    StreamBuffer(const StreamBuffer& buf);
-    virtual ~StreamBuffer() {}
+    StreamBuffer() = default;
+    virtual ~StreamBuffer() = default;
+    explicit StreamBuffer(const StreamBuffer& buf);
     virtual StreamBuffer& operator=(const StreamBuffer& other);
     DISALLOW_MOVE(StreamBuffer);
-
+    
+    void Reset();
     void Clean();
-    bool SetReadIdx(int32_t idx);
+    bool SeekReadPos(int32_t n);
 
     bool Read(std::string& buf);
     bool Write(const std::string& buf);
@@ -45,11 +48,12 @@ public:
     bool Write(const StreamBuffer& buf);
 
     bool Read(char *buf, size_t size);
-    bool Write(const char *buf, size_t size);
+    virtual bool Write(const char *buf, size_t size);
 
-    bool IsEmpty();
+    bool IsEmpty() const;
     size_t Size() const;
-    size_t UnreadSize() const;
+    int32_t UnreadSize() const;
+    int32_t GetAvailableBufSize() const;
 
     bool ChkRWError() const;
     const std::string& GetErrorStatusRemark() const;
@@ -60,14 +64,15 @@ public:
     template<typename T>
     bool Write(const T& data);
 
+    const char *ReadBuf() const;
+    const char *WriteBuf() const;
+
     template<typename T>
     StreamBuffer& operator >> (T& data);
     template<typename T>
     StreamBuffer& operator << (const T& data);
 
 protected:
-    const char *ReadBuf() const;
-    const char *WriteBuf() const;
     bool Clone(const StreamBuffer& buf);
 
 protected:
@@ -80,9 +85,9 @@ protected:
     int32_t rCount_ = 0;
     int32_t wCount_ = 0;
 
-    int32_t rIdx_ = 0;
-    int32_t wIdx_ = 0;
-    char szBuff_[MAX_STREAM_BUF_SIZE] = {};
+    int32_t rPos_ = 0;
+    int32_t wPos_ = 0;
+    char szBuff_[MAX_STREAM_BUF_SIZE+1] = {};
 };
 
 template<typename T>
@@ -121,7 +126,7 @@ StreamBuffer &StreamBuffer::operator<<(const T &data)
 {
     if (!Write(data)) {
         MMI_LOGW("Write data failed");
-    }    
+    }
     return *this;
 }
 } // namespace MMI

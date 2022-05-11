@@ -29,38 +29,52 @@ StreamBuffer &StreamBuffer::operator=(const StreamBuffer &other)
     return *this;
 }
 
-void StreamBuffer::Clean()
+void StreamBuffer::Reset()
 {
-    rIdx_ = 0;
-    wIdx_ = 0;
+    rPos_ = 0;
+    wPos_ = 0;
     rCount_ = 0;
     wCount_ = 0;
     rwErrorStatus_ = ErrorStatus::ERROR_STATUS_OK;
-    CHK(EOK == memset_sp(&szBuff_, sizeof(szBuff_), 0, sizeof(szBuff_)), MEMCPY_SEC_FUN_FAIL);
 }
 
-bool StreamBuffer::SetReadIdx(int32_t idx)
+void StreamBuffer::Clean()
 {
-    CHKF(idx <= wIdx_, PARAM_INPUT_INVALID);
-    rIdx_ = idx;
+    Reset();
+    errno_t ret = memset_sp(&szBuff_, sizeof(szBuff_), 0, sizeof(szBuff_));
+    if (ret != EOK) {
+        MMI_LOGE("call memset_s fail");
+        return;
+    }
+}
+
+bool StreamBuffer::SeekReadPos(int32_t n)
+{
+    int32_t pos = rPos_ + n;
+    if (pos < 0 || pos > wPos_) {
+        MMI_LOGE("The position in the calculation is not as expected. pos:%{public}d [0, %{public}d]",
+            pos, wPos_);
+        return false;
+    }
+    rPos_ = pos;
     return true;
 }
 
 bool StreamBuffer::Read(std::string &buf)
 {
-    if (rIdx_ == wIdx_) {
+    if (rPos_ == wPos_) {
         MMI_LOGE("Not enough memory to read, errCode:%{public}d", MEM_NOT_ENOUGH);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
     buf = ReadBuf();
-    rIdx_ += static_cast<int32_t>(buf.size()) + 1;
-    return (buf.size() > 0);
+    rPos_ += static_cast<int32_t>(buf.length()) + 1;
+    return (buf.length() > 0);
 }
 
 bool StreamBuffer::Write(const std::string &buf)
 {
-    return Write(buf.c_str(), buf.size() + 1);
+    return Write(buf.c_str(), buf.length()+1);
 }
 
 bool StreamBuffer::Read(StreamBuffer &buf)
@@ -76,7 +90,7 @@ bool StreamBuffer::Write(const StreamBuffer &buf)
 bool StreamBuffer::Read(char *buf, size_t size)
 {
     if (ChkRWError()) {
-        return false; // No need to print log here, only the first error needs to be printed
+        return false;
     }
     if (buf == nullptr) {
         MMI_LOGE("Invalid input parameter buf=nullptr errCode:%{public}d", ERROR_NULL_POINTER);
@@ -88,17 +102,17 @@ bool StreamBuffer::Read(char *buf, size_t size)
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
-    if (rIdx_ + static_cast<int32_t>(size) > wIdx_) {
+    if (rPos_ + static_cast<int32_t>(size) > wPos_) {
         MMI_LOGE("Memory out of bounds on read... errCode:%{public}d", MEM_OUT_OF_BOUNDS);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
-    if (EOK != memcpy_sp(buf, size, ReadBuf(), size)) {
+    if (memcpy_sp(buf, size, ReadBuf(), size) != EOK) {
         MMI_LOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
-    rIdx_ += static_cast<int32_t>(size);
+    rPos_ += static_cast<int32_t>(size);
     rCount_ += 1;
     return true;
 }
@@ -106,7 +120,7 @@ bool StreamBuffer::Read(char *buf, size_t size)
 bool StreamBuffer::Write(const char *buf, size_t size)
 {
     if (ChkRWError()) {
-        return false; // No need to print log here, only the first error needs to be printed
+        return false;
     }
     if (buf == nullptr) {
         MMI_LOGE("Invalid input parameter buf=nullptr errCode:%{public}d", ERROR_NULL_POINTER);
@@ -118,38 +132,41 @@ bool StreamBuffer::Write(const char *buf, size_t size)
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
-    if (wIdx_ + static_cast<int32_t>(size) >= MAX_STREAM_BUF_SIZE) {
-        MMI_LOGE("The write length exceeds buffer. errCode:%{public}d", MEM_OUT_OF_BOUNDS);
+    if (wPos_ + static_cast<int32_t>(size) > MAX_STREAM_BUF_SIZE) {
+        MMI_LOGE("The write length exceeds buffer. wIdx:%{public}d size:%{public}zu maxBufSize:%{public}d "
+            "errCode:%{public}d", wPos_, size, MAX_STREAM_BUF_SIZE, MEM_OUT_OF_BOUNDS);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
-    if (EOK != memcpy_sp(&szBuff_[wIdx_], static_cast<size_t>(MAX_STREAM_BUF_SIZE - wIdx_), buf, size)) {
+    errno_t ret = memcpy_sp(&szBuff_[wPos_], GetAvailableBufSize(), buf, size);
+    if (ret != EOK) {
         MMI_LOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }
-    wIdx_ += static_cast<int32_t>(size);
+    wPos_ += static_cast<int32_t>(size);
     wCount_ += 1;
     return true;
 }
 
-bool StreamBuffer::IsEmpty()
+bool StreamBuffer::IsEmpty() const
 {
-    if ((rIdx_ == wIdx_) && (wIdx_ == 0)) {
-        return true;
-    }
-    return false;
+    return (rPos_ == wPos_);
 }
 
 size_t StreamBuffer::Size() const
 {
-    return static_cast<size_t>(wIdx_);
+    return static_cast<size_t>(wPos_);
 }
 
-size_t StreamBuffer::UnreadSize() const
+int32_t StreamBuffer::UnreadSize() const
 {
-    CHKR(wIdx_ >= rIdx_, VAL_NOT_EXP, 0);
-    return static_cast<size_t>(wIdx_ - rIdx_);
+    return ((wPos_ <= rPos_) ? 0 : (wPos_ - rPos_));
+}
+
+int32_t StreamBuffer::GetAvailableBufSize() const
+{
+    return ((wPos_ >= MAX_STREAM_BUF_SIZE) ? 0 : (MAX_STREAM_BUF_SIZE - wPos_));
 }
 
 bool StreamBuffer::ChkRWError() const
@@ -159,7 +176,6 @@ bool StreamBuffer::ChkRWError() const
 
 const std::string& StreamBuffer::GetErrorStatusRemark() const
 {
-    static const std::string invalidStatus = "UNKNOWN";
     static const std::vector<std::pair<ErrorStatus, std::string>> remark {
         {ErrorStatus::ERROR_STATUS_OK, "OK"},
         {ErrorStatus::ERROR_STATUS_READ, "READ_ERROR"},
@@ -170,6 +186,7 @@ const std::string& StreamBuffer::GetErrorStatusRemark() const
             return it.second;
         }
     }
+    static const std::string invalidStatus = "UNKNOWN";
     return invalidStatus;
 }
 
@@ -180,12 +197,12 @@ const char *StreamBuffer::Data() const
 
 const char *StreamBuffer::ReadBuf() const
 {
-    return &szBuff_[rIdx_];
+    return &szBuff_[rPos_];
 }
 
 const char *StreamBuffer::WriteBuf() const
 {
-    return &szBuff_[wIdx_];
+    return &szBuff_[wPos_];
 }
 
 bool StreamBuffer::Clone(const StreamBuffer &buf)

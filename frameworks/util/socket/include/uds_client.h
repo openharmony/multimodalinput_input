@@ -15,12 +15,15 @@
 #ifndef UDS_CLIENT_H
 #define UDS_CLIENT_H
 
-#include <thread>
-#include <future>
 #include <functional>
-#include "uds_socket.h"
-#include "net_packet.h"
+#include <future>
+#include <thread>
+
 #include "nocopyable.h"
+
+#include "circle_stream_buffer.h"
+#include "net_packet.h"
+#include "uds_socket.h"
 
 namespace OHOS {
 namespace MMI {
@@ -58,8 +61,11 @@ protected:
     virtual void OnThreadLoop() {}
 
     bool StartClient(MsgClientFunCallback fun, bool detachMode);
-    void OnRecv(const char *buf, size_t size);
-    void OnEvent(const struct epoll_event& ev, StreamBuffer& buf);
+    void Disconnected(int32_t fd);
+
+    void OnPacket(NetPacket& pkt);
+    void OnRecvMsg(const char *buf, size_t size);
+    void OnEvent(const struct epoll_event& ev);
     void OnThread();
     void SetToExit();
 
@@ -70,6 +76,7 @@ protected:
     bool isRunning_ = false;
     bool isConnected_ = false;
     MsgClientFunCallback recvFun_;
+    CircleStreamBuffer circBuf_;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -45,35 +45,42 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 {
     CHKPF(buf);
     if ((size == 0) || (size > MAX_PACKET_BUF_SIZE)) {
-        MMI_LOGD("buf size:%{public}zu", size);
-        return PARAM_INPUT_INVALID;
+        MMI_LOGE("buf size:%{public}zu", size);
+        return false;
     }
-    CHKF(fd_ >= 0, PARAM_INPUT_INVALID);
+    if (fd_ < 0) {
+        MMI_LOGE("fd_ is less than 0");
+        return false;
+    }
 
-    int32_t retryTimes = 32;
-    while (size > 0 && retryTimes > 0) {
-        retryTimes--;
-        auto count = send(fd_, static_cast<void *>(const_cast<char *>(buf)), size, MSG_DONTWAIT | MSG_NOSIGNAL);
+    int32_t idx = 0;
+    int32_t retryCount = 0;
+    const int32_t bufSize = static_cast<int32_t>(size);
+    int32_t remSize = bufSize;
+    while (remSize > 0 && retryCount < SEND_RETRY_LIMIT) {
+        retryCount += 1;
+        auto count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_LOGW("send msg failed, errno:%{public}d", errno);
+                MMI_LOGW("continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
+                usleep(SEND_RETRY_SLEEP_TIME);
                 continue;
             }
             MMI_LOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
             return false;
         }
-
-        size_t ucount = static_cast<size_t>(count);
-        if (ucount >= size) {
-            return true;
+        idx += count;
+        remSize -= count;
+        if (remSize > 0) {
+            usleep(SEND_RETRY_SLEEP_TIME);
         }
-        size -= ucount;
-        buf += ucount;
-        int32_t sleepTime = 10000;
-        usleep(sleepTime);
     }
-    MMI_LOGE("send msg failed");
-    return false;
+    if (retryCount >= SEND_RETRY_LIMIT || remSize != 0) {
+        MMI_LOGE("Send too many times:%{public}d/%{public}d,size:%{public}d/%{public}d fd:%{public}d",
+            retryCount, SEND_RETRY_LIMIT, idx, bufSize, fd_);
+        return false;
+    }
+    return true;
 }
 
 void UDSSession::Close()
