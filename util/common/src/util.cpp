@@ -439,10 +439,10 @@ bool IsFileExists(const std::string& fileName)
 {
     char realPath[PATH_MAX] = {};
     if (realpath(fileName.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("path is error, path:%{public}s", fileName.c_str());
+        MMI_HILOGE("path is error, path:%{public}s", realPath);
         return false;
     }
-    if ((access(fileName.c_str(), F_OK)) == 0) {
+    if ((access(realPath, F_OK)) == 0) {
         return true;
     }
     return false;
@@ -450,11 +450,6 @@ bool IsFileExists(const std::string& fileName)
 
 std::string GetFileExtendName(const std::string& fileName)
 {
-    char realPath[PATH_MAX] = {};
-    if (realpath(fileName.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("path is error, path:%{public}s", fileName.c_str());
-        return "";
-    }
     if (fileName.empty()) {
         return "";
     }
@@ -491,16 +486,16 @@ int32_t GetFileSize(const std::string& fileName)
     return RET_ERR;
 }
 
-std::string ReadFile(const std::string &filePath)
+static std::string ReadFile(const std::string &filePath)
 {
     char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
         MMI_HILOGE("path is error, path:%{public}s", filePath.c_str());
         return "";
     }
-    FILE* fp = fopen(filePath.c_str(), "r");
+    FILE* fp = fopen(realPath, "r");
     if (fp == nullptr) {
-        MMI_HILOGW("open file: %{pulic}s failed", filePath.c_str());
+        MMI_HILOGW("open file: %{pulic}s failed", realPath);
         return "";
     }
     std::string dataStr;
@@ -509,9 +504,31 @@ std::string ReadFile(const std::string &filePath)
         dataStr += buf;
     }
     if (fclose(fp) != 0) {
-        MMI_HILOGW("close file: %{pulic}s failed", filePath.c_str());
+        MMI_HILOGW("close file: %{pulic}s failed", realPath);
     }
     return dataStr;
+}
+
+std::string ReadJsonFile(const std::string &filePath)
+{
+    if (GetFileExtendName(filePath) != "json") {
+        MMI_HILOGE("Unable to parse files other than json format filePath:%{public}s", filePath.c_str());
+        return "";
+    }
+    if (!IsFileExists(filePath)) {
+        MMI_HILOGE("file %{public}s not exist", filePath.c_str());
+        return "";
+    }
+    return ReadFile(filePath);
+}
+
+std::string ReadUinputToolFile(const std::string &filePath)
+{
+    if (!IsFileExists(filePath)) {
+        MMI_HILOGE("file %{public}s not exist", filePath.c_str());
+        return "";
+    }
+    return ReadFile(filePath);
 }
 } // namespace MMI
 } // namespace OHOS

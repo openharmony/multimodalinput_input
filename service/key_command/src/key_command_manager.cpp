@@ -305,7 +305,7 @@ std::string KeyCommandManager::GetConfigFilePath() const
 
 bool KeyCommandManager::ParseJson(const std::string &configFile)
 {
-    std::string jsonStr = ReadFile(configFile);
+    std::string jsonStr = ReadJsonFile(configFile);
     if (jsonStr.empty()) {
         MMI_HILOGE("configFile read failed");
         return false;
