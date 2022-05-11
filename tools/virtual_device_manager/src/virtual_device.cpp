@@ -303,7 +303,7 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
         printf("file:%s size exceeds maximum", filePath.c_str());
         goto RELEASE_RES;
     }
-    temp = ReadFile(filePath);
+    temp = ReadUinputToolFile(filePath);
     if (temp.empty()) {
         printf("temp is empty");
         goto RELEASE_RES;

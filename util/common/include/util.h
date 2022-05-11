@@ -56,7 +56,8 @@ std::string StringFmt(const char* str, ...);
 bool IsFileExists(const std::string& fileName);
 std::string GetFileExtendName(const std::string& fileName);
 int32_t GetFileSize(const std::string& fileName);
-std::string ReadFile(const std::string &filePath);
+std::string ReadJsonFile(const std::string &filePath);
+std::string ReadUinputToolFile(const std::string &filePath);
 template <typename T>
 bool AddInt(T op1, T op2, T minVal, T maxVal, T &res);
 inline bool AddInt32(int32_t op1, int32_t op2, int32_t &res)
