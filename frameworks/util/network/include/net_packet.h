@@ -21,14 +21,14 @@
 #pragma pack(1)
 using PACKHEAD = struct PackHead {
     MmiMessageId idMsg;
-    int32_t size[1];
+    int32_t size;
 };
 #pragma pack()
 
 namespace OHOS {
 namespace MMI {
 class NetPacket : public StreamBuffer {
-     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NetPacket" };
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NetPacket" };
 public:
     explicit NetPacket(MmiMessageId msgId);
     NetPacket(const NetPacket& pkt);
@@ -41,6 +41,10 @@ public:
     size_t GetSize() const
     {
         return Size();
+    }
+    int32_t GetPacketLength() const
+    {
+        return (static_cast<int32_t>(sizeof(PackHead)) + wPos_);
     }
     const char *GetData() const
     {

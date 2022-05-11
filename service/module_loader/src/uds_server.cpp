@@ -56,9 +56,6 @@ void OHOS::MMI::UDSServer::UdsStop()
         item.second->Close();
     }
     sessionsMap_.clear();
-    if (t_.joinable()) {
-        t_.join();
-    }
 }
 
 int32_t OHOS::MMI::UDSServer::GetClientFd(int32_t pid)
@@ -268,140 +265,80 @@ void OHOS::MMI::UDSServer::SetRecvFun(MsgServerFunCallback fun)
     recvFun_ = fun;
 }
 
-bool OHOS::MMI::UDSServer::StartServer()
+void OHOS::MMI::UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
 {
-    isRunning_ = true;
-    t_ = std::thread(std::bind(&UDSServer::OnThread, this));
-    t_.detach();
-    return true;
-}
-
-void OHOS::MMI::UDSServer::OnRecv(int32_t fd, const char *buf, size_t size)
-{
-    CHKPV(buf);
-    CHK(fd >= 0, PARAM_INPUT_INVALID);
-    auto sess = GetSession(fd);
-    CHK(sess, ERROR_NULL_POINTER);
-    int32_t readIdx = 0;
-    int32_t packSize = 0;
-    int32_t bufSize = static_cast<int32_t>(size);
-    const int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
-    if (bufSize < headSize) {
-        MMI_LOGE("The in parameter size less than headSize, errCode%{public}d", VAL_NOT_EXP);
-        return;
+    auto secPtr = GetSession(fd);
+    if (secPtr != nullptr) {
+        OnDisconnected(secPtr);
+        DelSession(fd);
     }
-    while (bufSize > 0 && recvFun_) {
-        if (bufSize < headSize) {
-            MMI_LOGE("The size less than headSize, errCode%{public}d", VAL_NOT_EXP);
-            return;
-        }
-        auto head = (PackHead*)&buf[readIdx];
-        if (head->size[0] >= bufSize) {
-            MMI_LOGE("The head->size[0] more or equal than size, errCode:%{public}d", VAL_NOT_EXP);
-            return;
-        }
-        packSize = headSize + head->size[0];
-        if (bufSize < packSize) {
-            MMI_LOGE("The size less than packSize, errCode:%{public}d", VAL_NOT_EXP);
-            return;
-        }
-        
-        NetPacket pkt(head->idMsg);
-        if (head->size[0] > 0) {
-            if (!pkt.Write(&buf[readIdx + headSize], static_cast<size_t>(head->size[0]))) {
-                MMI_LOGE("Write to the stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
-                return;
-            }
-        }
-        recvFun_(sess, pkt);
-        bufSize -= packSize;
-        readIdx += packSize;
-    }
-}
-
-void OHOS::MMI::UDSServer::OnEpollRecv(int32_t fd, const char *buf, size_t size)
-{
-    OnRecv(fd, buf, size);
-}
-
-void OHOS::MMI::UDSServer::OnEvent(const struct epoll_event& ev, std::map<int32_t, StreamBufData>& bufMap)
-{
-    constexpr size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
-    CHK(maxCount > 0, VAL_NOT_EXP);
-    auto fd = ev.data.fd;
-    if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGD("UDSServer::OnEvent fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
-        auto secPtr = GetSession(fd);
-        if (secPtr) {
-            OnDisconnected(secPtr);
-            DelSession(fd);
-        }
-        close(fd);
-        return;
-    }
-
-    if (fd != IMultimodalInputConnect::INVALID_SOCKET_FD && (ev.events & EPOLLIN)) {
-        auto bufData = &bufMap[fd];
-        if (bufData->isOverflow) {
-            MMI_LOGE("OnEvent StreamBuffer full or write error, Data discarded errCode:%{public}d",
-                STREAMBUFF_OVER_FLOW);
-            return;
-        }
-        char szBuf[MAX_PACKET_BUF_SIZE] = {};
-        for (size_t j = 0; j < maxCount; j++) {
-            auto size = read(fd, (void*)szBuf, MAX_PACKET_BUF_SIZE);
-#ifdef OHOS_BUILD_HAVE_DUMP_DATA
-            DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
-#endif
-            if (size > 0 && bufData->sBuf.Write(szBuf, size) == false) {
-                bufData->isOverflow = true;
-                break;
-            }
-            if (size < MAX_PACKET_BUF_SIZE) {
-                break;
-            }
-        }
-    }
-}
-
-void OHOS::MMI::UDSServer::OnEpollEvent(std::map<int32_t, StreamBufData>& bufMap, struct epoll_event& ev)
-{
-    constexpr size_t maxCount = MAX_STREAM_BUF_SIZE / MAX_PACKET_BUF_SIZE + 1;
-    CHK(maxCount > 0, VAL_NOT_EXP);
-    CHK(ev.data.ptr, ERROR_NULL_POINTER);
-    auto fd = *static_cast<int32_t*>(ev.data.ptr);
-    CHK(fd >= 0, INVALID_PARAM);
-    if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_LOGD("OnEpollEvent EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
-        auto secPtr = GetSession(fd);
-        if (secPtr != nullptr) {
-            OnDisconnected(secPtr);
-            DelSession(fd);
-        }
+    if (ev.data.ptr) {
         free(ev.data.ptr);
         ev.data.ptr = nullptr;
-        close(fd);
-    } else if (ev.events & EPOLLIN) {
-        auto bufData = &bufMap[fd];
-        if (bufData->isOverflow) {
-            MMI_LOGE("OnEpollEvent StreamBuffer full or write error, Data discarded errCode:%{public}d",
-                STREAMBUFF_OVER_FLOW);
-            return;
-        }
-        char szBuf[MAX_PACKET_BUF_SIZE] = {};
-        for (size_t j = 0; j < maxCount; j++) {
-            auto size = recv(fd, (void*)szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
+    }
+    if (auto it = circleBufMap_.find(fd); it != circleBufMap_.end()) {
+        circleBufMap_.erase(it);
+    }
+    close(fd);
+}
+
+void OHOS::MMI::UDSServer::OnPacket(int32_t fd, NetPacket& pkt)
+{
+    auto sess = GetSession(fd);
+    CHKPV(sess);
+    recvFun_(sess, pkt);
+}
+
+void OHOS::MMI::UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
+{
+    if (fd < 0) {
+        MMI_LOGE("Invalid input param fd:%{public}d", fd);
+        return;
+    }
+    auto& buf = circleBufMap_[fd];
+    char szBuf[MAX_PACKET_BUF_SIZE] = {};
+    for (int32_t i = 0; i < MAX_RECV_LIMIT; i++) {
+        auto size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
+        if (size > 0) {
 #ifdef OHOS_BUILD_HAVE_DUMP_DATA
             DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
 #endif
-            if (size > 0 && bufData->sBuf.Write(szBuf, size) == false) {
-                bufData->isOverflow = true;
-                break;
+            if (!buf.Write(szBuf, size)) {
+                MMI_LOGW("Write data faild. size:%{public}zu", size);
             }
-            if (size < MAX_PACKET_BUF_SIZE) {
-                break;
+            OnReadPackets(buf, std::bind(&UDSServer::OnPacket, this, fd, std::placeholders::_1));
+        } else if (size < 0) {
+            if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
+                MMI_LOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
+                    size, errno);
+                continue;
             }
+            MMI_LOGE("recv return %{public}zu errno:%{public}d", size, errno);
+            break;
+        } else {
+            MMI_LOGE("The client side disconnect with the server. size:0 errno:%{public}d", errno);
+            ReleaseSession(fd, ev);
+            break;
         }
+        if (size < MAX_PACKET_BUF_SIZE) {
+            break;
+        }
+    }
+}
+
+void OHOS::MMI::UDSServer::OnEpollEvent(epoll_event& ev)
+{
+    CHKPV(ev.data.ptr);
+    auto fd = *static_cast<int32_t*>(ev.data.ptr);
+    if (fd < 0) {
+        MMI_LOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
+        return;
+    }
+    if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
+        MMI_LOGD("EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
+        ReleaseSession(fd, ev);
+    } else if (ev.events & EPOLLIN) {
+        OnEpollRecv(fd, ev);
     }
 }
 
@@ -461,35 +398,6 @@ void OHOS::MMI::UDSServer::DelSession(int32_t fd)
     }
     DumpSession("DelSession");
     MMI_LOGI("DelSession end");
-}
-
-void OHOS::MMI::UDSServer::OnThread()
-{
-    OHOS::MMI::SetThreadName(std::string("uds_server"));
-    uint64_t tid = GetThisThreadIdOfLL();
-    CHK(tid > 0, VAL_NOT_EXP);
-    MMI_LOGD("begin tid:%{public}" PRId64 "", tid);
-    SafeKpr->RegisterEvent(tid, "UDSServer::_OnThread");
-
-    std::map<int32_t, StreamBufData> bufMap;
-    struct epoll_event ev[MAX_EVENT_SIZE] = {};
-    while (isRunning_) {
-        auto count = EpollWait(*ev, MAX_EVENT_SIZE, DEFINE_EPOLL_TIMEOUT);
-        if (count > 0) {
-            bufMap.clear();
-            for (auto i = 0; i < count; i++) {
-                OnEvent(ev[i], bufMap);
-            }
-            for (const auto &item : bufMap) {
-                if (item.second.isOverflow) {
-                    continue;
-                }
-                OnRecv(item.first, item.second.sBuf.Data(), item.second.sBuf.Size());
-            }
-        }
-        SafeKpr->ReportHealthStatus(tid);
-    }
-    MMI_LOGI("end");
 }
 
 void OHOS::MMI::UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)

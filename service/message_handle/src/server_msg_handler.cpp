@@ -79,6 +79,9 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
 #ifdef OHOS_BUILD_HDF
         {MmiMessageId::HDI_INJECT, MsgCallbackBind2(&ServerMsgHandler::OnHdiInject, this)},
 #endif // OHOS_BUILD_HDF
+#ifdef OHOS_BUILD_MMI_DEBUG
+        {MmiMessageId::BIGPACKET_TEST, MsgCallbackBind2(&ServerMsgHandler::OnBigPacketTest, this)},
+#endif // OHOS_BUILD_MMI_DEBUG
     };
     for (auto& it : funs) {
         CHKC(RegistrationEvent(it), EVENT_REG_FAIL);
@@ -468,4 +471,48 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess
     InterceptorMgrGbl.OnRemoveInterceptor(id);
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_MMI_DEBUG
+int32_t OHOS::MMI::ServerMsgHandler::OnBigPacketTest(SessionPtr sess, NetPacket& pkt)
+{
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t pid = 0;
+    int32_t id = 0;
+    pkt >> pid >> id;
+    int32_t phyNum = 0;
+    pkt >> phyNum;
+    MMI_LOGD("BigPacketsTest pid:%{public}d id:%{public}d phyNum:%{public}d size:%{public}zu",
+        pid, id, phyNum, pkt.Size());
+    for (auto i = 0; i < phyNum; i++) {
+        PhysicalDisplayInfo info = {};
+        pkt >> info.id >> info.leftDisplayId >> info.upDisplayId >> info.topLeftX >> info.topLeftY;
+        pkt >> info.width >> info.height >> info.name >> info.seatId >> info.seatName >> info.logicWidth;
+        pkt >> info.logicHeight >> info.direction;
+        MMI_LOGD("\tPhysical: idx:%{public}d id:%{public}d seatId:%{public}s", i, info.id, info.seatId.c_str());
+    }
+    int32_t logcNum = 0;
+    pkt >> logcNum;
+    MMI_LOGD("\tlogcNum:%{public}d", logcNum);
+    for (auto i = 0; i < logcNum; i++) {
+        LogicalDisplayInfo info = {};
+        pkt >> info.id >> info.topLeftX >> info.topLeftY;
+        pkt >> info.width >> info.height >> info.name >> info.seatId >> info.seatName >> info.focusWindowId;
+        MMI_LOGD("\t\tLogical: idx:%{public}d id:%{public}d seatId:%{public}s", i, info.id, info.seatId.c_str());
+        int32_t winNum = 0;
+        pkt >> winNum;
+        MMI_LOGD("\t\twinNum:%{public}d", winNum);
+        for (auto j = 0; j < winNum; j++) {
+            WindowInfo winInfo;
+            pkt >> winInfo;
+            MMI_LOGD("\t\t\tWindows: idx:%{public}d id:%{public}d displayId:%{public}d",
+                j, winInfo.id, winInfo.displayId);
+        }
+    }
+    if (pkt.ChkRWError()) {
+        MMI_LOGE("Packet read data failed");
+        return PACKET_READ_FAIL;
+    }
+    return RET_OK;
+}
+#endif // OHOS_BUILD_MMI_DEBUG
 // LCOV_EXCL_STOP

@@ -55,6 +55,9 @@ protected:
     int32_t OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
+#ifdef OHOS_BUILD_MMI_DEBUG
+    int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
+#endif // OHOS_BUILD_MMI_DEBUG
 
 private:
     UDSServer *udsServer_ = nullptr; // External references, do not delete

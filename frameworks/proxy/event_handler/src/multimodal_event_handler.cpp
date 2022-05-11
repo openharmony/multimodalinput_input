@@ -33,13 +33,6 @@ void OnConnected(const OHOS::MMI::IfMMIClient& client)
     InputHandlerManager::GetInstance().OnConnected();
 }
 
-MultimodalEventHandler::MultimodalEventHandler()
-{
-#ifdef OHOS_BUILD_MMI_DEBUG
-    VerifyLogManagerRun();
-#endif
-}
-
 int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<OHOS::MMI::KeyEvent> keyEventPtr)
 {
     CHKPR(keyEventPtr, ERROR_NULL_POINTER);
