@@ -76,6 +76,7 @@ public:
         std::function<void(std::vector<bool>&)> callback);
 
     int32_t SetPointerVisible(bool visible);
+    bool IsPointerVisible();
 
 private:
     int32_t PackPhysicalDisplay(NetPacket &pkt);

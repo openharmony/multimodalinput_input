@@ -123,11 +123,11 @@ public:
      */
     static const char* EventTypeToString(int32_t eventType);
 
-   /**
-    * @brief Resets an input event to the initial state.
-    * @return void
-    * @since 9
-    */
+    /**
+     * @brief Resets an input event to the initial state.
+     * @return void
+     * @since 9
+     */
     virtual void Reset();
 
     /**
