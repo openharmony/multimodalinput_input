@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include <thread>
 #include "mmi_log.h"
-#include "virtual_stylus.h"
+#include "virtual_pen.h"
 
 namespace OHOS {
 namespace MMI {
@@ -84,11 +84,11 @@ public:
     static bool IsVirtualStylusOn();
 
 private:
-    static VirtualStylus virtualStylus_;
+    static VirtualPen virtualPen_;
     static std::string  devNode_;
 };
 
-VirtualStylus TransformPointTest::virtualStylus_;
+VirtualPen TransformPointTest::virtualPen_;
 std::string TransformPointTest::devNode_;
 
 void TransformPointTest::SetUpTestCase(void)
@@ -99,7 +99,7 @@ void TransformPointTest::SetUpTestCase(void)
 void TransformPointTest::TearDownTestCase(void)
 {
     if (!devNode_.empty()) {
-        virtualStylus_.Close();
+        virtualPen_.Close();
         devNode_.clear();
     }
 }
@@ -220,7 +220,7 @@ void TransformPointTest::GetInputDeviceNodes(std::map<std::string, std::string>&
 bool TransformPointTest::SetupVirtualStylus()
 {
     MMI_HILOGD("setup virtual stylus.");
-    if (!virtualStylus_.SetUp()) {
+    if (!virtualPen_.SetUp()) {
         MMI_HILOGE("Failed to setup virtual stylus.");
         return false;
     }

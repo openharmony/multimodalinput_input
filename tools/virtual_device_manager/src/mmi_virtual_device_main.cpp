@@ -17,7 +17,7 @@
 
 int32_t main(int32_t argc, const char *argv[])
 {
-    if (argc == 1 || argc > MAXPARAMETER) {
+    if (argc == 1 || argc > PARAMETERS_NUMBER) {
         printf("Invaild Input Para, Plase Check the validity of the para!\n");
         return 0;
     }
@@ -25,13 +25,15 @@ int32_t main(int32_t argc, const char *argv[])
     if (dir == nullptr) {
         mkdir(OHOS::MMI::g_folderpath.c_str(), SYMBOL_FOLDER_PERMISSIONS);
     } else {
-        closedir(dir);
+        if (closedir(dir) != 0) {
+            printf("close dir: %s failed", OHOS::MMI::g_folderpath.c_str());
+        }
     }
     std::vector<std::string> argvList;
     for (uint16_t i = 0; i < argc; i++) {
         argvList.push_back(argv[i]);
     }
-    if (!OHOS::MMI::VirtualDevice::FindDevice(argvList)) {
+    if (!OHOS::MMI::VirtualDevice::CommandBranch(argvList)) {
         return 0;
     }
     constexpr std::int32_t usleepTime = 1500000;
