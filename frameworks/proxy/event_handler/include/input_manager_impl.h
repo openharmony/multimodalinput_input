@@ -56,16 +56,16 @@ public:
     void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t PackDisplayData(NetPacket &pkt);
 
-    int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
-    int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor);
-    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> consumer);
+    int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> interceptor);
+    int32_t AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
+    int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
     void RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
     void MoveMouse(int32_t offsetX, int32_t offsetY);
 
-    int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
-    int32_t AddInterceptor(std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
+    int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
+    int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
     void RemoveInterceptor(int32_t interceptorId);
 
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);

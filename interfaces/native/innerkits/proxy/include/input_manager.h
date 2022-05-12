@@ -175,7 +175,6 @@ public:
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
     int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
-    int32_t AddInterceptor(std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
 
     /**
      * @brief Removes an interceptor.
