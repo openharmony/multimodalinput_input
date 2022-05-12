@@ -36,11 +36,13 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 
 struct MonitorEventConsumer : public IInputEventConsumer {
 public:
-    explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)>& monitor) : monitor_ (monitor)
+    explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)>& monitor)
+        : monitor_ (monitor)
     {
     }
 
-    explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<KeyEvent>)>& monitor) : keyMonitor_ (monitor)
+    explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<KeyEvent>)>& monitor)
+        : keyMonitor_ (monitor)
     {
     }
 
