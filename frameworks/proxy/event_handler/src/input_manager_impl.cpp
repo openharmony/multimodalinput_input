@@ -36,18 +36,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 
 struct MonitorEventConsumer : public IInputEventConsumer {
 public:
-    explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)>& monitor)
+    explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)>& monitor) : monitor_ (monitor)
     {
-        if (monitor != nullptr) {
-            monitor_ = monitor;
-        }
     }
 
-    explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<KeyEvent>)>& monitor)
+    explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<KeyEvent>)>& monitor) : keyMonitor_ (monitor)
     {
-        if (monitor != nullptr) {
-            keyMonitor_ = monitor;
-        }
     }
 
     void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
@@ -472,26 +466,6 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
-
-int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
-{
-    std::lock_guard<std::mutex> guard(mtx_);
-    CHKPR(interceptor, ERROR_NULL_POINTER);
-
-    auto consumer = std::make_shared<MonitorEventConsumer>(interceptor);
-    CHKPR(consumer, ERROR_NULL_POINTER);
-    return InputManagerImpl::AddInterceptor(consumer);
-}
-int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
-{
-    std::lock_guard<std::mutex> guard(mtx_);
-    CHKPR(interceptor, ERROR_NULL_POINTER);
-
-    auto consumer = std::make_shared<MonitorEventConsumer>(interceptor);
-    CHKPR(consumer, ERROR_NULL_POINTER);
-    return InputManagerImpl::AddInterceptor(consumer);
-}
-
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
     CHKPR(interceptor, INVALID_HANDLER_ID);
@@ -501,6 +475,22 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
     }
     std::lock_guard<std::mutex> guard(mtx_);
     return InputInterMgr->AddInterceptor(interceptor);
+}
+
+int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
+                                         std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
+{
+    return -1;
+}
+
+int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
+{
+    std::lock_guard<std::mutex> guard(mtx_);
+    CHKPR(interceptor, ERROR_NULL_POINTER);
+
+    auto consumer = std::make_shared<MonitorEventConsumer>(interceptor);
+    CHKPR(consumer, ERROR_NULL_POINTER);
+    return InputManagerImpl::AddInterceptor(consumer);
 }
 
 void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)

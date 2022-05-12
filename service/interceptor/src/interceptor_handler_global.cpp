@@ -161,7 +161,7 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
 {
     CHKPF(pointerEvent);
     if (interceptors_.empty()) {
-        MMI_HILOGW("Pointer interceptors is empty");
+        MMI_HILOGE("Pointer interceptors is empty");
         return false;
     }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
@@ -179,11 +179,10 @@ int32_t InterceptorHandlerGlobal::InterceptorCollection::AddInterceptor(const Se
         return RET_ERR;
     }
     auto ret = interceptors_.insert(interceptor);
-    if (ret.second) {
-        MMI_HILOGD("Register interceptor successfully");
-    } else {
+    if (!ret.second) {
         MMI_HILOGW("Duplicate interceptors");
     }
+    MMI_HILOGD("Register interceptor successfully");
     return RET_OK;
 }
 
@@ -192,8 +191,8 @@ void InterceptorHandlerGlobal::InterceptorCollection::RemoveInterceptor(const Se
     std::set<SessionHandler>::const_iterator tItr = interceptors_.find(interceptor);
     if (tItr != interceptors_.cend()) {
         interceptors_.erase(tItr);
-        MMI_HILOGD("Unregister interceptor successfully");
     }
+    MMI_HILOGD("Unregister interceptor successfully");
 }
 
 void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr session)
