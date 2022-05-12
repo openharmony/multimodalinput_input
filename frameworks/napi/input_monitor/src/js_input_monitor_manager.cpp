@@ -44,19 +44,19 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
             return;
         }
     }
-    auto monitor = std::make_unique<JsInputMonitor>(jsEnv, typeName, callback, nextId_++);
+    auto monitor = std::make_shared<JsInputMonitor>(jsEnv, typeName, callback, nextId_++);
     CHKPV(monitor);
     if (!monitor->Start()) {
         THROWERR(jsEnv, "js monitor startup failedn");
         return;
     }
-    monitors_.push_back(std::move(monitor));
+    monitors_.push_back(monitor);
 }
 
 void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback)
 {
     CALL_LOG_ENTER;
-    std::unique_ptr<JsInputMonitor> monitor = nullptr;
+    std::shared_ptr<JsInputMonitor> monitor = nullptr;
     do {
         std::lock_guard<std::mutex> guard(mutex_);
         for (auto it = monitors_.begin(); it != monitors_.end();) {
@@ -66,7 +66,7 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, const std::string &typ
             }
             if ((*it)->GetTypeName() == typeName) {
                 if ((*it)->IsMatch(jsEnv, callback) == RET_OK) {
-                    monitor = std::move(*it);
+                    monitor = *it;
                     monitors_.erase(it++);
                     MMI_HILOGD("Found monitor");
                     break;
@@ -83,7 +83,7 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, const std::string &typ
 void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, const std::string &typeName)
 {
     CALL_LOG_ENTER;
-    std::list<std::unique_ptr<JsInputMonitor>> monitors;
+    std::list<std::shared_ptr<JsInputMonitor>> monitors;
     do {
         std::lock_guard<std::mutex> guard(mutex_);
         for (auto it = monitors_.begin(); it != monitors_.end();) {
@@ -93,7 +93,7 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, const std::string &typ
             }
             if ((*it)->GetTypeName() == typeName) {
                 if ((*it)->IsMatch(jsEnv) == RET_OK) {
-                    monitors.push_back(std::move(*it));
+                    monitors.push_back(*it);
                     monitors_.erase(it++);
                     continue;
                 }
@@ -112,7 +112,7 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv, const std::string &typ
 void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv)
 {
     CALL_LOG_ENTER;
-    std::list<std::unique_ptr<JsInputMonitor>> monitors;
+    std::list<std::shared_ptr<JsInputMonitor>> monitors;
     do {
         std::lock_guard<std::mutex> guard(mutex_);
         for (auto it = monitors_.begin(); it != monitors_.end();) {
@@ -121,7 +121,7 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv)
                 continue;
             }
             if ((*it)->IsMatch(jsEnv) == RET_OK) {
-                monitors.push_back(std::move(*it));
+                monitors.push_back(*it);
                 monitors_.erase(it++);
                 continue;
             }
@@ -136,7 +136,7 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv)
     }
 }
 
-const std::unique_ptr<JsInputMonitor>& JsInputMonitorManager::GetMonitor(int32_t id)
+const std::shared_ptr<JsInputMonitor> JsInputMonitorManager::GetMonitor(int32_t id)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
