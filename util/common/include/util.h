@@ -57,7 +57,8 @@ bool IsFileExists(const std::string& fileName);
 std::string GetFileExtendName(const std::string& fileName);
 int32_t GetFileSize(const std::string& fileName);
 std::string ReadFile(const std::string &filePath);
-inline bool IsNum(const std::string &str) {
+inline bool IsNum(const std::string &str)
+{
     std::istringstream sin(str);
     double num;
     return (sin >> num) && sin.eof();
