@@ -136,7 +136,7 @@ void JsInputMonitorManager::RemoveMonitor(napi_env jsEnv)
     }
 }
 
-const std::shared_ptr<JsInputMonitor>& JsInputMonitorManager::GetMonitor(int32_t id)
+const std::shared_ptr<JsInputMonitor> JsInputMonitorManager::GetMonitor(int32_t id)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
