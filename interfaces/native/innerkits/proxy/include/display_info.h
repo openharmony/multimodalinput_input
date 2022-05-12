@@ -22,128 +22,292 @@
 namespace OHOS {
 namespace MMI {
 enum Direction {
-    // The display rotated 0 degrees clockwise
+    /**
+     * Rotating the display clockwise by 0 degree
+     *
+     * @since 9
+    */
     Direction0,
 
-    // The display rotated 90 degrees clockwise
+    /**
+     * Rotating the display clockwise by 90 degrees
+     *
+     * @since 9
+    */
     Direction90,
 
-    // The display rotated 180 degrees clockwise
+    /**
+     * Rotating the display clockwise by 180 degrees
+     *
+     * @since 9
+    */
     Direction180,
 
-    // The display rotated 270 degrees clockwise
+    /**
+     * Rotating the display clockwise by 270 degrees
+     *
+     * @since 9
+    */
+    
     Direction270
 };
 
 struct WindowInfo {
-    // The Bit0 of the flags field represents Touchable or not state
+    /**
+     * Untouchable window
+     *
+     * @since 9
+    */
     static constexpr uint32_t FLAG_BIT_UNTOUCHABLE = 1;
 
-    // The globally unique identifier of the window
+    /**
+     * Globally unique identifier of the window
+     *
+     * @since 9
+    */
     int32_t id;
 
-    // The id of the process where the window is located
+    /**
+     * ID of the process where the window is located
+     *
+     * @since 9
+    */
     int32_t pid;
 
-    // The uid of the process where the window is located
+    /**
+     * UID of the process where the window is located
+     *
+     * @since 9
+    */
     int32_t uid;
 
-    // The x coordinate of the upper left corner of the hot zone window in the logical display
+    /**
+     * X coordinate of the upper left corner of the hot zone window
+     *
+     * @since 9
+    */
     int32_t hotZoneTopLeftX;
 
-    // The y coordinate of the upper left corner of the hot zone window in the logical display
+    /**
+     * Y coordinate of the upper left corner of the hot zone window
+     *
+     * @since 9
+    */
     int32_t hotZoneTopLeftY;
 
-    // Logical width of the hot zone window
+    /**
+     * Width of the hot zone window
+     *
+     * @since 9
+    */
     int32_t hotZoneWidth;
 
-    // Logical height of the hot zone window
+    /**
+     * Height of the hot zone window
+     *
+     * @since 9
+    */
     int32_t hotZoneHeight;
 
-    // The logical display id to which the window belongs
+    /**
+     * Logical display ID
+     *
+     * @since 9
+    */
     int32_t displayId;
 
-    // The input events sent to this window will be sent to the agentwindowid window for processing
+    /**
+     * Agent window ID
+     *
+     * @since 9
+    */
     int32_t agentWindowId;
 
-    // The x coordinate of the upper left corner of the window in the logical display
+    /**
+     * X coordinate of the upper left corner of the window
+     *
+     * @since 9
+    */
     int32_t winTopLeftX;
 
-    // The y coordinate of the upper left corner of the window in the logical display
+    /**
+     * Y coordinate of the upper left corner of the window
+     *
+     * @since 9
+    */
     int32_t winTopLeftY;
 
-    // The current state of the window
+    /**
+     * A 32-bit flag that represents the window status. If the 0th bit is 1,
+     * the window is untouchable; if the 0th bit is 0, the window is touchable.
+     *
+     * @since 9
+    */
     uint32_t flags;
 };
 
 struct PhysicalDisplayInfo {
-    // The globally unique id of the physical display
+    /**
+     * Unique ID of the physical display
+     *
+     * @since 9
+    */
     int32_t id;
 
-    // Globally unique id of the physical display on the left
+    /**
+     * ID of the left physical display
+     *
+     * @since 9
+    */
     int32_t leftDisplayId;
 
-    // The globally unique id of the upper physical display
+    /**
+     * ID of the upper physical display
+     *
+     * @since 9
+    */
     int32_t upDisplayId;
 
-    // The x coordinate of the upper left corner of the display
+    /**
+     * X coordinate of the upper left corner of the display
+     *
+     * @since 9
+    */
     int32_t topLeftX;
 
-    // The y coordinate of the upper left corner of the display
+    /**
+     * Y coordinate of the upper left corner of the display
+     *
+     * @since 9
+    */
     int32_t topLeftY;
 
-    // Display width
+    /**
+     * Display width
+     *
+     * @since 9
+    */
     int32_t width;
 
-    // Display height
+    /**
+     * Display height
+     *
+     * @since 9
+    */
     int32_t height;
 
-    // Display name, for debugging
+    /**
+     * Name of the physical display, which is used for debugging
+     *
+     * @since 9
+    */
     std::string name;
 
-    // Display seatId, The display associated with the touch screen must be configured with a non-empty seatid
+    /**
+     * Seat ID of the physical display, which is used for matching the touchscreen and display
+     *
+     * @since 9
+    */
     std::string seatId;
 
+    /**
+     * Seat name of the physical display, which is used for matching the touchscreen and display
+     *
+     * @since 9
+    */
     std::string seatName;
 
-    // Display logic width
+    /**
+     * Logical width of the physical display
+     *
+     * @since 9
+    */
     int32_t logicWidth;
 
-    // Display logic width
+    /**
+     * Logical height of the physical display
+     *
+     * @since 9
+    */
     int32_t logicHeight;
 
-    // Display orientation
+    /**
+     * Orientation of the physical display
+     *
+     * @since 9
+    */
     Direction direction;
 };
 
 struct LogicalDisplayInfo {
-    // The globally unique id of the logic display
+    /**
+     * Unique ID of the logical display
+     *
+     * @since 9
+    */
     int32_t id;
 
-    // The x coordinate of the upper left corner of the logical display
+    /**
+     * X coordinate of the upper left corner of the logical display
+     *
+     * @since 9
+    */
     int32_t topLeftX;
 
-    // The y coordinate of the upper left corner of the logical display
+    /**
+     * Y coordinate of the upper left corner of the logical display
+     *
+     * @since 9
+    */
     int32_t topLeftY;
 
-    // Logical display width
+    /**
+     * Width of the logical display
+     *
+     * @since 9
+    */
     int32_t width;
 
-    // Logical display height
+    /**
+     * Height of the logical display
+     *
+     * @since 9
+    */
     int32_t height;
 
-    // Logical display name, for debugging
+    /**
+     * Name of the logical display, which is used for debugging
+     *
+     * @since 9
+    */
     std::string name;
 
-    // Logical display seatId, Displays that are not touch screen-independent use this attribute to associate with input
-    // devices Keep it empty unless you are sure of what you are doing
+    /**
+     * Seat ID of the logical display, which is used for matching the touchscreen
+     *
+     * @since 9
+    */
     std::string seatId;
 
+    /**
+     * Seat name of the logical display, which is used for matching the touchscreen
+     *
+     * @since 9
+    */
     std::string seatName;
 
+    /**
+     * ID of the focus window
+     *
+     * @since 9
+    */
     int32_t focusWindowId;
 
-    // List of window information arranged in Z order, with the top window at the top
+    /**
+     * List of window information of the logical display arranged in Z order, with the top window at the top
+     *
+     * @since 9
+    */
     std::vector<WindowInfo> windowsInfo;
 };
 } // namespace MMI
