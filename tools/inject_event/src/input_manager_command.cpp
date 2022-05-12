@@ -70,6 +70,10 @@ int32_t InputManagerCommand::NextPos(int64_t begTimeMs, int64_t curtTimeMs, int3
     if (curtTimeMs < begTimeMs || curtTimeMs > endTimeMs) {
         return begPos;
     }
+    if (totalTimeMs == 0) {
+        std::cout << "invalid totalTimeMs" << std::endl;
+        return begPos;
+    }
     double tmpTimeMs = static_cast<double>(curtTimeMs - begTimeMs) / totalTimeMs;
     int32_t offsetPos = std::ceil(tmpTimeMs * (endPos - begPos));
     int32_t retPos = 0;

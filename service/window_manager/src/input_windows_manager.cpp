@@ -263,7 +263,7 @@ bool InputWindowsManager::TouchMotionPointToDisplayPoint(struct libinput_event_t
         return false;
     }
     for (const auto &display : logicalDisplays_) {
-        if (targetDisplayId == display.id ) {
+        if (targetDisplayId == display.id) {
             touchInfo.point.x -= display.topLeftX;
             touchInfo.point.y -= display.topLeftY;
             AdjustGlobalCoordinate(display, touchInfo.point);
