@@ -73,7 +73,7 @@ void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
     NetPacket pkt(MmiMessageId::MARK_CONSUMED);
     pkt << monitorId << eventId;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write monitorId failed");
+        MMI_HILOGE("Packet write monitor data failed");
         return;
     }
     if (!client->SendMessage(pkt)) {
@@ -108,7 +108,7 @@ void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handle
     NetPacket pkt(MmiMessageId::ADD_INPUT_HANDLER);
     pkt << handlerId << handlerType;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write add handlerId failed");
+        MMI_HILOGE("Packet write add handlerType failed");
         return;
     }
     if (!client->SendMessage(pkt)) {
@@ -141,7 +141,7 @@ void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType h
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_HANDLER);
     pkt << handlerId << handlerType;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write remove handlerId failed");
+        MMI_HILOGE("Packet write remove handlerType failed");
         return;
     }
     if (!client->SendMessage(pkt)) {

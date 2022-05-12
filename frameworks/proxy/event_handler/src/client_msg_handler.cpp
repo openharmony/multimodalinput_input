@@ -301,7 +301,7 @@ int32_t ClientMsgHandler::OnDevMonitor(const UDSClient& client, NetPacket& pkt)
     int32_t deviceId;
     pkt >> type >> deviceId;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read deviceId failed");
+        MMI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
     InputDeviceImpl::GetInstance().OnDevMonitor(type, deviceId);
@@ -377,7 +377,7 @@ void ClientMsgHandler::OnEventProcessed(int32_t eventId)
     NetPacket pkt(MmiMessageId::MARK_PROCESS);
     pkt << eventId;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write eventId failed");
+        MMI_HILOGE("Packet write event failed");
         return;
     }
     if (!client->SendMessage(pkt)) {

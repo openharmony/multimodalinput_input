@@ -486,8 +486,8 @@ int32_t ServerMsgHandler::OnSupportKeys(SessionPtr sess, NetPacket& pkt)
     std::vector<bool> keystroke = InputDevMgr->SupportKeys(deviceId, keyCode);
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
     pkt2 << userData << keystroke.size();
-    for (const auto &item : keystroke) {
-        pkt2 << static_cast<bool>(item);
+    for (const bool &item : keystroke) {
+        pkt2 << item;
     }
     if (pkt2.ChkRWError()) {
         MMI_HILOGE("Packet write support keys failed");

@@ -80,7 +80,7 @@ void InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<KeyEvent> key
         MMI_HILOGD("server send the msg to client: keyCode:%{public}d,pid:%{public}d", keyEvent->GetKeyCode(),
             item.session->GetPid());
         if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet write pid failed");
+            MMI_HILOGE("Packet write item failed");
             return;
         }
         item.session->SendMsg(pkt);
@@ -135,7 +135,7 @@ void InputEventMonitorManager::OnTouchpadMonitorInputEvent(
         MMI_HILOGD("server send the msg to client: EventType:%{public}d,pid:%{public}d",
             pointerEvent->GetEventType(), item.session->GetPid());
         if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet write pid failed");
+            MMI_HILOGE("Packet write item failed");
             return;
         }
         item.session->SendMsg(pkt);
