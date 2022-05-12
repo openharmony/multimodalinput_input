@@ -170,7 +170,7 @@ int32_t StandardizedEventManager::GetDeviceIds(int32_t userData)
     NetPacket pkt(MmiMessageId::INPUT_DEVICE_IDS);
     pkt << userData;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write get deviceIds failed");
+        MMI_HILOGE("Packet write userData failed");
         return RET_ERR;
     }
     return SendMsg(pkt);
@@ -181,7 +181,7 @@ int32_t StandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId)
     NetPacket pkt(MmiMessageId::INPUT_DEVICE);
     pkt << userData << deviceId;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write get device failed");
+        MMI_HILOGE("Packet write userData failed");
         return RET_ERR;
     }
     return SendMsg(pkt);
@@ -192,7 +192,7 @@ int32_t StandardizedEventManager::SupportKeys(int32_t userData, int32_t deviceId
     NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
     pkt << userData << deviceId << keyCodes;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write support keys failed");
+        MMI_HILOGE("Packet write keyCodes failed");
         return RET_ERR;
     }
     return SendMsg(pkt);

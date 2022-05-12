@@ -159,7 +159,7 @@ int32_t MultimodalEventHandler::AddInterceptor(int32_t sourceType, int32_t id)
     NetPacket pkt(MmiMessageId::ADD_EVENT_INTERCEPTOR);
     pkt << sourceType << id;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write touchpad event interceptor failed");
+        MMI_HILOGE("Packet write add touchpad event interceptor failed");
         return MMI_SERVICE_INVALID;
     }
     client_->SendMessage(pkt);
@@ -179,7 +179,7 @@ int32_t MultimodalEventHandler::RemoveInterceptor(int32_t id)
     NetPacket pkt(MmiMessageId::REMOVE_EVENT_INTERCEPTOR);
     pkt << id;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write touchpad event interceptor failed");
+        MMI_HILOGE("Packet write remove touchpad event interceptor failed");
         return MMI_SERVICE_INVALID;
     }
     client_->SendMessage(pkt);
@@ -198,7 +198,7 @@ int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
     NetPacket pkt(MmiMessageId::ADD_INPUT_EVENT_MONITOR);
     pkt << keyEventType;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write keyEventType failed");
+        MMI_HILOGE("Packet write add keyEventType failed");
         return MMI_SERVICE_INVALID;
     }
     client_->SendMessage(pkt);
@@ -215,7 +215,7 @@ void MultimodalEventHandler::RemoveInputEventMontior(int32_t keyEventType)
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_EVENT_MONITOR);
     pkt << keyEventType;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write keyEventType failed");
+        MMI_HILOGE("Packet write remove keyEventType failed");
         return;
     }
     client_->SendMessage(pkt);
