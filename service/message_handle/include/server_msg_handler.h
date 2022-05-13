@@ -34,7 +34,6 @@ public:
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
 
 protected:
-    int32_t OnVirtualKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_HDF
     int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
