@@ -29,7 +29,6 @@
 
 #include "bytrace_adapter.h"
 #include "input_device_manager.h"
-#include "interceptor_manager_global.h"
 #include "mmi_func_callback.h"
 #include "mouse_event_handler.h"
 #include "libinput_adapter.h"

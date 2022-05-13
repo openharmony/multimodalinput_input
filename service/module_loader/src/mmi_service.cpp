@@ -319,6 +319,13 @@ int32_t MMIService::SetPointerVisible(bool visible)
     return RET_OK;
 }
 
+int32_t MMIService::IsPointerVisible(bool &visible)
+{
+    CALL_LOG_ENTER;
+    visible = IPointerDrawingManager::GetInstance()->IsPointerVisible();
+    return RET_OK;
+}
+
 #ifdef OHOS_RSS_CLIENT
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
@@ -351,6 +358,7 @@ void MMIService::OnThread()
 #ifdef OHOS_RSS_CLIENT
     tid_.store(tid);
 #endif
+    libinputAdapter_.ProcessPendingEvents();
 
     int32_t count = 0;
     constexpr int32_t timeOut = 1;

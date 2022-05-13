@@ -43,7 +43,7 @@ public:
 
     void RemoveMonitor(napi_env jsEnv);
 
-    const std::unique_ptr<JsInputMonitor>& GetMonitor(int32_t id);
+    const std::shared_ptr<JsInputMonitor> GetMonitor(int32_t id);
 
     bool AddEnv(napi_env env, napi_callback_info cbInfo);
 
@@ -60,7 +60,7 @@ private:
 private:
     int32_t nextId_ {0};
     std::mutex mutex_;
-    std::list<std::unique_ptr<JsInputMonitor>> monitors_;
+    std::list<std::shared_ptr<JsInputMonitor>> monitors_;
     std::map<napi_env, napi_ref> envManager_;
 };
 

@@ -17,20 +17,16 @@
 
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     #include "input_interceptor_manager.h"
-    #include "interceptor_manager.h"
 #else
     #include "i_input_interceptor_manager.h"
-    #include "i_interceptor_manager.h"
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 
 namespace OHOS {
 namespace MMI {
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     #define InputInterMgr InputInterceptorManager::GetInstance()
-    #define InterMgr InterceptorManager::GetInstance()
 #else
     #define InputInterMgr IInputInterceptorManager::GetInstance()
-    #define InterMgr IInterceptorManager::GetInstance()
 #endif
 } // namespace MMI
 } // namespace OHOS

@@ -291,6 +291,29 @@ napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_i
     return jsInputDeviceMgr->SetPointerVisible(env, visible, argv[1]);
 }
 
+napi_value JsInputDeviceContext::IsPointerVisible(napi_env env, napi_callback_info info)
+{
+    CALL_LOG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc > 1) {
+        THROWERR(env, "the number of parameters is not as expected");
+        return nullptr;
+    }
+
+    JsInputDeviceContext *jsPointer = JsInputDeviceContext::GetInstance(env);
+    auto jsInputDeviceMgr = jsPointer->GetJsInputDeviceMgr();
+    if (argc == 0) {
+        return jsInputDeviceMgr->IsPointerVisible(env);
+    }
+    if (!JsUtil::TypeOf(env, argv[0], napi_function)) {
+        THROWERR(env, "The first parameter type is wrong");
+        return nullptr;
+    }
+
+    return jsInputDeviceMgr->IsPointerVisible(env, argv[0]);
+}
 napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
@@ -388,6 +411,7 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getDevice", GetDevice),
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceIds", GetDeviceIds),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerVisible", SetPointerVisible),
+        DECLARE_NAPI_STATIC_FUNCTION("isPointerVisible", IsPointerVisible),
         DECLARE_NAPI_STATIC_FUNCTION("supportKeys", SupportKeys),
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardType", GetKeyboardType),
     };
