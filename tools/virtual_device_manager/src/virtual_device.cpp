@@ -46,13 +46,6 @@ namespace MMI {
 namespace {
 constexpr int32_t READ_FILE_SIZE_MAX = 1000;
 const std::string VIRTUAL_DEVICE_NAME = "mmi-virtual-device";
-bool IsNum(const std::string &str)
-{
-    return std::all_of(str.begin(), str.end(), [](char c) {
-        return std::isdigit(c) != 0;
-    });
-}
-
 bool CheckFileName(const std::string& fileName)
 {
     std::string::size_type pos = fileName.find("_");

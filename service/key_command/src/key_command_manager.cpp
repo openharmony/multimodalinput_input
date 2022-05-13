@@ -269,10 +269,6 @@ bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
 KeyCommandManager::KeyCommandManager()
 {
     std::string configFile = GetConfigFilePath();
-    if (!FileExists(configFile)) {
-        MMI_HILOGE("config file %{public}s not exist", configFile.c_str());
-        return;
-    }
     int32_t fileSize = GetFileSize(configFile);
     if ((fileSize <= 0) || (fileSize > JSON_FILE_SIZE)) {
         MMI_HILOGE("The file size is out of range 20KB or empty. filesize:%{public}d", fileSize);
