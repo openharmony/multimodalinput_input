@@ -254,6 +254,10 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     std::vector<PhysicalDisplayInfo> physicalDisplays;
     int32_t num = 0;
     pkt >> num;
+    if (num > MAX_PHYSICAL_SIZE) {
+        MMI_HILOGE("Physical exceeds the max range");
+        return RET_ERR;
+    }
     for (int32_t i = 0; i < num; i++) {
         PhysicalDisplayInfo info;
         pkt >> info.id >> info.leftDisplayId >> info.upDisplayId >> info.topLeftX >> info.topLeftY
@@ -264,6 +268,10 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 
     std::vector<LogicalDisplayInfo> logicalDisplays;
     pkt >> num;
+    if (num > MAX_LOGICAL_SIZE) {
+        MMI_HILOGE("Logical exceeds the max range");
+        return RET_ERR;
+    }
     for (int32_t i = 0; i < num; i++) {
         LogicalDisplayInfo info;
         std::vector<WindowInfo> windowInfos;

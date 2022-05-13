@@ -47,6 +47,9 @@ namespace MMI {
 #define MAX_VECTOR_SIZE 1000
 #define MAX_INPUT_DEVICE 64
 #define MAX_SUPPORT_KEY 5
+#define MAX_PHYSICAL_SIZE 128
+#define MAX_LOGICAL_SIZE 128
+#define MAX_KEY_SIZE 108
 
 #define MAX_LIST_SIZE 100                   // Instantaneous maximum listening buffer size of socket
 #define MAX_SESSON_ALARM 300                // Client quantity warning value
