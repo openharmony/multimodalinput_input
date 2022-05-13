@@ -101,7 +101,10 @@ public:
     }
     static bool RandomDisplayPacket(NetPacket& pkt, int32_t phyNum = 1)
     {
-        pkt << phyNum;
+        if (!pkt.Write(phyNum)) {
+            printf("write failed 1\n");
+            return false;
+        }
         for (auto i = 0; i < phyNum; i++) {
             PhysicalDisplayInfo info = {};
             RandomPhysicalInfo(i+1, info);
@@ -111,7 +114,10 @@ public:
             }
         }
         int32_t logicalNum = GetRandomInt(5, 10);
-        pkt << logicalNum;
+        if (!pkt.Write(logicalNum)) {
+            printf("write failed 3\n");
+            return false;
+        }
         for (auto i = 0; i < logicalNum; i++) {
             LogicalDisplayInfo logiclInfo = {};
             RandomLogicalInfo(i+1, logiclInfo);
@@ -121,16 +127,18 @@ public:
                 printf("write failed 4\n");
                 return false;
             }
-            pkt << windowsNum;
+            if (!pkt.Write(windowsNum)) {
+                printf("write failed 5\n");
+                return false;
+            }
             for (auto j = 0; j < windowsNum; j++) {
                 WindowInfo winInfo = {};
                 RandomWindowInfo(i*100+j+1, logiclInfo, winInfo);
-                pkt << winInfo;
+                if (!pkt.Write(winInfo)) {
+                    printf("write failed 6\n");
+                    return false;
+                }
             }
-        }
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet write random display failed");
-            return false;
         }
         return true;
     }
