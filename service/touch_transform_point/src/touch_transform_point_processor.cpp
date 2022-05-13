@@ -67,7 +67,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     PointerEvent::PointerItem item;
     auto pressure = libinput_event_touch_get_pressure(data);
     auto seatSlot = libinput_event_touch_get_seat_slot(data);
-    auto axisLong = libinput_event_get_touch_contact_axis_Long(data);
+    auto axisLong = libinput_event_get_touch_contact_axis_long(data);
     auto axisShort = libinput_event_get_touch_contact_axis_short(data);
     item.SetPressure(pressure);
     item.SetAxisLong(axisLong);
@@ -113,7 +113,7 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
         return false;
     }
     auto pressure = libinput_event_touch_get_pressure(data);
-    auto axisLong = libinput_event_get_touch_contact_axis_Long(data);
+    auto axisLong = libinput_event_get_touch_contact_axis_long(data);
     auto axisShort = libinput_event_get_touch_contact_axis_short(data);
     item.SetPressure(pressure);
     item.SetAxisLong(axisLong);

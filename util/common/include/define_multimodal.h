@@ -64,6 +64,15 @@ namespace MMI {
         } \
     } while (0)
 
+#define CHKPS(cond) \
+    do { \
+        if ((cond) == nullptr) { \
+            MMI_HILOGE("%{public}s, (%{public}d), CHKPF(%{public}s) is null", \
+                __FILE__, __LINE__, #cond); \
+            return ""; \
+        } \
+    } while (0)
+
 #define CHKPC(cond) \
     { \
         if ((cond) == nullptr) { \
@@ -144,6 +153,14 @@ namespace MMI {
         if ((cond) == nullptr) { \
             MMI_HILOGE("CHKPF(%{public}s) is null", #cond); \
             return false; \
+        } \
+    } while (0)
+
+#define CHKPS(cond) \
+    do { \
+        if ((cond) == nullptr) { \
+            MMI_HILOGE("CHKPF(%{public}s) is null", #cond); \
+            return ""; \
         } \
     } while (0)
 

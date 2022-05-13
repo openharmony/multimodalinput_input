@@ -234,17 +234,17 @@ public:
      */
     static constexpr int32_t MOUSE_BUTTON_TASK = 7;
 
-    static constexpr int32_t TOOL_TYPE_PEN = 0;
+    static constexpr int32_t TOOL_TYPE_FINGER = 0;
 
-    static constexpr int32_t TOOL_TYPE_RUBBER = 1;
+    static constexpr int32_t TOOL_TYPE_PEN = 1;
 
-    static constexpr int32_t TOOL_TYPE_BRUSH = 2;
+    static constexpr int32_t TOOL_TYPE_RUBBER = 2;
 
-    static constexpr int32_t TOOL_TYPE_PENCIL = 3;
+    static constexpr int32_t TOOL_TYPE_BRUSH = 3;
 
-    static constexpr int32_t TOOL_TYPE_AIRBRUSH = 4;
+    static constexpr int32_t TOOL_TYPE_PENCIL = 4;
 
-    static constexpr int32_t TOOL_TYPE_FINGER = 5;
+    static constexpr int32_t TOOL_TYPE_AIRBRUSH = 5;
 
     static constexpr int32_t TOOL_TYPE_MOUSE = 6;
 

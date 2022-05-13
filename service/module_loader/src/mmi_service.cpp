@@ -358,6 +358,7 @@ void MMIService::OnThread()
 #ifdef OHOS_RSS_CLIENT
     tid_.store(tid);
 #endif
+    libinputAdapter_.ProcessPendingEvents();
 
     int32_t count = 0;
     constexpr int32_t timeOut = 1;
