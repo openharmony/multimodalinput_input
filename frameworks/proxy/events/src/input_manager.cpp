@@ -29,7 +29,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManager" };
 } // namespace
 
-InputManager *InputManager::instance_ = nullptr;
 InputManager *InputManager::GetInstance()
 {
     if (instance_ == nullptr) {
@@ -105,11 +104,6 @@ void InputManager::MoveMouse(int32_t offsetX, int32_t offsetY)
 int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
     return InputMgrImpl->AddInterceptor(interceptor);
-}
-
-int32_t InputManager::AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
-{
-    return -1;
 }
 
 int32_t InputManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
