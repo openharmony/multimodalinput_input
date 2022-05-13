@@ -14,8 +14,6 @@
  */
 
 #include "virtual_device.h"
-
-#include "directory_ex.h"
 #include "virtual_finger.h"
 #include "virtual_gamepad.h"
 #include "virtual_joystick.h"
@@ -69,6 +67,43 @@ bool CheckFileName(const std::string& fileName)
         printf("file name check divece file name error : %s", fileName.c_str());
     }
     return result;
+}
+
+void RemoveDir(const std::string& filePath)
+{
+    if (filePath.empty()) {
+        printf("file path is empty");
+        return;
+    }
+    DIR* dir = opendir(filePath.c_str());
+    if (dir == nullptr) {
+        printf("Failed to open folder");
+        return;
+    }
+    dirent* ptr = nullptr;
+    while ((ptr = readdir(dir)) != nullptr) {
+        std::string tmpDirName(ptr->d_name);
+        if ((tmpDirName == ".") || (tmpDirName == "..")) {
+            continue;
+        }
+        if (ptr->d_type == DT_REG) {
+            std::string rmFile = filePath + ptr->d_name;
+            if (std::remove(rmFile.c_str()) != 0) {
+                printf("remove file: %s failed", rmFile.c_str());
+            }
+        } else if (ptr->d_type == DT_DIR) {
+            RemoveDir((filePath + ptr->d_name + "/"));
+        } else {
+            printf("file name:%s, type is error", ptr->d_name);
+        }
+    }
+    if (closedir(dir) != 0) {
+        printf("close dir: %s failed", filePath.c_str());
+    }
+    if (std::remove(filePath.c_str()) != 0) {
+        printf("remove dir: %s failed", filePath.c_str());
+    }
+    return;
 }
 
 void StartMouse()
@@ -274,7 +309,7 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
             printf("close dir failed");
         }
     }
-    if (!RemoveFile((g_folderpath + fileName))) {
+    if (std::remove((g_folderpath + fileName).c_str()) != 0) {
         printf("remove file failed");
     }
     return false;
@@ -470,7 +505,7 @@ bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::v
         return false;
     }
     if (deviceList.empty()) {
-        ForceRemoveDirectory(g_folderpath);
+        RemoveDir(g_folderpath);
         printf("no start device");
         return false;
     }
@@ -478,14 +513,14 @@ bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::v
         for (auto it : deviceList) {
             kill(atoi(it.c_str()), SIGKILL);
         }
-        ForceRemoveDirectory(g_folderpath);
+        RemoveDir(g_folderpath);
         return true;
     }
     for (auto it : deviceList) {
         if (it.find(closeDeviceName) == 0) {
             kill(atoi(it.c_str()), SIGKILL);
             if (BrowseDirectory(g_folderpath).size() == 0) {
-                ForceRemoveDirectory(g_folderpath);
+                RemoveDir(g_folderpath);
             }
             return true;
         }
