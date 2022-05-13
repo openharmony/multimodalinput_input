@@ -58,6 +58,10 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
     key->SetKeyAction(data);
     int32_t size = 0;
     pkt >> size;
+    if (size > MAX_KEY_SIZE) {
+        MMI_HILOGE("Key exceeds the max range");
+        return RET_ERR;
+    }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read size failed");
         return RET_ERR;

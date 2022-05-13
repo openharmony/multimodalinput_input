@@ -231,7 +231,7 @@ int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& p
     pkt >> userData >> inputDeviceIds;
     size_t size = inputDeviceIds.size();
     if (size > MAX_INPUT_DEVICE) {
-        MMI_HILOGE("Data exceeds the max range");
+        MMI_HILOGE("Device exceeds the max range");
         return RET_ERR;
     }
     if (pkt.ChkRWError()) {
@@ -277,7 +277,7 @@ int32_t ClientMsgHandler::OnSupportKeys(const UDSClient& client, NetPacket& pkt)
     size_t size;
     pkt >> userData >> size;
     if (size > MAX_SUPPORT_KEY) {
-        MMI_HILOGE("Data exceeds the max range");
+        MMI_HILOGE("Keys exceeds the max range");
         return RET_ERR;
     }
     std::vector<bool> abilityRet;
