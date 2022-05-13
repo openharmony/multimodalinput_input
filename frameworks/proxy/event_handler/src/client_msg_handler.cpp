@@ -228,8 +228,7 @@ int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& p
     int32_t userData;
     std::vector<int32_t> inputDeviceIds;
     pkt >> userData >> inputDeviceIds;
-    size_t size = inputDeviceIds.size();
-    if (size > MAX_INPUT_DEVICE) {
+    if (inputDeviceIds.size() > MAX_INPUT_DEVICE) {
         MMI_HILOGE("Device exceeds the max range");
         return RET_ERR;
     }

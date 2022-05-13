@@ -121,17 +121,17 @@ bool StreamBuffer::Read(std::vector<T> &data)
 {
     int32_t size = 0;
     if (!Read(size)) {
-        MMI_HILOGE("vecotr read size error");
+        MMI_HILOGE("vector read size error");
         return false;
     }
     if (size < 0 || size > MAX_VECTOR_SIZE) {
-        MMI_HILOGE("vecotr read size:%{public}d error", size);
+        MMI_HILOGE("vector read size:%{public}d error", size);
         return false;
     }
     for (int32_t i = 0; i < size; i++) {
         T val;
         if (!Read(val)) {
-            MMI_HILOGE("vecotr read data error");
+            MMI_HILOGE("vector read data error");
             return false;
         }
         data.push_back(val);
@@ -142,14 +142,18 @@ bool StreamBuffer::Read(std::vector<T> &data)
 template<typename T>
 bool StreamBuffer::Write(const std::vector<T> &data)
 {
+    if (data.size() > INT32_MAX) {
+        MMI_HILOGE("vector exceeds the max range");
+        return false;
+    }
     int32_t size = static_cast<int32_t>(data.size());
     if (!Write(size)) {
-        MMI_HILOGE("vecotr write size error");
+        MMI_HILOGE("vector write size error");
         return false;
     }
     for (const auto &item : data) {
         if (!Write(item)) {
-            MMI_HILOGE("vecotr write data error");
+            MMI_HILOGE("vector write data error");
             return false;
         }
     }
