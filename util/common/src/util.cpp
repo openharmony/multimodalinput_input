@@ -35,7 +35,9 @@
 #endif // OHOS_BUILD
 #include "config_multimodal.h"
 #include "define_multimodal.h"
+#include "directory_ex.h"
 #include "error_multimodal.h"
+#include "file_ex.h"
 #include "mmi_log.h"
 #include "securec.h"
 #include "uuid.h"
@@ -435,100 +437,79 @@ std::string StringFmt(const char* str, ...)
     return buf;
 }
 
-bool IsFileExists(const std::string& fileName)
+static bool CheckFileExtendName(const std::string& filePath, const std::string& checkExtension)
 {
-    char realPath[PATH_MAX] = {};
-    if (realpath(fileName.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("path is error, path:%{public}s", realPath);
+    if (filePath.empty()) {
+        MMI_HILOGE("filePath is empty");
         return false;
     }
-    if ((access(realPath, F_OK)) == 0) {
+    std::string::size_type pos = filePath.find_last_of('.');
+    if (pos == std::string::npos) {
+        MMI_HILOGE("file is not find extension");
+        return false;
+    }
+    if (filePath.substr(pos + 1, filePath.npos) == checkExtension) {
         return true;
     }
+    MMI_HILOGE("file extension is not %{public}s", checkExtension.c_str());
     return false;
 }
 
-std::string GetFileExtendName(const std::string& fileName)
+int32_t GetFileSize(const std::string& filePath)
 {
-    if (fileName.empty()) {
-        return "";
-    }
-    size_t nPos = fileName.find_last_of('.');
-    if (fileName.npos == nPos) {
-        return fileName;
-    }
-    return fileName.substr(nPos + 1, fileName.npos);
-}
-
-int32_t GetFileSize(const std::string& fileName)
-{
-    char realPath[PATH_MAX] = {};
-    if (realpath(fileName.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("path is error, path:%{public}s", fileName.c_str());
+    std::string realPath;
+    if (!PathToRealPath(filePath, realPath)) {
+        MMI_HILOGE("path is failed");
         return RET_ERR;
     }
-    FILE* pFile = fopen(realPath, "rb");
-    if (pFile) {
-        fseek(pFile, 0, SEEK_END);
-        long fileSize = ftell(pFile);
-        if (fileSize > INT32_MAX) {
-            MMI_HILOGE("The file is too large for 32-bit systems, filesize:%{public}ld", fileSize);
-            if (fclose(pFile) != 0) {
-                MMI_HILOGW("close file: %{pulic}s failed", realPath);
-            }
-            return RET_ERR;
-        }
-        if (fclose(pFile) != 0) {
-            MMI_HILOGW("close file: %{pulic}s failed", realPath);
-        }
-        return fileSize;
+    struct stat statbuf = {0};
+    if (stat(realPath.c_str(), &statbuf) == 0) {
+        return statbuf.st_size;
     }
+    MMI_HILOGE("get file size error");
     return RET_ERR;
-}
-
-static std::string ReadFile(const std::string &filePath)
-{
-    char realPath[PATH_MAX] = {};
-    if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("path is error, path:%{public}s", filePath.c_str());
-        return "";
-    }
-    FILE* fp = fopen(realPath, "r");
-    if (fp == nullptr) {
-        MMI_HILOGW("open file: %{pulic}s failed", realPath);
-        return "";
-    }
-    std::string dataStr;
-    char buf[256] = {};
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        dataStr += buf;
-    }
-    if (fclose(fp) != 0) {
-        MMI_HILOGW("close file: %{pulic}s failed", realPath);
-    }
-    return dataStr;
 }
 
 std::string ReadJsonFile(const std::string &filePath)
 {
-    if (GetFileExtendName(filePath) != "json") {
-        MMI_HILOGE("Unable to parse files other than json format filePath:%{public}s", filePath.c_str());
+    std::string realPath;
+    if (!PathToRealPath(filePath, realPath)) {
+        MMI_HILOGE("path is failed");
         return "";
     }
-    if (!IsFileExists(filePath)) {
-        MMI_HILOGE("file %{public}s not exist", filePath.c_str());
+    if (!CheckFileExtendName(realPath, "json")) {
+        MMI_HILOGE("Unable to parse files other than json format");
         return "";
     }
-    return ReadFile(filePath);
+    if (!FileExists(realPath)) {
+        MMI_HILOGE("file not exist");
+        return "";
+    }
+    std::string fileStr;
+    if (LoadStringFromFile(realPath, fileStr)) {
+        return fileStr;
+    }
+    MMI_HILOGE("file read error");
+    return "";
 }
 
 std::string ReadUinputToolFile(const std::string &filePath)
 {
-    if (!IsFileExists(filePath)) {
-        MMI_HILOGE("file %{public}s not exist", filePath.c_str());
+    std::string realPath;
+    if (!PathToRealPath(filePath, realPath)) {
+        MMI_HILOGE("path is failed");
         return "";
     }
-    return ReadFile(filePath);
+    if (!FileExists(realPath)) {
+        MMI_HILOGE("file not exist");
+        return "";
+    }
+    std::string fileStr;
+    if (LoadStringFromFile(realPath, fileStr)) {
+        return fileStr;
+    }
+    MMI_HILOGE("file read error");
+    return "";
 }
 } // namespace MMI
 } // namespace OHOS
