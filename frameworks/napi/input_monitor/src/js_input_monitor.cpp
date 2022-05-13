@@ -428,7 +428,7 @@ int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> 
             return false;
         }
         if (!GetAxesValue(pointerEvent, element)) {
-            MMI_HILOGE("Get axesValue failed");
+            THROWERR(jsEnv_, "Get axesValue failed");
             return RET_ERR;
         }
         status = napi_set_element(jsEnv_, axes, index, element);
@@ -508,11 +508,7 @@ bool JsInputMonitor::GetPressedKeys(const std::vector<int32_t>& pressedKeys, nap
 bool JsInputMonitor::CheckExists(const std::vector<int32_t>& pressedKeys, int32_t keyCode)
 {
     auto it = std::find(pressedKeys.begin(), pressedKeys.end(), keyCode);
-    if (it == pressedKeys.end()) {
-        return false;
-    } else {
-        return true;
-    }
+    return it == pressedKeys.end();
 }
 
 bool JsInputMonitor::GetPressedKey(const std::vector<int32_t>& pressedKeys, napi_value result)
