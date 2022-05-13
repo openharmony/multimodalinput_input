@@ -44,7 +44,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t READ_FILE_SIZE_MAX = 1000;
 const std::string VIRTUAL_DEVICE_NAME = "mmi-virtual-device";
 bool CheckFileName(const std::string& fileName)
 {
@@ -255,10 +254,6 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
     dir = opendir(procressPath.c_str());
     if (dir == nullptr) {
         printf("open dir:%s failed", procressPath.c_str());
-        goto RELEASE_RES;
-    }
-    if (GetFileSize(filePath) > READ_FILE_SIZE_MAX) {
-        printf("file:%s size exceeds maximum", filePath.c_str());
         goto RELEASE_RES;
     }
     temp = ReadUinputToolFile(filePath);

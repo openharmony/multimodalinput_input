@@ -62,11 +62,6 @@ int32_t InjectionEventDispatch::OnJson()
         return RET_ERR;
     }
     const std::string jsonFile = injectArgvs_.at(JSON_FILE_PATH_INDEX);
-    int32_t fileSize = GetFileSize(jsonFile);
-    if ((fileSize <= 0) || (fileSize > JSON_FILE_SIZE)) {
-        MMI_HILOGE("The file size is out of range 20KB or empty. filesize:%{public}d", fileSize);
-        return RET_ERR;
-    }
     std::string jsonBuf = ReadJsonFile(jsonFile);
     if (jsonBuf.empty()) {
         MMI_HILOGE("read file failed");
