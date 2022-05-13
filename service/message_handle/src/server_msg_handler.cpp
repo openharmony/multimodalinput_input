@@ -401,6 +401,10 @@ int32_t ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     std::vector<int32_t> ids = InputDevMgr->GetInputDeviceIds();
+    if (ids.size() > MAX_INPUT_DEVICE) {
+        MMI_HILOGE("Device exceeds the max range");
+        return RET_ERR;
+    }
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE_IDS);
     pkt2 << userData << ids;
     if (pkt2.ChkRWError()) {
@@ -488,6 +492,10 @@ int32_t ServerMsgHandler::OnSupportKeys(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     std::vector<bool> keystroke = InputDevMgr->SupportKeys(deviceId, keyCode);
+    if (keystroke.size() > MAX_SUPPORT_KEY) {
+        MMI_HILOGE("Keys exceeds the max range");
+        return RET_ERR;
+    }
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
     pkt2 << userData << keystroke.size();
     for (const bool &item : keystroke) {

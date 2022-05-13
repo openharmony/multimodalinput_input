@@ -245,6 +245,10 @@ int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &pkt)
 {
     uint32_t num = static_cast<uint32_t>(physicalDisplays_.size());
+    if (num > MAX_PHYSICAL_SIZE) {
+        MMI_HILOGE("Physical exceeds the max range");
+        return RET_ERR;
+    }
     pkt << num;
     for (uint32_t i = 0; i < num; i++) {
         pkt << physicalDisplays_[i].id << physicalDisplays_[i].leftDisplayId << physicalDisplays_[i].upDisplayId
@@ -263,6 +267,10 @@ int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &pkt)
 int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
 {
     int32_t num = static_cast<int32_t>(logicalDisplays_.size());
+    if (num > MAX_LOGICAL_SIZE) {
+        MMI_HILOGE("Logical exceeds the max range");
+        return RET_ERR;
+    }
     pkt << num;
     for (int32_t i = 0; i < num; i++) {
         pkt << logicalDisplays_[i].id << logicalDisplays_[i].topLeftX << logicalDisplays_[i].topLeftY

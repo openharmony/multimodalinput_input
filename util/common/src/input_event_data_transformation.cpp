@@ -33,6 +33,10 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
     pkt << key->GetKeyCode() << key->GetKeyAction();
     auto keys = key->GetKeyItems();
     int32_t size = static_cast<int32_t>(keys.size());
+    if (size > MAX_KEY_SIZE) {
+        MMI_HILOGE("Key exceeds the max range");
+        return RET_ERR;
+    }
     pkt << size;
     for (const auto &item : keys) {
         pkt << item.GetKeyCode() << item.GetDownTime()
