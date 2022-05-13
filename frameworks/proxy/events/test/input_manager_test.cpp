@@ -29,7 +29,6 @@
 #include "input_event_monitor_manager.h"
 #include "input_handler_type.h"
 #include "input_manager.h"
-#include "interceptor_manager.h"
 #include "multimodal_event_handler.h"
 #include "mmi_client.h"
 #include "pointer_event.h"
