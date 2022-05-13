@@ -82,10 +82,6 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
         {MmiMessageId::SUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnSubscribeKeyEvent, this)},
         {MmiMessageId::UNSUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnUnSubscribeKeyEvent, this)},
-        {MmiMessageId::ADD_EVENT_INTERCEPTOR,
-            MsgCallbackBind2(&ServerMsgHandler::OnAddTouchpadEventFilter, this)},
-        {MmiMessageId::REMOVE_EVENT_INTERCEPTOR,
-            MsgCallbackBind2(&ServerMsgHandler::OnRemoveTouchpadEventFilter, this)},
 #ifdef OHOS_BUILD_MMI_DEBUG
         {MmiMessageId::BIGPACKET_TEST, MsgCallbackBind2(&ServerMsgHandler::OnBigPacketTest, this)},
 #endif // OHOS_BUILD_MMI_DEBUG
@@ -655,33 +651,6 @@ int32_t ServerMsgHandler::OnRemoveInputEventTouchpadMontior(SessionPtr sess, Net
         return RET_ERR;
     }
     InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t sourceType = 0;
-    int32_t id = 0;
-    pkt >> sourceType >> id;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read sourceType failed");
-        return PACKET_READ_FAIL;
-    }
-    InterMgrGl->OnAddInterceptor(sourceType, id, sess);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t id = 0;
-    pkt >> id;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read data failed");
-        return PACKET_READ_FAIL;
-    }
-    InterMgrGl->OnRemoveInterceptor(id);
     return RET_OK;
 }
 

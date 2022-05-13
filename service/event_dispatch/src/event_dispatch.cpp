@@ -133,14 +133,14 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     auto session = udsServer->GetSession(fd);
     CHKPF(session);
     if (session->isANRProcess_) {
-        MMI_HILOGD("is ANR process");
+        MMI_HILOGD("application not responsing");
         return RET_OK;
     }
 
     auto currentTime = GetSysClockTime();
     if (TriggerANR(currentTime, session)) {
         session->isANRProcess_ = true;
-        MMI_HILOGW("the pointer event does not report normally, triggering ANR");
+        MMI_HILOGW("the pointer event does not report normally, application not response");
         return RET_OK;
     }
 
@@ -157,7 +157,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
     CALL_LOG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
     if (!key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
-        if (InterMgrGl->OnKeyEvent(key)) {
+        if (InterHdlGl->HandleEvent(key)) {
             MMI_HILOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 key->GetKeyCode());
             BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_INTERCEPT_EVENT);

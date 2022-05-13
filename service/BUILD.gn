@@ -153,15 +153,9 @@ ohos_shared_library("libmmi-server") {
   }
 
   if (mmi_enable_interceptor) {
-    sources += [
-      "interceptor/src/interceptor_handler_global.cpp",
-      "interceptor/src/interceptor_manager_global.cpp",
-    ]
+    sources += [ "interceptor/src/interceptor_handler_global.cpp" ]
   } else {
-    sources += [
-      "interceptor/src/i_interceptor_handler_global.cpp",
-      "interceptor/src/i_interceptor_manager_global.cpp",
-    ]
+    sources += [ "interceptor/src/i_interceptor_handler_global.cpp" ]
   }
 
   sources += [ "module_loader/src/mmi_service.cpp" ]
@@ -173,7 +167,7 @@ ohos_shared_library("libmmi-server") {
     ":mmi_device_config.ini",
     ":multimodalinput_config_ability.json",
     ":universal_key_value_transformation",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
+    "${aakits_path}/ability/native:abilitykit_native",
     "//foundation/graphic/graphic/rosen/modules/2d_graphics:2d_graphics",
     "//foundation/graphic/graphic/rosen/modules/render_service_client:librender_service_client",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
@@ -295,10 +289,10 @@ ohos_unittest("ut-mmi-service-out") {
   configs = [ ":libmmi_server_config" ]
 
   deps = [
+    "${aakits_path}/appkit:appkit_native",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
