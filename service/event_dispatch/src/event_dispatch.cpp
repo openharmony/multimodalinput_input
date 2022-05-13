@@ -229,7 +229,7 @@ bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
         earlist = sess->GetEarlistEventTime();
     }
 
-    if (time == time) {
+    if (time >= 0) {
         sess->isANRProcess_ = false;
         MMI_HILOGD("the event reports normally");
         return false;
