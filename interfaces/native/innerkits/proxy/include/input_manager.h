@@ -173,7 +173,6 @@ public:
      * @since 9
      */
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
-    int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
 
     /**
@@ -232,7 +231,7 @@ public:
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
-    static InputManager *instance_;
+    inline static InputManager *instance_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS

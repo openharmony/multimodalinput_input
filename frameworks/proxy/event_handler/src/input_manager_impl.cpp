@@ -491,12 +491,6 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
     return interceptorId;
 }
 
-int32_t InputManagerImpl::AddInterceptor(int32_t sourceType,
-                                         std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
-{
-    return -1;
-}
-
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
     std::lock_guard<std::mutex> guard(mtx_);
