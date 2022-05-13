@@ -232,7 +232,7 @@ public:
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
-    static InputManager *instance_;
+    inline static InputManager *instance_ = nullptr;
 };
 } // namespace MMI
 } // namespace OHOS
