@@ -35,9 +35,7 @@
 #endif // OHOS_BUILD
 #include "config_multimodal.h"
 #include "define_multimodal.h"
-#include "directory_ex.h"
 #include "error_multimodal.h"
-#include "file_ex.h"
 #include "mmi_log.h"
 #include "securec.h"
 #include "uuid.h"
@@ -437,6 +435,11 @@ std::string StringFmt(const char* str, ...)
     return buf;
 }
 
+static bool IsFileExists(const std::string& fileName)
+{
+    return (access(fileName.c_str(), F_OK) == 0);
+}
+
 static bool CheckFileExtendName(const std::string& filePath, const std::string& checkExtension)
 {
     if (filePath.empty()) {
@@ -455,33 +458,46 @@ static bool CheckFileExtendName(const std::string& filePath, const std::string& 
     return false;
 }
 
-int32_t GetFileSize(const std::string& filePath)
+static int32_t GetFileSize(const std::string& filePath)
 {
-    std::string realPath;
-    if (!PathToRealPath(filePath, realPath)) {
-        MMI_HILOGE("path is failed");
-        return RET_ERR;
-    }
     struct stat statbuf = {0};
-    if (stat(realPath.c_str(), &statbuf) == 0) {
+    if (stat(filePath.c_str(), &statbuf) == 0) {
         return statbuf.st_size;
     }
     MMI_HILOGE("get file size error");
     return RET_ERR;
 }
 
+static std::string ReadFile(const std::string &filePath)
+{
+    FILE* fp = fopen(filePath.c_str(), "r");
+    if (fp == nullptr) {
+        MMI_HILOGW("open file failed");
+        return "";
+    }
+    std::string dataStr;
+    char buf[256] = {};
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        dataStr += buf;
+    }
+    if (fclose(fp) != 0) {
+        MMI_HILOGW("close file failed");
+    }
+    return dataStr;
+}
+
 std::string ReadJsonFile(const std::string &filePath)
 {
-    std::string realPath;
-    if (!PathToRealPath(filePath, realPath)) {
-        MMI_HILOGE("path is failed");
+    char realPath[PATH_MAX] = {};
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("path is error");
         return "";
     }
     if (!CheckFileExtendName(realPath, "json")) {
         MMI_HILOGE("Unable to parse files other than json format");
         return "";
     }
-    if (!FileExists(realPath)) {
+    if (!IsFileExists(realPath)) {
         MMI_HILOGE("file not exist");
         return "";
     }
@@ -490,22 +506,17 @@ std::string ReadJsonFile(const std::string &filePath)
         MMI_HILOGE("The file size is out of range 20KB or empty. filesize:%{public}d", fileSize);
         return "";
     }
-    std::string fileStr;
-    if (LoadStringFromFile(realPath, fileStr)) {
-        return fileStr;
-    }
-    MMI_HILOGE("file read error");
-    return "";
+    return ReadFile(filePath);
 }
 
 std::string ReadUinputToolFile(const std::string &filePath)
 {
-    std::string realPath;
-    if (!PathToRealPath(filePath, realPath)) {
-        MMI_HILOGE("path is failed");
+    char realPath[PATH_MAX] = {};
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("path is error");
         return "";
     }
-    if (!FileExists(realPath)) {
+    if (!IsFileExists(realPath)) {
         MMI_HILOGE("file not exist");
         return "";
     }
@@ -514,12 +525,7 @@ std::string ReadUinputToolFile(const std::string &filePath)
         MMI_HILOGE("The file size is out of range 20KB or empty. filesize:%{public}d", fileSize);
         return "";
     }
-    std::string fileStr;
-    if (LoadStringFromFile(realPath, fileStr)) {
-        return fileStr;
-    }
-    MMI_HILOGE("file read error");
-    return "";
+    return ReadFile(filePath);
 }
 } // namespace MMI
 } // namespace OHOS

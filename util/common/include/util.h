@@ -53,7 +53,6 @@ void AddId(std::vector<int32_t> &list, int32_t id);
 size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_t> &list2,
     std::vector<int32_t> &difList);
 std::string StringFmt(const char* str, ...);
-int32_t GetFileSize(const std::string& filePath);
 std::string ReadJsonFile(const std::string &filePath);
 std::string ReadUinputToolFile(const std::string &filePath);
 inline bool IsNum(const std::string &str)
