@@ -485,6 +485,11 @@ std::string ReadJsonFile(const std::string &filePath)
         MMI_HILOGE("file not exist");
         return "";
     }
+    int32_t fileSize = GetFileSize(realPath);
+    if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
+        MMI_HILOGE("The file size is out of range 20KB or empty. filesize:%{public}d", fileSize);
+        return "";
+    }
     std::string fileStr;
     if (LoadStringFromFile(realPath, fileStr)) {
         return fileStr;
@@ -502,6 +507,11 @@ std::string ReadUinputToolFile(const std::string &filePath)
     }
     if (!FileExists(realPath)) {
         MMI_HILOGE("file not exist");
+        return "";
+    }
+    int32_t fileSize = GetFileSize(realPath);
+    if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
+        MMI_HILOGE("The file size is out of range 20KB or empty. filesize:%{public}d", fileSize);
         return "";
     }
     std::string fileStr;
