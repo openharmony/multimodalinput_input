@@ -508,7 +508,7 @@ bool JsInputMonitor::GetPressedKeys(const std::vector<int32_t>& pressedKeys, nap
 bool JsInputMonitor::CheckExists(const std::vector<int32_t>& pressedKeys, int32_t keyCode)
 {
     auto it = std::find(pressedKeys.begin(), pressedKeys.end(), keyCode);
-    return it == pressedKeys.end();
+    return it != pressedKeys.end();
 }
 
 bool JsInputMonitor::GetPressedKey(const std::vector<int32_t>& pressedKeys, napi_value result)
