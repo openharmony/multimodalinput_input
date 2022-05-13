@@ -34,21 +34,21 @@ class PointerEvent : public InputEvent {
 public:
     /**
      * Indicates an unknown pointer action. It is usually used as initial value.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t POINTER_ACTION_UNKNOWN = 0;
 
     /**
      * Indicates a pointer action that has been canceled.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t POINTER_ACTION_CANCEL = 1;
 
     /**
      * Indicates a pointer action representing that a finger is pressed on a touchscreen or touchpad.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t POINTER_ACTION_DOWN = 2;
@@ -56,49 +56,49 @@ public:
     /**
      * Indicates a pointer action representing that a finger moves on a touchscreen or touchpad or a mouse
      * pointer moves.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t POINTER_ACTION_MOVE = 3;
 
     /**
      * Indicates a pointer action representing that a finger leaves  the touchscreen or touchpad.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t POINTER_ACTION_UP = 4;
 
     /**
      * Indicates the start action of the axis event related to the pointer.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t POINTER_ACTION_AXIS_BEGIN = 5;
 
     /**
      * Indicates the update action of the axis event related to the pointer.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t POINTER_ACTION_AXIS_UPDATE = 6;
 
     /**
      * Indicates the end action of the axis event related to the pointer.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t POINTER_ACTION_AXIS_END = 7;
 
     /**
      * Indicates a pointer action representing that a button is pressed.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t POINTER_ACTION_BUTTON_DOWN = 8;
 
     /**
      * Indicates a pointer action representing that a button is released.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t POINTER_ACTION_BUTTON_UP = 9;
@@ -106,7 +106,7 @@ public:
     enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.
-         * 
+         *
          * @since 9
          */
         AXIS_TYPE_UNKNOWN,
@@ -114,7 +114,7 @@ public:
         /**
          * Indicates the vertical scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad,
          * the status of the vertical scroll axis changes.
-         * 
+         *
          * @since 9
          */
         AXIS_TYPE_SCROLL_VERTICAL,
@@ -122,21 +122,21 @@ public:
         /**
          * Indicates the horizontal scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad,
          * the status of the horizontal scroll axis changes.
-         * 
+         *
          * @since 9
          */
         AXIS_TYPE_SCROLL_HORIZONTAL,
 
         /**
          * Indicates the pinch axis, which is used to describe a pinch gesture on the touchscreen or touchpad.
-         * 
+         *
          * @since 9
          */
         AXIS_TYPE_PINCH,
 
         /**
          * Indicates the maximum number of defined axis types.
-         * 
+         *
          * @since 9
          */
         AXIS_TYPE_MAX
@@ -144,7 +144,7 @@ public:
 
     /**
      * Indicates an unknown input source type. It is usually used as the initial value.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t SOURCE_TYPE_UNKNOWN = 0;
@@ -152,54 +152,54 @@ public:
     /**
      * Indicates that the input source generates events similar to mouse cursor movement,
      * button press and release, and wheel scrolling.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t SOURCE_TYPE_MOUSE = 1;
 
     /**
      * Indicates that the input source generates a touchscreen multi-touch event.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t SOURCE_TYPE_TOUCHSCREEN = 2;
 
     /**
      * Indicates that the input source generates a touchpad multi-touch event.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t SOURCE_TYPE_TOUCHPAD = 3;
 
     /**
      * Indicates an invalid button ID.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t BUTTON_NONE = -1;
 
     /**
      * Indicates the left button on a mouse.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t MOUSE_BUTTON_LEFT = 0;
 
     /**
      * Indicates the right button on a mouse.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t MOUSE_BUTTON_RIGHT = 1;
 
     /**
      * Indicates the middle button on a mouse.
-     * 
+     *
      * @since 9
      */
     static constexpr int32_t MOUSE_BUTTON_MIDDLE = 2;
 
-     /**
+    /**
      * Indicates the side button on a mouse.
      *
      * @since 9
@@ -233,18 +233,18 @@ public:
      * @since 9
      */
     static constexpr int32_t MOUSE_BUTTON_TASK = 7;
-    
-    static constexpr int32_t TOOL_TYPE_PEN = 0;
 
-    static constexpr int32_t TOOL_TYPE_RUBBER = 1;
+    static constexpr int32_t TOOL_TYPE_FINGER = 0;
 
-    static constexpr int32_t TOOL_TYPE_BRUSH = 2;
+    static constexpr int32_t TOOL_TYPE_PEN = 1;
 
-    static constexpr int32_t TOOL_TYPE_PENCIL = 3;
+    static constexpr int32_t TOOL_TYPE_RUBBER = 2;
 
-    static constexpr int32_t TOOL_TYPE_AIRBRUSH = 4;
+    static constexpr int32_t TOOL_TYPE_BRUSH = 3;
 
-    static constexpr int32_t TOOL_TYPE_FINGER = 5;
+    static constexpr int32_t TOOL_TYPE_PENCIL = 4;
+
+    static constexpr int32_t TOOL_TYPE_AIRBRUSH = 5;
 
     static constexpr int32_t TOOL_TYPE_MOUSE = 6;
 
