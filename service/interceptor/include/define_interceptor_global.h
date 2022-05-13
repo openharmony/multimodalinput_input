@@ -18,20 +18,16 @@
 
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     #include "interceptor_handler_global.h"
-    #include "interceptor_manager_global.h"
 #else
     #include "i_interceptor_handler_global.h"
-    #include "i_interceptor_manager_global.h"
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 
 namespace OHOS {
 namespace MMI {
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     #define InterHdlGl InterceptorHandlerGlobal::GetInstance()
-    #define InterMgrGl InterceptorManagerGlobal::GetInstance()
 #else
     #define InterHdlGl IInterceptorHandlerGlobal::GetInstance()
-    #define InterMgrGl IInterceptorManagerGlobal::GetInstance()
 #endif
 } // namespace MMI
 } // namespace OHOS
