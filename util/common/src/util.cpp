@@ -503,7 +503,7 @@ std::string ReadJsonFile(const std::string &filePath)
     }
     int32_t fileSize = GetFileSize(realPath);
     if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
-        MMI_HILOGE("The file size is out of range 20KB or empty. filesize:%{public}d", fileSize);
+        MMI_HILOGE("file size out of read range");
         return "";
     }
     return ReadFile(filePath);
@@ -522,7 +522,7 @@ std::string ReadUinputToolFile(const std::string &filePath)
     }
     int32_t fileSize = GetFileSize(realPath);
     if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
-        MMI_HILOGE("The file size is out of range 20KB or empty. filesize:%{public}d", fileSize);
+        MMI_HILOGE("file size out of read range");
         return "";
     }
     return ReadFile(filePath);
