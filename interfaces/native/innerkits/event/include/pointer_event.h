@@ -393,30 +393,6 @@ public:
          */
         int32_t GetHeight() const;
 
-        int32_t GetToolGlobalX() const;
-
-        void SetToolGlobalX(int32_t globalX);
-
-        int32_t GetToolGlobalY() const;
-
-        void SetToolGlobalY(int32_t globalY);
-
-        int32_t GetToolLocalX() const;
-
-        void SetToolLocalX(int32_t x);
-
-        int32_t GetToolLocalY() const;
-
-        void SetToolLocalY(int32_t y);
-
-        int32_t GetToolWidth() const;
-
-        void SetToolWidth(int32_t width);
-
-        int32_t GetToolHeight() const;
-
-        void SetToolHeight(int32_t height);
-
         /**
          * @brief Sets the height of the pressed area.
          * @param height Indicates the height to set.
@@ -424,6 +400,96 @@ public:
          * @since 9
          */
         void SetHeight(int32_t height);
+
+        /**
+         * @brief 获取工具区域中心点相对于屏幕左上角的 x 坐标.
+         * @return 返回 x 坐标.
+         * @since 9
+         */
+        int32_t GetToolGlobalX() const;
+
+        /**
+         * @brief 设置工具区域中心点相对于屏幕左上角的x坐标.
+         * @param globalY 表示要设置的 x 坐标.
+         * @return void
+         * @since 9
+         */
+        void SetToolGlobalX(int32_t globalX);
+
+        /**
+         * @brief 获取工具区域中心点相对于屏幕左上角的 y 坐标.
+         * @return 返回 y 坐标.
+         * @since 9
+         */
+        int32_t GetToolGlobalY() const;
+
+        /**
+         * @brief 设置工具区域中心点相对于屏幕左上角的 y 坐标.
+         * @param globalY 表示要设置的 y 坐标.
+         * @return void
+         * @since 9
+         */
+        void SetToolGlobalY(int32_t globalY);
+
+        /**
+         * @brief 获取工具区域中心点相对于窗口左上角的 x 坐标.
+         * @return 返回 x 坐标.
+         * @since 9
+         */
+        int32_t GetToolLocalX() const;
+
+        /**
+         * @brief 设置工具区域中心点相对于窗口左上角的 x 坐标.
+         * @param x 表示要设置的 x 坐标.
+         * @return void
+         * @since 9
+         */
+        void SetToolLocalX(int32_t x);
+
+        /**
+         * @brief 获取工具区域中心点相对于窗口左上角的 y 坐标.
+         * @return 返回 y 坐标.
+         * @since 9
+         */
+        int32_t GetToolLocalY() const;
+
+        /**
+         * @brief 设置工具区域中心点相对于窗口左上角的 y 坐标.
+         * @param y 表示要设置的 x 坐标.
+         * @return void
+         * @since 9
+         */
+        void SetToolLocalY(int32_t y);
+
+        /**
+         * @brief 获取工具区域的宽度.
+         * @return 返回宽度.
+         * @since 9
+         */
+        int32_t GetToolWidth() const;
+
+        /**
+         * @brief 设置工具区域的宽度.
+         * @param width 表示要设置的宽度.
+         * @return void
+         * @since 9
+         */
+        void SetToolWidth(int32_t width);
+
+        /**
+         * @brief 获取工具区域的高度.
+         * @return 返回高度.
+         * @since 9
+         */
+        int32_t GetToolHeight() const;
+
+        /**
+         * @brief 设置工具区域的高度.
+         * @param height 表示要设置的高度.
+         * @return void
+         * @since 9
+         */
+        void SetToolHeight(int32_t height);
 
         /**
          * @brief Obtains the tilt angle of the x axis.
