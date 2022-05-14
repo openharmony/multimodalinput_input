@@ -514,28 +514,28 @@ public:
         bool ReadFromParcel(Parcel &in);
 
     private:
-        int32_t pointerId_ { 0 };
+        int32_t pointerId_ {};
         bool pressed_ { false };
-        int32_t globalX_ { 0 };
-        int32_t globalY_ { 0 };
-        int32_t localX_ { 0 };
-        int32_t localY_ { 0 };
-        int32_t width_ { 0 };
-        int32_t height_ { 0 };
-        double  tiltX_ { 0.0 };
-        double  tiltY_ { 0.0 };
-        int32_t toolGlobalX_ { 0 };
-        int32_t toolGlobalY_ { 0 };
-        int32_t toolLocalX_ { 0 };
-        int32_t toolLocalY_ { 0 };
-        int32_t toolWidth_ { 0 };
-        int32_t toolHeight_ { 0 };
-        double  pressure_ { 0.0 };
-        int32_t axisLong_ { 0 };
-        int32_t axisShort_ { 0 };
-        int32_t deviceId_ { 0 };
-        int64_t downTime_ { 0 };
-        int32_t toolType_ { 0 };
+        int32_t globalX_ {};
+        int32_t globalY_ {};
+        int32_t localX_ {};
+        int32_t localY_ {};
+        int32_t width_ {};
+        int32_t height_ {};
+        double  tiltX_ {};
+        double  tiltY_ {};
+        int32_t toolGlobalX_ {};
+        int32_t toolGlobalY_ {};
+        int32_t toolLocalX_ {};
+        int32_t toolLocalY_ {};
+        int32_t toolWidth_ {};
+        int32_t toolHeight_ {};
+        double  pressure_ {};
+        int32_t axisLong_ {};
+        int32_t axisShort_ {};
+        int32_t deviceId_ {};
+        int64_t downTime_ {};
+        int32_t toolType_ {};
     };
 
 public:

@@ -153,18 +153,18 @@ struct EventJoyStickAxis {
 };
 
 struct NormalizedCoords {
-    double x;
-    double y;
+    double x {};
+    double y {};
 };
 
 struct PhysicalCoordinate {
-    double x;
-    double y;
+    double x {};
+    double y {};
 };
 
 struct LogicalCoordinate {
-    int32_t x;
-    int32_t y;
+    int32_t x {};
+    int32_t y {};
 };
 
 struct LogicalRectangle {
@@ -174,71 +174,71 @@ struct LogicalRectangle {
 };
 
 struct TiltDegrees {
-    double x;
-    double y;
+    double x {};
+    double y {};
 };
 
 struct PhysEllipsis {
-    double major;
-    double minor;
+    double major {};
+    double minor {};
 };
 
 struct Threshold {
-    int32_t upper;
-    int32_t lower;
+    int32_t upper {};
+    int32_t lower {};
 };
 
 struct RegisteredEvent {
-    int32_t deviceId;
-    char uuid[MAX_UUIDSIZE];
-    int32_t eventType;
-    int64_t occurredTime;
+    int32_t deviceId {};
+    char uuid[MAX_UUIDSIZE] {};
+    int32_t eventType {};
+    int64_t occurredTime {};
     DEVICE_TYPE deviceType;
-    char physical[MAX_DEVICENAME];
+    char physical[MAX_DEVICENAME] {};
 };
 
 struct StandardTouchStruct {
-    int64_t time;
-    uint32_t msgType;
-    int32_t buttonType;
-    int32_t buttonCount;
-    int32_t buttonState;
-    int32_t reRventType;
-    int32_t curRventType;
-    int32_t tipState;
-    double x;
-    double y;
+    int64_t time {};
+    uint32_t msgType {};
+    int32_t buttonType {};
+    int32_t buttonCount {};
+    int32_t buttonState {};
+    int32_t reRventType {};
+    int32_t curRventType {};
+    int32_t tipState {};
+    double x {};
+    double y {};
 };
 
 struct EventKeyboard {
-    int32_t deviceId;
-    char physical[MAX_DEVICENAME];
-    char deviceName[MAX_DEVICENAME];
+    int32_t deviceId {};
+    char physical[MAX_DEVICENAME] {};
+    char deviceName[MAX_DEVICENAME] {};
     DEVICE_TYPE deviceType;
-    int32_t eventType;
-    char uuid[MAX_UUIDSIZE];
-    int64_t time;
-    int32_t key;
-    uint32_t seat_key_count;
+    int32_t eventType {};
+    char uuid[MAX_UUIDSIZE] {};
+    int64_t time {};
+    int32_t key {};
+    uint32_t seat_key_count {};
     enum KEY_STATE state;
-    int32_t unicode;
-    bool isIntercepted {true};
+    int32_t unicode {};
+    bool isIntercepted { true };
 };
 
 struct EventPointer {
-    int32_t deviceId;
-    char physical[MAX_DEVICENAME];
-    char deviceName[MAX_DEVICENAME];
+    int32_t deviceId {};
+    char physical[MAX_DEVICENAME] {};
+    char deviceName[MAX_DEVICENAME] {};
     DEVICE_TYPE deviceType;
-    int32_t eventType;
-    char uuid[MAX_UUIDSIZE];
-    int64_t time;
+    int32_t eventType {};
+    char uuid[MAX_UUIDSIZE] {};
+    int64_t time {};
     NormalizedCoords delta;
     PhysicalCoordinate deltaRaw;
     PhysicalCoordinate absolute;
     PhysicalCoordinate discrete;
-    int32_t button;
-    int32_t seatButtonCount;
+    int32_t button {};
+    int32_t seatButtonCount {};
     enum BUTTON_STATE state;
     enum POINTER_AXIS_SOURCE source;
     enum POINTER_AXIS axis;
@@ -251,33 +251,33 @@ struct Pointer {
 struct TabletAxes {
     PhysicalCoordinate point;
     NormalizedCoords delta;
-    double distance;
-    double pressure;
+    double distance {};
+    double pressure {};
     TiltDegrees tilt;
-    double rotation;
-    double slider;
-    double wheel;
-    int32_t wheel_discrete;
+    double rotation {};
+    double slider {};
+    double wheel {};
+    int32_t wheel_discrete {};
     PhysEllipsis size;
 };
 
 struct TabletTool {
-    uint32_t serial;
-    uint32_t tool_id;
+    uint32_t serial {};
+    uint32_t tool_id {};
     enum TABLE_TOOL_TYPE type;
 };
 
 struct EventTabletTool {
-    int32_t deviceId;
-    char physical[MAX_DEVICENAME];
-    char deviceName[MAX_DEVICENAME];
+    int32_t deviceId {};
+    char physical[MAX_DEVICENAME] {};
+    char deviceName[MAX_DEVICENAME] {};
     DEVICE_TYPE deviceType;
-    int32_t eventType;
-    char uuid[MAX_UUIDSIZE];
-    uint32_t button;
+    int32_t eventType {};
+    char uuid[MAX_UUIDSIZE] {};
+    uint32_t button {};
     enum BUTTON_STATE state;
-    uint32_t seat_button_count;
-    int64_t time;
+    uint32_t seat_button_count {};
+    int64_t time {};
     TabletAxes axes;
     TabletTool tool;
     enum TABLE_TOOL_PROXIMITY_STATE proximity_state;
@@ -285,111 +285,111 @@ struct EventTabletTool {
 };
 
 struct EventTouch {
-    int32_t deviceId;
-    char physical[MAX_DEVICENAME];
-    char deviceName[MAX_DEVICENAME];
-    char uuid[MAX_UUIDSIZE];
-    int32_t eventType;
-    int64_t time;
-    int32_t slot;
-    int32_t seatSlot;
+    int32_t deviceId {};
+    char physical[MAX_DEVICENAME] {};
+    char deviceName[MAX_DEVICENAME] {};
+    char uuid[MAX_UUIDSIZE] {};
+    int32_t eventType {};
+    int64_t time {};
+    int32_t slot {};
+    int32_t seatSlot {};
     LogicalCoordinate point;
     LogicalRectangle toolRect;
     DEVICE_TYPE deviceType;
-    double pressure;
-    double area;
+    double pressure {};
+    double area {};
 };
 
 struct SlotedCoords {
-    bool isActive;
-    float x;
-    float y;
+    bool isActive {};
+    float x {};
+    float y {};
 };
 
 struct SlotedCoordsInfo {
     SlotedCoords coords[MAX_SOLTED_COORDS_NUMS];
-    uint32_t activeCount;
+    uint32_t activeCount {};
 };
 
 struct EventGesture {
-    int32_t deviceId;
-    char physical[MAX_DEVICENAME];
-    char deviceName[MAX_DEVICENAME];
+    int32_t deviceId {};
+    char physical[MAX_DEVICENAME] {};
+    char deviceName[MAX_DEVICENAME] {};
     DEVICE_TYPE deviceType;
-    int32_t eventType;
-    char uuid[MAX_UUIDSIZE];
-    int64_t time;
-    int32_t fingerCount;
-    int32_t cancelled;
+    int32_t eventType {};
+    char uuid[MAX_UUIDSIZE] {};
+    int64_t time {};
+    int32_t fingerCount {};
+    int32_t cancelled {};
     NormalizedCoords delta;
     NormalizedCoords deltaUnaccel;
     SlotedCoordsInfo soltTouches;
-    double scale;
-    double angle;
-    int32_t pointerEventType;
+    double scale {};
+    double angle {};
+    int32_t pointerEventType {};
 };
 
 struct RawInputEvent {
-    uint32_t stamp;
-    uint32_t ev_type;
-    uint32_t ev_code;
-    uint32_t ev_value;
+    uint32_t stamp {};
+    uint32_t ev_type {};
+    uint32_t ev_code {};
+    uint32_t ev_value {};
 };
 
 struct TestSurfaceData {
-    int32_t screenId;
-    int32_t onLayerId;
-    int32_t surfaceId;
-    int32_t opacity;
-    int32_t visibility;
-    int32_t srcX;
-    int32_t srcY;
-    int32_t srcW;
-    int32_t srcH;
+    int32_t screenId {};
+    int32_t onLayerId {};
+    int32_t surfaceId {};
+    int32_t opacity {};
+    int32_t visibility {};
+    int32_t srcX {};
+    int32_t srcY {};
+    int32_t srcW {};
+    int32_t srcH {};
 };
 
 struct VirtualKey {
-    bool isPressed;
-    int32_t keyCode;
-    int64_t keyDownDuration;
-    bool isIntercepted {true};
+    bool isPressed {};
+    int32_t keyCode {};
+    int64_t keyDownDuration {};
+    bool isIntercepted { true };
 };
 
 struct DeviceManage {
-    uint32_t deviceId;
-    char physical[MAX_DEVICENAME];
-    char deviceName[MAX_DEVICENAME];
+    uint32_t deviceId {};
+    char physical[MAX_DEVICENAME] {};
+    char deviceName[MAX_DEVICENAME] {};
     DEVICE_TYPE deviceType;
-    int32_t eventType;
-    char uuid[MAX_UUIDSIZE];
+    int32_t eventType {};
+    char uuid[MAX_UUIDSIZE] {};
 };
 
 struct EventTabletPad {
-    uint32_t deviceId;
-    char physical[MAX_DEVICENAME];
-    char deviceName[MAX_DEVICENAME];
+    uint32_t deviceId {};
+    char physical[MAX_DEVICENAME] {};
+    char deviceName[MAX_DEVICENAME] {};
     DEVICE_TYPE deviceType;
-    int32_t eventType;
-    char uuid[MAX_UUIDSIZE];
-    int64_t time;
-    uint32_t mode;
+    int32_t eventType {};
+    char uuid[MAX_UUIDSIZE] {};
+    int64_t time {};
+    uint32_t mode {};
     struct {
-        uint32_t number;
+        uint32_t number {};
         enum BUTTON_STATE state;
     } button;
     struct {
-        uint32_t code;
+        uint32_t code {};
         enum KEY_STATE state;
     } key;
     struct {
         enum TABLET_PAD_RING_AXIS_SOURCE source;
-        double position;
-        int32_t number;
+        double position {};
+        int32_t number {};
     } ring;
     struct {
         enum TABLET_PAD_STRIP_AXIS_SOURCE source;
-        double position;
-        int32_t number;
+        double position {};
+        int32_t number {};
     } strip;
 };
 } // namespace MMI
