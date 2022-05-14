@@ -25,7 +25,6 @@
 
 namespace OHOS {
 namespace MMI {
-constexpr int32_t FILE_SIZE_MAX = 0x5000;
 const char *GetMmiErrorTypeDesc(int32_t errorCodeEnum);
 std::string UuIdGenerate();
 int64_t GetMicrotime();

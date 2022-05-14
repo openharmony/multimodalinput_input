@@ -44,6 +44,11 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Util"};
+constexpr int32_t FILE_SIZE_MAX = 0x5000;
+constexpr int32_t INVALID_FILE_SIZE = -1;
+const std::string DATA_PATH = "/data";
+const std::string PROC_PATH = "/proc";
+const std::string SYSTEM_PATH = "/system/etc/multimodalinput/";
 } // namespace
 
 const std::map<int32_t, std::string> ERROR_STRING_MAP = {
@@ -465,16 +470,13 @@ static int32_t GetFileSize(const std::string& filePath)
         return statbuf.st_size;
     }
     MMI_HILOGE("get file size error");
-    return RET_ERR;
+    return INVALID_FILE_SIZE;
 }
 
 static std::string ReadFile(const std::string &filePath)
 {
     FILE* fp = fopen(filePath.c_str(), "r");
-    if (fp == nullptr) {
-        MMI_HILOGW("open file failed");
-        return "";
-    }
+    CHKPS(fp);
     std::string dataStr;
     char buf[256] = {};
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
@@ -486,11 +488,35 @@ static std::string ReadFile(const std::string &filePath)
     return dataStr;
 }
 
+static bool IsValidPath(const std::string &rootDir, const std::string &filePath)
+{
+    if (filePath.find(rootDir) != 0) {
+        MMI_HILOGE("file path is error");
+        return false;
+    }
+    return filePath.compare(0, rootDir.size(), rootDir) == 0;
+}
+
+static bool IsValidJsonPath(const std::string &filePath)
+{
+    return IsValidPath(DATA_PATH, filePath) ||
+        IsValidPath(SYSTEM_PATH, filePath);
+}
+
+static bool IsValidUinputPath(const std::string &filePath)
+{
+    return IsValidPath(PROC_PATH, filePath);
+}
+
 std::string ReadJsonFile(const std::string &filePath)
 {
     char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
         MMI_HILOGE("path is error");
+        return "";
+    }
+    if (!IsValidJsonPath(realPath)) {
+        MMI_HILOGE("file path is error");
         return "";
     }
     if (!CheckFileExtendName(realPath, "json")) {
@@ -516,12 +542,16 @@ std::string ReadUinputToolFile(const std::string &filePath)
         MMI_HILOGE("path is error");
         return "";
     }
+    if (!IsValidUinputPath(realPath)) {
+        MMI_HILOGE("file path is error");
+        return "";
+    }
     if (!IsFileExists(realPath)) {
         MMI_HILOGE("file not exist");
         return "";
     }
     int32_t fileSize = GetFileSize(realPath);
-    if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
+    if ((fileSize < 0) || (fileSize > FILE_SIZE_MAX)) {
         MMI_HILOGE("file size out of read range");
         return "";
     }

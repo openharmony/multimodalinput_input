@@ -164,7 +164,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
             return RET_OK;
         }
     }
-    if (IKeyCommandManager::GetInstance()->HandEvent(key)) {
+    if (IKeyCommandManager::GetInstance()->HandleEvent(key)) {
         MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{public}d", key->GetKeyCode());
         BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_LAUNCH_EVENT);
         return RET_OK;

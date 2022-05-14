@@ -338,7 +338,7 @@ void KeyCommandManager::Print()
     }
 }
 
-bool KeyCommandManager::HandEvent(const std::shared_ptr<KeyEvent> key)
+bool KeyCommandManager::HandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_LOG_ENTER;
     if (IsKeyMatch(lastMatchedKey_, key)) {
@@ -352,7 +352,8 @@ bool KeyCommandManager::HandEvent(const std::shared_ptr<KeyEvent> key)
     ResetLastMatchedKey();
     if (shortcutKeys_.empty()) {
         if (!ParseJson()) {
-            MMI_HILOGW("Parse configFile failed");
+            MMI_HILOGE("Parse configFile failed");
+            return false;
         }
         Print();
     }
