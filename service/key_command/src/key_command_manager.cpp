@@ -268,10 +268,9 @@ bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
 
 KeyCommandManager::KeyCommandManager()
 {
-    std::string configFile = GetConfigFilePath();
-    MMI_HILOGD("config file path:%{public}s", configFile.c_str());
-    if (!ParseJson(configFile)) {
-        MMI_HILOGW("Parse configFile to failed");
+    CALL_LOG_ENTER;
+    if (!ParseJson()) {
+        MMI_HILOGW("Parse configFile failed");
     }
     Print();
 }
@@ -294,9 +293,10 @@ std::string KeyCommandManager::GetConfigFilePath() const
     return FileExists(defaultConfig) ? defaultConfig : "/system/etc/multimodalinput/ability_launch_config.json";
 }
 
-bool KeyCommandManager::ParseJson(const std::string &configFile)
+bool KeyCommandManager::ParseJson()
 {
-    std::string jsonStr = ReadJsonFile(configFile);
+    CALL_LOG_ENTER;
+    std::string jsonStr = ReadJsonFile(GetConfigFilePath());
     if (jsonStr.empty()) {
         MMI_HILOGE("configFile read failed");
         return false;
