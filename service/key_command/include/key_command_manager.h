@@ -57,10 +57,10 @@ struct ShortcutKey {
 
 class KeyCommandManager : public IKeyCommandManager {
 public:
-    KeyCommandManager();
+    KeyCommandManager() = default;
     DISALLOW_COPY_AND_MOVE(KeyCommandManager);
     ~KeyCommandManager() = default;
-    bool HandlerEvent(const std::shared_ptr<KeyEvent> event);
+    bool HandEvent(const std::shared_ptr<KeyEvent> event);
 private:
     bool ParseJson();
     std::string GetConfigFilePath() const;
