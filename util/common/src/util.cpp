@@ -490,11 +490,7 @@ static std::string ReadFile(const std::string &filePath)
 
 static bool IsValidPath(const std::string &rootDir, const std::string &filePath)
 {
-    if (filePath.find(rootDir) != 0) {
-        MMI_HILOGE("file path is error");
-        return false;
-    }
-    return filePath.compare(0, rootDir.size(), rootDir) == 0;
+    return (filePath.compare(0, rootDir.size(), rootDir) == 0);
 }
 
 static bool IsValidJsonPath(const std::string &filePath)
