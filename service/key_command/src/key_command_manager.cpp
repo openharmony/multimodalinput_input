@@ -266,15 +266,6 @@ bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
 }
 } // namespace
 
-KeyCommandManager::KeyCommandManager()
-{
-    CALL_LOG_ENTER;
-    if (!ParseJson()) {
-        MMI_HILOGW("Parse configFile failed");
-    }
-    Print();
-}
-
 std::string KeyCommandManager::GenerateKey(const ShortcutKey& key)
 {
     std::set<int32_t> preKeys = key.preKeys;
@@ -347,7 +338,7 @@ void KeyCommandManager::Print()
     }
 }
 
-bool KeyCommandManager::HandlerEvent(const std::shared_ptr<KeyEvent> key)
+bool KeyCommandManager::HandEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_LOG_ENTER;
     if (IsKeyMatch(lastMatchedKey_, key)) {
@@ -359,6 +350,12 @@ bool KeyCommandManager::HandlerEvent(const std::shared_ptr<KeyEvent> key)
         TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
     }
     ResetLastMatchedKey();
+    if (shortcutKeys_.empty()) {
+        if (!ParseJson()) {
+            MMI_HILOGW("Parse configFile failed");
+        }
+        Print();
+    }
     for (auto& item : shortcutKeys_) {
         ShortcutKey &shortcutKey = item.second;
         if (!IsKeyMatch(shortcutKey, key)) {
