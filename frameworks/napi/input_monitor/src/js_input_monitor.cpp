@@ -505,7 +505,7 @@ bool JsInputMonitor::GetPressedKeys(const std::vector<int32_t>& pressedKeys, nap
     return true;
 }
 
-bool JsInputMonitor::CheckExists(const std::vector<int32_t>& pressedKeys, int32_t keyCode)
+bool JsInputMonitor::HasKeyCode(const std::vector<int32_t>& pressedKeys, int32_t keyCode)
 {
     auto it = std::find(pressedKeys.begin(), pressedKeys.end(), keyCode);
     return it != pressedKeys.end();
@@ -514,31 +514,31 @@ bool JsInputMonitor::CheckExists(const std::vector<int32_t>& pressedKeys, int32_
 bool JsInputMonitor::GetPressedKey(const std::vector<int32_t>& pressedKeys, napi_value result)
 {
     CALL_LOG_ENTER;
-    bool isExists = CheckExists(pressedKeys, KeyEvent::KEYCODE_CTRL_LEFT)
-        || CheckExists(pressedKeys, KeyEvent::KEYCODE_CTRL_RIGHT);
+    bool isExists = HasKeyCode(pressedKeys, KeyEvent::KEYCODE_CTRL_LEFT)
+        || HasKeyCode(pressedKeys, KeyEvent::KEYCODE_CTRL_RIGHT);
     if (SetNameProperty(jsEnv_, result, "ctrlKey", isExists) != napi_ok) {
         THROWERR(jsEnv_, "Set ctrlKey with failed");
         return false;
     }
-    isExists = CheckExists(pressedKeys, KeyEvent::KEYCODE_ALT_LEFT)
-        || CheckExists(pressedKeys, KeyEvent::KEYCODE_ALT_RIGHT);
+    isExists = HasKeyCode(pressedKeys, KeyEvent::KEYCODE_ALT_LEFT)
+        || HasKeyCode(pressedKeys, KeyEvent::KEYCODE_ALT_RIGHT);
     if (SetNameProperty(jsEnv_, result, "altKey", isExists) != napi_ok) {
         THROWERR(jsEnv_, "Set altKey failed");
         return false;
     }
-    isExists = CheckExists(pressedKeys, KeyEvent::KEYCODE_SHIFT_LEFT)
-        || CheckExists(pressedKeys, KeyEvent::KEYCODE_SHIFT_RIGHT);
+    isExists = HasKeyCode(pressedKeys, KeyEvent::KEYCODE_SHIFT_LEFT)
+        || HasKeyCode(pressedKeys, KeyEvent::KEYCODE_SHIFT_RIGHT);
     if (SetNameProperty(jsEnv_, result, "shiftKey", isExists) != napi_ok) {
         THROWERR(jsEnv_, "Set shiftKey failed");
         return false;
     }
-    isExists = CheckExists(pressedKeys, KeyEvent::KEYCODE_META_LEFT)
-        || CheckExists(pressedKeys, KeyEvent::KEYCODE_META_RIGHT);
+    isExists = HasKeyCode(pressedKeys, KeyEvent::KEYCODE_META_LEFT)
+        || HasKeyCode(pressedKeys, KeyEvent::KEYCODE_META_RIGHT);
     if (SetNameProperty(jsEnv_, result, "logoKey", isExists) != napi_ok) {
         THROWERR(jsEnv_, "Set logoKey failed");
         return false;
     }
-    isExists = CheckExists(pressedKeys, KeyEvent::KEYCODE_FN);
+    isExists = HasKeyCode(pressedKeys, KeyEvent::KEYCODE_FN);
     if (SetNameProperty(jsEnv_, result, "fnKey", isExists) != napi_ok) {
         THROWERR(jsEnv_, "Set fnKey with true failed");
         return false;
