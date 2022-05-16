@@ -245,63 +245,21 @@ int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &pkt)
 {
     uint32_t num = static_cast<uint32_t>(physicalDisplays_.size());
-    if (!pkt.Write(num)) {
-        MMI_HILOGE("Packet write num failed");
+    if (num > MAX_PHYSICAL_SIZE) {
+        MMI_HILOGE("Physical exceeds the max range");
         return RET_ERR;
     }
+    pkt << num;
     for (uint32_t i = 0; i < num; i++) {
-        if (!pkt.Write(physicalDisplays_[i].id)) {
-            MMI_HILOGE("Packet write physical data failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(physicalDisplays_[i].leftDisplayId)) {
-            MMI_HILOGE("Packet write physical leftDisplay failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(physicalDisplays_[i].upDisplayId)) {
-            MMI_HILOGE("Packet write physical upDisplay failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(physicalDisplays_[i].topLeftX)) {
-            MMI_HILOGE("Packet write physical topLeftX failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(physicalDisplays_[i].topLeftY)) {
-            MMI_HILOGE("Packet write physical topLeftY failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(physicalDisplays_[i].width)) {
-            MMI_HILOGE("Packet write physical width failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(physicalDisplays_[i].height)) {
-            MMI_HILOGE("Packet write physical height failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(physicalDisplays_[i].name)) {
-            MMI_HILOGE("Packet write physical name failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(physicalDisplays_[i].seatId)) {
-            MMI_HILOGE("Packet write physical seatId failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(physicalDisplays_[i].seatName)) {
-            MMI_HILOGE("Packet write physical seatName failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(physicalDisplays_[i].logicWidth)) {
-            MMI_HILOGE("Packet write physical logicWidth failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(physicalDisplays_[i].logicHeight)) {
-            MMI_HILOGE("Packet write physical logicHeight failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(physicalDisplays_[i].direction)) {
-            MMI_HILOGE("Packet write physical direction failed");
-            return RET_ERR;
-        }
+        pkt << physicalDisplays_[i].id << physicalDisplays_[i].leftDisplayId << physicalDisplays_[i].upDisplayId
+            << physicalDisplays_[i].topLeftX << physicalDisplays_[i].topLeftY << physicalDisplays_[i].width
+            << physicalDisplays_[i].height << physicalDisplays_[i].name << physicalDisplays_[i].seatId
+            << physicalDisplays_[i].seatName << physicalDisplays_[i].logicWidth
+            << physicalDisplays_[i].logicHeight << physicalDisplays_[i].direction;
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write physical data failed");
+        return RET_ERR;
     }
     return RET_OK;
 }
@@ -309,58 +267,20 @@ int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &pkt)
 int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
 {
     int32_t num = static_cast<int32_t>(logicalDisplays_.size());
-    if (!pkt.Write(num)) {
-        MMI_HILOGE("Packet write logical num failed");
+    if (num > MAX_LOGICAL_SIZE) {
+        MMI_HILOGE("Logical exceeds the max range");
         return RET_ERR;
     }
+    pkt << num;
     for (int32_t i = 0; i < num; i++) {
-        if (!pkt.Write(logicalDisplays_[i].id)) {
-            MMI_HILOGE("Packet write logical data failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(logicalDisplays_[i].topLeftX)) {
-            MMI_HILOGE("Packet write logical topLeftX failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(logicalDisplays_[i].topLeftY)) {
-            MMI_HILOGE("Packet write logical topLeftY failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(logicalDisplays_[i].width)) {
-            MMI_HILOGE("Packet write logical width failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(logicalDisplays_[i].height)) {
-            MMI_HILOGE("Packet write logical height failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(logicalDisplays_[i].name)) {
-            MMI_HILOGE("Packet write logical name failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(logicalDisplays_[i].seatId)) {
-            MMI_HILOGE("Packet write logical seat failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(logicalDisplays_[i].seatName)) {
-            MMI_HILOGE("Packet write logical seatName failed");
-            return RET_ERR;
-        }
-        if (!pkt.Write(logicalDisplays_[i].focusWindowId)) {
-            MMI_HILOGE("Packet write logical focusWindow failed");
-            return RET_ERR;
-        }
-        int32_t numWindow = static_cast<int32_t>(logicalDisplays_[i].windowsInfo.size());
-        if (!pkt.Write(numWindow)) {
-            MMI_HILOGE("Packet write logical numWindow failed");
-            return RET_ERR;
-        }
-        for (int32_t j = 0; j < numWindow; j++) {
-            if (!pkt.Write(logicalDisplays_[i].windowsInfo[j])) {
-                MMI_HILOGE("Packet write logical windowsInfo failed");
-                return RET_ERR;
-            }
-        }
+        pkt << logicalDisplays_[i].id << logicalDisplays_[i].topLeftX << logicalDisplays_[i].topLeftY
+            << logicalDisplays_[i].width << logicalDisplays_[i].height << logicalDisplays_[i].name
+            << logicalDisplays_[i].seatId << logicalDisplays_[i].seatName << logicalDisplays_[i].focusWindowId
+            << logicalDisplays_[i].windowsInfo;
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write logical data failed");
+        return RET_ERR;
     }
     return RET_OK;
 }
