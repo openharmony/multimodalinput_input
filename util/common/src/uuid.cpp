@@ -86,7 +86,7 @@ char ConvertToHex(uint8_t c)
 
 void Uuid::ConvertToStdString(std::string& s) const
 {
-    constexpr int32_t uuidBufMaxSize = 37;
+    static constexpr int32_t uuidBufMaxSize = 37;
     char uuidBuf[uuidBufMaxSize + 1] = {0};
     int32_t writePos = 0;
     for (size_t i = 0; i < UUID128_BYTES_TYPE; i++) {

@@ -44,7 +44,7 @@ namespace MMI {
 
 static int g_fd_klog = -1;
 
-constexpr int32_t MAX_LOG_SIZE = 1024;
+static constexpr int32_t MAX_LOG_SIZE = 1024;
 
 void KLogOpenLogDevice(void)
 {

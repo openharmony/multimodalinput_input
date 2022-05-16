@@ -20,7 +20,7 @@ namespace MMI {
 VirtualTouchpad::VirtualTouchpad() : VirtualDevice("Virtual Touchpad",
     BUS_USB, 0x56a, 0x392)
 {
-    constexpr int32_t ABS_MAX_WHEEL = 71;
+    static constexpr int32_t ABS_MAX_WHEEL = 71;
 
     dev_.absmin[ABS_X] = 0;
     dev_.absmax[ABS_X] = 1;

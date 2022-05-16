@@ -20,8 +20,8 @@
 
 #include "nocopyable.h"
 
-constexpr int64_t MAX_INPUT_EVENT_TIME = 1000;
-constexpr int64_t MAX_OVER_TIME = 300;
+static constexpr int64_t MAX_INPUT_EVENT_TIME = 1000;
+static constexpr int64_t MAX_OVER_TIME = 300;
 
 namespace OHOS {
 namespace MMI {
