@@ -18,13 +18,13 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t ABS_MAX_X = 6400;
-constexpr int32_t ABS_MAX_Y = 4000;
-constexpr int32_t ABS_MAX_MT_SLOT = 9;
-constexpr int32_t ABS_MAX_MT_TOUCH_MAJOR = 21;
-constexpr int32_t ABS_MAX_MT_TOUCH_MINOR = 21;
-constexpr int32_t ABS_MAX_MT_TRACKING_ID = 65535;
-constexpr int32_t ABS_MAX_MT_PRESSURE = 8191;
+static constexpr int32_t ABS_MAX_X = 6400;
+static constexpr int32_t ABS_MAX_Y = 4000;
+static constexpr int32_t ABS_MAX_MT_SLOT = 9;
+static constexpr int32_t ABS_MAX_MT_TOUCH_MAJOR = 21;
+static constexpr int32_t ABS_MAX_MT_TOUCH_MINOR = 21;
+static constexpr int32_t ABS_MAX_MT_TRACKING_ID = 65535;
+static constexpr int32_t ABS_MAX_MT_PRESSURE = 8191;
 } // namespace
 
 VirtualFinger::VirtualFinger() : VirtualDevice("Virtual Finger",

@@ -20,7 +20,7 @@ namespace MMI {
 VirtualKeyboardConsumerCtrl::VirtualKeyboardConsumerCtrl() : VirtualDevice("Virtual KeyboardConsumerCtrl",
     BUS_USB, 0x24ae, 0x4035)
 {
-    constexpr int32_t ABS_MAX_VOLUME = 572;
+    static constexpr int32_t ABS_MAX_VOLUME = 572;
 
     dev_.absmin[ABS_VOLUME] = 0;
     dev_.absmax[ABS_VOLUME] = ABS_MAX_VOLUME;

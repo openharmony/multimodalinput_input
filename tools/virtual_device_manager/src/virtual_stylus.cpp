@@ -20,17 +20,17 @@ namespace MMI {
 VirtualStylus::VirtualStylus() : VirtualDevice("Virtual Stylus",
     BUS_USB, 0x56a, 0x392)
 {
-    constexpr int32_t ABS_MAX_X = 31920;
-    constexpr int32_t ABS_MAX_Y = 19950;
-    constexpr int32_t ABS_MIN_Z = -900;
-    constexpr int32_t ABS_MAX_Z = 899;
-    constexpr int32_t ABS_MAX_WHEEL = 2047;
-    constexpr int32_t ABS_MAX_PRESSURE = 8191;
-    constexpr int32_t ABS_MIN_TILT_XY = -64;
-    constexpr int32_t ABS_MAX_TILT_XY_DISTANCE = 63;
-    constexpr int32_t ABS_MIN_MISC = -2147483648;
-    constexpr int32_t ABS_MAX_MISC = 2147483647;
-    constexpr int32_t ABS_FUZZ_XY = 4;
+    static constexpr int32_t ABS_MAX_X = 31920;
+    static constexpr int32_t ABS_MAX_Y = 19950;
+    static constexpr int32_t ABS_MIN_Z = -900;
+    static constexpr int32_t ABS_MAX_Z = 899;
+    static constexpr int32_t ABS_MAX_WHEEL = 2047;
+    static constexpr int32_t ABS_MAX_PRESSURE = 8191;
+    static constexpr int32_t ABS_MIN_TILT_XY = -64;
+    static constexpr int32_t ABS_MAX_TILT_XY_DISTANCE = 63;
+    static constexpr int32_t ABS_MIN_MISC = -2147483648;
+    static constexpr int32_t ABS_MAX_MISC = 2147483647;
+    static constexpr int32_t ABS_FUZZ_XY = 4;
 
     dev_.absmin[ABS_X] = 0;
     dev_.absmax[ABS_X] = ABS_MAX_X;

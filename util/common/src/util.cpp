@@ -97,7 +97,7 @@ int64_t GetMillisTime()
 
 std::string UuIdGenerate()
 {
-    constexpr int32_t UUID_BUF_SIZE = 64;
+    static constexpr int32_t UUID_BUF_SIZE = 64;
     char buf[UUID_BUF_SIZE] = {};
     return buf;
 }
@@ -115,7 +115,7 @@ std::string GetThisThreadIdOfString()
     thread_local std::string threadLocalId;
     if (threadLocalId.empty()) {
         long tid = syscall(SYS_gettid);
-        constexpr size_t bufSize = 10;
+        static constexpr size_t bufSize = 10;
         char buf[bufSize] = {};
         const int32_t ret = sprintf_s(buf, bufSize, "%06d", tid);
         if (ret < 0) {
@@ -269,13 +269,13 @@ std::string GetFileName(const std::string& strPath)
 
 const char* GetProgramName()
 {
-    constexpr size_t programNameSize = 256;
+    static constexpr size_t programNameSize = 256;
     static char programName[programNameSize] = {};
     if (programName[0] != '\0') {
         return programName;
     }
 
-    constexpr size_t bufSize = 512;
+    static constexpr size_t bufSize = 512;
     char buf[bufSize] = { 0 };
     if (sprintf_s(buf, bufSize, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
         KMSG_LOGE("GetProcessInfo sprintf_s /proc/.../cmdline error");
@@ -286,7 +286,7 @@ const char* GetProgramName()
         KMSG_LOGE("fp is nullptr, filename = %s.", buf);
         return "";
     }
-    constexpr size_t bufLineSize = 512;
+    static constexpr size_t bufLineSize = 512;
     char bufLine[bufLineSize] = { 0 };
     if ((fgets(bufLine, bufLineSize, fp) == nullptr)) {
         KMSG_LOGE("fgets fail.");
@@ -341,7 +341,7 @@ char* MmiBasename(char* path)
 std::string GetStackInfo()
 {
 #ifndef OHOS_BUILD
-    constexpr size_t bufferSize = 1024;
+    static constexpr size_t bufferSize = 1024;
     void* buffer[bufferSize];
     const int32_t nptrs = backtrace(buffer, bufferSize);
     char** strings = backtrace_symbols(buffer, nptrs);
@@ -374,7 +374,7 @@ const std::string& GetThreadName()
     if (!g_threadName.empty()) {
         return g_threadName;
     }
-    constexpr size_t MAX_THREAD_NAME_SIZE = 16;
+    static constexpr size_t MAX_THREAD_NAME_SIZE = 16;
     char thisThreadName[MAX_THREAD_NAME_SIZE + 1];
     int32_t ret = prctl(PR_GET_NAME, thisThreadName);
     if (ret == 0) {

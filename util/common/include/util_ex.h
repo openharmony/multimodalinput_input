@@ -38,7 +38,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilE
         return RET_ERR;
     }
 
-    constexpr size_t bufSize = 1024 * 10;
+    static constexpr size_t bufSize = 1024 * 10;
     char buf[bufSize] = {};
     int32_t ret = snprintf_s(buf, bufSize, bufSize - 1, fmt, args...);
     if (ret == -1) {
@@ -86,17 +86,17 @@ void DumpData(const char* dataPtr, const size_t dataSize, const char* fileName, 
 
     funcOutput();
 
-    constexpr size_t bufSize = 81;
-    constexpr size_t oneLineCharCount = 16;
-    constexpr size_t countStep = 2;
-    constexpr size_t byteSize = 8;
-    constexpr size_t wordSize = 16;
+    static constexpr size_t bufSize = 81;
+    static constexpr size_t oneLineCharCount = 16;
+    static constexpr size_t countStep = 2;
+    static constexpr size_t byteSize = 8;
+    static constexpr size_t wordSize = 16;
     char bufLeft[bufSize] = {};
     char bufRight[bufSize] = {};
     size_t writePosHex = 0;
     size_t writePosChar = 0;
-    constexpr size_t writePosHexStep1 = 2;
-    constexpr size_t writePosHexStep2 = 3;
+    static constexpr size_t writePosHexStep1 = 2;
+    static constexpr size_t writePosHexStep2 = 3;
     size_t i = 0;
     auto funCheckRetAndLog = [ret](const char* fileName, const int32_t lineNo) -> void {
         if (ret == -1) {

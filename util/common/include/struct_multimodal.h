@@ -20,10 +20,10 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t MAX_DEVICENAME = 64;
-constexpr int32_t MAX_UUIDSIZE = 64;
-constexpr int32_t SYSTEMUID = 1000;
-constexpr int32_t MAX_SOLTED_COORDS_NUMS = 10;
+static constexpr int32_t MAX_DEVICENAME = 64;
+static constexpr int32_t MAX_UUIDSIZE = 64;
+static constexpr int32_t SYSTEMUID = 1000;
+static constexpr int32_t MAX_SOLTED_COORDS_NUMS = 10;
 } // namespace
 
 enum SENIOR_DEVICE_TYPE {

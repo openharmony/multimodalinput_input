@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t ERROR_UNSUPPORT = -2;
+static constexpr int32_t ERROR_UNSUPPORT = -2;
 }
 
 enum MmiModuleType {
@@ -33,7 +33,7 @@ enum MmiModuleType {
     MODULE_NAPI = 0x05
 };
 // Error code for client
-constexpr ErrCode CLIENT_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_CLIENT);
+static constexpr ErrCode CLIENT_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_CLIENT);
 
 enum {
     MSG_HANDLER_INIT_FAIL = CLIENT_ERR_OFFSET,  // 消息处理初始化失败
@@ -45,7 +45,7 @@ enum {
 };
 
 // Error code for event simulate
-constexpr ErrCode EVENT_SIMULATE_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_EVENT_SIMULATE);
+static constexpr ErrCode EVENT_SIMULATE_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_EVENT_SIMULATE);
 
 enum {
     FILE_OPEN_FAIL = EVENT_SIMULATE_ERR_OFFSET, // 文件打开失败
@@ -60,7 +60,7 @@ enum {
     CMD_STR_INVALID,                            // 无效指令字符串
 };
 // Error code for server
-constexpr ErrCode SERVER_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_SERVER);
+static constexpr ErrCode SERVER_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_SERVER);
 
 enum {
     MSG_SEND_FAIL = SERVER_ERR_OFFSET,          // 发送消息失败
@@ -141,7 +141,7 @@ enum {
     POINTER_DRAW_INIT_FAIL,                     // 初始化画鼠标失败
 };
 // Error code for util
-constexpr ErrCode UTIL_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_UTIL);
+static constexpr ErrCode UTIL_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_UTIL);
 
 enum {
     NON_STD_EVENT = UTIL_ERR_OFFSET,            // 非标准化事件
@@ -172,10 +172,10 @@ enum {
     INVALID_MONITOR_MON                         // 监听增加失败
 };
 // Error code for virtual deviceparam
-constexpr ErrCode VIRTUAL_DEVICE_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_VIRTUAL_DEVICE);
+static constexpr ErrCode VIRTUAL_DEVICE_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_VIRTUAL_DEVICE);
 
 // Error code for napi
-constexpr ErrCode NAPI_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_NAPI);
+static constexpr ErrCode NAPI_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_NAPI);
 
 enum {
     CALL_NAPI_API_ERR = NAPI_ERR_OFFSET

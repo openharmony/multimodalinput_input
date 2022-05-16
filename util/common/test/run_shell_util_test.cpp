@@ -27,7 +27,7 @@ namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
 using namespace OHOS;
-constexpr int32_t SLEEP = 1000;
+static constexpr int32_t SLEEP = 1000;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RunShellUtilTest" };
 } // namespace
 
