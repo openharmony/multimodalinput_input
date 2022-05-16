@@ -17,14 +17,14 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-static constexpr int32_t ABS_MAX_X = 20479;
-static constexpr int32_t ABS_MAX_Y = 12799;
-static constexpr int32_t ABS_MAX_PRESSURE = 4096;
-static constexpr int32_t ABS_MIN_TILT_X = -90;
-static constexpr int32_t ABS_MAX_TILT_X = 90;
-static constexpr int32_t ABS_MIN_TILT_Y = -90;
-static constexpr int32_t ABS_MAX_TILT_Y = 90;
-static constexpr int32_t ABS_MAX_TYPE = 15;
+constexpr int32_t ABS_MAX_X = 20479;
+constexpr int32_t ABS_MAX_Y = 12799;
+constexpr int32_t ABS_MAX_PRESSURE = 4096;
+constexpr int32_t ABS_MIN_TILT_X = -90;
+constexpr int32_t ABS_MAX_TILT_X = 90;
+constexpr int32_t ABS_MIN_TILT_Y = -90;
+constexpr int32_t ABS_MAX_TILT_Y = 90;
+constexpr int32_t ABS_MAX_TYPE = 15;
 } // namespace
 
 VirtualPen::VirtualPen() : VirtualDevice("V-Pencil", BUS_USB, 0, 0)

@@ -42,7 +42,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-static constexpr int32_t READ_FILE_SIZE_MAX = 1000;
+constexpr int32_t READ_FILE_SIZE_MAX = 1000;
 const std::string VIRTUAL_DEVICE_NAME = "mmi-virtual-device";
 bool IsNum(const std::string &str)
 {

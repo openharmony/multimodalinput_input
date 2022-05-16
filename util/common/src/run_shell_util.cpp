@@ -24,7 +24,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 const std::string HILOG_GREP = "hilog -x | grep ";
-static constexpr int32_t MAXSIZE = 1000;
+constexpr int32_t MAXSIZE = 1000;
 const std::regex REGEX_LOG("\n");
 static inline constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "RUNSHELLUTILL" };
 } // namespace
