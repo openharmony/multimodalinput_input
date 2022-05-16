@@ -28,8 +28,6 @@ struct InjectFunctionMap {
     InjectFunction fun;
 };
 
-static constexpr int32_t ARGV_VALID = 2;
-
 class InjectionEventDispatch {
 public:
     InjectionEventDispatch() = default;
