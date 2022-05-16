@@ -77,23 +77,6 @@ int32_t StandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
     return RET_OK;
 }
 
-int32_t StandardizedEventManager::InjectionVirtual(bool isPressed, int32_t keyCode,
-    int64_t keyDownDuration, int32_t maxKeyCode)
-{
-    CALL_LOG_ENTER;
-    VirtualKey virtualEvent;
-    virtualEvent.isPressed = isPressed;
-    virtualEvent.keyCode = keyCode;
-    virtualEvent.keyDownDuration = keyDownDuration;
-    NetPacket pkt(MmiMessageId::ON_VIRTUAL_KEY);
-    pkt << virtualEvent;
-    if (!SendMsg(pkt)) {
-        MMI_HILOGE("Send virtual event Msg error");
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
 int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_LOG_ENTER;

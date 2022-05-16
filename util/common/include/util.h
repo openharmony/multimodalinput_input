@@ -57,6 +57,16 @@ bool IsFileExists(const std::string& fileName);
 std::string GetFileExtendName(const std::string& fileName);
 int32_t GetFileSize(const std::string& fileName);
 std::string ReadFile(const std::string &filePath);
+inline bool IsNum(const std::string &str)
+{
+    std::istringstream sin(str);
+    double num;
+    return (sin >> num) && sin.eof();
+}
+inline void RemoveSpace(std::string &str)
+{
+    str.erase(remove_if(str.begin(), str.end(), [](unsigned char c) { return std::isspace(c);}), str.end());
+}
 template <typename T>
 bool AddInt(T op1, T op2, T minVal, T maxVal, T &res);
 inline bool AddInt32(int32_t op1, int32_t op2, int32_t &res)

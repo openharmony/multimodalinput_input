@@ -42,7 +42,6 @@ public:
     bool Start() override;
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
-    void VirtualKeyIn(RawInputEvent virtualKeyEvent);
 
 protected:
     virtual void OnConnected() override;

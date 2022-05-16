@@ -29,7 +29,6 @@
 #include "input_event_monitor_manager.h"
 #include "input_handler_type.h"
 #include "input_manager.h"
-#include "interceptor_manager.h"
 #include "multimodal_event_handler.h"
 #include "mmi_client.h"
 #include "pointer_event.h"
@@ -1360,14 +1359,14 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_015, TestSize.Level1)
 
 
 /**
- * @tc.name:InputManager_ANR_TEST
- * @tc.desc: detection of ANR
+ * @tc.name:InputManager_NotResponse_001
+ * @tc.desc: detection of not response
  * @tc.type: FUNC
  * @tc.require:AR000GJG6G
  */
-HWTEST_F(InputManagerTest, InputManager_ANR_TEST_001, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManager_NotResponse_001, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManager_ANR_TEST_001");
+    MMI_HILOGD("start InputManager_NotResponse_001");
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
 
@@ -1386,14 +1385,14 @@ HWTEST_F(InputManagerTest, InputManager_ANR_TEST_001, TestSize.Level1)
 }
 
 /**
- * @tc.name:InputManager_ANR_TEST
- * @tc.desc: detection of ANR
+ * @tc.name:InputManager_NotResponse_002
+ * @tc.desc: detection of not response
  * @tc.type: FUNC
  * @tc.require:SR000GGN6G
  */
-HWTEST_F(InputManagerTest, InputManager_ANR_TEST_002, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManager_NotResponse_002, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManager_ANR_TEST_002");
+    MMI_HILOGD("start InputManager_NotResponse_002");
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
 

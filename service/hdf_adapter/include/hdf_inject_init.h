@@ -18,10 +18,10 @@ enum  DrvType {
     TOUCH = 0,
     MOUSE,
     KEYBOARD,
-    PEN,    /* tag = 33 */
-    PAD, /* tag = 289 */
-    FINGER, /* tag = 2089 */
-    JOYSTICK, /* 65 */
+    PEN,
+    PAD,
+    FINGER,
+    JOYSTICK,
     SWITCH5,
     TRACKPAD5,
     GAMEPAD,
