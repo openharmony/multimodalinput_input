@@ -48,7 +48,7 @@ constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int32_t INVALID_FILE_SIZE = -1;
 const std::string DATA_PATH = "/data";
 const std::string PROC_PATH = "/proc";
-const std::string SYSTEM_PATH = "/system/etc/multimodalinput/";
+const std::string INPUT_PATH = "/system/etc/multimodalinput/";
 } // namespace
 
 const std::map<int32_t, std::string> ERROR_STRING_MAP = {
@@ -466,11 +466,11 @@ static bool CheckFileExtendName(const std::string& filePath, const std::string& 
 static int32_t GetFileSize(const std::string& filePath)
 {
     struct stat statbuf = {0};
-    if (stat(filePath.c_str(), &statbuf) == 0) {
-        return statbuf.st_size;
+    if (stat(filePath.c_str(), &statbuf) != 0) {
+        MMI_HILOGE("get file size error");
+        return INVALID_FILE_SIZE;
     }
-    MMI_HILOGE("get file size error");
-    return INVALID_FILE_SIZE;
+    return statbuf.st_size;
 }
 
 static std::string ReadFile(const std::string &filePath)
@@ -496,7 +496,7 @@ static bool IsValidPath(const std::string &rootDir, const std::string &filePath)
 static bool IsValidJsonPath(const std::string &filePath)
 {
     return IsValidPath(DATA_PATH, filePath) ||
-        IsValidPath(SYSTEM_PATH, filePath);
+        IsValidPath(INPUT_PATH, filePath);
 }
 
 static bool IsValidUinputPath(const std::string &filePath)
@@ -506,6 +506,10 @@ static bool IsValidUinputPath(const std::string &filePath)
 
 std::string ReadJsonFile(const std::string &filePath)
 {
+    if (filePath.empty()) {
+        MMI_HILOGE("path is empty");
+        return "";
+    }
     char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
         MMI_HILOGE("path is error");
@@ -533,6 +537,10 @@ std::string ReadJsonFile(const std::string &filePath)
 
 std::string ReadUinputToolFile(const std::string &filePath)
 {
+    if (filePath.empty()) {
+        MMI_HILOGE("path is empty");
+        return "";
+    }
     char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
         MMI_HILOGE("path is error");
