@@ -65,7 +65,6 @@ public:
     void MoveMouse(int32_t offsetX, int32_t offsetY);
 
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
-    int32_t AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor);
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
     void RemoveInterceptor(int32_t interceptorId);
 
