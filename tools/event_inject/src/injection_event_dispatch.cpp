@@ -61,7 +61,7 @@ int32_t InjectionEventDispatch::OnJson()
         MMI_HILOGE("path is error");
         return RET_ERR;
     }
-    std::string jsonBuf = ReadJsonFile(injectArgvs_.at(ARGVS_CODE_INDEX - 1));
+    std::string jsonBuf = ReadJsonFile(injectArgvs_.at(JSON_FILE_PATH_INDEX));
     if (jsonBuf.empty()) {
         MMI_HILOGE("read file failed");
         return RET_ERR;
