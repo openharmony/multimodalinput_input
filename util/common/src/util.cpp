@@ -447,10 +447,6 @@ static bool IsFileExists(const std::string& fileName)
 
 static bool CheckFileExtendName(const std::string& filePath, const std::string& checkExtension)
 {
-    if (filePath.empty()) {
-        MMI_HILOGE("filePath is empty");
-        return false;
-    }
     std::string::size_type pos = filePath.find_last_of('.');
     if (pos == std::string::npos) {
         MMI_HILOGE("file is not find extension");
@@ -506,6 +502,10 @@ static bool IsValidUinputPath(const std::string &filePath)
 
 std::string ReadJsonFile(const std::string &filePath)
 {
+    if (filePath.empty()) {
+        MMI_HILOGE("filePath is empty");
+        return "";
+    }
     char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
         MMI_HILOGE("path is error");
@@ -533,6 +533,10 @@ std::string ReadJsonFile(const std::string &filePath)
 
 std::string ReadUinputToolFile(const std::string &filePath)
 {
+    if (filePath.empty()) {
+        MMI_HILOGE("filePath is empty");
+        return "";
+    }
     char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
         MMI_HILOGE("path is error");
