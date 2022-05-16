@@ -506,10 +506,6 @@ static bool IsValidUinputPath(const std::string &filePath)
 
 std::string ReadJsonFile(const std::string &filePath)
 {
-    if (filePath.empty()) {
-        MMI_HILOGE("path is empty");
-        return "";
-    }
     char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
         MMI_HILOGE("path is error");
@@ -537,10 +533,6 @@ std::string ReadJsonFile(const std::string &filePath)
 
 std::string ReadUinputToolFile(const std::string &filePath)
 {
-    if (filePath.empty()) {
-        MMI_HILOGE("path is empty");
-        return "";
-    }
     char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
         MMI_HILOGE("path is error");
