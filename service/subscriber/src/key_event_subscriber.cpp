@@ -154,6 +154,10 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
     int32_t fd = subscriber->sess_->GetFd();
     pkt << fd << subscriber->id_;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write disaptch subscriber failed");
+        return;
+    }
     if (!udsServerPtr->SendMsg(fd, pkt)) {
         MMI_HILOGE("Leave, server disaptch subscriber failed");
         return;

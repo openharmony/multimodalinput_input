@@ -104,8 +104,9 @@ void InterceptorHandlerGlobal::SessionHandler::SendToClient(std::shared_ptr<KeyE
 {
     CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
-    if (!pkt.Write(id_)) {
-        MMI_HILOGE("Write to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+    pkt << id_;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write key event failed");
         return;
     }
     if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
@@ -123,8 +124,9 @@ void InterceptorHandlerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poin
     CHKPV(pointerEvent);
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
     MMI_HILOGD("Service SendToClient id:%{public}d,InputHandlerType:%{public}d", id_, handlerType_);
-    if (!pkt.Write(id_) || !pkt.Write(handlerType_)) {
-        MMI_HILOGE("Write id_ to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+    pkt << id_ << handlerType_;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write pointer event failed");
         return;
     }
     if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
