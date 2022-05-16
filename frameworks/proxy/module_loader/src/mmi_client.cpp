@@ -202,13 +202,6 @@ void MMIClient::RegisterDisconnectedFunction(ConnectCallback fun)
     funDisconnected_ = fun;
 }
 
-void MMIClient::VirtualKeyIn(RawInputEvent virtualKeyEvent)
-{
-    NetPacket pkt(MmiMessageId::ON_VIRTUAL_KEY);
-    pkt << virtualKeyEvent;
-    SendMsg(pkt);
-}
-
 void MMIClient::OnDisconnected()
 {
     CALL_LOG_ENTER;

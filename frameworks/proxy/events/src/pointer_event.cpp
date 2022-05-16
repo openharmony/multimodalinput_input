@@ -518,7 +518,7 @@ void PointerEvent::SetButtonId(int32_t buttonId)
 
 double PointerEvent::GetAxisValue(AxisType axis) const
 {
-    double axisValue {  };
+    double axisValue {};
     if ((axis >= AXIS_TYPE_UNKNOWN) && (axis < AXIS_TYPE_MAX)) {
         axisValue = axisValues_[axis];
     }
@@ -699,7 +699,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     }
 
     for (int32_t i = 0; i < axisValueSize; i++) {
-        double val = {};
+        double val {};
         if (!in.ReadDouble(val)) {
             return false;
         }
