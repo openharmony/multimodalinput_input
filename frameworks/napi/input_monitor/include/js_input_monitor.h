@@ -17,6 +17,7 @@
 #define JS_INPUT_MONITOR_H
 
 #include <cinttypes>
+#include <map>
 #include <mutex>
 #include <queue>
 #include <uv.h>
@@ -85,6 +86,8 @@ private:
     bool GetPressedButtons(const std::set<int32_t>& pressedButtons, napi_value result);
     bool HasKeyCode(const std::vector<int32_t>& pressedKeys, int32_t keyCode);
     bool GetPressedKey(const std::vector<int32_t>& pressedKeys, napi_value result);
+    void GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item,
+        std::map<std::string, std::function<int64_t()>>& mapFun);
 private:
     std::shared_ptr<InputMonitor> monitor_ {nullptr};
     napi_ref receiver_ {nullptr};

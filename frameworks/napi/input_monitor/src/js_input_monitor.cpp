@@ -322,44 +322,30 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
     return RET_OK;
 }
 
+void JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item,
+    std::map<std::string, std::function<int64_t()>>& mapFun)
+{
+    mapFun["actionTime"] = std::bind(&PointerEvent::GetActionTime, pointerEvent);
+    mapFun["button"] = std::bind(&PointerEvent::GetButtonId, pointerEvent);
+    mapFun["screenId"] = std::bind(&PointerEvent::GetTargetDisplayId, pointerEvent);
+    mapFun["windowId"] = std::bind(&PointerEvent::GetTargetWindowId, pointerEvent);
+    mapFun["deviceId"] = std::bind(&PointerEvent::PointerItem::GetDeviceId, item);
+    mapFun["windowX"] = std::bind(&PointerEvent::PointerItem::GetGlobalX, item);
+    mapFun["windowY"] = std::bind(&PointerEvent::PointerItem::GetGlobalY, item);
+    mapFun["screenX"] = std::bind(&PointerEvent::PointerItem::GetLocalX, item);
+    mapFun["screenY"] = std::bind(&PointerEvent::PointerItem::GetLocalY, item);
+}
+
 bool JsInputMonitor::SetMouseProperty(const std::shared_ptr<PointerEvent> pointerEvent,
     const PointerEvent::PointerItem& item, napi_value result)
 {
-    if (SetNameProperty(jsEnv_, result, "actionTime", pointerEvent->GetActionTime()) != napi_ok) {
-        THROWERR(jsEnv_, "Set property of actionTime failed");
-        return false;
-    }
-    if (SetNameProperty(jsEnv_, result, "button", pointerEvent->GetButtonId()) != napi_ok) {
-        THROWERR(jsEnv_, "Set property of button failed");
-        return false;
-    }
-    if (SetNameProperty(jsEnv_, result, "screenId", pointerEvent->GetTargetDisplayId()) != napi_ok) {
-        THROWERR(jsEnv_, "Set property of screenId failed");
-        return false;
-    }
-    if (SetNameProperty(jsEnv_, result, "windowId", pointerEvent->GetTargetWindowId()) != napi_ok) {
-        THROWERR(jsEnv_, "Set property of windowId failed");
-        return false;
-    }
-    if (SetNameProperty(jsEnv_, result, "deviceId", item.GetDeviceId()) != napi_ok) {
-        THROWERR(jsEnv_, "Set property of deviceId failed");
-        return false;
-    }
-    if (SetNameProperty(jsEnv_, result, "windowX", item.GetGlobalX()) != napi_ok) {
-        THROWERR(jsEnv_, "Set property of windowX failed");
-        return false;
-    }
-    if (SetNameProperty(jsEnv_, result, "windowY", item.GetGlobalY()) != napi_ok) {
-        THROWERR(jsEnv_, "Set property of windowY failed");
-        return false;
-    }
-    if (SetNameProperty(jsEnv_, result, "screenX", item.GetLocalX()) != napi_ok) {
-        THROWERR(jsEnv_, "Set property of screenX failed");
-        return false;
-    }
-    if (SetNameProperty(jsEnv_, result, "screenY", item.GetLocalY()) != napi_ok) {
-        THROWERR(jsEnv_, "Set property of screenY failed");
-        return false;
+    std::map<std::string, std::function<int64_t()>> mapFun;
+    GetFuns(pointerEvent, item, mapFun);
+    for (const auto& it : mapFun) {
+        if (SetNameProperty(jsEnv_, result, it.first, it.second()) != napi_ok) {
+            THROWERR(jsEnv_, "Set property failed");
+            return false;
+        }
     }
     return true;
 }
@@ -383,11 +369,11 @@ bool JsInputMonitor::GetAxesValue(const std::shared_ptr<PointerEvent> pointerEve
         axis = AXIS_TYPE_PINCH;
     }
     if (SetNameProperty(jsEnv_, element, "axis", axis) != napi_ok) {
-        THROWERR(jsEnv_, "Set axis property failed");
+        THROWERR(jsEnv_, "Set property of axis failed");
         return false;
     }
     if (SetNameProperty(jsEnv_, element, "value", axisValue) != napi_ok) {
-        THROWERR(jsEnv_, "Set value property failed");
+        THROWERR(jsEnv_, "Set property of value failed");
         return false;
     }
     return true;
@@ -540,7 +526,7 @@ bool JsInputMonitor::GetPressedKey(const std::vector<int32_t>& pressedKeys, napi
     }
     isExists = HasKeyCode(pressedKeys, KeyEvent::KEYCODE_FN);
     if (SetNameProperty(jsEnv_, result, "fnKey", isExists) != napi_ok) {
-        THROWERR(jsEnv_, "Set fnKey with true failed");
+        THROWERR(jsEnv_, "Set fnKey failed");
         return false;
     }
     return true;
