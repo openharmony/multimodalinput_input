@@ -171,19 +171,6 @@ HWTEST_F(MMIClientTest, RegisterDisconnectedFunction, TestSize.Level1)
 }
 
 /**
- * @tc.name:VirtualKeyIn
- * @tc.desc:Verify virtual key in
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, VirtualKeyIn, TestSize.Level1)
-{
-    RawInputEvent virtualKeyEvent = {};
-    MMIClient mmiClient;
-    mmiClient.VirtualKeyIn(virtualKeyEvent);
-}
-
-/**
  * @tc.name:Re_RegisterConnectedFunction
  * @tc.desc:Verify register connetct
  * @tc.type: FUNC
@@ -205,19 +192,6 @@ HWTEST_F(MMIClientTest, Re_RegisterDisconnectedFunction, TestSize.Level1)
 {
     MMIClientUnitTest mmiClientTest;
     mmiClientTest.RegisterDisconnectedFunction(connectFun);
-}
-
-/**
- * @tc.name:Re_VirtualKeyIn
- * @tc.desc:Verify virtual key in
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, Re_VirtualKeyIn, TestSize.Level1)
-{
-    RawInputEvent virtualKeyEvent = {};
-    MMIClientUnitTest mmiClientTest;
-    mmiClientTest.VirtualKeyIn(virtualKeyEvent);
 }
 
 HWTEST_F(MMIClientTest, Re_OnConnected, TestSize.Level1)

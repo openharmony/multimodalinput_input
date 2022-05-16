@@ -55,7 +55,6 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     }
 #endif
     MsgCallback funs[] = {
-        {MmiMessageId::ON_VIRTUAL_KEY, MsgCallbackBind2(&ServerMsgHandler::OnVirtualKeyEvent, this)},
         {MmiMessageId::MARK_PROCESS,
             MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
         {MmiMessageId::ON_DUMP, MsgCallbackBind2(&ServerMsgHandler::OnDump, this)},
@@ -82,10 +81,6 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
         {MmiMessageId::SUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnSubscribeKeyEvent, this)},
         {MmiMessageId::UNSUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnUnSubscribeKeyEvent, this)},
-        {MmiMessageId::ADD_EVENT_INTERCEPTOR,
-            MsgCallbackBind2(&ServerMsgHandler::OnAddTouchpadEventFilter, this)},
-        {MmiMessageId::REMOVE_EVENT_INTERCEPTOR,
-            MsgCallbackBind2(&ServerMsgHandler::OnRemoveTouchpadEventFilter, this)},
 #ifdef OHOS_BUILD_MMI_DEBUG
         {MmiMessageId::BIGPACKET_TEST, MsgCallbackBind2(&ServerMsgHandler::OnBigPacketTest, this)},
 #endif // OHOS_BUILD_MMI_DEBUG
@@ -133,24 +128,6 @@ int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
     return RET_OK;
 }
 #endif // OHOS_BUILD_HDF
-
-int32_t ServerMsgHandler::OnVirtualKeyEvent(SessionPtr sess, NetPacket& pkt)
-{
-    VirtualKey virtualKeyEvent;
-    pkt >> virtualKeyEvent;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read virtualKeyEvent failed");
-        return PACKET_READ_FAIL;
-    }
-    if (virtualKeyEvent.keyCode == HOS_KEY_HOME) {
-        MMI_HILOGD(" home press");
-    } else if (virtualKeyEvent.keyCode == HOS_KEY_BACK) {
-        MMI_HILOGD(" back press");
-    } else if (virtualKeyEvent.keyCode == HOS_KEY_VIRTUAL_MULTITASK) {
-        MMI_HILOGD(" multitask press");
-    }
-    return RET_OK;
-}
 
 int32_t ServerMsgHandler::OnDump(SessionPtr sess, NetPacket& pkt)
 {
@@ -655,33 +632,6 @@ int32_t ServerMsgHandler::OnRemoveInputEventTouchpadMontior(SessionPtr sess, Net
         return RET_ERR;
     }
     InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t sourceType = 0;
-    int32_t id = 0;
-    pkt >> sourceType >> id;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read sourceType failed");
-        return PACKET_READ_FAIL;
-    }
-    InterMgrGl->OnAddInterceptor(sourceType, id, sess);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t id = 0;
-    pkt >> id;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read data failed");
-        return PACKET_READ_FAIL;
-    }
-    InterMgrGl->OnRemoveInterceptor(id);
     return RET_OK;
 }
 

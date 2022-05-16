@@ -36,6 +36,7 @@ public:
     bool Init(FunInputEvent funInputEvent, const std::string& seat_id = "seat0");
     void EventDispatch(struct epoll_event& ev);
     void Stop();
+    void ProcessPendingEvents();
 
     int32_t GetInputFd() const
     {

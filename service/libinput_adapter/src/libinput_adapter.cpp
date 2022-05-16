@@ -149,6 +149,11 @@ void LibinputAdapter::Stop()
     udev_unref(udev_);
 }
 
+void LibinputAdapter::ProcessPendingEvents()
+{
+    OnEventHandler();
+}
+
 void LibinputAdapter::OnEventHandler()
 {
     CALL_LOG_ENTER;
