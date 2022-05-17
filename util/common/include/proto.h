@@ -20,7 +20,6 @@
 enum class MmiMessageId : int32_t {
     INVALID = 0,
 
-    // libinput message id
     INPUT_DEVICE = 901,
     INPUT_DEVICE_IDS,
     INPUT_DEVICE_KEYSTROKE_ABILITY,
@@ -28,7 +27,6 @@ enum class MmiMessageId : int32_t {
     REMOVE_INPUT_DEVICE_MONITOR,
     INPUT_DEVICE_KEYBOARD_TYPE,
 
-    // mmi message id
     BEGIN = 1001,
     REGISTER_APP_INFO,
     REGISTER_MSG_HANDLER,
@@ -143,7 +141,7 @@ enum class MmiMessageId : int32_t {
 
 #ifdef OHOS_BUILD_MMI_DEBUG
     BIGPACKET_TEST = 91000,
-#endif // OHOS_BUILD_MMI_DEBUG
+#endif
 
     END,
 };

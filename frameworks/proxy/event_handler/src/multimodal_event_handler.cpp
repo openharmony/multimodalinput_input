@@ -146,7 +146,7 @@ int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
     }
     return EventManager.MoveMouseEvent(offsetX, offsetY);
 }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif
 
 int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
 {

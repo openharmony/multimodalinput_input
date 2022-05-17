@@ -47,7 +47,7 @@ public:
     void RemoveDevMonitor(SessionPtr sess);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasPointerDevice();
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif
 
 private:
     bool IsPointerDevice(struct libinput_device* device);

@@ -164,7 +164,7 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
         keyEventPtr->RemoveReleasedKeyItems(keyItem);
         keyEventPtr->AddPressedKeyItems(keyItem);
     } else {
-        // nothing to do.
+
     }
     return RET_OK;
 }

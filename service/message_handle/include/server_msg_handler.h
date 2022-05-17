@@ -60,10 +60,10 @@ protected:
     int32_t OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t OnMoveMouse(SessionPtr sess, NetPacket& pkt);
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
-#endif // OHOS_BUILD_MMI_DEBUG
+#endif
 private:
     UDSServer *udsServer_ = nullptr;
     EventDispatch eventDispatch_;

@@ -19,7 +19,7 @@
     #include "input_interceptor_manager.h"
 #else
     #include "i_input_interceptor_manager.h"
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif
 
 namespace OHOS {
 namespace MMI {

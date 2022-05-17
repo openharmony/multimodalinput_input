@@ -55,14 +55,14 @@ Uuid::Uuid()
         static_cast<uint8_t>((tvUsec & 0x00FF000000000000) >> BIT_OPT_SIX_BYTE * BASE_BIT_OPT_SIZE);
     uuid_[UUID_TIME_HIGH] =
         static_cast<uint8_t>((tvUsec & 0xFF00000000000000) >> BIT_OPT_SEVEN_BYTE * BASE_BIT_OPT_SIZE);
-    // 4 - 6
+
     uuid_[UUID_VERSION] =
         static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_sec) + randNum) & 0xFF);
     uuid_[UUID_TIME_MID_SECEND_BYTE] =
         static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_min) + (randNum >> BASE_BIT_OPT_SIZE)) & 0xFF);
     uuid_[UUID_TIME_MID_FIRST_BYTE] = static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_hour) +
                                       (randNum >> BIT_OPT_TWO_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
-    // 0 - 3
+
     uuid_[UUID_TIME_LOW_FOURTH_BYTE] = static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_mday) +
                                        (randNum >> BIT_OPT_THREE_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
     uuid_[UUID_TIME_LOW_THIRD_BYTE] =
@@ -96,7 +96,7 @@ void Uuid::ConvertToStdString(std::string& s) const
         if (writePos <= uuidBufMaxSize) {
             uuidBuf[writePos++] = ConvertToHex(low4Bit);
             uuidBuf[writePos++] = ConvertToHex(high4Bit);
-            if (i == 3 || i == 5 || i == 7 || i == 9) { // 3 5 7 9 uuid 按标准格式(8-4-4-4-12)分隔符
+            if (i == 3 || i == 5 || i == 7 || i == 9) {
                 uuidBuf[writePos++] = '-';
             }
         }

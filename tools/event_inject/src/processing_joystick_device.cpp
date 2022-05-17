@@ -118,7 +118,7 @@ void ProcessingJoystickDevice::TransformRocker1Event(const DeviceEvent& joystick
     } else if (direction == "lt") {
         SetEvAbsRz(inputEventArray, 0, default_absz_value);
     } else {
-        // nothint to do.
+
     }
     SetSynReport(inputEventArray);
 }
@@ -153,7 +153,7 @@ void ProcessingJoystickDevice::TransformDerectionKeyEvent(const DeviceEvent& joy
         SetEvAbsHat0Y(inputEventArray, 0, 0);
         SetSynReport(inputEventArray);
     }  else {
-        // nothint to do.
+
     }
 }
 
