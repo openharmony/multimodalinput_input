@@ -41,33 +41,6 @@ public:
     // 16 bits uuid length
     static constexpr int32_t UUID16_BYTES_TYPE = 2;
     using UUID128Bit = std::array<uint8_t, UUID128_BYTES_TYPE>;
-
-    static constexpr int32_t UUID_TIME_LOW_FIRST_BYTE = 0;
-    static constexpr int32_t UUID_TIME_LOW_SECEND_BYTE = 1;
-    static constexpr int32_t UUID_TIME_LOW_THIRD_BYTE = 2;
-    static constexpr int32_t UUID_TIME_LOW_FOURTH_BYTE = 3;
-    static constexpr int32_t UUID_TIME_MID_FIRST_BYTE = 4;
-    static constexpr int32_t UUID_TIME_MID_SECEND_BYTE = 5;
-    static constexpr int32_t UUID_VERSION = 6;
-    static constexpr int32_t UUID_TIME_HIGH = 7;
-    static constexpr int32_t UUID_VARIANT = 8;
-    static constexpr int32_t UUID_CLOCK_SEQ = 9;
-    static constexpr int32_t UUID_NODE_FIRST_BYTE = 10;
-    static constexpr int32_t UUID_NODE_SECEND_BYTE = 11;
-    static constexpr int32_t UUID_NODE_THIRD_BYTE = 12;
-    static constexpr int32_t UUID_NODE_FOURTH_BYTE = 13;
-    static constexpr int32_t UUID_NODE_FIFTH_BYTE = 14;
-    static constexpr int32_t UUID_NODE_SIXTH_BYTE = 15;
-
-    static constexpr int32_t BASE_BIT_OPT_SIZE = 8;
-    static constexpr int32_t BIT_OPT_TWO_BYTE = 2;
-    static constexpr int32_t BIT_OPT_THREE_BYTE = 3;
-    static constexpr int32_t BIT_OPT_FOUR_BYTE = 4;
-    static constexpr int32_t BIT_OPT_FIVE_BYTE = 5;
-    static constexpr int32_t BIT_OPT_SIX_BYTE = 6;
-    static constexpr int32_t BIT_OPT_SEVEN_BYTE = 7;
-
-    static constexpr int32_t SIZE_STRING_TO_INT = 2;
     /**
      * @brief A constructor used to create an <b>UUID</b> instance.
      *

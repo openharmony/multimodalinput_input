@@ -22,6 +22,7 @@ using namespace OHOS::MMI;
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ManageInjectDevice" };
+constexpr int64_t INJECT_SLEEP_TIMES = 10;
 } // namespace
 
 int32_t ManageInjectDevice::TransformJsonData(const DeviceItems& configData)
