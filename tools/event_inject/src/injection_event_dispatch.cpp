@@ -61,26 +61,7 @@ int32_t InjectionEventDispatch::OnJson()
         MMI_HILOGE("path is error");
         return RET_ERR;
     }
-    const std::string jsonFile = injectArgvs_.at(JSON_FILE_PATH_INDEX);
-    char Path[PATH_MAX] = {};
-    if (realpath(jsonFile.c_str(), Path) == nullptr) {
-        MMI_HILOGE("json path is error, jsonFile:%{public}s", jsonFile.c_str());
-        return RET_ERR;
-    }
-    if (!(IsFileExists(jsonFile))) {
-        MMI_HILOGE("This file does not exist, jsonFile:%{public}s", jsonFile.c_str());
-        return RET_ERR;
-    }
-    if (GetFileExtendName(jsonFile) != "json") {
-        MMI_HILOGE("Unable to parse files other than json format jsonFile:%{public}s", jsonFile.c_str());
-        return RET_ERR;
-    }
-    int32_t fileSize = GetFileSize(jsonFile);
-    if ((fileSize <= 0) || (fileSize > JSON_FILE_SIZE)) {
-        MMI_HILOGE("The file size is out of range 20KB or empty. filesize:%{public}d", fileSize);
-        return RET_ERR;
-    }
-    std::string jsonBuf = ReadFile(jsonFile);
+    std::string jsonBuf = ReadJsonFile(injectArgvs_.at(JSON_FILE_PATH_INDEX));
     if (jsonBuf.empty()) {
         MMI_HILOGE("read file failed");
         return RET_ERR;

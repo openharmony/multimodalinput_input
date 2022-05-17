@@ -42,15 +42,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t READ_FILE_SIZE_MAX = 1000;
 const std::string VIRTUAL_DEVICE_NAME = "mmi-virtual-device";
-bool IsNum(const std::string &str)
-{
-    return std::all_of(str.begin(), str.end(), [](char c) {
-        return std::isdigit(c) != 0;
-    });
-}
-
 bool CheckFileName(const std::string& fileName)
 {
     std::string::size_type pos = fileName.find("_");
@@ -79,8 +71,8 @@ bool CheckFileName(const std::string& fileName)
 
 void RemoveDir(const std::string& filePath)
 {
-    if (!IsFileExists(filePath)) {
-        printf("file path:%s failed", filePath.c_str());
+    if (filePath.empty()) {
+        printf("file path is empty");
         return;
     }
     DIR* dir = opendir(filePath.c_str());
@@ -299,11 +291,7 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
         printf("open dir:%s failed", procressPath.c_str());
         goto RELEASE_RES;
     }
-    if (GetFileSize(filePath) > READ_FILE_SIZE_MAX) {
-        printf("file:%s size exceeds maximum", filePath.c_str());
-        goto RELEASE_RES;
-    }
-    temp = ReadFile(filePath);
+    temp = ReadUinputToolFile(filePath);
     if (temp.empty()) {
         printf("temp is empty");
         goto RELEASE_RES;
@@ -322,7 +310,7 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
         }
     }
     if (std::remove((g_folderpath + fileName).c_str()) != 0) {
-        printf("remove file: %s failed", (g_folderpath + fileName).c_str());
+        printf("remove file failed");
     }
     return false;
 }

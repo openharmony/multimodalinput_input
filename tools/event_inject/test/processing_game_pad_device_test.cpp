@@ -56,7 +56,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputData, 
     }
     pclose(startDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::string jsonBuf = ReadFile(path);
+    std::string jsonBuf = ReadJsonFile(path);
     if (jsonBuf.empty()) {
         ASSERT_TRUE(false) << "read file failed" << path;
     }
@@ -93,7 +93,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    std::string jsonBuf = ReadFile(path);
+    std::string jsonBuf = ReadJsonFile(path);
     if (jsonBuf.empty()) {
         ASSERT_TRUE(false) << "read file failed" << path;
     }
@@ -130,7 +130,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataEv
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    std::string jsonBuf = ReadFile(path);
+    std::string jsonBuf = ReadJsonFile(path);
     if (jsonBuf.empty()) {
         ASSERT_TRUE(false) << "read file failed" << path;
     }
@@ -167,7 +167,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    std::string jsonBuf = ReadFile(path);
+    std::string jsonBuf = ReadJsonFile(path);
     if (jsonBuf.empty()) {
         ASSERT_TRUE(false) << "read file failed" << path;
     }
@@ -204,7 +204,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    std::string jsonBuf = ReadFile(path);
+    std::string jsonBuf = ReadJsonFile(path);
     if (jsonBuf.empty()) {
         ASSERT_TRUE(false) << "read file failed" << path;
     }
@@ -241,7 +241,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    std::string jsonBuf = ReadFile(path);
+    std::string jsonBuf = ReadJsonFile(path);
     if (jsonBuf.empty()) {
         ASSERT_TRUE(false) << "read file failed" << path;
     }
@@ -280,7 +280,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    std::string jsonBuf = ReadFile(path);
+    std::string jsonBuf = ReadJsonFile(path);
     if (jsonBuf.empty()) {
         ASSERT_TRUE(false) << "read file failed" << path;
     }
