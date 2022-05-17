@@ -25,8 +25,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SimulateInputEventFuzzTest" };
-constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
-constexpr int32_t SEC_TO_NANOSEC = 1000000000;
 } // namespace
 
 template<class T>
@@ -53,7 +51,7 @@ bool SimulateInputEventFuzzTest(const uint8_t* data, size_t size)
     injectDownEvent->SetKeyCode(keyCode);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     int64_t downTime;
-    startPos += GetObject<int32_t>(downTime, data + startPos, size - startPos);
+    startPos += GetObject<int64_t>(downTime, data + startPos, size - startPos);
     KeyEvent::KeyItem kitDown;
     kitDown.SetDownTime(downTime);
     int32_t keyCodePressed;
@@ -65,11 +63,11 @@ bool SimulateInputEventFuzzTest(const uint8_t* data, size_t size)
 
     auto injectUpEvent = KeyEvent::Create();
     CHKPF(injectUpEvent);
-    kitUp.SetKeyCode(keyCodePressed);
-    kitUp.SetPressed(false);
-    startPos += GetObject<int32_t>(downTime, data + startPos, size - startPos);
+    startPos += GetObject<int64_t>(downTime, data + startPos, size - startPos);
     KeyEvent::KeyItem kitUp;
     kitUp.SetDownTime(downTime);
+    kitUp.SetKeyCode(keyCodePressed);
+    kitUp.SetPressed(false);
     injectUpEvent->SetKeyCode(keyCode);
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);

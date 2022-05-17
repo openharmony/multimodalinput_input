@@ -43,7 +43,7 @@ void MoveMouseFuzzTest(const uint8_t* data, size_t size)
     size_t startPos = 0;
     startPos += GetObject<int32_t>(mouseX, data + startPos, size - startPos);
     int32_t mouseY;
-    startPos += GetObject<int32_t>(mouseX, data + startPos, size - startPos);
+    startPos += GetObject<int32_t>(mouseY, data + startPos, size - startPos);
     InputManager::GetInstance()->MoveMouse(mouseX, mouseY);
 }
 } // MMI
