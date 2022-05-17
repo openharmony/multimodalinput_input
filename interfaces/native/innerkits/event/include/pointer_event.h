@@ -234,20 +234,60 @@ public:
      */
     static constexpr int32_t MOUSE_BUTTON_TASK = 7;
 
+    /**
+     * 手指工具类型属性
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_FINGER = 0;
 
+    /**
+     * 手写笔工具类型属性
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_PEN = 1;
 
+    /**
+     * 橡皮擦工具类型属性
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_RUBBER = 2;
 
+    /**
+     * 画笔工具类型属性
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_BRUSH = 3;
 
+    /**
+     * 铅笔工具类型属性
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_PENCIL = 4;
 
+    /**
+     * 喷枪工具类型属性
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_AIRBRUSH = 5;
 
+    /**
+     * 鼠标工具类型属性
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_MOUSE = 6;
 
+    /**
+     * 放大镜工具类型属性
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_LENS = 7;
 
 public:
@@ -493,8 +533,19 @@ public:
          */
         void SetDeviceId(int32_t deviceId);
 
+        /**
+         * @brief 获取工具类型
+         * @return 返回值工具类型
+         * @since 9
+         */
         int32_t GetToolType() const;
 
+        /**
+         * @brief 设置此事件的工具类型
+         * @param toolType 表示要设置的工具类型
+         * @return void
+         * @since 9
+         */
         void SetToolType(int32_t toolType);
 
         /**
