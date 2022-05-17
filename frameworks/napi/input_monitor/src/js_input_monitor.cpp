@@ -322,9 +322,9 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
     return RET_OK;
 }
 
-void JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item,
-    std::map<std::string, std::function<int64_t()>>& mapFun)
+MapFun JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item)
 {
+    MapFun mapFun;
     mapFun["actionTime"] = std::bind(&PointerEvent::GetActionTime, pointerEvent);
     mapFun["button"] = std::bind(&PointerEvent::GetButtonId, pointerEvent);
     mapFun["screenId"] = std::bind(&PointerEvent::GetTargetDisplayId, pointerEvent);
@@ -334,13 +334,13 @@ void JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, c
     mapFun["windowY"] = std::bind(&PointerEvent::PointerItem::GetGlobalY, item);
     mapFun["screenX"] = std::bind(&PointerEvent::PointerItem::GetLocalX, item);
     mapFun["screenY"] = std::bind(&PointerEvent::PointerItem::GetLocalY, item);
+    return mapFun;
 }
 
 bool JsInputMonitor::SetMouseProperty(const std::shared_ptr<PointerEvent> pointerEvent,
     const PointerEvent::PointerItem& item, napi_value result)
 {
-    std::map<std::string, std::function<int64_t()>> mapFun;
-    GetFuns(pointerEvent, item, mapFun);
+    auto mapFun = GetFuns(pointerEvent, item);
     for (const auto& it : mapFun) {
         if (SetNameProperty(jsEnv_, result, it.first, it.second()) != napi_ok) {
             THROWERR(jsEnv_, "Set property failed");
@@ -493,8 +493,7 @@ bool JsInputMonitor::GetPressedKeys(const std::vector<int32_t>& pressedKeys, nap
 
 bool JsInputMonitor::HasKeyCode(const std::vector<int32_t>& pressedKeys, int32_t keyCode)
 {
-    auto it = std::find(pressedKeys.begin(), pressedKeys.end(), keyCode);
-    return it != pressedKeys.end();
+    return std::find(pressedKeys.begin(), pressedKeys.end(), keyCode) != pressedKeys.end();
 }
 
 bool JsInputMonitor::GetPressedKey(const std::vector<int32_t>& pressedKeys, napi_value result)
@@ -670,7 +669,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
     CHKPV(jsEnv_);
     CHKPV(receiver_);
     std::lock_guard<std::mutex> guard(mutex_);
-    napi_handle_scope scope = nullptr;
     while (!evQueue_.empty()) {
         if (!isMonitoring_) {
             MMI_HILOGE("js monitor stop handle callback");
@@ -679,14 +677,9 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
         auto pointerEvent = evQueue_.front();
         CHKPC(pointerEvent);
         evQueue_.pop();
-        auto status = napi_open_handle_scope(jsEnv_, &scope);
-        if (status != napi_ok) {
-            break;
-        }
         napi_value napiPointer = nullptr;
-        status = napi_create_object(jsEnv_, &napiPointer);
+        auto status = napi_create_object(jsEnv_, &napiPointer);
         if (status != napi_ok) {
-            napi_close_handle_scope(jsEnv_, scope);
             break;
         }
         auto ret = RET_ERR;
@@ -695,31 +688,23 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
         } else {
             ret = TransformMousePointerEvent(pointerEvent, napiPointer);
         }
-        if (ret != RET_OK) {
-            napi_close_handle_scope(jsEnv_, scope);
-            break;
-        }
-        if (napiPointer == nullptr) {
-            napi_close_handle_scope(jsEnv_, scope);
+        if (ret != RET_OK || napiPointer == nullptr) {
             break;
         }
         napi_value callback = nullptr;
         status = napi_get_reference_value(jsEnv_, receiver_, &callback);
         if (status != napi_ok) {
-            napi_close_handle_scope(jsEnv_, scope);
             break;
         }
         napi_value result = nullptr;
         status = napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result);
         if (status != napi_ok) {
-            napi_close_handle_scope(jsEnv_, scope);
             break;
         }
         if (typeName == "touch") {
             bool retValue = false;
             status = napi_get_value_bool(jsEnv_, result, &retValue);
             if (status != napi_ok) {
-                napi_close_handle_scope(jsEnv_, scope);
                 --jsTaskNum_;
                 return;
             }
@@ -728,8 +713,6 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
                 MarkConsumed(eventId);
             }
         }
-
-        napi_close_handle_scope(jsEnv_, scope);
     }
     --jsTaskNum_;
 }
