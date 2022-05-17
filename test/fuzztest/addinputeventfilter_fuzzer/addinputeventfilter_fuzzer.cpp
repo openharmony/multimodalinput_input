@@ -25,14 +25,13 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AddInputEventFilterFuzzTest" };
 } // namespace
 
-bool AddInputEventFilterFuzzTest(const uint8_t* data, size_t /* size */)
+void AddInputEventFilterFuzzTest(const uint8_t* data, size_t /* size */)
 {
     auto fun = [](std::shared_ptr<PointerEvent> event) ->bool {
         MMI_HILOGD("add inputevent filter success");
         return false;
     };
     InputManager::GetInstance()->AddInputEventFilter(fun);
-    return true;
 }
 } // MMI
 } // OHOS

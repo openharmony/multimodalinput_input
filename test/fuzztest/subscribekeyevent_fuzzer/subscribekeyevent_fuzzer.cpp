@@ -15,6 +15,8 @@
 
 #include "subscribekeyevent_fuzzer.h"
 
+#include "securec.h"
+
 #include "input_manager.h"
 #include "mmi_log.h"
 
@@ -22,33 +24,58 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SubscribeKeyEventFuzzTest" };
+constexpr int32_t DEFAULT_PREKEY_COUNT = 4;
 } // namespace
 
-class InputEventConsumerTest: public OHOS::MMI::IInputEventConsumer {
+class InputEventConsumerTest : public IInputEventConsumer {
 public:
     virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
-    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override {
+    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+    {
         MMI_HILOGD("report pointerevent success");
     };
     virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
 };
 
-bool SubscribeKeyEventFuzzTest(const uint8_t* data, size_t /* size */)
+template<class T>
+size_t GetObject(T &object, const uint8_t *data, size_t size)
+{
+    size_t objectSize = sizeof(object);
+    if (objectSize > size) {
+        return 0;
+    }
+    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
+    if (ret != EOK) {
+        return 0;
+    }
+    return objectSize;
+}
+
+void SubscribeKeyEventFuzzTest(const uint8_t* data, size_t size)
 {
     std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
     std::set<int32_t> prekeys;
-    prekeys.insert(KeyEvent::KEYCODE_CTRL_LEFT);
-    prekeys.insert(KeyEvent::KEYCODE_ALT_LEFT);
+    size_t startPos = 0;
+    for (int32_t i = 0; i < DEFAULT_PREKEY_COUNT; i++) {
+        int32_t preKey;
+        startPos += GetObject<int32_t>(preKey, data + startPos, size - startPos);
+        prekeys.insert(preKey);
+    }
     keyOption->SetPreKeys(prekeys);
-    keyOption->SetFinalKeyDown(true);
-    keyOption->SetFinalKeyDownDuration(0);
-    keyOption->SetFinalKey(KeyEvent::KEYCODE_DEL);
+    int32_t keyDown;
+    startPos += GetObject<int32_t>(keyDown, data + startPos, size - startPos);
+    keyOption->SetFinalKeyDown(keyDown != 0);
+    int32_t keyDownDuration;
+    startPos += GetObject<int32_t>(keyDownDuration, data + startPos, size - startPos);
+    keyOption->SetFinalKeyDownDuration(keyDownDuration);
+    int32_t finalKey;
+    startPos += GetObject<int32_t>(finalKey, data + startPos, size - startPos);
+    keyOption->SetFinalKey(finalKey);
     auto fun = [](std::shared_ptr<KeyEvent> event) {
         MMI_HILOGD("subscribe keyevent success");
     };
     int32_t subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, fun);
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
-    return true;
 }
 } // MMI
 } // OHOS
