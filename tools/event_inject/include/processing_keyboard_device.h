@@ -40,10 +40,6 @@ private:
     void TransformKeyLongPressEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);
     void TransformKeyReleaseEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);
     void TransformKeyClickEvent(const KeyBoardEvent& keyBoardEvent, InputEventArray& inputEventArray);
-private:
-    static constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE = 15;
-    static constexpr int32_t EVENT_REPROT_COUNTS = 50;
-    static constexpr int64_t EVENT_REPROT_TIMES = 20;
 };
 } // namespace MMI
 } // namespace OHOS
