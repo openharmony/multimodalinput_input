@@ -37,6 +37,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
+constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 } // namespace
 
 EventDispatch::EventDispatch() {}
@@ -232,7 +233,7 @@ bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
         earlist = sess->GetEarlistEventTime();
     }
 
-    if (time >= 0) {
+    if (time < (earlist + INPUT_UI_TIMEOUT_TIME)) {
         sess->isANRProcess_ = false;
         MMI_HILOGD("the event reports normally");
         return false;
