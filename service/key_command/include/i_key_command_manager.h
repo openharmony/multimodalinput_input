@@ -25,7 +25,7 @@ public:
     IKeyCommandManager() = default;
     virtual ~IKeyCommandManager() = default;
     static std::shared_ptr<IKeyCommandManager> GetInstance();
-    virtual bool HandlerEvent(const std::shared_ptr<KeyEvent> key)
+    virtual bool HandleEvent(const std::shared_ptr<KeyEvent> key)
     {
         return false;
     }

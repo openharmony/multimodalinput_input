@@ -103,11 +103,6 @@ int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interc
     return InputMgrImpl->AddInterceptor(interceptor);
 }
 
-int32_t InputManager::AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
-{
-    return -1;
-}
-
 int32_t InputManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
     return InputMgrImpl->AddInterceptor(interceptor);
