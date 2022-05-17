@@ -15,8 +15,10 @@
 
 #include "simulateinputevent_fuzzer.h"
 
-#include "input_manager.h"
+#include "securec.h"
+
 #include "define_multimodal.h"
+#include "input_manager.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -27,35 +29,48 @@ constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t SEC_TO_NANOSEC = 1000000000;
 } // namespace
 
-int64_t GetNanoTime()
+template<class T>
+size_t GetObject(T &object, const uint8_t *data, size_t size)
 {
-    struct timespec time = { 0 };
-    clock_gettime(CLOCK_MONOTONIC, &time);
-    return static_cast<int64_t>(time.tv_sec) * SEC_TO_NANOSEC + time.tv_nsec;
+    size_t objectSize = sizeof(object);
+    if (objectSize > size) {
+        return 0;
+    }
+    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
+    if (ret != EOK) {
+        return 0;
+    }
+    return objectSize;
 }
 
-bool SimulateInputEventFuzzTest(const uint8_t* data, size_t /* size */)
+bool SimulateInputEventFuzzTest(const uint8_t* data, size_t size)
 {
     auto injectDownEvent = KeyEvent::Create();
     CHKPF(injectDownEvent);
-    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_FN);
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_FN);
+    size_t startPos = 0;
+    int32_t keyCode;
+    startPos += GetObject<int32_t>(keyCode, data + startPos, size - startPos);
+    injectDownEvent->SetKeyCode(keyCode);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    int64_t downTime;
+    startPos += GetObject<int32_t>(downTime, data + startPos, size - startPos);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetDownTime(downTime);
+    int32_t keyCodePressed;
+    startPos += GetObject<int32_t>(keyCodePressed, data + startPos, size - startPos);
+    kitDown.SetKeyCode(keyCodePressed);
+    kitDown.SetPressed(true);
     injectDownEvent->AddPressedKeyItems(kitDown);
     InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
 
     auto injectUpEvent = KeyEvent::Create();
     CHKPF(injectUpEvent);
-    downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitUp;
-    kitUp.SetKeyCode(KeyEvent::KEYCODE_FN);
+    kitUp.SetKeyCode(keyCodePressed);
     kitUp.SetPressed(false);
+    startPos += GetObject<int32_t>(downTime, data + startPos, size - startPos);
+    KeyEvent::KeyItem kitUp;
     kitUp.SetDownTime(downTime);
-    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_FN);
+    injectUpEvent->SetKeyCode(keyCode);
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
     InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
@@ -64,9 +79,15 @@ bool SimulateInputEventFuzzTest(const uint8_t* data, size_t /* size */)
     CHKPF(pointerDownEvent);
     PointerEvent::PointerItem downitem;
     downitem.SetPointerId(0);   // test code，set the PointerId = 0
-    downitem.SetGlobalX(10);   // test code，set the GlobalX = 823
-    downitem.SetGlobalY(10);   // test code，set the GlobalY = 723
-    downitem.SetPressure(5);    // test code，set the Pressure = 5
+    int32_t globalX;
+    startPos += GetObject<int32_t>(globalX, data + startPos, size - startPos);
+    downitem.SetGlobalX(globalX);   // test code，set the GlobalX = 823
+    int32_t globalY;
+    startPos += GetObject<int32_t>(globalY, data + startPos, size - startPos);
+    downitem.SetGlobalY(globalY);   // test code，set the GlobalY = 723
+    int32_t pressure;
+    startPos += GetObject<int32_t>(pressure, data + startPos, size - startPos);
+    downitem.SetPressure(pressure);    // test code，set the Pressure = 5
     downitem.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerDownEvent->AddPointerItem(downitem);
     pointerDownEvent->SetId(std::numeric_limits<int32_t>::max());
@@ -80,9 +101,9 @@ bool SimulateInputEventFuzzTest(const uint8_t* data, size_t /* size */)
     CHKPF(pointerUpEvent);
     PointerEvent::PointerItem upitem;
     upitem.SetPointerId(0);   // test code，set the PointerId = 0
-    upitem.SetGlobalX(10);   // test code，set the GlobalX = 823
-    upitem.SetGlobalY(10);   // test code，set the GlobalY = 723
-    upitem.SetPressure(5);    // test code，set the Pressure = 5
+    upitem.SetGlobalX(globalX);   // test code，set the GlobalX = 823
+    upitem.SetGlobalY(globalY);   // test code，set the GlobalY = 723
+    upitem.SetPressure(pressure);    // test code，set the Pressure = 5
     upitem.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerUpEvent->AddPointerItem(upitem);
     pointerUpEvent->SetId(std::numeric_limits<int32_t>::max());

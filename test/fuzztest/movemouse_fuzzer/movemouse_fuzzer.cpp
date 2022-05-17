@@ -15,17 +15,36 @@
 
 #include "movemouse_fuzzer.h"
 
+#include "securec.h"
+
 #include "input_manager.h"
 #include "mmi_log.h"
 
+
 namespace OHOS {
 namespace MMI {
-bool MoveMouseFuzzTest(const uint8_t* data, size_t /* size */)
+template<class T>
+size_t GetObject(T &object, const uint8_t *data, size_t size)
 {
-    int32_t mouseX = 100;
-    int32_t mouseY = 100;
+    size_t objectSize = sizeof(object);
+    if (objectSize > size) {
+        return 0;
+    }
+    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
+    if (ret != EOK) {
+        return 0;
+    }
+    return objectSize;
+}
+
+void MoveMouseFuzzTest(const uint8_t* data, size_t size)
+{
+    int32_t mouseX;
+    size_t startPos = 0;
+    startPos += GetObject<int32_t>(mouseX, data + startPos, size - startPos);
+    int32_t mouseY;
+    startPos += GetObject<int32_t>(mouseX, data + startPos, size - startPos);
     InputManager::GetInstance()->MoveMouse(mouseX, mouseY);
-    return true;
 }
 } // MMI
 } // OHOS

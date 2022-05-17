@@ -24,20 +24,20 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SetWindowInputEventConsumerFuzzTest" };
 } // namespace
 
-class InputEventConsumerTest: public OHOS::MMI::IInputEventConsumer {
+class InputEventConsumerTest : public IInputEventConsumer {
 public:
     virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
-    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override {
+    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+    {
         MMI_HILOGD("report pointerevent success");
     };
     virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
 };
 
-bool SetWindowInputEventConsumerFuzzTest(const uint8_t* data, size_t /* size */)
+void SetWindowInputEventConsumerFuzzTest(const uint8_t* data, size_t /* size */)
 {
     std::shared_ptr<InputEventConsumerTest> consumer = std::make_shared<InputEventConsumerTest>();
     InputManager::GetInstance()->SetWindowInputEventConsumer(consumer);
-    return true;
 }
 } // MMI
 } // OHOS

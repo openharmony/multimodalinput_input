@@ -24,10 +24,11 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AddMonitorFuzzTeset" };
 } // namespace
 
-class InputEventConsumerTest: public OHOS::MMI::IInputEventConsumer {
+class InputEventConsumerTest : public IInputEventConsumer {
 public:
     virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
-    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override {
+    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+    {
         MMI_HILOGD("report pointerevent success");
     };
     virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
