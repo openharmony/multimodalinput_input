@@ -144,7 +144,7 @@ bool InputDeviceManager::HasPointerDevice()
     }
     return false;
 }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif
 
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 {
@@ -210,7 +210,7 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
     CHKPF(device);
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
     MMI_HILOGD("udev tag:%{public}d", static_cast<int32_t>(udevTags));
-    return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK | 
+    return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK |
     EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD);
 }
 

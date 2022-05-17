@@ -18,16 +18,16 @@
 
 namespace OHOS {
 namespace MMI {
-#define DEF_SEAT_ID "seat0"         // Default libinput seat
+#define DEF_SEAT_ID "seat0"
 
 #ifndef OHOS_BUILD
     #define DEF_MMI_EVENT_INJECTION "/root/projects/build/bin/mmi-event-injection"
     #define DEF_MMI_VIRTUAL_DEVICE_MANAGER "/root/projects/build/bin/mmi-virtual-device-manager"
     #define DEF_MMI_DATA_ROOT       "/root/projects/run_root/"
-    #define DEF_EXP_CONFIG          "/root/projects/run_root/etc/mmi_device_config.ini" // Default device config file
-    #define DEF_EXP_SOPATH          "/root/projects/run_root/lib"                 // Default device so path
-    #define DEF_SCREEN_MAX_WIDTH    65535          // Default screen max width
-    #define DEF_SCREEN_MAX_HEIGHT   65535          // Default screen max height
+    #define DEF_EXP_CONFIG          "/root/projects/run_root/etc/mmi_device_config.ini"
+    #define DEF_EXP_SOPATH          "/root/projects/run_root/lib"
+    #define DEF_SCREEN_MAX_WIDTH    65535
+    #define DEF_SCREEN_MAX_HEIGHT   65535
 #else
     #define DEF_MMI_EVENT_INJECTION "/system/bin/mmi-event-injection"
     #define DEF_MMI_VIRTUAL_DEVICE_MANAGER "/system/bin/mmi-virtual-device-manager"
@@ -42,8 +42,8 @@ namespace MMI {
     #define DEF_SCREEN_MAX_HEIGHT 960
 #endif
 
-#define MAX_PACKET_BUF_SIZE (1024*8)                // Maximum buffer size of network packets
-#define MAX_STREAM_BUF_SIZE (MAX_PACKET_BUF_SIZE*2) // Maximum buffer size of socket stream
+#define MAX_PACKET_BUF_SIZE (1024*8)
+#define MAX_STREAM_BUF_SIZE (MAX_PACKET_BUF_SIZE*2)
 #define MAX_VECTOR_SIZE 1000
 #define MAX_INPUT_DEVICE 64
 #define MAX_SUPPORT_KEY 5
@@ -51,15 +51,15 @@ namespace MMI {
 #define MAX_LOGICAL_SIZE 128
 #define MAX_KEY_SIZE 108
 
-#define MAX_LIST_SIZE 100                   // Instantaneous maximum listening buffer size of socket
-#define MAX_SESSON_ALARM 300                // Client quantity warning value
-#define MAX_EVENT_SIZE 100                  // Epoll create maximum event size
-#define DEFINE_EPOLL_TIMEOUT 1000           // Default epoll write timeout
-#define CLIENT_RECONNECT_COOLING_TIME 800   // Client reconnection cooldown
-#define SERVER_RESTART_COOLING_TIME 2000    // Server failure restart cooldown
-#define MAX_THREAD_DEATH_TIME (6*1000)      // Thread death threshold time
-#define MMISEVER_WMS_DEVICE_ADDED 1         // notifyDeviceChange@Device added
-#define MMISEVER_WMS_DEVICE_REMOVE 2        // notifyDeviceChange@Device removed
+#define MAX_LIST_SIZE 100
+#define MAX_SESSON_ALARM 300
+#define MAX_EVENT_SIZE 100
+#define DEFINE_EPOLL_TIMEOUT 1000
+#define CLIENT_RECONNECT_COOLING_TIME 800
+#define SERVER_RESTART_COOLING_TIME 2000
+#define MAX_THREAD_DEATH_TIME (6*1000)
+#define MMISEVER_WMS_DEVICE_ADDED 1
+#define MMISEVER_WMS_DEVICE_REMOVE 2
 #define SEND_RETRY_LIMIT 32
 #define SEND_RETRY_SLEEP_TIME 100000
 #define ONCE_PROCESS_NETPACKET_LIMIT 100

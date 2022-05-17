@@ -95,7 +95,7 @@ protected:
     bool hasPermission_ = true;
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t clientFd_ = -1;
-#endif // OHOS_BUILD_MMI_DEBUG
+#endif
 };
 } // namespace MMI
 } // namespace OHOS

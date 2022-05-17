@@ -37,7 +37,7 @@ public:
 
     MMIClientPtr GetMMIClient();
     bool InitClient();
-    
+
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDevice(int32_t userData, int32_t deviceId);
@@ -52,7 +52,7 @@ public:
     void RemoveInputEventTouchpadMontior(int32_t pointerEventType);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif
 
 private:
     MMIClientPtr client_ = nullptr;

@@ -32,7 +32,7 @@
 
 #ifndef OHOS_BUILD
 #include <execinfo.h>
-#endif // OHOS_BUILD
+#endif
 #include "config_multimodal.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"

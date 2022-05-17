@@ -130,7 +130,7 @@ void ProcessingGamePadDevice::TransformRocker1Event(const DeviceEvent& padEvent,
     } else if (direction == "lt") {
         SetEvAbsZ(inputEventArray, 0, 0);
     } else {
-        // nothint to do.
+
     }
     SetSynReport(inputEventArray);
 }
@@ -178,7 +178,7 @@ void ProcessingGamePadDevice::TransformRocker2Event(const DeviceEvent& padEvent,
     } else if (direction == "rt") {
         SetEvAbsRz(inputEventArray, 0, 0);
     } else {
-        // nothint to do.
+
     }
     SetSynReport(inputEventArray);
 }
@@ -211,6 +211,6 @@ void ProcessingGamePadDevice::TransformDerectionKeyEvent(const DeviceEvent& padE
         SetEvAbsHat0Y(inputEventArray, padEvent.blockTime, 0);
         SetSynReport(inputEventArray);
     }  else {
-        // nothint to do.
+
     }
 }
