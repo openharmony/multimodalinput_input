@@ -56,7 +56,7 @@ HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputData
     }
     pclose(startDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::string jsonBuf = ReadFile(path);
+    std::string jsonBuf = ReadJsonFile(path);
     if (jsonBuf.empty()) {
         ASSERT_TRUE(false) << "read file failed" << path;
     }
@@ -93,7 +93,7 @@ HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputData
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    std::string jsonBuf = ReadFile(path);
+    std::string jsonBuf = ReadJsonFile(path);
     if (jsonBuf.empty()) {
         ASSERT_TRUE(false) << "read file failed" << path;
     }
