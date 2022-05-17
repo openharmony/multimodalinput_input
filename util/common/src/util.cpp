@@ -452,11 +452,7 @@ static bool CheckFileExtendName(const std::string& filePath, const std::string& 
         MMI_HILOGE("file is not find extension");
         return false;
     }
-    if (filePath.substr(pos + 1, filePath.npos) == checkExtension) {
-        return true;
-    }
-    MMI_HILOGE("file extension is not %{public}s", checkExtension.c_str());
-    return false;
+    return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
 }
 
 static int32_t GetFileSize(const std::string& filePath)
