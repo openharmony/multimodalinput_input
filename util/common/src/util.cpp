@@ -312,12 +312,12 @@ const char* GetProgramName()
         KMSG_LOGE("tempName is empty.");
         return "";
     }
-    const size_t copySize = (std::min)(tempName.size(), programNameSize - 1);
+    const size_t copySize = (std::min)(tempName.size(), PROGRAM_NAME_SIZE - 1);
     if (copySize == 0) {
         KMSG_LOGE("copySize is 0.");
         return "";
     }
-    errno_t ret = memcpy_s(programName, programNameSize, tempName.c_str(), copySize);
+    errno_t ret = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
     if (ret != RET_OK) {
         return "";
     }
