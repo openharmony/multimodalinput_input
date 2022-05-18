@@ -34,11 +34,8 @@ namespace MMI {
  */
 class Uuid {
 public:
-    // 128 bits uuid length type
     static constexpr int32_t UUID128_BYTES_TYPE = 16;
-    // 32 bits uuid length
     static constexpr int32_t UUID32_BYTES_TYPE = 4;
-    // 16 bits uuid length
     static constexpr int32_t UUID16_BYTES_TYPE = 2;
     using UUID128Bit = std::array<uint8_t, UUID128_BYTES_TYPE>;
     /**
