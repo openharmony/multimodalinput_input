@@ -61,7 +61,7 @@ void DumpData(const char* dataPtr, const size_t dataSize, const char* fileName, 
 {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilEx" };
 
-    constexpr size_t OUT_BUF_SIZE = 1024;
+    static constexpr size_t OUT_BUF_SIZE = 1024;
     char outBuf[OUT_BUF_SIZE] = {};
     int32_t writeLen = 0;
     int32_t ret;
