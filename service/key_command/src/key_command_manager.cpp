@@ -16,13 +16,11 @@
 #include "key_command_manager.h"
 
 #include "ability_manager_client.h"
-#include "file_ex.h"
-#include "ohos/aafwk/base/string_wrapper.h"
-
-#include "mmi_log.h"
-#include "timer_manager.h"
-
 #include "cJSON.h"
+#include "file_ex.h"
+#include "mmi_log.h"
+#include "string_wrapper.h"
+#include "timer_manager.h"
 
 namespace OHOS {
 namespace MMI {
