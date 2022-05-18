@@ -120,14 +120,14 @@ std::string GetThisThreadIdOfString()
     thread_local std::string threadLocalId;
     if (threadLocalId.empty()) {
         long tid = syscall(SYS_gettid);
-        static constexpr size_t bufSize = 10;
-        char buf[bufSize] = {};
-        const int32_t ret = sprintf_s(buf, bufSize, "%06d", tid);
+        static constexpr size_t BUF_SIZE = 10;
+        char buf[BUF_SIZE] = {};
+        const int32_t ret = sprintf_s(buf, BUF_SIZE, "%06d", tid);
         if (ret < 0) {
             printf("ERR: in %s, #%d, call sprintf_s fail, ret = %d.", __func__, __LINE__, ret);
             return threadLocalId;
         }
-        buf[bufSize - 1] = '\0';
+        buf[BUF_SIZE - 1] = '\0';
         threadLocalId = buf;
     }
 
@@ -274,15 +274,15 @@ std::string GetFileName(const std::string& strPath)
 
 const char* GetProgramName()
 {
-    static constexpr size_t programNameSize = 256;
-    static char programName[programNameSize] = {};
+    static constexpr size_t PROGRAM_NAME_SIZE = 256;
+    static char programName[PROGRAM_NAME_SIZE] = {};
     if (programName[0] != '\0') {
         return programName;
     }
 
-    static constexpr size_t bufSize = 512;
-    char buf[bufSize] = { 0 };
-    if (sprintf_s(buf, bufSize, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
+    static constexpr size_t BUF_SIZE = 512;
+    char buf[BUF_SIZE] = { 0 };
+    if (sprintf_s(buf, BUF_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
         KMSG_LOGE("GetProcessInfo sprintf_s /proc/.../cmdline error");
         return "";
     }
@@ -291,9 +291,9 @@ const char* GetProgramName()
         KMSG_LOGE("fp is nullptr, filename = %s.", buf);
         return "";
     }
-    static constexpr size_t bufLineSize = 512;
-    char bufLine[bufLineSize] = { 0 };
-    if ((fgets(bufLine, bufLineSize, fp) == nullptr)) {
+    static constexpr size_t BUF_LINE_SIZE = 512;
+    char bufLine[BUF_LINE_SIZE] = { 0 };
+    if ((fgets(bufLine, BUF_LINE_SIZE, fp) == nullptr)) {
         KMSG_LOGE("fgets fail.");
         if (fclose(fp) != 0) {
             KMSG_LOGW("close file: %s failed", buf);
@@ -346,9 +346,9 @@ char* MmiBasename(char* path)
 std::string GetStackInfo()
 {
 #ifndef OHOS_BUILD
-    static constexpr size_t bufferSize = 1024;
-    void* buffer[bufferSize];
-    const int32_t nptrs = backtrace(buffer, bufferSize);
+    static constexpr size_t BUFFER_SIZE = 1024;
+    void* buffer[BUFFER_SIZE];
+    const int32_t nptrs = backtrace(buffer, BUFFER_SIZE);
     char** strings = backtrace_symbols(buffer, nptrs);
     if (strings == nullptr) {
         perror("backtrace_symbols");
