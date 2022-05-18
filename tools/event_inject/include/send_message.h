@@ -28,8 +28,6 @@ public:
     ~SendMessage() = default;
     DISALLOW_COPY_AND_MOVE(SendMessage);
     int32_t GetDevIndexName(const std::string& deviceName);
-private:
-    static constexpr int64_t INJECT_SLEEP_TIMES = 10;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -38,9 +38,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilE
         return RET_ERR;
     }
 
-    constexpr size_t bufSize = 1024 * 10;
-    char buf[bufSize] = {};
-    int32_t ret = snprintf_s(buf, bufSize, bufSize - 1, fmt, args...);
+    static constexpr size_t BUF_SIZE = 1024 * 10;
+    char buf[BUF_SIZE] = {};
+    int32_t ret = snprintf_s(buf, BUF_SIZE, BUF_SIZE - 1, fmt, args...);
     if (ret == -1) {
         return ret;
     }
@@ -61,8 +61,8 @@ void DumpData(const char* dataPtr, const size_t dataSize, const char* fileName, 
 {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilEx" };
 
-    constexpr size_t outBufSize = 1024;
-    char outBuf[outBufSize] = {};
+    constexpr size_t OUT_BUF_SIZE = 1024;
+    char outBuf[OUT_BUF_SIZE] = {};
     int32_t writeLen = 0;
     int32_t ret;
     auto funcAdvanceWriteLen = [&writeLen, ret]() {
@@ -71,32 +71,32 @@ void DumpData(const char* dataPtr, const size_t dataSize, const char* fileName, 
         }
     };
 
-    auto funcOutput = [&writeLen, &ret, &outBuf, outBufSize]() {
+    auto funcOutput = [&writeLen, &ret, &outBuf, OUT_BUF_SIZE]() {
         (void)memset_s(&outBuf[0], sizeof(outBuf), 0, sizeof(outBuf));
         writeLen = 0;
         ret = 0;
     };
 
-    ret = sprintf_s(outBuf, outBufSize - writeLen, "[%s]", GetProgramName());
+    ret = sprintf_s(outBuf, OUT_BUF_SIZE - writeLen, "[%s]", GetProgramName());
     funcAdvanceWriteLen(ret);
-    ret = sprintf_s(outBuf, outBufSize - writeLen, titleFormat, args...);
+    ret = sprintf_s(outBuf, OUT_BUF_SIZE - writeLen, titleFormat, args...);
     funcAdvanceWriteLen(ret);
-    ret = sprintf_s(outBuf, outBufSize - writeLen, " data size = %zu. %s:%d\n", dataSize, fileName, lineNo);
+    ret = sprintf_s(outBuf, OUT_BUF_SIZE - writeLen, " data size = %zu. %s:%d\n", dataSize, fileName, lineNo);
     funcAdvanceWriteLen(ret);
 
     funcOutput();
 
-    constexpr size_t bufSize = 81;
-    constexpr size_t oneLineCharCount = 16;
-    constexpr size_t countStep = 2;
-    constexpr size_t byteSize = 8;
-    constexpr size_t wordSize = 16;
-    char bufLeft[bufSize] = {};
-    char bufRight[bufSize] = {};
+    static constexpr size_t BUF_SIZE = 81;
+    static constexpr size_t ONE_LINE_CHAR_COUNT = 16;
+    static constexpr size_t COUNT_STEP = 2;
+    static constexpr size_t BYTE_SIZE = 8;
+    static constexpr size_t WORD_SIZE = 16;
+    char bufLeft[BUF_SIZE] = {};
+    char bufRight[BUF_SIZE] = {};
     size_t writePosHex = 0;
     size_t writePosChar = 0;
-    constexpr size_t writePosHexStep1 = 2;
-    constexpr size_t writePosHexStep2 = 3;
+    static constexpr size_t WRITE_POS_HEX_STEP1 = 2;
+    static constexpr size_t WRITE_POS_HEX_STEP2 = 3;
     size_t i = 0;
     auto funCheckRetAndLog = [ret](const char* fileName, const int32_t lineNo) -> void {
         if (ret == -1) {
@@ -106,27 +106,27 @@ void DumpData(const char* dataPtr, const size_t dataSize, const char* fileName, 
 
     for (i = 0; i < dataSize; i++) {
         const unsigned char c = static_cast<unsigned char>(dataPtr[i]);
-        ret = sprintf_s(bufLeft + writePosHex, bufSize - writePosHex, "%02x ", c);
+        ret = sprintf_s(bufLeft + writePosHex, BUF_SIZE - writePosHex, "%02x ", c);
         funCheckRetAndLog(MMI_LINE_INFO);
-        if (i != 0 && (i + 1) % byteSize == 0 && (i + 1) % wordSize != 0) {
-            ret = sprintf_s(bufLeft + writePosHex, bufSize - writePosHex, "- ");
+        if (i != 0 && (i + 1) % BYTE_SIZE == 0 && (i + 1) % WORD_SIZE != 0) {
+            ret = sprintf_s(bufLeft + writePosHex, BUF_SIZE - writePosHex, "- ");
             funCheckRetAndLog(MMI_LINE_INFO);
-            writePosHex += writePosHexStep1;
+            writePosHex += WRITE_POS_HEX_STEP1;
         } else {
-            writePosHex += writePosHexStep2;
+            writePosHex += WRITE_POS_HEX_STEP2;
         }
         if (isprint(c)) {
-            ret = sprintf_s(bufRight + writePosChar, bufSize - writePosChar, "%c", c);
+            ret = sprintf_s(bufRight + writePosChar, BUF_SIZE - writePosChar, "%c", c);
             funCheckRetAndLog(MMI_LINE_INFO);
             writePosChar += 1;
         } else {
-            ret = sprintf_s(bufRight + writePosChar, bufSize - writePosChar, "%c", ' ');
+            ret = sprintf_s(bufRight + writePosChar, BUF_SIZE - writePosChar, "%c", ' ');
             funCheckRetAndLog(MMI_LINE_INFO);
             writePosChar += 1;
         }
-        if ((i != 0) && ((i + 1) % oneLineCharCount == 0)) {
-            ret = sprintf_s(outBuf, outBufSize - writeLen, "%04zu-%04zu %s  %s\n",
-                            i - (oneLineCharCount - 1), i, bufLeft, bufRight);
+        if ((i != 0) && ((i + 1) % ONE_LINE_CHAR_COUNT == 0)) {
+            ret = sprintf_s(outBuf, OUT_BUF_SIZE - writeLen, "%04zu-%04zu %s  %s\n",
+                            i - (ONE_LINE_CHAR_COUNT - 1), i, bufLeft, bufRight);
             funcAdvanceWriteLen(ret);
             funcOutput();
             (void)memset_s(bufLeft, sizeof(bufLeft), 0, sizeof(bufLeft));
@@ -138,11 +138,11 @@ void DumpData(const char* dataPtr, const size_t dataSize, const char* fileName, 
 
     if (writePosHex != 0) {
         size_t ibefore = 0;
-        if (i > (oneLineCharCount - 1)) {
-            i = ((i + (oneLineCharCount - countStep)) % (oneLineCharCount - 1)) - (oneLineCharCount - 1);
+        if (i > (ONE_LINE_CHAR_COUNT - 1)) {
+            i = ((i + (ONE_LINE_CHAR_COUNT - COUNT_STEP)) % (ONE_LINE_CHAR_COUNT - 1)) - (ONE_LINE_CHAR_COUNT - 1);
         }
-        size_t iafter = ((i + (oneLineCharCount - 2)) % (oneLineCharCount - 1));
-        ret = sprintf_s(outBuf, outBufSize - writeLen, "%04zu-%04zu %s  %s\n", ibefore, iafter, bufLeft, bufRight);
+        size_t iafter = ((i + (ONE_LINE_CHAR_COUNT - 2)) % (ONE_LINE_CHAR_COUNT - 1));
+        ret = sprintf_s(outBuf, OUT_BUF_SIZE - writeLen, "%04zu-%04zu %s  %s\n", ibefore, iafter, bufLeft, bufRight);
                         funcAdvanceWriteLen(ret);
         funcOutput();
     }

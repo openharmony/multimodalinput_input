@@ -52,6 +52,9 @@ const std::string DATA_PATH = "/data";
 const std::string PROC_PATH = "/proc";
 const std::string INPUT_PATH = "/system/etc/multimodalinput/";
 const std::string PRO_PATH = "/vendor/etc/KeyValueTransform/";
+constexpr size_t BUF_TID_SIZE = 10;
+constexpr size_t BUF_CMD_SIZE = 512;
+constexpr size_t PROGRAM_NAME_SIZE = 256;
 } // namespace
 
 const std::map<int32_t, std::string> ERROR_STRING_MAP = {
@@ -105,7 +108,7 @@ int64_t GetMillisTime()
 
 std::string UuIdGenerate()
 {
-    constexpr int32_t UUID_BUF_SIZE = 64;
+    static constexpr int32_t UUID_BUF_SIZE = 64;
     char buf[UUID_BUF_SIZE] = {};
     return buf;
 }
@@ -123,14 +126,13 @@ std::string GetThisThreadIdOfString()
     thread_local std::string threadLocalId;
     if (threadLocalId.empty()) {
         long tid = syscall(SYS_gettid);
-        constexpr size_t bufSize = 10;
-        char buf[bufSize] = {};
-        const int32_t ret = sprintf_s(buf, bufSize, "%06d", tid);
+        char buf[BUF_TID_SIZE] = {};
+        const int32_t ret = sprintf_s(buf, BUF_TID_SIZE, "%06d", tid);
         if (ret < 0) {
             printf("ERR: in %s, #%d, call sprintf_s fail, ret = %d.", __func__, __LINE__, ret);
             return threadLocalId;
         }
-        buf[bufSize - 1] = '\0';
+        buf[BUF_TID_SIZE - 1] = '\0';
         threadLocalId = buf;
     }
 
@@ -277,15 +279,13 @@ std::string GetFileName(const std::string& strPath)
 
 const char* GetProgramName()
 {
-    constexpr size_t programNameSize = 256;
-    static char programName[programNameSize] = {};
+    static char programName[PROGRAM_NAME_SIZE] = {};
     if (programName[0] != '\0') {
         return programName;
     }
 
-    constexpr size_t bufSize = 512;
-    char buf[bufSize] = { 0 };
-    if (sprintf_s(buf, bufSize, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
+    char buf[BUF_CMD_SIZE] = { 0 };
+    if (sprintf_s(buf, BUF_CMD_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
         KMSG_LOGE("GetProcessInfo sprintf_s /proc/.../cmdline error");
         return "";
     }
@@ -294,9 +294,9 @@ const char* GetProgramName()
         KMSG_LOGE("fp is nullptr, filename = %s.", buf);
         return "";
     }
-    constexpr size_t bufLineSize = 512;
-    char bufLine[bufLineSize] = { 0 };
-    if ((fgets(bufLine, bufLineSize, fp) == nullptr)) {
+    static constexpr size_t BUF_LINE_SIZE = 512;
+    char bufLine[BUF_LINE_SIZE] = { 0 };
+    if ((fgets(bufLine, BUF_LINE_SIZE, fp) == nullptr)) {
         KMSG_LOGE("fgets fail.");
         if (fclose(fp) != 0) {
             KMSG_LOGW("close file: %s failed", buf);
@@ -315,13 +315,13 @@ const char* GetProgramName()
         KMSG_LOGE("tempName is empty.");
         return "";
     }
-    const size_t copySize = (std::min)(tempName.size(), programNameSize - 1);
+    const size_t copySize = std::min(tempName.size(), PROGRAM_NAME_SIZE - 1);
     if (copySize == 0) {
         KMSG_LOGE("copySize is 0.");
         return "";
     }
-    errno_t ret = memcpy_s(programName, programNameSize, tempName.c_str(), copySize);
-    if (ret != RET_OK) {
+    errno_t ret = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
+    if (ret != EOK) {
         return "";
     }
     KMSG_LOGI("GetProgramName success. programName = %s", programName);
@@ -349,9 +349,9 @@ char* MmiBasename(char* path)
 std::string GetStackInfo()
 {
 #ifndef OHOS_BUILD
-    constexpr size_t bufferSize = 1024;
-    void* buffer[bufferSize];
-    const int32_t nptrs = backtrace(buffer, bufferSize);
+    static constexpr size_t BUFFER_SIZE = 1024;
+    void* buffer[BUFFER_SIZE];
+    const int32_t nptrs = backtrace(buffer, BUFFER_SIZE);
     char** strings = backtrace_symbols(buffer, nptrs);
     if (strings == nullptr) {
         perror("backtrace_symbols");
@@ -382,7 +382,7 @@ const std::string& GetThreadName()
     if (!g_threadName.empty()) {
         return g_threadName;
     }
-    constexpr size_t MAX_THREAD_NAME_SIZE = 16;
+    static constexpr size_t MAX_THREAD_NAME_SIZE = 16;
     char thisThreadName[MAX_THREAD_NAME_SIZE + 1];
     int32_t ret = prctl(PR_GET_NAME, thisThreadName);
     if (ret == 0) {
