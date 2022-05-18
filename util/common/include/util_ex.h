@@ -61,7 +61,7 @@ void DumpData(const char* dataPtr, const size_t dataSize, const char* fileName, 
 {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilEx" };
 
-    static constexpr size_t OUT_BUF_SIZE = 1024;
+    constexpr size_t OUT_BUF_SIZE = 1024;
     char outBuf[OUT_BUF_SIZE] = {};
     int32_t writeLen = 0;
     int32_t ret;
@@ -125,7 +125,7 @@ void DumpData(const char* dataPtr, const size_t dataSize, const char* fileName, 
             writePosChar += 1;
         }
         if ((i != 0) && ((i + 1) % ONE_LINE_CHAR_COUNT == 0)) {
-            ret = sprintf_s(outBuf, outBufSize - writeLen, "%04zu-%04zu %s  %s\n",
+            ret = sprintf_s(outBuf, OUT_BUF_SIZE - writeLen, "%04zu-%04zu %s  %s\n",
                             i - (ONE_LINE_CHAR_COUNT - 1), i, bufLeft, bufRight);
             funcAdvanceWriteLen(ret);
             funcOutput();
@@ -142,7 +142,7 @@ void DumpData(const char* dataPtr, const size_t dataSize, const char* fileName, 
             i = ((i + (ONE_LINE_CHAR_COUNT - COUNT_STEP)) % (ONE_LINE_CHAR_COUNT - 1)) - (ONE_LINE_CHAR_COUNT - 1);
         }
         size_t iafter = ((i + (ONE_LINE_CHAR_COUNT - 2)) % (ONE_LINE_CHAR_COUNT - 1));
-        ret = sprintf_s(outBuf, outBufSize - writeLen, "%04zu-%04zu %s  %s\n", ibefore, iafter, bufLeft, bufRight);
+        ret = sprintf_s(outBuf, OUT_BUF_SIZE - writeLen, "%04zu-%04zu %s  %s\n", ibefore, iafter, bufLeft, bufRight);
                         funcAdvanceWriteLen(ret);
         funcOutput();
     }
