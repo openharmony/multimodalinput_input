@@ -166,7 +166,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     AddPermission(sess);
 #ifdef OHOS_BUILD_MMI_DEBUG
     sess->SetClientFd(toReturnClientFd);
-#endif
+#endif // OHOS__BUILD_MMI_DEBUG
 
     if (!AddSession(sess)) {
         cleanTaskWhenError();
@@ -181,7 +181,7 @@ void UDSServer::AddPermission(SessionPtr sess)
 {
     uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
     std::string permissionMonitor = "ohos.permission.INPUT_MONITORING";
-
+    
     if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) ==
         Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
         MMI_HILOGD("type flag matched");

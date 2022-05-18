@@ -105,7 +105,7 @@ void UDSSession::UpdateDescript()
         << ((fd_ < 0) ? ", closed" : ", opened")
 #ifdef OHOS_BUILD_MMI_DEBUG
         << ", clientFd = " << clientFd_
-#endif
+#endif // OHOS_BUILD_MMI_DEBUG
         << std::endl;
     descript_ = oss.str().c_str();
 }

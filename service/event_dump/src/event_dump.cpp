@@ -46,7 +46,7 @@ void ChkConfig(int32_t fd)
 #endif
 #ifdef OHOS_BUILD_MMI_DEBUG
     mprintf(fd, "OHOS_BUILD_MMI_DEBUG");
-#endif
+#endif // OHOS_BUILD_MMI_DEBUG
 
     mprintf(fd, "DEF_MMI_DATA_ROOT: %s\n", DEF_MMI_DATA_ROOT);
     mprintf(fd, "EXP_CONFIG: %s\n", DEF_EXP_CONFIG);

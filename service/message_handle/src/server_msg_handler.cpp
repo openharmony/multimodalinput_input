@@ -78,15 +78,15 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::MARK_CONSUMED, MsgCallbackBind2(&ServerMsgHandler::OnMarkConsumed, this)},
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
         {MmiMessageId::MOVE_MOUSE_BY_OFFSET, MsgCallbackBind2(&ServerMsgHandler::OnMoveMouse, this)},
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
         {MmiMessageId::SUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnSubscribeKeyEvent, this)},
         {MmiMessageId::UNSUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnUnSubscribeKeyEvent, this)},
 #ifdef OHOS_BUILD_MMI_DEBUG
         {MmiMessageId::BIGPACKET_TEST, MsgCallbackBind2(&ServerMsgHandler::OnBigPacketTest, this)},
-#endif
+#endif // OHOS_BUILD_MMI_DEBUG
 #ifdef OHOS_BUILD_HDF
         {MmiMessageId::HDI_INJECT, MsgCallbackBind2(&ServerMsgHandler::OnHdiInject, this)},
-#endif
+#endif // OHOS_BUILD_HDF
     };
     for (auto& it : funs) {
         if (!RegistrationEvent(it)) {
@@ -131,7 +131,7 @@ int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
     }
     return RET_OK;
 }
-#endif
+#endif // OHOS_BUILD_HDF
 
 int32_t ServerMsgHandler::OnDump(SessionPtr sess, NetPacket& pkt)
 {
@@ -328,7 +328,7 @@ int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
     }
     return RET_OK;
 }
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 int32_t ServerMsgHandler::OnSubscribeKeyEvent(SessionPtr sess, NetPacket &pkt)
 {
@@ -633,6 +633,6 @@ int32_t ServerMsgHandler::OnBigPacketTest(SessionPtr sess, NetPacket& pkt)
     }
     return RET_OK;
 }
-#endif
+#endif // OHOS_BUILD_MMI_DEBUG
 } // namespace MMI
 } // namespace OHOS

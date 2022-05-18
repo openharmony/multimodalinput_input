@@ -141,7 +141,7 @@ enum class MmiMessageId : int32_t {
 
 #ifdef OHOS_BUILD_MMI_DEBUG
     BIGPACKET_TEST = 91000,
-#endif
+#endif // OHOS_BUILD_MMI_DEBUG
 
     END,
 };

@@ -385,7 +385,7 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
     }
 #else
     MMI_HILOGW("Pointer drawing module does not support");
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
@@ -457,7 +457,7 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible)
 #else
     MMI_HILOGW("Pointer drawing module does not support");
     return ERROR_UNSUPPORT;
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
 bool InputManagerImpl::IsPointerVisible()
@@ -473,7 +473,7 @@ bool InputManagerImpl::IsPointerVisible()
 #else
     MMI_HILOGW("Pointer drawing module dose not support");
     return false;
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
 void InputManagerImpl::OnConnected()
