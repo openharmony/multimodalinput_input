@@ -49,6 +49,9 @@ constexpr int32_t INVALID_FILE_SIZE = -1;
 const std::string DATA_PATH = "/data";
 const std::string PROC_PATH = "/proc";
 const std::string INPUT_PATH = "/system/etc/multimodalinput/";
+constexpr size_t BUF_TID_SIZE = 10;
+constexpr size_t BUF_CMD_SIZE = 512;
+constexpr size_t PROGRAM_NAME_SIZE = 256;
 } // namespace
 
 const std::map<int32_t, std::string> ERROR_STRING_MAP = {
@@ -120,14 +123,13 @@ std::string GetThisThreadIdOfString()
     thread_local std::string threadLocalId;
     if (threadLocalId.empty()) {
         long tid = syscall(SYS_gettid);
-        constexpr size_t BUF_SIZE = 10;
-        char buf[BUF_SIZE] = {};
-        const int32_t ret = sprintf_s(buf, BUF_SIZE, "%06d", tid);
+        char buf[BUF_TID_SIZE] = {};
+        const int32_t ret = sprintf_s(buf, BUF_TID_SIZE, "%06d", tid);
         if (ret < 0) {
             printf("ERR: in %s, #%d, call sprintf_s fail, ret = %d.", __func__, __LINE__, ret);
             return threadLocalId;
         }
-        buf[BUF_SIZE - 1] = '\0';
+        buf[BUF_TID_SIZE - 1] = '\0';
         threadLocalId = buf;
     }
 
@@ -274,15 +276,13 @@ std::string GetFileName(const std::string& strPath)
 
 const char* GetProgramName()
 {
-    constexpr size_t PROGRAM_NAME_SIZE = 256;
     static char programName[PROGRAM_NAME_SIZE] = {};
     if (programName[0] != '\0') {
         return programName;
     }
 
-    constexpr size_t BUF_SIZE = 512;
-    char buf[BUF_SIZE] = { 0 };
-    if (sprintf_s(buf, BUF_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
+    char buf[BUF_CMD_SIZE] = { 0 };
+    if (sprintf_s(buf, BUF_CMD_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
         KMSG_LOGE("GetProcessInfo sprintf_s /proc/.../cmdline error");
         return "";
     }
@@ -312,7 +312,7 @@ const char* GetProgramName()
         KMSG_LOGE("tempName is empty.");
         return "";
     }
-    const size_t copySize = (std::min)(tempName.size(), PROGRAM_NAME_SIZE - 1);
+    const size_t copySize = std::min(tempName.size(), PROGRAM_NAME_SIZE - 1);
     if (copySize == 0) {
         KMSG_LOGE("copySize is 0.");
         return "";
