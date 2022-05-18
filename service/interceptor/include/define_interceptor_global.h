@@ -20,7 +20,7 @@
     #include "interceptor_handler_global.h"
 #else
     #include "i_interceptor_handler_global.h"
-#endif
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 
 namespace OHOS {
 namespace MMI {

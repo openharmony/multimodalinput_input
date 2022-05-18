@@ -144,7 +144,7 @@ bool InputDeviceManager::HasPointerDevice()
     }
     return false;
 }
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 {

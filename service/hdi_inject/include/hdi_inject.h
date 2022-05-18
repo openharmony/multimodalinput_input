@@ -94,5 +94,5 @@ private:
 #define MMIHdiInject DelayedSingleton<HdiInject>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#endif
+#endif // OHOS_BUILD_HDF
 #endif // HDI_INJECT_H
