@@ -120,7 +120,7 @@ std::string GetThisThreadIdOfString()
     thread_local std::string threadLocalId;
     if (threadLocalId.empty()) {
         long tid = syscall(SYS_gettid);
-        static constexpr size_t BUF_SIZE = 10;
+        constexpr size_t BUF_SIZE = 10;
         char buf[BUF_SIZE] = {};
         const int32_t ret = sprintf_s(buf, BUF_SIZE, "%06d", tid);
         if (ret < 0) {
@@ -274,13 +274,13 @@ std::string GetFileName(const std::string& strPath)
 
 const char* GetProgramName()
 {
-    static constexpr size_t PROGRAM_NAME_SIZE = 256;
+    constexpr size_t PROGRAM_NAME_SIZE = 256;
     static char programName[PROGRAM_NAME_SIZE] = {};
     if (programName[0] != '\0') {
         return programName;
     }
 
-    static constexpr size_t BUF_SIZE = 512;
+    constexpr size_t BUF_SIZE = 512;
     char buf[BUF_SIZE] = { 0 };
     if (sprintf_s(buf, BUF_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
         KMSG_LOGE("GetProcessInfo sprintf_s /proc/.../cmdline error");
@@ -318,7 +318,7 @@ const char* GetProgramName()
         return "";
     }
     errno_t ret = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
-    if (ret != RET_OK) {
+    if (ret != EOK) {
         return "";
     }
     KMSG_LOGI("GetProgramName success. programName = %s", programName);
