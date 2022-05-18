@@ -18,8 +18,8 @@
 #include <chrono>
 #include <cinttypes>
 #include <cstdarg>
+#include <fstream>
 #include <iomanip>
-#include <sstream>
 #include <thread>
 
 #include <fcntl.h>
@@ -45,10 +45,13 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Util"};
 constexpr int32_t FILE_SIZE_MAX = 0x5000;
+constexpr int32_t MAX_PRO_FILE_SIZE = 128000;
+constexpr int32_t KEY_ELEMENT_COUNT = 4;
 constexpr int32_t INVALID_FILE_SIZE = -1;
 const std::string DATA_PATH = "/data";
 const std::string PROC_PATH = "/proc";
 const std::string INPUT_PATH = "/system/etc/multimodalinput/";
+const std::string PRO_PATH = "/vendor/etc/KeyValueTransform/";
 } // namespace
 
 const std::map<int32_t, std::string> ERROR_STRING_MAP = {
@@ -494,6 +497,73 @@ static bool IsValidJsonPath(const std::string &filePath)
 static bool IsValidUinputPath(const std::string &filePath)
 {
     return IsValidPath(PROC_PATH, filePath);
+}
+
+static bool IsValidProPath(const std::string &filePath)
+{
+    return IsValidPath(PRO_PATH, filePath);
+}
+
+std::vector<std::string> ReadProFile(const std::string &filePath)
+{
+    std::vector<std::string> configKey;
+    if (filePath.empty()) {
+        MMI_HILOGE("filePath is empty");
+        return configKey;
+    }
+    char realPath[PATH_MAX] = {};
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("Path is error");
+        return configKey;
+    }
+    if (!IsValidProPath(realPath)) {
+        MMI_HILOGE("File path is error");
+        return configKey;
+    }
+    if (!IsFileExists(realPath)) {
+        MMI_HILOGE("File not exist");
+        return configKey;
+    }
+    if (!CheckFileExtendName(realPath, "pro")) {
+        MMI_HILOGE("Unable to parse files other than json format");
+        return configKey;
+    }
+    auto fileSize = GetFileSize(realPath);
+    if ((fileSize == INVALID_FILE_SIZE) || (fileSize >= MAX_PRO_FILE_SIZE)) {
+        MMI_HILOGE("The configuration file size is incorrect");
+        return configKey;
+    }
+    ReadProConfigFile(realPath, configKey);
+    return configKey;
+}
+
+void ReadProConfigFile(const std::string &realPath, std::vector<std::string> &configKey)
+{
+    std::ifstream reader(realPath);
+    if (!reader.is_open()) {
+        MMI_HILOGE("Failed to open config file");
+        return;
+    }
+    std::string strLine;
+    while (std::getline(reader, strLine)) {
+        if (!strLine.empty() && strLine.front() != '#') {
+            std::istringstream stream(strLine);
+            std::array<std::string, KEY_ELEMENT_COUNT> keyElement;
+            stream >> keyElement[0] >> keyElement[1] >> keyElement[2] >> keyElement[3];
+            if (keyElement[0].empty() || keyElement[1].empty() || keyElement[2].empty() || keyElement[3].empty()) {
+                MMI_HILOGE("The key value data is incomplete");
+                reader.close();
+                return;
+            }
+            if (!IsNum(keyElement[1]) || !IsNum(keyElement[2])) {
+                MMI_HILOGE("Get key value is invalid");
+                reader.close();
+                return;
+            }
+            configKey.push_back(strLine);
+        }
+    }
+    reader.close();
 }
 
 std::string ReadJsonFile(const std::string &filePath)
