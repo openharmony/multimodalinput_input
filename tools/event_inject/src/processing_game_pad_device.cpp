@@ -182,7 +182,7 @@ void ProcessingGamePadDevice::TransformRocker2Event(const DeviceEvent& padEvent,
     } else if (direction == "rt") {
         SetEvAbsRz(inputEventArray, 0, 0);
     } else {
-         MMI_HILOGW("direction type error");
+        MMI_HILOGW("direction type error");
     }
     SetSynReport(inputEventArray);
 }
