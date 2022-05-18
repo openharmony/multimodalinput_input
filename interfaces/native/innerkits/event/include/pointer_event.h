@@ -535,14 +535,14 @@ public:
 
         /**
          * @brief 获取工具类型
-         * @return 返回值工具类型
+         * @return 工具类型
          * @since 9
          */
         int32_t GetToolType() const;
 
         /**
-         * @brief 设置此事件的工具类型
-         * @param toolType 表示要设置的工具类型
+         * @brief 设置工具类型
+         * @param toolType 工具类型
          * @return void
          * @since 9
          */
