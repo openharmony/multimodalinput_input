@@ -34,8 +34,6 @@ private:
     int32_t SendEventToDeviveNode(const InputEventArray& inputEventArray);
 private:
     GetDeviceNode getDeviceNodeObject_;
-private:
-    static constexpr int64_t INJECT_SLEEP_TIMES = 10;
 };
 } // namespace MMI
 } // namespace OHOS

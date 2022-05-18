@@ -49,8 +49,6 @@ private:
     void AnalysisTouchPadFingerMoveData(InputEventArray& inputEventArray, const TouchPadInputEvent& touchPadInputEvent);
     void AnalysisTouchPadFingerReleaseData(InputEventArray& inputEventArray,
                                            const TouchPadInputEvent& touchPadInputEvent);
-private:
-    static constexpr int64_t FINGER_BLOCK_TIME = 6;
 };
 } // namespace MMI
 } // namespace OHOS
