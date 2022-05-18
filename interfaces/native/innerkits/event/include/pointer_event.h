@@ -403,14 +403,14 @@ public:
 
         /**
          * @brief 获取工具区域中心点相对于屏幕左上角的 x 坐标.
-         * @return 返回 x 坐标.
+         * @return x 坐标.
          * @since 9
          */
         int32_t GetToolGlobalX() const;
 
         /**
          * @brief 设置工具区域中心点相对于屏幕左上角的x坐标.
-         * @param globalY 表示要设置的 x 坐标.
+         * @param x 坐标.
          * @return void
          * @since 9
          */
@@ -418,14 +418,14 @@ public:
 
         /**
          * @brief 获取工具区域中心点相对于屏幕左上角的 y 坐标.
-         * @return 返回 y 坐标.
+         * @return y 坐标.
          * @since 9
          */
         int32_t GetToolGlobalY() const;
 
         /**
          * @brief 设置工具区域中心点相对于屏幕左上角的 y 坐标.
-         * @param globalY 表示要设置的 y 坐标.
+         * @param y 坐标.
          * @return void
          * @since 9
          */
@@ -433,14 +433,14 @@ public:
 
         /**
          * @brief 获取工具区域中心点相对于窗口左上角的 x 坐标.
-         * @return 返回 x 坐标.
+         * @return x 坐标.
          * @since 9
          */
         int32_t GetToolLocalX() const;
 
         /**
          * @brief 设置工具区域中心点相对于窗口左上角的 x 坐标.
-         * @param x 表示要设置的 x 坐标.
+         * @param x 坐标.
          * @return void
          * @since 9
          */
@@ -448,14 +448,14 @@ public:
 
         /**
          * @brief 获取工具区域中心点相对于窗口左上角的 y 坐标.
-         * @return 返回 y 坐标.
+         * @return y 坐标.
          * @since 9
          */
         int32_t GetToolLocalY() const;
 
         /**
          * @brief 设置工具区域中心点相对于窗口左上角的 y 坐标.
-         * @param y 表示要设置的 x 坐标.
+         * @param y 坐标.
          * @return void
          * @since 9
          */
@@ -463,14 +463,14 @@ public:
 
         /**
          * @brief 获取工具区域的宽度.
-         * @return 返回宽度.
+         * @return 工具区域的宽度.
          * @since 9
          */
         int32_t GetToolWidth() const;
 
         /**
          * @brief 设置工具区域的宽度.
-         * @param width 表示要设置的宽度.
+         * @param 工具区域的宽度.
          * @return void
          * @since 9
          */
@@ -478,14 +478,14 @@ public:
 
         /**
          * @brief 获取工具区域的高度.
-         * @return 返回高度.
+         * @return 工具区域的高度.
          * @since 9
          */
         int32_t GetToolHeight() const;
 
         /**
          * @brief 设置工具区域的高度.
-         * @param height 表示要设置的高度.
+         * @param 工具区域的高度.
          * @return void
          * @since 9
          */
