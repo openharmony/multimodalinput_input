@@ -15,8 +15,6 @@
 
 #include "send_message.h"
 
-#include "sys/file.h"
-
 #include "proto.h"
 
 using namespace OHOS::MMI;
