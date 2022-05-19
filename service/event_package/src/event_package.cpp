@@ -165,7 +165,7 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
         keyEventPtr->RemoveReleasedKeyItems(keyItem);
         keyEventPtr->AddPressedKeyItems(keyItem);
     } else {
-        MMI_HILOGW("keyAction is error");
+        MMI_HILOGW("unknown keyAction type");
     }
     return RET_OK;
 }

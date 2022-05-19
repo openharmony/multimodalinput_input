@@ -37,7 +37,7 @@ public:
 
     MMIClientPtr GetMMIClient();
     bool InitClient();
-
+    
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GetDevice(int32_t userData, int32_t deviceId);
