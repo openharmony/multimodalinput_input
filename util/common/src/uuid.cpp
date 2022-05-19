@@ -111,14 +111,14 @@ char ConvertToHex(uint8_t c)
 
 void Uuid::ConvertToStdString(std::string& s) const
 {
-    static constexpr int32_t UUID_BUF_MAX_SIZE = 37;
-    char uuidBuf[UUID_BUF_MAX_SIZE + 1] = {0};
+    static constexpr int32_t uuidBufMaxSize = 37;
+    char uuidBuf[uuidBufMaxSize + 1] = {0};
     int32_t writePos = 0;
     for (size_t i = 0; i < UUID128_BYTES_TYPE; i++) {
         const uint8_t c = uuid_[i];
         const uint8_t low4Bit = (c & 0xf);
         const uint8_t high4Bit = ((c >> 4) & 0xf);
-        if (writePos <= UUID_BUF_MAX_SIZE) {
+        if (writePos <= uuidBufMaxSize) {
             uuidBuf[writePos++] = ConvertToHex(low4Bit);
             uuidBuf[writePos++] = ConvertToHex(high4Bit);
             if (i == 3 || i == 5 || i == 7 || i == 9) { // 3 5 7 9 uuid 按标准格式(8-4-4-4-12)分隔符
@@ -126,7 +126,7 @@ void Uuid::ConvertToStdString(std::string& s) const
             }
         }
     }
-    uuidBuf[UUID_BUF_MAX_SIZE - 1] = '\0';
+    uuidBuf[uuidBufMaxSize - 1] = '\0';
     s = uuidBuf;
 }
 } // namespace MMI

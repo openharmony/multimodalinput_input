@@ -79,9 +79,9 @@ void EventDump::Dump(int32_t fd)
 
 void EventDump::TestDump()
 {
-    static constexpr int32_t MAX_PATH_SIZE = 128;
-    char szPath[MAX_PATH_SIZE] = {};
-    auto ret = sprintf_s(szPath, MAX_PATH_SIZE, "%s/mmidump-%s.txt",
+    static constexpr int32_t maxPathSize = 128;
+    char szPath[maxPathSize] = {};
+    auto ret = sprintf_s(szPath, maxPathSize, "%s/mmidump-%s.txt",
                          DEF_MMI_DATA_ROOT, Strftime("%y%m%d%H%M%S").c_str());
     if (ret < 0) {
         MMI_HILOGE("The function sprintf_s perform error, errCode:%{public}d", SPRINTF_S_SEC_FUN_FAIL);
@@ -109,8 +109,8 @@ void EventDump::InsertDumpInfo(const std::string& str)
     }
     std::lock_guard<std::mutex> lock(mu_);
 
-    static constexpr int32_t VECMAXSIZE = 300;
-    if (dumpInfo_.size() > VECMAXSIZE) {
+    static constexpr int32_t vecMaxSize = 300;
+    if (dumpInfo_.size() > vecMaxSize) {
         dumpInfo_.erase(dumpInfo_.begin());
     }
     dumpInfo_.push_back(str);

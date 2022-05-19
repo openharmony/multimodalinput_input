@@ -23,9 +23,7 @@ constexpr int32_t SECOND_FINGER = 2;
 constexpr int32_t THIRD_FINGER = 3;
 constexpr int32_t FOURTH_FINGER = 4;
 constexpr int32_t FITTH_FINGER = 5;
-constexpr int32_t BTN_STYLUS_DEFAULT_CODE = 331;
 constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE = 15;
-constexpr int32_t BTN_MSC_SERIAL_DEFAULT_VALUE = 0xA806D21;
 } // namespace
 
 void DeviceBase::SetTimeToLibinputEvent(InjectEvent& injectEvent)

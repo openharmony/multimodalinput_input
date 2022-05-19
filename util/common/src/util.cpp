@@ -108,8 +108,8 @@ int64_t GetMillisTime()
 
 std::string UuIdGenerate()
 {
-    static constexpr int32_t UUID_BUF_SIZE = 64;
-    char buf[UUID_BUF_SIZE] = {};
+    static constexpr int32_t uuidBufSize = 64;
+    char buf[uuidBufSize] = {};
     return buf;
 }
 
@@ -294,9 +294,9 @@ const char* GetProgramName()
         KMSG_LOGE("fp is nullptr, filename = %s.", buf);
         return "";
     }
-    static constexpr size_t BUF_LINE_SIZE = 512;
-    char bufLine[BUF_LINE_SIZE] = { 0 };
-    if ((fgets(bufLine, BUF_LINE_SIZE, fp) == nullptr)) {
+    static constexpr size_t bufLineSize = 512;
+    char bufLine[bufLineSize] = { 0 };
+    if ((fgets(bufLine, bufLineSize, fp) == nullptr)) {
         KMSG_LOGE("fgets fail.");
         if (fclose(fp) != 0) {
             KMSG_LOGW("close file: %s failed", buf);
@@ -349,9 +349,9 @@ char* MmiBasename(char* path)
 std::string GetStackInfo()
 {
 #ifndef OHOS_BUILD
-    static constexpr size_t BUFFER_SIZE = 1024;
-    void* buffer[BUFFER_SIZE];
-    const int32_t nptrs = backtrace(buffer, BUFFER_SIZE);
+    static constexpr size_t bufferSize = 1024;
+    void* buffer[bufferSize];
+    const int32_t nptrs = backtrace(buffer, bufferSize);
     char** strings = backtrace_symbols(buffer, nptrs);
     if (strings == nullptr) {
         perror("backtrace_symbols");
@@ -382,11 +382,11 @@ const std::string& GetThreadName()
     if (!g_threadName.empty()) {
         return g_threadName;
     }
-    static constexpr size_t MAX_THREAD_NAME_SIZE = 16;
-    char thisThreadName[MAX_THREAD_NAME_SIZE + 1];
+    static constexpr size_t maxThreadNameSize = 16;
+    char thisThreadName[maxThreadNameSize + 1];
     int32_t ret = prctl(PR_GET_NAME, thisThreadName);
     if (ret == 0) {
-        thisThreadName[MAX_THREAD_NAME_SIZE] = '\0';
+        thisThreadName[maxThreadNameSize] = '\0';
         g_threadName = thisThreadName;
     } else {
         printf("in GetThreadName, call prctl get name fail, errno: %d.\n", errno);
