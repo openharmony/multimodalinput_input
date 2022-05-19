@@ -38,7 +38,7 @@ public:
     std::thread thread_;
 
 private:
-    DeviceInfo *iDevInfo_ = nullptr;
+    InputDeviceInfo *iDevInfo_ = nullptr;
     IInputInterface *inputInterface_ = nullptr;
     InputEventCb callback_ {};
     const uint32_t TOUCH_DEV_ID = 1;
