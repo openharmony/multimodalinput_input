@@ -27,19 +27,20 @@ namespace MMI {
 namespace {
 constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandManager" };
-struct JsonParser {
-    JsonParser() = default;
-    ~JsonParser()
-    {
-        if (json_ != nullptr) {
-            cJSON_Delete(json_);
+class JsonParser {
+    public:
+        JsonParser() = default;
+        ~JsonParser()
+        {
+            if (json_ != nullptr) {
+                cJSON_Delete(json_);
+            }
         }
-    }
-    operator cJSON *()
-    {
-        return json_;
-    }
-    cJSON *json_ = nullptr;
+        operator cJSON *()
+        {
+            return json_;
+        }
+        cJSON *json_ = nullptr;
 };
 
 bool GetPreKeys(cJSON* jsonData, ShortcutKey &shortcutKey)
