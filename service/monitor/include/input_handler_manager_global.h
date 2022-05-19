@@ -43,44 +43,46 @@ private:
     void OnSessionLost(SessionPtr session);
 
 private:
-    struct SessionHandler {
-        SessionHandler(int32_t id, InputHandlerType handlerType, SessionPtr session)
-            : id_(id), handlerType_(handlerType), session_(session) { }
-        void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
-        void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
-        bool operator<(const SessionHandler& other) const
-        {
-            if (id_ != other.id_) {
-                return (id_ < other.id_);
+    class SessionHandler {
+        public:
+            SessionHandler(int32_t id, InputHandlerType handlerType, SessionPtr session)
+                : id_(id), handlerType_(handlerType), session_(session) { }
+            void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
+            void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
+            bool operator<(const SessionHandler& other) const
+            {
+                if (id_ != other.id_) {
+                    return (id_ < other.id_);
+                }
+                if (handlerType_ != other.handlerType_) {
+                    return (handlerType_ < other.handlerType_);
+                }
+                return (session_ < other.session_);
             }
-            if (handlerType_ != other.handlerType_) {
-                return (handlerType_ < other.handlerType_);
-            }
-            return (session_ < other.session_);
-        }
-        int32_t id_;
-        InputHandlerType handlerType_;
-        SessionPtr session_ = nullptr;
+            int32_t id_;
+            InputHandlerType handlerType_;
+            SessionPtr session_ = nullptr;
     };
 
-    struct MonitorCollection : public IInputEventHandler, protected NoCopyable {
-        virtual int32_t GetPriority() const override;
-        virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
-        virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) override;
+    class MonitorCollection : public IInputEventHandler, protected NoCopyable {
+        public:
+            virtual int32_t GetPriority() const override;
+            virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;
+            virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) override;
 
-        int32_t AddMonitor(const SessionHandler& mon);
-        void RemoveMonitor(const SessionHandler& mon);
-        void MarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr session);
+            int32_t AddMonitor(const SessionHandler& mon);
+            void RemoveMonitor(const SessionHandler& mon);
+            void MarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr session);
 
-        bool HasMonitor(int32_t monitorId, SessionPtr session);
-        void UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent);
-        void Monitor(std::shared_ptr<PointerEvent> pointerEvent);
-        void OnSessionLost(SessionPtr session);
+            bool HasMonitor(int32_t monitorId, SessionPtr session);
+            void UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent);
+            void Monitor(std::shared_ptr<PointerEvent> pointerEvent);
+            void OnSessionLost(SessionPtr session);
 
-        std::set<SessionHandler> monitors_;
-        std::shared_ptr<PointerEvent> lastPointerEvent_ = nullptr;
-        int32_t downEventId_ { -1 };
-        bool isMonitorConsumed_ { false };
+            std::set<SessionHandler> monitors_;
+            std::shared_ptr<PointerEvent> lastPointerEvent_ = nullptr;
+            int32_t downEventId_ { -1 };
+            bool isMonitorConsumed_ { false };
     };
 
 private:
