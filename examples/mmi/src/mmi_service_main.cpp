@@ -28,10 +28,9 @@ int32_t main(int32_t argc, const char *argv[])
     using namespace OHOS::MMI;
     auto service = OHOS::DelayedSingleton<MMIService>::GetInstance();
     service->OnStart();
-    constexpr int32_t sleepTime = 10 * 60;
+    static constexpr int32_t SLEEP_TIME = 10 * 60;
     while (1) {
-        std::this_thread::sleep_for(std::chrono::seconds(sleepTime));
-        
+        std::this_thread::sleep_for(std::chrono::seconds(SLEEP_TIME));
     }
     service->OnStop();
     service->OnDump();

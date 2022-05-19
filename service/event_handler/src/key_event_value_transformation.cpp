@@ -439,7 +439,7 @@ KeyEventValueTransformation TransferKeyValue(int32_t keyValueOfInput)
 {
     auto it = MAP_KEY_EVENT_VALUE_TRANSFORMATION.find(keyValueOfInput);
     if (it == MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
-        constexpr int32_t UNKNOWN_KEY_BASE = 10000;
+        static constexpr int32_t UNKNOWN_KEY_BASE = 10000;
         KeyEventValueTransformation unknownKey = {
             "UNKNOWN_KEY", keyValueOfInput, UNKNOWN_KEY_BASE + keyValueOfInput, HOS_UNKNOWN_KEY_BASE
         };
