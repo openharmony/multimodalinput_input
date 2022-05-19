@@ -38,7 +38,6 @@ public:
     static constexpr int32_t UUID32_BYTES_TYPE = 4;
     static constexpr int32_t UUID16_BYTES_TYPE = 2;
     using UUID128Bit = std::array<uint8_t, UUID128_BYTES_TYPE>;
-
     /**
      * @brief A constructor used to create an <b>UUID</b> instance.
      *

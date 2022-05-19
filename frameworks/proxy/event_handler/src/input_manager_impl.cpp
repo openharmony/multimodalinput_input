@@ -60,7 +60,7 @@ public:
         monitor_(pointerEvent);
     }
 
-    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const 
     {
         CHKPV(axisEvent);
         CHKPV(axisMonitor_);
