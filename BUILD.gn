@@ -111,6 +111,7 @@ group("mmi_tests") {
     "frameworks/proxy:PointerEventTest",
     "frameworks/proxy:ut-mmi-proxy-out",
     "service:ut-mmi-service-out",
+    "test/fuzztest:test",
     "tools/inject_event:InjectEventTest",
     "util:RunShellUtilTest",
     "util:ut-mmi-util-out",

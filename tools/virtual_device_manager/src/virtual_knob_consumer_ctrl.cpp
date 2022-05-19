@@ -17,11 +17,13 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t ABS_MAX_VOLUME = 572;
+} // namespace
+
 VirtualKnobConsumerCtrl::VirtualKnobConsumerCtrl() : VirtualDevice("Virtual KnobConsumerCtrl",
     BUS_USB, 0x5ac, 0x202)
 {
-    constexpr int32_t ABS_MAX_VOLUME = 572;
-
     dev_.absmin[ABS_VOLUME] = 0;
     dev_.absmax[ABS_VOLUME] = ABS_MAX_VOLUME;
     dev_.absfuzz[ABS_VOLUME] = 0;

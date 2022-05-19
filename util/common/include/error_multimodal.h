@@ -22,6 +22,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t ERROR_UNSUPPORT = -2;
+constexpr int32_t ARGV_VALID = 2;
 }
 
 enum MmiModuleType {
