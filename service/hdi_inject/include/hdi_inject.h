@@ -42,10 +42,10 @@ enum HdiDeviceStatus {
 };
 
 struct DeviceInformation {
-    bool status;
-    int32_t devIndex;
-    int32_t devType;
-    int16_t fd;
+    bool status = false;
+    int32_t devIndex = 0;
+    int32_t devType = 0;
+    int16_t fd = 0;
     char chipName[32];
 };
 public:
