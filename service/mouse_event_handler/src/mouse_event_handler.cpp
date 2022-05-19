@@ -151,7 +151,7 @@ int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
         TimerMgr->ResetTimer(timerId_);
         MMI_HILOGD("axis update");
     } else {
-        constexpr int32_t timeout = 100;
+        static constexpr int32_t timeout = 100;
         std::weak_ptr<MouseEventHandler> weakPtr = shared_from_this();
         timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
             CALL_LOG_ENTER;

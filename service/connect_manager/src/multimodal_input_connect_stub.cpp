@@ -29,6 +29,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectStub" };
+constexpr int32_t SYSTEM_UID = 1000;
+constexpr int32_t ROOT_UID = 0;
 } // namespace
 
 int32_t MultimodalInputConnectStub::OnRemoteRequest(

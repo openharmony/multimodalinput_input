@@ -42,9 +42,6 @@ protected:
     int32_t StubIsPointerVisible(MessageParcel& data, MessageParcel& reply);
 
 private:
-    static constexpr int32_t SYSTEM_UID = 1000;
-    static constexpr int32_t ROOT_UID = 0;
-
     bool CheckPermission();
 };
 } // namespace MMI

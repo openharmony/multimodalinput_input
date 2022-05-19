@@ -363,10 +363,10 @@ void MMIService::OnThread()
     libinputAdapter_.ProcessPendingEvents();
 
     int32_t count = 0;
-    constexpr int32_t timeOut = 1;
+    static constexpr int32_t timeout = 1;
     struct epoll_event ev[MAX_EVENT_SIZE] = {};
     while (state_ == ServiceRunningState::STATE_RUNNING) {
-        count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
+        count = EpollWait(ev[0], MAX_EVENT_SIZE, timeout, mmiFd_);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
             CHKPC(mmiEd);
