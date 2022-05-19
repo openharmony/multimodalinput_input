@@ -82,7 +82,7 @@ bool InputManagerImpl::InitEventHandler()
     }
 
     std::mutex mtx;
-    constexpr int32_t timeout = 3;
+    static constexpr int32_t timeout = 3;
     std::unique_lock <std::mutex> lck(mtx);
     ehThread_ = std::thread(std::bind(&InputManagerImpl::OnThread, this));
     ehThread_.detach();
