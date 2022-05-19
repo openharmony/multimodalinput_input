@@ -38,9 +38,7 @@ protected:
 #ifdef OHOS_BUILD_HDF
     int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
 #endif
-    int32_t OnDump(SessionPtr sess, NetPacket& pkt);
     int32_t MarkProcessed(SessionPtr sess, NetPacket& pkt);
-    int32_t GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt);
     int32_t OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
