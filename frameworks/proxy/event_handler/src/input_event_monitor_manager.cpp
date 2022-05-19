@@ -25,6 +25,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventMonitorManager" };
+constexpr int32_t INVALID_MONITOR_ID = -1;
 } // namespace
 
 InputEventMonitorManager::InputEventMonitorManager() {}

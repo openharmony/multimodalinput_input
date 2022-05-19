@@ -422,12 +422,12 @@ int32_t HdfEventManager::DeviceRemoveHandle(uint32_t devIndex, uint32_t devType)
 
 void HdfEventManager::GetEventCallback(const EventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
-    constexpr uint16_t byteSize = 8;
+    static constexpr uint16_t BYTE_SIZE = 8;
     CHKPV(pkgs);
     struct input_event eventarry[MAX_EVENT_PKG_NUM];
     for (uint32_t i = 0; i < count && i < MAX_EVENT_PKG_NUM; i++) {
         eventarry[i].code = pkgs[i]->code;
-        eventarry[i].type = (pkgs[i]->type) | static_cast<uint16_t>(devIndex<<byteSize);
+        eventarry[i].type = (pkgs[i]->type) | static_cast<uint16_t>(devIndex<<BYTE_SIZE);
         eventarry[i].value = pkgs[i]->value;
         eventarry[i].input_event_sec = (pkgs[i]->timestamp) / (USEC_PER_SEC);
         eventarry[i].input_event_usec = (pkgs[i]->timestamp) % (USEC_PER_SEC);
@@ -437,6 +437,7 @@ void HdfEventManager::GetEventCallback(const EventPackage **pkgs, uint32_t count
     }
     libinput_pipe_write(globleThis_->hdiinput_, devIndex, eventarry, count * sizeof(struct input_event));
 }
+
 int32_t HdfEventManager::DeviceAddHandle(uint32_t devIndex, uint32_t devType)
 {
     MMI_HILOGD("%{public}s:%{public}d DeviceAddHandle devindex:%{public}u,devType:%{public}u",

@@ -79,7 +79,7 @@ void EventDump::Dump(int32_t fd)
 
 void EventDump::TestDump()
 {
-    constexpr int32_t MAX_PATH_SIZE = 128;
+    static constexpr int32_t MAX_PATH_SIZE = 128;
     char szPath[MAX_PATH_SIZE] = {};
     auto ret = sprintf_s(szPath, MAX_PATH_SIZE, "%s/mmidump-%s.txt",
                          DEF_MMI_DATA_ROOT, Strftime("%y%m%d%H%M%S").c_str());
@@ -109,7 +109,7 @@ void EventDump::InsertDumpInfo(const std::string& str)
     }
     std::lock_guard<std::mutex> lock(mu_);
 
-    constexpr int32_t VECMAXSIZE = 300;
+    static constexpr int32_t VECMAXSIZE = 300;
     if (dumpInfo_.size() > VECMAXSIZE) {
         dumpInfo_.erase(dumpInfo_.begin());
     }

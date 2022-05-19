@@ -217,7 +217,7 @@ void InputEventHandler::OnCheckEventReport()
     if (initSysClock_ == 0 || lastSysClock_ != 0) {
         return;
     }
-    constexpr int64_t MAX_DID_TIME = 1000 * 1000 * 3;
+    static constexpr int64_t MAX_DID_TIME = 1000 * 1000 * 3;
     auto curSysClock = GetSysClockTime();
     auto lostTime = curSysClock - initSysClock_;
     if (lostTime < MAX_DID_TIME) {
@@ -267,11 +267,12 @@ void InputEventHandler::AddHandleTimer(int32_t timeout)
         if (ret != RET_OK) {
             MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
         }
-        constexpr int32_t triggerTime = 100;
-        this->AddHandleTimer(triggerTime);
+        static constexpr int32_t TRIGGER_TIME = 100;
+        this->AddHandleTimer(TRIGGER_TIME);
         MMI_HILOGD("leave");
     });
 }
+
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
