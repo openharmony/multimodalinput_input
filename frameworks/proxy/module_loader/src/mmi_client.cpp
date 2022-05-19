@@ -91,11 +91,11 @@ bool MMIClient::StartEventRunner()
     }
 
     std::mutex mtx;
-    static constexpr int32_t OUTTIME = 3;
+    static constexpr int32_t outTime = 3;
     recvThread_ = std::thread(std::bind(&MMIClient::OnRecvThread, this));
     recvThread_.detach();
     std::unique_lock <std::mutex> lck(mtx);
-    if (cv_.wait_for(lck, std::chrono::seconds(OUTTIME)) == std::cv_status::timeout) {
+    if (cv_.wait_for(lck, std::chrono::seconds(outTime)) == std::cv_status::timeout) {
         MMI_HILOGE("Recv thread start timeout");
         Stop();
         return false;

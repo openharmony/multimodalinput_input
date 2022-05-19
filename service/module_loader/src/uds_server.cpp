@@ -124,11 +124,11 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
         return RET_ERR;
     }
 
-    static constexpr size_t BUFFER_SIZE = 32 * 1024;
-    setsockopt(sockFds[0], SOL_SOCKET, SO_SNDBUF, &BUFFER_SIZE, sizeof(BUFFER_SIZE));
-    setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &BUFFER_SIZE, sizeof(BUFFER_SIZE));
-    setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &BUFFER_SIZE, sizeof(BUFFER_SIZE));
-    setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &BUFFER_SIZE, sizeof(BUFFER_SIZE));
+    static constexpr size_t bufferSize = 32 * 1024;
+    setsockopt(sockFds[0], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
+    setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
+    setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
+    setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
 
     MMI_HILOGD("alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
                serverFd, toReturnClientFd, sockFds[1]);

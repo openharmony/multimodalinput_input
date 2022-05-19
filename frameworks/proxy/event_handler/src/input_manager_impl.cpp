@@ -82,11 +82,11 @@ bool InputManagerImpl::InitEventHandler()
     }
 
     std::mutex mtx;
-    static constexpr int32_t TIMEOUT = 3;
+    static constexpr int32_t timeout = 3;
     std::unique_lock <std::mutex> lck(mtx);
     ehThread_ = std::thread(std::bind(&InputManagerImpl::OnThread, this));
     ehThread_.detach();
-    if (cv_.wait_for(lck, std::chrono::seconds(TIMEOUT)) == std::cv_status::timeout) {
+    if (cv_.wait_for(lck, std::chrono::seconds(timeout)) == std::cv_status::timeout) {
         MMI_HILOGE("EventThandler thread start timeout");
         return false;
     }
