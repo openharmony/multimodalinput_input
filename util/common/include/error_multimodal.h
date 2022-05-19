@@ -37,140 +37,140 @@ enum MmiModuleType {
 constexpr ErrCode CLIENT_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_CLIENT);
 
 enum {
-    MSG_HANDLER_INIT_FAIL = CLIENT_ERR_OFFSET,  // ��Ϣ������ʼ��ʧ��
-    START_CLI_FAIL,                             // �ͻ�������ʧ��
-    EVENT_CONSUM_FAIL,                          // �¼�����ʧ��
-    UNKNOW_TOUCH_TYPE,                          // �ͻ��˴���Touchʱ��ʱ���յ��˿ͻ��˷�����λ������
-    STRCPY_S_CALLBACK_FAIL,                     // strcpy_s���ش���
-    CHECK_PERMISSION_FAIL,                      // APL��Ȩʧ��
+    MSG_HANDLER_INIT_FAIL = CLIENT_ERR_OFFSET,  // 消息处理初始化失败
+    START_CLI_FAIL,                             // 客户端启动失败
+    EVENT_CONSUM_FAIL,                          // 事件消费失败
+    UNKNOW_TOUCH_TYPE,                          // 客户端处理Touch时间时，收到了客户端发来的位置类型
+    STRCPY_S_CALLBACK_FAIL,                     // strcpy_s返回错误
+    CHECK_PERMISSION_FAIL,                      // APL鉴权失败
 };
 
 // Error code for event simulate
 constexpr ErrCode EVENT_SIMULATE_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_EVENT_SIMULATE);
 
 enum {
-    FILE_OPEN_FAIL = EVENT_SIMULATE_ERR_OFFSET, // �ļ���ʧ��
-    STREAM_BUF_READ_FAIL,                       // �������ȡʧ��
-    EVENT_REG_FAIL,                             // �¼�ע��ʧ��
-    PARAM_INPUT_FAIL,                           // ע��Я����������
-    EVENT_DATA_LEN_INPUT_FAIL,                  // ע���¼������ݳ��ȴ���
-    TOUCH_CMD_INPUT_FAIL,                       // ע���touch������Ч
-    STRSET_SEC_FUN_FAIL,                        // strset��ȫ��������
-    DRIVE_PATH_INVALID,                         // ��Ч�������б��ļ�·��
-    CMD_PATH_INVALID,                           // ��Ч��ָ��ļ�·��
-    CMD_STR_INVALID,                            // ��Чָ���ַ���
+    FILE_OPEN_FAIL = EVENT_SIMULATE_ERR_OFFSET, // 文件打开失败
+    STREAM_BUF_READ_FAIL,                       // 流缓冲读取失败
+    EVENT_REG_FAIL,                             // 事件注册失败
+    PARAM_INPUT_FAIL,                           // 注入携带参数错误
+    EVENT_DATA_LEN_INPUT_FAIL,                  // 注入事件的数据长度错误
+    TOUCH_CMD_INPUT_FAIL,                       // 注入的touch命令无效
+    STRSET_SEC_FUN_FAIL,                        // strset安全函数错误
+    DRIVE_PATH_INVALID,                         // 无效的驱动列表文件路径
+    CMD_PATH_INVALID,                           // 无效的指令集文件路径
+    CMD_STR_INVALID,                            // 无效指令字符串
 };
 // Error code for server
 constexpr ErrCode SERVER_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_SERVER);
 
 enum {
-    MSG_SEND_FAIL = SERVER_ERR_OFFSET,          // ������Ϣʧ��
-    UNKNOWN_EVENT,                              // δ֪���¼�
-    ERROR_NULL_POINTER,                         // ��ָ��
-    WINDOWS_MSG_INIT_FAIL,                      // ���ڹ�������ʼ��ʧ��
-    SVR_MSG_HANDLER_INIT_FAIL,                  // ������Ϣ������ʼ��ʧ��
-    INPUT_EVENT_HANDLER_INIT_FAIL,              // �����¼�������ʼ��ʧ��
-    LIBINPUT_INIT_FAIL,                         // libinput��ʼ��ʧ��
-    LIBINPUT_START_FAIL,                        // libinput����ʧ��
-    LIBMMI_SVR_START_FAIL,                      // ��ģ��������ʧ��
-    LOG_CONFIG_FAIL,                            // log4z����ʧ��
-    LOG_START_FAIL,                             // log4z����ʧ��
-    PARAM_INPUT_INVALID,                        // ��Ч���������
-    INVALID_PARAM,                              // ��Ч�Ĳ���
-    SENIOR_INPUT_DEV_INIT_FAIL,                 // �߼������豸��ʼ��ʧ��
-    LIBINPUT_DEV_EMPTY,                         // libinput�豸Ϊ��
-    REG_EVENT_DISP_FAIL,                        // ע���¼��ɷ�ʧ��
-    KEY_EVENT_DISP_FAIL,                        // �����¼��ɷ�ʧ��
-    INVAILD_COORDINATE,                         // ��Ч�����꣨�������δ�ҵ����ڣ�
-    ILLEGAL_DEV_ID,                             // �Ƿ����豸fd
-    DEV_REG_FAIL,                               // �豸ע��ʧ��
-    FD_FIND_FAIL,                               // ����fdʧ��
-    CONN_BREAK,                                 // ���ӶϿ�
-    SOCKET_BUF_FULL,                            // socket ��������
-    WAITING_QUEUE_FULL,                         // �ȴ�������
-    APP_NOT_RESP,                               // Ӧ�ó�����Ӧ
-    MEMCPY_SEC_FUN_FAIL,                        // memcpy��ȫ��������
-    LIBINPUT_DEV_NULLPTR,                       // libinput DeviceΪ��
-    TOUCH_ID_NO_FIND,                           // δ�ҵ�touchid
-    JOYSTICK_EVENT_DISP_FAIL,                   // ҡ�˻��ֱ��¼��ɷ�ʧ��
-    TOUCH_EVENT_DISP_FAIL,                      // �������¼��ɷ�ʧ��
-    POINT_REG_EVENT_DISP_FAIL,                  // ���ע���¼��ɷ�ʧ��
-    POINT_EVENT_DISP_FAIL,                      // ����¼��ɷ�ʧ��
-    KEY_EVENT_PKG_FAIL,                         // �����¼���װʧ��
-    POINT_EVENT_PKG_FAIL,                       // ����¼���װʧ��
-    JOYSTICK_AXIS_EVENT_PKG_FAIL,               // ҡ���ֱ����¼���װʧ��
-    JOYSTICK_KEY_EVENT_PKG_FAIL,                // ҡ���ֱ����¼���װʧ��
-    SPRINTF_S_SEC_FUN_FAIL,                     // sprintf_s��ȫ��������
-    SPCL_REG_EVENT_DISP_FAIL,                   // ����ע���¼��ɷ�ʧ��.
-    TABLETPAD_KEY_EVENT_PKG_FAIL,               // ���ذ���¼���װʧ��
-    TABLETPAD_KEY_EVENT_DISP_FAIL,              // ���ذ���¼��ɷ�ʧ��
-    TABLETPAD_EVENT_PKG_FAIL,                   // ���ذ����¼���װʧ��
-    TABLETPAD_EVENT_DISP_FAIL,                  // ���ذ����¼��ɷ�ʧ��
-    TABLETTOOL_EVENT_PKG_FAIL,                  // ���ر��¼���װʧ��
-    TABLETTOOL_EVENT_DISP_FAIL,                 // ���ر��¼��ɷ�ʧ��
-    MULTIDEVICE_SAME_EVENT_MARK,                // ���豸��ͬ�¼����ر�־
-    GESTURE_EVENT_PKG_FAIL,                     // GESTURE_SWIPE�¼���װʧ��
-    STAT_CALL_FAIL,                             // stat��������ʧ��
-    REG_EVENT_PKG_FAIL,                         // ע���¼���װʧ��
-    GESTURE_EVENT_DISP_FAIL,                    // gesture swipe�¼��ɷ�ʧ��
-    DEV_PARAM_PKG_FAIL,                         // �豸�Ų�����װʧ��
-    DEV_ADD_EVENT_PKG_FAIL,                     // �����豸�¼���װʧ��
-    DEV_REMOVE_EVENT_PKG_FAIL,                  // ɾ���豸�¼���װʧ��
-    ADD_DEVICE_INFO_CALL_FAIL,                  // ����AddDeviceInfo����ʧ��
-    TOUCH_EVENT_PKG_FAIL,                       // �������¼���װʧ��
-    UNKNOWN_EVENT_PKG_FAIL,                     // δʶ���¼���װʧ��
-    MEMSET_SEC_FUN_FAIL,                        // memset��ȫ��������
-    DEVICEID_PARAM_PKG_FAIL,                    // �豸�Ų�����װʧ��
-    MALLOC_FAIL,                                // mallocʧ��
-    SEC_STRCPY_FAIL,                            // ��ȫ����strcpy����
-    SASERVICE_INIT_FAIL,                        // SA_Service��ʼ������
-    SASERVICE_START_FAIL,                       // SA_Service��������
-    SASERVICE_STOP_FAIL,                        // SA_Serviceֹͣ����
-    INVALID_RETURN_VALUE,                       // ��Ч�ķ���ֵ
-    EPOLL_CTL_FAIL,                             // epoll_ctl����
-    EXP_SO_LIBY_INIT_FAIL,                      // ����չģ���ʼ������
-    SASERVICE_PERMISSION_FAIL,                  // SA_ServiceȨ�޲���
-    SASERVICE_IPC_CALL_FAIL,                    // SA_Service����ʧ��
-    STREAMBUFF_OVER_FLOW,                       // ������д�����
-    ADD_SESSION_FAIL,                           // ����session����
-    MAKE_SHARED_FAIL,                           // make_shared����
-    CLEAR_DEAD_SESSION_FAIL,                    // ������Ч��session����
-    INIT_SIGNAL_HANDLER_FAIL,                   // ��ʼ��ȫ���źŴ�����ʧ��
-    FCNTL_FAIL,                                 // fcntl �������ô���
-    PACKET_WRITE_FAIL,                          // д�����ݴ���
-    PACKET_READ_FAIL,                           // ��ȡ���ݴ���
-    POINTER_DRAW_INIT_FAIL,                     // ��ʼ�������ʧ��
+    MSG_SEND_FAIL = SERVER_ERR_OFFSET,          // 发送消息失败
+    UNKNOWN_EVENT,                              // 未知的事件
+    ERROR_NULL_POINTER,                         // 空指针
+    WINDOWS_MSG_INIT_FAIL,                      // 窗口管理器初始化失败
+    SVR_MSG_HANDLER_INIT_FAIL,                  // 服务消息处理初始化失败
+    INPUT_EVENT_HANDLER_INIT_FAIL,              // 输入事件处理初始化失败
+    LIBINPUT_INIT_FAIL,                         // libinput初始化失败
+    LIBINPUT_START_FAIL,                        // libinput启动失败
+    LIBMMI_SVR_START_FAIL,                      // 多模服务启动失败
+    LOG_CONFIG_FAIL,                            // log4z配置失败
+    LOG_START_FAIL,                             // log4z启动失败
+    PARAM_INPUT_INVALID,                        // 无效的输入参数
+    INVALID_PARAM,                              // 无效的参数
+    SENIOR_INPUT_DEV_INIT_FAIL,                 // 高级输入设备初始化失败
+    LIBINPUT_DEV_EMPTY,                         // libinput设备为空
+    REG_EVENT_DISP_FAIL,                        // 注册事件派发失败
+    KEY_EVENT_DISP_FAIL,                        // 键盘事件派发失败
+    INVAILD_COORDINATE,                         // 无效的坐标（坐标落点未找到窗口）
+    ILLEGAL_DEV_ID,                             // 非法的设备fd
+    DEV_REG_FAIL,                               // 设备注册失败
+    FD_FIND_FAIL,                               // 查找fd失败
+    CONN_BREAK,                                 // 连接断开
+    SOCKET_BUF_FULL,                            // socket 缓冲区满
+    WAITING_QUEUE_FULL,                         // 等待队列满
+    APP_NOT_RESP,                               // 应用程序不响应
+    MEMCPY_SEC_FUN_FAIL,                        // memcpy安全函数错误
+    LIBINPUT_DEV_NULLPTR,                       // libinput Device为空
+    TOUCH_ID_NO_FIND,                           // 未找到touchid
+    JOYSTICK_EVENT_DISP_FAIL,                   // 摇杆或手柄事件派发失败
+    TOUCH_EVENT_DISP_FAIL,                      // 触摸屏事件派发失败
+    POINT_REG_EVENT_DISP_FAIL,                  // 鼠标注册事件派发失败
+    POINT_EVENT_DISP_FAIL,                      // 鼠标事件派发失败
+    KEY_EVENT_PKG_FAIL,                         // 键盘事件封装失败
+    POINT_EVENT_PKG_FAIL,                       // 鼠标事件封装失败
+    JOYSTICK_AXIS_EVENT_PKG_FAIL,               // 摇杆手柄轴事件封装失败
+    JOYSTICK_KEY_EVENT_PKG_FAIL,                // 摇杆手柄键事件封装失败
+    SPRINTF_S_SEC_FUN_FAIL,                     // sprintf_s安全函数错误
+    SPCL_REG_EVENT_DISP_FAIL,                   // 特殊注册事件派发失败.
+    TABLETPAD_KEY_EVENT_PKG_FAIL,               // 触控板键事件封装失败
+    TABLETPAD_KEY_EVENT_DISP_FAIL,              // 触控板键事件派发失败
+    TABLETPAD_EVENT_PKG_FAIL,                   // 触控板轴事件封装失败
+    TABLETPAD_EVENT_DISP_FAIL,                  // 触控板轴事件派发失败
+    TABLETTOOL_EVENT_PKG_FAIL,                  // 触控笔事件封装失败
+    TABLETTOOL_EVENT_DISP_FAIL,                 // 触控笔事件派发失败
+    MULTIDEVICE_SAME_EVENT_MARK,                // 多设备相同事件返回标志
+    GESTURE_EVENT_PKG_FAIL,                     // GESTURE_SWIPE事件封装失败
+    STAT_CALL_FAIL,                             // stat函数调用失败
+    REG_EVENT_PKG_FAIL,                         // 注册事件封装失败
+    GESTURE_EVENT_DISP_FAIL,                    // gesture swipe事件派发失败
+    DEV_PARAM_PKG_FAIL,                         // 设备号参数封装失败
+    DEV_ADD_EVENT_PKG_FAIL,                     // 新增设备事件封装失败
+    DEV_REMOVE_EVENT_PKG_FAIL,                  // 删除设备事件封装失败
+    ADD_DEVICE_INFO_CALL_FAIL,                  // 调用AddDeviceInfo函数失败
+    TOUCH_EVENT_PKG_FAIL,                       // 触摸屏事件封装失败
+    UNKNOWN_EVENT_PKG_FAIL,                     // 未识别事件封装失败
+    MEMSET_SEC_FUN_FAIL,                        // memset安全函数错误
+    DEVICEID_PARAM_PKG_FAIL,                    // 设备号参数封装失败
+    MALLOC_FAIL,                                // malloc失败
+    SEC_STRCPY_FAIL,                            // 安全函数strcpy错误
+    SASERVICE_INIT_FAIL,                        // SA_Service初始化错误
+    SASERVICE_START_FAIL,                       // SA_Service启动错误
+    SASERVICE_STOP_FAIL,                        // SA_Service停止错误
+    INVALID_RETURN_VALUE,                       // 无效的返回值
+    EPOLL_CTL_FAIL,                             // epoll_ctl错误
+    EXP_SO_LIBY_INIT_FAIL,                      // 可扩展模块初始化错误
+    SASERVICE_PERMISSION_FAIL,                  // SA_Service权限不足
+    SASERVICE_IPC_CALL_FAIL,                    // SA_Service调用失败
+    STREAMBUFF_OVER_FLOW,                       // 缓冲区写入错误
+    ADD_SESSION_FAIL,                           // 增加session错误
+    MAKE_SHARED_FAIL,                           // make_shared错误
+    CLEAR_DEAD_SESSION_FAIL,                    // 清理无效的session错误
+    INIT_SIGNAL_HANDLER_FAIL,                   // 初始化全局信号处理器失败
+    FCNTL_FAIL,                                 // fcntl 函数调用错误
+    PACKET_WRITE_FAIL,                          // 写入数据错误
+    PACKET_READ_FAIL,                           // 读取数据错误
+    POINTER_DRAW_INIT_FAIL,                     // 初始化画鼠标失败
 };
 // Error code for util
 constexpr ErrCode UTIL_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_UTIL);
 
 enum {
-    NON_STD_EVENT = UTIL_ERR_OFFSET,            // �Ǳ�׼���¼�
-    UNPROC_MSG,                                 // δ��������Ϣ
-    UNKNOWN_MSG_ID,                             // δ֪��ϢID
-    UNKNOWN_DEV,                                // δ֪�豸
-    FILE_READ_FAIL,                             // �ļ���ȡʧ��
-    FILE_WRITE_FAIL,                            // �ļ�д��ʧ��
-    API_PARAM_TYPE_FAIL,                        // api�������ʹ���
-    API_OUT_OF_RANGE,                           // api����ֵ�������巶Χ
-    FOCUS_ID_OBTAIN_FAIL,                       // ��ȡfocus_idʧ��
-    SOCKET_PATH_INVALID,                        // ��Ч��Socket�ļ�·��
-    SOCKET_CREATE_FAIL,                         // Socket����ʧ��
-    SOCKET_BIND_FAIL,                           // ����Socketʧ��
-    SOCKET_LISTEN_FAIL,                         // ����Socketʧ��
-    EPOLL_CREATE_FAIL,                          // EPOLL����ʧ��
-    EPOLL_MODIFY_FAIL,                          // �޸�EPOLLʧ��
-    STREAM_BUF_WRITE_FAIL,                      // ������д��ʧ��
-    SESSION_ADD_FAIL,                           // ����Sessionʧ��
-    VAL_NOT_EXP,                                // ֵ������Ԥ��
-    MEM_NOT_ENOUGH,                             // û���㹻���ڴ�
-    MEM_OUT_OF_BOUNDS,                          // �ڴ�Խ��
-    CONN_FAIL,                                  // ��������ʧ��
-    SESSION_NOT_FOUND,                          // û���ҵ�session
-    FD_ACCEPT_FAIL,                             // ��������ʱfd��Ч
-    PID_OBTAIN_FAIL,                            // ��ȡPIDʧ��
-    FD_OBTAIN_FAIL,                             // ��ȡFDʧ��
-    INVALID_MONITOR_MON                         // ��������ʧ��
+    NON_STD_EVENT = UTIL_ERR_OFFSET,            // 非标准化事件
+    UNPROC_MSG,                                 // 未处理的消息
+    UNKNOWN_MSG_ID,                             // 未知消息ID
+    UNKNOWN_DEV,                                // 未知设备
+    FILE_READ_FAIL,                             // 文件读取失败
+    FILE_WRITE_FAIL,                            // 文件写入失败
+    API_PARAM_TYPE_FAIL,                        // api参数类型错误
+    API_OUT_OF_RANGE,                           // api返回值超出定义范围
+    FOCUS_ID_OBTAIN_FAIL,                       // 获取focus_id失败
+    SOCKET_PATH_INVALID,                        // 无效的Socket文件路径
+    SOCKET_CREATE_FAIL,                         // Socket创建失败
+    SOCKET_BIND_FAIL,                           // 监听Socket失败
+    SOCKET_LISTEN_FAIL,                         // 监听Socket失败
+    EPOLL_CREATE_FAIL,                          // EPOLL创建失败
+    EPOLL_MODIFY_FAIL,                          // 修改EPOLL失败
+    STREAM_BUF_WRITE_FAIL,                      // 流缓冲写入失败
+    SESSION_ADD_FAIL,                           // 增加Session失败
+    VAL_NOT_EXP,                                // 值不符合预期
+    MEM_NOT_ENOUGH,                             // 没有足够的内存
+    MEM_OUT_OF_BOUNDS,                          // 内存越界
+    CONN_FAIL,                                  // 建立连接失败
+    SESSION_NOT_FOUND,                          // 没有找到session
+    FD_ACCEPT_FAIL,                             // 接受连接时fd无效
+    PID_OBTAIN_FAIL,                            // 获取PID失败
+    FD_OBTAIN_FAIL,                             // 获取FD失败
+    INVALID_MONITOR_MON                         // 监听增加失败
 };
 // Error code for virtual deviceparam
 constexpr ErrCode VIRTUAL_DEVICE_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_VIRTUAL_DEVICE);
@@ -194,8 +194,8 @@ enum EXCEPTIONTEST {
 };
 
 enum MMI_SERVICE_STATUS {
-    MMI_SERVICE_INVALID = -1, // ��ģ���񲻴��ڣ���ģ��������쳣
-    MMI_SERVICE_RUNNING,     // ��ģ������������
+    MMI_SERVICE_INVALID = -1, // 多模服务不存在，多模输入服务异常
+    MMI_SERVICE_RUNNING,     // 多模服务运行正常
 };
 } // namespace MMI
 } // namespace OHOS
