@@ -69,7 +69,7 @@ void ProcessingPenDevice::SetPenApproachPadEvent(const PenEvent& penEvent, Input
     } else if (penEvent.eventType == "RUBBER_TOUCH") {
         SetBtnRubber(inputEventArray, 0, 1);
     } else {
-        // nothing to do.
+        MMI_HILOGW("unknown eventType type");
     }
 
     SetMscSerial(inputEventArray, 0);
@@ -98,13 +98,13 @@ void ProcessingPenDevice::SetPenSlidePadEvent(const PenEvent& penEvent, InputEve
         } else if (previousPressure > 0) {
             SetAbsPressure(inputEventArray, 0, penEvent.pressure);
         } else {
-            // nothing to do.
+            MMI_HILOGW("unknown previousPressure type");
         }
     } else if ((penEvent.pressure == 0) && (previousPressure > 0)) {
         SetAbsPressure(inputEventArray, 0, penEvent.pressure);
         SetBtnTouch(inputEventArray, 0, 0);
     } else {
-        // nothing to do.
+        MMI_HILOGW("unknown pressure type");
     }
     previousPressure = penEvent.pressure;
     SetAbsDistance(inputEventArray, 0, penEvent.distance);
@@ -127,7 +127,7 @@ void ProcessingPenDevice::SetPenLeavePadEvent(const PenEvent& penEvent, InputEve
     } else if (penEvent.eventType == "RUBBER_TOUCH") {
         SetBtnRubber(inputEventArray, 0, 0);
     } else {
-        // nothing to do.
+        MMI_HILOGW("unknown eventType type");
     }
 
     SetMscSerial(inputEventArray, 0);
@@ -191,7 +191,7 @@ int32_t ProcessingPenDevice::AnalysisPenSlidePadEvent(const DeviceEvent& event, 
         penEvent.pressure = event.pressure;
         penEvent.distance = event.distance;
     } else {
-        // nothing to do.
+        MMI_HILOGW("unknown eventType type");
     }
     penEventArray.push_back(penEvent);
 
