@@ -25,12 +25,12 @@
 namespace OHOS {
 namespace MMI {
 class IInputEventHandler {
-    public:
-        static constexpr int32_t DEFAULT_INTERCEPTOR = 10;
-        static constexpr int32_t DEFAULT_MONITOR = 20;
-        virtual int32_t GetPriority() const = 0;
-        virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) = 0;
-        virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) = 0;
+public:
+    static constexpr int32_t DEFAULT_INTERCEPTOR = 10;
+    static constexpr int32_t DEFAULT_MONITOR = 20;
+    virtual int32_t GetPriority() const = 0;
+    virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) = 0;
+    virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
