@@ -18,7 +18,7 @@
 #include "message_option.h"
 #include "string_ex.h"
 
-#include "event_filter_parcel.h"
+#include "PointerEventParcel.h"
 #include "mmi_log.h"
 
 namespace OHOS {
