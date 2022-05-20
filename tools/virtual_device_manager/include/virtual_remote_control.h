@@ -30,7 +30,7 @@ protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;
     const std::vector<uint32_t>& GetAbs() const override;
-    const std::vector<uint32_t>& GetMscs() const override;
+    const std::vector<uint32_t>& GetMiscellaneous() const override;
 };
 } // namespace MMI
 } // namespace OHOS
