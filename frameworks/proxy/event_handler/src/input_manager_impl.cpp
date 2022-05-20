@@ -34,8 +34,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerImpl" };
 } // namespace
 
-class MonitorEventConsumer : public IInputEventConsumer {
-public:
+struct MonitorEventConsumer : public IInputEventConsumer {
     explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)>& monitor)
         : monitor_ (monitor)
     {

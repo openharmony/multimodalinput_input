@@ -32,13 +32,13 @@
 namespace OHOS {
 namespace MMI {
 class MonitorItem {
-    public:
-        int32_t eventType;
-        SessionPtr session = nullptr;
-        bool operator == (const MonitorItem& item)
-        {
-            return eventType == item.eventType && session == item.session;
-        }
+public:
+    int32_t eventType;
+    SessionPtr session = nullptr;
+    bool operator == (const MonitorItem& item)
+    {
+        return eventType == item.eventType && session == item.session;
+    }
 };
 
 class InputEventMonitorManager {

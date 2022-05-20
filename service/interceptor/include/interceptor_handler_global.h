@@ -43,35 +43,35 @@ private:
 
 private:
     class SessionHandler {
-        public:
-            SessionHandler(int32_t id, InputHandlerType handlerType, SessionPtr session)
-                : id_(id), handlerType_(handlerType), session_(session) { }
-            void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
-            void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
-            bool operator<(const SessionHandler& other) const
-            {
-                if (id_ != other.id_) {
-                    return (id_ < other.id_);
-                }
-                if (handlerType_ != other.handlerType_) {
-                    return (handlerType_ < other.handlerType_);
-                }
-                return (session_ < other.session_);
+    public:
+        SessionHandler(int32_t id, InputHandlerType handlerType, SessionPtr session)
+            : id_(id), handlerType_(handlerType), session_(session) { }
+        void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
+        void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
+        bool operator<(const SessionHandler& other) const
+        {
+            if (id_ != other.id_) {
+                return (id_ < other.id_);
             }
-            int32_t id_;
-            InputHandlerType handlerType_;
-            SessionPtr session_ = nullptr;
+            if (handlerType_ != other.handlerType_) {
+                return (handlerType_ < other.handlerType_);
+            }
+            return (session_ < other.session_);
+        }
+        int32_t id_;
+        InputHandlerType handlerType_;
+        SessionPtr session_ = nullptr;
     };
 
     class InterceptorCollection : public IInputEventHandler, protected NoCopyable {
-        public:
-            virtual int32_t GetPriority() const override;
-            virtual bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent) override;
-            virtual bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-            int32_t AddInterceptor(const SessionHandler& interceptor);
-            void RemoveInterceptor(const SessionHandler& interceptor);
-            void OnSessionLost(SessionPtr session);
-            std::set<SessionHandler> interceptors_;
+    public:
+        virtual int32_t GetPriority() const override;
+        virtual bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+        virtual bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+        int32_t AddInterceptor(const SessionHandler& interceptor);
+        void RemoveInterceptor(const SessionHandler& interceptor);
+        void OnSessionLost(SessionPtr session);
+        std::set<SessionHandler> interceptors_;
     };
 
 private:

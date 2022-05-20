@@ -24,14 +24,14 @@
 namespace OHOS {
 namespace MMI {
 class PointerEventParcel final : public Parcelable {
-	public:
-	    PointerEventParcel() = default;
-	    DISALLOW_COPY_AND_MOVE(PointerEventParcel);
-	    ~PointerEventParcel() override = default;
+public:
+    PointerEventParcel() = default;
+    DISALLOW_COPY_AND_MOVE(PointerEventParcel);
+    ~PointerEventParcel() override = default;
 
-	    bool Marshalling(Parcel& out) const override;
-	    static PointerEventParcel *Unmarshalling(Parcel& in);
-	    mutable std::shared_ptr<PointerEvent> data_ {nullptr};
+    bool Marshalling(Parcel& out) const override;
+    static PointerEventParcel *Unmarshalling(Parcel& in);
+    mutable std::shared_ptr<PointerEvent> data_ {nullptr};
 };
 } // namespace MMI
 } // namespace OHOS
