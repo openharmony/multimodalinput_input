@@ -107,13 +107,13 @@ const std::vector<uint32_t>& VirtualStylus::GetAbs() const
     return abs;
 }
 
-const std::vector<uint32_t>& VirtualStylus::GetMscs() const
+const std::vector<uint32_t>& VirtualStylus::GetMiscellaneous() const
 {
-    static const std::vector<uint32_t> mscs {
+    static const std::vector<uint32_t> miscellaneous {
         MSC_SERIAL
     };
 
-    return mscs;
+    return miscellaneous;
 }
 
 const std::vector<uint32_t>& VirtualStylus::GetProperties() const

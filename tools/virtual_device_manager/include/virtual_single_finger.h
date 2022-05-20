@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,25 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef VIRTUAL_KEYBOARD_H
-#define VIRTUAL_KEYBOARD_H
+#ifndef VIRTUAL_SINGLE_FINGER_H
+#define VIRTUAL_SINGLE_FINGER_H
 #include "virtual_device.h"
 
 namespace OHOS {
 namespace MMI {
-class VirtualKeyboard : public VirtualDevice {
+class VirtualSingleFinger : public VirtualDevice {
 public:
-    VirtualKeyboard();
-    ~VirtualKeyboard();
-    DISALLOW_COPY_AND_MOVE(VirtualKeyboard);
-
+    VirtualSingleFinger();
+    ~VirtualSingleFinger() = default;
+    DISALLOW_COPY_AND_MOVE(VirtualSingleFinger);
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;
-    const std::vector<uint32_t>& GetMiscellaneous() const override;
-    const std::vector<uint32_t>& GetLeds() const override;
-    const std::vector<uint32_t>& GetRepeats() const override;
+    const std::vector<uint32_t>& GetAbs()const override;
+    const std::vector<uint32_t>& GetSwitchs() const override;
+    const std::vector<uint32_t>& GetProperties() const override;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // VIRTUAL_KEYBOARD_H
+#endif // VIRTUAL_SINGLE_FINGER_H

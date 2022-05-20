@@ -30,6 +30,8 @@
 #include "virtual_pen_mouse.h"
 #include "virtual_pen_keyboard.h"
 #include "virtual_remote_control.h"
+#include "virtual_single_finger.h"
+#include "virtual_single_touchscreen.h"
 #include "virtual_stylus.h"
 #include "virtual_trackball.h"
 #include "virtual_trackpad.h"
@@ -182,12 +184,16 @@ void StartTouchPad()
     virtualTouchpad.SetUp();
     static VirtualFinger virtualFinger;
     virtualFinger.SetUp();
+    static VirtualSingleFinger virtualSingleFinger;
+    virtualSingleFinger.SetUp();
 }
 
 void StartTouchScreen()
 {
     static VirtualTouchScreen virtualTouchScreen;
     virtualTouchScreen.SetUp();
+    static VirtualSingleTouchScreen virtualSingleTouchScreen;
+    virtualSingleTouchScreen.SetUp();
 }
 
 void StartPen()
@@ -335,10 +341,10 @@ bool VirtualDevice::CreateKey()
     evt_type[UI_SET_PROPBIT] = GetProperties();
     evt_type[UI_SET_ABSBIT] = GetAbs();
     evt_type[UI_SET_RELBIT] = GetRelBits();
-    evt_type[UI_SET_MSCBIT] = GetMscs();
+    evt_type[UI_SET_MSCBIT] = GetMiscellaneous();
     evt_type[UI_SET_LEDBIT] = GetLeds();
-    evt_type[UI_SET_SWBIT] = GetSws();
-    evt_type[UI_SET_PHYS] = GetReps();
+    evt_type[UI_SET_SWBIT] = GetSwitchs();
+    evt_type[UI_SET_PHYS] = GetRepeats();
     for (auto &item : evt_type) {
         fun(item.first, item.second);
     }
@@ -395,6 +401,7 @@ bool VirtualDevice::SetPhys(const std::string& deviceName)
         {"Virtual TrackPadMouse",        "trackpad"},
         {"Virtual TrackpadSysCtrl",      "trackpad"},
         {"Virtual Finger",               "touchpad"},
+        {"Virtual SingleFinger",         "touchpad"},
         {"Virtual Stylus",               "touchpad"},
         {"Virtual Touchpad",             "touchpad"},
         {"Virtual RemoteControl",        "remotecontrol"},
@@ -402,6 +409,7 @@ bool VirtualDevice::SetPhys(const std::string& deviceName)
         {"Virtual GamePad",              "gamepad"},
         {"Virtual Trackball",            "trackball"},
         {"Virtual TouchScreen",          "touchscreen"},
+        {"Virtual SingleTouchScreen",    "touchscreen"},
         {"V-Pencil",                     "pen"},
         {"V-Pencil-mouse",               "pen"},
         {"V-Pencil-keyboard",            "pen"},
@@ -614,25 +622,25 @@ const std::vector<uint32_t>& VirtualDevice::GetLeds() const
     return leds;
 }
 
-const std::vector<uint32_t>& VirtualDevice::GetReps() const
+const std::vector<uint32_t>& VirtualDevice::GetRepeats() const
 {
-    static const std::vector<uint32_t> reps {
+    static const std::vector<uint32_t> repeats {
     };
-    return reps;
+    return repeats;
 }
 
-const std::vector<uint32_t>& VirtualDevice::GetMscs() const
+const std::vector<uint32_t>& VirtualDevice::GetMiscellaneous() const
 {
-    static const std::vector<uint32_t> mscs {
+    static const std::vector<uint32_t> miscellaneous {
     };
-    return mscs;
+    return miscellaneous;
 }
 
-const std::vector<uint32_t>& VirtualDevice::GetSws() const
+const std::vector<uint32_t>& VirtualDevice::GetSwitchs() const
 {
-    static const std::vector<uint32_t> sws {
+    static const std::vector<uint32_t> switchs {
     };
-    return sws;
+    return switchs;
 }
 } // namespace MMI
 } // namespace OHOS

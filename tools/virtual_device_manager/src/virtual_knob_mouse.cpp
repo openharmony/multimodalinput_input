@@ -48,12 +48,12 @@ const std::vector<uint32_t>& VirtualKnobMouse::GetRelBits() const
     return rels;
 }
 
-const std::vector<uint32_t>& VirtualKnobMouse::GetMscs() const
+const std::vector<uint32_t>& VirtualKnobMouse::GetMiscellaneous() const
 {
-    static const std::vector<uint32_t> mscs {
+    static const std::vector<uint32_t> miscellaneous {
         MSC_SCAN
     };
-    return mscs;
+    return miscellaneous;
 }
 } // namespace MMI
 } // namespace OHOS
