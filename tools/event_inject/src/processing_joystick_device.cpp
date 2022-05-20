@@ -61,6 +61,8 @@ void ProcessingJoystickDevice::TransformPadEventToInputEvent(const std::vector<D
             TransformRocker1Event(item, inputEventArray);
         } else if (item.eventType == "THROTTLE") {
             TransformThrottle1Event(item, inputEventArray);
+        } else {
+            MMI_HILOGW("unknown eventType type");
         }
     }
 }
@@ -110,6 +112,8 @@ void ProcessingJoystickDevice::TransformRocker1Event(const DeviceEvent& joystick
             SetEvAbsY(inputEventArray, 0, item);
         } else if (direction == "lt") {
             SetEvAbsRz(inputEventArray, 0, item);
+        } else {
+            MMI_HILOGW("unknown direction move type");
         }
         SetSynReport(inputEventArray);
     }
@@ -121,7 +125,7 @@ void ProcessingJoystickDevice::TransformRocker1Event(const DeviceEvent& joystick
     } else if (direction == "lt") {
         SetEvAbsRz(inputEventArray, 0, DEFAULT_ABSZ_VALUE);
     } else {
-        // nothint to do.
+        MMI_HILOGW("unknown direction type");
     }
     SetSynReport(inputEventArray);
 }
@@ -156,7 +160,7 @@ void ProcessingJoystickDevice::TransformDerectionKeyEvent(const DeviceEvent& joy
         SetEvAbsHat0Y(inputEventArray, 0, 0);
         SetSynReport(inputEventArray);
     }  else {
-        // nothint to do.
+        MMI_HILOGW("unknown direction type");
     }
 }
 
