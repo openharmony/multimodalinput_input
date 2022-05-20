@@ -16,7 +16,6 @@
 #ifndef MULTIMODAL_INPUT_CONNECT_STUB_H
 #define MULTIMODAL_INPUT_CONNECT_STUB_H
 
-#include "ipc_skeleton.h"
 #include "iremote_stub.h"
 #include "message_parcel.h"
 #include "nocopyable.h"
@@ -40,9 +39,6 @@ protected:
     int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
     int32_t StubIsPointerVisible(MessageParcel& data, MessageParcel& reply);
-
-private:
-    bool CheckPermission();
 };
 } // namespace MMI
 } // namespace OHOS
