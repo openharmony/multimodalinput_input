@@ -75,12 +75,12 @@ const std::vector<uint32_t>& VirtualKeyboardConsumerCtrl::GetAbs() const
     return abs;
 }
 
-const std::vector<uint32_t>& VirtualKeyboardConsumerCtrl::GetMscs() const
+const std::vector<uint32_t>& VirtualKeyboardConsumerCtrl::GetMiscellaneous() const
 {
-    static const std::vector<uint32_t> mscs {
+    static const std::vector<uint32_t> miscellaneous {
         MSC_SCAN
     };
-    return mscs;
+    return miscellaneous;
 }
 } // namespace MMI
 } // namespace OHOS
