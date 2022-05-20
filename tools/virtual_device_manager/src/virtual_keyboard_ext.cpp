@@ -47,20 +47,20 @@ const std::vector<uint32_t>& VirtualKeyboardExt::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& VirtualKeyboardExt::GetMscs() const
+const std::vector<uint32_t>& VirtualKeyboardExt::GetMiscellaneous() const
 {
-    static const std::vector<uint32_t> mscs {
+    static const std::vector<uint32_t> miscellaneous {
         MSC_SCAN
     };
-    return mscs;
+    return miscellaneous;
 }
 
-const std::vector<uint32_t>& VirtualKeyboardExt::GetReps() const
+const std::vector<uint32_t>& VirtualKeyboardExt::GetRepeats() const
 {
-    static const std::vector<uint32_t> reps {
+    static const std::vector<uint32_t> repeats {
         REP_DELAY, REP_PERIOD
     };
-    return reps;
+    return repeats;
 }
 } // namespace MMI
 } // namespace OHOS

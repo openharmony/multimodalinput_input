@@ -110,12 +110,12 @@ const std::vector<uint32_t>& VirtualGamePad::GetAbs() const
     return abs;
 }
 
-const std::vector<uint32_t>& VirtualGamePad::GetMscs() const
+const std::vector<uint32_t>& VirtualGamePad::GetMiscellaneous() const
 {
-    static const std::vector<uint32_t> mscs {
+    static const std::vector<uint32_t> miscellaneous {
         MSC_SCAN
     };
-    return mscs;
+    return miscellaneous;
 }
 } // namespace MMI
 } // namespace OHOS
