@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -151,7 +151,7 @@ int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
         TimerMgr->ResetTimer(timerId_);
         MMI_HILOGD("axis update");
     } else {
-        constexpr int32_t timeout = 100;
+        static constexpr int32_t timeout = 100;
         std::weak_ptr<MouseEventHandler> weakPtr = shared_from_this();
         timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
             CALL_LOG_ENTER;

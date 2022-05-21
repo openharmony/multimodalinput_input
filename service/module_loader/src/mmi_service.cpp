@@ -23,6 +23,7 @@
 #include <unordered_map>
 #endif
 
+#include "config_key_value_transform.h"
 #include "event_dump.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
@@ -206,6 +207,7 @@ int32_t MMIService::Init()
         return LIBINPUT_INIT_FAIL;
     }
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
+    KeyValueTransform->GetConfigKeyValue("default_key");
     return RET_OK;
 }
 
@@ -361,10 +363,10 @@ void MMIService::OnThread()
     libinputAdapter_.ProcessPendingEvents();
 
     int32_t count = 0;
-    constexpr int32_t timeOut = 1;
+    static constexpr int32_t timeout = 1;
     struct epoll_event ev[MAX_EVENT_SIZE] = {};
     while (state_ == ServiceRunningState::STATE_RUNNING) {
-        count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
+        count = EpollWait(ev[0], MAX_EVENT_SIZE, timeout, mmiFd_);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
             CHKPC(mmiEd);

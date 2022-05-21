@@ -47,9 +47,6 @@ private:
     int32_t AnalysisPenApproachPadEvent(const DeviceEvent& event, std::vector<PenEvent>& penEventArray);
     int32_t AnalysisPenSlidePadEvent(const DeviceEvent& event, std::vector<PenEvent>& penEventArray);
     int32_t AnalysisPenLeavePadEvent(const DeviceEvent& event, std::vector<PenEvent>& penEventArray);
-private:
-    static constexpr int32_t EV_ABS_Z_DEFAULT_VALUE = 450;
-    static constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE = 2114;
 };
 } // namespace MMI
 } // namespace OHOS

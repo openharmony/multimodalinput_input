@@ -17,6 +17,7 @@
 
 #include <ctime>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -25,7 +26,6 @@
 
 namespace OHOS {
 namespace MMI {
-constexpr int32_t JSON_FILE_SIZE = 0x5000;
 const char *GetMmiErrorTypeDesc(int32_t errorCodeEnum);
 std::string UuIdGenerate();
 int64_t GetMicrotime();
@@ -52,11 +52,11 @@ const std::string& GetThreadName();
 void AddId(std::vector<int32_t> &list, int32_t id);
 size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_t> &list2,
     std::vector<int32_t> &difList);
+std::vector<std::string> ReadProFile(const std::string &filePath);
+void ReadProConfigFile(const std::string &realPath, std::vector<std::string> &configKey);
 std::string StringFmt(const char* str, ...);
-bool IsFileExists(const std::string& fileName);
-std::string GetFileExtendName(const std::string& fileName);
-int32_t GetFileSize(const std::string& fileName);
-std::string ReadFile(const std::string &filePath);
+std::string ReadJsonFile(const std::string &filePath);
+std::string ReadUinputToolFile(const std::string &filePath);
 inline bool IsNum(const std::string &str)
 {
     std::istringstream sin(str);

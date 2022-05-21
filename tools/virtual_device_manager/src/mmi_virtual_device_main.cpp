@@ -36,7 +36,7 @@ int32_t main(int32_t argc, const char *argv[])
     if (!OHOS::MMI::VirtualDevice::CommandBranch(argvList)) {
         return 0;
     }
-    constexpr std::int32_t usleepTime = 1500000;
+    static constexpr std::int32_t usleepTime = 1500000;
     while (true) {
         usleep(usleepTime);
     }
