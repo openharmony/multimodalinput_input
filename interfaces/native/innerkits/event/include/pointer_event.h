@@ -393,6 +393,14 @@ public:
          */
         int32_t GetHeight() const;
 
+        /**
+         * @brief Sets the height of the pressed area.
+         * @param height Indicates the height to set.
+         * @return void
+         * @since 9
+         */
+        void SetHeight(int32_t height);
+
         int32_t GetToolGlobalX() const;
 
         void SetToolGlobalX(int32_t globalX);
@@ -416,14 +424,6 @@ public:
         int32_t GetToolHeight() const;
 
         void SetToolHeight(int32_t height);
-
-        /**
-         * @brief Sets the height of the pressed area.
-         * @param height Indicates the height to set.
-         * @return void
-         * @since 9
-         */
-        void SetHeight(int32_t height);
 
         /**
          * @brief Obtains the tilt angle of the x axis.
