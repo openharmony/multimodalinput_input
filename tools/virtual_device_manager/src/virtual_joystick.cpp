@@ -17,16 +17,18 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t ABS_MAX_XY = 16383;
+constexpr int32_t ABS_FUZZ = 63;
+constexpr int32_t ABS_FLAT = 1023;
+constexpr int32_t ABS_MAX_RZ = 255;
+constexpr int32_t ABS_FLAT_RZ = 15;
+constexpr int32_t ABS_MIN_HAT = -1;
+} // namespace
+
 VirtualJoystick::VirtualJoystick() : VirtualDevice("Virtual Joystick",
     BUS_USB, 0x44f, 0xb10a)
 {
-    constexpr int32_t ABS_MAX_XY = 16383;
-    constexpr int32_t ABS_FUZZ = 63;
-    constexpr int32_t ABS_FLAT = 1023;
-    constexpr int32_t ABS_MAX_RZ = 255;
-    constexpr int32_t ABS_FLAT_RZ = 15;
-    constexpr int32_t ABS_MIN_HAT = -1;
-
     dev_.absmin[ABS_X] = 0;
     dev_.absmax[ABS_X] = ABS_MAX_XY;
     dev_.absfuzz[ABS_X] = ABS_FUZZ;

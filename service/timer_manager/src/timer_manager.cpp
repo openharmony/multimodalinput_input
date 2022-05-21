@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,14 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t MIN_DELAY = 36;
+constexpr int32_t MIN_INTERVAL = 50;
+constexpr int32_t MAX_INTERVAL = 4096;
+constexpr int32_t MAX_TIMER_COUNT = 32;
+constexpr int32_t NONEXISTENT_ID = -1;
+} // namespace
+
 int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
 {
     return AddTimerInternal(intervalMs, repeatCount, callback);

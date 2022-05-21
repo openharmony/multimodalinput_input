@@ -18,8 +18,8 @@
 #include <chrono>
 #include <cinttypes>
 #include <cstdarg>
+#include <fstream>
 #include <iomanip>
-#include <sstream>
 #include <thread>
 
 #include <fcntl.h>
@@ -44,6 +44,17 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Util"};
+constexpr int32_t FILE_SIZE_MAX = 0x5000;
+constexpr int32_t MAX_PRO_FILE_SIZE = 128000;
+constexpr int32_t KEY_ELEMENT_COUNT = 4;
+constexpr int32_t INVALID_FILE_SIZE = -1;
+const std::string DATA_PATH = "/data";
+const std::string PROC_PATH = "/proc";
+const std::string INPUT_PATH = "/system/etc/multimodalinput/";
+const std::string PRO_PATH = "/vendor/etc/KeyValueTransform/";
+constexpr size_t BUF_TID_SIZE = 10;
+constexpr size_t BUF_CMD_SIZE = 512;
+constexpr size_t PROGRAM_NAME_SIZE = 256;
 } // namespace
 
 const std::map<int32_t, std::string> ERROR_STRING_MAP = {
@@ -97,8 +108,8 @@ int64_t GetMillisTime()
 
 std::string UuIdGenerate()
 {
-    constexpr int32_t UUID_BUF_SIZE = 64;
-    char buf[UUID_BUF_SIZE] = {};
+    static constexpr int32_t uuidBufSize = 64;
+    char buf[uuidBufSize] = {};
     return buf;
 }
 
@@ -115,14 +126,13 @@ std::string GetThisThreadIdOfString()
     thread_local std::string threadLocalId;
     if (threadLocalId.empty()) {
         long tid = syscall(SYS_gettid);
-        constexpr size_t bufSize = 10;
-        char buf[bufSize] = {};
-        const int32_t ret = sprintf_s(buf, bufSize, "%06d", tid);
+        char buf[BUF_TID_SIZE] = {};
+        const int32_t ret = sprintf_s(buf, BUF_TID_SIZE, "%06d", tid);
         if (ret < 0) {
             printf("ERR: in %s, #%d, call sprintf_s fail, ret = %d.", __func__, __LINE__, ret);
             return threadLocalId;
         }
-        buf[bufSize - 1] = '\0';
+        buf[BUF_TID_SIZE - 1] = '\0';
         threadLocalId = buf;
     }
 
@@ -269,15 +279,13 @@ std::string GetFileName(const std::string& strPath)
 
 const char* GetProgramName()
 {
-    constexpr size_t programNameSize = 256;
-    static char programName[programNameSize] = {};
+    static char programName[PROGRAM_NAME_SIZE] = {};
     if (programName[0] != '\0') {
         return programName;
     }
 
-    constexpr size_t bufSize = 512;
-    char buf[bufSize] = { 0 };
-    if (sprintf_s(buf, bufSize, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
+    char buf[BUF_CMD_SIZE] = { 0 };
+    if (sprintf_s(buf, BUF_CMD_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
         KMSG_LOGE("GetProcessInfo sprintf_s /proc/.../cmdline error");
         return "";
     }
@@ -286,7 +294,7 @@ const char* GetProgramName()
         KMSG_LOGE("fp is nullptr, filename = %s.", buf);
         return "";
     }
-    constexpr size_t bufLineSize = 512;
+    static constexpr size_t bufLineSize = 512;
     char bufLine[bufLineSize] = { 0 };
     if ((fgets(bufLine, bufLineSize, fp) == nullptr)) {
         KMSG_LOGE("fgets fail.");
@@ -307,13 +315,13 @@ const char* GetProgramName()
         KMSG_LOGE("tempName is empty.");
         return "";
     }
-    const size_t copySize = (std::min)(tempName.size(), programNameSize - 1);
+    const size_t copySize = std::min(tempName.size(), PROGRAM_NAME_SIZE - 1);
     if (copySize == 0) {
         KMSG_LOGE("copySize is 0.");
         return "";
     }
-    errno_t ret = memcpy_s(programName, programNameSize, tempName.c_str(), copySize);
-    if (ret != RET_OK) {
+    errno_t ret = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
+    if (ret != EOK) {
         return "";
     }
     KMSG_LOGI("GetProgramName success. programName = %s", programName);
@@ -341,7 +349,7 @@ char* MmiBasename(char* path)
 std::string GetStackInfo()
 {
 #ifndef OHOS_BUILD
-    constexpr size_t bufferSize = 1024;
+    static constexpr size_t bufferSize = 1024;
     void* buffer[bufferSize];
     const int32_t nptrs = backtrace(buffer, bufferSize);
     char** strings = backtrace_symbols(buffer, nptrs);
@@ -374,11 +382,11 @@ const std::string& GetThreadName()
     if (!g_threadName.empty()) {
         return g_threadName;
     }
-    constexpr size_t MAX_THREAD_NAME_SIZE = 16;
-    char thisThreadName[MAX_THREAD_NAME_SIZE + 1];
+    static constexpr size_t maxThreadNameSize = 16;
+    char thisThreadName[maxThreadNameSize + 1];
     int32_t ret = prctl(PR_GET_NAME, thisThreadName);
     if (ret == 0) {
-        thisThreadName[MAX_THREAD_NAME_SIZE] = '\0';
+        thisThreadName[maxThreadNameSize] = '\0';
         g_threadName = thisThreadName;
     } else {
         printf("in GetThreadName, call prctl get name fail, errno: %d.\n", errno);
@@ -435,83 +443,185 @@ std::string StringFmt(const char* str, ...)
     return buf;
 }
 
-bool IsFileExists(const std::string& fileName)
+static bool IsFileExists(const std::string& fileName)
 {
-    char realPath[PATH_MAX] = {};
-    if (realpath(fileName.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("path is error, path:%{public}s", fileName.c_str());
+    return (access(fileName.c_str(), F_OK) == 0);
+}
+
+static bool CheckFileExtendName(const std::string& filePath, const std::string& checkExtension)
+{
+    std::string::size_type pos = filePath.find_last_of('.');
+    if (pos == std::string::npos) {
+        MMI_HILOGE("file is not find extension");
         return false;
     }
-    if ((access(fileName.c_str(), F_OK)) == 0) {
-        return true;
-    }
-    return false;
+    return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
 }
 
-std::string GetFileExtendName(const std::string& fileName)
+static int32_t GetFileSize(const std::string& filePath)
 {
-    char realPath[PATH_MAX] = {};
-    if (realpath(fileName.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("path is error, path:%{public}s", fileName.c_str());
-        return "";
+    struct stat statbuf = {0};
+    if (stat(filePath.c_str(), &statbuf) != 0) {
+        MMI_HILOGE("get file size error");
+        return INVALID_FILE_SIZE;
     }
-    if (fileName.empty()) {
-        return "";
-    }
-    size_t nPos = fileName.find_last_of('.');
-    if (fileName.npos == nPos) {
-        return fileName;
-    }
-    return fileName.substr(nPos + 1, fileName.npos);
+    return statbuf.st_size;
 }
 
-int32_t GetFileSize(const std::string& fileName)
+static std::string ReadFile(const std::string &filePath)
 {
-    char realPath[PATH_MAX] = {};
-    if (realpath(fileName.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("path is error, path:%{public}s", fileName.c_str());
-        return RET_ERR;
-    }
-    FILE* pFile = fopen(realPath, "rb");
-    if (pFile) {
-        fseek(pFile, 0, SEEK_END);
-        long fileSize = ftell(pFile);
-        if (fileSize > INT32_MAX) {
-            MMI_HILOGE("The file is too large for 32-bit systems, filesize:%{public}ld", fileSize);
-            if (fclose(pFile) != 0) {
-                MMI_HILOGW("close file: %{pulic}s failed", realPath);
-            }
-            return RET_ERR;
-        }
-        if (fclose(pFile) != 0) {
-            MMI_HILOGW("close file: %{pulic}s failed", realPath);
-        }
-        return fileSize;
-    }
-    return RET_ERR;
-}
-
-std::string ReadFile(const std::string &filePath)
-{
-    char realPath[PATH_MAX] = {};
-    if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("path is error, path:%{public}s", filePath.c_str());
-        return "";
-    }
     FILE* fp = fopen(filePath.c_str(), "r");
-    if (fp == nullptr) {
-        MMI_HILOGW("open file: %{pulic}s failed", filePath.c_str());
-        return "";
-    }
+    CHKPS(fp);
     std::string dataStr;
     char buf[256] = {};
     while (fgets(buf, sizeof(buf), fp) != nullptr) {
         dataStr += buf;
     }
     if (fclose(fp) != 0) {
-        MMI_HILOGW("close file: %{pulic}s failed", filePath.c_str());
+        MMI_HILOGW("close file failed");
     }
     return dataStr;
+}
+
+static bool IsValidPath(const std::string &rootDir, const std::string &filePath)
+{
+    return (filePath.compare(0, rootDir.size(), rootDir) == 0);
+}
+
+static bool IsValidJsonPath(const std::string &filePath)
+{
+    return IsValidPath(DATA_PATH, filePath) ||
+        IsValidPath(INPUT_PATH, filePath);
+}
+
+static bool IsValidUinputPath(const std::string &filePath)
+{
+    return IsValidPath(PROC_PATH, filePath);
+}
+
+static bool IsValidProPath(const std::string &filePath)
+{
+    return IsValidPath(PRO_PATH, filePath);
+}
+
+std::vector<std::string> ReadProFile(const std::string &filePath)
+{
+    std::vector<std::string> configKey;
+    if (filePath.empty()) {
+        MMI_HILOGE("filePath is empty");
+        return configKey;
+    }
+    char realPath[PATH_MAX] = {};
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("Path is error");
+        return configKey;
+    }
+    if (!IsValidProPath(realPath)) {
+        MMI_HILOGE("File path is error");
+        return configKey;
+    }
+    if (!IsFileExists(realPath)) {
+        MMI_HILOGE("File not exist");
+        return configKey;
+    }
+    if (!CheckFileExtendName(realPath, "pro")) {
+        MMI_HILOGE("Unable to parse files other than json format");
+        return configKey;
+    }
+    auto fileSize = GetFileSize(realPath);
+    if ((fileSize == INVALID_FILE_SIZE) || (fileSize >= MAX_PRO_FILE_SIZE)) {
+        MMI_HILOGE("The configuration file size is incorrect");
+        return configKey;
+    }
+    ReadProConfigFile(realPath, configKey);
+    return configKey;
+}
+
+void ReadProConfigFile(const std::string &realPath, std::vector<std::string> &configKey)
+{
+    std::ifstream reader(realPath);
+    if (!reader.is_open()) {
+        MMI_HILOGE("Failed to open config file");
+        return;
+    }
+    std::string strLine;
+    while (std::getline(reader, strLine)) {
+        if (!strLine.empty() && strLine.front() != '#') {
+            std::istringstream stream(strLine);
+            std::array<std::string, KEY_ELEMENT_COUNT> keyElement;
+            stream >> keyElement[0] >> keyElement[1] >> keyElement[2] >> keyElement[3];
+            if (keyElement[0].empty() || keyElement[1].empty() || keyElement[2].empty() || keyElement[3].empty()) {
+                MMI_HILOGE("The key value data is incomplete");
+                reader.close();
+                return;
+            }
+            if (!IsNum(keyElement[1]) || !IsNum(keyElement[2])) {
+                MMI_HILOGE("Get key value is invalid");
+                reader.close();
+                return;
+            }
+            configKey.push_back(strLine);
+        }
+    }
+    reader.close();
+}
+
+std::string ReadJsonFile(const std::string &filePath)
+{
+    if (filePath.empty()) {
+        MMI_HILOGE("filePath is empty");
+        return "";
+    }
+    char realPath[PATH_MAX] = {};
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("path is error");
+        return "";
+    }
+    if (!IsValidJsonPath(realPath)) {
+        MMI_HILOGE("file path is error");
+        return "";
+    }
+    if (!CheckFileExtendName(realPath, "json")) {
+        MMI_HILOGE("Unable to parse files other than json format");
+        return "";
+    }
+    if (!IsFileExists(realPath)) {
+        MMI_HILOGE("file not exist");
+        return "";
+    }
+    int32_t fileSize = GetFileSize(realPath);
+    if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
+        MMI_HILOGE("file size out of read range");
+        return "";
+    }
+    return ReadFile(filePath);
+}
+
+std::string ReadUinputToolFile(const std::string &filePath)
+{
+    if (filePath.empty()) {
+        MMI_HILOGE("filePath is empty");
+        return "";
+    }
+    char realPath[PATH_MAX] = {};
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("path is error");
+        return "";
+    }
+    if (!IsValidUinputPath(realPath)) {
+        MMI_HILOGE("file path is error");
+        return "";
+    }
+    if (!IsFileExists(realPath)) {
+        MMI_HILOGE("file not exist");
+        return "";
+    }
+    int32_t fileSize = GetFileSize(realPath);
+    if ((fileSize < 0) || (fileSize > FILE_SIZE_MAX)) {
+        MMI_HILOGE("file size out of read range");
+        return "";
+    }
+    return ReadFile(filePath);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -19,18 +19,18 @@
 
 namespace OHOS {
 namespace MMI {
-    class VirtualTouchScreen : public VirtualDevice {
-    public:
-        VirtualTouchScreen();
-        ~VirtualTouchScreen();
-        DISALLOW_COPY_AND_MOVE(VirtualTouchScreen);
+class VirtualTouchScreen : public VirtualDevice {
+public:
+    VirtualTouchScreen();
+    ~VirtualTouchScreen();
+    DISALLOW_COPY_AND_MOVE(VirtualTouchScreen);
 
-    protected:
-        virtual const std::vector<uint32_t>& GetEventTypes() const override;
-        virtual const std::vector<uint32_t>& GetKeys() const override;
-        virtual const std::vector<uint32_t>& GetProperties() const override;
-        virtual const std::vector<uint32_t>& GetAbs() const override;
-    };
+protected:
+    virtual const std::vector<uint32_t>& GetEventTypes() const override;
+    virtual const std::vector<uint32_t>& GetKeys() const override;
+    virtual const std::vector<uint32_t>& GetProperties() const override;
+    virtual const std::vector<uint32_t>& GetAbs() const override;
+};
 } // namespace MMI
 } // namespace OHOS
 #endif  // VIRTUAL_TOUCHSCREEN_H

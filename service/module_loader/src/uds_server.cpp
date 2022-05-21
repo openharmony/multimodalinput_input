@@ -124,7 +124,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
         return RET_ERR;
     }
 
-    constexpr size_t bufferSize = 32 * 1024;
+    static constexpr size_t bufferSize = 32 * 1024;
     setsockopt(sockFds[0], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));

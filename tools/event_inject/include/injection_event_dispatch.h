@@ -28,8 +28,6 @@ struct InjectFunctionMap {
     InjectFunction fun;
 };
 
-constexpr int32_t ARGV_VALID = 2;
-
 class InjectionEventDispatch {
 public:
     InjectionEventDispatch() = default;
@@ -79,20 +77,6 @@ private:
     bool CheckValue(const std::string& inputValue);
     bool CheckEventValue(const std::string& inputType, const std::string& inputCode,
     const std::string& inputValue);
-private:
-    static constexpr uint32_t SEND_EVENT_ARGV_COUNTS = 5;
-    static constexpr uint32_t SEND_EVENT_DEV_NODE_INDEX = 1;
-    static constexpr uint32_t SEND_EVENT_TYPE_INDEX = 2;
-    static constexpr uint32_t SEND_EVENT_CODE_INDEX = 3;
-    static constexpr uint32_t SEND_EVENT_VALUE_INDEX = 4;
-    static constexpr int32_t ARGVS_TARGET_INDEX = 1;
-    static constexpr int32_t ARGVS_CODE_INDEX = 2;
-    static constexpr int32_t SEND_EVENT_TO_DEVICE = 0;
-    static constexpr int32_t JSON_FILE_PATH_INDEX = 1;
-    static constexpr uint32_t INPUT_TYPE_LENGTH = 3;
-    static constexpr uint16_t INPUT_TYPE_MAX = 100;
-    static constexpr uint32_t INPUT_CODE_LENGTH = 6;
-    static constexpr uint32_t INPUT_VALUE_LENGTH = 11;
 };
 } // namespace MMI
 } // namespace OHOS

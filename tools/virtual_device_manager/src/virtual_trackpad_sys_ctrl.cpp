@@ -41,12 +41,12 @@ const std::vector<uint32_t>& VirtualTrackpadSysCtrl::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& VirtualTrackpadSysCtrl::GetMscs() const
+const std::vector<uint32_t>& VirtualTrackpadSysCtrl::GetMiscellaneous() const
 {
-    static const std::vector<uint32_t> mscs {
+    static const std::vector<uint32_t> miscellaneous {
         MSC_SCAN
     };
-    return mscs;
+    return miscellaneous;
 }
 } // namespace MMI
 } // namespace OHOS

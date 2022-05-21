@@ -65,6 +65,8 @@ ohos_shared_library("libmmi-virtual-device") {
     "src/virtual_pen_keyboard.cpp",
     "src/virtual_pen_mouse.cpp",
     "src/virtual_remote_control.cpp",
+    "src/virtual_single_finger.cpp",
+    "src/virtual_single_touchscreen.cpp",
     "src/virtual_stylus.cpp",
     "src/virtual_touchpad.cpp",
     "src/virtual_touchscreen.cpp",

@@ -29,7 +29,7 @@ protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;
     const std::vector<uint32_t>& GetAbs()const override;
-    const std::vector<uint32_t>& GetSws() const override;
+    const std::vector<uint32_t>& GetSwitchs() const override;
     const std::vector<uint32_t>& GetProperties() const override;
 };
 } // namespace MMI
