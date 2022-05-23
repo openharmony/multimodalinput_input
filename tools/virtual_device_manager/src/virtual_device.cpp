@@ -44,7 +44,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t READ_FILE_SIZE_MAX = 1000;
 constexpr int32_t ABSRANGE = 200;
 constexpr int32_t FINGERABSRANGE = 40;
 const std::string VIRTUAL_DEVICE_NAME = "mmi-virtual-device";

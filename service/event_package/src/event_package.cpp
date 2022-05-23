@@ -42,6 +42,7 @@ int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_
     CHKPR(data, ERROR_NULL_POINTER);
 
     auto device = libinput_event_get_device(event);
+    CHKPR(device, ERROR_NULL_POINTER);
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     int32_t keyCode = static_cast<int32_t>(libinput_event_keyboard_get_key(data));
     MMI_HILOGD("The linux input keyCode:%{public}d", keyCode);
