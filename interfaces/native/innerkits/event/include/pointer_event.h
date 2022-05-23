@@ -470,13 +470,13 @@ public:
          */
         void SetPressure(double pressure);
 
-        int32_t GetAxisLong() const;
+        int32_t GetLongAxis() const;
 
-        void SetAxisLong(int32_t axisLong);
+        void SetLongAxis(int32_t longAxis);
 
-        int32_t GetAxisShort() const;
+        int32_t GetShortAxis() const;
 
-        void SetAxisShort(int32_t axisShort);
+        void SetShortAxis(int32_t shortAxis);
 
         /**
          * @brief Obtains the ID of the current device.
@@ -531,8 +531,8 @@ public:
         int32_t toolWidth_ {};
         int32_t toolHeight_ {};
         double  pressure_ {};
-        int32_t axisLong_ {};
-        int32_t axisShort_ {};
+        int32_t longAxis_ {};
+        int32_t shortAxis_ {};
         int32_t deviceId_ {};
         int64_t downTime_ {};
         int32_t toolType_ {};

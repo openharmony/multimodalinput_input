@@ -67,11 +67,11 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     PointerEvent::PointerItem item;
     auto pressure = libinput_event_touch_get_pressure(data);
     auto seatSlot = libinput_event_touch_get_seat_slot(data);
-    auto axisLong = libinput_event_get_touch_contact_axis_long(data);
-    auto axisShort = libinput_event_get_touch_contact_axis_short(data);
+    auto longAxis = libinput_event_get_touch_contact_long_axis(data);
+    auto shortAxis = libinput_event_get_touch_contact_short_axis(data);
     item.SetPressure(pressure);
-    item.SetAxisLong(axisLong);
-    item.SetAxisShort(axisShort);
+    item.SetLongAxis(longAxis);
+    item.SetShortAxis(shortAxis);
     int32_t toolType = GetTouchToolType(event);
     item.SetToolType(toolType);
     item.SetPointerId(seatSlot);
@@ -113,11 +113,11 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
         return false;
     }
     auto pressure = libinput_event_touch_get_pressure(data);
-    auto axisLong = libinput_event_get_touch_contact_axis_long(data);
-    auto axisShort = libinput_event_get_touch_contact_axis_short(data);
+    auto longAxis = libinput_event_get_touch_contact_long_axis(data);
+    auto shortAxis = libinput_event_get_touch_contact_short_axis(data);
     item.SetPressure(pressure);
-    item.SetAxisLong(axisLong);
-    item.SetAxisShort(axisShort);
+    item.SetLongAxis(longAxis);
+    item.SetShortAxis(shortAxis);
     item.SetGlobalX(touchInfo.point.x);
     item.SetGlobalY(touchInfo.point.y);
     item.SetToolGlobalX(touchInfo.toolRect.point.x);

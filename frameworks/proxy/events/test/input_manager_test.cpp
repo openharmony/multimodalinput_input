@@ -499,7 +499,7 @@ std::string InputManagerTest::DumpPointerItem(const PointerEvent::PointerItem &i
          << ",ToolLocalX:" << item.GetToolLocalX() << ",ToolLocalY:" << item.GetToolLocalY()
          << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
          << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
-         << ",AxisLong:" << item.GetAxisLong() << ",AxisShort:" << item.GetAxisShort();
+         << ",LongAxis:" << item.GetLongAxis() << ",ShortAxis:" << item.GetShortAxis();
     return strm.str();
 }
 
