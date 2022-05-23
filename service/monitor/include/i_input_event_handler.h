@@ -24,7 +24,8 @@
 
 namespace OHOS {
 namespace MMI {
-struct IInputEventHandler {
+class IInputEventHandler {
+public:
     static constexpr int32_t DEFAULT_INTERCEPTOR = 10;
     static constexpr int32_t DEFAULT_MONITOR = 20;
     virtual int32_t GetPriority() const = 0;
