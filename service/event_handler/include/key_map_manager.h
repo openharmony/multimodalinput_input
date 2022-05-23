@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef CONFIG_KEY_VALUE_TRANSFORM_H
-#define CONFIG_KEY_VALUE_TRANSFORM_H
+#ifndef KEY_MAP_MANAGER_H
+#define KEY_MAP_MANAGER_H
 
 #include <map>
 #include <string>
@@ -25,22 +25,25 @@
 
 namespace OHOS {
 namespace MMI {
-class ConfigKeyValueTransform : public DelayedSingleton<ConfigKeyValueTransform> {
+class KeyMapManager : public DelayedSingleton<KeyMapManager> {
 public:
-    ConfigKeyValueTransform() = default;
-    ~ConfigKeyValueTransform() = default;
-    void GetConfigKeyValue(const std::string &fileName);
-    void ParseDeviceConfigFile(struct libinput_event *event);
-    void RemoveKeyValue(struct libinput_event *event);
+    KeyMapManager() = default;
+    ~KeyMapManager() = default;
+    void GetConfigKeyValue(const std::string &fileName, int32_t deviceId);
+    void ParseDeviceConfigFile(struct libinput_device *device);
+    void RemoveKeyValue(struct libinput_device *device);
     std::string GetProFilePath(const std::string &fileName) const;
-    std::string GetKeyEventFileName(struct libinput_event* event);
-    KeyEventValueTransformation TransferDefaultKeyValue(int32_t inputKey);
-    KeyEventValueTransformation TransferDeviceKeyValue(struct libinput_event* event, int32_t inputKey);
+    std::string GetKeyEventFileName(struct libinput_device *device);
+    int32_t GetDefaultKeyId();
+    int32_t TransferDefaultKeyValue(int32_t inputKey);
+    int32_t TransferDeviceKeyValue(struct libinput_device *device, int32_t inputKey);
+    std::vector<int32_t> InputTransferKeyValue(int32_t deviceId, int32_t keyCode);
 private:
-    std::map<std::string, std::multimap<int32_t, KeyEventValueTransformation>> configKeyValue_;
+    std::map<int32_t, std::map<int32_t, int32_t>> configKeyValue_;
+    int32_t defaultKeyId_ = -1;
 };
 
-#define KeyValueTransform ConfigKeyValueTransform::GetInstance()
+#define KeyMapMgr KeyMapManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#endif // CONFIG_KEY_VALUE_TRANSFORM_H
+#endif // KEY_MAP_MANAGER_H
