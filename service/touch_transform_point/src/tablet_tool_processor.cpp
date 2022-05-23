@@ -67,6 +67,7 @@ std::shared_ptr<PointerEvent> TabletToolProcessor::OnEvent(struct libinput_event
 
 int32_t TabletToolProcessor::GetToolType(struct libinput_event_tablet_tool* tabletEvent)
 {
+    CHKPR(tabletEvent, INVALID_TOOL_TYPE);
     int32_t toolType = libinput_event_tablet_tool_get_tool_type(tabletEvent);
     if (toolType != 0) {
         return PointerEvent::TOOL_TYPE_PEN;
@@ -104,7 +105,9 @@ int32_t TabletToolProcessor::GetToolType(struct libinput_event_tablet_tool* tabl
 
 bool TabletToolProcessor::OnTip(struct libinput_event* event)
 {
+    CHKPF(event);
     auto tabletEvent = libinput_event_get_tablet_tool_event(event);
+    CHKPF(tabletEvent);
     auto tipState = libinput_event_tablet_tool_get_tip_state(tabletEvent);
     bool ret = false;
     switch (tipState) {
@@ -133,6 +136,7 @@ bool TabletToolProcessor::OnTip(struct libinput_event* event)
 bool TabletToolProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
 {
     CALL_LOG_ENTER;
+    CHKPF(event);
     int32_t targetDisplayId = -1;
     LogicalCoordinate tCoord;
     if (!WinMgr->CalculateTipPoint(event, targetDisplayId, tCoord)) {
@@ -177,7 +181,9 @@ bool TabletToolProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
 bool TabletToolProcessor::OnTipMotion(struct libinput_event* event)
 {
     CALL_LOG_ENTER;
+    CHKPF(event);
     auto tabletEvent = libinput_event_get_tablet_tool_event(event);
+    CHKPF(tabletEvent);
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -223,6 +229,7 @@ bool TabletToolProcessor::OnTipMotion(struct libinput_event* event)
 bool TabletToolProcessor::OnTipUp(struct libinput_event_tablet_tool* event)
 {
     CALL_LOG_ENTER;
+    CHKPF(event);
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
