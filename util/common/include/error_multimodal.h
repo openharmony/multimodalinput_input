@@ -44,7 +44,6 @@ enum {
     STRCPY_S_CALLBACK_FAIL,                     // strcpy_s返回错误
     CHECK_PERMISSION_FAIL,                      // APL鉴权失败
 };
-
 // Error code for event simulate
 constexpr ErrCode EVENT_SIMULATE_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_EVENT_SIMULATE);
 
