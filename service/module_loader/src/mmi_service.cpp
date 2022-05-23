@@ -360,7 +360,7 @@ void MMIService::OnThread()
 #endif
 
     int32_t count = 0;
-    constexpr int32_t timeOut = 1;
+    int32_t timeOut = TimerMgr->CalcNextDelay();
     struct epoll_event ev[MAX_EVENT_SIZE] = {};
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
@@ -377,10 +377,12 @@ void MMIService::OnThread()
                 MMI_HILOGW("unknown epoll event type:%{public}d", mmiEd->event_type);
             }
         }
+        OnTimer();
+        timeOut = TimerMgr->CalcNextDelay();
         if (state_ != ServiceRunningState::STATE_RUNNING) {
             break;
         }
-        OnTimer();
+        
     }
     MMI_HILOGI("Main worker thread stop. tid:%{public}" PRId64 "", tid);
 }
