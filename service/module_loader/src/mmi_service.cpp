@@ -23,10 +23,10 @@
 #include <unordered_map>
 #endif
 
-#include "config_key_value_transform.h"
 #include "event_dump.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
+#include "key_map_manager.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
 #ifdef OHOS_RSS_CLIENT
@@ -207,7 +207,7 @@ int32_t MMIService::Init()
         return LIBINPUT_INIT_FAIL;
     }
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
-    KeyValueTransform->GetConfigKeyValue("default_key");
+    KeyMapMgr->GetConfigKeyValue("default_keymap", KeyMapMgr->GetDefaultKeyId());
     return RET_OK;
 }
 
