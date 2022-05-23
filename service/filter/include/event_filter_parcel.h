@@ -23,7 +23,8 @@
 
 namespace OHOS {
 namespace MMI {
-struct PointerEventParcel final : public Parcelable {
+class PointerEventParcel final : public Parcelable {
+public:
     PointerEventParcel() = default;
     DISALLOW_COPY_AND_MOVE(PointerEventParcel);
     ~PointerEventParcel() override = default;
