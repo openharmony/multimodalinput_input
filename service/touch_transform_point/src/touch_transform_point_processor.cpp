@@ -192,6 +192,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
 
 int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_event *event)
 {
+    CHKPR(event, PointerEvent::TOOL_TYPE_FINGER);
     auto data = libinput_event_get_touch_event(event);
     CHKPR(data, PointerEvent::TOOL_TYPE_FINGER);
     auto toolTypeTmp = libinput_event_touch_get_tool_type(data);
@@ -216,6 +217,7 @@ int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_event *ev
 
 int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_device *device)
 {
+    CHKPR(device, PointerEvent::TOOL_TYPE_FINGER);
     if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_PEN) == BTN_DOWN) {
         return PointerEvent::TOOL_TYPE_PEN;
     } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_RUBBER) == BTN_DOWN) {
