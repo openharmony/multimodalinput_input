@@ -36,6 +36,7 @@ constexpr int32_t WAIT_TIME_FOR_INPUT { 100 };
 
 static void HiLogFunc(struct libinput* input, libinput_log_priority priority, const char* fmt, va_list args)
 {
+    CHKPV(input);
     char buffer[256];
     if (vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args) == -1) {
         MMI_HILOGE("call vsnprintf_s fail");
@@ -61,6 +62,7 @@ void LibinputAdapter::LoginfoPackagingTool(struct libinput_event *event)
 {
     CHKPV(event);
     auto context = libinput_event_get_context(event);
+    CHKPV(context);
     InitHiLogFunc(context);
 }
 

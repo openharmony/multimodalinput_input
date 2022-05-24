@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -216,24 +216,24 @@ void PointerEvent::PointerItem::SetPressure(double pressure)
     pressure_ = pressure >= MAX_PRESSURE ? MAX_PRESSURE : pressure;
 }
 
-int32_t PointerEvent::PointerItem::GetAxisLong() const
+int32_t PointerEvent::PointerItem::GetLongAxis() const
 {
-    return axisLong_;
+    return longAxis_;
 }
 
-void PointerEvent::PointerItem::SetAxisLong(int32_t axisLong)
+void PointerEvent::PointerItem::SetLongAxis(int32_t longAxis)
 {
-    axisLong_ = axisLong;
+    longAxis_ = longAxis;
 }
 
-int32_t PointerEvent::PointerItem::GetAxisShort() const
+int32_t PointerEvent::PointerItem::GetShortAxis() const
 {
-    return axisShort_;
+    return shortAxis_;
 }
 
-void PointerEvent::PointerItem::SetAxisShort(int32_t axisShort)
+void PointerEvent::PointerItem::SetShortAxis(int32_t shortAxis)
 {
-    axisShort_ = axisShort;
+    shortAxis_ = shortAxis;
 }
 
 int32_t PointerEvent::PointerItem::GetDeviceId() const
@@ -277,8 +277,8 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteDouble(tiltX_) &&
         out.WriteDouble(tiltY_) &&
         out.WriteDouble(pressure_) &&
-        out.WriteInt32(axisLong_) &&
-        out.WriteInt32(axisShort_) &&
+        out.WriteInt32(longAxis_) &&
+        out.WriteInt32(shortAxis_) &&
         out.WriteInt32(toolType_) &&
         out.WriteInt32(deviceId_)
     );
@@ -305,8 +305,8 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadDouble(tiltX_) &&
         in.ReadDouble(tiltY_) &&
         in.ReadDouble(pressure_) &&
-        in.ReadInt32(axisLong_) &&
-        in.ReadInt32(axisShort_) &&
+        in.ReadInt32(longAxis_) &&
+        in.ReadInt32(shortAxis_) &&
         in.ReadInt32(toolType_) &&
         in.ReadInt32(deviceId_)
     );
@@ -935,7 +935,7 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
             << ",ToolLocalX:" << item.GetToolLocalX() << ",ToolLocalY:" << item.GetToolLocalY()
             << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
             << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
-            << ",AxisLong:" << item.GetAxisLong() << ",AxisShort:" << item.GetAxisShort()
+            << ",LongAxis:" << item.GetLongAxis() << ",ShortAxis:" << item.GetShortAxis()
             << std::endl;
     }
     std::vector<int32_t> pressedKeys = pointerEvent.GetPressedKeys();

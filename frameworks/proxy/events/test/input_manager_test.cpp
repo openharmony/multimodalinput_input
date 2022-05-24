@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -499,7 +499,7 @@ std::string InputManagerTest::DumpPointerItem(const PointerEvent::PointerItem &i
          << ",ToolLocalX:" << item.GetToolLocalX() << ",ToolLocalY:" << item.GetToolLocalY()
          << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
          << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
-         << ",AxisLong:" << item.GetAxisLong() << ",AxisShort:" << item.GetAxisShort();
+         << ",LongAxis:" << item.GetLongAxis() << ",ShortAxis:" << item.GetShortAxis();
     return strm.str();
 }
 

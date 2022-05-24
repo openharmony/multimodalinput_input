@@ -55,10 +55,7 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     }
 #endif
     MsgCallback funs[] = {
-        {MmiMessageId::MARK_PROCESS,
-            MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
-        {MmiMessageId::ON_DUMP, MsgCallbackBind2(&ServerMsgHandler::OnDump, this)},
-        {MmiMessageId::GET_MMI_INFO_REQ, MsgCallbackBind2(&ServerMsgHandler::GetMultimodeInputInfo, this)},
+        {MmiMessageId::MARK_PROCESS, MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
         {MmiMessageId::INJECT_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectKeyEvent, this) },
         {MmiMessageId::INJECT_POINTER_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectPointerEvent, this) },
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputDevice, this)},
@@ -133,19 +130,6 @@ int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
 }
 #endif // OHOS_BUILD_HDF
 
-int32_t ServerMsgHandler::OnDump(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    int32_t fd = -1;
-    pkt >> fd;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read fd failed");
-        return PACKET_READ_FAIL;
-    }
-    MMIEventDump->Dump(fd);
-    return RET_OK;
-}
-
 int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
@@ -158,33 +142,6 @@ int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
         return PACKET_READ_FAIL;
     }
     sess->DelEvents(eventId);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    TagPackHead tagPackHead;
-    pkt >> tagPackHead;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read tagPackHead failed");
-        return PACKET_READ_FAIL;
-    }
-    int32_t fd = sess->GetFd();
-    if (tagPackHead.idMsg != MmiMessageId::INVALID) {
-        TagPackHead tagPackHeadAck = { MmiMessageId::INVALID, {fd}};
-        NetPacket pkt(MmiMessageId::GET_MMI_INFO_ACK);
-        pkt << tagPackHeadAck;
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet write tagPackHeadAck failed");
-            return PACKET_READ_FAIL;
-        }
-        if (!udsServer_->SendMsg(fd, pkt)) {
-            MMI_HILOGE("Sending message failed");
-            return MSG_SEND_FAIL;
-        }
-    }
     return RET_OK;
 }
 

@@ -29,6 +29,7 @@
 
 #include "bytrace_adapter.h"
 #include "input_device_manager.h"
+#include "key_map_manager.h"
 #include "mmi_func_callback.h"
 #include "mouse_event_handler.h"
 #include "libinput_adapter.h"
@@ -216,10 +217,10 @@ void InputEventHandler::OnCheckEventReport()
     if (initSysClock_ == 0 || lastSysClock_ != 0) {
         return;
     }
-    constexpr int64_t MAX_DID_TIME = 1000 * 1000 * 3;
+    static constexpr int64_t maxDidTime = 1000 * 1000 * 3;
     auto curSysClock = GetSysClockTime();
     auto lostTime = curSysClock - initSysClock_;
-    if (lostTime < MAX_DID_TIME) {
+    if (lostTime < maxDidTime) {
         return;
     }
     MMI_HILOGE("Event not responding. id:%{public}" PRId64 ",eventType:%{public}d,initSysClock:%{public}" PRId64 ","
@@ -240,13 +241,18 @@ int32_t InputEventHandler::OnEventDeviceAdded(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
+    CHKPR(device, ERROR_NULL_POINTER);
     InputDevMgr->OnInputDeviceAdded(device);
+    KeyMapMgr->ParseDeviceConfigFile(device);
     return RET_OK;
 }
+
 int32_t InputEventHandler::OnEventDeviceRemoved(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
+    CHKPR(device, ERROR_NULL_POINTER);
+    KeyMapMgr->RemoveKeyValue(device);
     InputDevMgr->OnInputDeviceRemoved(device);
     return RET_OK;
 }
@@ -263,11 +269,12 @@ void InputEventHandler::AddHandleTimer(int32_t timeout)
         if (ret != RET_OK) {
             MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
         }
-        constexpr int32_t triggerTime = 100;
+        static constexpr int32_t triggerTime = 100;
         this->AddHandleTimer(triggerTime);
         MMI_HILOGD("leave");
     });
 }
+
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
@@ -371,6 +378,7 @@ int32_t InputEventHandler::OnEventTouch(libinput_event *event)
 
 int32_t InputEventHandler::OnEventTouchpad(libinput_event *event)
 {
+    CHKPR(event, ERROR_NULL_POINTER);
     OnEventTouchPadSecond(event);
     return RET_OK;
 }

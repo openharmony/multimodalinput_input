@@ -39,7 +39,7 @@ HdfDeviceEventDispatch::HdfDeviceEventDispatch(const uint32_t maxX, const uint32
 HdfDeviceEventDispatch::~HdfDeviceEventDispatch() {}
 
 void HdfDeviceEventDispatch::GetEventCallbackDispatch(
-    const EventPackage **pkgs, uint32_t count, uint32_t devIndex)
+    const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
     if (pkgs == nullptr) {
         MMI_HILOGE("pkgs is nullptr");

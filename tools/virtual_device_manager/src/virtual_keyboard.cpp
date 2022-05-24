@@ -52,12 +52,12 @@ const std::vector<uint32_t>& VirtualKeyboard::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& VirtualKeyboard::GetMscs() const
+const std::vector<uint32_t>& VirtualKeyboard::GetMiscellaneous() const
 {
-    static const std::vector<uint32_t> mscs {
+    static const std::vector<uint32_t> miscellaneous {
         MSC_SCAN
     };
-    return mscs;
+    return miscellaneous;
 }
 
 const std::vector<uint32_t>& VirtualKeyboard::GetLeds() const
@@ -68,12 +68,12 @@ const std::vector<uint32_t>& VirtualKeyboard::GetLeds() const
     return leds;
 }
 
-const std::vector<uint32_t>& VirtualKeyboard::GetReps() const
+const std::vector<uint32_t>& VirtualKeyboard::GetRepeats() const
 {
-    static const std::vector<uint32_t> reps {
+    static const std::vector<uint32_t> repeats {
         REP_DELAY, REP_PERIOD
     };
-    return reps;
+    return repeats;
 }
 } // namespace MMI
 } // namespace OHOS
