@@ -241,7 +241,7 @@ void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
 bool KeyEventSubscriber::InitSessionDeleteCallback()
 {
     CALL_LOG_ENTER;
-    if (callbackInitialized_)  {
+    if (callbackInitialized_) {
         MMI_HILOGD("session delete callback has already been initialized");
         return true;
     }
@@ -300,7 +300,6 @@ bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent
             MMI_HILOGE("Leave, add timer failed");
         }
     }
-
     MMI_HILOGD("%{public}s", handled ? "true" : "false");
     return handled;
 }
@@ -355,12 +354,10 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
             MMI_HILOGE("upTime - downTime >= duration");
             continue;
         }
-
         MMI_HILOGD("upTime - downTime < duration");
         NotifySubscriber(keyEvent, subscriber);
         handled = true;
     }
-
     MMI_HILOGD("%{public}s", handled ? "true" : "false");
     return handled;
 }

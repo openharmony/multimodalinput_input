@@ -71,11 +71,11 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
         subscribeInfo.GetSubscribeId(), keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
+    subscribeInfos_.push_back(subscribeInfo);
     if (EventManager.SubscribeKeyEvent(subscribeInfo) != RET_OK) {
         MMI_HILOGE("Leave, subscribe key event failed");
         return INVALID_SUBSCRIBE_ID;
     }
-    subscribeInfos_.push_back(subscribeInfo);
     return subscribeInfo.GetSubscribeId();
 }
 

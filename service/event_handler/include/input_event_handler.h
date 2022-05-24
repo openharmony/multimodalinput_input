@@ -31,7 +31,7 @@ namespace OHOS {
 namespace MMI {
 using EventFun = std::function<int32_t(libinput_event *event)>;
 using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
-class InputEventHandler : public MsgHandler<EventFun>, public DelayedSingleton<InputEventHandler> {
+class InputEventHandler : public MsgHandler<MmiMessageId, EventFun>, public DelayedSingleton<InputEventHandler> {
 public:
     InputEventHandler();
     DISALLOW_COPY_AND_MOVE(InputEventHandler);

@@ -23,9 +23,10 @@
 #include "nocopyable.h"
 
 #include "circle_stream_buffer.h"
-#include "i_uds_server.h"
 #include "uds_session.h"
 #include "uds_socket.h"
+
+#include "i_uds_server.h"
 
 namespace OHOS {
 namespace MMI {
@@ -34,6 +35,7 @@ enum EpollEventType {
     EPOLL_EVENT_INPUT = EPOLL_EVENT_BEGIN,
     EPOLL_EVENT_SOCKET,
     EPOLL_EVENT_SIGNAL,
+    EPOLL_EVENT_ETASK,
 
     EPOLL_EVENT_END,
 };
@@ -48,14 +50,14 @@ public:
     bool SendMsg(int32_t fd, NetPacket& pkt);
     void Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt);
     void Dump(int32_t fd);
-    int32_t GetClientFd(int32_t pid);
-    int32_t GetClientPid(int32_t fd);
+    int32_t GetClientFd(int32_t pid) const;
+    int32_t GetClientPid(int32_t fd) const;
     void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
+    int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
+        const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd);
 
-public:
-    virtual int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
-                                      const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd);
     SessionPtr GetSession(int32_t fd) const;
+    SessionPtr GetSessionByPid(int32_t pid) const;
 
 protected:
     virtual void OnConnected(SessionPtr s);
@@ -74,8 +76,6 @@ protected:
     void AddPermission(SessionPtr sess);
 
 protected:
-    std::mutex mux_;
-    bool isRunning_ = false;
     MsgServerFunCallback recvFun_ = nullptr;
     std::map<int32_t, SessionPtr> sessionsMap_;
     std::map<int32_t, int32_t> idxPidMap_;
