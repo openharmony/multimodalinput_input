@@ -344,14 +344,6 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& 
 }
 #endif
 
-void MMIService::OnTimer()
-{
-    if (InputHandler != nullptr) {
-        InputHandler->OnCheckEventReport();
-    }
-    TimerMgr->ProcessTimers();
-}
-
 void MMIService::OnThread()
 {
     SetThreadName(std::string("mmi_service"));
@@ -379,7 +371,7 @@ void MMIService::OnThread()
                 MMI_HILOGW("unknown epoll event type:%{public}d", mmiEd->event_type);
             }
         }
-        OnTimer();
+        TimerMgr->ProcessTimers();
         if (state_ != ServiceRunningState::STATE_RUNNING) {
             break;
         }

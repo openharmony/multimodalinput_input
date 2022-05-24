@@ -38,7 +38,6 @@ public:
     virtual ~InputEventHandler() override;
     void Init(UDSServer& udsServer);
     void OnEvent(void *event);
-    void OnCheckEventReport();
     int32_t OnMouseEventEndTimerHandler(std::shared_ptr<PointerEvent> pointerEvent);
     UDSServer *GetUDSServer() const;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
@@ -68,9 +67,6 @@ private:
     std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
 
     uint64_t idSeed_ = 0;
-    int32_t eventType_ = 0;
-    int64_t initSysClock_ = 0;
-    int64_t lastSysClock_ = 0;
     int32_t timerId_ = -1;
 };
 
