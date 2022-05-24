@@ -30,6 +30,7 @@
 #include "bytrace_adapter.h"
 #include "input_device_manager.h"
 #include "key_map_manager.h"
+#include "key_autorepeat.h"
 #include "mmi_func_callback.h"
 #include "mouse_event_handler.h"
 #include "libinput_adapter.h"
@@ -222,6 +223,7 @@ int32_t InputEventHandler::OnEventDeviceAdded(libinput_event *event)
     CHKPR(device, ERROR_NULL_POINTER);
     InputDevMgr->OnInputDeviceAdded(device);
     KeyMapMgr->ParseDeviceConfigFile(device);
+    KeyRepeat->AddDeviceConfig(device);
     return RET_OK;
 }
 
@@ -231,26 +233,23 @@ int32_t InputEventHandler::OnEventDeviceRemoved(libinput_event *event)
     auto device = libinput_event_get_device(event);
     CHKPR(device, ERROR_NULL_POINTER);
     KeyMapMgr->RemoveKeyValue(device);
+    KeyRepeat->RemoveDeviceConfig(device);
     InputDevMgr->OnInputDeviceRemoved(device);
     return RET_OK;
 }
 
-void InputEventHandler::AddHandleTimer(int32_t timeout)
+int32_t InputEventHandler::AddHandleTimer(int32_t timeout)
 {
+    CALL_LOG_ENTER;
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
-        MMI_HILOGD("enter");
-        if (this->keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-            MMI_HILOGD("key up");
-            return;
-        }
         auto ret = eventDispatch_.DispatchKeyEventPid(*(this->udsServer_), this->keyEvent_);
         if (ret != RET_OK) {
             MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
         }
-        static constexpr int32_t triggerTime = 100;
-        this->AddHandleTimer(triggerTime);
-        MMI_HILOGD("leave");
+        int32_t triggertime = KeyRepeat->GetIntervalTime(keyEvent_->GetDeviceId());
+        this->AddHandleTimer(triggertime);
     });
+    return timerId_;
 }
 
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
@@ -261,6 +260,12 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         keyEvent_ = KeyEvent::Create();
     }
 
+    std::vector<int32_t> pressedKeys = keyEvent_->GetPressedKeys();
+    int32_t lastPressedKey = -1;
+    if (!pressedKeys.empty()) {
+        lastPressedKey = pressedKeys.back();
+        MMI_HILOGD("The last repeat button, keyCode:%{public}d", lastPressedKey);
+    }
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_HILOGD("The same event reported by multi_device should be discarded");
@@ -278,19 +283,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
-    if (keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP ||
-        keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN ||
-        keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_DEL) {
-        if (!TimerMgr->IsExist(timerId_) && keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
-            AddHandleTimer();
-            MMI_HILOGD("add a timer");
-        }
-        if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
-            TimerMgr->RemoveTimer(timerId_);
-            timerId_ = -1;
-        }
-    }
-
+    KeyRepeat->SelectAutoRepeat(keyEvent_, lastPressedKey);
     MMI_HILOGD("keyCode:%{public}d,action:%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
     return RET_OK;
 }
@@ -451,7 +444,7 @@ int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEv
                pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
     PointerEvent::PointerItem item;
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
-        MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
+        MMI_HILOGE("Get pointer item failed, pointer:%{public}d", pointerEvent->GetPointerId());
         return RET_ERR;
     }
     MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"

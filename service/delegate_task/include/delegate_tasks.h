@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef ENTRUST_TASKS_H
-#define ENTRUST_TASKS_H
+#ifndef DELEGATE_TASKS_H
+#define DELEGATE_TASKS_H
 #include <cinttypes>
 #include <functional>
 #include <future>
@@ -26,8 +26,8 @@
 
 namespace OHOS {
 namespace MMI {
-using ETaskCallback = std::function<int32_t()>;
-class EntrustTasks : public IdFactory<int32_t> {
+using DTaskCallback = std::function<int32_t()>;
+class DelegateTasks : public IdFactory<int32_t> {
 public:
     struct TaskData {
         uint64_t tid;
@@ -37,8 +37,8 @@ public:
     public:
         using Promise = std::promise<int32_t>;
         using Future = std::future<int32_t>;
-        using TaskPtr = std::shared_ptr<EntrustTasks::Task>;
-        Task(int32_t id, ETaskCallback fun, Promise *promise = nullptr)
+        using TaskPtr = std::shared_ptr<DelegateTasks::Task>;
+        Task(int32_t id, DTaskCallback fun, Promise *promise = nullptr)
             : id_(id), fun_(fun), promise_(promise) {}
         ~Task() = default;
         void ProcessTask();
@@ -59,7 +59,7 @@ public:
     private:
         std::atomic_bool hasWaited_ = false;
         int32_t id_ = 0;
-        ETaskCallback fun_;
+        DTaskCallback fun_;
         Promise* promise_ = nullptr;
     };
     using TaskPtr = Task::TaskPtr;
@@ -67,13 +67,13 @@ public:
     using Future = Task::Future;
     
 public:
-    EntrustTasks() = default;
-    virtual ~EntrustTasks() = default;
+    DelegateTasks() = default;
+    virtual ~DelegateTasks() = default;
 
     bool Init();
     void ProcessTasks();
-    int32_t PostSyncTask(ETaskCallback callback);
-    int32_t PostAsyncTask(ETaskCallback callback);
+    int32_t PostSyncTask(DTaskCallback callback);
+    int32_t PostAsyncTask(DTaskCallback callback);
 
     int32_t GetReadFd() const
     {
@@ -90,7 +90,7 @@ public:
 
 private:
     void PopPendingTaskList(std::vector<TaskPtr> &tasks);
-    TaskPtr PostTask(ETaskCallback callback, Promise *promise = nullptr);
+    TaskPtr PostTask(DTaskCallback callback, Promise *promise = nullptr);
 
 private:
     uint64_t workerThreadId_ = 0;
@@ -100,4 +100,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // ENTRUST_TASKS_H
+#endif // DELEGATE_TASKS_H

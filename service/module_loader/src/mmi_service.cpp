@@ -179,20 +179,20 @@ bool MMIService::InitService()
     return true;
 }
 
-bool MMIService::InitEntrustTasks()
+bool MMIService::InitDelegateTasks()
 {
     CALL_LOG_ENTER;
-    if (!entrustTasks_.Init()) {
-        MMI_HILOGE("entrust task init failed");
+    if (!delegateTasks_.Init()) {
+        MMI_HILOGE("delegate task init failed");
         return false;
     }
-    auto ret = AddEpoll(EPOLL_EVENT_ETASK, entrustTasks_.GetReadFd());
+    auto ret = AddEpoll(EPOLL_EVENT_ETASK, delegateTasks_.GetReadFd());
     if (ret <  0) {
         MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
         EpollClose();
         return false;
     }
-    MMI_HILOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, entrustTasks_.GetReadFd());
+    MMI_HILOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
     return true;
 }
 
@@ -222,8 +222,8 @@ int32_t MMIService::Init()
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
     }
-    if (!InitEntrustTasks()) {
-        MMI_HILOGE("Entrust tasks init failed");
+    if (!InitDelegateTasks()) {
+        MMI_HILOGE("Delegate tasks init failed");
         return ETASKS_INIT_FAIL;
     }
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1,
@@ -277,7 +277,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     int32_t serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t pid = GetCallingPid();
     int32_t uid = GetCallingUid();
-    int32_t ret = entrustTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this,
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this,
         programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd)));
     if (ret != RET_OK) {
         MMI_HILOGE("call AddSocketPairInfo failed,return %{public}d", ret);
@@ -290,8 +290,8 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
 
 int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    CHKPR(filter, INVALID_PARAM);
-    int32_t ret = entrustTasks_.PostSyncTask(std::bind(&InputEventHandler::AddInputEventFilter,
+    CHKPR(filter, ERROR_NULL_POINTER);
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputEventHandler::AddInputEventFilter,
         InputHandler, filter));
     if (ret != RET_OK) {
         MMI_HILOGE("add event filter failed,return %{public}d", ret);
@@ -315,7 +315,7 @@ void MMIService::OnDisconnected(SessionPtr s)
 int32_t MMIService::SetPointerVisible(bool visible)
 {
     CALL_LOG_ENTER;
-    int32_t ret = entrustTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerVisible,
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerVisible,
         IPointerDrawingManager::GetInstance(), GetCallingPid(), visible));
     if (ret != RET_OK) {
         MMI_HILOGE("set pointer visible failed,return %{public}d", ret);
@@ -333,7 +333,7 @@ int32_t MMIService::CheckPointerVisible(bool &visible)
 int32_t MMIService::IsPointerVisible(bool &visible)
 {
     CALL_LOG_ENTER;
-    int32_t ret = entrustTasks_.PostSyncTask(std::bind(&MMIService::CheckPointerVisible, this, std::ref(visible)));
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckPointerVisible, this, std::ref(visible)));
     if (ret != RET_OK) {
         MMI_HILOGE("is pointer visible failed,return %{public}d", ret);
         return RET_ERR;
@@ -357,27 +357,27 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& 
 }
 #endif
 
-void MMIService::OnEntrustTask(epoll_event& ev)
+void MMIService::OnDelegateTask(epoll_event& ev)
 {
     if ((ev.events & EPOLLIN) == 0) {
         MMI_HILOGW("not epollin");
         return;
     }
-    EntrustTasks::TaskData data = {};
-    auto res = read(entrustTasks_.GetReadFd(), &data, sizeof(data));
+    DelegateTasks::TaskData data = {};
+    auto res = read(delegateTasks_.GetReadFd(), &data, sizeof(data));
     if (res == -1) {
         MMI_HILOGW("read failed erron:%{public}d", errno);
     }
     MMI_HILOGD("RemoteRequest notify td:%{public}" PRId64 ",std:%{public}" PRId64 ""
         ",taskId:%{public}d", GetThisThreadId(), data.tid, data.taskId);
-    entrustTasks_.ProcessTasks();
+    delegateTasks_.ProcessTasks();
 }
 
 void MMIService::OnThread()
 {
     SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadId();
-    entrustTasks_.SetWorkerThreadId(tid);
+    delegateTasks_.SetWorkerThreadId(tid);
     MMI_HILOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
 #ifdef OHOS_RSS_CLIENT
     tid_.store(tid);
@@ -398,7 +398,7 @@ void MMIService::OnThread()
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
                 OnSignalEvent(mmiEd->fd);
             } else if (mmiEd->event_type == EPOLL_EVENT_ETASK) {
-                OnEntrustTask(ev[i]);
+                OnDelegateTask(ev[i]);
             } else {
                 MMI_HILOGW("unknown epoll event type:%{public}d", mmiEd->event_type);
             }
