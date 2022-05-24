@@ -114,11 +114,23 @@ int32_t KeyMapManager::TransferDeviceKeyValue(struct libinput_device *device,
 std::vector<int32_t> KeyMapManager::InputTransferKeyValue(int32_t deviceId, int32_t keyCode)
 {
     std::vector<int32_t> sysKey;
-    auto iter = configKeyValue_.find(deviceId);
-    for (auto it : iter->second) {
-        if (it.second == keyCode) {
-            sysKey.push_back(it.first);
+    if (auto iter = configKeyValue_.find(deviceId); iter != configKeyValue_.end()){
+        for (auto it : iter->second) {
+            if (it.second == keyCode) {
+                sysKey.push_back(it.first);
+            }
         }
+        return sysKey;
+    } else if (auto itr = configKeyValue_.find(defaultKeyId_); itr != configKeyValue_.end()) {
+        for (auto it : itr->second) {
+            if (it.second == keyCode) {
+                sysKey.push_back(it.first);
+            }
+        }
+        return sysKey;
+    } else {
+        sysKey.push_back(InputTransformationKeyValue(keyCode));
+        return sysKey;
     }
     return sysKey;
 }
