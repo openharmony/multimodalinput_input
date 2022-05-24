@@ -12,27 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef I_INTERCEPTOR_MANAGER_GLOBAL_H
-#define I_INTERCEPTOR_MANAGER_GLOBAL_H
 
-#include "nocopyable.h"
-#include "singleton.h"
-
-#include "key_event.h"
-#include "pointer_event.h"
-#include "uds_session.h"
+#ifndef VIRTUAL_SINGLE_TOUCHSCREEN_H
+#define VIRTUAL_SINGLE_TOUCHSCREEN_H
+#include "virtual_device.h"
 
 namespace OHOS {
 namespace MMI {
-class IInterceptorManagerGlobal : public DelayedSingleton<IInterceptorManagerGlobal> {
+class VirtualSingleTouchScreen : public VirtualDevice {
 public:
-    IInterceptorManagerGlobal() = default;
-    ~IInterceptorManagerGlobal() = default;
-    DISALLOW_COPY_AND_MOVE(IInterceptorManagerGlobal);
-    void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
-    void OnRemoveInterceptor(int32_t id);
-    bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+    VirtualSingleTouchScreen();
+    ~VirtualSingleTouchScreen() = default;
+    DISALLOW_COPY_AND_MOVE(VirtualSingleTouchScreen);
+protected:
+    virtual const std::vector<uint32_t>& GetEventTypes() const override;
+    virtual const std::vector<uint32_t>& GetKeys() const override;
+    virtual const std::vector<uint32_t>& GetProperties() const override;
+    virtual const std::vector<uint32_t>& GetAbs() const override;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_INTERCEPTOR_MANAGER_GLOBAL_H
+#endif  // VIRTUAL_SINGLE_TOUCHSCREEN_H

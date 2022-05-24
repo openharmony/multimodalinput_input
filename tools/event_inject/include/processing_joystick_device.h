@@ -36,10 +36,6 @@ private:
     void TransformRocker1Event(const DeviceEvent& joystickEvent, InputEventArray& inputEventArray);
     void TransformDerectionKeyEvent(const DeviceEvent& joystickEvent, InputEventArray& inputEventArray);
     void TransformThrottle1Event(const DeviceEvent& joystickEvent, InputEventArray& inputEventArray);
-private:
-    static constexpr int32_t default_absx_value = 8188;
-    static constexpr int32_t default_absy_value = 8192;
-    static constexpr int32_t default_absz_value = 125;
 };
 } // namespace MMI
 } // namespace OHOS

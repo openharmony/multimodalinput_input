@@ -91,7 +91,7 @@ bool MMIClient::StartEventRunner()
     }
 
     std::mutex mtx;
-    constexpr int32_t outTime = 3;
+    static constexpr int32_t outTime = 3;
     recvThread_ = std::thread(std::bind(&MMIClient::OnRecvThread, this));
     recvThread_.detach();
     std::unique_lock <std::mutex> lck(mtx);
@@ -200,13 +200,6 @@ void MMIClient::RegisterConnectedFunction(ConnectCallback fun)
 void MMIClient::RegisterDisconnectedFunction(ConnectCallback fun)
 {
     funDisconnected_ = fun;
-}
-
-void MMIClient::VirtualKeyIn(RawInputEvent virtualKeyEvent)
-{
-    NetPacket pkt(MmiMessageId::ON_VIRTUAL_KEY);
-    pkt << virtualKeyEvent;
-    SendMsg(pkt);
 }
 
 void MMIClient::OnDisconnected()

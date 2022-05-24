@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,26 +26,26 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInte
 int32_t IInterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
-    MMI_HILOGD("Add hdl module dose not support");
+    MMI_HILOGW("Add interceptor module does not support");
     return RET_ERR;
 }
 
 void IInterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
-    MMI_HILOGD("Remove hdl module dose not support");
+    MMI_HILOGW("Remove interceptor module does not support");
     return;
 }
 
 bool IInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    MMI_HILOGD("Key handle module dose not support");
+    MMI_HILOGW("Key interceptor module does not support");
     return false;
 }
 
 bool IInterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    MMI_HILOGD("Pointer handle module dose not support");
+    MMI_HILOGW("Pointer interceptor module does not support");
     return false;
 }
 } // namespace MMI

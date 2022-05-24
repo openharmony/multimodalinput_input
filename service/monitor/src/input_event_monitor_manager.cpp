@@ -79,6 +79,10 @@ void InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<KeyEvent> key
         pkt << item.session->GetPid();
         MMI_HILOGD("server send the msg to client: keyCode:%{public}d,pid:%{public}d", keyEvent->GetKeyCode(),
             item.session->GetPid());
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet write item failed");
+            return;
+        }
         item.session->SendMsg(pkt);
     }
 }
@@ -126,11 +130,14 @@ void InputEventMonitorManager::OnTouchpadMonitorInputEvent(
     }
     NetPacket pkt(MmiMessageId::ON_TOUCHPAD_MONITOR);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
-    std::list<MonitorItem>::iterator iter;
     for (const auto &item :  monitorsTouch_) {
         pkt << item.session->GetPid();
         MMI_HILOGD("server send the msg to client: EventType:%{public}d,pid:%{public}d",
             pointerEvent->GetEventType(), item.session->GetPid());
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet write item failed");
+            return;
+        }
         item.session->SendMsg(pkt);
         MMI_HILOGD("Service SendMsg Success");
     }

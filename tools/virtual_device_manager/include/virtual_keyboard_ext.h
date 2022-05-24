@@ -28,8 +28,8 @@ public:
 protected:
     const std::vector<uint32_t>& GetEventTypes() const override;
     const std::vector<uint32_t>& GetKeys() const override;
-    const std::vector<uint32_t>& GetMscs() const override;
-    const std::vector<uint32_t>& GetReps() const override;
+    const std::vector<uint32_t>& GetMiscellaneous() const override;
+    const std::vector<uint32_t>& GetRepeats() const override;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -23,6 +23,7 @@
 #include <unordered_map>
 #endif
 
+#include "config_key_value_transform.h"
 #include "event_dump.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
@@ -206,6 +207,7 @@ int32_t MMIService::Init()
         return LIBINPUT_INIT_FAIL;
     }
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
+    KeyValueTransform->GetConfigKeyValue("default_key");
     return RET_OK;
 }
 
@@ -358,12 +360,12 @@ void MMIService::OnThread()
 #ifdef OHOS_RSS_CLIENT
     tid_.store(tid);
 #endif
-
-    int32_t count = 0;
-    int32_t timeOut = TimerMgr->CalcNextDelay();
-    struct epoll_event ev[MAX_EVENT_SIZE] = {};
+    libinputAdapter_.ProcessPendingEvents();
     while (state_ == ServiceRunningState::STATE_RUNNING) {
-        count = EpollWait(ev[0], MAX_EVENT_SIZE, timeOut, mmiFd_);
+        epoll_event ev[MAX_EVENT_SIZE] = {};
+        int32_t timeout = TimerMgr->CalcNextDelay();
+        MMI_HILOGD("timeout:%{public}d", timeout);
+        int32_t count = EpollWait(ev[0], MAX_EVENT_SIZE, timeout, mmiFd_);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
             CHKPC(mmiEd);
@@ -378,11 +380,9 @@ void MMIService::OnThread()
             }
         }
         OnTimer();
-        timeOut = TimerMgr->CalcNextDelay();
         if (state_ != ServiceRunningState::STATE_RUNNING) {
             break;
         }
-        
     }
     MMI_HILOGI("Main worker thread stop. tid:%{public}" PRId64 "", tid);
 }

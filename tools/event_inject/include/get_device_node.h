@@ -35,8 +35,6 @@ private:
     void AnalyseDevices(const std::vector<std::string>& cmdResult, DeviceList& deviceList) const;
 private:
     std::map<std::string, std::string> deviceList_;
-    static constexpr int32_t READ_CMD_BUFF_SIZE = 1024;
-    static constexpr int32_t CMD_EVENT_LENGTH = 6;
 };
 } // namespace MMI
 } // namespace OHOS

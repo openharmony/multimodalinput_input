@@ -13,32 +13,34 @@
  * limitations under the License.
  */
 
-#include "i_interceptor_manager_global.h"
+#include "addinputeventfilter_fuzzer.h"
 
+#include "input_manager.h"
+#include "define_multimodal.h"
 #include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInterceptorManagerGlobal" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AddInputEventFilterFuzzTest" };
 } // namespace
 
-void IInterceptorManagerGlobal::OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session)
+void AddInputEventFilterFuzzTest(const uint8_t* data, size_t /* size */)
 {
-    MMI_HILOGD("Add inter module dose not support");
-    return;
+    auto fun = [](std::shared_ptr<PointerEvent> event) ->bool {
+        MMI_HILOGD("add inputevent filter success");
+        return false;
+    };
+    InputManager::GetInstance()->AddInputEventFilter(fun);
+}
+} // MMI
+} // OHOS
+
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+{
+    /* Run your code on data */
+    OHOS::MMI::AddInputEventFilterFuzzTest(data, size);
+    return 0;
 }
 
-void IInterceptorManagerGlobal::OnRemoveInterceptor(int32_t id)
-{
-    MMI_HILOGD("Remove inter module dose not support");
-    return;
-}
-
-bool IInterceptorManagerGlobal::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
-{
-    MMI_HILOGD("Key inter module dose not support");
-    return false;
-}
-} // namespace MMI
-} // namespace OHOS

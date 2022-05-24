@@ -12,25 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef I_INTERCEPTOR_MANAGER_H
-#define I_INTERCEPTOR_MANAGER_H
 
-#include "nocopyable.h"
-#include "singleton.h"
-
-#include "i_input_event_consumer.h"
+#ifndef VIRTUAL_SINGLE_FINGER_H
+#define VIRTUAL_SINGLE_FINGER_H
+#include "virtual_device.h"
 
 namespace OHOS {
 namespace MMI {
-class IInterceptorManager : public DelayedSingleton<IInterceptorManager> {
+class VirtualSingleFinger : public VirtualDevice {
 public:
-    IInterceptorManager() = default;
-    ~IInterceptorManager() = default;
-    DISALLOW_COPY_AND_MOVE(IInterceptorManager);
-    int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
-    void RemoveInterceptor(int32_t interceptorId);
-    int32_t OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+    VirtualSingleFinger();
+    ~VirtualSingleFinger() = default;
+    DISALLOW_COPY_AND_MOVE(VirtualSingleFinger);
+protected:
+    const std::vector<uint32_t>& GetEventTypes() const override;
+    const std::vector<uint32_t>& GetKeys() const override;
+    const std::vector<uint32_t>& GetAbs()const override;
+    const std::vector<uint32_t>& GetSwitchs() const override;
+    const std::vector<uint32_t>& GetProperties() const override;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_INTERCEPTOR_MANAGER_H
+#endif // VIRTUAL_SINGLE_FINGER_H

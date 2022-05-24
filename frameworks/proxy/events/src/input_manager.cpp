@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,6 @@
 #include "error_multimodal.h"
 #include "input_event_monitor_manager.h"
 #include "input_manager_impl.h"
-#include "interceptor_manager.h"
 #include "key_event_input_subscribe_manager.h"
 #include "define_multimodal.h"
 #include "multimodal_event_handler.h"
@@ -29,12 +28,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManager" };
 } // namespace
 
-InputManager *InputManager::instance_ = nullptr;
+InputManager *InputManager::instance_ = new (std::nothrow) InputManager();
 InputManager *InputManager::GetInstance()
 {
-    if (instance_ == nullptr) {
-        instance_ = new (std::nothrow) InputManager();
-    }
     return instance_;
 }
 
@@ -107,11 +103,6 @@ int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interc
     return InputMgrImpl->AddInterceptor(interceptor);
 }
 
-int32_t InputManager::AddInterceptor(int32_t sourceType, std::function<void(std::shared_ptr<PointerEvent>)> interceptor)
-{
-    return -1;
-}
-
 int32_t InputManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
     return InputMgrImpl->AddInterceptor(interceptor);
@@ -142,7 +133,6 @@ int32_t InputManager::SetPointerVisible(bool visible)
 {
     return InputMgrImpl->GetInstance()->SetPointerVisible(visible);
 }
-
 bool InputManager::IsPointerVisible()
 {
     return InputMgrImpl->GetInstance()->IsPointerVisible();

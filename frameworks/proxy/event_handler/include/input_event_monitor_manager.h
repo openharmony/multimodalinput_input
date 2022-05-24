@@ -53,9 +53,6 @@ public:
     void RemoveInputEventTouchpadMontior(int32_t monitorId);
     int32_t OnTouchpadMonitorInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
-public:
-    static constexpr int32_t INVALID_MONITOR_ID { -1 };
-
 private:
     std::list<MonitorItem> monitors_;
 };

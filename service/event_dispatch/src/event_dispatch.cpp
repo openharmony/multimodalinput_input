@@ -35,9 +35,9 @@
 
 namespace OHOS {
 namespace MMI {
-constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
+constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 } // namespace
 
 EventDispatch::EventDispatch() {}
@@ -130,25 +130,10 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         return RET_ERR;
     }
 
-    auto session = udsServer->GetSession(fd);
-    CHKPF(session);
-    if (session->isANRProcess_) {
-        MMI_HILOGD("is ANR process");
-        return RET_OK;
-    }
-
-    auto currentTime = GetSysClockTime();
-    if (TriggerANR(currentTime, session)) {
-        session->isANRProcess_ = true;
-        MMI_HILOGW("the pointer event does not report normally, triggering ANR");
-        return RET_OK;
-    }
-
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
-    session->AddEvent(point->GetId(), currentTime);
     return RET_OK;
 }
 
@@ -157,14 +142,14 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
     CALL_LOG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
     if (!key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
-        if (InterMgrGl->OnKeyEvent(key)) {
+        if (InterHdlGl->HandleEvent(key)) {
             MMI_HILOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 key->GetKeyCode());
             BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_INTERCEPT_EVENT);
             return RET_OK;
         }
     }
-    if (IKeyCommandManager::GetInstance()->HandlerEvent(key)) {
+    if (IKeyCommandManager::GetInstance()->HandleEvent(key)) {
         MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{public}d", key->GetKeyCode());
         BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_LAUNCH_EVENT);
         return RET_OK;
@@ -188,29 +173,19 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
                key->GetEventType(),
                key->GetFlag(), key->GetKeyAction(), fd);
     InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
-    auto session = udsServer.GetSession(fd);
-    CHKPF(session);
-    if (session->isANRProcess_) {
-        MMI_HILOGD("is ANR process");
-        return RET_OK;
-    }
-
-    auto currentTime = GetSysClockTime();
-    if (TriggerANR(currentTime, session)) {
-        session->isANRProcess_ = true;
-        MMI_HILOGW("the key event does not report normally, triggering ANR");
-        return RET_OK;
-    }
 
     NetPacket pkt(MmiMessageId::ON_KEYEVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_DISPATCH_EVENT);
     pkt << fd;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write structure of EventKeyboard failed");
+        return RET_ERR;
+    }
     if (!udsServer.SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-    session->AddEvent(key->GetId(), currentTime);
     return RET_OK;
 }
 
