@@ -86,10 +86,8 @@ std::string KeyMapManager::GetKeyEventFileName(struct libinput_device *device)
 int32_t KeyMapManager::TransferDefaultKeyValue(int32_t inputKey)
 {
     CALL_LOG_ENTER;
-    auto itr = configKeyValue_.find(defaultKeyId_);
-    if (itr != configKeyValue_.end()) {
-        auto defaultKey = itr->second.find(inputKey);
-        if (defaultKey != itr->second.end()) {
+    if (auto itr = configKeyValue_.find(defaultKeyId_); itr != configKeyValue_.end()) {
+        if (auto defaultKey = itr->second.find(inputKey); defaultKey != itr->second.end()) {
             return defaultKey->second;
         }
     }
@@ -105,10 +103,8 @@ int32_t KeyMapManager::TransferDeviceKeyValue(struct libinput_device *device,
         return TransferDefaultKeyValue(inputKey);
     }
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
-    auto itr = configKeyValue_.find(deviceId);
-    if (itr != configKeyValue_.end()) {
-        auto devKey = itr->second.find(inputKey);
-        if (devKey != itr->second.end()) {
+    if (auto itr = configKeyValue_.find(deviceId); itr != configKeyValue_.end()) {
+        if (auto devKey = itr->second.find(inputKey); devKey != itr->second.end()) {
             return devKey->second;
         }
     }
@@ -119,9 +115,6 @@ std::vector<int32_t> KeyMapManager::InputTransferKeyValue(int32_t deviceId, int3
 {
     std::vector<int32_t> sysKey;
     auto iter = configKeyValue_.find(deviceId);
-    if (iter == configKeyValue_.end()) {
-        return std::vector<int32_t>();
-    }
     for (auto it : iter->second) {
         if (it.second == keyCode) {
             sysKey.push_back(it.first);
