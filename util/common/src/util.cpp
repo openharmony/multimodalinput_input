@@ -505,7 +505,7 @@ static bool IsValidProPath(const std::string &filePath)
     return IsValidPath(PRO_PATH, filePath);
 }
 
-void ReadProFile(const std::string &filePath, int32_t deviceId, 
+void ReadProFile(const std::string &filePath, int32_t deviceId,
     std::map<int32_t, std::map<int32_t, int32_t>> &configMap)
 {
     CALL_LOG_ENTER;
