@@ -67,11 +67,11 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     PointerEvent::PointerItem item;
     auto pressure = libinput_event_touch_get_pressure(data);
     auto seatSlot = libinput_event_touch_get_seat_slot(data);
-    auto axisLong = libinput_event_get_touch_contact_axis_long(data);
-    auto axisShort = libinput_event_get_touch_contact_axis_short(data);
+    auto longAxis = libinput_event_get_touch_contact_long_axis(data);
+    auto shortAxis = libinput_event_get_touch_contact_short_axis(data);
     item.SetPressure(pressure);
-    item.SetAxisLong(axisLong);
-    item.SetAxisShort(axisShort);
+    item.SetLongAxis(longAxis);
+    item.SetShortAxis(shortAxis);
     int32_t toolType = GetTouchToolType(event);
     item.SetToolType(toolType);
     item.SetPointerId(seatSlot);
@@ -113,11 +113,11 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
         return false;
     }
     auto pressure = libinput_event_touch_get_pressure(data);
-    auto axisLong = libinput_event_get_touch_contact_axis_long(data);
-    auto axisShort = libinput_event_get_touch_contact_axis_short(data);
+    auto longAxis = libinput_event_get_touch_contact_long_axis(data);
+    auto shortAxis = libinput_event_get_touch_contact_short_axis(data);
     item.SetPressure(pressure);
-    item.SetAxisLong(axisLong);
-    item.SetAxisShort(axisShort);
+    item.SetLongAxis(longAxis);
+    item.SetShortAxis(shortAxis);
     item.SetGlobalX(touchInfo.point.x);
     item.SetGlobalY(touchInfo.point.y);
     item.SetToolGlobalX(touchInfo.toolRect.point.x);
@@ -192,6 +192,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
 
 int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_event *event)
 {
+    CHKPR(event, PointerEvent::TOOL_TYPE_FINGER);
     auto data = libinput_event_get_touch_event(event);
     CHKPR(data, PointerEvent::TOOL_TYPE_FINGER);
     auto toolTypeTmp = libinput_event_touch_get_tool_type(data);
@@ -216,6 +217,7 @@ int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_event *ev
 
 int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_device *device)
 {
+    CHKPR(device, PointerEvent::TOOL_TYPE_FINGER);
     if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_PEN) == BTN_DOWN) {
         return PointerEvent::TOOL_TYPE_PEN;
     } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_RUBBER) == BTN_DOWN) {

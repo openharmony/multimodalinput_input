@@ -19,6 +19,8 @@ using namespace OHOS::MMI;
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingKeyboardDevice" };
+constexpr int32_t EVENT_REPROT_COUNTS = 50;
+constexpr int64_t EVENT_REPROT_TIMES = 20;
 } // namespace
 
 int32_t ProcessingKeyboardDevice::TransformJsonDataToInputData(const DeviceItem& fingerEventArrays,

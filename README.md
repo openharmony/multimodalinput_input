@@ -63,13 +63,17 @@ When a system app needs to return to the previous directory, you can call the AP
 
 ```
 // Import the required JavaScript API library.
-import input from '@ohos.injectEventHandler'
+import input from '@ohos.multimodalInput.inputEventClient'
 
 // Call the API for injecting events.
-var res = input.injectEventSync({
+var keyEvent = {
     isPressed:true,           // Action type of the key event. true indicates that the key is being pressed down, and false indicates that the key is being released.
     code:2,                   // Keycode for the key, for example, 2 for the BACK key.
     keyDownDuration:10,       // Duration in which the current key is pressed down before it is released, in milliseconds.
+};
+
+var res = input.injectEvent({
+    KeyEvent: keyEvent
 });
 ```
 

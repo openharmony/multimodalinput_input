@@ -19,6 +19,7 @@ using namespace OHOS::MMI;
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingFingerDevice" };
+constexpr int64_t FINGER_BLOCK_TIME = 6;
 } // namespace
 
 int32_t ProcessingFingerDevice::TransformJsonDataToInputData(const DeviceItem& fingerEventArrays,

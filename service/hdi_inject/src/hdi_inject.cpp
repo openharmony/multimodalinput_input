@@ -30,6 +30,21 @@ using namespace OHOS::MMI;
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "HdiInject" };
+constexpr int32_t HDF_MOUSE_DEV_TYPE = 5;
+constexpr int32_t HDF_KEYBOARD_DEV_TYPE = 3;
+constexpr int32_t HDF_TOUCH_DEV_TYPE = 17;
+constexpr int32_t HDF_TABLET_DEV_TYPE = 33;
+constexpr int32_t HDF_TABLET_PAD_DEV_TYPE = 289;
+constexpr int32_t HDF_SWITH_PAD_DEV_TYPE = 2089;
+constexpr int32_t HDF_TOUCH_FINGER_DEV_TYPE = 2089;
+constexpr int32_t HDF_SWITCH_DEV_TYPE = 7;
+constexpr int32_t HDF_TRACK_PAD_DEV_TYPE = 7;
+constexpr int32_t HDF_JOYSTICK_DEV_TYPE = 65;
+constexpr int32_t HDF_GAMEPAD_DEV_TYPE = 65;
+constexpr int32_t HDF_TOUCH_PAD_DEV_TYPE = 5;
+constexpr int32_t HDF_TRACK_BALL_DEV_TYPE = 3;
+constexpr int32_t HDF_DEVICE_FD_DEFAULT_STATUS = -1;
+constexpr int32_t EVENT_PACKAGE_ARROW_SIZE = 1;
 } // namespace
 
 bool HdiInject::Init(UDSServer &sess)

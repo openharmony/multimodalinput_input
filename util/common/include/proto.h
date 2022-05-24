@@ -20,7 +20,6 @@
 enum class MmiMessageId : int32_t {
     INVALID = 0,
 
-    // libinput message id
     INPUT_DEVICE = 901,
     INPUT_DEVICE_IDS,
     INPUT_DEVICE_KEYSTROKE_ABILITY,
@@ -28,7 +27,6 @@ enum class MmiMessageId : int32_t {
     REMOVE_INPUT_DEVICE_MONITOR,
     INPUT_DEVICE_KEYBOARD_TYPE,
 
-    // mmi message id
     BEGIN = 1001,
     REGISTER_APP_INFO,
     REGISTER_MSG_HANDLER,
@@ -132,10 +130,7 @@ enum class MmiMessageId : int32_t {
     ON_VIRTUAL_HOME,
     ON_VIRTUAL_BACK,
     ON_VIRTUAL_MULTI_XERA,
-    GET_MMI_INFO_REQ = 12100,
-    GET_MMI_INFO_ACK,
 
-    ON_DUMP = 13000,
     ON_EXCEPTION = 13050,
     ON_LIST,
     INJECT_KEY_EVENT = 14000,

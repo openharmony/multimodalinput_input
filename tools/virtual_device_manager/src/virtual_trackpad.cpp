@@ -49,12 +49,12 @@ const std::vector<uint32_t>& VirtualTrackpad::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& VirtualTrackpad::GetMscs() const
+const std::vector<uint32_t>& VirtualTrackpad::GetMiscellaneous() const
 {
-    static const std::vector<uint32_t> mscs {
+    static const std::vector<uint32_t> miscellaneous {
         MSC_SCAN
     };
-    return mscs;
+    return miscellaneous;
 }
 
 const std::vector<uint32_t>& VirtualTrackpad::GetLeds() const
@@ -65,12 +65,12 @@ const std::vector<uint32_t>& VirtualTrackpad::GetLeds() const
     return leds;
 }
 
-const std::vector<uint32_t>& VirtualTrackpad::GetReps() const
+const std::vector<uint32_t>& VirtualTrackpad::GetRepeats() const
 {
-    static const std::vector<uint32_t> reps {
+    static const std::vector<uint32_t> repeats {
         REP_DELAY, REP_PERIOD
     };
-    return reps;
+    return repeats;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -18,8 +18,8 @@
 #include <chrono>
 #include <cinttypes>
 #include <cstdarg>
+#include <fstream>
 #include <iomanip>
-#include <sstream>
 #include <thread>
 
 #include <fcntl.h>
@@ -45,10 +45,17 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Util"};
 constexpr int32_t FILE_SIZE_MAX = 0x5000;
+constexpr int32_t MAX_PRO_FILE_SIZE = 128000;
+constexpr int32_t KEY_ELEMENT_COUNT = 4;
 constexpr int32_t INVALID_FILE_SIZE = -1;
+constexpr int32_t COMMENT_SUBSCRIPT = 0;
 const std::string DATA_PATH = "/data";
 const std::string PROC_PATH = "/proc";
 const std::string INPUT_PATH = "/system/etc/multimodalinput/";
+const std::string PRO_PATH = "/vendor/etc/keymap/";
+constexpr size_t BUF_TID_SIZE = 10;
+constexpr size_t BUF_CMD_SIZE = 512;
+constexpr size_t PROGRAM_NAME_SIZE = 256;
 } // namespace
 
 const std::map<int32_t, std::string> ERROR_STRING_MAP = {
@@ -102,8 +109,8 @@ int64_t GetMillisTime()
 
 std::string UuIdGenerate()
 {
-    constexpr int32_t UUID_BUF_SIZE = 64;
-    char buf[UUID_BUF_SIZE] = {};
+    static constexpr int32_t uuidBufSize = 64;
+    char buf[uuidBufSize] = {};
     return buf;
 }
 
@@ -120,14 +127,13 @@ std::string GetThisThreadIdOfString()
     thread_local std::string threadLocalId;
     if (threadLocalId.empty()) {
         long tid = syscall(SYS_gettid);
-        constexpr size_t bufSize = 10;
-        char buf[bufSize] = {};
-        const int32_t ret = sprintf_s(buf, bufSize, "%06d", tid);
+        char buf[BUF_TID_SIZE] = {};
+        const int32_t ret = sprintf_s(buf, BUF_TID_SIZE, "%06d", tid);
         if (ret < 0) {
             printf("ERR: in %s, #%d, call sprintf_s fail, ret = %d.", __func__, __LINE__, ret);
             return threadLocalId;
         }
-        buf[bufSize - 1] = '\0';
+        buf[BUF_TID_SIZE - 1] = '\0';
         threadLocalId = buf;
     }
 
@@ -274,15 +280,13 @@ std::string GetFileName(const std::string& strPath)
 
 const char* GetProgramName()
 {
-    constexpr size_t programNameSize = 256;
-    static char programName[programNameSize] = {};
+    static char programName[PROGRAM_NAME_SIZE] = {};
     if (programName[0] != '\0') {
         return programName;
     }
 
-    constexpr size_t bufSize = 512;
-    char buf[bufSize] = { 0 };
-    if (sprintf_s(buf, bufSize, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
+    char buf[BUF_CMD_SIZE] = { 0 };
+    if (sprintf_s(buf, BUF_CMD_SIZE, "/proc/%d/cmdline", static_cast<int32_t>(getpid())) == -1) {
         KMSG_LOGE("GetProcessInfo sprintf_s /proc/.../cmdline error");
         return "";
     }
@@ -291,7 +295,7 @@ const char* GetProgramName()
         KMSG_LOGE("fp is nullptr, filename = %s.", buf);
         return "";
     }
-    constexpr size_t bufLineSize = 512;
+    static constexpr size_t bufLineSize = 512;
     char bufLine[bufLineSize] = { 0 };
     if ((fgets(bufLine, bufLineSize, fp) == nullptr)) {
         KMSG_LOGE("fgets fail.");
@@ -312,13 +316,13 @@ const char* GetProgramName()
         KMSG_LOGE("tempName is empty.");
         return "";
     }
-    const size_t copySize = (std::min)(tempName.size(), programNameSize - 1);
+    const size_t copySize = std::min(tempName.size(), PROGRAM_NAME_SIZE - 1);
     if (copySize == 0) {
         KMSG_LOGE("copySize is 0.");
         return "";
     }
-    errno_t ret = memcpy_s(programName, programNameSize, tempName.c_str(), copySize);
-    if (ret != RET_OK) {
+    errno_t ret = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
+    if (ret != EOK) {
         return "";
     }
     KMSG_LOGI("GetProgramName success. programName = %s", programName);
@@ -346,7 +350,7 @@ char* MmiBasename(char* path)
 std::string GetStackInfo()
 {
 #ifndef OHOS_BUILD
-    constexpr size_t bufferSize = 1024;
+    static constexpr size_t bufferSize = 1024;
     void* buffer[bufferSize];
     const int32_t nptrs = backtrace(buffer, bufferSize);
     char** strings = backtrace_symbols(buffer, nptrs);
@@ -379,11 +383,11 @@ const std::string& GetThreadName()
     if (!g_threadName.empty()) {
         return g_threadName;
     }
-    constexpr size_t MAX_THREAD_NAME_SIZE = 16;
-    char thisThreadName[MAX_THREAD_NAME_SIZE + 1];
+    static constexpr size_t maxThreadNameSize = 16;
+    char thisThreadName[maxThreadNameSize + 1];
     int32_t ret = prctl(PR_GET_NAME, thisThreadName);
     if (ret == 0) {
-        thisThreadName[MAX_THREAD_NAME_SIZE] = '\0';
+        thisThreadName[maxThreadNameSize] = '\0';
         g_threadName = thisThreadName;
     } else {
         printf("in GetThreadName, call prctl get name fail, errno: %d.\n", errno);
@@ -494,6 +498,90 @@ static bool IsValidJsonPath(const std::string &filePath)
 static bool IsValidUinputPath(const std::string &filePath)
 {
     return IsValidPath(PROC_PATH, filePath);
+}
+
+static bool IsValidProPath(const std::string &filePath)
+{
+    return IsValidPath(PRO_PATH, filePath);
+}
+
+void ReadProFile(const std::string &filePath, int32_t deviceId,
+    std::map<int32_t, std::map<int32_t, int32_t>> &configMap)
+{
+    CALL_LOG_ENTER;
+    if (filePath.empty()) {
+        MMI_HILOGE("FilePath is empty");
+        return;
+    }
+    char realPath[PATH_MAX] = {};
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("Path is error");
+        return;
+    }
+    if (!IsValidProPath(realPath)) {
+        MMI_HILOGE("File path is error");
+        return;
+    }
+    if (!IsFileExists(realPath)) {
+        MMI_HILOGE("File not exist");
+        return;
+    }
+    if (!CheckFileExtendName(realPath, "pro")) {
+        MMI_HILOGE("Unable to parse files other than json format");
+        return;
+    }
+    auto fileSize = GetFileSize(realPath);
+    if ((fileSize == INVALID_FILE_SIZE) || (fileSize >= MAX_PRO_FILE_SIZE)) {
+        MMI_HILOGE("The configuration file size is incorrect");
+        return;
+    }
+    ReadProConfigFile(realPath, deviceId, configMap);
+}
+
+void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
+    std::map<int32_t, std::map<int32_t, int32_t>> &configKey)
+{
+    CALL_LOG_ENTER;
+    std::ifstream reader(realPath);
+    if (!reader.is_open()) {
+        MMI_HILOGE("Failed to open config file");
+        return;
+    }
+    std::string strLine;
+    int32_t sysKeyValue;
+    int32_t nativeKeyValue;
+    std::map<int32_t, int32_t> tmpConfigKey;
+    while (std::getline(reader, strLine)) {
+        size_t pos = strLine.find('#');
+        if (pos != strLine.npos && pos != COMMENT_SUBSCRIPT) {
+            MMI_HILOGE("The comment line format is error");
+            return;
+        }
+        if (!strLine.empty() && strLine.front() != '#') {
+            std::istringstream stream(strLine);
+            std::array<std::string, KEY_ELEMENT_COUNT> keyElement;
+            stream >> keyElement[0] >> keyElement[1] >> keyElement[2] >> keyElement[3];
+            if (keyElement[0].empty() || keyElement[1].empty() || keyElement[2].empty() || keyElement[3].empty()) {
+                MMI_HILOGE("The key value data is incomplete");
+                reader.close();
+                return;
+            }
+            if (!IsNum(keyElement[1]) || !IsNum(keyElement[2])) {
+                MMI_HILOGE("Get key value is invalid");
+                reader.close();
+                return;
+            }
+            nativeKeyValue = stoi(keyElement[1]);
+            sysKeyValue = stoi(keyElement[2]);
+            tmpConfigKey.insert(std::pair<int32_t, int32_t>(nativeKeyValue, sysKeyValue));
+        }
+    }
+    reader.close();
+    auto iter = configKey.insert(std::make_pair(deviceId, tmpConfigKey));
+    if (!iter.second) {
+        MMI_HILOGE("The file name is duplicated");
+        return;
+    }
 }
 
 std::string ReadJsonFile(const std::string &filePath)

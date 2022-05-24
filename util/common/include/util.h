@@ -17,6 +17,7 @@
 
 #include <ctime>
 #include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -51,6 +52,10 @@ const std::string& GetThreadName();
 void AddId(std::vector<int32_t> &list, int32_t id);
 size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_t> &list2,
     std::vector<int32_t> &difList);
+void ReadProFile(const std::string &filePath, int32_t deviceId,
+    std::map<int32_t, std::map<int32_t, int32_t>> &configMap);
+void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
+    std::map<int32_t, std::map<int32_t, int32_t>> &configKey);
 std::string StringFmt(const char* str, ...);
 std::string ReadJsonFile(const std::string &filePath);
 std::string ReadUinputToolFile(const std::string &filePath);
