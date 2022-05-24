@@ -48,10 +48,11 @@ constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int32_t MAX_PRO_FILE_SIZE = 128000;
 constexpr int32_t KEY_ELEMENT_COUNT = 4;
 constexpr int32_t INVALID_FILE_SIZE = -1;
+constexpr int32_t COMMENT_SUBSCRIPT = 0;
 const std::string DATA_PATH = "/data";
 const std::string PROC_PATH = "/proc";
 const std::string INPUT_PATH = "/system/etc/multimodalinput/";
-const std::string PRO_PATH = "/vendor/etc/KeyValueTransform/";
+const std::string PRO_PATH = "/vendor/etc/keymap/";
 constexpr size_t BUF_TID_SIZE = 10;
 constexpr size_t BUF_CMD_SIZE = 512;
 constexpr size_t PROGRAM_NAME_SIZE = 256;
@@ -504,48 +505,58 @@ static bool IsValidProPath(const std::string &filePath)
     return IsValidPath(PRO_PATH, filePath);
 }
 
-std::vector<std::string> ReadProFile(const std::string &filePath)
+void ReadProFile(const std::string &filePath, int32_t deviceId,
+    std::map<int32_t, std::map<int32_t, int32_t>> &configMap)
 {
-    std::vector<std::string> configKey;
+    CALL_LOG_ENTER;
     if (filePath.empty()) {
-        MMI_HILOGE("filePath is empty");
-        return configKey;
+        MMI_HILOGE("FilePath is empty");
+        return;
     }
     char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
         MMI_HILOGE("Path is error");
-        return configKey;
+        return;
     }
     if (!IsValidProPath(realPath)) {
         MMI_HILOGE("File path is error");
-        return configKey;
+        return;
     }
     if (!IsFileExists(realPath)) {
         MMI_HILOGE("File not exist");
-        return configKey;
+        return;
     }
     if (!CheckFileExtendName(realPath, "pro")) {
         MMI_HILOGE("Unable to parse files other than json format");
-        return configKey;
+        return;
     }
     auto fileSize = GetFileSize(realPath);
     if ((fileSize == INVALID_FILE_SIZE) || (fileSize >= MAX_PRO_FILE_SIZE)) {
         MMI_HILOGE("The configuration file size is incorrect");
-        return configKey;
+        return;
     }
-    ReadProConfigFile(realPath, configKey);
-    return configKey;
+    ReadProConfigFile(realPath, deviceId, configMap);
 }
 
-void ReadProConfigFile(const std::string &realPath, std::vector<std::string> &configKey)
+void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
+    std::map<int32_t, std::map<int32_t, int32_t>> &configKey)
 {
+    CALL_LOG_ENTER;
     std::ifstream reader(realPath);
     if (!reader.is_open()) {
         MMI_HILOGE("Failed to open config file");
         return;
     }
     std::string strLine;
+    int32_t sysKeyValue;
+    int32_t nativeKeyValue;
+    std::map<int32_t, int32_t> tmpConfigKey;
     while (std::getline(reader, strLine)) {
+        size_t pos = strLine.find('#');
+        if (pos != strLine.npos && pos != COMMENT_SUBSCRIPT) {
+            MMI_HILOGE("The comment line format is error");
+            return;
+        }
         if (!strLine.empty() && strLine.front() != '#') {
             std::istringstream stream(strLine);
             std::array<std::string, KEY_ELEMENT_COUNT> keyElement;
@@ -560,10 +571,17 @@ void ReadProConfigFile(const std::string &realPath, std::vector<std::string> &co
                 reader.close();
                 return;
             }
-            configKey.push_back(strLine);
+            nativeKeyValue = stoi(keyElement[1]);
+            sysKeyValue = stoi(keyElement[2]);
+            tmpConfigKey.insert(std::pair<int32_t, int32_t>(nativeKeyValue, sysKeyValue));
         }
     }
     reader.close();
+    auto iter = configKey.insert(std::make_pair(deviceId, tmpConfigKey));
+    if (!iter.second) {
+        MMI_HILOGE("The file name is duplicated");
+        return;
+    }
 }
 
 std::string ReadJsonFile(const std::string &filePath)
