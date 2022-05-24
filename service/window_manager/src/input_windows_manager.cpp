@@ -32,10 +32,9 @@ InputWindowsManager::InputWindowsManager() {}
 
 InputWindowsManager::~InputWindowsManager() {}
 
-bool InputWindowsManager::Init(UDSServer& udsServer)
+void InputWindowsManager::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
-    return true;
 }
 
 int32_t InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent> inputEvent)
