@@ -70,7 +70,6 @@ protected:
     bool InitSignalHandler();
     int32_t Init();
 
-    void OnTimer();
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
 
