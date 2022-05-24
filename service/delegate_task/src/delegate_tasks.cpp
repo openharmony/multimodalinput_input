@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "entrust_tasks.h"
+#include "delegate_tasks.h"
 
 #include <sys/syscall.h>
 #include <unistd.h>
@@ -23,10 +23,10 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EntrustTasks" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DelegateTasks" };
 } // namespace
 
-void EntrustTasks::Task::ProcessTask()
+void DelegateTasks::Task::ProcessTask()
 {
     CALL_LOG_ENTER;
     if (hasWaited_) {
@@ -41,7 +41,7 @@ void EntrustTasks::Task::ProcessTask()
     }
 }
 
-bool EntrustTasks::Init()
+bool DelegateTasks::Init()
 {
     CALL_LOG_ENTER;
     int32_t res = pipe(fds_);
@@ -52,7 +52,7 @@ bool EntrustTasks::Init()
     return true;
 }
 
-void EntrustTasks::ProcessTasks()
+void DelegateTasks::ProcessTasks()
 {
     CALL_LOG_ENTER;
     std::vector<TaskPtr> tasks;
@@ -63,7 +63,7 @@ void EntrustTasks::ProcessTasks()
     }
 }
 
-int32_t EntrustTasks::PostSyncTask(ETaskCallback callback)
+int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
 {
     CALL_LOG_ENTER;
     if (IsCallFromWorkerThread()) {
@@ -91,7 +91,7 @@ int32_t EntrustTasks::PostSyncTask(ETaskCallback callback)
     return future.get();
 }
 
-int32_t EntrustTasks::PostAsyncTask(ETaskCallback callback)
+int32_t DelegateTasks::PostAsyncTask(DTaskCallback callback)
 {
     if (IsCallFromWorkerThread()) {
         return callback();
@@ -104,7 +104,7 @@ int32_t EntrustTasks::PostAsyncTask(ETaskCallback callback)
     return RET_OK;
 }
 
-void EntrustTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
+void DelegateTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 {
     std::lock_guard<std::mutex> guard(mux_);
     int32_t count = 0;
@@ -117,7 +117,7 @@ void EntrustTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
     }
 }
 
-EntrustTasks::TaskPtr EntrustTasks::PostTask(ETaskCallback callback, Promise *promise)
+DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *promise)
 {
     if (IsCallFromWorkerThread()) {
         MMI_HILOGE("This interface cannot be called from a worker thread.");

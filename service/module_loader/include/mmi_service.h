@@ -25,7 +25,7 @@
 #include "singleton.h"
 #include "system_ability.h"
 
-#include "entrust_tasks.h"
+#include "delegate_tasks.h"
 #include "input_event_handler.h"
 #include "multimodal_input_connect_stub.h"
 #include "libinput_adapter.h"
@@ -68,12 +68,12 @@ protected:
     bool InitLibinputService();
     bool InitService();
     bool InitSignalHandler();
-    bool InitEntrustTasks();
+    bool InitDelegateTasks();
     int32_t Init();
 
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
-    void OnEntrustTask(epoll_event& ev);
+    void OnDelegateTask(epoll_event& ev);
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
@@ -86,7 +86,7 @@ private:
 
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
-    EntrustTasks entrustTasks_;
+    DelegateTasks delegateTasks_;
 };
 } // namespace MMI
 } // namespace OHOS

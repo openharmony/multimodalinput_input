@@ -1,0 +1,50 @@
+/*
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef KEY_AUTO_REPEAT_H
+#define KEY_AUTO_REPEAT_H
+
+#include <map>
+#include <string>
+
+#include "key_map_manager.h"
+#include "key_event.h"
+#include "libinput.h"
+#include "singleton.h"
+#include "util.h"
+
+namespace OHOS {
+namespace MMI {
+class KeyAutoRepeat : public DelayedSingleton<KeyAutoRepeat> {
+public:
+    KeyAutoRepeat() = default;
+    ~KeyAutoRepeat() = default;
+    int32_t AddDeviceConfig(struct libinput_device *device);
+    int32_t SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent, int32_t lastPressedKeyCode);
+    void RemoveDeviceConfig(struct libinput_device *device);
+    int32_t GetIntervalTime(int32_t deviceId) const;
+    std::map<int32_t, DeviceConfig> GetDeviceConfig() const;
+private:
+    std::string GetTomlFilePath(const std::string &fileName) const;
+    DeviceConfig GetAutoSwitch(int32_t deviceId);
+private:
+    std::map<int32_t, DeviceConfig> deviceConfig_;
+    int32_t timerId_ = -1;
+};
+
+#define KeyRepeat KeyAutoRepeat::GetInstance()
+} // namespace MMI
+} // namespace OHOS
+#endif // KEY_AUTO_REPEAT_H
