@@ -56,20 +56,20 @@ const std::vector<uint32_t>& VirtualKnob::GetLeds() const
     return leds;
 }
 
-const std::vector<uint32_t>& VirtualKnob::GetReps() const
+const std::vector<uint32_t>& VirtualKnob::GetRepeats() const
 {
-    static const std::vector<uint32_t> reps {
+    static const std::vector<uint32_t> repeats {
         REP_DELAY, REP_PERIOD
     };
-    return reps;
+    return repeats;
 }
 
-const std::vector<uint32_t>& VirtualKnob::GetMscs() const
+const std::vector<uint32_t>& VirtualKnob::GetMiscellaneous() const
 {
-    static const std::vector<uint32_t> mscs {
+    static const std::vector<uint32_t> miscellaneous {
         MSC_SCAN
     };
-    return mscs;
+    return miscellaneous;
 }
 } // namespace MMI
 } // namespace OHOS

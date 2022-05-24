@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,20 +18,16 @@
 
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     #include "interceptor_handler_global.h"
-    #include "interceptor_manager_global.h"
 #else
     #include "i_interceptor_handler_global.h"
-    #include "i_interceptor_manager_global.h"
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 
 namespace OHOS {
 namespace MMI {
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     #define InterHdlGl InterceptorHandlerGlobal::GetInstance()
-    #define InterMgrGl InterceptorManagerGlobal::GetInstance()
 #else
     #define InterHdlGl IInterceptorHandlerGlobal::GetInstance()
-    #define InterMgrGl IInterceptorManagerGlobal::GetInstance()
 #endif
 } // namespace MMI
 } // namespace OHOS

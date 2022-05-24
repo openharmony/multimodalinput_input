@@ -33,6 +33,7 @@ config("libmmi_server_config") {
     "key_command/include",
     "subscriber/include",
     "timer_manager/include",
+    "permission_helper/include",
     "${mmi_service_path}/connect_manager/include",
     "${mmi_service_path}/filter/include",
     "${mmi_service_path}/module_loader/include",
@@ -92,10 +93,11 @@ ohos_prebuilt_etc("multimodalinput_config_ability.json") {
 }
 
 ohos_prebuilt_etc("universal_key_value_transformation") {
-  source = "//foundation/multimodalinput/input/util/KeyValueTransform/key_universal.pro"
-  part_name = "input"
+  source = "//foundation/multimodalinput/input/util/KeyValueTransform/default_key.pro"
+  relative_install_dir = "KeyValueTransform"
+  install_images = [ "vendor" ]
   subsystem_name = "multimodalinput"
-  relative_install_dir = "multimodalinput/KeyValueTransform"
+  part_name = "input"
 }
 
 ohos_prebuilt_etc("drawing_pointer_image") {
@@ -112,6 +114,7 @@ ohos_shared_library("libmmi-server") {
     "device_manager/src/input_device_manager.cpp",
     "event_dispatch/src/event_dispatch.cpp",
     "event_dump/src/event_dump.cpp",
+    "event_handler/src/config_key_value_transform.cpp",
     "event_handler/src/input_event_handler.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
     "event_package/src/event_package.cpp",
@@ -122,6 +125,7 @@ ohos_shared_library("libmmi-server") {
     "monitor/src/input_handler_manager_global.cpp",
     "mouse_event_handler/src/mouse_device_state.cpp",
     "mouse_event_handler/src/mouse_event_handler.cpp",
+    "permission_helper/src/permission_helper.cpp",
     "subscriber/src/key_event_subscriber.cpp",
     "subscriber/src/key_option.cpp",
     "timer_manager/src/timer_manager.cpp",
@@ -153,15 +157,9 @@ ohos_shared_library("libmmi-server") {
   }
 
   if (mmi_enable_interceptor) {
-    sources += [
-      "interceptor/src/interceptor_handler_global.cpp",
-      "interceptor/src/interceptor_manager_global.cpp",
-    ]
+    sources += [ "interceptor/src/interceptor_handler_global.cpp" ]
   } else {
-    sources += [
-      "interceptor/src/i_interceptor_handler_global.cpp",
-      "interceptor/src/i_interceptor_manager_global.cpp",
-    ]
+    sources += [ "interceptor/src/i_interceptor_handler_global.cpp" ]
   }
 
   sources += [ "module_loader/src/mmi_service.cpp" ]
@@ -173,7 +171,7 @@ ohos_shared_library("libmmi-server") {
     ":mmi_device_config.ini",
     ":multimodalinput_config_ability.json",
     ":universal_key_value_transformation",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
+    "${aakits_path}/ability/native:abilitykit_native",
     "//foundation/graphic/graphic/rosen/modules/2d_graphics:2d_graphics",
     "//foundation/graphic/graphic/rosen/modules/render_service_client:librender_service_client",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
@@ -295,10 +293,10 @@ ohos_unittest("ut-mmi-service-out") {
   configs = [ ":libmmi_server_config" ]
 
   deps = [
+    "${aakits_path}/appkit:appkit_native",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]

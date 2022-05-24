@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -518,7 +518,7 @@ void PointerEvent::SetButtonId(int32_t buttonId)
 
 double PointerEvent::GetAxisValue(AxisType axis) const
 {
-    double axisValue {  };
+    double axisValue {};
     if ((axis >= AXIS_TYPE_UNKNOWN) && (axis < AXIS_TYPE_MAX)) {
         axisValue = axisValues_[axis];
     }
@@ -699,7 +699,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     }
 
     for (int32_t i = 0; i < axisValueSize; i++) {
-        double val = {};
+        double val {};
         if (!in.ReadDouble(val)) {
             return false;
         }

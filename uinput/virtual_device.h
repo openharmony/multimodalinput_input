@@ -48,7 +48,6 @@ protected:
     const uint16_t productId_;
     const uint16_t version_;
     uinput_user_dev dev_ {};
-    static constexpr uint32_t MAX_NAME_LENGTH = 80;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -18,10 +18,10 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-    constexpr int32_t ABS_MAX_REMOTE = 65535;
-    constexpr int32_t ABS_FUZZ_REMOTE = 255;
-    constexpr int32_t ABS_FLAT_REMOTE = 4095;
-}
+constexpr int32_t ABS_MAX_REMOTE = 65535;
+constexpr int32_t ABS_FUZZ_REMOTE = 255;
+constexpr int32_t ABS_FLAT_REMOTE = 4095;
+} // namespace
 
 VirtualRemoteControl::VirtualRemoteControl() : VirtualDevice("Virtual RemoteControl", BUS_USB, 0x7d02, 0x0002)
 {
@@ -71,10 +71,10 @@ const std::vector<uint32_t>& VirtualRemoteControl::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& VirtualRemoteControl::GetMscs() const
+const std::vector<uint32_t>& VirtualRemoteControl::GetMiscellaneous() const
 {
-    static const std::vector<uint32_t> mscs { MSC_SCAN };
-    return mscs;
+    static const std::vector<uint32_t> miscellaneous { MSC_SCAN };
+    return miscellaneous;
 }
 } // namespace MMI
 } // namespace OHOS

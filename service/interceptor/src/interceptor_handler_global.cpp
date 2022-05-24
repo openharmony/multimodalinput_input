@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -104,8 +104,9 @@ void InterceptorHandlerGlobal::SessionHandler::SendToClient(std::shared_ptr<KeyE
 {
     CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
-    if (!pkt.Write(id_)) {
-        MMI_HILOGE("Write to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+    pkt << id_;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write key event failed");
         return;
     }
     if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
@@ -123,8 +124,9 @@ void InterceptorHandlerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poin
     CHKPV(pointerEvent);
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
     MMI_HILOGD("Service SendToClient id:%{public}d,InputHandlerType:%{public}d", id_, handlerType_);
-    if (!pkt.Write(id_) || !pkt.Write(handlerType_)) {
-        MMI_HILOGE("Write id_ to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+    pkt << id_ << handlerType_;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write pointer event failed");
         return;
     }
     if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
@@ -161,7 +163,7 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
 {
     CHKPF(pointerEvent);
     if (interceptors_.empty()) {
-        MMI_HILOGW("Pointer interceptors is empty");
+        MMI_HILOGE("Pointer interceptors is empty");
         return false;
     }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
@@ -179,11 +181,10 @@ int32_t InterceptorHandlerGlobal::InterceptorCollection::AddInterceptor(const Se
         return RET_ERR;
     }
     auto ret = interceptors_.insert(interceptor);
-    if (ret.second) {
-        MMI_HILOGD("Register interceptor successfully");
-    } else {
+    if (!ret.second) {
         MMI_HILOGW("Duplicate interceptors");
     }
+    MMI_HILOGD("Register interceptor successfully");
     return RET_OK;
 }
 
@@ -192,8 +193,8 @@ void InterceptorHandlerGlobal::InterceptorCollection::RemoveInterceptor(const Se
     std::set<SessionHandler>::const_iterator tItr = interceptors_.find(interceptor);
     if (tItr != interceptors_.cend()) {
         interceptors_.erase(tItr);
-        MMI_HILOGD("Unregister interceptor successfully");
     }
+    MMI_HILOGD("Unregister interceptor successfully");
 }
 
 void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr session)

@@ -22,6 +22,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t ERROR_UNSUPPORT = -2;
+constexpr int32_t ARGV_VALID = 2;
 }
 
 enum MmiModuleType {
@@ -87,7 +88,7 @@ enum {
     CONN_BREAK,                                 // 连接断开
     SOCKET_BUF_FULL,                            // socket 缓冲区满
     WAITING_QUEUE_FULL,                         // 等待队列满
-    APP_NOT_RESP,                               // ANR
+    APP_NOT_RESP,                               // 应用程序不响应
     MEMCPY_SEC_FUN_FAIL,                        // memcpy安全函数错误
     LIBINPUT_DEV_NULLPTR,                       // libinput Device为空
     TOUCH_ID_NO_FIND,                           // 未找到touchid

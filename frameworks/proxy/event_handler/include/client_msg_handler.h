@@ -40,14 +40,12 @@ protected:
     int32_t OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt);
     int32_t OnPointerEvent(const UDSClient& client, NetPacket& pkt);
     int32_t OnSubscribeKeyEventCallback(const UDSClient& client, NetPacket& pkt);
-    int32_t GetMultimodeInputInfo(const UDSClient& client, NetPacket& pkt);
     int32_t ReportKeyEvent(const UDSClient& client, NetPacket& pkt);
     int32_t ReportPointerEvent(const UDSClient& client, NetPacket& pkt);
     int32_t OnInputDevice(const UDSClient& client, NetPacket& pkt);
     int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);
     int32_t OnSupportKeys(const UDSClient& client, NetPacket& pkt);
     int32_t OnDevMonitor(const UDSClient& client, NetPacket& pkt);
-    int32_t KeyEventInterceptor(const UDSClient& client, NetPacket& pkt);
 
 private:
     static void OnEventProcessed(int32_t eventId);
