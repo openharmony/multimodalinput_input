@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t MIN_DELAY = 36;
+constexpr int32_t MIN_DELAY = -1;
 constexpr int32_t MIN_INTERVAL = 50;
 constexpr int32_t MAX_INTERVAL = 4096;
 constexpr int32_t MAX_TIMER_COUNT = 32;
@@ -148,14 +148,13 @@ std::unique_ptr<TimerManager::TimerItem>& TimerManager::InsertTimerInternal(std:
 int32_t TimerManager::CalcNextDelayInternal()
 {
     auto delay = MIN_DELAY;
-    auto nowTime = GetMillisTime();
-    for (const auto& timer : timers_) {
-        if (nowTime < timer->nextCallTime) {
-            delay = timer->nextCallTime - nowTime;
-            if (delay < MIN_DELAY) {
-                delay = MIN_DELAY;
-                break;
-            }
+    if (!timers_.empty()) {
+        auto nowTime = GetMillisTime();
+        const auto& item = *timers_.begin();
+        if (nowTime >= item->nextCallTime) {
+            delay = 0;
+        } else {
+            delay = item->nextCallTime - nowTime;
         }
     }
     return delay;

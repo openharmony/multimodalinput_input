@@ -344,14 +344,6 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& 
 }
 #endif
 
-void MMIService::OnTimer()
-{
-    if (InputHandler != nullptr) {
-        InputHandler->OnCheckEventReport();
-    }
-    TimerMgr->ProcessTimers();
-}
-
 void MMIService::OnThread()
 {
     SetThreadName(std::string("mmi_service"));
@@ -361,12 +353,11 @@ void MMIService::OnThread()
     tid_.store(tid);
 #endif
     libinputAdapter_.ProcessPendingEvents();
-
-    int32_t count = 0;
-    static constexpr int32_t timeout = 1;
-    struct epoll_event ev[MAX_EVENT_SIZE] = {};
     while (state_ == ServiceRunningState::STATE_RUNNING) {
-        count = EpollWait(ev[0], MAX_EVENT_SIZE, timeout, mmiFd_);
+        epoll_event ev[MAX_EVENT_SIZE] = {};
+        int32_t timeout = TimerMgr->CalcNextDelay();
+        MMI_HILOGD("timeout:%{public}d", timeout);
+        int32_t count = EpollWait(ev[0], MAX_EVENT_SIZE, timeout, mmiFd_);
         for (int32_t i = 0; i < count && state_ == ServiceRunningState::STATE_RUNNING; i++) {
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
             CHKPC(mmiEd);
@@ -380,10 +371,10 @@ void MMIService::OnThread()
                 MMI_HILOGW("unknown epoll event type:%{public}d", mmiEd->event_type);
             }
         }
+        TimerMgr->ProcessTimers();
         if (state_ != ServiceRunningState::STATE_RUNNING) {
             break;
         }
-        OnTimer();
     }
     MMI_HILOGI("Main worker thread stop. tid:%{public}" PRId64 "", tid);
 }
