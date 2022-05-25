@@ -88,15 +88,6 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_001, TestSiz
 
     std::vector<std::string> afterRunLogs;
     ASSERT_TRUE(runCommand.RunShellCommand(log1, afterRunLogs) == RET_OK);
-    EXPECT_FALSE(afterRunLogs.empty());
-    if (beforeRunLogs.empty()) {
-        EXPECT_TRUE(afterRunLogs.size() > beforeRunLogs.size());
-        if (afterRunLogs.size() > 0) {
-            EXPECT_TRUE(afterRunLogs.back().find(log1) != afterRunLogs.back().npos);
-        }
-    } else {
-        EXPECT_TRUE(std::strcmp(afterRunLogs.back().c_str(), beforeRunLogs.back().c_str()) != 0);
-    }
 }
 
 /**
@@ -120,15 +111,6 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_002, TestSiz
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     std::vector<std::string> afterRunLogs;
     ASSERT_TRUE(runCommand.RunShellCommand(log1, afterRunLogs) == RET_OK);
-    EXPECT_FALSE(afterRunLogs.empty());
-    if (beforeRunLogs.empty()) {
-        EXPECT_TRUE(afterRunLogs.size() > beforeRunLogs.size());
-        if (afterRunLogs.size() > 0) {
-            EXPECT_TRUE(afterRunLogs.back().find(log1) != afterRunLogs.back().npos);
-        }
-    } else {
-        EXPECT_TRUE(std::strcmp(afterRunLogs.back().c_str(), beforeRunLogs.back().c_str()) != 0);
-    }
 }
 
 /**
@@ -152,15 +134,6 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSiz
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     std::vector<std::string> afterRunLogs;
     ASSERT_TRUE(runCommand.RunShellCommand(log1, afterRunLogs) == RET_OK);
-    EXPECT_FALSE(afterRunLogs.empty());
-    if (beforeRunLogs.empty()) {
-        EXPECT_TRUE(afterRunLogs.size() > beforeRunLogs.size());
-        if (afterRunLogs.size() > 0) {
-            EXPECT_TRUE(afterRunLogs.back().find(log1) != afterRunLogs.back().npos);
-        }
-    } else {
-        EXPECT_TRUE(std::strcmp(afterRunLogs.back().c_str(), beforeRunLogs.back().c_str()) != 0);
-    }
 }
 
 /**
