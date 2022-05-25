@@ -585,13 +585,15 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-u <key>                  --up     <key>      -release a button " << std::endl;
     std::cout << "-c <key>                  --click  <key>      -press the left button down,then raise" << std::endl;
     std::cout << "-s <key>                  --scroll <key>      -positive values are sliding backwards" << std::endl;
-    std::cout << "-i <time>                 --interval <time>   -the program interval for the (time) milliseconds" << std::endl;
+    std::cout << "-i <time>                 --interval <time>   -the program interval for the (time) milliseconds";
+    std::cout << std::endl;
     std::cout << "                                               negative values are sliding forwards"  << std::endl;
     std::cout << "-K  --keyboard                                                " << std::endl;
     std::cout << "commands for keyboard:                                        " << std::endl;
     std::cout << "-d <key>                   --down   <key>     -press down a key" << std::endl;
     std::cout << "-u <key>                   --up     <key>     -release a key   " << std::endl;
-    std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds" << std::endl;
+    std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
+    std::cout << std::endl;
     std::cout << "-T  --touch                                                   " << std::endl;
     std::cout << "commands for touch:                                           " << std::endl;
     std::cout << "-d <dx1> <dy1>             --down   <dx1> <dy1> -press down a position  dx1 dy1, " << std::endl;
@@ -599,7 +601,8 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-m <dx1> <dy1> <dx2> <dy2> [smooth time]      --smooth movement"   << std::endl;
     std::cout << "   <dx1> <dy1> <dx2> <dy2> [smooth time]      -smooth movement, "  << std::endl;
     std::cout << "                                              dx1 dy1 to dx2 dy2 smooth movement"   << std::endl;
-    std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds" << std::endl;
+    std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
+    std::cout << std::endl;
     std::cout << "                                                              " << std::endl;
     std::cout << "-?  --help                                                    " << std::endl;
 }
