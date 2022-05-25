@@ -234,20 +234,60 @@ public:
      */
     static constexpr int32_t MOUSE_BUTTON_TASK = 7;
 
+    /**
+     * Indicates a finger.
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_FINGER = 0;
 
+    /**
+     * Indicates a stylus.
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_PEN = 1;
 
+    /**
+     * Indicates an eraser.
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_RUBBER = 2;
 
+    /**
+     * Indicates a brush.
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_BRUSH = 3;
 
+    /**
+     * Indicates a pencil.
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_PENCIL = 4;
 
+    /**
+     * Indicates an air brush.
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_AIRBRUSH = 5;
 
+    /**
+     * Indicates a mouse.
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_MOUSE = 6;
 
+    /**
+     * Indicates a lens.
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_LENS = 7;
 
 public:
@@ -493,8 +533,19 @@ public:
          */
         void SetDeviceId(int32_t deviceId);
 
+        /**
+         * @brief Obtains the tool type.
+         * @return Returns the tool type.
+         * @since 9
+         */
         int32_t GetToolType() const;
 
+        /**
+         * @brief Sets the tool type.
+         * @param toolType Indicates the tool type to set.
+         * @return void
+         * @since 9
+         */
         void SetToolType(int32_t toolType);
 
         /**
