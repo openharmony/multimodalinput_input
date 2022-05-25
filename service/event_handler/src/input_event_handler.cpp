@@ -165,32 +165,25 @@ void InputEventHandler::Init(UDSServer& udsServer)
 void InputEventHandler::OnEvent(void *event)
 {
     CHKPV(event);
-    auto *lpEvent = static_cast<libinput_event *>(event);
-    CHKPV(lpEvent);
-    if (initSysClock_ != 0 && lastSysClock_ == 0) {
-        MMI_HILOGE("Event not handled. id:%{public}" PRId64 ",eventType:%{public}d,initSysClock:%{public}" PRId64,
-                   idSeed_, eventType_, initSysClock_);
-    }
-
-    eventType_ = libinput_event_get_type(lpEvent);
-    initSysClock_ = GetSysClockTime();
-    lastSysClock_ = 0;
     idSeed_ += 1;
     const uint64_t maxUInt64 = (std::numeric_limits<uint64_t>::max)() - 1;
     if (idSeed_ >= maxUInt64) {
-        MMI_HILOGE("Invaild value. id:%{public}" PRId64, idSeed_);
+        MMI_HILOGE("value is flipped. id:%{public}" PRId64, idSeed_);
         idSeed_ = 1;
-        return;
     }
 
+    auto *lpEvent = static_cast<libinput_event *>(event);
+    CHKPV(lpEvent);
+    int32_t eventType = libinput_event_get_type(lpEvent);
+    int64_t beginTime = GetSysClockTime();
     MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
-               "initSysClock:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType_, initSysClock_);
+               "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType, beginTime);
 
     OnEventHandler(lpEvent);
-    lastSysClock_ = GetSysClockTime();
-    int64_t lostTime = lastSysClock_ - initSysClock_;
-    MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",lastSynClock:%{public}" PRId64
-               ",lostTime:%{public}" PRId64, idSeed_, lastSysClock_, lostTime);
+    int64_t endTime = GetSysClockTime();
+    int64_t lostTime = endTime - beginTime;
+    MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
+               ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
 }
 
 int32_t InputEventHandler::OnEventHandler(libinput_event *event)
@@ -210,21 +203,6 @@ int32_t InputEventHandler::OnEventHandler(libinput_event *event)
         return ret;
     }
     return ret;
-}
-
-void InputEventHandler::OnCheckEventReport()
-{
-    if (initSysClock_ == 0 || lastSysClock_ != 0) {
-        return;
-    }
-    static constexpr int64_t maxDidTime = 1000 * 1000 * 3;
-    auto curSysClock = GetSysClockTime();
-    auto lostTime = curSysClock - initSysClock_;
-    if (lostTime < maxDidTime) {
-        return;
-    }
-    MMI_HILOGE("Event not responding. id:%{public}" PRId64 ",eventType:%{public}d,initSysClock:%{public}" PRId64 ","
-               "lostTime:%{public}" PRId64, idSeed_, eventType_, initSysClock_, lostTime);
 }
 
 UDSServer* InputEventHandler::GetUDSServer() const
