@@ -2724,5 +2724,41 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
+
+/**
+ * @tc.name:InputManagerTest_MoveMouse_01
+ * @tc.desc:Verify move mouse
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_01, TestSize.Level1)
+{
+    MMI_HILOGD("Call InputManager::MoveMouse");
+    std::string command {
+        "ServerMsgHandler: in OnMoveMouse, "
+        "Mouse movement message processed successfully"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    InputManager::GetInstance()->MoveMouse(50, 50);
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+}
+
+/**
+ * @tc.name:InputManagerTest_MoveMouse_02
+ * @tc.desc:Verify move mouse
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_02, TestSize.Level1)
+{
+    MMI_HILOGD("Call InputManager::MoveMouse");
+    std::string command {
+        "ServerMsgHandler: in OnMoveMouse, "
+        "Mouse movement message processed successfully"
+    };
+    std::vector<std::string> sLogs { SearchLog(command, true) };
+    InputManager::GetInstance()->MoveMouse(-1000, 100);
+    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+}
 } // namespace MMI
 } // namespace OHOS
