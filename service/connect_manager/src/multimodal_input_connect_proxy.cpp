@@ -59,17 +59,8 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
     MessageParcel reply;
     MessageOption option;
     int32_t requestResult = Remote()->SendRequest(ALLOC_SOCKET_FD, data, reply, option);
-    if (requestResult != NO_ERROR) {
+    if (requestResult != RET_OK) {
         MMI_HILOGE("send request fail, result:%{public}d", requestResult);
-        return RET_ERR;
-    }
-
-    MMI_HILOGD("recieved message from server");
-
-    int32_t result = reply.ReadInt32();
-    MMI_HILOGD("result:%{public}d", result);
-    if (result != RET_OK) {
-        MMI_HILOGE("responce return error:%{public}d", result);
         return RET_ERR;
     }
     socketFd = reply.ReadFileDescriptor();
@@ -94,16 +85,11 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
     MessageParcel reply;
     MessageOption option;
     int32_t requestResult = Remote()->SendRequest(ADD_INPUT_EVENT_FILTER, data, reply, option);
-    if (requestResult != NO_ERROR) {
-        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
-        return RET_ERR;
+    if (requestResult != RET_OK) {
+        MMI_HILOGE("reply readint32 error:%{public}d", requestResult);
+        return requestResult;
     }
-
-    int32_t result = reply.ReadInt32();
-    if (result != RET_OK) {
-        MMI_HILOGE("reply readint32 error:%{public}d", result);
-    }
-    return result;
+    return RET_OK;
 }
 
 int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
@@ -123,16 +109,11 @@ int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
     MessageParcel reply;
     MessageOption option;
     int32_t requestResult = Remote()->SendRequest(SET_POINTER_VISIBLE, data, reply, option);
-    if (requestResult != NO_ERROR) {
+    if (requestResult != RET_OK) {
         MMI_HILOGE("send request fail, result:%{public}d", requestResult);
-        return RET_ERR;
+        return requestResult;
     }
-
-    int32_t result = reply.ReadInt32();
-    if (result != RET_OK) {
-        MMI_HILOGE("reply readint32 error:%{public}d", result);
-    }
-    return result;
+    return RET_OK;
 }
 
 int32_t MultimodalInputConnectProxy::IsPointerVisible(bool &visible)
@@ -147,11 +128,10 @@ int32_t MultimodalInputConnectProxy::IsPointerVisible(bool &visible)
     MessageParcel reply;
     MessageOption option;
     int32_t requestResult = Remote()->SendRequest(IS_POINTER_VISIBLE, data, reply, option);
-    if (requestResult != NO_ERROR) {
+    if (requestResult != RET_OK) {
         MMI_HILOGE("send request fail, result:%{public}d", requestResult);
-        return RET_ERR;
+        return requestResult;
     }
-
     visible = reply.ReadBool();
     return RET_OK;
 }

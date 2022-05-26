@@ -48,11 +48,19 @@ constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int32_t MAX_PRO_FILE_SIZE = 128000;
 constexpr int32_t KEY_ELEMENT_COUNT = 4;
 constexpr int32_t INVALID_FILE_SIZE = -1;
+constexpr int32_t MIN_INTERVALTIME = 50;
+constexpr int32_t MAX_INTERVALTIME = 500;
+constexpr int32_t MIN_DELAYTIME = 200;
+constexpr int32_t MAX_DELAYTIME = 1000;
+constexpr int32_t CONFIG_ITEM_FIRST = 1;
+constexpr int32_t CONFIG_ITEM_SECOND = 2;
+constexpr int32_t CONFIG_ITEM_THIRDLY = 3;
 constexpr int32_t COMMENT_SUBSCRIPT = 0;
 const std::string DATA_PATH = "/data";
 const std::string PROC_PATH = "/proc";
 const std::string INPUT_PATH = "/system/etc/multimodalinput/";
 const std::string PRO_PATH = "/vendor/etc/keymap/";
+const std::string TOML_PATH = "/vendor/etc/keymap/";
 constexpr size_t BUF_TID_SIZE = 10;
 constexpr size_t BUF_CMD_SIZE = 512;
 constexpr size_t PROGRAM_NAME_SIZE = 256;
@@ -505,6 +513,11 @@ static bool IsValidProPath(const std::string &filePath)
     return IsValidPath(PRO_PATH, filePath);
 }
 
+static bool IsValidTomlPath(const std::string &filePath)
+{
+    return IsValidPath(TOML_PATH, filePath);
+}
+
 void ReadProFile(const std::string &filePath, int32_t deviceId,
     std::map<int32_t, std::map<int32_t, int32_t>> &configMap)
 {
@@ -640,6 +653,84 @@ std::string ReadUinputToolFile(const std::string &filePath)
         return "";
     }
     return ReadFile(filePath);
+}
+
+int32_t ReadTomlFile(const std::string &filePath, DeviceConfig& devConf)
+{
+    if (filePath.empty()) {
+        MMI_HILOGE("FilePath is empty");
+        return RET_ERR;
+    }
+    char realPath[PATH_MAX] = {};
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("Path is error");
+        return RET_ERR;
+    }
+    if (!IsValidTomlPath(realPath)) {
+        MMI_HILOGE("File path is error");
+        return RET_ERR;
+    }
+    if (!IsFileExists(realPath)) {
+        MMI_HILOGE("File not exist");
+        return RET_ERR;
+    }
+    if (!CheckFileExtendName(realPath, "TOML")) {
+        MMI_HILOGE("Unable to parse files other than json format");
+        return RET_ERR;
+    }
+    if (ReadConfigFile(realPath, devConf) == RET_ERR) {
+        MMI_HILOGE("Read device config file faild");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t ReadConfigFile(const std::string &realPath, DeviceConfig& devConf)
+{
+    CALL_LOG_ENTER;
+    std::ifstream cfgFile(realPath);
+    if (!cfgFile.is_open()) {
+        MMI_HILOGE("Failed to open config file");
+        return FILE_OPEN_FAIL;
+    }
+
+    std::string tmp;
+    size_t flag = 1;
+    while (std::getline(cfgFile, tmp)) {
+        size_t pos = tmp.find('#');
+        if (pos != tmp.npos && pos != COMMENT_SUBSCRIPT) {
+            MMI_HILOGE("File format is error");
+            return RET_ERR;
+        }
+        if (tmp.empty() || tmp.front() == '#') {
+            continue;
+        }
+        pos = tmp.find('=');
+        if (pos == tmp.back() || pos == tmp.npos) {
+            MMI_HILOGE("Find config item error");
+            return RET_ERR;
+        }
+        if (flag == CONFIG_ITEM_FIRST) {
+            devConf.autoSwitch = stoi(tmp.substr(pos+1, tmp.npos));
+        } else if (flag == CONFIG_ITEM_SECOND) {
+            devConf.delayTime = stoi(tmp.substr(pos+1, tmp.npos));
+            if (devConf.delayTime < MIN_DELAYTIME || devConf.delayTime > MAX_DELAYTIME) {
+                MMI_HILOGE("Unusual the delaytime");
+                return RET_ERR;
+            }
+        } else if (flag == CONFIG_ITEM_THIRDLY) {
+            devConf.intervalTime = stoi(tmp.substr(pos+1, tmp.npos));
+            if (devConf.intervalTime < MIN_INTERVALTIME || devConf.intervalTime > MAX_INTERVALTIME) {
+                MMI_HILOGE("Unusual the intervaltime");
+                return RET_ERR;
+            }
+        } else {
+            devConf.keyboardType = stoi(tmp.substr(pos+1, tmp.npos));
+        }
+        ++flag;
+        MMI_HILOGD("Read device config file succeeded");
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

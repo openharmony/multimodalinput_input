@@ -320,11 +320,12 @@ void PointerDrawingManager::DeletePointerVisible(int32_t pid)
     UpdataPointerVisible();
 }
 
-void PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
+int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
 {
     CALL_LOG_ENTER;
     UpdataPidInfo(pid, visible);
     UpdataPointerVisible();
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

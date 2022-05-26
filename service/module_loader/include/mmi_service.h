@@ -16,9 +16,7 @@
 #ifndef MMI_SERVICE_H
 #define MMI_SERVICE_H
 
-#ifdef OHOS_RSS_CLIENT
 #include <atomic>
-#endif
 #include <mutex>
 #include <thread>
 
@@ -27,6 +25,7 @@
 #include "singleton.h"
 #include "system_ability.h"
 
+#include "delegate_tasks.h"
 #include "input_event_handler.h"
 #include "multimodal_input_connect_stub.h"
 #include "libinput_adapter.h"
@@ -40,7 +39,7 @@
 namespace OHOS {
 namespace MMI {
 
-enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
+enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
 class MMIService : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MMIService);
     DECLEAR_SYSTEM_ABILITY(MMIService);
@@ -50,7 +49,8 @@ public:
     virtual void OnStart() override;
     virtual void OnStop() override;
     virtual void OnDump() override;
-    virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &socketFd) override;
+    virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
+        int32_t &toReturnClientFd) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
     virtual int32_t SetPointerVisible(bool visible) override;
     virtual int32_t IsPointerVisible(bool &visible) override;
@@ -61,20 +61,22 @@ public:
 protected:
     virtual void OnConnected(SessionPtr s) override;
     virtual void OnDisconnected(SessionPtr s) override;
-    virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) override;
-
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd) override;
+    virtual bool IsRunning() const override;
+    int32_t CheckPointerVisible(bool &visible);
 
     bool InitLibinputService();
     bool InitService();
     bool InitSignalHandler();
+    bool InitDelegateTasks();
     int32_t Init();
 
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
+    void OnDelegateTask(epoll_event& ev);
 
 private:
-    ServiceRunningState state_ = ServiceRunningState::STATE_NOT_START;
+    std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ = -1;
     std::mutex mu_;
     std::thread t_;
@@ -84,6 +86,7 @@ private:
 
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
+    DelegateTasks delegateTasks_;
 };
 } // namespace MMI
 } // namespace OHOS
