@@ -339,8 +339,8 @@ void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
     int32_t ret = MultimodalInputConnectManager::GetInstance()->MarkEventProcessed(eventId);
     if (ret != 0) {
-         MMI_HILOGE("send to server fail, ret:%{public}d", ret);
-         return;
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+        return;
     }
 }
 } // namespace MMI

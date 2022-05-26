@@ -346,7 +346,8 @@ int32_t MMIService::MarkEventProcessed(int32_t eventId)
     CALL_LOG_ENTER;
     auto sess = GetSessionByPid(GetCallingPid());
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&ServerMsgHandler::MarkEventProcessed, &sMsgHandler_, sess, eventId));
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::MarkEventProcessed, &sMsgHandler_, sess, eventId));
     if (ret != RET_OK) {
         MMI_HILOGE("mark event processed failed, return %{public}d", ret);
         return RET_ERR;
