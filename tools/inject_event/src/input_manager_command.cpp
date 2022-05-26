@@ -288,6 +288,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
+                            const int64_t minTaktTimeMs = 1;
+                            const int64_t maxTaktTimeMs = 15000;
+                            if ((minTaktTimeMs > taktTime) || (maxTaktTimeMs < taktTime)) {
+                                std::cout << "taktTime is out of range. ";
+                                std::cout << minTaktTimeMs << " < taktTime < " << maxTaktTimeMs;
+                                std::cout << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
                             std::this_thread::sleep_for(std::chrono::milliseconds(taktTime));
                             break;
                         }
@@ -374,6 +382,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             if (!StrToInt(optarg, taktTime)) {
                                 std::cout << "invalid command to interval time" << std::endl;
                                 ShowUsage();
+                                return EVENT_REG_FAIL;
+                            }
+                            const int64_t minTaktTimeMs = 1;
+                            const int64_t maxTaktTimeMs = 15000;
+                            if ((minTaktTimeMs > taktTime) || (maxTaktTimeMs < taktTime)) {
+                                std::cout << "taktTime is out of range. ";
+                                std::cout << minTaktTimeMs << " < taktTime < " << maxTaktTimeMs;
+                                std::cout << std::endl;
                                 return EVENT_REG_FAIL;
                             }
                             std::this_thread::sleep_for(std::chrono::milliseconds(taktTime));
@@ -537,6 +553,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             if (!StrToInt(optarg, taktTime)) {
                                 std::cout << "invalid command to interval time" << std::endl;
                                 ShowUsage();
+                                return EVENT_REG_FAIL;
+                            }
+                            const int64_t minTaktTimeMs = 1;
+                            const int64_t maxTaktTimeMs = 15000;
+                            if ((minTaktTimeMs > taktTime) || (maxTaktTimeMs < taktTime)) {
+                                std::cout << "taktTime is out of range. ";
+                                std::cout << minTaktTimeMs << " < taktTime < " << maxTaktTimeMs;
+                                std::cout << std::endl;
                                 return EVENT_REG_FAIL;
                             }
                             std::this_thread::sleep_for(std::chrono::milliseconds(taktTime));
