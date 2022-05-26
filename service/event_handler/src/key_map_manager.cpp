@@ -33,6 +33,7 @@ void KeyMapManager::GetConfigKeyValue(const std::string &fileName, int32_t devic
     CALL_LOG_ENTER;
     std::string filePath = GetProFilePath(fileName);
     ReadProFile(filePath, deviceId, configKeyValue_);
+    MMI_HILOGD("Number of loaded config files:%{public}zu", configKeyValue_.size());
 }
 
 void KeyMapManager::ParseDeviceConfigFile(struct libinput_device *device)
@@ -57,6 +58,7 @@ void KeyMapManager::RemoveKeyValue(struct libinput_device *device)
         return;
     }
     configKeyValue_.erase(iter);
+    MMI_HILOGD("Number of files that remain after deletion:%{public}zu", configKeyValue_.size());
 }
 
 int32_t KeyMapManager::GetDefaultKeyId()
