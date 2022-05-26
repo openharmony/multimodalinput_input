@@ -399,16 +399,16 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t py2 = 0;
                 int32_t totalTimeMs = 0;
                 int32_t moveArgcSeven = 7;
-                int32_t moveArgcEight = 8;
                 while ((c = getopt_long(argc, argv, "m:d:u:i:", touchSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
-                            if ((moveArgcSeven != argc) && (moveArgcEight != argc)) {
+                            if (argc < moveArgcSeven) {
+                                std::cout << "argc:" << argc << std::endl;
                                 std::cout << "wrong number of parameters" << std::endl;
                                 ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
-                            if (argc == moveArgcSeven) {
+                            if(argv[optind + 3] == nullptr || argv[optind + 3][0] == '-') {
                                 totalTimeMs = 1000;
                                 if ((!StrToInt(optarg, px1)) ||
                                     (!StrToInt(argv[optind], py1)) ||
@@ -418,8 +418,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         ShowUsage();
                                         return EVENT_REG_FAIL;
                                 }
-                            }
-                            if (argc == moveArgcEight) {
+                            } else {
                                 if ((!StrToInt(optarg, px1)) ||
                                     (!StrToInt(argv[optind], py1)) ||
                                     (!StrToInt(argv[optind + 1], px2)) ||
