@@ -408,7 +408,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
-                            if(argv[optind + 3] == nullptr || argv[optind + 3][0] == '-') {
+                            if (argv[optind + 3] == nullptr || argv[optind + 3][0] == '-') {
                                 totalTimeMs = 1000;
                                 if ((!StrToInt(optarg, px1)) ||
                                     (!StrToInt(argv[optind], py1)) ||
