@@ -32,12 +32,13 @@ public:
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) = 0;
     virtual int32_t SetPointerVisible(bool visible) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
-
+    virtual int32_t MarkEventProcessed(int32_t eventId) = 0;
     enum {
         ALLOC_SOCKET_FD = 0,
         ADD_INPUT_EVENT_FILTER = 1,
         SET_POINTER_VISIBLE = 2,
         IS_POINTER_VISIBLE = 3,
+        MARK_EVENT_PROCESSED = 4,
     };
 
     enum {
