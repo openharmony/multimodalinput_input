@@ -2771,7 +2771,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
 }
 
 /**
- * @tc.name:InputManagerTest_MoveMouse
+ * @tc.name:InputManagerTest_MoveMouse_01
  * @tc.desc:Verify move mouse
  * @tc.type: FUNC
  * @tc.require:
@@ -2779,9 +2779,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
 HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_01, TestSize.Level1)
 {
     MMI_HILOGD("Call InputManager::MoveMouse");
+    InputManager::GetInstance()->MoveMouse(0, 0);
     std::string command {
         "ServerMsgHandler: in OnMoveMouse, "
-        "MoveMouse interface move success"
+        "Mouse movement message processed successfully"
     };
     std::vector<std::string> sLogs { SearchLog(command, true) };
     InputManager::GetInstance()->MoveMouse(50, 50);
@@ -2791,7 +2792,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_01, TestSize.Level1)
 }
 
 /**
- * @tc.name:InputManagerTest_MoveMouse
+ * @tc.name:InputManagerTest_MoveMouse_02
  * @tc.desc:Verify move mouse
  * @tc.type: FUNC
  * @tc.require:
@@ -2799,9 +2800,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_01, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_02, TestSize.Level1)
 {
     MMI_HILOGD("Call InputManager::MoveMouse");
+    InputManager::GetInstance()->MoveMouse(0, 0);
     std::string command {
         "ServerMsgHandler: in OnMoveMouse, "
-        "MoveMouse interface move success"
+        "Mouse movement message processed successfully"
     };
     std::vector<std::string> sLogs { SearchLog(command, true) };
     InputManager::GetInstance()->MoveMouse(-1000, 100);
