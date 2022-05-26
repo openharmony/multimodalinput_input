@@ -19,6 +19,7 @@ config("libmmi_server_config") {
   include_dirs = [
     "device_manager/include",
     "device_scalability/include",
+    "delegate_task/include",
     "event_dispatch/include",
     "event_package/include",
     "event_handler/include",
@@ -102,11 +103,13 @@ ohos_prebuilt_etc("drawing_pointer_image") {
 ohos_shared_library("libmmi-server") {
   sources = [
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
+    "delegate_task/src/delegate_tasks.cpp",
     "device_manager/src/input_device.cpp",
     "device_manager/src/input_device_manager.cpp",
     "event_dispatch/src/event_dispatch.cpp",
     "event_dump/src/event_dump.cpp",
     "event_handler/src/input_event_handler.cpp",
+    "event_handler/src/key_autorepeat.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
     "event_handler/src/key_map_manager.cpp",
     "event_package/src/event_package.cpp",

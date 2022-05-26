@@ -44,7 +44,7 @@ public:
     void UpdatePointerDevice(bool hasPointerDevice);
     bool Init();
     void DeletePointerVisible(int32_t pid);
-    void SetPointerVisible(int32_t pid, bool visible);
+    int32_t SetPointerVisible(int32_t pid, bool visible);
     bool IsPointerVisible();
 
 public:

@@ -124,8 +124,15 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
     return RET_OK;
 }
 
+bool MMIService::IsRunning() const
+{
+    return (state_ == ServiceRunningState::STATE_RUNNING);
+}
+
 bool MMIService::InitLibinputService()
 {
+    MMI_HILOGD("input msg handler Init");
+    InputHandler->Init(*this);
 #ifdef OHOS_BUILD_HDF
     MMI_HILOGD("HDF Init");
     hdfEventManager.SetupCallback();
@@ -148,6 +155,8 @@ bool MMIService::InitLibinputService()
 
 bool MMIService::InitService()
 {
+    MMI_HILOGD("server msg handler Init");
+    sMsgHandler_.Init(*this);
     if (state_ != ServiceRunningState::STATE_NOT_START) {
         MMI_HILOGE("Service running status is not enabled");
         return false;
@@ -170,23 +179,30 @@ bool MMIService::InitService()
     return true;
 }
 
+bool MMIService::InitDelegateTasks()
+{
+    CALL_LOG_ENTER;
+    if (!delegateTasks_.Init()) {
+        MMI_HILOGE("delegate task init failed");
+        return false;
+    }
+    auto ret = AddEpoll(EPOLL_EVENT_ETASK, delegateTasks_.GetReadFd());
+    if (ret <  0) {
+        MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
+        EpollClose();
+        return false;
+    }
+    MMI_HILOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
+    return true;
+}
+
 int32_t MMIService::Init()
 {
     CheckDefine();
-
-    MMI_HILOGD("InputEventHandler Init");
-    InputHandler->Init(*this);
-
-    MMI_HILOGD("ServerMsgHandler Init");
-    sMsgHandler_.Init(*this);
     MMI_HILOGD("EventDump Init");
     MMIEventDump->Init(*this);
-
     MMI_HILOGD("WindowsManager Init");
-    if (!WinMgr->Init(*this)) {
-        MMI_HILOGE("Windows message init failed");
-        return WINDOWS_MSG_INIT_FAIL;
-    }
+    WinMgr->Init(*this);
     MMI_HILOGD("PointerDrawingManager Init");
     if (!IPointerDrawingManager::GetInstance()->Init()) {
         MMI_HILOGE("Pointer draw init failed");
@@ -206,7 +222,12 @@ int32_t MMIService::Init()
         MMI_HILOGE("Libinput init failed");
         return LIBINPUT_INIT_FAIL;
     }
-    SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
+    if (!InitDelegateTasks()) {
+        MMI_HILOGE("Delegate tasks init failed");
+        return ETASKS_INIT_FAIL;
+    }
+    SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1,
+        std::placeholders::_2));
     KeyMapMgr->GetConfigKeyValue("default_keymap", KeyMapMgr->GetDefaultKeyId());
     return RET_OK;
 }
@@ -248,83 +269,75 @@ void MMIService::OnDump()
     MMIEventDump->Dump();
 }
 
-void MMIService::OnConnected(SessionPtr s)
+int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
+    int32_t &toReturnClientFd)
 {
-    CHKPV(s);
-    int32_t fd = s->GetFd();
-    MMI_HILOGI("fd:%{public}d", fd);
-}
-
-void MMIService::OnDisconnected(SessionPtr s)
-{
-    CHKPV(s);
-    int32_t fd = s->GetFd();
-    MMI_HILOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), fd);
-    IPointerDrawingManager::GetInstance()->DeletePointerVisible(s->GetPid());
-}
-
-int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd)
-{
-    CALL_LOG_ENTER;
     MMI_HILOGI("enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
-
-    toReturnClientFd = INVALID_SOCKET_FD;
-    int32_t serverFd = INVALID_SOCKET_FD;
-    int32_t uid = GetCallingUid();
+    toReturnClientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
+    int32_t serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t pid = GetCallingPid();
-    const int32_t ret = AddSocketPairInfo(programName, moduleType, uid, pid, serverFd, toReturnClientFd);
+    int32_t uid = GetCallingUid();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this,
+        programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd)));
     if (ret != RET_OK) {
-        MMI_HILOGE("call AddSocketPairInfo return %{public}d", ret);
+        MMI_HILOGE("call AddSocketPairInfo failed,return %{public}d", ret);
         return RET_ERR;
     }
-
     MMI_HILOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
         programName.c_str(), moduleType);
-
-    return RET_OK;
-}
-
-int32_t MMIService::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
-{
-    sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
-    CHKPR(req, RET_ERR);
-    MMI_HILOGIK("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
-
-    int32_t clientFd = INVALID_SOCKET_FD;
-    int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
-    if (ret != RET_OK) {
-        MMI_HILOGE("call AddSocketPairInfo return %{public}d", ret);
-        reply.WriteInt32(RET_ERR);
-        return RET_ERR;
-    }
-
-    MMI_HILOGI("call AllocSocketFd success");
-
-    reply.WriteInt32(RET_OK);
-    reply.WriteFileDescriptor(clientFd);
-
-    MMI_HILOGI("send clientFd to client, clientFd = %d", clientFd);
-    close(clientFd);
     return RET_OK;
 }
 
 int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    CHKPR(InputHandler, ERROR_NULL_POINTER);
-    return InputHandler->AddInputEventFilter(filter);
+    CHKPR(filter, ERROR_NULL_POINTER);
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputEventHandler::AddInputEventFilter,
+        InputHandler, filter));
+    if (ret != RET_OK) {
+        MMI_HILOGE("add event filter failed,return %{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+void MMIService::OnConnected(SessionPtr s)
+{
+    CHKPV(s);
+    MMI_HILOGI("fd:%{public}d", s->GetFd());
+}
+
+void MMIService::OnDisconnected(SessionPtr s)
+{
+    CHKPV(s);
+    MMI_HILOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), s->GetFd());
 }
 
 int32_t MMIService::SetPointerVisible(bool visible)
 {
     CALL_LOG_ENTER;
-    IPointerDrawingManager::GetInstance()->SetPointerVisible(GetCallingPid(), visible);
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerVisible,
+        IPointerDrawingManager::GetInstance(), GetCallingPid(), visible));
+    if (ret != RET_OK) {
+        MMI_HILOGE("set pointer visible failed,return %{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::CheckPointerVisible(bool &visible)
+{
+    visible = IPointerDrawingManager::GetInstance()->IsPointerVisible();
     return RET_OK;
 }
 
 int32_t MMIService::IsPointerVisible(bool &visible)
 {
     CALL_LOG_ENTER;
-    visible = IPointerDrawingManager::GetInstance()->IsPointerVisible();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckPointerVisible, this, std::ref(visible)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("is pointer visible failed,return %{public}d", ret);
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
@@ -344,10 +357,27 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& 
 }
 #endif
 
+void MMIService::OnDelegateTask(epoll_event& ev)
+{
+    if ((ev.events & EPOLLIN) == 0) {
+        MMI_HILOGW("not epollin");
+        return;
+    }
+    DelegateTasks::TaskData data = {};
+    auto res = read(delegateTasks_.GetReadFd(), &data, sizeof(data));
+    if (res == -1) {
+        MMI_HILOGW("read failed erron:%{public}d", errno);
+    }
+    MMI_HILOGD("RemoteRequest notify td:%{public}" PRId64 ",std:%{public}" PRId64 ""
+        ",taskId:%{public}d", GetThisThreadId(), data.tid, data.taskId);
+    delegateTasks_.ProcessTasks();
+}
+
 void MMIService::OnThread()
 {
     SetThreadName(std::string("mmi_service"));
     uint64_t tid = GetThisThreadId();
+    delegateTasks_.SetWorkerThreadId(tid);
     MMI_HILOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
 #ifdef OHOS_RSS_CLIENT
     tid_.store(tid);
@@ -367,6 +397,8 @@ void MMIService::OnThread()
                 OnEpollEvent(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {
                 OnSignalEvent(mmiEd->fd);
+            } else if (mmiEd->event_type == EPOLL_EVENT_ETASK) {
+                OnDelegateTask(ev[i]);
             } else {
                 MMI_HILOGW("unknown epoll event type:%{public}d", mmiEd->event_type);
             }

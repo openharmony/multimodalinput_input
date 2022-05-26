@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(const UDSClient&, NetPacket&)> ClientMsgFun;
-class ClientMsgHandler : public MsgHandler<ClientMsgFun> {
+class ClientMsgHandler : public MsgHandler<MmiMessageId, ClientMsgFun> {
 public:
     ClientMsgHandler();
     virtual ~ClientMsgHandler();
