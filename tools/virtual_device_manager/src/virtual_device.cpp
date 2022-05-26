@@ -47,6 +47,12 @@ namespace {
 constexpr int32_t ABSRANGE = 200;
 constexpr int32_t FINGERABSRANGE = 40;
 const std::string VIRTUAL_DEVICE_NAME = "mmi-virtual-device";
+#define SETRESOLUTION(codeTmp, value) do { \
+    g_absTemp_.code = codeTmp; \
+    g_absTemp_.absinfo.resolution = value; \
+    absInit_.push_back(g_absTemp_); \
+} while (0)
+
 bool CheckFileName(const std::string& fileName)
 {
     std::string::size_type pos = fileName.find("_");
@@ -353,26 +359,18 @@ bool VirtualDevice::CreateKey()
 bool VirtualDevice::SetAbsResolution(const std::string& deviceName)
 {
     if (deviceName == "Virtual Stylus" || deviceName == "Virtual Touchpad") {
-        g_absTemp_.code = 0x00;
-        g_absTemp_.absinfo.resolution = ABSRANGE;
-        absInit_.push_back(g_absTemp_);
-        g_absTemp_.code = 0x01;
-        g_absTemp_.absinfo.resolution = ABSRANGE;
-        absInit_.push_back(g_absTemp_);
+        SETRESOLUTION(ABS_X, ABSRANGE);
+        SETRESOLUTION(ABS_Y, ABSRANGE);
     } else if (deviceName == "Virtual Finger") {
-        g_absTemp_.code = 0x00;
-        g_absTemp_.absinfo.resolution = FINGERABSRANGE;
-        absInit_.push_back(g_absTemp_);
-        g_absTemp_.code = 0x01;
-        g_absTemp_.absinfo.resolution = FINGERABSRANGE;
-        absInit_.push_back(g_absTemp_);
+        SETRESOLUTION(ABS_X, FINGERABSRANGE);
+        SETRESOLUTION(ABS_Y, FINGERABSRANGE);
+        SETRESOLUTION(ABS_MT_POSITION_X, FINGERABSRANGE);
+        SETRESOLUTION(ABS_MT_POSITION_Y, FINGERABSRANGE);
+        SETRESOLUTION(ABS_MT_TOOL_X, FINGERABSRANGE);
+        SETRESOLUTION(ABS_MT_TOOL_Y, FINGERABSRANGE);
     } else if (deviceName == "V-Pencil") {
-        g_absTemp_.code = 0x00;
-        g_absTemp_.absinfo.resolution = ABSRANGE;
-        absInit_.push_back(g_absTemp_);
-        g_absTemp_.code = 0x01;
-        g_absTemp_.absinfo.resolution = ABSRANGE;
-        absInit_.push_back(g_absTemp_);
+        SETRESOLUTION(ABS_X, ABSRANGE);
+        SETRESOLUTION(ABS_Y, ABSRANGE);
     } else {
         printf("Not devide:deviceName:%s", deviceName.c_str());
         return false;
