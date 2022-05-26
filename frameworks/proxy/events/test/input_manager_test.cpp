@@ -2779,7 +2779,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
 HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_01, TestSize.Level1)
 {
     MMI_HILOGD("Call InputManager::MoveMouse");
-    InputManager::GetInstance()->MoveMouse(0, 0);
     std::string command {
         "ServerMsgHandler: in OnMoveMouse, "
         "Mouse movement message processed successfully"
@@ -2800,7 +2799,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_01, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_02, TestSize.Level1)
 {
     MMI_HILOGD("Call InputManager::MoveMouse");
-    InputManager::GetInstance()->MoveMouse(0, 0);
     std::string command {
         "ServerMsgHandler: in OnMoveMouse, "
         "Mouse movement message processed successfully"
