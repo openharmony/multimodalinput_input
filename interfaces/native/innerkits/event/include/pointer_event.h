@@ -510,12 +510,34 @@ public:
          */
         void SetPressure(double pressure);
 
+        /**
+         * @brief Obtains the long axis of the touch point area.
+         * @return Returns the long axis of the touch point area.
+         * @since 9
+         */
         int32_t GetLongAxis() const;
 
+        /**
+         * @brief Sets the long axis of the touch point area.
+         * @param longAxis Indicates the long axis of the touch point area.
+         * @return void
+         * @since 9
+         */
         void SetLongAxis(int32_t longAxis);
 
+        /**
+         * @brief Obtains the short axis of the touch point area.
+         * @return Returns the short axis of the touch point area.
+         * @since 9
+         */
         int32_t GetShortAxis() const;
 
+        /**
+         * @brief Sets the short axis of the touch point area.
+         * @param shortAxis Indicates the short axis of the touch point area.
+         * @return void
+         * @since 9
+         */
         void SetShortAxis(int32_t shortAxis);
 
         /**
