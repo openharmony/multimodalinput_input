@@ -2765,33 +2765,33 @@ static void GetKeyboardTypeCallback(int32_t keyboardType)
 {
     switch (keyboardType) {
         case KEYBOARD_TYPE_NONE: {
-            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d", 
-                        deviceIDtest, "None", keyboardType);
+            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d",
+                       deviceIDtest, "None", keyboardType);
             break;
             }
         case KEYBOARD_TYPE_UNKNOWN: {
             MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d",
-                        deviceIDtest, "unknown", keyboardType);
+                       deviceIDtest, "unknown", keyboardType);
             break;
         }
         case KEYBOARD_TYPE_ALPHABETICKEYBOARD: {
             MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d",
-                        deviceIDtest, "alphabetickeyboard", keyboardType);
+                       deviceIDtest, "alphabetickeyboard", keyboardType);
             break;
         }
         case KEYBOARD_TYPE_DIGITALKEYBOARD: {
             MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d",
-                        deviceIDtest, "digitalkeyboard", keyboardType);
+                       deviceIDtest, "digitalkeyboard", keyboardType);
             break;
         }
         case KEYBOARD_TYPE_HANDWRITINGPEN: {
             MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d",
-                        deviceIDtest, "handwritingpen", keyboardType);
+                       deviceIDtest, "handwritingpen", keyboardType);
             break;
         }
         case KEYBOARD_TYPE_REMOTECONTROL: {
             MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d",
-                        deviceIDtest, "remotecontrol", keyboardType);
+                       deviceIDtest, "remotecontrol", keyboardType);
             break;
         }
         default: {
