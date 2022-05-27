@@ -287,7 +287,7 @@ int32_t ClientMsgHandler::OnInputKeyboardType(const UDSClient& client, NetPacket
     int32_t KeyboardType;
     pkt >> userData >> KeyboardType;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write KeyboardType failed");
+        MMI_HILOGE("Packet read failed");
         return PACKET_WRITE_FAIL;
     }
     InputDevImpl.OnKeyboardType(userData, KeyboardType);

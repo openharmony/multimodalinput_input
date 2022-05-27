@@ -142,7 +142,7 @@ int32_t InputDeviceManager::GetKeyboardBusMode(int32_t deviceId)
     return dev->GetBustype();
 }
 
-void InputDeviceManager::GetDeviceSupportKeys(int32_t deviceId, int32_t &keyboardType)
+int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId)
 {
     CALL_LOG_ENTER;
     std::vector <int32_t> keyCodes;
@@ -151,18 +151,19 @@ void InputDeviceManager::GetDeviceSupportKeys(int32_t deviceId, int32_t &keyboar
     keyCodes.push_back(KeyEvent::KEYCODE_HOME);
     keyCodes.push_back(KeyEvent::KEYCODE_CTRL_LEFT);
     keyCodes.push_back(KeyEvent::KEYCODE_SHIFT_RIGHT);
-    keyCodes.push_back(KeyEvent::KEYCODE_F13);
+    keyCodes.push_back(KeyEvent::KEYCODE_F20);
     std::vector<bool> supportKey = SupportKeys(deviceId, keyCodes);
     std::map<int32_t, bool> determineKbType;
     for (size_t i = 0; i < keyCodes.size(); i++) {
         determineKbType[keyCodes[i]] = supportKey[i];
     }
+    int32_t keyboardType = 0;
     if (determineKbType[KeyEvent::KEYCODE_HOME] && GetKeyboardBusMode(deviceId) == BUS_BLUETOOTH) {
         keyboardType = KEYBOARD_TYPE_REMOTECONTROL;
         MMI_HILOGD("The keyboard type is remote control:%{public}d", keyboardType);
     } else if (determineKbType[KeyEvent::KEYCODE_NUMPAD_1] && !determineKbType[KeyEvent::KEYCODE_Q]) {
         keyboardType = KEYBOARD_TYPE_DIGITALKEYBOARD;
-        MMI_HILOGD("The keyboard type is numeric keyboard:%{public}d", keyboardType);
+        MMI_HILOGD("The keyboard type is digital keyboard:%{public}d", keyboardType);
     } else if (determineKbType[KeyEvent::KEYCODE_Q]) {
         keyboardType = KEYBOARD_TYPE_ALPHABETICKEYBOARD;
         MMI_HILOGD("The keyboard type is standard:%{public}d", keyboardType);
@@ -172,8 +173,10 @@ void InputDeviceManager::GetDeviceSupportKeys(int32_t deviceId, int32_t &keyboar
         MMI_HILOGD("The keyboard type is handwriting pen:%{public}d", keyboardType);
     } else {
         keyboardType = KEYBOARD_TYPE_UNKNOWN;
+        MMI_HILOGW("Undefined keyboard type");
     }
     MMI_HILOGD("Get keyboard type results by supporting keys:%{public}d", keyboardType);
+    return keyboardType;
 }
 
 int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId)
@@ -187,7 +190,7 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId)
     if (GetDeviceConfig(deviceId, keyboardType)) {
         return keyboardType;
     }
-    GetDeviceSupportKeys(deviceId, keyboardType);
+    keyboardType = GetDeviceSupportKey(deviceId);
     return keyboardType;
 }
 
