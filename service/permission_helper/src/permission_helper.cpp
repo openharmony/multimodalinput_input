@@ -23,7 +23,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "PermissionHelper"};
 } // namespace
 
-bool PermissionHelper::CheckPermission(int32_t required)
+bool PermissionHelper::CheckPermission(uint32_t required)
 {
     CALL_LOG_ENTER;
     auto tokenId = IPCSkeleton::GetCallingTokenID();
@@ -38,7 +38,7 @@ bool PermissionHelper::CheckPermission(int32_t required)
     }
 }
 
-bool PermissionHelper::CheckHapPermission(uint32_t tokenId, int32_t required)
+bool PermissionHelper::CheckHapPermission(uint32_t tokenId, uint32_t required)
 {
     OHOS::Security::AccessToken::HapTokenInfo findInfo;
     if (OHOS::Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenId, findInfo) != 0) {
@@ -53,7 +53,7 @@ bool PermissionHelper::CheckHapPermission(uint32_t tokenId, int32_t required)
     return true;
 }
 
-bool PermissionHelper::CheckNativePermission(uint32_t tokenId, int32_t required)
+bool PermissionHelper::CheckNativePermission(uint32_t tokenId, uint32_t required)
 {
     OHOS::Security::AccessToken::NativeTokenInfo findInfo;
     if (OHOS::Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, findInfo) != 0) {

@@ -23,17 +23,17 @@ namespace OHOS {
 namespace MMI {
 class PermissionHelper : public DelayedSingleton<PermissionHelper> {
 public:
-    static const int32_t APL_NORMAL = 1 << OHOS::Security::AccessToken::APL_NORMAL;
-    static const int32_t APL_SYSTEM_BASIC = 1 << OHOS::Security::AccessToken::APL_SYSTEM_BASIC;
-    static const int32_t APL_SYSTEM_CORE = 1 << OHOS::Security::AccessToken::APL_SYSTEM_CORE;
-    static const int32_t APL_SYSTEM_BASIC_CORE = APL_SYSTEM_BASIC + APL_SYSTEM_CORE;
+    static const uint32_t APL_NORMAL = 1 << OHOS::Security::AccessToken::APL_NORMAL;
+    static const uint32_t APL_SYSTEM_BASIC = 1 << OHOS::Security::AccessToken::APL_SYSTEM_BASIC;
+    static const uint32_t APL_SYSTEM_CORE = 1 << OHOS::Security::AccessToken::APL_SYSTEM_CORE;
+    static const uint32_t APL_SYSTEM_BASIC_CORE = APL_SYSTEM_BASIC + APL_SYSTEM_CORE;
 
 public:
-    bool CheckPermission(int32_t required);
+    bool CheckPermission(uint32_t required);
 
 private:
-    bool CheckHapPermission(uint32_t tokenId, int32_t required);
-    bool CheckNativePermission(uint32_t tokenId, int32_t required);
+    bool CheckHapPermission(uint32_t tokenId, uint32_t required);
+    bool CheckNativePermission(uint32_t tokenId, uint32_t required);
 };
 #define PerHelper PermissionHelper::GetInstance()
 } // namespace MMI

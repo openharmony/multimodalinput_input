@@ -184,7 +184,7 @@ void UDSServer::AddPermission(SessionPtr sess)
 
 void UDSServer::Dump(int32_t fd)
 {
-    mprintf(fd, "Sessions: count=%d, idxMap count=%d", sessionsMap_.size());
+    mprintf(fd, "Sessions: count=%d, idxMap count=%d", sessionsMap_.size(), idxPidMap_.size());
     int32_t i = 0;
     mprintf(fd, "Sessions:");
     for (const auto& [key, value] : sessionsMap_) {
