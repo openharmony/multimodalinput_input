@@ -30,6 +30,7 @@
 #include "mmi_client.h"
 #include "mmi_func_callback.h"
 #include "multimodal_event_handler.h"
+#include "multimodal_input_connect_manager.h"
 #include "proto.h"
 #include "time_cost_chk.h"
 #include "util.h"
@@ -351,16 +352,9 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    NetPacket pkt(MmiMessageId::MARK_PROCESS);
-    pkt << eventId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write event failed");
-        return;
-    }
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->MarkEventProcessed(eventId);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
         return;
     }
 }

@@ -36,6 +36,7 @@ public:
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
     virtual int32_t SetPointerVisible(bool visible) override;
     virtual int32_t IsPointerVisible(bool &visible) override;
+    virtual int32_t MarkEventProcessed(int32_t eventId) override;
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };
