@@ -62,6 +62,7 @@ void ClientMsgHandler::Init()
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ClientMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ClientMsgHandler::OnInputDeviceIds, this)},
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ClientMsgHandler::OnSupportKeys, this)},
+        {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind2(&ClientMsgHandler::OnInputKeyboardType, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnDevMonitor, this)},
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
@@ -276,6 +277,20 @@ int32_t ClientMsgHandler::OnSupportKeys(const UDSClient& client, NetPacket& pkt)
         return RET_ERR;
     }
     InputDevImpl.OnSupportKeys(userData, abilityRet);
+    return RET_OK;
+}
+
+int32_t ClientMsgHandler::OnInputKeyboardType(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    int32_t userData;
+    int32_t KeyboardType;
+    pkt >> userData >> KeyboardType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read failed");
+        return PACKET_WRITE_FAIL;
+    }
+    InputDevImpl.OnKeyboardType(userData, KeyboardType);
     return RET_OK;
 }
 

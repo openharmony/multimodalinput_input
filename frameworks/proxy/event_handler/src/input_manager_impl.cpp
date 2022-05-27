@@ -506,5 +506,16 @@ void InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCo
 {
     InputDevImpl.SupportKeys(deviceId, keyCodes, callback);
 }
+
+void InputManagerImpl::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return;
+    }
+    InputDevImpl.GetKeyboardType(deviceId, callback);
+}
 } // namespace MMI
 } // namespace OHOS
