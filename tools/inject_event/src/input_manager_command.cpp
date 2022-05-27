@@ -107,17 +107,20 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"down", required_argument, NULL, 'd'},
         {"up", required_argument, NULL, 'u'},
         {"scroll", required_argument, NULL, 's'},
+        {"interval", required_argument, NULL, 'i'},
         {NULL, 0, NULL, 0}
     };
     struct option keyboardSensorOptions[] = {
         {"down", required_argument, NULL, 'd'},
         {"up", required_argument, NULL, 'u'},
+        {"interval", required_argument, NULL, 'i'},
         {NULL, 0, NULL, 0}
     };
     struct option touchSensorOptions[] = {
         {"move", required_argument, NULL, 'm'},
         {"down", required_argument, NULL, 'd'},
         {"up", required_argument, NULL, 'u'},
+        {"interval", required_argument, NULL, 'i'},
         {NULL, 0, NULL, 0}
     };
     int32_t c;
@@ -130,7 +133,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t py;
                 int32_t buttonId;
                 int32_t scrollValue;
-                while ((c = getopt_long(argc, argv, "m:d:u:c:s:", mouseSensorOptions, &optionIndex)) != -1) {
+                while ((c = getopt_long(argc, argv, "m:d:u:c:s:i:", mouseSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
                             if (optind >= argc) {
@@ -278,6 +281,24 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             break;
                         }
+                        case 'i': {
+                            int32_t taktTime = 0;
+                            if (!StrToInt(optarg, taktTime)) {
+                                std::cout << "invalid command to interval time" << std::endl;
+                                ShowUsage();
+                                return EVENT_REG_FAIL;
+                            }
+                            const int64_t minTaktTimeMs = 1;
+                            const int64_t maxTaktTimeMs = 15000;
+                            if ((minTaktTimeMs > taktTime) || (maxTaktTimeMs < taktTime)) {
+                                std::cout << "taktTime is out of range. ";
+                                std::cout << minTaktTimeMs << " < taktTime < " << maxTaktTimeMs;
+                                std::cout << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
+                            std::this_thread::sleep_for(std::chrono::milliseconds(taktTime));
+                            break;
+                        }
                         default: {
                             std::cout << "invalid command to virtual mouse" << std::endl;
                             ShowUsage();
@@ -292,7 +313,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 std::vector<int32_t> downKey;
                 int32_t keyCode;
                 int32_t isCombinationKey = 0;
-                while ((c = getopt_long(argc, argv, "d:u:", keyboardSensorOptions, &optionIndex)) != -1) {
+                while ((c = getopt_long(argc, argv, "d:u:i:", keyboardSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'd': {
                             if (!StrToInt(optarg, keyCode)) {
@@ -356,6 +377,24 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
                         }
+                        case 'i': {
+                            int32_t taktTime = 0;
+                            if (!StrToInt(optarg, taktTime)) {
+                                std::cout << "invalid command to interval time" << std::endl;
+                                ShowUsage();
+                                return EVENT_REG_FAIL;
+                            }
+                            const int64_t minTaktTimeMs = 1;
+                            const int64_t maxTaktTimeMs = 15000;
+                            if ((minTaktTimeMs > taktTime) || (maxTaktTimeMs < taktTime)) {
+                                std::cout << "taktTime is out of range. ";
+                                std::cout << minTaktTimeMs << " < taktTime < " << maxTaktTimeMs;
+                                std::cout << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
+                            std::this_thread::sleep_for(std::chrono::milliseconds(taktTime));
+                            break;
+                        }
                         default: {
                             std::cout << "invalid command to keyboard key" << std::endl;
                             ShowUsage();
@@ -376,16 +415,16 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t py2 = 0;
                 int32_t totalTimeMs = 0;
                 int32_t moveArgcSeven = 7;
-                int32_t moveArgcEight = 8;
-                while ((c = getopt_long(argc, argv, "m:d:u:", touchSensorOptions, &optionIndex)) != -1) {
+                while ((c = getopt_long(argc, argv, "m:d:u:i:", touchSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
-                            if ((moveArgcSeven != argc) && (moveArgcEight != argc)) {
+                            if (argc < moveArgcSeven) {
+                                std::cout << "argc:" << argc << std::endl;
                                 std::cout << "wrong number of parameters" << std::endl;
                                 ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
-                            if (argc == moveArgcSeven) {
+                            if (argv[optind + 3] == nullptr || argv[optind + 3][0] == '-') {
                                 totalTimeMs = 1000;
                                 if ((!StrToInt(optarg, px1)) ||
                                     (!StrToInt(argv[optind], py1)) ||
@@ -395,8 +434,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         ShowUsage();
                                         return EVENT_REG_FAIL;
                                 }
-                            }
-                            if (argc == moveArgcEight) {
+                            } else {
                                 if ((!StrToInt(optarg, px1)) ||
                                     (!StrToInt(argv[optind], py1)) ||
                                     (!StrToInt(argv[optind + 1], px2)) ||
@@ -510,6 +548,24 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             optind++;
                             break;
                         }
+                        case 'i': {
+                            int32_t taktTime = 0;
+                            if (!StrToInt(optarg, taktTime)) {
+                                std::cout << "invalid command to interval time" << std::endl;
+                                ShowUsage();
+                                return EVENT_REG_FAIL;
+                            }
+                            const int64_t minTaktTimeMs = 1;
+                            const int64_t maxTaktTimeMs = 15000;
+                            if ((minTaktTimeMs > taktTime) || (maxTaktTimeMs < taktTime)) {
+                                std::cout << "taktTime is out of range. ";
+                                std::cout << minTaktTimeMs << " < taktTime < " << maxTaktTimeMs;
+                                std::cout << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
+                            std::this_thread::sleep_for(std::chrono::milliseconds(taktTime));
+                            break;
+                        }
                         default: {
                             std::cout << "invalid command" << std::endl;
                             ShowUsage();
@@ -552,18 +608,24 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-u <key>                  --up     <key>      -release a button " << std::endl;
     std::cout << "-c <key>                  --click  <key>      -press the left button down,then raise" << std::endl;
     std::cout << "-s <key>                  --scroll <key>      -positive values are sliding backwards" << std::endl;
+    std::cout << "-i <time>                 --interval <time>   -the program interval for the (time) milliseconds";
+    std::cout << std::endl;
     std::cout << "                                               negative values are sliding forwards"  << std::endl;
     std::cout << "-K  --keyboard                                                " << std::endl;
     std::cout << "commands for keyboard:                                        " << std::endl;
-    std::cout << "-d <key>                   --down   <key>    -press down a key" << std::endl;
-    std::cout << "-u <key>                   --up     <key>    -release a key   " << std::endl;
+    std::cout << "-d <key>                   --down   <key>     -press down a key" << std::endl;
+    std::cout << "-u <key>                   --up     <key>     -release a key   " << std::endl;
+    std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
+    std::cout << std::endl;
     std::cout << "-T  --touch                                                   " << std::endl;
     std::cout << "commands for touch:                                           " << std::endl;
     std::cout << "-d <dx1> <dy1>             --down   <dx1> <dy1> -press down a position  dx1 dy1, " << std::endl;
     std::cout << "-u <dx1> <dy1>             --up     <dx1> <dy1> -release a position dx1 dy1, "     << std::endl;
-    std::cout << "-m <dx1> <dy1> <dx2> <dy2> [smooth time]     --smooth movement"   << std::endl;
-    std::cout << "   <dx1> <dy1> <dx2> <dy2> [smooth time]     -smooth movement, "  << std::endl;
-    std::cout << "                                             dx1 dy1 to dx2 dy2 smooth movement"   << std::endl;
+    std::cout << "-m <dx1> <dy1> <dx2> <dy2> [smooth time]      --smooth movement"   << std::endl;
+    std::cout << "   <dx1> <dy1> <dx2> <dy2> [smooth time]      -smooth movement, "  << std::endl;
+    std::cout << "                                              dx1 dy1 to dx2 dy2 smooth movement"   << std::endl;
+    std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
+    std::cout << std::endl;
     std::cout << "                                                              " << std::endl;
     std::cout << "-?  --help                                                    " << std::endl;
 }
