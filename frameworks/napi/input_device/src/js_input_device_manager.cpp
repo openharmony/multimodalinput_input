@@ -193,9 +193,11 @@ napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vect
 napi_value JsInputDeviceManager::GetKeyboardType(napi_env env, int32_t id, napi_value handle)
 {
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevImpl.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
-    InputDevImpl.GetKeyboardTypeAsync(id, EmitJsKeyboardType);
+    auto callback = std::bind(EmitJsKeyboardType, userData, std::placeholders::_1);
+    InputManager::GetInstance()->GetKeyboardType(id, callback);
     return ret;
 }
 

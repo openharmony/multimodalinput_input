@@ -2760,5 +2760,60 @@ HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_02, TestSize.Level1)
     InputManager::GetInstance()->MoveMouse(-1000, 100);
     std::vector<std::string> tLogs { SearchLog(command, sLogs) };
 }
+int32_t deviceIDtest = 0;
+static void GetKeyboardTypeCallback(int32_t keyboardType)
+{
+    switch (keyboardType)
+    {
+        case KEYBOARD_TYPE_NONE: {
+            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d", deviceIDtest, "None", keyboardType);
+            break;
+            }
+        case KEYBOARD_TYPE_UNKNOWN: {
+            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d", deviceIDtest, "unknown", keyboardType);
+            break;
+        }
+        case KEYBOARD_TYPE_ALPHABETICKEYBOARD: {
+            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d", deviceIDtest, "alphabetickeyboard", keyboardType);
+            break;
+        }
+        case KEYBOARD_TYPE_DIGITALKEYBOARD: {
+            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d", deviceIDtest, "digitalkeyboard", keyboardType);
+            break;
+        }
+        case KEYBOARD_TYPE_HANDWRITINGPEN: {
+            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d", deviceIDtest, "handwritingpen", keyboardType);
+            break;
+        }
+        case KEYBOARD_TYPE_REMOTECONTROL: {
+            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d", deviceIDtest, "remotecontrol", keyboardType);
+            break;
+        }
+        default: {
+            MMI_HILOGW("Error obtaining keyboard type");
+            break;
+        }
+    }
+}
+/**
+ * @tc.name:InputManagerTest_GetKeyboardType
+ * @tc.desc:Verify GetKeyboardType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardType, TestSize.Level1)
+{
+    MMI_HILOGD("Start InputManagerTest_GetKeyboardType");
+    for (int32_t i = 0; i < 20; ++i)
+    {
+        deviceIDtest = i;
+        InputManager::GetInstance()->GetKeyboardType(deviceIDtest, GetKeyboardTypeCallback);
+        MMI_HILOGD("i:%{public}d, deviceIDtest:%{public}d", i, deviceIDtest);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
+    MMI_HILOGD("Stop InputManagerTest_GetKeyboardType");
+}
+
 } // namespace MMI
 } // namespace OHOS
