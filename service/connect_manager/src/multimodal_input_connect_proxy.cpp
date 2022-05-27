@@ -144,7 +144,6 @@ int32_t MultimodalInputConnectProxy::MarkEventProcessed(int32_t eventId)
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-
     if (!data.WriteInt32(eventId)) {
         MMI_HILOGE("Failed to write eventId");
         return ERR_INVALID_VALUE;

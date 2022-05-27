@@ -169,12 +169,12 @@ int32_t MultimodalInputConnectStub::StubMarkEventProcessed(MessageParcel& data, 
     }
     int32_t eventId;
     if (!data.ReadInt32(eventId)) {
-        MMI_HILOGE("data ReadInt32 fail");
+        MMI_HILOGE("Read eventId failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
     int32_t ret = MarkEventProcessed(eventId);
     if (ret != RET_OK) {
-        MMI_HILOGE("MarkEventProcessed ret = %{public}d", ret);
+        MMI_HILOGE("MarkEventProcessed failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
