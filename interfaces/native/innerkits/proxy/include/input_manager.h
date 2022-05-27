@@ -228,6 +228,8 @@ public:
      */
     bool IsPointerVisible();
 
+    void GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
