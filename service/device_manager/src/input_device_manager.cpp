@@ -125,7 +125,7 @@ bool InputDeviceManager::GetDeviceConfig(int32_t deviceId, int32_t &keyboardType
     }
     auto deviceConfig = KeyRepeat->GetDeviceConfig();
     auto it = deviceConfig.find(deviceId);
-    if(it == deviceConfig.end()) {
+    if (it == deviceConfig.end()) {
         MMI_HILOGE("Failed to obtain the keyboard type of the configuration file");
         return false;
     }
@@ -170,7 +170,7 @@ void InputDeviceManager::GetDeviceSupportKeys(int32_t deviceId, int32_t &keyboar
         && determineKbType[KeyEvent::KEYCODE_F20]) {
         keyboardType = KEYBOARD_TYPE_HANDWRITINGPEN;
         MMI_HILOGD("The keyboard type is handwriting pen:%{public}d", keyboardType);
-    }else {
+    } else {
         keyboardType = KEYBOARD_TYPE_UNKNOWN;
     }
     MMI_HILOGD("Get keyboard type results by supporting keys:%{public}d", keyboardType);
@@ -184,7 +184,7 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId)
         MMI_HILOGE("Failed to search for the deviceID");
         return keyboardType;
     }
-    if(GetDeviceConfig(deviceId, keyboardType)) {
+    if (GetDeviceConfig(deviceId, keyboardType)) {
         return keyboardType;
     }
     GetDeviceSupportKeys(deviceId, keyboardType);

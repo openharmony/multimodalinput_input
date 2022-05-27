@@ -2763,30 +2763,35 @@ HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_02, TestSize.Level1)
 int32_t deviceIDtest = 0;
 static void GetKeyboardTypeCallback(int32_t keyboardType)
 {
-    switch (keyboardType)
-    {
+    switch (keyboardType) {
         case KEYBOARD_TYPE_NONE: {
-            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d", deviceIDtest, "None", keyboardType);
+            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d", 
+                        deviceIDtest, "None", keyboardType);
             break;
             }
         case KEYBOARD_TYPE_UNKNOWN: {
-            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d", deviceIDtest, "unknown", keyboardType);
+            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d",
+                        deviceIDtest, "unknown", keyboardType);
             break;
         }
         case KEYBOARD_TYPE_ALPHABETICKEYBOARD: {
-            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d", deviceIDtest, "alphabetickeyboard", keyboardType);
+            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d",
+                        deviceIDtest, "alphabetickeyboard", keyboardType);
             break;
         }
         case KEYBOARD_TYPE_DIGITALKEYBOARD: {
-            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d", deviceIDtest, "digitalkeyboard", keyboardType);
+            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d",
+                        deviceIDtest, "digitalkeyboard", keyboardType);
             break;
         }
         case KEYBOARD_TYPE_HANDWRITINGPEN: {
-            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d", deviceIDtest, "handwritingpen", keyboardType);
+            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d",
+                        deviceIDtest, "handwritingpen", keyboardType);
             break;
         }
         case KEYBOARD_TYPE_REMOTECONTROL: {
-            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d", deviceIDtest, "remotecontrol", keyboardType);
+            MMI_HILOGD("IdAndType: deviceID:%{public}d-->KeyboardType: %{public}s, keyboardType:%{public}d",
+                        deviceIDtest, "remotecontrol", keyboardType);
             break;
         }
         default: {
@@ -2814,6 +2819,5 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardType, TestSize.Level1)
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
     MMI_HILOGD("Stop InputManagerTest_GetKeyboardType");
 }
-
 } // namespace MMI
 } // namespace OHOS
