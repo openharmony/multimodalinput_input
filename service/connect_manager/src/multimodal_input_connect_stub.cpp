@@ -58,6 +58,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         case IMultimodalInputConnect::IS_POINTER_VISIBLE: {
             return StubIsPointerVisible(data, reply);
         }
+        case IMultimodalInputConnect::MARK_EVENT_PROCESSED: {
+            return StubMarkEventProcessed(data, reply);
+        }
         default: {
             MMI_HILOGE("unknown code:%{public}u, go switch default", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -154,6 +157,26 @@ int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, Me
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
     MMI_HILOGD("visible:%{public}d,ret:%{public}d,pid:%{public}d", visible, ret, GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubMarkEventProcessed(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t eventId;
+    if (!data.ReadInt32(eventId)) {
+        MMI_HILOGE("Read eventId failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t ret = MarkEventProcessed(eventId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("MarkEventProcessed failed, ret:%{public}d", ret);
+        return ret;
+    }
     return RET_OK;
 }
 } // namespace MMI
