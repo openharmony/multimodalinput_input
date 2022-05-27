@@ -349,7 +349,7 @@ int32_t MMIService::MarkEventProcessed(int32_t eventId)
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&ServerMsgHandler::MarkEventProcessed, &sMsgHandler_, sess, eventId));
     if (ret != RET_OK) {
-        MMI_HILOGE("mark event processed failed, return %{public}d", ret);
+        MMI_HILOGE("mark event processed failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
