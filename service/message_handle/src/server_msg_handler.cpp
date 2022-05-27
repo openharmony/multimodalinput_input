@@ -468,7 +468,7 @@ int32_t ServerMsgHandler::OnInputKeyboardType(SessionPtr sess, NetPacket& pkt)
     NetPacket pkt2(MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE);
     pkt2 << userData << keyboardType;
     if (pkt2.ChkRWError()) {
-        MMI_HILOGE("Packet write support keys failed");
+        MMI_HILOGE("Packet write keyboard type failed");
         return RET_ERR;
     }
     if (!sess->SendMsg(pkt2)) {
