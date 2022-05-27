@@ -44,7 +44,7 @@ public:
     int32_t FindInputDeviceId(struct libinput_device* inputDevice);
     int32_t GetKeyboardBusMode(int32_t deviceId);
     bool GetDeviceConfig(int32_t deviceId, int32_t &KeyboardType);
-    void GetDeviceSupportKeys(int32_t deviceId, int32_t &keyboardType);
+    int32_t GetDeviceSupportKey(int32_t deviceId);
     int32_t GetKeyboardType(int32_t deviceId);
     void Attach(std::shared_ptr<IDeviceObserver> observer);
     void Detach(std::shared_ptr<IDeviceObserver> observer);
