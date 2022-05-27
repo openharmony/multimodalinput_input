@@ -23,7 +23,7 @@ constexpr int32_t ABS_FUZZ_REMOTE = 255;
 constexpr int32_t ABS_FLAT_REMOTE = 4095;
 } // namespace
 
-VirtualRemoteControl::VirtualRemoteControl() : VirtualDevice("Virtual RemoteControl", BUS_USB, 0x7d02, 0x0002)
+VirtualRemoteControl::VirtualRemoteControl() : VirtualDevice("Virtual RemoteControl", BUS_BLUETOOTH, 0x7d02, 0x0002)
 {
     dev_.absmin[ABS_X] = 0;
     dev_.absmax[ABS_X] = ABS_MAX_REMOTE;
