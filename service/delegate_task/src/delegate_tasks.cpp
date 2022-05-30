@@ -59,7 +59,6 @@ void DelegateTasks::ProcessTasks()
     PopPendingTaskList(tasks);
     for (const auto &it : tasks) {
         it->ProcessTask();
-        RecoveryId(it->GetId());
     }
 }
 
@@ -112,6 +111,7 @@ void DelegateTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
     while (!tasks_.empty() && ((count++) < onceProcessTaskLimit)) {
         auto task = tasks_.front();
         CHKPB(task);
+        RecoveryId(task->GetId());
         tasks.push_back(task->GetSharedPtr());
         tasks_.pop();
     }
