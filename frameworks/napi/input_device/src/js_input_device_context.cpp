@@ -262,6 +262,7 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
     return jsInputDeviceMgr->GetDevice(env, id, argv[1]);
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 napi_value JsInputDeviceContext::SetPointerVisible(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
@@ -314,6 +315,8 @@ napi_value JsInputDeviceContext::IsPointerVisible(napi_env env, napi_callback_in
 
     return jsInputDeviceMgr->IsPointerVisible(env, argv[0]);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
+
 napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
@@ -410,8 +413,10 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("off", Off),
         DECLARE_NAPI_STATIC_FUNCTION("getDevice", GetDevice),
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceIds", GetDeviceIds),
+#ifdef OHOS_BUILD_ENABLE_POINTER
         DECLARE_NAPI_STATIC_FUNCTION("setPointerVisible", SetPointerVisible),
         DECLARE_NAPI_STATIC_FUNCTION("isPointerVisible", IsPointerVisible),
+#endif // OHOS_BUILD_ENABLE_POINTER
         DECLARE_NAPI_STATIC_FUNCTION("supportKeys", SupportKeys),
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardType", GetKeyboardType),
     };

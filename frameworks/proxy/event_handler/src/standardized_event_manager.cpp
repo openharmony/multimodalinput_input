@@ -44,6 +44,7 @@ void StandardizedEventManager::SetClientHandle(MMIClientPtr client)
     client_ = client;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t StandardizedEventManager::SubscribeKeyEvent(
     const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
 {
@@ -106,7 +107,9 @@ int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> ke
     }
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
@@ -129,12 +132,13 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
     }
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
     CALL_LOG_ENTER;
-    NetPacket pkt(MmiMessageId::MOVE_MOUSE_BY_OFFSET);
+    NetPacket pkt(MmiMessageId::MOVE_MOUSE);
     pkt << offsetX << offsetY;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write move mouse event failed");
@@ -146,7 +150,7 @@ int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offset
     }
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 int32_t StandardizedEventManager::GetDeviceIds(int32_t userData)
 {

@@ -69,6 +69,7 @@ napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value 
     return ret;
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 napi_value getResult(sptr<AsyncContext> asyncContext)
 {
     CALL_LOG_ENTER;
@@ -177,6 +178,7 @@ napi_value JsInputDeviceManager::IsPointerVisible(napi_env env, napi_value handl
     AsyncCallbackWork(asyncContext);
     return promise;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vector<int32_t> keyCodes,
     napi_value handle)

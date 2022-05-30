@@ -42,8 +42,12 @@ public:
 
     int32_t OnInjectKeyEventTest(SessionPtr sess, NetPacket pkt)
     {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         int32_t retResult = OnInjectKeyEvent(sess, pkt);
         return retResult;
+#else
+        return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     }
 };
 } // namespace MMI

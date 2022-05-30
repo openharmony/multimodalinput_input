@@ -30,8 +30,10 @@ public:
     static napi_value Off(napi_env env, napi_callback_info info);
     static napi_value GetDeviceIds(napi_env env, napi_callback_info info);
     static napi_value GetDevice(napi_env env, napi_callback_info info);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     static napi_value SetPointerVisible(napi_env env, napi_callback_info info);
     static napi_value IsPointerVisible(napi_env env, napi_callback_info info);
+#endif // OHOS_BUILD_ENABLE_POINTER
     static napi_value SupportKeys(napi_env env, napi_callback_info info);
     static napi_value GetKeyboardType(napi_env env, napi_callback_info info);
     std::shared_ptr<JsInputDeviceManager> GetJsInputDeviceMgr() const;

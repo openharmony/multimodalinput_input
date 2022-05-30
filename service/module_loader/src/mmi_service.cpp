@@ -82,6 +82,21 @@ static void CheckDefine()
 #ifdef OHOS_BUILD_MMI_DEBUG
     CheckDefineOutput("%-40s", "OHOS_BUILD_MMI_DEBUG");
 #endif
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_POINTER_DRAWING");
+#endif
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_INTERCEPTOR");
+#endif
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_KEYBOARD");
+#endif
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_POINTER");
+#endif
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_TOUCH");
+#endif
 }
 
 MMIService::MMIService() : SystemAbility(MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true) {}
@@ -204,11 +219,12 @@ int32_t MMIService::Init()
     MMI_HILOGD("WindowsManager Init");
     WinMgr->Init(*this);
     MMI_HILOGD("PointerDrawingManager Init");
+#ifdef OHOS_BUILD_ENABLE_POINTER
     if (!IPointerDrawingManager::GetInstance()->Init()) {
         MMI_HILOGE("Pointer draw init failed");
         return POINTER_DRAW_INIT_FAIL;
     }
-    
+#endif // OHOS_BUILD_ENABLE_POINTER
     mmiFd_ = EpollCreat(MAX_EVENT_SIZE);
     if (mmiFd_ < 0) {
         MMI_HILOGE("Epoll creat failed");
@@ -315,29 +331,35 @@ void MMIService::OnDisconnected(SessionPtr s)
 int32_t MMIService::SetPointerVisible(bool visible)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerVisible,
         IPointerDrawingManager::GetInstance(), GetCallingPid(), visible));
     if (ret != RET_OK) {
         MMI_HILOGE("set pointer visible failed,return %{public}d", ret);
         return ret;
     }
+#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
 
 int32_t MMIService::CheckPointerVisible(bool &visible)
 {
+#ifdef OHOS_BUILD_ENABLE_POINTER
     visible = IPointerDrawingManager::GetInstance()->IsPointerVisible();
+#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
 
 int32_t MMIService::IsPointerVisible(bool &visible)
 {
     CALL_LOG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckPointerVisible, this, std::ref(visible)));
     if (ret != RET_OK) {
         MMI_HILOGE("is pointer visible failed,return %{public}d", ret);
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
 

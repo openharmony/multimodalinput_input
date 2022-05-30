@@ -32,12 +32,15 @@ void OnConnected(const IfMMIClient& client)
 {
     CALL_LOG_ENTER;
     InputMgrImpl->OnConnected();
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventInputSubscribeMgr.OnConnected();
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     InputHandlerManager::GetInstance().OnConnected();
 }
 
 MultimodalEventHandler::MultimodalEventHandler() {}
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr)
 {
     CHKPR(keyEventPtr, ERROR_NULL_POINTER);
@@ -47,6 +50,7 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
     }
     return EventManager.InjectEvent(keyEventPtr);
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 bool MultimodalEventHandler::InitClient()
 {
@@ -126,7 +130,7 @@ int32_t MultimodalEventHandler::UnRegisterInputDeviceMonitor()
     }
     return EventManager.UnRegisterInputDeviceMonitor();
 }
-
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -136,13 +140,14 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
     }
     return EventManager.InjectPointerEvent(pointerEvent);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
     return EventManager.MoveMouseEvent(offsetX, offsetY);
 }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
 {
@@ -177,6 +182,7 @@ void MultimodalEventHandler::RemoveInputEventMontior(int32_t keyEventType)
     client_->SendMessage(pkt);
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEventType)
 {
     CALL_LOG_ENTER;
@@ -212,5 +218,6 @@ int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEven
         MMI_HILOGD("sendAdd msg Success");
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS

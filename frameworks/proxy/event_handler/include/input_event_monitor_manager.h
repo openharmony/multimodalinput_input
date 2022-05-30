@@ -43,15 +43,17 @@ public:
     InputEventMonitorManager();
     DISALLOW_COPY_AND_MOVE(InputEventMonitorManager);
     virtual ~InputEventMonitorManager();
-
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t AddInputEventMontior(std::function<void (std::shared_ptr<KeyEvent>)> keyEventMonitor);
     void RemoveInputEventMontior(int32_t monitorId);
     int32_t OnMonitorInputEvent(std::shared_ptr<KeyEvent> keyEvent);
-
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t AddInputEventTouchpadMontior(std::function<void (std::shared_ptr<PointerEvent>)>
                                         TouchPadEventMonitor);
     void RemoveInputEventTouchpadMontior(int32_t monitorId);
     int32_t OnTouchpadMonitorInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 private:
     std::list<MonitorItem> monitors_;
