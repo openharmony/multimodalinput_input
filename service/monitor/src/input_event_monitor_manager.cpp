@@ -62,6 +62,7 @@ void InputEventMonitorManager::RemoveInputEventMontior(SessionPtr session, int32
     }
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
@@ -86,6 +87,7 @@ void InputEventMonitorManager::OnMonitorInputEvent(std::shared_ptr<KeyEvent> key
         item.session->SendMsg(pkt);
     }
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 int32_t InputEventMonitorManager::AddInputEventTouchpadMontior(int32_t eventType, SessionPtr session)
 {
@@ -120,6 +122,7 @@ void InputEventMonitorManager::RemoveInputEventTouchpadMontior(int32_t eventType
     }
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void InputEventMonitorManager::OnTouchpadMonitorInputEvent(
     std::shared_ptr<PointerEvent> pointerEvent)
 {
@@ -159,5 +162,6 @@ bool InputEventMonitorManager::ReportTouchpadEvent(std::shared_ptr<PointerEvent>
     OnTouchpadMonitorInputEvent(pointerEvent);
     return true;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS

@@ -71,7 +71,6 @@ ohos_shared_library("libmmi-client") {
     "event_handler/src/input_handler_manager.cpp",
     "event_handler/src/input_manager_impl.cpp",
     "event_handler/src/input_monitor_manager.cpp",
-    "event_handler/src/key_event_input_subscribe_manager.cpp",
     "event_handler/src/multimodal_event_handler.cpp",
     "event_handler/src/standardized_event_manager.cpp",
     "events/src/axis_event.cpp",
@@ -96,10 +95,26 @@ ohos_shared_library("libmmi-client") {
     cflags += [ "-DOHOS_BUILD_ENABLE_INTERCEPTOR" ]
   }
 
+  if (mmi_enable_keyboard) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
+  }
+
+  if (mmi_enable_mouse) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
+  }
+
+  if (mmi_enable_tp) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
+  }
+
   if (mmi_enable_interceptor) {
     sources += [ "event_handler/src/input_interceptor_manager.cpp" ]
   } else {
     sources += [ "event_handler/src/i_input_interceptor_manager.cpp" ]
+  }
+
+  if (mmi_enable_keyboard) {
+    sources += [ "event_handler/src/key_event_input_subscribe_manager.cpp" ]
   }
 
   configs = [
@@ -288,6 +303,18 @@ ohos_unittest("InputManagerTest") {
 
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
+  }
+
+  if (mmi_enable_keyboard) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
+  }
+
+  if (mmi_enable_mouse) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
+  }
+
+  if (mmi_enable_tp) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
   }
 
   sources = [ "events/test/input_manager_test.cpp" ]

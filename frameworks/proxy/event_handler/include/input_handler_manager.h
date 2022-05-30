@@ -36,8 +36,12 @@ public:
     int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer);
     void RemoveHandler(int32_t handlerId, InputHandlerType handlerType);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent);
+#endif
     void OnConnected();
 
 private:
@@ -58,10 +62,14 @@ private:
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
     EventHandlerPtr GetEventHandler(int32_t handlerId);
     bool PostTask(int32_t handlerId, const AppExecFwk::EventHandler::Callback &callback);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
         std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
         std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 private:
     std::mutex mtxHandlers_;

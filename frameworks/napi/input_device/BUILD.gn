@@ -30,6 +30,10 @@ config("libinputdevice_config") {
   if (is_mmi_have_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
+
+  if (mmi_enable_mouse) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
+  }
 }
 
 ohos_shared_library("inputdevice") {

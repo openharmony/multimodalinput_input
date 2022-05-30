@@ -15,9 +15,12 @@
 
 #include "key_command_manager.h"
 
+
 #include "ability_manager_client.h"
 #include "cJSON.h"
 #include "file_ex.h"
+#include "bytrace_adapter.h"
+#include "error_multimodal.h"
 #include "mmi_log.h"
 #include "string_wrapper.h"
 #include "timer_manager.h"
@@ -264,6 +267,38 @@ bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
 }
 } // namespace
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+void KeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPV(keyEvent);
+    if (HandleEvent(keyEvent)) {
+        MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{public}d", keyEvent->GetKeyCode());
+        BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
+        return;
+    }
+    CHKPV(nextHandler_);
+    nextHandler_->HandleKeyEvent(keyEvent);
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+void KeyCommandManager::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    CHKPV(nextHandler_);
+    nextHandler_->HandlePointerEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+void KeyCommandManager::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    CHKPV(nextHandler_);
+    nextHandler_->HandleTouchEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_TOUCH
+
 std::string KeyCommandManager::GenerateKey(const ShortcutKey& key)
 {
     std::set<int32_t> preKeys = key.preKeys;
@@ -488,14 +523,6 @@ void ShortcutKey::Print() const
     }
     MMI_HILOGD("eventkey matched, finalKey:%{public}d,bundleName:%{public}s",
         finalKey, ability.bundleName.c_str());
-}
-
-std::shared_ptr<IKeyCommandManager> IKeyCommandManager::GetInstance()
-{
-    if (keyCommand_ == nullptr) {
-        keyCommand_ = std::make_shared<KeyCommandManager>();
-    }
-    return keyCommand_;
 }
 } // namespace MMI
 } // namespace OHOS
