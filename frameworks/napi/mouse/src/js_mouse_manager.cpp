@@ -26,7 +26,7 @@ enum class ReturnType {
     BOOL,
     NUMBER,
 };
-} 
+}
 
 bool JsCommon::TypeOf(napi_env env, napi_value value, napi_valuetype type)
 {
