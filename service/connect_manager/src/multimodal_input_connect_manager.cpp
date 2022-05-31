@@ -100,6 +100,25 @@ int32_t MultimodalInputConnectManager::MarkEventProcessed(int32_t eventId)
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->MarkEventProcessed(eventId);
 }
+
+int32_t MultimodalInputConnectManager::AddInputHandler(int32_t handlerId, InputHandlerType handlerType)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->AddInputHandler(handlerId, handlerType);
+}
+
+int32_t MultimodalInputConnectManager::RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->RemoveInputHandler(handlerId, handlerType);
+}
+
+int32_t MultimodalInputConnectManager::MarkEventConsumed(int32_t monitorId, int32_t eventId)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->MarkEventConsumed(monitorId, eventId);
+}
+
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 {
     CALL_LOG_ENTER;

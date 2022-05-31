@@ -158,5 +158,83 @@ int32_t MultimodalInputConnectProxy::MarkEventProcessed(int32_t eventId)
     }
     return RET_OK;
 }
+
+int32_t MultimodalInputConnectProxy::AddInputHandler(int32_t handlerId, InputHandlerType handlerType)
+{
+    CALL_LOG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    if (!data.WriteInt32(handlerId)) {
+        MMI_HILOGE("Failed to write handlerId");
+        return ERR_INVALID_VALUE;
+    }
+    if (!data.WriteInt32(handlerType)) {
+        MMI_HILOGE("Failed to write handlerType");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    int32_t requestResult = Remote()->SendRequest(ADD_INPUT_HANDLER, data, reply, option);
+    if (requestResult != RET_OK) {
+        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
+        return requestResult;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType)
+{
+    CALL_LOG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    if (!data.WriteInt32(handlerId)) {
+        MMI_HILOGE("Failed to write handlerId");
+        return ERR_INVALID_VALUE;
+    }
+    if (!data.WriteInt32(handlerType)) {
+        MMI_HILOGE("Failed to write handlerType");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    int32_t requestResult = Remote()->SendRequest(REMOVE_INPUT_HANDLER, data, reply, option);
+    if (requestResult != RET_OK) {
+        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
+        return requestResult;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::MarkEventConsumed(int32_t monitorId, int32_t eventId)
+{
+    CALL_LOG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    if (!data.WriteInt32(monitorId)) {
+        MMI_HILOGE("Failed to write monitorId");
+        return ERR_INVALID_VALUE;
+    }
+    if (!data.WriteInt32(eventId)) {
+        MMI_HILOGE("Failed to write eventId");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    int32_t requestResult = Remote()->SendRequest(MARK_EVENT_CONSUMED, data, reply, option);
+    if (requestResult != RET_OK) {
+        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
+        return requestResult;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
