@@ -33,6 +33,9 @@ public:
     void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
     int32_t MarkEventProcessed(SessionPtr sess, int32_t eventId);
+    int32_t OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType);
+    int32_t OnRemoveInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType);
+    int32_t OnMarkConsumed(SessionPtr sess, int32_t monitorId, int32_t eventId);
 
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
@@ -42,9 +45,6 @@ protected:
     int32_t OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
-    int32_t OnAddInputHandler(SessionPtr sess, NetPacket& pkt);
-    int32_t OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt);
-    int32_t OnMarkConsumed(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputDevice(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputDeviceIds(SessionPtr sess, NetPacket& pkt);
     int32_t OnSupportKeys(SessionPtr sess, NetPacket& pkt);

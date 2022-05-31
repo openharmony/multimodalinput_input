@@ -70,9 +70,6 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
             MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventTouchpadMontior, this)},
         {MmiMessageId::REMOVE_INPUT_EVENT_TOUCHPAD_MONITOR,
             MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventTouchpadMontior, this)},
-        {MmiMessageId::ADD_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnAddInputHandler, this)},
-        {MmiMessageId::REMOVE_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputHandler, this)},
-        {MmiMessageId::MARK_CONSUMED, MsgCallbackBind2(&ServerMsgHandler::OnMarkConsumed, this)},
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
         {MmiMessageId::MOVE_MOUSE_BY_OFFSET, MsgCallbackBind2(&ServerMsgHandler::OnMoveMouse, this)},
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -216,47 +213,35 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t handlerId;
-    InputHandlerType handlerType;
-    pkt >> handlerId >> handlerType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read add input data failed");
-        return RET_ERR;
-    }
     MMI_HILOGD("OnAddInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
-    InterHdlGl->AddInputHandler(handlerId, handlerType, sess);
-    InputHandlerManagerGlobal::GetInstance().AddInputHandler(handlerId, handlerType, sess);
+    if (handlerType == InputHandlerType::INTERCEPTOR) {
+        return InterHdlGl->AddInputHandler(handlerId, handlerType, sess);
+    }
+    if (handlerType == InputHandlerType::MONITOR) {
+        return InputHandlerManagerGlobal::GetInstance().AddInputHandler(handlerId, handlerType, sess);
+    }
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t handlerId;
-    InputHandlerType handlerType;
-    pkt >> handlerId >> handlerType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read remove input data failed");
-        return RET_ERR;
-    }
     MMI_HILOGD("OnRemoveInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
-    InterHdlGl->RemoveInputHandler(handlerId, handlerType, sess);
-    InputHandlerManagerGlobal::GetInstance().RemoveInputHandler(handlerId, handlerType, sess);
+    if (handlerType == InputHandlerType::INTERCEPTOR) {
+        InterHdlGl->RemoveInputHandler(handlerId, handlerType, sess);
+    }
+    if (handlerType == InputHandlerType::MONITOR) {
+        InputHandlerManagerGlobal::GetInstance().RemoveInputHandler(handlerId, handlerType, sess);
+    }
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t monitorId, int32_t eventId)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t monitorId, eventId;
-    pkt >> monitorId >> eventId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read monitor data failed");
-        return RET_ERR;
-    }
     InputHandlerManagerGlobal::GetInstance().MarkConsumed(monitorId, eventId, sess);
     return RET_OK;
 }

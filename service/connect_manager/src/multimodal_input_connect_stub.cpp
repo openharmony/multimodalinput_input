@@ -61,6 +61,15 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         case IMultimodalInputConnect::MARK_EVENT_PROCESSED: {
             return StubMarkEventProcessed(data, reply);
         }
+        case IMultimodalInputConnect::ADD_INPUT_HANDLER: {
+            return StubAddInputHandler(data, reply);
+        }
+        case IMultimodalInputConnect::REMOVE_INPUT_HANDLER: {
+            return StubRemoveInputHandler(data, reply);
+        }
+        case IMultimodalInputConnect::MARK_EVENT_CONSUMED: {
+            return StubMarkEventConsumed(data, reply);
+        }
         default: {
             MMI_HILOGE("unknown code:%{public}u, go switch default", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -175,6 +184,81 @@ int32_t MultimodalInputConnectStub::StubMarkEventProcessed(MessageParcel& data, 
     int32_t ret = MarkEventProcessed(eventId);
     if (ret != RET_OK) {
         MMI_HILOGE("MarkEventProcessed failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t handlerId;
+    if (!data.ReadInt32(handlerId)) {
+        MMI_HILOGE("Read handlerId failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    InputHandlerType handlerType;
+    if (!data.ReadInt32(handlerType)) {
+        MMI_HILOGE("Read handlerType failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t ret = AddInputHandler(handlerId, handlerType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("call AddInputHandler failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t handlerId;
+    if (!data.ReadInt32(handlerId)) {
+        MMI_HILOGE("Read handlerId failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    InputHandlerType handlerType;
+    if (!data.ReadInt32(handlerType)) {
+        MMI_HILOGE("Read handlerType failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t ret = RemoveInputHandler(handlerId, handlerType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("call RemoveInputHandler failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t monitorId;
+    if (!data.ReadInt32(monitorId)) {
+        MMI_HILOGE("Read monitorId failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t eventId;
+    if (!data.ReadInt32(eventId)) {
+        MMI_HILOGE("Read eventId failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t ret = MarkEventConsumed(monitorId, eventId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("call MarkEventConsumed failed ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
