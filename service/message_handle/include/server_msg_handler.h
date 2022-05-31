@@ -20,6 +20,7 @@
 
 #include "event_dispatch.h"
 #include "input_handler_type.h"
+#include "key_option.h"
 #include "msg_handler.h"
 
 namespace OHOS {
@@ -38,6 +39,9 @@ public:
         HandleEventType eventType);
     int32_t OnRemoveInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType);
     int32_t OnMarkConsumed(SessionPtr sess, int32_t monitorId, int32_t eventId);
+    int32_t OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
+        int32_t subscribeId, const std::shared_ptr<KeyOption> option);
+    int32_t OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid, int32_t subscribeId);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t OnMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -59,8 +63,6 @@ protected:
     int32_t OnRemoveInputEventMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt);
-    int32_t OnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
-    int32_t OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_MMI_DEBUG

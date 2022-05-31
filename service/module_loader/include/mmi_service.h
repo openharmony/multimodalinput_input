@@ -61,6 +61,8 @@ public:
     virtual int32_t MarkEventConsumed(int32_t monitorId, int32_t eventId) override;
     virtual int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
     virtual int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
+    virtual int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
+    virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
 
 #ifdef OHOS_RSS_CLIENT
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;

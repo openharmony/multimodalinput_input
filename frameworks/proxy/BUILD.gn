@@ -43,6 +43,7 @@ ohos_source_set("libmmi-common") {
   sources = [
     "events/src/input_event.cpp",
     "events/src/key_event.cpp",
+    "events/src/key_option.cpp",
     "events/src/pointer_event.cpp",
   ]
 
@@ -76,7 +77,6 @@ ohos_shared_library("libmmi-client") {
     "event_handler/src/standardized_event_manager.cpp",
     "events/src/axis_event.cpp",
     "events/src/input_manager.cpp",
-    "events/src/key_option.cpp",
     "module_loader/src/mmi_client.cpp",
     "module_loader/src/mmi_event_handler.cpp",
     "module_loader/src/mmi_fd_listener.cpp",

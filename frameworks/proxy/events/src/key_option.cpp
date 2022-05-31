@@ -21,6 +21,7 @@ std::set<int32_t> KeyOption::GetPreKeys() const
 {
     return preKeys_;
 }
+
 void KeyOption::SetPreKeys(const std::set<int32_t> &preKeys)
 {
     preKeys_ = preKeys;
@@ -49,9 +50,60 @@ int32_t KeyOption::GetFinalKeyDownDuration() const
 {
     return finalKeyDownDuration_;
 }
+
 void KeyOption::SetFinalKeyDownDuration(int32_t duration)
 {
     finalKeyDownDuration_ = duration;
+}
+
+bool KeyOption::ReadFromParcel(Parcel &in)
+{
+    int32_t preKeysSize;
+    if (!in.ReadInt32(preKeysSize)) {
+        return false;
+    }
+
+    if (preKeysSize < 0) {
+        return false;
+    }
+
+    for (auto i = 0; i < preKeysSize; ++i) {
+        int keyValue;
+        if (!in.ReadInt32(keyValue)) {
+            return false;
+        }
+        preKeys_.insert(keyValue);
+    }
+
+    return (
+        in.ReadInt32(finalKey_) &&
+        in.ReadBool(isFinalKeyDown_) &&
+        in.ReadInt32(finalKeyDownDuration_)
+    );
+}
+
+bool KeyOption::WriteToParcel(Parcel &out) const
+{
+    if (preKeys_.size() > std::numeric_limits<int32_t>::max()) {
+        return false;
+    }
+
+    int32_t preKeysSize = static_cast<int32_t>(preKeys_.size());
+    if (!out.WriteInt32(preKeysSize)) {
+        return false;
+    }
+
+    for (const auto &i : preKeys_) {
+        if (!out.WriteInt32(i)) {
+            return false;
+        }
+    }
+
+    return (
+        out.WriteInt32(finalKey_) &&
+        out.WriteBool(isFinalKeyDown_) &&
+        out.WriteInt32(finalKeyDownDuration_)
+    );
 }
 } // namespace MMI
 } // namespace OHOS

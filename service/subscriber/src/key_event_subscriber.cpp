@@ -92,8 +92,10 @@ bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         handled = HandleKeyDown(keyEvent);
     } else if (keyAction == KeyEvent::KEY_ACTION_UP) {
+        hasEventExecuting = false;
         handled = HandleKeyUp(keyEvent);
     } else if (keyAction == KeyEvent::KEY_ACTION_CANCEL) {
+        hasEventExecuting = false;
         handled = HandleKeyCanel(keyEvent);
     } else {
         MMI_HILOGW("keyAction exception");
