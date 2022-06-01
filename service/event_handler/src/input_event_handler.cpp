@@ -238,20 +238,6 @@ int32_t InputEventHandler::OnEventDeviceRemoved(libinput_event *event)
     return RET_OK;
 }
 
-int32_t InputEventHandler::AddHandleTimer(int32_t timeout)
-{
-    CALL_LOG_ENTER;
-    timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
-        auto ret = eventDispatch_.DispatchKeyEventPid(*(this->udsServer_), this->keyEvent_);
-        if (ret != RET_OK) {
-            MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
-        }
-        int32_t triggertime = KeyRepeat->GetIntervalTime(keyEvent_->GetDeviceId());
-        this->AddHandleTimer(triggertime);
-    });
-    return timerId_;
-}
-
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
@@ -260,12 +246,6 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         keyEvent_ = KeyEvent::Create();
     }
 
-    std::vector<int32_t> pressedKeys = keyEvent_->GetPressedKeys();
-    int32_t lastPressedKey = -1;
-    if (!pressedKeys.empty()) {
-        lastPressedKey = pressedKeys.back();
-        MMI_HILOGD("The last repeat button, keyCode:%{public}d", lastPressedKey);
-    }
     auto packageResult = eventPackage_.PackageKeyEvent(event, keyEvent_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_HILOGD("The same event reported by multi_device should be discarded");
@@ -283,7 +263,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
-    KeyRepeat->SelectAutoRepeat(keyEvent_, lastPressedKey);
+    KeyRepeat->SelectAutoRepeat(keyEvent_);
     MMI_HILOGD("keyCode:%{public}d,action:%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
     return RET_OK;
 }
