@@ -65,6 +65,7 @@ protected:
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd) override;
     virtual bool IsRunning() const override;
     int32_t CheckPointerVisible(bool &visible);
+    int32_t CheckEventProcessed(int32_t pid, int32_t eventId);
 
     bool InitLibinputService();
     bool InitService();
