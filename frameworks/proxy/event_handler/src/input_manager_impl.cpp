@@ -23,7 +23,6 @@
 #include "bytrace_adapter.h"
 #include "define_interceptor_manager.h"
 #include "event_filter_service.h"
-#include "key_event_input_subscribe_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -206,7 +205,7 @@ void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
 {
     CHK_PIDANDTID();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    KeyEventInputSubscribeMgr.UnSubscribeKeyEvent(subscriberId);
+    KeyEventInputSubscribeMgr.UnsubscribeKeyEvent(subscriberId);
 #else
     MMI_HILOGW("Keyboard device does not support");
 #endif
@@ -410,7 +409,6 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
     monitorManager_.RemoveMonitor(monitorId);
 #else
     MMI_HILOGI("Monitor function does not support");
-    return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
@@ -425,7 +423,6 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
     monitorManager_.MarkConsumed(monitorId, eventId);
 #else
     MMI_HILOGI("Monitor function does not support");
-    return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_MONITOR
 }
 

@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-#include "input_event_monitor_manager.h"
-
 #include <cinttypes>
 
 #include "proto.h"

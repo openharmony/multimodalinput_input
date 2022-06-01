@@ -79,7 +79,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
     return subscribeInfo.GetSubscribeId();
 }
 
-int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
+int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
 {
     CALL_LOG_ENTER;
     if (subscribeId < 0) {
@@ -99,7 +99,7 @@ int32_t KeyEventInputSubscribeManager::UnSubscribeKeyEvent(int32_t subscribeId)
     
     for (auto it = subscribeInfos_.begin(); it != subscribeInfos_.end(); ++it) {
         if (it->GetSubscribeId() == subscribeId) {
-            if (EventManager.UnSubscribeKeyEvent(subscribeId) != RET_OK) {
+            if (EventManager.UnsubscribeKeyEvent(subscribeId) != RET_OK) {
                 MMI_HILOGE("Leave, unsubscribe key event failed");
                 return RET_ERR;
             }

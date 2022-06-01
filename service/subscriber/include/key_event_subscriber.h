@@ -46,7 +46,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
             const std::shared_ptr<KeyOption> keyOption);
-    int32_t UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
+    int32_t UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
     bool OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 
 private:
