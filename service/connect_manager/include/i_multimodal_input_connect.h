@@ -43,9 +43,9 @@ public:
         SET_POINTER_VISIBLE = 2,
         IS_POINTER_VISIBLE = 3,
         MARK_EVENT_PROCESSED = 4,
-        ADD_INPUT_HANDLER = 5,
-        REMOVE_INPUT_HANDLER = 6,
-        MARK_EVENT_CONSUMED = 7
+        ADD_INPUT_HANDLER = 8,
+        REMOVE_INPUT_HANDLER = 9,
+        MARK_EVENT_CONSUMED = 10
     };
 
     enum {
