@@ -686,7 +686,7 @@ int32_t ReadConfigFile(const std::string &realPath, DeviceConfig& devConf)
             MMI_HILOGE("Configuration item error");
             cfgFile.close();
             return RET_ERR;
-        }     
+        }
     }
     return RET_OK;
 }
