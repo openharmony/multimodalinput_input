@@ -70,8 +70,8 @@ void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
     keyEvent_ = keyEvent;
     if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
         if (TimerMgr->IsExist(timerId_)) {
-            MMI_HILOGI("Keyboard down but timer exists,"
-                        "timerId:%{public}d, keyCode:%{public}d", timerId_, keyEvent_->GetKeyCode());
+            MMI_HILOGI("Keyboard down but timer exists timerId:%{public}d, keyCode:%{public}d",
+                timerId_, keyEvent_->GetKeyCode());
             TimerMgr->RemoveTimer(timerId_);
             timerId_ = -1;
         }

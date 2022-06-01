@@ -20,7 +20,6 @@
 #include <string>
 
 #include "event_dispatch.h"
-//#include "event_package.h"
 #include "key_map_manager.h"
 #include "key_event.h"
 #include "libinput.h"
