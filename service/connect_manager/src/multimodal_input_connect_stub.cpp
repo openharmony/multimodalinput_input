@@ -30,6 +30,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectStub" };
+using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, MessageParcel& reply);
 } // namespace
 
 int32_t MultimodalInputConnectStub::OnRemoteRequest(
@@ -45,36 +46,22 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         MMI_HILOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
-    switch (code) {
-        case IMultimodalInputConnect::ALLOC_SOCKET_FD: {
-            return StubHandleAllocSocketFd(data, reply);
-        }
-        case IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER: {
-            return StubAddInputEventFilter(data, reply);
-        }
-        case IMultimodalInputConnect::SET_POINTER_VISIBLE: {
-            return StubSetPointerVisible(data, reply);
-        }
-        case IMultimodalInputConnect::IS_POINTER_VISIBLE: {
-            return StubIsPointerVisible(data, reply);
-        }
-        case IMultimodalInputConnect::MARK_EVENT_PROCESSED: {
-            return StubMarkEventProcessed(data, reply);
-        }
-        case IMultimodalInputConnect::ADD_INPUT_HANDLER: {
-            return StubAddInputHandler(data, reply);
-        }
-        case IMultimodalInputConnect::REMOVE_INPUT_HANDLER: {
-            return StubRemoveInputHandler(data, reply);
-        }
-        case IMultimodalInputConnect::MARK_EVENT_CONSUMED: {
-            return StubMarkEventConsumed(data, reply);
-        }
-        default: {
-            MMI_HILOGE("unknown code:%{public}u, go switch default", code);
-            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
-        }
+    const static std::map<int32_t, ConnFunc> mapConnFunc = {
+        {IMultimodalInputConnect::ALLOC_SOCKET_FD, &MultimodalInputConnectStub::StubHandleAllocSocketFd},
+        {IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubAddInputEventFilter},
+        {IMultimodalInputConnect::SET_POINTER_VISIBLE, &MultimodalInputConnectStub::StubSetPointerVisible},
+        {IMultimodalInputConnect::IS_POINTER_VISIBLE, &MultimodalInputConnectStub::StubIsPointerVisible},
+        {IMultimodalInputConnect::MARK_EVENT_PROCESSED, &MultimodalInputConnectStub::StubMarkEventProcessed},
+        {IMultimodalInputConnect::ADD_INPUT_HANDLER, &MultimodalInputConnectStub::StubAddInputHandler},
+        {IMultimodalInputConnect::REMOVE_INPUT_HANDLER, &MultimodalInputConnectStub::StubRemoveInputHandler},
+        {IMultimodalInputConnect::MARK_EVENT_CONSUMED, &MultimodalInputConnectStub::StubMarkEventConsumed}
+    };
+    auto it = mapConnFunc.find(code);
+    if (it != mapConnFunc.end()) {
+        return (this->*mapConnFunc[code])(data, reply);
     }
+    MMI_HILOGE("unknown code:%{public}u, go switch default", code);
+    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
 int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
