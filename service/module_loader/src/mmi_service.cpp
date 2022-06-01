@@ -97,6 +97,9 @@ static void CheckDefine()
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_TOUCH");
 #endif
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+    CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_MONITOR");
+#endif
 }
 
 MMIService::MMIService() : SystemAbility(MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true) {}

@@ -60,14 +60,12 @@ ohos_source_set("mmi_event_filter_proxy") {
   if (mmi_enable_keyboard) {
     cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
   }
-
   if (mmi_enable_tp) {
     cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
   }
   if (mmi_enable_mouse) {
     cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
   }
-
   if (mmi_enable_tp) {
     cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
   }

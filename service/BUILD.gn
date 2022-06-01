@@ -107,6 +107,9 @@ config("libmmi_server_config") {
   if (mmi_enable_tp) {
     cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
   }
+  if (mmi_enable_monitor) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR" ]
+  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
@@ -141,7 +144,6 @@ ohos_shared_library("libmmi-server") {
     "module_loader/src/mmi_service.cpp",
     "module_loader/src/uds_server.cpp",
     "monitor/src/input_event_monitor_manager.cpp",
-    "monitor/src/input_handler_manager_global.cpp",
     "permission_helper/src/permission_helper.cpp",
     "subscriber/src/key_option.cpp",
     "timer_manager/src/timer_manager.cpp",
@@ -187,7 +189,9 @@ ohos_shared_library("libmmi-server") {
       ]
     }
   }
-
+  if (mmi_enable_monitor) {
+    sources += [ "monitor/src/input_handler_manager_global.cpp" ]
+  }
   if (mmi_enable_interceptor) {
     sources += [ "interceptor/src/interceptor_handler_global.cpp" ]
   }
@@ -316,17 +320,17 @@ ohos_unittest("ut-mmi-service-out") {
   if (mmi_enable_pointer_drawing) {
     cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
-
   if (mmi_enable_keyboard) {
     cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
   }
-
   if (mmi_enable_mouse) {
     cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
   }
-
   if (mmi_enable_tp) {
     cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
+  }
+  if (mmi_enable_monitor) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR" ]
   }
 
   configs = [ ":libmmi_server_config" ]
