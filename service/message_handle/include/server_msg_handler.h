@@ -19,6 +19,7 @@
 #include "nocopyable.h"
 
 #include "event_dispatch.h"
+#include "input_handler_type.h"
 #include "msg_handler.h"
 
 namespace OHOS {
