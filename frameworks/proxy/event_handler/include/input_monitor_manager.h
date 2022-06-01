@@ -30,7 +30,7 @@ class InputMonitorManager {
 public:
     InputMonitorManager() = default;
     DISALLOW_COPY_AND_MOVE(InputMonitorManager);
-
+    ~InputMonitorManager() = default;
 public:
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor);
     void RemoveMonitor(int32_t monitorId);

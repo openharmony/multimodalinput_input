@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +23,6 @@
 #include "bytrace_adapter.h"
 #include "define_interceptor_manager.h"
 #include "event_filter_service.h"
-#include "input_event_monitor_manager.h"
 #include "key_event_input_subscribe_manager.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
@@ -359,7 +358,7 @@ void InputManagerImpl::PrintDisplayInfo()
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
     CHKPR(monitor, ERROR_NULL_POINTER);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
     CHKPR(consumer, ERROR_NULL_POINTER);
@@ -373,7 +372,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
     CHKPR(monitor, ERROR_NULL_POINTER);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
     CHKPR(consumer, ERROR_NULL_POINTER);
@@ -386,6 +385,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerE
 
 int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
 {
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     CHKPR(consumer, ERROR_NULL_POINTER);
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
@@ -393,26 +393,40 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
         return -1;
     }
     return monitorManager_.AddMonitor(consumer);
+#else
+    MMI_HILOGI("Monitor function does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 {
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return;
     }
     monitorManager_.RemoveMonitor(monitorId);
+#else
+    MMI_HILOGI("Monitor function does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return;
     }
     monitorManager_.MarkConsumed(monitorId, eventId);
+#else
+    MMI_HILOGI("Monitor function does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
