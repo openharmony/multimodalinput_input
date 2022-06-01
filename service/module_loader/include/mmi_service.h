@@ -68,9 +68,10 @@ protected:
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd) override;
     virtual bool IsRunning() const override;
     int32_t CheckPointerVisible(bool &visible);
-    int32_t CheckAddInput(int32_t handlerId, InputHandlerType handlerType);
-    int32_t CheckRemoveInput(int32_t handlerId, InputHandlerType handlerType);
-    int32_t CheckMarkConsumed(int32_t monitorId, int32_t eventId);
+    int32_t CheckEventProcessed(int32_t pid, int32_t eventId);
+    int32_t CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType);
+    int32_t CheckRemoveInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType);
+    int32_t CheckMarkConsumed(int32_t pid, int32_t monitorId, int32_t eventId);
 
     bool InitLibinputService();
     bool InitService();
