@@ -20,8 +20,6 @@
 #include "msg_handler.h"
 #include "uds_client.h"
 
-#include "key_event_input_subscribe_manager.h"
-
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(const UDSClient&, NetPacket&)> ClientMsgFun;

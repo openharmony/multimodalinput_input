@@ -50,7 +50,7 @@ public:
     int32_t UnRegisterInputDeviceMonitor();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t SubscribeKeyEvent(const KeyEventInputSubscribeManager::SubscribeKeyEventInfo& subscribeInfo);
-    int32_t UnSubscribeKeyEvent(int32_t subscribeId);
+    int32_t UnsubscribeKeyEvent(int32_t subscribeId);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);

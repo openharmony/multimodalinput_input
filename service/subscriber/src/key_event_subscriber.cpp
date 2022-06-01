@@ -92,7 +92,7 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
     return RET_OK;
 }
 
-int32_t KeyEventSubscriber::UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
+int32_t KeyEventSubscriber::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
 {
     CALL_LOG_ENTER;
     MMI_HILOGD("subscribeId:%{public}d", subscribeId);

@@ -143,7 +143,6 @@ ohos_shared_library("libmmi-server") {
     "message_handle/src/server_msg_handler.cpp",
     "module_loader/src/mmi_service.cpp",
     "module_loader/src/uds_server.cpp",
-    "monitor/src/input_event_monitor_manager.cpp",
     "permission_helper/src/permission_helper.cpp",
     "subscriber/src/key_option.cpp",
     "timer_manager/src/timer_manager.cpp",

@@ -70,7 +70,7 @@ int32_t StandardizedEventManager::SubscribeKeyEvent(
     return RET_OK;
 }
 
-int32_t StandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
+int32_t StandardizedEventManager::UnsubscribeKeyEvent(int32_t subscribeId)
 {
     CALL_LOG_ENTER;
     NetPacket pkt(MmiMessageId::UNSUBSCRIBE_KEY_EVENT);
