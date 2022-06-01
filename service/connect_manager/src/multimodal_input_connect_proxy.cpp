@@ -177,10 +177,10 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(int32_t handlerId, InputHan
     }
     MessageParcel reply;
     MessageOption option;
-    int32_t requestResult = Remote()->SendRequest(ADD_INPUT_HANDLER, data, reply, option);
-    if (requestResult != RET_OK) {
-        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
-        return requestResult;
+    int32_t ret = Remote()->SendRequest(ADD_INPUT_HANDLER, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        return ret;
     }
     return RET_OK;
 }
@@ -203,10 +203,10 @@ int32_t MultimodalInputConnectProxy::RemoveInputHandler(int32_t handlerId, Input
     }
     MessageParcel reply;
     MessageOption option;
-    int32_t requestResult = Remote()->SendRequest(REMOVE_INPUT_HANDLER, data, reply, option);
-    if (requestResult != RET_OK) {
-        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
-        return requestResult;
+    int32_t ret = Remote()->SendRequest(REMOVE_INPUT_HANDLER, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        return ret;
     }
     return RET_OK;
 }
@@ -229,10 +229,10 @@ int32_t MultimodalInputConnectProxy::MarkEventConsumed(int32_t monitorId, int32_
     }
     MessageParcel reply;
     MessageOption option;
-    int32_t requestResult = Remote()->SendRequest(MARK_EVENT_CONSUMED, data, reply, option);
-    if (requestResult != RET_OK) {
-        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
-        return requestResult;
+    int32_t ret = Remote()->SendRequest(MARK_EVENT_CONSUMED, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        return ret;
     }
     return RET_OK;
 }
