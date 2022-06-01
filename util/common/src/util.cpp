@@ -57,7 +57,6 @@ constexpr int32_t CONFIG_ITEM_SECOND = 2;
 constexpr int32_t CONFIG_ITEM_THIRDLY = 3;
 constexpr int32_t COMMENT_SUBSCRIPT = 0;
 const std::string DATA_PATH = "/data";
-const std::string PROC_PATH = "/proc";
 const std::string INPUT_PATH = "/system/etc/multimodalinput/";
 const std::string PRO_PATH = "/vendor/etc/keymap/";
 const std::string TOML_PATH = "/vendor/etc/keymap/";
@@ -503,11 +502,6 @@ static bool IsValidJsonPath(const std::string &filePath)
         IsValidPath(INPUT_PATH, filePath);
 }
 
-static bool IsValidUinputPath(const std::string &filePath)
-{
-    return IsValidPath(PROC_PATH, filePath);
-}
-
 static bool IsValidProPath(const std::string &filePath)
 {
     return IsValidPath(PRO_PATH, filePath);
@@ -622,33 +616,6 @@ std::string ReadJsonFile(const std::string &filePath)
     }
     int32_t fileSize = GetFileSize(realPath);
     if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
-        MMI_HILOGE("file size out of read range");
-        return "";
-    }
-    return ReadFile(filePath);
-}
-
-std::string ReadUinputToolFile(const std::string &filePath)
-{
-    if (filePath.empty()) {
-        MMI_HILOGE("filePath is empty");
-        return "";
-    }
-    char realPath[PATH_MAX] = {};
-    if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("path is error");
-        return "";
-    }
-    if (!IsValidUinputPath(realPath)) {
-        MMI_HILOGE("file path is error");
-        return "";
-    }
-    if (!IsFileExists(realPath)) {
-        MMI_HILOGE("file not exist");
-        return "";
-    }
-    int32_t fileSize = GetFileSize(realPath);
-    if ((fileSize < 0) || (fileSize > FILE_SIZE_MAX)) {
         MMI_HILOGE("file size out of read range");
         return "";
     }

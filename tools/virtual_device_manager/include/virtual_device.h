@@ -33,7 +33,9 @@ public:
     bool SetPhys(const std::string& deviceName);
     bool SetUp();
     void Close();
-    void MakeFolder(const std::string &filePath);
+    static std::string ReadFile(const std::string &filePath);
+    static int32_t GetFileSize(const std::string& filePath);
+    static std::string ReadUinputToolFile(const std::string &filePath);
     static bool CreateHandle(const std::string& deviceArgv);
     static bool AddDevice(const std::string& startDeviceName);
     static bool CloseDevice(const std::string& closeDeviceName, const std::vector<std::string>& deviceList);
