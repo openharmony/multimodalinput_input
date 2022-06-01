@@ -201,12 +201,12 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
         MMI_HILOGE("Read handlerId failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
-    InputHandlerType handlerType;
-    if (!data.ReadInt32(static_cast<int32_t>(handlerType))) {
+    int32_t handlerType;
+    if (!data.ReadInt32(handlerType)) {
         MMI_HILOGE("Read handlerType failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
-    int32_t ret = AddInputHandler(handlerId, handlerType);
+    int32_t ret = AddInputHandler(handlerId, static_cast<InputHandlerType>(handlerType));
     if (ret != RET_OK) {
         MMI_HILOGE("call AddInputHandler failed ret:%{public}d", ret);
         return ret;
@@ -226,12 +226,12 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
         MMI_HILOGE("Read handlerId failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
-    InputHandlerType handlerType;
-    if (!data.ReadInt32(static_cast<int32_t>(handlerType))) {
+    int32_t handlerType;
+    if (!data.ReadInt32(handlerType)) {
         MMI_HILOGE("Read handlerType failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
-    int32_t ret = RemoveInputHandler(handlerId, handlerType);
+    int32_t ret = RemoveInputHandler(handlerId, static_cast<InputHandlerType>(handlerType));
     if (ret != RET_OK) {
         MMI_HILOGE("call RemoveInputHandler failed ret:%{public}d", ret);
         return ret;
