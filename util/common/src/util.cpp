@@ -682,7 +682,7 @@ int32_t ReadConfigFile(const std::string &realPath, DeviceConfig& devConf)
         }
         std::string configItem = tmp.substr(0, pos);
         std::string value = tmp.substr(pos + 1);
-        if (RET_ERR == ConfigItemSwitch(configItem, value, devConf)) {
+        if (ConfigItemSwitch(configItem, value, devConf) == RET_ERR) {
             MMI_HILOGE("Configuration item error");
             cfgFile.close();
             return RET_ERR;
