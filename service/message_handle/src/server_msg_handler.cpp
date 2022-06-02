@@ -25,7 +25,6 @@
 #include "input_event.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "input_event_monitor_manager.h"
 #include "input_handler_manager_global.h"
 #include "input_windows_manager.h"
 #include "key_event_subscriber.h"
@@ -67,6 +66,7 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ServerMsgHandler::OnSupportKeys, this)},
         {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind2(&ServerMsgHandler::OnInputKeyboardType, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputDeviceMontior, this)},
+        {MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputDeviceMontior, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
         {MmiMessageId::ADD_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnAddInputHandler, this)},
         {MmiMessageId::REMOVE_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputHandler, this)},
@@ -252,10 +252,11 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
     CHKPR(interceptorHandler, ERROR_NULL_POINTER);
     interceptorHandler->AddInputHandler(handlerId, handlerType, sess);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     auto monitorHandler = InputHandler->GetMonitorHandler();
     CHKPR(monitorHandler, ERROR_NULL_POINTER);
     monitorHandler->AddInputHandler(handlerId, handlerType, sess);
-  
+#endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
 
@@ -275,9 +276,11 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
     CHKPR(interceptorHandler, ERROR_NULL_POINTER);
     interceptorHandler->RemoveInputHandler(handlerId, handlerType, sess);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     auto monitorHandler = InputHandler->GetMonitorHandler();
     CHKPR(monitorHandler, ERROR_NULL_POINTER);
     monitorHandler->RemoveInputHandler(handlerId, handlerType, sess);
+#endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
 
@@ -290,9 +293,11 @@ int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, NetPacket& pkt)
         MMI_HILOGE("Packet read monitor data failed");
         return RET_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     auto monitorHandler = InputHandler->GetMonitorHandler();
     CHKPR(monitorHandler, ERROR_NULL_POINTER);
     monitorHandler->MarkConsumed(monitorId, eventId, sess);
+#endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
 
@@ -530,6 +535,14 @@ int32_t ServerMsgHandler::OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pk
             return;
         }
     });
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    InputDevMgr->RemoveDevMonitor(sess);
     return RET_OK;
 }
 

@@ -56,6 +56,7 @@ protected:
     int32_t OnSupportKeys(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputKeyboardType(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
+    int32_t OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnUnsubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
