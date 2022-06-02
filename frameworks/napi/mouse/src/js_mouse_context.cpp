@@ -21,20 +21,12 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsMouseContext" };
 } // namespace
 
-JsMouseContext::JsMouseContext()
-{
-    mgr_ = std::make_shared<JsMouseManager>();
-    CHKPL(mgr_);
-}
+JsMouseContext::JsMouseContext() : mgr_(std::make_shared<JsMouseManager>()) {}
 
 JsMouseContext::~JsMouseContext()
 {
     std::lock_guard<std::mutex> guard(mtx_);
-    auto jsmouseMgr = mgr_;
     mgr_.reset();
-    if (jsmouseMgr) {
-        jsmouseMgr->ResetEnv();
-    }
 }
 
 napi_value JsMouseContext::CreateInstance(napi_env env)
@@ -46,7 +38,7 @@ napi_value JsMouseContext::CreateInstance(napi_env env)
     constexpr char className[] = "JsMouseContext";
     napi_value jsClass = nullptr;
     napi_property_descriptor desc[] = {};
-    napi_status status = napi_define_class(env, className, sizeof(className), JsMouseContext::JsConstructor,
+    napi_status status = napi_define_class(env, className, sizeof(className), JsMouseContext::CreateJsObject,
                                            nullptr, sizeof(desc) / sizeof(desc[0]), nullptr, &jsClass);
     CHKRP(env, status, DEFINE_CLASS);
 
@@ -67,7 +59,7 @@ napi_value JsMouseContext::CreateInstance(napi_env env)
     return jsInstance;
 }
 
-napi_value JsMouseContext::JsConstructor(napi_env env, napi_callback_info info)
+napi_value JsMouseContext::CreateJsObject(napi_env env, napi_callback_info info)
 {
     CALL_LOG_ENTER;
     napi_value thisVar = nullptr;

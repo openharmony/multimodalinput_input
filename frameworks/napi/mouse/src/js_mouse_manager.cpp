@@ -158,10 +158,5 @@ napi_value JsMouseManager::IsPointerVisible(napi_env env, napi_value handle)
     AsyncCallbackWork(asyncContext);
     return promise;
 }
-
-void JsMouseManager::ResetEnv()
-{
-    CALL_LOG_ENTER;
-}
 } // namespace MMI
 } // namespace OHOS

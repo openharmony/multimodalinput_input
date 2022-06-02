@@ -18,20 +18,16 @@
 
 #include <memory>
 
-#include "input_manager.h"
-
-#include "stream_buffer.h"
-#include "input_device_impl.h"
-#include "refbase.h"
-
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "util_napi.h"
 #include "utils/log.h"
+#include "refbase.h"
 
+#include "stream_buffer.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-
+#include "input_manager.h"
 
 namespace OHOS {
 namespace MMI {

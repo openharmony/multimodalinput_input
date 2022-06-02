@@ -32,7 +32,7 @@ public:
 private:
     static napi_value CreateInstance(napi_env env);
     static JsMouseContext* GetInstance(napi_env env);
-    static napi_value JsConstructor(napi_env env, napi_callback_info info);
+    static napi_value CreateJsObject(napi_env env, napi_callback_info info);
     std::shared_ptr<JsMouseManager> mgr_ {nullptr};
     std::mutex mtx_;
     napi_ref contextRef_ {nullptr};
