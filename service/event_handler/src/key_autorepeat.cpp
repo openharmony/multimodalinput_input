@@ -63,14 +63,13 @@ void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
     CHKPV(keyEvent);
     DeviceConfig devConf = GetAutoSwitch(keyEvent->GetDeviceId());
     if (devConf.autoSwitch != OPEN_AUTO_REPEAT) {
-        MMI_HILOGW("The branch not pass autorepaet flow");
         return;
     }
     udsServer_ = InputHandler->GetUDSServer();
     keyEvent_ = keyEvent;
     if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
         if (TimerMgr->IsExist(timerId_)) {
-            MMI_HILOGI("Keyboard down but timer exists timerId:%{public}d, keyCode:%{public}d",
+            MMI_HILOGI("Keyboard down but timer exists, timerId:%{public}d, keyCode:%{public}d",
                 timerId_, keyEvent_->GetKeyCode());
             TimerMgr->RemoveTimer(timerId_);
             timerId_ = -1;
@@ -99,7 +98,7 @@ void KeyAutoRepeat::AddHandleTimer(int32_t timeout)
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
         auto ret = eventDispatch_.DispatchKeyEventPid(*(this->udsServer_), this->keyEvent_);
         if (ret != RET_OK) {
-            MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
+            MMI_HILOGE("KeyEvent dispatch failed, ret:%{public}d, errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
         }
         int32_t triggertime = KeyRepeat->GetIntervalTime(keyEvent_->GetDeviceId());
         this->AddHandleTimer(triggertime);

@@ -51,8 +51,8 @@ constexpr int32_t INVALID_FILE_SIZE = -1;
 constexpr int32_t MIN_INTERVALTIME = 50;
 constexpr int32_t MAX_INTERVALTIME = 500;
 constexpr int32_t MIN_DELAYTIME = 200;
-const int32_t MAX_DELAYTIME = 1000;
-const int32_t COMMENT_SUBSCRIPT = 0;
+constexpr int32_t MAX_DELAYTIME = 1000;
+constexpr int32_t COMMENT_SUBSCRIPT = 0;
 const std::string CONFIG_ITEM_REPEAT = "Key.autorepeat";
 const std::string CONFIG_ITEM_DELAY = "Key.autorepeat.delaytime";
 const std::string CONFIG_ITEM_INTERVAL = "Key.autorepeat.intervaltime";
@@ -688,6 +688,7 @@ int32_t ReadConfigFile(const std::string &realPath, DeviceConfig& devConf)
             return RET_ERR;
         }
     }
+    cfgFile.close();
     return RET_OK;
 }
 
@@ -695,6 +696,7 @@ int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value
 {
     CALL_LOG_ENTER;
     if (configItem.empty() || value.empty()) {
+        MMI_HILOGE("Get key config item is invalid");
         return RET_ERR;
     }
     if (!IsNum(value)) {
