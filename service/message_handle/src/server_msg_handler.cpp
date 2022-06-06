@@ -163,9 +163,17 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     pointerEvent->UpdateId();
+    int action = pointerEvent->GetPointerAction();
+    if ((action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_UP)
+        && targetWindowId_ > 0) {
+        pointerEvent->SetTargetWindowId(targetWindowId_);
+    }
     if (eventDispatch_.HandlePointerEvent(pointerEvent) != RET_OK) {
         MMI_HILOGE("HandlePointerEvent failed");
         return RET_ERR;
+    }
+    if (action == PointerEvent::POINTER_ACTION_DOWN) {
+        targetWindowId_ = pointerEvent->GetTargetWindowId();
     }
     return RET_OK;
 }
