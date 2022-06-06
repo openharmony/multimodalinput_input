@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(const UDSClient&, NetPacket&)> ClientMsgFun;
-class ClientMsgHandler : public MsgHandler<ClientMsgFun> {
+class ClientMsgHandler : public MsgHandler<MmiMessageId, ClientMsgFun> {
 public:
     ClientMsgHandler();
     virtual ~ClientMsgHandler();
@@ -40,12 +40,12 @@ protected:
     int32_t OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt);
     int32_t OnPointerEvent(const UDSClient& client, NetPacket& pkt);
     int32_t OnSubscribeKeyEventCallback(const UDSClient& client, NetPacket& pkt);
-    int32_t GetMultimodeInputInfo(const UDSClient& client, NetPacket& pkt);
     int32_t ReportKeyEvent(const UDSClient& client, NetPacket& pkt);
     int32_t ReportPointerEvent(const UDSClient& client, NetPacket& pkt);
     int32_t OnInputDevice(const UDSClient& client, NetPacket& pkt);
     int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);
     int32_t OnSupportKeys(const UDSClient& client, NetPacket& pkt);
+    int32_t OnInputKeyboardType(const UDSClient& client, NetPacket& pkt);
     int32_t OnDevMonitor(const UDSClient& client, NetPacket& pkt);
 
 private:

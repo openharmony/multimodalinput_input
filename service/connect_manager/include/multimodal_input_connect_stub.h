@@ -16,7 +16,6 @@
 #ifndef MULTIMODAL_INPUT_CONNECT_STUB_H
 #define MULTIMODAL_INPUT_CONNECT_STUB_H
 
-#include "ipc_skeleton.h"
 #include "iremote_stub.h"
 #include "message_parcel.h"
 #include "nocopyable.h"
@@ -33,19 +32,19 @@ public:
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectStub);
     ~MultimodalInputConnectStub() = default;
 
-    int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;
+    virtual bool IsRunning() const = 0;
+    virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
+        MessageOption& options) override;
 
 protected:
-    virtual int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply) = 0;
+    int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply);
     int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
     int32_t StubIsPointerVisible(MessageParcel& data, MessageParcel& reply);
-
-private:
-    static constexpr int32_t SYSTEM_UID = 1000;
-    static constexpr int32_t ROOT_UID = 0;
-
-    bool CheckPermission();
+    int32_t StubMarkEventProcessed(MessageParcel& data, MessageParcel& reply);
+    int32_t StubAddInputHandler(MessageParcel& data, MessageParcel& reply);
+    int32_t StubRemoveInputHandler(MessageParcel& data, MessageParcel& reply);
+    int32_t StubMarkEventConsumed(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace MMI
 } // namespace OHOS

@@ -23,6 +23,8 @@
 #include "event_dispatch.h"
 #include "event_package.h"
 #include "input_device.h"
+#include "key_autorepeat.h"
+#include "key_map_manager.h"
 #include "msg_handler.h"
 #include "nocopyable.h"
 #include "singleton.h"
@@ -40,6 +42,10 @@ public:
     std::shared_ptr<InputDevice> GetInputDevice(int32_t id) const;
     std::vector<bool> SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes);
     int32_t FindInputDeviceId(struct libinput_device* inputDevice);
+    int32_t GetKeyboardBusMode(int32_t deviceId);
+    bool GetDeviceConfig(int32_t deviceId, int32_t &KeyboardType);
+    int32_t GetDeviceSupportKey(int32_t deviceId);
+    int32_t GetKeyboardType(int32_t deviceId);
     void Attach(std::shared_ptr<IDeviceObserver> observer);
     void Detach(std::shared_ptr<IDeviceObserver> observer);
     void NotifyPointerDevice(bool hasPointerDevice);

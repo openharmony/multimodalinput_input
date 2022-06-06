@@ -55,15 +55,12 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     }
 #endif
     MsgCallback funs[] = {
-        {MmiMessageId::MARK_PROCESS,
-            MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
-        {MmiMessageId::ON_DUMP, MsgCallbackBind2(&ServerMsgHandler::OnDump, this)},
-        {MmiMessageId::GET_MMI_INFO_REQ, MsgCallbackBind2(&ServerMsgHandler::GetMultimodeInputInfo, this)},
         {MmiMessageId::INJECT_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectKeyEvent, this) },
         {MmiMessageId::INJECT_POINTER_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectPointerEvent, this) },
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ServerMsgHandler::OnInputDeviceIds, this)},
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ServerMsgHandler::OnSupportKeys, this)},
+        {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind2(&ServerMsgHandler::OnInputKeyboardType, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputDeviceMontior, this)},
         {MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputDeviceMontior, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
@@ -73,9 +70,6 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
             MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventTouchpadMontior, this)},
         {MmiMessageId::REMOVE_INPUT_EVENT_TOUCHPAD_MONITOR,
             MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventTouchpadMontior, this)},
-        {MmiMessageId::ADD_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnAddInputHandler, this)},
-        {MmiMessageId::REMOVE_INPUT_HANDLER, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputHandler, this)},
-        {MmiMessageId::MARK_CONSUMED, MsgCallbackBind2(&ServerMsgHandler::OnMarkConsumed, this)},
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
         {MmiMessageId::MOVE_MOUSE_BY_OFFSET, MsgCallbackBind2(&ServerMsgHandler::OnMoveMouse, this)},
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -133,58 +127,11 @@ int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
 }
 #endif // OHOS_BUILD_HDF
 
-int32_t ServerMsgHandler::OnDump(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    int32_t fd = -1;
-    pkt >> fd;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read fd failed");
-        return PACKET_READ_FAIL;
-    }
-    MMIEventDump->Dump(fd);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::MarkEventProcessed(SessionPtr sess, int32_t eventId)
 {
     CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t eventId = 0;
-    pkt >> eventId;
-    MMI_HILOGD("event is: %{public}d", eventId);
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read data failed");
-        return PACKET_READ_FAIL;
-    }
     sess->DelEvents(eventId);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    TagPackHead tagPackHead;
-    pkt >> tagPackHead;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read tagPackHead failed");
-        return PACKET_READ_FAIL;
-    }
-    int32_t fd = sess->GetFd();
-    if (tagPackHead.idMsg != MmiMessageId::INVALID) {
-        TagPackHead tagPackHeadAck = { MmiMessageId::INVALID, {fd}};
-        NetPacket pkt(MmiMessageId::GET_MMI_INFO_ACK);
-        pkt << tagPackHeadAck;
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet write tagPackHeadAck failed");
-            return PACKET_READ_FAIL;
-        }
-        if (!udsServer_->SendMsg(fd, pkt)) {
-            MMI_HILOGE("Sending message failed");
-            return MSG_SEND_FAIL;
-        }
-    }
     return RET_OK;
 }
 
@@ -266,47 +213,35 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t handlerId;
-    InputHandlerType handlerType;
-    pkt >> handlerId >> handlerType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read add input data failed");
-        return RET_ERR;
-    }
     MMI_HILOGD("OnAddInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
-    InterHdlGl->AddInputHandler(handlerId, handlerType, sess);
-    InputHandlerManagerGlobal::GetInstance().AddInputHandler(handlerId, handlerType, sess);
+    if (handlerType == InputHandlerType::INTERCEPTOR) {
+        return InterHdlGl->AddInputHandler(handlerId, handlerType, sess);
+    }
+    if (handlerType == InputHandlerType::MONITOR) {
+        return InputHandlerManagerGlobal::GetInstance().AddInputHandler(handlerId, handlerType, sess);
+    }
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t handlerId;
-    InputHandlerType handlerType;
-    pkt >> handlerId >> handlerType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read remove input data failed");
-        return RET_ERR;
-    }
     MMI_HILOGD("OnRemoveInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
-    InterHdlGl->RemoveInputHandler(handlerId, handlerType, sess);
-    InputHandlerManagerGlobal::GetInstance().RemoveInputHandler(handlerId, handlerType, sess);
+    if (handlerType == InputHandlerType::INTERCEPTOR) {
+        InterHdlGl->RemoveInputHandler(handlerId, handlerType, sess);
+    }
+    if (handlerType == InputHandlerType::MONITOR) {
+        InputHandlerManagerGlobal::GetInstance().RemoveInputHandler(handlerId, handlerType, sess);
+    }
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t monitorId, int32_t eventId)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t monitorId, eventId;
-    pkt >> monitorId >> eventId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read monitor data failed");
-        return RET_ERR;
-    }
     InputHandlerManagerGlobal::GetInstance().MarkConsumed(monitorId, eventId, sess);
     return RET_OK;
 }
@@ -325,6 +260,7 @@ int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
     if (MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
         auto pointerEvent = MouseEventHdr->GetPointerEvent();
         eventDispatch_.HandlePointerEvent(pointerEvent);
+        MMI_HILOGD("Mouse movement message processed successfully");
     }
     return RET_OK;
 }
@@ -488,6 +424,32 @@ int32_t ServerMsgHandler::OnSupportKeys(SessionPtr sess, NetPacket& pkt)
     }
     if (!sess->SendMsg(pkt2)) {
         MMI_HILOGE("Sending failed");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnInputKeyboardType(SessionPtr sess, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t userData;
+    int32_t deviceId;
+    pkt >> userData >> deviceId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read key info failed");
+        return RET_ERR;
+    }
+    int32_t keyboardType = InputDevMgr->GetKeyboardType(deviceId);
+    MMI_HILOGD("Gets the keyboard type result:%{public}d", keyboardType);
+    NetPacket pkt2(MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE);
+    pkt2 << userData << keyboardType;
+    if (pkt2.ChkRWError()) {
+        MMI_HILOGE("Packet write keyboard type failed");
+        return RET_ERR;
+    }
+    if (!sess->SendMsg(pkt2)) {
+        MMI_HILOGE("Failed to send the keyboard package");
         return MSG_SEND_FAIL;
     }
     return RET_OK;

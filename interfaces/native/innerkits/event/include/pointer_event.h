@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -294,7 +294,7 @@ public:
     static std::shared_ptr<PointerEvent> from(std::shared_ptr<InputEvent> inputEvent);
 
 public:
-    struct PointerItem {
+    class PointerItem {
     public:
         PointerItem();
         ~PointerItem();
@@ -433,6 +433,14 @@ public:
          */
         int32_t GetHeight() const;
 
+        /**
+         * @brief Sets the height of the pressed area.
+         * @param height Indicates the height to set.
+         * @return void
+         * @since 9
+         */
+        void SetHeight(int32_t height);
+
         int32_t GetToolGlobalX() const;
 
         void SetToolGlobalX(int32_t globalX);
@@ -456,14 +464,6 @@ public:
         int32_t GetToolHeight() const;
 
         void SetToolHeight(int32_t height);
-
-        /**
-         * @brief Sets the height of the pressed area.
-         * @param height Indicates the height to set.
-         * @return void
-         * @since 9
-         */
-        void SetHeight(int32_t height);
 
         /**
          * @brief Obtains the tilt angle of the x axis.
@@ -510,13 +510,35 @@ public:
          */
         void SetPressure(double pressure);
 
-        int32_t GetAxisLong() const;
+        /**
+         * @brief Obtains the long axis of the touch point area.
+         * @return Returns the long axis of the touch point area.
+         * @since 9
+         */
+        int32_t GetLongAxis() const;
 
-        void SetAxisLong(int32_t axisLong);
+        /**
+         * @brief Sets the long axis of the touch point area.
+         * @param longAxis Indicates the long axis of the touch point area.
+         * @return void
+         * @since 9
+         */
+        void SetLongAxis(int32_t longAxis);
 
-        int32_t GetAxisShort() const;
+        /**
+         * @brief Obtains the short axis of the touch point area.
+         * @return Returns the short axis of the touch point area.
+         * @since 9
+         */
+        int32_t GetShortAxis() const;
 
-        void SetAxisShort(int32_t axisShort);
+        /**
+         * @brief Sets the short axis of the touch point area.
+         * @param shortAxis Indicates the short axis of the touch point area.
+         * @return void
+         * @since 9
+         */
+        void SetShortAxis(int32_t shortAxis);
 
         /**
          * @brief Obtains the ID of the current device.
@@ -582,8 +604,8 @@ public:
         int32_t toolWidth_ {};
         int32_t toolHeight_ {};
         double  pressure_ {};
-        int32_t axisLong_ {};
-        int32_t axisShort_ {};
+        int32_t longAxis_ {};
+        int32_t shortAxis_ {};
         int32_t deviceId_ {};
         int64_t downTime_ {};
         int32_t toolType_ {};

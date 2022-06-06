@@ -37,10 +37,10 @@ const std::vector<uint32_t>& VirtualPenKeyboard::GetKeys() const
     return keys;
 }
 
-const std::vector<uint32_t>& VirtualPenKeyboard::GetMscs() const
+const std::vector<uint32_t>& VirtualPenKeyboard::GetMiscellaneous() const
 {
-    static const std::vector<uint32_t> mscs { MSC_SCAN };
-    return mscs;
+    static const std::vector<uint32_t> miscellaneous { MSC_SCAN };
+    return miscellaneous;
 }
 } // namespace MMI
 } // namespace OHOS

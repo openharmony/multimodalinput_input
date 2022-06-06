@@ -140,7 +140,11 @@ int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offset
         MMI_HILOGE("Packet write move mouse event failed");
         return RET_ERR;
     }
-    return SendMsg(pkt);
+    if (!SendMsg(pkt)) {
+        MMI_HILOGE("SendMsg failed");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 

@@ -115,15 +115,16 @@ void InputDeviceImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCode
     ++userData_;
 }
 
-void InputDeviceImpl::GetKeyboardTypeAsync(int32_t deviceId, std::function<void(int32_t, int32_t)> callback)
+void InputDeviceImpl::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
 {
     CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
     CHKPV(eventHandler);
     InputDeviceData data;
     data.kbTypes = std::make_pair(eventHandler, callback);
     if (userData_ == INT32_MAX) {
-        MMI_HILOGE("userData exceeds the maximum");
+        MMI_HILOGE("UserData exceeds the maximum");
         return;
     }
     inputDevices_[userData_] = data;
@@ -227,7 +228,7 @@ void InputDeviceImpl::OnKeyboardTypeTask(InputDeviceImpl::DevKeyboardTypes kbTyp
     int32_t keyboardType)
 {
     CHK_PIDANDTID();
-    kbTypes.second(userData, keyboardType);
+    kbTypes.second(keyboardType);
     MMI_HILOGD("Keyboard type event callback userData:%{public}d keyboardType:(%{public}d)",
         userData, keyboardType);
 }
@@ -237,14 +238,14 @@ void InputDeviceImpl::OnKeyboardType(int32_t userData, int32_t keyboardType)
     CHK_PIDANDTID();
     std::lock_guard<std::mutex> guard(mtx_);
     if (auto iter = inputDevices_.find(userData); iter == inputDevices_.end()) {
-        MMI_HILOGD("find userData failed");
+        MMI_HILOGD("Find userData failed");
         return;
     }
     auto devKbTypes = GetKeyboardTypes(userData);
     CHKPV(devKbTypes);
     if (!MMIEventHandler::PostTask(devKbTypes->first,
         std::bind(&InputDeviceImpl::OnKeyboardTypeTask, this, *devKbTypes, userData, keyboardType))) {
-        MMI_HILOGE("post task failed");
+        MMI_HILOGE("Post task failed");
     }
     MMI_HILOGD("Keyboard type event userData:%{public}d keyboardType:%{public}d",
         userData, keyboardType);

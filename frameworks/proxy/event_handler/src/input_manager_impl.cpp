@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,7 +35,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
-public:
     explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)>& monitor)
         : monitor_ (monitor)
     {
@@ -60,7 +59,7 @@ public:
         monitor_(pointerEvent);
     }
 
-    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const 
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const
     {
         CHKPV(axisEvent);
         CHKPV(axisMonitor_);
@@ -82,7 +81,7 @@ bool InputManagerImpl::InitEventHandler()
     }
 
     std::mutex mtx;
-    constexpr int32_t timeout = 3;
+    static constexpr int32_t timeout = 3;
     std::unique_lock <std::mutex> lck(mtx);
     ehThread_ = std::thread(std::bind(&InputManagerImpl::OnThread, this));
     ehThread_.detach();
@@ -326,7 +325,6 @@ void InputManagerImpl::PrintDisplayInfo()
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
     CHKPR(monitor, ERROR_NULL_POINTER);
-    std::lock_guard<std::mutex> guard(mtx_);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
     CHKPR(consumer, ERROR_NULL_POINTER);
     return InputManagerImpl::AddMonitor(consumer);
@@ -335,7 +333,6 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
     CHKPR(monitor, ERROR_NULL_POINTER);
-    std::lock_guard<std::mutex> guard(mtx_);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
     CHKPR(consumer, ERROR_NULL_POINTER);
     return InputManagerImpl::AddMonitor(consumer);
@@ -344,6 +341,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerE
 int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
 {
     CHKPR(consumer, ERROR_NULL_POINTER);
+    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return -1;
@@ -401,9 +399,7 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
 
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
-    std::lock_guard<std::mutex> guard(mtx_);
     CHKPR(interceptor, ERROR_NULL_POINTER);
-
     auto consumer = std::make_shared<MonitorEventConsumer>(interceptor);
     CHKPR(consumer, ERROR_NULL_POINTER);
     return InputManagerImpl::AddInterceptor(consumer);
@@ -506,6 +502,17 @@ void InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCo
     std::function<void(std::vector<bool>&)> callback)
 {
     InputDevImpl.SupportKeys(deviceId, keyCodes, callback);
+}
+
+void InputManagerImpl::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return;
+    }
+    InputDevImpl.GetKeyboardType(deviceId, callback);
 }
 } // namespace MMI
 } // namespace OHOS
