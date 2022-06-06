@@ -62,6 +62,7 @@ void HdfDeviceEventManager::ConnectHDFInit()
         }
         callback_.EventPkgCallback = hdf->GetEventCallbackDispatch;
         ret = inputInterface_->iInputReporter->RegisterReportCallback(TOUCH_DEV_ID, &callback_);
+        MMI_HILOGD("RegisterReportCallback ret:%{public}d", ret);
     }
 }
 } // namespace MMI

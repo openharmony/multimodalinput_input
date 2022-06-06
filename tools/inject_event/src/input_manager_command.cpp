@@ -129,8 +129,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
     if ((c = getopt_long(argc, argv, "MKT?", headOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'M': {
-                int32_t px;
-                int32_t py;
+                int32_t px = 0;
+                int32_t py = 0;
                 int32_t buttonId;
                 int32_t scrollValue;
                 while ((c = getopt_long(argc, argv, "m:d:u:c:s:i:", mouseSensorOptions, &optionIndex)) != -1) {
