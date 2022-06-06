@@ -360,6 +360,66 @@ int32_t MMIService::MarkEventProcessed(int32_t eventId)
     return RET_OK;
 }
 
+int32_t MMIService::CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType)
+{
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnAddInputHandler(sess, handlerId, handlerType);
+}
+
+int32_t MMIService::AddInputHandler(int32_t handlerId, InputHandlerType handlerType)
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&MMIService::CheckAddInput, this, pid, handlerId, handlerType));
+    if (ret != RET_OK) {
+        MMI_HILOGE("add input handler failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::CheckRemoveInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType)
+{
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnRemoveInputHandler(sess, handlerId, handlerType);
+}
+
+int32_t MMIService::RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType)
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&MMIService::CheckRemoveInput, this, pid, handlerId, handlerType));
+    if (ret != RET_OK) {
+        MMI_HILOGE("remove input handler failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::CheckMarkConsumed(int32_t pid, int32_t monitorId, int32_t eventId)
+{
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnMarkConsumed(sess, monitorId, eventId);
+}
+
+int32_t MMIService::MarkEventConsumed(int32_t monitorId, int32_t eventId)
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&MMIService::CheckMarkConsumed, this, pid, monitorId, eventId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("mark event consumed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 #ifdef OHOS_RSS_CLIENT
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
