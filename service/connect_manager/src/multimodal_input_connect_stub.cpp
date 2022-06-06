@@ -58,7 +58,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
-        return (this->*mapConnFunc[code])(data, reply);
+        return (this->*it->second)(data, reply);
     }
     MMI_HILOGE("unknown code:%{public}u, go switch default", code);
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
