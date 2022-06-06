@@ -501,6 +501,12 @@ void InputManagerImpl::SendDisplayInfo()
 void InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
     std::function<void(std::vector<bool>&)> callback)
 {
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("client init failed");
+        return;
+    }
     InputDevImpl.SupportKeys(deviceId, keyCodes, callback);
 }
 
