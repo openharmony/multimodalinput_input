@@ -19,6 +19,7 @@
 #include <map>
 #include <string>
 
+#include "event_dispatch.h"
 #include "key_map_manager.h"
 #include "key_event.h"
 #include "libinput.h"
@@ -32,7 +33,8 @@ public:
     KeyAutoRepeat() = default;
     ~KeyAutoRepeat() = default;
     int32_t AddDeviceConfig(struct libinput_device *device);
-    int32_t SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent, int32_t lastPressedKeyCode);
+    void SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent);
+    void AddHandleTimer(int32_t timeout);
     void RemoveDeviceConfig(struct libinput_device *device);
     int32_t GetIntervalTime(int32_t deviceId) const;
     std::map<int32_t, DeviceConfig> GetDeviceConfig() const;
@@ -42,6 +44,10 @@ private:
 private:
     std::map<int32_t, DeviceConfig> deviceConfig_;
     int32_t timerId_ = -1;
+    int32_t repeatKeyCode_ = -1;
+    UDSServer *udsServer_ = nullptr;
+    EventDispatch eventDispatch_;
+    std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
 };
 
 #define KeyRepeat KeyAutoRepeat::GetInstance()
