@@ -68,6 +68,7 @@ private:
     UDSServer *udsServer_ = nullptr;
     EventDispatch eventDispatch_;
     std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
+    int32_t targetWindowId_ = -1;
 };
 } // namespace MMI
 } // namespace OHOS
