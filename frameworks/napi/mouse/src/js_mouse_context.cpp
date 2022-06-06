@@ -23,12 +23,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsMou
 
 JsMouseContext::JsMouseContext() : mgr_(std::make_shared<JsMouseManager>()) {}
 
-JsMouseContext::~JsMouseContext()
-{
-    std::lock_guard<std::mutex> guard(mtx_);
-    mgr_.reset();
-}
-
 napi_value JsMouseContext::CreateInstance(napi_env env)
 {
     CALL_LOG_ENTER;
