@@ -36,7 +36,7 @@ ohos_shared_library("mouse") {
   sources = [
     "src/js_mouse_context.cpp",
     "src/js_mouse_manager.cpp",
-    "src/register_mouse_module.cpp",
+    "src/js_mouse_module.cpp",
   ]
 
   configs = [ ":libmouse_config" ]
