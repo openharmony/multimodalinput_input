@@ -19,6 +19,7 @@
 #include "iremote_broker.h"
 
 #include "i_event_filter.h"
+#include "input_handler_type.h"
 
 namespace OHOS {
 namespace MMI {
@@ -33,12 +34,18 @@ public:
     virtual int32_t SetPointerVisible(bool visible) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
     virtual int32_t MarkEventProcessed(int32_t eventId) = 0;
+    virtual int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType) = 0;
+    virtual int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType) = 0;
+    virtual int32_t MarkEventConsumed(int32_t monitorId, int32_t eventId) = 0;
     enum {
         ALLOC_SOCKET_FD = 0,
         ADD_INPUT_EVENT_FILTER = 1,
         SET_POINTER_VISIBLE = 2,
         IS_POINTER_VISIBLE = 3,
         MARK_EVENT_PROCESSED = 4,
+        ADD_INPUT_HANDLER = 8,
+        REMOVE_INPUT_HANDLER = 9,
+        MARK_EVENT_CONSUMED = 10
     };
 
     enum {

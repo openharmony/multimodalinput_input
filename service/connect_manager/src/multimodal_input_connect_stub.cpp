@@ -30,6 +30,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectStub" };
+using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, MessageParcel& reply);
 } // namespace
 
 int32_t MultimodalInputConnectStub::OnRemoteRequest(
@@ -45,27 +46,22 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         MMI_HILOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
-    switch (code) {
-        case IMultimodalInputConnect::ALLOC_SOCKET_FD: {
-            return StubHandleAllocSocketFd(data, reply);
-        }
-        case IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER: {
-            return StubAddInputEventFilter(data, reply);
-        }
-        case IMultimodalInputConnect::SET_POINTER_VISIBLE: {
-            return StubSetPointerVisible(data, reply);
-        }
-        case IMultimodalInputConnect::IS_POINTER_VISIBLE: {
-            return StubIsPointerVisible(data, reply);
-        }
-        case IMultimodalInputConnect::MARK_EVENT_PROCESSED: {
-            return StubMarkEventProcessed(data, reply);
-        }
-        default: {
-            MMI_HILOGE("unknown code:%{public}u, go switch default", code);
-            return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
-        }
+    const static std::map<int32_t, ConnFunc> mapConnFunc = {
+        {IMultimodalInputConnect::ALLOC_SOCKET_FD, &MultimodalInputConnectStub::StubHandleAllocSocketFd},
+        {IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubAddInputEventFilter},
+        {IMultimodalInputConnect::SET_POINTER_VISIBLE, &MultimodalInputConnectStub::StubSetPointerVisible},
+        {IMultimodalInputConnect::IS_POINTER_VISIBLE, &MultimodalInputConnectStub::StubIsPointerVisible},
+        {IMultimodalInputConnect::MARK_EVENT_PROCESSED, &MultimodalInputConnectStub::StubMarkEventProcessed},
+        {IMultimodalInputConnect::ADD_INPUT_HANDLER, &MultimodalInputConnectStub::StubAddInputHandler},
+        {IMultimodalInputConnect::REMOVE_INPUT_HANDLER, &MultimodalInputConnectStub::StubRemoveInputHandler},
+        {IMultimodalInputConnect::MARK_EVENT_CONSUMED, &MultimodalInputConnectStub::StubMarkEventConsumed}
+    };
+    auto it = mapConnFunc.find(code);
+    if (it != mapConnFunc.end()) {
+        return (this->*it->second)(data, reply);
     }
+    MMI_HILOGE("unknown code:%{public}u, go switch default", code);
+    return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
 int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data, MessageParcel& reply)
@@ -175,6 +171,81 @@ int32_t MultimodalInputConnectStub::StubMarkEventProcessed(MessageParcel& data, 
     int32_t ret = MarkEventProcessed(eventId);
     if (ret != RET_OK) {
         MMI_HILOGE("MarkEventProcessed failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t handlerId;
+    if (!data.ReadInt32(handlerId)) {
+        MMI_HILOGE("Read handlerId failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t handlerType;
+    if (!data.ReadInt32(handlerType)) {
+        MMI_HILOGE("Read handlerType failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t ret = AddInputHandler(handlerId, static_cast<InputHandlerType>(handlerType));
+    if (ret != RET_OK) {
+        MMI_HILOGE("call AddInputHandler failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t handlerId;
+    if (!data.ReadInt32(handlerId)) {
+        MMI_HILOGE("Read handlerId failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t handlerType;
+    if (!data.ReadInt32(handlerType)) {
+        MMI_HILOGE("Read handlerType failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t ret = RemoveInputHandler(handlerId, static_cast<InputHandlerType>(handlerType));
+    if (ret != RET_OK) {
+        MMI_HILOGE("call RemoveInputHandler failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t monitorId;
+    if (!data.ReadInt32(monitorId)) {
+        MMI_HILOGE("Read monitorId failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t eventId;
+    if (!data.ReadInt32(eventId)) {
+        MMI_HILOGE("Read eventId failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t ret = MarkEventConsumed(monitorId, eventId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("call MarkEventConsumed failed ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

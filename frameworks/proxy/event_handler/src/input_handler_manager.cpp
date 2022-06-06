@@ -24,6 +24,7 @@
 #include "input_handler_type.h"
 #include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
+#include "multimodal_input_connect_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -68,17 +69,9 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
 void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
     MMI_HILOGD("Mark consumed state, monitor:%{public}d,event:%{public}d", monitorId, eventId);
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    NetPacket pkt(MmiMessageId::MARK_CONSUMED);
-    pkt << monitorId << eventId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write monitor data failed");
-        return;
-    }
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
+    int32_t ret = MultimodalInputConnMgr->MarkEventConsumed(monitorId, eventId);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
     }
 }
 
@@ -103,17 +96,9 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
 
 void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handlerType)
 {
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    NetPacket pkt(MmiMessageId::ADD_INPUT_HANDLER);
-    pkt << handlerId << handlerType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write add handlerType failed");
-        return;
-    }
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
+    int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerId, handlerType);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
     }
 }
 
@@ -136,17 +121,9 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
 void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType handlerType)
 {
     MMI_HILOGD("Remove handler:%{public}d from server", handlerId);
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    NetPacket pkt(MmiMessageId::REMOVE_INPUT_HANDLER);
-    pkt << handlerId << handlerType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write remove handlerType failed");
-        return;
-    }
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
+    int32_t ret = MultimodalInputConnMgr->RemoveInputHandler(handlerId, handlerType);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
     }
 }
 
