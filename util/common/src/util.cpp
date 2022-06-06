@@ -52,10 +52,11 @@ constexpr int32_t MIN_INTERVALTIME = 50;
 constexpr int32_t MAX_INTERVALTIME = 500;
 constexpr int32_t MIN_DELAYTIME = 200;
 constexpr int32_t MAX_DELAYTIME = 1000;
-constexpr int32_t CONFIG_ITEM_FIRST = 1;
-constexpr int32_t CONFIG_ITEM_SECOND = 2;
-constexpr int32_t CONFIG_ITEM_THIRDLY = 3;
 constexpr int32_t COMMENT_SUBSCRIPT = 0;
+const std::string CONFIG_ITEM_REPEAT = "Key.autorepeat";
+const std::string CONFIG_ITEM_DELAY = "Key.autorepeat.delaytime";
+const std::string CONFIG_ITEM_INTERVAL = "Key.autorepeat.intervaltime";
+const std::string CONFIG_ITEM_TYPE = "Key.keyboard.type";
 const std::string DATA_PATH = "/data";
 const std::string INPUT_PATH = "/system/etc/multimodalinput/";
 const std::string PRO_PATH = "/vendor/etc/keymap/";
@@ -562,6 +563,7 @@ void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
         size_t pos = strLine.find('#');
         if (pos != strLine.npos && pos != COMMENT_SUBSCRIPT) {
             MMI_HILOGE("The comment line format is error");
+            reader.close();
             return;
         }
         if (!strLine.empty() && strLine.front() != '#') {
@@ -660,42 +662,63 @@ int32_t ReadConfigFile(const std::string &realPath, DeviceConfig& devConf)
         MMI_HILOGE("Failed to open config file");
         return FILE_OPEN_FAIL;
     }
-
     std::string tmp;
-    size_t flag = 1;
     while (std::getline(cfgFile, tmp)) {
+        RemoveSpace(tmp);
         size_t pos = tmp.find('#');
         if (pos != tmp.npos && pos != COMMENT_SUBSCRIPT) {
             MMI_HILOGE("File format is error");
+            cfgFile.close();
             return RET_ERR;
         }
         if (tmp.empty() || tmp.front() == '#') {
             continue;
         }
         pos = tmp.find('=');
-        if (pos == tmp.back() || pos == tmp.npos) {
+        if (pos == (tmp.size() - 1) || pos == tmp.npos) {
             MMI_HILOGE("Find config item error");
+            cfgFile.close();
             return RET_ERR;
         }
-        if (flag == CONFIG_ITEM_FIRST) {
-            devConf.autoSwitch = stoi(tmp.substr(pos+1, tmp.npos));
-        } else if (flag == CONFIG_ITEM_SECOND) {
-            devConf.delayTime = stoi(tmp.substr(pos+1, tmp.npos));
-            if (devConf.delayTime < MIN_DELAYTIME || devConf.delayTime > MAX_DELAYTIME) {
-                MMI_HILOGE("Unusual the delaytime");
-                return RET_ERR;
-            }
-        } else if (flag == CONFIG_ITEM_THIRDLY) {
-            devConf.intervalTime = stoi(tmp.substr(pos+1, tmp.npos));
-            if (devConf.intervalTime < MIN_INTERVALTIME || devConf.intervalTime > MAX_INTERVALTIME) {
-                MMI_HILOGE("Unusual the intervaltime");
-                return RET_ERR;
-            }
-        } else {
-            devConf.keyboardType = stoi(tmp.substr(pos+1, tmp.npos));
+        std::string configItem = tmp.substr(0, pos);
+        std::string value = tmp.substr(pos + 1);
+        if (ConfigItemSwitch(configItem, value, devConf) == RET_ERR) {
+            MMI_HILOGE("Configuration item error");
+            cfgFile.close();
+            return RET_ERR;
         }
-        ++flag;
-        MMI_HILOGD("Read device config file succeeded");
+    }
+    cfgFile.close();
+    return RET_OK;
+}
+
+int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value, DeviceConfig& devConf)
+{
+    CALL_LOG_ENTER;
+    if (configItem.empty() || value.empty()) {
+        MMI_HILOGE("Get key config item is invalid");
+        return RET_ERR;
+    }
+    if (!IsNum(value)) {
+        MMI_HILOGE("Get key config item is invalid");
+        return RET_ERR;
+    }
+    if (configItem == CONFIG_ITEM_REPEAT) {
+        devConf.autoSwitch = stoi(value);
+    } else if (configItem == CONFIG_ITEM_DELAY) {
+        devConf.delayTime = stoi(value);
+        if (devConf.delayTime < MIN_DELAYTIME || devConf.delayTime > MAX_DELAYTIME) {
+            MMI_HILOGE("Unusual the delaytime");
+            return RET_ERR;
+        }
+    } else if (configItem == CONFIG_ITEM_INTERVAL) {
+        devConf.intervalTime = stoi(value);
+        if (devConf.intervalTime < MIN_INTERVALTIME || devConf.intervalTime > MAX_INTERVALTIME) {
+            MMI_HILOGE("Unusual the intervaltime");
+            return RET_ERR;
+        }
+    } else if (configItem == CONFIG_ITEM_TYPE) {
+        devConf.keyboardType = stoi(value);
     }
     return RET_OK;
 }
