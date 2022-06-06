@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -43,17 +43,17 @@ enum JS_CALLBACK_EVENT {
 
 namespace OHOS {
 namespace MMI {
-typedef struct {
+struct KeyEventMonitorInfo {
     napi_env env;
     napi_async_work asyncWork;
     std::string eventType;
     std::string name;
     napi_value handle;
-    std::shared_ptr<KeyEvent> keyEvent = { nullptr };
-    napi_ref callback[1] = { 0 };
+    std::shared_ptr<KeyEvent> keyEvent { nullptr };
+    napi_ref callback[1] = {};
     int32_t subscribeId;
-    std::shared_ptr<KeyOption> keyOption = { nullptr };
-} KeyEventMonitorInfo;
+    std::shared_ptr<KeyOption> keyOption { nullptr };
+};
 
 typedef std::map<std::string, std::list<KeyEventMonitorInfo *>> Callbacks;
 } // namespace MMI

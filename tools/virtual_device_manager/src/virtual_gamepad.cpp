@@ -17,17 +17,19 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t ABS_MAX_RXYZ = 255;
+constexpr int32_t ABS_FLAT = 15;
+constexpr int32_t ABS_MIN_HAT = -1;
+constexpr int32_t ABS_min_VALUE = -32768;
+constexpr int32_t ABS_MAX_VALUE = 32767;
+constexpr int32_t ABS_FUZZ_VALUE = 16;
+constexpr int32_t ABS_FLAT_VALUE = 128;
+} // namespace
+
 VirtualGamePad::VirtualGamePad() : VirtualDevice("Virtual GamePad",
     BUS_USB, 0x79, 0x181c)
 {
-    constexpr int32_t ABS_MAX_RXYZ = 255;
-    constexpr int32_t ABS_FLAT = 15;
-    constexpr int32_t ABS_MIN_HAT = -1;
-    constexpr int32_t ABS_min_VALUE = -32768;
-    constexpr int32_t ABS_MAX_VALUE = 32767;
-    constexpr int32_t ABS_FUZZ_VALUE = 16;
-    constexpr int32_t ABS_FLAT_VALUE = 128;
-
     dev_.absmin[ABS_X] = 0;
     dev_.absmax[ABS_X] = ABS_MAX_RXYZ;
     dev_.absfuzz[ABS_X] = 0;
@@ -108,12 +110,12 @@ const std::vector<uint32_t>& VirtualGamePad::GetAbs() const
     return abs;
 }
 
-const std::vector<uint32_t>& VirtualGamePad::GetMscs() const
+const std::vector<uint32_t>& VirtualGamePad::GetMiscellaneous() const
 {
-    static const std::vector<uint32_t> mscs {
+    static const std::vector<uint32_t> miscellaneous {
         MSC_SCAN
     };
-    return mscs;
+    return miscellaneous;
 }
 } // namespace MMI
 } // namespace OHOS

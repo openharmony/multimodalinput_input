@@ -91,7 +91,7 @@ bool MMIClient::StartEventRunner()
     }
 
     std::mutex mtx;
-    constexpr int32_t outTime = 3;
+    static constexpr int32_t outTime = 3;
     recvThread_ = std::thread(std::bind(&MMIClient::OnRecvThread, this));
     recvThread_.detach();
     std::unique_lock <std::mutex> lck(mtx);

@@ -31,18 +31,17 @@ namespace OHOS {
 namespace MMI {
 using EventFun = std::function<int32_t(libinput_event *event)>;
 using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
-class InputEventHandler : public MsgHandler<EventFun>, public DelayedSingleton<InputEventHandler> {
+class InputEventHandler : public MsgHandler<MmiMessageId, EventFun>, public DelayedSingleton<InputEventHandler> {
 public:
     InputEventHandler();
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
     virtual ~InputEventHandler() override;
     void Init(UDSServer& udsServer);
     void OnEvent(void *event);
-    void OnCheckEventReport();
     int32_t OnMouseEventEndTimerHandler(std::shared_ptr<PointerEvent> pointerEvent);
     UDSServer *GetUDSServer() const;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
-    void AddHandleTimer(int32_t timeout = 300);
+    int32_t AddHandleTimer(int32_t timeout = 300);
 protected:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);
@@ -68,9 +67,6 @@ private:
     std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
 
     uint64_t idSeed_ = 0;
-    int32_t eventType_ = 0;
-    int64_t initSysClock_ = 0;
-    int64_t lastSysClock_ = 0;
     int32_t timerId_ = -1;
 };
 

@@ -33,7 +33,6 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "UDSServer"};
 } // namespace
-
 UDSServer::UDSServer() {}
 
 UDSServer::~UDSServer()
@@ -44,8 +43,6 @@ UDSServer::~UDSServer()
 
 void UDSServer::UdsStop()
 {
-    std::lock_guard<std::mutex> lock(mux_);
-    isRunning_ = false;
     if (epollFd_ != -1) {
         close(epollFd_);
         epollFd_ = -1;
@@ -57,25 +54,19 @@ void UDSServer::UdsStop()
     sessionsMap_.clear();
 }
 
-int32_t UDSServer::GetClientFd(int32_t pid)
+int32_t UDSServer::GetClientFd(int32_t pid) const
 {
-    std::lock_guard<std::mutex> lock(mux_);
     auto it = idxPidMap_.find(pid);
     if (it == idxPidMap_.end()) {
-        MMI_HILOGE("find fd error, Invalid input parameter pid:%{public}d,errCode:%{public}d",
-            pid, SESSION_NOT_FOUND);
         return RET_ERR;
     }
     return it->second;
 }
 
-int32_t UDSServer::GetClientPid(int32_t fd)
+int32_t UDSServer::GetClientPid(int32_t fd) const
 {
-    std::lock_guard<std::mutex> lock(mux_);
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
-        MMI_HILOGE("find pid error, Invalid input parameter fd:%{public}d,errCode:%{public}d",
-            fd, SESSION_NOT_FOUND);
         return RET_ERR;
     }
     return it->second->GetPid();
@@ -83,7 +74,6 @@ int32_t UDSServer::GetClientPid(int32_t fd)
 
 bool UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
 {
-    std::lock_guard<std::mutex> lock(mux_);
     if (fd < 0) {
         MMI_HILOGE("fd is less than 0");
         return false;
@@ -109,7 +99,6 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     int32_t& serverFd, int32_t& toReturnClientFd)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> lock(mux_);
     int32_t sockFds[2] = {};
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
@@ -124,12 +113,11 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
         return RET_ERR;
     }
 
-    constexpr size_t bufferSize = 32 * 1024;
+    static constexpr size_t bufferSize = 32 * 1024;
     setsockopt(sockFds[0], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
-
     MMI_HILOGD("alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
                serverFd, toReturnClientFd, sockFds[1]);
     auto closeSocketFdWhenError = [&serverFd, &toReturnClientFd] {
@@ -196,20 +184,19 @@ void UDSServer::AddPermission(SessionPtr sess)
 
 void UDSServer::Dump(int32_t fd)
 {
-    std::lock_guard<std::mutex> lock(mux_);
-    mprintf(fd, "Sessions: count=%d", sessionsMap_.size());
-    std::string strTmp = "fds:[";
-    if (sessionsMap_.empty()) {
-        strTmp = "fds:[]";
-        mprintf(fd, "\t%s", strTmp.c_str());
-        return;
+    mprintf(fd, "Sessions: count=%d, idxMap count=%d", sessionsMap_.size(), idxPidMap_.size());
+    int32_t i = 0;
+    mprintf(fd, "Sessions:");
+    for (const auto& [key, value] : sessionsMap_) {
+        mprintf(fd, "\t%d, [%d, %s]", i, key, value->GetDescript().c_str());
+        i++;
     }
-    for (const auto& item : sessionsMap_) {
-        strTmp += std::to_string(item.second->GetFd()) + ",";
+    i = 0;
+    mprintf(fd, "IdxMap:");
+    for (const auto& [key, value] : idxPidMap_) {
+        mprintf(fd, "\t%d, [%d, %d]", i, key, value);
+        i++;
     }
-    strTmp.resize(strTmp.size() - 1);
-    strTmp += "]";
-    mprintf(fd, "\t%s", strTmp.c_str());
 }
 
 void UDSServer::OnConnected(SessionPtr s)
@@ -325,10 +312,21 @@ SessionPtr UDSServer::GetSession(int32_t fd) const
 {
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
+        MMI_HILOGE("Session not found.fd:%{public}d", fd);
         return nullptr;
     }
     CHKPP(it->second);
     return it->second->GetSharedPtr();
+}
+
+SessionPtr UDSServer::GetSessionByPid(int32_t pid) const
+{
+    int32_t fd = GetClientFd(pid);
+    if (fd <= 0) {
+        MMI_HILOGE("Session not found.pid:%{public}d", pid);
+        return nullptr;
+    }
+    return GetSession(fd);
 }
 
 bool UDSServer::AddSession(SessionPtr ses)

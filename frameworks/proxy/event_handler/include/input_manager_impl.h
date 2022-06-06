@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -74,6 +74,7 @@ public:
 
     void SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
         std::function<void(std::vector<bool>&)> callback);
+    void GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
 
     int32_t SetPointerVisible(bool visible);
     bool IsPointerVisible();

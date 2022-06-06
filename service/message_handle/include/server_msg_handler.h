@@ -19,12 +19,13 @@
 #include "nocopyable.h"
 
 #include "event_dispatch.h"
+#include "input_handler_type.h"
 #include "msg_handler.h"
 
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(SessionPtr sess, NetPacket& pkt)> ServerMsgFun;
-class ServerMsgHandler : public MsgHandler<ServerMsgFun> {
+class ServerMsgHandler : public MsgHandler<MmiMessageId, ServerMsgFun> {
 public:
     ServerMsgHandler();
     DISALLOW_COPY_AND_MOVE(ServerMsgHandler);
@@ -32,24 +33,23 @@ public:
 
     void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
+    int32_t MarkEventProcessed(SessionPtr sess, int32_t eventId);
+    int32_t OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType);
+    int32_t OnRemoveInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType);
+    int32_t OnMarkConsumed(SessionPtr sess, int32_t monitorId, int32_t eventId);
 
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_HDF
     int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
 #endif
-    int32_t OnDump(SessionPtr sess, NetPacket& pkt);
-    int32_t MarkProcessed(SessionPtr sess, NetPacket& pkt);
-    int32_t GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt);
     int32_t OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
-    int32_t OnAddInputHandler(SessionPtr sess, NetPacket& pkt);
-    int32_t OnRemoveInputHandler(SessionPtr sess, NetPacket& pkt);
-    int32_t OnMarkConsumed(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputDevice(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputDeviceIds(SessionPtr sess, NetPacket& pkt);
     int32_t OnSupportKeys(SessionPtr sess, NetPacket& pkt);
+    int32_t OnInputKeyboardType(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt);

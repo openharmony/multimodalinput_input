@@ -26,44 +26,28 @@
 
 namespace OHOS {
 namespace MMI {
-    constexpr int32_t HDF_MOUSE_DEV_TYPE = 5;
-    constexpr int32_t HDF_KEYBOARD_DEV_TYPE = 3;
-    constexpr int32_t HDF_TOUCH_DEV_TYPE = 17;
-    constexpr int32_t HDF_TABLET_DEV_TYPE = 33;
-    constexpr int32_t HDF_TABLET_PAD_DEV_TYPE = 289;
-    constexpr int32_t HDF_SWITH_PAD_DEV_TYPE = 2089;
-    constexpr int32_t HDF_TOUCH_FINGER_DEV_TYPE = 2089;
-    constexpr int32_t HDF_SWITCH_DEV_TYPE = 7;
-    constexpr int32_t HDF_TRACK_PAD_DEV_TYPE = 7;
-    constexpr int32_t HDF_JOYSTICK_DEV_TYPE = 65;
-    constexpr int32_t HDF_GAMEPAD_DEV_TYPE = 65;
-    constexpr int32_t HDF_TOUCH_PAD_DEV_TYPE = 5;
-    constexpr int32_t HDF_TRACK_BALL_DEV_TYPE = 3;
-    constexpr int32_t HDF_DEVICE_FD_DEFAULT_STATUS = -1;
-    constexpr int32_t EVENT_PACKAGE_ARROW_SIZE = 1;
-
 class HdiInject {
-    enum HdiInfoType {
-        GET_STATUS_INFO = 1001,
-        SET_HOT_PLUGS = 1002,
-        SET_EVENT_INJECT = 1003,
-        GET_DEVICE_INFO = 1004,
-        SHOW_DEVICE_INFO = 1005,
-        REPLY_STATUS_INFO = 2001,
-    };
+enum HdiInfoType {
+    GET_STATUS_INFO = 1001,
+    SET_HOT_PLUGS = 1002,
+    SET_EVENT_INJECT = 1003,
+    GET_DEVICE_INFO = 1004,
+    SHOW_DEVICE_INFO = 1005,
+    REPLY_STATUS_INFO = 2001,
+};
 
-    enum HdiDeviceStatus {
-        HDI_DEVICE_ADD_STATUS = 0,
-        HDI_DEVICE_REMOVE_STATUS = 1,
-    };
+enum HdiDeviceStatus {
+    HDI_DEVICE_ADD_STATUS = 0,
+    HDI_DEVICE_REMOVE_STATUS = 1,
+};
 
-    struct DeviceInformation {
-        bool status;
-        int32_t devIndex;
-        int32_t devType;
-        int16_t fd;
-        char chipName[32];
-    };
+struct DeviceInformation {
+    bool status = false;
+    int32_t devIndex = 0;
+    int32_t devType = 0;
+    int16_t fd = 0;
+    char chipName[32];
+};
 public:
     bool Init(UDSServer &sess);
     void StartHdiserver();

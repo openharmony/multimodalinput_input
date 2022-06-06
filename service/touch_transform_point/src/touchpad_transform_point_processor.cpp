@@ -24,12 +24,25 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN,
     "TouchPadTransformPointProcessor"};
+constexpr int32_t MT_TOOL_NONE      = -1;
+constexpr int32_t MT_TOOL_FINGER    = 0;
+constexpr int32_t MT_TOOL_PEN       = 1;
+constexpr int32_t BTN_TOOL_PEN      = 0x140;
+constexpr int32_t BTN_TOOL_RUBBER   = 0x141;
+constexpr int32_t BTN_TOOL_BRUSH    = 0x142;
+constexpr int32_t BTN_TOOL_PENCIL   = 0x143;
+constexpr int32_t BTN_TOOL_AIRBRUSH = 0x144;
+constexpr int32_t BTN_TOOL_FINGER   = 0x145;
+constexpr int32_t BTN_TOOL_MOUSE    = 0x146;
+constexpr int32_t BTN_TOOL_LENS     = 0x147;
+constexpr int32_t BTN_DOWN          = 1;
 } // namespace
 
 TouchPadTransformPointProcessor::TouchPadTransformPointProcessor(int32_t deviceId) : deviceId_(deviceId)
 {
     pointerEvent_ = PointerEvent::Create();
     CHKPL(pointerEvent_);
+    InitToolType();
 }
 
 TouchPadTransformPointProcessor::~TouchPadTransformPointProcessor() {}
@@ -40,9 +53,8 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(struct libinput_event 
     CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
     CHKPV(data);
-    auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
-    auto logicalX = libinput_event_touchpad_get_x(data);
-    auto logicalY = libinput_event_touchpad_get_y(data);
+    auto device = libinput_event_get_device(event);
+    CHKPV(device);
 
     int64_t time = GetSysClockTime();
     auto pointIds = pointerEvent_->GetPointersIdList();
@@ -52,17 +64,31 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(struct libinput_event 
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     PointerEvent::PointerItem item;
-    auto pressure = libinput_event_touchpad_get_pressure(data);
-    auto axisLong = libinput_event_touchpad_get_touch_contact_axis_long(data);
-    auto axisShort = libinput_event_touchpad_get_touch_contact_axis_short(data);
-    item.SetAxisLong(axisLong);
-    item.SetAxisShort(axisShort);
+    int32_t longAxis = libinput_event_touchpad_get_touch_contact_long_axis(data);
+    int32_t shortAxis = libinput_event_touchpad_get_touch_contact_short_axis(data);
+    double pressure = libinput_event_touchpad_get_pressure(data);
+    int32_t seatSlot = libinput_event_touchpad_get_seat_slot(data);
+    double logicalX = libinput_event_touchpad_get_x(data);
+    double logicalY = libinput_event_touchpad_get_y(data);
+    double toolGlobalX = libinput_event_touchpad_get_tool_x(data);
+    double toolGlobalY = libinput_event_touchpad_get_tool_y(data);
+    double toolWidth = libinput_event_touchpad_get_tool_width(data);
+    double toolHeight = libinput_event_touchpad_get_tool_height(data);
+    int32_t toolType = GetTouchPadToolType(data, device);
+
+    item.SetLongAxis(longAxis);
+    item.SetShortAxis(shortAxis);
     item.SetPressure(pressure);
+    item.SetToolType(toolType);
     item.SetPointerId(seatSlot);
     item.SetDownTime(time);
     item.SetPressed(true);
     item.SetGlobalX(static_cast<int32_t>(logicalX));
     item.SetGlobalY(static_cast<int32_t>(logicalY));
+    item.SetToolGlobalX(static_cast<int32_t>(toolGlobalX));
+    item.SetToolGlobalY(static_cast<int32_t>(toolGlobalY));
+    item.SetToolWidth(static_cast<int32_t>(toolWidth));
+    item.SetToolHeight(static_cast<int32_t>(toolHeight));
     item.SetDeviceId(deviceId_);
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
@@ -75,9 +101,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(struct libinput_even
     CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
     CHKPV(data);
-    auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
-    auto logicalX = libinput_event_touchpad_get_x(data);
-    auto logicalY = libinput_event_touchpad_get_y(data);
+    int32_t seatSlot = libinput_event_touchpad_get_seat_slot(data);
 
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionTime(time);
@@ -88,14 +112,25 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(struct libinput_even
                    seatSlot, PARAM_INPUT_FAIL);
         return;
     }
-    auto pressure = libinput_event_touchpad_get_pressure(data);
-    auto axisLong = libinput_event_touchpad_get_touch_contact_axis_long(data);
-    auto axisShort = libinput_event_touchpad_get_touch_contact_axis_short(data);
-    item.SetAxisLong(axisLong);
-    item.SetAxisShort(axisShort);
+    int32_t longAxis = libinput_event_touchpad_get_touch_contact_long_axis(data);
+    int32_t shortAxis = libinput_event_touchpad_get_touch_contact_short_axis(data);
+    double pressure = libinput_event_touchpad_get_pressure(data);
+    double logicalX = libinput_event_touchpad_get_x(data);
+    double logicalY = libinput_event_touchpad_get_y(data);
+    double toolGlobalX = libinput_event_touchpad_get_tool_x(data);
+    double toolGlobalY = libinput_event_touchpad_get_tool_y(data);
+    double toolWidth = libinput_event_touchpad_get_tool_width(data);
+    double toolHeight = libinput_event_touchpad_get_tool_height(data);
+
+    item.SetLongAxis(longAxis);
+    item.SetShortAxis(shortAxis);
     item.SetPressure(pressure);
     item.SetGlobalX(static_cast<int32_t>(logicalX));
     item.SetGlobalY(static_cast<int32_t>(logicalY));
+    item.SetToolGlobalX(static_cast<int32_t>(toolGlobalX));
+    item.SetToolGlobalY(static_cast<int32_t>(toolGlobalY));
+    item.SetToolWidth(static_cast<int32_t>(toolWidth));
+    item.SetToolHeight(static_cast<int32_t>(toolHeight));
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
 }
@@ -106,9 +141,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(struct libinput_event *e
     CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
     CHKPV(data);
-    auto seatSlot = libinput_event_touchpad_get_seat_slot(data);
-    auto logicalX = libinput_event_touchpad_get_x(data);
-    auto logicalY = libinput_event_touchpad_get_y(data);
+    int32_t seatSlot = libinput_event_touchpad_get_seat_slot(data);
 
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionTime(time);
@@ -120,9 +153,11 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(struct libinput_event *e
                    seatSlot, PARAM_INPUT_FAIL);
         return;
     }
-    item.SetPressed(false);
-    auto pressure = libinput_event_touchpad_get_pressure(data);
+    double pressure = libinput_event_touchpad_get_pressure(data);
+    double logicalX = libinput_event_touchpad_get_x(data);
+    double logicalY = libinput_event_touchpad_get_y(data);
     item.SetPressure(pressure);
+    item.SetPressed(false);
     item.SetGlobalX(static_cast<int32_t>(logicalX));
     item.SetGlobalY(static_cast<int32_t>(logicalY));
     pointerEvent_->UpdatePointerItem(seatSlot, item);
@@ -135,7 +170,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
     CALL_LOG_ENTER;
     CHKPP(event);
     CHKPP(pointerEvent_);
-    auto type = libinput_event_get_type(event);
+    int32_t type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_TOUCHPAD_DOWN: {
             OnEventTouchPadDown(event);
@@ -158,6 +193,50 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
     MMI_HILOGD("Pointer event dispatcher of server:");
     PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(), pointerEvent_->GetPointersIdList().size());
     return pointerEvent_;
+}
+
+int32_t TouchPadTransformPointProcessor::GetTouchPadToolType(struct libinput_event_touch *data,
+    struct libinput_device *device)
+{
+    auto toolTypeTmp = libinput_event_touchpad_get_tool_type(data);
+    switch (toolTypeTmp) {
+        case MT_TOOL_NONE: {
+            return GetTouchPadToolType(device);
+        }
+        case MT_TOOL_FINGER: {
+            return PointerEvent::TOOL_TYPE_FINGER;
+        }
+        case MT_TOOL_PEN: {
+            return PointerEvent::TOOL_TYPE_PEN;
+        }
+        default : {
+            MMI_HILOGW("Unknown tool type, identified as finger, toolType:%{public}d", toolTypeTmp);
+            return PointerEvent::TOOL_TYPE_FINGER;
+        }
+    }
+}
+
+int32_t TouchPadTransformPointProcessor::GetTouchPadToolType(struct libinput_device *device)
+{
+    for (const auto &item : vecToolType_) {
+        if (libinput_device_touchpad_btn_tool_type_down(device, item.first) == BTN_DOWN) {
+            return item.second;
+        }
+    }
+    MMI_HILOGW("Unknown Btn tool type, identified as finger");
+    return PointerEvent::TOOL_TYPE_FINGER;
+}
+
+void TouchPadTransformPointProcessor::InitToolType()
+{
+    vecToolType_.push_back(std::make_pair(BTN_TOOL_PEN, PointerEvent::TOOL_TYPE_PEN));
+    vecToolType_.push_back(std::make_pair(BTN_TOOL_RUBBER, PointerEvent::TOOL_TYPE_RUBBER));
+    vecToolType_.push_back(std::make_pair(BTN_TOOL_BRUSH, PointerEvent::TOOL_TYPE_BRUSH));
+    vecToolType_.push_back(std::make_pair(BTN_TOOL_PENCIL, PointerEvent::TOOL_TYPE_PENCIL));
+    vecToolType_.push_back(std::make_pair(BTN_TOOL_AIRBRUSH, PointerEvent::TOOL_TYPE_AIRBRUSH));
+    vecToolType_.push_back(std::make_pair(BTN_TOOL_FINGER, PointerEvent::TOOL_TYPE_FINGER));
+    vecToolType_.push_back(std::make_pair(BTN_TOOL_MOUSE, PointerEvent::TOOL_TYPE_MOUSE));
+    vecToolType_.push_back(std::make_pair(BTN_TOOL_LENS, PointerEvent::TOOL_TYPE_LENS));
 }
 } // namespace MMI
 } // namespace OHOS

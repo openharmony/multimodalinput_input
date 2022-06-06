@@ -19,6 +19,9 @@ using namespace OHOS::MMI;
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ProcessingJoystickDevice" };
+constexpr int32_t DEFAULT_ABSX_VALUE = 8188;
+constexpr int32_t DEFAULT_ABSY_VALUE = 8192;
+constexpr int32_t DEFAULT_ABSZ_VALUE = 125;
 } // namespace
 
 int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const DeviceItem& originalEvent,
@@ -58,6 +61,8 @@ void ProcessingJoystickDevice::TransformPadEventToInputEvent(const std::vector<D
             TransformRocker1Event(item, inputEventArray);
         } else if (item.eventType == "THROTTLE") {
             TransformThrottle1Event(item, inputEventArray);
+        } else {
+            MMI_HILOGW("unknown eventType type");
         }
     }
 }
@@ -107,18 +112,20 @@ void ProcessingJoystickDevice::TransformRocker1Event(const DeviceEvent& joystick
             SetEvAbsY(inputEventArray, 0, item);
         } else if (direction == "lt") {
             SetEvAbsRz(inputEventArray, 0, item);
+        } else {
+            MMI_HILOGW("unknown direction move type");
         }
         SetSynReport(inputEventArray);
     }
 
     if ((direction == "left") || (direction == "right")) {
-        SetEvAbsX(inputEventArray, 0, default_absx_value);
+        SetEvAbsX(inputEventArray, 0, DEFAULT_ABSX_VALUE);
     } else if ((direction == "up") || (direction == "down")) {
-        SetEvAbsY(inputEventArray, 0, default_absy_value);
+        SetEvAbsY(inputEventArray, 0, DEFAULT_ABSY_VALUE);
     } else if (direction == "lt") {
-        SetEvAbsRz(inputEventArray, 0, default_absz_value);
+        SetEvAbsRz(inputEventArray, 0, DEFAULT_ABSZ_VALUE);
     } else {
-        // nothint to do.
+        MMI_HILOGW("unknown direction type");
     }
     SetSynReport(inputEventArray);
 }
@@ -153,7 +160,7 @@ void ProcessingJoystickDevice::TransformDerectionKeyEvent(const DeviceEvent& joy
         SetEvAbsHat0Y(inputEventArray, 0, 0);
         SetSynReport(inputEventArray);
     }  else {
-        // nothint to do.
+        MMI_HILOGW("unknown direction type");
     }
 }
 
