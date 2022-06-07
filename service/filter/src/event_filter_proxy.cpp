@@ -54,10 +54,12 @@ bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> ev
         return false;
     }
 
+    sptr<IRemoteObject> remote = Remote();
+    CHKPF(remote);
     const uint32_t code = static_cast<uint32_t>(OPERATOR_TYPE::HANDLE_POINTER_EVENT);
-    int32_t requestResult = Remote()->SendRequest(code, data, reply, option);
-    if (requestResult != NO_ERROR) {
-        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
+    int32_t ret = remote->SendRequest(code, data, reply, option);
+    if (ret != NO_ERROR) {
+        MMI_HILOGE("send request fail, ret:%{public}d", ret);
         return false;
     }
 
