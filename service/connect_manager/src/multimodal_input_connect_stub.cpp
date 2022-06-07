@@ -159,6 +159,11 @@ int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, Me
 int32_t MultimodalInputConnectStub::StubMarkEventProcessed(MessageParcel& data, MessageParcel& reply)
 {
     CALL_LOG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+
     if (!IsRunning()) {
         MMI_HILOGE("service is not running");
         return MMISERVICE_NOT_RUNNING;
