@@ -69,7 +69,7 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -h: dump help\n");
     mprintf(fd, "      -d: dump the device information\n");
     mprintf(fd, "      -w: dump the windows information \n");
-	mprintf(fd, "      -u: dump the uds_server information \n");
+    mprintf(fd, "      -u: dump the uds_server information \n");
     mprintf(fd, "      -o: dump the monitor information\n");
     mprintf(fd, "      -s: dump the subscriber information\n");
     mprintf(fd, "      -i: dump the interceptor information\n");
