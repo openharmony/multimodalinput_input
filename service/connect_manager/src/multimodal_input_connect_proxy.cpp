@@ -58,9 +58,11 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
 
     MessageParcel reply;
     MessageOption option;
-    int32_t requestResult = Remote()->SendRequest(ALLOC_SOCKET_FD, data, reply, option);
-    if (requestResult != RET_OK) {
-        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(ALLOC_SOCKET_FD, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("send request fail, ret:%{public}d", ret);
         return RET_ERR;
     }
     socketFd = reply.ReadFileDescriptor();
@@ -84,10 +86,12 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
 
     MessageParcel reply;
     MessageOption option;
-    int32_t requestResult = Remote()->SendRequest(ADD_INPUT_EVENT_FILTER, data, reply, option);
-    if (requestResult != RET_OK) {
-        MMI_HILOGE("reply readint32 error:%{public}d", requestResult);
-        return requestResult;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(ADD_INPUT_EVENT_FILTER, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("reply readint32 error:%{public}d", ret);
+        return ret;
     }
     return RET_OK;
 }
@@ -108,10 +112,12 @@ int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
 
     MessageParcel reply;
     MessageOption option;
-    int32_t requestResult = Remote()->SendRequest(SET_POINTER_VISIBLE, data, reply, option);
-    if (requestResult != RET_OK) {
-        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
-        return requestResult;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(SET_POINTER_VISIBLE, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        return ret;
     }
     return RET_OK;
 }
@@ -127,10 +133,12 @@ int32_t MultimodalInputConnectProxy::IsPointerVisible(bool &visible)
 
     MessageParcel reply;
     MessageOption option;
-    int32_t requestResult = Remote()->SendRequest(IS_POINTER_VISIBLE, data, reply, option);
-    if (requestResult != RET_OK) {
-        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
-        return requestResult;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(IS_POINTER_VISIBLE, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        return ret;
     }
     visible = reply.ReadBool();
     return RET_OK;
@@ -151,10 +159,12 @@ int32_t MultimodalInputConnectProxy::MarkEventProcessed(int32_t eventId)
 
     MessageParcel reply;
     MessageOption option;
-    int32_t requestResult = Remote()->SendRequest(MARK_EVENT_PROCESSED, data, reply, option);
-    if (requestResult != RET_OK) {
-        MMI_HILOGE("send request fail, result:%{public}d", requestResult);
-        return requestResult;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(MARK_EVENT_PROCESSED, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        return ret;
     }
     return RET_OK;
 }
@@ -177,7 +187,9 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(int32_t handlerId, InputHan
     }
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = Remote()->SendRequest(ADD_INPUT_HANDLER, data, reply, option);
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(ADD_INPUT_HANDLER, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("send request fail, ret:%{public}d", ret);
         return ret;
@@ -203,7 +215,9 @@ int32_t MultimodalInputConnectProxy::RemoveInputHandler(int32_t handlerId, Input
     }
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = Remote()->SendRequest(REMOVE_INPUT_HANDLER, data, reply, option);
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(REMOVE_INPUT_HANDLER, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("send request fail, ret:%{public}d", ret);
         return ret;
@@ -229,7 +243,9 @@ int32_t MultimodalInputConnectProxy::MarkEventConsumed(int32_t monitorId, int32_
     }
     MessageParcel reply;
     MessageOption option;
-    int32_t ret = Remote()->SendRequest(MARK_EVENT_CONSUMED, data, reply, option);
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(MARK_EVENT_CONSUMED, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("send request fail, ret:%{public}d", ret);
         return ret;
