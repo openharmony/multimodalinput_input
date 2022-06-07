@@ -32,6 +32,12 @@ enum InputHandlerType : int32_t {
     MONITOR,
 };
 
+enum InputHandlerEventType : int32_t {
+    ALL,
+    KEY,
+    POINTER,
+};
+
 inline bool IsValidHandlerType(InputHandlerType handlerType)
 {
     return ((handlerType == InputHandlerType::INTERCEPTOR) ||
