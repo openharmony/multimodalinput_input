@@ -310,6 +310,7 @@ void MMIService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
     MMI_HILOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), s->GetFd());
+    IPointerDrawingManager::GetInstance()->DeletePointerVisible(s->GetPid());
 }
 
 int32_t MMIService::SetPointerVisible(bool visible)
