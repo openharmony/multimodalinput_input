@@ -682,5 +682,49 @@ MouseLocation InputWindowsManager::GetMouseInfo()
     }
     return mouseLoction_;
 }
+bool InputWindowsManager::Dump(int32_t fd, const std::vector<std::u16string> &args)
+{
+    CALL_LOG_ENTER;
+     if ((args.empty()) || (args[0].compare(u"-w") != 0)) {
+        MMI_HILOGE("args cannot be empty or invalid");
+        return false;
+    }
+    mprintf(fd, "------------------------[physicalDisplay information]---------------------------");
+    mprintf(fd,"physicalDisplays,num:%zu", physicalDisplays_.size());
+    if (physicalDisplays_.empty()){
+            MMI_HILOGI("------null----");
+    }
+    for (const auto &physicalDisplay : physicalDisplays_) {
+         mprintf(fd,
+                "id:%d | leftDisplayId:%d | upDisplayId:%d | topLeftX:%d | topLeftY:%d | width:%d | height:%d "
+                "| name:%s | seatId:%s | seatName:%s | logicWidth:%d | logicHeight:%d | direction:%d \n",
+                physicalDisplay.id, physicalDisplay.leftDisplayId, physicalDisplay.upDisplayId, physicalDisplay.topLeftX, 
+                physicalDisplay.topLeftY, physicalDisplay.width, physicalDisplay.height, physicalDisplay.name.c_str(), 
+                physicalDisplay.seatId.c_str(), physicalDisplay.seatName.c_str(),physicalDisplay.logicWidth,
+                physicalDisplay.logicHeight, physicalDisplay.direction);
+    }
+    mprintf(fd, "-------------------------[logicalDisplays information]--------------------------");
+    mprintf(fd,"logicalDisplays,num:%zu", logicalDisplays_.size());
+    for (const auto &logicalDisplays : logicalDisplays_) {
+         mprintf(fd,
+                "id:%d | topLeftX:%d | topLeftY:%d | width:%d | height:%d "
+                "| name:%s | seatId:%s | seatName:%s | focusWindowId:%d | window num:%d \n",
+                logicalDisplays.id, logicalDisplays.topLeftX, logicalDisplays.topLeftY, logicalDisplays.width,
+                logicalDisplays.height, logicalDisplays.name.c_str(), logicalDisplays.seatId.c_str(),
+                logicalDisplays.seatName.c_str(),logicalDisplays.focusWindowId, logicalDisplays.windowsInfo.size());
+    }
+    mprintf(fd, "-------------------------[windowInfo information]-------------------------------");
+    mprintf(fd,"window info,num:%zu", windowInfos_.size());
+    for (const auto &windowInfo : windowInfos_) {
+         mprintf(fd,
+                "id:%d | pid:%d | uid:%d | hotZoneTopLeftX:%d | hotZoneTopLeftY:%d | hotZoneWidth:%d | hotZoneHeight:%d "
+                "| displayId:%d | agentWindowId:%d | winTopLeftX:%d | winTopLeftY:%d | flags:%d \n",
+                windowInfo.second.id, windowInfo.second.pid, windowInfo.second.uid, windowInfo.second.hotZoneTopLeftX, 
+                windowInfo.second.hotZoneTopLeftY, windowInfo.second.hotZoneWidth, windowInfo.second.hotZoneHeight,
+                windowInfo.second.displayId, windowInfo.second.agentWindowId, windowInfo.second.winTopLeftX, 
+                windowInfo.second.winTopLeftY, windowInfo.second.flags);
+    }
+    return true;
+}
 } // namespace MMI
 } // namespace OHOS

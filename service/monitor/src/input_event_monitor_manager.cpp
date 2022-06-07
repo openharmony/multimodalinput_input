@@ -20,6 +20,7 @@
 #include "proto.h"
 
 #include "input_event_data_transformation.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {

@@ -49,7 +49,7 @@ public:
     void UdsStop();
     bool SendMsg(int32_t fd, NetPacket& pkt);
     void Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt);
-    void Dump(int32_t fd);
+    bool Dump(int32_t fd, const std::vector<std::u16string> &args);
     int32_t GetClientFd(int32_t pid) const;
     int32_t GetClientPid(int32_t fd) const;
     void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
