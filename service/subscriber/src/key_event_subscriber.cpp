@@ -22,6 +22,7 @@
 #include "net_packet.h"
 #include "proto.h"
 #include "timer_manager.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -431,6 +432,28 @@ bool KeyEventSubscriber::IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent) 
         if (!findResult) {
             return false;
         }
+    }
+    return true;
+}
+
+bool KeyEventSubscriber::Dump(int32_t fd, const std::vector<std::u16string> &args)
+{
+    CALL_LOG_ENTER;
+    MMI_HILOGI("Subscriber Dump in !");
+    if ((args.empty()) || (args[0].compare(u"-s") != 0)) {
+        MMI_HILOGE("args cannot be empty or invalid");
+        return false;
+    }
+    mprintf(fd, "--------------------------[Subscriber information]-------------------------");
+    mprintf(fd, "subscribers: count=%d", subscribers_.size());
+    for (const auto &item : subscribers_){
+        std::shared_ptr<Subscriber> subscriber = item;
+        mprintf(fd,
+               "Pid:%d | Uid:%d |subscriber id:%d | timer id:%d | Fd:%d"
+               "| FinalKey:%d | finalKeyDownDuration:%d | IsFinalKeyDown:%s \n",
+               subscriber->sess_->GetPid(), subscriber->sess_->GetUid(), subscriber->id_,
+               subscriber->timerId_, subscriber->sess_->GetFd(), subscriber->keyOption_->GetFinalKey(),
+               subscriber->keyOption_->GetFinalKeyDownDuration(), subscriber->keyOption_->IsFinalKeyDown() ? "true" : "false");
     }
     return true;
 }

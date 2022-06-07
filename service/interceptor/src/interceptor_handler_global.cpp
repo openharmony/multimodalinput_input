@@ -22,6 +22,7 @@
 #include "mmi_log.h"
 #include "net_packet.h"
 #include "proto.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -207,6 +208,30 @@ void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr s
             cItr = interceptors_.erase(cItr);
         }
     }
+}
+bool InterceptorHandlerGlobal::Dump(int32_t fd, const std::vector<std::u16string> &args)
+{
+    return interceptors_.Dump(fd, args);
+}
+
+bool InterceptorHandlerGlobal::InterceptorCollection::Dump(int32_t fd, const std::vector<std::u16string> &args)
+{
+    CALL_LOG_ENTER;
+    MMI_HILOGI("Interceptor Dump in !");
+    if ((args.empty()) || (args[0].compare(u"-i") != 0)) {
+        MMI_HILOGE("args cannot be empty or invalid");
+        return false;
+    }
+    mprintf(fd, "--------------------------[interceptor information]-------------------------");
+    mprintf(fd, "interceptors: count=%d", interceptors_.size());
+    for (const auto &interceptor : interceptors_){
+        mprintf(fd,
+                "interceptor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d | EarlistEventTime:%d \n",
+                interceptor.id_, interceptor.handlerType_, interceptor.session_->GetPid(), 
+                interceptor.session_->GetUid(), interceptor.session_->GetFd(),
+                interceptor.session_->GetEarlistEventTime());
+    }
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS

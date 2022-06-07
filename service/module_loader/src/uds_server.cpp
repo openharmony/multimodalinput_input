@@ -182,21 +182,24 @@ void UDSServer::AddPermission(SessionPtr sess)
     }
 }
 
-void UDSServer::Dump(int32_t fd)
+bool UDSServer::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
-    mprintf(fd, "Sessions: count=%d, idxMap count=%d", sessionsMap_.size(), idxPidMap_.size());
-    int32_t i = 0;
-    mprintf(fd, "Sessions:");
-    for (const auto& [key, value] : sessionsMap_) {
-        mprintf(fd, "\t%d, [%d, %s]", i, key, value->GetDescript().c_str());
-        i++;
+    CALL_LOG_ENTER;
+    MMI_HILOGI("uds_erver Dump in !");
+    if ((args.empty()) || (args[0].compare(u"-u") != 0)) {
+        MMI_HILOGE("args cannot be empty or invalid");
+        return false;
     }
-    i = 0;
-    mprintf(fd, "IdxMap:");
-    for (const auto& [key, value] : idxPidMap_) {
-        mprintf(fd, "\t%d, [%d, %d]", i, key, value);
-        i++;
+    mprintf(fd, "--------------------[uds_server information]----------------------");
+    mprintf(fd, "uds_server: count=%d", sessionsMap_.size());
+    for (const auto &item : sessionsMap_) { 
+        std::shared_ptr<UDSSession> udsSession = item.second;
+        mprintf(fd,
+                "Uid:%d | Pid:%d | Fd:%d | HasPermission:%s | Descript:%s \n",
+                udsSession->GetUid(), udsSession->GetPid(), udsSession->GetFd(),
+                udsSession->HasPermission() ? "true" : "false", udsSession->GetDescript().c_str());
     }
+    return true;
 }
 
 void UDSServer::OnConnected(SessionPtr s)

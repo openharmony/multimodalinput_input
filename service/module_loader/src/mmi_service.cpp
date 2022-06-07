@@ -24,6 +24,12 @@
 #endif
 
 #include "event_dump.h"
+#include "input_device_manager.h"
+#include "input_handler_manager_global.h"
+#include "key_event_subscriber.h"
+#include "interceptor_handler_global.h"
+#include "mouse_event_handler.h"
+#include "util_ex.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "key_map_manager.h"
@@ -261,12 +267,6 @@ void MMIService::OnStop()
 #ifdef OHOS_RSS_CLIENT
     RemoveSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
 #endif
-}
-
-void MMIService::OnDump()
-{
-    CHK_PIDANDTID();
-    MMIEventDump->Dump();
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
@@ -549,6 +549,33 @@ void MMIService::OnSignalEvent(int32_t signalFd)
             break;
         }
     }
+}
+
+int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
+{
+    CALL_LOG_ENTER;
+    MMI_HILOGI("Dump Start !");
+    if ((args.empty()) || (args[0].size() != 2)) {
+        MMI_HILOGE("param cannot be empty or the length is not 2");
+        mprintf(fd, "cmd param number is not equal to 2\n");
+        MMIEventDump->DumpHelp(fd);
+        return -1;
+    }
+    bool helpRet = MMIEventDump->DumpEventHelp(fd, args);
+    bool deviceRet = InputDevMgr->Dump(fd, args);
+    bool windowsRet = WinMgr->Dump(fd, args);
+    bool udsserverRet = UDSServer::Dump(fd, args);
+    bool monitorsRet = InputHandlerManagerGlobal::GetInstance().Dump(fd, args);
+    bool interceptorsRet = InterceptorHandlerGlobal::GetInstance()->Dump(fd, args);
+    bool subscriberRet  = KeyEventSubscriber_.Dump(fd, args);
+    bool mouseStateRet = MouseEventHdr->Dump(fd, args);
+    bool total = helpRet + deviceRet + windowsRet + udsserverRet + subscriberRet + monitorsRet + interceptorsRet + mouseStateRet;
+    if (!total) {
+        mprintf(fd, "cmd param is error\n");
+        MMIEventDump->DumpHelp(fd);
+        return -1;
+    }
+    return 0;
 }
 } // namespace MMI
 } // namespace OHOS

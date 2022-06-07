@@ -28,9 +28,9 @@ class EventDump : public DelayedSingleton<EventDump> {
 public:
     EventDump() = default;
     DISALLOW_COPY_AND_MOVE(EventDump);
+	void DumpHelp(int32_t fd);
+    bool DumpEventHelp(int32_t fd, const std::vector<std::u16string> &args);
     void Init(UDSServer& udss);
-    void Dump(int32_t fd = 0);
-    void TestDump();
     void InsertDumpInfo(const std::string& str);
     void InsertFormat(std::string str, ...);
 

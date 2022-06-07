@@ -30,7 +30,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
-constexpr int32_t MAX_PATH_SIZE = 1024;
 } // namespace
 
 void ChkConfig(int32_t fd)
@@ -54,51 +53,32 @@ void ChkConfig(int32_t fd)
     mprintf(fd, "EXP_SOPATH: %s\n", DEF_EXP_SOPATH);
 }
 
+bool EventDump::DumpEventHelp(int32_t fd, const std::vector<std::u16string> &args)
+{
+    if ((args.empty()) || (args[0].compare(u"-h") != 0)) {
+        MMI_HILOGE("args cannot be empty or invalid");
+        return false;
+    }
+    DumpHelp(fd);
+    return true;
+}
+
+void EventDump::DumpHelp(int32_t fd)
+{
+    mprintf(fd, "Usage:\n");
+    mprintf(fd, "      -h: dump help\n");
+    mprintf(fd, "      -d: dump the device information\n");
+    mprintf(fd, "      -w: dump the windows information \n");
+	mprintf(fd, "      -u: dump the uds_server information \n");
+    mprintf(fd, "      -o: dump the monitor information\n");
+    mprintf(fd, "      -s: dump the subscriber information\n");
+    mprintf(fd, "      -i: dump the interceptor information\n");
+    mprintf(fd, "      -m: dump the mouse information\n");
+}
+
 void EventDump::Init(UDSServer& uds)
 {
     udsServer_ = &uds;
-}
-
-void EventDump::Dump(int32_t fd)
-{
-    std::lock_guard<std::mutex> lock(mu_);
-
-    auto strCurTime = Strftime();
-    mprintf(fd, "MMIDumpsBegin: %s", strCurTime.c_str());
-    ChkConfig(fd);
-    if (udsServer_) {
-        udsServer_->Dump(fd);
-    }
-
-    mprintf(fd, "MMI_MSGDumps:");
-    for (const auto &item : dumpInfo_) {
-        mprintf(fd, "\t%s", item.c_str());
-    }
-    strCurTime = Strftime();
-    mprintf(fd, "MMIDumpsEnd: %s", strCurTime.c_str());
-}
-
-void EventDump::TestDump()
-{
-    char szPath[MAX_PATH_SIZE] = {};
-    auto ret = sprintf_s(szPath, MAX_PATH_SIZE, "%s/mmidump-%s.txt",
-                         DEF_MMI_DATA_ROOT, Strftime("%y%m%d%H%M%S").c_str());
-    if (ret < 0) {
-        MMI_HILOGE("The function sprintf_s perform error, errCode:%{public}d", SPRINTF_S_SEC_FUN_FAIL);
-        return;
-    }
-    char path[PATH_MAX] = {};
-    if (realpath(szPath, path) == nullptr) {
-        MMI_HILOGE("path is error, szPath:%{public}s", szPath);
-        return;
-    }
-    auto fd = open(path, O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
-    if (fd < 0) {
-        MMI_HILOGE("The fd less than 0, errCode:%{public}d", FILE_OPEN_FAIL);
-        return;
-    }
-    Dump(fd);
-    close(fd);
 }
 
 void EventDump::InsertDumpInfo(const std::string& str)

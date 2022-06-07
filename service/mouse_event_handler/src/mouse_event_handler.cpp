@@ -26,6 +26,7 @@
 #include "mouse_device_state.h"
 #include "timer_manager.h"
 #include "util.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -328,6 +329,27 @@ void MouseEventHandler::DumpInner()
         "Width:%{public}d,Height:%{public}d,Pressure:%{public}f",
         item.GetDownTime(), (item.IsPressed() ? "true" : "false"), item.GetGlobalX(), item.GetGlobalY(),
         item.GetWidth(), item.GetHeight(), item.GetPressure());
+}
+bool MouseEventHandler::Dump(int32_t fd, const std::vector<std::u16string> &args)
+{
+    CALL_LOG_ENTER;
+    MMI_HILOGI("Mouse Device State Dump in !");
+    PointerEvent::PointerItem item;
+    if ((args.empty()) || (args[0].compare(u"-m") != 0)) {
+        MMI_HILOGE("args cannot be empty or invalid");
+        return false; 
+    }
+    mprintf(fd, "---------------------[Mouse Device State information]--------------------");
+    mprintf(fd,
+               "PointerId:%d | SourceType:%d | PointerAction:%d | ButtonId:%d "
+               "| VerticalAxisValue:%lf | HorizontalAxisValue:%lf | DownTime:%d "
+               "| IsPressed:%s | GlobalX:%d | GlobalY:%d | Width:%d | Height:%d | Pressure:%lf \n",
+               pointerEvent_->GetPointerId(), pointerEvent_->GetSourceType(), pointerEvent_->GetPointerAction(),
+               pointerEvent_->GetButtonId(), pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
+               pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL), item.GetDownTime(), 
+               item.IsPressed() ? "true" : "false", item.GetGlobalX(), item.GetGlobalY(), item.GetWidth(), 
+               item.GetHeight(), item.GetPressure());
+    return true;
 }
 } // namespace MMI
 } // namespace OHOS
