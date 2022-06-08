@@ -222,7 +222,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 }
 
 int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType,
-    InputHandlerEventType eventType)
+    HandleEventType eventType)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGD("OnAddInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);

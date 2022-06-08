@@ -33,7 +33,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 } // namespace
 
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
-    std::shared_ptr<IInputEventConsumer> consumer, InputHandlerEventType eventType)
+    std::shared_ptr<IInputEventConsumer> consumer, HandleEventType eventType)
 {
     CHKPR(consumer, INVALID_HANDLER_ID);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
@@ -76,7 +76,7 @@ void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 }
 
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType,
-    InputHandlerEventType eventType, std::shared_ptr<IInputEventConsumer> monitor)
+    HandleEventType eventType, std::shared_ptr<IInputEventConsumer> monitor)
 {
     auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
     CHKPR(eventHandler, RET_ERR);
@@ -96,7 +96,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
 }
 
 void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handlerType,
-    InputHandlerEventType eventType)
+    HandleEventType eventType)
 {
     int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerId, handlerType, eventType);
     if (ret != 0) {

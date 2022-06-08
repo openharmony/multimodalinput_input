@@ -35,7 +35,7 @@ public:
     virtual int32_t IsPointerVisible(bool &visible) = 0;
     virtual int32_t MarkEventProcessed(int32_t eventId) = 0;
     virtual int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
-        InputHandlerEventType eventType) = 0;
+        HandleEventType eventType) = 0;
     virtual int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType) = 0;
     virtual int32_t MarkEventConsumed(int32_t monitorId, int32_t eventId) = 0;
     enum {

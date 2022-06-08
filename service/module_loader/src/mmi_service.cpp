@@ -361,7 +361,7 @@ int32_t MMIService::MarkEventProcessed(int32_t eventId)
 }
 
 int32_t MMIService::CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType,
-    InputHandlerEventType eventType)
+    HandleEventType eventType)
 {
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
@@ -369,7 +369,7 @@ int32_t MMIService::CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerTy
 }
 
 int32_t MMIService::AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
-    InputHandlerEventType eventType)
+    HandleEventType eventType)
 {
     CALL_LOG_ENTER;
     int32_t pid = GetCallingPid();

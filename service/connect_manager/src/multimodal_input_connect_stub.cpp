@@ -199,7 +199,7 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
     int32_t ret = AddInputHandler(handlerId, static_cast<InputHandlerType>(handlerType),
-        static_cast<InputHandlerEventType>(eventType));
+        static_cast<HandleEventType>(eventType));
     if (ret != RET_OK) {
         MMI_HILOGE("call AddInputHandler failed ret:%{public}d", ret);
         return ret;
