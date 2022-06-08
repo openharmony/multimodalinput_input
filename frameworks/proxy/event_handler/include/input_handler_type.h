@@ -32,7 +32,7 @@ enum InputHandlerType : int32_t {
     MONITOR,
 };
 
-enum InputHandlerEventType : int32_t {
+enum HandleEventType : int32_t {
     ALL,
     KEY,
     POINTER,

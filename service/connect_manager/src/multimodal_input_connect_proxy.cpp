@@ -170,7 +170,7 @@ int32_t MultimodalInputConnectProxy::MarkEventProcessed(int32_t eventId)
 }
 
 int32_t MultimodalInputConnectProxy::AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
-    InputHandlerEventType eventType)
+    HandleEventType eventType)
 {
     CALL_LOG_ENTER;
     MessageParcel data;

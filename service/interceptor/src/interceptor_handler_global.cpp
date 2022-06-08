@@ -32,7 +32,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Inter
 InterceptorHandlerGlobal::InterceptorHandlerGlobal() {}
 
 int32_t InterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
-    InputHandlerType handlerType, InputHandlerEventType eventType, SessionPtr session)
+    InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
 {
     CHKPR(session, RET_ERR);
     if (!IsValidHandlerId(handlerId)) {
@@ -55,7 +55,7 @@ void InterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,
     CHKPV(session);
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         MMI_HILOGD("Unregister interceptor:%{public}d", handlerId);
-        SessionHandler interceptor { handlerId, handlerType, InputHandlerEventType::ALL, session };
+        SessionHandler interceptor { handlerId, handlerType, HandleEventType::ALL, session };
         interceptors_.RemoveInterceptor(interceptor);
     }
 }
@@ -154,8 +154,8 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     bool isInterceptor = false;
     for (const auto &interceptor : interceptors_) {
-        if(interceptor.eventType_ == InputHandlerEventType::KEY 
-            || interceptor.eventType_ == InputHandlerEventType::ALL) {
+        if(interceptor.eventType_ == HandleEventType::KEY 
+            || interceptor.eventType_ == HandleEventType::ALL) {
             interceptor.SendToClient(keyEvent);
             MMI_HILOGD("Key event was intercepted");
             isInterceptor = true;
@@ -174,7 +174,7 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     bool isInterceptor = false;
     for (const auto &interceptor : interceptors_) {
-        if(interceptor.eventType_ == InputHandlerEventType::ALL) {
+        if(interceptor.eventType_ == HandleEventType::ALL) {
             interceptor.SendToClient(pointerEvent);
             MMI_HILOGD("Pointer event was intercepted");
             isInterceptor = true;
