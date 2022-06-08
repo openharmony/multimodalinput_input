@@ -30,7 +30,7 @@ config("libmmi_client_config") {
 
 config("libmmi_public_client_config") {
   include_dirs = [
-    "//foundation/bundlemanager/bundle_framework/interfaces/innerkits/libeventhandler/include",
+    "//base/notification/eventhandler/interfaces/inner_api",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
