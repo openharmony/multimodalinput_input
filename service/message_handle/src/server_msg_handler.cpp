@@ -221,12 +221,13 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType)
+int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType,
+    HandleEventType eventType)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGD("OnAddInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
     if (handlerType == InputHandlerType::INTERCEPTOR) {
-        return InterHdlGl->AddInputHandler(handlerId, handlerType, sess);
+        return InterHdlGl->AddInputHandler(handlerId, handlerType, eventType, sess);
     }
     if (handlerType == InputHandlerType::MONITOR) {
         return InputHandlerManagerGlobal::GetInstance().AddInputHandler(handlerId, handlerType, sess);

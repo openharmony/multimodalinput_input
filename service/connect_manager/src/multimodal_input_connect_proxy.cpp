@@ -169,7 +169,8 @@ int32_t MultimodalInputConnectProxy::MarkEventProcessed(int32_t eventId)
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::AddInputHandler(int32_t handlerId, InputHandlerType handlerType)
+int32_t MultimodalInputConnectProxy::AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
+    HandleEventType eventType)
 {
     CALL_LOG_ENTER;
     MessageParcel data;
@@ -183,6 +184,10 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(int32_t handlerId, InputHan
     }
     if (!data.WriteInt32(handlerType)) {
         MMI_HILOGE("Failed to write handlerType");
+        return ERR_INVALID_VALUE;
+    }
+    if (!data.WriteInt32(eventType)) {
+        MMI_HILOGE("Failed to write eventType");
         return ERR_INVALID_VALUE;
     }
     MessageParcel reply;

@@ -34,7 +34,8 @@ public:
     void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
     int32_t MarkEventProcessed(SessionPtr sess, int32_t eventId);
-    int32_t OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType);
+    int32_t OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType,
+        HandleEventType eventType);
     int32_t OnRemoveInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType);
     int32_t OnMarkConsumed(SessionPtr sess, int32_t monitorId, int32_t eventId);
 

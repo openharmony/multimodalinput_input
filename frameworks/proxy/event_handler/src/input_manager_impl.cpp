@@ -394,15 +394,20 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
         return -1;
     }
     std::lock_guard<std::mutex> guard(mtx_);
-    return InputInterMgr->AddInterceptor(interceptor);
+    return InputInterMgr->AddInterceptor(interceptor, HandleEventType::ALL);
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
     CHKPR(interceptor, ERROR_NULL_POINTER);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("client init failed");
+        return -1;
+    }
     auto consumer = std::make_shared<MonitorEventConsumer>(interceptor);
     CHKPR(consumer, ERROR_NULL_POINTER);
-    return InputManagerImpl::AddInterceptor(consumer);
+    std::lock_guard<std::mutex> guard(mtx_);
+    return InputInterMgr->AddInterceptor(consumer, HandleEventType::KEY);
 }
 
 void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
