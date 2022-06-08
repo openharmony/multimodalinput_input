@@ -152,13 +152,15 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
         return false;
     }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
+    bool isInterceptor = false;
     for (const auto &interceptor : interceptors_) {
         if(interceptor.eventType_ == InputHandlerEventType::KEY) {
             interceptor.SendToClient(keyEvent);
+            MMI_HILOGD("Key event was intercepted");
+            isInterceptor = true;
         }
     }
-    MMI_HILOGD("Key event was intercepted");
-    return true;
+    return isInterceptor;
 }
 
 bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -169,13 +171,15 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
         return false;
     }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
+    bool isInterceptor = false;
     for (const auto &interceptor : interceptors_) {
         if(interceptor.eventType_ == InputHandlerEventType::POINTER) {
             interceptor.SendToClient(pointerEvent);
+            MMI_HILOGD("Pointer event was intercepted");
+            isInterceptor = true;
         }
     }
-    MMI_HILOGD("Pointer event was intercepted");
-    return true;
+    return isInterceptor;
 }
 
 int32_t InterceptorHandlerGlobal::InterceptorCollection::AddInterceptor(const SessionHandler& interceptor)
