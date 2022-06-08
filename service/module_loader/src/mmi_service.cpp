@@ -361,19 +361,21 @@ int32_t MMIService::MarkEventProcessed(int32_t eventId)
     return RET_OK;
 }
 
-int32_t MMIService::CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType)
+int32_t MMIService::CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType,
+    HandleEventType eventType)
 {
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnAddInputHandler(sess, handlerId, handlerType);
+    return sMsgHandler_.OnAddInputHandler(sess, handlerId, handlerType, eventType);
 }
 
-int32_t MMIService::AddInputHandler(int32_t handlerId, InputHandlerType handlerType)
+int32_t MMIService::AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
+    HandleEventType eventType)
 {
     CALL_LOG_ENTER;
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckAddInput, this, pid, handlerId, handlerType));
+        std::bind(&MMIService::CheckAddInput, this, pid, handlerId, handlerType, eventType));
     if (ret != RET_OK) {
         MMI_HILOGE("add input handler failed, ret:%{public}d", ret);
         return RET_ERR;

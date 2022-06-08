@@ -198,7 +198,13 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
         MMI_HILOGE("Read handlerType failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
-    int32_t ret = AddInputHandler(handlerId, static_cast<InputHandlerType>(handlerType));
+    int32_t eventType;
+    if (!data.ReadInt32(eventType)) {
+        MMI_HILOGE("Read eventType failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t ret = AddInputHandler(handlerId, static_cast<InputHandlerType>(handlerType),
+        static_cast<HandleEventType>(eventType));
     if (ret != RET_OK) {
         MMI_HILOGE("call AddInputHandler failed ret:%{public}d", ret);
         return ret;

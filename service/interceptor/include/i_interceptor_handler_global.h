@@ -30,7 +30,8 @@ public:
     IInterceptorHandlerGlobal() = default;
     ~IInterceptorHandlerGlobal() = default;
     DISALLOW_COPY_AND_MOVE(IInterceptorHandlerGlobal);
-    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
+        HandleEventType eventType, SessionPtr session);
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent);
     bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent);

@@ -32,7 +32,8 @@ public:
     InterceptorHandlerGlobal();
     DISALLOW_COPY_AND_MOVE(InterceptorHandlerGlobal);
     ~InterceptorHandlerGlobal() = default;
-    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
+        HandleEventType eventType, SessionPtr session);
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent);
     bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent);
@@ -44,8 +45,9 @@ private:
 private:
     class SessionHandler {
     public:
-        SessionHandler(int32_t id, InputHandlerType handlerType, SessionPtr session)
-            : id_(id), handlerType_(handlerType), session_(session) { }
+        SessionHandler(int32_t id, InputHandlerType handlerType, HandleEventType eventType,
+            SessionPtr session) : id_(id), handlerType_(handlerType), eventType_(eventType),
+            session_(session) { }
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
         bool operator<(const SessionHandler& other) const
@@ -60,6 +62,7 @@ private:
         }
         int32_t id_;
         InputHandlerType handlerType_;
+        HandleEventType eventType_;
         SessionPtr session_ = nullptr;
     };
 
