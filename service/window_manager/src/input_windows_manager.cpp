@@ -685,15 +685,13 @@ MouseLocation InputWindowsManager::GetMouseInfo()
 bool InputWindowsManager::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
     CALL_LOG_ENTER;
-     if ((args.empty()) || (args[0].compare(u"-w") != 0)) {
+    MMI_HILOGI("Windows Manager Dump in !");
+    if ((args.empty()) || (args[0].compare(u"-w") != 0)) {
         MMI_HILOGE("args cannot be empty or invalid");
         return false;
     }
     mprintf(fd, "------------------------[physicalDisplay information]---------------------------");
     mprintf(fd,"physicalDisplays,num:%zu", physicalDisplays_.size());
-    if (physicalDisplays_.empty()){
-            MMI_HILOGI("------null----");
-    }
     for (const auto &physicalDisplay : physicalDisplays_) {
          mprintf(fd,
                 "id:%d | leftDisplayId:%d | upDisplayId:%d | topLeftX:%d | topLeftY:%d | width:%d | height:%d "
