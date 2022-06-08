@@ -102,7 +102,7 @@ int32_t MultimodalInputConnectManager::MarkEventProcessed(int32_t eventId)
 }
 
 int32_t MultimodalInputConnectManager::AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
-    InputHandlerEventType eventType)
+    HandleEventType eventType)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->AddInputHandler(handlerId, handlerType, eventType);
