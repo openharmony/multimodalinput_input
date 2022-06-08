@@ -154,7 +154,8 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     bool isInterceptor = false;
     for (const auto &interceptor : interceptors_) {
-        if(interceptor.eventType_ == InputHandlerEventType::KEY) {
+        if(interceptor.eventType_ == InputHandlerEventType::KEY 
+            || interceptor.eventType_ == InputHandlerEventType::ALL) {
             interceptor.SendToClient(keyEvent);
             MMI_HILOGD("Key event was intercepted");
             isInterceptor = true;
@@ -173,7 +174,7 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     bool isInterceptor = false;
     for (const auto &interceptor : interceptors_) {
-        if(interceptor.eventType_ == InputHandlerEventType::POINTER) {
+        if(interceptor.eventType_ == InputHandlerEventType::ALL) {
             interceptor.SendToClient(pointerEvent);
             MMI_HILOGD("Pointer event was intercepted");
             isInterceptor = true;
