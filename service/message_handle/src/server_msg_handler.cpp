@@ -163,7 +163,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(SessionPtr sess, NetPacket& pkt)
         return RET_ERR;
     }
     pointerEvent->UpdateId();
-    int action = pointerEvent->GetPointerAction();
+    int32_t action = pointerEvent->GetPointerAction();
     if ((action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_UP)
         && targetWindowId_ > 0) {
         pointerEvent->SetTargetWindowId(targetWindowId_);
