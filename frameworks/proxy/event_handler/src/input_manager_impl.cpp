@@ -388,7 +388,6 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
-    MMI_HILOGE("InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)");
     CHKPR(interceptor, INVALID_HANDLER_ID);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
@@ -400,7 +399,6 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
 
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
-    MMI_HILOGE("InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)");
     CHKPR(interceptor, ERROR_NULL_POINTER);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
