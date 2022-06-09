@@ -25,6 +25,7 @@
 
 #include "input_event_data_transformation.h"
 #include "multimodal_event_handler.h"
+#include "multimodal_input_connect_manager.h"
 
 namespace OHOS {
 namespace MMI {
