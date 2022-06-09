@@ -76,7 +76,6 @@ protected:
         HandleEventType eventType);
     int32_t CheckRemoveInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType);
     int32_t CheckMarkConsumed(int32_t pid, int32_t monitorId, int32_t eventId);
-    int32_t CheckEventMoveMouse(int32_t pid, int32_t offsetX, int32_t offsetY);
     bool InitLibinputService();
     bool InitService();
     bool InitSignalHandler();

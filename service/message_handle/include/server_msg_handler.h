@@ -39,7 +39,7 @@ public:
     int32_t OnRemoveInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType);
     int32_t OnMarkConsumed(SessionPtr sess, int32_t monitorId, int32_t eventId);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    int32_t OnMoveMouse(SessionPtr sess, int32_t offsetX, int32_t offsetY);
+    int32_t OnMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 protected:
