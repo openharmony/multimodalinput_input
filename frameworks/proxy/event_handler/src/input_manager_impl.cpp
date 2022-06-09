@@ -132,13 +132,6 @@ void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInf
         MMI_HILOGE("windows info or display info is empty!");
         return;
     }
-    uint32_t windowsNum = static_cast<uint32_t>(displayGroupInfo.windowsInfo.size());
-    uint32_t displayNum = static_cast<uint32_t>(displayGroupInfo.displayInfos.size());
-    if ((windowsNum > WindowInfo::MAX_HOTAREA_COUNT) || (displayNum > WindowInfo::MAX_HOTAREA_COUNT)) {
-        MMI_HILOGE("display info check failed! windowsInfos size:%{public}d,displayInfos size:%{public}d",
-            windowsNum, displayNum);
-        return;
-    }
     displayGroupInfo_ = displayGroupInfo;
     SendDisplayInfo();
     PrintDisplayInfo();
