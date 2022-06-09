@@ -52,6 +52,7 @@ public:
     void AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback);
     void RemoveDevMonitor(SessionPtr sess);
     bool Dump(int32_t fd, const std::vector<std::u16string> &args);
+    bool DumpDeviceList(int32_t fd, const std::vector<std::u16string> &args);
     
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasPointerDevice();

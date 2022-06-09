@@ -338,28 +338,51 @@ bool InputDeviceManager::Dump(int32_t fd, const std::vector<std::u16string> &arg
         return false;
     }
     mprintf(fd, "--------------------------[device information]-------------------------");
-    mprintf(fd, "InputDevices: count=%d", inputDevice_.size());
+    mprintf(fd, "Input Devices: count=%d", inputDevice_.size());
     for (const auto &item : inputDevice_) { 
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
             mprintf(fd,
                 "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d" 
-                "| product:%d | vendor:%d | phys:%s | uniq:%s \n",
-                inputDevice->GetId(), inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBustype(),
-                inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor(), inputDevice->GetPhys().c_str(),
-                inputDevice->GetUniq().c_str());
+                "| product:%d | vendor:%d | phys:%s | uniq:%s\t",
+                inputDevice->GetId(), inputDevice->GetName().c_str(), inputDevice->GetType(),
+                inputDevice->GetBustype(),inputDevice->GetVersion(), inputDevice->GetProduct(),
+                inputDevice->GetVendor(), inputDevice->GetPhys().c_str(), inputDevice->GetUniq().c_str()); 
         auto axisinfo = inputDevice->GetAxisInfo();
         mprintf(fd, "axis: count=%d", axisinfo.size());
-        for (const auto &axis : axisinfo){
+        for (const auto &axis : axisinfo) {
             auto iter = axisType.find(axis.GetAxisType());
             if (iter == axisType.end()) {
                 MMI_HILOGE("AxisType is not found !");
                 return false;
             }
             mprintf(fd,
-                    "axisType:%s | minimum:%d | maximum:%d | fuzz:%d | flat:%d | resolution:%d \n",
+                    "axisType:%s | minimum:%d | maximum:%d | fuzz:%d | flat:%d | resolution:%d\t",
                     iter->second.c_str(), axis.GetMinimum(), axis.GetMaximum(), 
                     axis.GetFuzz(), axis.GetFlat(), axis.GetResolution());
         }
+    }
+    return true;
+}
+
+bool InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::u16string> &args)
+{
+    CALL_LOG_ENTER;
+    MMI_HILOGI("Device List Dump in !");
+    if ((args.empty()) || (args[0].compare(u"-l") != 0)) {
+        MMI_HILOGE("args cannot be empty or invalid");
+        return false;
+    }
+    mprintf(fd, "--------------------------[device List information]-------------------------");
+    std::vector<int32_t> ids = GetInputDeviceIds();
+    mprintf(fd, "Total device:%d, Device list:\n", ids.size());
+    for (const auto &item : inputDevice_) { 
+        std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
+        auto deviceId = inputDevice->GetId();
+            mprintf(fd,
+                "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d" 
+                "| product:%d | vendor:%d\t",
+                deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBustype(),
+                inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor());
     }
     return true;
 }
