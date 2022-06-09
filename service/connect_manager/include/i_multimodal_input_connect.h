@@ -48,7 +48,7 @@ public:
         ADD_INPUT_HANDLER = 8,
         REMOVE_INPUT_HANDLER = 9,
         MARK_EVENT_CONSUMED = 10,
-        MOVE_MOUSE_OFFSET = 11
+        MOVE_MOUSE = 11
     };
 
     enum {

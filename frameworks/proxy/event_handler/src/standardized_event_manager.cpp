@@ -135,12 +135,6 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
 int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
     CALL_LOG_ENTER;
-    NetPacket pkt(MmiMessageId::MOVE_MOUSE_BY_OFFSET);
-    pkt << offsetX << offsetY;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write move mouse event failed");
-        return RET_ERR;
-    }
     int32_t ret = MultimodalInputConnMgr->MoveMouseEvent(offsetX, offsetY);
     if (ret != 0) {
         MMI_HILOGE("send to server fail, ret:%{public}d", ret);

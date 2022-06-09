@@ -55,7 +55,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::ADD_INPUT_HANDLER, &MultimodalInputConnectStub::StubAddInputHandler},
         {IMultimodalInputConnect::REMOVE_INPUT_HANDLER, &MultimodalInputConnectStub::StubRemoveInputHandler},
         {IMultimodalInputConnect::MARK_EVENT_CONSUMED, &MultimodalInputConnectStub::StubMarkEventConsumed},
-        {IMultimodalInputConnect::MOVE_MOUSE_OFFSET, &MultimodalInputConnectStub::StubMoveMouseEvent}
+        {IMultimodalInputConnect::MOVE_MOUSE, &MultimodalInputConnectStub::StubMoveMouseEvent}
 
     };
     auto it = mapConnFunc.find(code);
@@ -263,6 +263,7 @@ int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, M
     }
     return RET_OK;
 }
+
 int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_LOG_ENTER;
@@ -289,6 +290,5 @@ int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel& data, Mess
     }
     return RET_OK;
 }
-
 } // namespace MMI
 } // namespace OHOS
