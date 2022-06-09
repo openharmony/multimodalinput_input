@@ -279,7 +279,7 @@ int32_t MultimodalInputConnectProxy::MoveMouseEvent(int32_t offsetX, int32_t off
     MessageOption option;
 	sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t requestResult = Remote()->SendRequest(MOVE_MOUSE_OFFSET, data, reply, option);
+    int32_t requestResult = remote->SendRequest(MOVE_MOUSE_OFFSET, data, reply, option);
     if (requestResult != RET_OK) {
         MMI_HILOGE("send request fail, result:%{public}d", requestResult);
         return requestResult;

@@ -422,13 +422,21 @@ int32_t MMIService::MarkEventConsumed(int32_t monitorId, int32_t eventId)
     }
     return RET_OK;
 }
+
+int32_t MMIService::CheckEventMoveMouse(int32_t pid, int32_t offsetX, int32_t offsetY)
+{
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnMoveMouse(sess, offsetX, offsetY);
+}
+
 int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
     CALL_LOG_ENTER;
     auto sess = GetSessionByPid(GetCallingPid());
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&ServerMsgHandler::OnMoveMouse, &sMsgHandler_, sess, offsetX, offsetY));
+        std::bind(std::bind(&MMIService::CheckEventMoveMouse, this, pid, offsetX, offsetY));
     if (ret != RET_OK) {
         MMI_HILOGE("mark event processed failed, ret:%{public}d", ret);
         return RET_ERR;
