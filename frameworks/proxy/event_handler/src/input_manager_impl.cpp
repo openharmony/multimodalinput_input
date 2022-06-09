@@ -470,9 +470,8 @@ bool InputManagerImpl::IsPointerVisible()
 void InputManagerImpl::OnConnected()
 {
     CALL_LOG_ENTER;
-    if (physicalDisplays_.empty() || logicalDisplays_.empty()) {
-        MMI_HILOGE("display info check failed! physicalDisplays_ size:%{public}zu,logicalDisplays_ size:%{public}zu",
-            physicalDisplays_.size(), logicalDisplays_.size());
+    if (displayGroupInfo_.windowsInfo.empty() || displayGroupInfo_.displayInfos.empty()) {
+        MMI_HILOGE("windows info or display info is empty!");
         return;
     }
     SendDisplayInfo();
