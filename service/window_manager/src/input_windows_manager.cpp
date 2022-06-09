@@ -97,51 +97,56 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> i
     return RET_ERR;
 }
 
-void InputWindowsManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
-    const std::vector<LogicalDisplayInfo> &logicalDisplays)
+void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_LOG_ENTER;
-    physicalDisplays_ = physicalDisplays;
-    logicalDisplays_ = logicalDisplays;
+    displayGroupInfo_ = displayGroupInfo;
     windowInfos_.clear();
-    for (const auto &item : logicalDisplays) {
-        for (const auto &window : item.windowsInfo) {
-            auto iter = windowInfos_.insert(std::pair<int32_t, WindowInfo>(window.id, window));
-            if (!iter.second) {
-                MMI_HILOGE("Insert value failed, Window:%{public}d", window.id);
-            }
+    for (const auto &window : displayGroupInfo.windowsInfo) {
+        auto iter = windowInfos_.insert(std::pair<int32_t, WindowInfo>(window.id, window));
+        if (!iter.second) {
+            MMI_HILOGE("Insert value failed, Window:%{public}d", window.id);
         }
     }
-    if (!logicalDisplays.empty()) {
-        IPointerDrawingManager::GetInstance()->OnDisplayInfo(logicalDisplays[0].id,
-            logicalDisplays[0].width, logicalDisplays_[0].height);
+    if (!displayGroupInfo.displayInfos.empty()) {
+        IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo.displayInfos[0].id,
+            displayGroupInfo.displayInfos[0].width, displayGroupInfo.displayInfos[0].height);
     }
     PrintDisplayInfo();
 }
 
 void InputWindowsManager::PrintDisplayInfo()
 {
-    MMI_HILOGD("physicalDisplays,num:%{public}zu", physicalDisplays_.size());
-    for (const auto &item : physicalDisplays_) {
-        MMI_HILOGD("PhysicalDisplays,id:%{public}d,leftDisplay:%{public}d,upDisplay:%{public}d,"
-            "topLeftX:%{public}d,topLeftY:%{public}d,width:%{public}d,height:%{public}d,name:%{public}s,"
-            "seatId:%{public}s,seatName:%{public}s,logicWidth:%{public}d,logicHeight:%{public}d,"
-            "direction:%{public}d",
-            item.id, item.leftDisplayId, item.upDisplayId,
-            item.topLeftX, item.topLeftY, item.width,
-            item.height, item.name.c_str(), item.seatId.c_str(),
-            item.seatName.c_str(), item.logicWidth, item.logicHeight, item.direction);
+    MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
+        displayGroupInfo_.width, displayGroupInfo_.height, displayGroupInfo_.focusWindowId);
+    std::vector<WindowInfo> windowsInfos = displayGroupInfo_.windowsInfo;
+    MMI_HILOGD("windowsInfos,num:%{public}zu", windowsInfo.size());
+    for (const auto &item : windowsInfos) {
+        MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
+            "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
+            "defaultHotAreas:%{public}zu,pointerHotAreas:%{public}zu"
+            "agentWindowId:%{public}d,flags:%{public}d",
+            item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
+            item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
+            item.agentWindowId, item.flags);
+        for (const auto &win : item.defaultHotAreas) {
+            MMI_HILOGD("x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+                win.x, win.y, win.width, win.height);
+        }
+        for (const auto &pointer : item.pointerHotAreas) {
+            MMI_HILOGD("x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+                pointer.x, pointer.y, pointer.width, pointer.height);
+        }
     }
 
-    MMI_HILOGD("logicalDisplays,num:%{public}zu", logicalDisplays_.size());
-    for (const auto &item : logicalDisplays_) {
-        MMI_HILOGD("logicalDisplays, id:%{public}d,topLeftX:%{public}d,topLeftY:%{public}d,"
+    std::vector<DisplayInfo> displayInfos = displayGroupInfo_.displayInfos;
+    MMI_HILOGD("displayInfos,num:%{public}zu", displayInfos.size());
+    for (const auto &item : displayInfos) {
+        MMI_HILOGD("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
             "width:%{public}d,height:%{public}d,name:%{public}s,"
-            "seatId:%{public}s,seatName:%{public}s,focusWindowId:%{public}d,window num:%{public}zu",
-            item.id, item.topLeftX, item.topLeftY,
-            item.width, item.height, item.name.c_str(),
-            item.seatId.c_str(), item.seatName.c_str(), item.focusWindowId,
-            item.windowsInfo.size());
+            "uniq:%{public}s,direction:%{public}d",
+            item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
+            item.uniq.c_str(), item.direction);
     }
 
     MMI_HILOGD("window info,num:%{public}zu", windowInfos_.size());
