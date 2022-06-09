@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -42,7 +42,8 @@ private:
     void OnSessionLost(SessionPtr session);
 
 private:
-    struct SessionHandler {
+    class SessionHandler {
+    public:
         SessionHandler(int32_t id, InputHandlerType handlerType, SessionPtr session)
             : id_(id), handlerType_(handlerType), session_(session) { }
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
@@ -62,15 +63,14 @@ private:
         SessionPtr session_ = nullptr;
     };
 
-    struct InterceptorCollection : public IInputEventHandler, protected NoCopyable {
+    class InterceptorCollection : public IInputEventHandler, protected NoCopyable {
+    public:
         virtual int32_t GetPriority() const override;
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent) override;
         virtual bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-
         int32_t AddInterceptor(const SessionHandler& interceptor);
         void RemoveInterceptor(const SessionHandler& interceptor);
         void OnSessionLost(SessionPtr session);
-
         std::set<SessionHandler> interceptors_;
     };
 

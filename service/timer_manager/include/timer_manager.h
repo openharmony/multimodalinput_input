@@ -39,14 +39,7 @@ public:
     bool IsExist(int32_t timerId);
     int32_t CalcNextDelay();
     void ProcessTimers();
-        
-private:
-    static constexpr int32_t MIN_DELAY = 36;
-    static constexpr int32_t MIN_INTERVAL = 50;
-    static constexpr int32_t MAX_INTERVAL = 4096;
-    static constexpr int32_t MAX_TIMER_COUNT = 32;
-    static constexpr int32_t NONEXISTENT_ID = -1;
-    
+
 private:
     struct TimerItem {
         int32_t id;

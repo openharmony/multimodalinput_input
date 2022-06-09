@@ -59,7 +59,7 @@ public:
     using FunInputDevInfo = std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)>;
     using FunInputDevIds = std::function<void(int32_t, std::vector<int32_t>&)>;
     using FunInputDevKeys = std::function<void(std::vector<bool>&)>;
-    using FunKeyboardTypes = std::function<void(int32_t, int32_t)>;
+    using FunKeyboardTypes = std::function<void(int32_t)>;
     using DevInfo = std::pair<EventHandlerPtr, FunInputDevInfo>;
     using DevIds = std::pair<EventHandlerPtr, FunInputDevIds>;
     using DevKeys = std::pair<EventHandlerPtr, FunInputDevKeys>;
@@ -83,7 +83,7 @@ public:
         std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)> callback);
     void SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
         std::function<void(std::vector<bool>&)> callback);
-    void GetKeyboardTypeAsync(int32_t deviceId, std::function<void(int32_t, int32_t)> callback);
+    void GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
     void OnInputDevice(int32_t userData, std::shared_ptr<InputDeviceInfo> devData);
     void OnInputDeviceIds(int32_t userData, std::vector<int32_t> &ids);
     void OnSupportKeys(int32_t userData, const std::vector<bool> &keystrokeAbility);

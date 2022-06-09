@@ -29,6 +29,8 @@
 
 #include "bytrace_adapter.h"
 #include "input_device_manager.h"
+#include "key_map_manager.h"
+#include "key_autorepeat.h"
 #include "mmi_func_callback.h"
 #include "mouse_event_handler.h"
 #include "libinput_adapter.h"
@@ -164,32 +166,25 @@ void InputEventHandler::Init(UDSServer& udsServer)
 void InputEventHandler::OnEvent(void *event)
 {
     CHKPV(event);
-    auto *lpEvent = static_cast<libinput_event *>(event);
-    CHKPV(lpEvent);
-    if (initSysClock_ != 0 && lastSysClock_ == 0) {
-        MMI_HILOGE("Event not handled. id:%{public}" PRId64 ",eventType:%{public}d,initSysClock:%{public}" PRId64,
-                   idSeed_, eventType_, initSysClock_);
-    }
-
-    eventType_ = libinput_event_get_type(lpEvent);
-    initSysClock_ = GetSysClockTime();
-    lastSysClock_ = 0;
     idSeed_ += 1;
     const uint64_t maxUInt64 = (std::numeric_limits<uint64_t>::max)() - 1;
     if (idSeed_ >= maxUInt64) {
-        MMI_HILOGE("Invaild value. id:%{public}" PRId64, idSeed_);
+        MMI_HILOGE("value is flipped. id:%{public}" PRId64, idSeed_);
         idSeed_ = 1;
-        return;
     }
 
+    auto *lpEvent = static_cast<libinput_event *>(event);
+    CHKPV(lpEvent);
+    int32_t eventType = libinput_event_get_type(lpEvent);
+    int64_t beginTime = GetSysClockTime();
     MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
-               "initSysClock:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType_, initSysClock_);
+               "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType, beginTime);
 
     OnEventHandler(lpEvent);
-    lastSysClock_ = GetSysClockTime();
-    int64_t lostTime = lastSysClock_ - initSysClock_;
-    MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",lastSynClock:%{public}" PRId64
-               ",lostTime:%{public}" PRId64, idSeed_, lastSysClock_, lostTime);
+    int64_t endTime = GetSysClockTime();
+    int64_t lostTime = endTime - beginTime;
+    MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
+               ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
 }
 
 int32_t InputEventHandler::OnEventHandler(libinput_event *event)
@@ -211,21 +206,6 @@ int32_t InputEventHandler::OnEventHandler(libinput_event *event)
     return ret;
 }
 
-void InputEventHandler::OnCheckEventReport()
-{
-    if (initSysClock_ == 0 || lastSysClock_ != 0) {
-        return;
-    }
-    constexpr int64_t MAX_DID_TIME = 1000 * 1000 * 3;
-    auto curSysClock = GetSysClockTime();
-    auto lostTime = curSysClock - initSysClock_;
-    if (lostTime < MAX_DID_TIME) {
-        return;
-    }
-    MMI_HILOGE("Event not responding. id:%{public}" PRId64 ",eventType:%{public}d,initSysClock:%{public}" PRId64 ","
-               "lostTime:%{public}" PRId64, idSeed_, eventType_, initSysClock_, lostTime);
-}
-
 UDSServer* InputEventHandler::GetUDSServer() const
 {
     return udsServer_;
@@ -240,34 +220,24 @@ int32_t InputEventHandler::OnEventDeviceAdded(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
+    CHKPR(device, ERROR_NULL_POINTER);
     InputDevMgr->OnInputDeviceAdded(device);
+    KeyMapMgr->ParseDeviceConfigFile(device);
+    KeyRepeat->AddDeviceConfig(device);
     return RET_OK;
 }
+
 int32_t InputEventHandler::OnEventDeviceRemoved(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     auto device = libinput_event_get_device(event);
+    CHKPR(device, ERROR_NULL_POINTER);
+    KeyMapMgr->RemoveKeyValue(device);
+    KeyRepeat->RemoveDeviceConfig(device);
     InputDevMgr->OnInputDeviceRemoved(device);
     return RET_OK;
 }
 
-void InputEventHandler::AddHandleTimer(int32_t timeout)
-{
-    timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
-        MMI_HILOGD("enter");
-        if (this->keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-            MMI_HILOGD("key up");
-            return;
-        }
-        auto ret = eventDispatch_.DispatchKeyEventPid(*(this->udsServer_), this->keyEvent_);
-        if (ret != RET_OK) {
-            MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
-        }
-        constexpr int32_t triggerTime = 100;
-        this->AddHandleTimer(triggerTime);
-        MMI_HILOGD("leave");
-    });
-}
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
@@ -293,19 +263,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
-    if (keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP ||
-        keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN ||
-        keyEvent_->GetKeyCode() == KeyEvent::KEYCODE_DEL) {
-        if (!TimerMgr->IsExist(timerId_) && keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
-            AddHandleTimer();
-            MMI_HILOGD("add a timer");
-        }
-        if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
-            TimerMgr->RemoveTimer(timerId_);
-            timerId_ = -1;
-        }
-    }
-
+    KeyRepeat->SelectAutoRepeat(keyEvent_);
     MMI_HILOGD("keyCode:%{public}d,action:%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
     return RET_OK;
 }
@@ -371,6 +329,7 @@ int32_t InputEventHandler::OnEventTouch(libinput_event *event)
 
 int32_t InputEventHandler::OnEventTouchpad(libinput_event *event)
 {
+    CHKPR(event, ERROR_NULL_POINTER);
     OnEventTouchPadSecond(event);
     return RET_OK;
 }
@@ -465,7 +424,7 @@ int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEv
                pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
     PointerEvent::PointerItem item;
     if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item)) {
-        MMI_HILOGE("Get pointer item failed. pointer:%{public}d", pointerEvent->GetPointerId());
+        MMI_HILOGE("Get pointer item failed, pointer:%{public}d", pointerEvent->GetPointerId());
         return RET_ERR;
     }
     MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -234,27 +234,67 @@ public:
      */
     static constexpr int32_t MOUSE_BUTTON_TASK = 7;
 
+    /**
+     * Indicates a finger.
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_FINGER = 0;
 
+    /**
+     * Indicates a stylus.
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_PEN = 1;
 
+    /**
+     * Indicates an eraser.
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_RUBBER = 2;
 
+    /**
+     * Indicates a brush.
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_BRUSH = 3;
 
+    /**
+     * Indicates a pencil.
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_PENCIL = 4;
 
+    /**
+     * Indicates an air brush.
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_AIRBRUSH = 5;
 
+    /**
+     * Indicates a mouse.
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_MOUSE = 6;
 
+    /**
+     * Indicates a lens.
+     *
+     * @since 9
+     */
     static constexpr int32_t TOOL_TYPE_LENS = 7;
 
 public:
     static std::shared_ptr<PointerEvent> from(std::shared_ptr<InputEvent> inputEvent);
 
 public:
-    struct PointerItem {
+    class PointerItem {
     public:
         PointerItem();
         ~PointerItem();
@@ -402,90 +442,98 @@ public:
         void SetHeight(int32_t height);
 
         /**
-         * @brief 获取工具区域中心点相对于屏幕左上角的 x 坐标.
-         * @return x 坐标.
+         * @brief Obtains the X coordinate of the tool area's center point relative to the
+         * upper left corner of the screen.
+         * @return Returns the X coordinate.
          * @since 9
          */
         int32_t GetToolGlobalX() const;
 
         /**
-         * @brief 设置工具区域中心点相对于屏幕左上角的x坐标.
-         * @param x 坐标.
+         * @brief Sets the X coordinate of the tool area's center point relative to the
+         * upper left corner of the screen.
+         * @param x Indicates the X coordinate.
          * @return void
          * @since 9
          */
         void SetToolGlobalX(int32_t globalX);
 
         /**
-         * @brief 获取工具区域中心点相对于屏幕左上角的 y 坐标.
-         * @return y 坐标.
+         * @brief Obtains the Y coordinate of the tool area's center point relative to the
+         * upper left corner of the screen.
+         * @return Returns the Y coordinate.
          * @since 9
          */
         int32_t GetToolGlobalY() const;
 
         /**
-         * @brief 设置工具区域中心点相对于屏幕左上角的 y 坐标.
-         * @param y 坐标.
+         * @brief Sets the Y coordinate of the tool area's center point relative to the
+         * upper left corner of the screen.
+         * @param y Indicates the Y coordinate.
          * @return void
          * @since 9
          */
         void SetToolGlobalY(int32_t globalY);
 
         /**
-         * @brief 获取工具区域中心点相对于窗口左上角的 x 坐标.
-         * @return x 坐标.
+         * @brief Obtains the X coordinate of the tool area's center point relative to the
+         * upper left corner of the window.
+         * @return Returns the X coordinate.
          * @since 9
          */
         int32_t GetToolLocalX() const;
 
         /**
-         * @brief 设置工具区域中心点相对于窗口左上角的 x 坐标.
-         * @param x 坐标.
+         * @brief Sets the X coordinate of the tool area's center point relative to the
+         * upper left corner of the window.
+         * @param x Indicates the X coordinate.
          * @return void
          * @since 9
          */
         void SetToolLocalX(int32_t x);
 
         /**
-         * @brief 获取工具区域中心点相对于窗口左上角的 y 坐标.
-         * @return y 坐标.
+         * @brief Obtains the Y coordinate of the tool area's center point relative to the
+         * upper left corner of the window.
+         * @return Returns the Y coordinate.
          * @since 9
          */
         int32_t GetToolLocalY() const;
 
         /**
-         * @brief 设置工具区域中心点相对于窗口左上角的 y 坐标.
-         * @param y 坐标.
+         * @brief Sets the Y coordinate of the tool area's center point relative to the
+         * upper left corner of the window.
+         * @param y Indicates the Y coordinate.
          * @return void
          * @since 9
          */
         void SetToolLocalY(int32_t y);
 
         /**
-         * @brief 获取工具区域的宽度.
-         * @return 工具区域的宽度.
+         * @brief Obtains the width of the tool area.
+         * @return Returns the width of the tool area.
          * @since 9
          */
         int32_t GetToolWidth() const;
 
         /**
-         * @brief 设置工具区域的宽度.
-         * @param 工具区域的宽度.
+         * @brief Sets the width of the tool area.
+         * @param width Indicates the width of the tool area.
          * @return void
          * @since 9
          */
         void SetToolWidth(int32_t width);
 
         /**
-         * @brief 获取工具区域的高度.
-         * @return 工具区域的高度.
+         * @brief Obtains the height of the tool area.
+         * @return Returns the height of the tool area.
          * @since 9
          */
         int32_t GetToolHeight() const;
 
         /**
-         * @brief 设置工具区域的高度.
-         * @param 工具区域的高度.
+         * @brief Sets the height of the tool area.
+         * @param height Indicates the height of the tool area.
          * @return void
          * @since 9
          */
@@ -536,13 +584,35 @@ public:
          */
         void SetPressure(double pressure);
 
-        int32_t GetAxisLong() const;
+        /**
+         * @brief Obtains the long axis of the touch point area.
+         * @return Returns the long axis of the touch point area.
+         * @since 9
+         */
+        int32_t GetLongAxis() const;
 
-        void SetAxisLong(int32_t axisLong);
+        /**
+         * @brief Sets the long axis of the touch point area.
+         * @param longAxis Indicates the long axis of the touch point area.
+         * @return void
+         * @since 9
+         */
+        void SetLongAxis(int32_t longAxis);
 
-        int32_t GetAxisShort() const;
+        /**
+         * @brief Obtains the short axis of the touch point area.
+         * @return Returns the short axis of the touch point area.
+         * @since 9
+         */
+        int32_t GetShortAxis() const;
 
-        void SetAxisShort(int32_t axisShort);
+        /**
+         * @brief Sets the short axis of the touch point area.
+         * @param shortAxis Indicates the short axis of the touch point area.
+         * @return void
+         * @since 9
+         */
+        void SetShortAxis(int32_t shortAxis);
 
         /**
          * @brief Obtains the ID of the current device.
@@ -559,8 +629,19 @@ public:
          */
         void SetDeviceId(int32_t deviceId);
 
+        /**
+         * @brief Obtains the tool type.
+         * @return Returns the tool type.
+         * @since 9
+         */
         int32_t GetToolType() const;
 
+        /**
+         * @brief Sets the tool type.
+         * @param toolType Indicates the tool type to set.
+         * @return void
+         * @since 9
+         */
         void SetToolType(int32_t toolType);
 
         /**
@@ -597,8 +678,8 @@ public:
         int32_t toolWidth_ {};
         int32_t toolHeight_ {};
         double  pressure_ {};
-        int32_t axisLong_ {};
-        int32_t axisShort_ {};
+        int32_t longAxis_ {};
+        int32_t shortAxis_ {};
         int32_t deviceId_ {};
         int64_t downTime_ {};
         int32_t toolType_ {};

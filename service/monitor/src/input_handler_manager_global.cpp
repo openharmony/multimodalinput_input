@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -123,8 +123,9 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Key
 {
     CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
-    if (!pkt.Write(id_)) {
-        MMI_HILOGE("Write to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+    pkt << id_;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write key event failed");
         return;
     }
     if (InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt) != RET_OK) {
@@ -142,8 +143,9 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poi
     CHKPV(pointerEvent);
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
     MMI_HILOGD("Service SendToClient id:%{public}d,InputHandlerType:%{public}d", id_, handlerType_);
-    if (!pkt.Write(id_) || !pkt.Write(handlerType_)) {
-        MMI_HILOGE("Write id_ to stream failed, errCode:%{public}d", STREAM_BUF_WRITE_FAIL);
+    pkt << id_ << handlerType_;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write pointer event failed");
         return;
     }
     if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {

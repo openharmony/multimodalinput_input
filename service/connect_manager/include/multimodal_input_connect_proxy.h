@@ -31,10 +31,15 @@ public:
     explicit MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl);
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectProxy);
     virtual ~MultimodalInputConnectProxy() override;
-    virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &socketFd) override;
+    virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
+        int32_t &socketFd) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
     virtual int32_t SetPointerVisible(bool visible) override;
     virtual int32_t IsPointerVisible(bool &visible) override;
+    virtual int32_t MarkEventProcessed(int32_t eventId) override;
+    virtual int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType) override;
+    virtual int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType) override;
+    virtual int32_t MarkEventConsumed(int32_t monitorId, int32_t eventId) override;
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };

@@ -73,13 +73,7 @@ public:
     void SetThrottle(InputEventArray& inputEventArray, int64_t blockTime, int32_t value);
     void SetSynMtReport(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
 private:
-    static constexpr int32_t FIRST_FINGER = 1;
-    static constexpr int32_t SECOND_FINGER = 2;
-    static constexpr int32_t THIRD_FINGER = 3;
-    static constexpr int32_t FOURTH_FINGER = 4;
-    static constexpr int32_t FITTH_FINGER = 5;
     static constexpr int32_t BTN_STYLUS_DEFAULT_CODE = 331;
-    static constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE = 15;
     static constexpr int32_t BTN_MSC_SERIAL_DEFAULT_VALUE = 0xA806D21;
 };
 } // namespace MMI

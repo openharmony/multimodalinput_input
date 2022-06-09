@@ -33,6 +33,8 @@ constexpr int32_t ABS_MT_PRESSURE = 0x3a;
 constexpr int32_t ABS_MT_WIDTH_MAJOR = 0x32;
 constexpr int32_t ABS_MT_WIDTH_MINOR = 0x33;
 
+constexpr int32_t BUS_BLUETOOTH = 0X5;
+
 std::list<int32_t> axisType = {
     ABS_MT_TOUCH_MAJOR,
     ABS_MT_TOUCH_MINOR,
@@ -112,6 +114,84 @@ std::vector<bool> InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<
         keystrokeAbility.push_back(ret);
     }
     return keystrokeAbility;
+}
+
+bool InputDeviceManager::GetDeviceConfig(int32_t deviceId, int32_t &keyboardType)
+{
+    CALL_LOG_ENTER;
+    if (auto iter = inputDevice_.find(deviceId); iter == inputDevice_.end()) {
+        MMI_HILOGE("Failed to search for the deviceID");
+        return false;
+    }
+    auto deviceConfig = KeyRepeat->GetDeviceConfig();
+    auto it = deviceConfig.find(deviceId);
+    if (it == deviceConfig.end()) {
+        MMI_HILOGE("Failed to obtain the keyboard type of the configuration file");
+        return false;
+    }
+    keyboardType = it->second.keyboardType;
+    MMI_HILOGD("Get keyboard type results from the configuration file:%{public}d", keyboardType);
+    return true;
+}
+
+int32_t InputDeviceManager::GetKeyboardBusMode(int32_t deviceId)
+{
+    CALL_LOG_ENTER;
+    std::shared_ptr dev = GetInputDevice(deviceId);
+    CHKPR(dev, ERROR_NULL_POINTER);
+    return dev->GetBustype();
+}
+
+int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId)
+{
+    CALL_LOG_ENTER;
+    std::vector <int32_t> keyCodes;
+    keyCodes.push_back(KeyEvent::KEYCODE_Q);
+    keyCodes.push_back(KeyEvent::KEYCODE_NUMPAD_1);
+    keyCodes.push_back(KeyEvent::KEYCODE_HOME);
+    keyCodes.push_back(KeyEvent::KEYCODE_CTRL_LEFT);
+    keyCodes.push_back(KeyEvent::KEYCODE_SHIFT_RIGHT);
+    keyCodes.push_back(KeyEvent::KEYCODE_F20);
+    std::vector<bool> supportKey = SupportKeys(deviceId, keyCodes);
+    std::map<int32_t, bool> determineKbType;
+    for (size_t i = 0; i < keyCodes.size(); i++) {
+        determineKbType[keyCodes[i]] = supportKey[i];
+    }
+    int32_t keyboardType = 0;
+    if (determineKbType[KeyEvent::KEYCODE_HOME] && GetKeyboardBusMode(deviceId) == BUS_BLUETOOTH) {
+        keyboardType = KEYBOARD_TYPE_REMOTECONTROL;
+        MMI_HILOGD("The keyboard type is remote control:%{public}d", keyboardType);
+    } else if (determineKbType[KeyEvent::KEYCODE_NUMPAD_1] && !determineKbType[KeyEvent::KEYCODE_Q]) {
+        keyboardType = KEYBOARD_TYPE_DIGITALKEYBOARD;
+        MMI_HILOGD("The keyboard type is digital keyboard:%{public}d", keyboardType);
+    } else if (determineKbType[KeyEvent::KEYCODE_Q]) {
+        keyboardType = KEYBOARD_TYPE_ALPHABETICKEYBOARD;
+        MMI_HILOGD("The keyboard type is standard:%{public}d", keyboardType);
+    } else if (determineKbType[KeyEvent::KEYCODE_CTRL_LEFT] && determineKbType[KeyEvent::KEYCODE_SHIFT_RIGHT]
+        && determineKbType[KeyEvent::KEYCODE_F20]) {
+        keyboardType = KEYBOARD_TYPE_HANDWRITINGPEN;
+        MMI_HILOGD("The keyboard type is handwriting pen:%{public}d", keyboardType);
+    } else {
+        keyboardType = KEYBOARD_TYPE_UNKNOWN;
+        MMI_HILOGW("Undefined keyboard type");
+    }
+    MMI_HILOGD("Get keyboard type results by supporting keys:%{public}d", keyboardType);
+    return keyboardType;
+}
+
+int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId)
+{
+    CALL_LOG_ENTER;
+    int32_t keyboardType = KEYBOARD_TYPE_NONE;
+    if (auto iter = inputDevice_.find(deviceId); iter == inputDevice_.end()) {
+        MMI_HILOGE("Failed to search for the deviceID");
+        return keyboardType;
+    }
+    if (GetDeviceConfig(deviceId, keyboardType)) {
+        return keyboardType;
+    }
+    keyboardType = GetDeviceSupportKey(deviceId);
+    return keyboardType;
 }
 
 void InputDeviceManager::AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback)

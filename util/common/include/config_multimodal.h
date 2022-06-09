@@ -44,6 +44,12 @@ namespace MMI {
 
 #define MAX_PACKET_BUF_SIZE (1024*8)                // Maximum buffer size of network packets
 #define MAX_STREAM_BUF_SIZE (MAX_PACKET_BUF_SIZE*2) // Maximum buffer size of socket stream
+#define MAX_VECTOR_SIZE 1000
+#define MAX_INPUT_DEVICE 64
+#define MAX_SUPPORT_KEY 5
+#define MAX_PHYSICAL_SIZE 128
+#define MAX_LOGICAL_SIZE 128
+#define MAX_KEY_SIZE 108
 
 #define MAX_LIST_SIZE 100                   // Instantaneous maximum listening buffer size of socket
 #define MAX_SESSON_ALARM 300                // Client quantity warning value
@@ -55,7 +61,7 @@ namespace MMI {
 #define MMISEVER_WMS_DEVICE_ADDED 1         // notifyDeviceChange@Device added
 #define MMISEVER_WMS_DEVICE_REMOVE 2        // notifyDeviceChange@Device removed
 #define SEND_RETRY_LIMIT 32
-#define SEND_RETRY_SLEEP_TIME 100000
+#define SEND_RETRY_SLEEP_TIME 10000
 #define ONCE_PROCESS_NETPACKET_LIMIT 100
 #define MAX_RECV_LIMIT 32
 } // namespace MMI
