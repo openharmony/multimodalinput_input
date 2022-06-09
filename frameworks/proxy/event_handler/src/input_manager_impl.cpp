@@ -324,23 +324,23 @@ void InputManagerImpl::PrintDisplayInfo()
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
-    CHKPR(monitor, ERROR_NULL_POINTER);
+    CHKPR(monitor, INVALID_HANDLER_ID);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
-    CHKPR(consumer, ERROR_NULL_POINTER);
+    CHKPR(consumer, INVALID_HANDLER_ID);
     return InputManagerImpl::AddMonitor(consumer);
 }
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
-    CHKPR(monitor, ERROR_NULL_POINTER);
+    CHKPR(monitor, INVALID_HANDLER_ID);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
-    CHKPR(consumer, ERROR_NULL_POINTER);
+    CHKPR(consumer, INVALID_HANDLER_ID);
     return InputManagerImpl::AddMonitor(consumer);
 }
 
 int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
 {
-    CHKPR(consumer, ERROR_NULL_POINTER);
+    CHKPR(consumer, INVALID_HANDLER_ID);
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
@@ -399,14 +399,14 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
 
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
-    CHKPR(interceptor, ERROR_NULL_POINTER);
+    CHKPR(interceptor, INVALID_HANDLER_ID);
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return -1;
     }
     auto consumer = std::make_shared<MonitorEventConsumer>(interceptor);
-    CHKPR(consumer, ERROR_NULL_POINTER);
+    CHKPR(consumer, INVALID_HANDLER_ID);
     return InputInterMgr->AddInterceptor(consumer, HandleEventType::KEY);
 }
 
