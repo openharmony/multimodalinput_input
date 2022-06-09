@@ -126,13 +126,13 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read fd failed");
         return PACKET_READ_FAIL;
     }
-    MMI_HILOGD("key event dispatcher of client, KeyCode:%{public}d,"
-               "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
-               "EventType:%{public}d,Flag:%{public}u,"
-               "KeyAction:%{public}d,eventNumber:%{public}d,Fd:%{public}d,",
-               key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
-               key->GetActionStartTime(), key->GetEventType(),
-               key->GetFlag(), key->GetKeyAction(), key->GetId(), fd);
+    MMI_HILOGD("key event dispatcher of client, Fd:%{public}d", fd);
+    std::string sLine;
+    std::stringstream sStream;
+    sStream << *key;
+    while (std::getline(sStream, sLine)) {
+        MMI_HILOGD("%{public}s", sLine.c_str());
+    }
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(eventProcessedCallback_);
     InputMgrImpl->OnKeyEvent(key);
