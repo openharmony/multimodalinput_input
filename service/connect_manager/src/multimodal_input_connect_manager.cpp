@@ -120,6 +120,12 @@ int32_t MultimodalInputConnectManager::MarkEventConsumed(int32_t monitorId, int3
     return multimodalInputConnectService_->MarkEventConsumed(monitorId, eventId);
 }
 
+int32_t MultimodalInputConnectManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->MoveMouseEvent(offsetX, offsetY);
+}
+
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 {
     CALL_LOG_ENTER;

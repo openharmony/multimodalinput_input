@@ -140,8 +140,9 @@ int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offset
         MMI_HILOGE("Packet write move mouse event failed");
         return RET_ERR;
     }
-    if (!SendMsg(pkt)) {
-        MMI_HILOGE("SendMsg failed");
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->MoveMouseEvent(offsetX, offsetY);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
