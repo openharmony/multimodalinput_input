@@ -435,7 +435,7 @@ int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
     CALL_LOG_ENTER;
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(std::bind(&MMIService::CheckEventMoveMouse, this, pid, offsetX, offsetY));
+        std::bind(&MMIService::CheckEventMoveMouse, this, pid, offsetX, offsetY));
     if (ret != RET_OK) {
         MMI_HILOGE("mark event processed failed, ret:%{public}d", ret);
         return RET_ERR;
