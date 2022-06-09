@@ -186,10 +186,6 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     pkt >> displayGroupInfo.width >> displayGroupInfo.height >> displayGroupInfo.focusWindowId;
     int32_t num = 0;
     pkt >> num;
-    if (num > WindowInfo::MAX_HOTAREA_COUNT) {
-        MMI_HILOGE("Window info exceeds the max range");
-        return RET_ERR;
-    }
     for (int32_t i = 0; i < num; i++) {
         WindowInfo info;
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
@@ -197,10 +193,6 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         displayGroupInfo.windowsInfo.push_back(info);
     }
     pkt >> num;
-    if (num > WindowInfo::MAX_HOTAREA_COUNT) {
-        MMI_HILOGE("Display info exceeds the max range");
-        return RET_ERR;
-    }
     for (int32_t i = 0; i < num; i++) {
         DisplayInfo info;
         pkt >> info.id >> info.x >> info.y >> info.width >> info.height
