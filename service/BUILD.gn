@@ -19,6 +19,7 @@ config("libmmi_server_config") {
   include_dirs = [
     "device_manager/include",
     "device_scalability/include",
+    "delegate_task/include",
     "event_dispatch/include",
     "event_package/include",
     "event_handler/include",
@@ -33,6 +34,7 @@ config("libmmi_server_config") {
     "key_command/include",
     "subscriber/include",
     "timer_manager/include",
+    "permission_helper/include",
     "${mmi_service_path}/connect_manager/include",
     "${mmi_service_path}/filter/include",
     "${mmi_service_path}/module_loader/include",
@@ -40,8 +42,8 @@ config("libmmi_server_config") {
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "mouse_event_handler/include",
     "//foundation/multimodalinput/interfaces/native/innerkits/event/include",
-    "//foundation/graphic/graphic/rosen/modules/2d_graphics/include",
-    "//foundation/graphic/graphic/rosen/modules/2d_graphics/src",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/util/socket/include",
@@ -82,6 +84,10 @@ config("libmmi_server_config") {
   if (resource_schedule_service_enabled) {
     cflags += [ "-DOHOS_RSS_CLIENT" ]
   }
+
+  if (mmi_enable_pointer_drawing) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
@@ -89,13 +95,6 @@ ohos_prebuilt_etc("multimodalinput_config_ability.json") {
   part_name = "input"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput"
-}
-
-ohos_prebuilt_etc("universal_key_value_transformation") {
-  source = "//foundation/multimodalinput/input/util/KeyValueTransform/key_universal.pro"
-  part_name = "input"
-  subsystem_name = "multimodalinput"
-  relative_install_dir = "multimodalinput/KeyValueTransform"
 }
 
 ohos_prebuilt_etc("drawing_pointer_image") {
@@ -108,12 +107,15 @@ ohos_prebuilt_etc("drawing_pointer_image") {
 ohos_shared_library("libmmi-server") {
   sources = [
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
+    "delegate_task/src/delegate_tasks.cpp",
     "device_manager/src/input_device.cpp",
     "device_manager/src/input_device_manager.cpp",
     "event_dispatch/src/event_dispatch.cpp",
     "event_dump/src/event_dump.cpp",
     "event_handler/src/input_event_handler.cpp",
+    "event_handler/src/key_autorepeat.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
+    "event_handler/src/key_map_manager.cpp",
     "event_package/src/event_package.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
     "message_handle/src/server_msg_handler.cpp",
@@ -122,6 +124,7 @@ ohos_shared_library("libmmi-server") {
     "monitor/src/input_handler_manager_global.cpp",
     "mouse_event_handler/src/mouse_device_state.cpp",
     "mouse_event_handler/src/mouse_event_handler.cpp",
+    "permission_helper/src/permission_helper.cpp",
     "subscriber/src/key_event_subscriber.cpp",
     "subscriber/src/key_option.cpp",
     "timer_manager/src/timer_manager.cpp",
@@ -166,10 +169,9 @@ ohos_shared_library("libmmi-server") {
     ":drawing_pointer_image",
     ":mmi_device_config.ini",
     ":multimodalinput_config_ability.json",
-    ":universal_key_value_transformation",
-    "${aakits_path}/ability/native:abilitykit_native",
-    "//foundation/graphic/graphic/rosen/modules/2d_graphics:2d_graphics",
-    "//foundation/graphic/graphic/rosen/modules/render_service_client:librender_service_client",
+    "${aafwk_kits_path}/ability/native:abilitykit_native",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
+    "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
@@ -289,7 +291,7 @@ ohos_unittest("ut-mmi-service-out") {
   configs = [ ":libmmi_server_config" ]
 
   deps = [
-    "${aakits_path}/appkit:appkit_native",
+    "${aafwk_kits_path}/appkit:appkit_native",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",

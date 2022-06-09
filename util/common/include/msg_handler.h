@@ -17,28 +17,46 @@
 
 #include <functional>
 #include <map>
+#include <string>
 
 #include "proto.h"
 
 namespace OHOS {
 namespace MMI {
-template<typename T>
+template<typename K, typename V>
 class MsgHandler {
 public:
     void Clear()
     {
         callbacks_.clear();
     }
+    bool ChkKey(K id)
+    {
+        return (GetMsgCallback(id) != nullptr);
+    }
+
+    const std::string& GetDebugInfo() const
+    {
+        std::string str;
+        for (auto& it : callbacks_) {
+            str += std::to_string(it.first);
+            str += ',';
+        }
+        if (str.size() > 0) {
+            str.resize(str.size() - 1);
+        }
+        return std::move(str);
+    }
 
 protected:
     struct MsgCallback {
-        MmiMessageId id;
-        T fun;
+        K id;
+        V fun;
     };
 
 protected:
-    virtual ~MsgHandler() {};
-    T *GetMsgCallback(MmiMessageId id)
+    virtual ~MsgHandler() = default;
+    V *GetMsgCallback(K id)
     {
         auto it = callbacks_.find(id);
         if (it == callbacks_.end()) {
@@ -57,7 +75,7 @@ protected:
     }
 
 protected:
-    std::map<MmiMessageId, T> callbacks_;
+    std::map<K, V> callbacks_;
 };
 } // namespace MMI
 } // namespace OHOS

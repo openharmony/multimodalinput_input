@@ -33,7 +33,9 @@ public:
     bool SetPhys(const std::string& deviceName);
     bool SetUp();
     void Close();
-    void MakeFolder(const std::string &filePath);
+    static std::string ReadFile(const std::string &filePath);
+    static int32_t GetFileSize(const std::string& filePath);
+    static std::string ReadUinputToolFile(const std::string &filePath);
     static bool CreateHandle(const std::string& deviceArgv);
     static bool AddDevice(const std::string& startDeviceName);
     static bool CloseDevice(const std::string& closeDeviceName, const std::vector<std::string>& deviceList);
@@ -45,9 +47,9 @@ protected:
     virtual const std::vector<uint32_t>& GetAbs() const;
     virtual const std::vector<uint32_t>& GetRelBits() const;
     virtual const std::vector<uint32_t>& GetLeds() const;
-    virtual const std::vector<uint32_t>& GetReps() const;
-    virtual const std::vector<uint32_t>& GetMscs() const;
-    virtual const std::vector<uint32_t>& GetSws() const;
+    virtual const std::vector<uint32_t>& GetRepeats() const;
+    virtual const std::vector<uint32_t>& GetMiscellaneous() const;
+    virtual const std::vector<uint32_t>& GetSwitchs() const;
     int32_t fd_ = -1;
     std::string deviceName_;
     const uint16_t busTtype_;

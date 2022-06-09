@@ -56,7 +56,7 @@ HWTEST_F(ProcessingPadDeviceTest, Test_TransformJsonDataToInputData, TestSize.Le
     }
     pclose(startDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::string jsonBuf = ReadFile(path);
+    std::string jsonBuf = ReadJsonFile(path);
     if (jsonBuf.empty()) {
         ASSERT_TRUE(false) << "read file failed" << path;
     }

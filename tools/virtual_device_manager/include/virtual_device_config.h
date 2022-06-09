@@ -31,6 +31,7 @@
 #include <cinttypes>
 #include <cerrno>
 #include <fcntl.h>
+#include <sstream>
 #include "securec.h"
 #include "linux/input.h"
 #include "linux/uinput.h"

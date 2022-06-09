@@ -439,12 +439,12 @@ KeyEventValueTransformation TransferKeyValue(int32_t keyValueOfInput)
 {
     auto it = MAP_KEY_EVENT_VALUE_TRANSFORMATION.find(keyValueOfInput);
     if (it == MAP_KEY_EVENT_VALUE_TRANSFORMATION.end()) {
-        constexpr int32_t UNKNOWN_KEY_BASE = 10000;
+        static constexpr int32_t unknownKeyBase = 10000;
         KeyEventValueTransformation unknownKey = {
-            "UNKNOWN_KEY", keyValueOfInput, UNKNOWN_KEY_BASE + keyValueOfInput, HOS_UNKNOWN_KEY_BASE
+            "UNKNOWN_KEY", keyValueOfInput, unknownKeyBase + keyValueOfInput, HOS_UNKNOWN_KEY_BASE
         };
         MMI_HILOGE("TransferKeyValue Failed, unknown linux-code:%{public}d,"
-                   "UNKNOWN_KEY_BASE:%{public}d", keyValueOfInput, UNKNOWN_KEY_BASE);
+                   "UNKNOWN_KEY_BASE:%{public}d", keyValueOfInput, unknownKeyBase);
         return unknownKey;
     }
     return it->second;

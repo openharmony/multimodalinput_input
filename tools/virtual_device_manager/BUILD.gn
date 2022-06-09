@@ -65,6 +65,8 @@ ohos_shared_library("libmmi-virtual-device") {
     "src/virtual_pen_keyboard.cpp",
     "src/virtual_pen_mouse.cpp",
     "src/virtual_remote_control.cpp",
+    "src/virtual_single_finger.cpp",
+    "src/virtual_single_touchscreen.cpp",
     "src/virtual_stylus.cpp",
     "src/virtual_touchpad.cpp",
     "src/virtual_touchscreen.cpp",
@@ -90,7 +92,7 @@ ohos_shared_library("libmmi-virtual-device") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
-  deps = [ "//foundation/multimodalinput/input/util:libmmi-util" ]
+  deps = [ "//utils/native/base:utils" ]
 
   install_enable = true
   part_name = "input"

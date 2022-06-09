@@ -26,6 +26,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Touch
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibInput(
     struct libinput_event *event, INPUT_DEVICE_TYPE deviceType)
 {
+    CHKPP(event);
     switch (deviceType) {
         case INPUT_DEVICE_CAP_TOUCH: {
             return OnLibinputTouchEvent(event);

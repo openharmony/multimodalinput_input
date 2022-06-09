@@ -140,10 +140,6 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return MMI_SERVICE_INVALID;
-    }
     return EventManager.MoveMouseEvent(offsetX, offsetY);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -157,6 +153,10 @@ int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
     }
     NetPacket pkt(MmiMessageId::ADD_INPUT_EVENT_MONITOR);
     pkt << keyEventType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write add keyEventType failed");
+        return MMI_SERVICE_INVALID;
+    }
     client_->SendMessage(pkt);
     return RET_OK;
 }
@@ -170,6 +170,10 @@ void MultimodalEventHandler::RemoveInputEventMontior(int32_t keyEventType)
     }
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_EVENT_MONITOR);
     pkt << keyEventType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write remove keyEventType failed");
+        return;
+    }
     client_->SendMessage(pkt);
 }
 
@@ -182,6 +186,10 @@ void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEven
     }
     NetPacket pkt(MmiMessageId::REMOVE_INPUT_EVENT_TOUCHPAD_MONITOR);
     pkt << InputEvent::EVENT_TYPE_POINTER;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write remove touchpad montior failed");
+        return;
+    }
     client_->SendMessage(pkt);
 }
 
@@ -194,6 +202,10 @@ int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEven
     }
     NetPacket pkt(MmiMessageId::ADD_INPUT_EVENT_TOUCHPAD_MONITOR);
     pkt << InputEvent::EVENT_TYPE_POINTER;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write add touchpad montior failed");
+        return MMI_SERVICE_INVALID;
+    }
     MMI_HILOGE("send msg before");
     bool isSuc = client_->SendMessage(pkt);
     if (isSuc)

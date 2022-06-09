@@ -70,7 +70,7 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileNotEmpty, TestSi
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    std::string jsonBuf = ReadFile(path);
+    std::string jsonBuf = ReadJsonFile(path);
     if (jsonBuf.empty()) {
         ASSERT_TRUE(false) << "read file failed" << path;
     }
@@ -107,7 +107,7 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataGetDeviceNodeError, TestS
         ASSERT_TRUE(false) << "start device failed";
     }
     pclose(startDevice);
-    std::string jsonBuf = ReadFile(path);
+    std::string jsonBuf = ReadJsonFile(path);
     if (jsonBuf.empty()) {
         ASSERT_TRUE(false) << "read file failed" << path;
     }

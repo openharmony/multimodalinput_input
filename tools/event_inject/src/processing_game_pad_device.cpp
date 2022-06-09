@@ -115,6 +115,8 @@ void ProcessingGamePadDevice::TransformRocker1Event(const DeviceEvent& padEvent,
         } else if (direction == "lt") {
             value = item;
             SetEvAbsZ(inputEventArray, 0, value);
+        } else {
+            MMI_HILOGW("unknown direction move type");
         }
         SetSynReport(inputEventArray);
     }
@@ -130,7 +132,7 @@ void ProcessingGamePadDevice::TransformRocker1Event(const DeviceEvent& padEvent,
     } else if (direction == "lt") {
         SetEvAbsZ(inputEventArray, 0, 0);
     } else {
-        // nothint to do.
+        MMI_HILOGW("unknown direction type");
     }
     SetSynReport(inputEventArray);
 }
@@ -163,6 +165,8 @@ void ProcessingGamePadDevice::TransformRocker2Event(const DeviceEvent& padEvent,
         } else if (direction == "rt") {
             value = item;
             SetEvAbsRz(inputEventArray, 0, value);
+        } else {
+            MMI_HILOGW("unknown direction move type");
         }
         SetSynReport(inputEventArray);
     }
@@ -178,7 +182,7 @@ void ProcessingGamePadDevice::TransformRocker2Event(const DeviceEvent& padEvent,
     } else if (direction == "rt") {
         SetEvAbsRz(inputEventArray, 0, 0);
     } else {
-        // nothint to do.
+        MMI_HILOGW("unknown direction type");
     }
     SetSynReport(inputEventArray);
 }
@@ -211,6 +215,6 @@ void ProcessingGamePadDevice::TransformDerectionKeyEvent(const DeviceEvent& padE
         SetEvAbsHat0Y(inputEventArray, padEvent.blockTime, 0);
         SetSynReport(inputEventArray);
     }  else {
-        // nothint to do.
+        MMI_HILOGW("unknown direction type");
     }
 }

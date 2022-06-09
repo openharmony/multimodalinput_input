@@ -17,11 +17,13 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t ABS_MAX_VOLUME = 572;
+} // namespace
+
 VirtualKeyboardConsumerCtrl::VirtualKeyboardConsumerCtrl() : VirtualDevice("Virtual KeyboardConsumerCtrl",
     BUS_USB, 0x24ae, 0x4035)
 {
-    constexpr int32_t ABS_MAX_VOLUME = 572;
-
     dev_.absmin[ABS_VOLUME] = 0;
     dev_.absmax[ABS_VOLUME] = ABS_MAX_VOLUME;
     dev_.absfuzz[ABS_VOLUME] = 0;
@@ -73,12 +75,12 @@ const std::vector<uint32_t>& VirtualKeyboardConsumerCtrl::GetAbs() const
     return abs;
 }
 
-const std::vector<uint32_t>& VirtualKeyboardConsumerCtrl::GetMscs() const
+const std::vector<uint32_t>& VirtualKeyboardConsumerCtrl::GetMiscellaneous() const
 {
-    static const std::vector<uint32_t> mscs {
+    static const std::vector<uint32_t> miscellaneous {
         MSC_SCAN
     };
-    return mscs;
+    return miscellaneous;
 }
 } // namespace MMI
 } // namespace OHOS

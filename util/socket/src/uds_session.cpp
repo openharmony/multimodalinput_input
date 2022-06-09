@@ -106,6 +106,8 @@ void UDSSession::UpdateDescript()
 #ifdef OHOS_BUILD_MMI_DEBUG
         << ", clientFd = " << clientFd_
 #endif // OHOS_BUILD_MMI_DEBUG
+        << ", uid = " << uid_
+        << ", pid = " << pid_
         << std::endl;
     descript_ = oss.str().c_str();
 }

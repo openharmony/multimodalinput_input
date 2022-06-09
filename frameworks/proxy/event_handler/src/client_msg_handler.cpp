@@ -30,6 +30,7 @@
 #include "mmi_client.h"
 #include "mmi_func_callback.h"
 #include "multimodal_event_handler.h"
+#include "multimodal_input_connect_manager.h"
 #include "proto.h"
 #include "time_cost_chk.h"
 #include "util.h"
@@ -59,10 +60,10 @@ void ClientMsgHandler::Init()
         {MmiMessageId::ON_KEYMONITOR, MsgCallbackBind2(&ClientMsgHandler::OnKeyMonitor, this)},
         {MmiMessageId::ON_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnPointerEvent, this)},
         {MmiMessageId::ON_TOUCHPAD_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnTouchPadMonitor, this)},
-        {MmiMessageId::GET_MMI_INFO_ACK, MsgCallbackBind2(&ClientMsgHandler::GetMultimodeInputInfo, this)},
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ClientMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ClientMsgHandler::OnInputDeviceIds, this)},
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ClientMsgHandler::OnSupportKeys, this)},
+        {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind2(&ClientMsgHandler::OnInputKeyboardType, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnDevMonitor, this)},
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
@@ -210,39 +211,19 @@ int32_t ClientMsgHandler::OnTouchPadMonitor(const UDSClient& client, NetPacket& 
     return InputMonitorMgr.OnTouchpadMonitorInputEvent(pointer);
 }
 
-int32_t ClientMsgHandler::GetMultimodeInputInfo(const UDSClient& client, NetPacket& pkt)
-{
-    TagPackHead tagPackHeadAck;
-    pkt >> tagPackHeadAck;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read tagPackHeadAck failed");
-        return PACKET_READ_FAIL;
-    }
-    std::cout << "GetMultimodeInputInfo: The client fd is " << tagPackHeadAck.sizeEvent[0] << std::endl;
-    return RET_OK;
-}
-
 int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
     int32_t userData;
-    int32_t size;
     std::vector<int32_t> inputDeviceIds;
-    if (!pkt.Read(userData)) {
-        MMI_HILOGE("Packet read userData failed");
+    pkt >> userData >> inputDeviceIds;
+    if (inputDeviceIds.size() > MAX_INPUT_DEVICE) {
+        MMI_HILOGE("Device exceeds the max range");
         return RET_ERR;
     }
-    if (!pkt.Read(size)) {
-        MMI_HILOGE("Packet read size failed");
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read device Data failed");
         return RET_ERR;
-    }
-    for (int32_t i = 0; i < size; i++) {
-        int32_t deviceId = 0;
-        if (!pkt.Read(deviceId)) {
-            MMI_HILOGE("Packet read deviceId failed");
-            return RET_ERR;
-        }
-        inputDeviceIds.push_back(deviceId);
     }
     InputDevImpl.OnInputDeviceIds(userData, inputDeviceIds);
     return RET_OK;
@@ -280,25 +261,37 @@ int32_t ClientMsgHandler::OnSupportKeys(const UDSClient& client, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
     int32_t userData;
-    if (!pkt.Read(userData)) {
-        MMI_HILOGE("Packet read userData failed");
-        return RET_ERR;
-    }
     size_t size;
-    if (!pkt.Read(size)) {
-        MMI_HILOGE("Packet read size failed");
+    pkt >> userData >> size;
+    if (size > MAX_SUPPORT_KEY) {
+        MMI_HILOGE("Keys exceeds the max range");
         return RET_ERR;
     }
     std::vector<bool> abilityRet;
     bool ret;
     for (size_t i = 0; i < size; ++i) {
-        if (!pkt.Read(ret)) {
-            MMI_HILOGE("Packet read ret failed");
-            return RET_ERR;
-        }
+        pkt >> ret;
         abilityRet.push_back(ret);
     }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read key Data failed");
+        return RET_ERR;
+    }
     InputDevImpl.OnSupportKeys(userData, abilityRet);
+    return RET_OK;
+}
+
+int32_t ClientMsgHandler::OnInputKeyboardType(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_LOG_ENTER;
+    int32_t userData;
+    int32_t KeyboardType;
+    pkt >> userData >> KeyboardType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read failed");
+        return PACKET_WRITE_FAIL;
+    }
+    InputDevImpl.OnKeyboardType(userData, KeyboardType);
     return RET_OK;
 }
 
@@ -306,13 +299,10 @@ int32_t ClientMsgHandler::OnDevMonitor(const UDSClient& client, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
     std::string type;
-    if (!pkt.Read(type)) {
-        MMI_HILOGE("Packet read type failed");
-        return RET_ERR;
-    }
     int32_t deviceId;
-    if (!pkt.Read(deviceId)) {
-        MMI_HILOGE("Packet read deviceId failed");
+    pkt >> type >> deviceId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
     InputDeviceImpl::GetInstance().OnDevMonitor(type, deviceId);
@@ -323,7 +313,8 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
 {
     CALL_LOG_ENTER;
     int32_t handlerId;
-    if (!pkt.Read(handlerId)) {
+    pkt >> handlerId;
+    if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read handler failed");
         return RET_ERR;
     }
@@ -342,12 +333,9 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     CALL_LOG_ENTER;
     int32_t handlerId;
     InputHandlerType handlerType;
-    if (!pkt.Read(handlerId)) {
-        MMI_HILOGE("Packet read handler failed");
-        return RET_ERR;
-    }
-    if (!pkt.Read(handlerType)) {
-        MMI_HILOGE("Packet read handlerType failed");
+    pkt >> handlerId >> handlerType;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read Pointer data failed");
         return RET_ERR;
     }
     MMI_HILOGD("Client handlerId:%{public}d,handlerType:%{public}d", handlerId, handlerType);
@@ -364,12 +352,9 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    NetPacket pkt(MmiMessageId::MARK_PROCESS);
-    pkt << eventId;
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+    int32_t ret = MultimodalInputConnectManager::GetInstance()->MarkEventProcessed(eventId);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
         return;
     }
 }
