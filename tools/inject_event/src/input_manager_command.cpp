@@ -240,6 +240,29 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                                        scrollValue);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            time = pointerEvent->GetActionStartTime();
+
+                            time = pointerEvent->GetActionStartTime();
+                            pointerEvent->SetActionTime(time + ACTION_TIME);
+                            pointerEvent->SetPointerId(0);
+                            pointerEvent->AddPointerItem(item);
+                            pointerEvent->SetButtonPressed(buttonId);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+                            pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
+                                                       scrollValue);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+                            time = pointerEvent->GetActionStartTime();
+                            pointerEvent->SetActionTime(time + ACTION_TIME);
+                            pointerEvent->SetPointerId(0);
+                            pointerEvent->AddPointerItem(item);
+                            pointerEvent->SetButtonPressed(buttonId);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+                            pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
+                                                       scrollValue);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             break;
                         }
                         case 'c': {
