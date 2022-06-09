@@ -45,8 +45,7 @@ public:
 
     int32_t GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent) const;
     int32_t UpdateTarget(std::shared_ptr<InputEvent> inputEvent);
-    void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
-        const std::vector<LogicalDisplayInfo> &logicalDisplays);
+    void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     const std::vector<LogicalDisplayInfo>& GetLogicalDisplayInfo() const;
     MouseLocation GetMouseInfo();
     void UpdateAndAdjustMouseLoction(double& x, double& y);
@@ -82,8 +81,7 @@ private:
 private:
     UDSServer* udsServer_ = nullptr;
     int32_t firstBtnDownWindowId_ = -1;
-    std::vector<PhysicalDisplayInfo> physicalDisplays_ = {};
-    std::vector<LogicalDisplayInfo> logicalDisplays_ = {};
+    DisplayGroupInfo displayGroupInfo_;
     std::map<int32_t, WindowInfo> windowInfos_ = {};
     MouseLocation mouseLoction_ = {-1, -1};
 };
