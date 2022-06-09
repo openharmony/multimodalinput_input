@@ -256,6 +256,7 @@ int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t monitorId, int
 int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, int32_t offsetX, int32_t offsetY)
 {
     CALL_LOG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
     if (MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
         auto pointerEvent = MouseEventHdr->GetPointerEvent();
         eventDispatch_.HandlePointerEvent(pointerEvent);
