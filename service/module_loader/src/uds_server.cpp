@@ -195,7 +195,7 @@ bool UDSServer::Dump(int32_t fd, const std::vector<std::u16string> &args)
     for (const auto &item : sessionsMap_) { 
         std::shared_ptr<UDSSession> udsSession = item.second;
         mprintf(fd,
-                "Uid:%d | Pid:%d | Fd:%d | HasPermission:%s | Descript:%s \n",
+                "Uid:%d | Pid:%d | Fd:%d | HasPermission:%s | Descript:%s\t",
                 udsSession->GetUid(), udsSession->GetPid(), udsSession->GetFd(),
                 udsSession->HasPermission() ? "true" : "false", udsSession->GetDescript().c_str());
     }

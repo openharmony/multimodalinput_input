@@ -337,13 +337,13 @@ bool MouseEventHandler::Dump(int32_t fd, const std::vector<std::u16string> &args
     PointerEvent::PointerItem item;
     if ((args.empty()) || (args[0].compare(u"-m") != 0)) {
         MMI_HILOGE("args cannot be empty or invalid");
-        return false; 
+        return false;
     }
     mprintf(fd, "---------------------[Mouse Device State information]--------------------");
     mprintf(fd,
                "PointerId:%d | SourceType:%d | PointerAction:%d | ButtonId:%d "
-               "| VerticalAxisValue:%lf | HorizontalAxisValue:%lf | DownTime:%d "
-               "| IsPressed:%s | GlobalX:%d | GlobalY:%d | Width:%d | Height:%d | Pressure:%lf \n",
+               "| VerticalAxisValue:%lf | HorizontalAxisValue:%lf | DownTime:%" PRId64 " "
+               "| IsPressed:%s | GlobalX:%d | GlobalY:%d | Width:%d | Height:%d | Pressure:%lf \t",
                pointerEvent_->GetPointerId(), pointerEvent_->GetSourceType(), pointerEvent_->GetPointerAction(),
                pointerEvent_->GetButtonId(), pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
                pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL), item.GetDownTime(), 

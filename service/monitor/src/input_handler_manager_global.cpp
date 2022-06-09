@@ -301,11 +301,11 @@ bool InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::v
     mprintf(fd, "--------------------------[monitor information]-------------------------");
     mprintf(fd, "monitors: count=%d", monitors_.size());
     for (const auto &monitor : monitors_) {
-          mprintf(fd,
-               "monitor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d | EarlistEventTime:%d \n",
-                monitor.id_, monitor.handlerType_, monitor.session_->GetPid(),
-                monitor.session_->GetUid(), monitor.session_->GetFd(),
-                monitor.session_->GetEarlistEventTime());
+    mprintf(fd,
+            "monitor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d | EarlistEventTime:%" PRId64 "\t",
+            monitor.id_, monitor.handlerType_, monitor.session_->GetPid(),
+            monitor.session_->GetUid(), monitor.session_->GetFd(),
+            monitor.session_->GetEarlistEventTime());
     }
     return true;
 }

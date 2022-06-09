@@ -695,7 +695,7 @@ bool InputWindowsManager::Dump(int32_t fd, const std::vector<std::u16string> &ar
     for (const auto &physicalDisplay : physicalDisplays_) {
          mprintf(fd,
                 "id:%d | leftDisplayId:%d | upDisplayId:%d | topLeftX:%d | topLeftY:%d | width:%d | height:%d "
-                "| name:%s | seatId:%s | seatName:%s | logicWidth:%d | logicHeight:%d | direction:%d \n",
+                "| name:%s | seatId:%s | seatName:%s | logicWidth:%d | logicHeight:%d | direction:%d \t",
                 physicalDisplay.id, physicalDisplay.leftDisplayId, physicalDisplay.upDisplayId, physicalDisplay.topLeftX, 
                 physicalDisplay.topLeftY, physicalDisplay.width, physicalDisplay.height, physicalDisplay.name.c_str(), 
                 physicalDisplay.seatId.c_str(), physicalDisplay.seatName.c_str(),physicalDisplay.logicWidth,
@@ -706,7 +706,7 @@ bool InputWindowsManager::Dump(int32_t fd, const std::vector<std::u16string> &ar
     for (const auto &logicalDisplays : logicalDisplays_) {
          mprintf(fd,
                 "id:%d | topLeftX:%d | topLeftY:%d | width:%d | height:%d "
-                "| name:%s | seatId:%s | seatName:%s | focusWindowId:%d | window num:%d \n",
+                "| name:%s | seatId:%s | seatName:%s | focusWindowId:%d | window num:%d \t",
                 logicalDisplays.id, logicalDisplays.topLeftX, logicalDisplays.topLeftY, logicalDisplays.width,
                 logicalDisplays.height, logicalDisplays.name.c_str(), logicalDisplays.seatId.c_str(),
                 logicalDisplays.seatName.c_str(),logicalDisplays.focusWindowId, logicalDisplays.windowsInfo.size());
@@ -716,7 +716,7 @@ bool InputWindowsManager::Dump(int32_t fd, const std::vector<std::u16string> &ar
     for (const auto &windowInfo : windowInfos_) {
          mprintf(fd,
                 "id:%d | pid:%d | uid:%d | hotZoneTopLeftX:%d | hotZoneTopLeftY:%d | hotZoneWidth:%d | hotZoneHeight:%d "
-                "| displayId:%d | agentWindowId:%d | winTopLeftX:%d | winTopLeftY:%d | flags:%d \n",
+                "| displayId:%d | agentWindowId:%d | winTopLeftX:%d | winTopLeftY:%d | flags:%d \t",
                 windowInfo.second.id, windowInfo.second.pid, windowInfo.second.uid, windowInfo.second.hotZoneTopLeftX, 
                 windowInfo.second.hotZoneTopLeftY, windowInfo.second.hotZoneWidth, windowInfo.second.hotZoneHeight,
                 windowInfo.second.displayId, windowInfo.second.agentWindowId, windowInfo.second.winTopLeftX, 

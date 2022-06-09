@@ -563,13 +563,14 @@ int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
     }
     bool helpRet = MMIEventDump->DumpEventHelp(fd, args);
     bool deviceRet = InputDevMgr->Dump(fd, args);
+    bool devicelistRet = InputDevMgr->DumpDeviceList(fd, args);
     bool windowsRet = WinMgr->Dump(fd, args);
     bool udsserverRet = UDSServer::Dump(fd, args);
     bool monitorsRet = InputHandlerManagerGlobal::GetInstance().Dump(fd, args);
     bool interceptorsRet = InterceptorHandlerGlobal::GetInstance()->Dump(fd, args);
     bool subscriberRet  = KeyEventSubscriber_.Dump(fd, args);
     bool mouseStateRet = MouseEventHdr->Dump(fd, args);
-    bool total = helpRet + deviceRet + windowsRet + udsserverRet + subscriberRet + monitorsRet + interceptorsRet + mouseStateRet;
+    bool total = helpRet + deviceRet + devicelistRet + windowsRet + udsserverRet + subscriberRet + monitorsRet + interceptorsRet + mouseStateRet;
     if (!total) {
         mprintf(fd, "cmd param is error\n");
         MMIEventDump->DumpHelp(fd);
