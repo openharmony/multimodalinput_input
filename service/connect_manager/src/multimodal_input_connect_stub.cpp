@@ -276,7 +276,6 @@ int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel& data, Mess
         MMI_HILOGE("Read offsetX failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
-
     int32_t offsetY;
     if (!data.ReadInt32(offsetY)) {
         MMI_HILOGE("Read offsetY failed");
