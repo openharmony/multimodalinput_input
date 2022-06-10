@@ -121,6 +121,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"down", required_argument, NULL, 'd'},
         {"up", required_argument, NULL, 'u'},
         {"interval", required_argument, NULL, 'i'},
+        {"drag", required_argument, NULL, 'g'},
         {NULL, 0, NULL, 0}
     };
     int32_t c;
@@ -438,7 +439,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t py2 = 0;
                 int32_t totalTimeMs = 0;
                 int32_t moveArgcSeven = 7;
-                while ((c = getopt_long(argc, argv, "m:d:u:i:", touchSensorOptions, &optionIndex)) != -1) {
+                while ((c = getopt_long(argc, argv, "m:d:u:i:g:", touchSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
                             if (argc < moveArgcSeven) {
@@ -589,6 +590,88 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             std::this_thread::sleep_for(std::chrono::milliseconds(taktTime));
                             break;
                         }
+                        case 'g': {
+                            if ((argc != moveArgcSeven) && (argc != 9)) {
+                                std::cout << "argc:" << argc << std::endl;
+                                std::cout << "wrong number of parameters" << std::endl;
+                                ShowUsage();
+                                return RET_ERR;
+                            }
+                            totalTimeMs = 1000;
+                            int32_t pressTimems = 500;
+                            if (argc == moveArgcSeven) {
+                                if ((!StrToInt(optarg, px1)) ||
+                                    (!StrToInt(argv[optind], py1)) ||
+                                    (!StrToInt(argv[optind + 1], px2)) ||
+                                    (!StrToInt(argv[optind + 2], py2))) {
+                                        std::cout << "invalid command to input value" << std::endl;
+                                        ShowUsage();
+                                        return RET_ERR;
+                                }
+                            } else {
+                                if ((!StrToInt(optarg, px1)) ||
+                                    (!StrToInt(argv[optind], py1)) ||
+                                    (!StrToInt(argv[optind + 1], px2)) ||
+                                    (!StrToInt(argv[optind + 2], py2)) ||
+                                    (!StrToInt(argv[optind + 3], pressTimems)) ||
+                                    (!StrToInt(argv[optind + 4], totalTimeMs))) {
+                                        std::cout << "invalid command to input value" << std::endl;
+                                        ShowUsage();
+                                        return RET_ERR;
+                                }
+                            }
+                            const int64_t minTotalTimeMs = 1000;
+                            const int64_t maxTotalTimeMs = 15000;
+                            if ((minTotalTimeMs > totalTimeMs) || (maxTotalTimeMs < totalTimeMs)) {
+                                std::cout << "totalTime is out of range. ";
+                                std::cout << minTotalTimeMs << " < totalTimeMs < " << maxTotalTimeMs;
+                                std::cout << std::endl;
+                                return RET_ERR;
+                            }
+                            auto pointerEvent = PointerEvent::Create();
+                            CHKPR(pointerEvent, ERROR_NULL_POINTER);
+                            PointerEvent::PointerItem item;
+                            item.SetGlobalX(px1);
+                            item.SetGlobalY(py1);
+                            pointerEvent->AddPointerItem(item);
+                            pointerEvent->SetPointerId(0);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            int64_t startTimeMs = GetSysClockTime() / 1000;
+                            int64_t endTimeMs = 0;
+                            if (!AddInt64(startTimeMs, totalTimeMs, endTimeMs)) {
+                                std::cout << "system time error." << std::endl;
+                                return RET_ERR;
+                            }
+                            int64_t downTimeMs = 0;
+                            if (!AddInt64(startTimeMs, pressTimems, downTimeMs)) {
+                                std::cout << "system time error." << std::endl;
+                                return RET_ERR;
+                            }
+                            int64_t currentTimeMs = startTimeMs;
+                            int64_t moveTimeMs = totalTimeMs - pressTimems;
+                            while ((currentTimeMs < endTimeMs)) {
+                                if (currentTimeMs > downTimeMs) {
+                                    item.SetGlobalX(NextPos(downTimeMs, currentTimeMs, moveTimeMs, px1, px2));
+                                    item.SetGlobalY(NextPos(downTimeMs, currentTimeMs, moveTimeMs, py1, py2));
+                                    pointerEvent->UpdatePointerItem(0, item);
+                                    pointerEvent->SetActionTime(currentTimeMs);
+                                    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                                    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                                }
+                                std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
+                                currentTimeMs = GetSysClockTime() / 1000;
+                            }
+                            item.SetGlobalX(px2);
+                            item.SetGlobalY(py2);
+                            pointerEvent->UpdatePointerItem(0, item);
+                            pointerEvent->SetActionTime(endTimeMs);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            optind =  optind + THREE_MORE_COMMAND;
+                            break;
+                        }
                         default: {
                             std::cout << "invalid command" << std::endl;
                             ShowUsage();
@@ -649,6 +732,9 @@ void InputManagerCommand::ShowUsage()
     std::cout << "                                              dx1 dy1 to dx2 dy2 smooth movement"   << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
+    std::cout << "-g <dx1> <dy1> <dx2> <dy2> [Press time] [all time]     -drag, "  << std::endl;
+    std::cout << "[Press time] not less than 500ms and [all time] - [Press time] not less than 500ms "  << std::endl;
+    std::cout << "Otherwise the operation result may produce error or invalid operation"  << std::endl;
     std::cout << "                                                              " << std::endl;
     std::cout << "-?  --help                                                    " << std::endl;
 }
