@@ -31,7 +31,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventInputSubscribeManager" };
 constexpr int32_t INVALID_SUBSCRIBE_ID = -1;
-constexpr size_t PRE_KEYS_SIZE = 4;
+constexpr size_t PRE_KEYS_NUM = 4;
 } // namespace
 int32_t KeyEventInputSubscribeManager::subscribeIdManager_ = 0;
 
@@ -57,7 +57,8 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
     CHKPR(keyOption, INVALID_SUBSCRIBE_ID);
     CHKPR(callback, INVALID_SUBSCRIBE_ID);
     std::set<int32_t> preKeys = keyOption->GetPreKeys();
-    if (preKeys.size() > PRE_KEYS_SIZE) {
+    if (preKeys.size() > PRE_KEYS_NUM) {
+        MMI_HILOGE("PreKeys number invalid");
         return INVALID_SUBSCRIBE_ID;
     }
     
@@ -67,7 +68,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         return INVALID_SUBSCRIBE_ID;
     }
     for (auto preKey : preKeys) {
-        MMI_HILOGD("keyOption->prekey:%{public}d", preKey);
+        MMI_HILOGD("prekey:%{public}d", preKey);
     }
     auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
     CHKPR(eventHandler, INVALID_SUBSCRIBE_ID);
