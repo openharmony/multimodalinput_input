@@ -604,7 +604,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     (!StrToInt(argv[optind], py1)) ||
                                     (!StrToInt(argv[optind + 1], px2)) ||
                                     (!StrToInt(argv[optind + 2], py2))) {
-                                        std::cout << "invalid command to input value" << std::endl;
+                                        std::cout << "Invalid input command" << std::endl;
                                         ShowUsage();
                                         return RET_ERR;
                                 }
@@ -615,17 +615,15 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     (!StrToInt(argv[optind + 2], py2)) ||
                                     (!StrToInt(argv[optind + 3], pressTimems)) ||
                                     (!StrToInt(argv[optind + 4], totalTimeMs))) {
-                                        std::cout << "invalid command to input value" << std::endl;
+                                        std::cout << "Invalid input command" << std::endl;
                                         ShowUsage();
                                         return RET_ERR;
                                 }
                             }
-                            const int64_t minTotalTimeMs = 1000;
-                            const int64_t maxTotalTimeMs = 15000;
+                            const int32_t minTotalTimeMs = 1000;
+                            const int32_t maxTotalTimeMs = 15000;
                             if ((minTotalTimeMs > totalTimeMs) || (maxTotalTimeMs < totalTimeMs)) {
-                                std::cout << "totalTime is out of range. ";
-                                std::cout << minTotalTimeMs << " < totalTimeMs < " << maxTotalTimeMs;
-                                std::cout << std::endl;
+                                std::cout << "total time is out of range." std::endl;
                                 return RET_ERR;
                             }
                             auto pointerEvent = PointerEvent::Create();
@@ -650,7 +648,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return RET_ERR;
                             }
                             int64_t currentTimeMs = startTimeMs;
-                            int64_t moveTimeMs = totalTimeMs - pressTimems;
+                            const int32_t moveTimeMs = totalTimeMs - pressTimems;
                             while ((currentTimeMs < endTimeMs)) {
                                 if (currentTimeMs > downTimeMs) {
                                     item.SetGlobalX(NextPos(downTimeMs, currentTimeMs, moveTimeMs, px1, px2));
@@ -669,7 +667,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetActionTime(endTimeMs);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            optind =  optind + THREE_MORE_COMMAND;
                             break;
                         }
                         default: {
@@ -703,7 +700,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
 void InputManagerCommand::ShowUsage()
 {
-    std::cout << "Usage: input <option> <command> <arg>..." << std::endl;
+    std::cout << "Usage: uinput <option> <command> <arg>..." << std::endl;
     std::cout << "The option are:                                " << std::endl;
     std::cout << "-M  --mouse                                    " << std::endl;
     std::cout << "commands for mouse:                            " << std::endl;
@@ -732,9 +729,9 @@ void InputManagerCommand::ShowUsage()
     std::cout << "                                              dx1 dy1 to dx2 dy2 smooth movement"   << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
-    std::cout << "-g <dx1> <dy1> <dx2> <dy2> [Press time] [all time]     -drag, "  << std::endl;
-    std::cout << "[Press time] not less than 500ms and [all time] - [Press time] not less than 500ms "  << std::endl;
-    std::cout << "Otherwise the operation result may produce error or invalid operation"  << std::endl;
+    std::cout << "-g <dx1> <dy1> <dx2> <dy2> [Press time] [total time]     -drag, "                       << std::endl;
+    std::cout << "  [Press time] not less than 500ms and [total time] - [Press time] not less than 500ms" << std::endl;
+    std::cout << "  Otherwise the operation result may produce error or invalid operation"              << std::endl;
     std::cout << "                                                              " << std::endl;
     std::cout << "-?  --help                                                    " << std::endl;
 }
