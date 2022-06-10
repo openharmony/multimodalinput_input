@@ -39,7 +39,7 @@ TouchTransformPointProcessor::TouchTransformPointProcessor(int32_t deviceId) : d
 {
     pointerEvent_ = PointerEvent::Create();
     CHKPL(pointerEvent_);
-    InitToolType();
+    InitToolTypes();
 }
 
 TouchTransformPointProcessor::~TouchTransformPointProcessor() {}
@@ -225,7 +225,7 @@ int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_device *d
     return PointerEvent::TOOL_TYPE_FINGER;
 }
 
-void TouchTransformPointProcessor::InitToolType()
+void TouchTransformPointProcessor::InitToolTypes()
 {
     vecToolType_.emplace_back(std::make_pair(BTN_TOOL_PEN, PointerEvent::TOOL_TYPE_PEN));
     vecToolType_.emplace_back(std::make_pair(BTN_TOOL_RUBBER, PointerEvent::TOOL_TYPE_RUBBER));
