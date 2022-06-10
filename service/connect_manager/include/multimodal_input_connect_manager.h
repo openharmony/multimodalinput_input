@@ -41,6 +41,7 @@ public:
         HandleEventType eventType);
     int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType);
     int32_t MarkEventConsumed(int32_t monitorId, int32_t eventId);
+    int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
 private:
     MultimodalInputConnectManager() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);

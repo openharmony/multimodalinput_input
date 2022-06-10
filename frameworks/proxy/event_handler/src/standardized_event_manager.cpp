@@ -25,6 +25,7 @@
 
 #include "input_event_data_transformation.h"
 #include "multimodal_event_handler.h"
+#include "multimodal_input_connect_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -134,14 +135,9 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
 int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
     CALL_LOG_ENTER;
-    NetPacket pkt(MmiMessageId::MOVE_MOUSE_BY_OFFSET);
-    pkt << offsetX << offsetY;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write move mouse event failed");
-        return RET_ERR;
-    }
-    if (!SendMsg(pkt)) {
-        MMI_HILOGE("SendMsg failed");
+    int32_t ret = MultimodalInputConnMgr->MoveMouseEvent(offsetX, offsetY);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;

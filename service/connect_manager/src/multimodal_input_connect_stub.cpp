@@ -54,7 +54,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::MARK_EVENT_PROCESSED, &MultimodalInputConnectStub::StubMarkEventProcessed},
         {IMultimodalInputConnect::ADD_INPUT_HANDLER, &MultimodalInputConnectStub::StubAddInputHandler},
         {IMultimodalInputConnect::REMOVE_INPUT_HANDLER, &MultimodalInputConnectStub::StubRemoveInputHandler},
-        {IMultimodalInputConnect::MARK_EVENT_CONSUMED, &MultimodalInputConnectStub::StubMarkEventConsumed}
+        {IMultimodalInputConnect::MARK_EVENT_CONSUMED, &MultimodalInputConnectStub::StubMarkEventConsumed},
+        {IMultimodalInputConnect::MOVE_MOUSE, &MultimodalInputConnectStub::StubMoveMouseEvent}
+
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -257,6 +259,32 @@ int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, M
     int32_t ret = MarkEventConsumed(monitorId, eventId);
     if (ret != RET_OK) {
         MMI_HILOGE("call MarkEventConsumed failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t offsetX;
+    if (!data.ReadInt32(offsetX)) {
+        MMI_HILOGE("Read offsetX failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t offsetY;
+    if (!data.ReadInt32(offsetY)) {
+        MMI_HILOGE("Read offsetY failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+
+    int32_t ret = MoveMouseEvent(offsetX, offsetY);
+    if (ret != RET_OK) {
+        MMI_HILOGE("MoveMouseEvent failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

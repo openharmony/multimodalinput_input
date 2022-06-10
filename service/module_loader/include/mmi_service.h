@@ -59,6 +59,8 @@ public:
         HandleEventType eventType) override;
     virtual int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType) override;
     virtual int32_t MarkEventConsumed(int32_t monitorId, int32_t eventId) override;
+    virtual int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
+
 #ifdef OHOS_RSS_CLIENT
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 #endif
@@ -74,7 +76,6 @@ protected:
         HandleEventType eventType);
     int32_t CheckRemoveInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType);
     int32_t CheckMarkConsumed(int32_t pid, int32_t monitorId, int32_t eventId);
-
     bool InitLibinputService();
     bool InitService();
     bool InitSignalHandler();

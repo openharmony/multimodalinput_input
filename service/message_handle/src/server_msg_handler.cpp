@@ -70,9 +70,6 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
             MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventTouchpadMontior, this)},
         {MmiMessageId::REMOVE_INPUT_EVENT_TOUCHPAD_MONITOR,
             MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventTouchpadMontior, this)},
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-        {MmiMessageId::MOVE_MOUSE_BY_OFFSET, MsgCallbackBind2(&ServerMsgHandler::OnMoveMouse, this)},
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
         {MmiMessageId::SUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnSubscribeKeyEvent, this)},
         {MmiMessageId::UNSUBSCRIBE_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnUnSubscribeKeyEvent, this)},
 #ifdef OHOS_BUILD_MMI_DEBUG
@@ -256,16 +253,9 @@ int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t monitorId, int
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-int32_t ServerMsgHandler::OnMoveMouse(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
 {
     CALL_LOG_ENTER;
-    int32_t offsetX = 0;
-    int32_t offsetY = 0;
-    pkt >> offsetX >> offsetY;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read offset X Y data failed");
-        return RET_ERR;
-    }
     if (MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
         auto pointerEvent = MouseEventHdr->GetPointerEvent();
         eventDispatch_.HandlePointerEvent(pointerEvent);
