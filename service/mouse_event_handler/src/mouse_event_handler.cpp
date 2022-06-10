@@ -312,12 +312,7 @@ bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
 
 void MouseEventHandler::DumpInner()
 {
-    std::stringstream sStream;
-    std::string sLine;
-    sStream << *pointerEvent_;
-    while (std::getline(sStream, sLine)) {
-        MMI_HILOGD("%{public}s", sLine.c_str());
-    }
+    PrintfEventData(pointerEvent_);
 }
 } // namespace MMI
 } // namespace OHOS

@@ -354,12 +354,7 @@ int32_t InputEventHandler::OnGestureEvent(libinput_event *event)
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_GESTURE);
     CHKPR(pointerEvent, GESTURE_EVENT_PKG_FAIL);
     MMI_HILOGD("GestrueEvent package:");
-    std::stringstream sStream;
-    std::string sLine;
-    sStream << *pointerEvent;
-    while (std::getline(sStream, sLine)) {
-        MMI_HILOGD("%{public}s", sLine.c_str());
-    }
+    PrintfEventData(pointerEvent);
     int32_t ret = eventDispatch_.HandlePointerEvent(pointerEvent);
     if (ret != RET_OK) {
         MMI_HILOGE("Gesture event dispatch failed, errCode:%{public}d", GESTURE_EVENT_DISP_FAIL);
@@ -406,12 +401,7 @@ int32_t InputEventHandler::OnMouseEventEndTimerHandler(std::shared_ptr<PointerEv
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     MMI_HILOGD("MouseEvent Normalization Results:");
-    std::stringstream sStream;
-    std::string sLine;
-    sStream << *pointerEvent;
-    while (std::getline(sStream, sLine)) {
-        MMI_HILOGI("%{public}s", sLine.c_str());
-    }
+    PrintfEventData(pointerEvent);
     eventDispatch_.HandlePointerEvent(pointerEvent);
     return RET_OK;
 }

@@ -127,12 +127,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         return PACKET_READ_FAIL;
     }
     MMI_HILOGD("key event dispatcher of client, Fd:%{public}d", fd);
-    std::string sLine;
-    std::stringstream sStream;
-    sStream << *key;
-    while (std::getline(sStream, sLine)) {
-        MMI_HILOGD("%{public}s", sLine.c_str());
-    }
+    PrintfEventData(key);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(eventProcessedCallback_);
     InputMgrImpl->OnKeyEvent(key);
@@ -150,12 +145,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         return RET_ERR;
     }
     MMI_HILOGD("Pointer event dispatcher of client:");
-    std::stringstream sStream;
-    sStream << *pointerEvent;
-    std::string sLine;
-    while (std::getline(sStream, sLine)) {
-        MMI_HILOGD("%{public}s", sLine.c_str());
-    }
+    PrintfEventData(pointerEvent);
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOGD("Operation canceled.");
     }
