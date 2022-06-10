@@ -143,10 +143,10 @@ static void PrintEventData(std::shared_ptr<Event> event, int32_t actionType, int
 }
 
 template<class Event>
-static void PrintfEventData(std::shared_ptr<Event> event)
+static void PrintEventData(std::shared_ptr<Event> event)
 {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MMILOG"};
-    
+
     std::stringstream sStream;
     sStream << *event;
     std::string sLine;
