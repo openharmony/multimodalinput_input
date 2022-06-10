@@ -63,10 +63,7 @@ bool WindowUtilsTest::DrawTestWindow()
     }
 
     CHKPF(testWindow_);
-    if (testWindow_->Show() != Rosen::WMError::WM_OK) {
-        return false;
-    }
-    return true;
+    return testWindow_->Show() == Rosen::WMError::WM_OK;
 }
 
 sptr<Rosen::Window>& WindowUtilsTest::GetWindow()
