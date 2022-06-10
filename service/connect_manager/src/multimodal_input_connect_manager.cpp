@@ -85,39 +85,45 @@ int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> fi
 
 int32_t MultimodalInputConnectManager::SetPointerVisible(bool visible)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetPointerVisible(visible);
 }
 
 int32_t MultimodalInputConnectManager::IsPointerVisible(bool &visible)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->IsPointerVisible(visible);
 }
 
 int32_t MultimodalInputConnectManager::MarkEventProcessed(int32_t eventId)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->MarkEventProcessed(eventId);
 }
 
 int32_t MultimodalInputConnectManager::AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
     HandleEventType eventType)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->AddInputHandler(handlerId, handlerType, eventType);
 }
 
 int32_t MultimodalInputConnectManager::RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->RemoveInputHandler(handlerId, handlerType);
 }
 
 int32_t MultimodalInputConnectManager::MarkEventConsumed(int32_t monitorId, int32_t eventId)
 {
-    CHKPR(multimodalInputConnectService_, RET_ERR);
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->MarkEventConsumed(monitorId, eventId);
+}
+
+int32_t MultimodalInputConnectManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->MoveMouseEvent(offsetX, offsetY);
 }
 
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()

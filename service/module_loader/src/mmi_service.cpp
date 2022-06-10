@@ -423,6 +423,17 @@ int32_t MMIService::MarkEventConsumed(int32_t monitorId, int32_t eventId)
     return RET_OK;
 }
 
+int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::OnMoveMouse, &sMsgHandler_, offsetX, offsetY));
+    if (ret != RET_OK) {
+        MMI_HILOGE("movemouse event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 #ifdef OHOS_RSS_CLIENT
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {

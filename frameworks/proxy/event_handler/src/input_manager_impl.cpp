@@ -324,27 +324,27 @@ void InputManagerImpl::PrintDisplayInfo()
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
-    CHKPR(monitor, ERROR_NULL_POINTER);
+    CHKPR(monitor, INVALID_HANDLER_ID);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
-    CHKPR(consumer, ERROR_NULL_POINTER);
+    CHKPR(consumer, INVALID_HANDLER_ID);
     return InputManagerImpl::AddMonitor(consumer);
 }
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
 {
-    CHKPR(monitor, ERROR_NULL_POINTER);
+    CHKPR(monitor, INVALID_HANDLER_ID);
     auto consumer = std::make_shared<MonitorEventConsumer>(monitor);
-    CHKPR(consumer, ERROR_NULL_POINTER);
+    CHKPR(consumer, INVALID_HANDLER_ID);
     return InputManagerImpl::AddMonitor(consumer);
 }
 
 int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
 {
-    CHKPR(consumer, ERROR_NULL_POINTER);
+    CHKPR(consumer, INVALID_HANDLER_ID);
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
-        return -1;
+        return RET_ERR;
     }
     int32_t monitorId = monitorManager_.AddMonitor(consumer);
     return monitorId;
@@ -374,10 +374,6 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 {
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("client init failed");
-        return;
-    }
     if (MMIEventHdl.MoveMouseEvent(offsetX, offsetY) != RET_OK) {
         MMI_HILOGE("Failed to inject move mouse offset event");
     }
@@ -389,24 +385,24 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
     CHKPR(interceptor, INVALID_HANDLER_ID);
+    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
-        return -1;
+        return RET_ERR;
     }
-    std::lock_guard<std::mutex> guard(mtx_);
     return InputInterMgr->AddInterceptor(interceptor, HandleEventType::ALL);
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
-    CHKPR(interceptor, ERROR_NULL_POINTER);
+    CHKPR(interceptor, INVALID_HANDLER_ID);
+    std::lock_guard<std::mutex> guard(mtx_);
+    auto consumer = std::make_shared<MonitorEventConsumer>(interceptor);
+    CHKPR(consumer, INVALID_HANDLER_ID);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
-        return -1;
+        return RET_ERR;
     }
-    auto consumer = std::make_shared<MonitorEventConsumer>(interceptor);
-    CHKPR(consumer, ERROR_NULL_POINTER);
-    std::lock_guard<std::mutex> guard(mtx_);
     return InputInterMgr->AddInterceptor(consumer, HandleEventType::KEY);
 }
 
