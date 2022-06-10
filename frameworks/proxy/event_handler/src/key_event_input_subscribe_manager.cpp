@@ -67,7 +67,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         MMI_HILOGE("client init failed");
         return INVALID_SUBSCRIBE_ID;
     }
-    for (auto preKey : preKeys) {
+    for (const auto &preKey : preKeys) {
         MMI_HILOGD("prekey:%{public}d", preKey);
     }
     auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
