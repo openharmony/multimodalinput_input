@@ -123,7 +123,7 @@ ohos_shared_library("libmmi-client") {
     "eventhandler:libeventhandler",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
-    "input_device_driver:hdi_input",
+    "input_device_driver_interface:hdi_input",
     "ipc:ipc_core",
     "utils_base:utils",
   ]
