@@ -355,6 +355,8 @@ private:
     uint32_t bitwise_;
     std::function<void(int32_t)> processedCallback_;
 };
+
+std::ostream& operator<<(std::ostream&, InputEvent&);
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_EVENT_H

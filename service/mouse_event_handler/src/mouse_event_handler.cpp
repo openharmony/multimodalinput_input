@@ -312,22 +312,7 @@ bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
 
 void MouseEventHandler::DumpInner()
 {
-    MMI_HILOGD("PointerAction:%{public}d,PointerId:%{public}d,SourceType:%{public}d,"
-        "ButtonId:%{public}d,VerticalAxisValue:%{public}lf,HorizontalAxisValue:%{public}lf",
-        pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerId(), pointerEvent_->GetSourceType(),
-        pointerEvent_->GetButtonId(), pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
-        pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL));
-
-    PointerEvent::PointerItem item;
-    if (!pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item)) {
-        MMI_HILOGE("Can't find the pointer item data, pointer:%{public}d, errCode:%{public}d",
-                   pointerEvent_->GetPointerId(), PARAM_INPUT_FAIL);
-        return;
-    }
-    MMI_HILOGD("Item: DownTime:%{public}" PRId64 ",IsPressed:%{public}s,GlobalX:%{public}d,GlobalY:%{public}d,"
-        "Width:%{public}d,Height:%{public}d,Pressure:%{public}f",
-        item.GetDownTime(), (item.IsPressed() ? "true" : "false"), item.GetGlobalX(), item.GetGlobalY(),
-        item.GetWidth(), item.GetHeight(), item.GetPressure());
+    PrintEventData(pointerEvent_);
 }
 } // namespace MMI
 } // namespace OHOS

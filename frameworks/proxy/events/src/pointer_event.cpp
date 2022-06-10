@@ -902,7 +902,7 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
 {
     const int precision = 2;
     std::vector<int32_t> pointerIds { pointerEvent.GetPointersIdList() };
-    ostream << "EventType:" << pointerEvent.GetEventType()
+    ostream << "EventType:" << InputEvent::EventTypeToString(pointerEvent.GetEventType())
          << ",ActionTime:" << pointerEvent.GetActionTime()
          << ",Action:" << pointerEvent.GetAction()
          << ",ActionStartTime:" << pointerEvent.GetActionStartTime()
@@ -939,10 +939,11 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
             << std::endl;
     }
     std::vector<int32_t> pressedKeys = pointerEvent.GetPressedKeys();
-    if (!pressedKeys.empty()) {
-        ostream << "Pressed keyCode: [";
-        for (const auto& keyCode : pressedKeys) {
-            ostream << keyCode << ",";
+    std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
+    if (cItr != pressedKeys.cend()) {
+        ostream << "Pressed keyCode: [" << *cItr++;
+        for (; cItr != pressedKeys.cend(); ++cItr) {
+            ostream << "," << *cItr;
         }
         ostream << "]" << std::endl;
     }
