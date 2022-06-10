@@ -278,6 +278,10 @@ ohos_unittest("InputManagerTest") {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
+  if (mmi_enable_pointer_drawing) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+  }
+
   if (is_mmi_have_libinput) {
     cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
@@ -286,15 +290,15 @@ ohos_unittest("InputManagerTest") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
-  sources = [ 
+  sources = [
     "events/test/input_manager_test.cpp",
     "events/test/window_utils_test.cpp",
   ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/util:libmmi-util",
     "${mmi_path}/tools/virtual_device_manager:libmmi-virtual-device",
+    "${mmi_path}/util:libmmi-util",
     "//foundation/ability/ability_runtime/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
     "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
