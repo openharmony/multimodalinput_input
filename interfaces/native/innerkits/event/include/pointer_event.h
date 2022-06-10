@@ -441,28 +441,102 @@ public:
          */
         void SetHeight(int32_t height);
 
+        /**
+         * @brief Obtains the X coordinate of the tool area's center point relative to the
+         * upper left corner of the screen.
+         * @return Returns the X coordinate.
+         * @since 9
+         */
         int32_t GetToolGlobalX() const;
 
+        /**
+         * @brief Sets the X coordinate of the tool area's center point relative to the
+         * upper left corner of the screen.
+         * @param x Indicates the X coordinate.
+         * @return void
+         * @since 9
+         */
         void SetToolGlobalX(int32_t globalX);
 
+        /**
+         * @brief Obtains the Y coordinate of the tool area's center point relative to the
+         * upper left corner of the screen.
+         * @return Returns the Y coordinate.
+         * @since 9
+         */
         int32_t GetToolGlobalY() const;
 
+        /**
+         * @brief Sets the Y coordinate of the tool area's center point relative to the
+         * upper left corner of the screen.
+         * @param y Indicates the Y coordinate.
+         * @return void
+         * @since 9
+         */
         void SetToolGlobalY(int32_t globalY);
 
+        /**
+         * @brief Obtains the X coordinate of the tool area's center point relative to the
+         * upper left corner of the window.
+         * @return Returns the X coordinate.
+         * @since 9
+         */
         int32_t GetToolLocalX() const;
 
+        /**
+         * @brief Sets the X coordinate of the tool area's center point relative to the
+         * upper left corner of the window.
+         * @param x Indicates the X coordinate.
+         * @return void
+         * @since 9
+         */
         void SetToolLocalX(int32_t x);
 
+        /**
+         * @brief Obtains the Y coordinate of the tool area's center point relative to the
+         * upper left corner of the window.
+         * @return Returns the Y coordinate.
+         * @since 9
+         */
         int32_t GetToolLocalY() const;
 
+        /**
+         * @brief Sets the Y coordinate of the tool area's center point relative to the
+         * upper left corner of the window.
+         * @param y Indicates the Y coordinate.
+         * @return void
+         * @since 9
+         */
         void SetToolLocalY(int32_t y);
 
+        /**
+         * @brief Obtains the width of the tool area.
+         * @return Returns the width of the tool area.
+         * @since 9
+         */
         int32_t GetToolWidth() const;
 
+        /**
+         * @brief Sets the width of the tool area.
+         * @param width Indicates the width of the tool area.
+         * @return void
+         * @since 9
+         */
         void SetToolWidth(int32_t width);
 
+        /**
+         * @brief Obtains the height of the tool area.
+         * @return Returns the height of the tool area.
+         * @since 9
+         */
         int32_t GetToolHeight() const;
 
+        /**
+         * @brief Sets the height of the tool area.
+         * @param height Indicates the height of the tool area.
+         * @return void
+         * @since 9
+         */
         void SetToolHeight(int32_t height);
 
         /**
