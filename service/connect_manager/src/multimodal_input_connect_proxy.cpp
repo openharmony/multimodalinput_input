@@ -281,7 +281,7 @@ int32_t MultimodalInputConnectProxy::MoveMouseEvent(int32_t offsetX, int32_t off
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(MOVE_MOUSE, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

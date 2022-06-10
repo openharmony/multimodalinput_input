@@ -344,7 +344,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
-        return -1;
+        return RET_ERR;
     }
     int32_t monitorId = monitorManager_.AddMonitor(consumer);
     return monitorId;
@@ -388,7 +388,7 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
-        return -1;
+        return RET_ERR;
     }
     return InputInterMgr->AddInterceptor(interceptor, HandleEventType::ALL);
 }
@@ -401,7 +401,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
     CHKPR(consumer, INVALID_HANDLER_ID);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
-        return -1;
+        return RET_ERR;
     }
     return InputInterMgr->AddInterceptor(consumer, HandleEventType::KEY);
 }
