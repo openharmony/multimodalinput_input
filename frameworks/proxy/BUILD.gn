@@ -249,27 +249,23 @@ ohos_unittest("KeyEventTest") {
 ohos_unittest("InputManagerTest") {
   module_out_path = module_output_path
   include_dirs = [
-    "//utils/native/base/include",
-    "//third_party/googletest/googletest/include",
-    "//utils/native/base/include",
-    "${mmi_path}/frameworks/proxy/event_handler",
+    "${mmi_path}/frameworks/proxy/events/test",
     "${mmi_path}/frameworks/proxy/event_handler/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/util/common",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/util/network",
-    "${mmi_path}/util/network/include",
-    "${mmi_path}/util/socket",
-    "${mmi_path}/util/socket/include",
-    "${mmi_path}/frameworks/proxy/event_handle",
-    "${mmi_path}/frameworks/proxy/event_handle/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
     "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/network/include",
+    "${mmi_path}/util/socket/include",
+    "${mmi_path}/tools/virtual_device_manager/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//foundation/windowmanager/wm/include",
+    "//third_party/googletest/googletest/include",
   ]
 
   if (is_mmi_have_libinput) {
@@ -282,6 +278,10 @@ ohos_unittest("InputManagerTest") {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
+  if (mmi_enable_pointer_drawing) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+  }
+
   if (is_mmi_have_libinput) {
     cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
@@ -290,11 +290,18 @@ ohos_unittest("InputManagerTest") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
-  sources = [ "events/test/input_manager_test.cpp" ]
+  sources = [
+    "events/test/input_manager_test.cpp",
+    "events/test/window_utils_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/tools/virtual_device_manager:libmmi-virtual-device",
     "${mmi_path}/util:libmmi-util",
+    "//foundation/ability/ability_runtime/frameworks/kits/ability/native:abilitykit_native",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
+    "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -302,6 +309,7 @@ ohos_unittest("InputManagerTest") {
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "window_manager:libwm",
   ]
 }
 
