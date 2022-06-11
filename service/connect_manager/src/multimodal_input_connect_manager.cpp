@@ -126,6 +126,12 @@ int32_t MultimodalInputConnectManager::MoveMouseEvent(int32_t offsetX, int32_t o
     return multimodalInputConnectService_->MoveMouseEvent(offsetX, offsetY);
 }
 
+int32_t MultimodalInputConnectManager::InjectKeyEvent(const std::shared_ptr<KeyEvent> event)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->InjectKeyEvent(event);
+}
+
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 {
     CALL_LOG_ENTER;
