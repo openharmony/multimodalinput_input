@@ -41,7 +41,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t OnMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    int32_t OnInjectKeyEvent(SessionPtr sess, const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_HDF
