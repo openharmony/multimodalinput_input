@@ -438,9 +438,8 @@ int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_LOG_ENTER;
-    int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckInjectKeyEvent, this, pid, keyEvent));
+        std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent));
     if (ret != RET_OK) {
         MMI_HILOGE("inject key event failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -448,11 +447,10 @@ int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
     return RET_OK;
 }
 
-int32_t MMIService::CheckInjectKeyEvent(int32_t pid, const std::shared_ptr<KeyEvent> keyEvent)
+int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    auto sess = GetSessionByPid(pid);
-    CHKPR(sess, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnInjectKeyEvent(sess, keyEvent);
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnInjectKeyEvent(keyEvent);
 }
 
 #ifdef OHOS_RSS_CLIENT

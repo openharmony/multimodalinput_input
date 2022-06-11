@@ -131,9 +131,8 @@ int32_t ServerMsgHandler::MarkEventProcessed(SessionPtr sess, int32_t eventId)
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, const std::shared_ptr<KeyEvent> keyEvent)
+int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHKPR(sess, ERROR_NULL_POINTER);
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     auto result = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent);
     if (result != RET_OK) {

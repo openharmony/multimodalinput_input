@@ -77,7 +77,7 @@ protected:
         HandleEventType eventType);
     int32_t CheckRemoveInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType);
     int32_t CheckMarkConsumed(int32_t pid, int32_t monitorId, int32_t eventId);
-    int32_t CheckInjectKeyEvent(int32_t pid, const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
     bool InitLibinputService();
     bool InitService();
     bool InitSignalHandler();
