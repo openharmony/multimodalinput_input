@@ -577,7 +577,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             if (argc == 5) {
                                 if (!StrToInt(optarg, px1) ||
                                     !StrToInt(argv[optind], py1)) {
-                                    std::cout << "Input coordinate error" << std::endl;
+                                    std::cout << "input coordinate error" << std::endl;
                                     return RET_ERR;
                                 }
                                 intervalTimeMs = 100;
@@ -585,7 +585,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 if (!StrToInt(optarg, px1) ||
                                     !StrToInt(argv[optind], py1) ||
                                     !StrToInt(argv[optind + 1], intervalTimeMs)) {
-                                    std::cout << "Input coordinate or time error" << std::endl;
+                                    std::cout << "input coordinate or time error" << std::endl;
                                     return RET_ERR;
                                 }
                                 const int64_t minIntervalTimeMs = 1;
