@@ -26,12 +26,14 @@ namespace OHOS {
 namespace MMI {
 class IInterceptorManagerGlobal : public DelayedSingleton<IInterceptorManagerGlobal> {
 public:
-    IInterceptorManagerGlobal() = default;
-    ~IInterceptorManagerGlobal() = default;
-    DISALLOW_COPY_AND_MOVE(IInterceptorManagerGlobal);
-    void OnAddInterceptor(int32_t sourceType, int32_t id, SessionPtr session);
-    void OnRemoveInterceptor(int32_t id);
-    bool OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+    IInterceptorHandlerGlobal() = default;
+    ~IInterceptorHandlerGlobal() = default;
+    DISALLOW_COPY_AND_MOVE(IInterceptorHandlerGlobal);
+    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
+        HandleEventType eventType, SessionPtr session);
+    void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+    bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent);
+    bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent);
 };
 } // namespace MMI
 } // namespace OHOS

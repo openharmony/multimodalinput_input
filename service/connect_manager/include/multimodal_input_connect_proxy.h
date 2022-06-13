@@ -37,9 +37,11 @@ public:
     virtual int32_t SetPointerVisible(bool visible) override;
     virtual int32_t IsPointerVisible(bool &visible) override;
     virtual int32_t MarkEventProcessed(int32_t eventId) override;
-    virtual int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType) override;
+    virtual int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
+        HandleEventType eventType) override;
     virtual int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType) override;
     virtual int32_t MarkEventConsumed(int32_t monitorId, int32_t eventId) override;
+    virtual int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };

@@ -129,8 +129,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
     if ((c = getopt_long(argc, argv, "MKT?", headOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'M': {
-                int32_t px;
-                int32_t py;
+                int32_t px = 0;
+                int32_t py = 0;
                 int32_t buttonId;
                 int32_t scrollValue;
                 while ((c = getopt_long(argc, argv, "m:d:u:c:s:i:", mouseSensorOptions, &optionIndex)) != -1) {
@@ -235,7 +235,30 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerId(0);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetButtonPressed(buttonId);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+                            pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
+                                                       scrollValue);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            time = pointerEvent->GetActionStartTime();
+
+                            time = pointerEvent->GetActionStartTime();
+                            pointerEvent->SetActionTime(time + ACTION_TIME);
+                            pointerEvent->SetPointerId(0);
+                            pointerEvent->AddPointerItem(item);
+                            pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+                            pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
+                                                       scrollValue);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+                            time = pointerEvent->GetActionStartTime();
+                            pointerEvent->SetActionTime(time + ACTION_TIME);
+                            pointerEvent->SetPointerId(0);
+                            pointerEvent->AddPointerItem(item);
+                            pointerEvent->SetButtonPressed(buttonId);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
                             pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
                                                        scrollValue);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);

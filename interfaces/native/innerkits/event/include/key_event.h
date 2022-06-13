@@ -3088,6 +3088,8 @@ private:
     std::vector<KeyItem> keys_;
     int32_t keyAction_ = 0;
 };
+
+std::ostream& operator<<(std::ostream&, KeyEvent&);
 } // namespace MMI
 } // namespace OHOS
 #endif // KEY_EVENT_H

@@ -18,7 +18,6 @@
 
 #include <uv.h>
 
-#include "stream_buffer.h"
 #include "input_device_impl.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -53,17 +52,6 @@ public:
     static bool GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_value &object);
     static bool GetDeviceSourceType(const std::unique_ptr<CallbackInfo> &cb, napi_value &object);
     static bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
-};
-
-struct AsyncContext : RefBase {
-    napi_env env = nullptr;
-    napi_async_work work = nullptr;
-    napi_deferred deferred = nullptr;
-    napi_ref callback = nullptr;
-    int32_t errorCode {-1};
-    StreamBuffer reserve;
-    AsyncContext(napi_env env) : env(env) {}
-    ~AsyncContext();
 };
 } // namespace MMI
 } // namespace OHOS

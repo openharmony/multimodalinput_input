@@ -24,7 +24,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInte
 } // namespace
 
 int32_t IInterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
-    InputHandlerType handlerType, SessionPtr session)
+    InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
 {
     MMI_HILOGW("Add interceptor module does not support");
     return RET_ERR;
