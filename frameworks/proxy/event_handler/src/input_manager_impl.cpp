@@ -120,8 +120,7 @@ void InputManagerImpl::OnThread()
     eventRunner->Run();
 }
 
-void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
-    const std::vector<LogicalDisplayInfo> &logicalDisplays)
+void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -129,13 +128,11 @@ void InputManagerImpl::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> 
         MMI_HILOGE("get mmi client is nullptr");
         return;
     }
-    if (physicalDisplays.empty() || logicalDisplays.empty()) {
-        MMI_HILOGE("display info check failed! physicalDisplays size:%{public}zu,logicalDisplays size:%{public}zu",
-            physicalDisplays.size(), logicalDisplays.size());
+    if (displayGroupInfo.windowsInfo.empty() || displayGroupInfo.displayInfos.empty()) {
+        MMI_HILOGE("windows info or display info is empty!");
         return;
     }
-    physicalDisplays_ = physicalDisplays;
-    logicalDisplays_ = logicalDisplays;
+    displayGroupInfo_ = displayGroupInfo;
     SendDisplayInfo();
     PrintDisplayInfo();
 }
@@ -234,51 +231,47 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 
 int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 {
-    if (PackPhysicalDisplay(pkt) == RET_ERR) {
-        MMI_HILOGE("pack physical display failed");
+    pkt << displayGroupInfo_.width << displayGroupInfo_.height << displayGroupInfo_.focusWindowId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write logical data failed");
         return RET_ERR;
     }
-    return PackLogicalDisplay(pkt);
+    if (PackWindowInfo(pkt) == RET_ERR) {
+        MMI_HILOGE("Packet write windows info failed");
+        return RET_ERR;
+    }
+    return PackDisplayInfo(pkt);
 }
 
-int32_t InputManagerImpl::PackPhysicalDisplay(NetPacket &pkt)
+int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
 {
-    uint32_t num = static_cast<uint32_t>(physicalDisplays_.size());
-    if (num > MAX_PHYSICAL_SIZE) {
-        MMI_HILOGE("Physical exceeds the max range");
-        return RET_ERR;
-    }
+    std::vector<WindowInfo> windowsInfos = displayGroupInfo_.windowsInfo;
+    uint32_t num = static_cast<uint32_t>(windowsInfos.size());
     pkt << num;
     for (uint32_t i = 0; i < num; i++) {
-        pkt << physicalDisplays_[i].id << physicalDisplays_[i].leftDisplayId << physicalDisplays_[i].upDisplayId
-            << physicalDisplays_[i].topLeftX << physicalDisplays_[i].topLeftY << physicalDisplays_[i].width
-            << physicalDisplays_[i].height << physicalDisplays_[i].name << physicalDisplays_[i].seatId
-            << physicalDisplays_[i].seatName << physicalDisplays_[i].logicWidth
-            << physicalDisplays_[i].logicHeight << physicalDisplays_[i].direction;
+        pkt << windowsInfos[i].id << windowsInfos[i].pid << windowsInfos[i].uid
+            << windowsInfos[i].area << windowsInfos[i].defaultHotAreas << windowsInfos[i].pointerHotAreas
+            << windowsInfos[i].agentWindowId << windowsInfos[i].flags;
     }
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write physical data failed");
+        MMI_HILOGE("Packet write windows data failed");
         return RET_ERR;
     }
     return RET_OK;
 }
 
-int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
+int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
 {
-    int32_t num = static_cast<int32_t>(logicalDisplays_.size());
-    if (num > MAX_LOGICAL_SIZE) {
-        MMI_HILOGE("Logical exceeds the max range");
-        return RET_ERR;
-    }
+    std::vector<DisplayInfo> displayInfos = displayGroupInfo_.displayInfos;
+    int32_t num = static_cast<int32_t>(displayInfos.size());
     pkt << num;
     for (int32_t i = 0; i < num; i++) {
-        pkt << logicalDisplays_[i].id << logicalDisplays_[i].topLeftX << logicalDisplays_[i].topLeftY
-            << logicalDisplays_[i].width << logicalDisplays_[i].height << logicalDisplays_[i].name
-            << logicalDisplays_[i].seatId << logicalDisplays_[i].seatName << logicalDisplays_[i].focusWindowId
-            << logicalDisplays_[i].windowsInfo;
+        pkt << displayInfos[i].id << displayInfos[i].x << displayInfos[i].y << displayInfos[i].width
+            << displayInfos[i].height << displayInfos[i].name << displayInfos[i].uniq
+            << displayInfos[i].direction;
     }
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write logical data failed");
+        MMI_HILOGE("Packet write display data failed");
         return RET_ERR;
     }
     return RET_OK;
@@ -286,39 +279,36 @@ int32_t InputManagerImpl::PackLogicalDisplay(NetPacket &pkt)
 
 void InputManagerImpl::PrintDisplayInfo()
 {
-    MMI_HILOGD("physicalDisplays,num:%{public}zu", physicalDisplays_.size());
-    for (const auto &item : physicalDisplays_) {
-        MMI_HILOGD("physicalDisplays,id:%{public}d,leftDisplay:%{public}d,upDisplay:%{public}d,"
-            "topLeftX:%{public}d,topLeftY:%{public}d,width:%{public}d,height:%{public}d,"
-            "name:%{public}s,seatId:%{public}s,seatName:%{public}s,logicWidth:%{public}d,"
-            "logicHeight:%{public}d,direction:%{public}d",
-            item.id, item.leftDisplayId, item.upDisplayId,
-            item.topLeftX, item.topLeftY, item.width,
-            item.height, item.name.c_str(), item.seatId.c_str(),
-            item.seatName.c_str(), item.logicWidth, item.logicHeight,
-            item.direction);
+    MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
+        displayGroupInfo_.width, displayGroupInfo_.height, displayGroupInfo_.focusWindowId);
+    std::vector<WindowInfo> windowsInfos = displayGroupInfo_.windowsInfo;
+    MMI_HILOGD("windowsInfos,num:%{public}zu", windowsInfos.size());
+    for (const auto &item : windowsInfos) {
+        MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
+            "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
+            "defaultHotAreas:%{public}zu,pointerHotAreas:%{public}zu"
+            "agentWindowId:%{public}d,flags:%{public}d",
+            item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
+            item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
+            item.agentWindowId, item.flags);
+        for (const auto &win : item.defaultHotAreas) {
+            MMI_HILOGD("x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+                win.x, win.y, win.width, win.height);
+        }
+        for (const auto &pointer : item.pointerHotAreas) {
+            MMI_HILOGD("x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+                pointer.x, pointer.y, pointer.width, pointer.height);
+        }
     }
 
-    MMI_HILOGD("logicalDisplays,num:%{public}zu", logicalDisplays_.size());
-    for (const auto &item : logicalDisplays_) {
-        MMI_HILOGD("logicalDisplays, id:%{public}d,topLeftX:%{public}d,topLeftY:%{public}d,"
+    std::vector<DisplayInfo> displayInfos = displayGroupInfo_.displayInfos;
+    MMI_HILOGD("displayInfos,num:%{public}zu", displayInfos.size());
+    for (const auto &item : displayInfos) {
+        MMI_HILOGD("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
             "width:%{public}d,height:%{public}d,name:%{public}s,"
-            "seatId:%{public}s,seatName:%{public}s,focusWindowId:%{public}d,window num:%{public}zu",
-            item.id, item.topLeftX, item.topLeftY,
-            item.width, item.height, item.name.c_str(),
-            item.seatId.c_str(), item.seatName.c_str(),
-            item.focusWindowId, item.windowsInfo.size());
-        for (const auto &win : item.windowsInfo) {
-            MMI_HILOGD("windowid:%{public}d,pid:%{public}d,uid:%{public}d,hotZoneTopLeftX:%{public}d,"
-                "hotZoneTopLeftY:%{public}d,hotZoneWidth:%{public}d,hotZoneHeight:%{public}d,display:%{public}d,"
-                "agentWindowId:%{public}d,winTopLeftX:%{public}d,winTopLeftY:%{public}d,flags:%{public}d",
-                win.id, win.pid,
-                win.uid, win.hotZoneTopLeftX,
-                win.hotZoneTopLeftY, win.hotZoneWidth,
-                win.hotZoneHeight, win.displayId,
-                win.agentWindowId,
-                win.winTopLeftX, win.winTopLeftY, win.flags);
-        }
+            "uniq:%{public}s,direction:%{public}d",
+            item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
+            item.uniq.c_str(), item.direction);
     }
 }
 
@@ -476,9 +466,8 @@ bool InputManagerImpl::IsPointerVisible()
 void InputManagerImpl::OnConnected()
 {
     CALL_LOG_ENTER;
-    if (physicalDisplays_.empty() || logicalDisplays_.empty()) {
-        MMI_HILOGE("display info check failed! physicalDisplays_ size:%{public}zu,logicalDisplays_ size:%{public}zu",
-            physicalDisplays_.size(), logicalDisplays_.size());
+    if (displayGroupInfo_.windowsInfo.empty() || displayGroupInfo_.displayInfos.empty()) {
+        MMI_HILOGE("windows info or display info is empty!");
         return;
     }
     SendDisplayInfo();
