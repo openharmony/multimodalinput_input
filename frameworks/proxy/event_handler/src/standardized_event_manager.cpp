@@ -86,23 +86,18 @@ int32_t StandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
     return RET_OK;
 }
 
-int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> key)
+int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_LOG_ENTER;
-    CHKPR(key, RET_ERR);
-    key->UpdateId();
-    if (key->GetKeyCode() < 0) {
-        MMI_HILOGE("keyCode is invalid:%{public}u", key->GetKeyCode());
+    CHKPR(keyEvent, RET_ERR);
+    keyEvent->UpdateId();
+    if (keyEvent->GetKeyCode() < 0) {
+        MMI_HILOGE("keyCode is invalid:%{public}u", keyEvent->GetKeyCode());
         return RET_ERR;
     }
-    NetPacket pkt(MmiMessageId::INJECT_KEY_EVENT);
-    int32_t errCode = InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
-    if (errCode != RET_OK) {
-        MMI_HILOGE("Serialization is Failed, errCode:%{public}u", errCode);
-        return RET_ERR;
-    }
-    if (!SendMsg(pkt)) {
-        MMI_HILOGE("Send inject event Msg error");
+    int32_t ret = MultimodalInputConnMgr->InjectKeyEvent(keyEvent);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
