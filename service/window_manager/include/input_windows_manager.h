@@ -65,7 +65,7 @@ public:
     bool TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord) const;
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, LogicalCoordinate& coord) const;
-    bool Dump(int32_t fd, const std::vector<std::u16string> &args);
+    void Dump(int32_t fd, const std::vector<std::u16string> &args);
 
 private:
     bool IsInsideWindow(int32_t x, int32_t y, const WindowInfo &info) const;

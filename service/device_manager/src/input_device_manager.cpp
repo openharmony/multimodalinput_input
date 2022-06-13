@@ -329,17 +329,13 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
     return INVALID_DEVICE_ID;
 }
 
-bool InputDeviceManager::Dump(int32_t fd, const std::vector<std::u16string> &args)
+void InputDeviceManager::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
     CALL_LOG_ENTER;
     MMI_HILOGI("Device Dump in !");
-    if ((args.empty()) || (args[0].compare(u"-d") != 0)) {
-        MMI_HILOGE("args cannot be empty or invalid");
-        return false;
-    }
     mprintf(fd, "--------------------------[device information]-------------------------");
     mprintf(fd, "Input Devices: count=%d", inputDevice_.size());
-    for (const auto &item : inputDevice_) { 
+    for (const auto &item : inputDevice_) {
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
             mprintf(fd,
                 "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d" 
@@ -348,12 +344,12 @@ bool InputDeviceManager::Dump(int32_t fd, const std::vector<std::u16string> &arg
                 inputDevice->GetBustype(),inputDevice->GetVersion(), inputDevice->GetProduct(),
                 inputDevice->GetVendor(), inputDevice->GetPhys().c_str(), inputDevice->GetUniq().c_str()); 
         auto axisinfo = inputDevice->GetAxisInfo();
-        mprintf(fd, "axis: count=%d", axisinfo.size());
+        mprintf(fd, "axis: count=%d \n", axisinfo.size());
         for (const auto &axis : axisinfo) {
             auto iter = axisType.find(axis.GetAxisType());
             if (iter == axisType.end()) {
                 MMI_HILOGE("AxisType is not found !");
-                return false;
+                return;
             }
             mprintf(fd,
                     "axisType:%s | minimum:%d | maximum:%d | fuzz:%d | flat:%d | resolution:%d\t",
@@ -361,21 +357,16 @@ bool InputDeviceManager::Dump(int32_t fd, const std::vector<std::u16string> &arg
                     axis.GetFuzz(), axis.GetFlat(), axis.GetResolution());
         }
     }
-    return true;
 }
 
-bool InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::u16string> &args)
+void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::u16string> &args)
 {
     CALL_LOG_ENTER;
     MMI_HILOGI("Device List Dump in !");
-    if ((args.empty()) || (args[0].compare(u"-l") != 0)) {
-        MMI_HILOGE("args cannot be empty or invalid");
-        return false;
-    }
     mprintf(fd, "--------------------------[device List information]-------------------------");
     std::vector<int32_t> ids = GetInputDeviceIds();
-    mprintf(fd, "Total device:%d, Device list:\n", ids.size());
-    for (const auto &item : inputDevice_) { 
+    mprintf(fd, "Total device:%d, Device list:", ids.size());
+    for (const auto &item : inputDevice_) {
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
         auto deviceId = inputDevice->GetId();
             mprintf(fd,
@@ -384,7 +375,6 @@ bool InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::u16st
                 deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBustype(),
                 inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor());
     }
-    return true;
 }
 } // namespace MMI
 } // namespace OHOS

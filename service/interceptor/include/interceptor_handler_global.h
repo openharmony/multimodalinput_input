@@ -36,7 +36,7 @@ public:
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent);
     bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent);
-    bool Dump(int32_t fd, const std::vector<std::u16string> &args);
+    void Dump(int32_t fd, const std::vector<std::u16string> &args);
 
 private:
     void InitSessionLostCallback();
@@ -72,7 +72,7 @@ private:
         int32_t AddInterceptor(const SessionHandler& interceptor);
         void RemoveInterceptor(const SessionHandler& interceptor);
         void OnSessionLost(SessionPtr session);
-        bool Dump(int32_t fd, const std::vector<std::u16string> &args);
+        void Dump(int32_t fd, const std::vector<std::u16string> &args);
         std::set<SessionHandler> interceptors_;
     };
 

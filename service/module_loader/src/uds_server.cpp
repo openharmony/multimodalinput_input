@@ -182,14 +182,10 @@ void UDSServer::AddPermission(SessionPtr sess)
     }
 }
 
-bool UDSServer::Dump(int32_t fd, const std::vector<std::u16string> &args)
+void UDSServer::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
     CALL_LOG_ENTER;
     MMI_HILOGI("uds_erver Dump in !");
-    if ((args.empty()) || (args[0].compare(u"-u") != 0)) {
-        MMI_HILOGE("args cannot be empty or invalid");
-        return false;
-    }
     mprintf(fd, "--------------------[uds_server information]----------------------");
     mprintf(fd, "uds_server: count=%d", sessionsMap_.size());
     for (const auto &item : sessionsMap_) { 
@@ -199,7 +195,6 @@ bool UDSServer::Dump(int32_t fd, const std::vector<std::u16string> &args)
                 udsSession->GetUid(), udsSession->GetPid(), udsSession->GetFd(),
                 udsSession->HasPermission() ? "true" : "false", udsSession->GetDescript().c_str());
     }
-    return true;
 }
 
 void UDSServer::OnConnected(SessionPtr s)

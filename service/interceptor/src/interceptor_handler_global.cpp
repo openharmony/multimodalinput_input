@@ -209,19 +209,15 @@ void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr s
         }
     }
 }
-bool InterceptorHandlerGlobal::Dump(int32_t fd, const std::vector<std::u16string> &args)
+void InterceptorHandlerGlobal::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
     return interceptors_.Dump(fd, args);
 }
 
-bool InterceptorHandlerGlobal::InterceptorCollection::Dump(int32_t fd, const std::vector<std::u16string> &args)
+void InterceptorHandlerGlobal::InterceptorCollection::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
     CALL_LOG_ENTER;
     MMI_HILOGI("Interceptor Dump in !");
-    if ((args.empty()) || (args[0].compare(u"-i") != 0)) {
-        MMI_HILOGE("args cannot be empty or invalid");
-        return false;
-    }
     mprintf(fd, "--------------------------[interceptor information]-------------------------");
     mprintf(fd, "interceptors: count=%d", interceptors_.size());
     for (const auto &interceptor : interceptors_){
@@ -231,7 +227,6 @@ bool InterceptorHandlerGlobal::InterceptorCollection::Dump(int32_t fd, const std
                 interceptor.session_->GetUid(), interceptor.session_->GetFd(),
                 interceptor.session_->GetEarlistEventTime());
     }
-    return true;
 }
 } // namespace MMI
 } // namespace OHOS

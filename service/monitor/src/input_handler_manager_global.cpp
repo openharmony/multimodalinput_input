@@ -285,19 +285,15 @@ void InputHandlerManagerGlobal::MonitorCollection::OnSessionLost(SessionPtr sess
         }
     }
 }
-bool InputHandlerManagerGlobal::Dump(int32_t fd, const std::vector<std::u16string> &args)
+void InputHandlerManagerGlobal::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
     return monitors_.Dump(fd, args);
 }
 
-bool InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::vector<std::u16string> &args)
+void InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
     CALL_LOG_ENTER;
     MMI_HILOGI("Monitor Dump in !");
-    if ((args.empty()) || (args[0].compare(u"-o") != 0)) {
-        MMI_HILOGE("args cannot be empty or invalid");
-        return false;
-    }
     mprintf(fd, "--------------------------[monitor information]-------------------------");
     mprintf(fd, "monitors: count=%d", monitors_.size());
     for (const auto &monitor : monitors_) {
@@ -307,7 +303,6 @@ bool InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::v
             monitor.session_->GetUid(), monitor.session_->GetFd(),
             monitor.session_->GetEarlistEventTime());
     }
-    return true;
 }
 } // namespace MMI
 } // namespace OHOS

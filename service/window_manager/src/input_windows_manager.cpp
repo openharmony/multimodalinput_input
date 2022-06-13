@@ -682,14 +682,11 @@ MouseLocation InputWindowsManager::GetMouseInfo()
     }
     return mouseLoction_;
 }
-bool InputWindowsManager::Dump(int32_t fd, const std::vector<std::u16string> &args)
+
+void InputWindowsManager::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
     CALL_LOG_ENTER;
     MMI_HILOGI("Windows Manager Dump in !");
-    if ((args.empty()) || (args[0].compare(u"-w") != 0)) {
-        MMI_HILOGE("args cannot be empty or invalid");
-        return false;
-    }
     mprintf(fd, "------------------------[physicalDisplay information]---------------------------");
     mprintf(fd,"physicalDisplays,num:%zu", physicalDisplays_.size());
     for (const auto &physicalDisplay : physicalDisplays_) {
@@ -722,7 +719,6 @@ bool InputWindowsManager::Dump(int32_t fd, const std::vector<std::u16string> &ar
                 windowInfo.second.displayId, windowInfo.second.agentWindowId, windowInfo.second.winTopLeftX, 
                 windowInfo.second.winTopLeftY, windowInfo.second.flags);
     }
-    return true;
 }
 } // namespace MMI
 } // namespace OHOS
