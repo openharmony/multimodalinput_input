@@ -33,7 +33,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 } // namespace
 
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
-    std::shared_ptr<IInputEventConsumer> consumer)
+    std::shared_ptr<IInputEventConsumer> consumer, HandleEventType eventType)
 {
     CHKPR(consumer, INVALID_HANDLER_ID);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
@@ -47,9 +47,9 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
         return INVALID_HANDLER_ID;
     }
     MMI_HILOGD("Register new handler:%{public}d", handlerId);
-    if (RET_OK == AddLocal(handlerId, handlerType, consumer)) {
+    if (RET_OK == AddLocal(handlerId, handlerType, eventType, consumer)) {
         MMI_HILOGD("New handler successfully registered, report to server");
-        AddToServer(handlerId, handlerType);
+        AddToServer(handlerId, handlerType, eventType);
     } else {
         handlerId = INVALID_HANDLER_ID;
     }
@@ -76,15 +76,16 @@ void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 }
 
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType,
-    std::shared_ptr<IInputEventConsumer> monitor)
+    HandleEventType eventType, std::shared_ptr<IInputEventConsumer> monitor)
 {
     auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
     CHKPR(eventHandler, RET_ERR);
     InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
         .handlerType_ = handlerType,
+        .eventType_ = eventType,
         .consumer_ = monitor,
-        .eventHandler_ = eventHandler
+        .eventHandler_ = eventHandler,
     };
     auto ret = inputHandlers_.emplace(handler.handlerId_, handler);
     if (!ret.second) {
@@ -94,9 +95,10 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
     return RET_OK;
 }
 
-void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handlerType)
+void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handlerType,
+    HandleEventType eventType)
 {
-    int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerId, handlerType);
+    int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerId, handlerType, eventType);
     if (ret != 0) {
         MMI_HILOGE("send to server fail, ret:%{public}d", ret);
     }
@@ -214,7 +216,7 @@ void InputHandlerManager::OnConnected()
 {
     CALL_LOG_ENTER;
     for (auto &inputHandler : inputHandlers_) {
-        AddToServer(inputHandler.second.handlerId_, inputHandler.second.handlerType_);
+        AddToServer(inputHandler.second.handlerId_, inputHandler.second.handlerType_, inputHandler.second.eventType_);
     }
 }
 } // namespace MMI

@@ -13,85 +13,193 @@
  * limitations under the License.
  */
 
-#include <bitset>
-#include <cinttypes>
-#include <regex>
-#include <sstream>
+#include <chrono>
+#include <condition_variable>
+#include <list>
+#include <mutex>
+#include <string>
 
 #include <gtest/gtest.h>
 
-#include "define_multimodal.h"
-#include "error_multimodal.h"
-#include "run_shell_util.h"
-#include "proto.h"
-
-#include "input_event.h"
-#include "input_event_monitor_manager.h"
 #include "input_handler_type.h"
 #include "input_manager.h"
+#include "input_transfer_station.h"
+#include "mmi_log.h"
 #include "multimodal_event_handler.h"
-#include "mmi_client.h"
-#include "pointer_event.h"
+#include "util.h"
+#include "virtual_mouse.h"
+#include "window_utils_test.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr int32_t DEFAULT_DEVICE_ID = 1;
+enum class TestScene { EXCEPTION_TEST, NORMAL_TEST, };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest" };
+enum class RECV_FLAG {
+    RECV_FOCUS = 0x00000000,
+    RECV_MONITOR,
+    RECV_INTERCEPT,
+    RECV_MARK_CONSUMED,
+};
 constexpr int32_t DEFAULT_POINTER_ID = 0;
+constexpr int32_t DEFAULT_DEVICE_ID = 0;
+constexpr int32_t TIME_WAIT_FOR_EVENT = 1000;
+constexpr int32_t TIME_WAIT_FOR_OP = 100;
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t SEC_TO_NANOSEC = 1000000000;
-constexpr int32_t TIME_WAIT_FOR_OP = 500;
-constexpr int32_t TIME_WAIT_FOR_LOG = 100;
-constexpr int32_t N_TRIES_FOR_LOG = 10;
 constexpr int32_t INDEX_FIRST = 1;
 constexpr int32_t INDEX_SECOND = 2;
 constexpr int32_t INDEX_THIRD = 3;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest" };
-} // namespace
+}
 
 class InputManagerTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {}
-    static void TearDownTestCase(void) {}
+    virtual void SetUp() override;
+    virtual void TearDown() override;
+    static void SetUpTestCase();
+    static void TearDownTestCase();
     static int64_t GetNanoTime();
-    static bool FindCommand(const std::string &log, const std::string &command);
-    static std::vector<std::string> SearchLog(const std::string &command, bool noWait = false);
-    static std::vector<std::string> SearchLog(const std::string &command,
-    const std::vector<std::string> &excludes, bool noWait = false);
-    static std::string DumpPointerItem(const PointerEvent::PointerItem &item);
-    static std::string DumpPointerEvent(const std::shared_ptr<PointerEvent> &pointE);
+    static std::string GetEventDump();
+    static void AddEventDump(std::string eventDump);
     static std::shared_ptr<PointerEvent> SetupPointerEvent001();
     static std::shared_ptr<PointerEvent> SetupPointerEvent002();
     static std::shared_ptr<PointerEvent> SetupPointerEvent003();
+    static std::shared_ptr<PointerEvent> SetupPointerEvent005();
     static std::shared_ptr<PointerEvent> SetupPointerEvent006();
     static std::shared_ptr<PointerEvent> SetupPointerEvent007();
-    static std::shared_ptr<PointerEvent> SetupPointerEvent008();
     static std::shared_ptr<PointerEvent> SetupPointerEvent009();
     static std::shared_ptr<PointerEvent> SetupPointerEvent010();
     static std::shared_ptr<PointerEvent> SetupPointerEvent011();
     static std::shared_ptr<PointerEvent> SetupPointerEvent012();
     static std::shared_ptr<PointerEvent> SetupPointerEvent013();
-    static void TestSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
-    static void TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> pointerEvent);
-    static std::string DumpPointerItem2(const PointerEvent::PointerItem &item);
-    static std::string DumpPointerEvent2(const std::shared_ptr<PointerEvent> &pointE);
-    static void TestInputEventInterceptor(std::shared_ptr<PointerEvent> pointerEvent);
-    static void TestInputEventInterceptor2(std::shared_ptr<PointerEvent> pointerEvent);
+    static std::string DumpInputEvent(const std::shared_ptr<PointerEvent>& pointerEvent);
+    static std::string DumpInputEvent(const std::shared_ptr<KeyEvent>& keyEvent);
     std::shared_ptr<PointerEvent> TestMarkConsumedStep1();
     std::shared_ptr<PointerEvent> TestMarkConsumedStep2();
     void TestMarkConsumedStep3(int32_t monitorId, int32_t eventId);
     void TestMarkConsumedStep4();
     void TestMarkConsumedStep5();
     void TestMarkConsumedStep6();
-    static void KeyMonitorCallBack(std::shared_ptr<KeyEvent> keyEvent);
-    static void TouchPadMonitorCallBack(std::shared_ptr<PointerEvent> pointerEvent);
-
+    static RECV_FLAG location_;
 private:
-    static RunShellUtil runCommand_;
+    static std::mutex mutex_;
+    static std::list<std::string> strEventDump_;
+    static std::condition_variable conditionVariable_;
 };
 
-RunShellUtil InputManagerTest::runCommand_ { };
+class InputEventConsumer : public IInputEventConsumer {
+public:
+    void OnInputEvent(std::shared_ptr<MMI::PointerEvent> pointerEvent) const override;
+    void OnInputEvent(std::shared_ptr<MMI::KeyEvent> keyEvent) const override;
+    void OnInputEvent(std::shared_ptr<MMI::AxisEvent> axisEvent) const override {};
+};
+
+class InputEventCallback : public IInputEventConsumer {
+public:
+    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
+    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override;
+    virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
+};
+
+RECV_FLAG InputManagerTest::location_ = RECV_FLAG::RECV_FOCUS;
+std::mutex InputManagerTest::mutex_;
+std::list<std::string> InputManagerTest::strEventDump_;
+std::condition_variable InputManagerTest::conditionVariable_;
+
+void InputEventConsumer::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    CALL_LOG_ENTER;
+    if (InputManagerTest::location_ == RECV_FLAG::RECV_FOCUS ||
+        InputManagerTest::location_ == RECV_FLAG::RECV_MARK_CONSUMED) {
+        ASSERT_TRUE(keyEvent != nullptr);
+        InputManagerTest::AddEventDump(InputManagerTest::DumpInputEvent(keyEvent));
+    }
+}
+
+void InputEventConsumer::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
+{
+    CALL_LOG_ENTER;
+    if (InputManagerTest::location_ == RECV_FLAG::RECV_FOCUS ||
+        InputManagerTest::location_ == RECV_FLAG::RECV_MARK_CONSUMED) {
+        ASSERT_TRUE(pointerEvent != nullptr);
+        InputManagerTest::AddEventDump(InputManagerTest::DumpInputEvent(pointerEvent));
+    }
+}
+
+void InputEventCallback::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
+{
+    CALL_LOG_ENTER;
+    if (InputManagerTest::location_ != RECV_FLAG::RECV_MARK_CONSUMED) {
+        InputManagerTest::location_ = RECV_FLAG::RECV_MONITOR;
+        ASSERT_TRUE(pointerEvent != nullptr);
+        InputManagerTest::AddEventDump(InputManagerTest::DumpInputEvent(pointerEvent));
+    }
+}
+
+template<typename sharedType>
+static std::shared_ptr<sharedType> GetPtr()
+{
+    return std::make_shared<sharedType>();
+}
+
+void InputManagerTest::AddEventDump(std::string eventDump)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> lockGuard(mutex_);
+    if (eventDump.empty()) {
+        strEventDump_.clear();
+        return;
+    }
+    strEventDump_.push_back(eventDump);
+    MMI_HILOGD("Setting the Dump event, strEventDump_ : %{public}s", eventDump.c_str());
+    conditionVariable_.notify_one();
+}
+
+std::string InputManagerTest::GetEventDump()
+{
+    CALL_LOG_ENTER;
+    std::unique_lock<std::mutex> uniqueLock(mutex_);
+    std::string str = "";
+    if (strEventDump_.empty()) {
+        MMI_HILOGD("Waiting for an event to fire");
+        if (conditionVariable_.wait_for(uniqueLock,
+            std::chrono::milliseconds(TIME_WAIT_FOR_EVENT)) == std::cv_status::timeout) {
+            MMI_HILOGD("Timeout");
+            return str;
+        }
+    }
+    str = strEventDump_.front();
+    strEventDump_.pop_front();
+    return str;
+}
+
+void InputManagerTest::SetUpTestCase()
+{
+    CALL_LOG_ENTER;
+    ASSERT_TRUE(WindowUtilsTest::GetInstance()->DrawTestWindow());
+    sptr<Rosen::Window> window_ = WindowUtilsTest::GetInstance()->GetWindow();
+    ASSERT_TRUE(window_ != nullptr);
+    auto listener_ = GetPtr<InputEventConsumer>();
+    ASSERT_TRUE(listener_ != nullptr);
+    MMI::InputManager::GetInstance()->SetWindowInputEventConsumer(listener_);
+    Rosen::InputTransferStation::GetInstance().SetInputListener(window_->GetWindowId(), listener_);
+    Rosen::InputTransferStation::GetInstance().AddInputWindow(window_);
+}
+
+void InputManagerTest::TearDownTestCase()
+{
+}
+
+void InputManagerTest::SetUp()
+{
+    location_ = RECV_FLAG::RECV_FOCUS;
+}
+
+void InputManagerTest::TearDown()
+{
+    AddEventDump("");
+}
 
 int64_t InputManagerTest::GetNanoTime()
 {
@@ -100,407 +208,12 @@ int64_t InputManagerTest::GetNanoTime()
     return static_cast<int64_t>(time.tv_sec) * SEC_TO_NANOSEC + time.tv_nsec;
 }
 
-class InputEventCallback : public IInputEventConsumer {
-public:
-    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
-    {
-        MMI_HILOGD("keyCode:%{public}d", keyEvent->GetKeyCode());
-    }
-    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
-    {
-        MMI_HILOGD("PointerEvent received.");
-    }
-    virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {}
-    static std::shared_ptr<InputEventCallback> GetPtr();
-};
-
-std::shared_ptr<InputEventCallback> InputEventCallback::GetPtr()
-{
-    return std::make_shared<InputEventCallback>();
-}
-
-bool InputManagerTest::FindCommand(const std::string &log, const std::string &command)
-{
-    std::ostringstream sCmd;
-    std::string::size_type spos { 0 }, tpos;
-    while (spos < command.size()) {
-        tpos = command.find("\\", spos);
-        if (tpos != std::string::npos) {
-            if (((tpos + 1) < command.size()) &&
-                (('{' == command[tpos + 1]) || ('}' == command[tpos + 1]))) {
-                sCmd << command.substr(spos, tpos - spos);
-            } else {
-                sCmd << command.substr(spos, tpos - spos + 1);
-            }
-            spos = tpos + 1;
-        } else {
-            sCmd << command.substr(spos);
-            spos = command.size();
-        }
-    }
-
-    std::regex pattern(sCmd.str());
-    return std::regex_search(log, pattern);
-}
-
-std::vector<std::string> InputManagerTest::SearchLog(const std::string &command, bool noWait)
-{
-    std::vector<std::string> excludes;
-    return SearchLog(command, excludes, noWait);
-}
-
-std::vector<std::string> InputManagerTest::SearchLog(const std::string &command,
-    const std::vector<std::string> &excludes, bool noWait)
-{
-    int32_t nTries { N_TRIES_FOR_LOG };
-    std::vector<std::string> results;
-
-    while (true) {
-        std::vector<std::string> logs;
-        (void)runCommand_.RunShellCommand(command, logs);
-        for (const std::string& s : logs) {
-            if (FindCommand(s, command) &&
-                (std::find(excludes.cbegin(), excludes.cend(), s) == excludes.cend())) {
-                results.push_back(s);
-            }
-        }
-        if (noWait || !results.empty() || (--nTries <= 0)) {
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
-    }
-    return results;
-}
-
-std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep1()
-{
-    auto pointerEvent = PointerEvent::Create();
-    CHKPP(pointerEvent);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetGlobalX(823);   // test code，set the GlobalX = 823
-    item.SetGlobalY(723);   // test code，set the GlobalY = 723
-    item.SetPressure(5);    // test code，set the Pressure = 5
-    item.SetDeviceId(1);    // test code，set the DeviceId = 1
-    pointerEvent->AddPointerItem(item);
-
-    pointerEvent->SetId(std::numeric_limits<int32_t>::max() - INDEX_THIRD);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetPointerId(0);  // test code，set the PointerId = 1
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-
-    MMI_HILOGD("Call InputManager::SimulatePointerEvent");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
-    return pointerEvent;
-}
-
-std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep2()
-{
-    auto pointerEvent = PointerEvent::Create();
-    CHKPP(pointerEvent);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetGlobalX(1023);  // test code，set the GlobalX = 823
-    item.SetGlobalY(723);   // test code，set the GlobalY = 723
-    item.SetPressure(5);    // test code，set the Pressure = 5
-    item.SetDeviceId(1);    // test code，set the DeviceId = 1
-    pointerEvent->AddPointerItem(item);
-
-    pointerEvent->SetId(std::numeric_limits<int32_t>::max() - INDEX_SECOND);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->SetPointerId(0);  // test code，set the PointerId = 1
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-
-    MMI_HILOGD("Call InputManager::SimulatePointerEvent");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
-    return pointerEvent;
-}
-
-void InputManagerTest::TestMarkConsumedStep3(int32_t monitorId, int32_t eventId)
-{
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
-    std::string command {
-        "ClientMsgHandler: in OnPointerEvent, "
-        "Operation canceled"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
-
-    MMI_HILOGD("Call InputManager::MarkConsumed");
-    InputManager::GetInstance()->MarkConsumed(monitorId, eventId);
-
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-}
-
-void InputManagerTest::TestMarkConsumedStep4()
-{
-    auto pointerEvent = PointerEvent::Create();
-    CHKPV(pointerEvent);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetGlobalX(1123);  // test code，set the GlobalX = 823
-    item.SetGlobalY(723);   // test code，set the GlobalY = 723
-    item.SetPressure(5);    // test code，set the Pressure = 5
-    item.SetDeviceId(1);    // test code，set the DeviceId = 1
-    pointerEvent->AddPointerItem(item);
-
-    pointerEvent->SetId(std::numeric_limits<int32_t>::max() - INDEX_FIRST);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->SetPointerId(0);  // test code，set the PointerId = 1
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-
-    std::string command {
-        "InputHandlerManagerGlobal: in HandleEvent, "
-        "Pointer event was monitor"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
-
-    MMI_HILOGD("Call InputManager::SimulatePointerEvent");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-}
-
-void InputManagerTest::TestMarkConsumedStep5()
-{
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
-    auto pointerEvent = PointerEvent::Create();
-    CHKPV(pointerEvent);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetGlobalX(0);  // test code，set the GlobalX = 823
-    item.SetGlobalY(0);   // test code，set the GlobalY = 723
-    item.SetPressure(0);    // test code，set the Pressure = 5
-    item.SetDeviceId(1);    // test code，set the DeviceId = 1
-    pointerEvent->AddPointerItem(item);
-
-    pointerEvent->SetId(std::numeric_limits<int32_t>::max());
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    pointerEvent->SetPointerId(0);  // test code，set the PointerId = 1
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-
-    std::string command {
-        "InputHandlerManagerGlobal: in HandleEvent, "
-        "Pointer event was monitor"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
-
-    MMI_HILOGD("Call InputManager::SimulatePointerEvent");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-}
-
-void InputManagerTest::TestMarkConsumedStep6()
-{
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    auto pointerEvent = PointerEvent::Create();
-    CHKPV(pointerEvent);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetGlobalX(823);   // test code，set the GlobalX = 823
-    item.SetGlobalY(723);   // test code，set the GlobalY = 723
-    item.SetPressure(5);    // test code，set the Pressure = 5
-    item.SetDeviceId(1);    // test code，set the DeviceId = 1
-    pointerEvent->AddPointerItem(item);
-
-    pointerEvent->SetId(std::numeric_limits<int32_t>::max());
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetPointerId(0);  // test code，set the PointerId = 1
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-
-    std::string command {
-        "InputManagerImpl: in OnPointerEvent, "
-        "pointer event pointerId:[[:digit:]]\\{1,\\}"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
-
-    MMI_HILOGD("Call InputManager::SimulatePointerEvent");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-}
-
-/**
- * @tc.name:MultimodalEventHandler_InjectKeyEvent_001
- * @tc.desc:Verify inject key Back
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_001, TestSize.Level1)
-{
-    std::string command = "Inject keyCode:2, action:2";
-    std::vector<std::string> slogs {SearchLog(command, true)};
-    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_NE(injectDownEvent, nullptr);
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
-
-    std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
-    ASSERT_NE(injectUpEvent, nullptr);
-    downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitUp;
-    kitUp.SetKeyCode(KeyEvent::KEYCODE_BACK);
-    kitUp.SetPressed(false);
-    kitUp.SetDownTime(downTime);
-    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
-    injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    injectUpEvent->RemoveReleasedKeyItems(kitUp);
-    InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
-    std::vector<std::string> tlogs {SearchLog(command, slogs)};
-}
-
-/**
- * @tc.name:MultimodalEventHandler_InjectKeyEvent_002
- * @tc.desc:Verify inject key home
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_002, TestSize.Level1)
-{
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_NE(injectDownEvent, nullptr);
-    int64_t downTime = -1;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_HOME);
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
-}
-
-/**
- * @tc.name:MultimodalEventHandler_InjectKeyEvent_003
- * @tc.desc:Verify inject key down
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_003, TestSize.Level1)
-{
-    std::string command = "Inject keyCode:2, action:2";
-    std::vector<std::string> slogs {SearchLog(command, true)};
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_NE(injectDownEvent, nullptr);
-    int64_t downTime = 0;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
-
-    std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
-    ASSERT_NE(injectUpEvent, nullptr);
-    KeyEvent::KeyItem kitUp;
-    kitUp.SetKeyCode(KeyEvent::KEYCODE_BACK);
-    kitUp.SetPressed(false);
-    kitUp.SetDownTime(downTime);
-    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
-    injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    injectUpEvent->RemoveReleasedKeyItems(kitUp);
-    InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
-    std::vector<std::string> tlogs {SearchLog(command, slogs)};
-}
-
-/**
- * @tc.name:MultimodalEventHandler_InjectKeyEvent_004
- * @tc.desc:Verify inject key unknown
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_004, TestSize.Level1)
-{
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_NE(injectDownEvent, nullptr);
-    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-    MMI_HILOGD("MMIEventHdl.InjectEvent begin");
-    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
-    MMI_HILOGD("MMIEventHdl.InjectEvent end");
-}
-
-/**
- * @tc.name:MultimodalEventHandler_InjectKeyEvent_005
- * @tc.desc:Verify inject key fn
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_InjectKeyEvent_005, TestSize.Level1)
-{
-    std::string command = "Inject keyCode:0, action:2";
-    std::vector<std::string> slogs {SearchLog(command, true)};
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_NE(injectDownEvent, nullptr);
-    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_FN);
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_FN);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-    if (injectDownEvent == nullptr) {
-        MMI_HILOGD("injectDownEvent is nullptr!");
-    }
-    MMI_HILOGD("MMIEventHdl.InjectEvent begin!");
-    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
-    MMI_HILOGD("MMIEventHdl.InjectEvent end!");
-
-    std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
-    ASSERT_NE(injectUpEvent, nullptr);
-    downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitUp;
-    kitUp.SetKeyCode(KeyEvent::KEYCODE_FN);
-    kitUp.SetPressed(false);
-    kitUp.SetDownTime(downTime);
-    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_FN);
-    injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    injectUpEvent->RemoveReleasedKeyItems(kitUp);
-    InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
-    std::vector<std::string> tlogs {SearchLog(command, slogs)};
-}
-
-std::string InputManagerTest::DumpPointerItem(const PointerEvent::PointerItem &item)
+std::string InputManagerTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& pointerEvent)
 {
     const int precision = 2;
-    std::ostringstream strm;
-    strm << "ClientMsgHandler: in OnPointerEvent, DownTime:" << item.GetDownTime()
-         << ",IsPressed:" << std::boolalpha << item.IsPressed()
-         << ",GlobalX:-\\{0,1\\}[[:digit:]]\\{1,\\},GlobalY:-\\{0,1\\}[[:digit:]]\\{1,\\}"
-         << ",LocalX:-\\{0,1\\}[[:digit:]]\\{1,\\},LocalY:-\\{0,1\\}[[:digit:]]\\{1,\\}"
-         << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
-         << ",TiltX:" << std::fixed << std::setprecision(precision) << item.GetTiltX()
-         << ",TiltY:" << std::fixed << std::setprecision(precision) << item.GetTiltY()
-         << ",ToolGlobalX:" << item.GetToolGlobalX() << ",ToolGlobalY:" << item.GetToolGlobalY()
-         << ",ToolLocalX:" << item.GetToolLocalX() << ",ToolLocalY:" << item.GetToolLocalY()
-         << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
-         << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
-         << ",LongAxis:" << item.GetLongAxis() << ",ShortAxis:" << item.GetShortAxis();
-    return strm.str();
-}
-
-std::string InputManagerTest::DumpPointerEvent(const std::shared_ptr<PointerEvent> &pointerEvent)
-{
-    const int precision = 2;
-    std::ostringstream strm;
-    strm << "ClientMsgHandler: in OnPointerEvent"
+    std::ostringstream ostream;
+    std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
+    ostream << "ClientMsgHandler: in OnPointerEvent"
          << ", EventType:" << pointerEvent->GetEventType()
          << ",ActionTime:" << pointerEvent->GetActionTime()
          << ",Action:" << pointerEvent->GetAction()
@@ -513,16 +226,60 @@ std::string InputManagerTest::DumpPointerEvent(const std::shared_ptr<PointerEven
          << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
          << ",HorizontalAxisValue:" << std::fixed << std::setprecision(precision)
          << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL);
+    for (const auto& pointerId : pointerIds) {
+        PointerEvent::PointerItem item;
+        if (!pointerEvent->GetPointerItem(pointerId, item)) {
+            MMI_HILOGE("Invalid pointer: %{public}d.", pointerId);
+            return ostream.str();
+        }
+        ostream << ",ClientMsgHandler: in OnPointerEvent, DownTime:" << item.GetDownTime()
+            << ",IsPressed:" << std::boolalpha << item.IsPressed()
+            << ",GlobalX:-\\{0,1\\}[[:digit:]]\\{1,\\},GlobalY:-\\{0,1\\}[[:digit:]]\\{1,\\}"
+            << ",LocalX:-\\{0,1\\}[[:digit:]]\\{1,\\},LocalY:-\\{0,1\\}[[:digit:]]\\{1,\\}"
+            << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
+            << ",TiltX:" << std::fixed << std::setprecision(precision) << item.GetTiltX()
+            << ",TiltY:" << std::fixed << std::setprecision(precision) << item.GetTiltY()
+            << ",ToolGlobalX:" << item.GetToolGlobalX() << ",ToolGlobalY:" << item.GetToolGlobalY()
+            << ",ToolLocalX:" << item.GetToolLocalX() << ",ToolLocalY:" << item.GetToolLocalY()
+            << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
+            << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
+            << ",LongAxis:" << item.GetLongAxis() << ",ShortAxis:" << item.GetShortAxis();
+    }
+    return ostream.str();
+}
+
+std::string InputManagerTest::DumpInputEvent(const std::shared_ptr<KeyEvent>& keyEvent)
+{
+    std::ostringstream strm;
+    strm << "InputManagerTest: in OnKeyEvent"
+         << ", KeyCode:" << keyEvent->GetKeyCode()
+         << ", ActionTime:" << keyEvent->GetActionTime()
+         << ", Action:" << keyEvent->GetAction()
+         << ", ActionStartTime:" << keyEvent->GetActionStartTime()
+         << ", EventType:" << keyEvent->GetEventType()
+         << ", KeyAction:" << keyEvent->GetKeyAction();
     return strm.str();
+}
+
+template<typename EventT>
+static void TestSimulateInputEvent(EventT& event, const TestScene& testScene = TestScene::NORMAL_TEST)
+{
+    CALL_LOG_ENTER;
+    std::string sPointeE = InputManagerTest::DumpInputEvent(event);
+    InputManager::GetInstance()->SimulateInputEvent(event);
+    std::string sPointerEs = InputManagerTest::GetEventDump();
+    MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
+    if (testScene == TestScene::NORMAL_TEST) {
+        EXPECT_STREQ(sPointeE.c_str(), sPointerEs.c_str());
+    } else {
+        EXPECT_STRNE(sPointeE.c_str(), sPointerEs.c_str());
+    }
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent001()
 {
     auto pointerEvent = PointerEvent::Create();
-    if (pointerEvent == nullptr) {
-        MMI_HILOGD("out of memory.");
-        return pointerEvent;
-    }
+    CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -547,10 +304,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent001()
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent002()
 {
     auto pointerEvent = PointerEvent::Create();
-    if (pointerEvent == nullptr) {
-        MMI_HILOGD("out of memory.");
-        return pointerEvent;
-    }
+    CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -575,10 +329,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent002()
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent003()
 {
     auto pointerEvent = PointerEvent::Create();
-    if (pointerEvent == nullptr) {
-        MMI_HILOGD("out of memory.");
-        return pointerEvent;
-    }
+    CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -600,228 +351,25 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent003()
     return pointerEvent;
 }
 
-void InputManagerTest::TestSimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CALL_LOG_ENTER;
-    PointerEvent::PointerItem item;
-    pointerEvent->GetPointerItem(0, item);
-    std::string sItem1 { DumpPointerItem(item) };
-    std::vector<std::string> sLogItem1s { SearchLog(sItem1, true) };
-    MMI_HILOGD("sItem1:%{public}s", sItem1.c_str());
-
-    pointerEvent->GetPointerItem(1, item);
-    std::string sItem2 { DumpPointerItem(item) };
-    std::vector<std::string> sLogItem2s { SearchLog(sItem2, true) };
-    MMI_HILOGD("sItem2:%{public}s", sItem2.c_str());
-
-    std::string sPointeE { DumpPointerEvent(pointerEvent) };
-    std::vector<std::string> sLogPointerEs { SearchLog(sPointeE, true) };
-    MMI_HILOGD("sPointerE:%{public}s", sPointeE.c_str());
-
-    std::string sCmd {
-        "InputManagerImpl: in OnPointerEvent, "
-        "pointer event pointerId:[[:digit:]]\\{1,\\}"
-    };
-    std::vector<std::string> sLogs { SearchLog(sCmd, true) };
-    MMI_HILOGD("sCmd:%{public}s", sCmd.c_str());
-
-    MMI_HILOGD("Call InputManager::SimulateInputEvent");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
-        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-        InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    }
-    int32_t nTries { N_TRIES_FOR_LOG };
-    std::bitset<4> states { };
-
-    while (true) {
-        if (!states.test(0)) {
-            std::vector<std::string> tLogPointerEs { SearchLog(sPointeE, sLogPointerEs, true) };
-            if (!tLogPointerEs.empty()) {
-                states.set(0);
-            }
-        }
-        if (!states.test(1)) {
-            std::vector<std::string> tLogItem1s { SearchLog(sItem1, sLogItem1s, true) };
-            if (!tLogItem1s.empty()) {
-                states.set(1);
-            }
-        }
-        if (!states.test(2)) {
-            std::vector<std::string> tLogItem2s { SearchLog(sItem2, sLogItem2s, true) };
-            if (!tLogItem2s.empty()) {
-                states.set(2);
-            }
-        }
-        if (!states.test(3)) {
-            std::vector<std::string> tLogs { SearchLog(sCmd, sLogs, true) };
-            if (!tLogs.empty()) {
-                states.set(3);
-            }
-        }
-        if (states.all() || (--nTries <= 0)) {
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
-    }
-}
-
-/**
- * @tc.name:InputManager_SimulateInputEvent_001
- * @tc.desc:Verify Simulate pointer down event
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_001, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManager_SimulateInputEvent_001");
-    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent001() };
-    ASSERT_TRUE(pointerEvent != nullptr);
-    TestSimulateInputEvent(pointerEvent);
-}
-
-/**
- * @tc.name:InputManager_SimulateInputEvent_002
- * @tc.desc:Verify Simulate pointer move event
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_002, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManager_SimulateInputEvent_002");
-    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent002() };
-    ASSERT_TRUE(pointerEvent != nullptr);
-    TestSimulateInputEvent(pointerEvent);
-}
-
-/**
- * @tc.name:InputManager_SimulateInputEvent_003
- * @tc.desc:Verify Simulate pointer up event
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_003, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManager_SimulateInputEvent_003");
-    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent002() };
-    ASSERT_TRUE(pointerEvent != nullptr);
-    TestSimulateInputEvent(pointerEvent);
-}
-
-/**
- * @tc.name:InputManager_SimulateInputEvent_004
- * @tc.desc:Verify Simulate pointer event
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_004, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManager_SimulateInputEvent_004");
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_TRUE(pointerEvent != nullptr);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->SetPointerId(-1);
-
-    std::string command {
-        "InputWindowsManager: in UpdateTouchScreenTarget, "
-        "Can.t find pointer item, pointer:"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
-
-    MMI_HILOGD("Call InputManager::SimulateInputEvent");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-}
-
-void InputManagerTest::TestSimulateInputEvent_2(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CALL_LOG_ENTER;
-    PointerEvent::PointerItem item;
-    pointerEvent->GetPointerItem(1, item);
-    std::string sItem1 { DumpPointerItem(item) };
-    std::vector<std::string> sLogItem1s { SearchLog(sItem1, true) };
-    MMI_HILOGD("sItem1:%{public}s", sItem1.c_str());
-
-    std::string sPointeE { DumpPointerEvent(pointerEvent) };
-    std::vector<std::string> sLogPointerEs { SearchLog(sPointeE, true) };
-    MMI_HILOGD("sPointerE:%{public}s", sPointeE.c_str());
-
-    std::string sCmd {
-        "InputManagerImpl: in OnPointerEvent, "
-        "pointer event pointerId:[[:digit:]]\\{1,\\}"
-    };
-    std::vector<std::string> sLogs { SearchLog(sCmd, true) };
-    MMI_HILOGD("sCmd:%{public}s", sCmd.c_str());
-
-    MMI_HILOGD("Call InputManager::SimulateInputEvent");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    int32_t nTries { N_TRIES_FOR_LOG };
-    // 这里主要测试以下两方面：
-    //   (1) 客户端可以成功接收到事件；
-    //   (2) 客户端接收到的事件结构的各个字段与初始设置的值一致；
-    // 为此，这里有三项测试：
-    //   (1) PointerEvent记录的按下手指的数据的各字段与设置的值是一致的；
-    //   (2) PointerEvent结构各字段的值与设置的值是一致的；
-    //   (3) 客户端成功接收到PointerEvent事件；
-    // 这三项测试各自成功与否依次由states[0]、states[1]和states[2]标识；
-    std::bitset<3> states { };
-
-    while (true) {
-        if (!states.test(0)) {
-            // 搜索日志，匹配PointerEvent事件结构的数据；
-            std::vector<std::string> tLogPointerEs { SearchLog(sPointeE, sLogPointerEs, true) };
-            if (!tLogPointerEs.empty()) {
-                states.set(0);
-            }
-        }
-        if (!states.test(1)) {
-            // 搜索日志，匹配按下手指的数据；
-            std::vector<std::string> tLogItem1s { SearchLog(sItem1, sLogItem1s, true) };
-            if (!tLogItem1s.empty()) {
-                states.set(1);
-            }
-        }
-        if (!states.test(2)) {
-            // 搜索标识客户端成功接收到事件的关键性日志；
-            std::vector<std::string> tLogs { SearchLog(sCmd, sLogs, true) };
-            if (!tLogs.empty()) {
-                states.set(2);
-            }
-        }
-        if (states.all() || (--nTries <= 0)) {
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
-    }
-}
-
-std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent006()
+std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent005()
 {
     auto pointerEvent = PointerEvent::Create();
-    if (pointerEvent == nullptr) {
-        MMI_HILOGD("out of memory.");
-        return pointerEvent;
-    }
+    CHKPP(pointerEvent);
     int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
     pointerEvent->SetPointerId(1);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
     PointerEvent::PointerItem item;
     item.SetPointerId(1);
     item.SetDownTime(downTime);
     item.SetPressed(true);
 
-    item.SetGlobalX(10);
-    item.SetGlobalY(10);
-    item.SetLocalX(20);
-    item.SetLocalY(20);
+    item.SetGlobalX(50);
+    item.SetGlobalY(50);
+    item.SetLocalX(70);
+    item.SetLocalY(70);
 
     item.SetWidth(0);
     item.SetHeight(0);
@@ -831,13 +379,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent006()
     return pointerEvent;
 }
 
-std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent007()
+std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent006()
 {
     auto pointerEvent = PointerEvent::Create();
-    if (pointerEvent == nullptr) {
-        MMI_HILOGD("out of memory.");
-        return pointerEvent;
-    }
+    CHKPP(pointerEvent);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->SetPointerId(1);
@@ -859,13 +404,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent007()
     return pointerEvent;
 }
 
-std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent008()
+std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent007()
 {
     auto pointerEvent = PointerEvent::Create();
-    if (pointerEvent == nullptr) {
-        MMI_HILOGD("out of memory.");
-        return pointerEvent;
-    }
+    CHKPP(pointerEvent);
     int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
@@ -893,10 +435,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent008()
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent009()
 {
     auto pointerEvent = PointerEvent::Create();
-    if (pointerEvent == nullptr) {
-        MMI_HILOGD("out of memory.");
-        return pointerEvent;
-    }
+    CHKPP(pointerEvent);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
     pointerEvent->SetPointerId(1);
@@ -920,6 +459,33 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent009()
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent010()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 30.0);
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, 40.0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDownTime(0);
+    item.SetPressed(false);
+
+    item.SetGlobalX(200);
+    item.SetGlobalY(200);
+    item.SetLocalX(300);
+    item.SetLocalY(300);
+
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetPressure(0);
+    item.SetDeviceId(0);
+    pointerEvent->AddPointerItem(item);
+    return pointerEvent;
+}
+
+std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent011()
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
@@ -957,7 +523,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent010()
     return pointerEvent;
 }
 
-std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent011()
+std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent012()
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
@@ -1033,201 +599,423 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent013()
     return pointerEvent;
 }
 
+std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep1()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);   // test code，set the PointerId = 0
+    item.SetGlobalX(823);   // test code，set the GlobalX = 823
+    item.SetGlobalY(723);   // test code，set the GlobalY = 723
+    item.SetPressure(5);    // test code，set the Pressure = 5
+    item.SetDeviceId(1);    // test code，set the DeviceId = 1
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetId(std::numeric_limits<int32_t>::max() - INDEX_THIRD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(0);  // test code，set the PointerId = 1
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+
+    TestSimulateInputEvent(pointerEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    return pointerEvent;
+}
+
+std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep2()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);   // test code，set the PointerId = 0
+    item.SetGlobalX(1023);  // test code，set the GlobalX = 823
+    item.SetGlobalY(723);   // test code，set the GlobalY = 723
+    item.SetPressure(5);    // test code，set the Pressure = 5
+    item.SetDeviceId(1);    // test code，set the DeviceId = 1
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetId(std::numeric_limits<int32_t>::max() - INDEX_SECOND);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(0);  // test code，set the PointerId = 1
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+
+    TestSimulateInputEvent(pointerEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    return pointerEvent;
+}
+
+void InputManagerTest::TestMarkConsumedStep3(int32_t monitorId, int32_t eventId)
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    location_ = RECV_FLAG::RECV_MARK_CONSUMED;
+    InputManager::GetInstance()->MarkConsumed(monitorId, eventId);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+}
+
+void InputManagerTest::TestMarkConsumedStep4()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);   // test code，set the PointerId = 0
+    item.SetGlobalX(1123);  // test code，set the GlobalX = 823
+    item.SetGlobalY(723);   // test code，set the GlobalY = 723
+    item.SetPressure(5);    // test code，set the Pressure = 5
+    item.SetDeviceId(1);    // test code，set the DeviceId = 1
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetId(std::numeric_limits<int32_t>::max() - INDEX_FIRST);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(0);  // test code，set the PointerId = 1
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+
+    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+}
+
+void InputManagerTest::TestMarkConsumedStep5()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);   // test code，set the PointerId = 0
+    item.SetGlobalX(0);  // test code，set the GlobalX = 823
+    item.SetGlobalY(0);   // test code，set the GlobalY = 723
+    item.SetPressure(0);    // test code，set the Pressure = 5
+    item.SetDeviceId(1);    // test code，set the DeviceId = 1
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetId(std::numeric_limits<int32_t>::max());
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetPointerId(0);  // test code，set the PointerId = 1
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+
+    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+}
+
+void InputManagerTest::TestMarkConsumedStep6()
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);   // test code，set the PointerId = 0
+    item.SetGlobalX(823);   // test code，set the GlobalX = 823
+    item.SetGlobalY(723);   // test code，set the GlobalY = 723
+    item.SetPressure(5);    // test code，set the Pressure = 5
+    item.SetDeviceId(1);    // test code，set the DeviceId = 1
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetId(std::numeric_limits<int32_t>::max());
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(0);  // test code，set the PointerId = 1
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+
+    TestSimulateInputEvent(pointerEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+}
+
 /**
- * @tc.name:InputManager_Pencil2InputEvent_001
- * @tc.desc:Verify simulate pointer event
+ * @tc.name: MultimodalEventHandler_SimulateKeyEvent_001
+ * @tc.desc: Verify simulate the back key is long pressed and lifted
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_001, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_001, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManager_Pencil2InputEvent_001");
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
+    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    TestSimulateInputEvent(injectDownEvent);
+
+    std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectUpEvent != nullptr);
+    downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitUp;
+    kitUp.SetKeyCode(KeyEvent::KEYCODE_BACK);
+    kitUp.SetPressed(false);
+    kitUp.SetDownTime(downTime);
+    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectUpEvent->RemoveReleasedKeyItems(kitUp);
+    TestSimulateInputEvent(injectUpEvent);
+}
+
+/**
+ * @tc.name: MultimodalEventHandler_SimulateKeyEvent_002
+ * @tc.desc: Verify simulate the back home is pressed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_002, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = -1;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_HOME);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    TestSimulateInputEvent(injectDownEvent);
+}
+
+/**
+ * @tc.name: MultimodalEventHandler_SimulateKeyEvent_003
+ * @tc.desc: Verify simulate the back key is pressed and lifted
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_003, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = 0;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    TestSimulateInputEvent(injectDownEvent);
+
+    std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectUpEvent != nullptr);
+    KeyEvent::KeyItem kitUp;
+    kitUp.SetKeyCode(KeyEvent::KEYCODE_BACK);
+    kitUp.SetPressed(false);
+    kitUp.SetDownTime(downTime);
+    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectUpEvent->RemoveReleasedKeyItems(kitUp);
+    TestSimulateInputEvent(injectUpEvent);
+}
+
+/**
+ * @tc.name: MultimodalEventHandler_SimulateKeyEvent_004
+ * @tc.desc: Verify simulate key exception event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_004, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    TestSimulateInputEvent(injectDownEvent, TestScene::EXCEPTION_TEST);
+}
+
+/**
+ * @tc.name: MultimodalEventHandler_SimulateKeyEvent_005
+ * @tc.desc: Verify simulate the fn key is long pressed and lifted
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_005, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_FN);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_FN);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    TestSimulateInputEvent(injectDownEvent);
+
+
+    std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectUpEvent != nullptr);
+    downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitUp;
+    kitUp.SetKeyCode(KeyEvent::KEYCODE_FN);
+    kitUp.SetPressed(false);
+    kitUp.SetDownTime(downTime);
+    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_FN);
+    injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectUpEvent->RemoveReleasedKeyItems(kitUp);
+    TestSimulateInputEvent(injectUpEvent);
+}
+
+/**
+ * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_001
+ * @tc.desc: Verify simulate screen down event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulatePoniterEvent_001, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent001() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_002
+ * @tc.desc: Verify simulate screen move event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulatePoniterEvent_002, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent002() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_003
+ * @tc.desc: Verify simulate screen up event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_003, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent003() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_004
+ * @tc.desc: Verify simulate screen exception event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_004, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerId(-1);
+    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
+}
+
+/**
+ * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_005
+ * @tc.desc: Verify simulate mouse down event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_005, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent005() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_006
+ * @tc.desc: Verify simulate mouse move event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_006, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent006() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_007
+ * @tc.desc: Verify simulate mouse up event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_007, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent007() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_008
+ * @tc.desc: Verify simulate mouse exception event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_008, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerId(-1);
+    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
+}
+
+/**
+ * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_009
+ * @tc.desc: Verify simulate mouse VERTICAL axis event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_009, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent009() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_010
+ * @tc.desc: Verify simulate mouse VERTICAL HORIZONTAL axis event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_010, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent010() };
     ASSERT_TRUE(pointerEvent != nullptr);
     TestSimulateInputEvent(pointerEvent);
 }
 
 /**
- * @tc.name:InputManager_Pencil2InputEvent_002
- * @tc.desc:Verify simulate pointer event
+ * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_011
+ * @tc.desc: Verify simulate mouse AXIS_BEGIN event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_002, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_011, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManager_Pencil2InputEvent_002");
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent011() };
-    ASSERT_TRUE(pointerEvent != nullptr);
-    TestSimulateInputEvent(pointerEvent);
-}
-
-/**
- * @tc.name:InputManager_Pencil2InputEvent_003
- * @tc.desc:Verify simulate pointer event
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_003, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManager_Pencil2InputEvent_003");
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent013() };
-    ASSERT_TRUE(pointerEvent != nullptr);
-    TestSimulateInputEvent(pointerEvent);
-}
-
-/**
- * @tc.name:InputManager_Pencil2InputEvent_004
- * @tc.desc:Verify simulate pointer event
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_004, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManager_Pencil2InputEvent_004");
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_TRUE(pointerEvent != nullptr);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->SetPointerId(-1);
-
-    std::string command {
-        "InputWindowsManager: in UpdateTouchScreenTarget, "
-        "Can.t find pointer item, pointer:"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
-
-    MMI_HILOGD("Call InputManager::SimulateInputEvent");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-}
-
-/**
- * @tc.name:InputManager_SimulateInputEvent_006
- * @tc.desc:Verify simulate mouse event
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_006, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManager_SimulateInputEvent_006");
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent006() };
-    ASSERT_TRUE(pointerEvent != nullptr);
-    TestSimulateInputEvent_2(pointerEvent);
-}
-
-/**
- * @tc.name:InputManager_SimulateInputEvent_007
- * @tc.desc:Verify simulate mouse event
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_007, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManager_SimulateInputEvent_007");
-    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent007() };
-    ASSERT_TRUE(pointerEvent != nullptr);
-    TestSimulateInputEvent_2(pointerEvent);
-}
-
-/**
- * @tc.name:InputManager_SimulateInputEvent_008
- * @tc.desc:Verify simulate mouse event
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_008, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManager_SimulateInputEvent_008");
-    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent008() };
-    ASSERT_TRUE(pointerEvent != nullptr);
-    TestSimulateInputEvent_2(pointerEvent);
-}
-
-/**
- * @tc.name:InputManager_SimulateInputEvent_009
- * @tc.desc:Verify simulate mouse event
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_009, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManager_SimulateInputEvent_009");
-    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent009() };
-    ASSERT_TRUE(pointerEvent != nullptr);
-    TestSimulateInputEvent_2(pointerEvent);
-}
-
-std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent012()
-{
-    auto pointerEvent = PointerEvent::Create();
-    if (pointerEvent == nullptr) {
-        MMI_HILOGD("out of memory.");
-        return pointerEvent;
-    }
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
-    pointerEvent->SetPointerId(1);
-    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 30.0);
-    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, 40.0);
-    PointerEvent::PointerItem item;
-    item.SetPointerId(1);
-    item.SetDownTime(0);
-    item.SetPressed(false);
-
-    item.SetGlobalX(200);
-    item.SetGlobalY(200);
-    item.SetLocalX(300);
-    item.SetLocalY(300);
-
-    item.SetWidth(0);
-    item.SetHeight(0);
-    item.SetPressure(0);
-    item.SetDeviceId(0);
-    pointerEvent->AddPointerItem(item);
-    return pointerEvent;
-}
-
-/**
- * @tc.name:InputManager_SimulateInputEvent_012
- * @tc.desc:Verify simulate mouse event
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_012, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManager_SimulateInputEvent_012");
-    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent012() };
-    ASSERT_TRUE(pointerEvent != nullptr);
-    TestSimulateInputEvent_2(pointerEvent);
-}
-
-/**
- * @tc.name:InputManager_SimulateInputEvent_013
- * @tc.desc:Verify simulate mouse event
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_013, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManager_SimulateInputEvent_013");
-    std::string command = "PointerAction:axis-begin";
-    std::vector<std::string> sLogs { SearchLog(command, true) };
-
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -1249,25 +1037,19 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_013, TestSize.Level1)
     item.SetPressure(0);
     item.SetDeviceId(0);
     pointerEvent->AddPointerItem(item);
-    MMI_HILOGD("Inject POINTER_ACTION_AXIS_BEGIN");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    TestSimulateInputEvent(pointerEvent);
 }
 
 /**
- * @tc.name:InputManager_SimulateInputEvent_014
- * @tc.desc:Verify simulate mouse event
+ * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_012
+ * @tc.desc: Verify simulate mouse AXIS_UPDATE event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_014, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_012, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManager_SimulateInputEvent_014");
-    std::string command = "PointerAction:axis-update";
-    std::vector<std::string> sLogs { SearchLog(command, true) };
-
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -1289,25 +1071,19 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_014, TestSize.Level1)
     item.SetPressure(0);
     item.SetDeviceId(0);
     pointerEvent->AddPointerItem(item);
-    MMI_HILOGD("Inject POINTER_ACTION_AXIS_UPDATE");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    TestSimulateInputEvent(pointerEvent);
 }
 
 /**
- * @tc.name:InputManager_SimulateInputEvent_015
- * @tc.desc:Verify simulate mouse event
+ * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_013
+ * @tc.desc: Verify simulate mouse AXIS_END event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_015, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_013, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManager_SimulateInputEvent_015");
-    std::string command = "PointerAction:axis-end";
-    std::vector<std::string>  sLogs { SearchLog(command, true) };
-
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -1330,22 +1106,77 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_015, TestSize.Level1)
     item.SetDeviceId(0);
     pointerEvent->AddPointerItem(item);
 
-    MMI_HILOGD("Inject POINTER_ACTION_AXIS_END");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    TestSimulateInputEvent(pointerEvent);
 }
 
+/**
+ * @tc.name: MultimodalEventHandler_SimulatePencil2Event_001
+ * @tc.desc: Verify simulate pencil2 down event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePencil2Event_001, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent011() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+}
 
 /**
- * @tc.name:InputManager_NotResponse_001
+ * @tc.name: MultimodalEventHandler_SimulatePencil2Event_002
+ * @tc.desc: Verify simulate pencil2 move event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePencil2Event_002, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent012() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: MultimodalEventHandler_SimulatePencil2Event_003
+ * @tc.desc: Verify simulate pencil2 up event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePencil2Event_003, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent013() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_Pencil2InputEvent_004
+ * @tc.desc: Verify simulate exception event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_004, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerId(-1);
+    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
+}
+
+/**
+ * @tc.name: InputManager_NotResponse_001
  * @tc.desc: detection of not response
  * @tc.type: FUNC
  * @tc.require:AR000GJG6G
  */
 HWTEST_F(InputManagerTest, InputManager_NotResponse_001, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManager_NotResponse_001");
+    CALL_LOG_ENTER;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
 
@@ -1364,14 +1195,14 @@ HWTEST_F(InputManagerTest, InputManager_NotResponse_001, TestSize.Level1)
 }
 
 /**
- * @tc.name:InputManager_NotResponse_002
+ * @tc.name: InputManager_NotResponse_002
  * @tc.desc: detection of not response
  * @tc.type: FUNC
  * @tc.require:SR000GGN6G
  */
 HWTEST_F(InputManagerTest, InputManager_NotResponse_002, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManager_NotResponse_002");
+    CALL_LOG_ENTER;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
 
@@ -1389,239 +1220,16 @@ HWTEST_F(InputManagerTest, InputManager_NotResponse_002, TestSize.Level1)
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 }
 
-void InputManagerTest::KeyMonitorCallBack(std::shared_ptr<KeyEvent> keyEvent)
-{
-    MMI_HILOGD("KeyMonitorCallBack: keyCode:%{public}d,keyAction:%{public}d,action:%{public}d,"
-               "actionTime:%{public}" PRId64 "", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
-             keyEvent->GetAction(), keyEvent->GetActionTime());
-    EXPECT_EQ(keyEvent->GetKeyCode(), KeyEvent::KEYCODE_BACK);
-    EXPECT_EQ(keyEvent->GetKeyAction(), KeyEvent::KEY_ACTION_UP);
-    EXPECT_EQ(keyEvent->GetAction(), KeyEvent::KEY_ACTION_UP);
-    EXPECT_EQ(keyEvent->GetDeviceId(), 0);
-}
-
 /**
- * @tc.name:InputManagerTest_AddHandler_001
- * @tc.desc:Verify monitor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_001, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManagerTest_AddHandler_001");
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    std::string command {
-        "InputHandlerManagerGlobal: in AddMonitor, "
-        "Service AddMonitor Success"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
-
-    auto callBackPtr = InputEventCallback::GetPtr();
-    EXPECT_TRUE(callBackPtr != nullptr);
-    MMI_HILOGD("InputManagerTest_AddHandler_001");
-    int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(IsValidHandlerId(id1));
-
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-
-    if (IsValidHandlerId(id1)) {
-        InputManager::GetInstance()->RemoveMonitor(id1);
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-}
-
-/**
- * @tc.name:InputManagerTest_AddHandler_002
- * @tc.desc:Verify monitor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_002, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManagerTest_AddHandler_002");
-    auto callBackPtr = InputEventCallback::GetPtr();
-    EXPECT_TRUE(callBackPtr != nullptr);
-    int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(IsValidHandlerId(id1));
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-    std::string command {
-        "InputHandlerManagerGlobal: in RemoveMonitor, "
-        "Service RemoveMonitor Success"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
-    MMI_HILOGD("InputManagerTest_AddHandler_002");
-    if (IsValidHandlerId(id1)) {
-        InputManager::GetInstance()->RemoveMonitor(id1);
-    }
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-}
-
-/**
- * @tc.name:InputManagerTest_AddHandler_003
- * @tc.desc:Verify monitor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_003, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManagerTest_AddHandler_003");
-    const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
-    std::vector<int32_t> ids(N_TEST_CASES);
-    std::vector<std::shared_ptr<InputEventCallback>> cbs(N_TEST_CASES);
-
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
-        cbs[i] = InputEventCallback::GetPtr();
-        EXPECT_TRUE(cbs[i] != nullptr);
-        ids[i] = InputManager::GetInstance()->AddMonitor(cbs[i]);
-        EXPECT_TRUE(IsValidHandlerId(ids[i]));
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-
-    std::string command {
-        "InputManagerTest: in OnInputEvent, "
-        "PointerEvent received"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
-
-    auto pointerEvent = SetupPointerEvent001();
-    MMI_HILOGD("InputManagerTest_AddHandler_003");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    
-    int32_t nTries { N_TRIES_FOR_LOG };
-    std::vector<std::string> rLogs;
-
-    while (true) {
-        std::vector<std::string> tLogs { SearchLog(command, sLogs, true) };
-        rLogs.insert(rLogs.end(), tLogs.begin(), tLogs.end());
-        if ((rLogs.size() >= N_TEST_CASES) || (--nTries <= 0)) {
-            break;
-        }
-        sLogs.insert(sLogs.end(), tLogs.begin(), tLogs.end());
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
-    }
-
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
-        if (IsValidHandlerId(ids[i])) {
-            InputManager::GetInstance()->RemoveMonitor(ids[i]);
-            std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-        }
-    }
-}
-
-/**
- * @tc.name:InputManagerTest_AddHandler_004
- * @tc.desc:Verify monitor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_004, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManagerTest_AddHandler_004");
-    std::string command {
-        "InputHandlerManager: in AddHandler, "
-        "The number of handlers exceeds the maximum"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
-
-    const std::vector<int32_t>::size_type N_TEST_CASES { MAX_N_INPUT_HANDLERS };
-    std::vector<int32_t> ids(N_TEST_CASES);
-    std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
-    EXPECT_TRUE(cb != nullptr);
-
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
-        ids[i] = InputManager::GetInstance()->AddMonitor(cb);
-        EXPECT_TRUE(IsValidHandlerId(ids[i]));
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-    MMI_HILOGD("InputManagerTest_AddHandler_004");
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
-    EXPECT_TRUE(!IsValidHandlerId(monitorId));
-
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
-        if (IsValidHandlerId(ids[i])) {
-            InputManager::GetInstance()->RemoveMonitor(ids[i]);
-            std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-        }
-    }
-}
-
-/**
- * @tc.name:InputManagerTest_AddHandler_005
- * @tc.desc:Verify monitor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_005, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManagerTest_AddHandler_005");
-    RunShellUtil runCommand;
-    std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
-    EXPECT_TRUE(cb != nullptr);
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
-    EXPECT_TRUE(IsValidHandlerId(monitorId));
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    MMI_HILOGD("InputManagerTest_AddHandler_005");
-    TestMarkConsumedStep1();
-    auto pointerEvent = TestMarkConsumedStep2();
-    TestMarkConsumedStep3(monitorId, pointerEvent->GetId());
-    TestMarkConsumedStep4();
-    TestMarkConsumedStep5();
-
-    if (IsValidHandlerId(monitorId)) {
-        InputManager::GetInstance()->RemoveMonitor(monitorId);
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-}
-
-/**
- * @tc.name:InputManagerTest_AddHandler_006
- * @tc.desc:Verify monitor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_006, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGD("start InputManagerTest_AddHandler_006");
-    RunShellUtil runCommand;
-    std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
-    EXPECT_TRUE(cb != nullptr);
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
-    EXPECT_TRUE(IsValidHandlerId(monitorId));
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    MMI_HILOGD("InputManagerTest_AddHandler_006");
-    auto pointerEvent = TestMarkConsumedStep1();
-    TestMarkConsumedStep3(monitorId, pointerEvent->GetId());
-    TestMarkConsumedStep4();
-    TestMarkConsumedStep6();
-
-    if (IsValidHandlerId(monitorId)) {
-        InputManager::GetInstance()->RemoveMonitor(monitorId);
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-}
-
-/**
- * @tc.name:InputManagerTest_SubscribeKeyEvent_008
- * @tc.desc:Verify invalid parameter.
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_001
+ * @tc.desc: Verify invalid parameter.
  * @tc.type: FUNC
  * @tc.require:SR000GGQL4  AR000GJNGN
  * @tc.author: yangguang
  */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_008, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManagerTest_SubscribeKeyEvent_008");
+    CALL_LOG_ENTER;
     std::set<int32_t> preKeys;
     std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
     keyOption->SetPreKeys(preKeys);
@@ -1632,21 +1240,20 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_008, TestSize.Leve
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, nullptr);
     EXPECT_TRUE(response < 0);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    InputManager::GetInstance()->UnsubscribeKeyEvent(response);
 }
 
 /**
- * @tc.name:InputManagerTest_SubscribeKeyEvent_010
- * @tc.desc:Verify subscribe power key event.
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_02
+ * @tc.desc: Verify subscribe power key event.
  * @tc.type: FUNC
  * @tc.require:SR000GGQL4  AR000GJNGN
  * @tc.author: zhaoxueyuan
  */
-HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level1)
 {
-    if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGD("get mmi client failed");
-        return;
-    }
+    CALL_LOG_ENTER;
+    ASSERT_TRUE(MMIEventHdl.InitClient());
     // 电源键长按按下订阅
     std::set<int32_t> preKeys;
     std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
@@ -1686,161 +1293,39 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_010, TestSize.Leve
     });
     EXPECT_TRUE(subscribeId2 >= 0);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId1);
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId2);
-    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-}
-
-class InputEventInterceptor : public IInputEventConsumer {
-public:
-    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override { }
-    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override;
-    virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {}
-    static std::shared_ptr<IInputEventConsumer> GetPtr();
-};
-
-void InputEventInterceptor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
-{
-    std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
-    MMI_HILOGD("Pointer event intercepted:");
-    MMI_HILOGD("EventType:%{public}s,ActionTime:%{public}" PRId64 ","
-               "Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
-               "Flag:%{public}u,PointerAction:%{public}s,SourceType:%{public}s,"
-               "VerticalAxisValue:%{public}.2f,HorizontalAxisValue:%{public}.2f,"
-               "PointerCount:%{public}zu",
-               InputEvent::EventTypeToString(pointerEvent->GetEventType()), pointerEvent->GetActionTime(),
-               pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
-               pointerEvent->GetFlag(), pointerEvent->DumpPointerAction(),
-               pointerEvent->DumpSourceType(),
-               pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
-               pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
-               pointerIds.size());
-    for (int32_t pointerId : pointerIds) {
-        PointerEvent::PointerItem item;
-        if (!pointerEvent->GetPointerItem(pointerId, item)) {
-            MMI_HILOGE("Can't find the pointer item data, pointer:%{public}d, errCode:%{public}d",
-                       pointerId, PARAM_INPUT_FAIL);
-            return;
-        }
-
-        MMI_HILOGD("DownTime:%{public}" PRId64 ",IsPressed:%{public}s,"
-                   "GlobalX:%{public}d,GlobalY:%{public}d,Pressure:%{public}.2f",
-                   item.GetDownTime(),
-                   item.IsPressed() ? "true" : "false",
-                   item.GetGlobalX(),
-                   item.GetGlobalY(),
-                   item.GetPressure());
-    }
-}
-
-std::shared_ptr<IInputEventConsumer> InputEventInterceptor::GetPtr()
-{
-    return std::make_shared<InputEventInterceptor>();
-}
-
-std::string InputManagerTest::DumpPointerItem2(const PointerEvent::PointerItem &item)
-{
-    std::ostringstream strm;
-    const int precision = 2;
-    strm << "InputManagerTest: in OnInputEvent, DownTime:" << item.GetDownTime()
-         << ",IsPressed:" << std::boolalpha << item.IsPressed()
-         << ",GlobalX:" << item.GetGlobalX() << ",GlobalY:" << item.GetGlobalY()
-         << ",Pressure:" << std::fixed << std::setprecision(precision) << item.GetPressure();
-    return strm.str();
-}
-
-std::string InputManagerTest::DumpPointerEvent2(const std::shared_ptr<PointerEvent> &pointerEvent)
-{
-    const int precision = 2;
-    std::ostringstream strm;
-    strm << "InputManagerTest: in OnInputEvent"
-        << ", EventType:" << InputEvent::EventTypeToString(pointerEvent->GetEventType())
-        << ",ActionTime:" << pointerEvent->GetActionTime()
-        << ",Action:" << pointerEvent->GetAction()
-        << ",ActionStartTime:" << pointerEvent->GetActionStartTime()
-        << ",Flag:" << pointerEvent->GetFlag()
-        << ",PointerAction:" << pointerEvent->DumpPointerAction()
-        << ",SourceType:" << pointerEvent->DumpSourceType()
-        << ",ButtonId:" << pointerEvent->GetButtonId()
-        << ",VerticalAxisValue:" << std::fixed << std::setprecision(precision)
-        << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
-        << ",HorizontalAxisValue:" << std::fixed << std::setprecision(precision)
-        << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL);
-    return strm.str();
-}
-
-void InputManagerTest::TestInputEventInterceptor(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    std::string sCmd {
-        "InputManagerTest: in OnInputEvent, "
-        "Pointer event intercepted:"
-    };
-    std::vector<std::string> sLogs { SearchLog(sCmd, true) };
-
-    std::string sPointeE { DumpPointerEvent2(pointerEvent) };
-    std::vector<std::string> sLogPointerEs { SearchLog(sPointeE, true) };
-    MMI_HILOGD("sPointerE:%{public}s", sPointeE.c_str());
-
-    PointerEvent::PointerItem item;
-    EXPECT_TRUE(pointerEvent->GetPointerItem(DEFAULT_POINTER_ID, item));
-    std::string sItem1 { DumpPointerItem2(item) };
-    std::vector<std::string> sLogItem1s { SearchLog(sItem1, true) };
-    MMI_HILOGD("sItem1:%{public}s", sItem1.c_str());
-
-    MMI_HILOGD("Call InputManager::SimulateInputEvent");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    int32_t nTries { N_TRIES_FOR_LOG };
-    // 这里主要测试以下两方面：
-    //   (1) 拦截器可以成功接收到事件；
-    //   (2) 拦截器接收到的事件结构的各个字段与初始设置的值一致；
-    // 为此，这里有三项测试：
-    //   (1) 拦截器成功接收到PointerEvent事件；
-    //   (2) PointerEvent记录的按下手指的数据的各字段与设置的值是一致的；
-    //   (3) PointerEvent结构各字段的值与设置的值是一致的；
-    // 这三项测试各自成功与否依次由states[0]、states[1]和states[2]标识；
-    std::bitset<3> states { };
-
-    while (true) {
-        if (!states.test(0)) {
-            // 搜索标识拦截器成功接收到事件的关键性日志；
-            std::vector<std::string> tLogs { SearchLog(sCmd, sLogs, true) };
-            if (!tLogs.empty()) {
-                states.set(0);
-            }
-        }
-        if (!states.test(1)) {
-            // 搜索日志，匹配PointerEvent事件结构的数据；
-            std::vector<std::string> tLogPointerEs { SearchLog(sPointeE, sLogPointerEs, true) };
-            if (!tLogPointerEs.empty()) {
-                states.set(1);
-            }
-        }
-        if (!states.test(2)) {
-            // 搜索日志，匹配按下手指的数据；
-            std::vector<std::string> tLogItem1s { SearchLog(sItem1, sLogItem1s, true) };
-            if (!tLogItem1s.empty()) {
-                states.set(2);
-            }
-        }
-        if (states.all() || (--nTries <= 0)) {
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
-    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
 
 /**
- * @tc.name:TestInputEventInterceptor_001
- * @tc.desc:Verify interceptor
+ * @tc.name: TestGetKeystrokeAbility_001
+ * @tc.desc: Verify SupportKeys
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, TestGetKeystrokeAbility_001, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    std::vector<int32_t> keyCodes = {17, 22, 2055};
+    InputManager::GetInstance()->SupportKeys(0, keyCodes, [](std::vector<bool> keystrokeAbility) {
+        MMI_HILOGD("TestGetKeystrokeAbility_001 callback ok");
+    });
+    MMI_HILOGD("stop TestGetKeystrokeAbility_001");
+}
+
+/**
+ * @tc.name: TestInputEventInterceptor_001
+ * @tc.desc: Verify mouse down event interceptor
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_001, TestSize.Level1)
 {
-    MMI_HILOGD("start TestInputEventInterceptor_001");
+    CALL_LOG_ENTER;
     auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(10010);
@@ -1849,16 +1334,17 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_001, TestSize.Level1)
     item.SetGlobalY(723);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
-
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     pointerEvent->SetPointerId(DEFAULT_POINTER_ID);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
-    std::shared_ptr<IInputEventConsumer> interceptor { InputEventInterceptor::GetPtr() };
+    auto interceptor = GetPtr<InputEventCallback>();
     int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor) };
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    TestInputEventInterceptor(pointerEvent);
+
+    TestSimulateInputEvent(pointerEvent);
+
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -1866,16 +1352,88 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_001, TestSize.Level1)
 }
 
 /**
- * @tc.name:TestInputEventInterceptor_002
- * @tc.desc:Verify interceptor
+ * @tc.name: TestInputEventInterceptor_002
+ * @tc.desc: Verify mouse move event interceptor
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_002, TestSize.Level1)
 {
-    MMI_HILOGD("start TestInputEventInterceptor_002");
+    CALL_LOG_ENTER;
     auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_TRUE(pointerEvent != nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(DEFAULT_POINTER_ID);
+    item.SetDownTime(10010);
+    item.SetPressed(true);
+    item.SetGlobalX(823);
+    item.SetGlobalY(723);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(DEFAULT_POINTER_ID);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+
+    auto interceptor = GetPtr<InputEventCallback>();
+    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor) };
+    EXPECT_TRUE(IsValidHandlerId(interceptorId));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    TestSimulateInputEvent(pointerEvent);
+
+    if (IsValidHandlerId(interceptorId)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+
+/**
+ * @tc.name: TestInputEventInterceptor_003
+ * @tc.desc: Verify mouse up event interceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(DEFAULT_POINTER_ID);
+    item.SetDownTime(10010);
+    item.SetPressed(true);
+    item.SetGlobalX(823);
+    item.SetGlobalY(723);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetPointerId(DEFAULT_POINTER_ID);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+
+    auto interceptor = GetPtr<InputEventCallback>();
+    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor) };
+    EXPECT_TRUE(IsValidHandlerId(interceptorId));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    TestSimulateInputEvent(pointerEvent);
+
+    if (IsValidHandlerId(interceptorId)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+
+/**
+ * @tc.name: TestInputEventInterceptor_004
+ * @tc.desc: Verify multiple interceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
@@ -1884,129 +1442,44 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_002, TestSize.Level1)
     item.SetGlobalY(723);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
-
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     pointerEvent->SetPointerId(0);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    MMI_HILOGD("Call InterceptorManager");
 
     const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
     std::vector<int32_t> ids(N_TEST_CASES);
-    std::shared_ptr<IInputEventConsumer> interceptor { InputEventInterceptor::GetPtr() };
+    auto interceptor = GetPtr<InputEventCallback>();
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
         ids[i] = InputManager::GetInstance()->AddInterceptor(interceptor);
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
-
-    std::string command {
-        "InputManagerTest: in OnInputEvent, "
-        "Pointer event intercepted"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
 
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    int32_t nTries { N_TRIES_FOR_LOG };
-    std::vector<std::string> rLogs;
 
-    while (true) {
-        std::vector<std::string> tLogs { SearchLog(command, sLogs, true) };
-        rLogs.insert(rLogs.end(), tLogs.begin(), tLogs.end());
-        if ((rLogs.size() >= N_TEST_CASES) || (--nTries <= 0)) {
-            break;
+    for (const auto& id : ids) {
+        std::string sPointerEs = InputManagerTest::GetEventDump();
+        MMI_HILOGD("sPointerEs : %{public}s", sPointerEs.c_str());
+        ASSERT_TRUE(!sPointerEs.empty());
+        if (IsValidHandlerId(id)) {
+            InputManager::GetInstance()->RemoveInterceptor(id);
         }
-        sLogs.insert(sLogs.end(), tLogs.begin(), tLogs.end());
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
-    }
-
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
-        if (IsValidHandlerId(ids[i])) {
-            InputManager::GetInstance()->RemoveInterceptor(ids[i]);
-            std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-        }
-    }
-}
-
-/**
- * @tc.name:TestInputEventInterceptor_003
- * @tc.desc:Verify interceptor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
-{
-    MMI_HILOGD("start TestInputEventInterceptor_003");
-    const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
-    std::vector<int32_t> ids(N_TEST_CASES);
-    std::shared_ptr<IInputEventConsumer> interceptor { InputEventInterceptor::GetPtr() };
-
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
-        ids[i] = InputManager::GetInstance()->AddInterceptor(interceptor);
-        EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
-
-    std::string command {
-        "InputHandlerManagerGlobal: in RemoveInterceptor, "
-        "Unregister interceptor successfully"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
-
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
-        if (IsValidHandlerId(ids[i])) {
-            InputManager::GetInstance()->RemoveInterceptor(ids[i]);
-            std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-        }
-    }
-
-    int32_t nTries { N_TRIES_FOR_LOG };
-    std::vector<std::string> rLogs;
-
-    while (true) {
-        std::vector<std::string> tLogs { SearchLog(command, sLogs, true) };
-        rLogs.insert(rLogs.end(), tLogs.begin(), tLogs.end());
-        if ((rLogs.size() >= N_TEST_CASES) || (--nTries <= 0)) {
-            break;
-        }
-        sLogs.insert(sLogs.end(), tLogs.begin(), tLogs.end());
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
-    }
 }
 
 /**
- * @tc.name:TestInputEventInterceptor_004
- * @tc.desc:Verify interceptor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
-{
-    MMI_HILOGD("start TestInputEventInterceptor_004");
-    std::string command {
-        "InputManagerImpl: in AddInterceptor, "
-        "CHKPR.interceptor. is null, return value is -1"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
-
-    std::shared_ptr<IInputEventConsumer> interceptor;
-    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor) };
-    EXPECT_TRUE(!IsValidHandlerId(interceptorId));
-
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-}
-
-/**
- * @tc.name:TestInputEventInterceptor_005
- * @tc.desc:Verify interceptor
+ * @tc.name: TestInputEventInterceptor_005
+ * @tc.desc: Verify mouse button interceptor
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_005, TestSize.Level1)
 {
-    MMI_HILOGD("start TestInputEventInterceptor_005");
+    CALL_LOG_ENTER;
     auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_TRUE(pointerEvent != nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
@@ -2020,11 +1493,13 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_005, TestSize.Level1)
     item.SetGlobalY(300);
     pointerEvent->AddPointerItem(item);
 
-    std::shared_ptr<IInputEventConsumer> interceptor { InputEventInterceptor::GetPtr() };
+    auto interceptor = GetPtr<InputEventCallback>();
     int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor) };
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    TestInputEventInterceptor(pointerEvent);
+
+    TestSimulateInputEvent(pointerEvent);
+
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2032,89 +1507,16 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_005, TestSize.Level1)
 }
 
 /**
- * @tc.name:TestGetKeystrokeAbility_001
- * @tc.desc:Verify SupportKeys
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, TestGetKeystrokeAbility_001, TestSize.Level1)
-{
-    MMI_HILOGD("start TestGetKeystrokeAbility_001");
-    std::vector<int32_t> keyCodes = {17, 22, 2055};
-    InputManager::GetInstance()->SupportKeys(0, keyCodes, [](std::vector<bool> keystrokeAbility) {
-        MMI_HILOGD("TestGetKeystrokeAbility_001 callback ok");
-    });
-    MMI_HILOGD("stop TestGetKeystrokeAbility_001");
-}
-
-void InputManagerTest::TestInputEventInterceptor2(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    std::string sCmd {
-        "InputManagerTest: in OnInputEvent, "
-        "Pointer event intercepted:"
-    };
-    std::vector<std::string> sLogs { SearchLog(sCmd, true) };
-
-    std::string sPointeE { DumpPointerEvent2(pointerEvent) };
-    std::vector<std::string> sLogPointerEs { SearchLog(sPointeE, true) };
-
-    PointerEvent::PointerItem item;
-    pointerEvent->GetPointerItem(0, item);
-    std::string sItem1 { DumpPointerItem2(item) };
-    std::vector<std::string> sLogItem1s { SearchLog(sItem1, true) };
-
-    pointerEvent->GetPointerItem(1, item);
-    std::string sItem2 { DumpPointerItem2(item) };
-    std::vector<std::string> sLogItem2s { SearchLog(sItem2, true) };
-
-    MMI_HILOGD("Call InputManager::SimulateInputEvent");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    int32_t nTries { N_TRIES_FOR_LOG };
-    std::bitset<4> states { };
-
-    while (true) {
-        if (!states.test(0)) {
-            std::vector<std::string> tLogs { SearchLog(sCmd, sLogs, true) };
-            if (!tLogs.empty()) {
-                states.set(0);
-            }
-        }
-        if (!states.test(1)) {
-            std::vector<std::string> tLogPointerEs { SearchLog(sPointeE, sLogPointerEs, true) };
-            if (!tLogPointerEs.empty()) {
-                states.set(1);
-            }
-        }
-        if (!states.test(2)) {
-            std::vector<std::string> tLogItem1s { SearchLog(sItem1, sLogItem1s, true) };
-            if (!tLogItem1s.empty()) {
-                states.set(2);
-            }
-        }
-        if (!states.test(3)) {
-            std::vector<std::string> tLogItem2s { SearchLog(sItem2, sLogItem2s, true) };
-            if (!tLogItem2s.empty()) {
-                states.set(3);
-            }
-        }
-        if (states.all() || (--nTries <= 0)) {
-            break;
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
-    }
-}
-
-/**
- * @tc.name:TestInputEventInterceptor_006
- * @tc.desc:Verify interceptor
+ * @tc.name: TestInputEventInterceptor_006
+ * @tc.desc: Verify touchscreen interceptor
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_006, TestSize.Level1)
 {
-    MMI_HILOGD("start TestInputEventInterceptor_006");
+    CALL_LOG_ENTER;
     auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetGlobalX(823);   // test code，set the GlobalX = 823
@@ -2122,50 +1524,184 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_006, TestSize.Level1)
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
-
     item.SetPointerId(1);   // test code，set the PointerId = 1
     item.SetGlobalX(1010);   // test code，set the GlobalX = 1010
     item.SetGlobalY(910);   // test code，set the GlobalY = 910
     item.SetPressure(7);    // test code，set the Pressure = 7
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
-
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     pointerEvent->SetPointerId(1);  // test code，set the PointerId = 1
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
 
-    std::shared_ptr<IInputEventConsumer> interceptor { InputEventInterceptor::GetPtr() };
+    auto interceptor = GetPtr<InputEventCallback>();
     int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor) };
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    TestInputEventInterceptor2(pointerEvent);
+
+    TestSimulateInputEvent(pointerEvent);
+
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
 
-void InputManagerTest::TouchPadMonitorCallBack(std::shared_ptr<PointerEvent> pointerEvent)
+/**
+ * @tc.name: InputManagerTest_OnAddScreenMonitor_001
+ * @tc.desc: Verify touchscreen down event monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_001, TestSize.Level1)
 {
-    int32_t pointerId = pointerEvent->GetPointerId();
-    PointerEvent::PointerItem pointerItem;
-    pointerEvent->GetPointerItem(pointerId, pointerItem);
-    MMI_HILOGD("TouchPadMonitorCallBack: pointerAction:%{public}d,pointerId:%{public}d,"
-        "x:%{public}d,y:%{public}d", pointerEvent->GetPointerAction(),
-        pointerEvent->GetPointerId(), pointerItem.GetGlobalX(), pointerItem.GetGlobalY());
+    CALL_LOG_ENTER;
+    auto pointerEvent = SetupPointerEvent001();
+    ASSERT_TRUE(pointerEvent != nullptr);
+
+    auto callBackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callBackPtr != nullptr);
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    EXPECT_TRUE(IsValidHandlerId(monitorId));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    TestSimulateInputEvent(pointerEvent);
+
+    if (IsValidHandlerId(monitorId)) {
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
 }
 
 /**
- * @tc.name:InputManagerTest_OnAddTouchPadMonitor_001
- * @tc.desc:Verify touchpad monitor
+ * @tc.name: InputManagerTest_OnAddScreenMonitor_002
+ * @tc.desc: Verify touchscreen move event multiple monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_002, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
+    std::vector<int32_t> ids(N_TEST_CASES);
+    std::vector<std::shared_ptr<InputEventCallback>> cbs(N_TEST_CASES);
+
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
+        cbs[i] = GetPtr<InputEventCallback>();
+        ASSERT_TRUE(cbs[i] != nullptr);
+        ids[i] = InputManager::GetInstance()->AddMonitor(cbs[i]);
+        EXPECT_TRUE(IsValidHandlerId(ids[i]));
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+
+    auto pointerEvent = SetupPointerEvent002();
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+    for (const auto& id : ids) {
+        std::string sPointerEs = InputManagerTest::GetEventDump();
+        MMI_HILOGD("sPointerEs : %{public}s", sPointerEs.c_str());
+        ASSERT_TRUE(!sPointerEs.empty());
+        if (IsValidHandlerId(id)) {
+            InputManager::GetInstance()->RemoveMonitor(id);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_OnAddScreenMonitor_003
+ * @tc.desc: Verify touchscreen up event monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_003, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    auto pointerEvent = SetupPointerEvent003();
+    ASSERT_TRUE(pointerEvent != nullptr);
+
+    auto callBackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callBackPtr != nullptr);
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    EXPECT_TRUE(IsValidHandlerId(monitorId));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    TestSimulateInputEvent(pointerEvent);
+
+    if (IsValidHandlerId(monitorId)) {
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_OnAddScreenMonitor_004
+ * @tc.desc: Verify touchscreen MarkConsumed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_004, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    auto callBackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callBackPtr != nullptr);
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    EXPECT_TRUE(IsValidHandlerId(monitorId));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    TestMarkConsumedStep1();
+    auto pointerEvent = TestMarkConsumedStep2();
+
+    TestMarkConsumedStep3(monitorId, pointerEvent->GetId());
+
+    TestMarkConsumedStep4();
+    TestMarkConsumedStep5();
+
+    if (IsValidHandlerId(monitorId)) {
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_AddHandler_006
+ * @tc.desc:  Verify touchscreen MarkConsumed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_006, TestSize.Level1)
+{
+    CALL_LOG_ENTER;
+    auto callBackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callBackPtr != nullptr);
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    EXPECT_TRUE(IsValidHandlerId(monitorId));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    auto pointerEvent = TestMarkConsumedStep1();
+
+    TestMarkConsumedStep3(monitorId, pointerEvent->GetId());
+
+    TestMarkConsumedStep4();
+    TestMarkConsumedStep6();
+
+    if (IsValidHandlerId(monitorId)) {
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_OnAddTouchPadMonitor_001
+ * @tc.desc: Verify touchpad down event monitor
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManagerTest_OnAddTouchPadMonitor_001");
+    CALL_LOG_ENTER;
     auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
@@ -2174,42 +1710,36 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
     item.SetGlobalY(723);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
-
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     pointerEvent->SetPointerId(0);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    MMI_HILOGD("Call MontiorManager");
-
-    std::string command { "PointerEvent received" };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
     int32_t monitorId { };
-    auto callBackPtr = InputEventCallback::GetPtr();
-    EXPECT_TRUE(callBackPtr != nullptr);
+    auto callBackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callBackPtr != nullptr);
     monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
-    EXPECT_EQ(RET_OK, response);
+    TestSimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    if (IsValidHandlerId(monitorId)) {
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
 }
 
 /**
- * @tc.name:InputManagerTest_OnAddTouchPadMonitor_002
- * @tc.desc:Verify touchpad monitor
+ * @tc.name: InputManagerTest_OnAddTouchPadMonitor_002
+ * @tc.desc: Verify touchpad move event monitor
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManagerTest_OnAddTouchPadMonitor_002");
+    CALL_LOG_ENTER;
     auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
@@ -2218,42 +1748,36 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
     item.SetGlobalY(723);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
-
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->SetPointerId(0);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    MMI_HILOGD("Call MontiorManager");
-
-    std::string command { "PointerEvent received" };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
     int32_t monitorId { };
-    auto callBackPtr = InputEventCallback::GetPtr();
-    EXPECT_TRUE(callBackPtr != nullptr);
+    auto callBackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callBackPtr != nullptr);
     monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
-    EXPECT_EQ(RET_OK, response);
+    TestSimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    if (IsValidHandlerId(monitorId)) {
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
 }
 
 /**
- * @tc.name:InputManagerTest_OnAddTouchPadMonitor_003
- * @tc.desc:Verify touchpad monitor
+ * @tc.name: InputManagerTest_OnAddTouchPadMonitor_003
+ * @tc.desc: Verify touchpad up event monitor
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManagerTest_OnAddTouchPadMonitor_003");
+    CALL_LOG_ENTER;
     auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
@@ -2262,42 +1786,36 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     item.SetGlobalY(723);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
-
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     pointerEvent->SetPointerId(0);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    MMI_HILOGD("Call MontiorManager");
-
-    std::string command { "PointerEvent received" };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
     int32_t monitorId { };
-    auto callBackPtr = InputEventCallback::GetPtr();
-    EXPECT_TRUE(callBackPtr != nullptr);
+    auto callBackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callBackPtr != nullptr);
     monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
-    EXPECT_EQ(RET_OK, response);
+    TestSimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    if (IsValidHandlerId(monitorId)) {
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
 }
 
 /**
- * @tc.name:InputManagerTest_OnAddTouchPadMonitor_004
- * @tc.desc:Verify touchpad monitor
+ * @tc.name: InputManagerTest_OnAddTouchPadMonitor_004
+ * @tc.desc: Verify touchpad multiple monitor
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManagerTest_OnAddTouchPadMonitor_004");
+    CALL_LOG_ENTER;
     auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
@@ -2306,60 +1824,44 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
     item.SetGlobalY(723);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
-
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     pointerEvent->SetPointerId(0);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
-    MMI_HILOGD("Call MontiorManager");
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
     const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
     std::vector<int32_t> ids(N_TEST_CASES);
-
-    auto callBackPtr = InputEventCallback::GetPtr();
-    EXPECT_TRUE(callBackPtr != nullptr);
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
+    auto callBackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callBackPtr != nullptr);
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
         ids[i] = InputManager::GetInstance()->AddMonitor(callBackPtr);
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
-    std::string command {
-        "InputManagerTest: in OnInputEvent, "
-        "PointerEvent received"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
-
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    int32_t nTries { N_TRIES_FOR_LOG };
-    std::vector<std::string> rLogs;
 
-    while (true) {
-        std::vector<std::string> tLogs { SearchLog(command, sLogs, true) };
-        rLogs.insert(rLogs.end(), tLogs.begin(), tLogs.end());
-        if ((rLogs.size() >= N_TEST_CASES) || (--nTries <= 0)) {
-            break;
+    for (const auto& id : ids) {
+        std::string sPointerEs = InputManagerTest::GetEventDump();
+        MMI_HILOGD("sPointerEs : %{public}s", sPointerEs.c_str());
+        ASSERT_TRUE(!sPointerEs.empty());
+        if (IsValidHandlerId(id)) {
+            InputManager::GetInstance()->RemoveMonitor(id);
         }
-        sLogs.insert(sLogs.end(), tLogs.begin(), tLogs.end());
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
-    }
-
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
-        InputManager::GetInstance()->RemoveMonitor(ids[i]);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
 
 /**
- * @tc.name:InputManagerTest_OnAddTouchPadMonitor_005
- * @tc.desc:Verify touchpad monitor
+ * @tc.name: InputManagerTest_OnAddTouchPadMonitor_005
+ * @tc.desc: Verify touchpad monitor
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManagerTest_OnAddTouchPadMonitor_005");
+    CALL_LOG_ENTER;
     auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
@@ -2368,52 +1870,43 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
     item.SetGlobalY(723);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
-
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     pointerEvent->SetPointerId(0);
-    pointerEvent->SetSourceType(-1);
-    MMI_HILOGD("Call MontiorManager");
-
-    std::string command {
-        "InputManagerTest: in OnInputEvent, "
-        "PointerEvent received"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
     int32_t monitorId { };
-    auto callBackPtr = InputEventCallback::GetPtr();
-    EXPECT_TRUE(callBackPtr != nullptr);
+    auto callBackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callBackPtr != nullptr);
     monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    int32_t response = MMIEventHdl.InjectPointerEvent(pointerEvent);
-    EXPECT_EQ(RET_OK, response);
+    TestSimulateInputEvent(pointerEvent);
 
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    if (IsValidHandlerId(monitorId)) {
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
 }
 
 /**
- * @tc.name:InputManager_TouchPadSimulateInputEvent_001
- * @tc.desc:Verify touchpad simulate and monitor
+ * @tc.name: InputManager_TouchPadSimulateInputEvent_001
+ * @tc.desc: Verify touchpad simulate and monitor
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManager_TouchPadSimulateInputEvent_001");
-    auto callBackPtr = InputEventCallback::GetPtr();
-    EXPECT_TRUE(callBackPtr != nullptr);
+    CALL_LOG_ENTER;
+    auto callBackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callBackPtr != nullptr);
     int32_t monitorId { InputManager::GetInstance()->AddMonitor(callBackPtr) };
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item { };
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
@@ -2422,45 +1915,37 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize
     item.SetGlobalY(723);
     item.SetDeviceId(DEFAULT_DEVICE_ID);
     pointerEvent->AddPointerItem(item);
-
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     pointerEvent->SetActionTime(actionTime);
     pointerEvent->SetPointerId(DEFAULT_POINTER_ID);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
-    std::string command {
-        "InputManagerTest: in OnInputEvent, "
-        "PointerEvent received"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
+    TestSimulateInputEvent(pointerEvent);
 
-    MMI_HILOGD("Call InputManager::SimulateInputEvent");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    if (IsValidHandlerId(monitorId)) {
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
 }
 
 /**
- * @tc.name:InputManager_TouchPadSimulateInputEvent_002
- * @tc.desc:Verify touchpad simulate and monitor
+ * @tc.name: InputManager_TouchPadSimulateInputEvent_002
+ * @tc.desc: Verify touchpad simulate and monitor
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManager_TouchPadSimulateInputEvent_002");
-    auto callBackPtr = InputEventCallback::GetPtr();
-    EXPECT_TRUE(callBackPtr != nullptr);
+    CALL_LOG_ENTER;
+    auto callBackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callBackPtr != nullptr);
     int32_t monitorId { InputManager::GetInstance()->AddMonitor(callBackPtr) };
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item { };
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
@@ -2469,45 +1954,37 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize
     item.SetGlobalY(610);
     item.SetDeviceId(DEFAULT_DEVICE_ID);
     pointerEvent->AddPointerItem(item);
-
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->SetActionTime(actionTime);
     pointerEvent->SetPointerId(DEFAULT_POINTER_ID);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
-    std::string command {
-        "InputManagerTest: in OnInputEvent, "
-        "PointerEvent received"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
+    TestSimulateInputEvent(pointerEvent);
 
-    MMI_HILOGD("Call InputManager::SimulateInputEvent");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    if (IsValidHandlerId(monitorId)) {
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
 }
 
 /**
- * @tc.name:InputManager_TouchPadSimulateInputEvent_003
- * @tc.desc:Verify touchpad simulate and monitor
+ * @tc.name: InputManager_TouchPadSimulateInputEvent_003
+ * @tc.desc: Verify touchpad simulate and monitor
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManager_TouchPadSimulateInputEvent_003");
-    auto callBackPtr = InputEventCallback::GetPtr();
-    EXPECT_TRUE(callBackPtr != nullptr);
+    CALL_LOG_ENTER;
+    auto callBackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callBackPtr != nullptr);
     int32_t monitorId { InputManager::GetInstance()->AddMonitor(callBackPtr) };
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item { };
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
@@ -2516,45 +1993,37 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize
     item.SetGlobalY(0);
     item.SetDeviceId(DEFAULT_DEVICE_ID);
     pointerEvent->AddPointerItem(item);
-
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     pointerEvent->SetActionTime(actionTime);
     pointerEvent->SetPointerId(DEFAULT_POINTER_ID);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
-    std::string command {
-        "InputManagerTest: in OnInputEvent, "
-        "PointerEvent received"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
+    TestSimulateInputEvent(pointerEvent);
 
-    MMI_HILOGD("Call InputManager::SimulateInputEvent");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    if (IsValidHandlerId(monitorId)) {
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
 }
 
 /**
- * @tc.name:InputManager_TouchPadSimulateInputEvent_004
- * @tc.desc:Verify touchpad simulate and monitor
+ * @tc.name: InputManager_TouchPadSimulateInputEvent_004
+ * @tc.desc: Verify touchpad simulate and monitor
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManager_TouchPadSimulateInputEvent_004");
-    auto callBackPtr = InputEventCallback::GetPtr();
-    EXPECT_TRUE(callBackPtr != nullptr);
+    CALL_LOG_ENTER;
+    auto callBackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callBackPtr != nullptr);
     int32_t monitorId { InputManager::GetInstance()->AddMonitor(callBackPtr) };
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
+    ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item { };
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
@@ -2563,7 +2032,6 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
     item.SetGlobalY(723);
     item.SetDeviceId(DEFAULT_DEVICE_ID);
     pointerEvent->AddPointerItem(item);
-
     item.SetPointerId(1);
     item.SetDownTime(actionTime);
     item.SetPressed(true);
@@ -2571,7 +2039,6 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
     item.SetGlobalY(740);
     item.SetDeviceId(DEFAULT_DEVICE_ID);
     pointerEvent->AddPointerItem(item);
-
     item.SetPointerId(2);
     item.SetDownTime(actionTime);
     item.SetPressed(true);
@@ -2579,187 +2046,179 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
     item.SetGlobalY(760);
     item.SetDeviceId(DEFAULT_DEVICE_ID);
     pointerEvent->AddPointerItem(item);
-
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     pointerEvent->SetActionTime(actionTime);
     pointerEvent->SetPointerId(DEFAULT_POINTER_ID);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
-    std::string command {
-        "InputManagerTest: in OnInputEvent, "
-        "PointerEvent received"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
+    TestSimulateInputEvent(pointerEvent);
 
-    MMI_HILOGD("Call InputManager::SimulateInputEvent");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-
-    InputManager::GetInstance()->RemoveMonitor(monitorId);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    if (IsValidHandlerId(monitorId)) {
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
 }
 
 /**
- * @tc.name:InputManagerTest_AddMouseMonitor_001
- * @tc.desc:Verify touchpad simulate and monitor
+ * @tc.name: InputManagerTest_AddMouseMonitor_001
+ * @tc.desc: Verify mouse down event monitor
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManagerTest_AddMouseMonitor_001");
-    std::string command {
-        "InputHandlerManagerGlobal: in AddMonitor, "
-        "Service AddMonitor Success"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
+    CALL_LOG_ENTER;
+    auto callBackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callBackPtr != nullptr);
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    EXPECT_TRUE(IsValidHandlerId(monitorId));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    auto callBackPtr = InputEventCallback::GetPtr();
-    EXPECT_TRUE(callBackPtr != nullptr);
-    int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(IsValidHandlerId(id1));
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-    if (IsValidHandlerId(id1)) {
-        InputManager::GetInstance()->RemoveMonitor(id1);
+    auto pointerEvent = SetupPointerEvent005();
+    TestSimulateInputEvent(pointerEvent);
+
+    if (IsValidHandlerId(monitorId)) {
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
 
 /**
- * @tc.name:InputManagerTest_AddMouseMonitor_002
- * @tc.desc:Verify mouse monitor
+ * @tc.name: InputManagerTest_AddMouseMonitor_002
+ * @tc.desc: Verify mouse move event monitor
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManagerTest_AddMouseMonitor_002");
-    auto callBackPtr = InputEventCallback::GetPtr();
-    EXPECT_TRUE(callBackPtr != nullptr);
-
-    int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(IsValidHandlerId(id1));
+    CALL_LOG_ENTER;
+    auto callBackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callBackPtr != nullptr);
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    std::string command {
-        "InputHandlerManagerGlobal: in RemoveMonitor, "
-        "Service RemoveMonitor Success"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
-    if (IsValidHandlerId(id1)) {
-        InputManager::GetInstance()->RemoveMonitor(id1);
+    auto pointerEvent = SetupPointerEvent006();
+    TestSimulateInputEvent(pointerEvent);
+
+    if (IsValidHandlerId(monitorId)) {
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+
+    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
 }
 
+
 /**
- * @tc.name:InputManagerTest_AddMouseMonitor_003
- * @tc.desc:Verify mouse monitor
+ * @tc.name: InputManagerTest_AddMouseMonitor_003
+ * @tc.desc: Verify mouse up event monitor
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManagerTest_AddMouseMonitor_003");
-    std::string command {
-        "InputHandlerManager: in AddHandler, "
-        "The number of handlers exceeds the maximum"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
+    CALL_LOG_ENTER;
+    auto callBackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callBackPtr != nullptr);
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    EXPECT_TRUE(IsValidHandlerId(monitorId));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    const std::vector<int32_t>::size_type N_TEST_CASES { MAX_N_INPUT_HANDLERS };
-    std::vector<int32_t> ids(N_TEST_CASES);
-    std::shared_ptr<InputEventCallback> cb = InputEventCallback::GetPtr();
-    EXPECT_TRUE(cb != nullptr);
+    auto pointerEvent = SetupPointerEvent007();;
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
 
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
-        ids[i] = InputManager::GetInstance()->AddMonitor(cb);
-        EXPECT_TRUE(IsValidHandlerId(ids[i]));
+    if (IsValidHandlerId(monitorId)) {
+        InputManager::GetInstance()->RemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(cb);
-    EXPECT_TRUE(!IsValidHandlerId(monitorId));
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-
-    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
-        if (IsValidHandlerId(ids[i])) {
-            InputManager::GetInstance()->RemoveMonitor(ids[i]);
-            std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-        }
     }
 }
 
 /**
- * @tc.name:InputManagerTest_AddMouseMonitor_004
- * @tc.desc:Verify mouse monitor
+ * @tc.name: InputManagerTest_AddMouseMonitor_004
+ * @tc.desc: Verify monitor upper limit
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1)
 {
-    MMI_HILOGD("start InputManagerTest_AddMouseMonitor_004");
-    auto callBackPtr = InputEventCallback::GetPtr();
-    EXPECT_TRUE(callBackPtr != nullptr);
-    int32_t id1 = InputManager::GetInstance()->AddMonitor(callBackPtr);
-    EXPECT_TRUE(IsValidHandlerId(id1));
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    CALL_LOG_ENTER;
+    const std::vector<int32_t>::size_type N_TEST_CASES { MAX_N_INPUT_HANDLERS };
+    std::vector<int32_t> ids(N_TEST_CASES);
+    int32_t maxMonitor = 0;
 
-    std::string command {
-        "InputManagerTest: in OnInputEvent, "
-        "PointerEvent received"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
-
-    auto pointerEvent = SetupPointerEvent006();
-    EXPECT_TRUE(pointerEvent != nullptr);
-    MMI_HILOGD("Call InputManager::SimulateInputEvent");
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
-    if (IsValidHandlerId(id1)) {
-        InputManager::GetInstance()->RemoveMonitor(id1);
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+        auto callBackPtr =  GetPtr<InputEventCallback>();
+        ASSERT_TRUE(callBackPtr != nullptr);
+        ids[i] = InputManager::GetInstance()->AddMonitor(callBackPtr);
+        EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
+
+    auto pointerEvent = SetupPointerEvent007();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+    for (const auto& id : ids) {
+        if (!InputManagerTest::GetEventDump().empty()) {
+            maxMonitor++;
+        }
+        if (IsValidHandlerId(id)) {
+            InputManager::GetInstance()->RemoveMonitor(id);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+    EXPECT_EQ(maxMonitor, (MAX_N_INPUT_HANDLERS - 1));
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 /**
- * @tc.name:InputManagerTest_MoveMouse_01
- * @tc.desc:Verify move mouse
+ * @tc.name: InputManagerTest_MoveMouse_01
+ * @tc.desc: Verify move mouse
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_01, TestSize.Level1)
 {
-    MMI_HILOGD("Call InputManager::MoveMouse");
-    std::string command {
-        "ServerMsgHandler: in OnMoveMouse, "
-        "Mouse movement message processed successfully"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
+    CALL_LOG_ENTER;
+
+    VirtualMouse mouse;
+    ASSERT_TRUE(mouse.SetUp());
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
     InputManager::GetInstance()->MoveMouse(50, 50);
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    std::string sPointerEs = InputManagerTest::GetEventDump();
+    MMI_HILOGD("sPointerEs : %{public}s", sPointerEs.c_str());
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    mouse.Close();
+
+    EXPECT_GT(sPointerEs.find("PointerAction:move,SourceType:mouse"), 0);
 }
 
 /**
- * @tc.name:InputManagerTest_MoveMouse_02
- * @tc.desc:Verify move mouse
+ * @tc.name: InputManagerTest_MoveMouse_02
+ * @tc.desc: Verify move mouse
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_02, TestSize.Level1)
 {
-    MMI_HILOGD("Call InputManager::MoveMouse");
-    std::string command {
-        "ServerMsgHandler: in OnMoveMouse, "
-        "Mouse movement message processed successfully"
-    };
-    std::vector<std::string> sLogs { SearchLog(command, true) };
+    CALL_LOG_ENTER;
+
+    VirtualMouse mouse;
+    ASSERT_TRUE(mouse.SetUp());
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
     InputManager::GetInstance()->MoveMouse(-1000, 100);
-    std::vector<std::string> tLogs { SearchLog(command, sLogs) };
+    std::string sPointerEs = InputManagerTest::GetEventDump();
+    MMI_HILOGD("sPointerEs : %{public}s", sPointerEs.c_str());
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    mouse.Close();
+
+    EXPECT_GT(sPointerEs.find("PointerAction:move,SourceType:mouse"), 0);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 static int32_t deviceIDtest = 0;
 static void GetKeyboardTypeCallback(int32_t keyboardType)
@@ -2795,24 +2254,24 @@ static void GetKeyboardTypeCallback(int32_t keyboardType)
         }
     }
 }
+
 /**
- * @tc.name:InputManagerTest_GetKeyboardType
- * @tc.desc:Verify GetKeyboardType
+ * @tc.name: InputManagerTest_GetKeyboardType
+ * @tc.desc: Verify Get Keyboard Type
  * @tc.type: FUNC
  * @tc.require:
  */
-
 HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardType, TestSize.Level1)
 {
     MMI_HILOGD("Start InputManagerTest_GetKeyboardType");
     for (int32_t i = 0; i < 20; ++i)
     {
         deviceIDtest = i;
-        InputManager::GetInstance()->GetKeyboardType(deviceIDtest, GetKeyboardTypeCallback);
+        InputManager::GetInstance()->GetKeyboardType(i, GetKeyboardTypeCallback);
         MMI_HILOGD("i:%{public}d", i);
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     MMI_HILOGD("Stop InputManagerTest_GetKeyboardType");
 }
 } // namespace MMI

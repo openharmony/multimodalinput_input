@@ -310,6 +310,7 @@ void MMIService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
     MMI_HILOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), s->GetFd());
+    IPointerDrawingManager::GetInstance()->DeletePointerVisible(s->GetPid());
 }
 
 int32_t MMIService::SetPointerVisible(bool visible)
@@ -360,19 +361,21 @@ int32_t MMIService::MarkEventProcessed(int32_t eventId)
     return RET_OK;
 }
 
-int32_t MMIService::CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType)
+int32_t MMIService::CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType,
+    HandleEventType eventType)
 {
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnAddInputHandler(sess, handlerId, handlerType);
+    return sMsgHandler_.OnAddInputHandler(sess, handlerId, handlerType, eventType);
 }
 
-int32_t MMIService::AddInputHandler(int32_t handlerId, InputHandlerType handlerType)
+int32_t MMIService::AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
+    HandleEventType eventType)
 {
     CALL_LOG_ENTER;
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckAddInput, this, pid, handlerId, handlerType));
+        std::bind(&MMIService::CheckAddInput, this, pid, handlerId, handlerType, eventType));
     if (ret != RET_OK) {
         MMI_HILOGE("add input handler failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -420,6 +423,17 @@ int32_t MMIService::MarkEventConsumed(int32_t monitorId, int32_t eventId)
     return RET_OK;
 }
 
+int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::OnMoveMouse, &sMsgHandler_, offsetX, offsetY));
+    if (ret != RET_OK) {
+        MMI_HILOGE("movemouse event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 #ifdef OHOS_RSS_CLIENT
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {

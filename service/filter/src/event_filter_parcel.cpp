@@ -48,13 +48,13 @@ PointerEventParcel *PointerEventParcel::Unmarshalling(Parcel& in)
     }
 
     if (request->data_ == nullptr) {
+        delete request;
         return nullptr;
     }
 
     if (!request->data_->ReadFromParcel(in)) {
         request->data_ = nullptr;
         delete request;
-        request = nullptr;
         return nullptr;
     }
     return request;
