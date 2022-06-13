@@ -22,9 +22,19 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "input_device_manager.h"
+#include "input_handler_manager_global.h"
+#include "key_event_subscriber.h"
+#include "interceptor_handler_global.h"
+#include "input_event_handler.h"
+#include "uds_server.h"
+#include "mouse_event_handler.h"
+#include "util_ex.h"
+
 #include "input_windows_manager.h"
 #include "util.h"
 #include "util_ex.h"
+#include <getopt.h>
 
 namespace OHOS {
 namespace MMI {
@@ -53,14 +63,87 @@ void ChkConfig(int32_t fd)
     mprintf(fd, "EXP_SOPATH: %s\n", DEF_EXP_SOPATH);
 }
 
-bool EventDump::DumpEventHelp(int32_t fd, const std::vector<std::u16string> &args)
+void EventDump::ParseCommand(int32_t fd, const std::vector<std::u16string> &args)
 {
-    if ((args.empty()) || (args[0].compare(u"-h") != 0)) {
-        MMI_HILOGE("args cannot be empty or invalid");
-        return false;
+    MMI_HILOGI("ParseCommand in");
+    auto &params = const_cast<std::vector<std::u16string>&>(args);
+    params.insert(params.begin(), std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes("first"));
+    char ** argv = new char*[params.size()];
+    for(size_t i = 0; i < params.size(); ++i){
+        argv[i] = new char[params[i].size() + 1];
+        std::string temp = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(params[i]);
+        strcpy(argv[i], temp.c_str());
     }
+    struct option dumpOptions[] = {
+        {"help", no_argument, 0, 'h'},
+        {"device", no_argument, 0, 'd'},
+        {"devicelist", no_argument, 0, 'l'},
+        {"windows", no_argument, 0, 'w'},
+        {"udsserver", no_argument, 0, 'u'},
+        {"subscriber", no_argument, 0, 's'},
+        {"monitor", no_argument, 0, 'o'},
+        {"interceptor", no_argument, 0, 'i'},
+        {"mouse", no_argument, 0, 'm'},
+        {NULL, 0, 0, 0}
+    };
+    int c;
+    int32_t optionIndex;
+    optind = 1;
+    while((c = getopt_long (params.size(), argv, "hdlwusoim", dumpOptions, &optionIndex)) != -1) {
+        switch (c) {
+            case 'h': {
+                DumpEventHelp(fd, args);
+                break;
+            }
+            case 'd': {
+                InputDevMgr->Dump(fd, args);
+                break;
+            }
+            case 'l': {
+                InputDevMgr->DumpDeviceList(fd, args);
+                break;
+            }
+            case 'w': {
+                WinMgr->Dump(fd, args);
+                break;
+            }
+            case 'u': {
+                auto udsServer = InputHandler->GetUDSServer();
+                udsServer->Dump(fd, args);
+                break;
+            }
+            case 's': {
+                KeyEventSubscriber_.Dump(fd, args);
+                break;
+            }
+            case 'o': {
+                InputHandlerManagerGlobal::GetInstance().Dump(fd, args);
+                break;
+            }
+            case 'i': {
+                InterceptorHandlerGlobal::GetInstance()->Dump(fd, args);
+                break;
+            }
+            case 'm': {
+                MouseEventHdr->Dump(fd, args);
+                break;
+            }
+            default: {
+                mprintf(fd, "cmd param is error\n");
+                DumpHelp(fd);
+                break;
+            }
+        }
+    }
+    for(size_t i = 0; i < params.size(); ++i){
+        delete [] argv[i];
+    }
+    delete [] argv;
+}
+
+void EventDump::DumpEventHelp(int32_t fd, const std::vector<std::u16string> &args)
+{
     DumpHelp(fd);
-    return true;
 }
 
 void EventDump::DumpHelp(int32_t fd)

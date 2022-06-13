@@ -436,14 +436,10 @@ bool KeyEventSubscriber::IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent) 
     return true;
 }
 
-bool KeyEventSubscriber::Dump(int32_t fd, const std::vector<std::u16string> &args)
+void KeyEventSubscriber::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
     CALL_LOG_ENTER;
     MMI_HILOGI("Subscriber Dump in !");
-    if ((args.empty()) || (args[0].compare(u"-s") != 0)) {
-        MMI_HILOGE("args cannot be empty or invalid");
-        return false;
-    }
     mprintf(fd, "--------------------------[Subscriber information]-------------------------");
     mprintf(fd, "subscribers: count=%d", subscribers_.size());
     for (const auto &item : subscribers_) {
@@ -457,7 +453,6 @@ bool KeyEventSubscriber::Dump(int32_t fd, const std::vector<std::u16string> &arg
                subscriber->keyOption_->GetFinalKeyDownDuration(),
                subscriber->keyOption_->IsFinalKeyDown() ? "true" : "false");
     }
-    return true;
 }
 } // namespace MMI
 } // namespace OHOS
