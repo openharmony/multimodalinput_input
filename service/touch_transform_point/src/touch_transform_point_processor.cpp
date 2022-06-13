@@ -54,7 +54,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     CHKPF(device);
     EventTouch touchInfo;
     int32_t logicalDisplayId = -1;
-    if (!WinMgr->TouchDownPointToDisplayPoint(data, touchInfo, logicalDisplayId)) {
+    if (!WinMgr->TouchPointToDisplayPoint(data, touchInfo, logicalDisplayId)) {
         MMI_HILOGE("TouchDownPointToDisplayPoint failed");
         return false;
     }
@@ -105,7 +105,7 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     EventTouch touchInfo;
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
-    if (!WinMgr->TouchMotionPointToDisplayPoint(data, logicalDisplayId, touchInfo)) {
+    if (!WinMgr->TouchPointToDisplayPoint(data, touchInfo, logicalDisplayId)) {
         MMI_HILOGE("Get TouchMotionPointToDisplayPoint failed");
         return false;
     }
