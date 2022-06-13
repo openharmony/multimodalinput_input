@@ -48,7 +48,7 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
     CALL_LOG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent_->SetButtonId(buttionId_);
+    pointerEvent_->SetButtonId(buttonId_);
 
     InitAbsolution();
     absolutionX_ += libinput_event_pointer_get_dx(data);
@@ -91,13 +91,14 @@ int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
         pointerEvent_->DeleteReleaseButton(button);
         isPressed_ = false;
-        buttionId_ = PointerEvent::BUTTON_NONE;
+        buttonId_ = PointerEvent::BUTTON_NONE;
+        pointerEvent_->SetButtonId(buttonId_);
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_PRESSED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
         pointerEvent_->SetButtonPressed(button);
         isPressed_ = true;
-        buttionId_ = pointerEvent_->GetButtonId();
+        buttonId_ = pointerEvent_->GetButtonId();
     } else {
         MMI_HILOGE("unknown state, state:%{public}u", state);
         return RET_ERR;
