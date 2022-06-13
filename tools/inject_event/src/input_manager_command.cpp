@@ -574,30 +574,25 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         }
                         case 'c': {
                             int32_t intervalTimeMs = 0;
-                            int32_t clickArgcFive = 5;
-                            int32_t clickArgcSix = 6;
-                            if (argc == clickArgcFive) {
+                            if (argc == 5) {
                                 if (!StrToInt(optarg, px1) ||
                                     !StrToInt(argv[optind], py1)) {
-                                    std::cout << "invalid command to input value" << std::endl;
+                                    std::cout << "Input coordinate error" << std::endl;
                                     return RET_ERR;
                                 }
                                 intervalTimeMs = 100;
-                            } else if (argc == clickArgcSix) {
+                            } else if (argc == 6) {
                                 if (!StrToInt(optarg, px1) ||
                                     !StrToInt(argv[optind], py1) ||
                                     !StrToInt(argv[optind + 1], intervalTimeMs)) {
-                                    std::cout << "invalid command to input value" << std::endl;
+                                    std::cout << "Input coordinate or time error" << std::endl;
                                     return RET_ERR;
                                 }
                                 const int64_t minIntervalTimeMs = 1;
                                 const int64_t maxIntervalTimeMs = 450;
                                 if ((minIntervalTimeMs > intervalTimeMs) || (maxIntervalTimeMs < intervalTimeMs)) {
-                                    std::cout << "interval time is out of range. ";
-                                    std::cout << minIntervalTimeMs << "ms";
-                                    std::cout << " < interval time < ";
-                                    std::cout << maxIntervalTimeMs << "ms";
-                                    std::cout << std::endl;
+                                    std::cout << "interval time is out of range: " << minIntervalTimeMs << "ms";
+                                    std::cout << " < interval time < " << maxIntervalTimeMs << "ms" << std::endl;
                                     return RET_ERR;
                                 }
                             } else {
