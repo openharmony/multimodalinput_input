@@ -55,7 +55,6 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     }
 #endif
     MsgCallback funs[] = {
-        {MmiMessageId::INJECT_KEY_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectKeyEvent, this) },
         {MmiMessageId::INJECT_POINTER_EVENT, MsgCallbackBind2(&ServerMsgHandler::OnInjectPointerEvent, this) },
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ServerMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ServerMsgHandler::OnInputDeviceIds, this)},
@@ -132,21 +131,14 @@ int32_t ServerMsgHandler::MarkEventProcessed(SessionPtr sess, int32_t eventId)
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnInjectKeyEvent(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHKPR(sess, ERROR_NULL_POINTER);
-    auto creKey = KeyEvent::Create();
-    CHKPR(creKey, ERROR_NULL_POINTER);
-    int32_t errCode = InputEventDataTransformation::NetPacketToKeyEvent(pkt, creKey);
-    if (errCode != RET_OK) {
-        MMI_HILOGE("Deserialization is Failed, errCode:%{public}u", errCode);
-        return RET_ERR;
-    }
-    auto result = eventDispatch_.DispatchKeyEventPid(*udsServer_, creKey);
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    auto result = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent);
     if (result != RET_OK) {
         MMI_HILOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d", result, KEY_EVENT_DISP_FAIL);
     }
-    MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", creKey->GetKeyCode(), creKey->GetKeyAction());
+    MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     return RET_OK;
 }
 

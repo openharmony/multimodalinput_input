@@ -40,9 +40,9 @@ public:
     }
 #endif
 
-    int32_t OnInjectKeyEventTest(SessionPtr sess, NetPacket pkt)
+    int32_t OnInjectKeyEventTest(SessionPtr sess, std::shared_ptr<KeyEvent> keyEvent)
     {
-        int32_t retResult = OnInjectKeyEvent(sess, pkt);
+        int32_t retResult = OnInjectKeyEvent(keyEvent);
         return retResult;
     }
 };

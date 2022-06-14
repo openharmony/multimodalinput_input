@@ -57,7 +57,7 @@ private:
     int32_t timerId_ = -1;
     double absolutionX_ = -1;
     double absolutionY_ = -1;
-    int32_t buttionId_ = -1;
+    int32_t buttonId_ = -1;
     bool isPressed_ = false;
 };
 
