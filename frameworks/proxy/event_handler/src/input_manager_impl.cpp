@@ -128,7 +128,7 @@ void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInf
         MMI_HILOGE("get mmi client is nullptr");
         return;
     }
-    if (displayGroupInfo.windowsInfo.empty() || displayGroupInfo.displayInfos.empty()) {
+    if (displayGroupInfo.windowsInfo.empty() || displayGroupInfo.displayInfo.empty()) {
         MMI_HILOGE("windows info or display info is empty!");
         return;
     }
@@ -262,7 +262,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
 
 int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
 {
-    std::vector<DisplayInfo> displayInfos = displayGroupInfo_.displayInfos;
+    std::vector<DisplayInfo> displayInfos = displayGroupInfo_.displayInfo;
     int32_t num = static_cast<int32_t>(displayInfos.size());
     pkt << num;
     for (int32_t i = 0; i < num; i++) {
@@ -301,7 +301,7 @@ void InputManagerImpl::PrintDisplayInfo()
         }
     }
 
-    std::vector<DisplayInfo> displayInfos = displayGroupInfo_.displayInfos;
+    std::vector<DisplayInfo> displayInfos = displayGroupInfo_.displayInfo;
     MMI_HILOGD("displayInfos,num:%{public}zu", displayInfos.size());
     for (const auto &item : displayInfos) {
         MMI_HILOGD("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
@@ -462,7 +462,7 @@ bool InputManagerImpl::IsPointerVisible()
 void InputManagerImpl::OnConnected()
 {
     CALL_LOG_ENTER;
-    if (displayGroupInfo_.windowsInfo.empty() || displayGroupInfo_.displayInfos.empty()) {
+    if (displayGroupInfo_.windowsInfo.empty() || displayGroupInfo_.displayInfo.empty()) {
         MMI_HILOGE("windows info or display info is empty!");
         return;
     }
