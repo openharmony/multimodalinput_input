@@ -310,5 +310,26 @@ int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, Mess
     }
     return RET_OK;
 }
+
+int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (!pointerEvent->ReadFromParcel(data)) {
+        MMI_HILOGE("Read eventId failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t ret = InjectPointerEvent(pointerEvent);
+    if (ret != RET_OK) {
+        MMI_HILOGE("call InjectPointerEvent failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
