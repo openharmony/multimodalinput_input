@@ -644,7 +644,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             break;
                         }
                         case 'g': {
-                            if ((argc != moveArgcSeven) && (argc != 9)) {
+                            const int32_t dragArgcSeven = 7;
+                            const int32_t dragArgcCommandNine = 9;
+                            if ((argc != dragArgcSeven) && (argc != dragArgcCommandNine)) {
                                 std::cout << "argc:" << argc << std::endl;
                                 std::cout << "wrong number of parameters" << std::endl;
                                 ShowUsage();
@@ -676,7 +678,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             const int32_t minTotalTimeMs = 1000;
                             const int32_t maxTotalTimeMs = 15000;
                             if ((minTotalTimeMs > totalTimeMs) || (maxTotalTimeMs < totalTimeMs)) {
-                                std::cout << "total time is out of range." std::endl;
+                                std::cout << "total time is out of range." << std::endl;
                                 return RET_ERR;
                             }
                             auto pointerEvent = PointerEvent::Create();
@@ -689,7 +691,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            int64_t startTimeMs = GetSysClockTime() / 1000;
+                            const int32_t conversionRate = 1000;
+                            int64_t startTimeMs = GetSysClockTime() / conversionRate;
                             int64_t endTimeMs = 0;
                             if (!AddInt64(startTimeMs, totalTimeMs, endTimeMs)) {
                                 std::cout << "system time error." << std::endl;
@@ -712,7 +715,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 }
                                 std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
-                                currentTimeMs = GetSysClockTime() / 1000;
+                                currentTimeMs = GetSysClockTime() / conversionRate;
                             }
                             item.SetGlobalX(px2);
                             item.SetGlobalY(py2);
