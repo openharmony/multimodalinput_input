@@ -132,6 +132,12 @@ int32_t MultimodalInputConnectManager::InjectKeyEvent(const std::shared_ptr<KeyE
     return multimodalInputConnectService_->InjectKeyEvent(event);
 }
 
+int32_t MultimodalInputConnectManager::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->InjectPointerEvent(pointerEvent);
+}
+
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 {
     CALL_LOG_ENTER;
