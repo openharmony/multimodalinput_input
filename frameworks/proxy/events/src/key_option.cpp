@@ -68,7 +68,7 @@ bool KeyOption::ReadFromParcel(Parcel &in)
     }
 
     for (auto i = 0; i < preKeysSize; ++i) {
-        int keyValue;
+        int32_t keyValue;
         if (!in.ReadInt32(keyValue)) {
             return false;
         }
