@@ -242,7 +242,6 @@ void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
 
     NotifySubscriber(subscriber->keyEvent_, subscriber);
     subscriber->keyEvent_.reset();
-    hasEventExecuting = false;
     MMI_HILOGD("subscribeId:%{public}d", subscriber->id_);
 }
 

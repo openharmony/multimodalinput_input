@@ -141,6 +141,19 @@ static void PrintEventData(std::shared_ptr<Event> event, int32_t actionType, int
         MMI_HILOGD("%{public}s", sLine.c_str());
     }
 }
+
+template<class Event>
+static void PrintEventData(std::shared_ptr<Event> event)
+{
+    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MMILOG"};
+
+    std::stringstream sStream;
+    sStream << *event;
+    std::string sLine;
+    while (std::getline(sStream, sLine)) {
+        MMI_HILOGD("%{public}s", sLine.c_str());
+    }
+}
 } // namespace MMI
 } // namespace OHOS
 
