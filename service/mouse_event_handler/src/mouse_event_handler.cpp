@@ -323,14 +323,14 @@ void MouseEventHandler::Dump(int32_t fd, const std::vector<std::u16string> &args
     PointerEvent::PointerItem item;
     mprintf(fd, "---------------------[Mouse Device State information]--------------------");
     mprintf(fd,
-               "PointerId:%d | SourceType:%d | PointerAction:%d | ButtonId:%d "
-               "| VerticalAxisValue:%lf | HorizontalAxisValue:%lf | DownTime:%" PRId64 " "
-               "| IsPressed:%s | GlobalX:%d | GlobalY:%d | Width:%d | Height:%d | Pressure:%lf \t",
-               pointerEvent_->GetPointerId(), pointerEvent_->GetSourceType(), pointerEvent_->GetPointerAction(),
-               pointerEvent_->GetButtonId(), pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
-               pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL), item.GetDownTime(), 
-               item.IsPressed() ? "true" : "false", item.GetGlobalX(), item.GetGlobalY(), item.GetWidth(), 
-               item.GetHeight(), item.GetPressure());
+            "PointerId:%d | SourceType:%d | PointerAction:%d | ButtonId:%d "
+            "| VerticalAxisValue:%lf | HorizontalAxisValue:%lf | DownTime:%" PRId64 " "
+            "| IsPressed:%s | GlobalX:%d | GlobalY:%d | Width:%d | Height:%d | Pressure:%lf \t",
+            pointerEvent_->GetPointerId(), pointerEvent_->GetSourceType(), pointerEvent_->GetPointerAction(),
+            pointerEvent_->GetButtonId(), pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
+            pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL), item.GetDownTime(),
+            item.IsPressed() ? "true" : "false", item.GetGlobalX(), item.GetGlobalY(), item.GetWidth(),
+            item.GetHeight(), item.GetPressure());
 }
 } // namespace MMI
 } // namespace OHOS
