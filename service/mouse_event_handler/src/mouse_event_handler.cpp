@@ -92,7 +92,6 @@ int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)
         pointerEvent_->DeleteReleaseButton(button);
         isPressed_ = false;
         buttonId_ = PointerEvent::BUTTON_NONE;
-        pointerEvent_->SetButtonId(buttonId_);
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_PRESSED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
