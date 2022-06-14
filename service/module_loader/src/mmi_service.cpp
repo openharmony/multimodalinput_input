@@ -465,7 +465,7 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
     if (ret != RET_OK) {
-    MMI_HILOGE("mark event consumed failed, ret:%{public}d", ret);
+    MMI_HILOGE("inject pointer event failed, ret:%{public}d", ret);
     return RET_ERR;
     }
     return RET_OK;
