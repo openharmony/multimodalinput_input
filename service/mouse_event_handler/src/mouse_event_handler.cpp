@@ -68,13 +68,13 @@ void MouseEventHandler::InitAbsolution()
     }
     MMI_HILOGD("init absolution");
     auto dispalyGroupInfo = WinMgr->GetDisplayGroupInfo();
-    if (dispalyGroupInfo.displayInfos.empty()) {
+    if (dispalyGroupInfo.displayInfo.empty()) {
         MMI_HILOGE("dispalyGroupInfo.displayInfos is empty");
         return;
     }
-    currentDisplayId_ = dispalyGroupInfo.displayInfos[0].id;
-    absolutionX_ = dispalyGroupInfo.displayInfos[0].width * 1.0 / 2;
-    absolutionY_ = dispalyGroupInfo.displayInfos[0].height * 1.0 / 2;
+    currentDisplayId_ = dispalyGroupInfo.displayInfo[0].id;
+    absolutionX_ = dispalyGroupInfo.displayInfo[0].width * 1.0 / 2;
+    absolutionY_ = dispalyGroupInfo.displayInfo[0].height * 1.0 / 2;
 }
 
 int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)

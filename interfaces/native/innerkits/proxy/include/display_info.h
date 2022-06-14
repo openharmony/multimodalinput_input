@@ -212,7 +212,7 @@ struct DisplayGroupInfo {
     */
     std::vector<WindowInfo> windowsInfo;
 
-    std::vector<DisplayInfo> displayInfos;
+    std::vector<DisplayInfo> displayInfo;
 };
 } // namespace MMI
 } // namespace OHOS
