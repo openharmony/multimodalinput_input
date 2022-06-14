@@ -59,10 +59,10 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
     int32_t displayId = inputEvent->GetTargetDisplayId();
     if (displayId < 0) {
         MMI_HILOGD("target display is -1");
-        if (displayGroupInfo_.displayInfo.empty()) {
+        if (displayGroupInfo_.displaysInfo.empty()) {
             return displayId;
         }
-        displayId = displayGroupInfo_.displayInfo[0].id;
+        displayId = displayGroupInfo_.displaysInfo[0].id;
         inputEvent->SetTargetDisplayId(displayId);
     }
     return displayId;
@@ -93,9 +93,9 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
 {
     CALL_LOG_ENTER;
     displayGroupInfo_ = displayGroupInfo;
-    if (!displayGroupInfo.displayInfo.empty()) {
-        IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo.displayInfo[0].id,
-            displayGroupInfo.displayInfo[0].width, displayGroupInfo.displayInfo[0].height);
+    if (!displayGroupInfo.displaysInfo.empty()) {
+        IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo.displaysInfo[0].id,
+            displayGroupInfo.displaysInfo[0].width, displayGroupInfo.displaysInfo[0].height);
     }
     PrintDisplayInfo();
 }
@@ -124,7 +124,7 @@ void InputWindowsManager::PrintDisplayInfo()
         }
     }
 
-    std::vector<DisplayInfo> displayInfos = displayGroupInfo_.displayInfo;
+    std::vector<DisplayInfo> displayInfos = displayGroupInfo_.displaysInfo;
     MMI_HILOGD("displayInfos,num:%{public}zu", displayInfos.size());
     for (const auto &item : displayInfos) {
         MMI_HILOGD("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
@@ -137,7 +137,7 @@ void InputWindowsManager::PrintDisplayInfo()
 
 const DisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id) const
 {
-    for (auto &it : displayGroupInfo_.displayInfo) {
+    for (auto &it : displayGroupInfo_.displaysInfo) {
         if (it.id == id) {
             return &it;
         }
@@ -148,7 +148,7 @@ const DisplayInfo* InputWindowsManager::GetPhysicalDisplay(int32_t id) const
 
 const DisplayInfo* InputWindowsManager::FindPhysicalDisplayInfo(const std::string& uniq) const
 {
-    for (auto &it : displayGroupInfo_.displayInfo) {
+    for (auto &it : displayGroupInfo_.displaysInfo) {
         if (it.uniq == uniq) {
             return &it;
         }
@@ -287,15 +287,15 @@ void InputWindowsManager::AdjustGlobalCoordinate(
 
 bool InputWindowsManager::UpdataDisplayId(int32_t& displayId)
 {
-    if (displayGroupInfo_.displayInfo.empty()) {
+    if (displayGroupInfo_.displaysInfo.empty()) {
         MMI_HILOGE("logicalDisplays_is empty");
         return false;
     }
     if (displayId < 0) {
-        displayId = displayGroupInfo_.displayInfo[0].id;
+        displayId = displayGroupInfo_.displaysInfo[0].id;
         return true;
     }
-    for (const auto &item : displayGroupInfo_.displayInfo) {
+    for (const auto &item : displayGroupInfo_.displaysInfo) {
         if (item.id == displayId) {
             return true;
         }
@@ -481,7 +481,7 @@ void InputWindowsManager::FindPhysicalDisplay(DisplayInfo displayInfo, int32_t& 
 {
     int32_t globalLogicX = globalX + displayInfo.x;
     int32_t globalLogicY = globalY + displayInfo.y;
-    for (auto &item : displayGroupInfo_.displayInfo) {
+    for (auto &item : displayGroupInfo_.displaysInfo) {
         if ((globalLogicX >= item.x && globalLogicX < item.x + item.width) &&
             (globalLogicY >= item.y && globalLogicY < item.y + item.height)) {
             globalX = globalLogicX - item.x;
@@ -524,9 +524,9 @@ void InputWindowsManager::UpdateAndAdjustMouseLoction(int32_t& displayId, double
 MouseLocation InputWindowsManager::GetMouseInfo()
 {
     if (mouseLoction_.globalX == -1 || mouseLoction_.globalY == -1) {
-        if (!displayGroupInfo_.displayInfo.empty()) {
-            mouseLoction_.globalX = displayGroupInfo_.displayInfo[0].width / 2;
-            mouseLoction_.globalY = displayGroupInfo_.displayInfo[0].height / 2;
+        if (!displayGroupInfo_.displaysInfo.empty()) {
+            mouseLoction_.globalX = displayGroupInfo_.displaysInfo[0].width / 2;
+            mouseLoction_.globalY = displayGroupInfo_.displaysInfo[0].height / 2;
         }
     }
     return mouseLoction_;
