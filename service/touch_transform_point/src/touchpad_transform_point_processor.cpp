@@ -198,7 +198,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
 int32_t TouchPadTransformPointProcessor::GetTouchPadToolType(struct libinput_event_touch *data,
     struct libinput_device *device)
 {
-    auto toolTypeTmp = libinput_event_touchpad_get_tool_type(data);
+    int32_t toolTypeTmp = libinput_event_touchpad_get_tool_type(data);
     switch (toolTypeTmp) {
         case MT_TOOL_NONE: {
             return GetTouchPadToolType(device);
