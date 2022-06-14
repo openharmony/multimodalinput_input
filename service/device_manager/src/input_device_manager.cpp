@@ -336,27 +336,27 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::u16string> &arg
     mprintf(fd, "--------------------------[device information]-------------------------");
     mprintf(fd, "Input Devices: count=%d", inputDevice_.size());
     for (const auto &item : inputDevice_) {
-        std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
-            mprintf(fd,
-                "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d" 
-                "| product:%d | vendor:%d | phys:%s | uniq:%s\t",
-                inputDevice->GetId(), inputDevice->GetName().c_str(), inputDevice->GetType(),
-                inputDevice->GetBustype(),inputDevice->GetVersion(), inputDevice->GetProduct(),
-                inputDevice->GetVendor(), inputDevice->GetPhys().c_str(), inputDevice->GetUniq().c_str()); 
-        auto axisinfo = inputDevice->GetAxisInfo();
-        mprintf(fd, "axis: count=%d \n", axisinfo.size());
-        for (const auto &axis : axisinfo) {
-            auto iter = axisType.find(axis.GetAxisType());
-            if (iter == axisType.end()) {
-                MMI_HILOGE("AxisType is not found !");
-                return;
-            }
-            mprintf(fd,
-                    "axisType:%s | minimum:%d | maximum:%d | fuzz:%d | flat:%d | resolution:%d\t",
-                    iter->second.c_str(), axis.GetMinimum(), axis.GetMaximum(), 
-                    axis.GetFuzz(), axis.GetFlat(), axis.GetResolution());
-        }
+    std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
+    mprintf(fd,
+            "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d"
+            "| product:%d | vendor:%d | phys:%s | uniq:%s\t",
+            inputDevice->GetId(), inputDevice->GetName().c_str(), inputDevice->GetType(),
+            inputDevice->GetBustype(), inputDevice->GetVersion(), inputDevice->GetProduct(),
+            inputDevice->GetVendor(), inputDevice->GetPhys().c_str(), inputDevice->GetUniq().c_str());
+    auto axisinfo = inputDevice->GetAxisInfo();
+    mprintf(fd, "axis: count=%d \n", axisinfo.size());
+    for (const auto &axis : axisinfo) {
+    auto iter = axisType.find(axis.GetAxisType());
+    if (iter == axisType.end()) {
+        MMI_HILOGE("AxisType is not found !");
+        return;
     }
+    mprintf(fd,
+            "axisType:%s | minimum:%d | maximum:%d | fuzz:%d | flat:%d | resolution:%d\t",
+            iter->second.c_str(), axis.GetMinimum(), axis.GetMaximum(),
+            axis.GetFuzz(), axis.GetFlat(), axis.GetResolution());
+    }
+}
 }
 
 void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::u16string> &args)
@@ -367,13 +367,12 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::u16st
     std::vector<int32_t> ids = GetInputDeviceIds();
     mprintf(fd, "Total device:%d, Device list:", ids.size());
     for (const auto &item : inputDevice_) {
-        std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
-        auto deviceId = inputDevice->GetId();
-            mprintf(fd,
-                "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d" 
-                "| product:%d | vendor:%d\t",
-                deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBustype(),
-                inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor());
+    std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
+    auto deviceId = inputDevice->GetId();
+    mprintf(fd,
+            "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d | product:%d | vendor:%d\t",
+            deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBustype(),
+            inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor());
     }
 }
 } // namespace MMI

@@ -188,12 +188,12 @@ void UDSServer::Dump(int32_t fd, const std::vector<std::u16string> &args)
     MMI_HILOGI("uds_erver Dump in !");
     mprintf(fd, "--------------------[uds_server information]----------------------");
     mprintf(fd, "uds_server: count=%d", sessionsMap_.size());
-    for (const auto &item : sessionsMap_) { 
-        std::shared_ptr<UDSSession> udsSession = item.second;
-        mprintf(fd,
-                "Uid:%d | Pid:%d | Fd:%d | HasPermission:%s | Descript:%s\t",
-                udsSession->GetUid(), udsSession->GetPid(), udsSession->GetFd(),
-                udsSession->HasPermission() ? "true" : "false", udsSession->GetDescript().c_str());
+    for (const auto &item : sessionsMap_) {
+    std::shared_ptr<UDSSession> udsSession = item.second;
+    mprintf(fd,
+            "Uid:%d | Pid:%d | Fd:%d | HasPermission:%s | Descript:%s\t",
+            udsSession->GetUid(), udsSession->GetPid(), udsSession->GetFd(),
+            udsSession->HasPermission() ? "true" : "false", udsSession->GetDescript().c_str());
     }
 }
 

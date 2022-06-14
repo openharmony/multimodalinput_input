@@ -229,12 +229,12 @@ void InterceptorHandlerGlobal::InterceptorCollection::Dump(int32_t fd, const std
     MMI_HILOGI("Interceptor Dump in !");
     mprintf(fd, "--------------------------[interceptor information]-------------------------");
     mprintf(fd, "interceptors: count=%d", interceptors_.size());
-    for (const auto &interceptor : interceptors_){
-        mprintf(fd,
-                "interceptor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d | EarlistEventTime:%" PRId64 "\t",
-                interceptor.id_, interceptor.handlerType_, interceptor.session_->GetPid(), 
-                interceptor.session_->GetUid(), interceptor.session_->GetFd(),
-                interceptor.session_->GetEarlistEventTime());
+    for (const auto &interceptor : interceptors_) {
+    mprintf(fd,
+            "interceptor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d | EarlistEventTime:%" PRId64 "\t",
+            interceptor.id_, interceptor.handlerType_, interceptor.session_->GetPid(),
+            interceptor.session_->GetUid(), interceptor.session_->GetFd(),
+            interceptor.session_->GetEarlistEventTime());
     }
 }
 } // namespace MMI

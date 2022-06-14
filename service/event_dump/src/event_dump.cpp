@@ -21,20 +21,19 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <getopt.h>
 
-#include "input_device_manager.h"
-#include "input_handler_manager_global.h"
-#include "key_event_subscriber.h"
-#include "interceptor_handler_global.h"
-#include "input_event_handler.h"
 #include "uds_server.h"
 #include "mouse_event_handler.h"
-#include "util_ex.h"
-
+#include "input_event_handler.h"
+#include "input_device_manager.h"
+#include "key_event_subscriber.h"
 #include "input_windows_manager.h"
+#include "interceptor_handler_global.h"
+#include "input_handler_manager_global.h"
+
 #include "util.h"
 #include "util_ex.h"
-#include <getopt.h>
 
 namespace OHOS {
 namespace MMI {
@@ -69,7 +68,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::u16string> &args
     auto &params = const_cast<std::vector<std::u16string>&>(args);
     params.insert(params.begin(), std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes("first"));
     char ** argv = new char*[params.size()];
-    for(size_t i = 0; i < params.size(); ++i){
+    for(size_t i = 0; i < params.size(); ++i) {
         argv[i] = new char[params[i].size() + 1];
         std::string temp = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(params[i]);
         strcpy(argv[i], temp.c_str());
@@ -135,7 +134,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::u16string> &args
             }
         }
     }
-    for(size_t i = 0; i < params.size(); ++i){
+    for(size_t i = 0; i < params.size(); ++i) {
         delete [] argv[i];
     }
     delete [] argv;
