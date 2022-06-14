@@ -681,6 +681,17 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "total time is out of range." << std::endl;
                                 return RET_ERR;
                             }
+                            const int32_t minPressTimeMs = 500;
+                            const int32_t maxPressTimeMs = 14500;
+                            if ((minPressTimeMs > pressTimems) || (maxPressTimeMs < pressTimems)) {
+                                std::cout << "press time is out of range." << std::endl;
+                                return RET_ERR;
+                            }
+                            const int32_t minMoveTimeMs = 500;
+                            if ((totalTimeMs -  pressTimems) <  minMoveTimeMs) {
+                                std::cout << "move time is out of range." << std::endl;
+                                return RET_ERR;
+                            }
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
