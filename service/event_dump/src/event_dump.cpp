@@ -64,18 +64,6 @@ void ChkConfig(int32_t fd)
     mprintf(fd, "EXP_SOPATH: %s\n", DEF_EXP_SOPATH);
 }
 
-void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
-{
-    MMI_HILOGI("ParseCommand in");
-    char **argv = new char *[args.size()];
-    for (size_t i = 0; i < args.size(); ++i) {
-        argv[i] = new char[args[i].size() + 1];
-        if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != EOK) {
-            MMI_HILOGE("strcpy_s error");
-            FreeArray(argv, args.size());
-            return;
-        }
-    }
 struct option dumpOptions[] = {
     {"help", no_argument, 0, 'h'},
     {"device", no_argument, 0, 'd'},
@@ -88,10 +76,22 @@ struct option dumpOptions[] = {
     {"mouse", no_argument, 0, 'm'},
     {NULL, 0, 0, 0}
 };
+void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
+{
+    MMI_HILOGI("ParseCommand in");
+    char **argv = new char *[args.size()];
+    for (size_t i = 0; i < args.size(); ++i) {
+        argv[i] = new char[args[i].size() + 1];
+        if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != EOK) {
+            MMI_HILOGE("strcpy_s error");
+            FreeArray(argv, args.size());
+            return;
+        }
+    }
     int c;
     optind = 1;
     int32_t optionIndex = 0;
-    while((c = getopt_long (args.size(), argv, "hdlwusoim", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long (args.size(), argv, "hdlwusoim", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
