@@ -142,9 +142,9 @@ bool TabletToolProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
         MMI_HILOGE("CalculateTipPoint failed");
         return false;
     }
-    auto tiltX = libinput_event_tablet_tool_get_tilt_x(event);
-    auto tiltY = libinput_event_tablet_tool_get_tilt_y(event);
-    auto pressure = libinput_event_tablet_tool_get_pressure(event);
+    double tiltX = libinput_event_tablet_tool_get_tilt_x(event);
+    double tiltY = libinput_event_tablet_tool_get_tilt_y(event);
+    double pressure = libinput_event_tablet_tool_get_pressure(event);
     int32_t toolType = GetToolType(event);
     
     int64_t time = GetSysClockTime();
@@ -190,9 +190,9 @@ bool TabletToolProcessor::OnTipMotion(struct libinput_event* event)
         MMI_HILOGE("CalculateTipPoint failed");
         return false;
     }
-    auto tiltX = libinput_event_tablet_tool_get_tilt_x(tabletEvent);
-    auto tiltY = libinput_event_tablet_tool_get_tilt_y(tabletEvent);
-    auto pressure = libinput_event_tablet_tool_get_pressure(tabletEvent);
+    double tiltX = libinput_event_tablet_tool_get_tilt_x(tabletEvent);
+    double tiltY = libinput_event_tablet_tool_get_tilt_y(tabletEvent);
+    double pressure = libinput_event_tablet_tool_get_pressure(tabletEvent);
     int32_t toolType = GetToolType(tabletEvent);
 
     PointerEvent::PointerItem item;
