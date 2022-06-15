@@ -17,6 +17,10 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "KeyOption"};
+const constexpr uint32_t PRE_KEYS_MAX_SIZE = 5;
+}
 std::set<int32_t> KeyOption::GetPreKeys() const
 {
     return preKeys_;
@@ -62,11 +66,14 @@ bool KeyOption::ReadFromParcel(Parcel &in)
     if (!in.ReadInt32(preKeysSize)) {
         return false;
     }
-
     if (preKeysSize < 0) {
         return false;
     }
-
+    if (preKeysSize > PRE_KEYS_MAX_SIZE) {
+        MMI_HILOGE("preKeys size(%{public}d) exceeds maximum allowed size(%{public}zu)", preKeysSize,
+            PRE_KEYS_MAX_SIZE);
+        return false;
+    }
     for (auto i = 0; i < preKeysSize; ++i) {
         int32_t keyValue;
         if (!in.ReadInt32(keyValue)) {
@@ -74,7 +81,6 @@ bool KeyOption::ReadFromParcel(Parcel &in)
         }
         preKeys_.insert(keyValue);
     }
-
     return (
         in.ReadInt32(finalKey_) &&
         in.ReadBool(isFinalKeyDown_) &&
@@ -84,21 +90,20 @@ bool KeyOption::ReadFromParcel(Parcel &in)
 
 bool KeyOption::WriteToParcel(Parcel &out) const
 {
-    if (preKeys_.size() > std::numeric_limits<int32_t>::max()) {
+    if (preKeys_.size() > PRE_KEYS_MAX_SIZE) {
+        MMI_HILOGE("preKeys size(%{public}zu) exceeds maximum allowed size(%{public}zu)", preKeys_.size(),
+            PRE_KEYS_MAX_SIZE);
         return false;
     }
-
     int32_t preKeysSize = static_cast<int32_t>(preKeys_.size());
     if (!out.WriteInt32(preKeysSize)) {
         return false;
     }
-
     for (const auto &i : preKeys_) {
         if (!out.WriteInt32(i)) {
             return false;
         }
     }
-
     return (
         out.WriteInt32(finalKey_) &&
         out.WriteBool(isFinalKeyDown_) &&
