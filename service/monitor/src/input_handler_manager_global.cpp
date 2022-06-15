@@ -285,12 +285,12 @@ void InputHandlerManagerGlobal::MonitorCollection::OnSessionLost(SessionPtr sess
         }
     }
 }
-void InputHandlerManagerGlobal::Dump(int32_t fd, const std::vector<std::u16string> &args)
+void InputHandlerManagerGlobal::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     return monitors_.Dump(fd, args);
 }
 
-void InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::vector<std::u16string> &args)
+void InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
     MMI_HILOGI("Monitor Dump in !");

@@ -182,7 +182,7 @@ void UDSServer::AddPermission(SessionPtr sess)
     }
 }
 
-void UDSServer::Dump(int32_t fd, const std::vector<std::u16string> &args)
+void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
     MMI_HILOGI("uds_erver Dump in !");

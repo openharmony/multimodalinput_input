@@ -722,5 +722,13 @@ int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value
     }
     return RET_OK;
 }
+
+void FreeArray(char **argv, size_t length)
+{
+    for(size_t i = 0; i < length; ++i) {
+        delete[] argv[i];
+    }
+    delete[] argv;
+}
 } // namespace MMI
 } // namespace OHOS

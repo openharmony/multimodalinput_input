@@ -683,7 +683,7 @@ MouseLocation InputWindowsManager::GetMouseInfo()
     return mouseLoction_;
 }
 
-void InputWindowsManager::Dump(int32_t fd, const std::vector<std::u16string> &args)
+void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
     MMI_HILOGI("Windows Manager Dump in !");

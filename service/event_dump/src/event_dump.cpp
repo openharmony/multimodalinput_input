@@ -22,6 +22,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <getopt.h>
+#include <cstring>
 
 #include "uds_server.h"
 #include "mouse_event_handler.h"
@@ -34,6 +35,7 @@
 
 #include "util.h"
 #include "util_ex.h"
+#include "securec.h"
 
 namespace OHOS {
 namespace MMI {
@@ -62,33 +64,34 @@ void ChkConfig(int32_t fd)
     mprintf(fd, "EXP_SOPATH: %s\n", DEF_EXP_SOPATH);
 }
 
-void EventDump::ParseCommand(int32_t fd, const std::vector<std::u16string> &args)
+void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 {
     MMI_HILOGI("ParseCommand in");
-    auto &params = const_cast<std::vector<std::u16string>&>(args);
-    params.insert(params.begin(), std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes("first"));
-    char ** argv = new char*[params.size()];
-    for(size_t i = 0; i < params.size(); ++i) {
-        argv[i] = new char[params[i].size() + 1];
-        std::string temp = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(params[i]);
-        strcpy(argv[i], temp.c_str());
+    char **argv = new char *[args.size()];
+    for (size_t i = 0; i < args.size(); ++i) {
+        argv[i] = new char[args[i].size() + 1];
+        if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != EOK) {
+            MMI_HILOGE("strcpy_s error");
+            FreeArray(argv, args.size());
+            return;
+        }
     }
-    struct option dumpOptions[] = {
-        {"help", no_argument, 0, 'h'},
-        {"device", no_argument, 0, 'd'},
-        {"devicelist", no_argument, 0, 'l'},
-        {"windows", no_argument, 0, 'w'},
-        {"udsserver", no_argument, 0, 'u'},
-        {"subscriber", no_argument, 0, 's'},
-        {"monitor", no_argument, 0, 'o'},
-        {"interceptor", no_argument, 0, 'i'},
-        {"mouse", no_argument, 0, 'm'},
-        {NULL, 0, 0, 0}
-    };
+struct option dumpOptions[] = {
+    {"help", no_argument, 0, 'h'},
+    {"device", no_argument, 0, 'd'},
+    {"devicelist", no_argument, 0, 'l'},
+    {"windows", no_argument, 0, 'w'},
+    {"udsserver", no_argument, 0, 'u'},
+    {"subscriber", no_argument, 0, 's'},
+    {"monitor", no_argument, 0, 'o'},
+    {"interceptor", no_argument, 0, 'i'},
+    {"mouse", no_argument, 0, 'm'},
+    {NULL, 0, 0, 0}
+};
     int c;
-    int32_t optionIndex;
     optind = 1;
-    while((c = getopt_long (params.size(), argv, "hdlwusoim", dumpOptions, &optionIndex)) != -1) {
+    int32_t optionIndex = 0;
+    while((c = getopt_long (args.size(), argv, "hdlwusoim", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
@@ -134,13 +137,10 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::u16string> &args
             }
         }
     }
-    for(size_t i = 0; i < params.size(); ++i) {
-        delete [] argv[i];
-    }
-    delete [] argv;
+    FreeArray(argv, args.size());
 }
 
-void EventDump::DumpEventHelp(int32_t fd, const std::vector<std::u16string> &args)
+void EventDump::DumpEventHelp(int32_t fd, const std::vector<std::string> &args)
 {
     DumpHelp(fd);
 }

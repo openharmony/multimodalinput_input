@@ -329,7 +329,7 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
     return INVALID_DEVICE_ID;
 }
 
-void InputDeviceManager::Dump(int32_t fd, const std::vector<std::u16string> &args)
+void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
     MMI_HILOGI("Device Dump in !");
@@ -359,7 +359,7 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::u16string> &arg
 }
 }
 
-void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::u16string> &args)
+void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
     MMI_HILOGI("Device List Dump in !");
