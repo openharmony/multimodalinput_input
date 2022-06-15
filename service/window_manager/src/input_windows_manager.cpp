@@ -192,12 +192,11 @@ void InputWindowsManager::GetGlobalLogicDisplayCoord(struct libinput_event_touch
 {
     LogicalCoordinate coord{
         .x = static_cast<int32_t>(libinput_event_touch_get_x_transformed(touch, info.width)),
-        .y = static_cast<int32_t>(libinput_event_touch_get_x_transformed(touch, info.height)),
+        .y = static_cast<int32_t>(libinput_event_touch_get_y_transformed(touch, info.height)),
     };
     RotateTouchScreen(info, coord);
     touchInfo.point.x = coord.x;
     touchInfo.point.y = coord.y;
-
     PhysicalCoordinate toolPhysCoord {
         .x = libinput_event_touch_get_tool_x_transformed(touch, info.width),
         .y = libinput_event_touch_get_tool_y_transformed(touch, info.height)
