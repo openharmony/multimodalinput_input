@@ -121,6 +121,20 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_HILOGE("The fd less than 0, fd: %{public}d", fd);
         return RET_ERR;
     }
+    auto session = udsServer->GetSession(fd);
+    CHKPF(session);
+    if (session->isANRProcess_) {
+        MMI_HILOGD("application not responsing");
+        return RET_OK;
+    }
+
+    auto currentTime = GetSysClockTime();
+    if (TriggerANR(currentTime, session)) {
+        session->isANRProcess_ = true;
+        MMI_HILOGW("the pointer event does not report normally, application not response");
+        return RET_OK;
+    }
+
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(point, pkt);
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
@@ -134,6 +148,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
+    session->AddEvent(point->GetId(), currentTime);
     return RET_OK;
 }
 
@@ -174,6 +189,20 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
                key->GetFlag(), key->GetKeyAction(), fd);
     InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
 
+    auto session = udsServer->GetSession(fd);
+    CHKPF(session);
+    if (session->isANRProcess_) {
+        MMI_HILOGD("application not responsing");
+        return RET_OK;
+    }
+
+    auto currentTime = GetSysClockTime();
+    if (TriggerANR(currentTime, session)) {
+        session->isANRProcess_ = true;
+        MMI_HILOGW("the key event does not report normally, application not response");
+        return RET_OK;
+    }
+
     NetPacket pkt(MmiMessageId::ON_KEYEVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_DISPATCH_EVENT);
@@ -186,6 +215,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
         MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
+    session->AddEvent(key->GetId(), currentTime);
     return RET_OK;
 }
 
