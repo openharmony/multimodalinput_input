@@ -120,11 +120,12 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"move", required_argument, NULL, 'm'},
         {"down", required_argument, NULL, 'd'},
         {"up", required_argument, NULL, 'u'},
+        {"click", required_argument, NULL, 'c'},
         {"interval", required_argument, NULL, 'i'},
         {NULL, 0, NULL, 0}
     };
-    int32_t c;
-    int32_t optionIndex;
+    int32_t c = 0;
+    int32_t optionIndex = 0;
     optind = 0;
     if ((c = getopt_long(argc, argv, "MKT?", headOptions, &optionIndex)) != -1) {
         switch (c) {
@@ -237,7 +238,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
                             pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
-                                                       scrollValue);
+                                scrollValue);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             time = pointerEvent->GetActionStartTime();
@@ -249,7 +250,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
                             pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
-                                                       scrollValue);
+                                scrollValue);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
@@ -260,7 +261,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
                             pointerEvent->SetAxisValue(PointerEvent::AxisType::AXIS_TYPE_SCROLL_VERTICAL,
-                                                       scrollValue);
+                                scrollValue);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             break;
@@ -334,7 +335,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
             }
             case 'K': {
                 std::vector<int32_t> downKey;
-                int32_t keyCode;
+                int32_t keyCode = 0;
                 int32_t isCombinationKey = 0;
                 while ((c = getopt_long(argc, argv, "d:u:i:", keyboardSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
@@ -438,7 +439,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t py2 = 0;
                 int32_t totalTimeMs = 0;
                 int32_t moveArgcSeven = 7;
-                while ((c = getopt_long(argc, argv, "m:d:u:i:", touchSensorOptions, &optionIndex)) != -1) {
+                while ((c = getopt_long(argc, argv, "m:d:u:c:i:", touchSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
                             if (argc < moveArgcSeven) {
@@ -571,6 +572,58 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             optind++;
                             break;
                         }
+                        case 'c': {
+                            int32_t intervalTimeMs = 0;
+                            if (argc == 5) {
+                                if (!StrToInt(optarg, px1) ||
+                                    !StrToInt(argv[optind], py1)) {
+                                    std::cout << "input coordinate error" << std::endl;
+                                    return RET_ERR;
+                                }
+                                intervalTimeMs = 100;
+                            } else if (argc == 6) {
+                                if (!StrToInt(optarg, px1) ||
+                                    !StrToInt(argv[optind], py1) ||
+                                    !StrToInt(argv[optind + 1], intervalTimeMs)) {
+                                    std::cout << "input coordinate or time error" << std::endl;
+                                    return RET_ERR;
+                                }
+                                const int64_t minIntervalTimeMs = 1;
+                                const int64_t maxIntervalTimeMs = 450;
+                                if ((minIntervalTimeMs > intervalTimeMs) || (maxIntervalTimeMs < intervalTimeMs)) {
+                                    std::cout << "interval time is out of range: " << minIntervalTimeMs << "ms";
+                                    std::cout << " < interval time < " << maxIntervalTimeMs << "ms" << std::endl;
+                                    return RET_ERR;
+                                }
+                            } else {
+                                std::cout << "parameter error, unable to run" << std::endl;
+                                ShowUsage();
+                                return RET_ERR;
+                            }
+                            std::cout << "touch screen click interval time:" << intervalTimeMs << "ms" << std::endl;
+                            std::cout << "single finger touch screen click " << px1 << " " << py1 << std::endl;
+                            auto pointerEvent = PointerEvent::Create();
+                            CHKPR(pointerEvent, ERROR_NULL_POINTER);
+                            PointerEvent::PointerItem item;
+                            item.SetPointerId(0);
+                            item.SetPressed(true);
+                            item.SetGlobalX(px1);
+                            item.SetGlobalY(py1);
+                            pointerEvent->SetPointerId(0);
+                            pointerEvent->AddPointerItem(item);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            std::this_thread::sleep_for(std::chrono::milliseconds(intervalTimeMs));
+
+                            item.SetPressed(false);
+                            item.SetGlobalX(px1);
+                            item.SetGlobalY(py1);
+                            pointerEvent->UpdatePointerItem(0, item);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            break;
+                        }
                         case 'i': {
                             int32_t taktTime = 0;
                             if (!StrToInt(optarg, taktTime)) {
@@ -646,7 +699,8 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-u <dx1> <dy1>             --up     <dx1> <dy1> -release a position dx1 dy1, "     << std::endl;
     std::cout << "-m <dx1> <dy1> <dx2> <dy2> [smooth time]      --smooth movement"   << std::endl;
     std::cout << "   <dx1> <dy1> <dx2> <dy2> [smooth time]      -smooth movement, "  << std::endl;
-    std::cout << "                                              dx1 dy1 to dx2 dy2 smooth movement"   << std::endl;
+    std::cout << "                                              dx1 dy1 to dx2 dy2 smooth movement"  << std::endl;
+    std::cout << "-c <dx1> <dy1> [click interval]               -touch screen click dx1 dy1"         << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
     std::cout << "                                                              " << std::endl;

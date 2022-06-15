@@ -263,9 +263,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         MMI_HILOGE("KeyEvent dispatch failed. ret:%{public}d,errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
         return KEY_EVENT_DISP_FAIL;
     }
-    if (keyEvent_->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
-        KeyRepeat->SelectAutoRepeat(keyEvent_);
-    }
+    KeyRepeat->SelectAutoRepeat(keyEvent_);
     MMI_HILOGD("keyCode:%{public}d,action:%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
     return RET_OK;
 }

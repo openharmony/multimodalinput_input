@@ -241,8 +241,8 @@ bool InputWindowsManager::TransformDisplayPoint(struct libinput_event_touch* tou
         return false;
     }
 
-    auto width = libinput_event_touch_get_tool_width_transformed(touch, info->width);
-    auto height = libinput_event_touch_get_tool_height_transformed(touch, info->height);
+    double width = libinput_event_touch_get_tool_width_transformed(touch, info->width);
+    double height = libinput_event_touch_get_tool_height_transformed(touch, info->height);
 
     touchInfo.point = touchLogicalCoord;
     touchInfo.toolRect = {

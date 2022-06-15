@@ -46,6 +46,7 @@ protected:
     int32_t StubRemoveInputHandler(MessageParcel& data, MessageParcel& reply);
     int32_t StubMarkEventConsumed(MessageParcel& data, MessageParcel& reply);
     int32_t StubMoveMouseEvent(MessageParcel& data, MessageParcel& reply);
+    int32_t StubInjectKeyEvent(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace MMI
 } // namespace OHOS
