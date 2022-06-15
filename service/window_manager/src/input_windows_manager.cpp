@@ -190,7 +190,7 @@ void InputWindowsManager::RotateTouchScreen(DisplayInfo info, LogicalCoordinate&
 void InputWindowsManager::GetGlobalLogicDisplayCoord(struct libinput_event_touch* touch,
     EventTouch& touchInfo, DisplayInfo info)
 {
-    LogicalCoordinate coord{
+    LogicalCoordinate coord {
         .x = static_cast<int32_t>(libinput_event_touch_get_x_transformed(touch, info.width)),
         .y = static_cast<int32_t>(libinput_event_touch_get_y_transformed(touch, info.height)),
     };
@@ -220,7 +220,8 @@ bool InputWindowsManager::TouchPointToDisplayPoint(struct libinput_event_touch* 
     return true;
 }
 
-bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord, int32_t& displayId) const
+bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* tip,
+    LogicalCoordinate& coord, int32_t& displayId) const
 {
     CHKPF(tip);
     auto displayInfo = FindPhysicalDisplayInfo("default0");
@@ -260,7 +261,7 @@ bool InputWindowsManager::IsInsideWindow(int32_t x, int32_t y, const std::vector
 {
     for (auto &item : rects) {
         if (((x >= item.x) && (x < (item.x + item.width))) &&
-            (y >= item.y) && (y < (item.y + item.height))){
+            (y >= item.y) && (y < (item.y + item.height))) {
             return true;
         }
     }
@@ -407,7 +408,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     int32_t globalY = pointerItem.GetGlobalY();
     AdjustGlobalCoordinate(*physicDisplayInfo, globalX, globalY);
     int32_t globalLogicX = pointerItem.GetGlobalX() + physicDisplayInfo->x;
-    int32_t globalLogicY = pointerItem.GetGlobalY() + physicDisplayInfo->y;  
+    int32_t globalLogicY = pointerItem.GetGlobalY() + physicDisplayInfo->y;
     WindowInfo *touchWindow = nullptr;
     for (auto &item : displayGroupInfo_.windowsInfo) {
         if (IsInsideWindow(globalLogicX, globalLogicY, item.defaultHotAreas)) {
@@ -435,7 +436,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     MMI_HILOGD("pid:%{public}d,fd:%{public}d,globalLogicX:%{public}d,globalLogicY:%{public}d,"
                "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
                "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",
-               touchWindow->pid, fd, globalLogicX, globalLogicY, globalX, globalY, 
+               touchWindow->pid, fd, globalLogicX, globalLogicY, globalX, globalY,
                localX, localY, displayId, pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
     return fd;
 }
@@ -470,7 +471,7 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
     return RET_ERR;
 }
 
-bool InputWindowsManager::IsInsideDisplay(DisplayInfo displayInfo, int32_t globalX, int32_t globalY)  
+bool InputWindowsManager::IsInsideDisplay(DisplayInfo displayInfo, int32_t globalX, int32_t globalY)
 {
     return (globalX >= 0 && globalX < displayInfo.width) && (globalY >= 0 && globalY < displayInfo.height);
 }
@@ -496,7 +497,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLoction(int32_t& displayId, double
     int32_t integerX = static_cast<int32_t>(x);
     int32_t integerY = static_cast<int32_t>(y);
     int32_t lastDisplayId = displayId;
-    if (!IsInsideDisplay(*displayInfo, integerX, integerY)){
+    if (!IsInsideDisplay(*displayInfo, integerX, integerY)) {
         FindPhysicalDisplay(*displayInfo, integerX, integerY, displayId);
     }
     if (displayId == lastDisplayId) {
@@ -517,7 +518,8 @@ void InputWindowsManager::UpdateAndAdjustMouseLoction(int32_t& displayId, double
     y = static_cast<double>(integerY);
     mouseLoction_.globalX = integerX;
     mouseLoction_.globalY = integerY;
-    MMI_HILOGD("Mouse Data: globalX:%{public}d,globalY:%{public}d, displayId:%{public}d", mouseLoction_.globalX, mouseLoction_.globalY, displayId);
+    MMI_HILOGD("Mouse Data: globalX:%{public}d,globalY:%{public}d, displayId:%{public}d",
+        mouseLoction_.globalX, mouseLoction_.globalY, displayId);
 }
 
 MouseLocation InputWindowsManager::GetMouseInfo()

@@ -70,7 +70,7 @@ private:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     void SelectWindowInfo(const int32_t& globalX, const int32_t& globalY,
         const std::shared_ptr<PointerEvent>& pointerEvent, WindowInfo*& touchWindow);
-    void GetGlobalLogicDisplayCoord(struct libinput_event_touch* touch, 
+    void GetGlobalLogicDisplayCoord(struct libinput_event_touch* touch,
         EventTouch& touchInfo, DisplayInfo info);
     bool IsInsideDisplay(DisplayInfo displayInfo, int32_t globalX, int32_t globalY);
     void FindPhysicalDisplay(DisplayInfo displayInfo, int32_t& globalX, int32_t& globalY, int32_t& displayId);
@@ -78,7 +78,7 @@ private:
     UDSServer* udsServer_ = nullptr;
     int32_t firstBtnDownWindowId_ = -1;
     DisplayGroupInfo displayGroupInfo_;
-    MouseLocation mouseLoction_ = {-1, -1};  //物理屏坐标
+    MouseLocation mouseLoction_ = {-1, -1}; // physical coord
 };
 
 #define WinMgr InputWindowsManager::GetInstance()
