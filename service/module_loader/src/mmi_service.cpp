@@ -453,6 +453,24 @@ int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent
     return sMsgHandler_.OnInjectKeyEvent(keyEvent);
 }
 
+int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnInjectPointerEvent(pointerEvent);
+}
+
+int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
+    if (ret != RET_OK) {
+    MMI_HILOGE("inject pointer event failed, ret:%{public}d", ret);
+    return RET_ERR;
+    }
+    return RET_OK;
+}
+
 #ifdef OHOS_RSS_CLIENT
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {

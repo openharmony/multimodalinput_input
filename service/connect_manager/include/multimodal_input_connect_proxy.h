@@ -43,6 +43,7 @@ public:
     virtual int32_t MarkEventConsumed(int32_t monitorId, int32_t eventId) override;
     virtual int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
     virtual int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
+    virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };
