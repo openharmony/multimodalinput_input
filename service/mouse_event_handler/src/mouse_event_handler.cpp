@@ -88,7 +88,7 @@ int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)
         MMI_HILOGE("The button value does not exist");
         return RET_ERR;
     }
-    auto button = libinput_event_pointer_get_button(data);
+    uint32_t button = libinput_event_pointer_get_button(data);
     auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
@@ -96,7 +96,6 @@ int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)
         pointerEvent_->DeleteReleaseButton(button);
         isPressed_ = false;
         buttonId_ = PointerEvent::BUTTON_NONE;
-        pointerEvent_->SetButtonId(buttonId_);
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_PRESSED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
@@ -115,7 +114,7 @@ int32_t MouseEventHandler::HandleButtonValueInner(libinput_event_pointer* data)
     CALL_LOG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
 
-    auto button = libinput_event_pointer_get_button(data);
+    uint32_t button = libinput_event_pointer_get_button(data);
     switch (button) {
         case BTN_LEFT:
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
@@ -175,11 +174,11 @@ int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
     }
 
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
-        auto axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
+        double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
     }
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
-        auto axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
+        double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }
     return RET_OK;
