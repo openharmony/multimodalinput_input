@@ -114,13 +114,9 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
     while (std::getline(sStream, sLine)) {
         MMI_HILOGD("%{public}s", sLine.c_str());
     }
-    NetPacket pkt(MmiMessageId::INJECT_POINTER_EVENT);
-    if (InputEventDataTransformation::Marshalling(pointerEvent, pkt) != RET_OK) {
-        MMI_HILOGE("Marshalling pointer event failed");
-        return RET_ERR;
-    }
-    if (!SendMsg(pkt)) {
-        MMI_HILOGE("SendMsg failed");
+    int32_t ret = MultimodalInputConnMgr->InjectPointerEvent(pointerEvent);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
