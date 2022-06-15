@@ -109,7 +109,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_
     CHKPF(udev_);
     input_ = libinput_udev_create_context(&LIBINPUT_INTERFACE, nullptr, udev_);
     CHKPF(input_);
-    auto rt = libinput_udev_assign_seat(input_, seat_id_.c_str());
+    int32_t rt = libinput_udev_assign_seat(input_, seat_id_.c_str());
     if (rt != 0) {
         libinput_unref(input_);
         udev_unref(udev_);
