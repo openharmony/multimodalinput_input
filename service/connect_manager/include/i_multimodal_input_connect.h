@@ -22,6 +22,7 @@
 #include "input_handler_type.h"
 #include "key_event.h"
 #include "key_option.h"
+#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
@@ -44,6 +45,7 @@ public:
     virtual int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) = 0;
     virtual int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) = 0;
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) = 0;
+    virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
     enum {
         ALLOC_SOCKET_FD = 0,
         ADD_INPUT_EVENT_FILTER = 1,
@@ -57,6 +59,7 @@ public:
         MARK_EVENT_CONSUMED = 10,
         MOVE_MOUSE = 11,
         INJECT_KEY_EVENT = 12,
+        INJECT_POINTER_EVENT = 13
     };
 
     enum {

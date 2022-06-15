@@ -63,6 +63,7 @@ public:
     virtual int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
     virtual int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
+    virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 
 #ifdef OHOS_RSS_CLIENT
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
@@ -80,6 +81,7 @@ protected:
     int32_t CheckRemoveInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType);
     int32_t CheckMarkConsumed(int32_t pid, int32_t monitorId, int32_t eventId);
     int32_t CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
     bool InitLibinputService();
     bool InitService();
     bool InitSignalHandler();
