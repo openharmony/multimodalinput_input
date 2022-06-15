@@ -410,8 +410,14 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     int32_t globalLogicX = pointerItem.GetGlobalX() + physicDisplayInfo->x;
     int32_t globalLogicY = pointerItem.GetGlobalY() + physicDisplayInfo->y;
     WindowInfo *touchWindow = nullptr;
+    auto targetWindowId = pointerEvent->GetTargetWindowId();
     for (auto &item : displayGroupInfo_.windowsInfo) {
-        if (IsInsideWindow(globalLogicX, globalLogicY, item.defaultHotAreas)) {
+        if (targetWindowId >= 0) {
+            if (item.id == targetWindowId) {
+                touchWindow = &item;
+                break;
+            }
+        } else if (IsInsideWindow(globalLogicX, globalLogicY, item.defaultHotAreas)) {
             touchWindow = &item;
             break;
         }
