@@ -260,7 +260,6 @@ int32_t ServerMsgHandler::OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
 {
     CALL_LOG_ENTER;
     CHKPR(server, ERROR_NULL_POINTER);
- 
     auto sess = server->GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
     return KeyEventSubscriber_.SubscribeKeyEvent(sess, subscribeId, option);
