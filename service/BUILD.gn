@@ -219,7 +219,6 @@ ohos_prebuilt_etc("mmi_device_config.ini") {
 
 import("//build/test.gni")
 module_output_path = "multimodalinput/unit_out"
-HDF_FWKS = "//drivers/framework"
 
 ohos_unittest("ut-mmi-service-out") {
   module_out_path = module_output_path
@@ -255,7 +254,6 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/uinput",
-    "$HDF_FWKS/inclue",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
