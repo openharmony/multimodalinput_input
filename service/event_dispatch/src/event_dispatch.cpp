@@ -121,13 +121,14 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_HILOGE("The fd less than 0, fd: %{public}d", fd);
         return RET_ERR;
     }
+    auto udsServer = InputHandler->GetUDSServer();
+    CHKPR(udsServer, RET_ERR);
     auto session = udsServer->GetSession(fd);
-    CHKPF(session);
+    CHKPR(session, RET_ERR);
     if (session->isANRProcess_) {
         MMI_HILOGD("application not responsing");
         return RET_OK;
     }
-
     auto currentTime = GetSysClockTime();
     if (TriggerANR(currentTime, session)) {
         session->isANRProcess_ = true;
@@ -138,11 +139,6 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(point, pkt);
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
-    auto udsServer = InputHandler->GetUDSServer();
-    if (udsServer == nullptr) {
-        MMI_HILOGE("UdsServer is a nullptr");
-        return RET_ERR;
-    }
 
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
@@ -188,14 +184,12 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
                key->GetEventType(),
                key->GetFlag(), key->GetKeyAction(), fd);
     InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
-
-    auto session = udsServer->GetSession(fd);
-    CHKPF(session);
+    auto session = udsServer.GetSession(fd);
+    CHKPR(session, RET_ERR);
     if (session->isANRProcess_) {
         MMI_HILOGD("application not responsing");
         return RET_OK;
     }
-
     auto currentTime = GetSysClockTime();
     if (TriggerANR(currentTime, session)) {
         session->isANRProcess_ = true;
