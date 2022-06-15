@@ -198,8 +198,8 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
 int32_t TouchPadTransformPointProcessor::GetTouchPadToolType(struct libinput_event_touch *data,
     struct libinput_device *device)
 {
-    auto toolTypeTmp = libinput_event_touchpad_get_tool_type(data);
-    switch (toolTypeTmp) {
+    int32_t toolType = libinput_event_touchpad_get_tool_type(data);
+    switch (toolType) {
         case MT_TOOL_NONE: {
             return GetTouchPadToolType(device);
         }
@@ -210,7 +210,7 @@ int32_t TouchPadTransformPointProcessor::GetTouchPadToolType(struct libinput_eve
             return PointerEvent::TOOL_TYPE_PEN;
         }
         default : {
-            MMI_HILOGW("Unknown tool type, identified as finger, toolType:%{public}d", toolTypeTmp);
+            MMI_HILOGW("Unknown tool type, identified as finger, toolType:%{public}d", toolType);
             return PointerEvent::TOOL_TYPE_FINGER;
         }
     }
