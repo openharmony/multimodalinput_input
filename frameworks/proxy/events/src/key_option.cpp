@@ -14,12 +14,13 @@
  */
 
 #include "key_option.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "KeyOption"};
-const constexpr uint32_t PRE_KEYS_MAX_SIZE = 5;
+const constexpr int32_t PRE_KEYS_MAX_SIZE = 5;
 }
 std::set<int32_t> KeyOption::GetPreKeys() const
 {
