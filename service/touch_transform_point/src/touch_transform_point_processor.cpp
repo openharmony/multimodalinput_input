@@ -68,10 +68,10 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
 
     PointerEvent::PointerItem item;
-    auto pressure = libinput_event_touch_get_pressure(data);
-    auto seatSlot = libinput_event_touch_get_seat_slot(data);
-    auto longAxis = libinput_event_get_touch_contact_long_axis(data);
-    auto shortAxis = libinput_event_get_touch_contact_short_axis(data);
+    double pressure = libinput_event_touch_get_pressure(data);
+    int32_t seatSlot = libinput_event_touch_get_seat_slot(data);
+    int32_t longAxis = libinput_event_get_touch_contact_long_axis(data);
+    int32_t shortAxis = libinput_event_get_touch_contact_short_axis(data);
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
@@ -110,14 +110,14 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
         return false;
     }
     PointerEvent::PointerItem item;
-    auto seatSlot = libinput_event_touch_get_seat_slot(data);
+    int32_t seatSlot = libinput_event_touch_get_seat_slot(data);
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
         MMI_HILOGE("Get pointer parameter failed");
         return false;
     }
-    auto pressure = libinput_event_touch_get_pressure(data);
-    auto longAxis = libinput_event_get_touch_contact_long_axis(data);
-    auto shortAxis = libinput_event_get_touch_contact_short_axis(data);
+    double pressure = libinput_event_touch_get_pressure(data);
+    int32_t longAxis = libinput_event_get_touch_contact_long_axis(data);
+    int32_t shortAxis = libinput_event_get_touch_contact_short_axis(data);
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
@@ -144,7 +144,7 @@ bool TouchTransformPointProcessor::OnEventTouchUp(struct libinput_event *event)
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
 
     PointerEvent::PointerItem item;
-    auto seatSlot = libinput_event_touch_get_seat_slot(data);
+    int32_t seatSlot = libinput_event_touch_get_seat_slot(data);
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
         MMI_HILOGE("Get pointer parameter failed");
         return false;
@@ -196,8 +196,8 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
 int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_event_touch *data,
     struct libinput_device *device)
 {
-    auto toolTypeTmp = libinput_event_touch_get_tool_type(data);
-    switch (toolTypeTmp) {
+    int32_t toolType = libinput_event_touch_get_tool_type(data);
+    switch (toolType) {
         case MT_TOOL_NONE: {
             return GetTouchToolType(device);
         }
@@ -208,7 +208,7 @@ int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_event_tou
             return PointerEvent::TOOL_TYPE_PEN;
         }
         default : {
-            MMI_HILOGW("Unknown tool type, identified as finger, toolType:%{public}d", toolTypeTmp);
+            MMI_HILOGW("Unknown tool type, identified as finger, toolType:%{public}d", toolType);
             return PointerEvent::TOOL_TYPE_FINGER;
         }
     }
