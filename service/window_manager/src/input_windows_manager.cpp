@@ -77,6 +77,7 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> i
     for (auto &item : displayGroupInfo_.windowsInfo) {
         if (item.id == focusWindowId) {
             windowInfo = &item;
+            break;
         }
     }
     if (windowInfo == nullptr) {
