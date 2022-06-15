@@ -60,20 +60,20 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     CHKPP(inputDevice);
     inputDevice->SetId(iter->first);
     inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(iter->second)));
-    auto name = libinput_device_get_name(iter->second);
+    const char* name = libinput_device_get_name(iter->second);
     inputDevice->SetName((name == nullptr) ? ("null") : (name));
     inputDevice->SetBustype(libinput_device_get_id_bustype(iter->second));
     inputDevice->SetVersion(libinput_device_get_id_version(iter->second));
     inputDevice->SetProduct(libinput_device_get_id_product(iter->second));
     inputDevice->SetVendor(libinput_device_get_id_vendor(iter->second));
-    auto phys = libinput_device_get_phys(iter->second);
+    const char* phys = libinput_device_get_phys(iter->second);
     inputDevice->SetPhys((phys == nullptr) ? ("null") : (phys));
-    auto uniq = libinput_device_get_uniq(iter->second);
+    const char* uniq = libinput_device_get_uniq(iter->second);
     inputDevice->SetUniq((uniq == nullptr) ? ("null") : (uniq));
 
     InputDevice::AxisInfo axis;
     for (const auto &item : axisType) {
-        auto min = libinput_device_get_axis_min(iter->second, item);
+        int32_t min = libinput_device_get_axis_min(iter->second, item);
         if (min == -1) {
             MMI_HILOGW("The device does not support this axis");
             continue;
