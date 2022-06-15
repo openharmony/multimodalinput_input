@@ -218,12 +218,12 @@ void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr s
         }
     }
 }
-void InterceptorHandlerGlobal::Dump(int32_t fd, const std::vector<std::u16string> &args)
+void InterceptorHandlerGlobal::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     return interceptors_.Dump(fd, args);
 }
 
-void InterceptorHandlerGlobal::InterceptorCollection::Dump(int32_t fd, const std::vector<std::u16string> &args)
+void InterceptorHandlerGlobal::InterceptorCollection::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
     MMI_HILOGI("Interceptor Dump in !");

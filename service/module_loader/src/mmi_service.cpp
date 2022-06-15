@@ -34,6 +34,7 @@
 #include "i_pointer_drawing_manager.h"
 #include "key_map_manager.h"
 #include "mmi_log.h"
+#include "string_ex.h"
 #include "multimodal_input_connect_def_parcel.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
@@ -567,8 +568,24 @@ void MMIService::OnSignalEvent(int32_t signalFd)
 
 int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
-    MMIEventDump->ParseCommand(fd, args);
-    return ERR_OK;
+    CALL_LOG_ENTER;
+    if (fd < 0) {
+        MMI_HILOGE("fd is invalid");
+        return DUMP_PARAM_ERR;
+    }
+    if (args.empty()) {
+        MMI_HILOGE("args cannot be empty");
+        mprintf(fd, "args cannot be empty\n");
+        MMIEventDump->DumpHelp(fd);
+        return DUMP_PARAM_ERR;
+    }
+    std::vector<std::string> argList = { "" };
+    std::transform(args.begin(), args.end(), std::back_inserter(argList),
+        [](const std::u16string &arg) {
+        return Str16ToStr8(arg);
+    });
+    MMIEventDump->ParseCommand(fd, argList);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

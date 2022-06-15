@@ -316,7 +316,7 @@ void MouseEventHandler::DumpInner()
     PrintEventData(pointerEvent_);
 }
 
-void MouseEventHandler::Dump(int32_t fd, const std::vector<std::u16string> &args)
+void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
     MMI_HILOGI("Mouse Device State Dump in !");

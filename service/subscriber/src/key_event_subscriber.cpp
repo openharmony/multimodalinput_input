@@ -436,7 +436,7 @@ bool KeyEventSubscriber::IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent) 
     return true;
 }
 
-void KeyEventSubscriber::Dump(int32_t fd, const std::vector<std::u16string> &args)
+void KeyEventSubscriber::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
     MMI_HILOGI("Subscriber Dump in !");
