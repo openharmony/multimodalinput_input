@@ -43,7 +43,7 @@ public:
     void UpdateSeatsInfo();
     void UpdateScreensInfo();
 
-    int32_t GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent) const;
+    int32_t GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent);
     int32_t UpdateTarget(std::shared_ptr<InputEvent> inputEvent);
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     MouseLocation GetMouseInfo();

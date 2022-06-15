@@ -68,13 +68,13 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
     return displayId;
 }
 
-int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent) const
+int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent)
 {
     CALL_LOG_ENTER;
     CHKPR(inputEvent, ERROR_NULL_POINTER);
     const int32_t focusWindowId = displayGroupInfo_.focusWindowId;
     WindowInfo* windowInfo = nullptr;
-    for (auto item : displayGroupInfo_.windowsInfo) {
+    for (auto &item : displayGroupInfo_.windowsInfo) {
         if (item.id == focusWindowId) {
             windowInfo = &item;
         }
@@ -412,6 +412,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     WindowInfo *touchWindow = nullptr;
     auto targetWindowId = pointerEvent->GetTargetWindowId();
     for (auto &item : displayGroupInfo_.windowsInfo) {
+        if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
+            MMI_HILOGD("Skip the untouchable window to continue searching, "
+                       "window:%{public}d, flags:%{public}d", item.id, item.flags);
+            continue;
+        }
         if (targetWindowId >= 0) {
             if (item.id == targetWindowId) {
                 touchWindow = &item;
