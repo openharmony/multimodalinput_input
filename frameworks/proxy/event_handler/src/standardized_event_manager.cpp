@@ -117,6 +117,7 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
     int32_t ret = MultimodalInputConnMgr->InjectPointerEvent(pointerEvent);
     if (ret != 0) {
         MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+        return RET_ERR;
     }
     return RET_OK;
 }
