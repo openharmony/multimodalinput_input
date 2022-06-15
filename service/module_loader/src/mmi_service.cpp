@@ -24,17 +24,12 @@
 #endif
 
 #include "event_dump.h"
-#include "input_device_manager.h"
-#include "input_handler_manager_global.h"
-#include "key_event_subscriber.h"
-#include "interceptor_handler_global.h"
-#include "mouse_event_handler.h"
-#include "util_ex.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "key_map_manager.h"
 #include "mmi_log.h"
 #include "string_ex.h"
+#include "util_ex.h"
 #include "multimodal_input_connect_def_parcel.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"

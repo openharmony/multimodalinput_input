@@ -696,7 +696,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
             physicalDisplay.id, physicalDisplay.leftDisplayId, physicalDisplay.upDisplayId,
             physicalDisplay.topLeftX, physicalDisplay.topLeftY, physicalDisplay.width, physicalDisplay.height,
             physicalDisplay.name.c_str(), physicalDisplay.seatId.c_str(), physicalDisplay.seatName.c_str(),
-            physicalDisplay.logicWidth,physicalDisplay.logicHeight, physicalDisplay.direction);
+            physicalDisplay.logicWidth, physicalDisplay.logicHeight, physicalDisplay.direction);
     }
     mprintf(fd, "-------------------------[logicalDisplays information]--------------------------");
     mprintf(fd, "logicalDisplays,num:%zu", logicalDisplays_.size());
