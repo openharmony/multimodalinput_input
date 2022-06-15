@@ -131,11 +131,11 @@ void InputManager::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
 
 int32_t InputManager::SetPointerVisible(bool visible)
 {
-    return InputMgrImpl->GetInstance()->SetPointerVisible(visible);
+    return InputMgrImpl->SetPointerVisible(visible);
 }
 bool InputManager::IsPointerVisible()
 {
-    return InputMgrImpl->GetInstance()->IsPointerVisible();
+    return InputMgrImpl->IsPointerVisible();
 }
 
 void InputManager::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
