@@ -52,7 +52,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerCommand"};
 constexpr int32_t SLEEPTIME = 20;
-constexpr int32_t MOUSE_ID = 2;
+constexpr int32_t MOUSE_ID = 7;
 constexpr int32_t TWO_MORE_COMMAND = 2;
 constexpr int32_t THREE_MORE_COMMAND = 3;
 constexpr int32_t MAX_PRESSED_COUNT = 30;
@@ -683,6 +683,14 @@ void InputManagerCommand::ShowUsage()
     std::cout << "                                               2 is the middle"   << std::endl;
     std::cout << "-u <key>                  --up     <key>      -release a button " << std::endl;
     std::cout << "-c <key>                  --click  <key>      -press the left button down,then raise" << std::endl;
+    std::cout << "   key value:0 - button left"     << std::endl;
+    std::cout << "   key value:1 - button right"    << std::endl;
+    std::cout << "   key value:2 - button middle"   << std::endl;
+    std::cout << "   key value:3 - button side"     << std::endl;
+    std::cout << "   key value:4 - button extra"    << std::endl;
+    std::cout << "   key value:5 - button forward"  << std::endl;
+    std::cout << "   key value:6 - button back"     << std::endl;
+    std::cout << "   key value:7 - button task"     << std::endl;
     std::cout << "-s <key>                  --scroll <key>      -positive values are sliding backwards" << std::endl;
     std::cout << "-i <time>                 --interval <time>   -the program interval for the (time) milliseconds";
     std::cout << std::endl;
