@@ -227,7 +227,7 @@ bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
     } else {
         earlist = sess->GetEarlistEventTime();
     }
-
+    MMI_HILOGD("Current time: %{public}" PRId64 "", time);
     if (time < (earlist + INPUT_UI_TIMEOUT_TIME)) {
         sess->isANRProcess_ = false;
         MMI_HILOGD("the event reports normally");
@@ -251,6 +251,7 @@ bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
     if (ret != 0) {
         MMI_HILOGE("AAFwk SendANRProcessID failed, AAFwk errCode: %{public}d", ret);
     }
+    MMI_HILOGI("AAFwk send ANR process id succeeded");
     return true;
 }
 } // namespace MMI
