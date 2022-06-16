@@ -316,7 +316,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             const int64_t minTaktTimeMs = 1;
                             const int64_t maxTaktTimeMs = 15000;
                             if ((minTaktTimeMs > taktTime) || (maxTaktTimeMs < taktTime)) {
-                                std::cout << "taktTime is out of range" << std::endl;;
+                                std::cout << "taktTime is out of range" << std::endl;
                                 std::cout << minTaktTimeMs << " < taktTime < " << maxTaktTimeMs;
                                 std::cout << std::endl;
                                 return EVENT_REG_FAIL;
