@@ -72,7 +72,7 @@ private:
         const std::shared_ptr<PointerEvent>& pointerEvent, WindowInfo*& touchWindow);
     void GetphysicalDisplayCoord(struct libinput_event_touch* touch,
         const DisplayInfo& info, EventTouch& touchInfo);
-    bool IsInsideDisplay(DisplayInfo displayInfo, int32_t globalX, int32_t globalY);
+    bool IsInsideDisplay(const DisplayInfo& displayInfo, int32_t globalX, int32_t globalY);
     void FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& globalX, int32_t& globalY, int32_t& displayId);
 private:
     UDSServer* udsServer_ = nullptr;

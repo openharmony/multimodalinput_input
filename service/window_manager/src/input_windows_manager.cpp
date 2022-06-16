@@ -480,7 +480,7 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
     return RET_ERR;
 }
 
-bool InputWindowsManager::IsInsideDisplay(DisplayInfo displayInfo, int32_t globalX, int32_t globalY)
+bool InputWindowsManager::IsInsideDisplay(const DisplayInfo& displayInfo, int32_t globalX, int32_t globalY)
 {
     return (globalX >= 0 && globalX < displayInfo.width) && (globalY >= 0 && globalY < displayInfo.height);
 }
