@@ -71,7 +71,8 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
 int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent)
 {
     CALL_LOG_ENTER;
-    CHKPR(inputEvent, ERROR_NULL_POINTER);
+    static constexpr int32_t invalid_pid = -1;
+    CHKPR(inputEvent, invalid_pid);
     const int32_t focusWindowId = displayGroupInfo_.focusWindowId;
     WindowInfo* windowInfo = nullptr;
     for (auto &item : displayGroupInfo_.windowsInfo) {
@@ -81,12 +82,12 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> i
         }
     }
     if (windowInfo == nullptr) {
-        MMI_HILOGE("can't find logical display");
+        MMI_HILOGE("can't find windowInfo");
         return RET_ERR;
     }
     inputEvent->SetTargetWindowId(windowInfo->id);
     inputEvent->SetAgentWindowId(windowInfo->agentWindowId);
-    MMI_HILOGD("pid:%{public}d", windowInfo->pid);
+    MMI_HILOGD("focusWindowId:%{public}d, pid:%{public}d", focusWindowId, windowInfo->pid);
     return windowInfo->pid;
 }
 
@@ -103,12 +104,12 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
 
 void InputWindowsManager::PrintDisplayInfo()
 {
-    MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
+    MMI_HILOGI("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
         displayGroupInfo_.width, displayGroupInfo_.height, displayGroupInfo_.focusWindowId);
     std::vector<WindowInfo> windowsInfos = displayGroupInfo_.windowsInfo;
-    MMI_HILOGD("windowsInfos,num:%{public}zu", windowsInfos.size());
+    MMI_HILOGI("windowsInfos,num:%{public}zu", windowsInfos.size());
     for (const auto &item : windowsInfos) {
-        MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
+        MMI_HILOGI("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
             "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
             "defaultHotAreas.size:%{public}zu,pointerHotAreas.size:%{public}zu,"
             "agentWindowId:%{public}d,flags:%{public}d",
@@ -116,19 +117,19 @@ void InputWindowsManager::PrintDisplayInfo()
             item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
             item.agentWindowId, item.flags);
         for (const auto &win : item.defaultHotAreas) {
-            MMI_HILOGD("defaultHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+            MMI_HILOGI("defaultHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
                 win.x, win.y, win.width, win.height);
         }
         for (const auto &pointer : item.pointerHotAreas) {
-            MMI_HILOGD("pointerHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+            MMI_HILOGI("pointerHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
                 pointer.x, pointer.y, pointer.width, pointer.height);
         }
     }
 
     std::vector<DisplayInfo> displayInfos = displayGroupInfo_.displaysInfo;
-    MMI_HILOGD("displayInfos,num:%{public}zu", displayInfos.size());
+    MMI_HILOGI("displayInfos,num:%{public}zu", displayInfos.size());
     for (const auto &item : displayInfos) {
-        MMI_HILOGD("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
+        MMI_HILOGI("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
             "width:%{public}d,height:%{public}d,name:%{public}s,"
             "uniq:%{public}s,direction:%{public}d",
             item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
@@ -188,8 +189,8 @@ void InputWindowsManager::RotateTouchScreen(DisplayInfo info, LogicalCoordinate&
     }
 }
 
-void InputWindowsManager::GetGlobalLogicDisplayCoord(struct libinput_event_touch* touch,
-    EventTouch& touchInfo, DisplayInfo info)
+void InputWindowsManager::GetphysicalDisplayCoord(struct libinput_event_touch* touch,
+    const DisplayInfo& info, EventTouch& touchInfo)
 {
     LogicalCoordinate coord {
         .x = static_cast<int32_t>(libinput_event_touch_get_x_transformed(touch, info.width)),
@@ -198,26 +199,26 @@ void InputWindowsManager::GetGlobalLogicDisplayCoord(struct libinput_event_touch
     RotateTouchScreen(info, coord);
     touchInfo.point.x = coord.x;
     touchInfo.point.y = coord.y;
-    PhysicalCoordinate toolPhysCoord {
-        .x = libinput_event_touch_get_tool_x_transformed(touch, info.width),
-        .y = libinput_event_touch_get_tool_y_transformed(touch, info.height)
-    };
-    touchInfo.toolRect.point.x = static_cast<int32_t>(toolPhysCoord.x);
-    touchInfo.toolRect.point.y = static_cast<int32_t>(toolPhysCoord.y);
+    touchInfo.toolRect.point.x = static_cast<int32_t>(libinput_event_touch_get_tool_x_transformed(touch, info.width));
+    touchInfo.toolRect.point.y = static_cast<int32_t>(libinput_event_touch_get_tool_y_transformed(touch, info.height));
+    touchInfo.toolRect.width =  static_cast<int32_t>(
+        libinput_event_touch_get_tool_width_transformed(touch, info.width));
+    touchInfo.toolRect.height = static_cast<int32_t>(
+        libinput_event_touch_get_tool_height_transformed(touch, info.height));
 }
 
 bool InputWindowsManager::TouchPointToDisplayPoint(struct libinput_event_touch* touch,
-    EventTouch& touchInfo, int32_t& logicalDisplayId)
+    EventTouch& touchInfo, int32_t& physicalDisplayId)
 {
     CHKPF(touch);
     auto info = FindPhysicalDisplayInfo("default0");
     CHKPF(info);
-    logicalDisplayId = info->id;
+    physicalDisplayId = info->id;
     if ((info->width <= 0) || (info->height <= 0)) {
         MMI_HILOGE("Get DisplayInfo is error");
         return false;
     }
-    GetGlobalLogicDisplayCoord(touch, touchInfo, *info);
+    GetphysicalDisplayCoord(touch, *info, touchInfo);
     return true;
 }
 
@@ -246,19 +247,18 @@ bool InputWindowsManager::CalculateTipPoint(struct libinput_event_tablet_tool* t
     int32_t& targetDisplayId, LogicalCoordinate& coord) const
 {
     CHKPF(tip);
-    LogicalCoordinate tCoord;
-    if (!TransformTipPoint(tip, tCoord, targetDisplayId)) {
+    if (!TransformTipPoint(tip, coord, targetDisplayId)) {
         return false;
     }
     return true;
 }
 
-DisplayGroupInfo InputWindowsManager::GetDisplayGroupInfo()
+const DisplayGroupInfo& InputWindowsManager::GetDisplayGroupInfo()
 {
     return displayGroupInfo_;
 }
 
-bool InputWindowsManager::IsInsideWindow(int32_t x, int32_t y, const std::vector<Rect> &rects) const
+bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const
 {
     for (auto &item : rects) {
         if (((x >= item.x) && (x < (item.x + item.width))) &&
@@ -317,7 +317,7 @@ void InputWindowsManager::SelectWindowInfo(const int32_t& globalLogicX, const in
                 MMI_HILOGD("Skip the untouchable window to continue searching, "
                            "window:%{public}d, flags:%{public}d", item.id, item.flags);
                 continue;
-            } else if ((targetWindowId < 0) && (IsInsideWindow(globalLogicX, globalLogicY, item.pointerHotAreas))) {
+            } else if ((targetWindowId < 0) && (IsInHotArea(globalLogicX, globalLogicY, item.pointerHotAreas))) {
                 firstBtnDownWindowId_ = item.id;
                 MMI_HILOGW("find out the dispatch window of this pointerevent when the targetWindowId "
                            "hasn't been setted up yet, window:%{public}d", firstBtnDownWindowId_);
@@ -408,8 +408,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     int32_t globalX = pointerItem.GetGlobalX();
     int32_t globalY = pointerItem.GetGlobalY();
     AdjustGlobalCoordinate(*physicDisplayInfo, globalX, globalY);
-    int32_t globalLogicX = pointerItem.GetGlobalX() + physicDisplayInfo->x;
-    int32_t globalLogicY = pointerItem.GetGlobalY() + physicDisplayInfo->y;
+    int32_t logicX = pointerItem.GetGlobalX() + physicDisplayInfo->x;
+    int32_t logicY = pointerItem.GetGlobalY() + physicDisplayInfo->y;
     WindowInfo *touchWindow = nullptr;
     auto targetWindowId = pointerEvent->GetTargetWindowId();
     for (auto &item : displayGroupInfo_.windowsInfo) {
@@ -423,18 +423,18 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 touchWindow = &item;
                 break;
             }
-        } else if (IsInsideWindow(globalLogicX, globalLogicY, item.defaultHotAreas)) {
+        } else if (IsInHotArea(logicX, logicY, item.defaultHotAreas)) {
             touchWindow = &item;
             break;
         }
     }
     if (touchWindow == nullptr) {
-        MMI_HILOGE("touchWindow is nullptr, globalLogicX:%{public}d, globalLogicY:%{public}d",
-            globalLogicX, globalLogicY);
+        MMI_HILOGE("touchWindow is nullptr, logicX:%{public}d, logicY:%{public}d",
+            logicX, logicY);
         return RET_ERR;
     }
-    auto localX = globalLogicX - touchWindow->area.x;
-    auto localY = globalLogicY - touchWindow->area.y;
+    auto localX = logicX - touchWindow->area.x;
+    auto localY = logicY - touchWindow->area.y;
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     pointerItem.SetGlobalX(globalX);
@@ -445,10 +445,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetToolLocalY(pointerItem.GetToolGlobalY() + physicDisplayInfo->y - touchWindow->area.y);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
-    MMI_HILOGD("pid:%{public}d,fd:%{public}d,globalLogicX:%{public}d,globalLogicY:%{public}d,"
+    MMI_HILOGD("pid:%{public}d,fd:%{public}d,logicX:%{public}d,logicY:%{public}d,"
                "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d,"
                "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",
-               touchWindow->pid, fd, globalLogicX, globalLogicY, globalX, globalY,
+               touchWindow->pid, fd, logicX, logicY, globalX, globalY,
                localX, localY, displayId, pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
     return fd;
 }
@@ -475,11 +475,10 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
             return UpdateTouchPadTarget(pointerEvent);
         }
         default: {
-            MMI_HILOGW("Source type is unknown, source:%{public}d", source);
+            MMI_HILOGE("Source type is unknown, source:%{public}d", source);
             break;
         }
     }
-    MMI_HILOGE("Source is not of the correct type, source:%{public}d", source);
     return RET_ERR;
 }
 
@@ -488,17 +487,18 @@ bool InputWindowsManager::IsInsideDisplay(DisplayInfo displayInfo, int32_t globa
     return (globalX >= 0 && globalX < displayInfo.width) && (globalY >= 0 && globalY < displayInfo.height);
 }
 
-void InputWindowsManager::FindPhysicalDisplay(DisplayInfo displayInfo, int32_t& globalX,
+void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& globalX,
     int32_t& globalY, int32_t& displayId)
 {
-    int32_t globalLogicX = globalX + displayInfo.x;
-    int32_t globalLogicY = globalY + displayInfo.y;
+    int32_t logicX = globalX + displayInfo.x;
+    int32_t logicY = globalY + displayInfo.y;
     for (auto &item : displayGroupInfo_.displaysInfo) {
-        if ((globalLogicX >= item.x && globalLogicX < item.x + item.width) &&
-            (globalLogicY >= item.y && globalLogicY < item.y + item.height)) {
-            globalX = globalLogicX - item.x;
-            globalY = globalLogicY - item.y;
+        if ((logicX >= item.x && logicX < item.x + item.width) &&
+            (logicY >= item.y && logicY < item.y + item.height)) {
+            globalX = logicX - item.x;
+            globalY = logicY - item.y;
             displayId = item.id;
+            break;
         }
     }
 }

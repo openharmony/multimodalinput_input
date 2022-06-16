@@ -57,10 +57,10 @@ public:
     bool TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord, int32_t& displayId) const;
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, LogicalCoordinate& coord) const;
-    DisplayGroupInfo GetDisplayGroupInfo();
+    const DisplayGroupInfo& GetDisplayGroupInfo();
     
 private:
-    bool IsInsideWindow(int32_t x, int32_t y, const std::vector<Rect> &rects) const;
+    bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const;
     void PrintDisplayInfo();
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
@@ -70,10 +70,10 @@ private:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     void SelectWindowInfo(const int32_t& globalX, const int32_t& globalY,
         const std::shared_ptr<PointerEvent>& pointerEvent, WindowInfo*& touchWindow);
-    void GetGlobalLogicDisplayCoord(struct libinput_event_touch* touch,
-        EventTouch& touchInfo, DisplayInfo info);
+    void GetphysicalDisplayCoord(struct libinput_event_touch* touch,
+        const DisplayInfo& info, EventTouch& touchInfo);
     bool IsInsideDisplay(DisplayInfo displayInfo, int32_t globalX, int32_t globalY);
-    void FindPhysicalDisplay(DisplayInfo displayInfo, int32_t& globalX, int32_t& globalY, int32_t& displayId);
+    void FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& globalX, int32_t& globalY, int32_t& displayId);
 private:
     UDSServer* udsServer_ = nullptr;
     int32_t firstBtnDownWindowId_ = -1;

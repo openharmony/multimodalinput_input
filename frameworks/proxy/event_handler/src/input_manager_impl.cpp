@@ -132,6 +132,16 @@ void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInf
         MMI_HILOGE("windows info or display info is empty!");
         return;
     }
+    for (const auto &item : displayGroupInfo_.windowsInfo) {
+        if ((item.defaultHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
+            (item.pointerHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
+            item.defaultHotAreas.empty() || item.pointerHotAreas.empty()) {
+            MMI_HILOGE("hot areas check failed! defaultHotAreas:size:%{public}d,"
+                       "pointerHotAreas:size:%{public}d",
+                       item.defaultHotAreas.size(), item.pointerHotAreas.size());
+            return;
+        }
+    }
     displayGroupInfo_ = displayGroupInfo;
     SendDisplayInfo();
     PrintDisplayInfo();
@@ -245,13 +255,12 @@ int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 
 int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
 {
-    std::vector<WindowInfo> windowsInfos = displayGroupInfo_.windowsInfo;
-    uint32_t num = static_cast<uint32_t>(windowsInfos.size());
+    uint32_t num = static_cast<uint32_t>(displayGroupInfo_.windowsInfo.size());
     pkt << num;
-    for (uint32_t i = 0; i < num; i++) {
-        pkt << windowsInfos[i].id << windowsInfos[i].pid << windowsInfos[i].uid
-            << windowsInfos[i].area << windowsInfos[i].defaultHotAreas << windowsInfos[i].pointerHotAreas
-            << windowsInfos[i].agentWindowId << windowsInfos[i].flags;
+    for (const auto& item : displayGroupInfo_.windowsInfo) {
+        pkt << item.id << item.pid << item.uid << item.area 
+            << item.defaultHotAreas << item.pointerHotAreas
+            << item.agentWindowId << item.flags;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write windows data failed");
@@ -262,13 +271,11 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
 
 int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
 {
-    std::vector<DisplayInfo> displayInfos = displayGroupInfo_.displaysInfo;
-    int32_t num = static_cast<int32_t>(displayInfos.size());
+    int32_t num = static_cast<int32_t>(displayGroupInfo_.displaysInfo.size());
     pkt << num;
-    for (int32_t i = 0; i < num; i++) {
-        pkt << displayInfos[i].id << displayInfos[i].x << displayInfos[i].y << displayInfos[i].width
-            << displayInfos[i].height << displayInfos[i].name << displayInfos[i].uniq
-            << displayInfos[i].direction;
+    for (const auto& item : displayGroupInfo_.displaysInfo) {
+        pkt << item.id << item.x << item.y << item.width
+            << item.height << item.name << item.uniq << item.direction;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");
@@ -279,12 +286,12 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
 
 void InputManagerImpl::PrintDisplayInfo()
 {
-    MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
+    MMI_HILOGI("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
         displayGroupInfo_.width, displayGroupInfo_.height, displayGroupInfo_.focusWindowId);
     std::vector<WindowInfo> windowsInfos = displayGroupInfo_.windowsInfo;
-    MMI_HILOGD("windowsInfos,num:%{public}zu", windowsInfos.size());
+    MMI_HILOGI("windowsInfos,num:%{public}zu", windowsInfos.size());
     for (const auto &item : windowsInfos) {
-        MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
+        MMI_HILOGI("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
             "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
             "defaultHotAreas.size:%{public}zu,pointerHotAreas.size:%{public}zu,"
             "agentWindowId:%{public}d,flags:%{public}d",
@@ -292,19 +299,19 @@ void InputManagerImpl::PrintDisplayInfo()
             item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
             item.agentWindowId, item.flags);
         for (const auto &win : item.defaultHotAreas) {
-            MMI_HILOGD("defaultHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+            MMI_HILOGI("defaultHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
                 win.x, win.y, win.width, win.height);
         }
         for (const auto &pointer : item.pointerHotAreas) {
-            MMI_HILOGD("pointerHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+            MMI_HILOGI("pointerHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
                 pointer.x, pointer.y, pointer.width, pointer.height);
         }
     }
 
     std::vector<DisplayInfo> displayInfos = displayGroupInfo_.displaysInfo;
-    MMI_HILOGD("displayInfos,num:%{public}zu", displayInfos.size());
+    MMI_HILOGI("displayInfos,num:%{public}zu", displayInfos.size());
     for (const auto &item : displayInfos) {
-        MMI_HILOGD("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
+        MMI_HILOGI("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
             "width:%{public}d,height:%{public}d,name:%{public}s,"
             "uniq:%{public}s,direction:%{public}d",
             item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
