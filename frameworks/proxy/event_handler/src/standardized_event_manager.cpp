@@ -49,14 +49,13 @@ int32_t StandardizedEventManager::SubscribeKeyEvent(
     const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
 {
     CALL_LOG_ENTER;
-    return MultimodalInputConnectManager::GetInstance()->SubscribeKeyEvent(subscribeInfo.GetSubscribeId(),
-        subscribeInfo.GetKeyOption());
+    return MultimodalInputConnMgr->SubscribeKeyEvent(subscribeInfo.GetSubscribeId(), subscribeInfo.GetKeyOption());
 }
 
 int32_t StandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
 {
     CALL_LOG_ENTER;
-    return MultimodalInputConnectManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
+    return MultimodalInputConnMgr->UnsubscribeKeyEvent(subscribeId);
 }
 
 int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> keyEvent)
