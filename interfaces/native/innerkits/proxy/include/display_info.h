@@ -52,24 +52,7 @@ enum Direction {
     Direction270
 };
 
-struct Rect {
-    // 左上角x坐标
-    int32_t x;
-
-    // 左上角y坐标
-    int32_t y;
-
-    // 宽度
-    int32_t width;
-
-    // 高度
-    int32_t height;
-}
-
 struct WindowInfo {
-    // 热区最大数量
-    static constexpr int32_t MAX_HOTAREA_COUNT = 10;
-
     /**
      * Untouchable window
      *
@@ -98,14 +81,40 @@ struct WindowInfo {
     */
     int32_t uid;
 
-    // 窗口的显示区域
-    Rect area;
+    /**
+     * X coordinate of the upper left corner of the hot zone window
+     *
+     * @since 9
+    */
+    int32_t hotZoneTopLeftX;
 
-    // 窗口的触摸响应区域(除鼠标之外的), 数量不能超过MAX_HOTAREA_COUNT
-    std::vector<Rect> defaultHotAreas;
+    /**
+     * Y coordinate of the upper left corner of the hot zone window
+     *
+     * @since 9
+    */
+    int32_t hotZoneTopLeftY;
 
-    // 窗口的鼠标响应区域，数量不能超过MAX_HOTAREA_COUNT
-    std::vector<Rect> pointerHotAreas;
+    /**
+     * Width of the hot zone window
+     *
+     * @since 9
+    */
+    int32_t hotZoneWidth;
+
+    /**
+     * Height of the hot zone window
+     *
+     * @since 9
+    */
+    int32_t hotZoneHeight;
+
+    /**
+     * Logical display ID
+     *
+     * @since 9
+    */
+    int32_t displayId;
 
     /**
      * Agent window ID
@@ -113,6 +122,20 @@ struct WindowInfo {
      * @since 9
     */
     int32_t agentWindowId;
+
+    /**
+     * X coordinate of the upper left corner of the window
+     *
+     * @since 9
+    */
+    int32_t winTopLeftX;
+
+    /**
+     * Y coordinate of the upper left corner of the window
+     *
+     * @since 9
+    */
+    int32_t winTopLeftY;
 
     /**
      * A 32-bit flag that represents the window status. If the 0th bit is 1,
@@ -123,8 +146,7 @@ struct WindowInfo {
     uint32_t flags;
 };
 
-// 物理显示信息
-struct DisplayInfo {
+struct PhysicalDisplayInfo {
     /**
      * Unique ID of the physical display
      *
@@ -133,28 +155,42 @@ struct DisplayInfo {
     int32_t id;
 
     /**
-     * 在逻辑屏幕中，屏幕左上角的x坐标
+     * ID of the left physical display
      *
      * @since 9
     */
-    int32_t x;
+    int32_t leftDisplayId;
 
     /**
-     * 在逻辑屏幕中，屏幕左上角的y坐标
+     * ID of the upper physical display
      *
      * @since 9
     */
-    int32_t y;
+    int32_t upDisplayId;
 
     /**
-     * Display width，原始显示屏的旋转角度为0的逻辑宽度，旋转后，此值依然保持旋转角度为0的值
+     * X coordinate of the upper left corner of the display
+     *
+     * @since 9
+    */
+    int32_t topLeftX;
+
+    /**
+     * Y coordinate of the upper left corner of the display
+     *
+     * @since 9
+    */
+    int32_t topLeftY;
+
+    /**
+     * Display width
      *
      * @since 9
     */
     int32_t width;
 
     /**
-     * Display height，原始显示屏的旋转角度为0的逻辑高度，旋转后，此值依然保持旋转角度为0的值
+     * Display height
      *
      * @since 9
     */
@@ -168,11 +204,32 @@ struct DisplayInfo {
     std::string name;
 
     /**
-     * 屏幕唯一标识符号，用于关联对应的触摸屏，默认为default0
+     * Seat ID of the physical display, which is used for matching the touchscreen and display
      *
      * @since 9
     */
-    std::string uniq;
+    std::string seatId;
+
+    /**
+     * Seat name of the physical display, which is used for matching the touchscreen and display
+     *
+     * @since 9
+    */
+    std::string seatName;
+
+    /**
+     * Logical width of the physical display
+     *
+     * @since 9
+    */
+    int32_t logicWidth;
+
+    /**
+     * Logical height of the physical display
+     *
+     * @since 9
+    */
+    int32_t logicHeight;
 
     /**
      * Orientation of the physical display
@@ -182,8 +239,28 @@ struct DisplayInfo {
     Direction direction;
 };
 
-// 逻辑屏
-struct DisplayGroupInfo {
+struct LogicalDisplayInfo {
+    /**
+     * Unique ID of the logical display
+     *
+     * @since 9
+    */
+    int32_t id;
+
+    /**
+     * X coordinate of the upper left corner of the logical display
+     *
+     * @since 9
+    */
+    int32_t topLeftX;
+
+    /**
+     * Y coordinate of the upper left corner of the logical display
+     *
+     * @since 9
+    */
+    int32_t topLeftY;
+
     /**
      * Width of the logical display
      *
@@ -199,6 +276,27 @@ struct DisplayGroupInfo {
     int32_t height;
 
     /**
+     * Name of the logical display, which is used for debugging
+     *
+     * @since 9
+    */
+    std::string name;
+
+    /**
+     * Seat ID of the logical display, which is used for matching the touchscreen
+     *
+     * @since 9
+    */
+    std::string seatId;
+
+    /**
+     * Seat name of the logical display, which is used for matching the touchscreen
+     *
+     * @since 9
+    */
+    std::string seatName;
+
+    /**
      * ID of the focus window
      *
      * @since 9
@@ -211,8 +309,6 @@ struct DisplayGroupInfo {
      * @since 9
     */
     std::vector<WindowInfo> windowsInfo;
-
-    std::vector<DisplayInfo> displayInfos;
 };
 } // namespace MMI
 } // namespace OHOS

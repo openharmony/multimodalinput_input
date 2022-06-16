@@ -34,9 +34,10 @@ InputManager *InputManager::GetInstance()
     return instance_;
 }
 
-void InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
+void InputManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
+    const std::vector<LogicalDisplayInfo> &logicalDisplays)
 {
-    InputMgrImpl->UpdateDisplayInfo(displayGroupInfo);
+    InputMgrImpl->UpdateDisplayInfo(physicalDisplays, logicalDisplays);
 }
 
 int32_t InputManager::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
