@@ -670,7 +670,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     (!StrToInt(argv[optind + 2], py2)) ||
                                     (!StrToInt(argv[optind + 3], pressTimems)) ||
                                     (!StrToInt(argv[optind + 4], totalTimeMs))) {
-                                        std::cout << "Invalid input command or time" << std::endl;
+                                        std::cout << "Invalid input coordinate or time" << std::endl;
                                         ShowUsage();
                                         return RET_ERR;
                                 }
