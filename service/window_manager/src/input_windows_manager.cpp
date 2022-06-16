@@ -106,9 +106,8 @@ void InputWindowsManager::PrintDisplayInfo()
 {
     MMI_HILOGI("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
         displayGroupInfo_.width, displayGroupInfo_.height, displayGroupInfo_.focusWindowId);
-    std::vector<WindowInfo> windowsInfos = displayGroupInfo_.windowsInfo;
-    MMI_HILOGI("windowsInfos,num:%{public}zu", windowsInfos.size());
-    for (const auto &item : windowsInfos) {
+    MMI_HILOGI("windowsInfos,num:%{public}zu", displayGroupInfo_.windowsInfo.size());
+    for (const auto &item : displayGroupInfo_.windowsInfo) {
         MMI_HILOGI("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
             "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
             "defaultHotAreas.size:%{public}zu,pointerHotAreas.size:%{public}zu,"
@@ -126,9 +125,8 @@ void InputWindowsManager::PrintDisplayInfo()
         }
     }
 
-    std::vector<DisplayInfo> displayInfos = displayGroupInfo_.displaysInfo;
-    MMI_HILOGI("displayInfos,num:%{public}zu", displayInfos.size());
-    for (const auto &item : displayInfos) {
+    MMI_HILOGI("displayInfos,num:%{public}zu", displayGroupInfo_.displaysInfo.size());
+    for (const auto &item : displayGroupInfo_.displaysInfo) {
         MMI_HILOGI("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
             "width:%{public}d,height:%{public}d,name:%{public}s,"
             "uniq:%{public}s,direction:%{public}d",
