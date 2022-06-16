@@ -136,8 +136,8 @@ void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInf
         if ((item.defaultHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
             (item.pointerHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
             item.defaultHotAreas.empty() || item.pointerHotAreas.empty()) {
-            MMI_HILOGE("hot areas check failed! defaultHotAreas:size:%{public}d,"
-                       "pointerHotAreas:size:%{public}d",
+            MMI_HILOGE("hot areas check failed! defaultHotAreas:size:%{public}zu,"
+                       "pointerHotAreas:size:%{public}zu",
                        item.defaultHotAreas.size(), item.pointerHotAreas.size());
             return;
         }
