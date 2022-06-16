@@ -321,16 +321,15 @@ void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
     CALL_LOG_ENTER;
     MMI_HILOGI("Mouse Device State Dump in !");
     PointerEvent::PointerItem item;
+    pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);
     mprintf(fd, "---------------------[Mouse Device State information]--------------------");
     mprintf(fd,
-            "PointerId:%d | SourceType:%d | PointerAction:%d | ButtonId:%d "
-            "| VerticalAxisValue:%lf | HorizontalAxisValue:%lf | DownTime:%" PRId64 " "
-            "| IsPressed:%s | GlobalX:%d | GlobalY:%d | Width:%d | Height:%d | Pressure:%lf \t",
-            pointerEvent_->GetPointerId(), pointerEvent_->GetSourceType(), pointerEvent_->GetPointerAction(),
-            pointerEvent_->GetButtonId(), pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
-            pointerEvent_->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL), item.GetDownTime(),
-            item.IsPressed() ? "true" : "false", item.GetGlobalX(), item.GetGlobalY(), item.GetWidth(),
-            item.GetHeight(), item.GetPressure());
+            "PointerId:%d | SourceType:%s | PointerAction:%s | ButtonId:%d | AgentWindowId:%d | TargetWindowId:%d"
+            "| DownTime:%" PRId64 " | IsPressed:%s | LocalX:%d | LocalY:%d | Width:%d | Height:%d | Pressure:%lf \t",
+            pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
+            pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(), pointerEvent_->GetTargetWindowId(),
+            item.GetDownTime(), item.IsPressed() ? "true" : "false", item.GetLocalX(),  item.GetLocalY(),
+            item.GetWidth(), item.GetHeight(), item.GetPressure());
 }
 } // namespace MMI
 } // namespace OHOS
