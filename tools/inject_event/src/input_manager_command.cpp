@@ -316,7 +316,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             const int64_t minTaktTimeMs = 1;
                             const int64_t maxTaktTimeMs = 15000;
                             if ((minTaktTimeMs > taktTime) || (maxTaktTimeMs < taktTime)) {
-                                std::cout << "taktTime is out of range. ";
+                                std::cout << "taktTime is out of range" << std::endl;;
                                 std::cout << minTaktTimeMs << " < taktTime < " << maxTaktTimeMs;
                                 std::cout << std::endl;
                                 return EVENT_REG_FAIL;
@@ -412,7 +412,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             const int64_t minTaktTimeMs = 1;
                             const int64_t maxTaktTimeMs = 15000;
                             if ((minTaktTimeMs > taktTime) || (maxTaktTimeMs < taktTime)) {
-                                std::cout << "taktTime is out of range. ";
+                                std::cout << "taktTime is error" << std::endl;
                                 std::cout << minTaktTimeMs << " < taktTime < " << maxTaktTimeMs;
                                 std::cout << std::endl;
                                 return EVENT_REG_FAIL;
@@ -429,7 +429,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
                 }
                 for (size_t i = 0; i < downKey.size(); i++) {
-                    std::cout << "you have a key " << downKey[i]<<" not release"<< std::endl;
+                    std::cout << "you have a key " << downKey[i] << " not release" << std::endl;
                 }
                 break;
             }
@@ -473,7 +473,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             const int64_t minTotalTimeMs = 1;
                             const int64_t maxTotalTimeMs = 15000;
                             if ((minTotalTimeMs > totalTimeMs) || (maxTotalTimeMs < totalTimeMs)) {
-                                std::cout << "totalTime is out of range. ";
+                                std::cout << "totalTime is out of range" << std::endl;
                                 std::cout << minTotalTimeMs << " < totalTimeMs < " << maxTotalTimeMs;
                                 std::cout << std::endl;
                                 return EVENT_REG_FAIL;
@@ -670,7 +670,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     (!StrToInt(argv[optind + 2], py2)) ||
                                     (!StrToInt(argv[optind + 3], pressTimems)) ||
                                     (!StrToInt(argv[optind + 4], totalTimeMs))) {
-                                        std::cout << "Invalid input command" << std::endl;
+                                        std::cout << "Invalid input command or time" << std::endl;
                                         ShowUsage();
                                         return RET_ERR;
                                 }
@@ -678,18 +678,18 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             const int32_t minTotalTimeMs = 1000;
                             const int32_t maxTotalTimeMs = 15000;
                             if ((minTotalTimeMs > totalTimeMs) || (maxTotalTimeMs < totalTimeMs)) {
-                                std::cout << "total time is out of range." << std::endl;
+                                std::cout << "total time input is error" << std::endl;
                                 return RET_ERR;
                             }
                             const int32_t minPressTimeMs = 500;
                             const int32_t maxPressTimeMs = 14500;
                             if ((minPressTimeMs > pressTimems) || (maxPressTimeMs < pressTimems)) {
-                                std::cout << "press time is out of range." << std::endl;
+                                std::cout << "press time is out of range" << std::endl;
                                 return RET_ERR;
                             }
                             const int32_t minMoveTimeMs = 500;
                             if ((totalTimeMs -  pressTimems) <  minMoveTimeMs) {
-                                std::cout << "move time is out of range." << std::endl;
+                                std::cout << "move time is out of range" << std::endl;
                                 return RET_ERR;
                             }
                             auto pointerEvent = PointerEvent::Create();
@@ -706,12 +706,12 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             int64_t startTimeMs = GetSysClockTime() / conversionRate;
                             int64_t endTimeMs = 0;
                             if (!AddInt64(startTimeMs, totalTimeMs, endTimeMs)) {
-                                std::cout << "system time error." << std::endl;
+                                std::cout << "end time count error" << std::endl;
                                 return RET_ERR;
                             }
                             int64_t downTimeMs = 0;
                             if (!AddInt64(startTimeMs, pressTimems, downTimeMs)) {
-                                std::cout << "system time error." << std::endl;
+                                std::cout << "down time count error" << std::endl;
                                 return RET_ERR;
                             }
                             int64_t currentTimeMs = startTimeMs;
