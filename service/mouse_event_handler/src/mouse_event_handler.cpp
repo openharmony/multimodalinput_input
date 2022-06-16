@@ -145,6 +145,7 @@ int32_t MouseEventHandler::HandleButtonValueInner(libinput_event_pointer* data)
 
 int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
 {
+    CALL_LOG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
     if (buttonId_ == PointerEvent::BUTTON_NONE && pointerEvent_->GetButtonId() != PointerEvent::BUTTON_NONE) {
         pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
