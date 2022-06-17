@@ -199,11 +199,11 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
     if ((handlerType == InputHandlerType::INTERCEPTOR) &&
-        (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE))) {
         MMI_HILOGE("interceptor permission check fail");
         return CHECK_PERMISSION_FAIL;
     }
-    if ((handlerType == InputHandlerType::MONITOR) && (!PerHelper->CheckMonitor()) {
+    if ((handlerType == InputHandlerType::MONITOR) && (!PerHelper->CheckMonitor())) {
         MMI_HILOGE("monitor permission check fail");
         return CHECK_PERMISSION_FAIL;
     }
@@ -239,11 +239,11 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
     if ((handlerType == InputHandlerType::INTERCEPTOR) &&
-        (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE))) {
         MMI_HILOGE("interceptor permission check fail");
         return CHECK_PERMISSION_FAIL;
     }
-    if ((handlerType == InputHandlerType::MONITOR) && (!PerHelper->CheckMonitor()) {
+    if ((handlerType == InputHandlerType::MONITOR) && (!PerHelper->CheckMonitor())) {
         MMI_HILOGE("monitor permission check fail");
         return CHECK_PERMISSION_FAIL;
     }
