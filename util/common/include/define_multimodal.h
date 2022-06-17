@@ -217,14 +217,14 @@ namespace MMI {
         MMI_HILOGD("pid:%{public}d threadId:%{public}" PRIu64, GetPid(), GetThisThreadId()); \
     } while (0)
 
-#define DEFRET_1(data, value, ...) value
-#define DEFRET(...) DEFRET_1(__VA_ARGS__, false)
+#define RETURN_DEFVAL_1(data, value, ...) (value)
+#define RETURN_DEFVAL(...) RETURN_DEFVAL_1(__VA_ARGS__, false)
 
 #define WRITEBOOL(parcel, data, ...) \
     do { \
         if (!(parcel).WriteBool(data)) { \
             MMI_HILOGE("WriteBool "#data" failed"); \
-            return DEFRET(false, ##__VA_ARGS__); \
+            return RETURN_DEFVAL(false, ##__VA_ARGS__); \
         } \
     } while (0)
 
@@ -232,7 +232,7 @@ namespace MMI {
     do { \
         if (!(parcel).WriteInt32(data)) { \
             MMI_HILOGE("WriteInt32 "#data" failed"); \
-            return DEFRET(false, ##__VA_ARGS__); \
+            return RETURN_DEFVAL(false, ##__VA_ARGS__); \
         } \
     } while (0)
 
@@ -240,7 +240,7 @@ namespace MMI {
     do { \
         if (!(parcel).WriteInt64(data)) { \
             MMI_HILOGE("WriteInt64 "#data" failed"); \
-            return DEFRET(false, ##__VA_ARGS__); \
+            return RETURN_DEFVAL(false, ##__VA_ARGS__); \
         } \
     } while (0)
 
@@ -248,7 +248,7 @@ namespace MMI {
     do { \
         if (!(parcel).WriteUint32(data)) { \
             MMI_HILOGE("WriteUint32 "#data" failed"); \
-            return DEFRET(false, ##__VA_ARGS__); \
+            return RETURN_DEFVAL(false, ##__VA_ARGS__); \
         } \
     } while (0)
 
@@ -256,7 +256,7 @@ namespace MMI {
     do { \
         if (!(parcel).WriteDouble(data)) { \
             MMI_HILOGE("WriteDouble "#data" failed"); \
-            return DEFRET(false, ##__VA_ARGS__); \
+            return RETURN_DEFVAL(false, ##__VA_ARGS__); \
         } \
     } while (0)
 
@@ -264,7 +264,7 @@ namespace MMI {
     do { \
         if (!(parcel).ReadBool(data)) { \
             MMI_HILOGE("ReadBool "#data" failed"); \
-            return DEFRET(false, ##__VA_ARGS__); \
+            return RETURN_DEFVAL(false, ##__VA_ARGS__); \
         } \
     } while (0)
 
@@ -272,7 +272,7 @@ namespace MMI {
     do { \
         if (!(parcel).ReadInt32(data)) { \
             MMI_HILOGE("ReadInt32 "#data" failed"); \
-            return DEFRET(false, ##__VA_ARGS__); \
+            return RETURN_DEFVAL(false, ##__VA_ARGS__); \
         } \
     } while (0)
 
@@ -280,7 +280,7 @@ namespace MMI {
     do { \
         if (!(parcel).ReadInt64(data)) { \
             MMI_HILOGE("ReadInt64 "#data" failed"); \
-            return DEFRET(false, ##__VA_ARGS__); \
+            return RETURN_DEFVAL(false, ##__VA_ARGS__); \
         } \
     } while (0)
 
@@ -288,7 +288,7 @@ namespace MMI {
     do { \
         if (!(parcel).ReadUint32(data)) { \
             MMI_HILOGE("ReadUint32 "#data" failed"); \
-            return DEFRET(false, ##__VA_ARGS__); \
+            return RETURN_DEFVAL(false, ##__VA_ARGS__); \
         } \
     } while (0)
 
@@ -296,7 +296,7 @@ namespace MMI {
     do { \
         if (!(parcel).ReadDouble(data)) { \
             MMI_HILOGE("ReadDouble "#data" failed"); \
-            return DEFRET(false, ##__VA_ARGS__); \
+            return RETURN_DEFVAL(false, ##__VA_ARGS__); \
         } \
     } while (0)
 
