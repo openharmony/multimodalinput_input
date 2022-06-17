@@ -81,10 +81,7 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> i
             break;
         }
     }
-    if (windowInfo == nullptr) {
-        MMI_HILOGE("can't find windowInfo");
-        return RET_ERR;
-    }
+    CHKPR(windowInfo, invalid_pid);
     inputEvent->SetTargetWindowId(windowInfo->id);
     inputEvent->SetAgentWindowId(windowInfo->agentWindowId);
     MMI_HILOGD("focusWindowId:%{public}d, pid:%{public}d", focusWindowId, windowInfo->pid);
@@ -258,7 +255,7 @@ const DisplayGroupInfo& InputWindowsManager::GetDisplayGroupInfo()
 
 bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const
 {
-    for (auto &item : rects) {
+    for (const auto &item : rects) {
         if (((x >= item.x) && (x < (item.x + item.width))) &&
             (y >= item.y) && (y < (item.y + item.height))) {
             return true;
@@ -490,7 +487,7 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, in
 {
     int32_t logicX = globalX + displayInfo.x;
     int32_t logicY = globalY + displayInfo.y;
-    for (auto &item : displayGroupInfo_.displaysInfo) {
+    for (const auto &item : displayGroupInfo_.displaysInfo) {
         if ((logicX >= item.x && logicX < item.x + item.width) &&
             (logicY >= item.y && logicY < item.y + item.height)) {
             globalX = logicX - item.x;
