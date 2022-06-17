@@ -585,7 +585,7 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
     WRITEINT32(out, static_cast<int32_t>(pressedButtons_.size()));
 
     for (const auto &item : pressedButtons_) {
-         WRITEINT32(out, item);
+        WRITEINT32(out, item);
     }
 
     WRITEINT32(out, sourceType_);
@@ -608,7 +608,7 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
     WRITEINT32(out, static_cast<int32_t>(axisValuesSize));
 
     for (const auto &item : axisValues_) {
-         WRITEDOUBLE(out, item);
+        WRITEDOUBLE(out, item);
     }
 
     return true;
@@ -641,12 +641,12 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     }
 
     for (int32_t i = 0; i < pressedButtonsSize; i++) {
-         int32_t val = 0;
-         READINT32(in, val);
-         auto iter = pressedButtons_.insert(val);
-         if (!iter.second) {
-             MMI_HILOGE("Insert value failed, button:%{public}d", val);
-         }
+        int32_t val = 0;
+        READINT32(in, val);
+        auto iter = pressedButtons_.insert(val);
+        if (!iter.second) {
+            MMI_HILOGE("Insert value failed, button:%{public}d", val);
+        }
     }
 
     READINT32(in, sourceType_);
@@ -667,9 +667,9 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     }
 
     for (int32_t i = 0; i < axisValueSize; i++) {
-         double val {};
-         READDOUBLE(in, val);
-         axisValues_[i] = val;
+        double val {};
+        READDOUBLE(in, val);
+        axisValues_[i] = val;
     }
 
     return true;
