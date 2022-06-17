@@ -124,10 +124,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, M
     }
 
     bool visible = false;
-    if (!data.ReadBool(visible)) {
-        MMI_HILOGE("data ReadBool fail");
-        return IPC_PROXY_DEAD_OBJECT_ERR;
-    }
+    READBOOL(data, visible, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetPointerVisible(visible);
     if (ret != RET_OK) {
         MMI_HILOGE("call SetPointerVisible failed ret:%{public}d", ret);
@@ -151,10 +148,7 @@ int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, Me
         MMI_HILOGE("call IsPointerVisible failed ret:%{public}d", ret);
         return ret;
     }
-    if (!reply.WriteBool(visible)) {
-        MMI_HILOGE("WriteBool:%{public}d fail", ret);
-        return IPC_STUB_WRITE_PARCEL_ERR;
-    }
+    WRITEBOOL(reply, visible, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("visible:%{public}d,ret:%{public}d,pid:%{public}d", visible, ret, GetCallingPid());
     return RET_OK;
 }
@@ -166,10 +160,7 @@ int32_t MultimodalInputConnectStub::StubMarkEventProcessed(MessageParcel& data, 
         MMI_HILOGE("service is not running");
     }
     int32_t eventId;
-    if (!data.ReadInt32(eventId)) {
-        MMI_HILOGE("Read eventId failed");
-        return IPC_PROXY_DEAD_OBJECT_ERR;
-    }
+    READINT32(data, eventId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = MarkEventProcessed(eventId);
     if (ret != RET_OK) {
         MMI_HILOGE("MarkEventProcessed failed, ret:%{public}d", ret);
@@ -186,20 +177,11 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
         return MMISERVICE_NOT_RUNNING;
     }
     int32_t handlerId;
-    if (!data.ReadInt32(handlerId)) {
-        MMI_HILOGE("Read handlerId failed");
-        return IPC_PROXY_DEAD_OBJECT_ERR;
-    }
+    READINT32(data, handlerId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t handlerType;
-    if (!data.ReadInt32(handlerType)) {
-        MMI_HILOGE("Read handlerType failed");
-        return IPC_PROXY_DEAD_OBJECT_ERR;
-    }
+    READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t eventType;
-    if (!data.ReadInt32(eventType)) {
-        MMI_HILOGE("Read eventType failed");
-        return IPC_PROXY_DEAD_OBJECT_ERR;
-    }
+    READINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = AddInputHandler(handlerId, static_cast<InputHandlerType>(handlerType),
         static_cast<HandleEventType>(eventType));
     if (ret != RET_OK) {
@@ -217,15 +199,9 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
         return MMISERVICE_NOT_RUNNING;
     }
     int32_t handlerId;
-    if (!data.ReadInt32(handlerId)) {
-        MMI_HILOGE("Read handlerId failed");
-        return IPC_PROXY_DEAD_OBJECT_ERR;
-    }
+    READINT32(data, handlerId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t handlerType;
-    if (!data.ReadInt32(handlerType)) {
-        MMI_HILOGE("Read handlerType failed");
-        return IPC_PROXY_DEAD_OBJECT_ERR;
-    }
+    READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = RemoveInputHandler(handlerId, static_cast<InputHandlerType>(handlerType));
     if (ret != RET_OK) {
         MMI_HILOGE("call RemoveInputHandler failed ret:%{public}d", ret);
@@ -242,15 +218,9 @@ int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, M
         return MMISERVICE_NOT_RUNNING;
     }
     int32_t monitorId;
-    if (!data.ReadInt32(monitorId)) {
-        MMI_HILOGE("Read monitorId failed");
-        return IPC_PROXY_DEAD_OBJECT_ERR;
-    }
+    READINT32(data, monitorId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t eventId;
-    if (!data.ReadInt32(eventId)) {
-        MMI_HILOGE("Read eventId failed");
-        return IPC_PROXY_DEAD_OBJECT_ERR;
-    }
+    READINT32(data, eventId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = MarkEventConsumed(monitorId, eventId);
     if (ret != RET_OK) {
         MMI_HILOGE("call MarkEventConsumed failed ret:%{public}d", ret);
@@ -267,15 +237,9 @@ int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel& data, Mess
         return MMISERVICE_NOT_RUNNING;
     }
     int32_t offsetX;
-    if (!data.ReadInt32(offsetX)) {
-        MMI_HILOGE("Read offsetX failed");
-        return IPC_PROXY_DEAD_OBJECT_ERR;
-    }
+    READINT32(data, offsetX, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t offsetY;
-    if (!data.ReadInt32(offsetY)) {
-        MMI_HILOGE("Read offsetY failed");
-        return IPC_PROXY_DEAD_OBJECT_ERR;
-    }
+    READINT32(data, offsetY, IPC_PROXY_DEAD_OBJECT_ERR);
 
     int32_t ret = MoveMouseEvent(offsetX, offsetY);
     if (ret != RET_OK) {

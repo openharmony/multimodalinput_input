@@ -68,10 +68,7 @@ int32_t EventFilterStub::StubHandlePointerEvent(MessageParcel& data, MessageParc
     }
 
     bool ret = HandlePointerEvent(event);
-    if (!reply.WriteBool(ret)) {
-        MMI_HILOGE("WriteBool:%{public}d fail", ret);
-        return RET_ERR;
-    }
+    WRITEBOOL(reply, ret, RET_ERR);
     return RET_OK;
 }
 } // namespace MMI
