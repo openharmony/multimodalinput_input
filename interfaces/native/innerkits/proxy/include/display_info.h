@@ -66,6 +66,7 @@ struct Rect {
     int32_t height;
 };
 
+
 struct WindowInfo {
     // 热区最大数量
     static constexpr int32_t MAX_HOTAREA_COUNT = 10;
@@ -123,7 +124,7 @@ struct WindowInfo {
     uint32_t flags;
 };
 
-// 物理显示信息
+// 物理屏显示信息
 struct DisplayInfo {
     /**
      * Unique ID of the physical display
@@ -182,7 +183,7 @@ struct DisplayInfo {
     Direction direction;
 };
 
-// 逻辑屏
+// 逻辑屏显示信息
 struct DisplayGroupInfo {
     /**
      * Width of the logical display
@@ -211,7 +212,8 @@ struct DisplayGroupInfo {
      * @since 9
     */
     std::vector<WindowInfo> windowsInfo;
-
+    
+    // 物理屏信息列表
     std::vector<DisplayInfo> displaysInfo;
 };
 } // namespace MMI

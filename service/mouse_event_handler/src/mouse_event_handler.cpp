@@ -69,7 +69,7 @@ void MouseEventHandler::InitAbsolution()
     MMI_HILOGD("init absolution");
     auto dispalyGroupInfo = WinMgr->GetDisplayGroupInfo();
     if (dispalyGroupInfo.displaysInfo.empty()) {
-        MMI_HILOGE("dispalyGroupInfo.displayInfos is empty");
+        MMI_HILOGE("physicaldisplay is empty");
         return;
     }
     currentDisplayId_ = dispalyGroupInfo.displaysInfo[0].id;
