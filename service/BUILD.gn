@@ -126,7 +126,6 @@ ohos_shared_library("libmmi-server") {
     "mouse_event_handler/src/mouse_event_handler.cpp",
     "permission_helper/src/permission_helper.cpp",
     "subscriber/src/key_event_subscriber.cpp",
-    "subscriber/src/key_option.cpp",
     "timer_manager/src/timer_manager.cpp",
     "touch_transform_point/src/gesture_transform_point_processor.cpp",
     "touch_transform_point/src/tablet_tool_processor.cpp",
