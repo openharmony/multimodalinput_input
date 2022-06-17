@@ -239,13 +239,12 @@ void MMIClient::OnConnected()
 int32_t MMIClient::Socket()
 {
     CALL_LOG_ENTER;
-    int32_t ret = MultimodalInputConnectManager::GetInstance()->
-                        AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
+    int32_t ret = MultimodalInputConnMgr->AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {
         MMI_HILOGE("call AllocSocketPair return %{public}d", ret);
         return RET_ERR;
     }
-    fd_ = MultimodalInputConnectManager::GetInstance()->GetClientSocketFdOfAllocedSocketPair();
+    fd_ = MultimodalInputConnMgr->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
         MMI_HILOGE("call GetClientSocketFdOfAllocedSocketPair return invalid fd");
     } else {

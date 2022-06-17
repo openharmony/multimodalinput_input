@@ -153,7 +153,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
 
     eventFilterService_->SetPointerEventPtr(filter);
     if (!hasSendToMmiServer) {
-        int32_t ret = MultimodalInputConnectManager::GetInstance()->AddInputEventFilter(eventFilterService_);
+        int32_t ret = MultimodalInputConnMgr->AddInputEventFilter(eventFilterService_);
         if (ret != RET_OK) {
             MMI_HILOGE("AddInputEventFilter has send to server fail, ret:%{public}d", ret);
             delete eventFilterService_;
@@ -438,7 +438,7 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible)
 {
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     CALL_LOG_ENTER;
-    int32_t ret = MultimodalInputConnectManager::GetInstance()->SetPointerVisible(visible);
+    int32_t ret = MultimodalInputConnMgr->SetPointerVisible(visible);
     if (ret != RET_OK) {
         MMI_HILOGE("send to server fail, ret:%{public}d", ret);
     }
@@ -454,7 +454,7 @@ bool InputManagerImpl::IsPointerVisible()
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     CALL_LOG_ENTER;
     bool visible;
-    int32_t ret = MultimodalInputConnectManager::GetInstance()->IsPointerVisible(visible);
+    int32_t ret = MultimodalInputConnMgr->IsPointerVisible(visible);
     if (ret != 0) {
         MMI_HILOGE("send to server fail, ret:%{public}d", ret);
     }
