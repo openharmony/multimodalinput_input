@@ -165,42 +165,40 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
     CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
-
-    std::vector<PhysicalDisplayInfo> physicalDisplays;
+    DisplayGroupInfo displayGroupInfo;
+    pkt >> displayGroupInfo.width >> displayGroupInfo.height >> displayGroupInfo.focusWindowId;
     int32_t num = 0;
     pkt >> num;
-    if (num > MAX_PHYSICAL_SIZE) {
-        MMI_HILOGE("Physical exceeds the max range");
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read display info failed");
         return RET_ERR;
     }
     for (int32_t i = 0; i < num; i++) {
-        PhysicalDisplayInfo info;
-        pkt >> info.id >> info.leftDisplayId >> info.upDisplayId >> info.topLeftX >> info.topLeftY
-            >> info.width >> info.height >> info.name >> info.seatId >> info.seatName >> info.logicWidth
-            >> info.logicHeight >> info.direction;
-        physicalDisplays.push_back(info);
+        WindowInfo info;
+        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
+            >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
+        displayGroupInfo.windowsInfo.push_back(info);
+        if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read display info failed");
+        return RET_ERR;
     }
-
-    std::vector<LogicalDisplayInfo> logicalDisplays;
+    }
     pkt >> num;
-    if (num > MAX_LOGICAL_SIZE) {
-        MMI_HILOGE("Logical exceeds the max range");
+    for (int32_t i = 0; i < num; i++) {
+        DisplayInfo info;
+        pkt >> info.id >> info.x >> info.y >> info.width >> info.height
+            >> info.name >> info.uniq >> info.direction;
+        displayGroupInfo.displaysInfo.push_back(info);
+        if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read display info failed");
         return RET_ERR;
     }
-    for (int32_t i = 0; i < num; i++) {
-        LogicalDisplayInfo info;
-        std::vector<WindowInfo> windowInfos;
-        pkt >> info.id >> info.topLeftX >> info.topLeftY >> info.width >> info.height
-            >> info.name >> info.seatId >> info.seatName >> info.focusWindowId
-            >> windowInfos;
-        info.windowsInfo = windowInfos;
-        logicalDisplays.push_back(info);
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read display info failed");
         return RET_ERR;
     }
-    InputWindowsManager::GetInstance()->UpdateDisplayInfo(physicalDisplays, logicalDisplays);
+    InputWindowsManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
     return RET_OK;
 }
 
