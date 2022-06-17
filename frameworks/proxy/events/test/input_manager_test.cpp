@@ -58,9 +58,8 @@ constexpr bool ISINTERCEPTED_TRUE = true;
 constexpr int32_t INDEX_FIRST = 1;
 constexpr int32_t INDEX_SECOND = 2;
 constexpr int32_t INDEX_THIRD = 3;
-#ifdef OHOS_WESTEN_MODEL
 constexpr int32_t INDEX_INVALID = -1;
-#endif
+
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest" };
 } // namespace
 
@@ -815,12 +814,11 @@ void InputManagerTest::KeyMonitorCallBack(std::shared_ptr<OHOS::MMI::KeyEvent> k
              "actionTime:%{public}" PRId64 "", keyEvent->GetKeyCode(), keyEvent->GetKeyAction(),
              keyEvent->GetAction(),  keyEvent->GetActionTime());
     EXPECT_EQ(keyEvent->GetKeyCode(), OHOS::MMI::KeyEvent::KEYCODE_BACK);
-    EXPECT_EQ(keyEvent->GetKeyAction(), OHOS::MMI::KeyEvent::KEY_ACTION_UP);
-    EXPECT_EQ(keyEvent->GetAction(), OHOS::MMI::KeyEvent::KEY_ACTION_UP);
+    EXPECT_EQ(keyEvent->GetKeyAction(), OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    EXPECT_EQ(keyEvent->GetAction(), OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
     EXPECT_EQ(keyEvent->GetDeviceId(), 0);
 }
 
-#ifdef OHOS_WESTEN_MODEL
 HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_001, TestSize.Level1)
 {
     RunShellUtil runCommand;
@@ -828,17 +826,23 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_001, TestSize.Level1)
     std::vector<std::string> log;
     ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
 
-    int32_t response = MMI_STANDARD_EVENT_SUCCESS;
-    response = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, response);
+    int32_t id = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
+    EXPECT_TRUE(IsValidHandlerId(id));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    KeyEvent injectUpEvent;
-    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
-    injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
-        ISINTERCEPTED_TRUE);
-    response = MMIEventHdl.InjectEvent(injectUpEvent);
-    EXPECT_TRUE(response);
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
+    int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    OHOS::MMI::KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetDeviceId(0);
+    injectDownEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    injectDownEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->SetAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManager::GetInstance()->RemoveMonitor(INDEX_FIRST);
@@ -852,25 +856,30 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_002, TestSize.Level1)
     std::vector<std::string> log;
     ASSERT_TRUE(runCommand.RunShellCommand(command, log) == RET_OK);
 
-    int32_t response = MMI_STANDARD_EVENT_SUCCESS;
-    response = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, response);
+    int32_t id = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
+    EXPECT_TRUE(IsValidHandlerId(id));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    response = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, response);
+    id = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
+    EXPECT_TRUE(IsValidHandlerId(id));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    response = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
-    EXPECT_EQ(MMI_STANDARD_EVENT_SUCCESS, response);
+    id = InputManager::GetInstance()->AddMonitor(KeyMonitorCallBack);
+    EXPECT_TRUE(IsValidHandlerId(id));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    KeyEvent injectUpEvent;
-    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
-    injectUpEvent.Initialize(0, ACTION_UP, MMI_KEY_BACK, downTime, 0, "", 0, 0, "", 0, false, 0,
-        ISINTERCEPTED_TRUE);
-    response = MMIEventHdl.InjectEvent(injectUpEvent);
-    EXPECT_TRUE(response);
+    std::shared_ptr<OHOS::MMI::KeyEvent> injectDownEvent = OHOS::MMI::KeyEvent::Create();
+    int32_t downTime = static_cast<int32_t>(GetNanoTime()/NANOSECOND_TO_MILLISECOND);
+    OHOS::MMI::KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    kitDown.SetPressed(false);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetDeviceId(0);
+    injectDownEvent->SetKeyCode(OHOS::MMI::KeyEvent::KEYCODE_BACK);
+    injectDownEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->SetAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManager::GetInstance()->RemoveMonitor(INDEX_FIRST);
@@ -882,7 +891,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_002, TestSize.Level1)
     InputManager::GetInstance()->RemoveMonitor(INDEX_INVALID);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
-#endif
 
 HWTEST_F(InputManagerTest, InputManagerTest_AddHandler_001, TestSize.Level1)
 {
@@ -1826,6 +1834,32 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_LOG));
     }
     EXPECT_TRUE(rLogs.size() >= N_TEST_CASES);
+}
+
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetDeviceId(0);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    injectDownEvent->SetAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->SetKeyAction(OHOS::MMI::KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+
+    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(KeyMonitorCallBack) };
+    EXPECT_TRUE(IsValidHandlerId(interceptorId));
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    if (IsValidHandlerId(interceptorId)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
 }
 
 void InputManagerTest::TestInputEventInterceptor2(std::shared_ptr<PointerEvent> pointerEvent)
