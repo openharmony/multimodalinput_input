@@ -217,11 +217,11 @@ namespace MMI {
         MMI_HILOGD("pid:%{public}d threadId:%{public}" PRIu64, GetPid(), GetThisThreadId()); \
     } while (0)
 
-#define DEFRET_1(data,value, ...) value
-#define DEFRET(...) DEFRET_1(__VA_ARGS__,false)
+#define DEFRET_1(data, value, ...) value
+#define DEFRET(...) DEFRET_1(__VA_ARGS__, false)
 
 #define WRITEBOOL(parcel, data, ...) \
-    do {\
+    do { \
         if (!(parcel).WriteBool(data)) { \
             MMI_HILOGE("WriteBool "#data" failed"); \
             return DEFRET(false, ##__VA_ARGS__); \
@@ -229,7 +229,7 @@ namespace MMI {
     } while (0)
 
 #define WRITEINT32(parcel, data, ...) \
-    do {\
+    do { \
         if (!(parcel).WriteInt32(data)) { \
             MMI_HILOGE("WriteInt32 "#data" failed"); \
             return DEFRET(false, ##__VA_ARGS__); \
@@ -237,7 +237,7 @@ namespace MMI {
     } while (0)
 
 #define WRITEINT64(parcel, data, ...) \
-    do {\
+    do { \
         if (!(parcel).WriteInt64(data)) { \
             MMI_HILOGE("WriteInt64 "#data" failed"); \
             return DEFRET(false, ##__VA_ARGS__); \
@@ -245,7 +245,7 @@ namespace MMI {
     } while (0)
 
 #define WRITEUINT32(parcel, data, ...) \
-    do {\
+    do { \
         if (!(parcel).WriteUint32(data)) { \
             MMI_HILOGE("WriteUint32 "#data" failed"); \
             return DEFRET(false, ##__VA_ARGS__); \
@@ -253,7 +253,7 @@ namespace MMI {
     } while (0)
 
 #define WRITEDOUBLE(parcel, data, ...) \
-    do {\
+    do { \
         if (!(parcel).WriteDouble(data)) { \
             MMI_HILOGE("WriteDouble "#data" failed"); \
             return DEFRET(false, ##__VA_ARGS__); \
@@ -261,7 +261,7 @@ namespace MMI {
     } while (0)
 
 #define READBOOL(parcel, data, ...) \
-    do {\
+    do { \
         if (!(parcel).ReadBool(data)) { \
             MMI_HILOGE("ReadBool "#data" failed"); \
             return DEFRET(false, ##__VA_ARGS__); \
@@ -269,7 +269,7 @@ namespace MMI {
     } while (0)
 
 #define READINT32(parcel, data, ...) \
-    do {\
+    do { \
         if (!(parcel).ReadInt32(data)) { \
             MMI_HILOGE("ReadInt32 "#data" failed"); \
             return DEFRET(false, ##__VA_ARGS__); \
@@ -277,7 +277,7 @@ namespace MMI {
     } while (0)
 
 #define READINT64(parcel, data, ...) \
-    do {\
+    do { \
         if (!(parcel).ReadInt64(data)) { \
             MMI_HILOGE("ReadInt64 "#data" failed"); \
             return DEFRET(false, ##__VA_ARGS__); \
@@ -285,7 +285,7 @@ namespace MMI {
     } while (0)
 
 #define READUINT32(parcel, data, ...) \
-    do {\
+    do { \
         if (!(parcel).ReadUint32(data)) { \
             MMI_HILOGE("ReadUint32 "#data" failed"); \
             return DEFRET(false, ##__VA_ARGS__); \
@@ -293,7 +293,7 @@ namespace MMI {
     } while (0)
 
 #define READDOUBLE(parcel, data, ...) \
-    do {\
+    do { \
         if (!(parcel).ReadDouble(data)) { \
             MMI_HILOGE("ReadDouble "#data" failed"); \
             return DEFRET(false, ##__VA_ARGS__); \
