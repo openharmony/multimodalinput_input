@@ -45,8 +45,7 @@ public:
     MMIEventHandlerPtr GetEventHandler() const;
     EventHandlerPtr GetCurrentEventHandler() const;
     
-    void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
-        const std::vector<LogicalDisplayInfo> &logicalDisplays);
+    void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);
 
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
@@ -80,8 +79,8 @@ public:
     bool IsPointerVisible();
 
 private:
-    int32_t PackPhysicalDisplay(NetPacket &pkt);
-    int32_t PackLogicalDisplay(NetPacket &pkt);
+    int32_t PackWindowInfo(NetPacket &pkt);
+    int32_t PackDisplayInfo(NetPacket &pkt);
     void PrintDisplayInfo();
     void SendDisplayInfo();
 
@@ -95,8 +94,7 @@ private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
     std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
 
-    std::vector<PhysicalDisplayInfo> physicalDisplays_;
-    std::vector<LogicalDisplayInfo> logicalDisplays_;
+    DisplayGroupInfo displayGroupInfo_;
     InputMonitorManager monitorManager_;
 
     std::mutex mtx_;

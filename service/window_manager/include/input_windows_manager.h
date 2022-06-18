@@ -43,49 +43,42 @@ public:
     void UpdateSeatsInfo();
     void UpdateScreensInfo();
 
-    int32_t GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent) const;
+    int32_t GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent);
     int32_t UpdateTarget(std::shared_ptr<InputEvent> inputEvent);
-    void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
-        const std::vector<LogicalDisplayInfo> &logicalDisplays);
-    const std::vector<LogicalDisplayInfo>& GetLogicalDisplayInfo() const;
+    void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     MouseLocation GetMouseInfo();
-    void UpdateAndAdjustMouseLoction(double& x, double& y);
-    void AdjustGlobalCoordinate(const LogicalDisplayInfo& displayInfo, LogicalCoordinate& coord) const;
+    void UpdateAndAdjustMouseLoction(int32_t& displayId, double& x, double& y);
+    void AdjustGlobalCoordinate(const DisplayInfo& displayInfo, int32_t& globalX, int32_t& globalY) const;
     bool UpdataDisplayId(int32_t& displayId);
-    LogicalDisplayInfo* GetLogicalDisplayId(int32_t displayId);
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
-    bool TouchDownPointToDisplayPoint(struct libinput_event_touch* touch,
-        EventTouch& touchInfo, int32_t& logicalDisplayId);
-    bool TouchMotionPointToDisplayPoint(struct libinput_event_touch* touch,
-        int32_t targetDisplayId, EventTouch& touchInfo);
-    bool TransformDisplayPoint(struct libinput_event_touch* touch, EventTouch& touchInfo);
-    void RotateTouchScreen(const PhysicalDisplayInfo* info, LogicalCoordinate& coord) const;
-    bool Physical2Logical(const PhysicalDisplayInfo* physInfo,
-        const PhysicalCoordinate& phys, LogicalCoordinate& logical) const;
-    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord) const;
+    bool TouchPointToDisplayPoint(struct libinput_event_touch* touch,
+        EventTouch& touchInfo, int32_t& targetDisplayId);
+    void RotateTouchScreen(DisplayInfo info, LogicalCoordinate& coord) const;
+    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord, int32_t& displayId) const;
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, LogicalCoordinate& coord) const;
-
+    const DisplayGroupInfo& GetDisplayGroupInfo();
+    
 private:
-    bool IsInsideWindow(int32_t x, int32_t y, const WindowInfo &info) const;
+    bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const;
     void PrintDisplayInfo();
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent);
-    const PhysicalDisplayInfo* GetPhysicalDisplay(int32_t id) const;
-    const PhysicalDisplayInfo* FindPhysicalDisplayInfo(const std::string& seatId, const std::string& seatName) const;
+    const DisplayInfo* GetPhysicalDisplay(int32_t id) const;
+    const DisplayInfo* FindPhysicalDisplayInfo(const std::string& uniq) const;
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     void SelectWindowInfo(const int32_t& globalX, const int32_t& globalY,
-        const std::shared_ptr<PointerEvent>& pointerEvent, LogicalDisplayInfo * const logicalDisplayInfo,
-        WindowInfo*& touchWindow);
-
+        const std::shared_ptr<PointerEvent>& pointerEvent, WindowInfo*& touchWindow);
+    void GetphysicalDisplayCoord(struct libinput_event_touch* touch,
+        const DisplayInfo& info, EventTouch& touchInfo);
+    bool IsInsideDisplay(const DisplayInfo& displayInfo, int32_t globalX, int32_t globalY);
+    void FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& globalX, int32_t& globalY, int32_t& displayId);
 private:
     UDSServer* udsServer_ = nullptr;
     int32_t firstBtnDownWindowId_ = -1;
-    std::vector<PhysicalDisplayInfo> physicalDisplays_ = {};
-    std::vector<LogicalDisplayInfo> logicalDisplays_ = {};
-    std::map<int32_t, WindowInfo> windowInfos_ = {};
-    MouseLocation mouseLoction_ = {-1, -1};
+    DisplayGroupInfo displayGroupInfo_;
+    MouseLocation mouseLoction_ = {-1, -1}; // physical coord
 };
 
 #define WinMgr InputWindowsManager::GetInstance()

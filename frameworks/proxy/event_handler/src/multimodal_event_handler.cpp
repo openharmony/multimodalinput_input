@@ -33,7 +33,7 @@ void OnConnected(const IfMMIClient& client)
     CALL_LOG_ENTER;
     InputMgrImpl->OnConnected();
     KeyEventInputSubscribeMgr.OnConnected();
-    InputHandlerManager::GetInstance().OnConnected();
+    InputHandlerMgr.OnConnected();
 }
 
 MultimodalEventHandler::MultimodalEventHandler() {}

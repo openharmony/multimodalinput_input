@@ -487,6 +487,32 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& 
 }
 #endif
 
+int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::OnSubscribeKeyEvent, &sMsgHandler_, this, pid, subscribeId, option));
+    if (ret != RET_OK) {
+        MMI_HILOGE("subscribe key event event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::OnUnsubscribeKeyEvent, &sMsgHandler_, this, pid, subscribeId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("unsubscribe key event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 void MMIService::OnDelegateTask(epoll_event& ev)
 {
     if ((ev.events & EPOLLIN) == 0) {
