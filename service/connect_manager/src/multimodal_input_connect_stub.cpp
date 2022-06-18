@@ -197,15 +197,6 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
         MMI_HILOGE("Read handlerType failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
-    if ((handlerType == InputHandlerType::INTERCEPTOR) &&
-        (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE))) {
-        MMI_HILOGE("interceptor permission check fail");
-        return CHECK_PERMISSION_FAIL;
-    }
-    if ((handlerType == InputHandlerType::MONITOR) && (!PerHelper->CheckMonitor())) {
-        MMI_HILOGE("monitor permission check fail");
-        return CHECK_PERMISSION_FAIL;
-    }
     int32_t eventType;
     if (!data.ReadInt32(eventType)) {
         MMI_HILOGE("Read eventType failed");
