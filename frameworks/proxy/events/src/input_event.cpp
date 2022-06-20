@@ -215,90 +215,50 @@ void InputEvent::MarkProcessed()
 
 bool InputEvent::WriteToParcel(Parcel &out) const
 {
-    if (!out.WriteInt32(eventType_)) {
-        return false;
-    }
+    WRITEINT32(out, eventType_);
 
-    if (!out.WriteInt32(id_)) {
-        return false;
-    }
+    WRITEINT32(out, id_);
 
-    if (!out.WriteInt64(actionTime_)) {
-        return false;
-    }
+    WRITEINT64(out, actionTime_);
 
-    if (!out.WriteInt32(action_)) {
-        return false;
-    }
+    WRITEINT32(out, action_);
 
-    if (!out.WriteInt64(actionStartTime_)) {
-        return false;
-    }
+    WRITEINT64(out, actionStartTime_);
 
-    if (!out.WriteInt32(deviceId_)) {
-        return false;
-    }
+    WRITEINT32(out, deviceId_);
 
-    if (!out.WriteInt32(targetDisplayId_)) {
-        return false;
-    }
+    WRITEINT32(out, targetDisplayId_);
 
-    if (!out.WriteInt32(targetWindowId_)) {
-        return false;
-    }
+    WRITEINT32(out, targetWindowId_);
 
-    if (!out.WriteInt32(agentWindowId_)) {
-        return false;
-    }
+    WRITEINT32(out, agentWindowId_);
 
-    if (!out.WriteUint32(bitwise_)) {
-        return false;
-    }
+    WRITEUINT32(out, bitwise_);
 
     return true;
 }
 
 bool InputEvent::ReadFromParcel(Parcel &in)
 {
-    if (!in.ReadInt32(eventType_)) {
-        return false;
-    }
+    READINT32(in, eventType_);
 
-    if (!in.ReadInt32(id_)) {
-        return false;
-    }
+    READINT32(in, id_);
 
-    if (!in.ReadInt64(actionTime_)) {
-        return false;
-    }
+    READINT64(in, actionTime_);
 
-    if (!in.ReadInt32(action_)) {
-        return false;
-    }
+    READINT32(in, action_);
 
-    if (!in.ReadInt64(actionStartTime_)) {
-        return false;
-    }
+    READINT64(in, actionStartTime_);
 
-    if (!in.ReadInt32(deviceId_)) {
-        return false;
-    }
+    READINT32(in, deviceId_);
 
-    if (!in.ReadInt32(targetDisplayId_)) {
-        return false;
-    }
+    READINT32(in, targetDisplayId_);
 
-    if (!in.ReadInt32(targetWindowId_)) {
-        return false;
-    }
+    READINT32(in, targetWindowId_);
 
-    if (!in.ReadInt32(agentWindowId_)) {
-        return false;
-    }
+    READINT32(in, agentWindowId_);
 
-    if (!in.ReadUint32(bitwise_)) {
-        return false;
-    }
+    READUINT32(in, bitwise_);
 
     return true;
 }
