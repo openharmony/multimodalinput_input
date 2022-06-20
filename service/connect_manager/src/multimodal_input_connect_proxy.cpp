@@ -105,10 +105,7 @@ int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
         return ERR_INVALID_VALUE;
     }
 
-    if (!data.WriteBool(visible)) {
-        MMI_HILOGE("Failed to write filter");
-        return ERR_INVALID_VALUE;
-    }
+    WRITEBOOL(data, visible, ERR_INVALID_VALUE);
 
     MessageParcel reply;
     MessageOption option;
@@ -152,10 +149,7 @@ int32_t MultimodalInputConnectProxy::MarkEventProcessed(int32_t eventId)
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    if (!data.WriteInt32(eventId)) {
-        MMI_HILOGE("Failed to write eventId");
-        return ERR_INVALID_VALUE;
-    }
+    WRITEINT32(data, eventId, ERR_INVALID_VALUE);
 
     MessageParcel reply;
     MessageOption option;
@@ -178,18 +172,9 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(int32_t handlerId, InputHan
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    if (!data.WriteInt32(handlerId)) {
-        MMI_HILOGE("Failed to write handlerId");
-        return ERR_INVALID_VALUE;
-    }
-    if (!data.WriteInt32(handlerType)) {
-        MMI_HILOGE("Failed to write handlerType");
-        return ERR_INVALID_VALUE;
-    }
-    if (!data.WriteInt32(eventType)) {
-        MMI_HILOGE("Failed to write eventType");
-        return ERR_INVALID_VALUE;
-    }
+    WRITEINT32(data, handlerId, ERR_INVALID_VALUE);
+    WRITEINT32(data, handlerType, ERR_INVALID_VALUE);
+    WRITEINT32(data, eventType, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -210,14 +195,8 @@ int32_t MultimodalInputConnectProxy::RemoveInputHandler(int32_t handlerId, Input
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    if (!data.WriteInt32(handlerId)) {
-        MMI_HILOGE("Failed to write handlerId");
-        return ERR_INVALID_VALUE;
-    }
-    if (!data.WriteInt32(handlerType)) {
-        MMI_HILOGE("Failed to write handlerType");
-        return ERR_INVALID_VALUE;
-    }
+    WRITEINT32(data, handlerId, ERR_INVALID_VALUE);
+    WRITEINT32(data, handlerType, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -238,14 +217,8 @@ int32_t MultimodalInputConnectProxy::MarkEventConsumed(int32_t monitorId, int32_
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    if (!data.WriteInt32(monitorId)) {
-        MMI_HILOGE("Failed to write monitorId");
-        return ERR_INVALID_VALUE;
-    }
-    if (!data.WriteInt32(eventId)) {
-        MMI_HILOGE("Failed to write eventId");
-        return ERR_INVALID_VALUE;
-    }
+    WRITEINT32(data, monitorId, ERR_INVALID_VALUE);
+    WRITEINT32(data, eventId, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -266,14 +239,8 @@ int32_t MultimodalInputConnectProxy::MoveMouseEvent(int32_t offsetX, int32_t off
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    if (!data.WriteInt32(offsetX)) {
-        MMI_HILOGE("Failed to write offsetX");
-        return ERR_INVALID_VALUE;
-    }
-    if (!data.WriteInt32(offsetY)) {
-        MMI_HILOGE("Failed to write offsetY");
-        return ERR_INVALID_VALUE;
-    }
+    WRITEINT32(data, offsetX, ERR_INVALID_VALUE);
+    WRITEINT32(data, offsetY, ERR_INVALID_VALUE);
 
     MessageParcel reply;
     MessageOption option;
