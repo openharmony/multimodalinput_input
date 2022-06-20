@@ -59,8 +59,7 @@ const std::string CONFIG_ITEM_INTERVAL = "Key.autorepeat.intervaltime";
 const std::string CONFIG_ITEM_TYPE = "Key.keyboard.type";
 const std::string DATA_PATH = "/data";
 const std::string INPUT_PATH = "/system/etc/multimodalinput/";
-const std::string PRO_PATH = "/vendor/etc/keymap/";
-const std::string TOML_PATH = "/vendor/etc/keymap/";
+const std::string KEY_PATH = "/vendor/etc/keymap/";
 constexpr size_t BUF_TID_SIZE = 10;
 constexpr size_t BUF_CMD_SIZE = 512;
 constexpr size_t PROGRAM_NAME_SIZE = 256;
@@ -505,12 +504,12 @@ static bool IsValidJsonPath(const std::string &filePath)
 
 static bool IsValidProPath(const std::string &filePath)
 {
-    return IsValidPath(PRO_PATH, filePath);
+    return IsValidPath(KEY_PATH, filePath);
 }
 
 static bool IsValidTomlPath(const std::string &filePath)
 {
-    return IsValidPath(TOML_PATH, filePath);
+    return IsValidPath(KEY_PATH, filePath);
 }
 
 void ReadProFile(const std::string &filePath, int32_t deviceId,

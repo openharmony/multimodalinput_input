@@ -113,7 +113,7 @@ ohos_shared_library("libmmi-server") {
     "event_dispatch/src/event_dispatch.cpp",
     "event_dump/src/event_dump.cpp",
     "event_handler/src/input_event_handler.cpp",
-    "event_handler/src/key_autorepeat.cpp",
+    "event_handler/src/key_auto_repeat.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
     "event_handler/src/key_map_manager.cpp",
     "event_package/src/event_package.cpp",
