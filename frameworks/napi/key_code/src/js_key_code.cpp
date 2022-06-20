@@ -29,7 +29,7 @@ const std::string CREATE_INT32 = "napi_create_int32";
 const std::string GET_CB_INFO = "napi_get_cb_info";
 } // namespace
 
-napi_value JsKeyCode::GetNapiInt32(napi_KeyEvent::env env, int32_t code)
+napi_value JsKeyCode::GetNapiInt32(napi_env env, int32_t code)
 {
     CALL_LOG_ENTER;
     napi_value keyCode = nullptr;
