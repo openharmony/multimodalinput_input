@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "key_autorepeat.h"
+#include "key_auto_repeat.h"
 
 #include <array>
 
