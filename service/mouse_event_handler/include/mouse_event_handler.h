@@ -32,6 +32,7 @@ public:
     MouseEventHandler();
     ~MouseEventHandler() = default;
     DISALLOW_COPY_AND_MOVE(MouseEventHandler);
+	void Dump(int32_t fd, const std::vector<std::string> &args);
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
     int32_t Normalize(struct libinput_event *event);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
