@@ -436,7 +436,7 @@ bool KeyEventSubscriber::IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent) 
     }
     return true;
 }
-
+//prekeys
 void KeyEventSubscriber::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;

@@ -58,6 +58,7 @@ public:
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, LogicalCoordinate& coord) const;
     const DisplayGroupInfo& GetDisplayGroupInfo();
+    void Dump(int32_t fd, const std::vector<std::string> &args);
     
 private:
     bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const;
