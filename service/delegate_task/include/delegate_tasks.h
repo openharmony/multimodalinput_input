@@ -30,8 +30,8 @@ using DTaskCallback = std::function<int32_t()>;
 class DelegateTasks : public IdFactory<int32_t> {
 public:
     struct TaskData {
-        uint64_t tid;
-        int32_t taskId;
+        uint64_t tid { 0 };
+        int32_t taskId { 0 };
     };
     class Task : public std::enable_shared_from_this<Task> {
     public:

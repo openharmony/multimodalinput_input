@@ -42,13 +42,13 @@ public:
 
 private:
     struct TimerItem {
-        int32_t id;
-        int32_t intervalMs;
-        int32_t repeatCount;
-        int32_t callbackCount;
-        int64_t nextCallTime;
+        int32_t id { 0 };
+        int32_t intervalMs  { 0 };
+        int32_t repeatCount  { 0 };
+        int32_t callbackCount  { 0 };
+        int64_t nextCallTime  { 0 };
         std::function<void()> callback;
-    };      
+    };
 private:
     int32_t TakeNextTimerId();
     int32_t AddTimerInternal(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
@@ -58,7 +58,7 @@ private:
     std::unique_ptr<TimerItem>& InsertTimerInternal(std::unique_ptr<TimerItem>& timer);
     int32_t CalcNextDelayInternal();
     void ProcessTimersInternal();
-       
+
 private:
         std::list<std::unique_ptr<TimerItem>> timers_;
 };

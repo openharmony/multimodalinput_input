@@ -25,10 +25,10 @@ extern std::unique_ptr<VirtualTouchScreen> g_pTouchScreen;
 extern std::unique_ptr<VirtualKeyboard> g_pKeyboard;
 
 struct InjectInputEvent {
-    int32_t deviceId;
-    int32_t type;
-    int32_t code;
-    int32_t value;
+    int32_t deviceId { 0 };
+    int32_t type { 0 };
+    int32_t code { 0 };
+    int32_t value { 0 };
 };
 
 class InjectThread {
