@@ -314,7 +314,7 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
         MMI_HILOGE("Failed to deserialize key event.");
         return RET_ERR;
     }
-    InputHandlerManager::GetInstance().OnInputEvent(handlerId, keyEvent);
+    InputHandlerMgr.OnInputEvent(handlerId, keyEvent);
     return RET_OK;
 }
 
@@ -336,13 +336,13 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
         return RET_ERR;
     }
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
-    InputHandlerManager::GetInstance().OnInputEvent(handlerId, pointerEvent);
+    InputHandlerMgr.OnInputEvent(handlerId, pointerEvent);
     return RET_OK;
 }
 
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
-    int32_t ret = MultimodalInputConnectManager::GetInstance()->MarkEventProcessed(eventId);
+    int32_t ret = MultimodalInputConnMgr->MarkEventProcessed(eventId);
     if (ret != 0) {
         MMI_HILOGE("send to server fail, ret:%{public}d", ret);
         return;

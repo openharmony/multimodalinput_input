@@ -38,6 +38,25 @@ bool PermissionHelper::CheckPermission(uint32_t required)
     }
 }
 
+bool PermissionHelper::CheckMonitor()
+{
+    CALL_LOG_ENTER;
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
+        static const std::string inputMonitor = "ohos.permission.INPUT_MONITORING";
+        int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, inputMonitor);
+        if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
+            MMI_HILOGE("check granted permisson failed ret:%{public}d", ret);
+            return false;
+        }
+        MMI_HILOGI("check granted permisson success");
+        return true;
+    }
+    MMI_HILOGE("unsupported token type:%{public}d", tokenType);
+    return false;
+}
+
 bool PermissionHelper::CheckHapPermission(uint32_t tokenId, uint32_t required)
 {
     OHOS::Security::AccessToken::HapTokenInfo findInfo;

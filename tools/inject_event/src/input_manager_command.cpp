@@ -52,7 +52,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerCommand"};
 constexpr int32_t SLEEPTIME = 20;
-constexpr int32_t MOUSE_ID = 2;
+constexpr int32_t MOUSE_ID = 7;
 constexpr int32_t TWO_MORE_COMMAND = 2;
 constexpr int32_t THREE_MORE_COMMAND = 3;
 constexpr int32_t MAX_PRESSED_COUNT = 30;
@@ -122,6 +122,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"up", required_argument, NULL, 'u'},
         {"click", required_argument, NULL, 'c'},
         {"interval", required_argument, NULL, 'i'},
+        {"drag", required_argument, NULL, 'g'},
         {NULL, 0, NULL, 0}
     };
     int32_t c = 0;
@@ -315,7 +316,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             const int64_t minTaktTimeMs = 1;
                             const int64_t maxTaktTimeMs = 15000;
                             if ((minTaktTimeMs > taktTime) || (maxTaktTimeMs < taktTime)) {
-                                std::cout << "taktTime is out of range. ";
+                                std::cout << "taktTime is out of range" << std::endl;
                                 std::cout << minTaktTimeMs << " < taktTime < " << maxTaktTimeMs;
                                 std::cout << std::endl;
                                 return EVENT_REG_FAIL;
@@ -411,7 +412,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             const int64_t minTaktTimeMs = 1;
                             const int64_t maxTaktTimeMs = 15000;
                             if ((minTaktTimeMs > taktTime) || (maxTaktTimeMs < taktTime)) {
-                                std::cout << "taktTime is out of range. ";
+                                std::cout << "taktTime is error" << std::endl;
                                 std::cout << minTaktTimeMs << " < taktTime < " << maxTaktTimeMs;
                                 std::cout << std::endl;
                                 return EVENT_REG_FAIL;
@@ -428,7 +429,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
                 }
                 for (size_t i = 0; i < downKey.size(); i++) {
-                    std::cout << "you have a key " << downKey[i]<<" not release"<< std::endl;
+                    std::cout << "you have a key " << downKey[i] << " not release" << std::endl;
                 }
                 break;
             }
@@ -439,7 +440,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t py2 = 0;
                 int32_t totalTimeMs = 0;
                 int32_t moveArgcSeven = 7;
-                while ((c = getopt_long(argc, argv, "m:d:u:c:i:", touchSensorOptions, &optionIndex)) != -1) {
+                while ((c = getopt_long(argc, argv, "m:d:u:c:i:g:", touchSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
                             if (argc < moveArgcSeven) {
@@ -472,7 +473,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             const int64_t minTotalTimeMs = 1;
                             const int64_t maxTotalTimeMs = 15000;
                             if ((minTotalTimeMs > totalTimeMs) || (maxTotalTimeMs < totalTimeMs)) {
-                                std::cout << "totalTime is out of range. ";
+                                std::cout << "totalTime is out of range" << std::endl;
                                 std::cout << minTotalTimeMs << " < totalTimeMs < " << maxTotalTimeMs;
                                 std::cout << std::endl;
                                 return EVENT_REG_FAIL;
@@ -642,6 +643,99 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             std::this_thread::sleep_for(std::chrono::milliseconds(taktTime));
                             break;
                         }
+                        case 'g': {
+                            const int32_t dragArgcSeven = 7;
+                            const int32_t dragArgcCommandNine = 9;
+                            if ((argc != dragArgcSeven) && (argc != dragArgcCommandNine)) {
+                                std::cout << "argc:" << argc << std::endl;
+                                std::cout << "wrong number of parameters" << std::endl;
+                                ShowUsage();
+                                return RET_ERR;
+                            }
+                            totalTimeMs = 1000;
+                            int32_t pressTimems = 500;
+                            if (argc == moveArgcSeven) {
+                                if ((!StrToInt(optarg, px1)) ||
+                                    (!StrToInt(argv[optind], py1)) ||
+                                    (!StrToInt(argv[optind + 1], px2)) ||
+                                    (!StrToInt(argv[optind + 2], py2))) {
+                                        std::cout << "Invalid input command" << std::endl;
+                                        ShowUsage();
+                                        return RET_ERR;
+                                }
+                            } else {
+                                if ((!StrToInt(optarg, px1)) ||
+                                    (!StrToInt(argv[optind], py1)) ||
+                                    (!StrToInt(argv[optind + 1], px2)) ||
+                                    (!StrToInt(argv[optind + 2], py2)) ||
+                                    (!StrToInt(argv[optind + 3], pressTimems)) ||
+                                    (!StrToInt(argv[optind + 4], totalTimeMs))) {
+                                        std::cout << "Invalid input coordinate or time" << std::endl;
+                                        ShowUsage();
+                                        return RET_ERR;
+                                }
+                            }
+                            const int32_t minTotalTimeMs = 1000;
+                            const int32_t maxTotalTimeMs = 15000;
+                            if ((minTotalTimeMs > totalTimeMs) || (maxTotalTimeMs < totalTimeMs)) {
+                                std::cout << "total time input is error" << std::endl;
+                                return RET_ERR;
+                            }
+                            const int32_t minPressTimeMs = 500;
+                            const int32_t maxPressTimeMs = 14500;
+                            if ((minPressTimeMs > pressTimems) || (maxPressTimeMs < pressTimems)) {
+                                std::cout << "press time is out of range" << std::endl;
+                                return RET_ERR;
+                            }
+                            const int32_t minMoveTimeMs = 500;
+                            if ((totalTimeMs -  pressTimems) <  minMoveTimeMs) {
+                                std::cout << "move time is out of range" << std::endl;
+                                return RET_ERR;
+                            }
+                            auto pointerEvent = PointerEvent::Create();
+                            CHKPR(pointerEvent, ERROR_NULL_POINTER);
+                            PointerEvent::PointerItem item;
+                            item.SetGlobalX(px1);
+                            item.SetGlobalY(py1);
+                            pointerEvent->AddPointerItem(item);
+                            pointerEvent->SetPointerId(0);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            const int32_t conversionRate = 1000;
+                            int64_t startTimeMs = GetSysClockTime() / conversionRate;
+                            int64_t endTimeMs = 0;
+                            if (!AddInt64(startTimeMs, totalTimeMs, endTimeMs)) {
+                                std::cout << "end time count error" << std::endl;
+                                return RET_ERR;
+                            }
+                            int64_t downTimeMs = 0;
+                            if (!AddInt64(startTimeMs, pressTimems, downTimeMs)) {
+                                std::cout << "down time count error" << std::endl;
+                                return RET_ERR;
+                            }
+                            int64_t currentTimeMs = startTimeMs;
+                            const int32_t moveTimeMs = totalTimeMs - pressTimems;
+                            while ((currentTimeMs < endTimeMs)) {
+                                if (currentTimeMs > downTimeMs) {
+                                    item.SetGlobalX(NextPos(downTimeMs, currentTimeMs, moveTimeMs, px1, px2));
+                                    item.SetGlobalY(NextPos(downTimeMs, currentTimeMs, moveTimeMs, py1, py2));
+                                    pointerEvent->UpdatePointerItem(0, item);
+                                    pointerEvent->SetActionTime(currentTimeMs);
+                                    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                                    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                                }
+                                std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
+                                currentTimeMs = GetSysClockTime() / conversionRate;
+                            }
+                            item.SetGlobalX(px2);
+                            item.SetGlobalY(py2);
+                            pointerEvent->UpdatePointerItem(0, item);
+                            pointerEvent->SetActionTime(endTimeMs);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            break;
+                        }
                         default: {
                             std::cout << "invalid command" << std::endl;
                             ShowUsage();
@@ -673,7 +767,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
 void InputManagerCommand::ShowUsage()
 {
-    std::cout << "Usage: input <option> <command> <arg>..." << std::endl;
+    std::cout << "Usage: uinput <option> <command> <arg>..." << std::endl;
     std::cout << "The option are:                                " << std::endl;
     std::cout << "-M  --mouse                                    " << std::endl;
     std::cout << "commands for mouse:                            " << std::endl;
@@ -683,6 +777,14 @@ void InputManagerCommand::ShowUsage()
     std::cout << "                                               2 is the middle"   << std::endl;
     std::cout << "-u <key>                  --up     <key>      -release a button " << std::endl;
     std::cout << "-c <key>                  --click  <key>      -press the left button down,then raise" << std::endl;
+    std::cout << "   key value:0 - button left"     << std::endl;
+    std::cout << "   key value:1 - button right"    << std::endl;
+    std::cout << "   key value:2 - button middle"   << std::endl;
+    std::cout << "   key value:3 - button side"     << std::endl;
+    std::cout << "   key value:4 - button extra"    << std::endl;
+    std::cout << "   key value:5 - button forward"  << std::endl;
+    std::cout << "   key value:6 - button back"     << std::endl;
+    std::cout << "   key value:7 - button task"     << std::endl;
     std::cout << "-s <key>                  --scroll <key>      -positive values are sliding backwards" << std::endl;
     std::cout << "-i <time>                 --interval <time>   -the program interval for the (time) milliseconds";
     std::cout << std::endl;
@@ -703,6 +805,9 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-c <dx1> <dy1> [click interval]               -touch screen click dx1 dy1"         << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
+    std::cout << "-g <dx1> <dy1> <dx2> <dy2> [Press time] [total time]     -drag, "                       << std::endl;
+    std::cout << "  [Press time] not less than 500ms and [total time] - [Press time] not less than 500ms" << std::endl;
+    std::cout << "  Otherwise the operation result may produce error or invalid operation"              << std::endl;
     std::cout << "                                                              " << std::endl;
     std::cout << "-?  --help                                                    " << std::endl;
 }

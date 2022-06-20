@@ -46,9 +46,8 @@ public:
      * @param logicalDisplays Indicates the logical screen information, which includes the window information.
      * @since 9
      */
-    void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
-        const std::vector<LogicalDisplayInfo> &logicalDisplays);
-        
+    void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+
     /**
      * @brief Sets a globally unique input event filter.
      * @param filter Indicates the input event filter to set. When an input event occurs, this filter is

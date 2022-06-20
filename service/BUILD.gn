@@ -126,7 +126,6 @@ ohos_shared_library("libmmi-server") {
     "mouse_event_handler/src/mouse_event_handler.cpp",
     "permission_helper/src/permission_helper.cpp",
     "subscriber/src/key_event_subscriber.cpp",
-    "subscriber/src/key_option.cpp",
     "timer_manager/src/timer_manager.cpp",
     "touch_transform_point/src/gesture_transform_point_processor.cpp",
     "touch_transform_point/src/tablet_tool_processor.cpp",
@@ -219,7 +218,6 @@ ohos_prebuilt_etc("mmi_device_config.ini") {
 
 import("//build/test.gni")
 module_output_path = "multimodalinput/unit_out"
-HDF_FWKS = "//drivers/framework"
 
 ohos_unittest("ut-mmi-service-out") {
   module_out_path = module_output_path
@@ -255,7 +253,6 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/uinput",
-    "$HDF_FWKS/inclue",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
