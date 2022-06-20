@@ -44,8 +44,6 @@ public:
 protected:
     void AddInputEventFilter();
     void SimulateInputEventHelper(int32_t globalX, int32_t globalY, int32_t expectVal);
-    void RandomHotAreasInfo(std::vector<Rect>& hotAreas);
-    void UpdateDisplayInfo();
 private:
     int32_t callbackRet = 0;
 };
@@ -113,55 +111,6 @@ void InputManagerManualTest::SimulateInputEventHelper(int32_t globalX, int32_t g
     EXPECT_EQ(callbackRet, expectVal);
 }
 
-void InputManagerManualTest::RandomHotAreasInfo(std::vector<Rect>& hotAreas)
-{
-    Rect area;
-    area.x = 0;
-    area.y = 0;
-    area.width = 720;
-    area.height = 1280;
-    hotAreas.push_back(area);
-}
-
-void InputManagerManualTest::UpdateDisplayInfo()
-{
-    DisplayGroupInfo displayGroupInfo;
-    displayGroupInfo.width = 720;
-    displayGroupInfo.height = 1280;
-    displayGroupInfo.focusWindowId = 1;
-    uint32_t num = 1;
-    for (uint32_t i = 0; i < num; i++) {
-        WindowInfo info;
-        info.id = i + 7;
-        info.pid = 1421;
-        info.uid = 1421;
-        Rect area;
-        area.x = 0;
-        area.y = 0;
-        area.width = 720;
-        area.height = 1280;
-        info.area = area;
-        RandomHotAreasInfo(info.defaultHotAreas);
-        RandomHotAreasInfo(info.pointerHotAreas);
-        info.agentWindowId = i + 7;
-        info.flags = 0;
-        displayGroupInfo.windowsInfo.push_back(info);
-    }
-    for (uint32_t i = 0; i < num; i++) {
-        DisplayInfo info;
-        info.id = 0;
-        info.x = 0;
-        info.y = 0;
-        info.width = 720;
-        info.height = 1280;
-        info.name = "seat0";
-        info.uniq = "default0";
-        info.direction = Direction::Direction0;
-        displayGroupInfo.displaysInfo.push_back(info);
-    }
-    InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
-}
-
 /**
  * @tc.name:HandlePointerEventFilter_001
  * @tc.desc:Verify pointer event filter
@@ -174,18 +123,6 @@ HWTEST_F(InputManagerManualTest, HandlePointerEventFilter_001, TestSize.Level1)
     AddInputEventFilter();
     SimulateInputEventHelper(10, 10, 1); // set global x and global y are 10, will expect value is 1
     SimulateInputEventHelper(0, 0, 2); // set global x and global y are not 10, will expect value is 2
-}
-
-/**
- * @tc.name:HandleUpdateDisplayInfo_001
- * @tc.desc:Update display info
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerManualTest, HandleUpdateDisplayInfo_001, TestSize.Level1)
-{
-    CALL_LOG_ENTER;
-    UpdateDisplayInfo();
 }
 } // namespace MMI
 } // namespace OHOS
