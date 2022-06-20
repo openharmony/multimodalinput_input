@@ -51,12 +51,15 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubAddInputEventFilter},
         {IMultimodalInputConnect::SET_POINTER_VISIBLE, &MultimodalInputConnectStub::StubSetPointerVisible},
         {IMultimodalInputConnect::IS_POINTER_VISIBLE, &MultimodalInputConnectStub::StubIsPointerVisible},
+        {IMultimodalInputConnect::SUBSCRIBE_KEY_EVENT, &MultimodalInputConnectStub::StubSubscribeKeyEvent},
+        {IMultimodalInputConnect::UNSUBSCRIBE_KEY_EVENT, &MultimodalInputConnectStub::StubUnsubscribeKeyEvent},
         {IMultimodalInputConnect::MARK_EVENT_PROCESSED, &MultimodalInputConnectStub::StubMarkEventProcessed},
         {IMultimodalInputConnect::ADD_INPUT_HANDLER, &MultimodalInputConnectStub::StubAddInputHandler},
         {IMultimodalInputConnect::REMOVE_INPUT_HANDLER, &MultimodalInputConnectStub::StubRemoveInputHandler},
         {IMultimodalInputConnect::MARK_EVENT_CONSUMED, &MultimodalInputConnectStub::StubMarkEventConsumed},
         {IMultimodalInputConnect::MOVE_MOUSE, &MultimodalInputConnectStub::StubMoveMouseEvent},
-        {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent}
+        {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
+        {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent}
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -161,14 +164,8 @@ int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, Me
 int32_t MultimodalInputConnectStub::StubMarkEventProcessed(MessageParcel& data, MessageParcel& reply)
 {
     CALL_LOG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("permission check fail");
-        return CHECK_PERMISSION_FAIL;
-    }
-
     if (!IsRunning()) {
         MMI_HILOGE("service is not running");
-        return MMISERVICE_NOT_RUNNING;
     }
     int32_t eventId;
     if (!data.ReadInt32(eventId)) {
@@ -231,6 +228,15 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
         MMI_HILOGE("Read handlerType failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
+    if ((handlerType == InputHandlerType::INTERCEPTOR) &&
+        (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE))) {
+        MMI_HILOGE("interceptor permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if ((handlerType == InputHandlerType::MONITOR) && (!PerHelper->CheckMonitor())) {
+        MMI_HILOGE("monitor permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
     int32_t ret = RemoveInputHandler(handlerId, static_cast<InputHandlerType>(handlerType));
     if (ret != RET_OK) {
         MMI_HILOGE("call RemoveInputHandler failed ret:%{public}d", ret);
@@ -242,6 +248,11 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
 int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, MessageParcel& reply)
 {
     CALL_LOG_ENTER;
+    if (!PerHelper->CheckMonitor()) {
+        MMI_HILOGE("permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+
     if (!IsRunning()) {
         MMI_HILOGE("service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -259,6 +270,56 @@ int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, M
     int32_t ret = MarkEventConsumed(monitorId, eventId);
     if (ret != RET_OK) {
         MMI_HILOGE("call MarkEventConsumed failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t subscribeId;
+    if (!data.ReadInt32(subscribeId)) {
+        MMI_HILOGE("Read subscribeId failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+
+    auto keyOption = std::make_shared<KeyOption>();
+    CHKPR(keyOption, IPC_STUB_WRITE_PARCEL_ERR);
+    if (!keyOption->ReadFromParcel(data)) {
+        MMI_HILOGE("Read keyOption failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t ret = SubscribeKeyEvent(subscribeId, keyOption);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SubscribeKeyEvent failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t subscribeId;
+    if (!data.ReadInt32(subscribeId)) {
+        MMI_HILOGE("Read subscribeId failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+
+    int32_t ret = UnsubscribeKeyEvent(subscribeId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("UnsubscribeKeyEvent failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -300,12 +361,33 @@ int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, Mess
     auto event = KeyEvent::Create();
     CHKPR(event, ERROR_NULL_POINTER);
     if (!event->ReadFromParcel(data)) {
-        MMI_HILOGE("Read eventId failed");
+        MMI_HILOGE("Read Key Event failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
     int32_t ret = InjectKeyEvent(event);
     if (ret != RET_OK) {
         MMI_HILOGE("InjectKeyEvent failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_LOG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    auto pointerEvent = PointerEvent::Create();
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (!pointerEvent->ReadFromParcel(data)) {
+        MMI_HILOGE("Read Pointer Event failed");
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
+    int32_t ret = InjectPointerEvent(pointerEvent);
+    if (ret != RET_OK) {
+        MMI_HILOGE("call InjectPointerEvent failed ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

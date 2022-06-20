@@ -23,7 +23,6 @@
 #include "nocopyable.h"
 
 #include "circle_stream_buffer.h"
-#include "uds_session.h"
 #include "uds_socket.h"
 
 #include "i_uds_server.h"
@@ -54,10 +53,10 @@ public:
     int32_t GetClientPid(int32_t fd) const;
     void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
     int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
-        const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd);
+        const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd) override;
 
     SessionPtr GetSession(int32_t fd) const;
-    SessionPtr GetSessionByPid(int32_t pid) const;
+    SessionPtr GetSessionByPid(int32_t pid) const override;
 
 protected:
     virtual void OnConnected(SessionPtr s);
