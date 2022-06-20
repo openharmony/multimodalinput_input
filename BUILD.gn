@@ -64,9 +64,9 @@ group("multimodalinput_mmi_packages") {
   deps = [
     "frameworks/napi/input_consumer:inputconsumer",
     "frameworks/napi/input_device:inputdevice",
-    "frameworks/napi/key_code:keycode",
     "frameworks/napi/input_event_client:inputeventclient",
     "frameworks/napi/input_monitor:inputmonitor",
+    "frameworks/napi/key_code:keycode",
     "frameworks/napi/mouse:mouse",
     "frameworks/proxy:libmmi-client",
     "service:libmmi-server",
