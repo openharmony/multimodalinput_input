@@ -209,10 +209,6 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
         MMI_HILOGE("interceptor permission check fail");
         return CHECK_PERMISSION_FAIL;
     }
-    if ((handlerType == InputHandlerType::MONITOR) && (!PerHelper->CheckMonitor())) {
-        MMI_HILOGE("monitor permission check fail");
-        return CHECK_PERMISSION_FAIL;
-    }
     int32_t ret = RemoveInputHandler(handlerId, static_cast<InputHandlerType>(handlerType));
     if (ret != RET_OK) {
         MMI_HILOGE("call RemoveInputHandler failed ret:%{public}d", ret);
@@ -224,11 +220,6 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
 int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, MessageParcel& reply)
 {
     CALL_LOG_ENTER;
-    if (!PerHelper->CheckMonitor()) {
-        MMI_HILOGE("permission check fail");
-        return CHECK_PERMISSION_FAIL;
-    }
-
     if (!IsRunning()) {
         MMI_HILOGE("service is not running");
         return MMISERVICE_NOT_RUNNING;
