@@ -147,7 +147,7 @@ void InputManagerManualTest::UpdateDisplayInfo()
         info.flags = 0;
         displayGroupInfo.windowsInfo.push_back(info);
     }
-    for (int32_t i = 0; i < 1; i++) {
+    for (int32_t i = 0; i < num; i++) {
         DisplayInfo info;
         info.id = 0;
         info.x = 0;
