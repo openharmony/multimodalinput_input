@@ -31,6 +31,8 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+constexpr int32_t DISPLAY_WIDTH = 720;
+constexpr int32_t DISPLAY_HEIGHT = 1280;
 } // namespace
 
 class MMIClientTest : public testing::Test {
@@ -74,8 +76,8 @@ public:
         Rect area;
         area.x = 0;
         area.y = 0;
-        area.width = 720;
-        area.height = 1280;
+        area.width = DISPLAY_WIDTH;
+        area.height = DISPLAY_HEIGHT;
         hotAreas.push_back(area);
     }
     static void RandomWindowInfo(int32_t id, int32_t pid, WindowInfo& info)
@@ -86,8 +88,8 @@ public:
         Rect area;
         area.x = 0;
         area.y = 0;
-        area.width = 720;
-        area.height = 1280;
+        area.width = DISPLAY_WIDTH;
+        area.height = DISPLAY_HEIGHT;
         info.area = area;
         RandomHotAreasInfo(info.defaultHotAreas);
         RandomHotAreasInfo(info.pointerHotAreas);
@@ -99,16 +101,16 @@ public:
         info.id = id;
         info.x = 0;
         info.y = 0;
-        info.width = 720;
-        info.height = 1280;
+        info.width = DISPLAY_WIDTH;
+        info.height = DISPLAY_HEIGHT;
         info.name = StringFmt("pd-%d", id);
         info.uniq = "default0";
         info.direction = Direction::Direction0;
     }
     static bool RandomDisplayPacket(NetPacket& pkt, int32_t pid)
     {
-        int32_t width = 720;
-        int32_t height = 1280;
+        int32_t width = DISPLAY_WIDTH;
+        int32_t height = DISPLAY_HEIGHT;
         int32_t focusWindowId = 1;
         pkt << width << height << focusWindowId;
         uint32_t windowNum = 1;
