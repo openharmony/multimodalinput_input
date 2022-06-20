@@ -31,8 +31,10 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+#ifdef OHOS_BUILD_MMI_DEBUG
 constexpr int32_t DISPLAY_WIDTH = 720;
 constexpr int32_t DISPLAY_HEIGHT = 1280;
+#endif // OHOS_BUILD_MMI_DEBUG
 } // namespace
 
 class MMIClientTest : public testing::Test {
