@@ -126,7 +126,7 @@ struct WindowInfo {
     Rect area;
 
     /**
-     *  窗口的触摸响应区域(除鼠标之外的), 数量不能超过MAX_HOTAREA_COUNT
+     *  除鼠标之外的窗口触摸响应区域, 数量不能超过MAX_HOTAREA_COUNT
      *
      * @since 9
      */
@@ -156,7 +156,7 @@ struct WindowInfo {
 };
 
 /**
- * 物理屏显示信息
+ * 物理屏信息
  *
  * @since 9
  */
@@ -219,7 +219,7 @@ struct DisplayInfo {
 };
 
 /**
- * 逻辑屏显示信息
+ * 逻辑屏信息
  *
  * @since 9
  */
