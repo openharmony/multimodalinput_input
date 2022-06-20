@@ -19,11 +19,12 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectDefParcel" };
+} // namespace
 bool ConnectReqParcel::Marshalling(Parcel& out) const
 {
-    if (!out.WriteInt32(data.moduleId)) {
-        return false;
-    }
+    WRITEINT32(out, data.moduleId);
     if (!out.WriteString(data.clientName)) {
         return false;
     }
@@ -49,12 +50,8 @@ ConnectReqParcel *ConnectReqParcel::Unmarshalling(Parcel& in)
 
 bool ConnectRespParcel::Marshalling(Parcel &out) const
 {
-    if (!out.WriteInt32(data.returnCode)) {
-        return false;
-    }
-    if (!out.WriteInt32(data.allocedSocketId)) {
-        return false;
-    }
+    WRITEINT32(out, data.returnCode);
+    WRITEINT32(out, data.allocedSocketId);
     return true;
 }
 

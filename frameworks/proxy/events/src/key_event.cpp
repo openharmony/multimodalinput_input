@@ -467,36 +467,20 @@ void KeyEvent::KeyItem::SetPressed(bool pressed)
 
 bool KeyEvent::KeyItem::WriteToParcel(Parcel &out) const
 {
-    if (!out.WriteBool(pressed_)) {
-        return false;
-    }
-    if (!out.WriteInt64(downTime_)) {
-        return false;
-    }
-    if (!out.WriteInt32(deviceId_)) {
-        return false;
-    }
-    if (!out.WriteInt32(keyCode_)) {
-        return false;
-    }
+    WRITEBOOL(out, pressed_);
+    WRITEINT64(out, downTime_);
+    WRITEINT32(out, deviceId_);
+    WRITEINT32(out, keyCode_);
 
     return true;
 }
 
 bool KeyEvent::KeyItem::ReadFromParcel(Parcel &in)
 {
-    if (!in.ReadBool(pressed_)) {
-        return false;
-    }
-    if (!in.ReadInt64(downTime_)) {
-        return false;
-    }
-    if (!in.ReadInt32(deviceId_)) {
-        return false;
-    }
-    if (!in.ReadInt32(keyCode_)) {
-        return false;
-    }
+    READBOOL(in, pressed_);
+    READINT64(in, downTime_);
+    READINT32(in, deviceId_);
+    READINT32(in, keyCode_);
 
     return true;
 }
@@ -1495,23 +1479,17 @@ bool KeyEvent::WriteToParcel(Parcel &out) const
     if (!InputEvent::WriteToParcel(out)) {
         return false;
     }
-    if (!out.WriteInt32(keyCode_)) {
-        return false;
-    }
+    WRITEINT32(out, keyCode_);
     if (keys_.size() > INT_MAX) {
         return false;
     }
-    if (!out.WriteInt32(static_cast<int32_t>(keys_.size()))) {
-        return false;
-    }
+    WRITEINT32(out, static_cast<int32_t>(keys_.size()));
     for (const auto &item : keys_) {
         if (!item.WriteToParcel(out)) {
             return false;
         }
     }
-    if (!out.WriteInt32(keyAction_)) {
-        return false;
-    }
+    WRITEINT32(out, keyAction_);
 
     return true;
 }
@@ -1521,9 +1499,7 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
     if (!InputEvent::ReadFromParcel(in)) {
         return false;
     }
-    if (!in.ReadInt32(keyCode_)) {
-        return false;
-    }
+    READINT32(in, keyCode_);
     const int32_t keysSize = in.ReadInt32();
     if (keysSize < 0) {
         return false;
@@ -1535,9 +1511,7 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
         }
         keys_.push_back(val);
     }
-    if (!in.ReadInt32(keyAction_)) {
-        return false;
-    }
+    READINT32(in, keyAction_);
 
     return true;
 }
