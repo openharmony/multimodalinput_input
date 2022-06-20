@@ -48,27 +48,46 @@ enum Direction {
      *
      * @since 9
     */
-    
     Direction270
 };
 
 struct Rect {
-    // 左上角x坐标
+    /**
+     * 左上角x坐标
+     *
+     * @since 9
+    */
     int32_t x;
 
-    // 左上角y坐标
+    /**
+     * 左上角y坐标
+     *
+     * @since 9
+    */
     int32_t y;
 
-    // 宽度
+    /**
+     * 宽度
+     *
+     * @since 9
+    */
     int32_t width;
 
-    // 高度
+    /**
+     * 高度
+     *
+     * @since 9
+    */
     int32_t height;
 };
 
 
 struct WindowInfo {
-    // 热区最大数量
+    /**
+     * 热区最大数量
+     *
+     * @since 9
+    */
     static constexpr int32_t MAX_HOTAREA_COUNT = 10;
 
     /**
@@ -99,13 +118,25 @@ struct WindowInfo {
     */
     int32_t uid;
 
-    // 窗口的显示区域
+    /**
+     * 窗口的显示区域
+     *
+     * @since 9
+    */
     Rect area;
 
-    // 窗口的触摸响应区域(除鼠标之外的), 数量不能超过MAX_HOTAREA_COUNT
+    /**
+     *  窗口的触摸响应区域(除鼠标之外的), 数量不能超过MAX_HOTAREA_COUNT
+     *
+     * @since 9
+    */
     std::vector<Rect> defaultHotAreas;
 
-    // 窗口的鼠标响应区域，数量不能超过MAX_HOTAREA_COUNT
+    /**
+     * 窗口的鼠标响应区域，数量不能超过MAX_HOTAREA_COUNT
+     *
+     * @since 9
+    */
     std::vector<Rect> pointerHotAreas;
 
     /**
@@ -124,7 +155,11 @@ struct WindowInfo {
     uint32_t flags;
 };
 
-// 物理屏显示信息
+/**
+ * 物理屏显示信息
+ *
+ * @since 9
+*/
 struct DisplayInfo {
     /**
      * Unique ID of the physical display
@@ -183,7 +218,11 @@ struct DisplayInfo {
     Direction direction;
 };
 
-// 逻辑屏显示信息
+/**
+ * 逻辑屏显示信息
+ *
+ * @since 9
+*/
 struct DisplayGroupInfo {
     /**
      * Width of the logical display
@@ -213,7 +252,11 @@ struct DisplayGroupInfo {
     */
     std::vector<WindowInfo> windowsInfo;
     
-    // 物理屏信息列表
+    /**
+     * 物理屏信息列表
+     *
+     * @since 9
+    */
     std::vector<DisplayInfo> displaysInfo;
 };
 } // namespace MMI
