@@ -19,6 +19,7 @@
 #include "util_napi.h"
 
 #include "key_event.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {
