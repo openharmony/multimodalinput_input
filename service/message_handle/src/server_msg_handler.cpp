@@ -165,13 +165,13 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     CHKPR(sess, ERROR_NULL_POINTER);
     DisplayGroupInfo displayGroupInfo;
     pkt >> displayGroupInfo.width >> displayGroupInfo.height >> displayGroupInfo.focusWindowId;
-    int32_t num = 0;
+    uint32_t num = 0;
     pkt >> num;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read display info failed");
         return RET_ERR;
     }
-    for (int32_t i = 0; i < num; i++) {
+    for (uint32_t i = 0; i < num; i++) {
         WindowInfo info;
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
@@ -182,7 +182,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     }
     }
     pkt >> num;
-    for (int32_t i = 0; i < num; i++) {
+    for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
         pkt >> info.id >> info.x >> info.y >> info.width >> info.height
             >> info.name >> info.uniq >> info.direction;
@@ -522,9 +522,9 @@ int32_t ServerMsgHandler::OnBigPacketTest(SessionPtr sess, NetPacket& pkt)
     pkt >> width >> height >> focusWindowId;
     MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
         width, height, focusWindowId);
-    int32_t num = 0;
+    uint32_t num = 0;
     pkt >> num;
-    for (int32_t i = 0; i < num; i++) {
+    for (uint32_t i = 0; i < num; i++) {
         WindowInfo info;
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
@@ -545,7 +545,7 @@ int32_t ServerMsgHandler::OnBigPacketTest(SessionPtr sess, NetPacket& pkt)
         }
     }
     pkt >> num;
-    for (int32_t i = 0; i < num; i++) {
+    for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
         pkt >> info.id >> info.x >> info.y >> info.width >> info.height
             >> info.name >> info.uniq >> info.direction;

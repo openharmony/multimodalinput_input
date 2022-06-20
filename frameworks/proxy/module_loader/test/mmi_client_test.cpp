@@ -111,7 +111,7 @@ public:
         int32_t height = 1280;
         int32_t focusWindowId = 1;
         pkt << width << height << focusWindowId;
-        int32_t windowNum = 1;
+        uint32_t windowNum = 1;
         pkt << windowNum;
         for (auto i = 0; i < windowNum; i++) {
             WindowInfo info = {};
@@ -121,7 +121,7 @@ public:
                 return false;
             }
         }
-        int32_t displayNum = 1;
+        uint32_t displayNum = 1;
         pkt << displayNum;
         for (auto i = 0; i < displayNum; i++) {
             DisplayInfo info = {};

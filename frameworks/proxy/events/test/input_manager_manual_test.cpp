@@ -129,8 +129,8 @@ void InputManagerManualTest::UpdateDisplayInfo()
     displayGroupInfo.width = 720;
     displayGroupInfo.height = 1280;
     displayGroupInfo.focusWindowId = 1;
-    int32_t num = 1;
-    for (int32_t i = 0; i < num; i++) {
+    uint32_t num = 1;
+    for (uint32_t i = 0; i < num; i++) {
         WindowInfo info;
         info.id = i + 7;
         info.pid = 1421;
@@ -147,7 +147,7 @@ void InputManagerManualTest::UpdateDisplayInfo()
         info.flags = 0;
         displayGroupInfo.windowsInfo.push_back(info);
     }
-    for (int32_t i = 0; i < num; i++) {
+    for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
         info.id = 0;
         info.x = 0;
