@@ -75,8 +75,8 @@ private:
     int32_t lastGlobalY_ = -1;
 
     struct PidInfo {
-        int32_t pid;
-        bool visible;
+        int32_t pid { 0 };
+        bool visible { false };
     };
     std::list<PidInfo> pidInfos_;
 };

@@ -23,11 +23,11 @@ namespace OHOS {
 namespace MMI {
 class ProcessingMouseDevice : public DeviceBase {
     struct MouseEvent {
-        int32_t xPos;
-        int32_t yPos;
-        int32_t keyValue;
-        int32_t distance;
-        int64_t blockTime;
+        int32_t xPos { 0 };
+        int32_t yPos { 0 };
+        int32_t keyValue { 0 };
+        int32_t distance { 0 };
+        int64_t blockTime { 0 };
         std::string eventType;
         std::string direction;
     };
