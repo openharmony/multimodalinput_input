@@ -23,17 +23,17 @@ namespace OHOS {
 namespace MMI {
 class ProcessingFingerDevice : public DeviceBase {
     struct TouchPadCoordinates {
-        int32_t xPos;
-        int32_t yPos;
+        int32_t xPos { 0 };
+        int32_t yPos { 0 };
     };
 
     struct TouchPadInputEvent {
-        uint32_t groupNumber;
+        uint32_t groupNumber { 0 };
         std::vector<TouchPadCoordinates> events;
     };
 
     struct TouchPadInputEvents {
-        uint64_t eventNumber;
+        uint64_t eventNumber { 0 };
         std::vector<TouchPadInputEvent> eventArray;
     };
 public:
