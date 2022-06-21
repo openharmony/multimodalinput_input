@@ -540,45 +540,6 @@ MouseLocation InputWindowsManager::GetMouseInfo()
     return mouseLoction_;
 }
 
-/*
-void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
-{
-    CALL_LOG_ENTER;
-    MMI_HILOGI("Windows Manager Dump in !");
-    mprintf(fd, "------------------------[physicalDisplay information]---------------------------");
-    mprintf(fd, "physicalDisplays,num:%zu", physicalDisplays_.size());
-    for (const auto &physicalDisplay : physicalDisplays_) {
-    mprintf(fd,
-            "id:%d | leftDisplayId:%d | upDisplayId:%d | topLeftX:%d | topLeftY:%d | width:%d | height:%d"
-            "| name:%s | seatId:%s | seatName:%s | logicWidth:%d | logicHeight:%d | direction:%d \t",
-            physicalDisplay.id, physicalDisplay.leftDisplayId, physicalDisplay.upDisplayId,
-            physicalDisplay.topLeftX, physicalDisplay.topLeftY, physicalDisplay.width, physicalDisplay.height,
-            physicalDisplay.name.c_str(), physicalDisplay.seatId.c_str(), physicalDisplay.seatName.c_str(),
-            physicalDisplay.logicWidth, physicalDisplay.logicHeight, physicalDisplay.direction);
-    }
-    mprintf(fd, "-------------------------[logicalDisplays information]--------------------------");
-    mprintf(fd, "logicalDisplays,num:%zu", logicalDisplays_.size());
-    for (const auto &logicalDisplays : logicalDisplays_) {
-    mprintf(fd,
-            "id:%d | topLeftX:%d | topLeftY:%d | width:%d | height:%d"
-            "| name:%s | seatId:%s | seatName:%s | focusWindowId:%d | window num:%d \t",
-            logicalDisplays.id, logicalDisplays.topLeftX, logicalDisplays.topLeftY, logicalDisplays.width,
-            logicalDisplays.height, logicalDisplays.name.c_str(), logicalDisplays.seatId.c_str(),
-            logicalDisplays.seatName.c_str(), logicalDisplays.focusWindowId, logicalDisplays.windowsInfo.size());
-    }
-    mprintf(fd, "-------------------------[windowInfo information]-------------------------------");
-    mprintf(fd, "window info,num:%zu", windowInfos_.size());
-    for (const auto &windowInfo : windowInfos_) {
-    mprintf(fd,
-            "id:%d | pid:%d | uid:%d | hotZoneTopLeftX:%d | hotZoneTopLeftY:%d | hotZoneWidth:%d"
-            "| hotZoneHeight:%d | displayId:%d | agentWindowId:%d | winTopLeftX:%d | winTopLeftY:%d | flags:%d \t",
-            windowInfo.second.id, windowInfo.second.pid, windowInfo.second.uid, windowInfo.second.hotZoneTopLeftX,
-            windowInfo.second.hotZoneTopLeftY, windowInfo.second.hotZoneWidth, windowInfo.second.hotZoneHeight,
-            windowInfo.second.displayId, windowInfo.second.agentWindowId, windowInfo.second.winTopLeftX,
-            windowInfo.second.winTopLeftY, windowInfo.second.flags);
-    }
-}
-*/
 void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
@@ -587,18 +548,18 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "windowsInfos,num:%zu", displayGroupInfo_.windowsInfo.size());
     for (const auto &item : displayGroupInfo_.windowsInfo) {
     mprintf(fd,
-            "windowsInfos:\n\t id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d | area.width:%d | area.height:%d"
+            "windowsInfos:\n\t\t id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d | area.width:%d | area.height:%d "
             "| defaultHotAreas.size:%zu | pointerHotAreas.size:%zu | agentWindowId:%d | flags:%d \t",
             item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width, item.area.height,
             item.defaultHotAreas.size(), item.pointerHotAreas.size(), item.agentWindowId, item.flags);
         for (const auto &win : item.defaultHotAreas) {
         mprintf(fd,
-                "defaultHotAreas:\n\t x:%d | y:%d | width:%d | height:%d \t",
+                "defaultHotAreas:\n\t\t x:%d | y:%d | width:%d | height:%d \t",
                 win.x, win.y, win.width, win.height);
         }
         for (const auto &pointer : item.pointerHotAreas) {
         mprintf(fd,
-                "pointerHotAreas:\n\t x:%d | y:%d | width:%d | height:%d \t",
+                "pointerHotAreas:\n\t\t x:%d | y:%d | width:%d | height:%d \t",
                 pointer.x, pointer.y, pointer.width, pointer.height);
         }
     }
@@ -606,7 +567,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "displayInfos,num:%zu", displayGroupInfo_.displaysInfo.size());
     for (const auto &item : displayGroupInfo_.displaysInfo) {
     mprintf(fd,
-            "displayInfos:\n\t id:%d | x:%d | y:%d | width:%d | height:%d | name:%s | uniq:%s | direction:%d \t",
+            "displayInfos:\n\t\t id:%d | x:%d | y:%d | width:%d | height:%d | name:%s | uniq:%s | direction:%d \t",
             item.id, item.x, item.y, item.width, item.height, item.name.c_str(), item.uniq.c_str(), item.direction);
     }
 }

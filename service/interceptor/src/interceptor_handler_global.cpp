@@ -231,10 +231,12 @@ void InterceptorHandlerGlobal::InterceptorCollection::Dump(int32_t fd, const std
     mprintf(fd, "interceptors: count=%d", interceptors_.size());
     for (const auto &interceptor : interceptors_) {
     mprintf(fd,
-            "interceptor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d | EarlistEventTime:%" PRId64 "\t",
-            interceptor.id_, interceptor.handlerType_, interceptor.session_->GetPid(),
-            interceptor.session_->GetUid(), interceptor.session_->GetFd(),
-            interceptor.session_->GetEarlistEventTime());
+            "interceptor id:%d | handlerType:%d | eventType:%d | Pid:%d | Uid:%d | Fd:%d "
+            "| HasPermission:%s | EarlistEventTime:%" PRId64 " | Descript:%s \t",
+            interceptor.id_, interceptor.handlerType_, interceptor.eventType_, 
+            interceptor.session_->GetPid(), interceptor.session_->GetUid(), 
+            interceptor.session_->GetFd(), interceptor.session_->HasPermission() ? "true" : "false",
+            interceptor.session_->GetEarlistEventTime(), interceptor.session_->GetDescript().c_str());
     }
 }
 } // namespace MMI
