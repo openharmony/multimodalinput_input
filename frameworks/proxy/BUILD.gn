@@ -258,7 +258,6 @@ ohos_unittest("InputManagerTest") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
-    "${mmi_path}/tools/virtual_device_manager/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
@@ -297,7 +296,6 @@ ohos_unittest("InputManagerTest") {
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/tools/virtual_device_manager:libmmi-virtual-device",
     "${mmi_path}/util:libmmi-util",
     "//foundation/ability/ability_runtime/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
