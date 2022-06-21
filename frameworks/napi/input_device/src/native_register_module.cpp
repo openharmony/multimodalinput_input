@@ -22,7 +22,7 @@ static napi_module mmiInputDeviceModule = {
     .nm_flags = 0,
     .nm_filename = nullptr,
     .nm_register_func = JsInputDeviceContext::Export,
-    .nm_modname = "inputDevice",
+    .nm_modname = "multimodalInput.inputDevice",
     .nm_priv = ((void*)0),
     .reserved = { 0 },
 };
