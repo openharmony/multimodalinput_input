@@ -314,6 +314,7 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
         MMI_HILOGE("Failed to deserialize key event.");
         return RET_ERR;
     }
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
     InputHandlerMgr.OnInputEvent(handlerId, keyEvent);
     return RET_OK;
 }
