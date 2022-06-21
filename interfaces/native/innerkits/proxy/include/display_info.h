@@ -53,28 +53,28 @@ enum Direction {
 
 struct Rect {
     /**
-     * 左上角x坐标
+     * X coordinate of the upper left corner
      *
      * @since 9
      */
     int32_t x;
 
     /**
-     * 左上角y坐标
+     * Y coordinate of the upper left corner
      *
      * @since 9
      */
     int32_t y;
 
     /**
-     * 宽度
+     * Width
      *
      * @since 9
      */
     int32_t width;
 
     /**
-     * 高度
+     * Height
      *
      * @since 9
      */
@@ -84,7 +84,7 @@ struct Rect {
 
 struct WindowInfo {
     /**
-     * 热区最大数量
+     * Maximum number of hot areas
      *
      * @since 9
      */
@@ -119,21 +119,22 @@ struct WindowInfo {
     int32_t uid;
 
     /**
-     * 窗口的显示区域
+     * Window display area
      *
      * @since 9
      */
     Rect area;
 
     /**
-     *  除鼠标之外的窗口触摸响应区域, 数量不能超过MAX_HOTAREA_COUNT
+     * Number of touch response areas (excluding the mouse response areas) in the window.
+     * The value cannot exceed the value of MAX_HOTAREA_COUNT.
      *
      * @since 9
      */
     std::vector<Rect> defaultHotAreas;
 
     /**
-     * 窗口的鼠标响应区域，数量不能超过MAX_HOTAREA_COUNT
+     * Number of mouse response areas in the window. The value cannot exceed the value of MAX_HOTAREA_COUNT.
      *
      * @since 9
      */
@@ -156,7 +157,7 @@ struct WindowInfo {
 };
 
 /**
- * 物理屏信息
+ * Physical screen information
  *
  * @since 9
  */
@@ -169,28 +170,30 @@ struct DisplayInfo {
     int32_t id;
 
     /**
-     * 在逻辑屏幕中，屏幕左上角的x坐标
+     * X coordinate of the upper left corner on the logical screen
      *
      * @since 9
      */
     int32_t x;
 
     /**
-     * 在逻辑屏幕中，屏幕左上角的y坐标
+     * Y coordinate of the upper left corner on the logical screen
      *
      * @since 9
      */
     int32_t y;
 
     /**
-     * Display width，原始显示屏的旋转角度为0的逻辑宽度，旋转后，此值依然保持旋转角度为0的值
+     * Display width, which is the logical width of the original screen when the rotation angle is 0. 
+     * The value remains unchanged even if the display screen is rotated.
      *
      * @since 9
      */
     int32_t width;
 
     /**
-     * Display height，原始显示屏的旋转角度为0的逻辑高度，旋转后，此值依然保持旋转角度为0的值
+     * Display height, which is the logical height of the original screen when the rotation angle is 0. 
+     * The value remains unchanged even if the display screen is rotated.
      *
      * @since 9
      */
@@ -204,7 +207,7 @@ struct DisplayInfo {
     std::string name;
 
     /**
-     * 屏幕唯一标识符号，用于关联对应的触摸屏，默认为default0
+     * Unique screen ID, which is used to associate the corresponding touchscreen. The default value is default0.
      *
      * @since 9
      */
@@ -219,7 +222,7 @@ struct DisplayInfo {
 };
 
 /**
- * 逻辑屏信息
+ * Logical screen information
  *
  * @since 9
  */
@@ -253,7 +256,7 @@ struct DisplayGroupInfo {
     std::vector<WindowInfo> windowsInfo;
     
     /**
-     * 物理屏信息列表
+     * Physical screen information list
      *
      * @since 9
      */

@@ -42,7 +42,7 @@ public:
 
     /**
      * @brief Updates the screen and window information.
-     * @param displayGroupInfo 逻辑屏信息
+     * @param displayGroupInfo Indicates the logical screen information.
      * @since 9
      */
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
