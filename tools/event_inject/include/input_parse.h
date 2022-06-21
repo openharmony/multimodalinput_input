@@ -22,32 +22,32 @@
 namespace OHOS {
 namespace MMI {
 struct Pos {
-    int32_t xPos = 0;
-    int32_t yPos = 0;
+    int32_t xPos { 0 };
+    int32_t yPos { 0 };
     std::string ToString() const;
 };
 struct DeviceEvent {
     std::string eventType;
     std::vector<int32_t> event;
-    int16_t keyValue = 0;
-    int64_t blockTime = 0;
+    int16_t keyValue { 0 };
+    int64_t blockTime { 0 };
     std::vector<int32_t> ringEvents;
     std::string direction;
-    int32_t distance = 0;
-    int32_t xPos = 0;
-    int32_t yPos = 0;
-    int32_t tiltX = 0;
-    int32_t tiltY = 0;
-    int32_t pressure = 0;
-    int32_t trackingId = 0;
-    int32_t reportType = 0;
-    int32_t keyStatus = 0;
+    int32_t distance { 0 };
+    int32_t xPos { 0 };
+    int32_t yPos { 0 };
+    int32_t tiltX { 0 };
+    int32_t tiltY { 0 };
+    int32_t pressure { 0 };
+    int32_t trackingId { 0 };
+    int32_t reportType { 0 };
+    int32_t keyStatus { 0 };
     std::vector<Pos> posXY;
     std::string ToString() const;
 };
 struct DeviceItem {
     std::string deviceName;
-    int32_t deviceIndex = 0;
+    int32_t deviceIndex { 0 };
     std::vector<DeviceEvent> events;
     std::string ToString() const;
 };

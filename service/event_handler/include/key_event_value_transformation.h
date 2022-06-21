@@ -22,9 +22,9 @@ namespace OHOS {
 namespace MMI {
 struct KeyEventValueTransformation {
     std::string keyEvent;
-    int32_t nativeKeyValue;
-    int32_t sysKeyValue;
-    int32_t sysKeyEvent;
+    int32_t nativeKeyValue { 0 };
+    int32_t sysKeyValue { 0 };
+    int32_t sysKeyEvent { 0 };
 };
 
 KeyEventValueTransformation TransferKeyValue(int32_t keyValueOfInput);
