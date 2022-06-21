@@ -29,22 +29,22 @@ class JsUtil {
 public:
     struct CallbackData {
         std::vector<int32_t> ids;
-        std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device = nullptr;
+        std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device { nullptr };
         std::vector<bool> keystrokeAbility;
-        int32_t deviceId = 0;
-        int32_t keyboardType = 0;
+        int32_t deviceId { 0 };
+        int32_t keyboardType { 0 };
     };
     struct CallbackInfo {
         CallbackInfo();
         ~CallbackInfo();
-        napi_env env = nullptr;
-        napi_ref ref = nullptr;
-        napi_deferred deferred = nullptr;
+        napi_env env { nullptr };
+        napi_ref ref { nullptr };
+        napi_deferred deferred { nullptr };
         CallbackData data;
     };
     struct DeviceType {
         std::string sourceTypeName;
-        uint32_t typeBit;
+        uint32_t typeBit { 0 };
     };
 
     static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);

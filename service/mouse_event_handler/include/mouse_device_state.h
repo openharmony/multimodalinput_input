@@ -40,8 +40,8 @@ public:
         LIBINPUT_TASK_BUTTON_CODE
     };
     struct MouseDeviceCoords {
-        int32_t globleX;
-        int32_t globleY;
+        int32_t globleX { 0 };
+        int32_t globleY { 0 };
     };
     const std::map<uint32_t, int32_t> mapLibinputChangeToPointer = {
         {LIBINPUT_LEFT_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_LEFT},

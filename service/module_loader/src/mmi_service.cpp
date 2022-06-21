@@ -48,8 +48,8 @@ const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
 
 struct mmi_epoll_event {
-    int32_t fd;
-    EpollEventType event_type;
+    int32_t fd { 0 };
+    EpollEventType event_type { EPOLL_EVENT_BEGIN };
 };
 
 template<class ...Ts>

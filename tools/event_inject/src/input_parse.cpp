@@ -36,7 +36,7 @@ struct JsonParser {
     {
         return json_;
     }
-    cJSON *json_ = nullptr;
+    cJSON *json_ { nullptr };
 };
 
 void GetJsonData(cJSON *json, const std::string& key, std::string& val)

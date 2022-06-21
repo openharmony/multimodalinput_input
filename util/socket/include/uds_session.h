@@ -82,8 +82,8 @@ public:
 
 protected:
     struct EventTime {
-        int32_t id;
-        int64_t eventTime;
+        int32_t id { 0 };
+        int64_t eventTime { 0 };
     };
     std::vector<EventTime> events_;
     std::string descript_;
