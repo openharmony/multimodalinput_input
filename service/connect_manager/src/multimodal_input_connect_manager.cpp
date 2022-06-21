@@ -120,6 +120,18 @@ int32_t MultimodalInputConnectManager::MarkEventConsumed(int32_t monitorId, int3
     return multimodalInputConnectService_->MarkEventConsumed(monitorId, eventId);
 }
 
+int32_t MultimodalInputConnectManager::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SubscribeKeyEvent(subscribeId, option);
+}
+
+int32_t MultimodalInputConnectManager::UnsubscribeKeyEvent(int32_t subscribeId)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->UnsubscribeKeyEvent(subscribeId);
+}
+
 int32_t MultimodalInputConnectManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);

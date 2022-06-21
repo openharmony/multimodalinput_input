@@ -43,6 +43,7 @@ ohos_source_set("libmmi-common") {
   sources = [
     "events/src/input_event.cpp",
     "events/src/key_event.cpp",
+    "events/src/key_option.cpp",
     "events/src/pointer_event.cpp",
   ]
 
@@ -76,7 +77,6 @@ ohos_shared_library("libmmi-client") {
     "event_handler/src/standardized_event_manager.cpp",
     "events/src/axis_event.cpp",
     "events/src/input_manager.cpp",
-    "events/src/key_option.cpp",
     "module_loader/src/mmi_client.cpp",
     "module_loader/src/mmi_event_handler.cpp",
     "module_loader/src/mmi_fd_listener.cpp",
@@ -258,7 +258,6 @@ ohos_unittest("InputManagerTest") {
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
-    "${mmi_path}/tools/virtual_device_manager/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
@@ -297,7 +296,6 @@ ohos_unittest("InputManagerTest") {
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/tools/virtual_device_manager:libmmi-virtual-device",
     "${mmi_path}/util:libmmi-util",
     "//foundation/ability/ability_runtime/frameworks/native/ability/native:abilitykit_native",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",

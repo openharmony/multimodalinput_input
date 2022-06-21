@@ -49,41 +49,13 @@ int32_t StandardizedEventManager::SubscribeKeyEvent(
     const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
 {
     CALL_LOG_ENTER;
-    NetPacket pkt(MmiMessageId::SUBSCRIBE_KEY_EVENT);
-    std::shared_ptr<KeyOption> keyOption = subscribeInfo.GetKeyOption();
-    uint32_t preKeySize = keyOption->GetPreKeys().size();
-    pkt << subscribeInfo.GetSubscribeId() << keyOption->GetFinalKey() << keyOption->IsFinalKeyDown()
-    << keyOption->GetFinalKeyDownDuration() << preKeySize;
-
-    std::set<int32_t> preKeys = keyOption->GetPreKeys();
-    for (const auto &item : preKeys) {
-        pkt << item;
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write subscribe key event failed");
-        return RET_ERR;
-    }
-    if (!SendMsg(pkt)) {
-        MMI_HILOGE("Client failed to send message");
-        return RET_ERR;
-    }
-    return RET_OK;
+    return MultimodalInputConnMgr->SubscribeKeyEvent(subscribeInfo.GetSubscribeId(), subscribeInfo.GetKeyOption());
 }
 
 int32_t StandardizedEventManager::UnSubscribeKeyEvent(int32_t subscribeId)
 {
     CALL_LOG_ENTER;
-    NetPacket pkt(MmiMessageId::UNSUBSCRIBE_KEY_EVENT);
-    pkt << subscribeId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write unsubscribe key event failed");
-        return RET_ERR;
-    }
-    if (!SendMsg(pkt)) {
-        MMI_HILOGE("Client failed to send message");
-        return RET_ERR;
-    }
-    return RET_OK;
+    return MultimodalInputConnMgr->UnsubscribeKeyEvent(subscribeId);
 }
 
 int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> keyEvent)

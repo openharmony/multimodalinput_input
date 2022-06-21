@@ -15,7 +15,6 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 module_output_path = "multimodalinput/unit_out"
-HDF_FWKS = "//drivers/framework"
 
 config("event_injection_config") {
   visibility = [ ":*" ]
@@ -93,7 +92,6 @@ ohos_unittest("ut-event-injection-out") {
   module_out_path = module_output_path
   include_dirs = [
     "//drivers/peripheral/input/interfaces/include",
-    "//drivers/adapter/uhdf2/adapter/osal/include",
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
     "//third_party/cJSON",
@@ -125,14 +123,6 @@ ohos_unittest("ut-event-injection-out") {
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/tools/event_inject/include",
     "${mmi_path}/uinput",
-    "$HDF_FWKS/include/utils",
-    "$HDF_FWKS/include/osal",
-    "$HDF_FWKS/core/adapter/syscall/include",
-    "$HDF_FWKS/include/core",
-    "$HDF_FWKS/ability/sbuf/include",
-    "$HDF_FWKS/core/shared/include",
-    "$HDF_FWKS/utils/include",
-    "$HDF_FWKS/inclue",
   ]
 
   if (is_mmi_have_libinput) {

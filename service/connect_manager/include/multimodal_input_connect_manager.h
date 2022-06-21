@@ -43,6 +43,8 @@ public:
     int32_t MarkEventConsumed(int32_t monitorId, int32_t eventId);
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option);
+    int32_t UnsubscribeKeyEvent(int32_t subscribeId);
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 private:
     MultimodalInputConnectManager() = default;

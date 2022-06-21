@@ -23,26 +23,26 @@ namespace OHOS {
 namespace MMI {
 class ProcessingTouchScreenDevice : public DeviceBase {
     struct TouchSingleEventData {
-        int32_t trackingId;
-        int32_t xPos;
-        int32_t yPos;
-        int64_t blockTime;
+        int32_t trackingId { 0 };
+        int32_t xPos { 0 };
+        int32_t yPos { 0 };
+        int64_t blockTime { 0 };
         std::string eventType;
         std::string reportType;
     };
 
     struct TouchScreenCoordinates {
-        int32_t xPos;
-        int32_t yPos;
+        int32_t xPos { 0 };
+        int32_t yPos { 0 };
     };
 
     struct TouchScreenInputEvent {
-        uint32_t groupNumber;
+        uint32_t groupNumber { 0 };
         std::vector<TouchScreenCoordinates> events;
     };
 
     struct TouchScreenInputEvents {
-        uint32_t eventNumber;
+        uint32_t eventNumber { 0 };
         std::vector<TouchScreenInputEvent> eventArray;
     };
 public:
