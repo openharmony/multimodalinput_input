@@ -22,7 +22,7 @@ static napi_module mmiKeyCodeModule = {
     .nm_flags = 0,
     .nm_filename = nullptr,
     .nm_register_func = JsKeyCode::Export,
-    .nm_modname = "keyCode",
+    .nm_modname = "multimodalInput.keyCode",
     .nm_priv = ((void*)0),
     .reserved = { 0 },
 };
