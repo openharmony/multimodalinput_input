@@ -226,7 +226,6 @@ bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
     } else {
         earlist = sess->GetEarlistEventTime();
     }
-    MMI_HILOGD("Current time: %{public}" PRId64 "", time);
     if (time < (earlist + INPUT_UI_TIMEOUT_TIME)) {
         sess->isANRProcess_ = false;
         MMI_HILOGD("the event reports normally");
