@@ -65,9 +65,7 @@ void KeyOption::SetFinalKeyDownDuration(int32_t duration)
 bool KeyOption::ReadFromParcel(Parcel &in)
 {
     int32_t preKeysSize;
-    if (!in.ReadInt32(preKeysSize)) {
-        return false;
-    }
+    READINT32(in, preKeysSize);
     if (preKeysSize < 0) {
         return false;
     }
@@ -78,9 +76,7 @@ bool KeyOption::ReadFromParcel(Parcel &in)
     }
     for (auto i = 0; i < preKeysSize; ++i) {
         int32_t keyValue;
-        if (!in.ReadInt32(keyValue)) {
-            return false;
-        }
+        READINT32(in, keyValue);
         preKeys_.insert(keyValue);
     }
     return (
@@ -98,13 +94,9 @@ bool KeyOption::WriteToParcel(Parcel &out) const
         return false;
     }
     int32_t preKeysSize = static_cast<int32_t>(preKeys_.size());
-    if (!out.WriteInt32(preKeysSize)) {
-        return false;
-    }
+    WRITEINT32(out, preKeysSize);
     for (const auto &i : preKeys_) {
-        if (!out.WriteInt32(i)) {
-            return false;
-        }
+        WRITEINT32(out, i);
     }
     return (
         out.WriteInt32(finalKey_) &&
