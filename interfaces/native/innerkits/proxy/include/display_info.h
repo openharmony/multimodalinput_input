@@ -184,7 +184,7 @@ struct DisplayInfo {
     int32_t y;
 
     /**
-     * Display width, which is the logical width of the original screen when the rotation angle is 0. 
+     * Display width, which is the logical width of the original screen when the rotation angle is 0.
      * The value remains unchanged even if the display screen is rotated.
      *
      * @since 9
@@ -192,7 +192,7 @@ struct DisplayInfo {
     int32_t width;
 
     /**
-     * Display height, which is the logical height of the original screen when the rotation angle is 0. 
+     * Display height, which is the logical height of the original screen when the rotation angle is 0.
      * The value remains unchanged even if the display screen is rotated.
      *
      * @since 9
