@@ -151,7 +151,7 @@ void EventDump::DumpEventHelp(int32_t fd, const std::vector<std::string> &args)
 
 void EventDump::DumpHelp(int32_t fd)
 {
-    mprintf(fd, "Usage:\n");
+    mprintf(fd, "Usage:\t");
     mprintf(fd, "      -h: dump help\t");
     mprintf(fd, "      -d: dump the device information\t");
     mprintf(fd, "      -l: dump the device list information\t");
