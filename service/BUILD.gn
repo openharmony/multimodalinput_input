@@ -288,7 +288,6 @@ ohos_unittest("ut-mmi-service-out") {
   configs = [ ":libmmi_server_config" ]
 
   deps = [
-    "${aafwk_kits_path}/appkit:appkit_native",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
@@ -301,7 +300,6 @@ ohos_unittest("ut-mmi-service-out") {
   }
 
   external_deps = [
-    "ability_runtime:ability_manager",
     "hiviewdfx_hilog_native:libhilog",
     "input_device_driver_interface:hdi_input",
     "utils_base:utils",
