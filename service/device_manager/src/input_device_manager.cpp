@@ -338,7 +338,7 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
     for (const auto &item : inputDevice_) {
     std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
     mprintf(fd,
-            "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d"
+            "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d "
             "| product:%d | vendor:%d | phys:%s\t",
             inputDevice->GetId(), inputDevice->GetName().c_str(), inputDevice->GetType(),
             inputDevice->GetBustype(), inputDevice->GetVersion(), inputDevice->GetProduct(),

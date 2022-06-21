@@ -298,10 +298,12 @@ void InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::v
     mprintf(fd, "monitors: count=%d", monitors_.size());
     for (const auto &monitor : monitors_) {
     mprintf(fd,
-            "monitor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d | EarlistEventTime:%" PRId64 "\t",
+            "monitor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
+            "| HasPermission:%s | EarlistEventTime:%" PRId64 " | Descript:%s \t",
             monitor.id_, monitor.handlerType_, monitor.session_->GetPid(),
             monitor.session_->GetUid(), monitor.session_->GetFd(),
-            monitor.session_->GetEarlistEventTime());
+            monitor.session_->HasPermission() ? "true" : "false",
+            monitor.session_->GetEarlistEventTime(), monitor.session_->GetDescript().c_str());
     }
 }
 } // namespace MMI
