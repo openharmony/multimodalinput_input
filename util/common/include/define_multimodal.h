@@ -301,7 +301,6 @@ namespace MMI {
             return DEFRET(false, ##__VA_ARGS__); \
         } \
     } while (0)
-
 } // namespace MMI
 } // namespace OHOS
 #endif // DEFINE_MULTIMODAL_H
