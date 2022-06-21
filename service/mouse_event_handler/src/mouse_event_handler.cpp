@@ -47,30 +47,34 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 {
     CALL_LOG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent_, ERROR_NULL_POINTER);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttonId_);
 
     InitAbsolution();
+   
     absolutionX_ += libinput_event_pointer_get_dx(data);
     absolutionY_ += libinput_event_pointer_get_dy(data);
-
-    WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
-
+    WinMgr->UpdateAndAdjustMouseLoction(currentDisplayId_, absolutionX_, absolutionY_);
+    pointerEvent_->SetTargetDisplayId(currentDisplayId_);
     MMI_HILOGD("Change Coordinate : x:%{public}lf,y:%{public}lf",  absolutionX_, absolutionY_);
     return RET_OK;
 }
 
 void MouseEventHandler::InitAbsolution()
 {
-    if (absolutionX_ != -1 || absolutionY_ != -1) {
+    if (absolutionX_ != -1 || absolutionY_ != -1 || currentDisplayId_ != -1) {
         return;
     }
     MMI_HILOGD("init absolution");
-    auto logicalDisplayInfo = WinMgr->GetLogicalDisplayInfo();
-    if (!logicalDisplayInfo.empty()) {
-        absolutionX_ = logicalDisplayInfo[0].width * 1.0 / 2;
-        absolutionY_ = logicalDisplayInfo[0].height * 1.0 / 2;
+    auto dispalyGroupInfo = WinMgr->GetDisplayGroupInfo();
+    if (dispalyGroupInfo.displaysInfo.empty()) {
+        MMI_HILOGE("physicaldisplay is empty");
+        return;
     }
+    currentDisplayId_ = dispalyGroupInfo.displaysInfo[0].id;
+    absolutionX_ = dispalyGroupInfo.displaysInfo[0].width * 1.0 / 2;
+    absolutionY_ = dispalyGroupInfo.displaysInfo[0].height * 1.0 / 2;
 }
 
 int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)
@@ -112,33 +116,42 @@ int32_t MouseEventHandler::HandleButtonValueInner(libinput_event_pointer* data)
 
     uint32_t button = libinput_event_pointer_get_button(data);
     switch (button) {
-        case BTN_LEFT:
+        case BTN_LEFT: {
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
             break;
-        case BTN_RIGHT:
+        }
+        case BTN_RIGHT: {
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
             break;
-        case BTN_MIDDLE:
+        }
+        case BTN_MIDDLE: {
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
             break;
-        case BTN_SIDE:
+        }
+        case BTN_SIDE: {
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_SIDE);
             break;
-        case BTN_EXTRA:
+        }
+        case BTN_EXTRA: {
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_EXTRA);
             break;
-        case BTN_FORWARD:
+        }
+        case BTN_FORWARD: {
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_FORWARD);
             break;
-        case BTN_BACK:
+        }
+        case BTN_BACK: {
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_BACK);
             break;
-        case BTN_TASK:
+        }
+        case BTN_TASK: {
             pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_TASK);
             break;
-        default:
+        }
+        default: {
             MMI_HILOGE("unknown btn, btn:%{public}u", button);
             return RET_ERR;
+        }
     }
     return RET_OK;
 }
@@ -262,7 +275,7 @@ void MouseEventHandler::HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY)
     InitAbsolution();
     absolutionX_ += offsetX;
     absolutionY_ += offsetY;
-    WinMgr->UpdateAndAdjustMouseLoction(absolutionX_, absolutionY_);
+    WinMgr->UpdateAndAdjustMouseLoction(currentDisplayId_, absolutionX_, absolutionY_);
 }
 
 void MouseEventHandler::HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem)

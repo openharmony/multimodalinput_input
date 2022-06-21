@@ -64,11 +64,11 @@ public:
 };
 
 struct AsyncContext : RefBase {
-    napi_env env = nullptr;
-    napi_async_work work = nullptr;
-    napi_deferred deferred = nullptr;
-    napi_ref callback = nullptr;
-    int32_t errorCode {-1};
+    napi_env env { nullptr };
+    napi_async_work work { nullptr };
+    napi_deferred deferred { nullptr };
+    napi_ref callback { nullptr };
+    int32_t errorCode { -1 };
     StreamBuffer reserve;
     AsyncContext(napi_env env) : env(env) {}
     ~AsyncContext();

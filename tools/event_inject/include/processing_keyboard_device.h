@@ -24,8 +24,8 @@ namespace MMI {
 class ProcessingKeyboardDevice : public DeviceBase {
     struct KeyBoardEvent {
         std::string eventType;
-        int32_t keyValue;
-        int64_t blockTime;
+        int32_t keyValue { 0 };
+        int64_t blockTime { 0 };
     };
 public:
     ProcessingKeyboardDevice() = default;

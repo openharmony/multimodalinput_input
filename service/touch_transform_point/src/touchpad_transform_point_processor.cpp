@@ -153,13 +153,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(struct libinput_event *e
                    seatSlot, PARAM_INPUT_FAIL);
         return;
     }
-    double pressure = libinput_event_touchpad_get_pressure(data);
-    double logicalX = libinput_event_touchpad_get_x(data);
-    double logicalY = libinput_event_touchpad_get_y(data);
-    item.SetPressure(pressure);
     item.SetPressed(false);
-    item.SetGlobalX(static_cast<int32_t>(logicalX));
-    item.SetGlobalY(static_cast<int32_t>(logicalY));
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
 }

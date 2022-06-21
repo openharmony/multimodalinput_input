@@ -47,8 +47,8 @@ private:
         Rosen::Rect rect;
         Rosen::WindowType type;
         Rosen::WindowMode mode;
-        bool needAvoid;
-        bool parentLimit;
+        bool needAvoid { false };
+        bool parentLimit { false };
         std::string parentName;
         bool focusable_ { true };
         Rosen::Orientation orientation_ { Rosen::Orientation::UNSPECIFIED };

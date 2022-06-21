@@ -13,23 +13,26 @@
  * limitations under the License.
  */
 
-#include "js_mouse_context.h"
+#ifndef JS_KEY_CODE
+#define JS_KEY_CODE
+
+#include "napi/native_api.h"
+#include "napi/native_node_api.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {
-static napi_module mmiMouseModule = {
-    .nm_version = 1,
-    .nm_flags = 0,
-    .nm_filename = nullptr,
-    .nm_register_func = JsMouseContext::Export,
-    .nm_modname = "multimodalInput.mouse",
-    .nm_priv = ((void*)0),
-    .reserved = { 0 },
+class JsKeyCode {
+public:
+    JsKeyCode() = default;
+    ~JsKeyCode() = default;
+    DISALLOW_COPY_AND_MOVE(JsKeyCode);
+    static napi_value Export(napi_env env, napi_value exports);
+private:
+    static napi_value GetNapiInt32(napi_env env, int32_t code);
+    static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
 };
-
-extern "C" __attribute__((constructor)) void RegisterModule(void)
-{
-    napi_module_register(&mmiMouseModule);
-}
 } // namespace MMI
 } // namespace OHOS
+
+#endif // JS_KEY_CODE

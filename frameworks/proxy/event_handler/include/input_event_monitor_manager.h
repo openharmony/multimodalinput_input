@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace MMI {
 struct MonitorItem {
-    int32_t id;
+    int32_t id { 0 };
     std::function<void (std::shared_ptr<KeyEvent>)> keyEventMonitor;
     bool operator == (const MonitorItem& item) const
     {
