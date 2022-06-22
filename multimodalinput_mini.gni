@@ -31,6 +31,7 @@ is_mmi_have_debug = false
 mmi_enable_combinationkey = true
 mmi_enable_pointer_drawing = true
 mmi_enable_interceptor = true
+input_enable_distributed = false
 
 print("is_mmi_have_libinput = ${is_mmi_have_libinput}")
 print("is_mmi_have_hdf = ${is_mmi_have_hdf}")
@@ -38,3 +39,4 @@ print("is_mmi_have_debug = ${is_mmi_have_debug}")
 print("mmi_enable_combinationkey = ${mmi_enable_combinationkey}")
 print("mmi_enable_pointer_drawing = ${mmi_enable_pointer_drawing}")
 print("mmi_enable_interceptor = ${mmi_enable_interceptor}")
+print("input_enable_distributed = ${input_enable_distributed}")
