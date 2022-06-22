@@ -17,7 +17,7 @@
 
 #include <cinttypes>
 #include <csignal>
-
+#include <parameters.h>
 #include <sys/signalfd.h>
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
@@ -229,6 +229,7 @@ int32_t MMIService::Init()
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1,
         std::placeholders::_2));
     KeyMapMgr->GetConfigKeyValue("default_keymap", KeyMapMgr->GetDefaultKeyId());
+    OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "false");
     return RET_OK;
 }
 

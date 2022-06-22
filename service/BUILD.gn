@@ -200,6 +200,7 @@ ohos_shared_library("libmmi-server") {
     "multimedia_image_standard:image_native",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
+    "startup_l2:syspara",
   ]
 
   if (mmi_enable_pointer_drawing) {
