@@ -62,6 +62,7 @@ namespace MMI {
 #define SEND_RETRY_SLEEP_TIME 10000
 #define ONCE_PROCESS_NETPACKET_LIMIT 100
 #define MAX_RECV_LIMIT 32
+#define INPUT_POINTER_DEVICE "input.pointer.device"
 } // namespace MMI
 } // namespace OHOS
 #endif // CONFIG_MULTIMODAL_H
