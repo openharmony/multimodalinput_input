@@ -52,7 +52,13 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
     pointerEvent_->SetButtonId(buttonId_);
 
     InitAbsolution();
-   
+    if (currentDisplayId_ == -1) {
+        absolutionX_ = -1;
+        absolutionY_ = -1;
+        MMI_HILOGI("currentDisplayId_ is -1");
+        return RET_ERR;
+    }
+
     absolutionX_ += libinput_event_pointer_get_dx(data);
     absolutionY_ += libinput_event_pointer_get_dy(data);
     WinMgr->UpdateAndAdjustMouseLoction(currentDisplayId_, absolutionX_, absolutionY_);
@@ -69,7 +75,7 @@ void MouseEventHandler::InitAbsolution()
     MMI_HILOGD("init absolution");
     auto dispalyGroupInfo = WinMgr->GetDisplayGroupInfo();
     if (dispalyGroupInfo.displaysInfo.empty()) {
-        MMI_HILOGE("physicaldisplay is empty");
+        MMI_HILOGI("displayInfo is empty");
         return;
     }
     currentDisplayId_ = dispalyGroupInfo.displaysInfo[0].id;
@@ -226,7 +232,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerEvent_->SetActionStartTime(time);
     pointerEvent_->SetDeviceId(deviceId);
     pointerEvent_->SetPointerId(0);
-    pointerEvent_->SetTargetDisplayId(-1);
+    pointerEvent_->SetTargetDisplayId(currentDisplayId_);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
 }
