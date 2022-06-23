@@ -293,17 +293,17 @@ void InputHandlerManagerGlobal::Dump(int32_t fd, const std::vector<std::string> 
 void InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
-    MMI_HILOGI("Monitor Dump in !");
+    MMI_HILOGI("Monitor Dump in");
     mprintf(fd, "--------------------------[monitor information]-------------------------");
     mprintf(fd, "monitors: count=%d", monitors_.size());
-    for (const auto &monitor : monitors_) {
-    mprintf(fd,
-            "monitor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
-            "| HasPermission:%s | EarlistEventTime:%" PRId64 " | Descript:%s \t",
-            monitor.id_, monitor.handlerType_, monitor.session_->GetPid(),
-            monitor.session_->GetUid(), monitor.session_->GetFd(),
-            monitor.session_->HasPermission() ? "true" : "false",
-            monitor.session_->GetEarlistEventTime(), monitor.session_->GetDescript().c_str());
+    for (const auto &item : monitors_) {
+        mprintf(fd,
+                "monitor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
+                "| HasPermission:%s | EarlistEventTime:%" PRId64 " | Descript:%s \t",
+                item.id_, item.handlerType_, item.session_->GetPid(),
+                item.session_->GetUid(), item.session_->GetFd(),
+                item.session_->HasPermission() ? "true" : "false",
+                item.session_->GetEarlistEventTime(), item.session_->GetDescript().c_str());
     }
 }
 } // namespace MMI
