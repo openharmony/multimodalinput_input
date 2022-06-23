@@ -15,27 +15,27 @@
 
 #include "event_dump.h"
 
+#include <getopt.h>
+
 #include <climits>
 #include <cstdarg>
+#include <cstring>
 
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <getopt.h>
-#include <cstring>
 
-#include "uds_server.h"
-#include "mouse_event_handler.h"
-#include "input_event_handler.h"
 #include "input_device_manager.h"
-#include "key_event_subscriber.h"
+#include "input_event_handler.h"
+#include "input_handler_manager_global.h"
 #include "input_windows_manager.h"
 #include "interceptor_handler_global.h"
-#include "input_handler_manager_global.h"
-
+#include "key_event_subscriber.h"
+#include "mouse_event_handler.h"
+#include "securec.h"
+#include "uds_server.h"
 #include "util.h"
 #include "util_ex.h"
-#include "securec.h"
 
 namespace OHOS {
 namespace MMI {
@@ -66,6 +66,7 @@ void ChkConfig(int32_t fd)
 
 void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 {
+    CALL_LOG_ENTER;
     int32_t optionIndex = 0;
     struct option dumpOptions[] = {
         {"help", no_argument, 0, 'h'},
