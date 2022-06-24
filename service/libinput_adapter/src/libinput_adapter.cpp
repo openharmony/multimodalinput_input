@@ -70,7 +70,7 @@ void LibinputAdapter::LoginfoPackagingTool(struct libinput_event *event)
 constexpr static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
         if (path == nullptr) {
-            MMI_HILOGWK("path is nullptr");
+            MMI_HILOGWK("input device path is nullptr");
             return RET_ERR;
         }
         char realPath[PATH_MAX] = {};
