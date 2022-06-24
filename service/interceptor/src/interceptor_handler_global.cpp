@@ -22,6 +22,7 @@
 #include "mmi_log.h"
 #include "net_packet.h"
 #include "proto.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -215,6 +216,28 @@ void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr s
         } else {
             cItr = interceptors_.erase(cItr);
         }
+    }
+}
+void InterceptorHandlerGlobal::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    return interceptors_.Dump(fd, args);
+}
+
+void InterceptorHandlerGlobal::InterceptorCollection::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_LOG_ENTER;
+    mprintf(fd, "--------------------------[Interceptor Information]-------------------------");
+    mprintf(fd, "interceptors: count=%d", interceptors_.size());
+    for (const auto &item : interceptors_) {
+        SessionPtr session = item.session_;
+        CHKPV(session);
+        mprintf(fd,
+                "interceptor id:%d | handlerType:%d | eventType:%d | Pid:%d | Uid:%d | Fd:%d "
+                "| HasPermission:%s | EarlistEventTime:%" PRId64 " | Descript:%s \t",
+                item.id_, item.handlerType_, item.eventType_,
+                session->GetPid(), session->GetUid(),
+                session->GetFd(), session->HasPermission() ? "true" : "false",
+                session->GetEarlistEventTime(), session->GetDescript().c_str());
     }
 }
 } // namespace MMI
