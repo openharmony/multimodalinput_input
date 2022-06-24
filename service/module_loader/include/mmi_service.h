@@ -73,6 +73,7 @@ protected:
     virtual void OnConnected(SessionPtr s) override;
     virtual void OnDisconnected(SessionPtr s) override;
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd) override;
+    int32_t DelEpoll(EpollEventType type, int32_t fd);
     virtual bool IsRunning() const override;
     int32_t CheckPointerVisible(bool &visible);
     int32_t CheckEventProcessed(int32_t pid, int32_t eventId);
@@ -91,6 +92,8 @@ protected:
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
     void OnDelegateTask(epoll_event& ev);
+
+    void AddReloadLibinputTimer();
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
