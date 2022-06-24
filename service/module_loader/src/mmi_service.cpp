@@ -143,6 +143,7 @@ int32_t MMIService::DelEpoll(EpollEventType type, int32_t fd)
     struct epoll_event ev = {};
     auto ret = EpollCtl(fd, EPOLL_CTL_DEL, ev, mmiFd_);
     if (ret < 0) {
+        MMI_HILOGE("DelEpoll failed");
         return ret;
     }
     return RET_OK;
