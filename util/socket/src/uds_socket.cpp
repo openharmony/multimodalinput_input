@@ -58,7 +58,7 @@ int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, i
         MMI_HILOGE("Invalid param epollFd");
         return RET_ERR;
     }
-    int ret;
+    int32_t ret;
     if (op == EPOLL_CTL_DEL) {
         ret = epoll_ctl(epollFd, op, fd, NULL);
     } else {
