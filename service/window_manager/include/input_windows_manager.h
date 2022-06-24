@@ -29,8 +29,8 @@
 namespace OHOS {
 namespace MMI {
 struct MouseLocation {
-    int32_t globalX;
-    int32_t globalY;
+    int32_t globalX { 0 };
+    int32_t globalY { 0 };
 };
 
 class InputWindowsManager : public DelayedSingleton<InputWindowsManager> {

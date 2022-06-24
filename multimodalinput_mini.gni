@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 
 aafwk_kits_path = "//foundation/ability/ability_runtime/frameworks/kits"
-
+aafwk_path = "//foundation/ability/ability_runtime"
 declare_args() {
   resource_schedule_service_enabled = false
 

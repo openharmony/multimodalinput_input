@@ -271,7 +271,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
 
 int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
 {
-    int32_t num = static_cast<int32_t>(displayGroupInfo_.displaysInfo.size());
+    uint32_t num = static_cast<uint32_t>(displayGroupInfo_.displaysInfo.size());
     pkt << num;
     for (const auto& item : displayGroupInfo_.displaysInfo) {
         pkt << item.id << item.x << item.y << item.width

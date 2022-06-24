@@ -43,11 +43,11 @@ public:
 
 private:
     struct Handler {
-        int32_t handlerId_ = 0;
-        InputHandlerType handlerType_ = NONE;
-        HandleEventType eventType_ = HandleEventType::ALL;
-        std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
-        EventHandlerPtr eventHandler_ = nullptr;
+        int32_t handlerId_ { 0 };
+        InputHandlerType handlerType_ { NONE };
+        HandleEventType eventType_ { HandleEventType::ALL };
+        std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
+        EventHandlerPtr eventHandler_ { nullptr };
     };
 
 private:

@@ -24,7 +24,7 @@ namespace MMI {
 class ProcessingPadDevice : public DeviceBase {
     struct PadEvent {
         std::string eventType;
-        int32_t keyValue;
+        int32_t keyValue { 0 };
         std::vector<int32_t> ringEvents;
     };
 public:
