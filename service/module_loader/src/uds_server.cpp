@@ -185,8 +185,7 @@ void UDSServer::AddPermission(SessionPtr sess)
 void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
-    MMI_HILOGI("uds_erver Dump in");
-    mprintf(fd, "--------------------[uds_server information]----------------------");
+    mprintf(fd, "--------------------[Uds_server Information]----------------------");
     mprintf(fd, "uds_server: count=%d", sessionsMap_.size());
     for (const auto &item : sessionsMap_) {
         std::shared_ptr<UDSSession> udsSession = item.second;

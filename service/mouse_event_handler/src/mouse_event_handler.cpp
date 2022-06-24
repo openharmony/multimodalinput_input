@@ -336,10 +336,10 @@ void MouseEventHandler::DumpInner()
 void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
-    MMI_HILOGI("Mouse Device State Dump in");
     PointerEvent::PointerItem item;
     pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);
-    mprintf(fd, "---------------------[Mouse Device State information]--------------------");
+    CHKPV(pointerEvent_);
+    mprintf(fd, "---------------------[Mouse Device State Information]--------------------");
     mprintf(fd,
             "PointerId:%d | SourceType:%s | PointerAction:%s | ButtonId:%d | AgentWindowId:%d | TargetWindowId:%d "
             "| DownTime:%" PRId64 " | IsPressed:%s | LocalX:%d | LocalY:%d | Width:%d | Height:%d | Pressure:%lf \t",

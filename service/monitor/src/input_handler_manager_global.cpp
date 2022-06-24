@@ -293,17 +293,18 @@ void InputHandlerManagerGlobal::Dump(int32_t fd, const std::vector<std::string> 
 void InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
-    MMI_HILOGI("Monitor Dump in");
-    mprintf(fd, "--------------------------[monitor information]-------------------------");
+    mprintf(fd, "--------------------------[Monitor Information]-------------------------");
     mprintf(fd, "monitors: count=%d", monitors_.size());
     for (const auto &item : monitors_) {
+        SessionPtr session = item.session_;
+        CHKPV(session);
         mprintf(fd,
                 "monitor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
                 "| HasPermission:%s | EarlistEventTime:%" PRId64 " | Descript:%s \t",
-                item.id_, item.handlerType_, item.session_->GetPid(),
-                item.session_->GetUid(), item.session_->GetFd(),
-                item.session_->HasPermission() ? "true" : "false",
-                item.session_->GetEarlistEventTime(), item.session_->GetDescript().c_str());
+                item.id_, item.handlerType_, session->GetPid(),
+                session->GetUid(), session->GetFd(),
+                session->HasPermission() ? "true" : "false",
+                session->GetEarlistEventTime(), session->GetDescript().c_str());
     }
 }
 } // namespace MMI

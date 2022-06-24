@@ -15,6 +15,8 @@
 
 #include "input_device_manager.h"
 
+ #include<unordered_map>
+
 #include "key_event_value_transformation.h"
 #include "util_ex.h"
 
@@ -36,7 +38,7 @@ constexpr int32_t ABS_MT_WIDTH_MINOR = 0x33;
 
 constexpr int32_t BUS_BLUETOOTH = 0X5;
 
-std::map<int32_t, std::string> axisType = {
+std::unordered_map<int32_t, std::string> axisType = {
     {ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR"},
     {ABS_MT_TOUCH_MINOR, "TOUCH_MINOR"},
     {ABS_MT_ORIENTATION, "ORIENTATION"},
@@ -332,9 +334,8 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
 void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
-    MMI_HILOGI("Device Dump in");
-    mprintf(fd, "--------------------------[device information]-------------------------");
-    mprintf(fd, "Input Devices: count=%d", inputDevice_.size());
+    mprintf(fd, "--------------------------[Device Information]-------------------------");
+    mprintf(fd, "Input devices: count=%d", inputDevice_.size());
     for (const auto &item : inputDevice_) {
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
         CHKPV(inputDevice);
@@ -349,7 +350,7 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
         for (const auto &axis : axisinfo) {
             auto iter = axisType.find(axis.GetAxisType());
             if (iter == axisType.end()) {
-                MMI_HILOGE("AxisType is not found !");
+                MMI_HILOGE("AxisType is not found");
                 return;
             }
             mprintf(fd,
@@ -363,8 +364,7 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
 void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
-    MMI_HILOGI("Device List Dump in");
-    mprintf(fd, "--------------------------[device List information]-------------------------");
+    mprintf(fd, "--------------------------[Device List Information]-------------------------");
     std::vector<int32_t> ids = GetInputDeviceIds();
     mprintf(fd, "Total device:%d, Device list:", ids.size());
     for (const auto &item : inputDevice_) {
