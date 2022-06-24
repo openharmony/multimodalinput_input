@@ -35,6 +35,8 @@ public:
 private:
     bool CheckHapPermission(uint32_t tokenId, uint32_t required);
     bool CheckNativePermission(uint32_t tokenId, uint32_t required);
+    bool CheckMonitorHap(uint32_t tokenId, const std::string &required);
+    bool CheckMonitorNative(uint32_t tokenId, const std::string &required);
 };
 #define PerHelper PermissionHelper::GetInstance()
 } // namespace MMI
