@@ -26,6 +26,7 @@
 #include "mouse_device_state.h"
 #include "timer_manager.h"
 #include "util.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -336,6 +337,22 @@ bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
 void MouseEventHandler::DumpInner()
 {
     PrintEventData(pointerEvent_);
+}
+
+void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_LOG_ENTER;
+    PointerEvent::PointerItem item;
+    pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);
+    CHKPV(pointerEvent_);
+    mprintf(fd, "---------------------[Mouse Device State Information]--------------------");
+    mprintf(fd,
+            "PointerId:%d | SourceType:%s | PointerAction:%s | ButtonId:%d | AgentWindowId:%d | TargetWindowId:%d "
+            "| DownTime:%" PRId64 " | IsPressed:%s | LocalX:%d | LocalY:%d | Width:%d | Height:%d | Pressure:%lf \t",
+            pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
+            pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(), pointerEvent_->GetTargetWindowId(),
+            item.GetDownTime(), item.IsPressed() ? "true" : "false", item.GetLocalX(),  item.GetLocalY(),
+            item.GetWidth(), item.GetHeight(), item.GetPressure());
 }
 } // namespace MMI
 } // namespace OHOS
