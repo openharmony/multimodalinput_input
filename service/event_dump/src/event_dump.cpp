@@ -80,7 +80,6 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         {"mouse", no_argument, 0, 'm'},
         {NULL, 0, 0, 0}
     };
-    MMI_HILOGI("ParseCommand in");
     char **argv = new char *[args.size()];
     for (size_t i = 0; i < args.size(); ++i) {
         argv[i] = new char[args[i].size() + 1];

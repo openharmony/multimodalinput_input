@@ -226,17 +226,18 @@ void InterceptorHandlerGlobal::Dump(int32_t fd, const std::vector<std::string> &
 void InterceptorHandlerGlobal::InterceptorCollection::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
-    MMI_HILOGI("Interceptor Dump in");
-    mprintf(fd, "--------------------------[interceptor information]-------------------------");
+    mprintf(fd, "--------------------------[Interceptor Information]-------------------------");
     mprintf(fd, "interceptors: count=%d", interceptors_.size());
     for (const auto &item : interceptors_) {
+        SessionPtr session = item.session_;
+        CHKPV(session);
         mprintf(fd,
                 "interceptor id:%d | handlerType:%d | eventType:%d | Pid:%d | Uid:%d | Fd:%d "
                 "| HasPermission:%s | EarlistEventTime:%" PRId64 " | Descript:%s \t",
                 item.id_, item.handlerType_, item.eventType_,
-                item.session_->GetPid(), item.session_->GetUid(),
-                item.session_->GetFd(), item.session_->HasPermission() ? "true" : "false",
-                item.session_->GetEarlistEventTime(), item.session_->GetDescript().c_str());
+                session->GetPid(), session->GetUid(),
+                session->GetFd(), session->HasPermission() ? "true" : "false",
+                session->GetEarlistEventTime(), session->GetDescript().c_str());
     }
 }
 } // namespace MMI

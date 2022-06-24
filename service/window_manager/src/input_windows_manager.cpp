@@ -543,8 +543,7 @@ MouseLocation InputWindowsManager::GetMouseInfo()
 void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
-    MMI_HILOGI("Windows Manager Dump in");
-    mprintf(fd, "------------------------[windowsInfo information]---------------------------");
+    mprintf(fd, "------------------------[WindowsInfo Information]---------------------------");
     mprintf(fd, "windowsInfos,num:%zu", displayGroupInfo_.windowsInfo.size());
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         mprintf(fd,
@@ -565,7 +564,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
                     pointer.x, pointer.y, pointer.width, pointer.height);
         }
     }
-    mprintf(fd, "------------------------[displaysInfo information]---------------------------");
+    mprintf(fd, "------------------------[DisplaysInfo Information]---------------------------");
     mprintf(fd, "displayInfos,num:%zu", displayGroupInfo_.displaysInfo.size());
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         mprintf(fd,
