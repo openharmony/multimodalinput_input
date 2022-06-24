@@ -43,18 +43,15 @@ bool PermissionHelper::CheckMonitor()
     CALL_LOG_ENTER;
     auto tokenId = IPCSkeleton::GetCallingTokenID();
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    static const std::string inputMonitor = "ohos.permission.INPUT_MONITORING";
     if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
-        static const std::string inputMonitor = "ohos.permission.INPUT_MONITORING";
-        int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, inputMonitor);
-        if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
-            MMI_HILOGE("check granted permisson failed ret:%{public}d", ret);
-            return false;
-        }
-        MMI_HILOGI("check granted permisson success");
-        return true;
+        return CheckMonitorHap(tokenId, inputMonitor);
+    } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
+        return CheckMonitorNative(tokenId, inputMonitor);
+    } else {
+        MMI_HILOGE("unsupported token type:%{public}d", tokenType);
+        return false;
     }
-    MMI_HILOGE("unsupported token type:%{public}d", tokenType);
-    return false;
 }
 
 bool PermissionHelper::CheckHapPermission(uint32_t tokenId, uint32_t required)
@@ -81,6 +78,28 @@ bool PermissionHelper::CheckNativePermission(uint32_t tokenId, uint32_t required
     }
     if (!((1 << findInfo.apl) & required)) {
         MMI_HILOGE("check native permisson failed");
+        return false;
+    }
+    MMI_HILOGI("check native permisson success");
+    return true;
+}
+
+bool PermissionHelper::CheckMonitorHap(uint32_t tokenId, const std::string &required)
+{
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, required);
+    if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
+        MMI_HILOGE("check hap permisson failed ret:%{public}d", ret);
+        return false;
+    }
+    MMI_HILOGI("check hap permisson success");
+    return true;
+}
+
+bool PermissionHelper::CheckMonitorNative(uint32_t tokenId, const std::string &required)
+{
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyNativeToken(tokenId, required);
+    if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
+        MMI_HILOGE("check native permisson failed ret:%{public}d", ret);
         return false;
     }
     MMI_HILOGI("check native permisson success");
