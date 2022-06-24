@@ -445,15 +445,17 @@ void KeyEventSubscriber::Dump(int32_t fd, const std::vector<std::string> &args)
     for (const auto &item : subscribers_) {
         std::shared_ptr<Subscriber> subscriber = item;
         CHKPV(subscriber);
+        SessionPtr session = item->sess_;
+        CHKPV(session);
+        std::shared_ptr<KeyOption> keyOption = item->keyOption_;
+        CHKPV(keyOption);
         mprintf(fd,
-                "Pid:%d | Uid:%d |subscriber id:%d | timer id:%d | Fd:%d "
+                "subscriber id:%d | timer id:%d | Pid:%d | Uid:%d | Fd:%d "
                 "| FinalKey:%d | finalKeyDownDuration:%d | IsFinalKeyDown:%s\t",
-                subscriber->sess_->GetPid(), subscriber->sess_->GetUid(),
-                subscriber->id_, subscriber->timerId_, subscriber->sess_->GetFd(),
-                subscriber->keyOption_->GetFinalKey(),
-                subscriber->keyOption_->GetFinalKeyDownDuration(),
-                subscriber->keyOption_->IsFinalKeyDown() ? "true" : "false");
-        std::set<int32_t> preKeys = subscriber->keyOption_->GetPreKeys();
+                subscriber->id_, subscriber->timerId_, session->GetPid(),
+                session->GetUid(), session->GetFd(), keyOption->GetFinalKey(),
+                keyOption->GetFinalKeyDownDuration(), keyOption->IsFinalKeyDown() ? "true" : "false");
+        std::set<int32_t> preKeys = keyOption->GetPreKeys();
         for (const auto &preKey : preKeys) {
             mprintf(fd, "preKeys:%d\t", preKey);
         }
