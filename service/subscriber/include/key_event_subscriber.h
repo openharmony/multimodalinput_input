@@ -42,7 +42,7 @@ public:
             const std::shared_ptr<KeyOption> keyOption);
     int32_t UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
     bool SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
-
+    void Dump(int32_t fd, const std::vector<std::string> &args);
 private:
     struct Subscriber {
         Subscriber(int32_t id, SessionPtr sess, std::shared_ptr<KeyOption> keyOption)
