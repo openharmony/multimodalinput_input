@@ -26,12 +26,12 @@ int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const DeviceItem& 
 {
     CALL_LOG_ENTER;
     if (originalEvent.events.empty()) {
-        MMI_HILOGE("manage game pad array faild, inputData is empty");
+        MMI_HILOGE("manage game pad array failed, inputData is empty");
         return RET_ERR;
     }
     std::vector<DeviceEvent> inputData = originalEvent.events;
     if (inputData.empty()) {
-        MMI_HILOGE("manage finger array faild, inputData is empty");
+        MMI_HILOGE("manage finger array failed, inputData is empty");
         return RET_ERR;
     }
     TransformPadEventToInputEvent(inputData, inputEventArray);
