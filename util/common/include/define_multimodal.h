@@ -217,6 +217,8 @@ namespace MMI {
         MMI_HILOGD("pid:%{public}d threadId:%{public}" PRIu64, GetPid(), GetThisThreadId()); \
     } while (0)
 
+#endif
+
 #define DEFRET_1(data, value, ...) (value)
 #define DEFRET(...) DEFRET_1(__VA_ARGS__, false)
 
@@ -299,8 +301,6 @@ namespace MMI {
             return DEFRET(false, ##__VA_ARGS__); \
         } \
     } while (0)
-
-#endif
 } // namespace MMI
 } // namespace OHOS
 #endif // DEFINE_MULTIMODAL_H

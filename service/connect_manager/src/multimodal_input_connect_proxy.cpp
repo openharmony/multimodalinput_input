@@ -289,10 +289,7 @@ int32_t MultimodalInputConnectProxy::SubscribeKeyEvent(int32_t subscribeId, cons
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    if (!data.WriteInt32(subscribeId)) {
-        MMI_HILOGE("Failed to write subscribeId");
-        return ERR_INVALID_VALUE;
-    }
+    WRITEINT32(data, subscribeId, ERR_INVALID_VALUE);
     if (!keyOption->WriteToParcel(data)) {
         MMI_HILOGE("Failed to write key option");
         return ERR_INVALID_VALUE;
@@ -318,10 +315,7 @@ int32_t MultimodalInputConnectProxy::UnsubscribeKeyEvent(int32_t subscribeId)
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    if (!data.WriteInt32(subscribeId)) {
-        MMI_HILOGE("Failed to write subscribeId");
-        return ERR_INVALID_VALUE;
-    }
+    WRITEINT32(data, subscribeId, ERR_INVALID_VALUE);
 
     MessageParcel reply;
     MessageOption option;

@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -13,13 +13,13 @@
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-config("libinputmonitor_config") {
+config("libkeyCode_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//foundation/multimodalinput/input/frameworks/napi/input_monitor/include",
+    "//foundation/multimodalinput/input/frameworks/napi/key_code/include",
     "//foundation/multimodalinput/input/util/common/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
+    "//foundation/multimodalinput/input/util/network/include",
   ]
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -32,29 +32,27 @@ config("libinputmonitor_config") {
   }
 }
 
-ohos_shared_library("inputmonitor") {
+ohos_shared_library("keycode") {
   sources = [
-    "src/js_input_monitor.cpp",
-    "src/js_input_monitor_manager.cpp",
-    "src/js_input_monitor_module.cpp",
-    "src/js_input_monitor_util.cpp",
+    "src/js_key_code.cpp",
+    "src/native_register_module.cpp",
   ]
 
-  configs = [ ":libinputmonitor_config" ]
+  configs = [ ":libkeyCode_config" ]
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/libuv:uv_static",
   ]
 
+  if (is_mmi_have_libinput || is_mmi_have_hdf) {
+    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
+  }
+
   external_deps = [
-    "drivers_interface_input:hdi_input",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
     "napi:ace_napi",
-    "utils_base:utils",
   ]
 
   relative_install_dir = "module/multimodalinput"

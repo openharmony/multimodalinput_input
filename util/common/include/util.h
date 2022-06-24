@@ -27,10 +27,10 @@
 namespace OHOS {
 namespace MMI {
 struct DeviceConfig {
-    int32_t autoSwitch = 1;
-    int32_t delayTime = 300;
-    int32_t intervalTime = 100;
-    int32_t keyboardType = 0;
+    int32_t autoSwitch { 1 };
+    int32_t delayTime { 300 };
+    int32_t intervalTime { 100 };
+    int32_t keyboardType { 0 };
 };
 const char *GetMmiErrorTypeDesc(int32_t errorCodeEnum);
 std::string UuIdGenerate();

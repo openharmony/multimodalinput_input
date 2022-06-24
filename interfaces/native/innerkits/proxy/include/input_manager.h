@@ -42,8 +42,7 @@ public:
 
     /**
      * @brief Updates the screen and window information.
-     * @param physicalDisplays Indicates the physical screen information.
-     * @param logicalDisplays Indicates the logical screen information, which includes the window information.
+     * @param displayGroupInfo Indicates the logical screen information.
      * @since 9
      */
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);

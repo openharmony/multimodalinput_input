@@ -23,7 +23,7 @@
 #include "event_dispatch.h"
 #include "event_package.h"
 #include "input_device.h"
-#include "key_autorepeat.h"
+#include "key_auto_repeat.h"
 #include "key_map_manager.h"
 #include "msg_handler.h"
 #include "nocopyable.h"

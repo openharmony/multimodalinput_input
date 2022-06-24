@@ -165,13 +165,13 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     CHKPR(sess, ERROR_NULL_POINTER);
     DisplayGroupInfo displayGroupInfo;
     pkt >> displayGroupInfo.width >> displayGroupInfo.height >> displayGroupInfo.focusWindowId;
-    int32_t num = 0;
+    uint32_t num = 0;
     pkt >> num;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read display info failed");
         return RET_ERR;
     }
-    for (int32_t i = 0; i < num; i++) {
+    for (uint32_t i = 0; i < num; i++) {
         WindowInfo info;
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
@@ -182,7 +182,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     }
     }
     pkt >> num;
-    for (int32_t i = 0; i < num; i++) {
+    for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
         pkt >> info.id >> info.x >> info.y >> info.width >> info.height
             >> info.name >> info.uniq >> info.direction;
@@ -516,37 +516,44 @@ int32_t ServerMsgHandler::OnRemoveInputEventTouchpadMontior(SessionPtr sess, Net
 int32_t ServerMsgHandler::OnBigPacketTest(SessionPtr sess, NetPacket& pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t pid = 0;
-    int32_t id = 0;
-    pkt >> pid >> id;
-    int32_t phyNum = 0;
-    pkt >> phyNum;
-    MMI_HILOGD("BigPacketsTest pid:%{public}d id:%{public}d phyNum:%{public}d size:%{public}zu",
-        pid, id, phyNum, pkt.Size());
-    for (auto i = 0; i < phyNum; i++) {
-        PhysicalDisplayInfo info = {};
-        pkt >> info.id >> info.leftDisplayId >> info.upDisplayId >> info.topLeftX >> info.topLeftY;
-        pkt >> info.width >> info.height >> info.name >> info.seatId >> info.seatName >> info.logicWidth;
-        pkt >> info.logicHeight >> info.direction;
-        MMI_HILOGD("\tPhysical: idx:%{public}d id:%{public}d seatId:%{public}s", i, info.id, info.seatId.c_str());
-    }
-    int32_t logcNum = 0;
-    pkt >> logcNum;
-    MMI_HILOGD("\tlogcNum:%{public}d", logcNum);
-    for (auto i = 0; i < logcNum; i++) {
-        LogicalDisplayInfo info = {};
-        pkt >> info.id >> info.topLeftX >> info.topLeftY;
-        pkt >> info.width >> info.height >> info.name >> info.seatId >> info.seatName >> info.focusWindowId;
-        MMI_HILOGD("\t\tLogical: idx:%{public}d id:%{public}d seatId:%{public}s", i, info.id, info.seatId.c_str());
-        int32_t winNum = 0;
-        pkt >> winNum;
-        MMI_HILOGD("\t\twinNum:%{public}d", winNum);
-        for (auto j = 0; j < winNum; j++) {
-            WindowInfo winInfo;
-            pkt >> winInfo;
-            MMI_HILOGD("\t\t\tWindows: idx:%{public}d id:%{public}d displayId:%{public}d",
-                j, winInfo.id, winInfo.displayId);
+    int32_t width = 0;
+    int32_t height = 0;
+    int32_t focusWindowId = 0;
+    pkt >> width >> height >> focusWindowId;
+    MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
+        width, height, focusWindowId);
+    uint32_t num = 0;
+    pkt >> num;
+    for (uint32_t i = 0; i < num; i++) {
+        WindowInfo info;
+        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
+            >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
+        MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
+            "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
+            "defaultHotAreas:size:%{public}zu,pointerHotAreas:size:%{public}zu,"
+            "agentWindowId:%{public}d,flags:%{public}d",
+            info.id, info.pid, info.uid, info.area.x, info.area.y, info.area.width,
+            info.area.height, info.defaultHotAreas.size(), info.pointerHotAreas.size(),
+            info.agentWindowId, info.flags);
+        for (const auto &win : info.defaultHotAreas) {
+            MMI_HILOGD("defaultHotAreas,x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+                win.x, win.y, win.width, win.height);
         }
+        for (const auto &pointer : info.pointerHotAreas) {
+            MMI_HILOGD("pointerHotAreas,x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
+                pointer.x, pointer.y, pointer.width, pointer.height);
+        }
+    }
+    pkt >> num;
+    for (uint32_t i = 0; i < num; i++) {
+        DisplayInfo info;
+        pkt >> info.id >> info.x >> info.y >> info.width >> info.height
+            >> info.name >> info.uniq >> info.direction;
+        MMI_HILOGD("displaysInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
+            "width:%{public}d,height:%{public}d,name:%{public}s,"
+            "uniq:%{public}s,direction:%{public}d",
+            info.id, info.x, info.y, info.width, info.height, info.name.c_str(),
+            info.uniq.c_str(), info.direction);
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read data failed");

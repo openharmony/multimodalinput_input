@@ -33,23 +33,23 @@ public:
     ~InputDeviceImpl() = default;
 
     struct AxisInfo {
-        int32_t axisType = 0;
-        int32_t min = 0;
-        int32_t max = 0;
-        int32_t fuzz = 0;
-        int32_t flat = 0;
-        int32_t resolution = 0;
+        int32_t axisType { 0 };
+        int32_t min { 0 };
+        int32_t max { 0 };
+        int32_t fuzz { 0 };
+        int32_t flat { 0 };
+        int32_t resolution { 0 };
     };
     struct InputDeviceInfo {
-        int32_t id = -1;
-        std::string name = "null";
-        uint32_t deviceType = 0;
-        int32_t busType = 0;
-        int32_t product = 0;
-        int32_t vendor = 0;
-        int32_t version = 0;
-        std::string phys = "null";
-        std::string uniq = "null";
+        int32_t id { -1 };
+        std::string name { "null" };
+        uint32_t deviceType { 0 };
+        int32_t busType { 0 };
+        int32_t product { 0 };
+        int32_t vendor { 0 };
+        int32_t version { 0 };
+        std::string phys { "null" };
+        std::string uniq { "null" };
         std::vector<AxisInfo> axis;
     };
 
@@ -69,8 +69,8 @@ public:
         DevIds ids;
         DevKeys keys;
         DevKeyboardTypes kbTypes;
-        CppFunInputDevInfo cppDev = nullptr;
-        CppFunInputDevIds cppIds = nullptr;
+        CppFunInputDevInfo cppDev { nullptr };
+        CppFunInputDevIds cppIds { nullptr };
     };
     using FunInputDevMonitor = std::function<void(std::string, int32_t)>;
     using DevMonitor = std::pair<EventHandlerPtr, FunInputDevMonitor>;

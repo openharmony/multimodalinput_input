@@ -253,6 +253,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 
     if (IsPointerDevice(inputDevice)) {
         NotifyPointerDevice(true);
+        OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "true");
     }
 }
 
@@ -286,6 +287,7 @@ void InputDeviceManager::ScanPointerDevice()
     }
     if (!hasPointerDevice) {
         NotifyPointerDevice(false);
+        OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "false");
     }
 }
 
