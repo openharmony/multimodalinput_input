@@ -49,13 +49,13 @@ public:
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     MouseLocation GetMouseInfo();
-    void UpdateAndAdjustMouseLoction(int32_t& displayId, double& x, double& y);
+    void UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y);
 #endif //OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void AdjustGlobalCoordinate(const DisplayInfo& displayInfo, int32_t& globalX, int32_t& globalY) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    bool UpdataDisplayId(int32_t& displayId);
+    bool UpdateDisplayId(int32_t& displayId);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
@@ -99,7 +99,7 @@ private:
         const std::shared_ptr<PointerEvent>& pointerEvent, WindowInfo*& touchWindow);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    void GetphysicalDisplayCoord(struct libinput_event_touch* touch,
+    void GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
         const DisplayInfo& info, EventTouch& touchInfo);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -112,7 +112,7 @@ private:
     int32_t firstBtnDownWindowId_ = -1;
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
-    MouseLocation mouseLoction_ = {-1, -1}; // physical coord
+    MouseLocation mouseLocation_ = {-1, -1}; // physical coord
 };
 
 #define WinMgr InputWindowsManager::GetInstance()

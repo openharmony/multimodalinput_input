@@ -682,7 +682,7 @@ void MMIService::OnSignalEvent(int32_t signalFd)
     signalfd_siginfo sigInfo;
     int32_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
     if (size != static_cast<int32_t>(sizeof(signalfd_siginfo))) {
-        MMI_HILOGE("read signal info faild, invalid size:%{public}d,errno:%{public}d", size, errno);
+        MMI_HILOGE("read signal info failed, invalid size:%{public}d,errno:%{public}d", size, errno);
         return;
     }
     int32_t signo = static_cast<int32_t>(sigInfo.ssi_signo);

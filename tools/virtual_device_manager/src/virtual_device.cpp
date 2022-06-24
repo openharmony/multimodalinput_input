@@ -569,7 +569,7 @@ bool VirtualDevice::AddDevice(const std::string& startDeviceName)
         return false;
     }
     if (!CreateHandle(startDeviceName)) {
-        printf("Device %s start faild", startDeviceName.c_str());
+        printf("Device %s start failed", startDeviceName.c_str());
         return false;
     }
     std::string symbolFile;
