@@ -48,7 +48,7 @@ class MMIService : public UDSServer, public SystemAbility, public MultimodalInpu
 public:
     virtual void OnStart() override;
     virtual void OnStop() override;
-    virtual void OnDump() override;
+    int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
