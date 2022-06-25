@@ -23,7 +23,7 @@
 #include "event_dispatch.h"
 #include "event_package.h"
 #include "input_device.h"
-#include "key_autorepeat.h"
+#include "key_auto_repeat.h"
 #include "key_map_manager.h"
 #include "msg_handler.h"
 #include "nocopyable.h"
@@ -51,6 +51,9 @@ public:
     void NotifyPointerDevice(bool hasPointerDevice);
     void AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback);
     void RemoveDevMonitor(SessionPtr sess);
+    void Dump(int32_t fd, const std::vector<std::string> &args);
+    void DumpDeviceList(int32_t fd, const std::vector<std::string> &args);
+    
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasPointerDevice();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING

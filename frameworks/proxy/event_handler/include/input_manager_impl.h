@@ -48,8 +48,7 @@ public:
     MMIEventHandlerPtr GetEventHandler() const;
     EventHandlerPtr GetCurrentEventHandler() const;
     
-    void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
-        const std::vector<LogicalDisplayInfo> &logicalDisplays);
+    void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     int32_t SubscribeKeyEvent(
 		std::shared_ptr<KeyOption> keyOption,
         std::function<void(std::shared_ptr<KeyEvent>)> callback
@@ -92,8 +91,8 @@ public:
     bool IsPointerVisible();
 
 private:
-    int32_t PackPhysicalDisplay(NetPacket &pkt);
-    int32_t PackLogicalDisplay(NetPacket &pkt);
+    int32_t PackWindowInfo(NetPacket &pkt);
+    int32_t PackDisplayInfo(NetPacket &pkt);
     void PrintDisplayInfo();
     void SendDisplayInfo();
 
@@ -111,8 +110,7 @@ private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
     std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
 
-    std::vector<PhysicalDisplayInfo> physicalDisplays_;
-    std::vector<LogicalDisplayInfo> logicalDisplays_;
+    DisplayGroupInfo displayGroupInfo_;
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     InputMonitorManager monitorManager_;
 #endif // OHOS_BUILD_ENABLE_MONITOR

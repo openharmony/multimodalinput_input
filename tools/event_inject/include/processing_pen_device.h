@@ -24,14 +24,14 @@ namespace MMI {
 class ProcessingPenDevice : public DeviceBase {
     struct PenEvent {
         std::string eventType;
-        int32_t xPos;
-        int32_t yPos;
-        int32_t tiltX;
-        int32_t tiltY;
-        int32_t pressure;
-        int32_t distance;
-        int32_t keyValue;
-        int32_t keyStatus;
+        int32_t xPos { 0 };
+        int32_t yPos { 0 };
+        int32_t tiltX { 0 };
+        int32_t tiltY { 0 };
+        int32_t pressure { 0 };
+        int32_t distance { 0 };
+        int32_t keyValue { 0 };
+        int32_t keyStatus { 0 };
     };
 public:
     ProcessingPenDevice() = default;

@@ -267,7 +267,6 @@ std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
 void PointerDrawingManager::DeletePidInfo(int32_t pid)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
             pidInfos_.erase(it);
@@ -279,7 +278,6 @@ void PointerDrawingManager::DeletePidInfo(int32_t pid)
 void PointerDrawingManager::UpdataPidInfo(int32_t pid, bool visible)
 {
     CALL_LOG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
             pidInfos_.erase(it);

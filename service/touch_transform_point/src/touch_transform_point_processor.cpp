@@ -39,6 +39,7 @@ TouchTransformPointProcessor::TouchTransformPointProcessor(int32_t deviceId) : d
 {
     pointerEvent_ = PointerEvent::Create();
     CHKPL(pointerEvent_);
+    InitToolTypes();
 }
 
 TouchTransformPointProcessor::~TouchTransformPointProcessor() {}
@@ -49,9 +50,11 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     CHKPF(event);
     auto data = libinput_event_get_touch_event(event);
     CHKPF(data);
+    auto device = libinput_event_get_device(event);
+    CHKPF(device);
     EventTouch touchInfo;
     int32_t logicalDisplayId = -1;
-    if (!WinMgr->TouchDownPointToDisplayPoint(data, touchInfo, logicalDisplayId)) {
+    if (!WinMgr->TouchPointToDisplayPoint(data, touchInfo, logicalDisplayId)) {
         MMI_HILOGE("TouchDownPointToDisplayPoint failed");
         return false;
     }
@@ -65,14 +68,14 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
 
     PointerEvent::PointerItem item;
-    auto pressure = libinput_event_touch_get_pressure(data);
-    auto seatSlot = libinput_event_touch_get_seat_slot(data);
-    auto longAxis = libinput_event_get_touch_contact_long_axis(data);
-    auto shortAxis = libinput_event_get_touch_contact_short_axis(data);
+    double pressure = libinput_event_touch_get_pressure(data);
+    int32_t seatSlot = libinput_event_touch_get_seat_slot(data);
+    int32_t longAxis = libinput_event_get_touch_contact_long_axis(data);
+    int32_t shortAxis = libinput_event_get_touch_contact_short_axis(data);
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
-    int32_t toolType = GetTouchToolType(event);
+    int32_t toolType = GetTouchToolType(data, device);
     item.SetToolType(toolType);
     item.SetPointerId(seatSlot);
     item.SetDownTime(time);
@@ -102,19 +105,19 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     EventTouch touchInfo;
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
-    if (!WinMgr->TouchMotionPointToDisplayPoint(data, logicalDisplayId, touchInfo)) {
+    if (!WinMgr->TouchPointToDisplayPoint(data, touchInfo, logicalDisplayId)) {
         MMI_HILOGE("Get TouchMotionPointToDisplayPoint failed");
         return false;
     }
     PointerEvent::PointerItem item;
-    auto seatSlot = libinput_event_touch_get_seat_slot(data);
+    int32_t seatSlot = libinput_event_touch_get_seat_slot(data);
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
         MMI_HILOGE("Get pointer parameter failed");
         return false;
     }
-    auto pressure = libinput_event_touch_get_pressure(data);
-    auto longAxis = libinput_event_get_touch_contact_long_axis(data);
-    auto shortAxis = libinput_event_get_touch_contact_short_axis(data);
+    double pressure = libinput_event_touch_get_pressure(data);
+    int32_t longAxis = libinput_event_get_touch_contact_long_axis(data);
+    int32_t shortAxis = libinput_event_get_touch_contact_short_axis(data);
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
@@ -141,7 +144,7 @@ bool TouchTransformPointProcessor::OnEventTouchUp(struct libinput_event *event)
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
 
     PointerEvent::PointerItem item;
-    auto seatSlot = libinput_event_touch_get_seat_slot(data);
+    int32_t seatSlot = libinput_event_touch_get_seat_slot(data);
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
         MMI_HILOGE("Get pointer parameter failed");
         return false;
@@ -190,16 +193,12 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
     return pointerEvent_;
 }
 
-int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_event *event)
+int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_event_touch *data,
+    struct libinput_device *device)
 {
-    CHKPR(event, PointerEvent::TOOL_TYPE_FINGER);
-    auto data = libinput_event_get_touch_event(event);
-    CHKPR(data, PointerEvent::TOOL_TYPE_FINGER);
-    auto toolTypeTmp = libinput_event_touch_get_tool_type(data);
-    switch (toolTypeTmp) {
+    int32_t toolType = libinput_event_touch_get_tool_type(data);
+    switch (toolType) {
         case MT_TOOL_NONE: {
-            auto device = libinput_event_get_device(event);
-            CHKPR(device, PointerEvent::TOOL_TYPE_FINGER);
             return GetTouchToolType(device);
         }
         case MT_TOOL_FINGER: {
@@ -209,7 +208,7 @@ int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_event *ev
             return PointerEvent::TOOL_TYPE_PEN;
         }
         default : {
-            MMI_HILOGW("Unknown tool type, identified as finger, toolType:%{public}d", toolTypeTmp);
+            MMI_HILOGW("Unknown tool type, identified as finger, toolType:%{public}d", toolType);
             return PointerEvent::TOOL_TYPE_FINGER;
         }
     }
@@ -217,27 +216,25 @@ int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_event *ev
 
 int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_device *device)
 {
-    CHKPR(device, PointerEvent::TOOL_TYPE_FINGER);
-    if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_PEN) == BTN_DOWN) {
-        return PointerEvent::TOOL_TYPE_PEN;
-    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_RUBBER) == BTN_DOWN) {
-        return PointerEvent::TOOL_TYPE_RUBBER;
-    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_BRUSH) == BTN_DOWN) {
-        return PointerEvent::TOOL_TYPE_BRUSH;
-    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_PENCIL) == BTN_DOWN) {
-        return PointerEvent::TOOL_TYPE_PENCIL;
-    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_AIRBRUSH) == BTN_DOWN) {
-        return PointerEvent::TOOL_TYPE_AIRBRUSH;
-    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_FINGER) == BTN_DOWN) {
-        return PointerEvent::TOOL_TYPE_FINGER;
-    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_MOUSE) == BTN_DOWN) {
-        return PointerEvent::TOOL_TYPE_MOUSE;
-    } else if (libinput_device_touch_btn_tool_type_down(device, BTN_TOOL_LENS) == BTN_DOWN) {
-        return PointerEvent::TOOL_TYPE_LENS;
-    } else {
-        MMI_HILOGW("Unknown Btn tool type, identified as finger");
-        return PointerEvent::TOOL_TYPE_FINGER;
+    for (const auto &item : vecToolType_) {
+        if (libinput_device_touch_btn_tool_type_down(device, item.first) == BTN_DOWN) {
+            return item.second;
+        }
     }
+    MMI_HILOGW("Unknown Btn tool type, identified as finger");
+    return PointerEvent::TOOL_TYPE_FINGER;
+}
+
+void TouchTransformPointProcessor::InitToolTypes()
+{
+    vecToolType_.emplace_back(std::make_pair(BTN_TOOL_PEN, PointerEvent::TOOL_TYPE_PEN));
+    vecToolType_.emplace_back(std::make_pair(BTN_TOOL_RUBBER, PointerEvent::TOOL_TYPE_RUBBER));
+    vecToolType_.emplace_back(std::make_pair(BTN_TOOL_BRUSH, PointerEvent::TOOL_TYPE_BRUSH));
+    vecToolType_.emplace_back(std::make_pair(BTN_TOOL_PENCIL, PointerEvent::TOOL_TYPE_PENCIL));
+    vecToolType_.emplace_back(std::make_pair(BTN_TOOL_AIRBRUSH, PointerEvent::TOOL_TYPE_AIRBRUSH));
+    vecToolType_.emplace_back(std::make_pair(BTN_TOOL_FINGER, PointerEvent::TOOL_TYPE_FINGER));
+    vecToolType_.emplace_back(std::make_pair(BTN_TOOL_MOUSE, PointerEvent::TOOL_TYPE_MOUSE));
+    vecToolType_.emplace_back(std::make_pair(BTN_TOOL_LENS, PointerEvent::TOOL_TYPE_LENS));
 }
 } // namespace MMI
 } // namespace OHOS

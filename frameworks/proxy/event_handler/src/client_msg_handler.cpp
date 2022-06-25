@@ -116,13 +116,8 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read fd failed");
         return PACKET_READ_FAIL;
     }
-    MMI_HILOGD("key event dispatcher of client, KeyCode:%{public}d,"
-               "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
-               "EventType:%{public}d,Flag:%{public}u,"
-               "KeyAction:%{public}d,eventNumber:%{public}d,Fd:%{public}d,",
-               key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
-               key->GetActionStartTime(), key->GetEventType(),
-               key->GetFlag(), key->GetKeyAction(), key->GetId(), fd);
+    MMI_HILOGD("key event dispatcher of client, Fd:%{public}d", fd);
+    PrintEventData(key);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(eventProcessedCallback_);
     InputMgrImpl->OnKeyEvent(key);
@@ -142,12 +137,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         return RET_ERR;
     }
     MMI_HILOGD("Pointer event dispatcher of client:");
-    std::stringstream sStream;
-    sStream << *pointerEvent;
-    std::string sLine;
-    while (std::getline(sStream, sLine)) {
-        MMI_HILOGD("%{public}s", sLine.c_str());
-    }
+    PrintEventData(pointerEvent);
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOGD("Operation canceled.");
     }
@@ -302,7 +292,8 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
         MMI_HILOGE("Failed to deserialize key event.");
         return RET_ERR;
     }
-    InputHandlerManager::GetInstance().OnInputEvent(handlerId, keyEvent);
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
+    InputHandlerMgr.OnInputEvent(handlerId, keyEvent);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -326,13 +317,13 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
         return RET_ERR;
     }
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
-    InputHandlerManager::GetInstance().OnInputEvent(handlerId, pointerEvent);
+    InputHandlerMgr.OnInputEvent(handlerId, pointerEvent);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
-    int32_t ret = MultimodalInputConnectManager::GetInstance()->MarkEventProcessed(eventId);
+    int32_t ret = MultimodalInputConnMgr->MarkEventProcessed(eventId);
     if (ret != 0) {
         MMI_HILOGE("send to server fail, ret:%{public}d", ret);
         return;

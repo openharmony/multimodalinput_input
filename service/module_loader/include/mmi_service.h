@@ -48,13 +48,23 @@ class MMIService : public UDSServer, public SystemAbility, public MultimodalInpu
 public:
     virtual void OnStart() override;
     virtual void OnStop() override;
-    virtual void OnDump() override;
+    int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
     virtual int32_t SetPointerVisible(bool visible) override;
     virtual int32_t IsPointerVisible(bool &visible) override;
     virtual int32_t MarkEventProcessed(int32_t eventId) override;
+    virtual int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
+        HandleEventType eventType) override;
+    virtual int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType) override;
+    virtual int32_t MarkEventConsumed(int32_t monitorId, int32_t eventId) override;
+    virtual int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
+    virtual int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
+    virtual int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
+    virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
+    virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
+
 #ifdef OHOS_RSS_CLIENT
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 #endif
@@ -63,9 +73,16 @@ protected:
     virtual void OnConnected(SessionPtr s) override;
     virtual void OnDisconnected(SessionPtr s) override;
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd) override;
+    int32_t DelEpoll(EpollEventType type, int32_t fd);
     virtual bool IsRunning() const override;
     int32_t CheckPointerVisible(bool &visible);
-
+    int32_t CheckEventProcessed(int32_t pid, int32_t eventId);
+    int32_t CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType,
+        HandleEventType eventType);
+    int32_t CheckRemoveInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType);
+    int32_t CheckMarkConsumed(int32_t pid, int32_t monitorId, int32_t eventId);
+    int32_t CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
     bool InitLibinputService();
     bool InitService();
     bool InitSignalHandler();
@@ -75,6 +92,8 @@ protected:
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
     void OnDelegateTask(epoll_event& ev);
+
+    void AddReloadLibinputTimer();
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;

@@ -31,7 +31,7 @@ public:
     InputInterceptorManager();
     DISALLOW_COPY_AND_MOVE(InputInterceptorManager);
     ~InputInterceptorManager() = default;
-    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
+    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor, HandleEventType eventType);
     void RemoveInterceptor(int32_t interceptorId);
 };
 } // namespace MMI

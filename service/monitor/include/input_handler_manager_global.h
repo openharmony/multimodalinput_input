@@ -43,7 +43,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
+        HandleEventType eventType, SessionPtr session);
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -51,7 +52,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH    
+    void Dump(int32_t fd, const std::vector<std::string> &args);
 
 private:
     void InitSessionLostCallback();
@@ -99,6 +101,7 @@ private:
         void Monitor(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         void OnSessionLost(SessionPtr session);
+        void Dump(int32_t fd, const std::vector<std::string> &args);
 
         std::set<SessionHandler> monitors_;
         std::shared_ptr<PointerEvent> lastPointerEvent_ = nullptr;

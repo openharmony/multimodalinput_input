@@ -24,6 +24,7 @@
 #include "input_handler_type.h"
 #include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
+#include "multimodal_input_connect_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -32,7 +33,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 } // namespace
 
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
-    std::shared_ptr<IInputEventConsumer> consumer)
+    std::shared_ptr<IInputEventConsumer> consumer, HandleEventType eventType)
 {
     CHKPR(consumer, INVALID_HANDLER_ID);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
@@ -46,9 +47,9 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
         return INVALID_HANDLER_ID;
     }
     MMI_HILOGD("Register new handler:%{public}d", handlerId);
-    if (RET_OK == AddLocal(handlerId, handlerType, consumer)) {
+    if (RET_OK == AddLocal(handlerId, handlerType, eventType, consumer)) {
         MMI_HILOGD("New handler successfully registered, report to server");
-        AddToServer(handlerId, handlerType);
+        AddToServer(handlerId, handlerType, eventType);
     } else {
         handlerId = INVALID_HANDLER_ID;
     }
@@ -68,30 +69,23 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
 void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
     MMI_HILOGD("Mark consumed state, monitor:%{public}d,event:%{public}d", monitorId, eventId);
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    NetPacket pkt(MmiMessageId::MARK_CONSUMED);
-    pkt << monitorId << eventId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write monitor data failed");
-        return;
-    }
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
+    int32_t ret = MultimodalInputConnMgr->MarkEventConsumed(monitorId, eventId);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
     }
 }
 
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType,
-    std::shared_ptr<IInputEventConsumer> monitor)
+    HandleEventType eventType, std::shared_ptr<IInputEventConsumer> monitor)
 {
     auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
     CHKPR(eventHandler, RET_ERR);
     InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
         .handlerType_ = handlerType,
+        .eventType_ = eventType,
         .consumer_ = monitor,
-        .eventHandler_ = eventHandler
+        .eventHandler_ = eventHandler,
     };
     auto ret = inputHandlers_.emplace(handler.handlerId_, handler);
     if (!ret.second) {
@@ -101,19 +95,12 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
     return RET_OK;
 }
 
-void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handlerType)
+void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handlerType,
+    HandleEventType eventType)
 {
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    NetPacket pkt(MmiMessageId::ADD_INPUT_HANDLER);
-    pkt << handlerId << handlerType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write add handlerType failed");
-        return;
-    }
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
+    int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerId, handlerType, eventType);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
     }
 }
 
@@ -136,17 +123,9 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
 void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType handlerType)
 {
     MMI_HILOGD("Remove handler:%{public}d from server", handlerId);
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    NetPacket pkt(MmiMessageId::REMOVE_INPUT_HANDLER);
-    pkt << handlerId << handlerType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write remove handlerType failed");
-        return;
-    }
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
+    int32_t ret = MultimodalInputConnMgr->RemoveInputHandler(handlerId, handlerType);
+    if (ret != 0) {
+        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
     }
 }
 
@@ -200,6 +179,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
     CHK_PIDANDTID();
     CHKPV(keyEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_INTERCEPT_EVENT);
     auto consumer = FindHandler(handlerId);
     CHKPV(consumer);
     if (!PostTask(handlerId,
@@ -236,13 +216,14 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
     MMI_HILOGD("pointer event id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 void InputHandlerManager::OnConnected()
 {
     CALL_LOG_ENTER;
     for (auto &inputHandler : inputHandlers_) {
-        AddToServer(inputHandler.second.handlerId_, inputHandler.second.handlerType_);
+        AddToServer(inputHandler.second.handlerId_, inputHandler.second.handlerType_, inputHandler.second.eventType_);
     }
 }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 } // namespace MMI
 } // namespace OHOS

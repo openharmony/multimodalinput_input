@@ -17,7 +17,7 @@
 
 #include <cinttypes>
 #include <csignal>
-
+#include <parameters.h>
 #include <sys/signalfd.h>
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
@@ -28,6 +28,8 @@
 #include "i_pointer_drawing_manager.h"
 #include "key_map_manager.h"
 #include "mmi_log.h"
+#include "string_ex.h"
+#include "util_ex.h"
 #include "multimodal_input_connect_def_parcel.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
@@ -48,8 +50,8 @@ const bool REGISTER_RESULT =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
 
 struct mmi_epoll_event {
-    int32_t fd;
-    EpollEventType event_type;
+    int32_t fd { 0 };
+    EpollEventType event_type { EPOLL_EVENT_BEGIN };
 };
 
 template<class ...Ts>
@@ -137,6 +139,29 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
         free(eventData);
         eventData = nullptr;
         ev.data.ptr = nullptr;
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::DelEpoll(EpollEventType type, int32_t fd)
+{
+    if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
+        MMI_HILOGE("Invalid param type");
+        return RET_ERR;
+    }
+    if (fd < 0) {
+        MMI_HILOGE("Invalid param fd_");
+        return RET_ERR;
+    }
+    if (mmiFd_ < 0) {
+        MMI_HILOGE("Invalid param mmiFd_");
+        return RET_ERR;
+    }
+    struct epoll_event ev = {};
+    auto ret = EpollCtl(fd, EPOLL_CTL_DEL, ev, mmiFd_);
+    if (ret < 0) {
+        MMI_HILOGE("DelEpoll failed");
         return ret;
     }
     return RET_OK;
@@ -248,6 +273,7 @@ int32_t MMIService::Init()
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1,
         std::placeholders::_2));
     KeyMapMgr->GetConfigKeyValue("default_keymap", KeyMapMgr->GetDefaultKeyId());
+    OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "false");
     return RET_OK;
 }
 
@@ -263,6 +289,7 @@ void MMIService::OnStart()
     }
     state_ = ServiceRunningState::STATE_RUNNING;
     MMI_HILOGD("Started successfully");
+    AddReloadLibinputTimer();
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
 #ifdef OHOS_RSS_CLIENT
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
@@ -280,12 +307,6 @@ void MMIService::OnStop()
 #ifdef OHOS_RSS_CLIENT
     RemoveSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
 #endif
-}
-
-void MMIService::OnDump()
-{
-    CHK_PIDANDTID();
-    MMIEventDump->Dump();
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
@@ -329,6 +350,7 @@ void MMIService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
     MMI_HILOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), s->GetFd());
+    IPointerDrawingManager::GetInstance()->DeletePointerVisible(s->GetPid());
 }
 
 int32_t MMIService::SetPointerVisible(bool visible)
@@ -366,16 +388,131 @@ int32_t MMIService::IsPointerVisible(bool &visible)
     return RET_OK;
 }
 
+int32_t MMIService::CheckEventProcessed(int32_t pid, int32_t eventId)
+{
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    return sMsgHandler_.MarkEventProcessed(sess, eventId);
+}
+
 int32_t MMIService::MarkEventProcessed(int32_t eventId)
 {
     CALL_LOG_ENTER;
-    auto sess = GetSessionByPid(GetCallingPid());
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&ServerMsgHandler::MarkEventProcessed, &sMsgHandler_, sess, eventId));
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckEventProcessed, this, pid, eventId));
     if (ret != RET_OK) {
         MMI_HILOGE("mark event processed failed, ret:%{public}d", ret);
         return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType,
+    HandleEventType eventType)
+{
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnAddInputHandler(sess, handlerId, handlerType, eventType);
+}
+
+int32_t MMIService::AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
+    HandleEventType eventType)
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&MMIService::CheckAddInput, this, pid, handlerId, handlerType, eventType));
+    if (ret != RET_OK) {
+        MMI_HILOGE("add input handler failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::CheckRemoveInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType)
+{
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnRemoveInputHandler(sess, handlerId, handlerType);
+}
+
+int32_t MMIService::RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType)
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&MMIService::CheckRemoveInput, this, pid, handlerId, handlerType));
+    if (ret != RET_OK) {
+        MMI_HILOGE("remove input handler failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::CheckMarkConsumed(int32_t pid, int32_t monitorId, int32_t eventId)
+{
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnMarkConsumed(sess, monitorId, eventId);
+}
+
+int32_t MMIService::MarkEventConsumed(int32_t monitorId, int32_t eventId)
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&MMIService::CheckMarkConsumed, this, pid, monitorId, eventId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("mark event consumed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::OnMoveMouse, &sMsgHandler_, offsetX, offsetY));
+    if (ret != RET_OK) {
+        MMI_HILOGE("movemouse event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent));
+    if (ret != RET_OK) {
+        MMI_HILOGE("inject key event failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnInjectKeyEvent(keyEvent);
+}
+
+int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    return sMsgHandler_.OnInjectPointerEvent(pointerEvent);
+}
+
+int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_LOG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
+    if (ret != RET_OK) {
+    MMI_HILOGE("inject pointer event failed, ret:%{public}d", ret);
+    return RET_ERR;
     }
     return RET_OK;
 }
@@ -395,6 +532,32 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& 
     }
 }
 #endif
+
+int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::OnSubscribeKeyEvent, &sMsgHandler_, this, pid, subscribeId, option));
+    if (ret != RET_OK) {
+        MMI_HILOGE("subscribe key event event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
+{
+    CALL_LOG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::OnUnsubscribeKeyEvent, &sMsgHandler_, this, pid, subscribeId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("unsubscribe key event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 
 void MMIService::OnDelegateTask(epoll_event& ev)
 {
@@ -509,6 +672,49 @@ void MMIService::OnSignalEvent(int32_t signalFd)
             break;
         }
     }
+}
+
+void MMIService::AddReloadLibinputTimer()
+{
+    CALL_LOG_ENTER;
+    TimerMgr->AddTimer(2000, 2, [this]() {
+        auto inputFd = libinputAdapter_.GetInputFd();
+        if (inputFd >= 0) {
+            auto ret = DelEpoll(EPOLL_EVENT_INPUT, inputFd);
+            if (ret <  0) {
+                MMI_HILOGE("del epoll fail, ret: %{public}d", ret);
+            }
+            libinputAdapter_.Stop();
+            MMI_HILOGI("libinput stop successful");
+        }
+
+        if (!InitLibinputService()) {
+            MMI_HILOGE("libinput init failed");
+            return;
+        }
+    });
+}
+
+int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
+{
+    CALL_LOG_ENTER;
+    if (fd < 0) {
+        MMI_HILOGE("fd is invalid");
+        return DUMP_PARAM_ERR;
+    }
+    if (args.empty()) {
+        MMI_HILOGE("args cannot be empty");
+        mprintf(fd, "args cannot be empty\n");
+        MMIEventDump->DumpHelp(fd);
+        return DUMP_PARAM_ERR;
+    }
+    std::vector<std::string> argList = { "" };
+    std::transform(args.begin(), args.end(), std::back_inserter(argList),
+        [](const std::u16string &arg) {
+        return Str16ToStr8(arg);
+    });
+    MMIEventDump->ParseCommand(fd, argList);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

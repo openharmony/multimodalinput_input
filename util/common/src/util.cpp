@@ -52,15 +52,14 @@ constexpr int32_t MIN_INTERVALTIME = 50;
 constexpr int32_t MAX_INTERVALTIME = 500;
 constexpr int32_t MIN_DELAYTIME = 200;
 constexpr int32_t MAX_DELAYTIME = 1000;
-constexpr int32_t CONFIG_ITEM_FIRST = 1;
-constexpr int32_t CONFIG_ITEM_SECOND = 2;
-constexpr int32_t CONFIG_ITEM_THIRDLY = 3;
 constexpr int32_t COMMENT_SUBSCRIPT = 0;
+const std::string CONFIG_ITEM_REPEAT = "Key.autorepeat";
+const std::string CONFIG_ITEM_DELAY = "Key.autorepeat.delaytime";
+const std::string CONFIG_ITEM_INTERVAL = "Key.autorepeat.intervaltime";
+const std::string CONFIG_ITEM_TYPE = "Key.keyboard.type";
 const std::string DATA_PATH = "/data";
-const std::string PROC_PATH = "/proc";
 const std::string INPUT_PATH = "/system/etc/multimodalinput/";
-const std::string PRO_PATH = "/vendor/etc/keymap/";
-const std::string TOML_PATH = "/vendor/etc/keymap/";
+const std::string KEY_PATH = "/vendor/etc/keymap/";
 constexpr size_t BUF_TID_SIZE = 10;
 constexpr size_t BUF_CMD_SIZE = 512;
 constexpr size_t PROGRAM_NAME_SIZE = 256;
@@ -503,19 +502,14 @@ static bool IsValidJsonPath(const std::string &filePath)
         IsValidPath(INPUT_PATH, filePath);
 }
 
-static bool IsValidUinputPath(const std::string &filePath)
-{
-    return IsValidPath(PROC_PATH, filePath);
-}
-
 static bool IsValidProPath(const std::string &filePath)
 {
-    return IsValidPath(PRO_PATH, filePath);
+    return IsValidPath(KEY_PATH, filePath);
 }
 
 static bool IsValidTomlPath(const std::string &filePath)
 {
-    return IsValidPath(TOML_PATH, filePath);
+    return IsValidPath(KEY_PATH, filePath);
 }
 
 void ReadProFile(const std::string &filePath, int32_t deviceId,
@@ -568,6 +562,7 @@ void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
         size_t pos = strLine.find('#');
         if (pos != strLine.npos && pos != COMMENT_SUBSCRIPT) {
             MMI_HILOGE("The comment line format is error");
+            reader.close();
             return;
         }
         if (!strLine.empty() && strLine.front() != '#') {
@@ -628,33 +623,6 @@ std::string ReadJsonFile(const std::string &filePath)
     return ReadFile(filePath);
 }
 
-std::string ReadUinputToolFile(const std::string &filePath)
-{
-    if (filePath.empty()) {
-        MMI_HILOGE("filePath is empty");
-        return "";
-    }
-    char realPath[PATH_MAX] = {};
-    if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("path is error");
-        return "";
-    }
-    if (!IsValidUinputPath(realPath)) {
-        MMI_HILOGE("file path is error");
-        return "";
-    }
-    if (!IsFileExists(realPath)) {
-        MMI_HILOGE("file not exist");
-        return "";
-    }
-    int32_t fileSize = GetFileSize(realPath);
-    if ((fileSize < 0) || (fileSize > FILE_SIZE_MAX)) {
-        MMI_HILOGE("file size out of read range");
-        return "";
-    }
-    return ReadFile(filePath);
-}
-
 int32_t ReadTomlFile(const std::string &filePath, DeviceConfig& devConf)
 {
     if (filePath.empty()) {
@@ -693,42 +661,63 @@ int32_t ReadConfigFile(const std::string &realPath, DeviceConfig& devConf)
         MMI_HILOGE("Failed to open config file");
         return FILE_OPEN_FAIL;
     }
-
     std::string tmp;
-    size_t flag = 1;
     while (std::getline(cfgFile, tmp)) {
+        RemoveSpace(tmp);
         size_t pos = tmp.find('#');
         if (pos != tmp.npos && pos != COMMENT_SUBSCRIPT) {
             MMI_HILOGE("File format is error");
+            cfgFile.close();
             return RET_ERR;
         }
         if (tmp.empty() || tmp.front() == '#') {
             continue;
         }
         pos = tmp.find('=');
-        if (pos == tmp.back() || pos == tmp.npos) {
+        if (pos == (tmp.size() - 1) || pos == tmp.npos) {
             MMI_HILOGE("Find config item error");
+            cfgFile.close();
             return RET_ERR;
         }
-        if (flag == CONFIG_ITEM_FIRST) {
-            devConf.autoSwitch = stoi(tmp.substr(pos+1, tmp.npos));
-        } else if (flag == CONFIG_ITEM_SECOND) {
-            devConf.delayTime = stoi(tmp.substr(pos+1, tmp.npos));
-            if (devConf.delayTime < MIN_DELAYTIME || devConf.delayTime > MAX_DELAYTIME) {
-                MMI_HILOGE("Unusual the delaytime");
-                return RET_ERR;
-            }
-        } else if (flag == CONFIG_ITEM_THIRDLY) {
-            devConf.intervalTime = stoi(tmp.substr(pos+1, tmp.npos));
-            if (devConf.intervalTime < MIN_INTERVALTIME || devConf.intervalTime > MAX_INTERVALTIME) {
-                MMI_HILOGE("Unusual the intervaltime");
-                return RET_ERR;
-            }
-        } else {
-            devConf.keyboardType = stoi(tmp.substr(pos+1, tmp.npos));
+        std::string configItem = tmp.substr(0, pos);
+        std::string value = tmp.substr(pos + 1);
+        if (ConfigItemSwitch(configItem, value, devConf) == RET_ERR) {
+            MMI_HILOGE("Configuration item error");
+            cfgFile.close();
+            return RET_ERR;
         }
-        ++flag;
-        MMI_HILOGD("Read device config file succeeded");
+    }
+    cfgFile.close();
+    return RET_OK;
+}
+
+int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value, DeviceConfig& devConf)
+{
+    CALL_LOG_ENTER;
+    if (configItem.empty() || value.empty()) {
+        MMI_HILOGE("Get key config item is invalid");
+        return RET_ERR;
+    }
+    if (!IsNum(value)) {
+        MMI_HILOGE("Get key config item is invalid");
+        return RET_ERR;
+    }
+    if (configItem == CONFIG_ITEM_REPEAT) {
+        devConf.autoSwitch = stoi(value);
+    } else if (configItem == CONFIG_ITEM_DELAY) {
+        devConf.delayTime = stoi(value);
+        if (devConf.delayTime < MIN_DELAYTIME || devConf.delayTime > MAX_DELAYTIME) {
+            MMI_HILOGE("Unusual the delaytime");
+            return RET_ERR;
+        }
+    } else if (configItem == CONFIG_ITEM_INTERVAL) {
+        devConf.intervalTime = stoi(value);
+        if (devConf.intervalTime < MIN_INTERVALTIME || devConf.intervalTime > MAX_INTERVALTIME) {
+            MMI_HILOGE("Unusual the intervaltime");
+            return RET_ERR;
+        }
+    } else if (configItem == CONFIG_ITEM_TYPE) {
+        devConf.keyboardType = stoi(value);
     }
     return RET_OK;
 }

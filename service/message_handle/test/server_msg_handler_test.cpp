@@ -38,13 +38,12 @@ public:
     {
         return OnHdiInject(sess, pkt);
     }
-#endif
+#endif // OHOS_BUILD_HDF
 
-    int32_t OnInjectKeyEventTest(SessionPtr sess, NetPacket pkt)
+    int32_t OnInjectKeyEventTest(SessionPtr sess, std::shared_ptr<KeyEvent> keyEvent)
     {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-        int32_t retResult = OnInjectKeyEvent(sess, pkt);
-        return retResult;
+        return OnInjectKeyEvent(keyEvent);
 #else
         return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

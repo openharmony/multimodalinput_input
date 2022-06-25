@@ -32,9 +32,9 @@ public:
     MouseEventHandler();
     ~MouseEventHandler() = default;
     DISALLOW_COPY_AND_MOVE(MouseEventHandler);
-
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
     int32_t Normalize(struct libinput_event *event);
+    void Dump(int32_t fd, const std::vector<std::string> &args);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -57,8 +57,9 @@ private:
     int32_t timerId_ = -1;
     double absolutionX_ = -1;
     double absolutionY_ = -1;
-    int32_t buttionId_ = -1;
+    int32_t buttonId_ = -1;
     bool isPressed_ = false;
+    int32_t currentDisplayId_ = -1;
 };
 
 #define MouseEventHdr MouseEventHandler::GetInstance()

@@ -42,7 +42,7 @@ struct JsonParser {
     {
         return json_;
     }
-    cJSON *json_ = nullptr;
+    cJSON *json_ { nullptr };
 };
 
 bool GetPreKeys(cJSON* jsonData, ShortcutKey &shortcutKey)

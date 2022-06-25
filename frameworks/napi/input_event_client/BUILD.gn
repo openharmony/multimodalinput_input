@@ -52,8 +52,8 @@ ohos_shared_library("inputeventclient") {
   }
 
   external_deps = [
+    "drivers_interface_input:hdi_input",
     "hiviewdfx_hilog_native:libhilog",
-    "input_device_driver:hdi_input",
     "ipc:ipc_core",
     "napi:ace_napi",
     "utils_base:utils",
