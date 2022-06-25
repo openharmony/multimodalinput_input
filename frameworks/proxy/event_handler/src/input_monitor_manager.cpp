@@ -27,17 +27,17 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 int32_t InputMonitorManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor)
 {
     CHKPR(monitor, INVALID_HANDLER_ID);
-    return InputHandlerManager::GetInstance().AddHandler(InputHandlerType::MONITOR, monitor);
+    return InputHandlerMgr.AddHandler(InputHandlerType::MONITOR, monitor);
 }
 
 void InputMonitorManager::RemoveMonitor(int32_t monitorId)
 {
-    InputHandlerManager::GetInstance().RemoveHandler(monitorId, InputHandlerType::MONITOR);
+    InputHandlerMgr.RemoveHandler(monitorId, InputHandlerType::MONITOR);
 }
 
 void InputMonitorManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
-    InputHandlerManager::GetInstance().MarkConsumed(monitorId, eventId);
+    InputHandlerMgr.MarkConsumed(monitorId, eventId);
 }
 } // namespace MMI
 } // namespace OHOS

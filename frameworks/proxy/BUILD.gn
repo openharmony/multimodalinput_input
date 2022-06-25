@@ -30,7 +30,7 @@ config("libmmi_client_config") {
 
 config("libmmi_public_client_config") {
   include_dirs = [
-    "//foundation/bundlemanager/bundle_framework/interfaces/innerkits/libeventhandler/include",
+    "//base/notification/eventhandler/interfaces/inner_api",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
@@ -43,6 +43,7 @@ ohos_source_set("libmmi-common") {
   sources = [
     "events/src/input_event.cpp",
     "events/src/key_event.cpp",
+    "events/src/key_option.cpp",
     "events/src/pointer_event.cpp",
   ]
 
@@ -73,7 +74,6 @@ ohos_shared_library("libmmi-client") {
     "event_handler/src/standardized_event_manager.cpp",
     "events/src/axis_event.cpp",
     "events/src/input_manager.cpp",
-    "events/src/key_option.cpp",
     "module_loader/src/mmi_client.cpp",
     "module_loader/src/mmi_event_handler.cpp",
     "module_loader/src/mmi_fd_listener.cpp",
@@ -135,10 +135,10 @@ ohos_shared_library("libmmi-client") {
 
   part_name = "input"
   external_deps = [
+    "drivers_interface_input:hdi_input",
     "eventhandler:libeventhandler",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
-    "input_device_driver:hdi_input",
     "ipc:ipc_core",
     "utils_base:utils",
   ]
@@ -264,27 +264,22 @@ ohos_unittest("KeyEventTest") {
 ohos_unittest("InputManagerTest") {
   module_out_path = module_output_path
   include_dirs = [
-    "//utils/native/base/include",
-    "//third_party/googletest/googletest/include",
-    "//utils/native/base/include",
-    "${mmi_path}/frameworks/proxy/event_handler",
+    "${mmi_path}/frameworks/proxy/events/test",
     "${mmi_path}/frameworks/proxy/event_handler/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/util/common",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/util/network",
-    "${mmi_path}/util/network/include",
-    "${mmi_path}/util/socket",
-    "${mmi_path}/util/socket/include",
-    "${mmi_path}/frameworks/proxy/event_handle",
-    "${mmi_path}/frameworks/proxy/event_handle/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
     "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/network/include",
+    "${mmi_path}/util/socket/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//foundation/windowmanager/wm/include",
+    "//third_party/googletest/googletest/include",
   ]
 
   if (is_mmi_have_libinput) {
@@ -295,6 +290,10 @@ ohos_unittest("InputManagerTest") {
 
   if (is_mmi_have_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  }
+
+  if (mmi_enable_pointer_drawing) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
 
   if (is_mmi_have_libinput) {
@@ -317,11 +316,17 @@ ohos_unittest("InputManagerTest") {
   if (mmi_enable_monitor) {
     cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR" ]
   }
-  sources = [ "events/test/input_manager_test.cpp" ]
+  sources = [
+    "events/test/input_manager_test.cpp",
+    "events/test/window_utils_test.cpp",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
+    "//foundation/ability/ability_runtime/frameworks/native/ability/native:abilitykit_native",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
+    "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -329,6 +334,7 @@ ohos_unittest("InputManagerTest") {
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "window_manager:libwm",
   ]
 }
 

@@ -39,19 +39,43 @@
 #include "virtual_touchpad.h"
 #include "virtual_touchscreen.h"
 #include "virtual_trackpad_mouse.h"
-#include "util.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t ABSRANGE = 200;
 constexpr int32_t FINGERABSRANGE = 40;
+constexpr int32_t FILE_SIZE_MAX = 0x5000;
+const std::string PROC_PATH = "/proc";
+constexpr int32_t INVALID_FILE_SIZE = -1;
 const std::string VIRTUAL_DEVICE_NAME = "mmi-virtual-device";
 #define SETRESOLUTION(codeTmp, value) do { \
     g_absTemp_.code = codeTmp; \
     g_absTemp_.absinfo.resolution = value; \
     absInit_.push_back(g_absTemp_); \
 } while (0)
+
+inline bool IsNum(const std::string &str)
+{
+    std::istringstream sin(str);
+    double num;
+    return (sin >> num) && sin.eof();
+}
+
+inline bool IsValidPath(const std::string &rootDir, const std::string &filePath)
+{
+    return (filePath.compare(0, rootDir.size(), rootDir) == 0);
+}
+
+inline bool IsValidUinputPath(const std::string &filePath)
+{
+    return IsValidPath(PROC_PATH, filePath);
+}
+
+inline bool IsFileExists(const std::string& fileName)
+{
+    return (access(fileName.c_str(), F_OK) == 0);
+}
 
 bool CheckFileName(const std::string& fileName)
 {
@@ -467,6 +491,61 @@ void VirtualDevice::Close()
         close(fd_);
         fd_ = -1;
     }
+}
+
+std::string VirtualDevice::ReadFile(const std::string &filePath)
+{
+    FILE* fp = fopen(filePath.c_str(), "r");
+    if (fp == nullptr) {
+        printf("Failed to open file");
+        return "";
+    }
+    std::string dataStr;
+    char buf[256] = {};
+    while (fgets(buf, sizeof(buf), fp) != nullptr) {
+        dataStr += buf;
+    }
+    if (fclose(fp) != 0) {
+        printf("Failed to close file");
+    }
+    return dataStr;
+}
+
+int32_t VirtualDevice::GetFileSize(const std::string& filePath)
+{
+    struct stat statbuf = {0};
+    if (stat(filePath.c_str(), &statbuf) != 0) {
+        printf("Get file size error");
+        return INVALID_FILE_SIZE;
+    }
+    return statbuf.st_size;
+}
+
+std::string VirtualDevice::ReadUinputToolFile(const std::string &filePath)
+{
+    if (filePath.empty()) {
+        printf("filePath is empty");
+        return "";
+    }
+    char realPath[PATH_MAX] = {};
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        printf("Path is error");
+        return "";
+    }
+    if (!IsValidUinputPath(realPath)) {
+        printf("File path is error");
+        return "";
+    }
+    if (!IsFileExists(realPath)) {
+        printf("File not exist");
+        return "";
+    }
+    int32_t fileSize = GetFileSize(realPath);
+    if ((fileSize < 0) || (fileSize > FILE_SIZE_MAX)) {
+        printf("File size out of read range");
+        return "";
+    }
+    return ReadFile(filePath);
 }
 
 bool VirtualDevice::CreateHandle(const std::string& deviceArgv)

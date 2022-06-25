@@ -31,7 +31,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "LibinputAdapter" };
-constexpr int32_t WAIT_TIME_FOR_INPUT { 100 };
+constexpr int32_t WAIT_TIME_FOR_INPUT { 500 };
+constexpr int32_t MAX_RETRY_COUNT = 60;
 } // namespace
 
 static void HiLogFunc(struct libinput* input, libinput_log_priority priority, const char* fmt, va_list args)
@@ -68,16 +69,25 @@ void LibinputAdapter::LoginfoPackagingTool(struct libinput_event *event)
 
 constexpr static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
-        CHKPR(path, errno);
+        if (path == nullptr) {
+            MMI_HILOGWK("input device path is nullptr");
+            return RET_ERR;
+        }
         char realPath[PATH_MAX] = {};
-        if (realpath(path, realPath) == nullptr) {
-            MMI_HILOGE("path is error, path:%{public}s", path);
+        int32_t count = 0;
+        while ((realpath(path, realPath) == nullptr) && (count < MAX_RETRY_COUNT)) {
+            MMI_HILOGWK("path is error, count: %{public}d, path:%{public}s", count, path);
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
+            ++count;
+        }
+        if (count >= MAX_RETRY_COUNT) {
+            MMI_HILOGWK("retry %{public}d times realpath failed", count);
             return RET_ERR;
         }
         int32_t fd = open(realPath, flags);
-        MMI_HILOGD("libinput .open_restricted path:%{public}s,fd:%{public}d", path, fd);
-        return fd < 0 ? -errno : fd;
+        int32_t errNo = errno;
+        MMI_HILOGWK("libinput .open_restricted path:%{public}s,fd:%{public}d,errno:%{public}d", path, fd, errNo);
+        return fd < 0 ? RET_ERR : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)
     {
@@ -103,7 +113,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_
     CHKPF(udev_);
     input_ = libinput_udev_create_context(&LIBINPUT_INTERFACE, nullptr, udev_);
     CHKPF(input_);
-    auto rt = libinput_udev_assign_seat(input_, seat_id_.c_str());
+    int32_t rt = libinput_udev_assign_seat(input_, seat_id_.c_str());
     if (rt != 0) {
         libinput_unref(input_);
         udev_unref(udev_);

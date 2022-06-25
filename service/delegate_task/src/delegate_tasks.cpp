@@ -106,9 +106,11 @@ int32_t DelegateTasks::PostAsyncTask(DTaskCallback callback)
 void DelegateTasks::PopPendingTaskList(std::vector<TaskPtr> &tasks)
 {
     std::lock_guard<std::mutex> guard(mux_);
-    int32_t count = 0;
     static constexpr int32_t onceProcessTaskLimit = 10;
-    while (!tasks_.empty() && ((count++) < onceProcessTaskLimit)) {
+    for (int32_t count = 0; count < onceProcessTaskLimit; count++) {
+        if (tasks_.empty()) {
+            break;
+        }
         auto task = tasks_.front();
         CHKPB(task);
         RecoveryId(task->GetId());
@@ -146,7 +148,7 @@ DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *
     }
     tasks_.push(task);
     std::string taskType = ((promise == nullptr) ? "Async" : "Sync");
-    MMI_HILOGD("post %{public}s task:%{public}d,thread:%{public}" PRIu64 "", taskType.c_str(), id, data.tid);
+    MMI_HILOGD("post %{public}s", taskType.c_str());
     return task->GetSharedPtr();
 }
 } // namespace MMI

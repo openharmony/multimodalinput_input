@@ -161,7 +161,13 @@ bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
     int32_t *id = new (std::nothrow) int32_t;
     CHKPF(id);
     *id = 0;
-    CHKRF(env, napi_get_cb_info(env, cbInfo, nullptr, nullptr, &thisVar, &data), GET_CB_INFO);
+    if (napi_get_cb_info(env, cbInfo, nullptr, nullptr, &thisVar, &data) != napi_ok) {
+        MMI_HILOGE("GET_CB_INFO failed");
+        auto infoTemp = std::string("AddEnv GET_CB_INFO failed");
+        napi_throw_error(env, nullptr, infoTemp.c_str());
+        delete id;
+        return false;
+    }
     auto status = napi_wrap(env, thisVar, static_cast<void*>(id),
                             [](napi_env env, void *data, void *hint) {
                                 MMI_HILOGD("napi_wrap enter");

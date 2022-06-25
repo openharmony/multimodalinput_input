@@ -20,7 +20,7 @@
 #include "error_multimodal.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "key_autorepeat.h"
+#include "key_auto_repeat.h"
 #include "key_event_value_transformation.h"
 #include "mmi_log.h"
 #include "timer_manager.h"
@@ -164,16 +164,15 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         return RET_OK;
     }
     if (packageResult != RET_OK) {
-        MMI_HILOGE("KeyEvent package failed. ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
+        MMI_HILOGE("KeyEvent package failed, ret:%{public}d,errCode:%{public}d", packageResult, KEY_EVENT_PKG_FAIL);
         return KEY_EVENT_PKG_FAIL;
     }
 
     BytraceAdapter::StartBytrace(keyEvent);
 
-    nextHandler_->HandleKeyEvent(keyEvent);
-    KeyRepeat->SelectAutoRepeat(keyEvent, lastPressedKey);
-    MMI_HILOGD("keyCode:%{public}d,action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
-
+	nextHandler_->HandleKeyEvent(keyEvent);
+    KeyRepeat->SelectAutoRepeat(keyEvent);
+    MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }

@@ -29,9 +29,11 @@
 
 #include "bytrace_adapter.h"
 #include "input_device_manager.h"
-#include "key_autorepeat.h"
+#include "key_auto_repeat.h"
 #include "key_command_manager.h"
 #include "key_map_manager.h"
+#include "mmi_func_callback.h"
+#include "mouse_event_handler.h"
 #include "libinput_adapter.h"
 #include "mmi_func_callback.h"
 #include "time_cost_chk.h"
@@ -312,7 +314,6 @@ int32_t InputEventHandler::OnEventDeviceRemoved(libinput_event *event)
     InputDevMgr->OnInputDeviceRemoved(device);
     return RET_OK;
 }
-
 
 int32_t InputEventHandler::OnEventKey(libinput_event *event)
 {

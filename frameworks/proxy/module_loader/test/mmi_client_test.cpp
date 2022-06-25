@@ -31,6 +31,10 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS::MMI;
+#ifdef OHOS_BUILD_MMI_DEBUG
+constexpr int32_t DISPLAY_WIDTH = 720;
+constexpr int32_t DISPLAY_HEIGHT = 1280;
+#endif // OHOS_BUILD_MMI_DEBUG
 } // namespace
 
 class MMIClientTest : public testing::Test {
@@ -51,17 +55,16 @@ public:
     }
 #ifdef OHOS_BUILD_MMI_DEBUG
 public:
-    static bool Write(const PhysicalDisplayInfo& info, NetPacket& pkt)
+    static bool Write(const WindowInfo& info, NetPacket& pkt)
     {
-        pkt << info.id << info.leftDisplayId << info.upDisplayId << info.topLeftX << info.topLeftY;
-        pkt << info.width << info.height << info.name << info.seatId << info.seatName << info.logicWidth;
-        pkt << info.logicHeight << info.direction;
+        pkt << info.id << info.pid << info.uid << info.area << info.defaultHotAreas << info.pointerHotAreas
+            << info.agentWindowId << info.flags;
         return (!pkt.ChkRWError());
     }
-    static bool Write(const LogicalDisplayInfo& info, NetPacket& pkt)
+    static bool Write(const DisplayInfo& info, NetPacket& pkt)
     {
-        pkt << info.id << info.topLeftX << info.topLeftY;
-        pkt << info.width << info.height << info.name << info.seatId << info.seatName << info.focusWindowId;
+        pkt << info.id << info.x << info.y << info.width << info.height << info.name << info.uniq
+            << info.direction;
         return (!pkt.ChkRWError());
     }
     static int32_t GetRandomInt(int32_t min, int32_t max)
@@ -70,74 +73,66 @@ public:
         std::uniform_int_distribution<> dis(min, max);
         return dis(gen);
     }
-    static void RandomPhysicalInfo(int32_t id, PhysicalDisplayInfo& info)
+    static void RandomHotAreasInfo(std::vector<Rect>& hotAreas)
+    {
+        Rect area;
+        area.x = 0;
+        area.y = 0;
+        area.width = DISPLAY_WIDTH;
+        area.height = DISPLAY_HEIGHT;
+        hotAreas.push_back(area);
+    }
+    static void RandomWindowInfo(int32_t id, int32_t pid, WindowInfo& info)
     {
         info.id = id;
-        info.width = 1280;
-        info.height = 1024;
+        info.pid = pid;
+        info.uid = pid;
+        Rect area;
+        area.x = 0;
+        area.y = 0;
+        area.width = DISPLAY_WIDTH;
+        area.height = DISPLAY_HEIGHT;
+        info.area = area;
+        RandomHotAreasInfo(info.defaultHotAreas);
+        RandomHotAreasInfo(info.pointerHotAreas);
+        info.agentWindowId = id;
+        info.flags = 0;
+    }
+    static void RandomDisplayInfo(int32_t id, DisplayInfo& info)
+    {
+        info.id = id;
+        info.x = 0;
+        info.y = 0;
+        info.width = DISPLAY_WIDTH;
+        info.height = DISPLAY_HEIGHT;
         info.name = StringFmt("pd-%d", id);
-        info.seatId = StringFmt("seat%d", id);
-        info.seatName = StringFmt("seatname%d", id);
+        info.uniq = "default0";
+        info.direction = Direction::Direction0;
     }
-    static void RandomLogicalInfo(int32_t id, LogicalDisplayInfo& info)
+    static bool RandomDisplayPacket(NetPacket& pkt, int32_t pid)
     {
-        info.id = id;
-        info.width = 1280;
-        info.height = 1024;
-        info.name = StringFmt("pd-%d", id);
-        info.seatId = StringFmt("seat%d", id);
-        info.seatName = StringFmt("seatname%d", id);
-    }
-    static void RandomWindowInfo(int32_t id, const LogicalDisplayInfo& logcInfo, WindowInfo& info)
-    {
-        info.id = id;
-        info.pid = id;
-        info.uid = id;
-        info.hotZoneTopLeftX = GetRandomInt(0, 1280);
-        info.hotZoneTopLeftY = GetRandomInt(0, 1024);
-        info.hotZoneWidth = GetRandomInt(100, 1280);
-        info.hotZoneHeight = GetRandomInt(100, 1024);
-        info.displayId = logcInfo.id;
-    }
-    static bool RandomDisplayPacket(NetPacket& pkt, int32_t phyNum = 1)
-    {
-        if (!pkt.Write(phyNum)) {
-            printf("write failed 1\n");
-            return false;
-        }
-        for (auto i = 0; i < phyNum; i++) {
-            PhysicalDisplayInfo info = {};
-            RandomPhysicalInfo(i+1, info);
+        int32_t width = DISPLAY_WIDTH;
+        int32_t height = DISPLAY_HEIGHT;
+        int32_t focusWindowId = 1;
+        pkt << width << height << focusWindowId;
+        uint32_t windowNum = 1;
+        pkt << windowNum;
+        for (auto i = 0; i < windowNum; i++) {
+            WindowInfo info = {};
+            RandomWindowInfo(i + 1, pid, info);
             if (!Write(info, pkt)) {
-                printf("write failed 2\n");
+                printf("write WindowInfo failed\n");
                 return false;
             }
         }
-        int32_t logicalNum = GetRandomInt(5, 10);
-        if (!pkt.Write(logicalNum)) {
-            printf("write failed 3\n");
-            return false;
-        }
-        for (auto i = 0; i < logicalNum; i++) {
-            LogicalDisplayInfo logiclInfo = {};
-            RandomLogicalInfo(i+1, logiclInfo);
-            int32_t windowsNum = GetRandomInt(5, 15);
-            logiclInfo.focusWindowId = 100+windowsNum;
-            if (!Write(logiclInfo, pkt)) {
-                printf("write failed 4\n");
+        uint32_t displayNum = 1;
+        pkt << displayNum;
+        for (auto i = 0; i < displayNum; i++) {
+            DisplayInfo info = {};
+            RandomDisplayInfo(i + 1, info);
+            if (!Write(info, pkt)) {
+                printf("write DisplayInfo failed\n");
                 return false;
-            }
-            if (!pkt.Write(windowsNum)) {
-                printf("write failed 5\n");
-                return false;
-            }
-            for (auto j = 0; j < windowsNum; j++) {
-                WindowInfo winInfo = {};
-                RandomWindowInfo(i*100+j+1, logiclInfo, winInfo);
-                if (!pkt.Write(winInfo)) {
-                    printf("write failed 6\n");
-                    return false;
-                }
             }
         }
         return true;
@@ -251,10 +246,8 @@ HWTEST_F(MMIClientTest, BigPacketTest, TestSize.Level1)
     auto beginTime = GetSysClockTime();
     printf(" begin: maxLimit:%d beginTime:%" PRId64 "\n", maxLimit, beginTime);
     for (auto i = 1; i <= maxLimit; i++) {
-        int32_t phyNum = MMIClientUnitTest::GetRandomInt(5, 10);
         NetPacket pkt(MmiMessageId::BIGPACKET_TEST);
-        pkt << pid << i;
-        ASSERT_TRUE(MMIClientUnitTest::RandomDisplayPacket(pkt, phyNum));
+        ASSERT_TRUE(MMIClientUnitTest::RandomDisplayPacket(pkt, pid));
         EXPECT_TRUE(client->SendMessage(pkt));
     }
     auto endTime = GetSysClockTime();

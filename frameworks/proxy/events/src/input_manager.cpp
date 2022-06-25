@@ -32,10 +32,9 @@ InputManager *InputManager::GetInstance()
     return instance_;
 }
 
-void InputManager::UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
-    const std::vector<LogicalDisplayInfo> &logicalDisplays)
+void InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
-    InputMgrImpl->UpdateDisplayInfo(physicalDisplays, logicalDisplays);
+    InputMgrImpl->UpdateDisplayInfo(displayGroupInfo);
 }
 
 int32_t InputManager::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
@@ -129,11 +128,11 @@ void InputManager::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
 
 int32_t InputManager::SetPointerVisible(bool visible)
 {
-    return InputMgrImpl->GetInstance()->SetPointerVisible(visible);
+    return InputMgrImpl->SetPointerVisible(visible);
 }
 bool InputManager::IsPointerVisible()
 {
-    return InputMgrImpl->GetInstance()->IsPointerVisible();
+    return InputMgrImpl->IsPointerVisible();
 }
 
 void InputManager::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)

@@ -23,6 +23,7 @@
 #include "net_packet.h"
 #include "proto.h"
 #include "timer_manager.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -35,7 +36,7 @@ constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
 void KeyEventSubscriber::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
-    if (OnSubscribeKeyEvent(keyEvent)) {
+    if (SubscribeKeyEvent(keyEvent)) {
         MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{public}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
         return;
@@ -106,10 +107,15 @@ int32_t KeyEventSubscriber::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscri
     return RET_ERR;
 }
 
-bool KeyEventSubscriber::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_LOG_ENTER;
     CHKPF(keyEvent);
+    if (IsRepeatedKeyEvent(keyEvent)) {
+        MMI_HILOGD("repeat KeyEvent, skip");
+        return true;
+    }
+    keyEvent_ = KeyEvent::Clone(keyEvent);
     int32_t keyAction = keyEvent->GetKeyAction();
     MMI_HILOGD("keyCode:%{public}d,keyAction:%{public}s", keyEvent->GetKeyCode(),
         KeyEvent::ActionToString(keyAction));
@@ -120,13 +126,14 @@ bool KeyEventSubscriber::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         handled = HandleKeyDown(keyEvent);
     } else if (keyAction == KeyEvent::KEY_ACTION_UP) {
+        hasEventExecuting = false;
         handled = HandleKeyUp(keyEvent);
     } else if (keyAction == KeyEvent::KEY_ACTION_CANCEL) {
+        hasEventExecuting = false;
         handled = HandleKeyCanel(keyEvent);
     } else {
         MMI_HILOGW("keyAction exception");
     }
-    keyEvent_.reset();
     return handled;
 }
 
@@ -233,6 +240,7 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
         return false;
     }
     subscriber->keyEvent_ = keyEvent_;
+    hasEventExecuting = true;
     MMI_HILOGD("leave, add timer success, subscribeId:%{public}d,"
         "duration:%{public}d,timerId:%{public}d",
         subscriber->id_, keyOption->GetFinalKeyDownDuration(), subscriber->timerId_);
@@ -253,6 +261,7 @@ void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscribe
     subscriber->keyEvent_.reset();
     subscriber->timerId_ = -1;
     TimerMgr->RemoveTimer(timerId);
+    hasEventExecuting = false;
     MMI_HILOGD("subscribeId:%{public}d,timerId:%{public}d", subscriber->id_, timerId);
 }
 
@@ -422,6 +431,65 @@ void KeyEventSubscriber::RemoveKeyCode(int32_t keyCode, std::vector<int32_t>& ke
         if (*it == keyCode) {
             keyCodes.erase(it);
             return;
+        }
+    }
+}
+
+bool KeyEventSubscriber::IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent) {
+    CHKPF(keyEvent);
+    if (!hasEventExecuting) {
+        return false;
+    }
+
+    if (keyEvent->GetKeyCode() != keyEvent_->GetKeyCode()) {
+        return false;
+    }
+
+    if (keyEvent->GetKeyAction() != keyEvent_->GetKeyAction()) {
+        return false;
+    }
+
+    if (keyEvent->GetKeyItems().size() != keyEvent_->GetKeyItems().size()) {
+        return false;
+    }
+
+    for (const auto &item : keyEvent->GetKeyItems()) {
+        int32_t keyCode = item.GetKeyCode();
+        bool findResult = false;
+        for (const auto &item1 : keyEvent_->GetKeyItems()){
+            if (keyCode == item1.GetKeyCode()) {
+                findResult = true;
+                break;
+            }
+        }
+        if (!findResult) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void KeyEventSubscriber::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_LOG_ENTER;
+    mprintf(fd, "--------------------------[Subscriber Information]-------------------------");
+    mprintf(fd, "subscribers: count=%d", subscribers_.size());
+    for (const auto &item : subscribers_) {
+        std::shared_ptr<Subscriber> subscriber = item;
+        CHKPV(subscriber);
+        SessionPtr session = item->sess_;
+        CHKPV(session);
+        std::shared_ptr<KeyOption> keyOption = item->keyOption_;
+        CHKPV(keyOption);
+        mprintf(fd,
+                "subscriber id:%d | timer id:%d | Pid:%d | Uid:%d | Fd:%d "
+                "| FinalKey:%d | finalKeyDownDuration:%d | IsFinalKeyDown:%s\t",
+                subscriber->id_, subscriber->timerId_, session->GetPid(),
+                session->GetUid(), session->GetFd(), keyOption->GetFinalKey(),
+                keyOption->GetFinalKeyDownDuration(), keyOption->IsFinalKeyDown() ? "true" : "false");
+        std::set<int32_t> preKeys = keyOption->GetPreKeys();
+        for (const auto &preKey : preKeys) {
+            mprintf(fd, "preKeys:%d\t", preKey);
         }
     }
 }

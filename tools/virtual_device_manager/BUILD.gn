@@ -92,7 +92,7 @@ ohos_shared_library("libmmi-virtual-device") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
-  deps = [ "//foundation/multimodalinput/input/util:libmmi-util" ]
+  deps = [ "//utils/native/base:utils" ]
 
   install_enable = true
   part_name = "input"

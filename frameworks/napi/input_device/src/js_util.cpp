@@ -31,7 +31,6 @@ const std::string SET_ELEMENT = "napi_set_element";
 const std::string SET_NAMED_PROPERTY = "napi_set_named_property";
 const std::string CREATE_STRING_UTF8 = "napi_create_string_utf8";
 const std::string CREATE_OBJECT = "napi_create_object";
-const std::string DELETE_ASYNC_WORK = "napi_delete_async_work";
 const std::string TYPEOF = "napi_typeof";
 
 constexpr int32_t ABS_MT_TOUCH_MAJOR = 0x30;
@@ -214,18 +213,6 @@ JsUtil::CallbackInfo::~CallbackInfo()
     CALL_LOG_ENTER;
     if (ref != nullptr && env != nullptr) {
         CHKRV(env, napi_delete_reference(env, ref), DELETE_REFERENCE);
-        env = nullptr;
-    }
-}
-
-AsyncContext::~AsyncContext()
-{
-    CALL_LOG_ENTER;
-    if (work != nullptr) {
-        CHKRV(env, napi_delete_async_work(env, work), DELETE_ASYNC_WORK);
-    }
-    if (callback != nullptr && env != nullptr) {
-        CHKRV(env, napi_delete_reference(env, callback), DELETE_REFERENCE);
         env = nullptr;
     }
 }

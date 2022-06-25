@@ -152,7 +152,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     int32_t keyEventFinalKey = keyEvent->GetKeyCode();
     MMI_HILOGD("infoFinalKey:%{public}d,keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
     if (infoFinalKey != keyEventFinalKey || items.size() > PRE_KEYS_SIZE) {
-        MMI_HILOGE("param invalid");
+        MMI_HILOGE("Param invalid");
         return false;
     }
     std::set<int32_t> infoPreKeys = keyOption->GetPreKeys();
@@ -219,10 +219,13 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     };
     CHKPP(event);
     auto keyOption = std::make_shared<KeyOption>();
-    CHKPP(keyOption);
+    if ((keyOption) == nullptr) {
+        delete event;
+        MMI_HILOGE("check keyOption is null");
+        return nullptr;
+    }
     if (GetEventInfo(env, info, event, keyOption) < 0) {
         delete event;
-        event = nullptr;
         MMI_HILOGE("GetEventInfo failed");
         return nullptr;
     }
@@ -236,7 +239,6 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
             MMI_HILOGD("subscribeId invalid:%{public}d", subscribeId);
             napi_delete_reference(env, event->callback[0]);
             delete event;
-            event = nullptr;
             return nullptr;
         }
         MMI_HILOGD("SubscribeId:%{public}d", subscribeId);
@@ -246,7 +248,6 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     }
     if (AddEventCallback(env, callbacks, event) < 0) {
         delete event;
-        event = nullptr;
         MMI_HILOGE("AddEventCallback failed");
         return nullptr;
     }
@@ -262,17 +263,19 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     };
     CHKPP(event);
     auto keyOption = std::make_shared<KeyOption>();
-    CHKPP(keyOption);
+    if ((keyOption) == nullptr) {
+        delete event;
+        MMI_HILOGE("check keyOption is null");
+        return nullptr;
+    }
     if (GetEventInfo(env, info, event, keyOption) < 0) {
         delete event;
-        event = nullptr;
         MMI_HILOGE("GetEventInfo failed");
         return nullptr;
     }
     int32_t subscribeId = -1;
     if (DelEventCallback(env, callbacks, event, subscribeId) < 0) {
         delete event;
-        event = nullptr;
         MMI_HILOGE("DelEventCallback failed");
         return nullptr;
     }
@@ -284,7 +287,6 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         napi_delete_reference(env, event->callback[0]);
     }
     delete event;
-    event = nullptr;
     return nullptr;
 }
 
@@ -306,7 +308,7 @@ static napi_module mmiModule = {
     .nm_flags = 0,
     .nm_filename = nullptr,
     .nm_register_func = MmiInit,
-    .nm_modname = "inputConsumer",
+    .nm_modname = "multimodalInput.inputConsumer",
     .nm_priv = ((void*)0),
     .reserved = { 0 },
 };

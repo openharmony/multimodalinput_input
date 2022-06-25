@@ -53,7 +53,11 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
-    CHKPV(work->data);
+    if ((work->data) == nullptr) {
+        delete work;
+        MMI_HILOGE("check work->data is null");
+        return;
+    }
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
     delete work;
     
@@ -90,7 +94,11 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
     CALL_LOG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
-    CHKPV(work->data);
+    if ((work->data) == nullptr) {
+        delete work;
+        MMI_HILOGE("check work->data is null");
+        return;
+    }
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
     delete work;
     
@@ -225,7 +233,11 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> &ids)
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
-    CHKPV(uData);
+    if ((uData) == nullptr) {
+        delete work;
+        MMI_HILOGE("check uData is null");
+        return;
+    }
     work->data = static_cast<void*>(uData);
     int32_t ret;
     if (iter->second->ref == nullptr) {

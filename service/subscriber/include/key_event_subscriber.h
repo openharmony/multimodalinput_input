@@ -47,8 +47,8 @@ public:
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
             const std::shared_ptr<KeyOption> keyOption);
     int32_t UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
-    bool OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
-
+    bool SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+    void Dump(int32_t fd, const std::vector<std::string> &args);
 private:
     struct Subscriber {
         Subscriber(int32_t id, SessionPtr sess, std::shared_ptr<KeyOption> keyOption)
@@ -78,14 +78,14 @@ private:
     void OnTimer(const std::shared_ptr<Subscriber> subscriber);
     void OnSessionDelete(SessionPtr sess);
     bool InitSessionDeleteCallback();
-
     bool CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
-
     void RemoveKeyCode(int32_t keyCode, std::vector<int32_t>& keyCodes);
+    bool IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 
 private:
     std::list<std::shared_ptr<Subscriber>> subscribers_ {};
     bool callbackInitialized_ { false };
+    bool hasEventExecuting { false };
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
 };
 } // namespace MMI

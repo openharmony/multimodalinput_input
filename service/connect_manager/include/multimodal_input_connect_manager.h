@@ -37,6 +37,15 @@ public:
     int32_t SetPointerVisible(bool visible);
     int32_t IsPointerVisible(bool &visible);
     int32_t MarkEventProcessed(int32_t eventId);
+    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
+        HandleEventType eventType);
+    int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType);
+    int32_t MarkEventConsumed(int32_t monitorId, int32_t eventId);
+    int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
+    int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option);
+    int32_t UnsubscribeKeyEvent(int32_t subscribeId);
+    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 private:
     MultimodalInputConnectManager() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);
@@ -52,4 +61,5 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
+#define MultimodalInputConnMgr MultimodalInputConnectManager::GetInstance()
 #endif // MULTIMODAL_INPUT_CONNECT_MANAGER_H

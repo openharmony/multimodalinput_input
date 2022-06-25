@@ -18,7 +18,6 @@
 
 #include <uv.h>
 
-#include "stream_buffer.h"
 #include "input_device_impl.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -30,22 +29,22 @@ class JsUtil {
 public:
     struct CallbackData {
         std::vector<int32_t> ids;
-        std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device = nullptr;
+        std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device { nullptr };
         std::vector<bool> keystrokeAbility;
-        int32_t deviceId = 0;
-        int32_t keyboardType = 0;
+        int32_t deviceId { 0 };
+        int32_t keyboardType { 0 };
     };
     struct CallbackInfo {
         CallbackInfo();
         ~CallbackInfo();
-        napi_env env = nullptr;
-        napi_ref ref = nullptr;
-        napi_deferred deferred = nullptr;
+        napi_env env { nullptr };
+        napi_ref ref { nullptr };
+        napi_deferred deferred { nullptr };
         CallbackData data;
     };
     struct DeviceType {
         std::string sourceTypeName;
-        uint32_t typeBit;
+        uint32_t typeBit { 0 };
     };
 
     static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
@@ -53,17 +52,6 @@ public:
     static bool GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_value &object);
     static bool GetDeviceSourceType(const std::unique_ptr<CallbackInfo> &cb, napi_value &object);
     static bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
-};
-
-struct AsyncContext : RefBase {
-    napi_env env = nullptr;
-    napi_async_work work = nullptr;
-    napi_deferred deferred = nullptr;
-    napi_ref callback = nullptr;
-    int32_t errorCode {-1};
-    StreamBuffer reserve;
-    AsyncContext(napi_env env) : env(env) {}
-    ~AsyncContext();
 };
 } // namespace MMI
 } // namespace OHOS

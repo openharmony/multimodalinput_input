@@ -136,7 +136,7 @@ ohos_shared_library("libmmi-server") {
     "event_dump/src/event_dump.cpp",
     "event_handler/src/input_event_handler.cpp",
     "event_handler/src/input_event_normalize_handler.cpp",
-    "event_handler/src/key_autorepeat.cpp",
+    "event_handler/src/key_auto_repeat.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
     "event_handler/src/key_map_manager.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
@@ -144,7 +144,6 @@ ohos_shared_library("libmmi-server") {
     "module_loader/src/mmi_service.cpp",
     "module_loader/src/uds_server.cpp",
     "permission_helper/src/permission_helper.cpp",
-    "subscriber/src/key_option.cpp",
     "timer_manager/src/timer_manager.cpp",
     "window_manager/src/input_windows_manager.cpp",
   ]
@@ -201,7 +200,7 @@ ohos_shared_library("libmmi-server") {
     ":drawing_pointer_image",
     ":mmi_device_config.ini",
     ":multimodalinput_config_ability.json",
-    "${aafwk_kits_path}/ability/native:abilitykit_native",
+    "${aafwk_path}/frameworks/native/ability/native:abilitykit_native",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
     "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
@@ -225,14 +224,15 @@ ohos_shared_library("libmmi-server") {
     "ability_base:want",
     "ability_runtime:ability_manager",
     "access_token:libaccesstoken_sdk",
+    "drivers_interface_input:hdi_input",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
-    "input_device_driver:hdi_input",
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
+    "startup_l2:syspara",
   ]
 
   if (mmi_enable_pointer_drawing) {
@@ -251,7 +251,6 @@ ohos_prebuilt_etc("mmi_device_config.ini") {
 
 import("//build/test.gni")
 module_output_path = "multimodalinput/unit_out"
-HDF_FWKS = "//drivers/framework"
 
 ohos_unittest("ut-mmi-service-out") {
   module_out_path = module_output_path
@@ -287,7 +286,6 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/uinput",
-    "$HDF_FWKS/inclue",
   ]
 
   if (is_mmi_have_libinput || is_mmi_have_hdf) {
@@ -335,7 +333,6 @@ ohos_unittest("ut-mmi-service-out") {
   configs = [ ":libmmi_server_config" ]
 
   deps = [
-    "${aafwk_kits_path}/appkit:appkit_native",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
@@ -348,9 +345,8 @@ ohos_unittest("ut-mmi-service-out") {
   }
 
   external_deps = [
-    "ability_runtime:ability_manager",
+    "drivers_interface_input:hdi_input",
     "hiviewdfx_hilog_native:libhilog",
-    "input_device_driver:hdi_input",
     "utils_base:utils",
   ]
 }
