@@ -293,7 +293,7 @@ void InputHandlerManagerGlobal::Dump(int32_t fd, const std::vector<std::string> 
 void InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
-    mprintf(fd, "--------------------------[Monitor Information]-------------------------");
+    mprintf(fd, "Monitor information:\t");
     mprintf(fd, "monitors: count=%d", monitors_.size());
     for (const auto &item : monitors_) {
         SessionPtr session = item.session_;
