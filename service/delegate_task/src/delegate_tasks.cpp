@@ -15,6 +15,7 @@
 #include "delegate_tasks.h"
 
 #include <sys/syscall.h>
+#include <fcntl.h>
 #include <unistd.h>
 
 #include "error_multimodal.h"
@@ -36,7 +37,7 @@ void DelegateTasks::Task::ProcessTask()
     int32_t ret = fun_();
     std::string taskType = ((promise_ == nullptr) ? "Async" : "Sync");
     MMI_HILOGD("process %{public}s task id:%{public}d,ret:%{public}d", taskType.c_str(), id_, ret);
-    if (promise_ != nullptr) {
+    if (!hasWaited_ && promise_ != nullptr) {
         promise_->set_value(ret);
     }
 }
@@ -47,6 +48,14 @@ bool DelegateTasks::Init()
     int32_t res = pipe(fds_);
     if (res == -1) {
         MMI_HILOGE("pipe create failed,errno:%{public}d", errno);
+        return false;
+    }
+    if (fcntl(fds_[0], F_SETFL, O_NONBLOCK) == -1) {
+        MMI_HILOGE("fcntl read failed,errno:%{public}d", errno);
+        return false;
+    }
+    if (fcntl(fds_[1], F_SETFL, O_NONBLOCK) == -1) {
+        MMI_HILOGE("fcntl write failed,errno:%{public}d", errno);
         return false;
     }
     return true;
@@ -126,6 +135,7 @@ DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *
         return nullptr;
     }
     std::lock_guard<std::mutex> guard(mux_);
+    MMI_HILOGD("tasks_ size %{public}d", static_cast<int32_t>(tasks_.size()));
     static constexpr int32_t maxTasksLimit = 1000;
     auto tsize = tasks_.size();
     if (tsize > maxTasksLimit) {
