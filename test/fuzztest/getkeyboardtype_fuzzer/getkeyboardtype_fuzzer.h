@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef ADDMONITOR_FUZZER_H
-#define ADDMONITOR_FUZZER_H
+#ifndef GETKEYBOARDTYPE_FUZZER_H
+#define GETKEYBOARDTYPE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "addmonitor_fuzzer"
+#define FUZZ_PROJECT_NAME "getkeyboardtype_fuzzer"
 
-#endif // ADDMONITOR_FUZZER_H
+#endif // GETKEYBOARDTYPE_FUZZER_H
