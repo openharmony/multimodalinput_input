@@ -440,7 +440,7 @@ bool KeyEventSubscriber::IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent) 
 void KeyEventSubscriber::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
-    mprintf(fd, "--------------------------[Subscriber Information]-------------------------");
+    mprintf(fd, "Subscriber information:\t");
     mprintf(fd, "subscribers: count=%d", subscribers_.size());
     for (const auto &item : subscribers_) {
         std::shared_ptr<Subscriber> subscriber = item;

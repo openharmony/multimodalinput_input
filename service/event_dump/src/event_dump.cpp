@@ -152,15 +152,15 @@ void EventDump::DumpEventHelp(int32_t fd, const std::vector<std::string> &args)
 void EventDump::DumpHelp(int32_t fd)
 {
     mprintf(fd, "Usage:\t");
-    mprintf(fd, "      -h: dump help\t");
-    mprintf(fd, "      -d: dump the device information\t");
-    mprintf(fd, "      -l: dump the device list information\t");
-    mprintf(fd, "      -w: dump the windows information\t");
-    mprintf(fd, "      -u: dump the uds_server information\t");
-    mprintf(fd, "      -o: dump the monitor information\t");
-    mprintf(fd, "      -s: dump the subscriber information\t");
-    mprintf(fd, "      -i: dump the interceptor information\t");
-    mprintf(fd, "      -m: dump the mouse information\t");
+    mprintf(fd, "      -h, --help: dump help\t");
+    mprintf(fd, "      -d, --device: dump the device information\t");
+    mprintf(fd, "      -l, --devicelist: dump the device list information\t");
+    mprintf(fd, "      -w, --windows,: dump the windows information\t");
+    mprintf(fd, "      -u, --udsserver: dump the uds_server information\t");
+    mprintf(fd, "      -o, --monitor: dump the monitor information\t");
+    mprintf(fd, "      -s, --subscriber: dump the subscriber information\t");
+    mprintf(fd, "      -i, --interceptor: dump the interceptor information\t");
+    mprintf(fd, "      -m, --mouse: dump the mouse information\t");
 }
 
 void EventDump::Init(UDSServer& uds)
