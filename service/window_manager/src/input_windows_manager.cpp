@@ -543,11 +543,11 @@ MouseLocation InputWindowsManager::GetMouseInfo()
 void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
-    mprintf(fd, "------------------------[WindowsInfo Information]---------------------------");
+    mprintf(fd, "Windows information:\t");
     mprintf(fd, "windowsInfos,num:%zu", displayGroupInfo_.windowsInfo.size());
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         mprintf(fd,
-                "windowsInfos:\n\t\t id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
+                "\t windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
                 "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
                 "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%d \t",
                 item.id, item.pid, item.uid, item.area.x, item.area.y, item.area.width,
@@ -555,20 +555,20 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
                 item.agentWindowId, item.flags);
         for (const auto &win : item.defaultHotAreas) {
             mprintf(fd,
-                    "defaultHotAreas:\n\t\t x:%d | y:%d | width:%d | height:%d \t",
+                    "\t defaultHotAreas: x:%d | y:%d | width:%d | height:%d \t",
                     win.x, win.y, win.width, win.height);
         }
         for (const auto &pointer : item.pointerHotAreas) {
             mprintf(fd,
-                    "pointerHotAreas:\n\t\t x:%d | y:%d | width:%d | height:%d \t",
+                    "\t pointerHotAreas: x:%d | y:%d | width:%d | height:%d \t",
                     pointer.x, pointer.y, pointer.width, pointer.height);
         }
     }
-    mprintf(fd, "------------------------[DisplaysInfo Information]---------------------------");
+    mprintf(fd, "Displays information:\t");
     mprintf(fd, "displayInfos,num:%zu", displayGroupInfo_.displaysInfo.size());
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         mprintf(fd,
-                "displayInfos:\n\t\t id:%d | x:%d | y:%d | width:%d | height:%d | name:%s "
+                "\t displayInfos: id:%d | x:%d | y:%d | width:%d | height:%d | name:%s "
                 "| uniq:%s | direction:%d \t",
                 item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
                 item.uniq.c_str(), item.direction);

@@ -337,7 +337,7 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
 void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
-    mprintf(fd, "--------------------------[Device Information]-------------------------");
+    mprintf(fd, "Device information:\t");
     mprintf(fd, "Input devices: count=%d", inputDevice_.size());
     for (const auto &item : inputDevice_) {
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
@@ -349,7 +349,7 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
                 inputDevice->GetBustype(), inputDevice->GetVersion(), inputDevice->GetProduct(),
                 inputDevice->GetVendor(), inputDevice->GetPhys().c_str());
         std::vector<InputDevice::AxisInfo> axisinfo = inputDevice->GetAxisInfo();
-        mprintf(fd, "axis: count=%d \n", axisinfo.size());
+        mprintf(fd, "axis: count=%d", axisinfo.size());
         for (const auto &axis : axisinfo) {
             auto iter = axisType.find(axis.GetAxisType());
             if (iter == axisType.end()) {
@@ -357,7 +357,7 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
                 return;
             }
             mprintf(fd,
-                    "axisType:%s | minimum:%d | maximum:%d | fuzz:%d | flat:%d | resolution:%d\t",
+                    "\t axisType:%s | minimum:%d | maximum:%d | fuzz:%d | flat:%d | resolution:%d\t",
                     iter->second.c_str(), axis.GetMinimum(), axis.GetMaximum(), axis.GetFuzz(),
                     axis.GetFlat(), axis.GetResolution());
         }
@@ -367,9 +367,8 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
 void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
-    mprintf(fd, "--------------------------[Device List Information]-------------------------");
     std::vector<int32_t> ids = GetInputDeviceIds();
-    mprintf(fd, "Total device:%d, Device list:", ids.size());
+    mprintf(fd, "Total device:%d, Device list:\t", int32_t { ids.size() });
     for (const auto &item : inputDevice_) {
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
         CHKPV(inputDevice);
