@@ -1007,7 +1007,8 @@ const char* KeyEvent::KeyCodeToString(int32_t keyCode)
     return iter->second.c_str();
 }
 
-std::shared_ptr<KeyEvent> KeyEvent::Clone(std::shared_ptr<KeyEvent> keyEvent) {
+std::shared_ptr<KeyEvent> KeyEvent::Clone(std::shared_ptr<KeyEvent> keyEvent)
+{
     if (!keyEvent) {
         return nullptr;
     }

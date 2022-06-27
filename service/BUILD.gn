@@ -168,7 +168,7 @@ ohos_shared_library("libmmi-server") {
     ":drawing_pointer_image",
     ":mmi_device_config.ini",
     ":multimodalinput_config_ability.json",
-    "${ability_runtime_kits_path}/ability/native:abilitykit_native",
+    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
     "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
@@ -192,14 +192,15 @@ ohos_shared_library("libmmi-server") {
     "ability_base:want",
     "ability_runtime:ability_manager",
     "access_token:libaccesstoken_sdk",
+    "drivers_interface_input:hdi_input",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
-    "input_device_driver_interface:hdi_input",
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
+    "startup_l2:syspara",
   ]
 
   if (mmi_enable_pointer_drawing) {
@@ -300,8 +301,8 @@ ohos_unittest("ut-mmi-service-out") {
   }
 
   external_deps = [
+    "drivers_interface_input:hdi_input",
     "hiviewdfx_hilog_native:libhilog",
-    "input_device_driver_interface:hdi_input",
     "utils_base:utils",
   ]
 }

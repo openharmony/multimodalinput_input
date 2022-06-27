@@ -37,6 +37,7 @@ public:
     void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session);
     bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
     bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent);
+    void Dump(int32_t fd, const std::vector<std::string> &args);
 
 private:
     void InitSessionLostCallback();
@@ -78,6 +79,7 @@ private:
         void UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent);
         void Monitor(std::shared_ptr<PointerEvent> pointerEvent);
         void OnSessionLost(SessionPtr session);
+        void Dump(int32_t fd, const std::vector<std::string> &args);
 
         std::set<SessionHandler> monitors_;
         std::shared_ptr<PointerEvent> lastPointerEvent_ = nullptr;

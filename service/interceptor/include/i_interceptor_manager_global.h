@@ -12,20 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#ifndef I_INTERCEPTOR_HANDLER_GLOBAL_H
-#define I_INTERCEPTOR_HANDLER_GLOBAL_H
+#ifndef I_INTERCEPTOR_MANAGER_GLOBAL_H
+#define I_INTERCEPTOR_MANAGER_GLOBAL_H
 
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "i_input_event_handler.h"
-#include "input_handler_type.h"
+#include "key_event.h"
+#include "pointer_event.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class IInterceptorHandlerGlobal : public DelayedSingleton<IInterceptorHandlerGlobal> {
+class IInterceptorManagerGlobal : public DelayedSingleton<IInterceptorManagerGlobal> {
 public:
     IInterceptorHandlerGlobal() = default;
     ~IInterceptorHandlerGlobal() = default;
@@ -38,4 +37,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_INTERCEPTOR_HANDLER_GLOBAL_H
+#endif // I_INTERCEPTOR_MANAGER_GLOBAL_H

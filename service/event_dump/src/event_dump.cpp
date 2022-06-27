@@ -15,14 +15,25 @@
 
 #include "event_dump.h"
 
+#include <getopt.h>
+
 #include <climits>
 #include <cstdarg>
+#include <cstring>
 
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "input_device_manager.h"
+#include "input_event_handler.h"
+#include "input_handler_manager_global.h"
 #include "input_windows_manager.h"
+#include "interceptor_handler_global.h"
+#include "key_event_subscriber.h"
+#include "mouse_event_handler.h"
+#include "securec.h"
+#include "uds_server.h"
 #include "util.h"
 #include "util_ex.h"
 
@@ -30,7 +41,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
-constexpr int32_t MAX_PATH_SIZE = 1024;
 } // namespace
 
 void ChkConfig(int32_t fd)
@@ -54,51 +64,108 @@ void ChkConfig(int32_t fd)
     mprintf(fd, "EXP_SOPATH: %s\n", DEF_EXP_SOPATH);
 }
 
+void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_LOG_ENTER;
+    int32_t optionIndex = 0;
+    struct option dumpOptions[] = {
+        {"help", no_argument, 0, 'h'},
+        {"device", no_argument, 0, 'd'},
+        {"devicelist", no_argument, 0, 'l'},
+        {"windows", no_argument, 0, 'w'},
+        {"udsserver", no_argument, 0, 'u'},
+        {"subscriber", no_argument, 0, 's'},
+        {"monitor", no_argument, 0, 'o'},
+        {"interceptor", no_argument, 0, 'i'},
+        {"mouse", no_argument, 0, 'm'},
+        {NULL, 0, 0, 0}
+    };
+    char **argv = new char *[args.size()];
+    for (size_t i = 0; i < args.size(); ++i) {
+        argv[i] = new char[args[i].size() + 1];
+        if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != EOK) {
+            MMI_HILOGE("strcpy_s error");
+            goto RELEASE_RES;
+            return;
+        }
+    }
+    optind = 1;
+    int32_t c;
+    while ((c = getopt_long (args.size(), argv, "hdlwusoim", dumpOptions, &optionIndex)) != -1) {
+        switch (c) {
+            case 'h': {
+                DumpEventHelp(fd, args);
+                break;
+            }
+            case 'd': {
+                InputDevMgr->Dump(fd, args);
+                break;
+            }
+            case 'l': {
+                InputDevMgr->DumpDeviceList(fd, args);
+                break;
+            }
+            case 'w': {
+                WinMgr->Dump(fd, args);
+                break;
+            }
+            case 'u': {
+                auto udsServer = InputHandler->GetUDSServer();
+                udsServer->Dump(fd, args);
+                break;
+            }
+            case 's': {
+                KeyEventSubscriber_.Dump(fd, args);
+                break;
+            }
+            case 'o': {
+                InputHandlerManagerGlobal::GetInstance().Dump(fd, args);
+                break;
+            }
+            case 'i': {
+                InterceptorHandlerGlobal::GetInstance()->Dump(fd, args);
+                break;
+            }
+            case 'm': {
+                MouseEventHdr->Dump(fd, args);
+                break;
+            }
+            default: {
+                mprintf(fd, "cmd param is error\n");
+                DumpHelp(fd);
+                break;
+            }
+        }
+    }
+    RELEASE_RES:
+    for (size_t i = 0; i < args.size(); ++i) {
+        delete[] argv[i];
+    }
+    delete[] argv;
+}
+
+void EventDump::DumpEventHelp(int32_t fd, const std::vector<std::string> &args)
+{
+    DumpHelp(fd);
+}
+
+void EventDump::DumpHelp(int32_t fd)
+{
+    mprintf(fd, "Usage:\t");
+    mprintf(fd, "      -h: dump help\t");
+    mprintf(fd, "      -d: dump the device information\t");
+    mprintf(fd, "      -l: dump the device list information\t");
+    mprintf(fd, "      -w: dump the windows information\t");
+    mprintf(fd, "      -u: dump the uds_server information\t");
+    mprintf(fd, "      -o: dump the monitor information\t");
+    mprintf(fd, "      -s: dump the subscriber information\t");
+    mprintf(fd, "      -i: dump the interceptor information\t");
+    mprintf(fd, "      -m: dump the mouse information\t");
+}
+
 void EventDump::Init(UDSServer& uds)
 {
     udsServer_ = &uds;
-}
-
-void EventDump::Dump(int32_t fd)
-{
-    std::lock_guard<std::mutex> lock(mu_);
-
-    auto strCurTime = Strftime();
-    mprintf(fd, "MMIDumpsBegin: %s", strCurTime.c_str());
-    ChkConfig(fd);
-    if (udsServer_) {
-        udsServer_->Dump(fd);
-    }
-
-    mprintf(fd, "MMI_MSGDumps:");
-    for (const auto &item : dumpInfo_) {
-        mprintf(fd, "\t%s", item.c_str());
-    }
-    strCurTime = Strftime();
-    mprintf(fd, "MMIDumpsEnd: %s", strCurTime.c_str());
-}
-
-void EventDump::TestDump()
-{
-    char szPath[MAX_PATH_SIZE] = {};
-    auto ret = sprintf_s(szPath, MAX_PATH_SIZE, "%s/mmidump-%s.txt",
-                         DEF_MMI_DATA_ROOT, Strftime("%y%m%d%H%M%S").c_str());
-    if (ret < 0) {
-        MMI_HILOGE("The function sprintf_s perform error, errCode:%{public}d", SPRINTF_S_SEC_FUN_FAIL);
-        return;
-    }
-    char path[PATH_MAX] = {};
-    if (realpath(szPath, path) == nullptr) {
-        MMI_HILOGE("path is error, szPath:%{public}s", szPath);
-        return;
-    }
-    auto fd = open(path, O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR);
-    if (fd < 0) {
-        MMI_HILOGE("The fd less than 0, errCode:%{public}d", FILE_OPEN_FAIL);
-        return;
-    }
-    Dump(fd);
-    close(fd);
 }
 
 void EventDump::InsertDumpInfo(const std::string& str)

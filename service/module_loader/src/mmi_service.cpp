@@ -17,7 +17,7 @@
 
 #include <cinttypes>
 #include <csignal>
-
+#include <parameters.h>
 #include <sys/signalfd.h>
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
@@ -28,6 +28,8 @@
 #include "i_pointer_drawing_manager.h"
 #include "key_map_manager.h"
 #include "mmi_log.h"
+#include "string_ex.h"
+#include "util_ex.h"
 #include "multimodal_input_connect_def_parcel.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
@@ -119,6 +121,29 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
         free(eventData);
         eventData = nullptr;
         ev.data.ptr = nullptr;
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::DelEpoll(EpollEventType type, int32_t fd)
+{
+    if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
+        MMI_HILOGE("Invalid param type");
+        return RET_ERR;
+    }
+    if (fd < 0) {
+        MMI_HILOGE("Invalid param fd_");
+        return RET_ERR;
+    }
+    if (mmiFd_ < 0) {
+        MMI_HILOGE("Invalid param mmiFd_");
+        return RET_ERR;
+    }
+    struct epoll_event ev = {};
+    auto ret = EpollCtl(fd, EPOLL_CTL_DEL, ev, mmiFd_);
+    if (ret < 0) {
+        MMI_HILOGE("DelEpoll failed");
         return ret;
     }
     return RET_OK;
@@ -229,6 +254,7 @@ int32_t MMIService::Init()
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1,
         std::placeholders::_2));
     KeyMapMgr->GetConfigKeyValue("default_keymap", KeyMapMgr->GetDefaultKeyId());
+    OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "false");
     return RET_OK;
 }
 
@@ -244,6 +270,7 @@ void MMIService::OnStart()
     }
     state_ = ServiceRunningState::STATE_RUNNING;
     MMI_HILOGD("Started successfully");
+    AddReloadLibinputTimer();
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
 #ifdef OHOS_RSS_CLIENT
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
@@ -261,12 +288,6 @@ void MMIService::OnStop()
 #ifdef OHOS_RSS_CLIENT
     RemoveSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
 #endif
-}
-
-void MMIService::OnDump()
-{
-    CHK_PIDANDTID();
-    MMIEventDump->Dump();
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
@@ -626,6 +647,49 @@ void MMIService::OnSignalEvent(int32_t signalFd)
             break;
         }
     }
+}
+
+void MMIService::AddReloadLibinputTimer()
+{
+    CALL_LOG_ENTER;
+    TimerMgr->AddTimer(2000, 2, [this]() {
+        auto inputFd = libinputAdapter_.GetInputFd();
+        if (inputFd >= 0) {
+            auto ret = DelEpoll(EPOLL_EVENT_INPUT, inputFd);
+            if (ret <  0) {
+                MMI_HILOGE("del epoll fail, ret: %{public}d", ret);
+            }
+            libinputAdapter_.Stop();
+            MMI_HILOGI("libinput stop successful");
+        }
+
+        if (!InitLibinputService()) {
+            MMI_HILOGE("libinput init failed");
+            return;
+        }
+    });
+}
+
+int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
+{
+    CALL_LOG_ENTER;
+    if (fd < 0) {
+        MMI_HILOGE("fd is invalid");
+        return DUMP_PARAM_ERR;
+    }
+    if (args.empty()) {
+        MMI_HILOGE("args cannot be empty");
+        mprintf(fd, "args cannot be empty\n");
+        MMIEventDump->DumpHelp(fd);
+        return DUMP_PARAM_ERR;
+    }
+    std::vector<std::string> argList = { "" };
+    std::transform(args.begin(), args.end(), std::back_inserter(argList),
+        [](const std::u16string &arg) {
+        return Str16ToStr8(arg);
+    });
+    MMIEventDump->ParseCommand(fd, argList);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
