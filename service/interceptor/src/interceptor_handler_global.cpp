@@ -226,7 +226,7 @@ void InterceptorHandlerGlobal::Dump(int32_t fd, const std::vector<std::string> &
 void InterceptorHandlerGlobal::InterceptorCollection::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_LOG_ENTER;
-    mprintf(fd, "--------------------------[Interceptor Information]-------------------------");
+    mprintf(fd, "Interceptor information:\t");
     mprintf(fd, "interceptors: count=%d", interceptors_.size());
     for (const auto &item : interceptors_) {
         SessionPtr session = item.session_;
