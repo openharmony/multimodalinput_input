@@ -22,6 +22,7 @@
 #include "mmi_log.h"
 #include "net_packet.h"
 #include "proto.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -282,6 +283,28 @@ void InputHandlerManagerGlobal::MonitorCollection::OnSessionLost(SessionPtr sess
         } else {
             cItr = monitors_.erase(cItr);
         }
+    }
+}
+void InputHandlerManagerGlobal::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    return monitors_.Dump(fd, args);
+}
+
+void InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_LOG_ENTER;
+    mprintf(fd, "--------------------------[Monitor Information]-------------------------");
+    mprintf(fd, "monitors: count=%d", monitors_.size());
+    for (const auto &item : monitors_) {
+        SessionPtr session = item.session_;
+        CHKPV(session);
+        mprintf(fd,
+                "monitor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
+                "| HasPermission:%s | EarlistEventTime:%" PRId64 " | Descript:%s \t",
+                item.id_, item.handlerType_, session->GetPid(),
+                session->GetUid(), session->GetFd(),
+                session->HasPermission() ? "true" : "false",
+                session->GetEarlistEventTime(), session->GetDescript().c_str());
     }
 }
 } // namespace MMI

@@ -26,6 +26,7 @@
 #include "mouse_device_state.h"
 #include "timer_manager.h"
 #include "util.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -52,7 +53,13 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
     pointerEvent_->SetButtonId(buttonId_);
 
     InitAbsolution();
-   
+    if (currentDisplayId_ == -1) {
+        absolutionX_ = -1;
+        absolutionY_ = -1;
+        MMI_HILOGI("currentDisplayId_ is -1");
+        return RET_ERR;
+    }
+
     absolutionX_ += libinput_event_pointer_get_dx(data);
     absolutionY_ += libinput_event_pointer_get_dy(data);
     WinMgr->UpdateAndAdjustMouseLoction(currentDisplayId_, absolutionX_, absolutionY_);
@@ -69,7 +76,7 @@ void MouseEventHandler::InitAbsolution()
     MMI_HILOGD("init absolution");
     auto dispalyGroupInfo = WinMgr->GetDisplayGroupInfo();
     if (dispalyGroupInfo.displaysInfo.empty()) {
-        MMI_HILOGE("physicaldisplay is empty");
+        MMI_HILOGI("displayInfo is empty");
         return;
     }
     currentDisplayId_ = dispalyGroupInfo.displaysInfo[0].id;
@@ -226,7 +233,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     pointerEvent_->SetActionStartTime(time);
     pointerEvent_->SetDeviceId(deviceId);
     pointerEvent_->SetPointerId(0);
-    pointerEvent_->SetTargetDisplayId(-1);
+    pointerEvent_->SetTargetDisplayId(currentDisplayId_);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
 }
@@ -330,6 +337,22 @@ bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
 void MouseEventHandler::DumpInner()
 {
     PrintEventData(pointerEvent_);
+}
+
+void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_LOG_ENTER;
+    PointerEvent::PointerItem item;
+    pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);
+    CHKPV(pointerEvent_);
+    mprintf(fd, "---------------------[Mouse Device State Information]--------------------");
+    mprintf(fd,
+            "PointerId:%d | SourceType:%s | PointerAction:%s | ButtonId:%d | AgentWindowId:%d | TargetWindowId:%d "
+            "| DownTime:%" PRId64 " | IsPressed:%s | LocalX:%d | LocalY:%d | Width:%d | Height:%d | Pressure:%lf \t",
+            pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
+            pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(), pointerEvent_->GetTargetWindowId(),
+            item.GetDownTime(), item.IsPressed() ? "true" : "false", item.GetLocalX(),  item.GetLocalY(),
+            item.GetWidth(), item.GetHeight(), item.GetPressure());
 }
 } // namespace MMI
 } // namespace OHOS
