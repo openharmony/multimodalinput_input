@@ -20,7 +20,8 @@ module_output_path = "multimodalinput/fuzz"
 ##############################fuzztest##########################################
 ohos_fuzztest("SupportKeysFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "//foundation/multimodalinput/input/test/fuzztest/supportkeys_fuzzer"
+  fuzz_config_file =
+      "//foundation/multimodalinput/input/test/fuzztest/supportkeys_fuzzer"
   include_dirs =
       [ "//foundation/multimodalinput/input/interfaces/util/common/include" ]
   cflags = [
