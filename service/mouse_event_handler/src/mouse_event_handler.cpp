@@ -347,7 +347,7 @@ void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
     PointerEvent::PointerItem item;
     pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);
     CHKPV(pointerEvent_);
-    mprintf(fd, "---------------------[Mouse Device State Information]--------------------");
+    mprintf(fd, "Mouse device state information:\t");
     mprintf(fd,
             "PointerId:%d | SourceType:%s | PointerAction:%s | ButtonId:%d | AgentWindowId:%d | TargetWindowId:%d "
             "| DownTime:%" PRId64 " | IsPressed:%s | LocalX:%d | LocalY:%d | Width:%d | Height:%d | Pressure:%lf \t",
