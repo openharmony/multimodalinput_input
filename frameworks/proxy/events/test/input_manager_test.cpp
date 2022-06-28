@@ -30,7 +30,7 @@ constexpr int32_t DEFAULT_DEVICE_ID = 0;
 constexpr int32_t INDEX_FIRST = 1;
 constexpr int32_t INDEX_SECOND = 2;
 constexpr int32_t INDEX_THIRD = 3;
-}
+} // namespace
 
 class InputManagerTest : public testing::Test {
 public:
@@ -158,7 +158,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent005()
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
-    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
@@ -211,7 +211,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent007()
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
-    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
@@ -406,7 +406,7 @@ std::shared_ptr<KeyEvent> InputManagerTest::SetupKeyEvent001()
 {
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     CHKPP(keyEvent);
-    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
     kitDown.SetPressed(true);
@@ -544,7 +544,7 @@ void InputManagerTest::TestMarkConsumedStep6()
 HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_001, TestSize.Level1)
 {
     CALL_LOG_ENTER;
-    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
     KeyEvent::KeyItem kitDown;
@@ -558,7 +558,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_001, TestSize.Level
 
     std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
     ASSERT_TRUE(injectUpEvent != nullptr);
-    downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     KeyEvent::KeyItem kitUp;
     kitUp.SetKeyCode(KeyEvent::KEYCODE_BACK);
     kitUp.SetPressed(false);
@@ -635,7 +635,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_004, TestSize.Level
     CALL_LOG_ENTER;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
-    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
     kitDown.SetPressed(true);
@@ -657,7 +657,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_005, TestSize.Level
     CALL_LOG_ENTER;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
-    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(KeyEvent::KEYCODE_FN);
     kitDown.SetPressed(true);
@@ -670,7 +670,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_005, TestSize.Level
 
     std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
     ASSERT_TRUE(injectUpEvent != nullptr);
-    downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     KeyEvent::KeyItem kitUp;
     kitUp.SetKeyCode(KeyEvent::KEYCODE_FN);
     kitUp.SetPressed(false);
@@ -1280,7 +1280,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
 
     for (const auto& id : ids) {
         std::string sPointerEs = InputManagerTest::GetEventDump();
-        MMI_HILOGD("sPointerEs : %{public}s", sPointerEs.c_str());
+        MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
         ASSERT_TRUE(!sPointerEs.empty());
         if (IsValidHandlerId(id)) {
             InputManager::GetInstance()->RemoveInterceptor(id);
@@ -1378,7 +1378,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_007, TestSize.Level1)
     CALL_LOG_ENTER;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
-    int64_t downTime = GetNanoTime()/NANOSECOND_TO_MILLISECOND;
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     KeyEvent::KeyItem kitDown;
     kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
     kitDown.SetPressed(true);
@@ -1452,7 +1452,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_002, TestSize.Lev
 
     for (const auto& id : ids) {
         std::string sPointerEs = InputManagerTest::GetEventDump();
-        MMI_HILOGD("sPointerEs : %{public}s", sPointerEs.c_str());
+        MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
         ASSERT_TRUE(!sPointerEs.empty());
         if (IsValidHandlerId(id)) {
             InputManager::GetInstance()->RemoveMonitor(id);
@@ -1695,7 +1695,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
 
     for (const auto& id : ids) {
         std::string sPointerEs = InputManagerTest::GetEventDump();
-        MMI_HILOGD("sPointerEs : %{public}s", sPointerEs.c_str());
+        MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
         ASSERT_TRUE(!sPointerEs.empty());
         if (IsValidHandlerId(id)) {
             InputManager::GetInstance()->RemoveMonitor(id);
@@ -2056,7 +2056,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_001, TestSize.L
 
     for (const auto& id : ids) {
         std::string sPointerEs = InputManagerTest::GetEventDump();
-        MMI_HILOGD("sPointerEs : %{public}s", sPointerEs.c_str());
+        MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
         ASSERT_TRUE(!sPointerEs.empty());
         if (IsValidHandlerId(id)) {
             InputManager::GetInstance()->RemoveMonitor(id);
@@ -2095,7 +2095,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_002, TestSize.L
 
     for (const auto& id : ids) {
         std::string sPointerEs = InputManagerTest::GetEventDump();
-        MMI_HILOGD("sPointerEs : %{public}s", sPointerEs.c_str());
+        MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
         ASSERT_TRUE(sPointerEs.empty());
         if (IsValidHandlerId(id)) {
             InputManager::GetInstance()->RemoveMonitor(id);
