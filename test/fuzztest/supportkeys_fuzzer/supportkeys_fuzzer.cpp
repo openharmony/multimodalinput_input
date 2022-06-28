@@ -53,17 +53,17 @@ void SupportKeysFuzzTest(const uint8_t* data, size_t size)
         keycodes.push_back(preKey);
     }
     auto fun = [](std::vector<bool> isSupport) {
-        MMI_HILOGD("support key success");
+        MMI_HILOGD("Support key success");
     };
     InputManager::GetInstance()->SupportKeys(id, keycodes, fun);
 }
-} // MMI
-} // OHOS
+} // namespace MMI
+} // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-        /* Run your code on data */
+    /* Run your code on data */
     OHOS::MMI::SupportKeysFuzzTest(data, size);
     return 0;
 }
