@@ -25,10 +25,6 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerVisibleFuzzTest" };
 } // namespace
-inline bool IntToBool(int32_t visible)
-{
-    return !(visible % 2) ? true : false;
-}
 
 template<class T>
 size_t GetObject(T &object, const uint8_t *data, size_t size)
@@ -46,18 +42,19 @@ size_t GetObject(T &object, const uint8_t *data, size_t size)
 
 void PointerVisibleFuzzTest(const uint8_t* data, size_t size)
 {
-    int32_t visible = 0;
+    int32_t random = 0;
     size_t startPos = 0;
-    startPos += GetObject<int32_t>(visible, data + startPos, size - startPos);
-    if (InputManager::GetInstance()->SetPointerVisible(IntToBool(visible)) == RET_OK) {
-        MMI_HILOGD("set pointer visible succeeded");
+    startPos += GetObject<int32_t>(random, data + startPos, size - startPos);
+    bool visible = !(random % 2) ? true : false;
+    if (InputManager::GetInstance()->SetPointerVisible(visible) == RET_ERR) {
+        MMI_HILOGD("Set pointer visible failed");
     }
-    if (InputManager::GetInstance()->IsPointerVisible()) {
-        MMI_HILOGD("the pointer is visible");
+    if (!InputManager::GetInstance()->IsPointerVisible()) {
+        MMI_HILOGD("The pointer is not visible");
     }
 }
-} // MMI
-} // OHOS
+} // namespace MMI
+} // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)

@@ -46,17 +46,17 @@ void GetKeyboardTypeFuzzTest(const uint8_t* data, size_t size)
     size_t startPos = 0;
     startPos += GetObject<int32_t>(deviceId, data + startPos, size - startPos);
     auto fun = [](int32_t keyboardType) {
-        MMI_HILOGD("get keyboard type success");
+        MMI_HILOGD("Get keyboard type success");
     };
     InputManager::GetInstance()->GetKeyboardType(deviceId, fun);
 }
-} // MMI
-} // OHOS
+} // namespace MMI
+} // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-        /* Run your code on data */
+    /* Run your code on data */
     OHOS::MMI::GetKeyboardTypeFuzzTest(data, size);
     return 0;
 }
