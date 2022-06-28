@@ -661,10 +661,9 @@ void MMIService::AddReloadLibinputTimer()
                 MMI_HILOGE("del epoll fail, ret: %{public}d", ret);
             }
             libinputAdapter_.Stop();
-            InputDevMgr->RemoveAllDevice();
             MMI_HILOGI("libinput stop successful");
         }
-
+        InputDevMgr->RemoveAllDevice();
         if (!InitLibinputService()) {
             MMI_HILOGE("libinput init failed");
             return;
