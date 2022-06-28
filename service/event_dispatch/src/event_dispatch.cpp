@@ -23,6 +23,7 @@
 #include "hisysevent.h"
 
 #include "bytrace_adapter.h"
+#include "dfx_hisysevent.h"
 #include "define_interceptor_global.h"
 #include "error_multimodal.h"
 #include "event_filter_wrap.h"
@@ -98,29 +99,31 @@ bool EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point
     return EventFilterWrap::GetInstance().HandlePointerEventFilter(point);
 }
 
-int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
+int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> pointer)
 {
     CALL_LOG_ENTER;
-    CHKPR(point, ERROR_NULL_POINTER);
-    if (HandlePointerEventFilter(point)) {
+    CHKPR(pointer, ERROR_NULL_POINTER);
+    if (HandlePointerEventFilter(pointer)) {
         MMI_HILOGI("Pointer event Filter succeeded");
         return RET_OK;
     }
-    if (InterHdlGl->HandleEvent(point)) {
-        BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
+    if (InterHdlGl->HandleEvent(pointer)) {
+        BytraceAdapter::StartBytrace(pointer, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Interception is succeeded");
         return RET_OK;
     }
-    if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
-        BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
+    if (InputHandlerManagerGlobal::GetInstance().HandleEvent(pointer)) {
+        BytraceAdapter::StartBytrace(pointer, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Monitor is succeeded");
         return RET_OK;
     }
-    auto fd = WinMgr->UpdateTargetPointer(point);
+    auto fd = WinMgr->UpdateTargetPointer(pointer);
     if (fd < 0) {
         MMI_HILOGE("The fd less than 0, fd: %{public}d", fd);
+        DfxHisysevent::TargetPointerEvent(pointer);
         return RET_ERR;
     }
+    DfxHisysevent::TargetPointerEvent(pointer, fd);
     auto udsServer = InputHandler->GetUDSServer();
     CHKPR(udsServer, RET_ERR);
     auto session = udsServer->GetSession(fd);
@@ -137,14 +140,14 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     }
 
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::Marshalling(point, pkt);
-    BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
+    InputEventDataTransformation::Marshalling(pointer, pkt);
+    BytraceAdapter::StartBytrace(pointer, BytraceAdapter::TRACE_STOP);
 
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
-    session->AddEvent(point->GetId(), currentTime);
+    session->AddEvent(pointer->GetId(), currentTime);
     return RET_OK;
 }
 
@@ -173,8 +176,10 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
     auto fd = WinMgr->UpdateTarget(key);
     if (fd < 0) {
         MMI_HILOGE("Invalid fd, fd: %{public}d", fd);
+        DfxHisysevent::TargetKeyEvent(key);
         return RET_ERR;
     }
+    DfxHisysevent::TargetKeyEvent(key, fd);
     MMI_HILOGD("event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
                "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
                "EventType:%{public}d,Flag:%{public}u,"
@@ -233,21 +238,8 @@ bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
         MMI_HILOGD("the event reports normally");
         return false;
     }
-
-    int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
-        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-        "APPLICATION_BLOCK_INPUT",
-        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
-        "PID", sess->GetPid(),
-        "UID", sess->GetUid(),
-        "PACKAGE_NAME", "",
-        "PROCESS_NAME", "",
-        "MSG", "User input does not respond");
-    if (ret != 0) {
-        MMI_HILOGE("HiviewDFX Write failed, HiviewDFX errCode: %{public}d", ret);
-    }
-
-    ret = OHOS::AAFwk::AbilityManagerClient::GetInstance()->SendANRProcessID(sess->GetPid());
+    DfxHisysevent::ApplicationBlockInput(sess);
+    int32_t ret = OHOS::AAFwk::AbilityManagerClient::GetInstance()->SendANRProcessID(sess->GetPid());
     if (ret != 0) {
         MMI_HILOGE("AAFwk SendANRProcessID failed, AAFwk errCode: %{public}d", ret);
     }

@@ -17,7 +17,7 @@
 
 #include <cstdlib>
 #include <cstdio>
-
+#include "dfx_hisysevent.h"
 #include "i_pointer_drawing_manager.h"
 #include "util.h"
 #include "util_ex.h"
@@ -91,6 +91,8 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> i
 void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_LOG_ENTER;
+    DfxHisysevent::FocusWindowChange(displayGroupInfo_, displayGroupInfo);
+    DfxHisysevent::ZorderWindowChange(displayGroupInfo_, displayGroupInfo);
     displayGroupInfo_ = displayGroupInfo;
     if (!displayGroupInfo.displaysInfo.empty()) {
         IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo.displaysInfo[0].id,

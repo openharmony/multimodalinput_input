@@ -19,6 +19,7 @@
 #include <csignal>
 #include <parameters.h>
 #include <sys/signalfd.h>
+#include "dfx_hisysevent.h"
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
 #endif
@@ -303,10 +304,12 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
         programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd)));
     if (ret != RET_OK) {
         MMI_HILOGE("call AddSocketPairInfo failed,return %{public}d", ret);
+        DfxHisysevent::ClientConnectionEvent(pid, uid, moduleType, programName);
         return RET_ERR;
     }
     MMI_HILOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
         programName.c_str(), moduleType);
+    DfxHisysevent::ClientConnectionEvent(pid, uid, moduleType, programName, serverFd);
     return RET_OK;
 }
 

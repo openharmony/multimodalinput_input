@@ -22,7 +22,7 @@
 
 #include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
-
+#include "dfx_hisysevent.h"
 #include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
 #include "util.h"
@@ -225,6 +225,8 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     if (secPtr != nullptr) {
         OnDisconnected(secPtr);
         DelSession(fd);
+    } else {
+        DfxHisysevent::ClientDisconnectionEvent();
     }
     if (ev.data.ptr) {
         free(ev.data.ptr);
@@ -233,7 +235,12 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     if (auto it = circleBufMap_.find(fd); it != circleBufMap_.end()) {
         circleBufMap_.erase(it);
     }
-    close(fd);
+    auto result = close(fd);
+    if (result == RET_OK) {
+        DfxHisysevent::ClientDisconnectionEvent(secPtr, fd);
+    } else {
+        DfxHisysevent::ClientDisconnectionEvent();
+    }
 }
 
 void UDSServer::OnPacket(int32_t fd, NetPacket& pkt)
