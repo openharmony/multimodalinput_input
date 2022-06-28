@@ -41,18 +41,18 @@ config("libmmi_public_client_config") {
 
 config("libmmi_test_util") {
   include_dirs = [
-    "//third_party/googletest/googletest/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "${mmi_path}/test/unittest/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/windowmanager/wm/include",
+    "//third_party/googletest/googletest/include",
   ]
 }
 

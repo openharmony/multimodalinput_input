@@ -80,7 +80,7 @@ void EventUtilTest::AddEventDump(std::string eventDump)
         return;
     }
     strEventDump_.push_back(eventDump);
-    MMI_HILOGD("Setting the Dump event, strEventDump_ : %{public}s", eventDump.c_str());
+    MMI_HILOGD("Setting the Dump event, strEventDump_:%{public}s", eventDump.c_str());
     conditionVariable_.notify_one();
 }
 
@@ -124,7 +124,7 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& p
     std::ostringstream ostream;
     std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
     ostream << "ClientMsgHandler: in OnPointerEvent"
-         << ", EventType:" << pointerEvent->GetEventType()
+         << ",EventType:" << pointerEvent->GetEventType()
          << ",ActionTime:" << pointerEvent->GetActionTime()
          << ",Action:" << pointerEvent->GetAction()
          << ",ActionStartTime:" << pointerEvent->GetActionStartTime()
@@ -139,7 +139,7 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& p
     for (const auto& pointerId : pointerIds) {
         PointerEvent::PointerItem item;
         if (!pointerEvent->GetPointerItem(pointerId, item)) {
-            MMI_HILOGE("Invalid pointer: %{public}d.", pointerId);
+            MMI_HILOGE("Invalid pointer:%{public}d.", pointerId);
             return ostream.str();
         }
         ostream << ",pointerId:" << pointerId << ",DownTime:" << item.GetDownTime()
