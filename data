@@ -1,0 +1,24 @@
+patch/prebuild_eudev/hwdb.d/20-usb-vendor-model.hwdb:55017: ID_VENDOR_FROM_DATABASE=Shenzhen Tongyuan Network-Communication Cables Co., Ltd
+patch/prebuild_eudev/hwdb.d/20-usb-media-players.hwdb:3869: ID_MEDIA_PLAYER=sony_network-walkman
+frameworks/napi/input_monitor/src/js_input_monitor.cpp:636:        work->data = id;
+frameworks/napi/input_monitor/src/js_input_monitor.cpp:654:    int32_t *id = static_cast<int32_t *>(work->data);
+frameworks/napi/input_device/src/js_event_target.cpp:56:    if ((work->data) == nullptr) {
+frameworks/napi/input_device/src/js_event_target.cpp:58:        MMI_HILOGE("check work->data is null");
+frameworks/napi/input_device/src/js_event_target.cpp:61:    auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
+frameworks/napi/input_device/src/js_event_target.cpp:97:    if ((work->data) == nullptr) {
+frameworks/napi/input_device/src/js_event_target.cpp:99:        MMI_HILOGE("check work->data is null");
+frameworks/napi/input_device/src/js_event_target.cpp:102:    auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
+frameworks/napi/input_device/src/js_event_target.cpp:151:        work->data = static_cast<void*>(&item);
+frameworks/napi/input_device/src/js_event_target.cpp:172:    CHKPV(work->data);
+frameworks/napi/input_device/src/js_event_target.cpp:197:    CHKPV(work->data);
+frameworks/napi/input_device/src/js_event_target.cpp:241:    work->data = static_cast<void*>(uData);
+frameworks/napi/input_device/src/js_event_target.cpp:260:    CHKPV(work->data);
+frameworks/napi/input_device/src/js_event_target.cpp:277:    CHKPV(work->data);
+frameworks/napi/input_device/src/js_event_target.cpp:311:    work->data = static_cast<void*>(uData);
+frameworks/napi/input_device/src/js_event_target.cpp:330:    CHKPV(work->data);
+frameworks/napi/input_device/src/js_event_target.cpp:353:    CHKPV(work->data);
+frameworks/napi/input_device/src/js_event_target.cpp:401:    work->data = static_cast<void*>(uData);
+frameworks/napi/input_device/src/js_event_target.cpp:440:    work->data = static_cast<void*>(uData);
+frameworks/napi/input_device/src/js_event_target.cpp:459:    CHKPV(work->data);
+frameworks/napi/input_device/src/js_event_target.cpp:476:    CHKPV(work->data);
+frameworks/napi/input_device/src/js_event_target.cpp:566:    int32_t *uData = static_cast<int32_t*>(work->data);
