@@ -13,14 +13,9 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-
 #include "define_multimodal.h"
-#include "input_manager.h"
-#include "key_event.h"
-#include "pointer_event.h"
+#include "event_util_test.h"
 #include "proto.h"
-#include "run_shell_util.h"
 #include "standardized_event_manager.h"
 #include "util.h"
 
@@ -32,37 +27,41 @@ using namespace testing::ext;
 } // namespace
 class PointerEventTest : public testing::Test {
 public:
-    static void SetUpTestCase(void) {}
+    static void SetUpTestCase(void);
     static void TearDownTestCase(void) {}
-    static std::shared_ptr<PointerEvent> createPointEvent();
+    static std::shared_ptr<PointerEvent> CreatePointEvent();
 };
 
-std::shared_ptr<PointerEvent> PointerEventTest::createPointEvent()
+void PointerEventTest::SetUpTestCase()
 {
-    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(TestUtil->Init());
+}
+
+std::shared_ptr<PointerEvent> PointerEventTest::CreatePointEvent()
+{
+    auto pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
     int64_t downTime = GetMillisTime();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
     PointerEvent::PointerItem item;
-    item.SetPointerId(0);   // test code£¬set the PointerId = 0
-    item.SetGlobalX(823);   // test code£¬set the GlobalX = 823
-    item.SetGlobalY(723);   // test code£¬set the GlobalY = 723
+    item.SetPointerId(1);
+    item.SetDownTime(downTime);
+    item.SetPressed(true);
+
+    item.SetGlobalX(623);
+    item.SetGlobalY(823);
+    item.SetLocalX(600);
+    item.SetLocalY(800);
+
     item.SetWidth(0);
     item.SetHeight(0);
-    item.SetPressure(0);    // test code£¬set the Pressure = 5
-    item.SetDeviceId(1);    // test code£¬set the DeviceId = 1
-    item.SetDownTime(downTime);
+    item.SetPressure(0);
+    item.SetDeviceId(0);
     pointerEvent->AddPointerItem(item);
-
-    pointerEvent->SetPointerId(0);  // test code£¬set the PointerId = 1
-    pointerEvent->SetDeviceId(1);
-    pointerEvent->SetActionTime(downTime);
-    pointerEvent->SetActionStartTime(downTime);
-    pointerEvent->SetTargetDisplayId(0);
-    pointerEvent->SetTargetWindowId(-1);
-    pointerEvent->SetAgentWindowId(-1);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     return pointerEvent;
 }
 
@@ -75,19 +74,11 @@ std::shared_ptr<PointerEvent> PointerEventTest::createPointEvent()
  */
 HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_001, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string log1 = "Pressed keyCode:";
-    std::vector<std::string> beforeRunLogs;
-    ASSERT_TRUE(runCommand.RunShellCommand(log1, beforeRunLogs) == RET_OK);
-
-    std::shared_ptr<PointerEvent> pointerEvent = createPointEvent();
+    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    ASSERT_TRUE(pointerEvent != nullptr);
     std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT };
     pointerEvent->SetPressedKeys(pressedKeys);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-    std::vector<std::string> afterRunLogs;
-    ASSERT_TRUE(runCommand.RunShellCommand(log1, afterRunLogs) == RET_OK);
+    TestSimulateInputEvent(pointerEvent);
 }
 
 /**
@@ -99,18 +90,11 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_001, TestSiz
  */
 HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_002, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string log1 = "Pressed keyCode:";
-    std::vector<std::string> beforeRunLogs;
-    ASSERT_TRUE(runCommand.RunShellCommand(log1, beforeRunLogs) == RET_OK);
-
-    std::shared_ptr<PointerEvent> pointerEvent = createPointEvent();
+    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    ASSERT_TRUE(pointerEvent != nullptr);
     std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_RIGHT };
     pointerEvent->SetPressedKeys(pressedKeys);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    std::vector<std::string> afterRunLogs;
-    ASSERT_TRUE(runCommand.RunShellCommand(log1, afterRunLogs) == RET_OK);
+    TestSimulateInputEvent(pointerEvent);
 }
 
 /**
@@ -122,18 +106,11 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_002, TestSiz
  */
 HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSize.Level1)
 {
-    RunShellUtil runCommand;
-    std::string log1 = "Pressed keyCode:";
-    std::vector<std::string> beforeRunLogs;
-    ASSERT_TRUE(runCommand.RunShellCommand(log1, beforeRunLogs) == RET_OK);
-    std::shared_ptr<PointerEvent> pointerEvent = createPointEvent();
-    std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT,
-        KeyEvent::KEYCODE_CTRL_RIGHT };
+    std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_CTRL_RIGHT };
     pointerEvent->SetPressedKeys(pressedKeys);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    std::vector<std::string> afterRunLogs;
-    ASSERT_TRUE(runCommand.RunShellCommand(log1, afterRunLogs) == RET_OK);
+    TestSimulateInputEvent(pointerEvent);
 }
 
 /**

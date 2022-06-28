@@ -39,6 +39,23 @@ config("libmmi_public_client_config") {
   ]
 }
 
+config("libmmi_test_util") {
+  include_dirs = [
+    "${mmi_path}/frameworks/proxy/event_handler/include",
+    "${mmi_path}/frameworks/proxy/module_loader/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/test/unittest/common/include",
+    "${mmi_path}/util/network/include",
+    "${mmi_path}/util/socket/include",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//foundation/windowmanager/wm/include",
+    "//third_party/googletest/googletest/include",
+  ]
+}
+
 ohos_source_set("libmmi-common") {
   sources = [
     "events/src/input_event.cpp",
@@ -131,29 +148,7 @@ ohos_shared_library("libmmi-client") {
 
 ohos_unittest("ut-mmi-proxy-out") {
   module_out_path = module_output_path
-  include_dirs = [
-    "//utils/native/base/include",
-    "//third_party/googletest/googletest/include",
-    "//utils/native/base/include",
-    "${mmi_path}/frameworks/proxy/event_handler",
-    "${mmi_path}/frameworks/proxy/event_handler/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/util/common",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/util/network",
-    "${mmi_path}/util/network/include",
-    "${mmi_path}/util/socket",
-    "${mmi_path}/util/socket/include",
-    "${mmi_path}/frameworks/proxy/event_handle",
-    "${mmi_path}/frameworks/proxy/event_handle/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/interfaces/native/innerkits/common/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/interfaces/native/innerkits/event/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-  ]
+  include_dirs = [ "//utils/native/base/include" ]
 
   if (is_mmi_have_libinput) {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
@@ -175,6 +170,8 @@ ohos_unittest("ut-mmi-proxy-out") {
 
   sources = [ "module_loader/test/mmi_client_test.cpp" ]
 
+  configs = [ ":libmmi_test_util" ]
+
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
@@ -190,29 +187,7 @@ ohos_unittest("ut-mmi-proxy-out") {
 
 ohos_unittest("KeyEventTest") {
   module_out_path = module_output_path
-  include_dirs = [
-    "//utils/native/base/include",
-    "//third_party/googletest/googletest/include",
-    "//utils/native/base/include",
-    "${mmi_path}/frameworks/proxy/event_handler",
-    "${mmi_path}/frameworks/proxy/event_handler/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/util/common",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/util/network",
-    "${mmi_path}/util/network/include",
-    "${mmi_path}/util/socket",
-    "${mmi_path}/util/socket/include",
-    "${mmi_path}/frameworks/proxy/event_handle",
-    "${mmi_path}/frameworks/proxy/event_handle/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/interfaces/native/innerkits/common/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/interfaces/native/innerkits/event/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-  ]
+  include_dirs = [ "//utils/native/base/include" ]
 
   if (is_mmi_have_libinput) {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
@@ -248,24 +223,7 @@ ohos_unittest("KeyEventTest") {
 
 ohos_unittest("InputManagerTest") {
   module_out_path = module_output_path
-  include_dirs = [
-    "${mmi_path}/frameworks/proxy/events/test",
-    "${mmi_path}/frameworks/proxy/event_handler/include",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/interfaces/native/innerkits/common/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/interfaces/native/innerkits/event/include",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/util/network/include",
-    "${mmi_path}/util/socket/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
-    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
-    "//foundation/windowmanager/wm/include",
-    "//third_party/googletest/googletest/include",
-  ]
+  include_dirs = [ "${mmi_path}/frameworks/proxy/events/test" ]
 
   if (is_mmi_have_libinput) {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
@@ -290,9 +248,12 @@ ohos_unittest("InputManagerTest") {
   }
 
   sources = [
+    "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
+    "${mmi_path}/test/unittest/common/src/window_utils_test.cpp",
     "events/test/input_manager_test.cpp",
-    "events/test/window_utils_test.cpp",
   ]
+
+  configs = [ ":libmmi_test_util" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -313,29 +274,7 @@ ohos_unittest("InputManagerTest") {
 
 ohos_unittest("InputManagerManualTest") {
   module_out_path = module_output_path
-  include_dirs = [
-    "//utils/native/base/include",
-    "//third_party/googletest/googletest/include",
-    "//utils/native/base/include",
-    "${mmi_path}/frameworks/proxy/event_handler",
-    "${mmi_path}/frameworks/proxy/event_handler/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/util/common",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/util/network",
-    "${mmi_path}/util/network/include",
-    "${mmi_path}/util/socket",
-    "${mmi_path}/util/socket/include",
-    "${mmi_path}/frameworks/proxy/event_handle",
-    "${mmi_path}/frameworks/proxy/event_handle/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/interfaces/native/innerkits/common/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/interfaces/native/innerkits/event/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-  ]
+  include_dirs = [ "//utils/native/base/include" ]
 
   if (is_mmi_have_libinput) {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
@@ -357,6 +296,8 @@ ohos_unittest("InputManagerManualTest") {
 
   sources = [ "events/test/input_manager_manual_test.cpp" ]
 
+  configs = [ ":libmmi_test_util" ]
+
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
@@ -371,32 +312,9 @@ ohos_unittest("InputManagerManualTest") {
 
 ohos_unittest("PointerEventTest") {
   module_out_path = module_output_path
-  include_dirs = [
-    "//utils/native/base/include",
-    "//third_party/googletest/googletest/include",
-    "//utils/native/base/include",
-    "${mmi_path}/frameworks/proxy/event_handler",
-    "${mmi_path}/frameworks/proxy/event_handler/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/util/common",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/util/network",
-    "${mmi_path}/util/network/include",
-    "${mmi_path}/util/socket",
-    "${mmi_path}/util/socket/include",
-    "${mmi_path}/frameworks/proxy/event_handle",
-    "${mmi_path}/frameworks/proxy/event_handle/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/interfaces/native/innerkits/common/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/interfaces/native/innerkits/event/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-  ]
 
   if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
+    include_dirs = [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   cflags = [ "-DOHOS_BUILD" ]
@@ -413,16 +331,26 @@ ohos_unittest("PointerEventTest") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
-  sources = [ "events/test/pointer_event_test.cpp" ]
+  sources = [
+    "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
+    "${mmi_path}/test/unittest/common/src/window_utils_test.cpp",
+    "events/test/pointer_event_test.cpp",
+  ]
+
+  configs = [ ":libmmi_test_util" ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
+    "//foundation/ability/ability_runtime/frameworks/native/ability/native:abilitykit_native",
+    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
+    "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "window_manager:libwm",
   ]
 }

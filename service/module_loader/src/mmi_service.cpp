@@ -37,6 +37,7 @@
 #include "system_ability_definition.h"
 #endif
 #include "timer_manager.h"
+#include "input_device_manager.h"
 #include "util.h"
 
 namespace OHOS {
@@ -662,7 +663,7 @@ void MMIService::AddReloadLibinputTimer()
             libinputAdapter_.Stop();
             MMI_HILOGI("libinput stop successful");
         }
-
+        InputDevMgr->RemoveAllDevice();
         if (!InitLibinputService()) {
             MMI_HILOGE("libinput init failed");
             return;
