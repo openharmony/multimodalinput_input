@@ -276,7 +276,8 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     ScanPointerDevice();
 }
 
-void InputDeviceManager::RemoveAllDevice() {
+void InputDeviceManager::RemoveAllDevice()
+{
     inputDevice_.clear();
 }
 
