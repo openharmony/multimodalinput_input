@@ -262,6 +262,14 @@ namespace MMI {
         } \
     } while (0)
 
+#define WRITESTRING(parcel, data, ...) \
+    do { \
+        if (!(parcel).WriteString(data)) { \
+            MMI_HILOGE("WriteString "#data" failed"); \
+            return DEFRET(false, ##__VA_ARGS__); \
+        } \
+    } while (0)
+
 #define READBOOL(parcel, data, ...) \
     do { \
         if (!(parcel).ReadBool(data)) { \
@@ -298,6 +306,14 @@ namespace MMI {
     do { \
         if (!(parcel).ReadDouble(data)) { \
             MMI_HILOGE("ReadDouble "#data" failed"); \
+            return DEFRET(false, ##__VA_ARGS__); \
+        } \
+    } while (0)
+
+#define READSTRING(parcel, data, ...) \
+    do { \
+        if (!(parcel).ReadString(data)) { \
+            MMI_HILOGE("ReadString "#data" failed"); \
             return DEFRET(false, ##__VA_ARGS__); \
         } \
     } while (0)
