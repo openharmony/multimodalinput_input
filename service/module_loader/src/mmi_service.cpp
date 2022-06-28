@@ -283,7 +283,7 @@ void MMIService::OnStart()
 {
     int sleepSeconds = 3;
     sleep(sleepSeconds);
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     int32_t ret = Init();
     if (RET_OK != ret) {
         MMI_HILOGE("Init mmi_service failed");
@@ -301,7 +301,7 @@ void MMIService::OnStart()
 
 void MMIService::OnStop()
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     UdsStop();
     InputHandler->Clear();
     libinputAdapter_.Stop();

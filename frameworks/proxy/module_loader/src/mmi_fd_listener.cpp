@@ -70,7 +70,7 @@ void MMIFdListener::OnReadable(int32_t fd)
 
 void MMIFdListener::OnShutdown(int32_t fd)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     if (fd < 0) {
         MMI_HILOGE("Invalid fd:%{public}d", fd);
     }
@@ -80,7 +80,7 @@ void MMIFdListener::OnShutdown(int32_t fd)
 
 void MMIFdListener::OnException(int32_t fd)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     if (fd < 0) {
         MMI_HILOGE("Invalid fd:%{public}d", fd);
     }

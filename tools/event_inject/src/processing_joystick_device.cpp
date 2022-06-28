@@ -55,8 +55,8 @@ void ProcessingJoystickDevice::TransformPadEventToInputEvent(const std::vector<D
             TransformKeyReleaseEvent(item, inputEventArray);
         } else if (item.eventType == "KEY_EVENT_CLICK") {
             TransformKeyClickEvent(item, inputEventArray);
-        } else if (item.eventType == "DERECTION_KEY") {
-            TransformDerectionKeyEvent(item, inputEventArray);
+        } else if (item.eventType == "DIRECTION_KEY") {
+            TransformDirectionKeyEvent(item, inputEventArray);
         } else if (item.eventType == "ROCKER_1") {
             TransformRocker1Event(item, inputEventArray);
         } else if (item.eventType == "THROTTLE") {
@@ -131,7 +131,7 @@ void ProcessingJoystickDevice::TransformRocker1Event(const DeviceEvent& joystick
 }
 
 
-void ProcessingJoystickDevice::TransformDerectionKeyEvent(const DeviceEvent& joystickEvent,
+void ProcessingJoystickDevice::TransformDirectionKeyEvent(const DeviceEvent& joystickEvent,
                                                           InputEventArray& inputEventArray)
 {
     if (joystickEvent.direction.empty()) {

@@ -18,7 +18,7 @@
 int32_t main(int32_t argc, const char *argv[])
 {
     if (argc == 1 || argc > PARAMETERS_NUMBER) {
-        printf("Invaild Input Para, Plase Check the validity of the para!\n");
+        printf("Invalid Input Para, Please Check the validity of the para!\n");
         return 0;
     }
     DIR* dir = opendir(OHOS::MMI::g_folderpath.c_str());

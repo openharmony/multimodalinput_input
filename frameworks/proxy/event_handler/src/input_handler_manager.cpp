@@ -167,7 +167,7 @@ bool InputHandlerManager::PostTask(int32_t handlerId, const AppExecFwk::EventHan
 void InputHandlerManager::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
     std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     CHKPV(consumer);
     CHKPV(keyEvent);
     consumer->OnInputEvent(keyEvent);
@@ -176,7 +176,7 @@ void InputHandlerManager::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> co
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     CHKPV(keyEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_INTERCEPT_EVENT);
@@ -194,7 +194,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
 void InputHandlerManager::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
     std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     CHKPV(consumer);
     CHKPV(pointerEvent);
     consumer->OnInputEvent(pointerEvent);
@@ -203,7 +203,7 @@ void InputHandlerManager::OnPointerEventTask(std::shared_ptr<IInputEventConsumer
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     CHKPV(pointerEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);

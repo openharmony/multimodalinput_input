@@ -58,10 +58,10 @@ const std::vector<uint32_t>& VirtualSingleFinger::GetAbs() const
     return abs;
 }
 
-const std::vector<uint32_t>& VirtualSingleFinger::GetSwitchs() const
+const std::vector<uint32_t>& VirtualSingleFinger::GetSwitches() const
 {
-    static const std::vector<uint32_t> switchs { SW_MUTE_DEVICE };
-    return switchs;
+    static const std::vector<uint32_t> switches { SW_MUTE_DEVICE };
+    return switches;
 }
 
 const std::vector<uint32_t>& VirtualSingleFinger::GetProperties() const

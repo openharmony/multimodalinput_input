@@ -148,7 +148,7 @@ void UDSSession::DelEvents(int32_t id)
     }
 }
 
-int64_t UDSSession::GetEarlistEventTime() const
+int64_t UDSSession::GetEarliestEventTime() const
 {
     CALL_LOG_ENTER;
     if (events_.empty()) {

@@ -74,7 +74,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
     CHKPR(eventHandler, INVALID_SUBSCRIBE_ID);
     SubscribeKeyEventInfo subscribeInfo(keyOption, callback, eventHandler);
     MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
-        "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
+        "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuration:%{public}d",
         subscribeInfo.GetSubscribeId(), keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
     subscribeInfos_.push_back(subscribeInfo);
@@ -129,7 +129,7 @@ void KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask(
     KeyEventInputSubscribeManager::SubscribeKeyEventInfo info, std::shared_ptr<KeyEvent> event,
     int32_t subscribeId)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     CHKPV(event);
     info.GetCallback()(event);
     MMI_HILOGD("key event callback id:%{public}d keyCode:%{public}d", subscribeId, event->GetKeyCode());
@@ -138,7 +138,7 @@ void KeyEventInputSubscribeManager::OnSubscribeKeyEventCallbackTask(
 int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_ptr<KeyEvent> event,
     int32_t subscribeId)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     CHKPR(event, ERROR_NULL_POINTER);
     if (subscribeId < 0) {
         MMI_HILOGE("Leave, the subscribe id is less than 0");
