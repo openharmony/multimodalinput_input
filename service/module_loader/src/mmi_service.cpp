@@ -126,29 +126,6 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
     return RET_OK;
 }
 
-int32_t MMIService::DelEpoll(EpollEventType type, int32_t fd)
-{
-    if (!(type >= EPOLL_EVENT_BEGIN && type < EPOLL_EVENT_END)) {
-        MMI_HILOGE("Invalid param type");
-        return RET_ERR;
-    }
-    if (fd < 0) {
-        MMI_HILOGE("Invalid param fd_");
-        return RET_ERR;
-    }
-    if (mmiFd_ < 0) {
-        MMI_HILOGE("Invalid param mmiFd_");
-        return RET_ERR;
-    }
-    struct epoll_event ev = {};
-    auto ret = EpollCtl(fd, EPOLL_CTL_DEL, ev, mmiFd_);
-    if (ret < 0) {
-        MMI_HILOGE("DelEpoll failed");
-        return ret;
-    }
-    return RET_OK;
-}
-
 bool MMIService::IsRunning() const
 {
     return (state_ == ServiceRunningState::STATE_RUNNING);
@@ -270,7 +247,6 @@ void MMIService::OnStart()
     }
     state_ = ServiceRunningState::STATE_RUNNING;
     MMI_HILOGD("Started successfully");
-    AddReloadLibinputTimer();
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
 #ifdef OHOS_RSS_CLIENT
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
@@ -647,27 +623,6 @@ void MMIService::OnSignalEvent(int32_t signalFd)
             break;
         }
     }
-}
-
-void MMIService::AddReloadLibinputTimer()
-{
-    CALL_LOG_ENTER;
-    TimerMgr->AddTimer(2000, 2, [this]() {
-        auto inputFd = libinputAdapter_.GetInputFd();
-        if (inputFd >= 0) {
-            auto ret = DelEpoll(EPOLL_EVENT_INPUT, inputFd);
-            if (ret <  0) {
-                MMI_HILOGE("del epoll fail, ret: %{public}d", ret);
-            }
-            libinputAdapter_.Stop();
-            MMI_HILOGI("libinput stop successful");
-        }
-
-        if (!InitLibinputService()) {
-            MMI_HILOGE("libinput init failed");
-            return;
-        }
-    });
 }
 
 int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
