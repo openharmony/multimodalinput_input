@@ -170,7 +170,7 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 
     BytraceAdapter::StartBytrace(keyEvent);
 
-	nextHandler_->HandleKeyEvent(keyEvent);
+    nextHandler_->HandleKeyEvent(keyEvent);
     KeyRepeat->SelectAutoRepeat(keyEvent);
     MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

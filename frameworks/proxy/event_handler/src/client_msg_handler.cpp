@@ -176,8 +176,6 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-
-
 int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
