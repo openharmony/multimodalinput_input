@@ -27,7 +27,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetKe
 } // namespace
 
 template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
+size_t GetObject(const uint8_t *data, size_t size, T &object)
 {
     size_t objectSize = sizeof(object);
     if (objectSize > size) {
@@ -44,7 +44,7 @@ void GetKeyboardTypeFuzzTest(const uint8_t* data, size_t size)
 {
     int32_t deviceId;
     size_t startPos = 0;
-    startPos += GetObject<int32_t>(deviceId, data + startPos, size - startPos);
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, deviceId);
     auto fun = [](int32_t keyboardType) {
         MMI_HILOGD("Get keyboard type success");
     };

@@ -27,7 +27,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Point
 } // namespace
 
 template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
+size_t GetObject(const uint8_t *data, size_t size, T &object)
 {
     size_t objectSize = sizeof(object);
     if (objectSize > size) {
@@ -44,8 +44,8 @@ void PointerVisibleFuzzTest(const uint8_t* data, size_t size)
 {
     int32_t random = 0;
     size_t startPos = 0;
-    startPos += GetObject<int32_t>(random, data + startPos, size - startPos);
-    bool visible = !(random % 2) ? true : false;
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, random);
+    bool visible = (random % 2) ? false : true;
     if (InputManager::GetInstance()->SetPointerVisible(visible) == RET_ERR) {
         MMI_HILOGD("Set pointer visible failed");
     }
