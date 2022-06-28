@@ -37,6 +37,7 @@
 #include "system_ability_definition.h"
 #endif
 #include "timer_manager.h"
+#include "input_device_manager.h"
 #include "util.h"
 
 namespace OHOS {
@@ -660,6 +661,7 @@ void MMIService::AddReloadLibinputTimer()
                 MMI_HILOGE("del epoll fail, ret: %{public}d", ret);
             }
             libinputAdapter_.Stop();
+            InputDevMgr->RemoveAllDevice();
             MMI_HILOGI("libinput stop successful");
         }
 
