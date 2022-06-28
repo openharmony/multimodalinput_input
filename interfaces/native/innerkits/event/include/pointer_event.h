@@ -112,7 +112,7 @@ public:
         AXIS_TYPE_UNKNOWN,
 
         /**
-         * Indicates the vertical scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad,
+         * Indicates the vertical scroll axis. When you scroll the mouse wheel or make certain gestures on the touchpad,
          * the status of the vertical scroll axis changes.
          *
          * @since 9
@@ -120,7 +120,7 @@ public:
         AXIS_TYPE_SCROLL_VERTICAL,
 
         /**
-         * Indicates the horizontal scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad,
+         * Indicates the horizontal scroll axis. When you scroll the mouse wheel or make certain gestures on the touchpad,
          * the status of the horizontal scroll axis changes.
          *
          * @since 9

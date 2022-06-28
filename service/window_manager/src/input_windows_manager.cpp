@@ -333,16 +333,16 @@ void InputWindowsManager::SelectWindowInfo(const int32_t& globalLogicX, const in
                 continue;
             } else if ((targetWindowId < 0) && (IsInHotArea(globalLogicX, globalLogicY, item.pointerHotAreas))) {
                 firstBtnDownWindowId_ = item.id;
-                MMI_HILOGW("find out the dispatch window of this pointerevent when the targetWindowId "
+                MMI_HILOGW("find out the dispatch window of this pointer event when the targetWindowId "
                            "hasn't been setted up yet, window:%{public}d", firstBtnDownWindowId_);
                 break;
             } else if ((targetWindowId >= 0) && (targetWindowId == item.id)) {
                 firstBtnDownWindowId_ = targetWindowId;
-                MMI_HILOGW("find out the dispatch window of this pointerevent when the targetWindowId "
+                MMI_HILOGW("find out the dispatch window of this pointer event when the targetWindowId "
                            "has been setted up already, window:%{public}d", firstBtnDownWindowId_);
                 break;
             } else {
-                MMI_HILOGW("Continue searching for the dispatch window of this pointerevent");
+                MMI_HILOGW("Continue searching for the dispatch window of this pointer event");
             }
         }
     }
@@ -528,7 +528,6 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, in
         }
     }
 }
-
 void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y)
 {
     auto displayInfo = GetPhysicalDisplay(displayId);

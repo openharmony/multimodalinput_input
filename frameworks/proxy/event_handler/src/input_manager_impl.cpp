@@ -85,7 +85,7 @@ bool InputManagerImpl::InitEventHandler()
     ehThread_ = std::thread(std::bind(&InputManagerImpl::OnThread, this));
     ehThread_.detach();
     if (cv_.wait_for(lck, std::chrono::seconds(timeout)) == std::cv_status::timeout) {
-        MMI_HILOGE("EventThandler thread start timeout");
+        MMI_HILOGE("EventHandler thread start timeout");
         return false;
     }
     return true;
@@ -109,7 +109,7 @@ EventHandlerPtr InputManagerImpl::GetCurrentEventHandler() const
 void InputManagerImpl::OnThread()
 {
     CALL_LOG_ENTER;
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     SetThreadName("mmi_client_EventHdr");
     mmiEventHandler_ = std::make_shared<MMIEventHandler>();
     CHKPV(mmiEventHandler_);
@@ -197,7 +197,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
 int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
     std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPR(keyOption, ERROR_NULL_POINTER);
     CHKPR(callback, ERROR_NULL_POINTER);
@@ -210,7 +210,7 @@ int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption
 
 void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventInputSubscribeMgr.UnsubscribeKeyEvent(subscriberId);
 #else
@@ -222,7 +222,7 @@ void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
 void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
     std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     CHKPV(consumer);
     consumer->OnInputEvent(keyEvent);
     MMI_HILOGD("key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
@@ -230,7 +230,7 @@ void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consu
 
 void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     CHKPV(keyEvent);
     CHKPV(eventHandler_);
     CHKPV(consumer_);
@@ -248,7 +248,7 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
     std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     CHKPV(consumer);
     CHKPV(pointerEvent);
     consumer->OnInputEvent(pointerEvent);
@@ -258,7 +258,7 @@ void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> c
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     CHKPV(pointerEvent);
     CHKPV(eventHandler_);
     CHKPV(consumer_);

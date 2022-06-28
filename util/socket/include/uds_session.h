@@ -68,7 +68,7 @@ public:
     void DelEvents(int32_t id);
     void AddPermission(bool hasPermission);
     bool HasPermission();
-    int64_t GetEarlistEventTime() const;
+    int64_t GetEarliestEventTime() const;
     bool IsEventQueueEmpty();
     bool isANRProcess_ {false};
 
