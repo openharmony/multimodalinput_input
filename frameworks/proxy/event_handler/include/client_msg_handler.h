@@ -20,8 +20,6 @@
 #include "msg_handler.h"
 #include "uds_client.h"
 
-#include "key_event_input_subscribe_manager.h"
-
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(const UDSClient&, NetPacket&)> ClientMsgFun;
@@ -35,13 +33,22 @@ public:
     void OnMsgHandler(const UDSClient& client, NetPacket& pkt);
 
 protected:
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnKeyEvent(const UDSClient& client, NetPacket& pkt);
     int32_t OnKeyMonitor(const UDSClient& client, NetPacket& pkt);
-    int32_t OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t OnPointerEvent(const UDSClient& client, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnSubscribeKeyEventCallback(const UDSClient& client, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ReportKeyEvent(const UDSClient& client, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ReportPointerEvent(const UDSClient& client, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     int32_t OnInputDevice(const UDSClient& client, NetPacket& pkt);
     int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);
     int32_t OnSupportKeys(const UDSClient& client, NetPacket& pkt);

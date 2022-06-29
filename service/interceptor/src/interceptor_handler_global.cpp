@@ -15,6 +15,7 @@
 
 #include "interceptor_handler_global.h"
 
+#include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "event_dispatch.h"
 #include "input_event_data_transformation.h"
@@ -30,7 +31,48 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorHandlerGlobal" };
 } // namespace
 
-InterceptorHandlerGlobal::InterceptorHandlerGlobal() {}
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+void InterceptorHandlerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPV(keyEvent);
+    if (HandleEvent(keyEvent)) {
+            MMI_HILOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
+                keyEvent->GetKeyCode());
+            BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
+        return;
+    }
+    CHKPV(nextHandler_);
+    nextHandler_->HandleKeyEvent(keyEvent);
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+void InterceptorHandlerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    if (HandleEvent(pointerEvent)) {
+        BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
+        MMI_HILOGD("Interception is succeeded");
+        return;
+    }
+    CHKPV(nextHandler_);
+    nextHandler_->HandlePointerEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+void InterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    if (HandleEvent(pointerEvent)) {
+        BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
+        MMI_HILOGD("Interception is succeeded");
+        return;
+    }
+    CHKPV(nextHandler_);
+    nextHandler_->HandleTouchEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t InterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
@@ -60,7 +102,7 @@ void InterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,
         interceptors_.RemoveInterceptor(interceptor);
     }
 }
-
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool InterceptorHandlerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGD("Handle KeyEvent");
@@ -71,7 +113,9 @@ bool InterceptorHandlerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
     }
     return interceptors_.HandleEvent(keyEvent);
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 bool InterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
@@ -81,6 +125,7 @@ bool InterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointer
     }
     return interceptors_.HandleEvent(pointerEvent);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 void InterceptorHandlerGlobal::InitSessionLostCallback()
 {
@@ -140,11 +185,7 @@ void InterceptorHandlerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poin
     }
 }
 
-int32_t InterceptorHandlerGlobal::InterceptorCollection::GetPriority() const
-{
-    return IInputEventHandler::DEFAULT_INTERCEPTOR;
-}
-
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
@@ -164,7 +205,9 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
     }
     return isInterceptor;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
@@ -183,6 +226,7 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
     }
     return isInterceptor;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 int32_t InterceptorHandlerGlobal::InterceptorCollection::AddInterceptor(const SessionHandler& interceptor)
 {
