@@ -330,20 +330,17 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "invalid key ID" << std::endl;
                                 return RET_ERR;
                             }
-                            int32_t tmp = 0;
                             if (argc >= 7) {
-                                if (!StrToInt(argv[optind + 2], tmp)) {
+                                if (!StrToInt(argv[optind + 2], pressTimeMs)) {
                                     std::cout << "invalid press time" << std::endl;
                                     return RET_ERR;
                                 }
-                                pressTimeMs = tmp;
                             }
                             if (argc == 8) {
-                                if (!StrToInt(argv[optind + 3], tmp)) {
+                                if (!StrToInt(argv[optind + 3], clickIntervalTimeMs)) {
                                     std::cout << "invalid interval between hits" << std::endl;
                                     return RET_ERR;
                                 }
-                                clickIntervalTimeMs = tmp;
                             }
                             if ((minButtonId > buttonId) || (maxButtonId < buttonId)) {
                                 std::cout << "button id is out of range: " << minButtonId
@@ -869,7 +866,7 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-u <key>                  --up     <key>      -release a button " << std::endl;
     std::cout << "-c <key>                  --click  <key>      -press the left button down,then raise" << std::endl;
     std::cout << "-b <dx1> <dy1> <id> [press time] [click interval time]                --double click" << std::endl;
-    std::cout << "  [pressing time] the time range is more than 1ms but less than 300ms, "       << std::endl;
+    std::cout << "  [press time] the time range is more than 1ms but less than 300ms, "       << std::endl;
     std::cout << "  [click interval time] the time range is more than 1ms but less than 450ms, " << std::endl;
     std::cout << "  Otherwise the operation result may produce error or invalid operation"       << std::endl;
     std::cout << " -press the left button down,then raise" << std::endl;
