@@ -19,8 +19,8 @@
 
 #include "securec.h"
 
-#include "input_manager.h"
 #include "define_multimodal.h"
+#include "input_manager.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -57,14 +57,13 @@ size_t GetString(size_t objectSize, const uint8_t *data, size_t size, std::strin
 void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
 {
     DisplayGroupInfo displayGroupInfo;
-    int32_t startPos = 0;
+    size_t startPos = 0;
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.width);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.height);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.focusWindowId);
-    std::vector<WindowInfo> windowsInfo_;
-    std::vector<DisplayInfo> displaysInfo_;
-    for(size_t i = 0; i < WindowInfo::MAX_HOTAREA_COUNT + 1; ++i)
-    {
+    std::vector<WindowInfo> windowsInfos;
+    std::vector<DisplayInfo> displaysInfos;
+    for(size_t i = 0; i < WindowInfo::MAX_HOTAREA_COUNT + 1; ++i) {
         WindowInfo windowInfo;
         startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.id);
         startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.pid);
@@ -73,7 +72,7 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
         startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.y);
         startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.width);
         startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.height);
-        windowsInfo_.push_back(windowInfo);
+        windowsInfos.push_back(windowInfo);
 
         DisplayInfo displayInfo;
         startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.id);
@@ -89,10 +88,10 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
         std::string uniq = "";
         GetString(objectSize, data, size, uniq);
         displayInfo.uniq = uniq;
-        displaysInfo_.push_back(displayInfo);
+        displaysInfos.push_back(displayInfo);
     }
-    displayGroupInfo.windowsInfo = windowsInfo_;
-    displayGroupInfo.displaysInfo = displaysInfo_;
+    displayGroupInfo.windowsInfo = windowsInfos;
+    displayGroupInfo.displaysInfo = displaysInfos;
     InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
     MMI_HILOGD("Update display info success");
 }
