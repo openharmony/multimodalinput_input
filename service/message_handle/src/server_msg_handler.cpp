@@ -17,14 +17,14 @@
 
 #include <cinttypes>
 
-#include "define_interceptor_global.h"
 #include "event_dump.h"
 #include "event_package.h"
 #include "hos_key_event.h"
+#include "interceptor_handler_global.h"
 #include "input_device_manager.h"
 #include "input_event.h"
 #include "input_event_data_transformation.h"
-#include "input_event_monitor_manager.h"
+#include "input_event_handler.h"
 #include "input_handler_manager_global.h"
 #include "input_windows_manager.h"
 #include "key_event_subscriber.h"
@@ -62,12 +62,6 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputDeviceMontior, this)},
         {MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputDeviceMontior, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
-        {MmiMessageId::ADD_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventMontior, this)},
-        {MmiMessageId::REMOVE_INPUT_EVENT_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventMontior, this)},
-        {MmiMessageId::ADD_INPUT_EVENT_TOUCHPAD_MONITOR,
-            MsgCallbackBind2(&ServerMsgHandler::OnAddInputEventTouchpadMontior, this)},
-        {MmiMessageId::REMOVE_INPUT_EVENT_TOUCHPAD_MONITOR,
-            MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputEventTouchpadMontior, this)},
 #ifdef OHOS_BUILD_MMI_DEBUG
         {MmiMessageId::BIGPACKET_TEST, MsgCallbackBind2(&ServerMsgHandler::OnBigPacketTest, this)},
 #endif // OHOS_BUILD_MMI_DEBUG
@@ -128,17 +122,19 @@ int32_t ServerMsgHandler::MarkEventProcessed(SessionPtr sess, int32_t eventId)
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPR(keyEvent, ERROR_NULL_POINTER);
-    auto result = eventDispatch_.DispatchKeyEventPid(*udsServer_, keyEvent);
-    if (result != RET_OK) {
-        MMI_HILOGE("Key event dispatch failed. ret:%{public}d,errCode:%{public}d", result, KEY_EVENT_DISP_FAIL);
-    }
+    auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+    CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+    inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
     MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
@@ -149,15 +145,32 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
         && targetWindowId_ > 0) {
         pointerEvent->SetTargetWindowId(targetWindowId_);
     }
-    if (eventDispatch_.HandlePointerEvent(pointerEvent) != RET_OK) {
-        MMI_HILOGE("HandlePointerEvent failed");
-        return RET_ERR;
+    auto source = pointerEvent->GetSourceType();
+    switch (source) {
+        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
+            auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+            CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+            inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
+            break;
+        }
+        case PointerEvent::SOURCE_TYPE_MOUSE:
+        case PointerEvent::SOURCE_TYPE_TOUCHPAD : {
+            auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+            CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+            inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
+            break;
+        }
+        default: {
+            MMI_HILOGW("Source type is unknown, source:%{public}d", source);
+            break;
+        }
     }
     if (action == PointerEvent::POINTER_ACTION_DOWN) {
         targetWindowId_ = pointerEvent->GetTargetWindowId();
     }
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
@@ -200,17 +213,26 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     return RET_OK;
 }
 
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType,
     HandleEventType eventType)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    MMI_HILOGD("OnAddInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
+    MMI_HILOGD("handler:%{public}d, handlerType:%{public}d", handlerId, handlerType);
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     if (handlerType == InputHandlerType::INTERCEPTOR) {
-        return InterHdlGl->AddInputHandler(handlerId, handlerType, eventType, sess);
+        auto interceptorHandler = InputHandler->GetInterceptorHandler();
+        CHKPR(interceptorHandler, ERROR_NULL_POINTER);
+        return interceptorHandler->AddInputHandler(handlerId, handlerType, eventType, sess);
     }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     if (handlerType == InputHandlerType::MONITOR) {
-        return InputHandlerManagerGlobal::GetInstance().AddInputHandler(handlerId, handlerType, sess);
+        auto monitorHandler = InputHandler->GetMonitorHandler();
+        CHKPR(monitorHandler, ERROR_NULL_POINTER);
+        return monitorHandler->AddInputHandler(handlerId, handlerType, sess);
     }
+#endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
 
@@ -218,35 +240,52 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, int32_t handlerI
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGD("OnRemoveInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     if (handlerType == InputHandlerType::INTERCEPTOR) {
-        InterHdlGl->RemoveInputHandler(handlerId, handlerType, sess);
+        auto interceptorHandler = InputHandler->GetInterceptorHandler();
+        CHKPR(interceptorHandler, ERROR_NULL_POINTER);
+        interceptorHandler->RemoveInputHandler(handlerId, handlerType, sess);
     }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     if (handlerType == InputHandlerType::MONITOR) {
-        InputHandlerManagerGlobal::GetInstance().RemoveInputHandler(handlerId, handlerType, sess);
+        auto monitorHandler = InputHandler->GetMonitorHandler();
+        CHKPR(monitorHandler, ERROR_NULL_POINTER);
+        monitorHandler->RemoveInputHandler(handlerId, handlerType, sess);
     }
+#endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
+#ifdef OHOS_BUILD_ENABLE_MONITOR
 int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t monitorId, int32_t eventId)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    InputHandlerManagerGlobal::GetInstance().MarkConsumed(monitorId, eventId, sess);
+    auto monitorHandler = InputHandler->GetMonitorHandler();
+    CHKPR(monitorHandler, ERROR_NULL_POINTER);
+    monitorHandler->MarkConsumed(monitorId, eventId, sess);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_MONITOR
 
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
 {
     CALL_LOG_ENTER;
     if (MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
         auto pointerEvent = MouseEventHdr->GetPointerEvent();
-        eventDispatch_.HandlePointerEvent(pointerEvent);
+        CHKPR(pointerEvent, ERROR_NULL_POINTER);
+        auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+        CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+        inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
         MMI_HILOGD("Mouse movement message processed successfully");
     }
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ServerMsgHandler::OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
     int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {
@@ -254,7 +293,9 @@ int32_t ServerMsgHandler::OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
     CHKPR(server, ERROR_NULL_POINTER);
     auto sess = server->GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
-    return KeyEventSubscriber_.SubscribeKeyEvent(sess, subscribeId, option);
+    auto subscriberHandler = InputHandler->GetSubscriberHandler();
+    CHKPR(subscriberHandler, ERROR_NULL_POINTER);
+    return subscriberHandler->SubscribeKeyEvent(sess, subscribeId, option);
 }
 
 int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid, int32_t subscribeId)
@@ -263,8 +304,11 @@ int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid,
     CHKPR(server, ERROR_NULL_POINTER);
     auto sess = server->GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
-    return KeyEventSubscriber_.UnSubscribeKeyEvent(sess, subscribeId);
+    auto subscriberHandler = InputHandler->GetSubscriberHandler();
+    CHKPR(subscriberHandler, ERROR_NULL_POINTER);    
+    return subscriberHandler->UnsubscribeKeyEvent(sess, subscribeId);
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 int32_t ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
 {
@@ -440,75 +484,6 @@ int32_t ServerMsgHandler::OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket&
     CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     InputDevMgr->RemoveDevMonitor(sess);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t eventType = 0;
-    pkt >> eventType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read eventType failed");
-        return PACKET_READ_FAIL;
-    }
-    if (eventType != InputEvent::EVENT_TYPE_KEY) {
-        MMI_HILOGE("Wrong event type, eventType:%{public}d", eventType);
-        return RET_ERR;
-    }
-    InputMonitorServiceMgr.AddInputEventMontior(sess, eventType);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnAddInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt)
-{
-    CALL_LOG_ENTER;
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t eventType = 0;
-    pkt >> eventType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read eventType failed");
-        return PACKET_READ_FAIL;
-    }
-    if (eventType != InputEvent::EVENT_TYPE_POINTER) {
-        MMI_HILOGE("Wrong event type, eventType:%{public}d", eventType);
-        return RET_ERR;
-    }
-    InputMonitorServiceMgr.AddInputEventTouchpadMontior(eventType, sess);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnRemoveInputEventMontior(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t eventType = 0;
-    pkt >> eventType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read eventType failed");
-        return PACKET_READ_FAIL;
-    }
-    if (eventType != InputEvent::EVENT_TYPE_KEY) {
-        MMI_HILOGE("Wrong event type, eventType:%{public}d", eventType);
-        return RET_ERR;
-    }
-    InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
-    return RET_OK;
-}
-
-int32_t ServerMsgHandler::OnRemoveInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t eventType = 0;
-    pkt >> eventType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read eventType failed");
-        return PACKET_READ_FAIL;
-    }
-    if (eventType != InputEvent::EVENT_TYPE_POINTER) {
-        MMI_HILOGE("Wrong event type, eventType:%{public}d", eventType);
-        return RET_ERR;
-    }
-    InputMonitorServiceMgr.RemoveInputEventMontior(sess, eventType);
     return RET_OK;
 }
 
