@@ -63,7 +63,7 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.focusWindowId);
     std::vector<WindowInfo> windowsInfos;
     std::vector<DisplayInfo> displaysInfos;
-    for(size_t i = 0; i < WindowInfo::MAX_HOTAREA_COUNT + 1; ++i) {
+    for (size_t i = 0; i < WindowInfo::MAX_HOTAREA_COUNT + 1; ++i) {
         WindowInfo windowInfo;
         startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.id);
         startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.pid);
@@ -83,17 +83,26 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
 
         size_t objectSize = 0;
         std::string name = "";
-        GetString(objectSize, data, size, name);
+        size_t ret = 0;
+        ret = GetString(objectSize, data, size, name);
+        if (ret == 0) {
+             MMI_HILOGD("%{public}s:%{public}d The return value is 0", __func__, __LINE__);
+             return;
+        }
         displayInfo.name = name;
         std::string uniq = "";
-        GetString(objectSize, data, size, uniq);
+        ret = GetString(objectSize, data, size, uniq);
+         if (ret == 0) {
+             MMI_HILOGD("%{public}s:%{public}d The return value is 0", __func__, __LINE__);
+             return;
+        }
         displayInfo.uniq = uniq;
         displaysInfos.push_back(displayInfo);
     }
     displayGroupInfo.windowsInfo = windowsInfos;
     displayGroupInfo.displaysInfo = displaysInfos;
     InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
-    MMI_HILOGD("Update display info success");
+    MMI_HILOGD("update display info success");
 }
 } // namespace MMI
 } // namespace OHOS

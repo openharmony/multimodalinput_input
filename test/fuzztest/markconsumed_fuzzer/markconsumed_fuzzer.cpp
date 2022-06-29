@@ -43,7 +43,6 @@ T GetObject(const uint8_t *data, size_t size)
 
 void MarkConsumedFuzzTest(const uint8_t* data, size_t size)
 {
-    MMI_HILOGD("test func:MarkConsumed_fuzzer start");
     int32_t monitorId = GetObject<int32_t>(data, size);
     int32_t eventId = GetObject<int32_t>(data, size);
     InputManager::GetInstance()->MarkConsumed(monitorId, eventId);
