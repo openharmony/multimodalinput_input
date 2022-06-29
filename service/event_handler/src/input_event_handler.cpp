@@ -29,12 +29,10 @@
 
 #include "bytrace_adapter.h"
 #include "input_device_manager.h"
-#include "key_auto_repeat.h"
 #include "key_command_manager.h"
 #include "key_map_manager.h"
-#include "mmi_func_callback.h"
-#include "mouse_event_handler.h"
 #include "libinput_adapter.h"
+#include "key_auto_repeat.h"
 #include "mmi_func_callback.h"
 #include "time_cost_chk.h"
 #include "timer_manager.h"
@@ -286,12 +284,14 @@ std::shared_ptr<InputHandlerManagerGlobal> InputEventHandler::GetMonitorHandler(
     return monitorHandler_;
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
 {
     CHKPR(eventfilterHandler_, ERROR_NULL_POINTER);
     eventfilterHandler_->AddInputEventFilter(filter);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 int32_t InputEventHandler::OnEventDeviceAdded(libinput_event *event)
 {

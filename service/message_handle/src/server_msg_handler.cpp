@@ -213,6 +213,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     return RET_OK;
 }
 
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType,
     HandleEventType eventType)
 {
@@ -222,14 +223,14 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, int32_t handlerId, 
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         auto interceptorHandler = InputHandler->GetInterceptorHandler();
         CHKPR(interceptorHandler, ERROR_NULL_POINTER);
-        interceptorHandler->AddInputHandler(handlerId, handlerType, eventType, sess);
+        return interceptorHandler->AddInputHandler(handlerId, handlerType, eventType, sess);
     }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     if (handlerType == InputHandlerType::MONITOR) {
         auto monitorHandler = InputHandler->GetMonitorHandler();
         CHKPR(monitorHandler, ERROR_NULL_POINTER);
-        monitorHandler->AddInputHandler(handlerId, handlerType, eventType, sess);
+        return monitorHandler->AddInputHandler(handlerId, handlerType, sess);
     }
 #endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
@@ -255,17 +256,18 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, int32_t handlerI
 #endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
+#ifdef OHOS_BUILD_ENABLE_MONITOR
 int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t monitorId, int32_t eventId)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-#ifdef OHOS_BUILD_ENABLE_MONITOR
     auto monitorHandler = InputHandler->GetMonitorHandler();
     CHKPR(monitorHandler, ERROR_NULL_POINTER);
     monitorHandler->MarkConsumed(monitorId, eventId, sess);
-#endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_MONITOR
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
@@ -282,6 +284,7 @@ int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ServerMsgHandler::OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
     int32_t subscribeId, const std::shared_ptr<KeyOption> option)

@@ -205,7 +205,7 @@ int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption
 #else
     MMI_HILOGW("Keyboard device does not support");
     return ERROR_UNSUPPORT;
-#endif
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
@@ -215,7 +215,7 @@ void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
     KeyEventInputSubscribeMgr.UnsubscribeKeyEvent(subscriberId);
 #else
     MMI_HILOGW("Keyboard device does not support");
-#endif
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -358,9 +358,9 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
     CHKPR(consumer, INVALID_HANDLER_ID);
     return AddMonitor(consumer);
 #else
-    MMI_HILOGW("Keyboard device does not support");
+    MMI_HILOGW("Keyboard device or function does not support");
     return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD || OHOS_BUILD_ENABLE_MONITOR
 }
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerEvent>)> monitor)
@@ -371,9 +371,9 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerE
     CHKPR(consumer, INVALID_HANDLER_ID);
     return AddMonitor(consumer);
 #else
-    MMI_HILOGW("Pointer and tp device does not support");
+    MMI_HILOGW("Pointer/tp device or monitor function does not support");
     return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_MONITOR ||  OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
 }
 
 int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
@@ -428,12 +428,13 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
         MMI_HILOGE("Failed to inject move mouse offset event");
     }
 #else
-    MMI_HILOGW("Pointer device does not support");
+    MMI_HILOGW("Pointer device or pointer drawing module does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     CHKPR(interceptor, INVALID_HANDLER_ID);
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
@@ -441,11 +442,15 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
         return RET_ERR;
     }
     return InputInterMgr->AddInterceptor(interceptor, HandleEventType::ALL);
+#else 
+    MMI_HILOGW("Interceptor function does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
     CHKPR(interceptor, INVALID_HANDLER_ID);
     std::lock_guard<std::mutex> guard(mtx_);
     auto consumer = std::make_shared<MonitorEventConsumer>(interceptor);
@@ -456,19 +461,23 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
     }
     return InputInterMgr->AddInterceptor(consumer, HandleEventType::KEY);
 #else
-    MMI_HILOGW("Keyboard device does not support");
+    MMI_HILOGW("Keyboard device or interceptor function does not support");
     return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
 }
 
 void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 {
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
         return;
     }
     InputInterMgr->RemoveInterceptor(interceptorId);
+#else
+    MMI_HILOGW("Interceptor function does not support");
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 }
 
 void InputManagerImpl::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
@@ -506,13 +515,13 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
         MMI_HILOGE("Failed to inject pointer event");
     }
 #else
-    MMI_HILOGW("Pointer or tp device does not support");
+    MMI_HILOGW("Pointer and tp device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
 int32_t InputManagerImpl::SetPointerVisible(bool visible)
 {
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     CALL_LOG_ENTER;
     int32_t ret = MultimodalInputConnMgr->SetPointerVisible(visible);
     if (ret != RET_OK) {
@@ -520,14 +529,14 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible)
     }
     return ret;
 #else
-    MMI_HILOGW("Pointer drawing module does not support");
+    MMI_HILOGW("Pointer device or pointer drawing module does not support");
     return ERROR_UNSUPPORT;
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
 bool InputManagerImpl::IsPointerVisible()
 {
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     CALL_LOG_ENTER;
     bool visible;
     int32_t ret = MultimodalInputConnMgr->IsPointerVisible(visible);
@@ -536,7 +545,7 @@ bool InputManagerImpl::IsPointerVisible()
     }
     return visible;
 #else
-    MMI_HILOGW("Pointer drawing module does not support");
+    MMI_HILOGW("Pointer device or pointer drawing module does not support");
     return false;
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }

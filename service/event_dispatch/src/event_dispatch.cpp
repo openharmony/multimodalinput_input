@@ -141,6 +141,7 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     session->AddEvent(point->GetId(), currentTime);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_POINTER
+
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
 {
@@ -187,7 +188,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
     session->AddEvent(key->GetId(), currentTime);
     return RET_OK;
 }
-#endif
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
 {

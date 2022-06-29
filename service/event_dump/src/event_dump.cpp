@@ -74,10 +74,18 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         {"devicelist", no_argument, 0, 'l'},
         {"windows", no_argument, 0, 'w'},
         {"udsserver", no_argument, 0, 'u'},
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         {"subscriber", no_argument, 0, 's'},
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_MONITOR
         {"monitor", no_argument, 0, 'o'},
+#endif // OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
         {"interceptor", no_argument, 0, 'i'},
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_POINTER
         {"mouse", no_argument, 0, 'm'},
+#endif // OHOS_BUILD_ENABLE_POINTER
         {NULL, 0, 0, 0}
     };
     char **argv = new char *[args.size()];
@@ -115,28 +123,36 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 udsServer->Dump(fd, args);
                 break;
             }
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
             case 's': {
                 auto subscriberHandler = InputHandler->GetSubscriberHandler();
                 CHKPV(subscriberHandler);
                 subscriberHandler->Dump(fd, args);
                 break;
             }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_MONITOR
             case 'o': {
                 auto monitorHandler = InputHandler->GetMonitorHandler();
                 CHKPV(monitorHandler);
                 monitorHandler->Dump(fd, args);
                 break;
             }
+#endif // OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
             case 'i': {
                 auto interceptorHandler = InputHandler->GetInterceptorHandler();
                 CHKPV(interceptorHandler);
                 interceptorHandler->Dump(fd, args);
                 break;
             }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_POINTER
             case 'm': {
                 MouseEventHdr->Dump(fd, args);
                 break;
             }
+#endif // OHOS_BUILD_ENABLE_POINTER
             default: {
                 mprintf(fd, "cmd param is error\n");
                 DumpHelp(fd);
