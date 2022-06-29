@@ -15,6 +15,7 @@
 
 #include "key_event_subscriber.h"
 
+#include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_event_data_transformation.h"
@@ -30,6 +31,38 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "KeyEventSubscriber"};
 constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
 } // namespace
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+void KeyEventSubscriber::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPV(keyEvent);
+    if (SubscribeKeyEvent(keyEvent)) {
+        MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{public}d", keyEvent->GetKeyCode());
+        BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
+        return;
+    }
+    CHKPV(nextHandler_);
+    nextHandler_->HandleKeyEvent(keyEvent);
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+void KeyEventSubscriber::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    CHKPV(nextHandler_);
+    nextHandler_->HandlePointerEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+void KeyEventSubscriber::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    CHKPV(nextHandler_);
+    nextHandler_->HandleTouchEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t KeyEventSubscriber::SubscribeKeyEvent(
     SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)
@@ -60,7 +93,7 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
     return RET_OK;
 }
 
-int32_t KeyEventSubscriber::UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
+int32_t KeyEventSubscriber::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
 {
     CALL_LOG_ENTER;
     MMI_HILOGD("subscribeId:%{public}d", subscribeId);
@@ -101,7 +134,6 @@ bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     } else {
         MMI_HILOGW("keyAction exception");
     }
-    // keyEvent_.reset();
     return handled;
 }
 

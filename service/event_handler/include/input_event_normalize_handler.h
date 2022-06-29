@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,42 +12,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef EVENT_DISPATCH_H
-#define EVENT_DISPATCH_H
 
-#include "nocopyable.h"
+#ifndef INPUT_EVENT_NORMALIZE_H
+#define INPUT_EVENT_NORMALIZE_H
+
+#include <memory>
 
 #include "i_input_event_handler.h"
-#include "key_event.h"
-#include "key_event_value_transformation.h"
-#include "pointer_event.h"
-#include "uds_server.h"
+#include "event_package.h"
 
 namespace OHOS {
 namespace MMI {
-class EventDispatch : public IInputEventHandler {
+class InputEventNormalizeHandler : public IInputEventHandler {
 public:
-    EventDispatch();
-    DISALLOW_COPY_AND_MOVE(EventDispatch);
-    virtual ~EventDispatch();
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    InputEventNormalizeHandler() = default;
+    ~InputEventNormalizeHandler() = default;
+    void HandleLibinputEvent(libinput_event* event) override;
     void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-#endif // OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t AddHandleTimer(int32_t timeout = 300);
+   
+private:
+    int32_t HandleKeyboardEvent(libinput_event* event);
+    void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t HandleTouchPadEvent(libinput_event* event);
+    int32_t HandleGestureEvent(libinput_event* event);
+    int32_t HandleMouseEvent(libinput_event* event);
+    int32_t HandleTouchEvent(libinput_event* event);
+    int32_t HandleTableToolEvent(libinput_event* event);
 
-protected:
-    void OnEventTouchGetPointEventType(const EventTouch& touch, const int32_t fingerCount,
-        POINT_EVENT_TYPE& pointEventType);
-    bool TriggerANR(int64_t time, SessionPtr sess);
+private:
+    int32_t timerId_ = -1;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    EventPackage eventPackage_;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // EVENT_DISPATCH_H
+#endif // INPUT_EVENT_NORMALIZE_H
