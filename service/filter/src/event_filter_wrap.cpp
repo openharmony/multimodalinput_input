@@ -15,6 +15,7 @@
 
 #include "event_filter_wrap.h"
 
+#include "error_multimodal.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -32,6 +33,41 @@ EventFilterWrap::~EventFilterWrap()
 {
     CALL_LOG_ENTER;
 }
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+void EventFilterWrap::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_LOG_ENTER;
+    CHKPV(keyEvent);
+    CHKPV(nextHandler_);
+    nextHandler_->HandleKeyEvent(keyEvent);
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+void EventFilterWrap::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    if (HandlePointerEventFilter(pointerEvent)) {
+        MMI_HILOGI("Pointer event Filter succeeded");
+        return;
+    }
+    CHKPV(nextHandler_);
+    nextHandler_->HandlePointerEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+void EventFilterWrap::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    if (HandlePointerEventFilter(pointerEvent)) {
+        MMI_HILOGI("Pointer event Filter succeeded");
+        return;
+    }
+    CHKPV(nextHandler_);
+    nextHandler_->HandleTouchEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t EventFilterWrap::AddInputEventFilter(sptr<IEventFilter> filter)
 {

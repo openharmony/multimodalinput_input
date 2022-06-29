@@ -62,16 +62,24 @@ config("multimodalinput_mmi_public_config") {
 
 group("multimodalinput_mmi_packages") {
   deps = [
-    "frameworks/napi/input_consumer:inputconsumer",
     "frameworks/napi/input_device:inputdevice",
-    "frameworks/napi/input_event_client:inputeventclient",
-    "frameworks/napi/input_monitor:inputmonitor",
     "frameworks/napi/key_code:keycode",
-    "frameworks/napi/mouse:mouse",
     "frameworks/proxy:libmmi-client",
     "service:libmmi-server",
     "tools/inject_event:uinput",
   ]
+  if (mmi_enable_monitor) {
+    deps += [ "frameworks/napi/input_monitor:inputmonitor" ]
+  }
+  if (mmi_enable_mouse) {
+    deps += [ "frameworks/napi/mouse:mouse" ]
+  }
+  if (mmi_enable_keyboard) {
+    deps += [
+      "frameworks/napi/input_consumer:inputconsumer",
+      "frameworks/napi/input_event_client:inputeventclient",
+    ]
+  }
 }
 
 group("mmi_debug_tools") {

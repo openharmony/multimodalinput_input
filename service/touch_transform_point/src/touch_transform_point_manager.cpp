@@ -14,6 +14,7 @@
  */
 
 #include "touch_transform_point_manager.h"
+
 #include "tablet_tool_processor.h"
 #include "input_device_manager.h"
 
@@ -29,16 +30,24 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibInput(
     CHKPP(event);
     switch (deviceType) {
         case INPUT_DEVICE_CAP_TOUCH: {
+#ifdef OHOS_BUILD_ENABLE_TOUCH
             return OnLibinputTouchEvent(event);
+#endif // OHOS_BUILD_ENABLE_TOUCH
         }
         case INPUT_DEVICE_CAP_TABLET_TOOL: {
+#ifdef OHOS_BUILD_ENABLE_TOUCH
             return OnLibinputTabletToolEvent(event);
+#endif // OHOS_BUILD_ENABLE_TOUCH
         }
         case INPUT_DEVICE_CAP_TOUCH_PAD: {
+#ifdef OHOS_BUILD_ENABLE_POINTER
             return OnLibinputTouchPadEvent(event);
+#endif // OHOS_BUILD_ENABLE_POINTER
         }
         case INPUT_DEVICE_CAP_GESTURE: {
+#ifdef OHOS_BUILD_ENABLE_POINTER
             return OnTouchPadGestrueEvent(event);
+#endif // OHOS_BUILD_ENABLE_POINTER
         }
         default: {
             MMI_HILOGE("The in parameter deviceType is error, deviceType:%{public}d", deviceType);
@@ -48,6 +57,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibInput(
     return nullptr;
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(struct libinput_event *event)
 {
     CHKPP(event);
@@ -68,7 +78,9 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchEvent(s
     }
     return processor->OnLibinputTouchEvent(event);
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTabletToolEvent(struct libinput_event *event)
 {
     CHKPP(event);
@@ -89,7 +101,9 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTabletToolEv
     }
     return processor->OnEvent(event);
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEvent(struct libinput_event *event)
 {
     CHKPP(event);
@@ -111,7 +125,9 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEven
     }
     return processor->OnLibinputTouchPadEvent(event);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent(struct libinput_event *event)
 {
     CHKPP(event);
@@ -133,5 +149,6 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent
     }
     return processor->OnTouchPadGestrueEvent(event);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 } // namespace MMI
 } // namespace OHOS

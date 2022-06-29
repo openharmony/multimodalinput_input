@@ -28,8 +28,11 @@
 
 #include "if_mmi_client.h"
 #include "input_device_impl.h"
+#ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
+#endif // OHOS_BUILD_ENABLE_MONITOR
 #include "i_input_event_consumer.h"
+#include "key_option.h"
 #include "mmi_event_handler.h"
 #include "pointer_event.h"
 
@@ -46,13 +49,22 @@ public:
     EventHandlerPtr GetCurrentEventHandler() const;
     
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    int32_t SubscribeKeyEvent(
+		std::shared_ptr<KeyOption> keyOption,
+        std::function<void(std::shared_ptr<KeyEvent>)> callback
+	);
+    void UnsubscribeKeyEvent(int32_t subscriberId);
     int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);
 
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     int32_t PackDisplayData(NetPacket &pkt);
 
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
@@ -84,10 +96,14 @@ private:
     void PrintDisplayInfo();
     void SendDisplayInfo();
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void OnThread();
 
 private:
@@ -95,7 +111,9 @@ private:
     std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
 
     DisplayGroupInfo displayGroupInfo_;
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     InputMonitorManager monitorManager_;
+#endif // OHOS_BUILD_ENABLE_MONITOR
 
     std::mutex mtx_;
     std::condition_variable cv_;
