@@ -41,7 +41,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key);
-#endif
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 protected:
     void OnEventTouchGetPointEventType(const EventTouch& touch, const int32_t fingerCount,

@@ -69,7 +69,7 @@ void InputHandlerManagerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> p
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
-    InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
+    InputHandlerType handlerType, SessionPtr session)
 {
     InitSessionLostCallback();
     if (!IsValidHandlerId(handlerId)) {

@@ -36,8 +36,8 @@ void OnConnected(const IfMMIClient& client)
     KeyEventInputSubscribeMgr.OnConnected();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-    InputHandlerManager::GetInstance().OnConnected();
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR    
+    InputHandlerMgr.OnConnected();
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 }
 
 MultimodalEventHandler::MultimodalEventHandler() {}
@@ -138,76 +138,5 @@ int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
     return EventManager.MoveMouseEvent(offsetX, offsetY);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-
-int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
-{
-    CALL_LOG_ENTER;
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return MMI_SERVICE_INVALID;
-    }
-    NetPacket pkt(MmiMessageId::ADD_INPUT_EVENT_MONITOR);
-    pkt << keyEventType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write add keyEventType failed");
-        return MMI_SERVICE_INVALID;
-    }
-    client_->SendMessage(pkt);
-    return RET_OK;
-}
-
-void MultimodalEventHandler::RemoveInputEventMontior(int32_t keyEventType)
-{
-    CALL_LOG_ENTER;
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return;
-    }
-    NetPacket pkt(MmiMessageId::REMOVE_INPUT_EVENT_MONITOR);
-    pkt << keyEventType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write remove keyEventType failed");
-        return;
-    }
-    client_->SendMessage(pkt);
-}
-
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEventType)
-{
-    CALL_LOG_ENTER;
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return;
-    }
-    NetPacket pkt(MmiMessageId::REMOVE_INPUT_EVENT_TOUCHPAD_MONITOR);
-    pkt << InputEvent::EVENT_TYPE_POINTER;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write remove touchpad montior failed");
-        return;
-    }
-    client_->SendMessage(pkt);
-}
-
-int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEventType)
-{
-    CALL_LOG_ENTER;
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return MMI_SERVICE_INVALID;
-    }
-    NetPacket pkt(MmiMessageId::ADD_INPUT_EVENT_TOUCHPAD_MONITOR);
-    pkt << InputEvent::EVENT_TYPE_POINTER;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write add touchpad montior failed");
-        return MMI_SERVICE_INVALID;
-    }
-    MMI_HILOGE("send msg before");
-    bool isSuc = client_->SendMessage(pkt);
-    if (isSuc)
-        MMI_HILOGD("sendAdd msg Success");
-    return RET_OK;
-}
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS

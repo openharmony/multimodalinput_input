@@ -38,7 +38,6 @@ protected:
     int32_t OnKeyMonitor(const UDSClient& client, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt);
     int32_t OnPointerEvent(const UDSClient& client, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

@@ -363,35 +363,34 @@ void MMIService::OnDisconnected(SessionPtr s)
 int32_t MMIService::SetPointerVisible(bool visible)
 {
     CALL_LOG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerVisible,
         IPointerDrawingManager::GetInstance(), GetCallingPid(), visible));
     if (ret != RET_OK) {
         MMI_HILOGE("set pointer visible failed,return %{public}d", ret);
         return ret;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
 }
-
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MMIService::CheckPointerVisible(bool &visible)
 {
-#ifdef OHOS_BUILD_ENABLE_POINTER
     visible = IPointerDrawingManager::GetInstance()->IsPointerVisible();
-#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 int32_t MMIService::IsPointerVisible(bool &visible)
 {
     CALL_LOG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckPointerVisible, this, std::ref(visible)));
     if (ret != RET_OK) {
         MMI_HILOGE("is pointer visible failed,return %{public}d", ret);
         return RET_ERR;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
 }
 
@@ -524,25 +523,25 @@ int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     return sMsgHandler_.OnInjectPointerEvent(pointerEvent);
 }
-#endif // OHOS_BUILD_ENABLE_POINTER
 
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_LOG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
     if (ret != RET_OK) {
         MMI_HILOGE("inject pointer event failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
 }
 
