@@ -308,86 +308,66 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             break;
                         }
                         case 'b': {
-                            int32_t pressTimeMs = 0;
-                            int32_t clickTntervalTimeMs = 0;
+                            int32_t pressTimeMs = 50;
+                            int32_t clickIntervalTimeMs = 300;
                             const int32_t minButtonId = 0;
                             const int32_t maxButtonId = 7;
-                            const int64_t minPressTimeMs = 1;
-                            const int64_t maxPressTimeMs = 300;
-                            const int64_t minClickTntervalTimeMs = 1;
-                            const int64_t maxClickTntervalTimeMs = 450;
-                            if (argc == 6) {
-                                if (!StrToInt(optarg, px) ||
-                                    !StrToInt(argv[optind], py) ||
-                                    !StrToInt(argv[optind + 1], buttonId)) {
-                                    std::cout << "input coordinate or button error" << std::endl;
-                                    return RET_ERR;
-                                }
-                                if ((minButtonId > buttonId) || (maxButtonId < buttonId)) {
-                                    std::cout << "button id is out of range: " << minButtonId;
-                                    std::cout << " < button id < " << maxButtonId << std::endl;
-                                    return RET_ERR;
-                                }
-                                pressTimeMs = 50;
-                                clickTntervalTimeMs = 300;
-                            } else if (argc == 7) {
-                                if (!StrToInt(optarg, px) ||
-                                    !StrToInt(argv[optind], py) ||
-                                    !StrToInt(argv[optind + 1], buttonId) ||
-                                    !StrToInt(argv[optind + 2], pressTimeMs)) {
-                                    std::cout << "input coordinate or button or press time error" << std::endl;
-                                    return RET_ERR;
-                                }
-                                if ((minButtonId > buttonId) || (maxButtonId < buttonId)) {
-                                    std::cout << "button id is out of range: " << minButtonId;
-                                    std::cout << " < button id < " << maxButtonId << std::endl;
-                                    return RET_ERR;
-                                }
-                                if ((minPressTimeMs > pressTimeMs) || (maxPressTimeMs < pressTimeMs)) {
-                                    std::cout << "press time is out of range: " << minPressTimeMs << " ms";
-                                    std::cout << " < press time < " << maxPressTimeMs << " ms" << std::endl;
-                                    return RET_ERR;
-                                }
-                                clickTntervalTimeMs = 300;
-                            } else if (argc == 8) {
-                                if (!StrToInt(optarg, px) ||
-                                    !StrToInt(argv[optind], py) ||
-                                    !StrToInt(argv[optind + 1], buttonId) ||
-                                    !StrToInt(argv[optind + 2], pressTimeMs) ||
-                                    !StrToInt(argv[optind + 3], clickTntervalTimeMs)) {
-                                    std::cout << "input coordinate and button or time error" << std::endl;
-                                    return RET_ERR;
-                                }
-                                if ((minButtonId > buttonId) || (maxButtonId < buttonId)) {
-                                    std::cout << "button id is out of range: " << minButtonId;
-                                    std::cout << " < button id < " << maxButtonId << std::endl;
-                                    return RET_ERR;
-                                }
-                                if ((minPressTimeMs > pressTimeMs) || (maxPressTimeMs < pressTimeMs)) {
-                                    std::cout << "press time is out of range: " << minPressTimeMs << " ms";
-                                    std::cout << " < press time < " << maxPressTimeMs << " ms" << std::endl;
-                                    return RET_ERR;
-                                }
-                                if ((minClickTntervalTimeMs > clickTntervalTimeMs) ||
-                                    (maxClickTntervalTimeMs < clickTntervalTimeMs)) {
-                                    std::cout << "click interval time is out of range: ";
-                                    std::cout << minClickTntervalTimeMs << " ms";
-                                    std::cout << " < click interval time < " << maxClickTntervalTimeMs;
-                                    std::cout << " ms" << std::endl;
-                                    return RET_ERR;
-                                }
-                            } else {
-                                std::cout << "parameter error, unable to run" << std::endl;
+                            const int32_t minPressTimeMs = 1;
+                            const int32_t maxPressTimeMs = 300;
+                            const int32_t minClickIntervalTimeMs = 1;
+                            const int32_t maxClickIntervalTimeMs = 450;
+                            if (argc < 6 || argc > 8) {
+                                std::cout << "wrong number of parameters" << std::endl;
                                 ShowUsage();
                                 return RET_ERR;
                             }
-                            std::cout << "double click coordinate: " << px << ", " << py;
-                            std::cout << ", button: " << buttonId;
-                            std::cout << ", press time: " << pressTimeMs << " ms";
-                            std::cout << ", interval time: " << clickTntervalTimeMs << " ms" << std::endl;
+                            if (!StrToInt(optarg, px) ||
+                                !StrToInt(argv[optind], py)) {
+                                std::cout << "invalid coordinate value" << std::endl;
+                                return RET_ERR;
+                            }
+                            if (!StrToInt(argv[optind + 1], buttonId)) {
+                                std::cout << "invalid key ID" << std::endl;
+                                return RET_ERR;
+                            }
+                            int32_t tmp = 0;
+                            if (argc >= 7) {
+                                if (!StrToInt(argv[optind + 2], tmp)) {
+                                    std::cout << "invalid press time" << std::endl;
+                                    return RET_ERR;
+                                }
+                                pressTimeMs = tmp;
+                            }
+                            if (argc == 8) {
+                                if (!StrToInt(argv[optind + 3], tmp)) {
+                                    std::cout << "invalid interval between hits" << std::endl;
+                                    return RET_ERR;
+                                }
+                                clickIntervalTimeMs = tmp;
+                            }
+                            if ((minButtonId > buttonId) || (maxButtonId < buttonId)) {
+                                std::cout << "button id is out of range: " << minButtonId
+                                    << " < button id < " << maxButtonId << std::endl;
+                                return RET_ERR;
+                            }
+                            if ((minPressTimeMs > pressTimeMs) || (maxPressTimeMs < pressTimeMs)) {
+                                std::cout << "press time is out of range: " << minPressTimeMs << " ms"
+                                    << " < press time < " << maxPressTimeMs << " ms" << std::endl;
+                                return RET_ERR;
+                            }
+                            if ((minClickIntervalTimeMs > clickIntervalTimeMs) ||
+                                (maxClickIntervalTimeMs < clickIntervalTimeMs)) {
+                                std::cout << "click interval time is out of range: "<< minClickIntervalTimeMs << " ms"
+                                    << " < click interval time < " << maxClickIntervalTimeMs << " ms" << std::endl;
+                                return RET_ERR;
+                            }
+                            std::cout << "coordinate: (" << px << ", " << py
+                                << "), button id: " << buttonId << ", press time: " << pressTimeMs << " ms"
+                                << ", interval time: " << clickIntervalTimeMs << " ms" << std::endl;
 
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             PointerEvent::PointerItem item;
                             item.SetPointerId(0);
                             item.SetPressed(true);
@@ -398,31 +378,21 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetButtonId(buttonId);
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
                             item.SetPressed(false);
-                            pointerEvent->SetPointerId(0);
                             pointerEvent->UpdatePointerItem(0, item);
-                            pointerEvent->SetButtonPressed(buttonId);
-                            pointerEvent->SetButtonId(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            std::this_thread::sleep_for(std::chrono::milliseconds(clickTntervalTimeMs));
+                            std::this_thread::sleep_for(std::chrono::milliseconds(clickIntervalTimeMs));
 
                             item.SetPressed(true);
-                            pointerEvent->SetPointerId(0);
-                            pointerEvent->AddPointerItem(item);
-                            pointerEvent->SetButtonId(buttonId);
-                            pointerEvent->SetButtonPressed(buttonId);
+                            pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
                             item.SetPressed(false);
-                            pointerEvent->SetPointerId(0);
                             pointerEvent->UpdatePointerItem(0, item);
-                            pointerEvent->SetButtonPressed(buttonId);
-                            pointerEvent->SetButtonId(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             break;
