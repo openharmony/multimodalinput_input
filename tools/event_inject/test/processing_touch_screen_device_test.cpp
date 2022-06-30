@@ -43,8 +43,8 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, Tes
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformTouchScreenJsonDataToInputData.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start touchscreen & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start touchscreen & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformTouchScreenJsonDataToInputData.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchscreen &";
@@ -81,8 +81,8 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEvent
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJsonDataToInputDataEventsIsEmpty.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start touchscreen & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start touchscreen & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformJsonDataToInputDataEventsIsEmpty.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchscreen &";
@@ -119,8 +119,8 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataSingl
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJsonDataToInputDataSingleEventsIsEmpty.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start touchscreen & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start touchscreen & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformJsonDataToInputDataSingleEventsIsEmpty.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchscreen &";

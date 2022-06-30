@@ -92,7 +92,7 @@ group("mmi_debug_tools") {
     "patch/diff_libinput_mmi:libinput-record-mmi",
     "patch/diff_libinput_mmi:libinput-tablet-mmi",
     "tools/event_inject:mmi-event-injection",
-    "tools/virtual_device_manager:mmi-virtual-device-manager",
+    "tools/vuinput:vuinput",
     "//third_party/eudev:udevadm",
   ]
 }
@@ -101,7 +101,7 @@ group("ut_mmi_debug_tools") {
   testonly = true
   deps = [
     "tools/event_inject:ut-event-injection-out",
-    "tools/virtual_device_manager:ut-virtual-device-out",
+    "tools/vuinput:ut-virtual-device-out",
   ]
 }
 
