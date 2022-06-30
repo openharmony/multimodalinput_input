@@ -59,8 +59,8 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ServerMsgHandler::OnInputDeviceIds, this)},
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ServerMsgHandler::OnSupportKeys, this)},
         {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind2(&ServerMsgHandler::OnInputKeyboardType, this)},
-        {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputDeviceMontior, this)},
-        {MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputDeviceMontior, this)},
+        {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnAddInputDeviceMonitor, this)},
+        {MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ServerMsgHandler::OnRemoveInputDeviceMonitor, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
 #ifdef OHOS_BUILD_MMI_DEBUG
         {MmiMessageId::BIGPACKET_TEST, MsgCallbackBind2(&ServerMsgHandler::OnBigPacketTest, this)},
@@ -103,11 +103,11 @@ int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
     NetPacket pkt(MmiMessageId::HDI_INJECT);
     pkt << processingCode;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write reply messaage failed");
+        MMI_HILOGE("Packet write reply message failed");
         return RET_ERR;
     }
     if (!sess->SendMsg(pkt)) {
-        MMI_HILOGE("OnHdiInject reply messaage error");
+        MMI_HILOGE("OnHdiInject reply message error");
         return RET_ERR;
     }
     return RET_OK;
@@ -377,7 +377,7 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
     }
 
     pkt2 << userData << inputDevice->GetId() << inputDevice->GetName() << inputDevice->GetType()
-        << inputDevice->GetBustype() << inputDevice->GetProduct() << inputDevice->GetVendor()
+        << inputDevice->GetBusType() << inputDevice->GetProduct() << inputDevice->GetVendor()
         << inputDevice->GetVersion() << inputDevice->GetPhys() << inputDevice->GetUniq()
         << inputDevice->GetAxisInfo().size();
     if (pkt2.ChkRWError()) {
@@ -458,7 +458,7 @@ int32_t ServerMsgHandler::OnInputKeyboardType(SessionPtr sess, NetPacket& pkt)
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::OnAddInputDeviceMonitor(SessionPtr sess, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
@@ -479,7 +479,7 @@ int32_t ServerMsgHandler::OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pk
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt)
+int32_t ServerMsgHandler::OnRemoveInputDeviceMonitor(SessionPtr sess, NetPacket& pkt)
 {
     CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);

@@ -39,7 +39,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     std::shared_ptr<PointerEvent> OnLibinputTouchPadEvent(struct libinput_event *event);
-    std::shared_ptr<PointerEvent> OnTouchPadGestrueEvent(struct libinput_event *event);
+    std::shared_ptr<PointerEvent> OnTouchPadGestureEvent(struct libinput_event *event);
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 private:

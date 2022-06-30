@@ -350,11 +350,11 @@ void InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::v
         CHKPV(session);
         mprintf(fd,
                 "monitor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
-                "| HasPermission:%s | EarlistEventTime:%" PRId64 " | Descript:%s \t",
+                "| HasPermission:%s | EarliestEventTime:%" PRId64 " | Descript:%s \t",
                 item.id_, item.handlerType_, session->GetPid(),
                 session->GetUid(), session->GetFd(),
                 session->HasPermission() ? "true" : "false",
-                session->GetEarlistEventTime(), session->GetDescript().c_str());
+                session->GetEarliestEventTime(), session->GetDescript().c_str());
     }
 }
 } // namespace MMI

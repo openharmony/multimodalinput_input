@@ -84,7 +84,7 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
         MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
     }
     MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
-        "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
+        "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuration:%{public}d",
         subscribeId, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
@@ -130,7 +130,7 @@ bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
         handled = HandleKeyUp(keyEvent);
     } else if (keyAction == KeyEvent::KEY_ACTION_CANCEL) {
         hasEventExecuting = false;
-        handled = HandleKeyCanel(keyEvent);
+        handled = HandleKeyCancel(keyEvent);
     } else {
         MMI_HILOGW("keyAction exception");
     }
@@ -195,11 +195,11 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     int32_t fd = subscriber->sess_->GetFd();
     pkt << fd << subscriber->id_;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write disaptch subscriber failed");
+        MMI_HILOGE("Packet write dispatch subscriber failed");
         return;
     }
     if (!udsServerPtr->SendMsg(fd, pkt)) {
-        MMI_HILOGE("Leave, server disaptch subscriber failed");
+        MMI_HILOGE("Leave, server dispatch subscriber failed");
         return;
     }
 }
@@ -307,7 +307,7 @@ bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent
     for (const auto &subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
         MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
-            "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
+            "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuration:%{public}d",
             subscriber->id_, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
             keyOption->GetFinalKeyDownDuration());
         for (const auto &keyCode : keyOption->GetPreKeys()) {
@@ -357,7 +357,7 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
     for (const auto &subscriber : subscribers_) {
         auto& keyOption = subscriber->keyOption_;
         MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
-            "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuriation:%{public}d",
+            "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuration:%{public}d",
             subscriber->id_, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
             keyOption->GetFinalKeyDownDuration());
         for (auto keyCode : keyOption->GetPreKeys()) {
@@ -404,7 +404,7 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
     return handled;
 }
 
-bool KeyEventSubscriber::HandleKeyCanel(const std::shared_ptr<KeyEvent>& keyEvent)
+bool KeyEventSubscriber::HandleKeyCancel(const std::shared_ptr<KeyEvent>& keyEvent)
 {
     CALL_LOG_ENTER;
     CHKPF(keyEvent);

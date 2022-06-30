@@ -34,8 +34,8 @@ public:
     std::string GetName() const;
     void SetType(int32_t deviceType);
     int32_t GetType() const;
-    void SetBustype(int32_t bus);
-    int32_t GetBustype() const;
+    void SetBusType(int32_t bus);
+    int32_t GetBusType() const;
     void SetVersion(int32_t version);
     int32_t GetVersion() const;
     void SetProduct(int32_t product);

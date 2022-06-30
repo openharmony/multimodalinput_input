@@ -62,7 +62,7 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 
     absolutionX_ += libinput_event_pointer_get_dx(data);
     absolutionY_ += libinput_event_pointer_get_dy(data);
-    WinMgr->UpdateAndAdjustMouseLoction(currentDisplayId_, absolutionX_, absolutionY_);
+    WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
     pointerEvent_->SetTargetDisplayId(currentDisplayId_);
     MMI_HILOGD("Change Coordinate : x:%{public}lf,y:%{public}lf",  absolutionX_, absolutionY_);
     return RET_OK;
@@ -284,7 +284,7 @@ void MouseEventHandler::HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY)
     InitAbsolution();
     absolutionX_ += offsetX;
     absolutionY_ += offsetY;
-    WinMgr->UpdateAndAdjustMouseLoction(currentDisplayId_, absolutionX_, absolutionY_);
+    WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
 }
 
 void MouseEventHandler::HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem)

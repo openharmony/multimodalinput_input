@@ -34,7 +34,7 @@ private:
     void TransformKeyReleaseEvent(const DeviceEvent& joystickEvent, InputEventArray& inputEventArray);
     void TransformKeyClickEvent(const DeviceEvent& joystickEvent, InputEventArray& inputEventArray);
     void TransformRocker1Event(const DeviceEvent& joystickEvent, InputEventArray& inputEventArray);
-    void TransformDerectionKeyEvent(const DeviceEvent& joystickEvent, InputEventArray& inputEventArray);
+    void TransformDirectionKeyEvent(const DeviceEvent& joystickEvent, InputEventArray& inputEventArray);
     void TransformThrottle1Event(const DeviceEvent& joystickEvent, InputEventArray& inputEventArray);
 };
 } // namespace MMI

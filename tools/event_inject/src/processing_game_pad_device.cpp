@@ -26,12 +26,12 @@ int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const DeviceItem& 
 {
     CALL_LOG_ENTER;
     if (originalEvent.events.empty()) {
-        MMI_HILOGE("manage game pad array faild, inputData is empty");
+        MMI_HILOGE("manage game pad array failed, inputData is empty");
         return RET_ERR;
     }
     std::vector<DeviceEvent> inputData = originalEvent.events;
     if (inputData.empty()) {
-        MMI_HILOGE("manage finger array faild, inputData is empty");
+        MMI_HILOGE("manage finger array failed, inputData is empty");
         return RET_ERR;
     }
     TransformPadEventToInputEvent(inputData, inputEventArray);
@@ -52,8 +52,8 @@ void ProcessingGamePadDevice::TransformPadEventToInputEvent(const std::vector<De
             TransformKeyReleaseEvent(item, inputEventArray);
         } else if (item.eventType == "KEY_EVENT_CLICK") {
             TransformKeyClickEvent(item, inputEventArray);
-        } else if (item.eventType == "DERECTION_KEY") {
-            TransformDerectionKeyEvent(item, inputEventArray);
+        } else if (item.eventType == "DIRECTION_KEY") {
+            TransformDirectionKeyEvent(item, inputEventArray);
         } else if (item.eventType == "ROCKER_1") {
             TransformRocker1Event(item, inputEventArray);
         } else if (item.eventType == "ROCKER_2") {
@@ -187,7 +187,7 @@ void ProcessingGamePadDevice::TransformRocker2Event(const DeviceEvent& padEvent,
     SetSynReport(inputEventArray);
 }
 
-void ProcessingGamePadDevice::TransformDerectionKeyEvent(const DeviceEvent& padEvent, InputEventArray& inputEventArray)
+void ProcessingGamePadDevice::TransformDirectionKeyEvent(const DeviceEvent& padEvent, InputEventArray& inputEventArray)
 {
     if (padEvent.direction.empty()) {
         MMI_HILOGW("not find direction");

@@ -47,12 +47,12 @@ int32_t InputDevice::GetType() const
     return deviceType_;
 }
 
-void InputDevice::SetBustype(int32_t bus)
+void InputDevice::SetBusType(int32_t bus)
 {
     bus_ = bus;
 }
 
-int32_t InputDevice::GetBustype() const
+int32_t InputDevice::GetBusType() const
 {
     return bus_;
 }

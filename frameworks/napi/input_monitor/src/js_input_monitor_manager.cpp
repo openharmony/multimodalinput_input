@@ -47,7 +47,7 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
     auto monitor = std::make_shared<JsInputMonitor>(jsEnv, typeName, callback, nextId_++);
     CHKPV(monitor);
     if (!monitor->Start()) {
-        THROWERR(jsEnv, "js monitor startup failedn");
+        THROWERR(jsEnv, "js monitor startup failed");
         return;
     }
     monitors_.push_back(monitor);
