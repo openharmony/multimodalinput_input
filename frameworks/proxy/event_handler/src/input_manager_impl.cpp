@@ -163,7 +163,6 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
         int32_t ret = MultimodalInputConnMgr->AddInputEventFilter(eventFilterService_);
         if (ret != RET_OK) {
             MMI_HILOGE("AddInputEventFilter has send to server fail, ret:%{public}d", ret);
-            delete eventFilterService_;
             eventFilterService_ = nullptr;
             return RET_ERR;
         }
