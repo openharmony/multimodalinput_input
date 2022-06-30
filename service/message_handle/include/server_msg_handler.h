@@ -35,18 +35,28 @@ public:
     void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
     int32_t MarkEventProcessed(SessionPtr sess, int32_t eventId);
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType,
         HandleEventType eventType);
     int32_t OnRemoveInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t OnMarkConsumed(SessionPtr sess, int32_t monitorId, int32_t eventId);
+#endif // OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
         int32_t subscribeId, const std::shared_ptr<KeyOption> option);
     int32_t OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid, int32_t subscribeId);
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t OnMoveMouse(int32_t offsetX, int32_t offsetY);
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_HDF
@@ -59,17 +69,11 @@ protected:
     int32_t OnInputKeyboardType(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
-    int32_t OnAddInputEventMontior(SessionPtr sess, NetPacket& pkt);
-    int32_t OnRemoveInputEventMontior(SessionPtr sess, NetPacket& pkt);
-    int32_t OnAddInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt);
-    int32_t OnRemoveInputEventTouchpadMontior(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_MMI_DEBUG
 private:
     UDSServer *udsServer_ = nullptr;
-    EventDispatch eventDispatch_;
-    std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
     int32_t targetWindowId_ = -1;
 };
 } // namespace MMI

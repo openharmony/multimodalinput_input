@@ -17,7 +17,6 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-#include "input_event_monitor_manager.h"
 #include "input_handler_manager.h"
 #include "input_manager.h"
 #include "multimodal_event_handler.h"
@@ -86,7 +85,11 @@ void InputManagerManualTest::AddInputEventFilter()
     };
 
     int32_t ret = InputManager::GetInstance()->AddInputEventFilter(callback);
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif
 }
 
 void InputManagerManualTest::SimulateInputEventHelper(int32_t globalX, int32_t globalY, int32_t expectVal)
@@ -108,7 +111,11 @@ void InputManagerManualTest::SimulateInputEventHelper(int32_t globalX, int32_t g
     MMI_HILOGI("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     EXPECT_EQ(callbackRet, expectVal);
+#else
+    EXPECT_EQ(callbackRet, 0);
+#endif
 }
 
 /**

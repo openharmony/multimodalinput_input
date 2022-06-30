@@ -96,10 +96,9 @@ void KeyAutoRepeat::AddHandleTimer(int32_t timeout)
 {
     CALL_LOG_ENTER;
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
-        auto ret = eventDispatch_.DispatchKeyEventPid(*(this->udsServer_), this->keyEvent_);
-        if (ret != RET_OK) {
-            MMI_HILOGE("KeyEvent dispatch failed, ret:%{public}d, errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
-        }
+        auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+        CHKPV(inputEventNormalizeHandler);
+        inputEventNormalizeHandler->HandleKeyEvent(this->keyEvent_);   
         int32_t triggertime = KeyRepeat->GetIntervalTime(keyEvent_->GetDeviceId());
         this->AddHandleTimer(triggertime);
     });

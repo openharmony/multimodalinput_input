@@ -37,22 +37,21 @@ public:
 
     MMIClientPtr GetMMIClient();
     bool InitClient();
-    
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     int32_t GetDevice(int32_t userData, int32_t deviceId);
     int32_t GetDeviceIds(int32_t userData);
     int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes);
     int32_t GetKeyboardType(int32_t userData, int32_t deviceId);
     int32_t RegisterInputDeviceMonitor();
     int32_t UnRegisterInputDeviceMonitor();
-    int32_t AddInputEventMontior(int32_t keyEventType);
-    void RemoveInputEventMontior(int32_t keyEventType);
-    int32_t AddInputEventTouchpadMontior(int32_t pointerEventType);
-    void RemoveInputEventTouchpadMontior(int32_t pointerEventType);
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 private:
     MMIClientPtr client_ = nullptr;
