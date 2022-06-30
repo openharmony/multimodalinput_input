@@ -11,18 +11,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("test") {
-  testonly = true
-
-  deps = [
-    "addinputeventfilter_fuzzer:fuzztest",
-    "addinterceptor_fuzzer:fuzztest",
-    "addmonitor_fuzzer:fuzztest",
-    "markconsumed_fuzzer:fuzztest",
-    "movemouse_fuzzer:fuzztest",
-    "setwindowinputeventconsumer_fuzzer:fuzztest",
-    "simulateinputevent_fuzzer:fuzztest",
-    "subscribekeyevent_fuzzer:fuzztest",
-    "updatedisplayinfo_fuzzer:fuzztest",
-  ]
-}
+FUZZ
