@@ -126,7 +126,7 @@ namespace MMI {
         } \
     } while (0)
 
-#define CHK_PIDANDTID() \
+#define CHK_PID_AND_TID() \
     do { \
         MMI_HILOGD("%{public}s, (%{public}d), pid:%{public}d threadId:%{public}" PRIu64, \
             __FILE__, __LINE__, GetPid(), GetThisThreadId()); \
@@ -212,7 +212,7 @@ namespace MMI {
         } \
     } while (0)
 
-#define CHK_PIDANDTID() \
+#define CHK_PID_AND_TID() \
     do { \
         MMI_HILOGD("pid:%{public}d threadId:%{public}" PRIu64, GetPid(), GetThisThreadId()); \
     } while (0)

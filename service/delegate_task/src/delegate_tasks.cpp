@@ -81,7 +81,7 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
     Future future = promise.get_future();
     auto task = PostTask(callback, &promise);
     if (task == nullptr) {
-        MMI_HILOGE("post sync task faild");
+        MMI_HILOGE("post sync task failed");
         return ETASKS_POST_SYNCTASK_FAIL;
     }
 
@@ -106,7 +106,7 @@ int32_t DelegateTasks::PostAsyncTask(DTaskCallback callback)
     }
     auto task = PostTask(callback);
     if (task == nullptr) {
-        MMI_HILOGE("post async task faild");
+        MMI_HILOGE("post async task failed");
         return ETASKS_POST_ASYNCTASK_FAIL;
     }
     return RET_OK;
@@ -147,13 +147,13 @@ DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *
     auto res = write(fds_[1], &data, sizeof(data));
     if (res == -1) {
         RecoveryId(id);
-        MMI_HILOGE("pipe write faild,errno:%{public}d", errno);
+        MMI_HILOGE("pipe write failed,errno:%{public}d", errno);
         return nullptr;
     }
     TaskPtr task = std::make_shared<Task>(id, callback, promise);
     if (task == nullptr) {
         RecoveryId(id);
-        MMI_HILOGE("make task faild");
+        MMI_HILOGE("make task failed");
         return nullptr;
     }
     tasks_.push(task);
