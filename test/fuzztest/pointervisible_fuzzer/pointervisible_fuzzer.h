@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef ADDMONITOR_FUZZER_H
-#define ADDMONITOR_FUZZER_H
+#ifndef POINTERVISIBLE_FUZZER_H
+#define POINTERVISIBLE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "addmonitor_fuzzer"
+#define FUZZ_PROJECT_NAME "pointervisible_fuzzer"
 
-#endif // ADDMONITOR_FUZZER_H
+#endif // POINTERVISIBLE_FUZZER_H
