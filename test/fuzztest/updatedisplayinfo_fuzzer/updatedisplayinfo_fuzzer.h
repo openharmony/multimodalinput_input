@@ -13,16 +13,9 @@
  * limitations under the License.
  */
 
-#include "i_key_command_manager.h"
+#ifndef UPDATEDISPLAYINFO_FUZZER_H
+#define UPDATEDISPLAYINFO_FUZZER_H
 
-namespace OHOS {
-namespace MMI {
-std::shared_ptr<IKeyCommandManager> IKeyCommandManager::GetInstance()
-{
-    if (keyCommand_ == nullptr) {
-        keyCommand_ = std::make_shared<IKeyCommandManager>();
-    }
-    return keyCommand_;
-}
-} // namespace MMI
-} // namespace OHOS
+#define FUZZ_PROJECT_NAME "updatedisplayinfo_fuzzer"
+
+#endif // UPDATEDISPLAYINFO_FUZZER_H

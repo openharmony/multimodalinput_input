@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef I_INPUT_EVENT_HANDLER_H
-#define I_INPUT_EVENT_HANDLER_H
+#ifndef I_INPUT_EVENT_MONITOR_HANDLER_H
+#define I_INPUT_EVENT_MONITOR_HANDLER_H
 
 #include <mutex>
 
@@ -24,14 +24,17 @@
 
 namespace OHOS {
 namespace MMI {
-class IInputEventHandler {
+class IInputEventMonitorHandler {
 public:
     static constexpr int32_t DEFAULT_INTERCEPTOR = 10;
     static constexpr int32_t DEFAULT_MONITOR = 20;
-    virtual int32_t GetPriority() const = 0;
-    virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) = 0;
-    virtual bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent) = 0;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    virtual bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent) = 0;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    virtual bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent) = 0;
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_INPUT_EVENT_HANDLER_H
+#endif // I_INPUT_EVENT_MONITOR_HANDLER_H

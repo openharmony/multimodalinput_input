@@ -126,7 +126,7 @@ namespace MMI {
         } \
     } while (0)
 
-#define CHK_PIDANDTID() \
+#define CHK_PID_AND_TID() \
     do { \
         MMI_HILOGD("%{public}s, (%{public}d), pid:%{public}d threadId:%{public}" PRIu64, \
             __FILE__, __LINE__, GetPid(), GetThisThreadId()); \
@@ -212,7 +212,7 @@ namespace MMI {
         } \
     } while (0)
 
-#define CHK_PIDANDTID() \
+#define CHK_PID_AND_TID() \
     do { \
         MMI_HILOGD("pid:%{public}d threadId:%{public}" PRIu64, GetPid(), GetThisThreadId()); \
     } while (0)
@@ -262,6 +262,14 @@ namespace MMI {
         } \
     } while (0)
 
+#define WRITESTRING(parcel, data, ...) \
+    do { \
+        if (!(parcel).WriteString(data)) { \
+            MMI_HILOGE("WriteString "#data" failed"); \
+            return DEFRET(false, ##__VA_ARGS__); \
+        } \
+    } while (0)
+
 #define READBOOL(parcel, data, ...) \
     do { \
         if (!(parcel).ReadBool(data)) { \
@@ -298,6 +306,14 @@ namespace MMI {
     do { \
         if (!(parcel).ReadDouble(data)) { \
             MMI_HILOGE("ReadDouble "#data" failed"); \
+            return DEFRET(false, ##__VA_ARGS__); \
+        } \
+    } while (0)
+
+#define READSTRING(parcel, data, ...) \
+    do { \
+        if (!(parcel).ReadString(data)) { \
+            MMI_HILOGE("ReadString "#data" failed"); \
             return DEFRET(false, ##__VA_ARGS__); \
         } \
     } while (0)

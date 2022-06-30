@@ -146,19 +146,19 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataEventsIsEm
 }
 
 /**
- * @tc.name:Test_TransformPenJsonDataToInputDataApprochEventError
+ * @tc.name:Test_TransformPenJsonDataToInputDataApproachEventError
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEventError, TestSize.Level1)
+HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApproachEventError, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
-    const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataApprochEventError.json";
+    const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataApproachEventError.json";
     std::string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
     std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
-    const std::string path = "temp/Test_TransformPenJsonDataToInputDataApprochEventError.json";
+    const std::string path = "temp/Test_TransformPenJsonDataToInputDataApproachEventError.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif
@@ -257,19 +257,19 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEvent
 }
 
 /**
- * @tc.name:Test_TransformPenJsonDataToInputDataApprochEventEventTypeError
+ * @tc.name:Test_TransformPenJsonDataToInputDataApproachEventEventTypeError
  * @tc.desc:Verify ManageInjectDevice function TransformJsonData
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApprochEventEventTypeError, TestSize.Level1)
+HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApproachEventEventTypeError, TestSize.Level1)
 {
 #ifdef OHOS_BUILD
-    const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataApprochEventEventTypeError.json";
+    const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataApproachEventEventTypeError.json";
     std::string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
     std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
 #else
-    const std::string path = "temp/Test_TransformPenJsonDataToInputDataApprochEventEventTypeError.json";
+    const std::string path = "temp/Test_TransformPenJsonDataToInputDataApproachEventEventTypeError.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
     std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
 #endif

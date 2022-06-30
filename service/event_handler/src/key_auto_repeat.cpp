@@ -50,7 +50,7 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
     }
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     if (deviceId == INVALID_DEVICE_ID) {
-        MMI_HILOGE("Find to device faild");
+        MMI_HILOGE("Find to device failed");
         return RET_ERR;
     }
     deviceConfig_[deviceId] = devConf;
@@ -96,10 +96,9 @@ void KeyAutoRepeat::AddHandleTimer(int32_t timeout)
 {
     CALL_LOG_ENTER;
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
-        auto ret = eventDispatch_.DispatchKeyEventPid(*(this->udsServer_), this->keyEvent_);
-        if (ret != RET_OK) {
-            MMI_HILOGE("KeyEvent dispatch failed, ret:%{public}d, errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
-        }
+        auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+        CHKPV(inputEventNormalizeHandler);
+        inputEventNormalizeHandler->HandleKeyEvent(this->keyEvent_);   
         int32_t triggertime = KeyRepeat->GetIntervalTime(keyEvent_->GetDeviceId());
         this->AddHandleTimer(triggertime);
     });

@@ -112,7 +112,7 @@ public:
         AXIS_TYPE_UNKNOWN,
 
         /**
-         * Indicates the vertical scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad,
+         * Indicates the vertical scroll axis. When you scroll the mouse wheel or make certain gestures on the touchpad,
          * the status of the vertical scroll axis changes.
          *
          * @since 9
@@ -120,7 +120,7 @@ public:
         AXIS_TYPE_SCROLL_VERTICAL,
 
         /**
-         * Indicates the horizontal scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad,
+         * Indicates the horizontal scroll axis. When you scroll the mouse wheel or make certain gestures on the touchpad,
          * the status of the horizontal scroll axis changes.
          *
          * @since 9
@@ -645,7 +645,7 @@ public:
         void SetToolType(int32_t toolType);
 
         /**
-         * @brief Writes data to a <b>Parcel</b> obejct.
+         * @brief Writes data to a <b>Parcel</b> object.
          * @param out Indicates the object into which data will be written.
          * @return Returns <b>true</b> if the data is successfully written; returns <b>false</b> otherwise.
          * @since 9
@@ -653,7 +653,7 @@ public:
         bool WriteToParcel(Parcel &out) const;
 
         /**
-         * @brief Reads data from a <b>Parcel</b> obejct.
+         * @brief Reads data from a <b>Parcel</b> object.
          * @param in Indicates the object from which data will be read.
          * @return Returns <b>true</b> if the data is successfully read; returns <b>false</b> otherwise.
          * @since 9
@@ -936,7 +936,7 @@ public:
 
 public:
     /**
-     * @brief Writes data to a <b>Parcel</b> obejct.
+     * @brief Writes data to a <b>Parcel</b> object.
      * @param out Indicates the object into which data will be written.
      * @return Returns <b>true</b> if the data is successfully written; returns <b>false</b> otherwise.
      * @since 9
@@ -944,7 +944,7 @@ public:
     bool WriteToParcel(Parcel &out) const;
 
     /**
-     * @brief Reads data from a <b>Parcel</b> obejct.
+     * @brief Reads data from a <b>Parcel</b> object.
      * @param in Indicates the object from which data will be read.
      * @return Returns <b>true</b> if the data is successfully read; returns <b>false</b> otherwise.
      * @since 9
