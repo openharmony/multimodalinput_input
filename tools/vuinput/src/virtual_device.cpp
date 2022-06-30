@@ -586,7 +586,7 @@ bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::v
             return true;
         }
     }
-   std::cout << "Device shutdown failed! The PID format is incorrect" <<std::endl;
+    std::cout << "Device shutdown failed! The PID format is incorrect" <<std::endl;
     return false;
 }
 
