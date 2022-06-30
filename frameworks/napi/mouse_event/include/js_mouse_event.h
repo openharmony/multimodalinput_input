@@ -31,7 +31,6 @@ public:
 private:
     static napi_value GetNapiInt32(napi_env env, int32_t code);
     static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
-    // static napi_value EnumClassConstructor2(napi_env env, napi_callback_info info);
 };
 } // namespace MMI
 } // namespace OHOS
