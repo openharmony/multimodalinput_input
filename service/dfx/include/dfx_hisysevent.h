@@ -15,41 +15,40 @@
 #ifndef DFX_HISYSEVENT_H
 #define DFX_HISYSEVENT_H
 
-#include <string.h>
+#include <string>
 
 #include "hisysevent.h"
-#include "error_multimodal.h"
+
+#include "input_device_manager.h"
 #include "key_event.h"
 #include "mmi_log.h"
 #include "pointer_event.h"
 #include "uds_session.h"
-#include "input_device_manager.h"
 
 namespace OHOS {
 namespace MMI {
 class DfxHisysevent {
 public:
-    static void InputDeviceConnection(int32_t id);
-    static void InputDeviceConnection(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type);
-    static void InputDeviceConnection(void);
-    static void InputDeviceConnection1(void);
-    static void InputDeviceConnection2(void);
-    static void InputDeviceDisconnection(int32_t id);
-    static void InputDeviceDisconnection(void);
-    static void ClientConnectionEvent(const int32_t pid, const int32_t uid, const int32_t moduleType,
-        const std::string &programName);
-    static void ClientConnectionEvent(const int32_t pid, const int32_t uid, const int32_t moduleType,
-        const std::string &programName, const int32_t serverFd);
-    static void ClientDisconnectionEvent(void);
-    static void ClientDisconnectionEvent(const SessionPtr& secPtr, int32_t fd);
-    static void TargetPointerEvent(std::shared_ptr<PointerEvent> pointer);
-    static void TargetPointerEvent(std::shared_ptr<PointerEvent> pointer, int32_t fd);
-    static void TargetKeyEvent(std::shared_ptr<KeyEvent> key);
-    static void TargetKeyEvent(std::shared_ptr<KeyEvent> key, int32_t fd);
-    static void FocusWindowChange(const DisplayGroupInfo& oldDisplayGroupInfo,
-        const DisplayGroupInfo& newDisplayGroupInfo);
-    static void ZorderWindowChange(const DisplayGroupInfo& oldDisplayGroupInfo,
-        const DisplayGroupInfo& newDisplayGroupInfo);
+    struct ClientConnectData {
+        int32_t pid { -1 };
+        int32_t uid { -1 };
+        int32_t moduleType { -1 };
+        std::string programName;
+        int32_t serverFd { -1 };
+    };
+    static void OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type);
+    static void OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type);
+    static void OnClientConnect(const ClientConnectData &data, OHOS::HiviewDFX::HiSysEvent::EventType type);
+    static void OnClientDisconnect(const SessionPtr& secPtr, int32_t fd,
+        OHOS::HiviewDFX::HiSysEvent::EventType type);
+    static void OnUpdateTargetPointer(std::shared_ptr<PointerEvent> pointer, int32_t fd,
+        OHOS::HiviewDFX::HiSysEvent::EventType type);
+    static void OnUpdateTargetKey(std::shared_ptr<KeyEvent> key, int32_t fd,
+        OHOS::HiviewDFX::HiSysEvent::EventType type);
+    static void OnFocusWindowChanged(int32_t oldFocusWindowId, int32_t newFocusWindowId,
+        int32_t oldFocusWindowPid, int32_t newFocusWindowPid);
+    static void OnZorderWindowChanged(int32_t oldZorderFirstWindowId, int32_t newZorderFirstWindowId,
+        int32_t oldZorderFirstWindowPid, int32_t newZorderFirstWindowPid);
     static void ApplicationBlockInput(const SessionPtr& sess);
 };
 } // namespace MMI

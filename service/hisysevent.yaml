@@ -79,7 +79,7 @@ CLIENT_CONNECTION_SUCCESS:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: client connection event success}
   PID: {type: INT32, desc: pid}
   UID: {type: INT32, desc: uid}
-  MODULETYPE: {type: INT32, desc: module type}
+  MODULE_TYPE: {type: INT32, desc: module type}
   FD: {type: INT32, desc: server fd}
   PROGRAMNAME: {type: STRING, desc: program name}
   MSG: {type: STRING, desc: message}
@@ -88,7 +88,7 @@ CLIENT_CONNECTION_FAILURE:
   __BASE: {type: FAULT, level: MINOR, tag: PowerStats, desc: client connection event failure}
   PID: {type: INT32, desc: pid}
   UID: {type: INT32, desc: uid}
-  MODULETYPE: {type: INT32, desc: module type}
+  MODULE_TYPE: {type: INT32, desc: module type}
   PROGRAMNAME: {type: STRING, desc: program name}
   MSG: {type: STRING, desc: message}
 
@@ -96,7 +96,7 @@ CLIENT_DISCONNECTION_SUCCESS:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: client disconnection event success}
   PID: {type: INT32, desc: pid}
   UID: {type: INT32, desc: uid}
-  MODULETYPE: {type: INT32, desc: module type}
+  MODULE_TYPE: {type: INT32, desc: module type}
   FD: {type: INT32, desc: server fd}
   PROGRAMNAME: {type: STRING, desc: program name}
   MSG: {type: STRING, desc: message}

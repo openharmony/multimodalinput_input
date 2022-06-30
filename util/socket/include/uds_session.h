@@ -69,7 +69,7 @@ public:
         return descript_;
     }
 
-    const std::string& GetProgramName() const
+    const std::string GetProgramName() const
     {
         return programName_;
     }
