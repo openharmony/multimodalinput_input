@@ -108,7 +108,8 @@ napi_value JsMouseEvent::Export(napi_env env, napi_value exports)
 
     napi_property_descriptor axisArr[] = {
         DECLARE_NAPI_STATIC_PROPERTY("SCROLL_VERTICAL", GetNapiInt32(env, static_cast<int32_t>(Axis::SCROLL_VERTICAL))),
-        DECLARE_NAPI_STATIC_PROPERTY("SCROLL_HORIZONTAL", GetNapiInt32(env, static_cast<int32_t>(Axis::SCROLL_HORIZONTAL))),
+        DECLARE_NAPI_STATIC_PROPERTY("SCROLL_HORIZONTAL",
+            GetNapiInt32(env, static_cast<int32_t>(Axis::SCROLL_HORIZONTAL))),
         DECLARE_NAPI_STATIC_PROPERTY("PINCH", GetNapiInt32(env, static_cast<int32_t>(Axis::PINCH))),
     };
     napi_value axis = nullptr;
