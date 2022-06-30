@@ -356,7 +356,7 @@ ohos_unittest("TransformPointTest") {
   include_dirs = [
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/util/common/include",
-    "${mmi_path}/tools/virtual_device_manager/include",
+    "${mmi_path}/tools/vuinput/include",
   ]
 
   sources = [ "touch_transform_point/test/transform_point_test.cpp" ]
@@ -368,7 +368,7 @@ ohos_unittest("TransformPointTest") {
   }
 
   deps = [
-    "${mmi_path}/tools/virtual_device_manager:libmmi-virtual-device",
+    "${mmi_path}/tools/vuinput:libmmi-virtual-device",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]

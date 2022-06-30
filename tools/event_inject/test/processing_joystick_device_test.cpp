@@ -43,8 +43,8 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJsonDataToInputData, TestSi
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputData.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformJoyStickJsonDataToInputData.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
@@ -81,8 +81,8 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindEvents.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindEvents.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
@@ -118,8 +118,8 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataEventsIsEmpty.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataEventsIsEmpty.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
@@ -155,8 +155,8 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindKeyValue.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindKeyValue.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
@@ -192,8 +192,8 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindKeyValueInThro.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindKeyValueInThro.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
@@ -229,8 +229,8 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindEventInRocker.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindEventInRocker.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
@@ -267,8 +267,8 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInRocker.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInRocker.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
@@ -305,8 +305,8 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInDirectionKey.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInDirectionKey.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
@@ -342,8 +342,8 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindAnyEventType.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindAnyEventType.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
@@ -380,8 +380,8 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataHasBlockTime.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start joystick & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataHasBlockTime.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
