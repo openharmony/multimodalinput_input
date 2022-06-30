@@ -66,7 +66,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(iter->second)));
     const char* name = libinput_device_get_name(iter->second);
     inputDevice->SetName((name == nullptr) ? ("null") : (name));
-    inputDevice->SetBustype(libinput_device_get_id_bustype(iter->second));
+    inputDevice->SetBusType(libinput_device_get_id_bustype(iter->second));
     inputDevice->SetVersion(libinput_device_get_id_version(iter->second));
     inputDevice->SetProduct(libinput_device_get_id_product(iter->second));
     inputDevice->SetVendor(libinput_device_get_id_vendor(iter->second));
@@ -143,7 +143,7 @@ int32_t InputDeviceManager::GetKeyboardBusMode(int32_t deviceId)
     CALL_LOG_ENTER;
     std::shared_ptr dev = GetInputDevice(deviceId);
     CHKPR(dev, ERROR_NULL_POINTER);
-    return dev->GetBustype();
+    return dev->GetBusType();
 }
 
 int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId)
@@ -351,7 +351,7 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
                 "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d "
                 "| product:%d | vendor:%d | phys:%s\t",
                 inputDevice->GetId(), inputDevice->GetName().c_str(), inputDevice->GetType(),
-                inputDevice->GetBustype(), inputDevice->GetVersion(), inputDevice->GetProduct(),
+                inputDevice->GetBusType(), inputDevice->GetVersion(), inputDevice->GetProduct(),
                 inputDevice->GetVendor(), inputDevice->GetPhys().c_str());
         std::vector<InputDevice::AxisInfo> axisinfo = inputDevice->GetAxisInfo();
         mprintf(fd, "axis: count=%d", axisinfo.size());
@@ -380,7 +380,7 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
         int32_t deviceId = inputDevice->GetId();
         mprintf(fd,
                 "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d | product:%d | vendor:%d\t",
-                deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBustype(),
+                deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBusType(),
                 inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor());
     }
 }

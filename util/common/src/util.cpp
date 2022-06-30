@@ -647,7 +647,7 @@ int32_t ReadTomlFile(const std::string &filePath, DeviceConfig& devConf)
         return RET_ERR;
     }
     if (ReadConfigFile(realPath, devConf) == RET_ERR) {
-        MMI_HILOGE("Read device config file faild");
+        MMI_HILOGE("Read device config file failed");
         return RET_ERR;
     }
     return RET_OK;

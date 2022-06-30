@@ -115,7 +115,7 @@ int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIn
 void HdiInject::OnSetHotPlugs(uint32_t devIndex, uint32_t devSatatus)
 {
     if (!(ReportHotPlugEvent(devIndex, devSatatus))) {
-        MMI_HILOGE("ReportHotPlugEvent faild");
+        MMI_HILOGE("ReportHotPlugEvent failed");
         return;
     }
     MMI_HILOGI("ReportHotPlugEvent success");

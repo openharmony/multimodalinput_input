@@ -258,7 +258,7 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
             DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
 #endif
             if (!buf.Write(szBuf, size)) {
-                MMI_HILOGW("Write data faild. size:%{public}zu", size);
+                MMI_HILOGW("Write data failed. size:%{public}zu", size);
             }
             OnReadPackets(buf, std::bind(&UDSServer::OnPacket, this, fd, std::placeholders::_1));
         } else if (size < 0) {
@@ -339,7 +339,7 @@ bool UDSServer::AddSession(SessionPtr ses)
     }
     auto pid = ses->GetPid();
     if (pid <= 0) {
-        MMI_HILOGE("Get process faild");
+        MMI_HILOGE("Get process failed");
         return false;
     }
     idxPidMap_[pid] = fd;

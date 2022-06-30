@@ -61,8 +61,8 @@ private:
     void FixCursorPosition(int32_t &globalX, int32_t &globalY);
     std::unique_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
     void DeletePidInfo(int32_t pid);
-    void UpdataPointerVisible();
-    void UpdataPidInfo(int32_t pid, bool visible);
+    void UpdatePointerVisible();
+    void UpdatePidInfo(int32_t pid, bool visible);
 
 private:
     sptr<OHOS::Rosen::Window> pointerWindow_ = nullptr;

@@ -59,7 +59,7 @@ void InjectionEventDispatch::InitManageFunction()
     };
 
     for (auto &it : funs) {
-        if (!RegistInjectEvent(it)) {
+        if (!RegisterInjectEvent(it)) {
             MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
             continue;
         }
@@ -92,11 +92,11 @@ std::string InjectionEventDispatch::GetFunId() const
     return funId_;
 }
 
-bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const std::vector<std::string> &argv)
+bool InjectionEventDispatch::VerifyArgvs(const int32_t &argc, const std::vector<std::string> &argv)
 {
     CALL_LOG_ENTER;
     if (argc < ARGV_VALID || argv.at(ARGVS_TARGET_INDEX).empty()) {
-        MMI_HILOGE("Invaild Input Para, Plase Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
+        MMI_HILOGE("Invalid Input Para, Please Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
         return false;
     }
 
@@ -280,7 +280,7 @@ int32_t InjectionEventDispatch::OnSendEvent()
     event.value = static_cast<int32_t>(std::stoi(injectArgvs_[SEND_EVENT_VALUE_INDEX]));
     int32_t ret = write(fd, &event, sizeof(event));
     if (ret != sizeof(event)) {
-        MMI_HILOGE("send event to device node faild.");
+        MMI_HILOGE("send event to device node failed.");
         return RET_ERR;
     }
     if (fd >= 0) {

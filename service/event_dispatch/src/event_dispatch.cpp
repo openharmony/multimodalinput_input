@@ -121,7 +121,7 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     auto session = udsServer->GetSession(fd);
     CHKPV(session);
     if (session->isANRProcess_) {
-        MMI_HILOGD("application not responsing");
+        MMI_HILOGD("application not responding");
         return;
     }
     auto currentTime = GetSysClockTime();
@@ -163,7 +163,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
     auto session = udsServer.GetSession(fd);
     CHKPR(session, RET_ERR);
     if (session->isANRProcess_) {
-        MMI_HILOGD("application not responsing");
+        MMI_HILOGD("application not responding");
         return RET_OK;
     }
     auto currentTime = GetSysClockTime();
@@ -193,14 +193,14 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
 bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
 {
     CALL_LOG_ENTER;
-    int64_t earlist;
+    int64_t earliest;
     if (sess->IsEventQueueEmpty()) {
-        earlist = time;
+        earliest = time;
     } else {
-        earlist = sess->GetEarlistEventTime();
+        earliest = sess->GetEarliestEventTime();
     }
     MMI_HILOGD("Current time: %{public}" PRId64 "", time);
-    if (time < (earlist + INPUT_UI_TIMEOUT_TIME)) {
+    if (time < (earliest + INPUT_UI_TIMEOUT_TIME)) {
         sess->isANRProcess_ = false;
         MMI_HILOGD("the event reports normally");
         return false;
