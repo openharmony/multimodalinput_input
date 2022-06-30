@@ -2,7 +2,7 @@
     { 
      "deviceName": "gamePad", 
      "events":[
-                {"eventType": "DERECTION_KEY"}
+                {"eventType": "DIRECTION_KEY"}
             ]
     }
 ]

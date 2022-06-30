@@ -13,22 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef DEFINE_INTERCEPTOR_GLOBAL_H
-#define DEFINE_INTERCEPTOR_GLOBAL_H
+#ifndef UPDATEDISPLAYINFO_FUZZER_H
+#define UPDATEDISPLAYINFO_FUZZER_H
 
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    #include "interceptor_handler_global.h"
-#else
-    #include "i_interceptor_handler_global.h"
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#define FUZZ_PROJECT_NAME "updatedisplayinfo_fuzzer"
 
-namespace OHOS {
-namespace MMI {
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    #define InterHdlGl InterceptorHandlerGlobal::GetInstance()
-#else
-    #define InterHdlGl IInterceptorHandlerGlobal::GetInstance()
-#endif
-} // namespace MMI
-} // namespace OHOS
-#endif // DEFINE_INTERCEPTOR_GLOBAL_H
+#endif // UPDATEDISPLAYINFO_FUZZER_H

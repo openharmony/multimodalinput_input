@@ -20,6 +20,7 @@
 #include <memory>
 
 #include "singleton.h"
+#include "libinput.h"
 #include "transform_point_processor.h"
 #include "gesture_transform_point_processor.h"
 #include "touch_transform_point_processor.h"
@@ -32,10 +33,14 @@ public:
     std::shared_ptr<PointerEvent> OnLibInput(struct libinput_event *event, INPUT_DEVICE_TYPE deviceType);
 
 private:
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<PointerEvent> OnLibinputTouchEvent(struct libinput_event *event);
     std::shared_ptr<PointerEvent> OnLibinputTabletToolEvent(struct libinput_event *event);
+#endif // OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_POINTER
     std::shared_ptr<PointerEvent> OnLibinputTouchPadEvent(struct libinput_event *event);
-    std::shared_ptr<PointerEvent> OnTouchPadGestrueEvent(struct libinput_event *event);
+    std::shared_ptr<PointerEvent> OnTouchPadGestureEvent(struct libinput_event *event);
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 private:
     std::map<int32_t, std::shared_ptr<TransformPointProcessor>> processors_;

@@ -27,7 +27,7 @@ napi_value JsMouseContext::CreateInstance(napi_env env)
 {
     CALL_LOG_ENTER;
     napi_value global = nullptr;
-    CHKRP(env, napi_get_global(env, &global), GET_GLOBLE);
+    CHKRP(env, napi_get_global(env, &global), GET_GLOBAL);
 
     constexpr char className[] = "JsMouseContext";
     napi_value jsClass = nullptr;
@@ -75,7 +75,7 @@ JsMouseContext* JsMouseContext::GetInstance(napi_env env)
 {
     CALL_LOG_ENTER;
     napi_value global = nullptr;
-    CHKRP(env, napi_get_global(env, &global), GET_GLOBLE);
+    CHKRP(env, napi_get_global(env, &global), GET_GLOBAL);
 
     bool result = false;
     CHKRP(env, napi_has_named_property(env, global, "multimodal_mouse", &result), HAS_NAMED_PROPERTY);

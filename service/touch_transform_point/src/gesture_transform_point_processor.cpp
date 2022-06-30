@@ -116,7 +116,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gest
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
 }
 
-std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestrueEvent(
+std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestureEvent(
     struct libinput_event *event)
 {
     CALL_LOG_ENTER;

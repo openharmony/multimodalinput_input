@@ -372,7 +372,7 @@ bool VirtualDevice::CreateKey()
     evt_type[UI_SET_RELBIT] = GetRelBits();
     evt_type[UI_SET_MSCBIT] = GetMiscellaneous();
     evt_type[UI_SET_LEDBIT] = GetLeds();
-    evt_type[UI_SET_SWBIT] = GetSwitchs();
+    evt_type[UI_SET_SWBIT] = GetSwitches();
     evt_type[UI_SET_PHYS] = GetRepeats();
     for (auto &item : evt_type) {
         fun(item.first, item.second);
@@ -569,7 +569,7 @@ bool VirtualDevice::AddDevice(const std::string& startDeviceName)
         return false;
     }
     if (!CreateHandle(startDeviceName)) {
-        printf("Device %s start faild", startDeviceName.c_str());
+        printf("Device %s start failed", startDeviceName.c_str());
         return false;
     }
     std::string symbolFile;
@@ -619,7 +619,7 @@ bool VirtualDevice::CommandBranch(std::vector<std::string>& argvList)
     std::vector<std::string> deviceList = BrowseDirectory(g_folderpath);
     if (argvList[1] == "start") {
         if (argvList.size() != PARAMETERS_NUMBER) {
-            printf("Invaild Input Para, Plase Check the validity of the para");
+            printf("Invalid Input Para, Please Check the validity of the para");
             return false;
         }
         if (!AddDevice(argvList.back())) {
@@ -629,7 +629,7 @@ bool VirtualDevice::CommandBranch(std::vector<std::string>& argvList)
         return true;
     } else if (argvList[1] == "list") {
         if (argvList.size() != PARAMETERS_QUERY_NUMBER) {
-            printf("Invaild Input Para, Plase Check the validity of the para");
+            printf("Invalid Input Para, Please Check the validity of the para");
             return false;
         }
         std::string::size_type pos;
@@ -641,7 +641,7 @@ bool VirtualDevice::CommandBranch(std::vector<std::string>& argvList)
         return false;
     } else if (argvList[1] == "close") {
         if (argvList.size() != PARAMETERS_NUMBER) {
-            printf("Invaild Input Para, Plase Check the validity of the para");
+            printf("Invalid Input Para, Please Check the validity of the para");
             return false;
         }
         if (!CloseDevice(argvList.back(), deviceList)) {
@@ -712,11 +712,11 @@ const std::vector<uint32_t>& VirtualDevice::GetMiscellaneous() const
     return miscellaneous;
 }
 
-const std::vector<uint32_t>& VirtualDevice::GetSwitchs() const
+const std::vector<uint32_t>& VirtualDevice::GetSwitches() const
 {
-    static const std::vector<uint32_t> switchs {
+    static const std::vector<uint32_t> switches {
     };
-    return switchs;
+    return switches;
 }
 } // namespace MMI
 } // namespace OHOS

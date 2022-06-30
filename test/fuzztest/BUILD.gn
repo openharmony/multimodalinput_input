@@ -19,11 +19,13 @@ group("test") {
     "addinterceptor_fuzzer:fuzztest",
     "addmonitor_fuzzer:fuzztest",
     "getkeyboardtype_fuzzer:fuzztest",
+    "markconsumed_fuzzer:fuzztest",
     "movemouse_fuzzer:fuzztest",
     "pointervisible_fuzzer:fuzztest",
     "setwindowinputeventconsumer_fuzzer:fuzztest",
     "simulateinputevent_fuzzer:fuzztest",
     "subscribekeyevent_fuzzer:fuzztest",
     "supportkeys_fuzzer:fuzztest",
+    "updatedisplayinfo_fuzzer:fuzztest",
   ]
 }

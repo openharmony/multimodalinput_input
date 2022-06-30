@@ -19,6 +19,7 @@ config("mmi_event_filter_config") {
   include_dirs = [
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//foundation/multimodalinput/input/service/event_handler/include",
     "//foundation/multimodalinput/input/util/common/include",
     "${event_filter_path}/include",
   ]
@@ -55,6 +56,19 @@ ohos_source_set("mmi_event_filter_proxy") {
   configs = [ ":mmi_event_filter_config" ]
 
   cflags = [ "-DOHOS_BUILD" ]
+
+  if (mmi_enable_keyboard) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
+  }
+  if (mmi_enable_tp) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
+  }
+  if (mmi_enable_mouse) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
+  }
+  if (mmi_enable_tp) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
+  }
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",

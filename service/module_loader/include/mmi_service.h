@@ -48,7 +48,7 @@ class MMIService : public UDSServer, public SystemAbility, public MultimodalInpu
 public:
     virtual void OnStart() override;
     virtual void OnStop() override;
-    virtual void OnDump() override;
+    int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &toReturnClientFd) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
@@ -73,15 +73,24 @@ protected:
     virtual void OnConnected(SessionPtr s) override;
     virtual void OnDisconnected(SessionPtr s) override;
     virtual int32_t AddEpoll(EpollEventType type, int32_t fd) override;
+    int32_t DelEpoll(EpollEventType type, int32_t fd);
     virtual bool IsRunning() const override;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t CheckPointerVisible(bool &visible);
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t CheckEventProcessed(int32_t pid, int32_t eventId);
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType,
         HandleEventType eventType);
     int32_t CheckRemoveInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     int32_t CheckMarkConsumed(int32_t pid, int32_t monitorId, int32_t eventId);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     bool InitLibinputService();
     bool InitService();
     bool InitSignalHandler();
@@ -91,6 +100,8 @@ protected:
     void OnThread();
     void OnSignalEvent(int32_t signalFd);
     void OnDelegateTask(epoll_event& ev);
+
+    void AddReloadLibinputTimer();
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
