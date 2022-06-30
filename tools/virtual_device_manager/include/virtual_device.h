@@ -49,7 +49,7 @@ protected:
     virtual const std::vector<uint32_t>& GetLeds() const;
     virtual const std::vector<uint32_t>& GetRepeats() const;
     virtual const std::vector<uint32_t>& GetMiscellaneous() const;
-    virtual const std::vector<uint32_t>& GetSwitchs() const;
+    virtual const std::vector<uint32_t>& GetSwitches() const;
     int32_t fd_ = -1;
     std::string deviceName_;
     const uint16_t busTtype_;

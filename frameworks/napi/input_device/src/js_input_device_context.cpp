@@ -22,7 +22,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInp
 constexpr size_t MAX_STRING_LEN = 32;
 const std::string CHANGED_TYPE = "changed";
 
-const std::string GET_GLOBLE = "napi_get_global";
+const std::string GET_GLOBAL = "napi_get_global";
 const std::string DEFINE_CLASS = "napi_define_class";
 const std::string WRAP = "napi_wrap";
 const std::string UNWRAP = "napi_unwrap";
@@ -59,7 +59,7 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
 {
     CALL_LOG_ENTER;
     napi_value global = nullptr;
-    CHKRP(env, napi_get_global(env, &global), GET_GLOBLE);
+    CHKRP(env, napi_get_global(env, &global), GET_GLOBAL);
 
     constexpr char className[] = "JsInputDeviceContext";
     napi_value jsClass = nullptr;
@@ -107,7 +107,7 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
 {
     CALL_LOG_ENTER;
     napi_value global = nullptr;
-    CHKRP(env, napi_get_global(env, &global), GET_GLOBLE);
+    CHKRP(env, napi_get_global(env, &global), GET_GLOBAL);
 
     bool result = false;
     CHKRP(env, napi_has_named_property(env, global, "multimodal_input_device", &result), HAS_NAMED_PROPERTY);

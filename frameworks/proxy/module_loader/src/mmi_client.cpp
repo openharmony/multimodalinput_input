@@ -83,9 +83,9 @@ bool MMIClient::Start()
 bool MMIClient::StartEventRunner()
 {
     CALL_LOG_ENTER;
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     if (!InputMgrImpl->InitEventHandler()) {
-        MMI_HILOGE("init eventhandler error");
+        MMI_HILOGE("init event handler error");
         Stop();
         return false;
     }
@@ -106,7 +106,7 @@ bool MMIClient::StartEventRunner()
 void MMIClient::OnRecvThread()
 {
     CALL_LOG_ENTER;
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     SetThreadName("mmi_client_RecvEventHdr");
 
     auto runner = EventRunner::Create(false);
@@ -177,7 +177,7 @@ void MMIClient::OnRecvMsg(const char *buf, size_t size)
         return;
     }
     if (!circBuf_.Write(buf, size)) {
-        MMI_HILOGW("Write data faild. size:%{public}zu", size);
+        MMI_HILOGW("Write data failed. size:%{public}zu", size);
     }
     OnReadPackets(circBuf_, std::bind(&MMIClient::OnPacket, this, std::placeholders::_1));
 }

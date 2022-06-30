@@ -46,7 +46,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibInput(
         }
         case INPUT_DEVICE_CAP_GESTURE: {
 #ifdef OHOS_BUILD_ENABLE_POINTER
-            return OnTouchPadGestrueEvent(event);
+            return OnTouchPadGestureEvent(event);
 #endif // OHOS_BUILD_ENABLE_POINTER
         }
         default: {
@@ -128,7 +128,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTouchPadEven
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent(struct libinput_event *event)
+std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestureEvent(struct libinput_event *event)
 {
     CHKPP(event);
     auto device = libinput_event_get_device(event);
@@ -147,7 +147,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnTouchPadGestrueEvent
             MMI_HILOGE("Insert value failed, gesture device:%{public}d", deviceId);
         }
     }
-    return processor->OnTouchPadGestrueEvent(event);
+    return processor->OnTouchPadGestureEvent(event);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 } // namespace MMI

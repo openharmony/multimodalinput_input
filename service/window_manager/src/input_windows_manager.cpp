@@ -193,7 +193,7 @@ void InputWindowsManager::RotateTouchScreen(DisplayInfo info, LogicalCoordinate&
     }
 }
 
-void InputWindowsManager::GetphysicalDisplayCoord(struct libinput_event_touch* touch,
+void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
     const DisplayInfo& info, EventTouch& touchInfo)
 {
     LogicalCoordinate coord {
@@ -222,7 +222,7 @@ bool InputWindowsManager::TouchPointToDisplayPoint(struct libinput_event_touch* 
         MMI_HILOGE("Get DisplayInfo is error");
         return false;
     }
-    GetphysicalDisplayCoord(touch, *info, touchInfo);
+    GetPhysicalDisplayCoord(touch, *info, touchInfo);
     return true;
 }
 
@@ -298,7 +298,7 @@ void InputWindowsManager::AdjustGlobalCoordinate(
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-bool InputWindowsManager::UpdataDisplayId(int32_t& displayId)
+bool InputWindowsManager::UpdateDisplayId(int32_t& displayId)
 {
     if (displayGroupInfo_.displaysInfo.empty()) {
         MMI_HILOGE("logicalDisplays_is empty");
@@ -333,16 +333,16 @@ void InputWindowsManager::SelectWindowInfo(const int32_t& globalLogicX, const in
                 continue;
             } else if ((targetWindowId < 0) && (IsInHotArea(globalLogicX, globalLogicY, item.pointerHotAreas))) {
                 firstBtnDownWindowId_ = item.id;
-                MMI_HILOGW("find out the dispatch window of this pointerevent when the targetWindowId "
+                MMI_HILOGW("find out the dispatch window of this pointer event when the targetWindowId "
                            "hasn't been setted up yet, window:%{public}d", firstBtnDownWindowId_);
                 break;
             } else if ((targetWindowId >= 0) && (targetWindowId == item.id)) {
                 firstBtnDownWindowId_ = targetWindowId;
-                MMI_HILOGW("find out the dispatch window of this pointerevent when the targetWindowId "
+                MMI_HILOGW("find out the dispatch window of this pointer event when the targetWindowId "
                            "has been setted up already, window:%{public}d", firstBtnDownWindowId_);
                 break;
             } else {
-                MMI_HILOGW("Continue searching for the dispatch window of this pointerevent");
+                MMI_HILOGW("Continue searching for the dispatch window of this pointer event");
             }
         }
     }
@@ -359,7 +359,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     CALL_LOG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto displayId = pointerEvent->GetTargetDisplayId();
-    if (!UpdataDisplayId(displayId)) {
+    if (!UpdateDisplayId(displayId)) {
         MMI_HILOGE("This display:%{public}d is not exist", displayId);
         return RET_ERR;
     }
@@ -406,7 +406,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto displayId = pointerEvent->GetTargetDisplayId();
-    if (!UpdataDisplayId(displayId)) {
+    if (!UpdateDisplayId(displayId)) {
         MMI_HILOGE("This display is not exist");
         return RET_ERR;
     }
@@ -528,8 +528,7 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, in
         }
     }
 }
-
-void InputWindowsManager::UpdateAndAdjustMouseLoction(int32_t& displayId, double& x, double& y)
+void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y)
 {
     auto displayInfo = GetPhysicalDisplay(displayId);
     CHKPV(displayInfo);
@@ -555,21 +554,21 @@ void InputWindowsManager::UpdateAndAdjustMouseLoction(int32_t& displayId, double
     }
     x = static_cast<double>(integerX);
     y = static_cast<double>(integerY);
-    mouseLoction_.globalX = integerX;
-    mouseLoction_.globalY = integerY;
+    mouseLocation_.globalX = integerX;
+    mouseLocation_.globalY = integerY;
     MMI_HILOGD("Mouse Data: globalX:%{public}d,globalY:%{public}d, displayId:%{public}d",
-        mouseLoction_.globalX, mouseLoction_.globalY, displayId);
+        mouseLocation_.globalX, mouseLocation_.globalY, displayId);
 }
 
 MouseLocation InputWindowsManager::GetMouseInfo()
 {
-    if (mouseLoction_.globalX == -1 || mouseLoction_.globalY == -1) {
+    if (mouseLocation_.globalX == -1 || mouseLocation_.globalY == -1) {
         if (!displayGroupInfo_.displaysInfo.empty()) {
-            mouseLoction_.globalX = displayGroupInfo_.displaysInfo[0].width / 2;
-            mouseLoction_.globalY = displayGroupInfo_.displaysInfo[0].height / 2;
+            mouseLocation_.globalX = displayGroupInfo_.displaysInfo[0].width / 2;
+            mouseLocation_.globalY = displayGroupInfo_.displaysInfo[0].height / 2;
         }
     }
-    return mouseLoction_;
+    return mouseLocation_;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 

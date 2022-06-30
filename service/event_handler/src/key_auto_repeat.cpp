@@ -50,7 +50,7 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
     }
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     if (deviceId == INVALID_DEVICE_ID) {
-        MMI_HILOGE("Find to device faild");
+        MMI_HILOGE("Find to device failed");
         return RET_ERR;
     }
     deviceConfig_[deviceId] = devConf;
