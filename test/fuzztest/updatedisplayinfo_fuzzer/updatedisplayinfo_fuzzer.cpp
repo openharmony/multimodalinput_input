@@ -86,15 +86,15 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
         size_t ret = 0;
         ret = GetString(objectSize, data, size, name);
         if (ret == 0) {
-             MMI_HILOGD("%{public}s:%{public}d The return value is 0", __func__, __LINE__);
-             return;
+            MMI_HILOGD("%{public}s:%{public}d The return value is 0", __func__, __LINE__);
+            return;
         }
         displayInfo.name = name;
         std::string uniq = "";
         ret = GetString(objectSize, data, size, uniq);
-         if (ret == 0) {
-             MMI_HILOGD("%{public}s:%{public}d The return value is 0", __func__, __LINE__);
-             return;
+        if (ret == 0) {
+            MMI_HILOGD("%{public}s:%{public}d The return value is 0", __func__, __LINE__);
+            return;
         }
         displayInfo.uniq = uniq;
         displaysInfos.push_back(displayInfo);
