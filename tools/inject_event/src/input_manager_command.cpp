@@ -358,10 +358,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     << " < click interval time < " << maxClickIntervalTimeMs << " ms" << std::endl;
                                 return RET_ERR;
                             }
-                            std::cout << "coordinate: (" << px << ", " << py
-                                << "), button id: " << buttonId << ", press time: " << pressTimeMs << " ms"
-                                << ", interval time: " << clickIntervalTimeMs << " ms" << std::endl;
-
+                            std::cout << "   coordinate: ("<< px << ", "  << py << ")" << std::endl;
+                            std::cout << "    button id: " << buttonId    << std::endl;
+                            std::cout << "   press time: " << pressTimeMs << " ms" << std::endl;
+                            std::cout << "interval time: " << clickIntervalTimeMs  << " ms" << std::endl;
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
