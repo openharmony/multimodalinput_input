@@ -109,7 +109,13 @@ napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info 
         JsInputDeviceContext *context = static_cast<JsInputDeviceContext*>(data);
         delete context;
     }, nullptr, nullptr);
-    CHKRP(env, status, WRAP);
+    if (status != napi_ok) {
+        delete jsContext;
+        MMI_HILOGE("%{public}s failed", std::string(WRAP).c_str());
+        auto infoTemp = std::string(__FUNCTION__)+ ": " + std::string(WRAP) + " failed";
+        napi_throw_error(env, nullptr, infoTemp.c_str());
+        return nullptr;
+    }
     return thisVar;
 }
 
