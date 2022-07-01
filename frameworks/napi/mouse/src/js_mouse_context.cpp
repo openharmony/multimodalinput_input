@@ -67,7 +67,13 @@ napi_value JsMouseContext::CreateJsObject(napi_env env, napi_callback_info info)
         JsMouseContext *context = static_cast<JsMouseContext*>(data);
         delete context;
     }, nullptr, nullptr);
-    CHKRP(env, status, WRAP);
+    if (status != napi_ok) {
+        delete jsContext;
+        MMI_HILOGE("%{public}s failed", std::string(WRAP).c_str());
+        auto infoTemp = std::string(__FUNCTION__)+ ": " + std::string(WRAP) + " failed";
+        napi_throw_error(env, nullptr, infoTemp.c_str());
+        return nullptr;
+    }
     return thisVar;
 }
 
