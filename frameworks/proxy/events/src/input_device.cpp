@@ -17,6 +17,11 @@
 
 namespace OHOS {
 namespace MMI {
+InputDevice::InputDevice(int32_t id, std::string name, int32_t deviceType, int32_t bus, int32_t version,
+    int32_t product, int32_t vendor, std::string phys, std::string uniq, std::vector<AxisInfo> axis)
+    :id_(id), name_(name), type_(deviceType), bus_(bus), version_(version), product_(product),
+    vendor_(vendor), phys_(phys), uniq_(uniq), axis_(axis) {}
+
 void InputDevice::SetId(int32_t deviceId)
 {
     id_ = deviceId;
@@ -39,20 +44,20 @@ std::string InputDevice::GetName() const
 
 void InputDevice::SetType(int32_t deviceType)
 {
-    deviceType_ = deviceType;
+    type_ = deviceType;
 }
 
 int32_t InputDevice::GetType() const
 {
-    return deviceType_;
+    return type_;
 }
 
-void InputDevice::SetBusType(int32_t bus)
+void InputDevice::SetBus(int32_t bus)
 {
     bus_ = bus;
 }
 
-int32_t InputDevice::GetBusType() const
+int32_t InputDevice::GetBus() const
 {
     return bus_;
 }
@@ -116,6 +121,9 @@ std::vector<InputDevice::AxisInfo> InputDevice::GetAxisInfo()
 {
     return axis_;
 }
+
+InputDevice::AxisInfo::AxisInfo(int32_t type, int32_t min, int32_t max, int32_t fuzz, int32_t flat, int32_t resolution)
+    : axisType_(type), minimum_(min), maximum_(max), fuzz_(fuzz), flat_(flat), resolution_(resolution) {}
 
 void InputDevice::AxisInfo::SetAxisType(int32_t type)
 {

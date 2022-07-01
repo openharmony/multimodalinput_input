@@ -58,6 +58,7 @@ config("libmmi_test_util") {
 
 ohos_source_set("libmmi-common") {
   sources = [
+    "events/src/input_device.cpp",
     "events/src/input_event.cpp",
     "events/src/key_event.cpp",
     "events/src/key_option.cpp",

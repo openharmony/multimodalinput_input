@@ -22,6 +22,8 @@
 
 #include "nocopyable.h"
 
+#include "i_input_device_listener.h"
+#include "input_device.h"
 #include "mmi_event_handler.h"
 
 namespace OHOS {
@@ -32,32 +34,8 @@ public:
     DISALLOW_COPY_AND_MOVE(InputDeviceImpl);
     ~InputDeviceImpl() = default;
 
-    struct AxisInfo {
-        int32_t axisType { 0 };
-        int32_t min { 0 };
-        int32_t max { 0 };
-        int32_t fuzz { 0 };
-        int32_t flat { 0 };
-        int32_t resolution { 0 };
-    };
-    struct InputDeviceInfo {
-        int32_t id { -1 };
-        std::string name { "null" };
-        uint32_t deviceType { 0 };
-        int32_t busType { 0 };
-        int32_t product { 0 };
-        int32_t vendor { 0 };
-        int32_t version { 0 };
-        std::string phys { "null" };
-        std::string uniq { "null" };
-        std::vector<AxisInfo> axis;
-    };
-
-    using CppFunInputDevInfo = std::function<void(const std::shared_ptr<InputDeviceInfo>)>;
-    using CppFunInputDevIds = std::function<void(std::vector<int32_t>&)>;
-
-    using FunInputDevInfo = std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)>;
-    using FunInputDevIds = std::function<void(int32_t, std::vector<int32_t>&)>;
+    using FunInputDevInfo = std::function<void(std::shared_ptr<InputDevice>)>;
+    using FunInputDevIds = std::function<void(std::vector<int32_t>&)>;
     using FunInputDevKeys = std::function<void(std::vector<bool>&)>;
     using FunKeyboardTypes = std::function<void(int32_t)>;
     using DevInfo = std::pair<EventHandlerPtr, FunInputDevInfo>;
@@ -69,47 +47,41 @@ public:
         DevIds ids;
         DevKeys keys;
         DevKeyboardTypes kbTypes;
-        CppFunInputDevInfo cppDev { nullptr };
-        CppFunInputDevIds cppIds { nullptr };
     };
-    using FunInputDevMonitor = std::function<void(std::string, int32_t)>;
-    using DevMonitor = std::pair<EventHandlerPtr, FunInputDevMonitor>;
+    using InputDevListenerPtr = std::shared_ptr<IInputDeviceListener>;
+    using DevListener = std::pair<EventHandlerPtr, InputDevListenerPtr>;
 
-    void RegisterInputDeviceMonitor(std::function<void(std::string, int32_t)> listening);
-    void UnRegisterInputDeviceMonitor();
-
-    void GetInputDeviceIdsAsync(std::function<void(int32_t, std::vector<int32_t>&)> callback);
-    void GetInputDeviceAsync(int32_t deviceId,
-        std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)> callback);
-    void SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
-        std::function<void(std::vector<bool>&)> callback);
-    void GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
-    void OnInputDevice(int32_t userData, std::shared_ptr<InputDeviceInfo> devData);
+    int32_t RegisterDevListener(const std::string &type, InputDevListenerPtr listener);
+    int32_t UnregisterDevListener(const std::string &type, InputDevListenerPtr listener = nullptr);
+    int32_t GetInputDeviceIdsAsync(FunInputDevIds callback);
+    int32_t GetInputDeviceAsync(int32_t deviceId, FunInputDevInfo callback);
+    int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes, FunInputDevKeys callback);
+    int32_t GetKeyboardType(int32_t deviceId, FunKeyboardTypes callback);
+    void OnInputDevice(int32_t userData, std::shared_ptr<InputDevice> devData);
     void OnInputDeviceIds(int32_t userData, std::vector<int32_t> &ids);
     void OnSupportKeys(int32_t userData, const std::vector<bool> &keystrokeAbility);
-    void OnDevMonitor(std::string type, int32_t deviceId);
+    void OnDevListener(int32_t deviceId, const std::string &type);
     void OnKeyboardType(int32_t userData, int32_t keyboardType);
     int32_t GetUserData();
+    std::shared_ptr<InputDevice> DevDataUnmarshalling(NetPacket &pkt);
 
 private:
     const DevInfo* GetDeviceInfo(int32_t) const;
     const DevIds* GetDeviceIds(int32_t) const;
     const DevKeys* GetDeviceKeys(int32_t) const;
     const DevKeyboardTypes* GetKeyboardTypes(int32_t) const;
-    void OnInputDeviceTask(InputDeviceImpl::DevInfo devInfo, int32_t userData,
-        std::shared_ptr<InputDeviceInfo> devData);
-    void OnInputDeviceIdsTask(InputDeviceImpl::DevIds devIds, int32_t userData, std::vector<int32_t> ids);
-    void OnSupportKeysTask(InputDeviceImpl::DevKeys devKeys, int32_t userData,
-        std::vector<bool> keystrokeAbility);
-    void OnDevMonitorTask(DevMonitor devMonitor, std::string type, int32_t deviceId);
-    void OnKeyboardTypeTask(InputDeviceImpl::DevKeyboardTypes kbTypes, int32_t userData,
-        int32_t keyboardType);
+    void OnInputDeviceTask(const DevInfo &devInfo, int32_t userData, std::shared_ptr<InputDevice> devData);
+    void OnInputDeviceIdsTask(const DevIds &devIds, int32_t userData, std::vector<int32_t> &ids);
+    void OnSupportKeysTask(const DevKeys &devKeys, int32_t userData, std::vector<bool> &supportRet);
+    void OnDevListenerTask(const DevListener &devMonitor, const std::string &type, int32_t deviceId);
+    void OnKeyboardTypeTask(const DevKeyboardTypes &kbTypes, int32_t userData, int32_t keyboardType);
 private:
     InputDeviceImpl() = default;
     std::map<int32_t, InputDeviceData> inputDevices_;
-    DevMonitor devMonitor_;
+    std::map<std::string, std::list<DevListener>> devListener_ = { { "change", {} } };
     std::mutex mtx_;
     int32_t userData_ {0};
+    bool isListeningProcess_ {false};
 };
 } // namespace MMI
 } // namespace OHOS
