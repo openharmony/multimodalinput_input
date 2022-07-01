@@ -192,6 +192,7 @@ bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
     }
     auto iter = envManager_.insert(std::pair<napi_env, napi_ref>(env, ref));
     if (!iter.second) {
+        delete id;
         MMI_HILOGE("Insert value failed");
         return false;
     }
