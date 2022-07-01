@@ -283,9 +283,9 @@ ohos_unittest("InputManagerTest") {
   configs = [ ":libmmi_test_util" ]
 
   deps = [
+    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
-    "//foundation/ability/ability_runtime/frameworks/native/ability/native:abilitykit_native",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
     "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
     "//third_party/googletest:gmock_main",
