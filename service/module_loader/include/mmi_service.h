@@ -55,6 +55,12 @@ public:
     virtual int32_t SetPointerVisible(bool visible) override;
     virtual int32_t IsPointerVisible(bool &visible) override;
     virtual int32_t MarkEventProcessed(int32_t eventId) override;
+    virtual int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys) override;
+    virtual int32_t GetDeviceIds(int32_t userData) override;
+    virtual int32_t GetDevice(int32_t userData, int32_t deviceId) override;
+    virtual int32_t RegisterDevListener() override;
+    virtual int32_t UnregisterDevListener() override;
+    virtual int32_t GetKeyboardType(int32_t userData, int32_t deviceId) override;
     virtual int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
         HandleEventType eventType) override;
     virtual int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType) override;
@@ -80,6 +86,12 @@ protected:
     int32_t CheckPointerVisible(bool &visible);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t CheckEventProcessed(int32_t pid, int32_t eventId);
+    int32_t OnRegisterDevListener(int32_t pid);
+    int32_t OnUnregisterDevListener(int32_t pid);
+    int32_t OnGetDeviceIds(int32_t pid, int32_t userData);
+    int32_t OnGetDevice(int32_t pid, int32_t userData, int32_t deviceId);
+    int32_t OnSupportKeys(int32_t pid, int32_t userData, int32_t deviceId, std::vector<int32_t> &keys);
+    int32_t OnGetKeyboardType(int32_t pid, int32_t userData, int32_t deviceId);
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType,
         HandleEventType eventType);

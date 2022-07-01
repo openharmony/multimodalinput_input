@@ -15,22 +15,24 @@
 
 #include "js_input_device_manager.h"
 
+#include "input_device_impl.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceManager" };
 std::mutex mutex_;
 } // namespace
-void JsInputDeviceManager::RegisterInputDeviceMonitor(napi_env env, std::string type, napi_value handle)
+void JsInputDeviceManager::RegisterDevListener(napi_env env, const std::string &type, napi_value handle)
 {
     CALL_DEBUG_ENTER;
-    AddMonitor(env, type, handle);
+    AddListener(env, type, handle);
 }
 
-void JsInputDeviceManager::UnRegisterInputDeviceMonitor(napi_env env, std::string type, napi_value handle)
+void JsInputDeviceManager::UnregisterDevListener(napi_env env, const std::string &type, napi_value handle)
 {
     CALL_DEBUG_ENTER;
-    RemoveMonitor(env, type, handle);
+    RemoveListener(env, type, handle);
 }
 
 napi_value JsInputDeviceManager::GetDeviceIds(napi_env env, napi_value handle)
@@ -39,7 +41,8 @@ napi_value JsInputDeviceManager::GetDeviceIds(napi_env env, napi_value handle)
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevImpl.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
-    InputDevImpl.GetInputDeviceIdsAsync(EmitJsIds);
+    auto callback = std::bind(EmitJsIds, userData, std::placeholders::_1);
+    InputMgr->GetDeviceIds(callback);
     return ret;
 }
 
@@ -49,19 +52,20 @@ napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value 
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevImpl.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
-    InputDevImpl.GetInputDeviceAsync(id, EmitJsDev);
+    auto callback = std::bind(EmitJsDev, userData, std::placeholders::_1);
+    InputMgr->GetDevice(id, callback);
     return ret;
 }
 
-napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vector<int32_t> keyCodes,
+napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vector<int32_t> &keyCodes,
     napi_value handle)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevImpl.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
-    auto callback = std::bind(EmitJsKeystrokeAbility, userData, std::placeholders::_1);
-    InputManager::GetInstance()->SupportKeys(id, keyCodes, callback);
+    auto callback = std::bind(EmitSupportKeys, userData, std::placeholders::_1);
+    InputMgr->SupportKeys(id, keyCodes, callback);
     return ret;
 }
 
@@ -72,7 +76,7 @@ napi_value JsInputDeviceManager::GetKeyboardType(napi_env env, int32_t id, napi_
     int32_t userData = InputDevImpl.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
     auto callback = std::bind(EmitJsKeyboardType, userData, std::placeholders::_1);
-    InputManager::GetInstance()->GetKeyboardType(id, callback);
+    InputMgr->GetKeyboardType(id, callback);
     return ret;
 }
 
