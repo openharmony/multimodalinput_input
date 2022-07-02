@@ -26,6 +26,7 @@
 #include "mouse_device_state.h"
 #include "timer_manager.h"
 #include "util.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -61,7 +62,7 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 
     absolutionX_ += libinput_event_pointer_get_dx(data);
     absolutionY_ += libinput_event_pointer_get_dy(data);
-    WinMgr->UpdateAndAdjustMouseLoction(currentDisplayId_, absolutionX_, absolutionY_);
+    WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
     pointerEvent_->SetTargetDisplayId(currentDisplayId_);
     MMI_HILOGD("Change Coordinate : x:%{public}lf,y:%{public}lf",  absolutionX_, absolutionY_);
     return RET_OK;
@@ -185,7 +186,9 @@ int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
             auto pointerEvent = sharedPtr->GetPointerEvent();
             CHKPV(pointerEvent);
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
-            InputHandler->OnMouseEventEndTimerHandler(pointerEvent);
+            auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+            CHKPV(inputEventNormalizeHandler);
+            inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
         });
 
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
@@ -281,7 +284,7 @@ void MouseEventHandler::HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY)
     InitAbsolution();
     absolutionX_ += offsetX;
     absolutionY_ += offsetY;
-    WinMgr->UpdateAndAdjustMouseLoction(currentDisplayId_, absolutionX_, absolutionY_);
+    WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
 }
 
 void MouseEventHandler::HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem)
@@ -336,6 +339,22 @@ bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
 void MouseEventHandler::DumpInner()
 {
     PrintEventData(pointerEvent_);
+}
+
+void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_LOG_ENTER;
+    PointerEvent::PointerItem item;
+    pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);
+    CHKPV(pointerEvent_);
+    mprintf(fd, "Mouse device state information:\t");
+    mprintf(fd,
+            "PointerId:%d | SourceType:%s | PointerAction:%s | ButtonId:%d | AgentWindowId:%d | TargetWindowId:%d "
+            "| DownTime:%" PRId64 " | IsPressed:%s | LocalX:%d | LocalY:%d | Width:%d | Height:%d | Pressure:%lf \t",
+            pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
+            pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(), pointerEvent_->GetTargetWindowId(),
+            item.GetDownTime(), item.IsPressed() ? "true" : "false", item.GetLocalX(),  item.GetLocalY(),
+            item.GetWidth(), item.GetHeight(), item.GetPressure());
 }
 } // namespace MMI
 } // namespace OHOS

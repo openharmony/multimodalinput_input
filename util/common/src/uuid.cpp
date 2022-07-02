@@ -26,11 +26,11 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t UUID_TIME_LOW_FIRST_BYTE = 0;
-constexpr int32_t UUID_TIME_LOW_SECEND_BYTE = 1;
+constexpr int32_t UUID_TIME_LOW_SECOND_BYTE = 1;
 constexpr int32_t UUID_TIME_LOW_THIRD_BYTE = 2;
 constexpr int32_t UUID_TIME_LOW_FOURTH_BYTE = 3;
 constexpr int32_t UUID_TIME_MID_FIRST_BYTE = 4;
-constexpr int32_t UUID_TIME_MID_SECEND_BYTE = 5;
+constexpr int32_t UUID_TIME_MID_SECOND_BYTE = 5;
 constexpr int32_t UUID_VERSION = 6;
 constexpr int32_t UUID_TIME_HIGH = 7;
 constexpr int32_t UUID_VARIANT = 8;
@@ -83,7 +83,7 @@ Uuid::Uuid()
     // 4 - 6
     uuid_[UUID_VERSION] =
         static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_sec) + randNum) & 0xFF);
-    uuid_[UUID_TIME_MID_SECEND_BYTE] =
+    uuid_[UUID_TIME_MID_SECOND_BYTE] =
         static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_min) + (randNum >> BASE_BIT_OPT_SIZE)) & 0xFF);
     uuid_[UUID_TIME_MID_FIRST_BYTE] = static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_hour) +
                                       (randNum >> BIT_OPT_TWO_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
@@ -92,7 +92,7 @@ Uuid::Uuid()
                                        (randNum >> BIT_OPT_THREE_BYTE * BASE_BIT_OPT_SIZE)) & 0xFF);
     uuid_[UUID_TIME_LOW_THIRD_BYTE] =
         static_cast<uint8_t>(static_cast<uint32_t>(randomTime.tm_mon) & 0xFF);
-    uuid_[UUID_TIME_LOW_SECEND_BYTE] =
+    uuid_[UUID_TIME_LOW_SECOND_BYTE] =
         static_cast<uint8_t>(static_cast<uint32_t>(randomTime.tm_year) & 0xFF);
     uuid_[UUID_TIME_LOW_FIRST_BYTE] =
         static_cast<uint8_t>((static_cast<uint32_t>(randomTime.tm_year) & 0xFF00) >> BASE_BIT_OPT_SIZE);

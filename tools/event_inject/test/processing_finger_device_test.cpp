@@ -43,8 +43,8 @@ HWTEST_F(ProcessingFingerDeviceTest, Test_TransformJsonDataToInputData, TestSize
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformFingerJsonDataToInputData.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start touchpad & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformFingerJsonDataToInputData.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";

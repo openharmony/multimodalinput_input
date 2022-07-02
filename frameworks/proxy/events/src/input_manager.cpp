@@ -16,9 +16,7 @@
 #include "input_manager.h"
 
 #include "error_multimodal.h"
-#include "input_event_monitor_manager.h"
 #include "input_manager_impl.h"
-#include "key_event_input_subscribe_manager.h"
 #include "define_multimodal.h"
 #include "multimodal_event_handler.h"
 
@@ -59,12 +57,12 @@ void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsum
 int32_t InputManager::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
     std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
-    return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
+    return InputMgrImpl->SubscribeKeyEvent(keyOption, callback);
 }
 
 void InputManager::UnsubscribeKeyEvent(int32_t subscriberId)
 {
-    KeyEventInputSubscribeMgr.UnSubscribeKeyEvent(subscriberId);
+    InputMgrImpl->UnsubscribeKeyEvent(subscriberId);
 }
 
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)

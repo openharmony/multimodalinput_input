@@ -14,8 +14,12 @@
  */
 
 #include "input_device_manager.h"
+
 #include <parameters.h>
+#include <unordered_map>
+
 #include "key_event_value_transformation.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -35,15 +39,15 @@ constexpr int32_t ABS_MT_WIDTH_MINOR = 0x33;
 
 constexpr int32_t BUS_BLUETOOTH = 0X5;
 
-std::list<int32_t> axisType = {
-    ABS_MT_TOUCH_MAJOR,
-    ABS_MT_TOUCH_MINOR,
-    ABS_MT_ORIENTATION,
-    ABS_MT_POSITION_X,
-    ABS_MT_POSITION_Y,
-    ABS_MT_PRESSURE,
-    ABS_MT_WIDTH_MAJOR,
-    ABS_MT_WIDTH_MINOR,
+std::unordered_map<int32_t, std::string> axisType = {
+    {ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR"},
+    {ABS_MT_TOUCH_MINOR, "TOUCH_MINOR"},
+    {ABS_MT_ORIENTATION, "ORIENTATION"},
+    {ABS_MT_POSITION_X, "POSITION_X"},
+    {ABS_MT_POSITION_Y, "POSITION_Y"},
+    {ABS_MT_PRESSURE, "PRESSURE"},
+    {ABS_MT_WIDTH_MAJOR, "WIDTH_MAJOR"},
+    {ABS_MT_WIDTH_MINOR, "WIDTH_MINOR"}
 };
 } // namespace
 
@@ -62,7 +66,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(iter->second)));
     const char* name = libinput_device_get_name(iter->second);
     inputDevice->SetName((name == nullptr) ? ("null") : (name));
-    inputDevice->SetBustype(libinput_device_get_id_bustype(iter->second));
+    inputDevice->SetBusType(libinput_device_get_id_bustype(iter->second));
     inputDevice->SetVersion(libinput_device_get_id_version(iter->second));
     inputDevice->SetProduct(libinput_device_get_id_product(iter->second));
     inputDevice->SetVendor(libinput_device_get_id_vendor(iter->second));
@@ -73,17 +77,17 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
 
     InputDevice::AxisInfo axis;
     for (const auto &item : axisType) {
-        int32_t min = libinput_device_get_axis_min(iter->second, item);
+        int32_t min = libinput_device_get_axis_min(iter->second, item.first);
         if (min == -1) {
             MMI_HILOGW("The device does not support this axis");
             continue;
         }
-        axis.SetAxisType(item);
+        axis.SetAxisType(item.first);
         axis.SetMinimum(min);
-        axis.SetMaximum(libinput_device_get_axis_max(iter->second, item));
-        axis.SetFuzz(libinput_device_get_axis_fuzz(iter->second, item));
-        axis.SetFlat(libinput_device_get_axis_flat(iter->second, item));
-        axis.SetResolution(libinput_device_get_axis_resolution(iter->second, item));
+        axis.SetMaximum(libinput_device_get_axis_max(iter->second, item.first));
+        axis.SetFuzz(libinput_device_get_axis_fuzz(iter->second, item.first));
+        axis.SetFlat(libinput_device_get_axis_flat(iter->second, item.first));
+        axis.SetResolution(libinput_device_get_axis_resolution(iter->second, item.first));
         inputDevice->AddAxisInfo(axis);
     }
     return inputDevice;
@@ -139,7 +143,7 @@ int32_t InputDeviceManager::GetKeyboardBusMode(int32_t deviceId)
     CALL_LOG_ENTER;
     std::shared_ptr dev = GetInputDevice(deviceId);
     CHKPR(dev, ERROR_NULL_POINTER);
-    return dev->GetBustype();
+    return dev->GetBusType();
 }
 
 int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId)
@@ -328,6 +332,52 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
     }
     MMI_HILOGE("find input device id failed");
     return INVALID_DEVICE_ID;
+}
+
+void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_LOG_ENTER;
+    mprintf(fd, "Device information:\t");
+    mprintf(fd, "Input devices: count=%d", inputDevice_.size());
+    for (const auto &item : inputDevice_) {
+        std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
+        CHKPV(inputDevice);
+        mprintf(fd,
+                "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d "
+                "| product:%d | vendor:%d | phys:%s\t",
+                inputDevice->GetId(), inputDevice->GetName().c_str(), inputDevice->GetType(),
+                inputDevice->GetBusType(), inputDevice->GetVersion(), inputDevice->GetProduct(),
+                inputDevice->GetVendor(), inputDevice->GetPhys().c_str());
+        std::vector<InputDevice::AxisInfo> axisinfo = inputDevice->GetAxisInfo();
+        mprintf(fd, "axis: count=%d", axisinfo.size());
+        for (const auto &axis : axisinfo) {
+            auto iter = axisType.find(axis.GetAxisType());
+            if (iter == axisType.end()) {
+                MMI_HILOGE("AxisType is not found");
+                return;
+            }
+            mprintf(fd,
+                    "\t axisType:%s | minimum:%d | maximum:%d | fuzz:%d | flat:%d | resolution:%d\t",
+                    iter->second.c_str(), axis.GetMinimum(), axis.GetMaximum(), axis.GetFuzz(),
+                    axis.GetFlat(), axis.GetResolution());
+        }
+    }
+}
+
+void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_LOG_ENTER;
+    std::vector<int32_t> ids = GetInputDeviceIds();
+    mprintf(fd, "Total device:%d, Device list:\t", int32_t { ids.size() });
+    for (const auto &item : inputDevice_) {
+        std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
+        CHKPV(inputDevice);
+        int32_t deviceId = inputDevice->GetId();
+        mprintf(fd,
+                "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d | product:%d | vendor:%d\t",
+                deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBusType(),
+                inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor());
+    }
 }
 } // namespace MMI
 } // namespace OHOS

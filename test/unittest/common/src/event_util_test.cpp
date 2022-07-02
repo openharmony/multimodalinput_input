@@ -1,0 +1,203 @@
+/*
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "event_util_test.h"
+
+#include <iomanip>
+
+#include "input_transfer_station.h"
+#include "mmi_log.h"
+#include "window_utils_test.h"
+
+namespace OHOS {
+namespace MMI {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventUtilTest" };
+constexpr int32_t TIME_WAIT_FOR_EVENT = 1000;
+constexpr int32_t SEC_TO_NANOSEC = 1000000000;
+} // namespace
+
+void InputEventConsumer::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    CALL_LOG_ENTER;
+    RECV_FLAG flag = TestUtil->GetRecvFlag();
+    if (flag == RECV_FLAG::RECV_FOCUS || flag == RECV_FLAG::RECV_MARK_CONSUMED) {
+        keyEvent->MarkProcessed();
+        ASSERT_TRUE(keyEvent != nullptr);
+        TestUtil->AddEventDump(TestUtil->DumpInputEvent(keyEvent));
+    }
+}
+
+void InputEventConsumer::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
+{
+    CALL_LOG_ENTER;
+    RECV_FLAG flag = TestUtil->GetRecvFlag();
+    if (flag == RECV_FLAG::RECV_FOCUS || flag == RECV_FLAG::RECV_MARK_CONSUMED) {
+        pointerEvent->MarkProcessed();
+        ASSERT_TRUE(pointerEvent != nullptr);
+        TestUtil->AddEventDump(TestUtil->DumpInputEvent(pointerEvent));
+    }
+}
+
+void InputEventCallback::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
+{
+    CALL_LOG_ENTER;
+    if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
+        TestUtil->SetRecvFlag(RECV_FLAG::RECV_MONITOR);
+        ASSERT_TRUE(pointerEvent != nullptr);
+        TestUtil->AddEventDump(TestUtil->DumpInputEvent(pointerEvent));
+    }
+}
+
+void InputEventCallback::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    CALL_LOG_ENTER;
+    if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
+        TestUtil->SetRecvFlag(RECV_FLAG::RECV_MONITOR);
+        ASSERT_TRUE(keyEvent != nullptr);
+        TestUtil->AddEventDump(TestUtil->DumpInputEvent(keyEvent));
+    }
+}
+
+void EventUtilTest::AddEventDump(std::string eventDump)
+{
+    CALL_LOG_ENTER;
+    std::lock_guard<std::mutex> lockGuard(mutex_);
+    if (eventDump.empty()) {
+        strEventDump_.clear();
+        return;
+    }
+    strEventDump_.push_back(eventDump);
+    MMI_HILOGD("Setting the Dump event, strEventDump_:%{public}s", eventDump.c_str());
+    conditionVariable_.notify_one();
+}
+
+std::string EventUtilTest::GetEventDump()
+{
+    CALL_LOG_ENTER;
+    std::unique_lock<std::mutex> uniqueLock(mutex_);
+    std::string str = "";
+    if (strEventDump_.empty()) {
+        MMI_HILOGD("Waiting for an event to fire");
+        if (conditionVariable_.wait_for(uniqueLock,
+            std::chrono::milliseconds(TIME_WAIT_FOR_EVENT)) == std::cv_status::timeout) {
+            MMI_HILOGD("Timeout");
+            return str;
+        }
+    }
+    str = strEventDump_.front();
+    strEventDump_.pop_front();
+    return str;
+}
+
+bool EventUtilTest::Init()
+{
+    CALL_LOG_ENTER;
+    if (!WindowUtilsTest::GetInstance()->DrawTestWindow()) {
+        return false;
+    }
+    sptr<Rosen::Window> window_ = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPF(window_);
+    auto listener_ = GetPtr<InputEventConsumer>();
+    CHKPF(listener_);
+    MMI::InputManager::GetInstance()->SetWindowInputEventConsumer(listener_);
+    Rosen::InputTransferStation::GetInstance().SetInputListener(window_->GetWindowId(), listener_);
+    Rosen::InputTransferStation::GetInstance().AddInputWindow(window_);
+    return true;
+}
+
+std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& pointerEvent)
+{
+    const int precision = 2;
+    std::ostringstream ostream;
+    std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
+    ostream << "ClientMsgHandler: in OnPointerEvent"
+         << ",EventType:" << pointerEvent->GetEventType()
+         << ",ActionTime:" << pointerEvent->GetActionTime()
+         << ",Action:" << pointerEvent->GetAction()
+         << ",ActionStartTime:" << pointerEvent->GetActionStartTime()
+         << ",Flag:" << pointerEvent->GetFlag()
+         << ",PointerAction:" << pointerEvent->DumpPointerAction()
+         << ",SourceType:" << pointerEvent->DumpSourceType()
+         << ",ButtonId:" << pointerEvent->GetButtonId()
+         << ",VerticalAxisValue:" << std::fixed << std::setprecision(precision)
+         << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
+         << ",HorizontalAxisValue:" << std::fixed << std::setprecision(precision)
+         << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL);
+    for (const auto& pointerId : pointerIds) {
+        PointerEvent::PointerItem item;
+        if (!pointerEvent->GetPointerItem(pointerId, item)) {
+            MMI_HILOGE("Invalid pointer:%{public}d.", pointerId);
+            return ostream.str();
+        }
+        ostream << ",pointerId:" << pointerId << ",DownTime:" << item.GetDownTime()
+            << ",IsPressed:" << std::boolalpha << item.IsPressed()
+            << ",GlobalX:-\\{0,1\\}[[:digit:]]\\{1,\\},GlobalY:-\\{0,1\\}[[:digit:]]\\{1,\\}"
+            << ",LocalX:-\\{0,1\\}[[:digit:]]\\{1,\\},LocalY:-\\{0,1\\}[[:digit:]]\\{1,\\}"
+            << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
+            << ",TiltX:" << std::fixed << std::setprecision(precision) << item.GetTiltX()
+            << ",TiltY:" << std::fixed << std::setprecision(precision) << item.GetTiltY()
+            << ",ToolGlobalX:" << item.GetToolGlobalX() << ",ToolGlobalY:" << item.GetToolGlobalY()
+            << ",ToolLocalX:" << item.GetToolLocalX() << ",ToolLocalY:" << item.GetToolLocalY()
+            << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
+            << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
+            << ",LongAxis:" << item.GetLongAxis() << ",ShortAxis:" << item.GetShortAxis();
+    }
+    return ostream.str();
+}
+
+std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<KeyEvent>& keyEvent)
+{
+    std::ostringstream strm;
+    strm << "InputManagerTest: in OnKeyEvent"
+         << ", KeyCode:" << keyEvent->GetKeyCode()
+         << ", ActionTime:" << keyEvent->GetActionTime()
+         << ", Action:" << keyEvent->GetAction()
+         << ", ActionStartTime:" << keyEvent->GetActionStartTime()
+         << ", EventType:" << keyEvent->GetEventType()
+         << ", KeyAction:" << keyEvent->GetKeyAction();
+    return strm.str();
+}
+
+bool EventUtilTest::CompareDump(const std::shared_ptr<PointerEvent>& pointerEvent)
+{
+    CALL_LOG_ENTER;
+    std::string before = DumpInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    std::string after = GetEventDump();
+    MMI_HILOGD("after:%{public}s", after.c_str());
+
+    return before == after;
+}
+
+bool EventUtilTest::CompareDump(const std::shared_ptr<KeyEvent>& keyEvent)
+{
+    CALL_LOG_ENTER;
+    std::string before = DumpInputEvent(keyEvent);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    std::string after = GetEventDump();
+    MMI_HILOGD("after:%{public}s", after.c_str());
+
+    return before == after;
+}
+
+int64_t GetNanoTime()
+{
+    struct timespec time = { 0 };
+    clock_gettime(CLOCK_MONOTONIC, &time);
+    return static_cast<int64_t>(time.tv_sec) * SEC_TO_NANOSEC + time.tv_nsec;
+}
+} // namespace MMI
+} // namespace OHOS

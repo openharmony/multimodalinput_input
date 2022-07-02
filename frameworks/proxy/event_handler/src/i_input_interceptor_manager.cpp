@@ -25,13 +25,13 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInpu
 
 int32_t IInputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor)
 {
-    MMI_HILOGW("Interceptor function dose not support");
+    MMI_HILOGW("Interceptor function does not support");
     return ERROR_UNSUPPORT;
 }
 
 void IInputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
-    MMI_HILOGW("Interceptor function dose not support");
+    MMI_HILOGW("Interceptor function does not support");
     return;
 }
 } // namespace MMI
