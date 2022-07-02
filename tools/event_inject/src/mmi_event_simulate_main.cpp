@@ -27,7 +27,7 @@ int32_t main(int32_t argc, const char* argv[])
     do {
         SetThreadName("main");
         if (argc < ARGV_VALID) {
-            MMI_HILOGI("Invaild Input Para, Plase Check the validity of the para! errCode:%d", PARAM_INPUT_FAIL);
+            MMI_HILOGI("Invalid Input Para, Please Check the validity of the para! errCode:%d", PARAM_INPUT_FAIL);
             break;
         }
         std::vector<std::string> argvs;
@@ -36,8 +36,8 @@ int32_t main(int32_t argc, const char* argv[])
         }
         InjectionEventDispatch injection;
         injection.Init();
-        if (!(injection.VirifyArgvs(argc, argvs))) {
-            MMI_HILOGI("Invaild Input Para, Plase Check the validity of the para! errCode:%d", PARAM_INPUT_FAIL);
+        if (!(injection.VerifyArgvs(argc, argvs))) {
+            MMI_HILOGI("Invalid Input Para, Please Check the validity of the para! errCode:%d", PARAM_INPUT_FAIL);
             break;
         }
         injection.Run();

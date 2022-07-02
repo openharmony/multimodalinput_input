@@ -27,7 +27,7 @@ napi_value JsMouseContext::CreateInstance(napi_env env)
 {
     CALL_LOG_ENTER;
     napi_value global = nullptr;
-    CHKRP(env, napi_get_global(env, &global), GET_GLOBLE);
+    CHKRP(env, napi_get_global(env, &global), GET_GLOBAL);
 
     constexpr char className[] = "JsMouseContext";
     napi_value jsClass = nullptr;
@@ -67,7 +67,13 @@ napi_value JsMouseContext::CreateJsObject(napi_env env, napi_callback_info info)
         JsMouseContext *context = static_cast<JsMouseContext*>(data);
         delete context;
     }, nullptr, nullptr);
-    CHKRP(env, status, WRAP);
+    if (status != napi_ok) {
+        delete jsContext;
+        MMI_HILOGE("%{public}s failed", std::string(WRAP).c_str());
+        auto infoTemp = std::string(__FUNCTION__)+ ": " + std::string(WRAP) + " failed";
+        napi_throw_error(env, nullptr, infoTemp.c_str());
+        return nullptr;
+    }
     return thisVar;
 }
 
@@ -75,7 +81,7 @@ JsMouseContext* JsMouseContext::GetInstance(napi_env env)
 {
     CALL_LOG_ENTER;
     napi_value global = nullptr;
-    CHKRP(env, napi_get_global(env, &global), GET_GLOBLE);
+    CHKRP(env, napi_get_global(env, &global), GET_GLOBAL);
 
     bool result = false;
     CHKRP(env, napi_has_named_property(env, global, "multimodal_mouse", &result), HAS_NAMED_PROPERTY);

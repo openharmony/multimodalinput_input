@@ -27,7 +27,7 @@ int32_t ProcessingPadDevice::TransformJsonDataToInputData(const DeviceItem& fing
     CALL_LOG_ENTER;
     std::vector<DeviceEvent> inputData = fingerEventArrays.events;
     if (inputData.empty()) {
-        MMI_HILOGE("manage finger array faild, inputData is empty.");
+        MMI_HILOGE("manage finger array failed, inputData is empty.");
         return RET_ERR;
     }
     std::vector<PadEvent> padEventArray;
