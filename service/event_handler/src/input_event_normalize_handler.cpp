@@ -95,6 +95,7 @@ void InputEventNormalizeHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEve
     }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
+    PrintEventData(keyEvent);
     nextHandler_->HandleKeyEvent(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
@@ -169,7 +170,7 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     }
 
     BytraceAdapter::StartBytrace(keyEvent);
-
+    PrintEventData(keyEvent);
     nextHandler_->HandleKeyEvent(keyEvent);
     KeyRepeat->SelectAutoRepeat(keyEvent);
     MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
@@ -240,7 +241,7 @@ int32_t InputEventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_GESTURE);
     CHKPR(pointerEvent, GESTURE_EVENT_PKG_FAIL);
-    MMI_HILOGD("GestrueEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
+    MMI_HILOGD("GestureEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
                "action:%{public}d,actionStartTime:%{public}" PRId64 ","
                "pointerAction:%{public}d,sourceType:%{public}d,"
                "PinchAxisValue:%{public}.2f",
@@ -323,8 +324,8 @@ int32_t InputEventNormalizeHandler::AddHandleTimer(int32_t timeout)
         CHKPV(keyEvent);
         CHKPV(nextHandler_);
         nextHandler_->HandleKeyEvent(keyEvent);
-        int32_t triggertime = KeyRepeat->GetIntervalTime(keyEvent->GetDeviceId());
-        this->AddHandleTimer(triggertime);
+        int32_t triggerTime = KeyRepeat->GetIntervalTime(keyEvent->GetDeviceId());
+        this->AddHandleTimer(triggerTime);
     });
     return timerId_;
 }

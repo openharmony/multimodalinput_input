@@ -50,7 +50,7 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
     }
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     if (deviceId == INVALID_DEVICE_ID) {
-        MMI_HILOGE("Find to device faild");
+        MMI_HILOGE("Find to device failed");
         return RET_ERR;
     }
     deviceConfig_[deviceId] = devConf;
@@ -83,6 +83,12 @@ void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
         timerId_ = -1;
         MMI_HILOGI("Stop kayboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
         if (repeatKeyCode_ != keyEvent_->GetKeyCode()) {
+            auto pressedKeyItem = keyEvent_->GetKeyItem(keyEvent_->GetKeyCode());
+            if (pressedKeyItem != nullptr) {
+                keyEvent_->RemoveReleasedKeyItems(*pressedKeyItem);
+            } else {
+                MMI_HILOGW("pressedKeyItem is nullptr");
+            }
             keyEvent_->SetKeyCode(repeatKeyCode_);
             keyEvent_->SetAction(KeyEvent::KEY_ACTION_DOWN);
             keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);

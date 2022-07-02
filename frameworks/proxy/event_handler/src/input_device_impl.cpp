@@ -135,7 +135,7 @@ void InputDeviceImpl::GetKeyboardType(int32_t deviceId, std::function<void(int32
 void InputDeviceImpl::OnInputDeviceTask(InputDeviceImpl::DevInfo devInfo, int32_t userData,
     std::shared_ptr<InputDeviceInfo> devData)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     CHKPV(devData);
     devInfo.second(userData, devData);
     MMI_HILOGD("report device info task, userData:%{public}d name:%{public}s",
@@ -145,7 +145,7 @@ void InputDeviceImpl::OnInputDeviceTask(InputDeviceImpl::DevInfo devInfo, int32_
 void InputDeviceImpl::OnInputDevice(int32_t userData, std::shared_ptr<InputDeviceInfo> devData)
 {
     CALL_LOG_ENTER;
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
@@ -170,7 +170,7 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, std::shared_ptr<InputDevic
 
 void InputDeviceImpl::OnInputDeviceIdsTask(InputDeviceImpl::DevIds devIds, int32_t userData, std::vector<int32_t> ids)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     devIds.second(userData, ids);
     MMI_HILOGD("report all device, userData:%{public}d devices:(%{public}s)",
         userData, IdsListToString(ids).c_str());
@@ -178,7 +178,7 @@ void InputDeviceImpl::OnInputDeviceIdsTask(InputDeviceImpl::DevIds devIds, int32
 
 void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> &ids)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
@@ -203,13 +203,13 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> &i
 void InputDeviceImpl::OnSupportKeysTask(InputDeviceImpl::DevKeys devKeys, int32_t userData,
     std::vector<bool> keystrokeAbility)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     devKeys.second(keystrokeAbility);
 }
 
 void InputDeviceImpl::OnSupportKeys(int32_t userData, const std::vector<bool> &keystrokeAbility)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
@@ -227,7 +227,7 @@ void InputDeviceImpl::OnSupportKeys(int32_t userData, const std::vector<bool> &k
 void InputDeviceImpl::OnKeyboardTypeTask(InputDeviceImpl::DevKeyboardTypes kbTypes, int32_t userData,
     int32_t keyboardType)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     kbTypes.second(keyboardType);
     MMI_HILOGD("Keyboard type event callback userData:%{public}d keyboardType:(%{public}d)",
         userData, keyboardType);
@@ -235,7 +235,7 @@ void InputDeviceImpl::OnKeyboardTypeTask(InputDeviceImpl::DevKeyboardTypes kbTyp
 
 void InputDeviceImpl::OnKeyboardType(int32_t userData, int32_t keyboardType)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
     if (auto iter = inputDevices_.find(userData); iter == inputDevices_.end()) {
         MMI_HILOGD("Find userData failed");

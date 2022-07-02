@@ -38,7 +38,7 @@ int32_t UDSSocket::EpollCreat(int32_t size)
 {
     epollFd_ = epoll_create(size);
     if (epollFd_ < 0) {
-        MMI_HILOGE("epoll_create retrun %{public}d", epollFd_);
+        MMI_HILOGE("epoll_create return %{public}d", epollFd_);
     } else {
         MMI_HILOGI("epoll_create, epollFd_:%{public}d", epollFd_);
     }
@@ -65,7 +65,7 @@ int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, i
         ret = epoll_ctl(epollFd, op, fd, &event);
     }
     if (ret < 0) {
-        MMI_HILOGE("epoll_ctl retrun %{public}d,epollFd_:%{public}d,"
+        MMI_HILOGE("epoll_ctl return %{public}d,epollFd_:%{public}d,"
                    "op:%{public}d,fd:%{public}d,errno:%{public}d",
                    ret, epollFd, op, fd, errno);
     }

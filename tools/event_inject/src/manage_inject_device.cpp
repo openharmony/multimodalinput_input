@@ -65,10 +65,10 @@ int32_t ManageInjectDevice::TransformJsonData(const DeviceItems& configData)
 
 int32_t ManageInjectDevice::SendEvent(const InputEventArray& inputEventArray)
 {
-    return SendEventToDeviveNode(inputEventArray);
+    return SendEventToDeviceNode(inputEventArray);
 }
 
-int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEventArray)
+int32_t ManageInjectDevice::SendEventToDeviceNode(const InputEventArray& inputEventArray)
 {
     CALL_LOG_ENTER;
     std::string deviceNode = inputEventArray.target;
@@ -83,7 +83,7 @@ int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEv
     }
     int32_t fd = open(realPath, O_RDWR);
     if (fd < 0) {
-        MMI_HILOGE("open device node:%{public}s faild", deviceNode.c_str());
+        MMI_HILOGE("open device node:%{public}s failed", deviceNode.c_str());
         return RET_ERR;
     }
     for (const auto &item : inputEventArray.events) {

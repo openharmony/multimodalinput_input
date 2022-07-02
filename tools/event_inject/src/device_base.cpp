@@ -22,7 +22,7 @@ constexpr int32_t FIRST_FINGER = 1;
 constexpr int32_t SECOND_FINGER = 2;
 constexpr int32_t THIRD_FINGER = 3;
 constexpr int32_t FOURTH_FINGER = 4;
-constexpr int32_t FITTH_FINGER = 5;
+constexpr int32_t FIFTH_FINGER = 5;
 constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE = 15;
 } // namespace
 
@@ -214,7 +214,7 @@ void DeviceBase::SetMtTouchFingerType(InputEventArray& inputEventArray, int64_t 
         injectEvent.event.code = BTN_TOOL_TRIPLETAP;
     } else if (value == FOURTH_FINGER) {
         injectEvent.event.code = BTN_TOOL_QUADTAP;
-    } else if (value == FITTH_FINGER) {
+    } else if (value == FIFTH_FINGER) {
         injectEvent.event.code = BTN_TOOL_QUINTTAP;
     } else {
         injectEvent.event.code = BTN_TOOL_FINGER;

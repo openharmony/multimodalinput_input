@@ -67,8 +67,8 @@ protected:
     int32_t OnInputDeviceIds(SessionPtr sess, NetPacket& pkt);
     int32_t OnSupportKeys(SessionPtr sess, NetPacket& pkt);
     int32_t OnInputKeyboardType(SessionPtr sess, NetPacket& pkt);
-    int32_t OnAddInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
-    int32_t OnRemoveInputDeviceMontior(SessionPtr sess, NetPacket& pkt);
+    int32_t OnAddInputDeviceMonitor(SessionPtr sess, NetPacket& pkt);
+    int32_t OnRemoveInputDeviceMonitor(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_MMI_DEBUG
