@@ -28,12 +28,12 @@ int32_t ProcessingPenDevice::TransformJsonDataToInputData(const DeviceItem& penE
 {
     CALL_LOG_ENTER;
     if (penEventArrays.events.empty()) {
-        MMI_HILOGE("manage pen array faild, inputData is empty.");
+        MMI_HILOGE("manage pen array failed, inputData is empty.");
         return RET_ERR;
     }
     std::vector<DeviceEvent> inputData = penEventArrays.events;
     if (inputData.empty()) {
-        MMI_HILOGE("manage pen array faild, inputData is empty.");
+        MMI_HILOGE("manage pen array failed, inputData is empty.");
         return RET_ERR;
     }
     std::vector<PenEvent> penEventArray;

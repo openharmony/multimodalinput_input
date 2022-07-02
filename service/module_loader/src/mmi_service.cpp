@@ -284,7 +284,7 @@ void MMIService::OnStart()
 {
     int sleepSeconds = 3;
     sleep(sleepSeconds);
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     int32_t ret = Init();
     if (RET_OK != ret) {
         MMI_HILOGE("Init mmi_service failed");
@@ -292,7 +292,7 @@ void MMIService::OnStart()
     }
     state_ = ServiceRunningState::STATE_RUNNING;
     MMI_HILOGD("Started successfully");
-    AddReloadLibinputTimer();
+    AddReloadDeviceTimer();
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
 #ifdef OHOS_RSS_CLIENT
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
@@ -302,7 +302,7 @@ void MMIService::OnStart()
 
 void MMIService::OnStop()
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     UdsStop();
     InputHandler->Clear();
     libinputAdapter_.Stop();
@@ -693,7 +693,7 @@ void MMIService::OnSignalEvent(int32_t signalFd)
     signalfd_siginfo sigInfo;
     int32_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
     if (size != static_cast<int32_t>(sizeof(signalfd_siginfo))) {
-        MMI_HILOGE("read signal info faild, invalid size:%{public}d,errno:%{public}d", size, errno);
+        MMI_HILOGE("read signal info failed, invalid size:%{public}d,errno:%{public}d", size, errno);
         return;
     }
     int32_t signo = static_cast<int32_t>(sigInfo.ssi_signo);
@@ -717,23 +717,13 @@ void MMIService::OnSignalEvent(int32_t signalFd)
     }
 }
 
-void MMIService::AddReloadLibinputTimer()
+void MMIService::AddReloadDeviceTimer()
 {
     CALL_LOG_ENTER;
     TimerMgr->AddTimer(2000, 2, [this]() {
-        auto inputFd = libinputAdapter_.GetInputFd();
-        if (inputFd >= 0) {
-            auto ret = DelEpoll(EPOLL_EVENT_INPUT, inputFd);
-            if (ret <  0) {
-                MMI_HILOGE("del epoll fail, ret: %{public}d", ret);
-            }
-            libinputAdapter_.Stop();
-            MMI_HILOGI("libinput stop successful");
-        }
-        InputDevMgr->RemoveAllDevice();
-        if (!InitLibinputService()) {
-            MMI_HILOGE("libinput init failed");
-            return;
+        auto deviceIds = InputDevMgr->GetInputDeviceIds();
+        if (deviceIds.empty()) {
+            libinputAdapter_.ReloadDevice();
         }
     });
 }

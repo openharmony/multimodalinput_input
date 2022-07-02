@@ -38,6 +38,8 @@ private:
     static napi_value CreateInstance(napi_env env);
     static JsInputDeviceContext* GetInstance(napi_env env);
     static napi_value JsConstructor(napi_env env, napi_callback_info info);
+    static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
+    static napi_value CreateEnumKeyboardType(napi_env env, napi_value exports);
     std::shared_ptr<JsInputDeviceManager> mgr_ {nullptr};
     std::mutex mtx_;
     napi_ref contextRef_ {nullptr};

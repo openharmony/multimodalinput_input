@@ -176,5 +176,13 @@ void LibinputAdapter::OnEventHandler()
         libinput_event_destroy(event);
     }
 }
+
+void LibinputAdapter::ReloadDevice()
+{
+    CALL_LOG_ENTER;
+    CHKPV(input_);
+    libinput_suspend(input_);
+    libinput_resume(input_);
+}
 } // namespace MMI
 } // namespace OHOS
