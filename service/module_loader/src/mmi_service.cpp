@@ -19,6 +19,7 @@
 #include <csignal>
 #include <parameters.h>
 #include <sys/signalfd.h>
+#include "dfx_hisysevent.h"
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
 #endif
@@ -315,18 +316,28 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     int32_t &toReturnClientFd)
 {
     MMI_HILOGI("enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
+    
     toReturnClientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t pid = GetCallingPid();
     int32_t uid = GetCallingUid();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this,
         programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd)));
+    DfxHisysevent::ClientConnectData data = {
+        .pid = pid,
+        .uid = uid,
+        .moduleType = moduleType,
+        .programName = programName,
+        .serverFd = serverFd
+    };
     if (ret != RET_OK) {
         MMI_HILOGE("call AddSocketPairInfo failed,return %{public}d", ret);
+        DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return RET_ERR;
     }
     MMI_HILOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
         programName.c_str(), moduleType);
+    DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     return RET_OK;
 }
 

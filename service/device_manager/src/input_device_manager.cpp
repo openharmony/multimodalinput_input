@@ -17,7 +17,7 @@
 
 #include <parameters.h>
 #include <unordered_map>
-
+#include "dfx_hisysevent.h"
 #include "key_event_value_transformation.h"
 #include "util_ex.h"
 
@@ -237,11 +237,13 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     for (const auto& item : inputDevice_) {
         if (item.second == inputDevice) {
             MMI_HILOGI("the device already exists");
+            DfxHisysevent::OnDeviceConnect(item.first, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
             return;
         }
     }
     if (nextId_ == INT32_MAX) {
         MMI_HILOGE("the nextId_ exceeded the upper limit");
+        DfxHisysevent::OnDeviceConnect(INT32_MAX, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
     }
     inputDevice_[nextId_] = inputDevice;
@@ -255,6 +257,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         NotifyPointerDevice(true);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "true");
     }
+    DfxHisysevent::OnDeviceConnect(nextId_ - 1, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
 }
 
 void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevice)
@@ -265,6 +268,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second == inputDevice) {
             deviceId = it->first;
+            DfxHisysevent::OnDeviceDisconnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
             inputDevice_.erase(it);
             break;
         }
@@ -274,6 +278,9 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
         item.second("remove", deviceId);
     }
     ScanPointerDevice();
+    if (deviceId == INVALID_DEVICE_ID) {
+        DfxHisysevent::OnDeviceDisconnect(INVALID_DEVICE_ID, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    }
 }
 
 void InputDeviceManager::ScanPointerDevice()
