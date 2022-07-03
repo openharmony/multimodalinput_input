@@ -49,10 +49,16 @@ public:
         return pid_;
     }
 
+    int32_t GetModuleType() const
+    {
+        return moduleType_;
+    }
+
     SessionPtr GetSharedPtr()
     {
         return shared_from_this();
     }
+
     int32_t GetFd() const
     {
         return fd_;
@@ -61,6 +67,11 @@ public:
     const std::string& GetDescript() const
     {
         return descript_;
+    }
+
+    const std::string GetProgramName() const
+    {
+        return programName_;
     }
 
     void UpdateDescript();

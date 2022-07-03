@@ -72,7 +72,9 @@ public:
     const DisplayGroupInfo& GetDisplayGroupInfo();
 #endif // OHOS_BUILD_ENABLE_POINTER
     void Dump(int32_t fd, const std::vector<std::string> &args);
-    
+    int32_t GetWindowPid(const int32_t windowId, const DisplayGroupInfo& displayGroupInfo) const;
+    int32_t GetWindowPid(const int32_t windowId) const;
+
 private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const;
@@ -106,6 +108,8 @@ private:
     bool IsInsideDisplay(const DisplayInfo& displayInfo, int32_t globalX, int32_t globalY);
     void FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& globalX, int32_t& globalY, int32_t& displayId);
 #endif // OHOS_BUILD_ENABLE_POINTER
+    void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
+    void CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo);
 private:
     UDSServer* udsServer_ = nullptr;
 #ifdef OHOS_BUILD_ENABLE_POINTER
