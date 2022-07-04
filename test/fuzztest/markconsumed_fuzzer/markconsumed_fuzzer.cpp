@@ -43,7 +43,7 @@ T GetObject(const uint8_t *data, size_t size)
 
 void MarkConsumedFuzzTest(const uint8_t* data, size_t size)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t monitorId = GetObject<int32_t>(data, size);
     int32_t eventId = GetObject<int32_t>(data, size);
     InputManager::GetInstance()->MarkConsumed(monitorId, eventId);

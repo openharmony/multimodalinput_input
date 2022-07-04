@@ -224,7 +224,7 @@ bool MMIService::InitService()
 
 bool MMIService::InitDelegateTasks()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (!delegateTasks_.Init()) {
         MMI_HILOGE("delegate task init failed");
         return false;
@@ -343,7 +343,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
 
 int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPR(filter, ERROR_NULL_POINTER);
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputEventHandler::AddInputEventFilter,
@@ -373,7 +373,7 @@ void MMIService::OnDisconnected(SessionPtr s)
 
 int32_t MMIService::SetPointerVisible(bool visible)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerVisible,
         IPointerDrawingManager::GetInstance(), GetCallingPid(), visible));
@@ -394,7 +394,7 @@ int32_t MMIService::CheckPointerVisible(bool &visible)
 
 int32_t MMIService::IsPointerVisible(bool &visible)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckPointerVisible, this, std::ref(visible)));
     if (ret != RET_OK) {
@@ -414,7 +414,7 @@ int32_t MMIService::CheckEventProcessed(int32_t pid, int32_t eventId)
 
 int32_t MMIService::MarkEventProcessed(int32_t eventId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckEventProcessed, this, pid, eventId));
     if (ret != RET_OK) {
@@ -437,7 +437,7 @@ int32_t MMIService::CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerTy
 int32_t MMIService::AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
     HandleEventType eventType)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -461,7 +461,7 @@ int32_t MMIService::CheckRemoveInput(int32_t pid, int32_t handlerId, InputHandle
 
 int32_t MMIService::RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -485,7 +485,7 @@ int32_t MMIService::CheckMarkConsumed(int32_t pid, int32_t monitorId, int32_t ev
 
 int32_t MMIService::MarkEventConsumed(int32_t monitorId, int32_t eventId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -500,7 +500,7 @@ int32_t MMIService::MarkEventConsumed(int32_t monitorId, int32_t eventId)
 
 int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&ServerMsgHandler::OnMoveMouse, &sMsgHandler_, offsetX, offsetY));
@@ -514,7 +514,7 @@ int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 
 int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent));
@@ -544,7 +544,7 @@ int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> 
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
@@ -574,7 +574,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& 
 
 int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -589,7 +589,7 @@ int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr
 
 int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -658,7 +658,7 @@ void MMIService::OnThread()
 
 bool MMIService::InitSignalHandler()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     sigset_t mask = {0};
     int32_t retCode = sigfillset(&mask);
     if (retCode < 0) {
@@ -689,7 +689,7 @@ bool MMIService::InitSignalHandler()
 
 void MMIService::OnSignalEvent(int32_t signalFd)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     signalfd_siginfo sigInfo;
     int32_t size = ::read(signalFd, &sigInfo, sizeof(signalfd_siginfo));
     if (size != static_cast<int32_t>(sizeof(signalfd_siginfo))) {
@@ -719,7 +719,7 @@ void MMIService::OnSignalEvent(int32_t signalFd)
 
 void MMIService::AddReloadDeviceTimer()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     TimerMgr->AddTimer(2000, 2, [this]() {
         auto deviceIds = InputDevMgr->GetInputDeviceIds();
         if (deviceIds.empty()) {
@@ -730,7 +730,7 @@ void MMIService::AddReloadDeviceTimer()
 
 int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (fd < 0) {
         MMI_HILOGE("fd is invalid");
         return DUMP_PARAM_ERR;

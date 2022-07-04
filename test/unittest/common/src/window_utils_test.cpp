@@ -49,14 +49,14 @@ std::shared_ptr<WindowUtilsTest> WindowUtilsTest::GetInstance()
 
 void WindowUtilsTest::ClearTestWindow()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(testWindow_);
     testWindow_->Destroy();
 }
 
 bool WindowUtilsTest::DrawTestWindow()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     testWindow_ = Rosen::Window::Find(windowName);
     if (testWindow_ == nullptr) {
         CreateSmoothWindow();

@@ -32,7 +32,7 @@ const std::string GET_CB_INFO = "napi_get_cb_info";
 
 napi_value JsKeyCode::GetNapiInt32(napi_env env, int32_t code)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_value keyCode = nullptr;
     CHKRP(env, napi_create_int32(env, code, &keyCode), CREATE_INT32);
     return keyCode;
@@ -40,7 +40,7 @@ napi_value JsKeyCode::GetNapiInt32(napi_env env, int32_t code)
 
 napi_value JsKeyCode::EnumClassConstructor(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     size_t argc = 0;
     napi_value args[1] = {0};
     napi_value ret = nullptr;
@@ -51,7 +51,7 @@ napi_value JsKeyCode::EnumClassConstructor(napi_env env, napi_callback_info info
 
 napi_value JsKeyCode::Export(napi_env env, napi_value exports)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_FN", GetNapiInt32(env, KeyEvent::KEYCODE_FN)),
         DECLARE_NAPI_STATIC_PROPERTY("KEYCODE_UNKNOWN", GetNapiInt32(env, KeyEvent::KEYCODE_UNKNOWN)),

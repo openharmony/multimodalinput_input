@@ -46,7 +46,7 @@ TouchTransformPointProcessor::~TouchTransformPointProcessor() {}
 
 bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(event);
     auto data = libinput_event_get_touch_event(event);
     CHKPF(data);
@@ -96,7 +96,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
 
 bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(event);
     auto data = libinput_event_get_touch_event(event);
     CHKPF(data);
@@ -135,7 +135,7 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
 
 bool TouchTransformPointProcessor::OnEventTouchUp(struct libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(event);
     auto data = libinput_event_get_touch_event(event);
     CHKPF(data);
@@ -157,7 +157,7 @@ bool TouchTransformPointProcessor::OnEventTouchUp(struct libinput_event *event)
 
 std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent(struct libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPP(event);
     CHKPP(pointerEvent_);
     auto type = libinput_event_get_type(event);
