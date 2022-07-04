@@ -148,6 +148,7 @@ ohos_shared_library("libmmi-server") {
     "permission_helper/src/permission_helper.cpp",
     "timer_manager/src/timer_manager.cpp",
     "window_manager/src/input_windows_manager.cpp",
+    "event_handler/src/anr_manager.cpp",
   ]
 
   if (is_mmi_have_hdf) {

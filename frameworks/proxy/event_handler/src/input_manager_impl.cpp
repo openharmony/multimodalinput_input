@@ -596,5 +596,16 @@ void InputManagerImpl::GetKeyboardType(int32_t deviceId, std::function<void(int3
     }
     InputDevImpl.GetKeyboardType(deviceId, callback);
 }
+
+void InputManagerImpl::SetAnrCallback(std::function<void(int32_t)> callback)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return;
+    }
+    AnrCall->SetAnrCallback(callback);
+}
 } // namespace MMI
 } // namespace OHOS

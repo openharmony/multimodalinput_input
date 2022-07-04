@@ -21,6 +21,7 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
+#include "anr_callback.h"
 #include "net_packet.h"
 
 #include "display_info.h"
@@ -89,6 +90,8 @@ public:
 
     int32_t SetPointerVisible(bool visible);
     bool IsPointerVisible();
+
+    void SetAnrCallback(std::function<void(int32_t)> callback);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
