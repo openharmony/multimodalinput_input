@@ -100,7 +100,7 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
 
 int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIndex)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     EventPackage* pack[EVENT_PACKAGE_ARROW_SIZE];
     pack[0] = (EventPackage*)malloc(sizeof(EventPackage));
     pack[0]->type = static_cast<int32_t>(allEvent.ev_type);

@@ -67,7 +67,7 @@ void KeyEventSubscriber::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerE
 int32_t KeyEventSubscriber::SubscribeKeyEvent(
     SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (subscribeId < 0) {
         MMI_HILOGE("Invalid subscribe");
         return RET_ERR;
@@ -95,7 +95,7 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
 
 int32_t KeyEventSubscriber::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     MMI_HILOGD("subscribeId:%{public}d", subscribeId);
     for (auto it = subscribers_.begin(); it != subscribers_.end(); ++it) {
         if ((*it)->id_ == subscribeId && (*it)->sess_ == sess) {
@@ -109,7 +109,7 @@ int32_t KeyEventSubscriber::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscri
 
 bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     if (IsRepeatedKeyEvent(keyEvent)) {
         MMI_HILOGD("repeat KeyEvent, skip");
@@ -139,7 +139,7 @@ bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 
 void KeyEventSubscriber::InsertSubScriber(std::shared_ptr<Subscriber> subs)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(subs);
     for (auto it = subscribers_.begin(); it != subscribers_.end(); ++it) {
         if (subs->sess_ != nullptr && (*it)->id_ == subs->id_ && (*it)->sess_ == subs->sess_) {
@@ -153,7 +153,7 @@ void KeyEventSubscriber::InsertSubScriber(std::shared_ptr<Subscriber> subs)
 
 void KeyEventSubscriber::OnSessionDelete(SessionPtr sess)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(sess);
     for (auto it = subscribers_.begin(); it != subscribers_.end();) {
         if ((*it)->sess_ == sess) {
@@ -185,7 +185,7 @@ bool KeyEventSubscriber::IsPreKeysMatch(
 void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     const std::shared_ptr<Subscriber>& subscriber)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     CHKPV(subscriber);
     auto udsServerPtr = InputHandler->GetUDSServer();
@@ -207,7 +207,7 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
 bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
     const std::shared_ptr<KeyEvent>& keyEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     CHKPF(subscriber);
 
@@ -249,7 +249,7 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
 
 void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscriber)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(subscriber);
 
     if (subscriber->timerId_ < 0) {
@@ -267,7 +267,7 @@ void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscribe
 
 void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(subscriber);
     subscriber->timerId_ = -1;
     if (subscriber->keyEvent_ == nullptr) {
@@ -282,7 +282,7 @@ void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
 
 bool KeyEventSubscriber::InitSessionDeleteCallback()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (callbackInitialized_) {
         MMI_HILOGD("session delete callback has already been initialized");
         return true;
@@ -298,7 +298,7 @@ bool KeyEventSubscriber::InitSessionDeleteCallback()
 
 bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     bool handled = false;
     auto keyCode = keyEvent->GetKeyCode();
@@ -348,7 +348,7 @@ bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent
 
 bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     bool handled = false;
     auto keyCode = keyEvent->GetKeyCode();
@@ -406,7 +406,7 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
 
 bool KeyEventSubscriber::HandleKeyCancel(const std::shared_ptr<KeyEvent>& keyEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     for (const auto &subscriber : subscribers_) {
         ClearTimer(subscriber);
@@ -471,7 +471,7 @@ bool KeyEventSubscriber::IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent) 
 
 void KeyEventSubscriber::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     mprintf(fd, "Subscriber information:\t");
     mprintf(fd, "subscribers: count=%d", subscribers_.size());
     for (const auto &item : subscribers_) {

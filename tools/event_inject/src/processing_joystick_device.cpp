@@ -27,7 +27,7 @@ constexpr int32_t DEFAULT_ABSZ_VALUE = 125;
 int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const DeviceItem& originalEvent,
     InputEventArray& inputEventArray)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (originalEvent.events.empty()) {
         MMI_HILOGE("manage joystick array failed, inputData is empty");
         return RET_ERR;

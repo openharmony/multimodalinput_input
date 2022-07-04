@@ -67,7 +67,7 @@ JsInputDeviceContext::~JsInputDeviceContext()
 
 napi_value JsInputDeviceContext::CreateInstance(napi_env env)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_value global = nullptr;
     CHKRP(env, napi_get_global(env, &global), GET_GLOBAL);
 
@@ -97,7 +97,7 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
 
 napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_value thisVar = nullptr;
     void *data = nullptr;
     CHKRP(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data), GET_CB_INFO);
@@ -121,7 +121,7 @@ napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info 
 
 JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_value global = nullptr;
     CHKRP(env, napi_get_global(env, &global), GET_GLOBAL);
 
@@ -155,7 +155,7 @@ std::shared_ptr<JsInputDeviceManager> JsInputDeviceContext::GetJsInputDeviceMgr(
 
 napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -189,7 +189,7 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
 
 napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -227,7 +227,7 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
 
 napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     size_t argc = 1;
     napi_value argv[1];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -250,7 +250,7 @@ napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info i
 
 napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -279,7 +279,7 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
 
 napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     size_t argc = 3;
     napi_value argv[3];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -332,7 +332,7 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
 
 napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -362,7 +362,7 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
 
 napi_value JsInputDeviceContext::EnumClassConstructor(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     size_t argc = 0;
     napi_value args[1] = {0};
     napi_value ret = nullptr;
@@ -373,7 +373,7 @@ napi_value JsInputDeviceContext::EnumClassConstructor(napi_env env, napi_callbac
 
 napi_value JsInputDeviceContext::CreateEnumKeyboardType(napi_env env, napi_value exports)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_value none = nullptr;
     CHKRP(env, napi_create_int32(env, KeyboardType::NONE, &none), CREATE_INT32);
     napi_value unknown = nullptr;
@@ -403,7 +403,7 @@ napi_value JsInputDeviceContext::CreateEnumKeyboardType(napi_env env, napi_value
 
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto instance = CreateInstance(env);
     if (instance == nullptr) {
         THROWERR(env, "failed to create instance");

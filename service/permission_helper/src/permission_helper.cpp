@@ -25,7 +25,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Permis
 
 bool PermissionHelper::CheckPermission(uint32_t required)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto tokenId = IPCSkeleton::GetCallingTokenID();
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
@@ -40,7 +40,7 @@ bool PermissionHelper::CheckPermission(uint32_t required)
 
 bool PermissionHelper::CheckMonitor()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto tokenId = IPCSkeleton::GetCallingTokenID();
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     static const std::string inputMonitor = "ohos.permission.INPUT_MONITORING";

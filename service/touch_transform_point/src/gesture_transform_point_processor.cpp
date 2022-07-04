@@ -35,7 +35,7 @@ GestureTransformPointProcessor::~GestureTransformPointProcessor() {}
 
 void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_gesture *data)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(data);
     int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     double scale = libinput_event_gesture_get_scale(data);
@@ -119,7 +119,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gest
 std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestureEvent(
     struct libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPP(event);
     auto data = libinput_event_get_gesture_event(event);
     CHKPP(data);
