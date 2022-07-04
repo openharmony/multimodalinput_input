@@ -32,7 +32,7 @@ int32_t GetDeviceNode::GetDeviceNodeName(const std::string &targetName, uint16_t
 {
     std::vector<std::string> devices = ReadDeviceFile();
     if (devices.empty()) {
-        MMI_HILOGE("devices is faild");
+        MMI_HILOGE("devices is failed");
         return RET_ERR;
     }
     DeviceList deviceList;
@@ -44,12 +44,12 @@ int32_t GetDeviceNode::GetDeviceNodeName(const std::string &targetName, uint16_t
     std::string deviceName = deviceList_[targetName];
     auto iter = deviceList.find(deviceName);
     if (iter == deviceList.end()) {
-        MMI_HILOGE("faild for find deviceName:%{public}s", deviceName.c_str());
+        MMI_HILOGE("failed for find deviceName:%{public}s", deviceName.c_str());
         return RET_ERR;
     }
     size_t targetSize = iter->second.size();
     if (devIndex > targetSize) {
-        MMI_HILOGE("faild for devIndex:%{public}d > targetSize:%{public}zu", devIndex, targetSize);
+        MMI_HILOGE("failed for devIndex:%{public}d > targetSize:%{public}zu", devIndex, targetSize);
         return RET_ERR;
     }
     std::string nodeRootPath = "/dev/input/";
@@ -90,7 +90,7 @@ std::vector<std::string> GetDeviceNode::ReadDeviceFile()
     }
     FILE* fp = fopen(DEVICES_INFO_PATH.c_str(), "r");
     if (fp == nullptr) {
-        MMI_HILOGW("open file: %{pulic}s failed", DEVICES_INFO_PATH.c_str());
+        MMI_HILOGW("open file: %{public}s failed", DEVICES_INFO_PATH.c_str());
         return {};
     }
     char buf[READ_CMD_BUFF_SIZE] = {};
@@ -99,7 +99,7 @@ std::vector<std::string> GetDeviceNode::ReadDeviceFile()
         deviceStrs.push_back(buf);
     }
     if (fclose(fp) != 0) {
-        MMI_HILOGW("close file: %{pulic}s failed", DEVICES_INFO_PATH.c_str());
+        MMI_HILOGW("close file: %{public}s failed", DEVICES_INFO_PATH.c_str());
     }
     return deviceStrs;
 }

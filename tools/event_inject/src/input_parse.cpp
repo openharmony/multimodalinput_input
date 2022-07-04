@@ -36,7 +36,7 @@ struct JsonParser {
     {
         return json_;
     }
-    cJSON *json_ = nullptr;
+    cJSON *json_ { nullptr };
 };
 
 void GetJsonData(cJSON *json, const std::string& key, std::string& val)
@@ -229,7 +229,7 @@ std::string DeviceItem::ToString() const
 
 DeviceItems DataInit(const std::string& fileData, bool logStatus)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     JsonParser parser;
     parser.json_ = cJSON_Parse(fileData.c_str());
     if (!cJSON_IsArray(parser.json_)) {

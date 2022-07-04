@@ -163,10 +163,11 @@ bool InputHandlerManager::PostTask(int32_t handlerId, const AppExecFwk::EventHan
     return MMIEventHandler::PostTask(eventHandler, callback);
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void InputHandlerManager::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
     std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     CHKPV(consumer);
     CHKPV(keyEvent);
     consumer->OnInputEvent(keyEvent);
@@ -175,9 +176,10 @@ void InputHandlerManager::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> co
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     CHKPV(keyEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_INTERCEPT_EVENT);
     auto consumer = FindHandler(handlerId);
     CHKPV(consumer);
     if (!PostTask(handlerId,
@@ -186,11 +188,13 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
     }
     MMI_HILOGD("key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void InputHandlerManager::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
     std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     CHKPV(consumer);
     CHKPV(pointerEvent);
     consumer->OnInputEvent(pointerEvent);
@@ -199,7 +203,7 @@ void InputHandlerManager::OnPointerEventTask(std::shared_ptr<IInputEventConsumer
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     CHKPV(pointerEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
@@ -211,13 +215,15 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
     }
     MMI_HILOGD("pointer event id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
 }
-
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 void InputHandlerManager::OnConnected()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     for (auto &inputHandler : inputHandlers_) {
         AddToServer(inputHandler.second.handlerId_, inputHandler.second.handlerType_, inputHandler.second.eventType_);
     }
 }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 } // namespace MMI
 } // namespace OHOS

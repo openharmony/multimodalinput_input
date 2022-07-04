@@ -39,7 +39,7 @@ bool JsCommon::TypeOf(napi_env env, napi_value value, napi_valuetype type)
 
 AsyncContext::~AsyncContext()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (work != nullptr) {
         CHKRV(env, napi_delete_async_work(env, work), DELETE_ASYNC_WORK);
     }
@@ -51,7 +51,7 @@ AsyncContext::~AsyncContext()
 
 napi_value getResult(sptr<AsyncContext> asyncContext)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_env env = asyncContext->env;
     napi_value results;
     ReturnType resultType;
@@ -72,7 +72,7 @@ napi_value getResult(sptr<AsyncContext> asyncContext)
 
 void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(asyncContext);
     CHKPV(asyncContext->env);
     napi_env env = asyncContext->env;
@@ -113,7 +113,7 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
 
 napi_value JsMouseManager::SetPointerVisible(napi_env env, bool visible, napi_value handle)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     if (asyncContext == nullptr) {
         THROWERR(env, "create AsyncContext failed");
@@ -136,7 +136,7 @@ napi_value JsMouseManager::SetPointerVisible(napi_env env, bool visible, napi_va
 
 napi_value JsMouseManager::IsPointerVisible(napi_env env, napi_value handle)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     if (asyncContext == nullptr) {
         THROWERR(env, "create AsyncContext failed");

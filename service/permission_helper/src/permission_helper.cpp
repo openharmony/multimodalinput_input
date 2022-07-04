@@ -25,13 +25,29 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Permis
 
 bool PermissionHelper::CheckPermission(uint32_t required)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto tokenId = IPCSkeleton::GetCallingTokenID();
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
         return CheckHapPermission(tokenId, required);
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
         return CheckNativePermission(tokenId, required);
+    } else {
+        MMI_HILOGE("unsupported token type:%{public}d", tokenType);
+        return false;
+    }
+}
+
+bool PermissionHelper::CheckMonitor()
+{
+    CALL_DEBUG_ENTER;
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    static const std::string inputMonitor = "ohos.permission.INPUT_MONITORING";
+    if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
+        return CheckMonitorHap(tokenId, inputMonitor);
+    } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
+        return CheckMonitorNative(tokenId, inputMonitor);
     } else {
         MMI_HILOGE("unsupported token type:%{public}d", tokenType);
         return false;
@@ -46,10 +62,10 @@ bool PermissionHelper::CheckHapPermission(uint32_t tokenId, uint32_t required)
         return false;
     }
     if (!((1 << findInfo.apl) & required)) {
-        MMI_HILOGE("check hap permisson failed");
+        MMI_HILOGE("check hap permission failed");
         return false;
     }
-    MMI_HILOGI("check hap permisson success");
+    MMI_HILOGI("check hap permission success");
     return true;
 }
 
@@ -61,10 +77,32 @@ bool PermissionHelper::CheckNativePermission(uint32_t tokenId, uint32_t required
         return false;
     }
     if (!((1 << findInfo.apl) & required)) {
-        MMI_HILOGE("check native permisson failed");
+        MMI_HILOGE("check native permission failed");
         return false;
     }
-    MMI_HILOGI("check native permisson success");
+    MMI_HILOGI("check native permission success");
+    return true;
+}
+
+bool PermissionHelper::CheckMonitorHap(uint32_t tokenId, const std::string &required)
+{
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, required);
+    if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
+        MMI_HILOGE("check hap permission failed ret:%{public}d", ret);
+        return false;
+    }
+    MMI_HILOGI("check hap permission success");
+    return true;
+}
+
+bool PermissionHelper::CheckMonitorNative(uint32_t tokenId, const std::string &required)
+{
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyNativeToken(tokenId, required);
+    if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
+        MMI_HILOGE("check native permission failed ret:%{public}d", ret);
+        return false;
+    }
+    MMI_HILOGI("check native permission success");
     return true;
 }
 } // namespace MMI

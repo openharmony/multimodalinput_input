@@ -46,3 +46,117 @@ APPLICATION_BLOCK_INPUT:
   PACKAGE_NAME: {type: STRING, desc: package name}
   PROCESS_NAME: {type: STRING, desc: process name}
   MSG: {type: STRING, desc: multimodalinput event message}
+
+INPUT_DEV_CONNECTION_SUCCESS:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: input device connection success}
+  DEVICE_ID: {type: INT32, desc: device id}
+  DEVICE_PHYS: {type: STRING, desc: device physics}
+  DEVICE_NAME: {type: STRING, desc: device name}
+  DEVICE_TYPE: {type: INT32, desc: device type}
+  MSG: {type: STRING, desc: message}
+
+INPUT_DEV_CONNECTION_FAILURE:
+  __BASE: {type: FAULT, level: MINOR, tag: PowerStats, desc: input device connection failure}
+  DEVICE_ID: {type: INT32, desc: device id}
+  DEVICE_PHYS: {type: STRING, desc: device physics}
+  DEVICE_NAME: {type: STRING, desc: device name}
+  DEVICE_TYPE: {type: INT32, desc: device type}
+  MSG: {type: STRING, desc: message}
+
+INPUT_DEV_DISCONNECTION_SUCCESS:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: input device disconnection success}
+  DEVICE_ID: {type: INT32, desc: device id}
+  DEVICE_PHYS: {type: STRING, desc: device physics}
+  DEVICE_NAME: {type: STRING, desc: device name}
+  DEVICE_TYPE: {type: INT32, desc: device type}
+  MSG: {type: STRING, desc: message}
+
+INPUT_DEV_DISCONNECTION_FAILURE:
+  __BASE: {type: FAULT, level: MINOR, tag: PowerStats, desc: input device disconnection failure}
+  MSG: {type: STRING, desc: message}
+
+CLIENT_CONNECTION_SUCCESS:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: client connection event success}
+  PID: {type: INT32, desc: pid}
+  UID: {type: INT32, desc: uid}
+  MODULE_TYPE: {type: INT32, desc: module type}
+  FD: {type: INT32, desc: server fd}
+  PROGRAMNAME: {type: STRING, desc: program name}
+  MSG: {type: STRING, desc: message}
+
+CLIENT_CONNECTION_FAILURE:
+  __BASE: {type: FAULT, level: MINOR, tag: PowerStats, desc: client connection event failure}
+  PID: {type: INT32, desc: pid}
+  UID: {type: INT32, desc: uid}
+  MODULE_TYPE: {type: INT32, desc: module type}
+  PROGRAMNAME: {type: STRING, desc: program name}
+  MSG: {type: STRING, desc: message}
+
+CLIENT_DISCONNECTION_SUCCESS:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: client disconnection event success}
+  PID: {type: INT32, desc: pid}
+  UID: {type: INT32, desc: uid}
+  MODULE_TYPE: {type: INT32, desc: module type}
+  FD: {type: INT32, desc: server fd}
+  PROGRAMNAME: {type: STRING, desc: program name}
+  MSG: {type: STRING, desc: message}
+
+CLIENT_DISCONNECTION_FAILURE:
+  __BASE: {type: FAULT, level: MINOR, tag: PowerStats, desc: client disconnection event failure}
+  MSG: {type: STRING, desc: message}
+
+TARGET_POINTER_EVENT_SUCCESS:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: target pointer event success}
+  EVENTTYPE: {type: INT32, desc: event type}
+  AGENT_WINDOWID: {type: INT32, desc: agent windowid}
+  TARGET_WINDOWID: {type: INT32, desc: target windowid}
+  PID: {type: INT32, desc: pid}
+  FD: {type: INT32, desc: target fd}
+  MSG: {type: STRING, desc: message}
+
+TARGET_POINTER_EVENT_FAILURE:
+  __BASE: {type: FAULT, level: MINOR, tag: PowerStats, desc: target pointer event failure}
+  EVENTTYPE: {type: INT32, desc: event type}
+  MSG: {type: STRING, desc: message}
+
+TARGET_KEY_EVENT_SUCCESS:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: target key event success}
+  EVENTTYPE: {type: INT32, desc: event type}
+  KEYCODE: {type: INT32, desc: keycode}
+  ACTION: {type: INT32, desc: action}
+  ACTION_TIME: {type: UINT64, desc: action time}
+  ACTION_STARTTIME: {type: UINT64, desc: action start time}
+  FLAG: {type: INT32, desc: flag}
+  KEYACTION: {type: INT32, desc: keyaction}
+  FD: {type: INT32, desc: target fd}
+  AGENT_WINDOWID: {type: INT32, desc: agent windowid}
+  TARGET_WINDOWID: {type: INT32, desc: target windowid}
+  PID: {type: INT32, desc: pid}
+  MSG: {type: STRING, desc: message}
+
+TARGET_KEY_EVENT_FAILURE:
+  __BASE: {type: FAULT, level: MINOR, tag: PowerStats, desc: target key event failure}
+  EVENTTYPE: {type: INT32, desc: event type}
+  KEYCODE: {type: INT32, desc: keycode}
+  ACTION: {type: INT32, desc: action}
+  ACTION_TIME: {type: UINT64, desc: action time}
+  ACTION_STARTTIME: {type: UINT64, desc: action start time}
+  FLAG: {type: INT32, desc: flag}
+  KEYACTION: {type: INT32, desc: keyaction}
+  MSG: {type: STRING, desc: message}
+
+FOCUS_WINDOW_CHANGE:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: foucs window change}
+  OLD_FOCUS_WINDOWID: {type: INT32, desc: old focus windowid}
+  NEW_FOCUS_WINDOWID: {type: INT32, desc: new focus windowid}
+  OLD_FOCUS_WINDOWPID: {type: INT32, desc: old focus windowpid}
+  NEW_FOCUS_WINDOWPID: {type: INT32, desc: new focus windowpid}
+  MSG: {type: STRING, desc: message}
+
+Z_ORDER_WINDOW_CHANGE:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: zorder window change}
+  OLD_ZORDER_FIRST_WINDOWID: {type: INT32, desc: old zorder first windowid}
+  NEW_ZORDER_FIRST_WINDOWID: {type: INT32, desc: new zorder first windowid}
+  OLD_ZORDER_FIRST_WINDOWPID: {type: INT32, desc: old zorder first windowpid}
+  NEW_ZORDER_FIRST_WINDOWPID: {type: INT32, desc: new zorder first windowpid}
+  MSG: {type: STRING, desc: message}

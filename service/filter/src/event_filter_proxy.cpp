@@ -39,7 +39,7 @@ EventFilterProxy::~EventFilterProxy()
 
 bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(event);
     MessageParcel data;
     MessageParcel reply;
@@ -64,10 +64,7 @@ bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> ev
     }
 
     bool result = false;
-    if (!reply.ReadBool(result)) {
-        MMI_HILOGE("reply ReadBool fail");
-        return false;
-    }
+    READBOOL(reply, result);
     return result;
 }
 } // namespace MMI

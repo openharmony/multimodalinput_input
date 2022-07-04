@@ -45,8 +45,8 @@ enum hdf_event_type {
     HDF_RMV_DEVICE,
 };
 struct Devcmd {
-    int32_t index;
-    int32_t cmd;
+    int32_t index { 0 };
+    int32_t cmd { 0 };
 };
 class HdfEventManager {
 public:

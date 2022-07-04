@@ -33,12 +33,12 @@ int32_t InputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsu
         MMI_HILOGE("No interceptor was specified.");
         return INVALID_HANDLER_ID;
     }
-    return InputHandlerManager::GetInstance().AddHandler(InputHandlerType::INTERCEPTOR, interceptor, eventType);
+    return InputHandlerMgr.AddHandler(InputHandlerType::INTERCEPTOR, interceptor, eventType);
 }
 
 void InputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
-    InputHandlerManager::GetInstance().RemoveHandler(interceptorId, InputHandlerType::INTERCEPTOR);
+    InputHandlerMgr.RemoveHandler(interceptorId, InputHandlerType::INTERCEPTOR);
 }
 } // namespace MMI
 } // namespace OHOS

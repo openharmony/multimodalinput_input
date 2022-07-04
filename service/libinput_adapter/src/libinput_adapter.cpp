@@ -69,21 +69,25 @@ void LibinputAdapter::LoginfoPackagingTool(struct libinput_event *event)
 
 constexpr static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
-        CHKPR(path, errno);
+        if (path == nullptr) {
+            MMI_HILOGWK("input device path is nullptr");
+            return RET_ERR;
+        }
         char realPath[PATH_MAX] = {};
         int32_t count = 0;
         while ((realpath(path, realPath) == nullptr) && (count < MAX_RETRY_COUNT)) {
-            MMI_HILOGE("path is error, path:%{public}s", path);
+            MMI_HILOGWK("path is error, count: %{public}d, path:%{public}s", count, path);
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
             ++count;
         }
         if (count >= MAX_RETRY_COUNT) {
-            MMI_HILOGE("retry %{public}d times realpath failed", count);
+            MMI_HILOGWK("retry %{public}d times realpath failed", count);
             return RET_ERR;
         }
         int32_t fd = open(realPath, flags);
-        MMI_HILOGD("libinput .open_restricted path:%{public}s,fd:%{public}d", path, fd);
-        return fd < 0 ? -errno : fd;
+        int32_t errNo = errno;
+        MMI_HILOGWK("libinput .open_restricted path:%{public}s,fd:%{public}d,errno:%{public}d", path, fd, errNo);
+        return fd < 0 ? RET_ERR : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)
     {
@@ -98,7 +102,7 @@ LibinputAdapter::~LibinputAdapter() {}
 
 bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_id)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(funInputEvent);
     funInputEvent_ = funInputEvent;
     seat_id_ = seat_id;
@@ -129,7 +133,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_
 
 void LibinputAdapter::EventDispatch(struct epoll_event& ev)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int*>(ev.data.ptr);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
@@ -148,7 +152,7 @@ void LibinputAdapter::EventDispatch(struct epoll_event& ev)
 
 void LibinputAdapter::Stop()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (fd_ >= 0) {
         close(fd_);
         fd_ = -1;
@@ -164,13 +168,21 @@ void LibinputAdapter::ProcessPendingEvents()
 
 void LibinputAdapter::OnEventHandler()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(funInputEvent_);
     libinput_event *event = nullptr;
     while ((event = libinput_get_event(input_))) {
         funInputEvent_(event);
         libinput_event_destroy(event);
     }
+}
+
+void LibinputAdapter::ReloadDevice()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(input_);
+    libinput_suspend(input_);
+    libinput_resume(input_);
 }
 } // namespace MMI
 } // namespace OHOS

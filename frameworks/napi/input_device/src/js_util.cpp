@@ -210,7 +210,7 @@ JsUtil::CallbackInfo::CallbackInfo() {}
 
 JsUtil::CallbackInfo::~CallbackInfo()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (ref != nullptr && env != nullptr) {
         CHKRV(env, napi_delete_reference(env, ref), DELETE_REFERENCE);
         env = nullptr;

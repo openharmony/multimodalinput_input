@@ -60,12 +60,12 @@ bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const s
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGE("call napi_typeof fail");
+        MMI_HILOGE("Call napi_typeof fail");
         napi_throw_error(env, nullptr, "call napi_typeof failed");
         return false;
     }
     if (tmpType != napi_boolean) {
-        MMI_HILOGE("value is not bool");
+        MMI_HILOGE("The value is not bool");
         return value;
     }
 
@@ -81,12 +81,12 @@ int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, con
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGE("call napi_typeof fail");
+        MMI_HILOGE("Call napi_typeof fail");
         napi_throw_error(env, nullptr, "call napi_typeof failed");
         return value;
     }
     if (tmpType != napi_number) {
-        MMI_HILOGE("value is not number");
+        MMI_HILOGE("The value is not number");
         napi_throw_error(env, nullptr, "value is not number");
         return value;
     }
@@ -97,7 +97,7 @@ int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, con
 
 bool GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> &params)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     uint32_t arrayLength = 0;
     if (napi_get_array_length(env, value, &arrayLength) != napi_ok) {
         MMI_HILOGE("Get array length failed");
@@ -149,7 +149,7 @@ int32_t GetPreSubscribeId(Callbacks &callbacks, KeyEventMonitorInfo *event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto it = callbacks.find(event->eventType);
     if (it == callbacks.end() || it->second.empty()) {
-        MMI_HILOGE("callbacks is empty");
+        MMI_HILOGE("The callbacks is empty");
         return JS_CALLBACK_EVENT_FAILED;
     }
     CHKPR(it->second.front(), ERROR_NULL_POINTER);
@@ -158,7 +158,7 @@ int32_t GetPreSubscribeId(Callbacks &callbacks, KeyEventMonitorInfo *event)
 
 int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMonitorInfo *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     if (callbacks.find(event->eventType) == callbacks.end()) {
         MMI_HILOGD("No callback in %{public}s", event->eventType.c_str());
@@ -199,7 +199,7 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
 int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
     KeyEventMonitorInfo *event, int32_t &subscribeId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     if (callbacks.count(event->eventType) <= 0) {
         MMI_HILOGE("Callback doesn't exists");
@@ -322,7 +322,7 @@ static void AsyncWorkFn(const napi_env &env, KeyEventMonitorInfo *event, napi_va
 
 void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(reportEvent);
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(reportEvent->env, "AsyncCallback", NAPI_AUTO_LENGTH, &resourceName);

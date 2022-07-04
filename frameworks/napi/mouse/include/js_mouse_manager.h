@@ -36,7 +36,7 @@ const std::string GET_BOOL = "napi_get_boolean";
 const std::string DELETE_REFERENCE = "napi_delete_reference";
 const std::string DELETE_ASYNC_WORK = "napi_delete_async_work";
 const std::string TYPEOF = "napi_typeof";
-const std::string GET_GLOBLE = "napi_get_global";
+const std::string GET_GLOBAL = "napi_get_global";
 const std::string DEFINE_CLASS = "napi_define_class";
 const std::string WRAP = "napi_wrap";
 const std::string UNWRAP = "napi_unwrap";
@@ -64,11 +64,11 @@ public:
 };
 
 struct AsyncContext : RefBase {
-    napi_env env = nullptr;
-    napi_async_work work = nullptr;
-    napi_deferred deferred = nullptr;
-    napi_ref callback = nullptr;
-    int32_t errorCode {-1};
+    napi_env env { nullptr };
+    napi_async_work work { nullptr };
+    napi_deferred deferred { nullptr };
+    napi_ref callback { nullptr };
+    int32_t errorCode { -1 };
     StreamBuffer reserve;
     AsyncContext(napi_env env) : env(env) {}
     ~AsyncContext();

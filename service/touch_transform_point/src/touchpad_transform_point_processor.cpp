@@ -49,7 +49,7 @@ TouchPadTransformPointProcessor::~TouchPadTransformPointProcessor() {}
 
 void TouchPadTransformPointProcessor::OnEventTouchPadDown(struct libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
     CHKPV(data);
@@ -97,7 +97,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(struct libinput_event 
 
 void TouchPadTransformPointProcessor::OnEventTouchPadMotion(struct libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
     CHKPV(data);
@@ -137,7 +137,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(struct libinput_even
 
 void TouchPadTransformPointProcessor::OnEventTouchPadUp(struct libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
     CHKPV(data);
@@ -153,13 +153,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(struct libinput_event *e
                    seatSlot, PARAM_INPUT_FAIL);
         return;
     }
-    double pressure = libinput_event_touchpad_get_pressure(data);
-    double logicalX = libinput_event_touchpad_get_x(data);
-    double logicalY = libinput_event_touchpad_get_y(data);
-    item.SetPressure(pressure);
     item.SetPressed(false);
-    item.SetGlobalX(static_cast<int32_t>(logicalX));
-    item.SetGlobalY(static_cast<int32_t>(logicalY));
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
 }
@@ -167,7 +161,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(struct libinput_event *e
 std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPadEvent(
     struct libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPP(event);
     CHKPP(pointerEvent_);
     int32_t type = libinput_event_get_type(event);
