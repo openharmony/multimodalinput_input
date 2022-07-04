@@ -101,7 +101,7 @@ protected:
     void OnSignalEvent(int32_t signalFd);
     void OnDelegateTask(epoll_event& ev);
 
-    void AddReloadLibinputTimer();
+    void AddReloadDeviceTimer();
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
