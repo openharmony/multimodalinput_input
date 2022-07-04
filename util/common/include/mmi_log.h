@@ -16,6 +16,7 @@
 #define MMI_LOG_H
 
 #include <cinttypes>
+#include <functional>
 #include <future>
 #include <string>
 #include <sstream>
@@ -50,19 +51,19 @@ constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
 #endif
 
 #define MMI_HILOGD(fmt, ...) do { \
-    OHOS::HiviewDFX::HiLog::Debug(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    ::OHOS::HiviewDFX::HiLog::Debug(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGI(fmt, ...) do { \
-    OHOS::HiviewDFX::HiLog::Info(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    ::OHOS::HiviewDFX::HiLog::Info(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGW(fmt, ...) do { \
-    OHOS::HiviewDFX::HiLog::Warn(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    ::OHOS::HiviewDFX::HiLog::Warn(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGE(fmt, ...) do { \
-    OHOS::HiviewDFX::HiLog::Error(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    ::OHOS::HiviewDFX::HiLog::Error(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 #define MMI_HILOGF(fmt, ...) do { \
-    OHOS::HiviewDFX::HiLog::Fatal(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    ::OHOS::HiviewDFX::HiLog::Fatal(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
 } while (0)
 
 #define MMI_HILOGDK(fmt, ...) do { \
@@ -102,24 +103,26 @@ constexpr int32_t FINAL_FINGER = 1;
 
 class InnerFunctionTracer {
 public:
-    InnerFunctionTracer(const OHOS::HiviewDFX::HiLogLabel& label, const char *func)
-        : label_ { label }, func_ { func }
+    using HilogFunc = std::function<int(const char *)>;
+
+public:
+    InnerFunctionTracer(HilogFunc logfn)
+        : logfn_ { logfn }
     {
-        OHOS::HiviewDFX::HiLog::Debug(label_, "in %{public}s, enter", func_);
+        logfn_("in %{public}s, enter");
     }
     ~InnerFunctionTracer()
     {
-        OHOS::HiviewDFX::HiLog::Debug(label_, "in %{public}s, leave", func_);
+        logfn_("in %{public}s, leave");
     }
 private:
-    const OHOS::HiviewDFX::HiLogLabel& label_;
-    const char* func_ { nullptr };
+    HilogFunc logfn_;
 };
 
 template<class Event>
 static void PrintEventData(std::shared_ptr<Event> event, int32_t actionType, int32_t itemNum)
 {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MMILOG"};
+    constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MMILOG"};
 
     static int64_t nowTimeUSec = 0;
     static int32_t dropped = 0;
@@ -145,7 +148,7 @@ static void PrintEventData(std::shared_ptr<Event> event, int32_t actionType, int
 template<class Event>
 static void PrintEventData(std::shared_ptr<Event> event)
 {
-    constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MMILOG"};
+    constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MMILOG"};
 
     std::stringstream sStream;
     sStream << *event;
@@ -157,5 +160,9 @@ static void PrintEventData(std::shared_ptr<Event> event)
 } // namespace MMI
 } // namespace OHOS
 
-#define CALL_LOG_ENTER   InnerFunctionTracer ___innerFuncTracer___ { LABEL, __FUNCTION__ }
+#define CALL_DEBUG_ENTER        ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Debug___    \
+    { std::bind(&::OHOS::HiviewDFX::HiLog::Debug, LABEL, std::placeholders::_1, __FUNCTION__) }
+
+#define CALL_INFO_TRACE         ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___     \
+    { std::bind(&::OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1, __FUNCTION__) }
 #endif // MMI_LOG_H

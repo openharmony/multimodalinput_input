@@ -319,7 +319,7 @@ std::string KeyCommandManager::GetConfigFilePath() const
 
 bool KeyCommandManager::ParseJson()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::string jsonStr = ReadJsonFile(GetConfigFilePath());
     if (jsonStr.empty()) {
         MMI_HILOGE("configFile read failed");
@@ -373,7 +373,7 @@ void KeyCommandManager::Print()
 
 bool KeyCommandManager::HandleEvent(const std::shared_ptr<KeyEvent> key)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (IsKeyMatch(lastMatchedKey_, key)) {
         MMI_HILOGE("The same key is waiting timeout, skip");
         return true;
@@ -410,7 +410,7 @@ bool KeyCommandManager::HandleEvent(const std::shared_ptr<KeyEvent> key)
 
 bool KeyCommandManager::IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if ((key->GetKeyCode() != shortcutKey.finalKey) || (shortcutKey.triggerType != key->GetKeyAction())) {
         return false;
     }
@@ -437,7 +437,7 @@ bool KeyCommandManager::SkipFinalKey(const int32_t keyCode, const std::shared_pt
 
 bool KeyCommandManager::HandleKeyDown(ShortcutKey &shortcutKey)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (shortcutKey.keyDownDuration == 0) {
         MMI_HILOGD("Start launch ability immediately");
         LaunchAbility(shortcutKey);
@@ -458,7 +458,7 @@ bool KeyCommandManager::HandleKeyDown(ShortcutKey &shortcutKey)
 
 bool KeyCommandManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (shortcutKey.keyDownDuration == 0) {
         MMI_HILOGD("Start launch ability immediately");
         LaunchAbility(shortcutKey);
@@ -481,7 +481,7 @@ bool KeyCommandManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
 
 bool KeyCommandManager::HandleKeyCancel(ShortcutKey &shortcutKey)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (shortcutKey.timerId < 0) {
         MMI_HILOGE("Skip, timerid less than 0");
     }

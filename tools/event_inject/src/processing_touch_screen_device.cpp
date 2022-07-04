@@ -24,7 +24,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Proce
 int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const DeviceItem& touchScreenEventArrays,
                                                                   InputEventArray& inputEventArray)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (!touchScreenEventArrays.events.empty()) {
         return TransformJsonDataSingleTouchScreen(touchScreenEventArrays, inputEventArray);
     }
@@ -49,7 +49,7 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const DeviceIt
 int32_t ProcessingTouchScreenDevice::TransformJsonDataSingleTouchScreen(const DeviceItem& touchScreenEventArrays,
     InputEventArray& inputEventArray)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::vector<DeviceEvent> inputData = touchScreenEventArrays.events;
     if (inputData.empty()) {
         MMI_HILOGE("manage touchScreen array failed, inputData is empty.");

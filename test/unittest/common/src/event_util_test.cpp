@@ -31,7 +31,7 @@ constexpr int32_t SEC_TO_NANOSEC = 1000000000;
 
 void InputEventConsumer::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     RECV_FLAG flag = TestUtil->GetRecvFlag();
     if (flag == RECV_FLAG::RECV_FOCUS || flag == RECV_FLAG::RECV_MARK_CONSUMED) {
         keyEvent->MarkProcessed();
@@ -42,7 +42,7 @@ void InputEventConsumer::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
 
 void InputEventConsumer::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     RECV_FLAG flag = TestUtil->GetRecvFlag();
     if (flag == RECV_FLAG::RECV_FOCUS || flag == RECV_FLAG::RECV_MARK_CONSUMED) {
         pointerEvent->MarkProcessed();
@@ -53,7 +53,7 @@ void InputEventConsumer::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent
 
 void InputEventCallback::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
         TestUtil->SetRecvFlag(RECV_FLAG::RECV_MONITOR);
         ASSERT_TRUE(pointerEvent != nullptr);
@@ -63,7 +63,7 @@ void InputEventCallback::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent
 
 void InputEventCallback::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
         TestUtil->SetRecvFlag(RECV_FLAG::RECV_MONITOR);
         ASSERT_TRUE(keyEvent != nullptr);
@@ -73,7 +73,7 @@ void InputEventCallback::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
 
 void EventUtilTest::AddEventDump(std::string eventDump)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> lockGuard(mutex_);
     if (eventDump.empty()) {
         strEventDump_.clear();
@@ -86,7 +86,7 @@ void EventUtilTest::AddEventDump(std::string eventDump)
 
 std::string EventUtilTest::GetEventDump()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::unique_lock<std::mutex> uniqueLock(mutex_);
     std::string str = "";
     if (strEventDump_.empty()) {
@@ -104,7 +104,7 @@ std::string EventUtilTest::GetEventDump()
 
 bool EventUtilTest::Init()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (!WindowUtilsTest::GetInstance()->DrawTestWindow()) {
         return false;
     }
@@ -173,7 +173,7 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<KeyEvent>& keyEv
 
 bool EventUtilTest::CompareDump(const std::shared_ptr<PointerEvent>& pointerEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::string before = DumpInputEvent(pointerEvent);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::string after = GetEventDump();
@@ -184,7 +184,7 @@ bool EventUtilTest::CompareDump(const std::shared_ptr<PointerEvent>& pointerEven
 
 bool EventUtilTest::CompareDump(const std::shared_ptr<KeyEvent>& keyEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::string before = DumpInputEvent(keyEvent);
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     std::string after = GetEventDump();

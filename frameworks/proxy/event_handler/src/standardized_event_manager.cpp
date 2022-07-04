@@ -41,7 +41,7 @@ StandardizedEventManager::~StandardizedEventManager() {}
 
 void StandardizedEventManager::SetClientHandle(MMIClientPtr client)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     client_ = client;
 }
 
@@ -49,19 +49,19 @@ void StandardizedEventManager::SetClientHandle(MMIClientPtr client)
 int32_t StandardizedEventManager::SubscribeKeyEvent(
     const KeyEventInputSubscribeManager::SubscribeKeyEventInfo &subscribeInfo)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     return MultimodalInputConnMgr->SubscribeKeyEvent(subscribeInfo.GetSubscribeId(), subscribeInfo.GetKeyOption());
 }
 
 int32_t StandardizedEventManager::UnsubscribeKeyEvent(int32_t subscribeId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     return MultimodalInputConnMgr->UnsubscribeKeyEvent(subscribeId);
 }
 
 int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(keyEvent, RET_ERR);
     keyEvent->UpdateId();
     if (keyEvent->GetKeyCode() < 0) {
@@ -80,7 +80,7 @@ int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> ke
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     MMI_HILOGD("Inject pointer event:");
     std::stringstream sStream;
@@ -101,7 +101,7 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t ret = MultimodalInputConnMgr->MoveMouseEvent(offsetX, offsetY);
     if (ret != 0) {
         MMI_HILOGE("send to server fail, ret:%{public}d", ret);

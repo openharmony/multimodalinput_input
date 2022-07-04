@@ -35,7 +35,7 @@ RunShellUtil::~RunShellUtil() {}
 
 int32_t RunShellUtil::RunShellCommand(const std::string &command, std::vector<std::string> &vLog)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     vLog.clear();
     const std::string command_ = HILOG_GREP + "'" + command + "'";
 

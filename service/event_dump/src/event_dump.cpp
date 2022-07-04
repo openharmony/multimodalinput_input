@@ -66,7 +66,7 @@ void ChkConfig(int32_t fd)
 
 void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t optionIndex = 0;
     struct option dumpOptions[] = {
         {"help", no_argument, 0, 'h'},

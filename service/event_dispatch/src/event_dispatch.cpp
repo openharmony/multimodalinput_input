@@ -58,7 +58,7 @@ void EventDispatch::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(point);
     auto fd = WinMgr->UpdateTargetPointer(point);
     if (fd < 0) {
@@ -96,7 +96,7 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
     auto fd = WinMgr->UpdateTarget(key);
     if (fd < 0) {
@@ -139,7 +139,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
 
 bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int64_t earliest;
     if (sess->IsEventQueueEmpty()) {
         earliest = time;
