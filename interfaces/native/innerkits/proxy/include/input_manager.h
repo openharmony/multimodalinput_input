@@ -234,6 +234,15 @@ public:
      */
     void GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
 
+    /**
+     * @brief Sets a globally unique anr callback.
+     * @param callback xxxx
+     * @return return Returns a value greater than or equal to <b>0</b> if the input event filter is added
+     * successfully; returns a value less than <b>0</b> otherwise.
+     * @since 9
+     */
+    void SetAnrCallback(std::function<void(int32_t)> callback);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

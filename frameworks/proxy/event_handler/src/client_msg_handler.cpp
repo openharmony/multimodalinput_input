@@ -19,6 +19,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "anr_callback.h"
 #include "bytrace_adapter.h"
 #include "define_interceptor_manager.h"
 #include "input_device_impl.h"
@@ -68,6 +69,7 @@ void ClientMsgHandler::Init()
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ClientMsgHandler::OnSupportKeys, this)},
         {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind2(&ClientMsgHandler::OnInputKeyboardType, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnDevMonitor, this)},
+        {MmiMessageId::NOTICE_ANR, MsgCallbackBind2(&ClientMsgHandler::OnAnrNoticed, this)},
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -326,6 +328,20 @@ void ClientMsgHandler::OnEventProcessed(int32_t eventId)
         MMI_HILOGE("send to server fail, ret:%{public}d", ret);
         return;
     }
+}
+
+int32_t ClientMsgHandler::OnAnrNoticed(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid;
+    pkt >> pid;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read data failed");
+        return RET_ERR;
+    }
+    MMI_HILOGD("Client pid:%{public}d", pid);
+    AnrCall->OnAnrNoticed(pid);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
