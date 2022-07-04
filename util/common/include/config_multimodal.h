@@ -47,8 +47,6 @@ namespace MMI {
 #define MAX_VECTOR_SIZE 1000
 #define MAX_INPUT_DEVICE 64
 #define MAX_SUPPORT_KEY 5
-#define MAX_PHYSICAL_SIZE 128
-#define MAX_LOGICAL_SIZE 128
 #define MAX_KEY_SIZE 108
 
 #define MAX_LIST_SIZE 100                   // Instantaneous maximum listening buffer size of socket
@@ -64,6 +62,7 @@ namespace MMI {
 #define SEND_RETRY_SLEEP_TIME 10000
 #define ONCE_PROCESS_NETPACKET_LIMIT 100
 #define MAX_RECV_LIMIT 32
+#define INPUT_POINTER_DEVICE "input.pointer.device"
 } // namespace MMI
 } // namespace OHOS
 #endif // CONFIG_MULTIMODAL_H

@@ -13,8 +13,8 @@
 
 import("//build/ohos.gni")
 
-aafwk_kits_path = "//foundation/ability/ability_runtime/frameworks/kits"
-
+ability_runtime_path = "//foundation/ability/ability_runtime"
+ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
 declare_args() {
   resource_schedule_service_enabled = false
 
@@ -30,11 +30,19 @@ is_mmi_have_hdf = false
 is_mmi_have_debug = false
 mmi_enable_combinationkey = true
 mmi_enable_pointer_drawing = true
+mmi_enable_monitor = true
 mmi_enable_interceptor = true
+mmi_enable_keyboard = true
+mmi_enable_mouse = true
+mmi_enable_tp = true
 
 print("is_mmi_have_libinput = ${is_mmi_have_libinput}")
 print("is_mmi_have_hdf = ${is_mmi_have_hdf}")
 print("is_mmi_have_debug = ${is_mmi_have_debug}")
 print("mmi_enable_combinationkey = ${mmi_enable_combinationkey}")
 print("mmi_enable_pointer_drawing = ${mmi_enable_pointer_drawing}")
+print("mmi_enable_monitor = ${mmi_enable_monitor}")
 print("mmi_enable_interceptor = ${mmi_enable_interceptor}")
+print("mmi_enable_keyboard = ${mmi_enable_keyboard}")
+print("mmi_enable_mouse = ${mmi_enable_mouse}")
+print("mmi_enable_tp = ${mmi_enable_tp}")

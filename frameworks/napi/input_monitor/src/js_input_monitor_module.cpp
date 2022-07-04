@@ -34,7 +34,7 @@ const std::string GET_STRING_UTF8 = "napi_get_value_string_utf8";
 
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
 
@@ -73,7 +73,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     size_t argc = 2;
     napi_value argv[argc];
     argv[0] = nullptr;
@@ -124,7 +124,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
 EXTERN_C_START
 static napi_value MmiInputMonitorInit(napi_env env, napi_value exports)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
@@ -139,7 +139,7 @@ static napi_module mmiInputMonitorModule = {
     .nm_flags = 0,
     .nm_filename = nullptr,
     .nm_register_func = MmiInputMonitorInit,
-    .nm_modname = "inputMonitor",
+    .nm_modname = "multimodalInput.inputMonitor",
     .nm_priv = ((void*)0),
     .reserved = { 0 },
 };

@@ -144,7 +144,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
                             if (!StrToInt(optarg, px) || !StrToInt(argv[optind], py)) {
-                                std::cout << "invalid paremeter to move mouse" << std::endl;
+                                std::cout << "invalid parameter to move mouse" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
                             std::cout << "move to " << px << " " << py << std::endl;

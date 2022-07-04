@@ -32,7 +32,7 @@ InputDeviceImpl& InputDeviceImpl::GetInstance()
 
 void InputDeviceImpl::RegisterInputDeviceMonitor(std::function<void(std::string, int32_t)> listening)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
     CHKPV(eventHandler);
     auto listen = std::make_pair(eventHandler, listening);
@@ -42,20 +42,20 @@ void InputDeviceImpl::RegisterInputDeviceMonitor(std::function<void(std::string,
 
 void InputDeviceImpl::UnRegisterInputDeviceMonitor()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     MMIEventHdl.UnRegisterInputDeviceMonitor();
 }
 
 void InputDeviceImpl::OnDevMonitorTask(DevMonitor devMonitor, std::string type, int32_t deviceId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     devMonitor.second(type, deviceId);
     MMI_HILOGD("report device changed task, event type:%{public}s", type.c_str());
 }
 
 void InputDeviceImpl::OnDevMonitor(std::string type, int32_t deviceId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHandler::PostTask(devMonitor_.first,
         std::bind(&InputDeviceImpl::OnDevMonitorTask, this, devMonitor_, type, deviceId))) {
@@ -66,7 +66,7 @@ void InputDeviceImpl::OnDevMonitor(std::string type, int32_t deviceId)
 
 void InputDeviceImpl::GetInputDeviceIdsAsync(std::function<void(int32_t, std::vector<int32_t>&)> callback)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
     CHKPV(eventHandler);
     InputDeviceData data;
@@ -83,7 +83,7 @@ void InputDeviceImpl::GetInputDeviceIdsAsync(std::function<void(int32_t, std::ve
 void InputDeviceImpl::GetInputDeviceAsync(int32_t deviceId,
     std::function<void(int32_t, std::shared_ptr<InputDeviceInfo>)> callback)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
     CHKPV(eventHandler);
     InputDeviceData data;
@@ -100,7 +100,7 @@ void InputDeviceImpl::GetInputDeviceAsync(int32_t deviceId,
 void InputDeviceImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
     std::function<void(std::vector<bool>&)> callback)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
     CHKPV(eventHandler);
@@ -117,7 +117,7 @@ void InputDeviceImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCode
 
 void InputDeviceImpl::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
     CHKPV(eventHandler);
@@ -135,7 +135,7 @@ void InputDeviceImpl::GetKeyboardType(int32_t deviceId, std::function<void(int32
 void InputDeviceImpl::OnInputDeviceTask(InputDeviceImpl::DevInfo devInfo, int32_t userData,
     std::shared_ptr<InputDeviceInfo> devData)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     CHKPV(devData);
     devInfo.second(userData, devData);
     MMI_HILOGD("report device info task, userData:%{public}d name:%{public}s",
@@ -144,8 +144,8 @@ void InputDeviceImpl::OnInputDeviceTask(InputDeviceImpl::DevInfo devInfo, int32_
 
 void InputDeviceImpl::OnInputDevice(int32_t userData, std::shared_ptr<InputDeviceInfo> devData)
 {
-    CALL_LOG_ENTER;
-    CHK_PIDANDTID();
+    CALL_DEBUG_ENTER;
+    CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
@@ -170,7 +170,7 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, std::shared_ptr<InputDevic
 
 void InputDeviceImpl::OnInputDeviceIdsTask(InputDeviceImpl::DevIds devIds, int32_t userData, std::vector<int32_t> ids)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     devIds.second(userData, ids);
     MMI_HILOGD("report all device, userData:%{public}d devices:(%{public}s)",
         userData, IdsListToString(ids).c_str());
@@ -178,7 +178,7 @@ void InputDeviceImpl::OnInputDeviceIdsTask(InputDeviceImpl::DevIds devIds, int32
 
 void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> &ids)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
@@ -203,13 +203,13 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> &i
 void InputDeviceImpl::OnSupportKeysTask(InputDeviceImpl::DevKeys devKeys, int32_t userData,
     std::vector<bool> keystrokeAbility)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     devKeys.second(keystrokeAbility);
 }
 
 void InputDeviceImpl::OnSupportKeys(int32_t userData, const std::vector<bool> &keystrokeAbility)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
@@ -227,7 +227,7 @@ void InputDeviceImpl::OnSupportKeys(int32_t userData, const std::vector<bool> &k
 void InputDeviceImpl::OnKeyboardTypeTask(InputDeviceImpl::DevKeyboardTypes kbTypes, int32_t userData,
     int32_t keyboardType)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     kbTypes.second(keyboardType);
     MMI_HILOGD("Keyboard type event callback userData:%{public}d keyboardType:(%{public}d)",
         userData, keyboardType);
@@ -235,7 +235,7 @@ void InputDeviceImpl::OnKeyboardTypeTask(InputDeviceImpl::DevKeyboardTypes kbTyp
 
 void InputDeviceImpl::OnKeyboardType(int32_t userData, int32_t keyboardType)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
     if (auto iter = inputDevices_.find(userData); iter == inputDevices_.end()) {
         MMI_HILOGD("Find userData failed");

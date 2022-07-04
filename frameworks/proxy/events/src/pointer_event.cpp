@@ -564,17 +564,13 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    if (!out.WriteInt32(pointerId_)) {
-        return false;
-    }
+    WRITEINT32(out, pointerId_);
 
     if (pointers_.size() > INT_MAX) {
         return false;
     }
 
-    if (!out.WriteInt32(static_cast<int32_t>(pointers_.size()))) {
-        return false;
-    }
+    WRITEINT32(out, static_cast<int32_t>(pointers_.size()));
 
     for (const auto &item : pointers_) {
         if (!item.WriteToParcel(out)) {
@@ -586,31 +582,19 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    if (!out.WriteInt32(static_cast<int32_t>(pressedButtons_.size()))) {
-        return false;
-    }
+    WRITEINT32(out, static_cast<int32_t>(pressedButtons_.size()));
 
     for (const auto &item : pressedButtons_) {
-        if (!out.WriteInt32(item)) {
-            return false;
-        }
+        WRITEINT32(out, item);
     }
 
-    if (!out.WriteInt32(sourceType_)) {
-        return false;
-    }
+    WRITEINT32(out, sourceType_);
 
-    if (!out.WriteInt32(pointerAction_)) {
-        return false;
-    }
+    WRITEINT32(out, pointerAction_);
 
-    if (!out.WriteInt32(buttonId_)) {
-        return false;
-    }
+    WRITEINT32(out, buttonId_);
 
-    if (!out.WriteUint32(axes_)) {
-        return false;
-    }
+    WRITEUINT32(out, axes_);
 
     const size_t axisValuesSize = axisValues_.size();
     if (axisValuesSize > INT_MAX) {
@@ -621,14 +605,10 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         return false;
     }
 
-    if (!out.WriteInt32(static_cast<int32_t>(axisValuesSize))) {
-        return false;
-    }
+    WRITEINT32(out, static_cast<int32_t>(axisValuesSize));
 
     for (const auto &item : axisValues_) {
-        if (!out.WriteDouble(item)) {
-            return false;
-        }
+        WRITEDOUBLE(out, item);
     }
 
     return true;
@@ -640,9 +620,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         return false;
     }
 
-    if (!in.ReadInt32(pointerId_)) {
-        return false;
-    }
+    READINT32(in, pointerId_);
 
     const int32_t pointersSize = in.ReadInt32();
     if (pointersSize < 0) {
@@ -664,30 +642,20 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
     for (int32_t i = 0; i < pressedButtonsSize; i++) {
         int32_t val = 0;
-        if (!in.ReadInt32(val)) {
-            return false;
-        }
+        READINT32(in, val);
         auto iter = pressedButtons_.insert(val);
         if (!iter.second) {
             MMI_HILOGE("Insert value failed, button:%{public}d", val);
         }
     }
 
-    if (!in.ReadInt32(sourceType_)) {
-        return false;
-    }
+    READINT32(in, sourceType_);
 
-    if (!in.ReadInt32(pointerAction_)) {
-        return false;
-    }
+    READINT32(in, pointerAction_);
 
-    if (!in.ReadInt32(buttonId_)) {
-        return false;
-    }
+    READINT32(in, buttonId_);
 
-    if (!in.ReadUint32(axes_)) {
-        return false;
-    }
+    READUINT32(in, axes_);
 
     const int32_t axisValueSize = in.ReadInt32();
     if (axisValueSize < 0) {
@@ -700,9 +668,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
     for (int32_t i = 0; i < axisValueSize; i++) {
         double val {};
-        if (!in.ReadDouble(val)) {
-            return false;
-        }
+        READDOUBLE(in, val);
         axisValues_[i] = val;
     }
 
@@ -711,7 +677,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
 bool PointerEvent::IsValidCheckMouseFunc() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (pointers_.size() != 1) {
         MMI_HILOGE("Pointers_ is invalid");
         return false;
@@ -756,7 +722,7 @@ bool PointerEvent::IsValidCheckMouseFunc() const
 
 bool PointerEvent::IsValidCheckMouse() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t mousePointID = GetPointerId();
     if (mousePointID < 0) {
         MMI_HILOGE("MousePointID is invalid");
@@ -794,7 +760,7 @@ bool PointerEvent::IsValidCheckMouse() const
 
 bool PointerEvent::IsValidCheckTouchFunc() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t touchPointID = GetPointerId();
     if (touchPointID < 0) {
         MMI_HILOGE("TouchPointID is invalid");
@@ -822,7 +788,7 @@ bool PointerEvent::IsValidCheckTouchFunc() const
 
 bool PointerEvent::IsValidCheckTouch() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (!IsValidCheckTouchFunc()) {
         MMI_HILOGE("IsValidCheckTouchFunc is invalid");
         return false;
@@ -867,7 +833,7 @@ bool PointerEvent::IsValidCheckTouch() const
 
 bool PointerEvent::IsValid() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t sourceType = GetSourceType();
     if (sourceType != SOURCE_TYPE_MOUSE && sourceType != SOURCE_TYPE_TOUCHSCREEN &&
         sourceType != SOURCE_TYPE_TOUCHPAD) {

@@ -15,9 +15,12 @@
 
 #include "key_command_manager.h"
 
+
 #include "ability_manager_client.h"
 #include "cJSON.h"
 #include "file_ex.h"
+#include "bytrace_adapter.h"
+#include "error_multimodal.h"
 #include "mmi_log.h"
 #include "string_wrapper.h"
 #include "timer_manager.h"
@@ -39,7 +42,7 @@ struct JsonParser {
     {
         return json_;
     }
-    cJSON *json_ = nullptr;
+    cJSON *json_ { nullptr };
 };
 
 bool GetPreKeys(cJSON* jsonData, ShortcutKey &shortcutKey)
@@ -264,6 +267,38 @@ bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
 }
 } // namespace
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+void KeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPV(keyEvent);
+    if (HandleEvent(keyEvent)) {
+        MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{public}d", keyEvent->GetKeyCode());
+        BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
+        return;
+    }
+    CHKPV(nextHandler_);
+    nextHandler_->HandleKeyEvent(keyEvent);
+}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+void KeyCommandManager::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    CHKPV(nextHandler_);
+    nextHandler_->HandlePointerEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+void KeyCommandManager::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    CHKPV(nextHandler_);
+    nextHandler_->HandleTouchEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_TOUCH
+
 std::string KeyCommandManager::GenerateKey(const ShortcutKey& key)
 {
     std::set<int32_t> preKeys = key.preKeys;
@@ -284,7 +319,7 @@ std::string KeyCommandManager::GetConfigFilePath() const
 
 bool KeyCommandManager::ParseJson()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::string jsonStr = ReadJsonFile(GetConfigFilePath());
     if (jsonStr.empty()) {
         MMI_HILOGE("configFile read failed");
@@ -338,7 +373,7 @@ void KeyCommandManager::Print()
 
 bool KeyCommandManager::HandleEvent(const std::shared_ptr<KeyEvent> key)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (IsKeyMatch(lastMatchedKey_, key)) {
         MMI_HILOGE("The same key is waiting timeout, skip");
         return true;
@@ -375,7 +410,7 @@ bool KeyCommandManager::HandleEvent(const std::shared_ptr<KeyEvent> key)
 
 bool KeyCommandManager::IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if ((key->GetKeyCode() != shortcutKey.finalKey) || (shortcutKey.triggerType != key->GetKeyAction())) {
         return false;
     }
@@ -402,7 +437,7 @@ bool KeyCommandManager::SkipFinalKey(const int32_t keyCode, const std::shared_pt
 
 bool KeyCommandManager::HandleKeyDown(ShortcutKey &shortcutKey)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (shortcutKey.keyDownDuration == 0) {
         MMI_HILOGD("Start launch ability immediately");
         LaunchAbility(shortcutKey);
@@ -423,7 +458,7 @@ bool KeyCommandManager::HandleKeyDown(ShortcutKey &shortcutKey)
 
 bool KeyCommandManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (shortcutKey.keyDownDuration == 0) {
         MMI_HILOGD("Start launch ability immediately");
         LaunchAbility(shortcutKey);
@@ -446,7 +481,7 @@ bool KeyCommandManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
 
 bool KeyCommandManager::HandleKeyCancel(ShortcutKey &shortcutKey)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (shortcutKey.timerId < 0) {
         MMI_HILOGE("Skip, timerid less than 0");
     }
@@ -488,14 +523,6 @@ void ShortcutKey::Print() const
     }
     MMI_HILOGD("eventkey matched, finalKey:%{public}d,bundleName:%{public}s",
         finalKey, ability.bundleName.c_str());
-}
-
-std::shared_ptr<IKeyCommandManager> IKeyCommandManager::GetInstance()
-{
-    if (keyCommand_ == nullptr) {
-        keyCommand_ = std::make_shared<KeyCommandManager>();
-    }
-    return keyCommand_;
 }
 } // namespace MMI
 } // namespace OHOS

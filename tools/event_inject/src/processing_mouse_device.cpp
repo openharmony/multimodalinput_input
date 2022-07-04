@@ -24,10 +24,10 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Proces
 int32_t ProcessingMouseDevice::TransformJsonDataToInputData(const DeviceItem& fingerEventArrays,
     InputEventArray& inputEventArray)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::vector<DeviceEvent> inputData = fingerEventArrays.events;
     if (inputData.empty()) {
-        MMI_HILOGE("manage KeyBoard array faild, inputData is empty.");
+        MMI_HILOGE("manage KeyBoard array failed, inputData is empty.");
         return RET_ERR;
     }
     std::vector<MouseEvent> mouseEventArray;

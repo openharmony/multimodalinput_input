@@ -27,7 +27,7 @@ constexpr int64_t INJECT_SLEEP_TIMES = 10;
 
 int32_t ManageInjectDevice::TransformJsonData(const DeviceItems& configData)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (configData.empty()) {
         MMI_HILOGE("input data from json file is empty");
         return RET_ERR;
@@ -65,12 +65,12 @@ int32_t ManageInjectDevice::TransformJsonData(const DeviceItems& configData)
 
 int32_t ManageInjectDevice::SendEvent(const InputEventArray& inputEventArray)
 {
-    return SendEventToDeviveNode(inputEventArray);
+    return SendEventToDeviceNode(inputEventArray);
 }
 
-int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEventArray)
+int32_t ManageInjectDevice::SendEventToDeviceNode(const InputEventArray& inputEventArray)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::string deviceNode = inputEventArray.target;
     if (deviceNode.empty()) {
         MMI_HILOGE("device node:%{public}s is not exit", deviceNode.c_str());
@@ -83,7 +83,7 @@ int32_t ManageInjectDevice::SendEventToDeviveNode(const InputEventArray& inputEv
     }
     int32_t fd = open(realPath, O_RDWR);
     if (fd < 0) {
-        MMI_HILOGE("open device node:%{public}s faild", deviceNode.c_str());
+        MMI_HILOGE("open device node:%{public}s failed", deviceNode.c_str());
         return RET_ERR;
     }
     for (const auto &item : inputEventArray.events) {

@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef ADDINTERCEPTOR_FUZZER_H
-#define ADDINTERCEPTOR_FUZZER_H
+#ifndef ADDMONITOR_FUZZER_H
+#define ADDMONITOR_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "addmonitor_fuzzer"
 
-#endif // ADDINTERCEPTOR_FUZZER_H
+#endif // ADDMONITOR_FUZZER_H

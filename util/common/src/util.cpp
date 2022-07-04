@@ -59,8 +59,7 @@ const std::string CONFIG_ITEM_INTERVAL = "Key.autorepeat.intervaltime";
 const std::string CONFIG_ITEM_TYPE = "Key.keyboard.type";
 const std::string DATA_PATH = "/data";
 const std::string INPUT_PATH = "/system/etc/multimodalinput/";
-const std::string PRO_PATH = "/vendor/etc/keymap/";
-const std::string TOML_PATH = "/vendor/etc/keymap/";
+const std::string KEY_PATH = "/vendor/etc/keymap/";
 constexpr size_t BUF_TID_SIZE = 10;
 constexpr size_t BUF_CMD_SIZE = 512;
 constexpr size_t PROGRAM_NAME_SIZE = 256;
@@ -505,18 +504,18 @@ static bool IsValidJsonPath(const std::string &filePath)
 
 static bool IsValidProPath(const std::string &filePath)
 {
-    return IsValidPath(PRO_PATH, filePath);
+    return IsValidPath(KEY_PATH, filePath);
 }
 
 static bool IsValidTomlPath(const std::string &filePath)
 {
-    return IsValidPath(TOML_PATH, filePath);
+    return IsValidPath(KEY_PATH, filePath);
 }
 
 void ReadProFile(const std::string &filePath, int32_t deviceId,
     std::map<int32_t, std::map<int32_t, int32_t>> &configMap)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (filePath.empty()) {
         MMI_HILOGE("FilePath is empty");
         return;
@@ -549,7 +548,7 @@ void ReadProFile(const std::string &filePath, int32_t deviceId,
 void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
     std::map<int32_t, std::map<int32_t, int32_t>> &configKey)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::ifstream reader(realPath);
     if (!reader.is_open()) {
         MMI_HILOGE("Failed to open config file");
@@ -648,7 +647,7 @@ int32_t ReadTomlFile(const std::string &filePath, DeviceConfig& devConf)
         return RET_ERR;
     }
     if (ReadConfigFile(realPath, devConf) == RET_ERR) {
-        MMI_HILOGE("Read device config file faild");
+        MMI_HILOGE("Read device config file failed");
         return RET_ERR;
     }
     return RET_OK;
@@ -656,7 +655,7 @@ int32_t ReadTomlFile(const std::string &filePath, DeviceConfig& devConf)
 
 int32_t ReadConfigFile(const std::string &realPath, DeviceConfig& devConf)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::ifstream cfgFile(realPath);
     if (!cfgFile.is_open()) {
         MMI_HILOGE("Failed to open config file");
@@ -694,7 +693,7 @@ int32_t ReadConfigFile(const std::string &realPath, DeviceConfig& devConf)
 
 int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value, DeviceConfig& devConf)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (configItem.empty() || value.empty()) {
         MMI_HILOGE("Get key config item is invalid");
         return RET_ERR;

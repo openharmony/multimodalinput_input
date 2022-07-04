@@ -23,10 +23,11 @@
 #include "define_interceptor_manager.h"
 #include "input_device_impl.h"
 #include "input_event_data_transformation.h"
-#include "input_event_monitor_manager.h"
 #include "input_handler_manager.h"
 #include "input_manager_impl.h"
+#ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
+#endif // OHOS_BUILD_ENABLE_MONITOR
 #include "mmi_client.h"
 #include "mmi_func_callback.h"
 #include "multimodal_event_handler.h"
@@ -54,19 +55,25 @@ ClientMsgHandler::~ClientMsgHandler()
 void ClientMsgHandler::Init()
 {
     MsgCallback funs[] = {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         {MmiMessageId::ON_KEYEVENT, MsgCallbackBind2(&ClientMsgHandler::OnKeyEvent, this)},
         {MmiMessageId::ON_SUBSCRIBE_KEY, std::bind(&ClientMsgHandler::OnSubscribeKeyEventCallback,
                                                    this, std::placeholders::_1, std::placeholders::_2)},
-        {MmiMessageId::ON_KEYMONITOR, MsgCallbackBind2(&ClientMsgHandler::OnKeyMonitor, this)},
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         {MmiMessageId::ON_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnPointerEvent, this)},
-        {MmiMessageId::ON_TOUCHPAD_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnTouchPadMonitor, this)},
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ClientMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ClientMsgHandler::OnInputDeviceIds, this)},
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ClientMsgHandler::OnSupportKeys, this)},
         {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind2(&ClientMsgHandler::OnInputKeyboardType, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnDevMonitor, this)},
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     };
     for (auto& it : funs) {
         if (!RegistrationEvent(it)) {
@@ -92,24 +99,7 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
     }
 }
 
-int32_t ClientMsgHandler::OnKeyMonitor(const UDSClient& client, NetPacket& pkt)
-{
-    auto key = KeyEvent::Create();
-    CHKPR(key, ERROR_NULL_POINTER);
-    int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, key);
-    if (ret != RET_OK) {
-        MMI_HILOGE("read netPacket failed");
-        return RET_ERR;
-    }
-    int32_t pid;
-    pkt >> pid;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read pid failed");
-        return PACKET_READ_FAIL;
-    }
-    MMI_HILOGD("Client receive the msg from server, keyCode:%{public}d,pid:%{public}d", key->GetKeyCode(), pid);
-    return InputMonitorMgr.OnMonitorInputEvent(key);
-}
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 
 int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
 {
@@ -134,10 +124,12 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     key->MarkProcessed();
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
@@ -154,7 +146,9 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     InputMgrImpl->OnPointerEvent(pointerEvent);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, NetPacket &pkt)
 {
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
@@ -180,30 +174,11 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
     return KeyEventInputSubscribeMgr.OnSubscribeKeyEventCallback(keyEvent, subscribeId);
 }
-
-int32_t ClientMsgHandler::OnTouchPadMonitor(const UDSClient& client, NetPacket& pkt)
-{
-    auto pointer = PointerEvent::Create();
-    CHKPR(pointer, ERROR_NULL_POINTER);
-    int32_t ret = InputEventDataTransformation::Unmarshalling(pkt, pointer);
-    if (ret != RET_OK) {
-        MMI_HILOGE("read netPacket failed");
-        return RET_ERR;
-    }
-    int32_t pid = 0;
-    pkt >> pid;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read pid failed");
-        return PACKET_READ_FAIL;
-    }
-    MMI_HILOGD("client receive the msg from server: EventType:%{public}d,pid:%{public}d",
-        pointer->GetEventType(), pid);
-    return InputMonitorMgr.OnTouchpadMonitorInputEvent(pointer);
-}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t userData;
     std::vector<int32_t> inputDeviceIds;
     pkt >> userData >> inputDeviceIds;
@@ -221,7 +196,7 @@ int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& p
 
 int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t userData;
     size_t size;
     auto devData = std::make_shared<InputDeviceImpl::InputDeviceInfo>();
@@ -249,7 +224,7 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
 
 int32_t ClientMsgHandler::OnSupportKeys(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t userData;
     size_t size;
     pkt >> userData >> size;
@@ -273,7 +248,7 @@ int32_t ClientMsgHandler::OnSupportKeys(const UDSClient& client, NetPacket& pkt)
 
 int32_t ClientMsgHandler::OnInputKeyboardType(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t userData;
     int32_t KeyboardType;
     pkt >> userData >> KeyboardType;
@@ -287,7 +262,7 @@ int32_t ClientMsgHandler::OnInputKeyboardType(const UDSClient& client, NetPacket
 
 int32_t ClientMsgHandler::OnDevMonitor(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::string type;
     int32_t deviceId;
     pkt >> type >> deviceId;
@@ -299,9 +274,10 @@ int32_t ClientMsgHandler::OnDevMonitor(const UDSClient& client, NetPacket& pkt)
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t handlerId;
     pkt >> handlerId;
     if (pkt.ChkRWError()) {
@@ -314,13 +290,16 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
         MMI_HILOGE("Failed to deserialize key event.");
         return RET_ERR;
     }
-    InputHandlerManager::GetInstance().OnInputEvent(handlerId, keyEvent);
+    BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
+    InputHandlerMgr.OnInputEvent(handlerId, keyEvent);
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t handlerId;
     InputHandlerType handlerType;
     pkt >> handlerId >> handlerType;
@@ -336,13 +315,13 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
         return RET_ERR;
     }
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
-    InputHandlerManager::GetInstance().OnInputEvent(handlerId, pointerEvent);
+    InputHandlerMgr.OnInputEvent(handlerId, pointerEvent);
     return RET_OK;
 }
-
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
-    int32_t ret = MultimodalInputConnectManager::GetInstance()->MarkEventProcessed(eventId);
+    int32_t ret = MultimodalInputConnMgr->MarkEventProcessed(eventId);
     if (ret != 0) {
         MMI_HILOGE("send to server fail, ret:%{public}d", ret);
         return;

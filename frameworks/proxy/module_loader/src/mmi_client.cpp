@@ -35,12 +35,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMICl
 using namespace AppExecFwk;
 MMIClient::MMIClient()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 }
 
 MMIClient::~MMIClient()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     Stop();
 }
 
@@ -61,7 +61,7 @@ MMIClientPtr MMIClient::GetSharedPtr()
 
 bool MMIClient::Start()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     msgHandler_.Init();
     EventManager.SetClientHandle(GetSharedPtr());
     auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, &msgHandler_,
@@ -82,10 +82,10 @@ bool MMIClient::Start()
 
 bool MMIClient::StartEventRunner()
 {
-    CALL_LOG_ENTER;
-    CHK_PIDANDTID();
+    CALL_DEBUG_ENTER;
+    CHK_PID_AND_TID();
     if (!InputMgrImpl->InitEventHandler()) {
-        MMI_HILOGE("init eventhandler error");
+        MMI_HILOGE("init event handler error");
         Stop();
         return false;
     }
@@ -105,8 +105,8 @@ bool MMIClient::StartEventRunner()
 
 void MMIClient::OnRecvThread()
 {
-    CALL_LOG_ENTER;
-    CHK_PIDANDTID();
+    CALL_DEBUG_ENTER;
+    CHK_PID_AND_TID();
     SetThreadName("mmi_client_RecvEventHdr");
 
     auto runner = EventRunner::Create(false);
@@ -130,7 +130,7 @@ void MMIClient::OnRecvThread()
 
 bool MMIClient::AddFdListener(int32_t fd)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (fd < 0) {
         MMI_HILOGE("Invalid fd:%{public}d", fd);
         return false;
@@ -152,7 +152,7 @@ bool MMIClient::AddFdListener(int32_t fd)
 
 bool MMIClient::DelFdListener(int32_t fd)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (fd < 0) {
         MMI_HILOGE("Invalid fd:%{public}d", fd);
         return false;
@@ -177,7 +177,7 @@ void MMIClient::OnRecvMsg(const char *buf, size_t size)
         return;
     }
     if (!circBuf_.Write(buf, size)) {
-        MMI_HILOGW("Write data faild. size:%{public}zu", size);
+        MMI_HILOGW("Write data failed. size:%{public}zu", size);
     }
     OnReadPackets(circBuf_, std::bind(&MMIClient::OnPacket, this, std::placeholders::_1));
 }
@@ -204,7 +204,7 @@ void MMIClient::RegisterDisconnectedFunction(ConnectCallback fun)
 
 void MMIClient::OnDisconnected()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     MMI_HILOGD("Disconnected from server, fd:%{public}d", fd_);
     isConnected_ = false;
     if (funDisconnected_) {
@@ -223,7 +223,7 @@ void MMIClient::OnDisconnected()
 
 void MMIClient::OnConnected()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     MMI_HILOGD("Connection to server succeeded, fd:%{public}d", GetFd());
     isConnected_ = true;
     if (funConnected_) {
@@ -238,14 +238,13 @@ void MMIClient::OnConnected()
 
 int32_t MMIClient::Socket()
 {
-    CALL_LOG_ENTER;
-    int32_t ret = MultimodalInputConnectManager::GetInstance()->
-                        AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {
         MMI_HILOGE("call AllocSocketPair return %{public}d", ret);
         return RET_ERR;
     }
-    fd_ = MultimodalInputConnectManager::GetInstance()->GetClientSocketFdOfAllocedSocketPair();
+    fd_ = MultimodalInputConnMgr->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
         MMI_HILOGE("call GetClientSocketFdOfAllocedSocketPair return invalid fd");
     } else {
@@ -256,7 +255,7 @@ int32_t MMIClient::Socket()
 
 void MMIClient::Stop()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     UDSClient::Stop();
     if (recvEventHandler_ != nullptr) {
         recvEventHandler_->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);

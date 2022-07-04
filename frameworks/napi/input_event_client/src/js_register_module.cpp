@@ -23,12 +23,12 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterModule" };
 } // namespace
 
 static napi_value InjectEvent(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_value result = nullptr;
     size_t argc = 1;
     napi_value argv[1] = { 0 };
@@ -90,7 +90,7 @@ static napi_module mmiModule = {
     .nm_flags = 0,
     .nm_filename = nullptr,
     .nm_register_func = MmiInit,
-    .nm_modname = "inputEventClient",
+    .nm_modname = "multimodalInput.inputEventClient",
     .nm_priv = ((void*)0),
     .reserved = { 0 },
 };
