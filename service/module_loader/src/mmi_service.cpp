@@ -19,6 +19,7 @@
 #include <csignal>
 #include <parameters.h>
 #include <sys/signalfd.h>
+#include "dfx_hisysevent.h"
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
 #endif
@@ -291,7 +292,7 @@ void MMIService::OnStart()
     }
     state_ = ServiceRunningState::STATE_RUNNING;
     MMI_HILOGD("Started successfully");
-    AddReloadLibinputTimer();
+    AddReloadDeviceTimer();
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
 #ifdef OHOS_RSS_CLIENT
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
@@ -315,18 +316,28 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     int32_t &toReturnClientFd)
 {
     MMI_HILOGI("enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
+    
     toReturnClientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t pid = GetCallingPid();
     int32_t uid = GetCallingUid();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this,
         programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd)));
+    DfxHisysevent::ClientConnectData data = {
+        .pid = pid,
+        .uid = uid,
+        .moduleType = moduleType,
+        .programName = programName,
+        .serverFd = serverFd
+    };
     if (ret != RET_OK) {
         MMI_HILOGE("call AddSocketPairInfo failed,return %{public}d", ret);
+        DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return RET_ERR;
     }
     MMI_HILOGIK("leave, programName:%{public}s,moduleType:%{public}d,alloc success",
         programName.c_str(), moduleType);
+    DfxHisysevent::OnClientConnect(data, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     return RET_OK;
 }
 
@@ -706,23 +717,13 @@ void MMIService::OnSignalEvent(int32_t signalFd)
     }
 }
 
-void MMIService::AddReloadLibinputTimer()
+void MMIService::AddReloadDeviceTimer()
 {
     CALL_LOG_ENTER;
     TimerMgr->AddTimer(2000, 2, [this]() {
-        auto inputFd = libinputAdapter_.GetInputFd();
-        if (inputFd >= 0) {
-            auto ret = DelEpoll(EPOLL_EVENT_INPUT, inputFd);
-            if (ret <  0) {
-                MMI_HILOGE("del epoll fail, ret: %{public}d", ret);
-            }
-            libinputAdapter_.Stop();
-            MMI_HILOGI("libinput stop successful");
-        }
-        InputDevMgr->RemoveAllDevice();
-        if (!InitLibinputService()) {
-            MMI_HILOGE("libinput init failed");
-            return;
+        auto deviceIds = InputDevMgr->GetInputDeviceIds();
+        if (deviceIds.empty()) {
+            libinputAdapter_.ReloadDevice();
         }
     });
 }

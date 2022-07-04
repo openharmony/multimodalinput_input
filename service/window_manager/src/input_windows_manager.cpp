@@ -17,7 +17,7 @@
 
 #include <cstdlib>
 #include <cstdio>
-
+#include "dfx_hisysevent.h"
 #include "i_pointer_drawing_manager.h"
 #include "util.h"
 #include "util_ex.h"
@@ -92,9 +92,66 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> i
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+int32_t InputWindowsManager::GetWindowPid(const int32_t windowId) const
+{
+    int32_t windowPid = -1;
+    for (const auto& item : displayGroupInfo_.windowsInfo) {
+        if (item.id == windowId) {
+            windowPid = item.pid;
+            break;
+        }
+    }
+    return windowPid;
+}
+
+int32_t InputWindowsManager::GetWindowPid(const int32_t windowId, const DisplayGroupInfo& displayGroupInfo) const
+{
+    int32_t windowPid = -1;
+    for (auto &item : displayGroupInfo.windowsInfo) {
+        if (item.id == windowId) {
+            windowPid = item.pid;
+            break;
+        }
+    }
+    return windowPid;
+}
+
+void InputWindowsManager::CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo)
+{
+    const int32_t oldFocusWindowId = displayGroupInfo_.focusWindowId;
+    const int32_t newFocusWindowId = displayGroupInfo.focusWindowId;
+    if (oldFocusWindowId == newFocusWindowId) {
+        return;
+    }
+    const int32_t oldFocusWindowPid = GetWindowPid(oldFocusWindowId);
+    const int32_t newFocusWindowPid = GetWindowPid(newFocusWindowId, displayGroupInfo);
+    DfxHisysevent::OnFocusWindowChanged(oldFocusWindowId, newFocusWindowId, oldFocusWindowPid, newFocusWindowPid);
+}
+
+void InputWindowsManager::CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo)
+{
+    int32_t oldZorderFirstWindowId = -1;
+    int32_t newZorderFirstWindowId = -1;
+    if (!displayGroupInfo_.windowsInfo.empty()) {
+        oldZorderFirstWindowId = displayGroupInfo_.windowsInfo[0].id;
+    }
+    if (!displayGroupInfo.windowsInfo.empty()) {
+        newZorderFirstWindowId = displayGroupInfo.windowsInfo[0].id;
+    }
+    if (oldZorderFirstWindowId == newZorderFirstWindowId) {
+        return;
+    }
+    const int32_t oldZorderFirstWindowPid = GetWindowPid(oldZorderFirstWindowId);
+    const int32_t newZorderFirstWindowPid = GetWindowPid(newZorderFirstWindowId, displayGroupInfo);
+    DfxHisysevent::OnZorderWindowChanged(oldZorderFirstWindowId, newZorderFirstWindowId,
+        oldZorderFirstWindowPid, newZorderFirstWindowPid);
+}
+
 void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_LOG_ENTER;
+    CheckFocusWindowChange(displayGroupInfo);
+    CheckZorderWindowChange(displayGroupInfo);
     displayGroupInfo_ = displayGroupInfo;
     if (!displayGroupInfo.displaysInfo.empty()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
