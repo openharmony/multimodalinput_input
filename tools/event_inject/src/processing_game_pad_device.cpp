@@ -24,7 +24,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Proce
 int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const DeviceItem& originalEvent,
     InputEventArray& inputEventArray)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (originalEvent.events.empty()) {
         MMI_HILOGE("manage game pad array failed, inputData is empty");
         return RET_ERR;

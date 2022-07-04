@@ -26,17 +26,17 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Event
 
 EventFilterWrap::EventFilterWrap()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 }
 
 EventFilterWrap::~EventFilterWrap()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventFilterWrap::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
@@ -71,7 +71,7 @@ void EventFilterWrap::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEven
 
 int32_t EventFilterWrap::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lockFilter_);
     filter_ = filter;
     return RET_OK;
@@ -79,7 +79,7 @@ int32_t EventFilterWrap::AddInputEventFilter(sptr<IEventFilter> filter)
 
 bool EventFilterWrap::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(point);
     std::lock_guard<std::mutex> guard(lockFilter_);
     CHKPF(filter_);

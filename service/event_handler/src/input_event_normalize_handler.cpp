@@ -34,7 +34,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 
 void InputEventNormalizeHandler::HandleLibinputEvent(libinput_event* event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(event);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
@@ -318,7 +318,7 @@ int32_t InputEventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
 
 int32_t InputEventNormalizeHandler::AddHandleTimer(int32_t timeout)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
         auto keyEvent = InputHandler->GetKeyEvent();
         CHKPV(keyEvent);

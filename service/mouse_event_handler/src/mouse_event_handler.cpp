@@ -46,7 +46,7 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
 
 int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
     CHKPR(pointerEvent_, ERROR_NULL_POINTER);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -86,7 +86,7 @@ void MouseEventHandler::InitAbsolution()
 
 int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
     MMI_HILOGD("current action:%{public}d", pointerEvent_->GetPointerAction());
 
@@ -118,7 +118,7 @@ int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)
 
 int32_t MouseEventHandler::HandleButtonValueInner(libinput_event_pointer* data)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
 
     uint32_t button = libinput_event_pointer_get_button(data);
@@ -165,7 +165,7 @@ int32_t MouseEventHandler::HandleButtonValueInner(libinput_event_pointer* data)
 
 int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
     if (buttonId_ == PointerEvent::BUTTON_NONE && pointerEvent_->GetButtonId() != PointerEvent::BUTTON_NONE) {
         pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
@@ -178,7 +178,7 @@ int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
         static constexpr int32_t timeout = 100;
         std::weak_ptr<MouseEventHandler> weakPtr = shared_from_this();
         timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
-            CALL_LOG_ENTER;
+            CALL_DEBUG_ENTER;
             auto sharedPtr = weakPtr.lock();
             CHKPV(sharedPtr);
             MMI_HILOGD("timer:%{public}d", sharedPtr->timerId_);
@@ -209,7 +209,7 @@ int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
 void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t deviceId,
                                         PointerEvent::PointerItem& pointerItem)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(data);
     auto mouseInfo = WinMgr->GetMouseInfo();
     MouseState->SetMouseCoords(mouseInfo.globalX, mouseInfo.globalY);
@@ -242,7 +242,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
 
 int32_t MouseEventHandler::Normalize(struct libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_pointer_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
@@ -278,7 +278,7 @@ int32_t MouseEventHandler::Normalize(struct libinput_event *event)
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 void MouseEventHandler::HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(pointerEvent_);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     InitAbsolution();
@@ -289,7 +289,7 @@ void MouseEventHandler::HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY)
 
 void MouseEventHandler::HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto mouseInfo = WinMgr->GetMouseInfo();
     CHKPV(pointerEvent_);
     MouseState->SetMouseCoords(mouseInfo.globalX, mouseInfo.globalY);
@@ -320,7 +320,7 @@ void MouseEventHandler::HandlePostMoveMouse(PointerEvent::PointerItem& pointerIt
 
 bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(pointerEvent_);
     bool bHasPoinerDevice = InputDevMgr->HasPointerDevice();
     if (!bHasPoinerDevice) {
@@ -343,7 +343,7 @@ void MouseEventHandler::DumpInner()
 
 void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     PointerEvent::PointerItem item;
     CHKPV(pointerEvent_);
     pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);

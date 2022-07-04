@@ -68,7 +68,7 @@ void InjectionEventDispatch::InitManageFunction()
 
 int32_t InjectionEventDispatch::OnJson()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (injectArgvs_.size() < ARGVS_CODE_INDEX) {
         MMI_HILOGE("path is error");
         return RET_ERR;
@@ -94,7 +94,7 @@ std::string InjectionEventDispatch::GetFunId() const
 
 bool InjectionEventDispatch::VerifyArgvs(const int32_t &argc, const std::vector<std::string> &argv)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (argc < ARGV_VALID || argv.at(ARGVS_TARGET_INDEX).empty()) {
         MMI_HILOGE("Invalid Input Para, Please Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
         return false;
@@ -122,7 +122,7 @@ bool InjectionEventDispatch::VerifyArgvs(const int32_t &argc, const std::vector<
 
 void InjectionEventDispatch::Run()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::string id = GetFunId();
     auto fun = GetFun(id);
     CHKPV(fun);
