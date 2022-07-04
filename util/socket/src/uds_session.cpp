@@ -87,7 +87,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 
 void UDSSession::Close()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     MMI_HILOGD("enter fd_:%{public}d.", fd_);
     if (fd_ >= 0) {
         close(fd_);
@@ -125,14 +125,14 @@ bool UDSSession::SendMsg(NetPacket& pkt) const
 
 void UDSSession::AddEvent(int32_t id, int64_t time)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     EventTime eventTime = {id, time};
     events_.push_back(eventTime);
 }
 
 void UDSSession::DelEvents(int32_t id)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t count = 0;
     for (auto &item : events_) {
         ++count;
@@ -150,7 +150,7 @@ void UDSSession::DelEvents(int32_t id)
 
 int64_t UDSSession::GetEarliestEventTime() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (events_.empty()) {
         MMI_HILOGD("events_ is empty");
         return 0;

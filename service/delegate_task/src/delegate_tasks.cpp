@@ -29,7 +29,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Deleg
 
 void DelegateTasks::Task::ProcessTask()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (hasWaited_) {
         MMI_HILOGE("Expired tasks will be discarded. id:%{public}d", id_);
         return;
@@ -44,7 +44,7 @@ void DelegateTasks::Task::ProcessTask()
 
 bool DelegateTasks::Init()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t res = pipe(fds_);
     if (res == -1) {
         MMI_HILOGE("pipe create failed,errno:%{public}d", errno);
@@ -63,7 +63,7 @@ bool DelegateTasks::Init()
 
 void DelegateTasks::ProcessTasks()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::vector<TaskPtr> tasks;
     PopPendingTaskList(tasks);
     for (const auto &it : tasks) {
@@ -73,7 +73,7 @@ void DelegateTasks::ProcessTasks()
 
 int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (IsCallFromWorkerThread()) {
         return callback();
     }

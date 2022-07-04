@@ -40,7 +40,7 @@ namespace OHOS {
 namespace MMI {
 void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     MMI_HILOGD("display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
     FixCursorPosition(globalX, globalY);
     lastGlobalX_ = globalX;
@@ -160,7 +160,7 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
 
 void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     OHOS::Rosen::Drawing::Bitmap bitmap;
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
         OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
@@ -180,7 +180,7 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
 
 void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::unique_ptr<OHOS::Media::PixelMap> pixelmap = DecodeImageToPixelMap(IMAGE_POINTER_JPEG_PATH);
     CHKPV(pixelmap);
     OHOS::Rosen::Drawing::Pen pen;
@@ -213,7 +213,7 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
 
 void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int32_t height) 
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     hasDisplay_ = true;
     displayId_ = displayId;
     displayWidth_ = width;
@@ -223,7 +223,7 @@ void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int3
 
 void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     hasPointerDevice_ = hasPointerDevice;
     DrawManager();
 }
@@ -249,7 +249,7 @@ void PointerDrawingManager::DrawManager()
 
 bool PointerDrawingManager::Init()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     InputDevMgr->Attach(shared_from_this());
     pidInfos_.clear();
     return true;
@@ -265,7 +265,7 @@ std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
 
 void PointerDrawingManager::DeletePidInfo(int32_t pid)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
             pidInfos_.erase(it);
@@ -276,7 +276,7 @@ void PointerDrawingManager::DeletePidInfo(int32_t pid)
 
 void PointerDrawingManager::UpdatePidInfo(int32_t pid, bool visible)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
             pidInfos_.erase(it);
@@ -289,7 +289,7 @@ void PointerDrawingManager::UpdatePidInfo(int32_t pid, bool visible)
 
 void PointerDrawingManager::UpdatePointerVisible()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(pointerWindow_);
     if (IsPointerVisible()) {
         pointerWindow_->Show();
@@ -300,7 +300,7 @@ void PointerDrawingManager::UpdatePointerVisible()
 
 bool PointerDrawingManager::IsPointerVisible()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (pidInfos_.empty()) {
         MMI_HILOGD("visible property is true");
         return true;
@@ -312,14 +312,14 @@ bool PointerDrawingManager::IsPointerVisible()
 
 void PointerDrawingManager::DeletePointerVisible(int32_t pid)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     DeletePidInfo(pid);
     UpdatePointerVisible();
 }
 
 int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     UpdatePidInfo(pid, visible);
     UpdatePointerVisible();
     return RET_OK;

@@ -44,8 +44,6 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 protected:
-    void OnEventTouchGetPointEventType(const EventTouch& touch, const int32_t fingerCount,
-        POINT_EVENT_TYPE& pointEventType);
     bool TriggerANR(int64_t time, SessionPtr sess);
 };
 } // namespace MMI

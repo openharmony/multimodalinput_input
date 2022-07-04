@@ -102,7 +102,7 @@ LibinputAdapter::~LibinputAdapter() {}
 
 bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_id)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(funInputEvent);
     funInputEvent_ = funInputEvent;
     seat_id_ = seat_id;
@@ -133,7 +133,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_
 
 void LibinputAdapter::EventDispatch(struct epoll_event& ev)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int*>(ev.data.ptr);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
@@ -152,7 +152,7 @@ void LibinputAdapter::EventDispatch(struct epoll_event& ev)
 
 void LibinputAdapter::Stop()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (fd_ >= 0) {
         close(fd_);
         fd_ = -1;
@@ -168,7 +168,7 @@ void LibinputAdapter::ProcessPendingEvents()
 
 void LibinputAdapter::OnEventHandler()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(funInputEvent_);
     libinput_event *event = nullptr;
     while ((event = libinput_get_event(input_))) {
@@ -179,7 +179,7 @@ void LibinputAdapter::OnEventHandler()
 
 void LibinputAdapter::ReloadDevice()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(input_);
     libinput_suspend(input_);
     libinput_resume(input_);

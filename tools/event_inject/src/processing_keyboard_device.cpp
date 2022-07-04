@@ -26,7 +26,7 @@ constexpr int64_t EVENT_REPORT_TIMES = 20;
 int32_t ProcessingKeyboardDevice::TransformJsonDataToInputData(const DeviceItem& fingerEventArrays,
     InputEventArray& inputEventArray)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::vector<DeviceEvent> inputData = fingerEventArrays.events;
     if (inputData.empty()) {
         MMI_HILOGE("manage KeyBoard array failed, inputData is empty.");
