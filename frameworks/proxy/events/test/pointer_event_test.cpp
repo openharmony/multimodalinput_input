@@ -37,6 +37,7 @@ void PointerEventTest::SetUpTestCase()
     ASSERT_TRUE(TestUtil->Init());
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 std::shared_ptr<PointerEvent> PointerEventTest::CreatePointEvent()
 {
     auto pointerEvent = PointerEvent::Create();
@@ -113,6 +114,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSiz
     TestSimulateInputEvent(pointerEvent);
 }
 
+#endif // OHOS_BUILD_ENABLE_POINTER
 /**
  * @tc.name:PointerEventTest_CheckMousePointEvent_001
  * @tc.desc:Verify mouse point event
