@@ -23,19 +23,19 @@ std::mutex mutex_;
 } // namespace
 void JsInputDeviceManager::RegisterInputDeviceMonitor(napi_env env, std::string type, napi_value handle)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     AddMonitor(env, type, handle);
 }
 
 void JsInputDeviceManager::UnRegisterInputDeviceMonitor(napi_env env, std::string type, napi_value handle)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     RemoveMonitor(env, type, handle);
 }
 
 napi_value JsInputDeviceManager::GetDeviceIds(napi_env env, napi_value handle)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevImpl.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
@@ -45,7 +45,7 @@ napi_value JsInputDeviceManager::GetDeviceIds(napi_env env, napi_value handle)
 
 napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value handle)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevImpl.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
@@ -56,7 +56,7 @@ napi_value JsInputDeviceManager::GetDevice(napi_env env, int32_t id, napi_value 
 napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vector<int32_t> keyCodes,
     napi_value handle)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevImpl.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
@@ -67,7 +67,7 @@ napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vect
 
 napi_value JsInputDeviceManager::GetKeyboardType(napi_env env, int32_t id, napi_value handle)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevImpl.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
@@ -78,7 +78,7 @@ napi_value JsInputDeviceManager::GetKeyboardType(napi_env env, int32_t id, napi_
 
 void JsInputDeviceManager::ResetEnv()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     JsEventTarget::ResetEnv();
 }
 } // namespace MMI

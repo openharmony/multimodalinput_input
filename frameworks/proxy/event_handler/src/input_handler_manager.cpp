@@ -219,7 +219,7 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 void InputHandlerManager::OnConnected()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     for (auto &inputHandler : inputHandlers_) {
         AddToServer(inputHandler.second.handlerId_, inputHandler.second.handlerType_, inputHandler.second.eventType_);
     }

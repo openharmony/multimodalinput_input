@@ -53,7 +53,7 @@ std::unordered_map<int32_t, std::string> axisType = {
 
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto iter = inputDevice_.find(id);
     if (iter == inputDevice_.end()) {
         MMI_HILOGE("failed to search for the device");
@@ -95,7 +95,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
 
 std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::vector<int32_t> ids;
     for (const auto &item : inputDevice_) {
         ids.push_back(item.first);
@@ -105,7 +105,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
 
 std::vector<bool> InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::vector<bool> keystrokeAbility;
     auto iter = inputDevice_.find(deviceId);
     if (iter == inputDevice_.end()) {
@@ -122,7 +122,7 @@ std::vector<bool> InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<
 
 bool InputDeviceManager::GetDeviceConfig(int32_t deviceId, int32_t &keyboardType)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (auto iter = inputDevice_.find(deviceId); iter == inputDevice_.end()) {
         MMI_HILOGE("Failed to search for the deviceID");
         return false;
@@ -140,7 +140,7 @@ bool InputDeviceManager::GetDeviceConfig(int32_t deviceId, int32_t &keyboardType
 
 int32_t InputDeviceManager::GetKeyboardBusMode(int32_t deviceId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::shared_ptr dev = GetInputDevice(deviceId);
     CHKPR(dev, ERROR_NULL_POINTER);
     return dev->GetBusType();
@@ -148,7 +148,7 @@ int32_t InputDeviceManager::GetKeyboardBusMode(int32_t deviceId)
 
 int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::vector <int32_t> keyCodes;
     keyCodes.push_back(KeyEvent::KEYCODE_Q);
     keyCodes.push_back(KeyEvent::KEYCODE_NUMPAD_1);
@@ -185,7 +185,7 @@ int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId)
 
 int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t keyboardType = KEYBOARD_TYPE_NONE;
     if (auto iter = inputDevice_.find(deviceId); iter == inputDevice_.end()) {
         MMI_HILOGE("Failed to search for the deviceID");
@@ -200,7 +200,7 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId)
 
 void InputDeviceManager::AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto iter = devMonitor_.find(sess);
     if (iter == devMonitor_.end()) {
         devMonitor_[sess] = callback;
@@ -209,7 +209,7 @@ void InputDeviceManager::AddDevMonitor(SessionPtr sess, std::function<void(std::
 
 void InputDeviceManager::RemoveDevMonitor(SessionPtr sess)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto iter = devMonitor_.find(sess);
     if (iter == devMonitor_.end()) {
         MMI_HILOGE("session does not exist");
@@ -232,7 +232,7 @@ bool InputDeviceManager::HasPointerDevice()
 
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(inputDevice);
     for (const auto& item : inputDevice_) {
         if (item.second == inputDevice) {
@@ -262,7 +262,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 
 void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevice)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(inputDevice);
     int32_t deviceId = INVALID_DEVICE_ID;
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
@@ -309,13 +309,13 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
 
 void InputDeviceManager::Attach(std::shared_ptr<IDeviceObserver> observer)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     observers_.push_back(observer);
 }
 
 void InputDeviceManager::Detach(std::shared_ptr<IDeviceObserver> observer)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     observers_.remove(observer);
 }
 
@@ -329,7 +329,7 @@ void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice)
 
 int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevice)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(inputDevice, INVALID_DEVICE_ID);
     for (const auto& item : inputDevice_) {
         if (item.second == inputDevice) {
@@ -343,7 +343,7 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
 
 void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     mprintf(fd, "Device information:\t");
     mprintf(fd, "Input devices: count=%d", inputDevice_.size());
     for (const auto &item : inputDevice_) {
@@ -373,7 +373,7 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
 
 void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::string> &args)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::vector<int32_t> ids = GetInputDeviceIds();
     mprintf(fd, "Total device:%d, Device list:\t", int32_t { ids.size() });
     for (const auto &item : inputDevice_) {

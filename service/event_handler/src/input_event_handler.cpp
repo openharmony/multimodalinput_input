@@ -339,7 +339,7 @@ int32_t InputEventHandler::OnEventPointer(libinput_event *event)
 
 int32_t InputEventHandler::OnEventTouchpad(libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(inputEventNormalizeHandler_, ERROR_NULL_POINTER);
     inputEventNormalizeHandler_->HandleLibinputEvent(event);
@@ -365,7 +365,7 @@ int32_t InputEventHandler::OnEventTouch(libinput_event *event)
 
 int32_t InputEventHandler::OnTabletToolEvent(libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(inputEventNormalizeHandler_, ERROR_NULL_POINTER);
     inputEventNormalizeHandler_->HandleLibinputEvent(event);
