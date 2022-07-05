@@ -348,7 +348,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     << maxButtonId << std::endl;
                                 return RET_ERR;
                             }
-                            if ((pressTimeMs < minPressTimeMs ) || (pressTimeMs > maxPressTimeMs)) {
+                            if ((pressTimeMs < minPressTimeMs) || (pressTimeMs > maxPressTimeMs)) {
                                 std::cout << "press time is out of range:" << minPressTimeMs << " ms" << " < "
                                     << pressTimeMs << " < " << maxPressTimeMs << " ms" << std::endl;
                                 return RET_ERR;
@@ -356,7 +356,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             if ((clickIntervalTimeMs < minClickIntervalTimeMs) ||
                                 (clickIntervalTimeMs > maxClickIntervalTimeMs)) {
                                 std::cout << "click interval time is out of range:" << minClickIntervalTimeMs << " ms"
-                                    " < " << clickIntervalTimeMs << " < "<< maxClickIntervalTimeMs << " ms" 
+                                    " < " << clickIntervalTimeMs << " < " << maxClickIntervalTimeMs << " ms" 
                                     << std::endl;
                                 return RET_ERR;
                             }
