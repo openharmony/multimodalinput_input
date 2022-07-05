@@ -36,7 +36,7 @@ constexpr int32_t NAPI_ERR = 3;
 
 bool InputMonitor::Start()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
         monitorId_ = InputMgr->AddMonitor(shared_from_this());
@@ -47,7 +47,7 @@ bool InputMonitor::Start()
 
 void InputMonitor::Stop()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
         MMI_HILOGE("Invalid values");
@@ -66,7 +66,7 @@ void InputMonitor::SetCallback(std::function<void(std::shared_ptr<PointerEvent>)
 
 void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     if (JsInputMonMgr.GetMonitor(id_) == nullptr) {
         MMI_HILOGE("failed to process pointer event, id:%{public}d", id_);
@@ -352,7 +352,7 @@ bool JsInputMonitor::SetMouseProperty(const std::shared_ptr<PointerEvent> pointe
 
 bool JsInputMonitor::GetAxesValue(const std::shared_ptr<PointerEvent> pointerEvent, napi_value element)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(pointerEvent);
     double axisValue = -1.0;
     int32_t axis = -1;
@@ -381,7 +381,7 @@ bool JsInputMonitor::GetAxesValue(const std::shared_ptr<PointerEvent> pointerEve
 
 int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     napi_value axes = nullptr;
     napi_status status = napi_create_array(jsEnv_, &axes);
@@ -433,7 +433,7 @@ int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> 
 
 bool JsInputMonitor::GetPressedButtons(const std::set<int32_t>& pressedButtons, napi_value result)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_value value = nullptr;
     napi_status status = napi_create_array(jsEnv_, &value);
     if (status != napi_ok || value == nullptr) {
@@ -463,7 +463,7 @@ bool JsInputMonitor::GetPressedButtons(const std::set<int32_t>& pressedButtons, 
 
 bool JsInputMonitor::GetPressedKeys(const std::vector<int32_t>& pressedKeys, napi_value result)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_value value = nullptr;
     napi_status status = napi_create_array(jsEnv_, &value);
     if (status != napi_ok || value == nullptr) {
@@ -498,7 +498,7 @@ bool JsInputMonitor::HasKeyCode(const std::vector<int32_t>& pressedKeys, int32_t
 
 bool JsInputMonitor::GetPressedKey(const std::vector<int32_t>& pressedKeys, napi_value result)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     bool isExists = HasKeyCode(pressedKeys, KeyEvent::KEYCODE_CTRL_LEFT)
         || HasKeyCode(pressedKeys, KeyEvent::KEYCODE_CTRL_RIGHT);
     if (SetNameProperty(jsEnv_, result, "ctrlKey", isExists) != napi_ok) {
@@ -533,7 +533,7 @@ bool JsInputMonitor::GetPressedKey(const std::vector<int32_t>& pressedKeys, napi
 
 int32_t JsInputMonitor::TransformMousePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (SetNameProperty(jsEnv_, result, "action", pointerEvent->GetPointerAction()) != napi_ok) {
         THROWERR(jsEnv_, "Set property of action failed");
@@ -562,7 +562,7 @@ int32_t JsInputMonitor::TransformMousePointerEvent(const std::shared_ptr<Pointer
 
 bool JsInputMonitor::Start()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(monitor_);
     if (isMonitoring_) {
         MMI_HILOGW("js is monitoring");
@@ -577,7 +577,7 @@ bool JsInputMonitor::Start()
 
 JsInputMonitor::~JsInputMonitor()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (isMonitoring_) {
         isMonitoring_ = false;
         if (monitor_ != nullptr) {
@@ -594,7 +594,7 @@ JsInputMonitor::~JsInputMonitor()
 
 void JsInputMonitor::Stop()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(monitor_);
     if (isMonitoring_) {
         isMonitoring_ = false;
@@ -616,7 +616,7 @@ std::string JsInputMonitor::GetTypeName() const
 
 void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (!isMonitoring_) {
         MMI_HILOGE("js monitor stop");
         return;
@@ -649,7 +649,7 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 
 void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(work);
     int32_t *id = static_cast<int32_t *>(work->data);
     delete work;
@@ -662,7 +662,7 @@ void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status)
 
 void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (!isMonitoring_) {
         MMI_HILOGE("js monitor stop");
         return;

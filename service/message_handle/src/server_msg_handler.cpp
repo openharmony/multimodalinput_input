@@ -116,7 +116,7 @@ int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
 
 int32_t ServerMsgHandler::MarkEventProcessed(SessionPtr sess, int32_t eventId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     sess->DelEvents(eventId);
     return RET_OK;
@@ -137,7 +137,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     pointerEvent->UpdateId();
     int32_t action = pointerEvent->GetPointerAction();
@@ -174,7 +174,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 
 int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     DisplayGroupInfo displayGroupInfo;
     pkt >> displayGroupInfo.width >> displayGroupInfo.height >> displayGroupInfo.focusWindowId;
@@ -272,7 +272,7 @@ int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t monitorId, int
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
         auto pointerEvent = MouseEventHdr->GetPointerEvent();
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -289,7 +289,7 @@ int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
 int32_t ServerMsgHandler::OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
     int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(server, ERROR_NULL_POINTER);
     auto sess = server->GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
@@ -300,7 +300,7 @@ int32_t ServerMsgHandler::OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
 
 int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid, int32_t subscribeId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(server, ERROR_NULL_POINTER);
     auto sess = server->GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
@@ -312,7 +312,7 @@ int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid,
 
 int32_t ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData = 0;
     pkt >> userData;
@@ -340,7 +340,7 @@ int32_t ServerMsgHandler::OnInputDeviceIds(SessionPtr sess, NetPacket& pkt)
 
 int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData = 0;
     int32_t deviceId = 0;
@@ -401,7 +401,7 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
 
 int32_t ServerMsgHandler::OnSupportKeys(SessionPtr sess, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData;
     int32_t deviceId;
@@ -434,7 +434,7 @@ int32_t ServerMsgHandler::OnSupportKeys(SessionPtr sess, NetPacket& pkt)
 
 int32_t ServerMsgHandler::OnInputKeyboardType(SessionPtr sess, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t userData;
     int32_t deviceId;
@@ -460,10 +460,10 @@ int32_t ServerMsgHandler::OnInputKeyboardType(SessionPtr sess, NetPacket& pkt)
 
 int32_t ServerMsgHandler::OnAddInputDeviceMonitor(SessionPtr sess, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     InputDevMgr->AddDevMonitor(sess, [sess](std::string type, int32_t deviceId) {
-        CALL_LOG_ENTER;
+        CALL_DEBUG_ENTER;
         CHKPV(sess);
         NetPacket pkt2(MmiMessageId::ADD_INPUT_DEVICE_MONITOR);
         pkt2 << type << deviceId;
@@ -481,7 +481,7 @@ int32_t ServerMsgHandler::OnAddInputDeviceMonitor(SessionPtr sess, NetPacket& pk
 
 int32_t ServerMsgHandler::OnRemoveInputDeviceMonitor(SessionPtr sess, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     InputDevMgr->RemoveDevMonitor(sess);
     return RET_OK;

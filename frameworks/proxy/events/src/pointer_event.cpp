@@ -677,7 +677,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
 bool PointerEvent::IsValidCheckMouseFunc() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (pointers_.size() != 1) {
         MMI_HILOGE("Pointers_ is invalid");
         return false;
@@ -722,7 +722,7 @@ bool PointerEvent::IsValidCheckMouseFunc() const
 
 bool PointerEvent::IsValidCheckMouse() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t mousePointID = GetPointerId();
     if (mousePointID < 0) {
         MMI_HILOGE("MousePointID is invalid");
@@ -760,7 +760,7 @@ bool PointerEvent::IsValidCheckMouse() const
 
 bool PointerEvent::IsValidCheckTouchFunc() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t touchPointID = GetPointerId();
     if (touchPointID < 0) {
         MMI_HILOGE("TouchPointID is invalid");
@@ -788,7 +788,7 @@ bool PointerEvent::IsValidCheckTouchFunc() const
 
 bool PointerEvent::IsValidCheckTouch() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (!IsValidCheckTouchFunc()) {
         MMI_HILOGE("IsValidCheckTouchFunc is invalid");
         return false;
@@ -833,7 +833,7 @@ bool PointerEvent::IsValidCheckTouch() const
 
 bool PointerEvent::IsValid() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t sourceType = GetSourceType();
     if (sourceType != SOURCE_TYPE_MOUSE && sourceType != SOURCE_TYPE_TOUCHSCREEN &&
         sourceType != SOURCE_TYPE_TOUCHPAD) {

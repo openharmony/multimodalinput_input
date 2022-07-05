@@ -36,7 +36,7 @@ enum class Action : int32_t {
 
 napi_value JsKeyEvent::GetNapiInt32(napi_env env, int32_t code)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_value ret = nullptr;
     CHKRP(env, napi_create_int32(env, code, &ret), CREATE_INT32);
     return ret;
@@ -44,7 +44,7 @@ napi_value JsKeyEvent::GetNapiInt32(napi_env env, int32_t code)
 
 napi_value JsKeyEvent::EnumClassConstructor(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     size_t argc = 0;
     napi_value args[1] = {0};
     napi_value ret = nullptr;
@@ -55,7 +55,7 @@ napi_value JsKeyEvent::EnumClassConstructor(napi_env env, napi_callback_info inf
 
 napi_value JsKeyEvent::Export(napi_env env, napi_value exports)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("CANCEL", GetNapiInt32(env, static_cast<int32_t>(Action::CANCEL))),
         DECLARE_NAPI_STATIC_PROPERTY("DOWN", GetNapiInt32(env, static_cast<int32_t>(Action::DOWN))),

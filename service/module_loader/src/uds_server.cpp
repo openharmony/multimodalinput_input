@@ -22,7 +22,7 @@
 
 #include "accesstoken_kit.h"
 #include "ipc_skeleton.h"
-
+#include "dfx_hisysevent.h"
 #include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
 #include "util.h"
@@ -37,7 +37,7 @@ UDSServer::UDSServer() {}
 
 UDSServer::~UDSServer()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     UdsStop();
 }
 
@@ -98,7 +98,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     const int32_t moduleType, const int32_t uid, const int32_t pid,
     int32_t& serverFd, int32_t& toReturnClientFd)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t sockFds[2] = {};
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
@@ -184,7 +184,7 @@ void UDSServer::AddPermission(SessionPtr sess)
 
 void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     mprintf(fd, "Uds_server information:\t");
     mprintf(fd, "uds_server: count=%d", sessionsMap_.size());
     for (const auto &item : sessionsMap_) {
@@ -225,6 +225,8 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     if (secPtr != nullptr) {
         OnDisconnected(secPtr);
         DelSession(fd);
+    } else {
+        DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
     }
     if (ev.data.ptr) {
         free(ev.data.ptr);
@@ -233,7 +235,11 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     if (auto it = circleBufMap_.find(fd); it != circleBufMap_.end()) {
         circleBufMap_.erase(it);
     }
-    close(fd);
+    if (close(fd) == RET_OK) {
+        DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+    } else {
+        DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    }
 }
 
 void UDSServer::OnPacket(int32_t fd, NetPacket& pkt)
@@ -355,7 +361,7 @@ bool UDSServer::AddSession(SessionPtr ses)
 
 void UDSServer::DelSession(int32_t fd)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     MMI_HILOGD("fd:%{public}d", fd);
     if (fd < 0) {
         MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
@@ -375,13 +381,13 @@ void UDSServer::DelSession(int32_t fd)
 
 void UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     callbacks_.push_back(callback);
 }
 
 void UDSServer::NotifySessionDeleted(SessionPtr ses)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     for (const auto& callback : callbacks_) {
         callback(ses);
     }

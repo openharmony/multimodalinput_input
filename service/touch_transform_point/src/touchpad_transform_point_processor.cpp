@@ -49,7 +49,7 @@ TouchPadTransformPointProcessor::~TouchPadTransformPointProcessor() {}
 
 void TouchPadTransformPointProcessor::OnEventTouchPadDown(struct libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
     CHKPV(data);
@@ -97,7 +97,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(struct libinput_event 
 
 void TouchPadTransformPointProcessor::OnEventTouchPadMotion(struct libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
     CHKPV(data);
@@ -137,7 +137,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(struct libinput_even
 
 void TouchPadTransformPointProcessor::OnEventTouchPadUp(struct libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(event);
     auto data = libinput_event_get_touchpad_event(event);
     CHKPV(data);
@@ -161,7 +161,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadUp(struct libinput_event *e
 std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPadEvent(
     struct libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPP(event);
     CHKPP(pointerEvent_);
     int32_t type = libinput_event_get_type(event);
