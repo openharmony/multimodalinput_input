@@ -13,27 +13,20 @@
  * limitations under the License.
  */
 
-#ifndef ANR_CALLBACK_H
-#define ANR_CALLBACK_H
-
-#include <functional>
-
-#include "nocopyable.h"
-#include "singleton.h"
+#ifndef I_ANR_RECEIVER_H
+#define I_ANR_RECEIVER_H
 
 namespace OHOS {
 namespace MMI {
-class AnrCallback : public DelayedSingleton<AnrCallback> {
+class IAnrReceiver
+{
 public:
-    AnrCallback() = default;
-    DISALLOW_COPY_AND_MOVE(AnrCallback);
-    ~AnrCallback() = default;
-    void SetAnrCallback(std::function<void(int32_t)> callback);
-    void OnAnrNoticed(int32_t pid);
-private:
-    std::function<void(int32_t)> callback_;
+    IAnrReceiver() = default;
+    virtual ~IAnrReceiver() = default;
+    virtual void OnAnrNoticed(int32_t pid) const;
 };
-} // namespace MMI 
+} // namespace MMI
 } // namespace OHOS
-#define AnrCall OHOS::MMI::AnrCallback::GetInstance()
-#endif
+
+
+#endif // ANR_RECEIVER_H

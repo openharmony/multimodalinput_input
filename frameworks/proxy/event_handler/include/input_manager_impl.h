@@ -21,7 +21,6 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "anr_callback.h"
 #include "net_packet.h"
 
 #include "display_info.h"
@@ -32,6 +31,7 @@
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
+#include "i_anr_receiver.h"
 #include "i_input_event_consumer.h"
 #include "key_option.h"
 #include "mmi_event_handler.h"
@@ -91,7 +91,8 @@ public:
     int32_t SetPointerVisible(bool visible);
     bool IsPointerVisible();
 
-    void SetAnrCallback(std::function<void(int32_t)> callback);
+    void AddAnrCallback(std::shared_ptr<IAnrReceiver> receiver);
+    void OnAnrNoticed(int32_t pid);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
@@ -107,11 +108,13 @@ private:
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    void OnAnrNoticedTask(std::shared_ptr<IAnrReceiver> receiver, int32_t pid);
     void OnThread();
 
 private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
     std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
+    std::shared_ptr<IAnrReceiver> anrReceiver_ = nullptr;
 
     DisplayGroupInfo displayGroupInfo_;
 #ifdef OHOS_BUILD_ENABLE_MONITOR

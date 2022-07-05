@@ -606,12 +606,12 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
     return RET_OK;
 }
 
-int32_t MMIService::SetAnrCallback()
+int32_t MMIService::AddAnrCallback()
 {
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckSetAnrCallback, this, pid));
+        std::bind(&MMIService::CheckAddAnrCallback, this, pid));
     if (ret != RET_OK) {
         MMI_HILOGE("unsubscribe key event processed failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -619,7 +619,7 @@ int32_t MMIService::SetAnrCallback()
     return RET_OK;
 }
 
-int32_t MMIService::CheckSetAnrCallback(int32_t pid) {
+int32_t MMIService::CheckAddAnrCallback(int32_t pid) {
     CALL_DEBUG_ENTER;
     AnrMgr->SetAnrNoticedPid(pid);
     return RET_OK;
