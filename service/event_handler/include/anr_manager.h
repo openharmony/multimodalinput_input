@@ -35,6 +35,7 @@ public:
     {
         anrNoticedPid_ = anrPid;
     }
+
     void OnSessionLost(SessionPtr session);
 
 private:

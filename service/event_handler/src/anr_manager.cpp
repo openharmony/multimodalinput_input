@@ -74,6 +74,5 @@ void AnrManager::OnSessionLost(SessionPtr session)
         anrNoticedPid_ = -1;
     }
 }
-
 } // namespace MMI
 } // namespace OHOS

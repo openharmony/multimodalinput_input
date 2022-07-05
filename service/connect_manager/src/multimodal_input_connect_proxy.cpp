@@ -373,6 +373,5 @@ int32_t MultimodalInputConnectProxy::AddAnrCallback()
     }
     return RET_OK;
 }
-
 } // namespace MMI
 } // namespace OHOS

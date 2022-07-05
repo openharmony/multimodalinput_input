@@ -18,8 +18,7 @@
 
 namespace OHOS {
 namespace MMI {
-class IAnrReceiver
-{
+class IAnrReceiver {
 public:
     IAnrReceiver() = default;
     virtual ~IAnrReceiver() = default;
