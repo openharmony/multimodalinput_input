@@ -49,6 +49,7 @@ private:
 };
 namespace OHOS {
 namespace MMI {
+#define InputMgr InputManager::GetInstance()
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerCommand"};
 constexpr int32_t SLEEPTIME = 20;
@@ -310,12 +311,12 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         case 'b': {
                             int32_t pressTimeMs = 50;
                             int32_t clickIntervalTimeMs = 300;
-                            const int32_t minButtonId = 0;
-                            const int32_t maxButtonId = 7;
-                            const int32_t minPressTimeMs = 1;
-                            const int32_t maxPressTimeMs = 300;
-                            const int32_t minClickIntervalTimeMs = 1;
-                            const int32_t maxClickIntervalTimeMs = 450;
+                            static constexpr int32_t minButtonId = 0;
+                            static constexpr int32_t maxButtonId = 7;
+                            static constexpr int32_t minPressTimeMs = 1;
+                            static constexpr int32_t maxPressTimeMs = 300;
+                            static constexpr int32_t minClickIntervalTimeMs = 1;
+                            static constexpr int32_t maxClickIntervalTimeMs = 450;
                             if (argc < 6 || argc > 8) {
                                 std::cout << "wrong number of parameters" << std::endl;
                                 ShowUsage();
@@ -327,7 +328,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return RET_ERR;
                             }
                             if (!StrToInt(argv[optind + 1], buttonId)) {
-                                std::cout << "invalid key ID" << std::endl;
+                                std::cout << "invalid key" << std::endl;
                                 return RET_ERR;
                             }
                             if (argc >= 7) {
@@ -342,20 +343,21 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     return RET_ERR;
                                 }
                             }
-                            if ((minButtonId > buttonId) || (maxButtonId < buttonId)) {
-                                std::cout << "button id is out of range: " << minButtonId
-                                    << " < button id < " << maxButtonId << std::endl;
+                            if ((buttonId < minButtonId) || (buttonId > maxButtonId)) {
+                                std::cout << "button is out of range:" << minButtonId << " < " << buttonId << " < "
+                                    << maxButtonId << std::endl;
                                 return RET_ERR;
                             }
-                            if ((minPressTimeMs > pressTimeMs) || (maxPressTimeMs < pressTimeMs)) {
-                                std::cout << "press time is out of range: " << minPressTimeMs << " ms"
-                                    << " < press time < " << maxPressTimeMs << " ms" << std::endl;
+                            if ((pressTimeMs < minPressTimeMs ) || (pressTimeMs > maxPressTimeMs)) {
+                                std::cout << "press time is out of range:" << minPressTimeMs << " ms" << " < "
+                                    << pressTimeMs << " < " << maxPressTimeMs << " ms" << std::endl;
                                 return RET_ERR;
                             }
-                            if ((minClickIntervalTimeMs > clickIntervalTimeMs) ||
-                                (maxClickIntervalTimeMs < clickIntervalTimeMs)) {
-                                std::cout << "click interval time is out of range: "<< minClickIntervalTimeMs << " ms"
-                                    << " < click interval time < " << maxClickIntervalTimeMs << " ms" << std::endl;
+                            if ((clickIntervalTimeMs < minClickIntervalTimeMs) ||
+                                (clickIntervalTimeMs > maxClickIntervalTimeMs)) {
+                                std::cout << "click interval time is out of range:" << minClickIntervalTimeMs << " ms"
+                                    " < " << clickIntervalTimeMs << " < "<< maxClickIntervalTimeMs << " ms" 
+                                    << std::endl;
                                 return RET_ERR;
                             }
                             std::cout << "   coordinate: ("<< px << ", "  << py << ")" << std::endl;
@@ -375,23 +377,23 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetButtonId(buttonId);
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            InputMgr->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
                             item.SetPressed(false);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            InputMgr->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(clickIntervalTimeMs));
 
                             item.SetPressed(true);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            InputMgr->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
                             item.SetPressed(false);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            InputMgr->SimulateInputEvent(pointerEvent);
                             break;
                         }
                         case 'i': {
