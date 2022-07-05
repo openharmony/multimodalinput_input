@@ -31,11 +31,7 @@ public:
     ~AnrManager() = default;
     void Init(UDSServer& udsServer);
     bool TriggerAnr(int64_t time, SessionPtr sess);
-    void SetAnrNoticedPid(int32_t anrPid) 
-    {
-        anrNoticedPid_ = anrPid;
-    }
-
+    int32_t SetAnrNoticedPid(int32_t anrPid);
     void OnSessionLost(SessionPtr session);
 
 private:

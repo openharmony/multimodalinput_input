@@ -46,7 +46,7 @@ bool AnrManager::TriggerAnr(int64_t time, SessionPtr sess)
         earliest = sess->GetEarliestEventTime();
     }
     MMI_HILOGD("Current time: %{public}" PRId64 "", time);
-    if (time < (earliest + INPUT_UI_TIMEOUT_TIME)) {
+    if (time > (earliest + INPUT_UI_TIMEOUT_TIME)) {
         sess->isANRProcess_ = false;
         MMI_HILOGD("the event reports normally");
         return false;
@@ -63,7 +63,7 @@ bool AnrManager::TriggerAnr(int64_t time, SessionPtr sess)
     pkt << sess->GetPid();
     udsServer_->SendMsg(anrNoticedFd, pkt);
     MMI_HILOGI("AAFwk send ANR process id succeeded");
-    return true;
+    return false;
 }
 
 void AnrManager::OnSessionLost(SessionPtr session)
@@ -73,6 +73,13 @@ void AnrManager::OnSessionLost(SessionPtr session)
         MMI_HILOGD("NoticedPid_ set invalid");
         anrNoticedPid_ = -1;
     }
+}
+
+int32_t AnrManager::SetAnrNoticedPid(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    anrNoticedPid_ = pid;
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
