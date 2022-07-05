@@ -150,10 +150,10 @@ int32_t MultimodalInputConnectManager::InjectPointerEvent(const std::shared_ptr<
     return multimodalInputConnectService_->InjectPointerEvent(pointerEvent);
 }
 
-int32_t MultimodalInputConnectManager::SetAnrCallback()
+int32_t MultimodalInputConnectManager::AddAnrCallback()
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->SetAnrCallback();
+    return multimodalInputConnectService_->AddAnrCallback();
 }
 
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()

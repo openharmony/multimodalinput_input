@@ -19,7 +19,6 @@
 #include <iostream>
 #include <sstream>
 
-#include "anr_callback.h"
 #include "bytrace_adapter.h"
 #include "define_interceptor_manager.h"
 #include "input_device_impl.h"
@@ -340,7 +339,7 @@ int32_t ClientMsgHandler::OnAnrNoticed(const UDSClient& client, NetPacket& pkt)
         return RET_ERR;
     }
     MMI_HILOGD("Client pid:%{public}d", pid);
-    AnrCall->OnAnrNoticed(pid);
+    InputMgrImpl->OnAnrNoticed(pid);
     return RET_OK;
 }
 } // namespace MMI

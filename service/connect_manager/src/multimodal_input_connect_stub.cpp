@@ -60,7 +60,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::MOVE_MOUSE, &MultimodalInputConnectStub::StubMoveMouseEvent},
         {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
         {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
-        {IMultimodalInputConnect::SET_ANR_CALLBACK, &MultimodalInputConnectStub::StubSetAnrCallback}
+        {IMultimodalInputConnect::ADD_ANR_CALLBACK, &MultimodalInputConnectStub::StubAddAnrCallback}
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -366,7 +366,7 @@ int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, 
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubSetAnrCallback(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubAddAnrCallback(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE)) {
@@ -377,7 +377,7 @@ int32_t MultimodalInputConnectStub::StubSetAnrCallback(MessageParcel& data, Mess
         MMI_HILOGE("service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t ret = SetAnrCallback();
+    int32_t ret = AddAnrCallback();
     if (ret != RET_OK) {
         MMI_HILOGE("call SetCallback failed ret:%{public}d", ret);
         return ret;

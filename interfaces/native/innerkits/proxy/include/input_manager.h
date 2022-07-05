@@ -23,6 +23,7 @@
 #include "event_handler.h"
 #include "nocopyable.h"
 
+#include "i_anr_receiver.h"
 #include "display_info.h"
 #include "error_multimodal.h"
 #include "i_input_event_consumer.h"
@@ -234,14 +235,7 @@ public:
      */
     void GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
 
-    /**
-     * @brief Sets a globally unique anr callback.
-     * @param callback xxxx
-     * @return return Returns a value greater than or equal to <b>0</b> if the input event filter is added
-     * successfully; returns a value less than <b>0</b> otherwise.
-     * @since 9
-     */
-    void SetAnrCallback(std::function<void(int32_t)> callback);
+    void AddAnrCallback(std::shared_ptr<IAnrReceiver> receiver);
 
 private:
     InputManager() = default;
