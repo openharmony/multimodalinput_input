@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "ability_manager_client.h"
 #include "anr_manager.h"
 #include "dfx_hisysevent.h"
 #include "input_event_handler.h"
@@ -46,24 +47,18 @@ bool AnrManager::TriggerAnr(int64_t time, SessionPtr sess)
         earliest = sess->GetEarliestEventTime();
     }
     MMI_HILOGD("Current time: %{public}" PRId64 "", time);
-    if (time > (earliest + INPUT_UI_TIMEOUT_TIME)) {
+    if (time < (earliest + INPUT_UI_TIMEOUT_TIME)) {
         sess->isANRProcess_ = false;
         MMI_HILOGD("the event reports normally");
         return false;
     }
     DfxHisysevent::ApplicationBlockInput(sess);
-
-    MMI_HILOGD("anrpid:%{public}d", anrNoticedPid_);
-    if (anrNoticedPid_ < 0) {
-        MMI_HILOGE("anrNoticedPid_ is invalid");
-        return false;
+    int32_t ret = OHOS::AAFwk::AbilityManagerClient::GetInstance()->SendANRProcessID(sess->GetPid());
+    if (ret != 0) {
+        MMI_HILOGE("AAFwk SendANRProcessID failed, AAFwk errCode: %{public}d", ret);
     }
-    auto anrNoticedFd = udsServer_->GetClientFd(anrNoticedPid_);
-    NetPacket pkt(MmiMessageId::NOTICE_ANR);
-    pkt << sess->GetPid();
-    udsServer_->SendMsg(anrNoticedFd, pkt);
     MMI_HILOGI("AAFwk send ANR process id succeeded");
-    return false;
+    return true;
 }
 
 void AnrManager::OnSessionLost(SessionPtr session)
