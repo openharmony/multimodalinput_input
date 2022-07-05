@@ -597,7 +597,7 @@ void InputManagerImpl::GetKeyboardType(int32_t deviceId, std::function<void(int3
     InputDevImpl.GetKeyboardType(deviceId, callback);
 }
 
-void InputManagerImpl::AddAnrCallback(std::shared_ptr<IAnrReceiver> receiver)
+void InputManagerImpl::SetAnrListener(std::shared_ptr<IAnrListener> receiver)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -606,13 +606,13 @@ void InputManagerImpl::AddAnrCallback(std::shared_ptr<IAnrReceiver> receiver)
         return;
     }
     anrReceiver_ = receiver;
-    int32_t ret = MultimodalInputConnMgr->AddAnrCallback();
+    int32_t ret = MultimodalInputConnMgr->SetAnrListener();
     if (ret != RET_OK) {
         MMI_HILOGE("send to server fail, ret:%{public}d", ret);
     }
 }
 
-void InputManagerImpl::OnAnrNoticed(int32_t pid)
+void InputManagerImpl::OnAnr(int32_t pid)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
@@ -621,18 +621,18 @@ void InputManagerImpl::OnAnrNoticed(int32_t pid)
     CHKPV(eventHandler);
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHandler::PostTask(eventHandler,
-        std::bind(&InputManagerImpl::OnAnrNoticedTask, this, anrReceiver_, pid))) {
+        std::bind(&InputManagerImpl::OnAnrTask, this, anrReceiver_, pid))) {
         MMI_HILOGE("post task failed");
     }
     MMI_HILOGD("anr noticed pid:%{public}d", pid);
 }
 
-void InputManagerImpl::OnAnrNoticedTask(std::shared_ptr<IAnrReceiver> receiver, int32_t pid)
+void InputManagerImpl::OnAnrTask(std::shared_ptr<IAnrListener> receiver, int32_t pid)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     CHKPV(receiver);
-    receiver->OnAnrNoticed(pid);
+    receiver->OnAnr(pid);
     MMI_HILOGD("anr noticed pid:%{public}d", pid);
 }
 } // namespace MMI

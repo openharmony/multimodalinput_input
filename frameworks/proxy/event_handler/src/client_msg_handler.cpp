@@ -68,7 +68,7 @@ void ClientMsgHandler::Init()
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ClientMsgHandler::OnSupportKeys, this)},
         {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind2(&ClientMsgHandler::OnInputKeyboardType, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnDevMonitor, this)},
-        {MmiMessageId::NOTICE_ANR, MsgCallbackBind2(&ClientMsgHandler::OnAnrNoticed, this)},
+        {MmiMessageId::NOTICE_ANR, MsgCallbackBind2(&ClientMsgHandler::OnAnr, this)},
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -329,7 +329,7 @@ void ClientMsgHandler::OnEventProcessed(int32_t eventId)
     }
 }
 
-int32_t ClientMsgHandler::OnAnrNoticed(const UDSClient& client, NetPacket& pkt)
+int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
     int32_t pid;
@@ -339,7 +339,7 @@ int32_t ClientMsgHandler::OnAnrNoticed(const UDSClient& client, NetPacket& pkt)
         return RET_ERR;
     }
     MMI_HILOGD("Client pid:%{public}d", pid);
-    InputMgrImpl->OnAnrNoticed(pid);
+    InputMgrImpl->OnAnr(pid);
     return RET_OK;
 }
 } // namespace MMI
