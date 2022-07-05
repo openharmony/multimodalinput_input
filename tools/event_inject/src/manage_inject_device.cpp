@@ -27,7 +27,7 @@ constexpr int64_t INJECT_SLEEP_TIMES = 10;
 
 int32_t ManageInjectDevice::TransformJsonData(const DeviceItems& configData)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (configData.empty()) {
         MMI_HILOGE("input data from json file is empty");
         return RET_ERR;
@@ -70,7 +70,7 @@ int32_t ManageInjectDevice::SendEvent(const InputEventArray& inputEventArray)
 
 int32_t ManageInjectDevice::SendEventToDeviceNode(const InputEventArray& inputEventArray)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::string deviceNode = inputEventArray.target;
     if (deviceNode.empty()) {
         MMI_HILOGE("device node:%{public}s is not exit", deviceNode.c_str());

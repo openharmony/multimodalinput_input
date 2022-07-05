@@ -34,7 +34,7 @@ static Callbacks callbacks = {};
 int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
     std::shared_ptr<KeyOption> keyOption)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(keyOption, ERROR_NULL_POINTER);
     size_t argc = 3;
@@ -142,7 +142,7 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
 
 static bool MatchCombinationKeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(monitorInfo);
     CHKPF(keyEvent);
     auto keyOption = monitorInfo->keyOption;
@@ -191,7 +191,7 @@ static bool MatchCombinationKeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
 
 static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     auto iter = callbacks.begin();
     while (iter != callbacks.end()) {
@@ -212,7 +212,7 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
 
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
@@ -256,7 +256,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
@@ -293,7 +293,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
 EXTERN_C_START
 static napi_value MmiInit(napi_env env, napi_value exports)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),

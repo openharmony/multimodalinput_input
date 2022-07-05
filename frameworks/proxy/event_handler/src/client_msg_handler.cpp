@@ -129,7 +129,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
@@ -178,7 +178,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
 
 int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t userData;
     std::vector<int32_t> inputDeviceIds;
     pkt >> userData >> inputDeviceIds;
@@ -196,7 +196,7 @@ int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& p
 
 int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t userData;
     size_t size;
     auto devData = std::make_shared<InputDeviceImpl::InputDeviceInfo>();
@@ -224,7 +224,7 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
 
 int32_t ClientMsgHandler::OnSupportKeys(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t userData;
     size_t size;
     pkt >> userData >> size;
@@ -248,7 +248,7 @@ int32_t ClientMsgHandler::OnSupportKeys(const UDSClient& client, NetPacket& pkt)
 
 int32_t ClientMsgHandler::OnInputKeyboardType(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t userData;
     int32_t KeyboardType;
     pkt >> userData >> KeyboardType;
@@ -262,7 +262,7 @@ int32_t ClientMsgHandler::OnInputKeyboardType(const UDSClient& client, NetPacket
 
 int32_t ClientMsgHandler::OnDevMonitor(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::string type;
     int32_t deviceId;
     pkt >> type >> deviceId;
@@ -277,7 +277,7 @@ int32_t ClientMsgHandler::OnDevMonitor(const UDSClient& client, NetPacket& pkt)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t handlerId;
     pkt >> handlerId;
     if (pkt.ChkRWError()) {
@@ -299,7 +299,7 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t handlerId;
     InputHandlerType handlerType;
     pkt >> handlerId >> handlerType;
