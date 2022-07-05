@@ -619,7 +619,8 @@ int32_t MMIService::AddAnrCallback()
     return RET_OK;
 }
 
-int32_t MMIService::CheckAddAnrCallback(int32_t pid) {
+int32_t MMIService::CheckAddAnrCallback(int32_t pid
+{
     CALL_DEBUG_ENTER;
     AnrMgr->SetAnrNoticedPid(pid);
     return RET_OK;
