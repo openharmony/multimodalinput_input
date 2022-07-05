@@ -277,7 +277,11 @@ bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<P
     UpdateConsumptionState(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     Monitor(pointerEvent);
-    return isMonitorConsumed_;
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        return isMonitorConsumed_;
+    }
+    MMI_HILOGI("This is not a touch-screen event");
+    return false;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
@@ -292,7 +296,6 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
 {
     CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        MMI_HILOGE("This is not a touch-screen event");
         return;
     }
     lastPointerEvent_ = pointerEvent;
