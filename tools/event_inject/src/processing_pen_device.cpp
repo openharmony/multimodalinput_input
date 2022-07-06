@@ -26,7 +26,7 @@ constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE = 2114;
 int32_t ProcessingPenDevice::TransformJsonDataToInputData(const DeviceItem& penEventArrays,
     InputEventArray& inputEventArray)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (penEventArrays.events.empty()) {
         MMI_HILOGE("manage pen array failed, inputData is empty.");
         return RET_ERR;

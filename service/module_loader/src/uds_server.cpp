@@ -20,8 +20,6 @@
 
 #include <sys/socket.h>
 
-#include "accesstoken_kit.h"
-#include "ipc_skeleton.h"
 #include "dfx_hisysevent.h"
 #include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
@@ -37,7 +35,7 @@ UDSServer::UDSServer() {}
 
 UDSServer::~UDSServer()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     UdsStop();
 }
 
@@ -98,7 +96,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     const int32_t moduleType, const int32_t uid, const int32_t pid,
     int32_t& serverFd, int32_t& toReturnClientFd)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t sockFds[2] = {};
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
@@ -151,7 +149,6 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
             programName.c_str(), pid, MAKE_SHARED_FAIL);
         return RET_ERR;
     }
-    AddPermission(sess);
 #ifdef OHOS_BUILD_MMI_DEBUG
     sess->SetClientFd(toReturnClientFd);
 #endif // OHOS__BUILD_MMI_DEBUG
@@ -165,35 +162,17 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     return RET_OK;
 }
 
-void UDSServer::AddPermission(SessionPtr sess)
-{
-    uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
-    std::string permissionMonitor = "ohos.permission.INPUT_MONITORING";
-    
-    if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) ==
-        Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
-        MMI_HILOGD("type flag matched");
-        int32_t result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionMonitor);
-        MMI_HILOGD("verify access result:%{public}d", result);
-        if (result != Security::AccessToken::PERMISSION_GRANTED) {
-            MMI_HILOGD("permission is not granted");
-            sess->AddPermission(false);
-        }
-    }
-}
-
 void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     mprintf(fd, "Uds_server information:\t");
     mprintf(fd, "uds_server: count=%d", sessionsMap_.size());
     for (const auto &item : sessionsMap_) {
         std::shared_ptr<UDSSession> udsSession = item.second;
         CHKPV(udsSession);
         mprintf(fd,
-                "Uid:%d | Pid:%d | Fd:%d | HasPermission:%s | Descript:%s\t",
+                "Uid:%d | Pid:%d | Fd:%d | Descript:%s\t",
                 udsSession->GetUid(), udsSession->GetPid(), udsSession->GetFd(),
-                udsSession->HasPermission() ? "true" : "false",
                 udsSession->GetDescript().c_str());
     }
 }
@@ -361,7 +340,7 @@ bool UDSServer::AddSession(SessionPtr ses)
 
 void UDSServer::DelSession(int32_t fd)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     MMI_HILOGD("fd:%{public}d", fd);
     if (fd < 0) {
         MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
@@ -381,13 +360,13 @@ void UDSServer::DelSession(int32_t fd)
 
 void UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     callbacks_.push_back(callback);
 }
 
 void UDSServer::NotifySessionDeleted(SessionPtr ses)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     for (const auto& callback : callbacks_) {
         callback(ses);
     }

@@ -73,7 +73,7 @@ private:
 
 bool InputManagerImpl::InitEventHandler()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (mmiEventHandler_ != nullptr) {
         MMI_HILOGE("Repeated initialization operations");
         return false;
@@ -108,7 +108,7 @@ EventHandlerPtr InputManagerImpl::GetCurrentEventHandler() const
 
 void InputManagerImpl::OnThread()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     SetThreadName("mmi_client_EventHdr");
     mmiEventHandler_ = std::make_shared<MMIEventHandler>();
@@ -121,7 +121,7 @@ void InputManagerImpl::OnThread()
 
 void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("get mmi client is nullptr");
@@ -148,7 +148,7 @@ void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInf
 
 int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     std::lock_guard<std::mutex> guard(mtx_);
     bool hasSendToMmiServer = true;
@@ -179,7 +179,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(inputEventConsumer);
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
@@ -256,7 +256,7 @@ void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> c
 
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     CHKPV(pointerEvent);
     CHKPV(eventHandler_);
@@ -521,7 +521,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
 int32_t InputManagerImpl::SetPointerVisible(bool visible)
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t ret = MultimodalInputConnMgr->SetPointerVisible(visible);
     if (ret != RET_OK) {
         MMI_HILOGE("send to server fail, ret:%{public}d", ret);
@@ -536,7 +536,7 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible)
 bool InputManagerImpl::IsPointerVisible()
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     bool visible;
     int32_t ret = MultimodalInputConnMgr->IsPointerVisible(visible);
     if (ret != 0) {
@@ -551,7 +551,7 @@ bool InputManagerImpl::IsPointerVisible()
 
 void InputManagerImpl::OnConnected()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (displayGroupInfo_.windowsInfo.empty() || displayGroupInfo_.displaysInfo.empty()) {
         MMI_HILOGE("windows info or display info is empty");
         return;
@@ -577,7 +577,7 @@ void InputManagerImpl::SendDisplayInfo()
 void InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
     std::function<void(std::vector<bool>&)> callback)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("client init failed");
@@ -588,7 +588,7 @@ void InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCo
 
 void InputManagerImpl::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
