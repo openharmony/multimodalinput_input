@@ -95,8 +95,8 @@ private:
 #endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    void SelectWindowInfo(const int32_t& globalX, const int32_t& globalY,
-        const std::shared_ptr<PointerEvent>& pointerEvent, const WindowInfo* touchWindow);
+    const WindowInfo* SelectWindowInfo(const int32_t& globalX, const int32_t& globalY,
+        const std::shared_ptr<PointerEvent>& pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
