@@ -78,10 +78,6 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     }
     CHKPR(session, RET_ERR);
     if (handlerType == InputHandlerType::MONITOR) {
-        if (!session->HasPermission()) {
-            MMI_HILOGE("no permission, can not add monitor");
-            return RET_ERR;
-        }
         MMI_HILOGD("Register monitor:%{public}d", handlerId);
         SessionHandler mon { handlerId, handlerType, session };
         return monitors_.AddMonitor(mon);
@@ -94,10 +90,6 @@ void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
     if (handlerType == InputHandlerType::MONITOR) {
-        if (!session->HasPermission()) {
-            MMI_HILOGE("no permission, can not remove monitor");
-            return;
-        }
         MMI_HILOGD("Unregister monitor:%{public}d", handlerId);
         SessionHandler monitor { handlerId, handlerType, session };
         monitors_.RemoveMonitor(monitor);
@@ -353,10 +345,9 @@ void InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::v
         CHKPV(session);
         mprintf(fd,
                 "monitor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
-                "| HasPermission:%s | EarliestEventTime:%" PRId64 " | Descript:%s \t",
+                "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
                 item.id_, item.handlerType_, session->GetPid(),
                 session->GetUid(), session->GetFd(),
-                session->HasPermission() ? "true" : "false",
                 session->GetEarliestEventTime(), session->GetDescript().c_str());
     }
 }
