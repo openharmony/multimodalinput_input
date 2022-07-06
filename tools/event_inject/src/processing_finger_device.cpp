@@ -25,7 +25,7 @@ constexpr int64_t FINGER_BLOCK_TIME = 6;
 int32_t ProcessingFingerDevice::TransformJsonDataToInputData(const DeviceItem& fingerEventArrays,
     InputEventArray& inputEventArray)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::vector<DeviceEvent> inputData = fingerEventArrays.events;
     if (inputData.empty()) {
         MMI_HILOGE("manage finger array failed, inputData is empty.");

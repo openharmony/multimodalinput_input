@@ -78,10 +78,6 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     }
     CHKPR(session, RET_ERR);
     if (handlerType == InputHandlerType::MONITOR) {
-        if (!session->HasPermission()) {
-            MMI_HILOGE("no permission, can not add monitor");
-            return RET_ERR;
-        }
         MMI_HILOGD("Register monitor:%{public}d", handlerId);
         SessionHandler mon { handlerId, handlerType, session };
         return monitors_.AddMonitor(mon);
@@ -94,10 +90,6 @@ void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
     if (handlerType == InputHandlerType::MONITOR) {
-        if (!session->HasPermission()) {
-            MMI_HILOGE("no permission, can not remove monitor");
-            return;
-        }
         MMI_HILOGD("Unregister monitor:%{public}d", handlerId);
         SessionHandler monitor { handlerId, handlerType, session };
         monitors_.RemoveMonitor(monitor);
@@ -277,7 +269,11 @@ bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<P
     UpdateConsumptionState(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     Monitor(pointerEvent);
-    return isMonitorConsumed_;
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        return isMonitorConsumed_;
+    }
+    MMI_HILOGI("This is not a touch-screen event");
+    return false;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
@@ -292,7 +288,6 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
 {
     CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        MMI_HILOGE("This is not a touch-screen event");
         return;
     }
     lastPointerEvent_ = pointerEvent;
@@ -342,7 +337,7 @@ void InputHandlerManagerGlobal::Dump(int32_t fd, const std::vector<std::string> 
 
 void InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     mprintf(fd, "Monitor information:\t");
     mprintf(fd, "monitors: count=%d", monitors_.size());
     for (const auto &item : monitors_) {
@@ -350,10 +345,9 @@ void InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::v
         CHKPV(session);
         mprintf(fd,
                 "monitor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
-                "| HasPermission:%s | EarliestEventTime:%" PRId64 " | Descript:%s \t",
+                "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
                 item.id_, item.handlerType_, session->GetPid(),
                 session->GetUid(), session->GetFd(),
-                session->HasPermission() ? "true" : "false",
                 session->GetEarliestEventTime(), session->GetDescript().c_str());
     }
 }

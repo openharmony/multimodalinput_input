@@ -39,7 +39,7 @@ std::map<int32_t, DeviceConfig> KeyAutoRepeat::GetDeviceConfig() const
 
 int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(device, ERROR_NULL_POINTER);
     std::string fileName = KeyMapMgr->GetKeyEventFileName(device);
     DeviceConfig devConf;
@@ -59,7 +59,7 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
 
 void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     DeviceConfig devConf = GetAutoSwitch(keyEvent->GetDeviceId());
     if (devConf.autoSwitch != OPEN_AUTO_REPEAT) {
@@ -100,7 +100,7 @@ void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
 
 void KeyAutoRepeat::AddHandleTimer(int32_t timeout)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
         auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
         CHKPV(inputEventNormalizeHandler);
@@ -137,7 +137,7 @@ DeviceConfig KeyAutoRepeat::GetAutoSwitch(int32_t deviceId)
 
 void KeyAutoRepeat::RemoveDeviceConfig(struct libinput_device *device)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(device);
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     auto iter = deviceConfig_.find(deviceId);

@@ -229,7 +229,7 @@ std::string DeviceItem::ToString() const
 
 DeviceItems DataInit(const std::string& fileData, bool logStatus)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     JsonParser parser;
     parser.json_ = cJSON_Parse(fileData.c_str());
     if (!cJSON_IsArray(parser.json_)) {
