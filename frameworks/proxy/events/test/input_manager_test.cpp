@@ -13,6 +13,10 @@
  * limitations under the License.
  */
 
+#include "accesstoken_kit.h"
+#include "nativetoken_kit.h"
+#include "token_setproc.h"
+
 #include "event_util_test.h"
 #include "input_handler_type.h"
 #include "mmi_log.h"
@@ -21,6 +25,8 @@
 
 namespace OHOS {
 namespace MMI {
+using namespace Security::AccessToken;
+using Security::AccessToken::AccessTokenID;
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest" };
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
@@ -30,6 +36,38 @@ constexpr int32_t DEFAULT_DEVICE_ID = 0;
 constexpr int32_t INDEX_FIRST = 1;
 constexpr int32_t INDEX_SECOND = 2;
 constexpr int32_t INDEX_THIRD = 3;
+PermissionDef infoManagerTestPermDef_ = {
+    .permissionName = "ohos.permission.INPUT_MONITORING",
+    .bundleName = "accesstoken_test",
+    .grantMode = 1,
+    .label = "label",
+    .labelId = 1,
+    .description = "test input agent",
+    .descriptionId = 1,
+    .availableLevel = APL_NORMAL
+};
+
+PermissionStateFull infoManagerTestState_ = {
+    .grantFlags = {1},
+    .grantStatus = {PermissionState::PERMISSION_GRANTED},
+    .isGeneral = true,
+    .permissionName = "ohos.permission.INPUT_MONITORING",
+    .resDeviceID = {"local"}
+};
+
+HapPolicyParams infoManagerTestPolicyPrams_ = {
+    .apl = APL_NORMAL,
+    .domain = "test.domain",
+    .permList = {infoManagerTestPermDef_},
+    .permStateList = {infoManagerTestState_}
+};
+
+HapInfoParams infoManagerTestInfoParms_ = {
+    .bundleName = "inputManager_test",
+    .userID = 1,
+    .instIndex = 0,
+    .appIDDesc = "InputManagerTest"
+};
 } // namespace
 
 class InputManagerTest : public testing::Test {
@@ -37,6 +75,7 @@ public:
     void SetUp();
     void TearDown();
     static void SetUpTestCase();
+    static void TearDownTestCase();
     std::string GetEventDump();
     std::shared_ptr<PointerEvent> SetupPointerEvent001();
     std::shared_ptr<PointerEvent> SetupPointerEvent002();
@@ -56,11 +95,29 @@ public:
     void TestMarkConsumedStep4();
     void TestMarkConsumedStep5();
     void TestMarkConsumedStep6();
+private:
+    static AccessTokenID tokenID_;
 };
+
+AccessTokenID InputManagerTest::tokenID_ = 0;
 
 void InputManagerTest::SetUpTestCase()
 {
     ASSERT_TRUE(TestUtil->Init());
+
+    AccessTokenIDEx tokenIdEx = {0};
+    tokenIdEx = AccessTokenKit::AllocHapToken(infoManagerTestInfoParms_, infoManagerTestPolicyPrams_);
+    tokenID_ = tokenIdEx.tokenIdExStruct.tokenID;
+    ASSERT_NE(0, tokenID_);
+    ASSERT_EQ(0, SetSelfTokenID(tokenID_));
+}
+
+void InputManagerTest::TearDownTestCase()
+{
+    int32_t ret = AccessTokenKit::DeleteToken(tokenID_);
+    if (tokenID_ != 0) {
+        ASSERT_EQ(RET_SUCCESS, ret);
+    }
 }
 
 void InputManagerTest::SetUp()
