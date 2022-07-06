@@ -43,8 +43,8 @@ HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformKeyBoardJsonDataToInputData.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start keyboard & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start keyboard & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformKeyBoardJsonDataToInputData.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start keyboard &";
@@ -81,8 +81,8 @@ HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputData
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformKeyBoardJsonDataToInputDataEventsIsEmpty.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start keyboard & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start keyboard & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformKeyBoardJsonDataToInputDataEventsIsEmpty.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start keyboard &";

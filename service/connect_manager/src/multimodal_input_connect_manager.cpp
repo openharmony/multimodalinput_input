@@ -49,7 +49,7 @@ std::shared_ptr<MultimodalInputConnectManager> MultimodalInputConnectManager::Ge
 
 int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
         MMI_HILOGE("client has not connect server");
@@ -69,7 +69,7 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
 
 int32_t MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     return socketFd_;
 }
 
@@ -152,7 +152,7 @@ int32_t MultimodalInputConnectManager::InjectPointerEvent(const std::shared_ptr<
 
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ != nullptr) {
         return true;
@@ -190,14 +190,14 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 
 void MultimodalInputConnectManager::OnDeath()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     Clean();
     NotifyDeath();
 }
 
 void MultimodalInputConnectManager::Clean()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ != nullptr) {
         multimodalInputConnectService_.clear();
@@ -212,7 +212,7 @@ void MultimodalInputConnectManager::Clean()
 
 void MultimodalInputConnectManager::NotifyDeath()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 
     int32_t retryCount = 50;
     do {

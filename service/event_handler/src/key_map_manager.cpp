@@ -30,7 +30,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyMa
 
 void KeyMapManager::GetConfigKeyValue(const std::string &fileName, int32_t deviceId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::string filePath = GetProFilePath(fileName);
     ReadProFile(filePath, deviceId, configKeyValue_);
     MMI_HILOGD("Number of loaded config files:%{public}zu", configKeyValue_.size());
@@ -87,7 +87,7 @@ std::string KeyMapManager::GetKeyEventFileName(struct libinput_device *device)
 
 int32_t KeyMapManager::TransferDefaultKeyValue(int32_t inputKey)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (auto itr = configKeyValue_.find(defaultKeyId_); itr != configKeyValue_.end()) {
         if (auto defaultKey = itr->second.find(inputKey); defaultKey != itr->second.end()) {
             return defaultKey->second;
@@ -100,7 +100,7 @@ int32_t KeyMapManager::TransferDefaultKeyValue(int32_t inputKey)
 int32_t KeyMapManager::TransferDeviceKeyValue(struct libinput_device *device,
     int32_t inputKey)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (device == nullptr) {
         return TransferDefaultKeyValue(inputKey);
     }

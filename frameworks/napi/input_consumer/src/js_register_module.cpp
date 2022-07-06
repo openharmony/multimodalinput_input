@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterMoudle" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterModule" };
 constexpr size_t EVENT_NAME_LEN = 64;
 constexpr size_t PRE_KEYS_SIZE = 4;
 } // namespace
@@ -34,7 +34,7 @@ static Callbacks callbacks = {};
 int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
     std::shared_ptr<KeyOption> keyOption)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(keyOption, ERROR_NULL_POINTER);
     size_t argc = 3;
@@ -78,14 +78,14 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
         return ERROR_CODE;
     }
     event->name = eventName;
-    napi_value receiceValue = nullptr;
-    if (napi_get_named_property(env, argv[1], "preKeys", &receiceValue) != napi_ok) {
+    napi_value receiveValue = nullptr;
+    if (napi_get_named_property(env, argv[1], "preKeys", &receiveValue) != napi_ok) {
         MMI_HILOGE("Get preKeys failed");
         napi_throw_error(env, nullptr, "Get preKeys failed");
         return ERROR_CODE;
     }
     std::set<int32_t> preKeys;
-    if (!GetPreKeys(env, receiceValue, preKeys)) {
+    if (!GetPreKeys(env, receiveValue, preKeys)) {
         MMI_HILOGE("Get preKeys failed");
         return ERROR_CODE;
     }
@@ -113,11 +113,11 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     keyOption->SetFinalKeyDown(isFinalKeyDown);
     MMI_HILOGD("IsFinalKeyDown:%{public}d,map_key:%{public}s",
         (isFinalKeyDown == true?1:0), subKeyNames.c_str());
-    int32_t finalKeyDownDuriation = GetNamedPropertyInt32(env, argv[1], "finalKeyDownDuration");
-    subKeyNames += std::to_string(finalKeyDownDuriation);
-    keyOption->SetFinalKeyDownDuration(finalKeyDownDuriation);
+    int32_t finalKeyDownDuration = GetNamedPropertyInt32(env, argv[1], "finalKeyDownDuration");
+    subKeyNames += std::to_string(finalKeyDownDuration);
+    keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
     event->eventType = subKeyNames;
-    MMI_HILOGD("FinalKeyDownDuriation:%{public}d", finalKeyDownDuriation);
+    MMI_HILOGD("FinalKeyDownDuration:%{public}d", finalKeyDownDuration);
     if (argc == 3) {
         if (napi_typeof(env, argv[2], &valueType) != napi_ok) {
             MMI_HILOGE("Get type of third param failed");
@@ -140,9 +140,9 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
     return SUCCESS_CODE;
 }
 
-static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<KeyEvent> keyEvent)
+static bool MatchCombinationKeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(monitorInfo);
     CHKPF(keyEvent);
     auto keyOption = monitorInfo->keyOption;
@@ -181,8 +181,8 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     CHKPF(keyItem);
     auto upTime = keyEvent->GetActionTime();
     auto downTime = keyItem->GetDownTime();
-    auto curDurtionTime = keyOption->GetFinalKeyDownDuration();
-    if (curDurtionTime > 0 && (upTime - downTime >= (static_cast<int64_t>(curDurtionTime) * 1000))) {
+    auto curDurationTime = keyOption->GetFinalKeyDownDuration();
+    if (curDurationTime > 0 && (upTime - downTime >= (static_cast<int64_t>(curDurationTime) * 1000))) {
         MMI_HILOGE("Skip, upTime - downTime >= duration");
         return false;
     }
@@ -191,7 +191,7 @@ static bool MatchCombinationkeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
 
 static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     auto iter = callbacks.begin();
     while (iter != callbacks.end()) {
@@ -201,7 +201,7 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
         auto infoIter = list.begin();
         while (infoIter != list.end()) {
             auto monitorInfo = *infoIter;
-            if (MatchCombinationkeys(monitorInfo, keyEvent)) {
+            if (MatchCombinationKeys(monitorInfo, keyEvent)) {
                 monitorInfo->keyEvent = keyEvent;
                 EmitAsyncCallbackWork(monitorInfo);
             }
@@ -212,7 +212,7 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
 
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
@@ -256,7 +256,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
@@ -293,7 +293,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
 EXTERN_C_START
 static napi_value MmiInit(napi_env env, napi_value exports)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),

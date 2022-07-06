@@ -58,8 +58,8 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileNotEmpty, TestSi
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJsonDataCheckFileNotEmpty.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start all & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start all & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformJsonDataCheckFileNotEmpty.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start all &";
@@ -95,8 +95,8 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataGetDeviceNodeError, TestS
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJsonDataGetDeviceNodeError.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start all & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start all & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformJsonDataGetDeviceNodeError.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start all &";
@@ -123,17 +123,17 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataGetDeviceNodeError, TestS
 }
 
 /**
- * @tc.name:Test_SendEventToDeviveNodeError
- * @tc.desc:Verify ManageInjectDevice function SendEventToDeviveNode
+ * @tc.name:Test_SendEventToDeviceNodeError
+ * @tc.desc:Verify ManageInjectDevice function SendEventToDeviceNode
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(ManageInjectDeviceTest, Test_SendEventToDeviveNodeError, TestSize.Level1)
+HWTEST_F(ManageInjectDeviceTest, Test_SendEventToDeviceNodeError, TestSize.Level1)
 {
     ManageInjectDevice manageInjectDevice;
     InputEventArray inputEventArray = {};
     inputEventArray.target = "";
-    auto ret = manageInjectDevice.SendEventToDeviveNode(inputEventArray);
+    auto ret = manageInjectDevice.SendEventToDeviceNode(inputEventArray);
     EXPECT_EQ(ret, RET_ERR);
 }
 } // namespace MMI
