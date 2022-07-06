@@ -277,6 +277,7 @@ int32_t MMIService::Init()
         std::placeholders::_2));
     KeyMapMgr->GetConfigKeyValue("default_keymap", KeyMapMgr->GetDefaultKeyId());
     OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "false");
+    MMI_HILOGI("set para input.pointer.device false");
     return RET_OK;
 }
 
