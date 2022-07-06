@@ -43,8 +43,8 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputData, 
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputData.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start gamepad & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start gamepad & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformGamePadJsonDataToInputData.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
@@ -81,8 +81,8 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindEvents.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start gamepad & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start gamepad & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformGamePadJsonDataToInputDataNotFindEvents.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
@@ -118,8 +118,8 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataEv
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputDataEventsIsEmpty.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start gamepad & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start gamepad & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformGamePadJsonDataToInputDataEventsIsEmpty.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
@@ -155,8 +155,8 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindKeyValueInPress.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start gamepad & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start gamepad & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformGamePadJsonDataToInputDataNotFindKeyValueInPress.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
@@ -192,8 +192,8 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindEventInRocker.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start gamepad & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start gamepad & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformGamePadJsonDataToInputDataNotFindEventInRocker.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
@@ -229,8 +229,8 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 {
 #ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRocker.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start gamepad & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start gamepad & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRocker.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
@@ -268,8 +268,8 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 #ifdef OHOS_BUILD
     const std::string path =
      "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRockerDirectionKey.json";
-    std::string startDeviceCmd = "mmi-virtual-device-manager start gamepad & ";
-    std::string closeDeviceCmd = "mmi-virtual-device-manager close all";
+    std::string startDeviceCmd = "vuinput start gamepad & ";
+    std::string closeDeviceCmd = "vuinput close all";
 #else
     const std::string path = "temp/Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRockerDirectionKey.json";
     std::string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";

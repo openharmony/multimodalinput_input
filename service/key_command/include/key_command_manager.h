@@ -28,9 +28,9 @@
 
 #include "nocopyable.h"
 
+#include "i_input_event_handler.h"
 #include "key_event.h"
 #include "struct_multimodal.h"
-#include "i_key_command_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -55,12 +55,21 @@ struct ShortcutKey {
     void Print() const;
 };
 
-class KeyCommandManager : public IKeyCommandManager {
+class KeyCommandManager : public IInputEventHandler {
 public:
     KeyCommandManager() = default;
     DISALLOW_COPY_AND_MOVE(KeyCommandManager);
     ~KeyCommandManager() = default;
-    bool HandleEvent(const std::shared_ptr<KeyEvent> event);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    void HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_TOUCH
+    bool HandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
 private:
     bool ParseJson();
     std::string GetConfigFilePath() const;

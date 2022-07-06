@@ -14,8 +14,12 @@
  */
 
 #include "input_device_manager.h"
+
 #include <parameters.h>
+#include <unordered_map>
+#include "dfx_hisysevent.h"
 #include "key_event_value_transformation.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
@@ -35,21 +39,21 @@ constexpr int32_t ABS_MT_WIDTH_MINOR = 0x33;
 
 constexpr int32_t BUS_BLUETOOTH = 0X5;
 
-std::list<int32_t> axisType = {
-    ABS_MT_TOUCH_MAJOR,
-    ABS_MT_TOUCH_MINOR,
-    ABS_MT_ORIENTATION,
-    ABS_MT_POSITION_X,
-    ABS_MT_POSITION_Y,
-    ABS_MT_PRESSURE,
-    ABS_MT_WIDTH_MAJOR,
-    ABS_MT_WIDTH_MINOR,
+std::unordered_map<int32_t, std::string> axisType = {
+    {ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR"},
+    {ABS_MT_TOUCH_MINOR, "TOUCH_MINOR"},
+    {ABS_MT_ORIENTATION, "ORIENTATION"},
+    {ABS_MT_POSITION_X, "POSITION_X"},
+    {ABS_MT_POSITION_Y, "POSITION_Y"},
+    {ABS_MT_PRESSURE, "PRESSURE"},
+    {ABS_MT_WIDTH_MAJOR, "WIDTH_MAJOR"},
+    {ABS_MT_WIDTH_MINOR, "WIDTH_MINOR"}
 };
 } // namespace
 
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto iter = inputDevice_.find(id);
     if (iter == inputDevice_.end()) {
         MMI_HILOGE("failed to search for the device");
@@ -62,7 +66,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(iter->second)));
     const char* name = libinput_device_get_name(iter->second);
     inputDevice->SetName((name == nullptr) ? ("null") : (name));
-    inputDevice->SetBustype(libinput_device_get_id_bustype(iter->second));
+    inputDevice->SetBusType(libinput_device_get_id_bustype(iter->second));
     inputDevice->SetVersion(libinput_device_get_id_version(iter->second));
     inputDevice->SetProduct(libinput_device_get_id_product(iter->second));
     inputDevice->SetVendor(libinput_device_get_id_vendor(iter->second));
@@ -73,17 +77,17 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
 
     InputDevice::AxisInfo axis;
     for (const auto &item : axisType) {
-        int32_t min = libinput_device_get_axis_min(iter->second, item);
+        int32_t min = libinput_device_get_axis_min(iter->second, item.first);
         if (min == -1) {
             MMI_HILOGW("The device does not support this axis");
             continue;
         }
-        axis.SetAxisType(item);
+        axis.SetAxisType(item.first);
         axis.SetMinimum(min);
-        axis.SetMaximum(libinput_device_get_axis_max(iter->second, item));
-        axis.SetFuzz(libinput_device_get_axis_fuzz(iter->second, item));
-        axis.SetFlat(libinput_device_get_axis_flat(iter->second, item));
-        axis.SetResolution(libinput_device_get_axis_resolution(iter->second, item));
+        axis.SetMaximum(libinput_device_get_axis_max(iter->second, item.first));
+        axis.SetFuzz(libinput_device_get_axis_fuzz(iter->second, item.first));
+        axis.SetFlat(libinput_device_get_axis_flat(iter->second, item.first));
+        axis.SetResolution(libinput_device_get_axis_resolution(iter->second, item.first));
         inputDevice->AddAxisInfo(axis);
     }
     return inputDevice;
@@ -91,7 +95,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
 
 std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::vector<int32_t> ids;
     for (const auto &item : inputDevice_) {
         ids.push_back(item.first);
@@ -101,7 +105,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
 
 std::vector<bool> InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::vector<bool> keystrokeAbility;
     auto iter = inputDevice_.find(deviceId);
     if (iter == inputDevice_.end()) {
@@ -118,7 +122,7 @@ std::vector<bool> InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<
 
 bool InputDeviceManager::GetDeviceConfig(int32_t deviceId, int32_t &keyboardType)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (auto iter = inputDevice_.find(deviceId); iter == inputDevice_.end()) {
         MMI_HILOGE("Failed to search for the deviceID");
         return false;
@@ -136,15 +140,15 @@ bool InputDeviceManager::GetDeviceConfig(int32_t deviceId, int32_t &keyboardType
 
 int32_t InputDeviceManager::GetKeyboardBusMode(int32_t deviceId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::shared_ptr dev = GetInputDevice(deviceId);
     CHKPR(dev, ERROR_NULL_POINTER);
-    return dev->GetBustype();
+    return dev->GetBusType();
 }
 
 int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::vector <int32_t> keyCodes;
     keyCodes.push_back(KeyEvent::KEYCODE_Q);
     keyCodes.push_back(KeyEvent::KEYCODE_NUMPAD_1);
@@ -181,7 +185,7 @@ int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId)
 
 int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t keyboardType = KEYBOARD_TYPE_NONE;
     if (auto iter = inputDevice_.find(deviceId); iter == inputDevice_.end()) {
         MMI_HILOGE("Failed to search for the deviceID");
@@ -196,7 +200,7 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId)
 
 void InputDeviceManager::AddDevMonitor(SessionPtr sess, std::function<void(std::string, int32_t)> callback)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto iter = devMonitor_.find(sess);
     if (iter == devMonitor_.end()) {
         devMonitor_[sess] = callback;
@@ -205,7 +209,7 @@ void InputDeviceManager::AddDevMonitor(SessionPtr sess, std::function<void(std::
 
 void InputDeviceManager::RemoveDevMonitor(SessionPtr sess)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto iter = devMonitor_.find(sess);
     if (iter == devMonitor_.end()) {
         MMI_HILOGE("session does not exist");
@@ -228,16 +232,18 @@ bool InputDeviceManager::HasPointerDevice()
 
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(inputDevice);
     for (const auto& item : inputDevice_) {
         if (item.second == inputDevice) {
             MMI_HILOGI("the device already exists");
+            DfxHisysevent::OnDeviceConnect(item.first, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
             return;
         }
     }
     if (nextId_ == INT32_MAX) {
         MMI_HILOGE("the nextId_ exceeded the upper limit");
+        DfxHisysevent::OnDeviceConnect(INT32_MAX, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
     }
     inputDevice_[nextId_] = inputDevice;
@@ -250,17 +256,20 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     if (IsPointerDevice(inputDevice)) {
         NotifyPointerDevice(true);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "true");
+        MMI_HILOGI("set para input.pointer.device true");
     }
+    DfxHisysevent::OnDeviceConnect(nextId_ - 1, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
 }
 
 void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevice)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(inputDevice);
     int32_t deviceId = INVALID_DEVICE_ID;
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second == inputDevice) {
             deviceId = it->first;
+            DfxHisysevent::OnDeviceDisconnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
             inputDevice_.erase(it);
             break;
         }
@@ -270,6 +279,9 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
         item.second("remove", deviceId);
     }
     ScanPointerDevice();
+    if (deviceId == INVALID_DEVICE_ID) {
+        DfxHisysevent::OnDeviceDisconnect(INVALID_DEVICE_ID, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    }
 }
 
 void InputDeviceManager::ScanPointerDevice()
@@ -284,6 +296,7 @@ void InputDeviceManager::ScanPointerDevice()
     if (!hasPointerDevice) {
         NotifyPointerDevice(false);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "false");
+        MMI_HILOGI("set para input.pointer.device false");
     }
 }
 
@@ -298,13 +311,13 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
 
 void InputDeviceManager::Attach(std::shared_ptr<IDeviceObserver> observer)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     observers_.push_back(observer);
 }
 
 void InputDeviceManager::Detach(std::shared_ptr<IDeviceObserver> observer)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     observers_.remove(observer);
 }
 
@@ -318,7 +331,7 @@ void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice)
 
 int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevice)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(inputDevice, INVALID_DEVICE_ID);
     for (const auto& item : inputDevice_) {
         if (item.second == inputDevice) {
@@ -328,6 +341,52 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
     }
     MMI_HILOGE("find input device id failed");
     return INVALID_DEVICE_ID;
+}
+
+void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_DEBUG_ENTER;
+    mprintf(fd, "Device information:\t");
+    mprintf(fd, "Input devices: count=%d", inputDevice_.size());
+    for (const auto &item : inputDevice_) {
+        std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
+        CHKPV(inputDevice);
+        mprintf(fd,
+                "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d "
+                "| product:%d | vendor:%d | phys:%s\t",
+                inputDevice->GetId(), inputDevice->GetName().c_str(), inputDevice->GetType(),
+                inputDevice->GetBusType(), inputDevice->GetVersion(), inputDevice->GetProduct(),
+                inputDevice->GetVendor(), inputDevice->GetPhys().c_str());
+        std::vector<InputDevice::AxisInfo> axisinfo = inputDevice->GetAxisInfo();
+        mprintf(fd, "axis: count=%d", axisinfo.size());
+        for (const auto &axis : axisinfo) {
+            auto iter = axisType.find(axis.GetAxisType());
+            if (iter == axisType.end()) {
+                MMI_HILOGE("AxisType is not found");
+                return;
+            }
+            mprintf(fd,
+                    "\t axisType:%s | minimum:%d | maximum:%d | fuzz:%d | flat:%d | resolution:%d\t",
+                    iter->second.c_str(), axis.GetMinimum(), axis.GetMaximum(), axis.GetFuzz(),
+                    axis.GetFlat(), axis.GetResolution());
+        }
+    }
+}
+
+void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<int32_t> ids = GetInputDeviceIds();
+    mprintf(fd, "Total device:%d, Device list:\t", int32_t { ids.size() });
+    for (const auto &item : inputDevice_) {
+        std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first);
+        CHKPV(inputDevice);
+        int32_t deviceId = inputDevice->GetId();
+        mprintf(fd,
+                "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d | product:%d | vendor:%d\t",
+                deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBusType(),
+                inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor());
+    }
 }
 } // namespace MMI
 } // namespace OHOS

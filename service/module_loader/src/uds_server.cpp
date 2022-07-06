@@ -20,9 +20,7 @@
 
 #include <sys/socket.h>
 
-#include "accesstoken_kit.h"
-#include "ipc_skeleton.h"
-
+#include "dfx_hisysevent.h"
 #include "i_multimodal_input_connect.h"
 #include "mmi_log.h"
 #include "util.h"
@@ -37,7 +35,7 @@ UDSServer::UDSServer() {}
 
 UDSServer::~UDSServer()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     UdsStop();
 }
 
@@ -98,7 +96,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     const int32_t moduleType, const int32_t uid, const int32_t pid,
     int32_t& serverFd, int32_t& toReturnClientFd)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t sockFds[2] = {};
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
@@ -151,7 +149,6 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
             programName.c_str(), pid, MAKE_SHARED_FAIL);
         return RET_ERR;
     }
-    AddPermission(sess);
 #ifdef OHOS_BUILD_MMI_DEBUG
     sess->SetClientFd(toReturnClientFd);
 #endif // OHOS__BUILD_MMI_DEBUG
@@ -165,37 +162,18 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     return RET_OK;
 }
 
-void UDSServer::AddPermission(SessionPtr sess)
+void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
-    std::string permissionMonitor = "ohos.permission.INPUT_MONITORING";
-    
-    if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) ==
-        Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
-        MMI_HILOGD("type flag matched");
-        int32_t result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionMonitor);
-        MMI_HILOGD("verify access result:%{public}d", result);
-        if (result != Security::AccessToken::PERMISSION_GRANTED) {
-            MMI_HILOGD("permission is not granted");
-            sess->AddPermission(false);
-        }
-    }
-}
-
-void UDSServer::Dump(int32_t fd)
-{
-    mprintf(fd, "Sessions: count=%d, idxMap count=%d", sessionsMap_.size(), idxPidMap_.size());
-    int32_t i = 0;
-    mprintf(fd, "Sessions:");
-    for (const auto& [key, value] : sessionsMap_) {
-        mprintf(fd, "\t%d, [%d, %s]", i, key, value->GetDescript().c_str());
-        i++;
-    }
-    i = 0;
-    mprintf(fd, "IdxMap:");
-    for (const auto& [key, value] : idxPidMap_) {
-        mprintf(fd, "\t%d, [%d, %d]", i, key, value);
-        i++;
+    CALL_DEBUG_ENTER;
+    mprintf(fd, "Uds_server information:\t");
+    mprintf(fd, "uds_server: count=%d", sessionsMap_.size());
+    for (const auto &item : sessionsMap_) {
+        std::shared_ptr<UDSSession> udsSession = item.second;
+        CHKPV(udsSession);
+        mprintf(fd,
+                "Uid:%d | Pid:%d | Fd:%d | Descript:%s\t",
+                udsSession->GetUid(), udsSession->GetPid(), udsSession->GetFd(),
+                udsSession->GetDescript().c_str());
     }
 }
 
@@ -226,6 +204,8 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     if (secPtr != nullptr) {
         OnDisconnected(secPtr);
         DelSession(fd);
+    } else {
+        DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
     }
     if (ev.data.ptr) {
         free(ev.data.ptr);
@@ -234,7 +214,11 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     if (auto it = circleBufMap_.find(fd); it != circleBufMap_.end()) {
         circleBufMap_.erase(it);
     }
-    close(fd);
+    if (close(fd) == RET_OK) {
+        DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+    } else {
+        DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+    }
 }
 
 void UDSServer::OnPacket(int32_t fd, NetPacket& pkt)
@@ -259,7 +243,7 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
             DumpData(szBuf, size, LINEINFO, "in %s, read message from fd: %d.", __func__, fd);
 #endif
             if (!buf.Write(szBuf, size)) {
-                MMI_HILOGW("Write data faild. size:%{public}zu", size);
+                MMI_HILOGW("Write data failed. size:%{public}zu", size);
             }
             OnReadPackets(buf, std::bind(&UDSServer::OnPacket, this, fd, std::placeholders::_1));
         } else if (size < 0) {
@@ -340,7 +324,7 @@ bool UDSServer::AddSession(SessionPtr ses)
     }
     auto pid = ses->GetPid();
     if (pid <= 0) {
-        MMI_HILOGE("Get process faild");
+        MMI_HILOGE("Get process failed");
         return false;
     }
     idxPidMap_[pid] = fd;
@@ -356,7 +340,7 @@ bool UDSServer::AddSession(SessionPtr ses)
 
 void UDSServer::DelSession(int32_t fd)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     MMI_HILOGD("fd:%{public}d", fd);
     if (fd < 0) {
         MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
@@ -376,13 +360,13 @@ void UDSServer::DelSession(int32_t fd)
 
 void UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callback)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     callbacks_.push_back(callback);
 }
 
 void UDSServer::NotifySessionDeleted(SessionPtr ses)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     for (const auto& callback : callbacks_) {
         callback(ses);
     }

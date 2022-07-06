@@ -32,12 +32,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Event
 
 EventFilterService::EventFilterService()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 }
 
 EventFilterService::~EventFilterService()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 }
 
 void EventFilterService::SetPointerEventPtr(std::function<bool(std::shared_ptr<PointerEvent>)> pointerFilter)
