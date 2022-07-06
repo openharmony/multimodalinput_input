@@ -68,7 +68,7 @@ HapInfoParams infoManagerTestInfoParms_ = {
     .instIndex = 0,
     .appIDDesc = "InputManagerTest"
 };
-}
+} // namespace
 
 class InputManagerTest : public testing::Test {
 public:
