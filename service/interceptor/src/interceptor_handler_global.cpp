@@ -277,10 +277,10 @@ void InterceptorHandlerGlobal::InterceptorCollection::Dump(int32_t fd, const std
         CHKPV(session);
         mprintf(fd,
                 "interceptor id:%d | handlerType:%d | eventType:%d | Pid:%d | Uid:%d | Fd:%d "
-                "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
+                "| HasPermission:%s | EarliestEventTime:%" PRId64 " | Descript:%s \t",
                 item.id_, item.handlerType_, item.eventType_,
                 session->GetPid(), session->GetUid(),
-                session->GetFd(),
+                session->GetFd(), session->HasPermission() ? "true" : "false",
                 session->GetEarliestEventTime(), session->GetDescript().c_str());
     }
 }
