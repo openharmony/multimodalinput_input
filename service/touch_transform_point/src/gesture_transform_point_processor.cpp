@@ -44,8 +44,8 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_ge
 
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetDownTime(time);
-    pointerItem.SetGlobalX(MouseState->GetMouseCoordsX());
-    pointerItem.SetGlobalY(MouseState->GetMouseCoordsY());
+    pointerItem.SetDisplayX(MouseState->GetMouseCoordsX());
+    pointerItem.SetDisplayY(MouseState->GetMouseCoordsY());
     pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetPointerId(defaultPointerId);
     pointerItem.SetWidth(0);
@@ -77,8 +77,8 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_g
 
     PointerEvent::PointerItem pointerItem;
     pointerEvent_->GetPointerItem(defaultPointerId, pointerItem);
-    pointerItem.SetGlobalX(MouseState->GetMouseCoordsX());
-    pointerItem.SetGlobalY(MouseState->GetMouseCoordsY());
+    pointerItem.SetDisplayX(MouseState->GetMouseCoordsX());
+    pointerItem.SetDisplayY(MouseState->GetMouseCoordsY());
     pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
     pointerEvent_->UpdatePointerItem(defaultPointerId, pointerItem);
 
@@ -102,8 +102,8 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gest
 
     PointerEvent::PointerItem pointerItem;
     pointerEvent_->GetPointerItem(defaultPointerId, pointerItem);
-    pointerItem.SetGlobalX(MouseState->GetMouseCoordsX());
-    pointerItem.SetGlobalY(MouseState->GetMouseCoordsY());
+    pointerItem.SetDisplayX(MouseState->GetMouseCoordsX());
+    pointerItem.SetDisplayY(MouseState->GetMouseCoordsY());
     pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
     pointerEvent_->UpdatePointerItem(defaultPointerId, pointerItem);
 
