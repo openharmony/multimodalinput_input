@@ -77,6 +77,7 @@ void InterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> po
 int32_t InterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
 {
+    CALL_INFO_TRACE;
     CHKPR(session, RET_ERR);
     if (!IsValidHandlerId(handlerId)) {
         MMI_HILOGE("Invalid handler");
@@ -95,6 +96,7 @@ int32_t InterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
 void InterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
+    CALL_INFO_TRACE;
     CHKPV(session);
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         MMI_HILOGD("Unregister interceptor:%{public}d", handlerId);
@@ -253,6 +255,7 @@ void InterceptorHandlerGlobal::InterceptorCollection::RemoveInterceptor(const Se
 
 void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr session)
 {
+    CALL_INFO_TRACE;
     std::set<SessionHandler>::const_iterator cItr = interceptors_.cbegin();
     while (cItr != interceptors_.cend()) {
         if (cItr->session_ != session) {
