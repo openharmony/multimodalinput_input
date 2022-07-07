@@ -71,8 +71,8 @@ void InputManagerManualTest::AddInputEventFilter()
             return false;
         }
 
-        const int32_t x = item.GetGlobalX();
-        const int32_t y = item.GetGlobalY();
+        const int32_t x = item.GetDisplayX();
+        const int32_t y = item.GetDisplayY();
         if (x == 10 && y == 10) {
             MMI_HILOGI("The values of X and y are both 10, which meets the expectation and callbackRet is set to 1");
             callbackRet = 1;
@@ -98,8 +98,8 @@ void InputManagerManualTest::SimulateInputEventHelper(int32_t globalX, int32_t g
     const int32_t pointerId = 0;
     PointerEvent::PointerItem item;
     item.SetPointerId(pointerId);
-    item.SetGlobalX(globalX);
-    item.SetGlobalY(globalY);
+    item.SetDisplayX(globalX);
+    item.SetDisplayY(globalY);
 
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
