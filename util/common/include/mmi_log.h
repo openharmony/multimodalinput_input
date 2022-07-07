@@ -51,7 +51,9 @@ constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
 #endif
 
 #define MMI_HILOGD(fmt, ...) do { \
-    ::OHOS::HiviewDFX::HiLog::Debug(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) { \
+        ::OHOS::HiviewDFX::HiLog::Debug(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
+    } \
 } while (0)
 #define MMI_HILOGI(fmt, ...) do { \
     ::OHOS::HiviewDFX::HiLog::Info(LABEL, MMI_FUNC_FMT fmt, MMI_FUNC_INFO, ##__VA_ARGS__); \
@@ -106,17 +108,23 @@ public:
     using HilogFunc = std::function<int(const char *)>;
 
 public:
-    InnerFunctionTracer(HilogFunc logfn)
-        : logfn_ { logfn }
+    InnerFunctionTracer(HilogFunc logfn, const char* tag, LogLevel level)
+        : logfn_ { logfn }, tag_ { tag }, level_ { level }
     {
-        logfn_("in %{public}s, enter");
+        if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, tag_, level_)) {
+            logfn_("in %{public}s, enter");
+        }
     }
     ~InnerFunctionTracer()
     {
-        logfn_("in %{public}s, leave");
+        if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, tag_, level_)) {
+            logfn_("in %{public}s, leave");
+        }
     }
 private:
     HilogFunc logfn_;
+    const char* tag_ { nullptr };
+    LogLevel level_ { LOG_LEVEL_MIN };
 };
 
 template<class Event>
@@ -161,8 +169,8 @@ static void PrintEventData(std::shared_ptr<Event> event)
 } // namespace OHOS
 
 #define CALL_DEBUG_ENTER        ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Debug___    \
-    { std::bind(&::OHOS::HiviewDFX::HiLog::Debug, LABEL, std::placeholders::_1, __FUNCTION__) }
+    { std::bind(&::OHOS::HiviewDFX::HiLog::Debug, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_DEBUG }
 
 #define CALL_INFO_TRACE         ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___     \
-    { std::bind(&::OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1, __FUNCTION__) }
+    { std::bind(&::OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_INFO }
 #endif // MMI_LOG_H
