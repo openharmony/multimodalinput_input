@@ -430,9 +430,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     auto physicalDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPR(physicalDisplayInfo, ERROR_NULL_POINTER);
-    int32_t globalLogicX = pointerItem.GetGlobalX() + physicalDisplayInfo->x;
-    int32_t globalLogicY = pointerItem.GetGlobalY() + physicalDisplayInfo->y;
-    IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetGlobalX(), pointerItem.GetGlobalY());
+    int32_t globalLogicX = pointerItem.GetDisplayX() + physicalDisplayInfo->x;
+    int32_t globalLogicY = pointerItem.GetDisplayY() + physicalDisplayInfo->y;
+    IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
     WindowInfo* touchWindow = nullptr;
     SelectWindowInfo(globalLogicX, globalLogicY, pointerEvent, touchWindow);
     if (touchWindow == nullptr) {
@@ -443,8 +443,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     int32_t localX = globalLogicX - touchWindow->area.x;
     int32_t localY = globalLogicY - touchWindow->area.y;
-    pointerItem.SetLocalX(localX);
-    pointerItem.SetLocalY(localY);
+    pointerItem.SetWindowX(localX);
+    pointerItem.SetWindowY(localY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
@@ -453,7 +453,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                "globalLogicX:%{public}d,globalLogicY:%{public}d,"
                "globalX:%{public}d,globalY:%{public}d,localX:%{public}d,localY:%{public}d",
                fd, touchWindow->pid, touchWindow->id, touchWindow->agentWindowId,
-               globalLogicX, globalLogicY, pointerItem.GetGlobalX(), pointerItem.GetGlobalY(), localX, localY);
+               globalLogicX, globalLogicY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), localX, localY);
     return fd;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -478,11 +478,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     MMI_HILOGD("display:%{public}d", displayId);
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPR(physicDisplayInfo, ERROR_NULL_POINTER);
-    int32_t globalX = pointerItem.GetGlobalX();
-    int32_t globalY = pointerItem.GetGlobalY();
+    int32_t globalX = pointerItem.GetDisplayX();
+    int32_t globalY = pointerItem.GetDisplayY();
     AdjustGlobalCoordinate(*physicDisplayInfo, globalX, globalY);
-    int32_t logicX = pointerItem.GetGlobalX() + physicDisplayInfo->x;
-    int32_t logicY = pointerItem.GetGlobalY() + physicDisplayInfo->y;
+    int32_t logicX = pointerItem.GetDisplayX() + physicDisplayInfo->x;
+    int32_t logicY = pointerItem.GetDisplayY() + physicDisplayInfo->y;
     WindowInfo *touchWindow = nullptr;
     auto targetWindowId = pointerEvent->GetTargetWindowId();
     for (auto &item : displayGroupInfo_.windowsInfo) {
@@ -510,12 +510,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     auto localY = logicY - touchWindow->area.y;
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
-    pointerItem.SetGlobalX(globalX);
-    pointerItem.SetGlobalY(globalY);
-    pointerItem.SetLocalX(localX);
-    pointerItem.SetLocalY(localY);
-    pointerItem.SetToolLocalX(pointerItem.GetToolGlobalX() + physicDisplayInfo->x - touchWindow->area.x);
-    pointerItem.SetToolLocalY(pointerItem.GetToolGlobalY() + physicDisplayInfo->y - touchWindow->area.y);
+    pointerItem.SetDisplayX(globalX);
+    pointerItem.SetDisplayY(globalY);
+    pointerItem.SetWindowX(localX);
+    pointerItem.SetWindowY(localY);
+    pointerItem.SetToolWindowX(pointerItem.GetToolDisplayX() + physicDisplayInfo->x - touchWindow->area.x);
+    pointerItem.SetToolWindowY(pointerItem.GetToolDisplayY() + physicDisplayInfo->y - touchWindow->area.y);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
     MMI_HILOGD("pid:%{public}d,fd:%{public}d,logicX:%{public}d,logicY:%{public}d,"

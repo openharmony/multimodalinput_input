@@ -161,8 +161,8 @@ bool TabletToolProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
     item.SetDeviceId(deviceId_);
     item.SetDownTime(time);
     item.SetPressed(true);
-    item.SetGlobalX(tCoord.x);
-    item.SetGlobalY(tCoord.y);
+    item.SetDisplayX(tCoord.x);
+    item.SetDisplayY(tCoord.y);
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
     item.SetPressure(pressure);
@@ -209,8 +209,8 @@ bool TabletToolProcessor::OnTipMotion(struct libinput_event* event)
         item.SetPressed(true);
         item.SetToolType(toolType);
     }
-    item.SetGlobalX(tCoord.x);
-    item.SetGlobalY(tCoord.y);
+    item.SetDisplayX(tCoord.x);
+    item.SetDisplayY(tCoord.y);
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
     item.SetPressure(pressure);
