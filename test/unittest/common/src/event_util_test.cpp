@@ -149,8 +149,8 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& p
             << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
             << ",TiltX:" << std::fixed << std::setprecision(precision) << item.GetTiltX()
             << ",TiltY:" << std::fixed << std::setprecision(precision) << item.GetTiltY()
-            << ",ToolGlobalX:" << item.GetToolGlobalX() << ",ToolGlobalY:" << item.GetToolGlobalY()
-            << ",ToolLocalX:" << item.GetToolLocalX() << ",ToolLocalY:" << item.GetToolLocalY()
+            << ",ToolGlobalX:" << item.GetToolDisplayX() << ",ToolGlobalY:" << item.GetToolDisplayY()
+            << ",ToolLocalX:" << item.GetToolWindowX() << ",ToolLocalY:" << item.GetToolWindowY()
             << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
             << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
             << ",LongAxis:" << item.GetLongAxis() << ",ShortAxis:" << item.GetShortAxis();

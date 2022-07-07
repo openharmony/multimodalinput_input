@@ -256,6 +256,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     if (IsPointerDevice(inputDevice)) {
         NotifyPointerDevice(true);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "true");
+        MMI_HILOGI("set para input.pointer.device true");
     }
     DfxHisysevent::OnDeviceConnect(nextId_ - 1, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
 }
@@ -295,6 +296,7 @@ void InputDeviceManager::ScanPointerDevice()
     if (!hasPointerDevice) {
         NotifyPointerDevice(false);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "false");
+        MMI_HILOGI("set para input.pointer.device false");
     }
 }
 

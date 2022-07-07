@@ -221,11 +221,11 @@ std::string JsInputMonitor::GetAction(int32_t action) const
 
 int32_t JsInputMonitor::GetJsPointerItem(const PointerEvent::PointerItem &item, napi_value value) const
 {
-    if (SetNameProperty(jsEnv_, value, "globalX", item.GetGlobalX()) != napi_ok) {
+    if (SetNameProperty(jsEnv_, value, "globalX", item.GetDisplayX()) != napi_ok) {
         THROWERR(jsEnv_, "Set globalX property failed");
         return RET_ERR;
     }
-    if (SetNameProperty(jsEnv_, value, "globalY", item.GetGlobalY()) != napi_ok) {
+    if (SetNameProperty(jsEnv_, value, "globalY", item.GetDisplayY()) != napi_ok) {
         THROWERR(jsEnv_, "Set globalY property failed");
         return RET_ERR;
     }
@@ -330,10 +330,10 @@ MapFun JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent,
     mapFun["screenId"] = std::bind(&PointerEvent::GetTargetDisplayId, pointerEvent);
     mapFun["windowId"] = std::bind(&PointerEvent::GetTargetWindowId, pointerEvent);
     mapFun["deviceId"] = std::bind(&PointerEvent::PointerItem::GetDeviceId, item);
-    mapFun["windowX"] = std::bind(&PointerEvent::PointerItem::GetGlobalX, item);
-    mapFun["windowY"] = std::bind(&PointerEvent::PointerItem::GetGlobalY, item);
-    mapFun["screenX"] = std::bind(&PointerEvent::PointerItem::GetLocalX, item);
-    mapFun["screenY"] = std::bind(&PointerEvent::PointerItem::GetLocalY, item);
+    mapFun["windowX"] = std::bind(&PointerEvent::PointerItem::GetDisplayX, item);
+    mapFun["windowY"] = std::bind(&PointerEvent::PointerItem::GetDisplayY, item);
+    mapFun["screenX"] = std::bind(&PointerEvent::PointerItem::GetWindowX, item);
+    mapFun["screenY"] = std::bind(&PointerEvent::PointerItem::GetWindowY, item);
     return mapFun;
 }
 
