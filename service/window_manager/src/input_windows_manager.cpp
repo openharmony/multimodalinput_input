@@ -392,8 +392,8 @@ bool InputWindowsManager::UpdateDisplayId(int32_t& displayId)
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-const WindowInfo* InputWindowsManager::SelectWindowInfo(const int32_t& globalLogicX, const int32_t& globalLogicY,
-    const std::shared_ptr<PointerEvent>& pointerEvent)
+std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(const int32_t& globalLogicX,
+    const int32_t& globalLogicY, const std::shared_ptr<PointerEvent>& pointerEvent)
 {
     int32_t action = pointerEvent->GetPointerAction();
     if ((firstBtnDownWindowId_ == -1) ||
@@ -422,10 +422,10 @@ const WindowInfo* InputWindowsManager::SelectWindowInfo(const int32_t& globalLog
     }
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         if (item.id == firstBtnDownWindowId_) {
-            return &item;
+            return std::make_optional(item);
         }
     }
-    return nullptr;
+    return std::nullopt;
 }
  
 int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
@@ -451,7 +451,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int32_t globalLogicY = pointerItem.GetGlobalY() + physicalDisplayInfo->y;
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetGlobalX(), pointerItem.GetGlobalY());
     auto touchWindow = SelectWindowInfo(globalLogicX, globalLogicY, pointerEvent);
-    if (touchWindow == nullptr) {
+    if (!touchWindow) {
         MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
         return RET_ERR;
     }
