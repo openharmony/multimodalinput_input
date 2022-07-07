@@ -166,5 +166,15 @@ bool UDSSession::IsEventQueueEmpty()
     }
     return false;
 }
+
+void UDSSession::AddPermission(bool hasPermission)
+{
+    hasPermission_ = hasPermission;
+}
+
+bool UDSSession::HasPermission()
+{
+    return hasPermission_;
+}
 } // namespace MMI
 } // namespace OHOS
