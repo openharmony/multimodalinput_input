@@ -52,10 +52,10 @@ std::shared_ptr<PointerEvent> PointerEventTest::CreatePointEvent()
     item.SetDownTime(downTime);
     item.SetPressed(true);
 
-    item.SetGlobalX(623);
-    item.SetGlobalY(823);
-    item.SetLocalX(600);
-    item.SetLocalY(800);
+    item.SetDisplayX(623);
+    item.SetDisplayY(823);
+    item.SetWindowX(600);
+    item.SetWindowY(800);
 
     item.SetWidth(0);
     item.SetHeight(0);
