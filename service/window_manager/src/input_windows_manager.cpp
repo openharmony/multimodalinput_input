@@ -41,10 +41,9 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    int32_t targetWindowId = pointerEvent->GetTargetWindowId();
     const WindowInfo* windowInfo = nullptr;
     for (const auto &item : displayGroupInfo_.windowsInfo) {
-        if (item.id == targetWindowId) {
+        if (item.id == pointerEvent->GetTargetWindowId()) {
             windowInfo = &item;
             break;
         }
@@ -109,7 +108,7 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> i
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-int32_t InputWindowsManager::GetWindowPid(const int32_t windowId) const
+int32_t InputWindowsManager::GetWindowPid(int32_t windowId) const
 {
     int32_t windowPid = -1;
     for (const auto& item : displayGroupInfo_.windowsInfo) {
@@ -121,7 +120,7 @@ int32_t InputWindowsManager::GetWindowPid(const int32_t windowId) const
     return windowPid;
 }
 
-int32_t InputWindowsManager::GetWindowPid(const int32_t windowId, const DisplayGroupInfo& displayGroupInfo) const
+int32_t InputWindowsManager::GetWindowPid(int32_t windowId, const DisplayGroupInfo& displayGroupInfo) const
 {
     int32_t windowPid = -1;
     for (auto &item : displayGroupInfo.windowsInfo) {

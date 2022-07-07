@@ -79,8 +79,8 @@ public:
     int32_t UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
     void Dump(int32_t fd, const std::vector<std::string> &args);
-    int32_t GetWindowPid(const int32_t windowId, const DisplayGroupInfo& displayGroupInfo) const;
-    int32_t GetWindowPid(const int32_t windowId) const;
+    int32_t GetWindowPid(int32_t windowId, const DisplayGroupInfo& displayGroupInfo) const;
+    int32_t GetWindowPid(int32_t windowId) const;
 
 private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
