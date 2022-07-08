@@ -162,7 +162,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
     if (!hasSendToMmiServer) {
         int32_t ret = MultimodalInputConnMgr->AddInputEventFilter(eventFilterService_);
         if (ret != RET_OK) {
-            MMI_HILOGE("AddInputEventFilter has send to server fail, ret:%{public}d", ret);
+            MMI_HILOGE("AddInputEventFilter has send to server failed, ret:%{public}d", ret);
             eventFilterService_ = nullptr;
             return RET_ERR;
         }
@@ -524,7 +524,7 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible)
     CALL_DEBUG_ENTER;
     int32_t ret = MultimodalInputConnMgr->SetPointerVisible(visible);
     if (ret != RET_OK) {
-        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
     }
     return ret;
 #else
@@ -540,7 +540,7 @@ bool InputManagerImpl::IsPointerVisible()
     bool visible;
     int32_t ret = MultimodalInputConnMgr->IsPointerVisible(visible);
     if (ret != 0) {
-        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
     }
     return visible;
 #else
@@ -608,7 +608,7 @@ void InputManagerImpl::SetAnrListener(std::shared_ptr<IAnrListener> receiver)
     anrReceiver_ = receiver;
     int32_t ret = MultimodalInputConnMgr->SetAnrListener();
     if (ret != RET_OK) {
-        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
     }
 }
 
@@ -624,7 +624,7 @@ void InputManagerImpl::OnAnr(int32_t pid)
         std::bind(&InputManagerImpl::OnAnrTask, this, anrReceiver_, pid))) {
         MMI_HILOGE("post task failed");
     }
-    MMI_HILOGD("anr noticed pid:%{public}d", pid);
+    MMI_HILOGI("anr noticed pid:%{public}d", pid);
 }
 
 void InputManagerImpl::OnAnrTask(std::shared_ptr<IAnrListener> receiver, int32_t pid)
