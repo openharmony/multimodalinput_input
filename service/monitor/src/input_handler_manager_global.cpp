@@ -231,7 +231,11 @@ bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<P
     CHKPF(pointerEvent);
     UpdateConsumptionState(pointerEvent);
     Monitor(pointerEvent);
-    return isMonitorConsumed_;
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        return isMonitorConsumed_;
+    }
+    MMI_HILOGI("This is not a touch-screen event");
+    return false;
 }
 
 bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId, SessionPtr session)
@@ -244,7 +248,6 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
 {
     CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        MMI_HILOGE("This is not a touch-screen event");
         return;
     }
     lastPointerEvent_ = pointerEvent;
