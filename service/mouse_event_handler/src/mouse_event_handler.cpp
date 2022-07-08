@@ -212,9 +212,9 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     CALL_DEBUG_ENTER;
     CHKPV(data);
     auto mouseInfo = WinMgr->GetMouseInfo();
-    MouseState->SetMouseCoords(mouseInfo.globalX, mouseInfo.globalY);
-    pointerItem.SetDisplayX(mouseInfo.globalX);
-    pointerItem.SetDisplayY(mouseInfo.globalY);
+    MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
+    pointerItem.SetDisplayX(mouseInfo.physicalX);
+    pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerItem.SetWindowX(0);
     pointerItem.SetWindowY(0);
     pointerItem.SetPointerId(0);
@@ -292,9 +292,9 @@ void MouseEventHandler::HandlePostMoveMouse(PointerEvent::PointerItem& pointerIt
     CALL_DEBUG_ENTER;
     auto mouseInfo = WinMgr->GetMouseInfo();
     CHKPV(pointerEvent_);
-    MouseState->SetMouseCoords(mouseInfo.globalX, mouseInfo.globalY);
-    pointerItem.SetDisplayX(mouseInfo.globalX);
-    pointerItem.SetDisplayY(mouseInfo.globalY);
+    MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
+    pointerItem.SetDisplayX(mouseInfo.physicalX);
+    pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerItem.SetWindowX(0);
     pointerItem.SetWindowY(0);
     pointerItem.SetPointerId(0);
