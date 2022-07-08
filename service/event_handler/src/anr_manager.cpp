@@ -29,17 +29,18 @@ constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 
 void AnrManager::Init(UDSServer& udsServer)
 {
+    CALL_DEBUG_ENTER;
     udsServer_ = &udsServer;
     CHKPV(udsServer_);
     udsServer_->AddSessionDeletedCallback(std::bind(
         &AnrManager::OnSessionLost, this, std::placeholders::_1));
-    MMI_HILOGD("The callback on session deleted is registered successfully");
 }
 
 bool AnrManager::TriggerAnr(int64_t time, SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
     CHKPF(udsServer_);
+    CHKPF(sess);
     int64_t earliest;
     if (sess->IsEventQueueEmpty()) {
         earliest = time;
@@ -55,7 +56,7 @@ bool AnrManager::TriggerAnr(int64_t time, SessionPtr sess)
     DfxHisysevent::ApplicationBlockInput(sess);
     int32_t ret = OHOS::AAFwk::AbilityManagerClient::GetInstance()->SendANRProcessID(sess->GetPid());
     if (ret != 0) {
-        MMI_HILOGE("AAFwk SendANRProcessID failed, AAFwk errCode: %{public}d", ret);
+        MMI_HILOGW("AAFwk SendANRProcessID failed, AAFwk errCode: %{public}d", ret);
     }
     MMI_HILOGI("AAFwk send ANR process id succeeded");
     return true;
@@ -64,8 +65,9 @@ bool AnrManager::TriggerAnr(int64_t time, SessionPtr sess)
 void AnrManager::OnSessionLost(SessionPtr session)
 {
     CALL_DEBUG_ENTER;
+    CHKPF(sess);
     if (anrNoticedPid_ == session->GetPid()) {
-        MMI_HILOGD("NoticedPid_ set invalid");
+        MMI_HILOGD("NoticedPid_ is invalid");
         anrNoticedPid_ = -1;
     }
 }

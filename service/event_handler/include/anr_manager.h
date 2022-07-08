@@ -35,7 +35,7 @@ public:
     void OnSessionLost(SessionPtr session);
 
 private:
-    int32_t anrNoticedPid_ {-1};
+    int32_t anrNoticedPid_ { -1 };
     UDSServer *udsServer_ = nullptr;;
 };
 } // namespace MMI 

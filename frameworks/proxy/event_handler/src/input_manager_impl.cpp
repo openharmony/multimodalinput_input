@@ -633,7 +633,6 @@ void InputManagerImpl::OnAnrTask(std::shared_ptr<IAnrListener> receiver, int32_t
     CHK_PID_AND_TID();
     CHKPV(receiver);
     receiver->OnAnr(pid);
-    MMI_HILOGD("anr noticed pid:%{public}d", pid);
 }
 } // namespace MMI
 } // namespace OHOS
