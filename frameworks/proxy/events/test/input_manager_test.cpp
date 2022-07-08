@@ -85,15 +85,15 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent001()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetDisplayX(523);   // test code，set the GlobalX = 523
-    item.SetDisplayY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
 
     item.SetPointerId(1);   // test code，set the PointerId = 1
-    item.SetDisplayX(610);   // test code，set the GlobalX = 610
-    item.SetDisplayY(910);   // test code，set the GlobalY = 910
+    item.SetDisplayX(610);   // test code，set the DisplayX = 610
+    item.SetDisplayY(910);   // test code，set the DisplayY = 910
     item.SetPressure(7);    // test code，set the Pressure = 7
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
@@ -110,15 +110,15 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent002()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetDisplayX(523);   // test code，set the GlobalX = 523
-    item.SetDisplayY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
 
     item.SetPointerId(1);   // test code，set the PointerId = 1
-    item.SetDisplayX(600);   // test code，set the GlobalX = 600
-    item.SetDisplayY(610);   // test code，set the GlobalY = 610
+    item.SetDisplayX(600);   // test code，set the DisplayX = 600
+    item.SetDisplayY(610);   // test code，set the DisplayY = 610
     item.SetPressure(7);    // test code，set the Pressure = 7
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
@@ -135,15 +135,15 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent003()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetDisplayX(523);   // test code，set the GlobalX = 523
-    item.SetDisplayY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
 
     item.SetPointerId(1);   // test code，set the PointerId = 1
-    item.SetDisplayX(623);   // test code，set the GlobalX = 623
-    item.SetDisplayY(823);   // test code，set the GlobalY = 823
+    item.SetDisplayX(623);   // test code，set the DisplayX = 623
+    item.SetDisplayY(823);   // test code，set the DisplayY = 823
     item.SetPressure(0);    // test code，set the Pressure = 0
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
@@ -424,8 +424,8 @@ std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep1()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetDisplayX(523);   // test code，set the GlobalX = 523
-    item.SetDisplayY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
@@ -446,8 +446,8 @@ std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep2()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetDisplayX(623);  // test code，set the GlobalX = 623
-    item.SetDisplayY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(623);  // test code，set the DisplayX = 623
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
@@ -476,8 +476,8 @@ void InputManagerTest::TestMarkConsumedStep4()
     CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetDisplayX(523);  // test code，set the GlobalX = 523
-    item.SetDisplayY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(523);  // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
@@ -497,8 +497,8 @@ void InputManagerTest::TestMarkConsumedStep5()
     CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetDisplayX(523);  // test code，set the GlobalX = 523
-    item.SetDisplayY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(523);  // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
@@ -519,8 +519,8 @@ void InputManagerTest::TestMarkConsumedStep6()
     CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetDisplayX(523);   // test code，set the GlobalX = 523
-    item.SetDisplayY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
@@ -1339,14 +1339,14 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_006, TestSize.Level1)
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetDisplayX(523);   // test code，set the GlobalX = 523
-    item.SetDisplayY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
     item.SetPointerId(1);   // test code，set the PointerId = 1
-    item.SetDisplayX(710);   // test code，set the GlobalX = 710
-    item.SetDisplayY(910);   // test code，set the GlobalY = 910
+    item.SetDisplayX(710);   // test code，set the DisplayX = 710
+    item.SetDisplayY(910);   // test code，set the DisplayY = 910
     item.SetPressure(7);    // test code，set the Pressure = 7
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
