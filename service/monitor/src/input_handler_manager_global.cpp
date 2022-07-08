@@ -71,6 +71,7 @@ void InputHandlerManagerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> p
 int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
+    CALL_INFO_TRACE;
     InitSessionLostCallback();
     if (!IsValidHandlerId(handlerId)) {
         MMI_HILOGE("Invalid handler");
@@ -93,6 +94,7 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
 void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
+    CALL_INFO_TRACE;
     if (handlerType == InputHandlerType::MONITOR) {
         if (!session->HasPermission()) {
             MMI_HILOGE("no permission, can not remove monitor");
@@ -106,6 +108,7 @@ void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
 
 void InputHandlerManagerGlobal::MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session)
 {
+    CALL_INFO_TRACE;
     MMI_HILOGD("Mark consumed state, monitor:%{public}d", handlerId);
     monitors_.MarkConsumed(handlerId, eventId, session);
 }
@@ -329,6 +332,7 @@ void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<Point
 
 void InputHandlerManagerGlobal::MonitorCollection::OnSessionLost(SessionPtr session)
 {
+    CALL_INFO_TRACE;
     std::set<SessionHandler>::const_iterator cItr = monitors_.cbegin();
     while (cItr != monitors_.cend()) {
         if (cItr->session_ != session) {
