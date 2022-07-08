@@ -379,7 +379,7 @@ int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, Mess
     }
     int32_t ret = SetAnrListener();
     if (ret != RET_OK) {
-        MMI_HILOGE("call SetCallback failed ret:%{public}d", ret);
+        MMI_HILOGE("call SetAnrListener failed ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
