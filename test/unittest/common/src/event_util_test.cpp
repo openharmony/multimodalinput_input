@@ -144,12 +144,12 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& p
         }
         ostream << ",pointerId:" << pointerId << ",DownTime:" << item.GetDownTime()
             << ",IsPressed:" << std::boolalpha << item.IsPressed()
-            << ",GlobalX:-\\{0,1\\}[[:digit:]]\\{1,\\},GlobalY:-\\{0,1\\}[[:digit:]]\\{1,\\}"
+            << ",DisplayX:-\\{0,1\\}[[:digit:]]\\{1,\\},DisplayY:-\\{0,1\\}[[:digit:]]\\{1,\\}"
             << ",LocalX:-\\{0,1\\}[[:digit:]]\\{1,\\},LocalY:-\\{0,1\\}[[:digit:]]\\{1,\\}"
             << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
             << ",TiltX:" << std::fixed << std::setprecision(precision) << item.GetTiltX()
             << ",TiltY:" << std::fixed << std::setprecision(precision) << item.GetTiltY()
-            << ",ToolGlobalX:" << item.GetToolDisplayX() << ",ToolGlobalY:" << item.GetToolDisplayY()
+            << ",ToolDisplayX:" << item.GetToolDisplayX() << ",ToolDisplayY:" << item.GetToolDisplayY()
             << ",ToolLocalX:" << item.GetToolWindowX() << ",ToolLocalY:" << item.GetToolWindowY()
             << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
             << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
