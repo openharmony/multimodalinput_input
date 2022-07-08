@@ -65,7 +65,7 @@ bool AnrManager::TriggerAnr(int64_t time, SessionPtr sess)
 void AnrManager::OnSessionLost(SessionPtr session)
 {
     CALL_DEBUG_ENTER;
-    CHKPF(sess);
+    CHKPF(session);
     if (anrNoticedPid_ == session->GetPid()) {
         MMI_HILOGD("NoticedPid_ is invalid");
         anrNoticedPid_ = -1;
