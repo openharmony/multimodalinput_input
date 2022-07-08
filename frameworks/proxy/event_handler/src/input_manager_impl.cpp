@@ -198,8 +198,8 @@ int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption
 {
     CHK_PID_AND_TID();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    CHKPR(keyOption, ERROR_NULL_POINTER);
-    CHKPR(callback, ERROR_NULL_POINTER);
+    CHKPR(keyOption, RET_ERR);
+    CHKPR(callback, RET_ERR);
     return KeyEventInputSubscribeMgr.SubscribeKeyEvent(keyOption, callback);
 #else
     MMI_HILOGW("Keyboard device does not support");

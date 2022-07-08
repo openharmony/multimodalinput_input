@@ -121,10 +121,10 @@ void InputEventNormalizeHandler::HandlePointerEvent(std::shared_ptr<PointerEvent
             return;
         }
         MMI_HILOGI("MouseEvent Item Normalization Results, DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
-            "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
+            "DisplayX:%{public}d,DisplayY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
             "Width:%{public}d,Height:%{public}d,Pressure:%{public}f,Device:%{public}d",
-            item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetGlobalX(), item.GetGlobalY(),
-            item.GetLocalX(), item.GetLocalY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
+            item.GetDownTime(), static_cast<int32_t>(item.IsPressed()), item.GetDisplayX(), item.GetDisplayY(),
+            item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
             item.GetDeviceId());
     }
     nextHandler_->HandlePointerEvent(pointerEvent);
@@ -253,10 +253,10 @@ int32_t InputEventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     PointerEvent::PointerItem item;
     pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
     MMI_HILOGD("Item:DownTime:%{public}" PRId64 ",IsPressed:%{public}s,"
-               "GlobalX:%{public}d,GlobalY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
+               "DisplayX:%{public}d,DisplayY:%{public}d,LocalX:%{public}d,LocalY:%{public}d,"
                "Width:%{public}d,Height:%{public}d",
                item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
-               item.GetGlobalX(), item.GetGlobalY(), item.GetLocalX(), item.GetLocalY(),
+               item.GetDisplayX(), item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(),
                item.GetWidth(), item.GetHeight());
     nextHandler_->HandlePointerEvent(pointerEvent);
 #ifndef OHOS_BUILD_ENABLE_INTERCEPTOR
