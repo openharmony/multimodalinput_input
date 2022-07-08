@@ -354,7 +354,7 @@ public:
          * @return Returns the x coordinate.
          * @since 9
          */
-        int32_t GetGlobalX() const;
+        int32_t GetDisplayX() const;
 
         /**
          * @brief Sets the x coordinate relative to the upper left corner of the screen.
@@ -362,7 +362,7 @@ public:
          * @return void
          * @since 9
          */
-        void SetGlobalX(int32_t globalX);
+        void SetDisplayX(int32_t globalX);
 
         /**
          * @brief Obtains the y coordinate relative to the upper left corner of the screen.
@@ -371,7 +371,7 @@ public:
          * @return Returns the y coordinate.
          * @since 9
          */
-        int32_t GetGlobalY() const;
+        int32_t GetDisplayY() const;
 
         /**
          * @brief Sets the y coordinate relative to the upper left corner of the screen.
@@ -379,14 +379,14 @@ public:
          * @return void
          * @since 9
          */
-        void SetGlobalY(int32_t globalY);
+        void SetDisplayY(int32_t globalY);
 
         /**
          * @brief Obtains the x coordinate of the active window.
          * @return Returns the x coordinate.
          * @since 9
          */
-        int32_t GetLocalX() const;
+        int32_t GetWindowX() const;
 
         /**
          * @brief Sets the x coordinate of the active window.
@@ -394,14 +394,14 @@ public:
          * @return void
          * @since 9
          */
-        void SetLocalX(int32_t x);
+        void SetWindowX(int32_t x);
 
         /**
          * @brief Obtains the y coordinate of the active window.
          * @return Returns the y coordinate.
          * @since 9
          */
-        int32_t GetLocalY() const;
+        int32_t GetWindowY() const;
 
         /**
          * @brief Sets the y coordinate of the active window.
@@ -409,7 +409,7 @@ public:
          * @return void
          * @since 9
          */
-        void SetLocalY(int32_t y);
+        void SetWindowY(int32_t y);
 
         /**
          * @brief Obtains the width of the pressed area.
@@ -447,7 +447,7 @@ public:
          * @return Returns the X coordinate.
          * @since 9
          */
-        int32_t GetToolGlobalX() const;
+        int32_t GetToolDisplayX() const;
 
         /**
          * @brief Sets the X coordinate of the tool area's center point relative to the
@@ -456,7 +456,7 @@ public:
          * @return void
          * @since 9
          */
-        void SetToolGlobalX(int32_t globalX);
+        void SetToolDisplayX(int32_t globalX);
 
         /**
          * @brief Obtains the Y coordinate of the tool area's center point relative to the
@@ -464,7 +464,7 @@ public:
          * @return Returns the Y coordinate.
          * @since 9
          */
-        int32_t GetToolGlobalY() const;
+        int32_t GetToolDisplayY() const;
 
         /**
          * @brief Sets the Y coordinate of the tool area's center point relative to the
@@ -473,7 +473,7 @@ public:
          * @return void
          * @since 9
          */
-        void SetToolGlobalY(int32_t globalY);
+        void SetToolDisplayY(int32_t globalY);
 
         /**
          * @brief Obtains the X coordinate of the tool area's center point relative to the
@@ -481,7 +481,7 @@ public:
          * @return Returns the X coordinate.
          * @since 9
          */
-        int32_t GetToolLocalX() const;
+        int32_t GetToolWindowX() const;
 
         /**
          * @brief Sets the X coordinate of the tool area's center point relative to the
@@ -490,7 +490,7 @@ public:
          * @return void
          * @since 9
          */
-        void SetToolLocalX(int32_t x);
+        void SetToolWindowX(int32_t x);
 
         /**
          * @brief Obtains the Y coordinate of the tool area's center point relative to the
@@ -498,7 +498,7 @@ public:
          * @return Returns the Y coordinate.
          * @since 9
          */
-        int32_t GetToolLocalY() const;
+        int32_t GetToolWindowY() const;
 
         /**
          * @brief Sets the Y coordinate of the tool area's center point relative to the
@@ -507,7 +507,7 @@ public:
          * @return void
          * @since 9
          */
-        void SetToolLocalY(int32_t y);
+        void SetToolWindowY(int32_t y);
 
         /**
          * @brief Obtains the width of the tool area.

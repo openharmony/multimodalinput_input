@@ -29,8 +29,8 @@
 namespace OHOS {
 namespace MMI {
 struct MouseLocation {
-    int32_t globalX { 0 };
-    int32_t globalY { 0 };
+    int32_t physicalX { 0 };
+    int32_t physicalY { 0 };
 };
 
 class InputWindowsManager : public DelayedSingleton<InputWindowsManager> {
@@ -52,7 +52,7 @@ public:
     void UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y);
 #endif //OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    void AdjustGlobalCoordinate(const DisplayInfo& displayInfo, int32_t& globalX, int32_t& globalY) const;
+    void AdjustDisplayCoordinate(const DisplayInfo& displayInfo, int32_t& physicalX, int32_t& physicalY) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool UpdateDisplayId(int32_t& displayId);
@@ -97,7 +97,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    void SelectWindowInfo(const int32_t& globalX, const int32_t& globalY,
+    void SelectWindowInfo(const int32_t& logicalX, const int32_t& logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent, WindowInfo*& touchWindow);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -105,8 +105,9 @@ private:
         const DisplayInfo& info, EventTouch& touchInfo);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    bool IsInsideDisplay(const DisplayInfo& displayInfo, int32_t globalX, int32_t globalY);
-    void FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& globalX, int32_t& globalY, int32_t& displayId);
+    bool IsInsideDisplay(const DisplayInfo& displayInfo, int32_t physicalX, int32_t physicalY);
+    void FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& physicalX,
+        int32_t& physicalY, int32_t& displayId);
 #endif // OHOS_BUILD_ENABLE_POINTER
     void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo);

@@ -33,7 +33,6 @@
 #include "key_event_subscriber.h"
 #include "mouse_event_handler.h"
 #include "securec.h"
-#include "uds_server.h"
 #include "util.h"
 #include "util_ex.h"
 
