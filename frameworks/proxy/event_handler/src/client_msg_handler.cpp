@@ -324,7 +324,7 @@ void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
     int32_t ret = MultimodalInputConnMgr->MarkEventProcessed(eventId);
     if (ret != 0) {
-        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
         return;
     }
 }
@@ -338,7 +338,7 @@ int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read data failed");
         return RET_ERR;
     }
-    MMI_HILOGD("Client pid:%{public}d", pid);
+    MMI_HILOGI("Client pid:%{public}d", pid);
     InputMgrImpl->OnAnr(pid);
     return RET_OK;
 }
