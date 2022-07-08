@@ -39,7 +39,7 @@ public:
     PointerDrawingManager() = default;
     virtual ~PointerDrawingManager() = default;
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
-    void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY);
+    void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY);
     void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height);
     void UpdatePointerDevice(bool hasPointerDevice);
     bool Init();
@@ -52,13 +52,13 @@ public:
     static const int32_t IMAGE_HEIGHT = 64;
 
 private:
-    void CreatePointerWindow(int32_t displayId, int32_t globalX, int32_t globalY);
+    void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY);
     sptr<OHOS::Surface> GetLayer();
     sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer) const;
     void DoDraw(uint8_t *addr, uint32_t width, uint32_t height);
     void DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas);
     void DrawManager();
-    void FixCursorPosition(int32_t &globalX, int32_t &globalY);
+    void FixCursorPosition(int32_t &physicalX, int32_t &physicalY);
     std::unique_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
     void DeletePidInfo(int32_t pid);
     void UpdatePointerVisible();
@@ -71,8 +71,8 @@ private:
     int32_t displayWidth_ = 0;
     int32_t displayHeight_ = 0;
     bool hasPointerDevice_ = false;
-    int32_t lastGlobalX_ = -1;
-    int32_t lastGlobalY_ = -1;
+    int32_t lastPhysicalX_ = -1;
+    int32_t lastPhysicalY_ = -1;
 
     struct PidInfo {
         int32_t pid { 0 };

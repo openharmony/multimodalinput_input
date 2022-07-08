@@ -70,8 +70,8 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(struct libinput_event 
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(data);
     double logicalX = libinput_event_touchpad_get_x(data);
     double logicalY = libinput_event_touchpad_get_y(data);
-    double toolGlobalX = libinput_event_touchpad_get_tool_x(data);
-    double toolGlobalY = libinput_event_touchpad_get_tool_y(data);
+    double toolPhysicalX = libinput_event_touchpad_get_tool_x(data);
+    double toolPhysicalY = libinput_event_touchpad_get_tool_y(data);
     double toolWidth = libinput_event_touchpad_get_tool_width(data);
     double toolHeight = libinput_event_touchpad_get_tool_height(data);
     int32_t toolType = GetTouchPadToolType(data, device);
@@ -85,8 +85,8 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(struct libinput_event 
     item.SetPressed(true);
     item.SetDisplayX(static_cast<int32_t>(logicalX));
     item.SetDisplayY(static_cast<int32_t>(logicalY));
-    item.SetToolDisplayX(static_cast<int32_t>(toolGlobalX));
-    item.SetToolDisplayY(static_cast<int32_t>(toolGlobalY));
+    item.SetToolDisplayX(static_cast<int32_t>(toolPhysicalX));
+    item.SetToolDisplayY(static_cast<int32_t>(toolPhysicalY));
     item.SetToolWidth(static_cast<int32_t>(toolWidth));
     item.SetToolHeight(static_cast<int32_t>(toolHeight));
     item.SetDeviceId(deviceId_);
@@ -117,8 +117,8 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(struct libinput_even
     double pressure = libinput_event_touchpad_get_pressure(data);
     double logicalX = libinput_event_touchpad_get_x(data);
     double logicalY = libinput_event_touchpad_get_y(data);
-    double toolGlobalX = libinput_event_touchpad_get_tool_x(data);
-    double toolGlobalY = libinput_event_touchpad_get_tool_y(data);
+    double toolPhysicalX = libinput_event_touchpad_get_tool_x(data);
+    double toolPhysicalY = libinput_event_touchpad_get_tool_y(data);
     double toolWidth = libinput_event_touchpad_get_tool_width(data);
     double toolHeight = libinput_event_touchpad_get_tool_height(data);
 
@@ -127,8 +127,8 @@ void TouchPadTransformPointProcessor::OnEventTouchPadMotion(struct libinput_even
     item.SetPressure(pressure);
     item.SetDisplayX(static_cast<int32_t>(logicalX));
     item.SetDisplayY(static_cast<int32_t>(logicalY));
-    item.SetToolDisplayX(static_cast<int32_t>(toolGlobalX));
-    item.SetToolDisplayY(static_cast<int32_t>(toolGlobalY));
+    item.SetToolDisplayX(static_cast<int32_t>(toolPhysicalX));
+    item.SetToolDisplayY(static_cast<int32_t>(toolPhysicalY));
     item.SetToolWidth(static_cast<int32_t>(toolWidth));
     item.SetToolHeight(static_cast<int32_t>(toolHeight));
     pointerEvent_->UpdatePointerItem(seatSlot, item);
