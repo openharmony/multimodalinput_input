@@ -47,7 +47,6 @@ public:
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
             const std::shared_ptr<KeyOption> keyOption);
     int32_t UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
-    bool SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     void Dump(int32_t fd, const std::vector<std::string> &args);
 private:
     struct Subscriber {
@@ -64,6 +63,7 @@ private:
     void InsertSubScriber(std::shared_ptr<Subscriber> subs);
 
 private:
+    bool SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     bool HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent);
     bool HandleKeyCancel(const std::shared_ptr<KeyEvent>& keyEvent);
