@@ -38,22 +38,23 @@ const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_i
 
 namespace OHOS {
 namespace MMI {
-void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
+void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
-    FixCursorPosition(globalX, globalY);
-    lastGlobalX_ = globalX;
-    lastGlobalY_ = globalY;
+    MMI_HILOGD("display:%{public}d,physicalX:%{public}d,physicalY:%{public}d", displayId, physicalX, physicalY);
+    FixCursorPosition(physicalX, physicalY);
+    lastPhysicalX_ = physicalX;
+    lastPhysicalY_ = physicalY;
     if (pointerWindow_ != nullptr) {
         if (IsPointerVisible()) {
-            pointerWindow_->MoveTo(globalX, globalY);
+            pointerWindow_->MoveTo(physicalX, physicalY);
         }
-        MMI_HILOGD("leave, display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
+        MMI_HILOGD("leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
+            displayId, physicalX, physicalY);
         return;
     }
     
-    CreatePointerWindow(displayId, globalX, globalY);
+    CreatePointerWindow(displayId, physicalX, physicalY);
     CHKPV(pointerWindow_);
     sptr<OHOS::Surface> layer = GetLayer();
     if (layer == nullptr) {
@@ -84,29 +85,29 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int3
     if (IsPointerVisible()) {
         pointerWindow_->Show();
     }
-    MMI_HILOGD("display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
+    MMI_HILOGD("display:%{public}d,physicalX:%{public}d,physicalY:%{public}d", displayId, physicalX, physicalY);
 }
 
-void PointerDrawingManager::FixCursorPosition(int32_t &globalX, int32_t &globalY)
+void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physicalY)
 {
-    if (globalX < 0) {
-        globalX = 0;
+    if (physicalX < 0) {
+        physicalX = 0;
     }
 
-    if (globalY < 0) {
-        globalY = 0;
+    if (physicalY < 0) {
+        physicalY = 0;
     }
 
     const int32_t cursorUnit = 16;
-    if (globalX > (displayWidth_ - IMAGE_WIDTH / cursorUnit)) {
-        globalX = displayWidth_ - IMAGE_WIDTH / cursorUnit;
+    if (physicalX > (displayWidth_ - IMAGE_WIDTH / cursorUnit)) {
+        physicalX = displayWidth_ - IMAGE_WIDTH / cursorUnit;
     }
-    if (globalY > (displayHeight_ - IMAGE_HEIGHT / cursorUnit)) {
-        globalY = displayHeight_ - IMAGE_HEIGHT / cursorUnit;
+    if (physicalY > (displayHeight_ - IMAGE_HEIGHT / cursorUnit)) {
+        physicalY = displayHeight_ - IMAGE_HEIGHT / cursorUnit;
     }
 }
 
-void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t globalX, int32_t globalY)
+void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY)
 {
     sptr<OHOS::Rosen::WindowOption> option = new (std::nothrow) OHOS::Rosen::WindowOption();
     CHKPV(option);
@@ -114,8 +115,8 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t globa
     option->SetWindowMode(OHOS::Rosen::WindowMode::WINDOW_MODE_FLOATING);
     option->SetDisplayId(displayId);
     OHOS::Rosen::Rect rect = {
-        .posX_ = globalX,
-        .posY_ = globalY,
+        .posX_ = physicalX,
+        .posY_ = physicalY,
         .width_ = IMAGE_WIDTH,
         .height_ = IMAGE_HEIGHT,
     };
@@ -232,11 +233,11 @@ void PointerDrawingManager::DrawManager()
 {
     if (hasDisplay_ && hasPointerDevice_ && pointerWindow_ == nullptr) {
         MMI_HILOGD("draw pointer begin");
-        if (lastGlobalX_ == -1 || lastGlobalY_ == -1) {
+        if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayId_, displayWidth_/2, displayHeight_/2);
             return;
         }
-        DrawPointer(displayId_, lastGlobalX_, lastGlobalY_);
+        DrawPointer(displayId_, lastPhysicalX_, lastPhysicalY_);
         return;
     }
 
