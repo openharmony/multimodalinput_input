@@ -49,7 +49,10 @@ void InputEvent::Reset()
         actionTime_ = 0;
     }
     id_ = -1;
-    actionTime_ = (ts.tv_sec * 1000000 + (ts.tv_nsec / 1000));
+    if (!AddInt64(ts.tv_sec * 1000000, ts.tv_nsec / 1000, actionTime_)) {
+        MMI_HILOGE("Int64 addition overflow");
+        return;
+    }
     action_ = ACTION_UNKNOWN;
     actionStartTime_ = actionTime_;
     deviceId_ = -1;
