@@ -147,7 +147,12 @@ bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
         earliest = sess->GetEarliestEventTime();
     }
     MMI_HILOGD("Current time: %{public}" PRId64 "", time);
-    if (time < (earliest + INPUT_UI_TIMEOUT_TIME)) {
+    int64_t endTime = 0;
+    if (!AddInt64(earliest, INPUT_UI_TIMEOUT_TIME, endTime)) {
+        MMI_HILOGE("Int64 addition overflow");
+        return false;
+    }
+    if (time < endTime) {
         sess->isANRProcess_ = false;
         MMI_HILOGD("the event reports normally");
         return false;

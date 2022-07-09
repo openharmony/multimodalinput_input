@@ -326,8 +326,18 @@ const DisplayGroupInfo& InputWindowsManager::GetDisplayGroupInfo()
 bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const
 {
     for (const auto &item : rects) {
-        if (((x >= item.x) && (x < (item.x + item.width))) &&
-            (y >= item.y) && (y < (item.y + item.height))) {
+        int32_t displayMaxX = 0;
+        int32_t displayMaxY = 0;
+        if (!AddInt32(item.x, item.width, displayMaxX)) {
+            MMI_HILOGE("Int32 addition overflow");
+            return false;
+        }
+        if (!AddInt32(item.y, item.height, displayMaxY)) {
+            MMI_HILOGE("Int32 addition overflow");
+            return false;
+        }
+        if (((x >= item.x) && (x < displayMaxX)) &&
+            (y >= item.y) && (y < displayMaxY)) {
             return true;
         }
     }
@@ -430,8 +440,16 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     auto physicalDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPR(physicalDisplayInfo, ERROR_NULL_POINTER);
-    int32_t logicalX = pointerItem.GetDisplayX() + physicalDisplayInfo->x;
-    int32_t logicalY = pointerItem.GetDisplayY() + physicalDisplayInfo->y;
+    int32_t logicalX = 0;
+    int32_t logicalY = 0;
+    if (!AddInt32(pointerItem.GetDisplayX(), physicalDisplayInfo->x, logicalX)) {
+        MMI_HILOGE("Int32 addition overflow");
+        return RET_ERR;
+    }
+    if (!AddInt32(pointerItem.GetDisplayY(), physicalDisplayInfo->y, logicalY)) {
+        MMI_HILOGE("Int32 addition overflow");
+        return RET_ERR;
+    }
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
     WindowInfo* touchWindow = nullptr;
     SelectWindowInfo(logicalX, logicalY, pointerEvent, touchWindow);
@@ -481,8 +499,16 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     int32_t physicalX = pointerItem.GetDisplayX();
     int32_t physicalY = pointerItem.GetDisplayY();
     AdjustDisplayCoordinate(*physicDisplayInfo, physicalX, physicalY);
-    int32_t logicalX = physicalX + physicDisplayInfo->x;
-    int32_t logicalY = physicalY + physicDisplayInfo->y;
+    int32_t logicalX = 0;
+    int32_t logicalY = 0;
+    if (!AddInt32(physicalX, physicDisplayInfo->x, logicalX)) {
+        MMI_HILOGE("Int32 addition overflow");
+        return RET_ERR;
+    }
+    if (!AddInt32(physicalY, physicDisplayInfo->y, logicalY)) {
+        MMI_HILOGE("Int32 addition overflow");
+        return RET_ERR;
+    }
     WindowInfo *touchWindow = nullptr;
     auto targetWindowId = pointerEvent->GetTargetWindowId();
     for (auto &item : displayGroupInfo_.windowsInfo) {
@@ -573,11 +599,29 @@ bool InputWindowsManager::IsInsideDisplay(const DisplayInfo& displayInfo, int32_
 void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& physicalX,
     int32_t& physicalY, int32_t& displayId)
 {
-    int32_t logicalX = physicalX + displayInfo.x;
-    int32_t logicalY = physicalY + displayInfo.y;
+    int32_t logicalX = 0;
+    int32_t logicalY = 0;
+    if (!AddInt32(physicalX, displayInfo.x, logicalX)) {
+        MMI_HILOGE("Int32 addition overflow");
+        return;
+    }
+    if (!AddInt32(physicalY, displayInfo.y, logicalY)) {
+        MMI_HILOGE("Int32 addition overflow");
+        return;
+    }
     for (const auto &item : displayGroupInfo_.displaysInfo) {
-        if ((logicalX >= item.x && logicalX < item.x + item.width) &&
-            (logicalY >= item.y && logicalY < item.y + item.height)) {
+        int32_t displayMaxX = 0;
+        int32_t displayMaxY = 0;
+        if (!AddInt32(item.x, item.width, displayMaxX)) {
+            MMI_HILOGE("Int32 addition overflow");
+            return;
+        }
+        if (!AddInt32(item.y, item.height, displayMaxY)) {
+            MMI_HILOGE("Int32 addition overflow");
+            return;
+        }
+        if ((logicalX >= item.x && logicalX < displayMaxX) &&
+            (logicalY >= item.y && logicalY < displayMaxY)) {
             physicalX = logicalX - item.x;
             physicalY = logicalY - item.y;
             displayId = item.id;
