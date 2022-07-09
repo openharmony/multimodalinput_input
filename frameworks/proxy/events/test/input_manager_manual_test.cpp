@@ -45,8 +45,7 @@ public:
 protected:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void AddInputEventFilter();
-    void SimulateInputEventHelper(int32_t globalX, int32_t globalY, int32_t expectVal);
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    void SimulateInputEventHelper(int32_t physicalX, int32_t physicalY, int32_t expectVal);
 private:
     int32_t callbackRet = 0;
 };
@@ -76,8 +75,8 @@ void InputManagerManualTest::AddInputEventFilter()
             return false;
         }
 
-        const int32_t x = item.GetGlobalX();
-        const int32_t y = item.GetGlobalY();
+        const int32_t x = item.GetDisplayX();
+        const int32_t y = item.GetDisplayY();
         if (x == 10 && y == 10) {
             MMI_HILOGI("The values of X and y are both 10, which meets the expectation and callbackRet is set to 1");
             callbackRet = 1;
@@ -93,14 +92,14 @@ void InputManagerManualTest::AddInputEventFilter()
     ASSERT_EQ(ret, RET_OK);
 }
 
-void InputManagerManualTest::SimulateInputEventHelper(int32_t globalX, int32_t globalY, int32_t expectVal)
+void InputManagerManualTest::SimulateInputEventHelper(int32_t physicalX, int32_t physicalY, int32_t expectVal)
 {
     CALL_DEBUG_ENTER;
     const int32_t pointerId = 0;
     PointerEvent::PointerItem item;
     item.SetPointerId(pointerId);
-    item.SetGlobalX(globalX);
-    item.SetGlobalY(globalY);
+    item.SetDisplayX(physicalX);
+    item.SetDisplayY(physicalY);
 
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
@@ -125,8 +124,8 @@ HWTEST_F(InputManagerManualTest, HandlePointerEventFilter_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     AddInputEventFilter();
-    SimulateInputEventHelper(10, 10, 1); // set global x and global y are 10, will expect value is 1
-    SimulateInputEventHelper(0, 0, 2); // set global x and global y are not 10, will expect value is 2
+    SimulateInputEventHelper(10, 10, 1); // set physical x and physical y are 10, will expect value is 1
+    SimulateInputEventHelper(0, 0, 2); // set physical x and physical y are not 10, will expect value is 2
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
