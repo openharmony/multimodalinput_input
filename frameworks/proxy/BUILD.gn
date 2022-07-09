@@ -51,7 +51,7 @@ config("libmmi_test_util") {
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/windowmanager/wm/include",
+    "//foundation/window/window_manager/wm/include",
     "//third_party/googletest/googletest/include",
   ]
 }
