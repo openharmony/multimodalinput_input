@@ -53,7 +53,7 @@ KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(
 int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
     std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     CHKPR(keyOption, INVALID_SUBSCRIBE_ID);
     CHKPR(callback, INVALID_SUBSCRIBE_ID);
     std::set<int32_t> preKeys = keyOption->GetPreKeys();
@@ -87,7 +87,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
 
 int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (subscribeId < 0) {
         MMI_HILOGE("the subscribe id is less than 0");
         return RET_ERR;
@@ -102,7 +102,7 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
         MMI_HILOGE("the subscribeInfos is empty");
         return RET_ERR;
     }
-    
+
     for (auto it = subscribeInfos_.begin(); it != subscribeInfos_.end(); ++it) {
         if (it->GetSubscribeId() == subscribeId) {
             if (EventManager.UnsubscribeKeyEvent(subscribeId) != RET_OK) {

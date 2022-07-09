@@ -212,11 +212,11 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
     CALL_DEBUG_ENTER;
     CHKPV(data);
     auto mouseInfo = WinMgr->GetMouseInfo();
-    MouseState->SetMouseCoords(mouseInfo.globalX, mouseInfo.globalY);
-    pointerItem.SetGlobalX(mouseInfo.globalX);
-    pointerItem.SetGlobalY(mouseInfo.globalY);
-    pointerItem.SetLocalX(0);
-    pointerItem.SetLocalY(0);
+    MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
+    pointerItem.SetDisplayX(mouseInfo.physicalX);
+    pointerItem.SetDisplayY(mouseInfo.physicalY);
+    pointerItem.SetWindowX(0);
+    pointerItem.SetWindowY(0);
     pointerItem.SetPointerId(0);
     pointerItem.SetPressed(isPressed_);
 
@@ -292,11 +292,11 @@ void MouseEventHandler::HandlePostMoveMouse(PointerEvent::PointerItem& pointerIt
     CALL_DEBUG_ENTER;
     auto mouseInfo = WinMgr->GetMouseInfo();
     CHKPV(pointerEvent_);
-    MouseState->SetMouseCoords(mouseInfo.globalX, mouseInfo.globalY);
-    pointerItem.SetGlobalX(mouseInfo.globalX);
-    pointerItem.SetGlobalY(mouseInfo.globalY);
-    pointerItem.SetLocalX(0);
-    pointerItem.SetLocalY(0);
+    MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
+    pointerItem.SetDisplayX(mouseInfo.physicalX);
+    pointerItem.SetDisplayY(mouseInfo.physicalY);
+    pointerItem.SetWindowX(0);
+    pointerItem.SetWindowY(0);
     pointerItem.SetPointerId(0);
     pointerItem.SetPressed(isPressed_);
 
@@ -352,7 +352,7 @@ void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
             "PointerId:%d | SourceType:%s | PointerAction:%s | WindowX:%d | WindowY:%d | ButtonId:%d "
             "| AgentWindowId:%d | TargetWindowId:%d | DownTime:%" PRId64 " | IsPressed:%s \t",
             pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
-            item.GetLocalX(), item.GetLocalY(), pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(),
+            item.GetWindowX(), item.GetWindowY(), pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(),
             pointerEvent_->GetTargetWindowId(), item.GetDownTime(), item.IsPressed() ? "true" : "false");
 }
 } // namespace MMI

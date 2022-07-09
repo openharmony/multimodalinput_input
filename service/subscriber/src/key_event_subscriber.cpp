@@ -67,7 +67,7 @@ void KeyEventSubscriber::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerE
 int32_t KeyEventSubscriber::SubscribeKeyEvent(
     SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (subscribeId < 0) {
         MMI_HILOGE("Invalid subscribe");
         return RET_ERR;
@@ -95,7 +95,7 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
 
 int32_t KeyEventSubscriber::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     MMI_HILOGD("subscribeId:%{public}d", subscribeId);
     for (auto it = subscribers_.begin(); it != subscribers_.end(); ++it) {
         if ((*it)->id_ == subscribeId && (*it)->sess_ == sess) {
@@ -109,7 +109,6 @@ int32_t KeyEventSubscriber::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscri
 
 bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     if (IsRepeatedKeyEvent(keyEvent)) {
         MMI_HILOGD("repeat KeyEvent, skip");
