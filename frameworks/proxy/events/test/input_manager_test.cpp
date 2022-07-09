@@ -1172,7 +1172,7 @@ HWTEST_F(InputManagerTest, TestGetKeystrokeAbility_001, TestSize.Level1)
     MMI_HILOGD("stop TestGetKeystrokeAbility_001");
 }
 
-#if defined(OHOS_BUILD_ENABLE_MOUSE) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
 /**
  * @tc.name: TestInputEventInterceptor_001
  * @tc.desc: Verify mouse down event interceptor
@@ -1363,7 +1363,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_005, TestSize.Level1)
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
-#endif // OHOS_BUILD_ENABLE_MOUSE && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
 /**
