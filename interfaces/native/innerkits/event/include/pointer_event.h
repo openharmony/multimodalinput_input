@@ -698,7 +698,7 @@ public:
         int32_t deviceId_ {};
         int64_t downTime_ {};
         int32_t toolType_ {};
-        int32_t targetWindowId_{ -1 };
+        int32_t targetWindowId_ { -1 };
     };
 
 public:
