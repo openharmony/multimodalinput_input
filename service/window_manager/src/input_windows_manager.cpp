@@ -69,6 +69,18 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
     return displayId;
 }
 
+int32_t InputWindowsManager::GetWindowPid(int32_t windowId)
+{
+    for (const auto& logicalDisplayItem : logicalDisplays_) {
+        for (const auto& windowInfo : logicalDisplayItem.windowsInfo) {
+            if (windowInfo.id == windowId) {
+                return windowInfo.pid;
+            }
+        }
+    }
+    return RET_ERR;
+}
+
 int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent) const
 {
     CALL_LOG_ENTER;
@@ -561,7 +573,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     tCoord.x = pointerItem.GetGlobalX();
     tCoord.y = pointerItem.GetGlobalY();
     AdjustGlobalCoordinate(*logicalDisplayInfo, tCoord);
-    auto targetWindowId = pointerEvent->GetTargetWindowId();
+    auto targetWindowId = pointerItem.GetTargetWindowId();
     WindowInfo *touchWindow = nullptr;
     for (auto& item : logicalDisplayInfo->windowsInfo) {
         if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
@@ -597,6 +609,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetLocalY(localY);
     pointerItem.SetToolLocalX(pointerItem.GetToolGlobalX() - touchWindow->winTopLeftX);
     pointerItem.SetToolLocalY(pointerItem.GetToolGlobalY() - touchWindow->winTopLeftY);
+    pointerItem.SetTargetWindowId(touchWindow->id);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
     MMI_HILOGD("pid:%{public}d,fd:%{public}d,globalX01:%{public}d,"
