@@ -37,6 +37,16 @@ const std::string DEFINE_PROPERTIES = "napi_define_properties";
 const std::string GET_STRING_UTF8 = "napi_get_value_string_utf8";
 const std::string GET_ARRAY_LENGTH = "napi_get_array_length";
 const std::string GET_ELEMENT = "napi_get_element";
+const std::string CREATE_INT32 = "napi_create_int32";
+
+enum KeyboardType {
+    NONE = 0,
+    UNKNOWN = 1,
+    ALPHABETIC_KEYBOARD = 2,
+    DIGITAL_KEYBOARD = 3,
+    HANDWRITING_PEN = 4,
+    REMOTE_CONTROL = 5,
+};
 } // namespace
 
 JsInputDeviceContext::JsInputDeviceContext()
@@ -344,6 +354,47 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
     return jsInputDeviceMgr->GetKeyboardType(env, id, argv[1]);
 }
 
+napi_value JsInputDeviceContext::EnumClassConstructor(napi_env env, napi_callback_info info)
+{
+    CALL_LOG_ENTER;
+    size_t argc = 0;
+    napi_value args[1] = {0};
+    napi_value ret = nullptr;
+    void *data = nullptr;
+    CHKRP(env, napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);
+    return ret;
+}
+
+napi_value JsInputDeviceContext::CreateEnumKeyboardType(napi_env env, napi_value exports)
+{
+    CALL_LOG_ENTER;
+    napi_value none = nullptr;
+    CHKRP(env, napi_create_int32(env, KeyboardType::NONE, &none), CREATE_INT32);
+    napi_value unknown = nullptr;
+    CHKRP(env, napi_create_int32(env, KeyboardType::UNKNOWN, &unknown), CREATE_INT32);
+    napi_value alphabeticKeyboard = nullptr;
+    CHKRP(env, napi_create_int32(env, KeyboardType::ALPHABETIC_KEYBOARD, &alphabeticKeyboard), CREATE_INT32);
+    napi_value digitalKeyboard = nullptr;
+    CHKRP(env, napi_create_int32(env, KeyboardType::DIGITAL_KEYBOARD, &digitalKeyboard), CREATE_INT32);
+    napi_value handwritingPen = nullptr;
+    CHKRP(env, napi_create_int32(env, KeyboardType::HANDWRITING_PEN, &handwritingPen), CREATE_INT32);
+    napi_value remoteControl = nullptr;
+    CHKRP(env, napi_create_int32(env, KeyboardType::REMOTE_CONTROL, &remoteControl), CREATE_INT32);
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("NONE", none),
+        DECLARE_NAPI_STATIC_PROPERTY("UNKNOWN", unknown),
+        DECLARE_NAPI_STATIC_PROPERTY("ALPHABETIC_KEYBOARD", alphabeticKeyboard),
+        DECLARE_NAPI_STATIC_PROPERTY("DIGITAL_KEYBOARD", digitalKeyboard),
+        DECLARE_NAPI_STATIC_PROPERTY("HANDWRITING_PEN", handwritingPen),
+        DECLARE_NAPI_STATIC_PROPERTY("REMOTE_CONTROL", remoteControl),
+    };
+    napi_value result = nullptr;
+    CHKRP(env, napi_define_class(env, "KeyboardType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
+    CHKRP(env, napi_set_named_property(env, exports, "KeyboardType", result), SET_NAMED_PROPERTY);
+    return exports;
+}
+
 napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
 {
     CALL_LOG_ENTER;
@@ -361,6 +412,10 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardType", GetKeyboardType),
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
+    if (CreateEnumKeyboardType(env, exports) == nullptr) {
+        THROWERR(env, "Failed to create keyboard type enum");
+        return nullptr;
+    }
     return exports;
 }
 } // namespace MMI
