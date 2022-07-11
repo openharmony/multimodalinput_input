@@ -607,7 +607,7 @@ const char* KeyEvent::ActionToString(int32_t action)
 
 const char* KeyEvent::KeyCodeToString(int32_t keyCode)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     static const std::map <int32_t, std::string> keyCodeToString = {
         {KEYCODE_FN, "KEYCODE_FN"},
         {KEYCODE_UNKNOWN, "KEYCODE_UNKNOWN"},
@@ -1007,7 +1007,8 @@ const char* KeyEvent::KeyCodeToString(int32_t keyCode)
     return iter->second.c_str();
 }
 
-std::shared_ptr<KeyEvent> KeyEvent::Clone(std::shared_ptr<KeyEvent> keyEvent) {
+std::shared_ptr<KeyEvent> KeyEvent::Clone(std::shared_ptr<KeyEvent> keyEvent)
+{
     if (!keyEvent) {
         return nullptr;
     }
@@ -1018,7 +1019,7 @@ std::shared_ptr<KeyEvent> KeyEvent::Clone(std::shared_ptr<KeyEvent> keyEvent) {
 
 bool KeyEvent::IsValidKeyItem() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t sameKeyCodeNum = 0;
     int32_t keyCode = GetKeyCode();
     int32_t action = GetKeyAction();
@@ -1067,7 +1068,7 @@ bool KeyEvent::IsValidKeyItem() const
 
 bool KeyEvent::IsValid() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t keyCode = GetKeyCode();
     if (keyCode <= KEYCODE_UNKNOWN) {
         MMI_HILOGE("KeyCode_ is invalid");

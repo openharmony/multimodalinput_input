@@ -50,6 +50,7 @@ protected:
     int32_t StubSubscribeKeyEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnsubscribeKeyEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubInjectPointerEvent(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetAnrListener(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace MMI
 } // namespace OHOS

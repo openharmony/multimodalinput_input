@@ -17,7 +17,6 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-#include "input_event_monitor_manager.h"
 #include "input_handler_manager.h"
 #include "input_manager.h"
 #include "multimodal_event_handler.h"
@@ -43,7 +42,7 @@ public:
 
 protected:
     void AddInputEventFilter();
-    void SimulateInputEventHelper(int32_t globalX, int32_t globalY, int32_t expectVal);
+    void SimulateInputEventHelper(int32_t physicalX, int32_t physicalY, int32_t expectVal);
 private:
     int32_t callbackRet = 0;
 };
@@ -55,7 +54,7 @@ void InputManagerManualTest::SetUp()
 
 void InputManagerManualTest::AddInputEventFilter()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto callback = [this](std::shared_ptr<PointerEvent> pointer) -> bool {
         MMI_HILOGD("callback enter");
         CHKPF(pointer);
@@ -72,8 +71,8 @@ void InputManagerManualTest::AddInputEventFilter()
             return false;
         }
 
-        const int32_t x = item.GetGlobalX();
-        const int32_t y = item.GetGlobalY();
+        const int32_t x = item.GetDisplayX();
+        const int32_t y = item.GetDisplayY();
         if (x == 10 && y == 10) {
             MMI_HILOGI("The values of X and y are both 10, which meets the expectation and callbackRet is set to 1");
             callbackRet = 1;
@@ -86,17 +85,21 @@ void InputManagerManualTest::AddInputEventFilter()
     };
 
     int32_t ret = InputManager::GetInstance()->AddInputEventFilter(callback);
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif
 }
 
-void InputManagerManualTest::SimulateInputEventHelper(int32_t globalX, int32_t globalY, int32_t expectVal)
+void InputManagerManualTest::SimulateInputEventHelper(int32_t physicalX, int32_t physicalY, int32_t expectVal)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     const int32_t pointerId = 0;
     PointerEvent::PointerItem item;
     item.SetPointerId(pointerId);
-    item.SetGlobalX(globalX);
-    item.SetGlobalY(globalY);
+    item.SetDisplayX(physicalX);
+    item.SetDisplayY(physicalY);
 
     auto pointerEvent = PointerEvent::Create();
     ASSERT_NE(pointerEvent, nullptr);
@@ -108,7 +111,11 @@ void InputManagerManualTest::SimulateInputEventHelper(int32_t globalX, int32_t g
     MMI_HILOGI("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     EXPECT_EQ(callbackRet, expectVal);
+#else
+    EXPECT_EQ(callbackRet, 0);
+#endif
 }
 
 /**
@@ -119,10 +126,10 @@ void InputManagerManualTest::SimulateInputEventHelper(int32_t globalX, int32_t g
  */
 HWTEST_F(InputManagerManualTest, HandlePointerEventFilter_001, TestSize.Level1)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     AddInputEventFilter();
-    SimulateInputEventHelper(10, 10, 1); // set global x and global y are 10, will expect value is 1
-    SimulateInputEventHelper(0, 0, 2); // set global x and global y are not 10, will expect value is 2
+    SimulateInputEventHelper(10, 10, 1); // set physical x and physical y are 10, will expect value is 1
+    SimulateInputEventHelper(0, 0, 2); // set physical x and physical y are not 10, will expect value is 2
 }
 } // namespace MMI
 } // namespace OHOS

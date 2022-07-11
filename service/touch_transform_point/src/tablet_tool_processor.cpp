@@ -134,7 +134,7 @@ bool TabletToolProcessor::OnTip(struct libinput_event* event)
 
 bool TabletToolProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(event);
     int32_t targetDisplayId = -1;
     LogicalCoordinate tCoord;
@@ -161,8 +161,8 @@ bool TabletToolProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
     item.SetDeviceId(deviceId_);
     item.SetDownTime(time);
     item.SetPressed(true);
-    item.SetGlobalX(tCoord.x);
-    item.SetGlobalY(tCoord.y);
+    item.SetDisplayX(tCoord.x);
+    item.SetDisplayY(tCoord.y);
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
     item.SetPressure(pressure);
@@ -176,7 +176,7 @@ bool TabletToolProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
 
 bool TabletToolProcessor::OnTipMotion(struct libinput_event* event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(event);
     auto tabletEvent = libinput_event_get_tablet_tool_event(event);
     CHKPF(tabletEvent);
@@ -209,8 +209,8 @@ bool TabletToolProcessor::OnTipMotion(struct libinput_event* event)
         item.SetPressed(true);
         item.SetToolType(toolType);
     }
-    item.SetGlobalX(tCoord.x);
-    item.SetGlobalY(tCoord.y);
+    item.SetDisplayX(tCoord.x);
+    item.SetDisplayY(tCoord.y);
     item.SetTiltX(tiltX);
     item.SetTiltY(tiltY);
     item.SetPressure(pressure);
@@ -220,7 +220,7 @@ bool TabletToolProcessor::OnTipMotion(struct libinput_event* event)
 
 bool TabletToolProcessor::OnTipUp(struct libinput_event_tablet_tool* event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(event);
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionTime(time);

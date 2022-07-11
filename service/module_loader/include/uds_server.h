@@ -48,7 +48,7 @@ public:
     void UdsStop();
     bool SendMsg(int32_t fd, NetPacket& pkt);
     void Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt);
-    void Dump(int32_t fd);
+    void Dump(int32_t fd, const std::vector<std::string> &args);
     int32_t GetClientFd(int32_t pid) const;
     int32_t GetClientPid(int32_t fd) const;
     void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
@@ -72,7 +72,6 @@ protected:
     void DelSession(int32_t fd);
     void DumpSession(const std::string& title);
     void NotifySessionDeleted(SessionPtr ses);
-    void AddPermission(SessionPtr sess);
 
 protected:
     MsgServerFunCallback recvFun_ = nullptr;

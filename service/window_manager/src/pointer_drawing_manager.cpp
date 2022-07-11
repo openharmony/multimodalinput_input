@@ -38,27 +38,27 @@ const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_i
 
 namespace OHOS {
 namespace MMI {
-void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY)
+void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY)
 {
-    CALL_LOG_ENTER;
-    MMI_HILOGD("display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
-    FixCursorPosition(globalX, globalY);
-    lastGlobalX_ = globalX;
-    lastGlobalY_ = globalY;
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("display:%{public}d,physicalX:%{public}d,physicalY:%{public}d", displayId, physicalX, physicalY);
+    FixCursorPosition(physicalX, physicalY);
+    lastPhysicalX_ = physicalX;
+    lastPhysicalY_ = physicalY;
     if (pointerWindow_ != nullptr) {
-        pointerWindow_->MoveTo(globalX, globalY);
         if (IsPointerVisible()) {
-            pointerWindow_->Show();
+            pointerWindow_->MoveTo(physicalX, physicalY);
         }
-        MMI_HILOGD("leave, display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
+        MMI_HILOGD("leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
+            displayId, physicalX, physicalY);
         return;
     }
     
-    CreatePointerWindow(displayId, globalX, globalY);
+    CreatePointerWindow(displayId, physicalX, physicalY);
     CHKPV(pointerWindow_);
     sptr<OHOS::Surface> layer = GetLayer();
     if (layer == nullptr) {
-        MMI_HILOGE("draw pointer is faild, get layer is nullptr");
+        MMI_HILOGE("draw pointer is failed, get layer is nullptr");
         pointerWindow_->Destroy();
         pointerWindow_ = nullptr;
         return;
@@ -66,7 +66,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int3
 
     sptr<OHOS::SurfaceBuffer> buffer = GetSurfaceBuffer(layer);
     if (buffer == nullptr || buffer->GetVirAddr() == nullptr) {
-        MMI_HILOGE("draw pointer is faild, buffer or virAddr is nullptr");
+        MMI_HILOGE("draw pointer is failed, buffer or virAddr is nullptr");
         pointerWindow_->Destroy();
         pointerWindow_ = nullptr;
         return;
@@ -85,29 +85,29 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t globalX, int3
     if (IsPointerVisible()) {
         pointerWindow_->Show();
     }
-    MMI_HILOGD("display:%{public}d,globalX:%{public}d,globalY:%{public}d", displayId, globalX, globalY);
+    MMI_HILOGD("display:%{public}d,physicalX:%{public}d,physicalY:%{public}d", displayId, physicalX, physicalY);
 }
 
-void PointerDrawingManager::FixCursorPosition(int32_t &globalX, int32_t &globalY)
+void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physicalY)
 {
-    if (globalX < 0) {
-        globalX = 0;
+    if (physicalX < 0) {
+        physicalX = 0;
     }
 
-    if (globalY < 0) {
-        globalY = 0;
+    if (physicalY < 0) {
+        physicalY = 0;
     }
 
     const int32_t cursorUnit = 16;
-    if (globalX > (displayWidth_ - IMAGE_WIDTH / cursorUnit)) {
-        globalX = displayWidth_ - IMAGE_WIDTH / cursorUnit;
+    if (physicalX > (displayWidth_ - IMAGE_WIDTH / cursorUnit)) {
+        physicalX = displayWidth_ - IMAGE_WIDTH / cursorUnit;
     }
-    if (globalY > (displayHeight_ - IMAGE_HEIGHT / cursorUnit)) {
-        globalY = displayHeight_ - IMAGE_HEIGHT / cursorUnit;
+    if (physicalY > (displayHeight_ - IMAGE_HEIGHT / cursorUnit)) {
+        physicalY = displayHeight_ - IMAGE_HEIGHT / cursorUnit;
     }
 }
 
-void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t globalX, int32_t globalY)
+void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY)
 {
     sptr<OHOS::Rosen::WindowOption> option = new (std::nothrow) OHOS::Rosen::WindowOption();
     CHKPV(option);
@@ -115,8 +115,8 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t globa
     option->SetWindowMode(OHOS::Rosen::WindowMode::WINDOW_MODE_FLOATING);
     option->SetDisplayId(displayId);
     OHOS::Rosen::Rect rect = {
-        .posX_ = globalX,
-        .posY_ = globalY,
+        .posX_ = physicalX,
+        .posY_ = physicalY,
         .width_ = IMAGE_WIDTH,
         .height_ = IMAGE_HEIGHT,
     };
@@ -131,7 +131,7 @@ sptr<OHOS::Surface> PointerDrawingManager::GetLayer()
 {
     std::shared_ptr<OHOS::Rosen::RSSurfaceNode> surfaceNode = pointerWindow_->GetSurfaceNode();
     if (surfaceNode == nullptr) {
-        MMI_HILOGE("draw pointer is faild, get node is nullptr");
+        MMI_HILOGE("draw pointer is failed, get node is nullptr");
         pointerWindow_->Destroy();
         pointerWindow_ = nullptr;
         return nullptr;
@@ -161,10 +161,10 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
 
 void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t height)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     OHOS::Rosen::Drawing::Bitmap bitmap;
     OHOS::Rosen::Drawing::BitmapFormat format { OHOS::Rosen::Drawing::COLORTYPE_RGBA_8888,
-        OHOS::Rosen::Drawing::ALPHATYPE_OPAQUYE };
+        OHOS::Rosen::Drawing::ALPHATYPE_OPAQUE };
     bitmap.Build(width, height, format);
     OHOS::Rosen::Drawing::Canvas canvas;
     canvas.Bind(bitmap);
@@ -181,7 +181,7 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
 
 void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::unique_ptr<OHOS::Media::PixelMap> pixelmap = DecodeImageToPixelMap(IMAGE_POINTER_JPEG_PATH);
     CHKPV(pixelmap);
     OHOS::Rosen::Drawing::Pen pen;
@@ -214,7 +214,7 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
 
 void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int32_t height) 
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     hasDisplay_ = true;
     displayId_ = displayId;
     displayWidth_ = width;
@@ -224,7 +224,7 @@ void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int3
 
 void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     hasPointerDevice_ = hasPointerDevice;
     DrawManager();
 }
@@ -233,11 +233,11 @@ void PointerDrawingManager::DrawManager()
 {
     if (hasDisplay_ && hasPointerDevice_ && pointerWindow_ == nullptr) {
         MMI_HILOGD("draw pointer begin");
-        if (lastGlobalX_ == -1 || lastGlobalY_ == -1) {
+        if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayId_, displayWidth_/2, displayHeight_/2);
             return;
         }
-        DrawPointer(displayId_, lastGlobalX_, lastGlobalY_);
+        DrawPointer(displayId_, lastPhysicalX_, lastPhysicalY_);
         return;
     }
 
@@ -250,7 +250,7 @@ void PointerDrawingManager::DrawManager()
 
 bool PointerDrawingManager::Init()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     InputDevMgr->Attach(shared_from_this());
     pidInfos_.clear();
     return true;
@@ -266,7 +266,7 @@ std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
 
 void PointerDrawingManager::DeletePidInfo(int32_t pid)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
             pidInfos_.erase(it);
@@ -275,9 +275,9 @@ void PointerDrawingManager::DeletePidInfo(int32_t pid)
     }
 }
 
-void PointerDrawingManager::UpdataPidInfo(int32_t pid, bool visible)
+void PointerDrawingManager::UpdatePidInfo(int32_t pid, bool visible)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
             pidInfos_.erase(it);
@@ -288,9 +288,9 @@ void PointerDrawingManager::UpdataPidInfo(int32_t pid, bool visible)
     pidInfos_.push_back(info);
 }
 
-void PointerDrawingManager::UpdataPointerVisible()
+void PointerDrawingManager::UpdatePointerVisible()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(pointerWindow_);
     if (IsPointerVisible()) {
         pointerWindow_->Show();
@@ -301,7 +301,7 @@ void PointerDrawingManager::UpdataPointerVisible()
 
 bool PointerDrawingManager::IsPointerVisible()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (pidInfos_.empty()) {
         MMI_HILOGD("visible property is true");
         return true;
@@ -313,16 +313,16 @@ bool PointerDrawingManager::IsPointerVisible()
 
 void PointerDrawingManager::DeletePointerVisible(int32_t pid)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     DeletePidInfo(pid);
-    UpdataPointerVisible();
+    UpdatePointerVisible();
 }
 
 int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
 {
-    CALL_LOG_ENTER;
-    UpdataPidInfo(pid, visible);
-    UpdataPointerVisible();
+    CALL_DEBUG_ENTER;
+    UpdatePidInfo(pid, visible);
+    UpdatePointerVisible();
     return RET_OK;
 }
 } // namespace MMI

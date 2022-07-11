@@ -39,7 +39,7 @@ std::map<int32_t, DeviceConfig> KeyAutoRepeat::GetDeviceConfig() const
 
 int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(device, ERROR_NULL_POINTER);
     std::string fileName = KeyMapMgr->GetKeyEventFileName(device);
     DeviceConfig devConf;
@@ -50,7 +50,7 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
     }
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     if (deviceId == INVALID_DEVICE_ID) {
-        MMI_HILOGE("Find to device faild");
+        MMI_HILOGE("Find to device failed");
         return RET_ERR;
     }
     deviceConfig_[deviceId] = devConf;
@@ -59,13 +59,12 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
 
 void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     DeviceConfig devConf = GetAutoSwitch(keyEvent->GetDeviceId());
     if (devConf.autoSwitch != OPEN_AUTO_REPEAT) {
         return;
     }
-    udsServer_ = InputHandler->GetUDSServer();
     keyEvent_ = keyEvent;
     if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
         if (TimerMgr->IsExist(timerId_)) {
@@ -83,6 +82,12 @@ void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
         timerId_ = -1;
         MMI_HILOGI("Stop kayboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
         if (repeatKeyCode_ != keyEvent_->GetKeyCode()) {
+            auto pressedKeyItem = keyEvent_->GetKeyItem(keyEvent_->GetKeyCode());
+            if (pressedKeyItem != nullptr) {
+                keyEvent_->RemoveReleasedKeyItems(*pressedKeyItem);
+            } else {
+                MMI_HILOGW("pressedKeyItem is nullptr");
+            }
             keyEvent_->SetKeyCode(repeatKeyCode_);
             keyEvent_->SetAction(KeyEvent::KEY_ACTION_DOWN);
             keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
@@ -94,12 +99,11 @@ void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
 
 void KeyAutoRepeat::AddHandleTimer(int32_t timeout)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
-        auto ret = eventDispatch_.DispatchKeyEventPid(*(this->udsServer_), this->keyEvent_);
-        if (ret != RET_OK) {
-            MMI_HILOGE("KeyEvent dispatch failed, ret:%{public}d, errCode:%{public}d", ret, KEY_EVENT_DISP_FAIL);
-        }
+        auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+        CHKPV(inputEventNormalizeHandler);
+        inputEventNormalizeHandler->HandleKeyEvent(this->keyEvent_);   
         int32_t triggertime = KeyRepeat->GetIntervalTime(keyEvent_->GetDeviceId());
         this->AddHandleTimer(triggertime);
     });
@@ -132,7 +136,7 @@ DeviceConfig KeyAutoRepeat::GetAutoSwitch(int32_t deviceId)
 
 void KeyAutoRepeat::RemoveDeviceConfig(struct libinput_device *device)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(device);
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     auto iter = deviceConfig_.find(deviceId);

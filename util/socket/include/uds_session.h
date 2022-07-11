@@ -49,10 +49,16 @@ public:
         return pid_;
     }
 
+    int32_t GetModuleType() const
+    {
+        return moduleType_;
+    }
+
     SessionPtr GetSharedPtr()
     {
         return shared_from_this();
     }
+
     int32_t GetFd() const
     {
         return fd_;
@@ -63,12 +69,15 @@ public:
         return descript_;
     }
 
+    const std::string GetProgramName() const
+    {
+        return programName_;
+    }
+
     void UpdateDescript();
     void AddEvent(int32_t id, int64_t time);
     void DelEvents(int32_t id);
-    void AddPermission(bool hasPermission);
-    bool HasPermission();
-    int64_t GetEarlistEventTime() const;
+    int64_t GetEarliestEventTime() const;
     bool IsEventQueueEmpty();
     bool isANRProcess_ {false};
 
@@ -92,7 +101,6 @@ protected:
     int32_t fd_;
     const int32_t uid_;
     const int32_t pid_;
-    bool hasPermission_ = true;
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t clientFd_ = -1;
 #endif // OHOS_BUILD_MMI_DEBUG
