@@ -68,6 +68,18 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
     return displayId;
 }
 
+int32_t InputWindowsManager::GetWindowPid(int32_t windowId)
+{
+    for (const auto& logicalDisplayItem : logicalDisplays_) {
+        for (const auto& windowInfo : logicalDisplayItem.windowsInfo) {
+            if (windowInfo.id = windowId) {
+                return windowInfo.pid;
+            }
+        }
+    }
+    return RET_ERR;
+}
+
 int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent) const
 {
     CALL_LOG_ENTER;
