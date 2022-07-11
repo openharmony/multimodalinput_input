@@ -645,14 +645,14 @@ public:
         void SetToolType(int32_t toolType);
 
         /**
-         * @brief Obtains the ID of the target window for an input event.
+         * @brief 获取当前手指对应的窗口ID
          * @return Returns the ID of the target window.
          * @since 9
          */
         int32_t GetTargetWindowId() const;
 
         /**
-         * @brief Sets the ID of the target window for an input event.
+         * @brief 设置当前手指对应的窗口ID
          * @param windowId Indicates the ID of the target window.
          * @return void
          * @since 9
