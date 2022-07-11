@@ -645,6 +645,21 @@ public:
         void SetToolType(int32_t toolType);
 
         /**
+         * @brief 获取当前手指对应的窗口ID
+         * @return Returns the ID of the target window.
+         * @since 9
+         */
+        int32_t GetTargetWindowId() const;
+
+        /**
+         * @brief 设置当前手指对应的窗口ID
+         * @param windowId Indicates the ID of the target window.
+         * @return void
+         * @since 9
+         */
+        void SetTargetWindowId(int32_t windowId);
+
+        /**
          * @brief Writes data to a <b>Parcel</b> object.
          * @param out Indicates the object into which data will be written.
          * @return Returns <b>true</b> if the data is successfully written; returns <b>false</b> otherwise.
@@ -683,6 +698,7 @@ public:
         int32_t deviceId_ {};
         int64_t downTime_ {};
         int32_t toolType_ {};
+        int32_t targetWindowId_ { -1 };
     };
 
 public:

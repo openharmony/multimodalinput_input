@@ -80,9 +80,25 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_HILOGW("the pointer event does not report normally, application not response");
         return;
     }
-
+    auto pid = udsServer->GetClientPid(fd);
+    auto pointerEvent = std::make_shared<PointerEvent>(*point);
+    auto pointerIdList = pointerEvent->GetPointersIdList();
+    if (pointerIdList.size() > 1) {
+        for (const auto& id : pointerIdList) {
+            PointerEvent::PointerItem pointeritem;
+            if (!pointerEvent->GetPointerItem(id, pointeritem)) {
+                MMI_HILOGW("can't find this poinerItem");
+                continue;
+            }
+            auto itemPid = WinMgr->GetWindowPid(pointeritem.GetTargetWindowId());
+            if (itemPid >= 0 && itemPid != pid) {
+                pointerEvent->RemovePointerItem(id);
+                MMI_HILOGD("pointerIdList size: %{public}zu", pointerEvent->GetPointersIdList().size());
+            }
+        }
+    }
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::Marshalling(point, pkt);
+    InputEventDataTransformation::Marshalling(pointerEvent, pkt);
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
