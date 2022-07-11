@@ -353,5 +353,25 @@ int32_t MultimodalInputConnectProxy::InjectPointerEvent(const std::shared_ptr<Po
     }
     return RET_OK;
 }
+
+int32_t MultimodalInputConnectProxy::SetAnrListener()
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(SET_ANR_LISTENER, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
