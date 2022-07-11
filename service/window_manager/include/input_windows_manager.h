@@ -95,7 +95,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    std::optional<WindowInfo> SelectWindowInfo(const int32_t& globalX, const int32_t& globalY,
+    std::optional<WindowInfo> SelectWindowInfo(const int32_t& logicalX, const int32_t& logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
