@@ -106,7 +106,7 @@ void InputManagerManualTest::SimulateInputEventHelper(int32_t physicalX, int32_t
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(-1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(pointerId);
 
     MMI_HILOGI("Call InputManager::SimulateInputEvent");
