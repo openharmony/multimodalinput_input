@@ -235,7 +235,7 @@ public:
      */
     void GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
 
-    void SetAnrListener(std::shared_ptr<IAnrListener> receiver);
+    void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
 
 private:
     InputManager() = default;
