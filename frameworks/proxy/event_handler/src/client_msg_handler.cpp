@@ -68,6 +68,7 @@ void ClientMsgHandler::Init()
         {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ClientMsgHandler::OnSupportKeys, this)},
         {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind2(&ClientMsgHandler::OnInputKeyboardType, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnDevMonitor, this)},
+        {MmiMessageId::NOTICE_ANR, MsgCallbackBind2(&ClientMsgHandler::OnAnr, this)},
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -323,9 +324,23 @@ void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
     int32_t ret = MultimodalInputConnMgr->MarkEventProcessed(eventId);
     if (ret != 0) {
-        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
         return;
     }
+}
+
+int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid;
+    pkt >> pid;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read data failed");
+        return RET_ERR;
+    }
+    MMI_HILOGI("Client pid:%{public}d", pid);
+    InputMgrImpl->OnAnr(pid);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

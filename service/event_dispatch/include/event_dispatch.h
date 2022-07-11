@@ -42,9 +42,6 @@ public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-
-protected:
-    bool TriggerANR(int64_t time, SessionPtr sess);
 };
 } // namespace MMI
 } // namespace OHOS

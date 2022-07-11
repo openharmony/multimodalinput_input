@@ -54,6 +54,7 @@ protected:
     int32_t OnSupportKeys(const UDSClient& client, NetPacket& pkt);
     int32_t OnInputKeyboardType(const UDSClient& client, NetPacket& pkt);
     int32_t OnDevMonitor(const UDSClient& client, NetPacket& pkt);
+    int32_t OnAnr(const UDSClient& client, NetPacket& pkt);
 
 private:
     static void OnEventProcessed(int32_t eventId);

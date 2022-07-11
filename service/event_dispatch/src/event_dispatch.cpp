@@ -16,7 +16,7 @@
 #include "event_dispatch.h"
 #include <cinttypes>
 
-#include "ability_manager_client.h"
+#include "anr_manager.h"
 #include "bytrace_adapter.h"
 #include "dfx_hisysevent.h"
 #include "error_multimodal.h"
@@ -30,7 +30,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
-constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 } // namespace
 
 EventDispatch::EventDispatch() {}
@@ -76,7 +75,7 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         return;
     }
     auto currentTime = GetSysClockTime();
-    if (TriggerANR(currentTime, session)) {
+    if (AnrMgr->TriggerAnr(currentTime, session)) {
         session->isANRProcess_ = true;
         MMI_HILOGW("the pointer event does not report normally, application not response");
         return;
@@ -114,7 +113,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
         return RET_OK;
     }
     auto currentTime = GetSysClockTime();
-    if (TriggerANR(currentTime, session)) {
+    if (AnrMgr->TriggerAnr(currentTime, session)) {
         session->isANRProcess_ = true;
         MMI_HILOGW("the key event does not report normally, application not response");
         return RET_OK;
@@ -136,29 +135,5 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-
-bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
-{
-    CALL_DEBUG_ENTER;
-    int64_t earliest;
-    if (sess->IsEventQueueEmpty()) {
-        earliest = time;
-    } else {
-        earliest = sess->GetEarliestEventTime();
-    }
-    MMI_HILOGD("Current time: %{public}" PRId64 "", time);
-    if (time < (earliest + INPUT_UI_TIMEOUT_TIME)) {
-        sess->isANRProcess_ = false;
-        MMI_HILOGD("the event reports normally");
-        return false;
-    }
-    DfxHisysevent::ApplicationBlockInput(sess);
-    int32_t ret = OHOS::AAFwk::AbilityManagerClient::GetInstance()->SendANRProcessID(sess->GetPid());
-    if (ret != 0) {
-        MMI_HILOGE("AAFwk SendANRProcessID failed, AAFwk errCode: %{public}d", ret);
-    }
-    MMI_HILOGI("AAFwk send ANR process id succeeded");
-    return true;
-}
 } // namespace MMI
 } // namespace OHOS
