@@ -121,6 +121,11 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         return RET_ERR;
     }
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
+    auto udsServer = InputHandler->GetUDSServer();
+    if (udsServer == nullptr) {
+        MMI_HILOGE("UdsServer is a nullptr");
+        return RET_ERR;
+    }
     auto pid = udsServer->GetClientPid(fd);
     auto pointerEvent = std::make_shared<PointerEvent>(*point);
     auto pointerIdList = pointerEvent->GetPointersIdList();
@@ -141,11 +146,7 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
-    auto udsServer = InputHandler->GetUDSServer();
-    if (udsServer == nullptr) {
-        MMI_HILOGE("UdsServer is a nullptr");
-        return RET_ERR;
-    }
+    
 
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
