@@ -23,7 +23,7 @@
 #include "event_handler.h"
 #include "nocopyable.h"
 
-#include "i_anr_listener.h"
+#include "i_anr_observer.h"
 #include "display_info.h"
 #include "error_multimodal.h"
 #include "i_input_event_consumer.h"

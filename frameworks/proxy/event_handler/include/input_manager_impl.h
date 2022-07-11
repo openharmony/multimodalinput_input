@@ -31,7 +31,7 @@
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
-#include "i_anr_listener.h"
+#include "i_anr_observer.h"
 #include "i_input_event_consumer.h"
 #include "key_option.h"
 #include "mmi_event_handler.h"

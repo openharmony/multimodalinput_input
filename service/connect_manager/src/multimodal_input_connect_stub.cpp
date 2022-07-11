@@ -60,7 +60,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::MOVE_MOUSE, &MultimodalInputConnectStub::StubMoveMouseEvent},
         {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
         {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
-        {IMultimodalInputConnect::SET_ANR_LISTENER, &MultimodalInputConnectStub::StubSetAnrListener}
+        {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener}
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {

@@ -61,7 +61,7 @@ public:
         MOVE_MOUSE = 11,
         INJECT_KEY_EVENT = 12,
         INJECT_POINTER_EVENT = 13,
-        SET_ANR_LISTENER = 14
+        SET_ANR_OBSERVER = 14
     };
 
     enum {
