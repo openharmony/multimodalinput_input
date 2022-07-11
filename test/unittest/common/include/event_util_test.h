@@ -136,16 +136,17 @@ void TestSimulateInputEvent(EventType& event, const TestScene& testScene = TestS
     EXPECT_TRUE((static_cast<int32_t>(testScene) ^ TestUtil->CompareDump(event)));
 }
 
-class VerifyMonitor
-{
+class VerifyMonitor {
 public:
-    VerifyMonitor() {
+    VerifyMonitor()
+    {
         AccessTokenIDEx tokenIdEx = { 0 };
         tokenIdEx = AccessTokenKit::AllocHapToken(infoManagerTestInfoParms_, infoManagerTestPolicyPrams_);
         tokenID_ = tokenIdEx.tokenIdExStruct.tokenID;
         SetSelfTokenID(tokenID_);
     }
-    ~VerifyMonitor() {
+    ~VerifyMonitor()
+    {
         AccessTokenKit::DeleteToken(tokenID_);
     }
 private:
