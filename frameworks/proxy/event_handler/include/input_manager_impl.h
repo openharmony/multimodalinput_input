@@ -108,13 +108,13 @@ private:
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-    void OnAnrTask(std::shared_ptr<IAnrObserver> observer, int32_t pid);
+    void OnAnrTask(std::vector<std::shared_ptr<IAnrObserver>> observers, int32_t pid);
     void OnThread();
 
 private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
     std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
-    std::shared_ptr<IAnrObserver> anrObserver_ = nullptr;
+    std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
 
     DisplayGroupInfo displayGroupInfo_;
 #ifdef OHOS_BUILD_ENABLE_MONITOR
