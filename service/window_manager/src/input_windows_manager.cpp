@@ -32,10 +32,9 @@ InputWindowsManager::InputWindowsManager() {}
 
 InputWindowsManager::~InputWindowsManager() {}
 
-bool InputWindowsManager::Init(UDSServer& udsServer)
+void InputWindowsManager::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
-    return true;
 }
 
 int32_t InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent> inputEvent)
@@ -67,6 +66,18 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
         inputEvent->SetTargetDisplayId(displayId);
     }
     return displayId;
+}
+
+int32_t InputWindowsManager::GetWindowPid(int32_t windowId)
+{
+    for (const auto& logicalDisplayItem : logicalDisplays_) {
+        for (const auto& windowInfo : logicalDisplayItem.windowsInfo) {
+            if (windowInfo.id = windowId) {
+                return windowInfo.pid;
+            }
+        }
+    }
+    return RET_ERR;
 }
 
 int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent) const
@@ -289,10 +300,10 @@ bool InputWindowsManager::TouchDownPointToDisplayPoint(struct libinput_event_tou
         return false;
     }
     for (const auto &display : logicalDisplays_) {
-        if ((touchInfo.point.x < display.topLeftX) || (touchInfo.point.x > display.topLeftX + display.width)) {
-            continue;
-        }
-        if ((touchInfo.point.y < display.topLeftY) || (touchInfo.point.y > display.topLeftY + display.height)) {
+        if ((touchInfo.point.x < display.topLeftX) ||
+            (touchInfo.point.x > display.topLeftX + display.width) ||
+            (touchInfo.point.y < display.topLeftY) ||
+            (touchInfo.point.y > display.topLeftY + display.height)) {
             continue;
         }
         logicalDisplayId = display.id;

@@ -39,10 +39,10 @@ public:
     virtual ~InputWindowsManager();
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
 
-    bool Init(UDSServer& udsServer);
+    void Init(UDSServer& udsServer);
     void UpdateSeatsInfo();
     void UpdateScreensInfo();
-
+    int32_t GetWindowPid(int32_t windowId);
     int32_t GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent) const;
     int32_t UpdateTarget(std::shared_ptr<InputEvent> inputEvent);
     void UpdateDisplayInfo(const std::vector<PhysicalDisplayInfo> &physicalDisplays,
