@@ -39,7 +39,7 @@ public:
     virtual ~InputWindowsManager();
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
 
-    void Init(UDSServer& udsServer);
+    bool Init(UDSServer& udsServer);
     void UpdateSeatsInfo();
     void UpdateScreensInfo();
     int32_t GetWindowPid(int32_t windowId);
