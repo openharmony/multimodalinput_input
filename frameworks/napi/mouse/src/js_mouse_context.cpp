@@ -25,9 +25,9 @@ JsMouseContext::JsMouseContext() : mgr_(std::make_shared<JsMouseManager>()) {}
 
 napi_value JsMouseContext::CreateInstance(napi_env env)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_value global = nullptr;
-    CHKRP(env, napi_get_global(env, &global), GET_GLOBLE);
+    CHKRP(env, napi_get_global(env, &global), GET_GLOBAL);
 
     constexpr char className[] = "JsMouseContext";
     napi_value jsClass = nullptr;
@@ -55,7 +55,7 @@ napi_value JsMouseContext::CreateInstance(napi_env env)
 
 napi_value JsMouseContext::CreateJsObject(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_value thisVar = nullptr;
     void *data = nullptr;
     CHKRP(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data), GET_CB_INFO);
@@ -67,15 +67,21 @@ napi_value JsMouseContext::CreateJsObject(napi_env env, napi_callback_info info)
         JsMouseContext *context = static_cast<JsMouseContext*>(data);
         delete context;
     }, nullptr, nullptr);
-    CHKRP(env, status, WRAP);
+    if (status != napi_ok) {
+        delete jsContext;
+        MMI_HILOGE("%{public}s failed", std::string(WRAP).c_str());
+        auto infoTemp = std::string(__FUNCTION__)+ ": " + std::string(WRAP) + " failed";
+        napi_throw_error(env, nullptr, infoTemp.c_str());
+        return nullptr;
+    }
     return thisVar;
 }
 
 JsMouseContext* JsMouseContext::GetInstance(napi_env env)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     napi_value global = nullptr;
-    CHKRP(env, napi_get_global(env, &global), GET_GLOBLE);
+    CHKRP(env, napi_get_global(env, &global), GET_GLOBAL);
 
     bool result = false;
     CHKRP(env, napi_has_named_property(env, global, "multimodal_mouse", &result), HAS_NAMED_PROPERTY);
@@ -107,7 +113,7 @@ std::shared_ptr<JsMouseManager> JsMouseContext::GetJsMouseMgr() const
 
 napi_value JsMouseContext::SetPointerVisible(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -136,7 +142,7 @@ napi_value JsMouseContext::SetPointerVisible(napi_env env, napi_callback_info in
 
 napi_value JsMouseContext::IsPointerVisible(napi_env env, napi_callback_info info)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     size_t argc = 1;
     napi_value argv[1];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -160,7 +166,7 @@ napi_value JsMouseContext::IsPointerVisible(napi_env env, napi_callback_info inf
 
 napi_value JsMouseContext::Export(napi_env env, napi_value exports)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto instance = CreateInstance(env);
     if (instance == nullptr) {
         THROWERR(env, "failed to create instance");

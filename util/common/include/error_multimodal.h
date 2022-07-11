@@ -78,7 +78,8 @@ enum {
     ETASKS_WAIT_TIMEOUT,                        // 委托任务wait超时
     ETASKS_WAIT_DEFERRED,                       // 委托任务wait延期
     ETASKS_POST_SYNCTASK_FAIL,                  // 生成同步任务失败
-    ETASKS_POST_ASYNCTASK_FAIL                 // 生成异步任务失败
+    ETASKS_POST_ASYNCTASK_FAIL,                 // 生成异步任务失败
+    DUMP_PARAM_ERR                              // DUMP参数错误
 };
 // Error code for util
 constexpr ErrCode UTIL_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_UTIL);

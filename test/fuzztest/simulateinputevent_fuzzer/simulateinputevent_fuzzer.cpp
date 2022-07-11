@@ -77,12 +77,12 @@ bool SimulateInputEventFuzzTest(const uint8_t* data, size_t size)
     CHKPF(pointerDownEvent);
     PointerEvent::PointerItem downitem;
     downitem.SetPointerId(0);   // test code，set the PointerId = 0
-    int32_t globalX;
-    startPos += GetObject<int32_t>(globalX, data + startPos, size - startPos);
-    downitem.SetGlobalX(globalX);   // test code，set the GlobalX = 823
-    int32_t globalY;
-    startPos += GetObject<int32_t>(globalY, data + startPos, size - startPos);
-    downitem.SetGlobalY(globalY);   // test code，set the GlobalY = 723
+    int32_t physicalX;
+    startPos += GetObject<int32_t>(physicalX, data + startPos, size - startPos);
+    downitem.SetDisplayX(physicalX);   // test code，set the DisplayX = 823
+    int32_t physicalY;
+    startPos += GetObject<int32_t>(physicalY, data + startPos, size - startPos);
+    downitem.SetDisplayY(physicalY);   // test code，set the DisplayY = 723
     int32_t pressure;
     startPos += GetObject<int32_t>(pressure, data + startPos, size - startPos);
     downitem.SetPressure(pressure);    // test code，set the Pressure = 5
@@ -99,8 +99,8 @@ bool SimulateInputEventFuzzTest(const uint8_t* data, size_t size)
     CHKPF(pointerUpEvent);
     PointerEvent::PointerItem upitem;
     upitem.SetPointerId(0);   // test code，set the PointerId = 0
-    upitem.SetGlobalX(globalX);   // test code，set the GlobalX = 823
-    upitem.SetGlobalY(globalY);   // test code，set the GlobalY = 723
+    upitem.SetDisplayX(physicalX);   // test code，set the DisplayX = 823
+    upitem.SetDisplayY(physicalY);   // test code，set the DisplayY = 723
     upitem.SetPressure(pressure);    // test code，set the Pressure = 5
     upitem.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerUpEvent->AddPointerItem(upitem);

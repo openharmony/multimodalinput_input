@@ -28,7 +28,7 @@ constexpr HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIEventHan
 using namespace AppExecFwk;
 MMIEventHandler::MMIEventHandler() : MMIEventHandler(EventRunner::Create(false), nullptr)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 }
 
 MMIEventHandler::MMIEventHandler(const std::shared_ptr<EventRunner> &runner, MMIClientPtr client)
@@ -77,7 +77,7 @@ MMIEventHandlerPtr MMIEventHandler::GetSharedPtr()
 
 void MMIEventHandler::OnReconnect(const InnerEvent::Pointer &event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(mmiClient_);
     if (mmiClient_->Reconnect() != RET_OK) {
         SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME);
@@ -86,7 +86,7 @@ void MMIEventHandler::OnReconnect(const InnerEvent::Pointer &event)
 
 void MMIEventHandler::OnStop(const InnerEvent::Pointer &event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto runner = GetEventRunner();
     if (runner != nullptr) {
         runner->Stop();

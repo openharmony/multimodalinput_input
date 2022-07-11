@@ -41,7 +41,7 @@ const std::string REMOVE_EVENT = "remove";
 
 JsEventTarget::JsEventTarget()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto ret = devMonitor_.insert({ CHANGED_TYPE, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
     CK(ret.second, VAL_NOT_EXP);
 }
@@ -50,7 +50,7 @@ JsEventTarget::~JsEventTarget() {}
 
 void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     if ((work->data) == nullptr) {
@@ -91,7 +91,7 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
 
 void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(work);
     if ((work->data) == nullptr) {
@@ -132,7 +132,7 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
 
 void JsEventTarget::TargetOn(std::string type, int32_t deviceId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = devMonitor_.find(CHANGED_TYPE);
     if (iter == devMonitor_.end()) {
@@ -167,7 +167,7 @@ void JsEventTarget::TargetOn(std::string type, int32_t deviceId)
 
 void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
@@ -192,7 +192,7 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
 
 void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
@@ -213,7 +213,7 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
 
 void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> &ids)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
@@ -255,7 +255,7 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> &ids)
 
 void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
@@ -272,7 +272,7 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
 
 void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
@@ -286,7 +286,7 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
 
 void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(device);
     auto iter = callback_.find(userData);
@@ -325,7 +325,7 @@ void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl:
 
 void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
@@ -348,7 +348,7 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
 
 void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
@@ -377,7 +377,7 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
 
 void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<bool> &keystrokeAbility)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
@@ -415,7 +415,7 @@ void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<bool> &
 
 void JsEventTarget::EmitJsKeyboardType(int32_t userData, int32_t keyboardType)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
@@ -454,7 +454,7 @@ void JsEventTarget::EmitJsKeyboardType(int32_t userData, int32_t keyboardType)
 
 void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
@@ -471,7 +471,7 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
 
 void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
@@ -485,7 +485,7 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
 
 void JsEventTarget::AddMonitor(napi_env env, std::string type, napi_value handle)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = devMonitor_.find(type);
     if (iter == devMonitor_.end()) {
@@ -515,7 +515,7 @@ void JsEventTarget::AddMonitor(napi_env env, std::string type, napi_value handle
 
 void JsEventTarget::RemoveMonitor(napi_env env, std::string type, napi_value handle)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = devMonitor_.find(type);
     if (iter == devMonitor_.end()) {
@@ -543,7 +543,7 @@ monitorLabel:
 
 napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, const int32_t userData)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     auto cb = std::make_unique<JsUtil::CallbackInfo>();
     CHKPP(cb);
@@ -580,7 +580,7 @@ std::unique_ptr<JsUtil::CallbackInfo> JsEventTarget::GetCallbackInfo(uv_work_t *
 
 void JsEventTarget::ResetEnv()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     callback_.clear();
     devMonitor_.clear();
