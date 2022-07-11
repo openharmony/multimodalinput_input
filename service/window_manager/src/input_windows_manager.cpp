@@ -313,7 +313,6 @@ bool InputWindowsManager::CalculateTipPoint(struct libinput_event_tablet_tool* t
     }
     return true;
 }
-
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
