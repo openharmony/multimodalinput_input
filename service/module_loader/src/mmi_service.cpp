@@ -644,6 +644,7 @@ void MMIService::OnThread()
 #ifdef OHOS_RSS_CLIENT
     tid_.store(tid);
 #endif
+    libinputAdapter_.RetriggerHotplugEvents();
     libinputAdapter_.ProcessPendingEvents();
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         epoll_event ev[MAX_EVENT_SIZE] = {};
