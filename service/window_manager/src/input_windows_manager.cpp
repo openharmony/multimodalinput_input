@@ -72,7 +72,7 @@ int32_t InputWindowsManager::GetWindowPid(int32_t windowId)
 {
     for (const auto& logicalDisplayItem : logicalDisplays_) {
         for (const auto& windowInfo : logicalDisplayItem.windowsInfo) {
-            if (windowInfo.id = windowId) {
+            if (windowInfo.id == windowId) {
                 return windowInfo.pid;
             }
         }
