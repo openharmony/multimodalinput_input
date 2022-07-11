@@ -115,8 +115,8 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSiz
     pointerEvent->SetPressedKeys(pressedKeys);
     TestSimulateInputEvent(pointerEvent);
 }
-
 #endif // OHOS_BUILD_ENABLE_POINTER
+
 /**
  * @tc.name:PointerEventTest_CheckMousePointEvent_001
  * @tc.desc:Verify mouse point event
