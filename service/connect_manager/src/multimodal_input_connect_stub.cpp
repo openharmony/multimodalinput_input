@@ -377,9 +377,9 @@ int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, Mess
         MMI_HILOGE("service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t ret = SetAnrListener();
+    int32_t ret = SetAnrObserver();
     if (ret != RET_OK) {
-        MMI_HILOGE("call SetAnrListener failed ret:%{public}d", ret);
+        MMI_HILOGE("call SetAnrObserver failed ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

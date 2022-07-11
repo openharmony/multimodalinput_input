@@ -606,7 +606,7 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
     return RET_OK;
 }
 
-int32_t MMIService::SetAnrListener()
+int32_t MMIService::SetAnrObserver()
 {
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
