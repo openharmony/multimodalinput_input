@@ -46,6 +46,7 @@ protected:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void AddInputEventFilter();
     void SimulateInputEventHelper(int32_t physicalX, int32_t physicalY, int32_t expectVal);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 private:
     int32_t callbackRet = 0;
 };

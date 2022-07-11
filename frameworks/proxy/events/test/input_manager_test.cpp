@@ -1154,7 +1154,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId2);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
-#endif //OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 /**
  * @tc.name: TestGetKeystrokeAbility_001
