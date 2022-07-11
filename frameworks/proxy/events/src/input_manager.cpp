@@ -139,5 +139,10 @@ void InputManager::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)
 {
     InputMgrImpl->GetKeyboardType(deviceId, callback);
 }
+
+void InputManager::SetAnrListener(std::shared_ptr<IAnrListener> receiver)
+{
+    InputMgrImpl->SetAnrListener(receiver);
+}
 } // namespace MMI
 } // namespace OHOS
