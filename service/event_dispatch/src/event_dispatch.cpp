@@ -94,7 +94,7 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
             auto pointerPid = WinMgr->GetWindowPid(pointeritem.GetTargetWindowId());
             if (pointerPid >=0 && pointerPid != pid) {
                 pointerEvent->RemovePointerItem(id);
-                MMI_HILOGD("pointerIdList size: %{public}lu",pointerEvent->GetPointersIdList().size());
+                MMI_HILOGD("pointerIdList size: %{public}lu", pointerEvent->GetPointersIdList().size());
             }
         }
     }
