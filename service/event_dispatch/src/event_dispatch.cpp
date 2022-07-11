@@ -91,10 +91,10 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
                 MMI_HILOGW("can't find this poinerItem");
                 continue;
             }
-            auto pointerPid = WinMgr->GetWindowPid(pointeritem.GetTargetWindowId());
+            auto itemPid = WinMgr->GetWindowPid(pointeritem.GetTargetWindowId());
             if (pointerPid >=0 && pointerPid != pid) {
                 pointerEvent->RemovePointerItem(id);
-                MMI_HILOGD("pointerIdList size: %{public}lu", pointerEvent->GetPointersIdList().size());
+                MMI_HILOGD("pointerIdList size: %{public}u", pointerEvent->GetPointersIdList().size());
             }
         }
     }
