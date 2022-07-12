@@ -23,7 +23,7 @@
 #include "event_handler.h"
 #include "nocopyable.h"
 
-#include "i_anr_listener.h"
+#include "i_anr_observer.h"
 #include "display_info.h"
 #include "error_multimodal.h"
 #include "i_input_event_consumer.h"
@@ -235,7 +235,7 @@ public:
      */
     void GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
 
-    void SetAnrListener(std::shared_ptr<IAnrListener> receiver);
+    void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
 
 private:
     InputManager() = default;

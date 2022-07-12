@@ -609,7 +609,7 @@ void InputManagerImpl::GetKeyboardType(int32_t deviceId, std::function<void(int3
     InputDevImpl.GetKeyboardType(deviceId, callback);
 }
 
-void InputManagerImpl::SetAnrListener(std::shared_ptr<IAnrListener> receiver)
+void InputManagerImpl::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -617,8 +617,14 @@ void InputManagerImpl::SetAnrListener(std::shared_ptr<IAnrListener> receiver)
         MMI_HILOGE("Client init failed");
         return;
     }
-    anrReceiver_ = receiver;
-    int32_t ret = MultimodalInputConnMgr->SetAnrListener();
+    for (auto iter = anrObservers_.begin(); iter != anrObservers_.end(); ++iter) {
+        if (*iter == observer) {
+            MMI_HILOGE("observer already exist");
+            return;
+        }
+    }
+    anrObservers_.push_back(observer);
+    int32_t ret = MultimodalInputConnMgr->SetAnrObserver();
     if (ret != RET_OK) {
         MMI_HILOGE("send to server failed, ret:%{public}d", ret);
     }
@@ -628,23 +634,24 @@ void InputManagerImpl::OnAnr(int32_t pid)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    CHKPV(anrReceiver_);
     auto eventHandler = GetCurrentEventHandler();
     CHKPV(eventHandler);
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHandler::PostTask(eventHandler,
-        std::bind(&InputManagerImpl::OnAnrTask, this, anrReceiver_, pid))) {
+        std::bind(&InputManagerImpl::OnAnrTask, this, anrObservers_, pid))) {
         MMI_HILOGE("post task failed");
     }
     MMI_HILOGI("anr noticed pid:%{public}d", pid);
 }
 
-void InputManagerImpl::OnAnrTask(std::shared_ptr<IAnrListener> receiver, int32_t pid)
+void InputManagerImpl::OnAnrTask(std::vector<std::shared_ptr<IAnrObserver>> observers, int32_t pid)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    CHKPV(receiver);
-    receiver->OnAnr(pid);
+    for (auto &observer : observers) {
+        CHKPV(observer);
+        observer->OnAnr(pid);
+    }
 }
 } // namespace MMI
 } // namespace OHOS
