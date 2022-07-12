@@ -55,7 +55,7 @@ private:
     void InitAbsolution();
 
 private:
-    std::shared_ptr<PointerEvent> pointerEvent_ = nullptr;
+    std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     int32_t timerId_ { -1 };
     double absolutionX_ { -1 };
     double absolutionY_ { -1 };
