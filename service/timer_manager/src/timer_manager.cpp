@@ -94,7 +94,7 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
     timer->callbackCount = 0;
     auto nowTime = GetMillisTime();
     if (!AddInt64(nowTime, timer->intervalMs, timer->nextCallTime)) {
-        MMI_HILOGE("Int64 addition overflow");
+        MMI_HILOGE("The addition of nextCallTime in TimerItem overflows");
         return NONEXISTENT_ID;
     }
     timer->callback = callback;
@@ -121,7 +121,7 @@ int32_t TimerManager::ResetTimerInternal(int32_t timerId)
             timers_.erase(it);
             auto nowTime = GetMillisTime();
             if (!AddInt64(nowTime, timer->intervalMs, timer->nextCallTime)) {
-                MMI_HILOGE("Int64 addition overflow");
+                MMI_HILOGE("The addition of nextCallTime in TimerItem overflows");
                 return RET_ERR;
             }
             timer->callbackCount = 0;
@@ -190,7 +190,7 @@ void TimerManager::ProcessTimersInternal()
             continue;
         }
         if (!AddInt64(nowTime, curTimer->intervalMs, curTimer->nextCallTime)) {
-            MMI_HILOGE("Int64 addition overflow");
+            MMI_HILOGE("The addition of nextCallTime in TimerItem overflows");
             return;
         }
         const auto& timer = InsertTimerInternal(curTimer);

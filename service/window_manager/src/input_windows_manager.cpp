@@ -329,11 +329,11 @@ bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Re
         int32_t displayMaxX = 0;
         int32_t displayMaxY = 0;
         if (!AddInt32(item.x, item.width, displayMaxX)) {
-            MMI_HILOGE("Int32 addition overflow");
+            MMI_HILOGE("The addition of displayMaxX overflows");
             return false;
         }
         if (!AddInt32(item.y, item.height, displayMaxY)) {
-            MMI_HILOGE("Int32 addition overflow");
+            MMI_HILOGE("The addition of displayMaxY overflows");
             return false;
         }
         if (((x >= item.x) && (x < displayMaxX)) &&
@@ -443,11 +443,11 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int32_t logicalX = 0;
     int32_t logicalY = 0;
     if (!AddInt32(pointerItem.GetDisplayX(), physicalDisplayInfo->x, logicalX)) {
-        MMI_HILOGE("Int32 addition overflow");
+        MMI_HILOGE("The addition of logicalX overflows");
         return RET_ERR;
     }
     if (!AddInt32(pointerItem.GetDisplayY(), physicalDisplayInfo->y, logicalY)) {
-        MMI_HILOGE("Int32 addition overflow");
+        MMI_HILOGE("The addition of logicalY overflows");
         return RET_ERR;
     }
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
@@ -502,11 +502,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     int32_t logicalX = 0;
     int32_t logicalY = 0;
     if (!AddInt32(physicalX, physicDisplayInfo->x, logicalX)) {
-        MMI_HILOGE("Int32 addition overflow");
+        MMI_HILOGE("The addition of logicalX overflows");
         return RET_ERR;
     }
     if (!AddInt32(physicalY, physicDisplayInfo->y, logicalY)) {
-        MMI_HILOGE("Int32 addition overflow");
+        MMI_HILOGE("The addition of logicalY overflows");
         return RET_ERR;
     }
     WindowInfo *touchWindow = nullptr;
@@ -603,22 +603,22 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, in
     int32_t logicalX = 0;
     int32_t logicalY = 0;
     if (!AddInt32(physicalX, displayInfo.x, logicalX)) {
-        MMI_HILOGE("Int32 addition overflow");
+        MMI_HILOGE("The addition of logicalX overflows");
         return;
     }
     if (!AddInt32(physicalY, displayInfo.y, logicalY)) {
-        MMI_HILOGE("Int32 addition overflow");
+        MMI_HILOGE("The addition of logicalY overflows");
         return;
     }
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         int32_t displayMaxX = 0;
         int32_t displayMaxY = 0;
         if (!AddInt32(item.x, item.width, displayMaxX)) {
-            MMI_HILOGE("Int32 addition overflow");
+            MMI_HILOGE("The addition of displayMaxX overflows");
             return;
         }
         if (!AddInt32(item.y, item.height, displayMaxY)) {
-            MMI_HILOGE("Int32 addition overflow");
+            MMI_HILOGE("The addition of displayMaxY overflows");
             return;
         }
         if ((logicalX >= item.x && logicalX < displayMaxX) &&
