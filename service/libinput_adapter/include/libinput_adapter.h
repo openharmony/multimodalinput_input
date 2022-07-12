@@ -38,6 +38,7 @@ public:
     void Stop();
     void ProcessPendingEvents();
     void ReloadDevice();
+    void RetriggerHotplugEvents();
 
     int32_t GetInputFd() const
     {

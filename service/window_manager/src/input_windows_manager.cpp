@@ -355,17 +355,27 @@ bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Re
 void InputWindowsManager::AdjustDisplayCoordinate(
     const DisplayInfo& displayInfo, int32_t& physicalX, int32_t& physicalY) const
 {
+    int32_t width = 0;
+    int32_t height = 0;
+    if (displayInfo.direction == Direction0 || displayInfo.direction == Direction180) {
+        width = displayInfo.width;
+        height = displayInfo.height;
+    }
+    if (displayInfo.direction == Direction90 || displayInfo.direction == Direction270) {
+        height = displayInfo.width;
+        width = displayInfo.height;
+    }
     if (physicalX <= 0) {
         physicalX = 0;
     }
-    if (physicalX >= displayInfo.width && displayInfo.width > 0) {
-        physicalX = displayInfo.width - 1;
+    if (physicalX >= width && width > 0) {
+        physicalX = width - 1;
     }
     if (physicalY <= 0) {
         physicalY = 0;
     }
-    if (physicalY >= displayInfo.height && displayInfo.height > 0) {
-        physicalY = displayInfo.height - 1;
+    if (physicalY >= height && height > 0) {
+        physicalY = height - 1;
     }
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -499,7 +509,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     int32_t logicalX = physicalX + physicDisplayInfo->x;
     int32_t logicalY = physicalY + physicDisplayInfo->y;
     WindowInfo *touchWindow = nullptr;
-    auto targetWindowId = pointerEvent->GetTargetWindowId();
+    auto targetWindowId = pointerItem.GetTargetWindowId();
     for (auto &item : displayGroupInfo_.windowsInfo) {
         if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
             MMI_HILOGD("Skip the untouchable window to continue searching, "
@@ -531,6 +541,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetWindowY(localY);
     pointerItem.SetToolWindowX(pointerItem.GetToolDisplayX() + physicDisplayInfo->x - touchWindow->area.x);
     pointerItem.SetToolWindowY(pointerItem.GetToolDisplayY() + physicDisplayInfo->y - touchWindow->area.y);
+    pointerItem.SetTargetWindowId(touchWindow->id);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
     MMI_HILOGD("pid:%{public}d,fd:%{public}d,logicalX:%{public}d,logicalY:%{public}d,"
