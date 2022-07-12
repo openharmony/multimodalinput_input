@@ -51,7 +51,7 @@ config("libmmi_test_util") {
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/windowmanager/wm/include",
+    "//foundation/window/window_manager/wm/include",
     "//third_party/googletest/googletest/include",
   ]
 }
@@ -292,6 +292,9 @@ ohos_unittest("InputManagerTest") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
@@ -376,6 +379,9 @@ ohos_unittest("PointerEventTest") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "window_manager:libwm",
