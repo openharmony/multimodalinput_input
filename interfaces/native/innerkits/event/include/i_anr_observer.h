@@ -13,19 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef I_ANR_LISTENER_H
-#define I_ANR_LISTENER_H
+#ifndef I_ANR_OBSERVER_H
+#define I_ANR_OBSERVER_H
 
 namespace OHOS {
 namespace MMI {
-class IAnrListener {
+class IAnrObserver {
 public:
-    IAnrListener() = default;
-    virtual ~IAnrListener() = default;
+    IAnrObserver() = default;
+    virtual ~IAnrObserver() = default;
     virtual void OnAnr(int32_t pid) const;
 };
 } // namespace MMI
 } // namespace OHOS
 
 
-#endif // I_ANR_LISTENER_H
+#endif // I_ANR_OBSERVER_H
