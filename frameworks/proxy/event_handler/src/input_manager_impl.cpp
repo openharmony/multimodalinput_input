@@ -617,7 +617,11 @@ void InputManagerImpl::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
         MMI_HILOGE("Client init failed");
         return;
     }
-    anrObservers_.clear();
+    auto iter = anrObservers_.find(observer);
+    if (iter != anrObservers_.end()) {
+        MMI_HILOGE("observer already exist");
+        return;
+    }
     anrObservers_.push_back(observer);
     int32_t ret = MultimodalInputConnMgr->SetAnrObserver();
     if (ret != RET_OK) {
