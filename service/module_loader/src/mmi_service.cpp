@@ -24,6 +24,7 @@
 #include <unordered_map>
 #endif
 
+#include "anr_manager.h"
 #include "event_dump.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
@@ -246,6 +247,8 @@ int32_t MMIService::Init()
     MMIEventDump->Init(*this);
     MMI_HILOGD("WindowsManager Init");
     WinMgr->Init(*this);
+    MMI_HILOGD("AnrManager Init");
+    AnrMgr->Init(*this);
     MMI_HILOGD("PointerDrawingManager Init");
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if (!IPointerDrawingManager::GetInstance()->Init()) {
@@ -603,6 +606,19 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
     return RET_OK;
 }
 
+int32_t MMIService::SetAnrObserver()
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&AnrManager::SetAnrNoticedPid, AnrMgr, pid));
+    if (ret != RET_OK) {
+        MMI_HILOGE("unsubscribe key event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 void MMIService::OnDelegateTask(epoll_event& ev)
 {
     if ((ev.events & EPOLLIN) == 0) {
@@ -628,6 +644,7 @@ void MMIService::OnThread()
 #ifdef OHOS_RSS_CLIENT
     tid_.store(tid);
 #endif
+    libinputAdapter_.RetriggerHotplugEvents();
     libinputAdapter_.ProcessPendingEvents();
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         epoll_event ev[MAX_EVENT_SIZE] = {};

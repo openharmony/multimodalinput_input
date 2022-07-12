@@ -74,7 +74,7 @@ void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
     MMI_HILOGD("Mark consumed state, monitor:%{public}d,event:%{public}d", monitorId, eventId);
     int32_t ret = MultimodalInputConnMgr->MarkEventConsumed(monitorId, eventId);
     if (ret != 0) {
-        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
     }
 }
 
@@ -103,7 +103,7 @@ void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handle
 {
     int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerId, handlerType, eventType);
     if (ret != 0) {
-        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
     }
 }
 
@@ -128,7 +128,7 @@ void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType h
     MMI_HILOGD("Remove handler:%{public}d from server", handlerId);
     int32_t ret = MultimodalInputConnMgr->RemoveInputHandler(handlerId, handlerType);
     if (ret != 0) {
-        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
     }
 }
 

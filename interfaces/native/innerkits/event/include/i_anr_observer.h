@@ -13,26 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef JS_KEY_CODE
-#define JS_KEY_CODE
-
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
-#include "nocopyable.h"
+#ifndef I_ANR_OBSERVER_H
+#define I_ANR_OBSERVER_H
 
 namespace OHOS {
 namespace MMI {
-class JsKeyCode {
+class IAnrObserver {
 public:
-    JsKeyCode() = default;
-    ~JsKeyCode() = default;
-    DISALLOW_COPY_AND_MOVE(JsKeyCode);
-    static napi_value Export(napi_env env, napi_value exports);
-private:
-    static napi_value GetNapiInt32(napi_env env, int32_t code);
-    static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
+    IAnrObserver() = default;
+    virtual ~IAnrObserver() = default;
+    virtual void OnAnr(int32_t pid) const;
 };
 } // namespace MMI
 } // namespace OHOS
 
-#endif // JS_KEY_CODE
+
+#endif // I_ANR_OBSERVER_H
