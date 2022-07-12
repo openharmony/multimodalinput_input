@@ -50,7 +50,7 @@ void InputEvent::Reset()
     }
     id_ = -1;
     if (!AddInt64(ts.tv_sec * 1000000, ts.tv_nsec / 1000, actionTime_)) {
-        MMI_HILOGE("Int64 addition overflow");
+        MMI_HILOGE("The addition of actionTime_ overflows");
         return;
     }
     action_ = ACTION_UNKNOWN;

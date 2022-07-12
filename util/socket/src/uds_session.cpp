@@ -148,7 +148,7 @@ void UDSSession::DelEvents(int32_t id)
     }
     int64_t endTime = 0;
     if (!AddInt64(events_.begin()->eventTime, INPUT_UI_TIMEOUT_TIME, endTime)) {
-        MMI_HILOGE("Int64 addition overflow");
+        MMI_HILOGE("The addition of endTime overflows");
         return;
     }
     auto currentTime = GetSysClockTime();
