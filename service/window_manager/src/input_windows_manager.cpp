@@ -550,6 +550,35 @@ int32_t InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> 
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    auto source = pointerEvent->GetSourceType();
+    switch (source) {
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+        case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
+            return UpdateTouchScreenTarget(pointerEvent);
+        }
+#endif // OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_POINTER
+        case PointerEvent::SOURCE_TYPE_MOUSE: {
+            return UpdateMouseTarget(pointerEvent);
+        }
+        case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
+            return UpdateTouchPadTarget(pointerEvent);
+        }
+#endif // OHOS_BUILD_ENABLE_POINTER
+        default: {
+            MMI_HILOGE("Source type is unknown, source:%{public}d", source);
+            break;
+        }
+    }
+    return RET_ERR;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
 #ifdef OHOS_BUILD_ENABLE_POINTER
 bool InputWindowsManager::IsInsideDisplay(const DisplayInfo& displayInfo, int32_t physicalX, int32_t physicalY)
 {

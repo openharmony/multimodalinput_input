@@ -139,6 +139,7 @@ void InputEventNormalizeHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> 
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPV(pointerEvent);
+    WinMgr->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandleTouchEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }

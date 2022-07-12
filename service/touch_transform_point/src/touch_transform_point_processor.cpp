@@ -190,7 +190,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
     }
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->UpdateId();
-    WinMgr->UpdateTouchScreenTarget(pointerEvent_);
+    WinMgr->UpdateTargetPointer(pointerEvent_);
     return pointerEvent_;
 }
 
