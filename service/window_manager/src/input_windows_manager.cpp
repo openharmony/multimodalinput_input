@@ -339,17 +339,27 @@ bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Re
 void InputWindowsManager::AdjustDisplayCoordinate(
     const DisplayInfo& displayInfo, int32_t& physicalX, int32_t& physicalY) const
 {
+    int32_t width = 0;
+    int32_t height = 0;
+    if (displayInfo.direction == Direction0 || displayInfo.direction == Direction180) {
+        width = displayInfo.width;
+        height = displayInfo.height;
+    }
+    if (displayInfo.direction == Direction90 || displayInfo.direction == Direction270) {
+        height = displayInfo.width;
+        width = displayInfo.height;
+    }
     if (physicalX <= 0) {
         physicalX = 0;
     }
-    if (physicalX >= displayInfo.width && displayInfo.width > 0) {
-        physicalX = displayInfo.width - 1;
+    if (physicalX >= width && width > 0) {
+        physicalX = width - 1;
     }
     if (physicalY <= 0) {
         physicalY = 0;
     }
-    if (physicalY >= displayInfo.height && displayInfo.height > 0) {
-        physicalY = displayInfo.height - 1;
+    if (physicalY >= height && height > 0) {
+        physicalY = height - 1;
     }
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
