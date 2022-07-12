@@ -354,7 +354,7 @@ int32_t MultimodalInputConnectProxy::InjectPointerEvent(const std::shared_ptr<Po
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetAnrListener()
+int32_t MultimodalInputConnectProxy::SetAnrObserver()
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -366,7 +366,7 @@ int32_t MultimodalInputConnectProxy::SetAnrListener()
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SET_ANR_LISTENER, data, reply, option);
+    int32_t ret = remote->SendRequest(SET_ANR_OBSERVER, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("send request fail, ret:%{public}d", ret);
         return ret;
