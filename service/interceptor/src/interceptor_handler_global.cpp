@@ -77,6 +77,7 @@ void InterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> po
 int32_t InterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
 {
+    CALL_INFO_TRACE;
     CHKPR(session, RET_ERR);
     if (!IsValidHandlerId(handlerId)) {
         MMI_HILOGE("Invalid handler");
@@ -95,6 +96,7 @@ int32_t InterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
 void InterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
+    CALL_INFO_TRACE;
     CHKPV(session);
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         MMI_HILOGD("Unregister interceptor:%{public}d", handlerId);
@@ -253,6 +255,7 @@ void InterceptorHandlerGlobal::InterceptorCollection::RemoveInterceptor(const Se
 
 void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr session)
 {
+    CALL_INFO_TRACE;
     std::set<SessionHandler>::const_iterator cItr = interceptors_.cbegin();
     while (cItr != interceptors_.cend()) {
         if (cItr->session_ != session) {
@@ -277,10 +280,10 @@ void InterceptorHandlerGlobal::InterceptorCollection::Dump(int32_t fd, const std
         CHKPV(session);
         mprintf(fd,
                 "interceptor id:%d | handlerType:%d | eventType:%d | Pid:%d | Uid:%d | Fd:%d "
-                "| HasPermission:%s | EarliestEventTime:%" PRId64 " | Descript:%s \t",
+                "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
                 item.id_, item.handlerType_, item.eventType_,
                 session->GetPid(), session->GetUid(),
-                session->GetFd(), session->HasPermission() ? "true" : "false",
+                session->GetFd(),
                 session->GetEarliestEventTime(), session->GetDescript().c_str());
     }
 }

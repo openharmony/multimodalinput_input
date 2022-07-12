@@ -26,7 +26,7 @@ public:
     virtual ~IPointerDrawingManager() = default;
 
     static std::shared_ptr<IPointerDrawingManager> GetInstance();
-    virtual void DrawPointer(int32_t displayId, int32_t globalX, int32_t globalY) {}
+    virtual void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY) {}
     virtual void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height) {}
     virtual bool Init()
     {

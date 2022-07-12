@@ -61,7 +61,7 @@ int32_t StandardizedEventManager::UnsubscribeKeyEvent(int32_t subscribeId)
 
 int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     CHKPR(keyEvent, RET_ERR);
     keyEvent->UpdateId();
     if (keyEvent->GetKeyCode() < 0) {
@@ -70,7 +70,7 @@ int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> ke
     }
     int32_t ret = MultimodalInputConnMgr->InjectKeyEvent(keyEvent);
     if (ret != 0) {
-        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -80,7 +80,7 @@ int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> ke
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     MMI_HILOGD("Inject pointer event:");
     std::stringstream sStream;
@@ -91,7 +91,7 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
     }
     int32_t ret = MultimodalInputConnMgr->InjectPointerEvent(pointerEvent);
     if (ret != 0) {
-        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -104,7 +104,7 @@ int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offset
     CALL_DEBUG_ENTER;
     int32_t ret = MultimodalInputConnMgr->MoveMouseEvent(offsetX, offsetY);
     if (ret != 0) {
-        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
