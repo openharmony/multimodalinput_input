@@ -72,7 +72,6 @@ protected:
     void DelSession(int32_t fd);
     void DumpSession(const std::string& title);
     void NotifySessionDeleted(SessionPtr ses);
-    void AddPermission(SessionPtr sess);
 
 protected:
     MsgServerFunCallback recvFun_ = nullptr;

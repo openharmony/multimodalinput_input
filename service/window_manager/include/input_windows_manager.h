@@ -119,8 +119,7 @@ private:
     DisplayGroupInfo displayGroupInfo_;
     MouseLocation mouseLocation_ = {-1, -1}; // physical coord
 };
-
-#define WinMgr InputWindowsManager::GetInstance()
 } // namespace MMI
 } // namespace OHOS
+#define WinMgr InputWindowsManager::GetInstance()
 #endif // INPUT_WINDOWS_MANAGER_H
