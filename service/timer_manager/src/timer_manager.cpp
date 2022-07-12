@@ -24,7 +24,7 @@ constexpr int32_t MAX_INTERVAL = 4096;
 constexpr int32_t MAX_TIMER_COUNT = 32;
 constexpr int32_t NONEXISTENT_ID = -1;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TimerManager" };
-} // namespace
+} // namespacegit
 
 int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
 {
