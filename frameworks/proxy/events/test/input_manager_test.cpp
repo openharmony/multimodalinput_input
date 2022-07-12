@@ -85,15 +85,15 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent001()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetGlobalX(523);   // test code，set the GlobalX = 523
-    item.SetGlobalY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
 
     item.SetPointerId(1);   // test code，set the PointerId = 1
-    item.SetGlobalX(610);   // test code，set the GlobalX = 610
-    item.SetGlobalY(910);   // test code，set the GlobalY = 910
+    item.SetDisplayX(610);   // test code，set the DisplayX = 610
+    item.SetDisplayY(910);   // test code，set the DisplayY = 910
     item.SetPressure(7);    // test code，set the Pressure = 7
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
@@ -110,15 +110,15 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent002()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetGlobalX(523);   // test code，set the GlobalX = 523
-    item.SetGlobalY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
 
     item.SetPointerId(1);   // test code，set the PointerId = 1
-    item.SetGlobalX(600);   // test code，set the GlobalX = 600
-    item.SetGlobalY(610);   // test code，set the GlobalY = 610
+    item.SetDisplayX(600);   // test code，set the DisplayX = 600
+    item.SetDisplayY(610);   // test code，set the DisplayY = 610
     item.SetPressure(7);    // test code，set the Pressure = 7
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
@@ -135,15 +135,15 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent003()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetGlobalX(523);   // test code，set the GlobalX = 523
-    item.SetGlobalY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
 
     item.SetPointerId(1);   // test code，set the PointerId = 1
-    item.SetGlobalX(623);   // test code，set the GlobalX = 623
-    item.SetGlobalY(823);   // test code，set the GlobalY = 823
+    item.SetDisplayX(623);   // test code，set the DisplayX = 623
+    item.SetDisplayY(823);   // test code，set the DisplayY = 823
     item.SetPressure(0);    // test code，set the Pressure = 0
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
@@ -169,10 +169,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent005()
     item.SetDownTime(downTime);
     item.SetPressed(true);
 
-    item.SetGlobalX(50);
-    item.SetGlobalY(50);
-    item.SetLocalX(70);
-    item.SetLocalY(70);
+    item.SetDisplayX(50);
+    item.SetDisplayY(50);
+    item.SetWindowX(70);
+    item.SetWindowY(70);
 
     item.SetWidth(0);
     item.SetHeight(0);
@@ -194,10 +194,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent006()
     item.SetDownTime(0);
     item.SetPressed(false);
 
-    item.SetGlobalX(50);
-    item.SetGlobalY(50);
-    item.SetLocalX(70);
-    item.SetLocalY(70);
+    item.SetDisplayX(50);
+    item.SetDisplayY(50);
+    item.SetWindowX(70);
+    item.SetWindowY(70);
 
     item.SetWidth(0);
     item.SetHeight(0);
@@ -222,10 +222,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent007()
     item.SetDownTime(downTime);
     item.SetPressed(false);
 
-    item.SetGlobalX(50);
-    item.SetGlobalY(50);
-    item.SetLocalX(70);
-    item.SetLocalY(70);
+    item.SetDisplayX(50);
+    item.SetDisplayY(50);
+    item.SetWindowX(70);
+    item.SetWindowY(70);
 
     item.SetWidth(0);
     item.SetHeight(0);
@@ -248,10 +248,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent009()
     item.SetDownTime(0);
     item.SetPressed(false);
 
-    item.SetGlobalX(50);
-    item.SetGlobalY(50);
-    item.SetLocalX(70);
-    item.SetLocalY(70);
+    item.SetDisplayX(50);
+    item.SetDisplayY(50);
+    item.SetWindowX(70);
+    item.SetWindowY(70);
 
     item.SetWidth(0);
     item.SetHeight(0);
@@ -275,10 +275,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent010()
     item.SetDownTime(0);
     item.SetPressed(false);
 
-    item.SetGlobalX(200);
-    item.SetGlobalY(200);
-    item.SetLocalX(300);
-    item.SetLocalY(300);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    item.SetWindowX(300);
+    item.SetWindowY(300);
 
     item.SetWidth(0);
     item.SetHeight(0);
@@ -298,10 +298,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent011()
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(0);
-    item.SetGlobalX(523);
-    item.SetGlobalY(723);
-    item.SetLocalX(323);
-    item.SetLocalY(453);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
+    item.SetWindowX(323);
+    item.SetWindowY(453);
     item.SetWidth(0);
     item.SetHeight(0);
     item.SetTiltX(2.12);
@@ -312,10 +312,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent011()
 
     item.SetPointerId(1);
     item.SetDownTime(0);
-    item.SetGlobalX(50);
-    item.SetGlobalY(50);
-    item.SetLocalX(70);
-    item.SetLocalY(70);
+    item.SetDisplayX(50);
+    item.SetDisplayY(50);
+    item.SetWindowX(70);
+    item.SetWindowY(70);
     item.SetWidth(0);
     item.SetHeight(0);
     item.SetTiltX(12.22);
@@ -336,10 +336,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent012()
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(0);
-    item.SetGlobalX(523);
-    item.SetGlobalY(723);
-    item.SetLocalX(323);
-    item.SetLocalY(453);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
+    item.SetWindowX(323);
+    item.SetWindowY(453);
     item.SetWidth(0);
     item.SetHeight(0);
     item.SetTiltX(2.12);
@@ -350,10 +350,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent012()
 
     item.SetPointerId(1);
     item.SetDownTime(0);
-    item.SetGlobalX(50);
-    item.SetGlobalY(50);
-    item.SetLocalX(70);
-    item.SetLocalY(70);
+    item.SetDisplayX(50);
+    item.SetDisplayY(50);
+    item.SetWindowX(70);
+    item.SetWindowY(70);
     item.SetWidth(0);
     item.SetHeight(0);
     item.SetTiltX(12.22);
@@ -374,10 +374,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent013()
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(0);
-    item.SetGlobalX(523);
-    item.SetGlobalY(723);
-    item.SetLocalX(323);
-    item.SetLocalY(453);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
+    item.SetWindowX(323);
+    item.SetWindowY(453);
     item.SetWidth(0);
     item.SetHeight(0);
     item.SetTiltX(2.12);
@@ -388,10 +388,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent013()
 
     item.SetPointerId(1);
     item.SetDownTime(0);
-    item.SetGlobalX(50);
-    item.SetGlobalY(50);
-    item.SetLocalX(70);
-    item.SetLocalY(70);
+    item.SetDisplayX(50);
+    item.SetDisplayY(50);
+    item.SetWindowX(70);
+    item.SetWindowY(70);
     item.SetWidth(0);
     item.SetHeight(0);
     item.SetTiltX(12.22);
@@ -424,8 +424,8 @@ std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep1()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetGlobalX(523);   // test code，set the GlobalX = 523
-    item.SetGlobalY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
@@ -446,8 +446,8 @@ std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep2()
     CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetGlobalX(623);  // test code，set the GlobalX = 623
-    item.SetGlobalY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(623);  // test code，set the DisplayX = 623
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
@@ -476,8 +476,8 @@ void InputManagerTest::TestMarkConsumedStep4()
     CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetGlobalX(523);  // test code，set the GlobalX = 523
-    item.SetGlobalY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(523);  // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
@@ -497,8 +497,8 @@ void InputManagerTest::TestMarkConsumedStep5()
     CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetGlobalX(523);  // test code，set the GlobalX = 523
-    item.SetGlobalY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(523);  // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
@@ -519,8 +519,8 @@ void InputManagerTest::TestMarkConsumedStep6()
     CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetGlobalX(523);   // test code，set the GlobalX = 523
-    item.SetGlobalY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
@@ -847,10 +847,10 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_011, Test
     item.SetDownTime(0);
     item.SetPressed(false);
 
-    item.SetGlobalX(200);
-    item.SetGlobalY(200);
-    item.SetLocalX(300);
-    item.SetLocalY(300);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    item.SetWindowX(300);
+    item.SetWindowY(300);
 
     item.SetWidth(0);
     item.SetHeight(0);
@@ -881,10 +881,10 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_012, Test
     item.SetDownTime(0);
     item.SetPressed(false);
 
-    item.SetGlobalX(200);
-    item.SetGlobalY(200);
-    item.SetLocalX(300);
-    item.SetLocalY(300);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    item.SetWindowX(300);
+    item.SetWindowY(300);
 
     item.SetWidth(0);
     item.SetHeight(0);
@@ -915,10 +915,10 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_013, Test
     item.SetDownTime(0);
     item.SetPressed(false);
 
-    item.SetGlobalX(200);
-    item.SetGlobalY(200);
-    item.SetLocalX(300);
-    item.SetLocalY(300);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    item.SetWindowX(300);
+    item.SetWindowY(300);
 
     item.SetWidth(0);
     item.SetHeight(0);
@@ -1002,8 +1002,8 @@ HWTEST_F(InputManagerTest, InputManager_NotResponse_001, TestSize.Level1)
 
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
-    item.SetGlobalX(523);
-    item.SetGlobalY(723);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
     item.SetPressure(5);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
@@ -1028,8 +1028,8 @@ HWTEST_F(InputManagerTest, InputManager_NotResponse_002, TestSize.Level1)
 
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
-    item.SetGlobalX(523);
-    item.SetGlobalY(723);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
     item.SetPressure(5);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
@@ -1084,12 +1084,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
     int32_t subscribeId1 = -1;
     subscribeId1 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<KeyEvent> keyEvent) {
-        MMI_HILOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
-                   "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                   "EventType:%{public}d,flag:%{public}u",
-                   keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
-                   keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                   keyEvent->GetEventType(), keyEvent->GetFlag());
+        PrintEventData(keyEvent);
         MMI_HILOGD("subscribe key event KEYCODE_POWER down trigger callback");
     });
     EXPECT_TRUE(subscribeId1 >= 0);
@@ -1103,12 +1098,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
     int32_t subscribeId2 = -1;
     subscribeId2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2,
         [](std::shared_ptr<KeyEvent> keyEvent) {
-        MMI_HILOGD("KeyEvent:%{public}d,KeyCode:%{public}d,ActionTime:%{public}" PRId64 ","
-                   "ActionStartTime:%{public}" PRId64 ",Action:%{public}d,KeyAction:%{public}d,"
-                   "EventType:%{public}d,flag:%{public}u",
-                   keyEvent->GetId(), keyEvent->GetKeyCode(), keyEvent->GetActionTime(),
-                   keyEvent->GetActionStartTime(), keyEvent->GetAction(), keyEvent->GetKeyAction(),
-                   keyEvent->GetEventType(), keyEvent->GetFlag());
+        PrintEventData(keyEvent);
         MMI_HILOGD("subscribe key event KEYCODE_POWER up trigger callback");
     });
     EXPECT_TRUE(subscribeId2 >= 0);
@@ -1150,8 +1140,8 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_001, TestSize.Level1)
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(10010);
     item.SetPressed(true);
-    item.SetGlobalX(523);
-    item.SetGlobalY(723);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
@@ -1186,8 +1176,8 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_002, TestSize.Level1)
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(10010);
     item.SetPressed(true);
-    item.SetGlobalX(523);
-    item.SetGlobalY(723);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -1222,8 +1212,8 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_003, TestSize.Level1)
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(10010);
     item.SetPressed(true);
-    item.SetGlobalX(523);
-    item.SetGlobalY(723);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -1258,8 +1248,8 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
     item.SetPointerId(0);
     item.SetDownTime(10010);
     item.SetPressed(true);
-    item.SetGlobalX(523);
-    item.SetGlobalY(723);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -1309,8 +1299,8 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_005, TestSize.Level1)
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(GetNanoTime() / NANOSECOND_TO_MILLISECOND);
     item.SetPressed(true);
-    item.SetGlobalX(200);
-    item.SetGlobalY(300);
+    item.SetDisplayX(200);
+    item.SetDisplayY(300);
     pointerEvent->AddPointerItem(item);
 
     auto interceptor = GetPtr<InputEventCallback>();
@@ -1339,14 +1329,14 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_006, TestSize.Level1)
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetGlobalX(523);   // test code，set the GlobalX = 523
-    item.SetGlobalY(723);   // test code，set the GlobalY = 723
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
     item.SetPointerId(1);   // test code，set the PointerId = 1
-    item.SetGlobalX(710);   // test code，set the GlobalX = 710
-    item.SetGlobalY(910);   // test code，set the GlobalY = 910
+    item.SetDisplayX(710);   // test code，set the DisplayX = 710
+    item.SetDisplayY(910);   // test code，set the DisplayY = 910
     item.SetPressure(7);    // test code，set the Pressure = 7
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
     pointerEvent->AddPointerItem(item);
@@ -1409,6 +1399,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_007, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    VerifyMonitor monitor;
     auto pointerEvent = SetupPointerEvent001();
     ASSERT_TRUE(pointerEvent != nullptr);
 
@@ -1435,6 +1426,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_001, TestSize.Lev
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    VerifyMonitor monitor;
     const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
     std::vector<int32_t> ids(N_TEST_CASES);
     std::vector<std::shared_ptr<InputEventCallback>> cbs(N_TEST_CASES);
@@ -1470,6 +1462,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_002, TestSize.Lev
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_003, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    VerifyMonitor monitor;
     auto pointerEvent = SetupPointerEvent003();
     ASSERT_TRUE(pointerEvent != nullptr);
 
@@ -1496,6 +1489,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_003, TestSize.Lev
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_004, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    VerifyMonitor monitor;
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
@@ -1525,6 +1519,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_004, TestSize.Lev
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_005, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    VerifyMonitor monitor;
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
@@ -1553,14 +1548,15 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_005, TestSize.Lev
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    VerifyMonitor monitor;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
     item.SetPressed(true);
-    item.SetGlobalX(523);
-    item.SetGlobalY(723);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
@@ -1591,14 +1587,15 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    VerifyMonitor monitor;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
     item.SetPressed(true);
-    item.SetGlobalX(523);
-    item.SetGlobalY(723);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -1629,14 +1626,15 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    VerifyMonitor monitor;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
     item.SetPressed(true);
-    item.SetGlobalX(523);
-    item.SetGlobalY(723);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -1667,14 +1665,15 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    VerifyMonitor monitor;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
     item.SetPressed(true);
-    item.SetGlobalX(523);
-    item.SetGlobalY(723);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -1713,14 +1712,15 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    VerifyMonitor monitor;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
     item.SetPressed(true);
-    item.SetGlobalX(523);
-    item.SetGlobalY(723);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
@@ -1764,8 +1764,8 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
     item.SetPressed(true);
-    item.SetGlobalX(523);
-    item.SetGlobalY(723);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
     item.SetDeviceId(DEFAULT_DEVICE_ID);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
@@ -1803,8 +1803,8 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
     item.SetPressed(true);
-    item.SetGlobalX(700);
-    item.SetGlobalY(610);
+    item.SetDisplayX(700);
+    item.SetDisplayY(610);
     item.SetDeviceId(DEFAULT_DEVICE_ID);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -1842,8 +1842,8 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
     item.SetPressed(false);
-    item.SetGlobalX(50);
-    item.SetGlobalY(50);
+    item.SetDisplayX(50);
+    item.SetDisplayY(50);
     item.SetDeviceId(DEFAULT_DEVICE_ID);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -1881,22 +1881,22 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
     item.SetPressed(true);
-    item.SetGlobalX(523);
-    item.SetGlobalY(723);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
     item.SetDeviceId(DEFAULT_DEVICE_ID);
     pointerEvent->AddPointerItem(item);
     item.SetPointerId(1);
     item.SetDownTime(actionTime);
     item.SetPressed(true);
-    item.SetGlobalX(540);
-    item.SetGlobalY(740);
+    item.SetDisplayX(540);
+    item.SetDisplayY(740);
     item.SetDeviceId(DEFAULT_DEVICE_ID);
     pointerEvent->AddPointerItem(item);
     item.SetPointerId(2);
     item.SetDownTime(actionTime);
     item.SetPressed(true);
-    item.SetGlobalX(560);
-    item.SetGlobalY(760);
+    item.SetDisplayX(560);
+    item.SetDisplayY(760);
     item.SetDeviceId(DEFAULT_DEVICE_ID);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
@@ -1921,6 +1921,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    VerifyMonitor monitor;
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
@@ -1945,6 +1946,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    VerifyMonitor monitor;
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
@@ -1972,13 +1974,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    VerifyMonitor monitor;
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    auto pointerEvent = SetupPointerEvent007();;
+    auto pointerEvent = SetupPointerEvent007();
     ASSERT_TRUE(pointerEvent != nullptr);
     TestSimulateInputEvent(pointerEvent);
 
@@ -1997,6 +2000,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    VerifyMonitor monitor;
     const std::vector<int32_t>::size_type N_TEST_CASES { MAX_N_INPUT_HANDLERS - 1 };
     std::vector<int32_t> ids;
     int32_t maxMonitor = 0;
@@ -2036,6 +2040,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    VerifyMonitor monitor;
     const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
     std::vector<int32_t> ids;
     auto callBackPtr = GetPtr<InputEventCallback>();
@@ -2074,6 +2079,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_001, TestSize.L
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
+    VerifyMonitor monitor;
     const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
     std::vector<int32_t> ids;
     auto callBackPtr = GetPtr<InputEventCallback>();

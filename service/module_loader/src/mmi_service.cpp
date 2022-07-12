@@ -24,6 +24,7 @@
 #include <unordered_map>
 #endif
 
+#include "anr_manager.h"
 #include "event_dump.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
@@ -246,6 +247,8 @@ int32_t MMIService::Init()
     MMIEventDump->Init(*this);
     MMI_HILOGD("WindowsManager Init");
     WinMgr->Init(*this);
+    MMI_HILOGD("AnrManager Init");
+    AnrMgr->Init(*this);
     MMI_HILOGD("PointerDrawingManager Init");
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if (!IPointerDrawingManager::GetInstance()->Init()) {
@@ -344,7 +347,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
 
 int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPR(filter, ERROR_NULL_POINTER);
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputEventHandler::AddInputEventFilter,
@@ -438,7 +441,7 @@ int32_t MMIService::CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerTy
 int32_t MMIService::AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
     HandleEventType eventType)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -462,7 +465,7 @@ int32_t MMIService::CheckRemoveInput(int32_t pid, int32_t handlerId, InputHandle
 
 int32_t MMIService::RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -486,7 +489,7 @@ int32_t MMIService::CheckMarkConsumed(int32_t pid, int32_t monitorId, int32_t ev
 
 int32_t MMIService::MarkEventConsumed(int32_t monitorId, int32_t eventId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -515,7 +518,7 @@ int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 
 int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent));
@@ -545,7 +548,7 @@ int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> 
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
@@ -575,7 +578,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& 
 
 int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -590,7 +593,7 @@ int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr
 
 int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -600,6 +603,19 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
+}
+
+int32_t MMIService::SetAnrObserver()
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&AnrManager::SetAnrNoticedPid, AnrMgr, pid));
+    if (ret != RET_OK) {
+        MMI_HILOGE("unsubscribe key event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
@@ -628,6 +644,7 @@ void MMIService::OnThread()
 #ifdef OHOS_RSS_CLIENT
     tid_.store(tid);
 #endif
+    libinputAdapter_.RetriggerHotplugEvents();
     libinputAdapter_.ProcessPendingEvents();
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         epoll_event ev[MAX_EVENT_SIZE] = {};

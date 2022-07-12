@@ -125,6 +125,7 @@ int32_t ServerMsgHandler::MarkEventProcessed(SessionPtr sess, int32_t eventId)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
+    CALL_INFO_TRACE;
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
@@ -137,13 +138,20 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     pointerEvent->UpdateId();
     int32_t action = pointerEvent->GetPointerAction();
     if ((action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_UP)
         && targetWindowId_ > 0) {
         pointerEvent->SetTargetWindowId(targetWindowId_);
+        PointerEvent::PointerItem pointerItem;
+        if (!pointerEvent->GetPointerItem(0, pointerItem)) {
+            MMI_HILOGE("Can't find pointer item");
+            return RET_ERR;
+        }
+        pointerItem.SetTargetWindowId(targetWindowId_);
+        pointerEvent->UpdatePointerItem(0, pointerItem);
     }
     auto source = pointerEvent->GetSourceType();
     switch (source) {

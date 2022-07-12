@@ -71,6 +71,10 @@ group("multimodalinput_mmi_packages") {
     "service:libmmi-server",
     "tools/inject_event:uinput",
   ]
+
+  if (input_enable_distributed) {
+    deps += [ "frameworks/napi/distributed_input:distributedinput" ]
+  }
   if (mmi_enable_monitor) {
     deps += [ "frameworks/napi/input_monitor:inputmonitor" ]
   }
