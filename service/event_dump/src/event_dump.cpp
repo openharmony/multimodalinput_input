@@ -63,11 +63,6 @@ void ChkConfig(int32_t fd)
     mprintf(fd, "EXP_SOPATH: %s\n", DEF_EXP_SOPATH);
 }
 
-void EventDump::Init(UDSServer& uds)
-{
-    udsServer_ = &uds;
-}
-
 void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
