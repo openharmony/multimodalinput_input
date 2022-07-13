@@ -358,11 +358,11 @@ public:
 
         /**
          * @brief Sets the x coordinate relative to the upper left corner of the screen.
-         * @param globalX Indicates the x coordinate to set.
+         * @param displayX Indicates the x coordinate to set.
          * @return void
          * @since 9
          */
-        void SetDisplayX(int32_t globalX);
+        void SetDisplayX(int32_t displayX);
 
         /**
          * @brief Obtains the y coordinate relative to the upper left corner of the screen.
@@ -375,11 +375,11 @@ public:
 
         /**
          * @brief Sets the y coordinate relative to the upper left corner of the screen.
-         * @param globalY Indicates the y coordinate to set.
+         * @param displayY Indicates the y coordinate to set.
          * @return void
          * @since 9
          */
-        void SetDisplayY(int32_t globalY);
+        void SetDisplayY(int32_t displayY);
 
         /**
          * @brief Obtains the x coordinate of the active window.
@@ -456,7 +456,7 @@ public:
          * @return void
          * @since 9
          */
-        void SetToolDisplayX(int32_t globalX);
+        void SetToolDisplayX(int32_t displayX);
 
         /**
          * @brief Obtains the Y coordinate of the tool area's center point relative to the
@@ -473,7 +473,7 @@ public:
          * @return void
          * @since 9
          */
-        void SetToolDisplayY(int32_t globalY);
+        void SetToolDisplayY(int32_t displayY);
 
         /**
          * @brief Obtains the X coordinate of the tool area's center point relative to the
@@ -678,18 +678,18 @@ public:
     private:
         int32_t pointerId_ {};
         bool pressed_ { false };
-        int32_t globalX_ {};
-        int32_t globalY_ {};
-        int32_t localX_ {};
-        int32_t localY_ {};
+        int32_t displayX_ {};
+        int32_t displayY_ {};
+        int32_t windowX_ {};
+        int32_t windowY_ {};
         int32_t width_ {};
         int32_t height_ {};
         double  tiltX_ {};
         double  tiltY_ {};
-        int32_t toolGlobalX_ {};
-        int32_t toolGlobalY_ {};
-        int32_t toolLocalX_ {};
-        int32_t toolLocalY_ {};
+        int32_t toolDisplayX_ {};
+        int32_t toolDisplayY_ {};
+        int32_t toolWindowX_ {};
+        int32_t toolWindowY_ {};
         int32_t toolWidth_ {};
         int32_t toolHeight_ {};
         double  pressure_ {};

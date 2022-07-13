@@ -23,6 +23,7 @@ constexpr int32_t MIN_INTERVAL = 50;
 constexpr int32_t MAX_INTERVAL = 4096;
 constexpr int32_t MAX_TIMER_COUNT = 32;
 constexpr int32_t NONEXISTENT_ID = -1;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TimerManager" };
 } // namespace
 
 int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
@@ -91,7 +92,11 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
     timer->intervalMs = intervalMs;
     timer->repeatCount = repeatCount;
     timer->callbackCount = 0;
-    timer->nextCallTime = GetMillisTime() + intervalMs;
+    auto nowTime = GetMillisTime();
+    if (!AddInt64(nowTime, timer->intervalMs, timer->nextCallTime)) {
+        MMI_HILOGE("The addition of nextCallTime in TimerItem overflows");
+        return NONEXISTENT_ID;
+    }
     timer->callback = callback;
     InsertTimerInternal(timer);
     return timerId;
@@ -115,7 +120,10 @@ int32_t TimerManager::ResetTimerInternal(int32_t timerId)
             auto timer = std::move(*it);
             timers_.erase(it);
             auto nowTime = GetMillisTime();
-            timer->nextCallTime = nowTime + timer->intervalMs;
+            if (!AddInt64(nowTime, timer->intervalMs, timer->nextCallTime)) {
+                MMI_HILOGE("The addition of nextCallTime in TimerItem overflows");
+                return RET_ERR;
+            }
             timer->callbackCount = 0;
             InsertTimerInternal(timer);
             return RET_OK;
@@ -181,7 +189,10 @@ void TimerManager::ProcessTimersInternal()
             curTimer->callback();
             continue;
         }
-        curTimer->nextCallTime = nowTime + curTimer->intervalMs;
+        if (!AddInt64(nowTime, curTimer->intervalMs, curTimer->nextCallTime)) {
+            MMI_HILOGE("The addition of nextCallTime in TimerItem overflows");
+            return;
+        }
         const auto& timer = InsertTimerInternal(curTimer);
         timer->callback();
     }
