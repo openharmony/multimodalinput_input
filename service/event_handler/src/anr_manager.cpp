@@ -14,7 +14,6 @@
  */
 
 #include "ability_manager_client.h"
-#include "accesstoken_kit.h"
 #include "anr_manager.h"
 #include "dfx_hisysevent.h"
 #include "input_event_handler.h"
@@ -43,7 +42,7 @@ bool ANRManager::TriggerANR(int64_t time, SessionPtr sess)
     CHKPF(udsServer_);
     CHKPF(sess);
     MMI_HILOGD("Current time: %{public}" PRId64 "", time);
-    if (sess->GetTokenType() == OHOS::Security::AccessToken::TOKEN_NATIVE || sess->GetProgramName() == FOUNDATION) {
+    if (sess->GetTokenType() == static_cast<int32_t>(TokenType::TOKEN_NATIVE) || sess->GetProgramName() == FOUNDATION) {
         MMI_HILOGD("Native event");
         return false;
     }

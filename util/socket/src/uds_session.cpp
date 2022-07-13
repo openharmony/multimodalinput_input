@@ -23,8 +23,6 @@
 #include <sys/un.h>
 #include <unistd.h>
 
-#include "accesstoken_kit.h"
-
 #include "uds_socket.h"
 
 namespace OHOS {
@@ -36,12 +34,13 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSe
 } // namespace
 
 UDSSession::UDSSession(const std::string& programName, const int32_t moduleType, const int32_t fd,
-    const int32_t uid, const int32_t pid)
+    const int32_t uid, const int32_t pid, const int32_t tokenType)
     : programName_(programName),
       moduleType_(moduleType),
       fd_(fd),
       uid_(uid),
-      pid_(pid)
+      pid_(pid),
+      tokenType_(tokenType)
 {
     UpdateDescript();
 }
@@ -129,7 +128,7 @@ bool UDSSession::SendMsg(NetPacket& pkt) const
 void UDSSession::AddEvent(int32_t id, int64_t time)
 {
     CALL_DEBUG_ENTER;
-    if (GetTokenType() == OHOS::Security::AccessToken::TOKEN_NATIVE || GetProgramName() == FOUNDATION) {
+    if (GetTokenType() == static_cast<int32_t>(TokenType::TOKEN_NATIVE) || GetProgramName() == FOUNDATION) {
         MMI_HILOGD("Is native event");
         return;
     }
