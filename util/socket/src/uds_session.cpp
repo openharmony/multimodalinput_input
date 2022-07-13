@@ -34,13 +34,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSe
 } // namespace
 
 UDSSession::UDSSession(const std::string& programName, const int32_t moduleType, const int32_t fd,
-    const int32_t uid, const int32_t pid, const int32_t tokenType)
+    const int32_t uid, const int32_t pid)
     : programName_(programName),
       moduleType_(moduleType),
       fd_(fd),
       uid_(uid),
-      pid_(pid),
-      tokenType_(tokenType)
+      pid_(pid)
 {
     UpdateDescript();
 }
