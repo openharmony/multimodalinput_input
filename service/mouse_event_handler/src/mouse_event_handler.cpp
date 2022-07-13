@@ -46,7 +46,7 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
     return pointerEvent_;
 }
 
-double MouseEventHandler::GetSpeedGain(double speed)
+double MouseEventHandler::GetSpeedGain(const double &speed)
 {
     int32_t num = static_cast<int32_t>(ceil(abs(speed)));
     if (g_speedNums[0] <= num && num < g_speedNums[1]) {
@@ -94,7 +94,7 @@ int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
     uint64_t usec = libinput_event_pointer_get_time_usec(data);
     uint64_t timeDiff = usec - lastEventTime_;
     if (timeDiff <= 0) {
-        MMI_HILOGD("The time difference is less than or equal to 0");
+        MMI_HILOGE("The time difference is less than or equal to 0");
         return RET_ERR;
     }
 
