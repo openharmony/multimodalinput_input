@@ -26,14 +26,14 @@ config("event_injection_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
   ]
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   if (input_enable_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (input_enable_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 }
 
@@ -145,14 +145,14 @@ ohos_unittest("ut-event-injection-out") {
     "test/send_message_test.cpp",
   ]
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   if (input_enable_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (input_enable_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
   deps = [
@@ -189,14 +189,14 @@ ohos_executable("mmi-event-injection") {
   if (input_enable_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   if (input_enable_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (input_enable_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
   install_enable = true

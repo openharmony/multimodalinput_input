@@ -23,13 +23,13 @@ config("libinputeventclient_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
   ]
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
   if (input_enable_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
   if (input_enable_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 }
 
