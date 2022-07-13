@@ -14,6 +14,7 @@
  */
 
 #include "permission_helper.h"
+#include "proto.h"
 #include "ipc_skeleton.h"
 #include "mmi_log.h"
 
@@ -92,6 +93,21 @@ bool PermissionHelper::CheckMonitorPermission(uint32_t tokenId)
     }
     MMI_HILOGI("check monitor permission success");
     return true;
+}
+
+int32_t PermissionHelper::GetTokenType()
+{
+    CALL_DEBUG_ENTER;
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
+        return static_cast<int32_t>(TokenType::TOKEN_HAP);
+    } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
+        return static_cast<int32_t>(TokenType::TOKEN_NATIVE);
+    } else {
+        MMI_HILOGE("unsupported token type:%{public}d", tokenType);
+        return static_cast<int32_t>(TokenType::TOKEN_INVALID);
+    }
 }
 } // namespace MMI
 } // namespace OHOS
