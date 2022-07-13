@@ -38,6 +38,7 @@
 #include "res_type.h"
 #include "system_ability_definition.h"
 #endif
+#include "permission_helper.h"
 #include "timer_manager.h"
 #include "input_device_manager.h"
 #include "util.h"
@@ -245,8 +246,8 @@ int32_t MMIService::Init()
     CheckDefine();
     MMI_HILOGD("WindowsManager Init");
     WinMgr->Init(*this);
-    MMI_HILOGD("AnrManager Init");
-    AnrMgr->Init(*this);
+    MMI_HILOGD("ANRManager Init");
+    ANRMgr->Init(*this);
     MMI_HILOGD("PointerDrawingManager Init");
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if (!IPointerDrawingManager::GetInstance()->Init()) {
@@ -323,8 +324,9 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     int32_t serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t pid = GetCallingPid();
     int32_t uid = GetCallingUid();
+    int32_t tokenType = PerHelper->GetTokenType();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this,
-        programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd)));
+        programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd), tokenType));
     DfxHisysevent::ClientConnectData data = {
         .pid = pid,
         .uid = uid,
@@ -609,7 +611,7 @@ int32_t MMIService::SetAnrObserver()
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&AnrManager::SetAnrNoticedPid, AnrMgr, pid));
+        std::bind(&ANRManager::SetANRNoticedPid, ANRMgr, pid));
     if (ret != RET_OK) {
         MMI_HILOGE("unsubscribe key event processed failed, ret:%{public}d", ret);
         return RET_ERR;

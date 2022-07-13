@@ -23,31 +23,36 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AnrManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ANRManager" };
 constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
+const std::string FOUNDATION = "foundation";
 } // namespace
 
-void AnrManager::Init(UDSServer& udsServer)
+void ANRManager::Init(UDSServer& udsServer)
 {
     CALL_DEBUG_ENTER;
     udsServer_ = &udsServer;
     CHKPV(udsServer_);
-    udsServer_->AddSessionDeletedCallback(std::bind(
-        &AnrManager::OnSessionLost, this, std::placeholders::_1));
+    udsServer_->AddSessionDeletedCallback(std::bind(&ANRManager::OnSessionLost, this, std::placeholders::_1));
 }
 
-bool AnrManager::TriggerAnr(int64_t time, SessionPtr sess)
+bool ANRManager::TriggerANR(int64_t time, SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
     CHKPF(udsServer_);
     CHKPF(sess);
+    MMI_HILOGD("Current time: %{public}" PRId64 "", time);
+    if (sess->GetTokenType() ==TokenType::TOKEN_NATIVE || sess->GetProgramName() == FOUNDATION) {
+        MMI_HILOGD("Native event");
+        return false;
+    }
+
     int64_t earliest;
     if (sess->IsEventQueueEmpty()) {
         earliest = time;
     } else {
         earliest = sess->GetEarliestEventTime();
     }
-    MMI_HILOGD("Current time: %{public}" PRId64 "", time);
     if (time < (earliest + INPUT_UI_TIMEOUT_TIME)) {
         sess->isANRProcess_ = false;
         MMI_HILOGD("the event reports normally");
@@ -62,7 +67,7 @@ bool AnrManager::TriggerAnr(int64_t time, SessionPtr sess)
     return true;
 }
 
-void AnrManager::OnSessionLost(SessionPtr session)
+void ANRManager::OnSessionLost(SessionPtr session)
 {
     CALL_DEBUG_ENTER;
     CHKPV(session);
@@ -72,7 +77,7 @@ void AnrManager::OnSessionLost(SessionPtr session)
     }
 }
 
-int32_t AnrManager::SetAnrNoticedPid(int32_t pid)
+int32_t ANRManager::SetANRNoticedPid(int32_t pid)
 {
     CALL_DEBUG_ENTER;
     anrNoticedPid_ = pid;

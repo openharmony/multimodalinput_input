@@ -94,7 +94,7 @@ void UDSServer::Multicast(const std::vector<int32_t>& fdList, NetPacket& pkt)
 
 int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     const int32_t moduleType, const int32_t uid, const int32_t pid,
-    int32_t& serverFd, int32_t& toReturnClientFd)
+    int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType)
 {
     CALL_DEBUG_ENTER;
     int32_t sockFds[2] = {};
@@ -143,6 +143,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     }
 
     SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
+    sess->SetTokenType(tokenType);
     if (sess == nullptr) {
         cleanTaskWhenError();
         MMI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
