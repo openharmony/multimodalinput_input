@@ -53,7 +53,7 @@ public:
     int32_t GetClientPid(int32_t fd) const;
     void AddSessionDeletedCallback(std::function<void(SessionPtr)> callback);
     int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
-        const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd) override;
+        const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType) override;
 
     SessionPtr GetSession(int32_t fd) const;
     SessionPtr GetSessionByPid(int32_t pid) const override;

@@ -29,6 +29,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
+const std::string FOUNDATION = "foundation";
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 } // namespace
 
@@ -123,9 +124,13 @@ bool UDSSession::SendMsg(NetPacket& pkt) const
     return SendMsg(buf.Data(), buf.Size());
 }
 
-void UDSSession::AddEvent(int32_t id, int64_t time)
+void UDSSession::SaveANREvent(int32_t id, int64_t time)
 {
     CALL_DEBUG_ENTER;
+    if (GetTokenType() == TokenType::TOKEN_NATIVE || GetProgramName() == FOUNDATION) {
+        MMI_HILOGD("Is native event");
+        return;
+    }
     EventTime eventTime = {id, time};
     events_.push_back(eventTime);
 }

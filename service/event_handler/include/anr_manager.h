@@ -24,14 +24,14 @@
 
 namespace OHOS {
 namespace MMI {
-class AnrManager : public DelayedSingleton<AnrManager> {
+class ANRManager : public DelayedSingleton<ANRManager> {
 public:
-    AnrManager() = default;
-    DISALLOW_COPY_AND_MOVE(AnrManager);
-    ~AnrManager() = default;
+    ANRManager() = default;
+    DISALLOW_COPY_AND_MOVE(ANRManager);
+    ~ANRManager() = default;
     void Init(UDSServer& udsServer);
-    bool TriggerAnr(int64_t time, SessionPtr sess);
-    int32_t SetAnrNoticedPid(int32_t anrPid);
+    bool TriggerANR(int64_t time, SessionPtr sess);
+    int32_t SetANRNoticedPid(int32_t anrPid);
     void OnSessionLost(SessionPtr session);
 
 private:
@@ -40,5 +40,5 @@ private:
 };
 } // namespace MMI 
 } // namespace OHOS
-#define AnrMgr OHOS::MMI::AnrManager::GetInstance()
+#define ANRMgr OHOS::MMI::ANRManager::GetInstance()
 #endif // ANR_MANAGER_H
