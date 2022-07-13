@@ -142,8 +142,17 @@ void UDSSession::DelEvents(int32_t id)
             break;
         }
     }
+    if (events_.empty()) {
+        isANRProcess_ = false;
+        return;
+    }
+    int64_t endTime = 0;
+    if (!AddInt64(events_.begin()->eventTime, INPUT_UI_TIMEOUT_TIME, endTime)) {
+        MMI_HILOGE("The addition of endTime overflows");
+        return;
+    }
     auto currentTime = GetSysClockTime();
-    if (events_.empty() || (currentTime < (events_.begin()->eventTime + INPUT_UI_TIMEOUT_TIME))) {
+    if (currentTime < endTime) {
         isANRProcess_ = false;
     }
 }
