@@ -125,10 +125,10 @@ bool UDSSession::SendMsg(NetPacket& pkt) const
     return SendMsg(buf.Data(), buf.Size());
 }
 
-void UDSSession::AddEvent(int32_t id, int64_t time)
+void UDSSession::SaveANREvent(int32_t id, int64_t time)
 {
     CALL_DEBUG_ENTER;
-    if (GetTokenType() == static_cast<int32_t>(TokenType::TOKEN_NATIVE) || GetProgramName() == FOUNDATION) {
+    if (GetTokenType() == TokenType::TOKEN_NATIVE || GetProgramName() == FOUNDATION) {
         MMI_HILOGD("Is native event");
         return;
     }
