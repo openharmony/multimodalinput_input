@@ -104,7 +104,7 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
-    session->AddEvent(point->GetId(), currentTime);
+    session->SaveANREvent(point->GetId(), currentTime);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_POINTER
 
@@ -147,7 +147,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
         MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-    session->AddEvent(key->GetId(), currentTime);
+    session->SaveANREvent(key->GetId(), currentTime);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

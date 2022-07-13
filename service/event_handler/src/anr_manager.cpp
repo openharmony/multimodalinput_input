@@ -42,7 +42,7 @@ bool ANRManager::TriggerANR(int64_t time, SessionPtr sess)
     CHKPF(udsServer_);
     CHKPF(sess);
     MMI_HILOGD("Current time: %{public}" PRId64 "", time);
-    if (sess->GetTokenType() == static_cast<int32_t>(TokenType::TOKEN_NATIVE) || sess->GetProgramName() == FOUNDATION) {
+    if (sess->GetTokenType() ==TokenType::TOKEN_NATIVE || sess->GetProgramName() == FOUNDATION) {
         MMI_HILOGD("Native event");
         return false;
     }

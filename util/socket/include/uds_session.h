@@ -80,7 +80,7 @@ public:
     }
 
     void UpdateDescript();
-    void AddEvent(int32_t id, int64_t time);
+    void SaveANREvent(int32_t id, int64_t time);
     void DelEvents(int32_t id);
     int64_t GetEarliestEventTime() const;
     bool IsEventQueueEmpty();

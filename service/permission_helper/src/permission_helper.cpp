@@ -101,12 +101,12 @@ int32_t PermissionHelper::GetTokenType()
     auto tokenId = IPCSkeleton::GetCallingTokenID();
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
     if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
-        return static_cast<int32_t>(TokenType::TOKEN_HAP);
+        return TokenType::TOKEN_HAP;
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
-        return static_cast<int32_t>(TokenType::TOKEN_NATIVE);
+        return TokenType::TOKEN_NATIVE;
     } else {
-        MMI_HILOGE("unsupported token type:%{public}d", tokenType);
-        return static_cast<int32_t>(TokenType::TOKEN_INVALID);
+        MMI_HILOGW("unsupported token type:%{public}d", tokenType);
+        return TokenType::TOKEN_INVALID;
     }
 }
 } // namespace MMI
