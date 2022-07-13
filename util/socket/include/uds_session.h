@@ -107,13 +107,13 @@ protected:
     std::vector<EventTime> events_;
     std::string descript_;
     const std::string programName_;
-    const int32_t moduleType_;
-    int32_t fd_;
-    const int32_t uid_;
-    const int32_t pid_;
-    int32_t tokenType_;
+    const int32_t moduleType_ { -1 };
+    int32_t fd_ { -1 };
+    const int32_t uid_ { -1 };
+    const int32_t pid_ { -1 };
+    int32_t tokenType_ { -1 };
 #ifdef OHOS_BUILD_MMI_DEBUG
-    int32_t clientFd_ = -1;
+    int32_t clientFd_ { -1 };
 #endif // OHOS_BUILD_MMI_DEBUG
 };
 } // namespace MMI
