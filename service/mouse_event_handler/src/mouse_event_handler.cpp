@@ -32,8 +32,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MouseEventHandler"};
-const std::array<int32_t, 7> g_speedNums { 0, 5, 16, 23, 32, 41, 128 };
-const std::array<double, 6> g_speedGains { 0.6, 1, 1.2, 1.8, 2.1, 2.8 };
+const std::array<int32_t, 6> speedNums { 5, 16, 23, 32, 41, 128 };
+const std::array<double, 6> speedGains { 0.6, 1, 1.2, 1.8, 2.1, 2.8 };
 } // namespace
 MouseEventHandler::MouseEventHandler()
 {
@@ -49,19 +49,12 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
 double MouseEventHandler::GetSpeedGain(const double &speed) const
 {
     int32_t num = static_cast<int32_t>(ceil(abs(speed)));
-    if (g_speedNums[0] <= num && num < g_speedNums[1]) {
-        return g_speedGains[0];
-    } else if (g_speedNums[1] < num && num <= g_speedNums[2]) {
-        return g_speedGains[1];
-    } else if (g_speedNums[2] < num && num <= g_speedNums[3]) {
-        return g_speedGains[2];
-    } else if (g_speedNums[3] < num && num <= g_speedNums[4]) {
-        return g_speedGains[3];
-    } else if (g_speedNums[4] < num && num <= g_speedNums[5]) {
-        return g_speedGains[4];
-    } else {
-        return g_speedGains[5];
+    for ( size_t i = 0; i < speedNums.size(); ++i) {
+        if (num <= speedNums[i]) {
+            return speedGains[i];
+        }
     }
+    return speedGains.back();
 }
 
 int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
@@ -80,7 +73,12 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
         return RET_ERR;
     }
 
-    HandleMotionCorrection(data);
+    int32_t ret = HandleMotionCorrection(data);
+    if (ret == RET_ERR) {
+        MMI_HILOGE("Failed to handle motion correction");
+        return RET_ERR;
+    }
+
     WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
     pointerEvent_->SetTargetDisplayId(currentDisplayId_);
     MMI_HILOGD("Change Coordinate : x:%{public}lf,y:%{public}lf",  absolutionX_, absolutionY_);
@@ -93,7 +91,7 @@ int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
     CHKPR(data, ERROR_NULL_POINTER);
 
     uint64_t usec = libinput_event_pointer_get_time_usec(data);
-    uint64_t timeDiff = usec - lastEventTime_;
+    double timeDiff = static_cast<double>(usec - lastEventTime_);
     if (timeDiff <= 0) {
         MMI_HILOGE("The time difference is less than or equal to 0");
         return RET_ERR;
@@ -102,12 +100,12 @@ int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
     double dx = libinput_event_pointer_get_dx(data);
     double dy = libinput_event_pointer_get_dy(data);
     DisplayGroupInfo displayGroupInfo = WinMgr->GetDisplayGroupInfo();
-    double correctionX = (dx / timeDiff) * (static_cast<double>(speed_) / 10) *
-                         GetSpeedGain(dx) * displayGroupInfo.displaysInfo[0].width;
-    double correctionY = (dy / timeDiff) * (static_cast<double>(speed_) / 10) *
-                         GetSpeedGain(dy) * displayGroupInfo.displaysInfo[0].height;
+    double correctionX = (dx / timeDiff) * (static_cast<double>(speed_) / 10.0) *
+                         GetSpeedGain(dx) * static_cast<double>(displayGroupInfo.displaysInfo[0].width);
+    double correctionY = (dy / timeDiff) * (static_cast<double>(speed_) / 10.0) *
+                         GetSpeedGain(dy) * static_cast<double>(displayGroupInfo.displaysInfo[0].height);
     MMI_HILOGD("dx:%{public}lf, dy:%{public}lf, correctionX:%{public}lf, correctionY:%{public}lf,"
-               "timeDiff:%{public}ju, width:%{public}d, height:%{public}d",
+               "timeDiff:%{public}lf, width:%{public}d, height:%{public}d",
                dx, dy, correctionX, correctionY,
                timeDiff, displayGroupInfo.displaysInfo[0].width, displayGroupInfo.displaysInfo[0].height);
     absolutionX_ += correctionX;
