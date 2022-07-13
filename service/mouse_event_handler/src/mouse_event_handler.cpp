@@ -46,7 +46,7 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
     return pointerEvent_;
 }
 
-double MouseEventHandler::GetSpeedGain(const double &speed)
+double MouseEventHandler::GetSpeedGain(const double &speed) const
 {
     int32_t num = static_cast<int32_t>(ceil(abs(speed)));
     if (g_speedNums[0] <= num && num < g_speedNums[1]) {
@@ -86,6 +86,7 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
     MMI_HILOGD("Change Coordinate : x:%{public}lf,y:%{public}lf",  absolutionX_, absolutionY_);
     return RET_OK;
 }
+
 int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
 {
     CALL_DEBUG_ENTER;
