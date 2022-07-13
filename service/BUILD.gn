@@ -78,15 +78,15 @@ config("libmmi_server_config") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
-  if (mmi_enable_combinationkey) {
+  if (input_enable_combinationkey) {
     cflags += [ "-DOHOS_BUILD_ENABLE_COMBINATION_KEY" ]
   }
 
-  if (mmi_enable_pointer_drawing) {
+  if (input_enable_pointer_drawing) {
     cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
 
-  if (mmi_enable_interceptor) {
+  if (input_enable_interceptor) {
     cflags += [ "-DOHOS_BUILD_ENABLE_INTERCEPTOR" ]
   }
 
@@ -94,21 +94,21 @@ config("libmmi_server_config") {
     cflags += [ "-DOHOS_RSS_CLIENT" ]
   }
 
-  if (mmi_enable_pointer_drawing) {
+  if (input_enable_pointer_drawing) {
     cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
-  if (mmi_enable_keyboard) {
+  if (input_enable_keyboard) {
     cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
   }
 
-  if (mmi_enable_mouse) {
+  if (input_enable_mouse) {
     cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
   }
 
-  if (mmi_enable_tp) {
+  if (input_enable_tp) {
     cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
   }
-  if (mmi_enable_monitor) {
+  if (input_enable_monitor) {
     cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR" ]
   }
 }
@@ -158,42 +158,42 @@ ohos_shared_library("libmmi-server") {
     ]
   }
 
-  if (mmi_enable_keyboard) {
+  if (input_enable_keyboard) {
     sources += [
       "event_package/src/event_package.cpp",
       "subscriber/src/key_event_subscriber.cpp",
     ]
-    if (mmi_enable_combinationkey) {
+    if (input_enable_combinationkey) {
       sources += [ "key_command/src/key_command_manager.cpp" ]
     }
   }
 
-  if (mmi_enable_mouse || mmi_enable_tp) {
+  if (input_enable_mouse || input_enable_tp) {
     sources += [ "touch_transform_point/src/touch_transform_point_manager.cpp" ]
-    if (mmi_enable_mouse) {
+    if (input_enable_mouse) {
       sources += [
         "mouse_event_handler/src/mouse_device_state.cpp",
         "mouse_event_handler/src/mouse_event_handler.cpp",
         "touch_transform_point/src/gesture_transform_point_processor.cpp",
         "touch_transform_point/src/touchpad_transform_point_processor.cpp",
       ]
-      if (mmi_enable_pointer_drawing) {
+      if (input_enable_pointer_drawing) {
         sources += [ "window_manager/src/pointer_drawing_manager.cpp" ]
       } else {
         sources += [ "window_manager/src/i_pointer_drawing_manager.cpp" ]
       }
     }
-    if (mmi_enable_tp) {
+    if (input_enable_tp) {
       sources += [
         "touch_transform_point/src/tablet_tool_processor.cpp",
         "touch_transform_point/src/touch_transform_point_processor.cpp",
       ]
     }
   }
-  if (mmi_enable_monitor) {
+  if (input_enable_monitor) {
     sources += [ "monitor/src/input_handler_manager_global.cpp" ]
   }
-  if (mmi_enable_interceptor) {
+  if (input_enable_interceptor) {
     sources += [ "interceptor/src/interceptor_handler_global.cpp" ]
   }
 
@@ -238,7 +238,7 @@ ohos_shared_library("libmmi-server") {
     "samgr_standard:samgr_proxy",
   ]
 
-  if (mmi_enable_pointer_drawing) {
+  if (input_enable_pointer_drawing) {
     external_deps += [ "window_manager:libwm" ]
   }
 
@@ -317,19 +317,19 @@ ohos_unittest("ut-mmi-service-out") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
-  if (mmi_enable_pointer_drawing) {
+  if (input_enable_pointer_drawing) {
     cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
-  if (mmi_enable_keyboard) {
+  if (input_enable_keyboard) {
     cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
   }
-  if (mmi_enable_mouse) {
+  if (input_enable_mouse) {
     cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
   }
-  if (mmi_enable_tp) {
+  if (input_enable_tp) {
     cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
   }
-  if (mmi_enable_monitor) {
+  if (input_enable_monitor) {
     cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR" ]
   }
 
