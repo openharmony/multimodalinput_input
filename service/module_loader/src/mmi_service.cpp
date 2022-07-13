@@ -24,6 +24,9 @@
 #include <unordered_map>
 #endif
 
+#include "accesstoken_kit.h"
+#include "ipc_skeleton.h"
+
 #include "anr_manager.h"
 #include "event_dump.h"
 #include "input_windows_manager.h"
@@ -247,8 +250,8 @@ int32_t MMIService::Init()
     MMIEventDump->Init(*this);
     MMI_HILOGD("WindowsManager Init");
     WinMgr->Init(*this);
-    MMI_HILOGD("AnrManager Init");
-    AnrMgr->Init(*this);
+    MMI_HILOGD("ANRManager Init");
+    ANRMgr->Init(*this);
     MMI_HILOGD("PointerDrawingManager Init");
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if (!IPointerDrawingManager::GetInstance()->Init()) {
@@ -325,8 +328,10 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     int32_t serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t pid = GetCallingPid();
     int32_t uid = GetCallingUid();
+    uint32_t tokenType =
+        OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(IPCSkeleton::GetCallingTokenID());
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this,
-        programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd)));
+        programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd), tokenType));
     DfxHisysevent::ClientConnectData data = {
         .pid = pid,
         .uid = uid,
@@ -611,7 +616,7 @@ int32_t MMIService::SetAnrListener()
     CALL_DEBUG_ENTER;
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&AnrManager::SetAnrNoticedPid, AnrMgr, pid));
+        std::bind(&ANRManager::SetANRNoticedPid, ANRMgr, pid));
     if (ret != RET_OK) {
         MMI_HILOGE("unsubscribe key event processed failed, ret:%{public}d", ret);
         return RET_ERR;
