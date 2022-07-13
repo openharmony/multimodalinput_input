@@ -184,43 +184,5 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -i, --interceptor: dump the interceptor information\t");
     mprintf(fd, "      -m, --mouse: dump the mouse information\t");
 }
-
-void EventDump::Init(UDSServer& uds)
-{
-    udsServer_ = &uds;
-}
-
-void EventDump::InsertDumpInfo(const std::string& str)
-{
-    if (str.empty()) {
-        MMI_HILOGE("The in parameter str is empty, errCode:%{public}d", PARAM_INPUT_INVALID);
-        return;
-    }
-    std::lock_guard<std::mutex> guard(mu_);
-
-    static constexpr int32_t vecMaxSize = 300;
-    if (dumpInfo_.size() > vecMaxSize) {
-        dumpInfo_.erase(dumpInfo_.begin());
-    }
-    dumpInfo_.push_back(str);
-}
-
-void EventDump::InsertFormat(std::string str, ...)
-{
-    if (str.empty()) {
-        MMI_HILOGE("The in parameter str is empty, errCode:%{public}d", PARAM_INPUT_INVALID);
-        return;
-    }
-    va_list args;
-    va_start(args, str);
-    char buf[MAX_PACKET_BUF_SIZE] = {};
-    if (vsnprintf_s(buf, MAX_PACKET_BUF_SIZE, MAX_PACKET_BUF_SIZE - 1, str.c_str(), args) == -1) {
-        MMI_HILOGE("vsnprintf_s error");
-        va_end(args);
-        return;
-    }
-    va_end(args);
-    InsertDumpInfo(buf);
-}
 } // namespace MMI
 } // namespace OHOS

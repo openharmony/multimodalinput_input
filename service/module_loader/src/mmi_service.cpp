@@ -243,8 +243,6 @@ bool MMIService::InitDelegateTasks()
 int32_t MMIService::Init()
 {
     CheckDefine();
-    MMI_HILOGD("EventDump Init");
-    MMIEventDump->Init(*this);
     MMI_HILOGD("WindowsManager Init");
     WinMgr->Init(*this);
     MMI_HILOGD("AnrManager Init");
