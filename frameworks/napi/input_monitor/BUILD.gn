@@ -23,11 +23,11 @@ config("libinputmonitor_config") {
   ]
 
   cflags = [ "-DOHOS_BUILD" ]
-  if (is_mmi_have_libinput) {
+  if (input_enable_libinput) {
     cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
 
-  if (is_mmi_have_hdf) {
+  if (input_enable_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 }

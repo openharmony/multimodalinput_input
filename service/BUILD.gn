@@ -53,7 +53,7 @@ config("libmmi_server_config") {
     "//third_party/cJSON",
   ]
 
-  if (is_mmi_have_hdf) {
+  if (input_enable_hdf) {
     include_dirs += [
       "hdf_adapter/include",
       "hdi_inject/include",
@@ -66,15 +66,15 @@ config("libmmi_server_config") {
 
   cflags = [ "-DOHOS_BUILD" ]
 
-  if (is_mmi_have_debug) {
+  if (input_enable_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (is_mmi_have_libinput) {
+  if (input_enable_libinput) {
     cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
 
-  if (is_mmi_have_hdf) {
+  if (input_enable_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
@@ -151,7 +151,7 @@ ohos_shared_library("libmmi-server") {
     "window_manager/src/input_windows_manager.cpp",
   ]
 
-  if (is_mmi_have_hdf) {
+  if (input_enable_hdf) {
     sources += [
       "hdf_adapter/src/hdf_event_manager.cpp",
       "hdi_inject/src/hdi_inject.cpp",
@@ -214,7 +214,7 @@ ohos_shared_library("libmmi-server") {
     "//third_party/json:nlohmann_json_static",
   ]
 
-  if (is_mmi_have_libinput || is_mmi_have_hdf) {
+  if (input_enable_libinput || input_enable_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 
@@ -291,7 +291,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/uinput",
   ]
 
-  if (is_mmi_have_libinput || is_mmi_have_hdf) {
+  if (input_enable_libinput || input_enable_hdf) {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
@@ -305,15 +305,15 @@ ohos_unittest("ut-mmi-service-out") {
 
   cflags = [ "-DOHOS_BUILD" ]
 
-  if (is_mmi_have_debug) {
+  if (input_enable_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (is_mmi_have_libinput) {
+  if (input_enable_libinput) {
     cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
 
-  if (is_mmi_have_hdf) {
+  if (input_enable_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
@@ -343,7 +343,7 @@ ohos_unittest("ut-mmi-service-out") {
     "//third_party/googletest:gtest_main",
   ]
 
-  if (is_mmi_have_libinput || is_mmi_have_hdf) {
+  if (input_enable_libinput || input_enable_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 
@@ -366,7 +366,7 @@ ohos_unittest("TransformPointTest") {
 
   cflags = [ "-DOHOS_BUILD" ]
 
-  if (is_mmi_have_debug) {
+  if (input_enable_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 

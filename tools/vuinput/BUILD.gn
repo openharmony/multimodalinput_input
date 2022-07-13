@@ -26,15 +26,15 @@ config("virtual_device_config") {
 
   cflags = [ "-DOHOS_BUILD" ]
 
-  if (is_mmi_have_debug) {
+  if (input_enable_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (is_mmi_have_libinput) {
+  if (input_enable_libinput) {
     cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
 
-  if (is_mmi_have_hdf) {
+  if (input_enable_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 }
@@ -80,15 +80,15 @@ ohos_shared_library("libmmi-virtual-device") {
 
   cflags = [ "-DOHOS_BUILD" ]
 
-  if (is_mmi_have_debug) {
+  if (input_enable_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (is_mmi_have_libinput) {
+  if (input_enable_libinput) {
     cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
 
-  if (is_mmi_have_hdf) {
+  if (input_enable_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
@@ -105,20 +105,20 @@ ohos_executable("vuinput") {
 
   deps = [ "//foundation/multimodalinput/input/tools/vuinput:libmmi-virtual-device" ]
 
-  if (is_mmi_have_libinput) {
+  if (input_enable_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
   cflags = [ "-DOHOS_BUILD" ]
 
-  if (is_mmi_have_debug) {
+  if (input_enable_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (is_mmi_have_libinput) {
+  if (input_enable_libinput) {
     cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
 
-  if (is_mmi_have_hdf) {
+  if (input_enable_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
@@ -140,7 +140,7 @@ ohos_unittest("ut-virtual-device-out") {
     "${mmi_path}/util/socket/include",
   ]
 
-  if (is_mmi_have_libinput || is_mmi_have_hdf) {
+  if (input_enable_libinput || input_enable_hdf) {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
@@ -150,15 +150,15 @@ ohos_unittest("ut-virtual-device-out") {
 
   cflags = [ "-DOHOS_BUILD" ]
 
-  if (is_mmi_have_debug) {
+  if (input_enable_debug) {
     cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (is_mmi_have_libinput) {
+  if (input_enable_libinput) {
     cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
 
-  if (is_mmi_have_hdf) {
+  if (input_enable_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
@@ -169,7 +169,7 @@ ohos_unittest("ut-virtual-device-out") {
     "//third_party/googletest:gtest_main",
   ]
 
-  if (is_mmi_have_libinput || is_mmi_have_hdf) {
+  if (input_enable_libinput || input_enable_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
   external_deps = [
