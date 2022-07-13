@@ -24,9 +24,6 @@
 #include <unordered_map>
 #endif
 
-#include "accesstoken_kit.h"
-#include "ipc_skeleton.h"
-
 #include "anr_manager.h"
 #include "event_dump.h"
 #include "input_windows_manager.h"
@@ -41,6 +38,7 @@
 #include "res_type.h"
 #include "system_ability_definition.h"
 #endif
+#include "permission_helper.h"
 #include "timer_manager.h"
 #include "input_device_manager.h"
 #include "util.h"
@@ -328,8 +326,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     int32_t serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t pid = GetCallingPid();
     int32_t uid = GetCallingUid();
-    uint32_t tokenType =
-        OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(IPCSkeleton::GetCallingTokenID());
+    int32_t tokenType = PerHelper->GetTokenType();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&UDSServer::AddSocketPairInfo, this,
         programName, moduleType, uid, pid, serverFd, std::ref(toReturnClientFd), tokenType));
     DfxHisysevent::ClientConnectData data = {
