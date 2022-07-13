@@ -46,7 +46,7 @@ public:
     virtual int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
-    virtual int32_t SetAnrListener() override;
+    virtual int32_t SetAnrObserver() override;
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };

@@ -94,6 +94,7 @@ bool PermissionHelper::CheckMonitorPermission(uint32_t tokenId)
     MMI_HILOGI("check monitor permission success");
     return true;
 }
+
 int32_t PermissionHelper::GetTokenType()
 {
     CALL_DEBUG_ENTER;
