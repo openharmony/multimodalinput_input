@@ -31,6 +31,7 @@ public:
 public:
     bool CheckPermission(uint32_t required);
     bool CheckMonitor();
+    int32_t GetTokenType();
 
 private:
     bool CheckHapPermission(uint32_t tokenId, uint32_t required);
