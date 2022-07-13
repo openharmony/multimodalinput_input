@@ -105,7 +105,7 @@ int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
     double correctionY = (dy / static_cast<double>(timeDiff)) * (static_cast<double>(speed_) / 10.0) *
                          GetSpeedGain(dy) * static_cast<double>(displayGroupInfo.displaysInfo[0].height);
     MMI_HILOGD("dx:%{public}lf, dy:%{public}lf, correctionX:%{public}lf, correctionY:%{public}lf,"
-               "timeDiff:%{public}lf, width:%{public}d, height:%{public}d",
+               "timeDiff:%{public}ju, width:%{public}d, height:%{public}d",
                dx, dy, correctionX, correctionY,
                timeDiff, displayGroupInfo.displaysInfo[0].width, displayGroupInfo.displaysInfo[0].height);
     absolutionX_ += correctionX;
