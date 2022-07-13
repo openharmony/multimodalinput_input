@@ -49,7 +49,7 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
 double MouseEventHandler::GetSpeedGain(const double &speed) const
 {
     int32_t num = static_cast<int32_t>(ceil(abs(speed)));
-    for ( size_t i = 0; i < speedNums.size(); ++i) {
+    for (size_t i = 0; i < speedNums.size(); ++i) {
         if (num <= speedNums[i]) {
             return speedGains[i];
         }
