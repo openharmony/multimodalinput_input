@@ -32,7 +32,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MouseEventHandler"};
-const std::array<int, 7> g_speedNums { 0, 5, 16, 23, 32, 41, 128 };
+const std::array<int32_t, 7> g_speedNums { 0, 5, 16, 23, 32, 41, 128 };
 const std::array<double, 6> g_speedGains { 0.6, 1, 1.2, 1.8, 2.1, 2.8 };
 } // namespace
 MouseEventHandler::MouseEventHandler()
