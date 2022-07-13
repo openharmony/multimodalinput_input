@@ -13,10 +13,18 @@
 
 import("//build/ohos.gni")
 
+mmi_path = "//foundation/multimodalinput/input"
 ability_runtime_path = "//foundation/ability/ability_runtime"
 ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
 declare_args() {
   resource_schedule_service_enabled = false
+  input_enable_combinationkey = true
+  input_enable_pointer_drawing = true
+  input_enable_interceptor = true
+  input_enable_monitor = true
+  input_enable_keyboard = true
+  input_enable_mouse = true
+  input_enable_tp = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -24,10 +32,9 @@ declare_args() {
   }
 }
 
-mmi_path = "//foundation/multimodalinput/input"
-is_mmi_have_libinput = true
-is_mmi_have_hdf = false
-is_mmi_have_debug = false
+input_enable_libinput = true
+input_enable_hdf = false
+input_enable_debug = false
 input_enable_combinationkey = true
 input_enable_pointer_drawing = true
 input_enable_monitor = true
@@ -37,9 +44,9 @@ input_enable_keyboard = true
 input_enable_mouse = true
 input_enable_tp = true
 
-print("is_mmi_have_libinput = ${is_mmi_have_libinput}")
-print("is_mmi_have_hdf = ${is_mmi_have_hdf}")
-print("is_mmi_have_debug = ${is_mmi_have_debug}")
+print("input_enable_libinput = ${input_enable_libinput}")
+print("input_enable_hdf = ${input_enable_hdf}")
+print("input_enable_debug = ${input_enable_debug}")
 print("input_enable_combinationkey = ${input_enable_combinationkey}")
 print("input_enable_pointer_drawing = ${input_enable_pointer_drawing}")
 print("input_enable_monitor = ${input_enable_monitor}")

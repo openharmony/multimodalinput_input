@@ -24,11 +24,11 @@ config("libinputeventclient_config") {
   ]
 
   cflags = [ "-DOHOS_BUILD" ]
-  if (is_mmi_have_libinput) {
+  if (input_enable_libinput) {
     cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
   }
 
-  if (is_mmi_have_hdf) {
+  if (input_enable_hdf) {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 }
@@ -47,7 +47,7 @@ ohos_shared_library("inputeventclient") {
     "//third_party/libuv:uv_static",
   ]
 
-  if (is_mmi_have_libinput || is_mmi_have_hdf) {
+  if (input_enable_libinput || input_enable_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 
