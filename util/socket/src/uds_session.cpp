@@ -23,12 +23,15 @@
 #include <sys/un.h>
 #include <unistd.h>
 
+#include "accesstoken_kit.h"
+
 #include "uds_socket.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
+const std::string FOUNDATION = "foundation";
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 } // namespace
 
@@ -126,6 +129,10 @@ bool UDSSession::SendMsg(NetPacket& pkt) const
 void UDSSession::AddEvent(int32_t id, int64_t time)
 {
     CALL_DEBUG_ENTER;
+    if (GetTokenType() == OHOS::Security::AccessToken::TOKEN_NATIVE || GetProgramName() == FOUNDATION) {
+        MMI_HILOGD("Is native event");
+        return;
+    }
     EventTime eventTime = {id, time};
     events_.push_back(eventTime);
 }

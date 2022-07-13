@@ -60,6 +60,10 @@ ohos_shared_library("libmmi-util") {
     ":libmmi_util_public_config",
   ]
 
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+  ]
+
   public_deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",

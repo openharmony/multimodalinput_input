@@ -74,6 +74,16 @@ public:
         return programName_;
     }
 
+    void SetTokenType(uint32_t id)
+    {
+        tokenType_ = id;
+    }
+
+    uint32_t GetTokenType() const
+    {
+        return tokenType_;
+    }
+
     void UpdateDescript();
     void AddEvent(int32_t id, int64_t time);
     void DelEvents(int32_t id);
@@ -101,6 +111,7 @@ protected:
     int32_t fd_;
     const int32_t uid_;
     const int32_t pid_;
+    uint32_t tokenType_ { 0 };
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t clientFd_ = -1;
 #endif // OHOS_BUILD_MMI_DEBUG

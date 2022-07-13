@@ -75,7 +75,7 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         return;
     }
     auto currentTime = GetSysClockTime();
-    if (AnrMgr->TriggerAnr(currentTime, session)) {
+    if (ANRMgr->TriggerANR(currentTime, session)) {
         session->isANRProcess_ = true;
         MMI_HILOGW("the pointer event does not report normally, application not response");
         return;
@@ -129,7 +129,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
         return RET_OK;
     }
     auto currentTime = GetSysClockTime();
-    if (AnrMgr->TriggerAnr(currentTime, session)) {
+    if (ANRMgr->TriggerANR(currentTime, session)) {
         session->isANRProcess_ = true;
         MMI_HILOGW("the key event does not report normally, application not response");
         return RET_OK;
