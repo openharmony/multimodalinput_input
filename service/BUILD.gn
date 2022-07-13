@@ -64,52 +64,52 @@ config("libmmi_server_config") {
     ]
   }
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   if (input_enable_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (input_enable_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
   if (input_enable_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   if (input_enable_combinationkey) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_COMBINATION_KEY" ]
+    defines += [ "OHOS_BUILD_ENABLE_COMBINATION_KEY" ]
   }
 
   if (input_enable_pointer_drawing) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+    defines += [ "OHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
 
   if (input_enable_interceptor) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_INTERCEPTOR" ]
+    defines += [ "OHOS_BUILD_ENABLE_INTERCEPTOR" ]
   }
 
   if (resource_schedule_service_enabled) {
-    cflags += [ "-DOHOS_RSS_CLIENT" ]
+    defines += [ "OHOS_RSS_CLIENT" ]
   }
 
   if (input_enable_pointer_drawing) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+    defines += [ "OHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
   if (input_enable_keyboard) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
+    defines += [ "OHOS_BUILD_ENABLE_KEYBOARD" ]
   }
 
   if (input_enable_mouse) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
+    defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
   }
 
   if (input_enable_tp) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
+    defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
   }
   if (input_enable_monitor) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR" ]
+    defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
   }
 }
 
@@ -303,34 +303,34 @@ ohos_unittest("ut-mmi-service-out") {
     "window_manager/test/input_windows_manager_test.cpp",
   ]
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   if (input_enable_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (input_enable_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
   if (input_enable_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   if (input_enable_pointer_drawing) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+    defines += [ "OHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
   if (input_enable_keyboard) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
+    defines += [ "OHOS_BUILD_ENABLE_KEYBOARD" ]
   }
   if (input_enable_mouse) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
+    defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
   }
   if (input_enable_tp) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
+    defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
   }
   if (input_enable_monitor) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR" ]
+    defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
   }
 
   configs = [ ":libmmi_server_config" ]
@@ -364,10 +364,10 @@ ohos_unittest("TransformPointTest") {
 
   sources = [ "touch_transform_point/test/transform_point_test.cpp" ]
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   if (input_enable_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
   deps = [

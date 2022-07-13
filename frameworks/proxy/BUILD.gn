@@ -64,10 +64,10 @@ ohos_source_set("libmmi-common") {
     "events/src/pointer_event.cpp",
   ]
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   if (input_enable_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
   public_configs = [ ":libmmi_client_config" ]
@@ -96,29 +96,29 @@ ohos_shared_library("libmmi-client") {
     "module_loader/src/mmi_fd_listener.cpp",
   ]
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   if (input_enable_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (input_enable_pointer_drawing) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+    defines += [ "OHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
   if (input_enable_monitor) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR" ]
+    defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
   }
   if (input_enable_interceptor) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_INTERCEPTOR" ]
+    defines += [ "OHOS_BUILD_ENABLE_INTERCEPTOR" ]
   }
   if (input_enable_keyboard) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
+    defines += [ "OHOS_BUILD_ENABLE_KEYBOARD" ]
   }
   if (input_enable_mouse) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
+    defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
   }
   if (input_enable_tp) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
+    defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
   }
 
   if (input_enable_interceptor) {
@@ -169,18 +169,18 @@ ohos_unittest("ut-mmi-proxy-out") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   if (input_enable_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (input_enable_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
   if (input_enable_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   sources = [ "module_loader/test/mmi_client_test.cpp" ]
@@ -208,18 +208,18 @@ ohos_unittest("KeyEventTest") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   if (input_enable_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (input_enable_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
   if (input_enable_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   sources = [ "events/test/key_event_test.cpp" ]
@@ -244,35 +244,35 @@ ohos_unittest("InputManagerTest") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   if (input_enable_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (input_enable_pointer_drawing) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+    defines += [ "OHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
 
   if (input_enable_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
   if (input_enable_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   if (input_enable_keyboard) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
+    defines += [ "OHOS_BUILD_ENABLE_KEYBOARD" ]
   }
   if (input_enable_mouse) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
+    defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
   }
   if (input_enable_tp) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
+    defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
   }
   if (input_enable_monitor) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR" ]
+    defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
   }
   sources = [
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
@@ -310,18 +310,18 @@ ohos_unittest("InputManagerManualTest") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   if (input_enable_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (input_enable_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
   if (input_enable_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   sources = [ "events/test/input_manager_manual_test.cpp" ]
@@ -347,18 +347,18 @@ ohos_unittest("PointerEventTest") {
     include_dirs = [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   if (input_enable_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (input_enable_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
   if (input_enable_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   sources = [

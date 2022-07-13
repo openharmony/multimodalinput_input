@@ -24,18 +24,18 @@ config("virtual_device_config") {
     "//util/common/include",
   ]
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   if (input_enable_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (input_enable_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
   if (input_enable_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 }
 
@@ -78,18 +78,18 @@ ohos_shared_library("libmmi-virtual-device") {
 
   configs = [ ":virtual_device_config" ]
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   if (input_enable_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (input_enable_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
   if (input_enable_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   deps = [ "//utils/native/base:utils" ]
@@ -108,18 +108,18 @@ ohos_executable("vuinput") {
   if (input_enable_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   if (input_enable_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (input_enable_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
   if (input_enable_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   install_enable = true
@@ -148,18 +148,18 @@ ohos_unittest("ut-virtual-device-out") {
 
   configs = [ ":virtual_device_public_config" ]
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   if (input_enable_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
   if (input_enable_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
   if (input_enable_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   deps = [
