@@ -23,6 +23,7 @@
 #include "nocopyable.h"
 
 #include "net_packet.h"
+#include "proto.h"
 
 namespace OHOS {
 namespace MMI {
@@ -111,7 +112,7 @@ protected:
     int32_t fd_ { -1 };
     const int32_t uid_ { -1 };
     const int32_t pid_ { -1 };
-    int32_t tokenType_ { -1 };
+    int32_t tokenType_ { TokenType::TOKEN_INVALID };
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t clientFd_ { -1 };
 #endif // OHOS_BUILD_MMI_DEBUG
