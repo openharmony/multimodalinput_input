@@ -31,7 +31,7 @@ using SessionPtr = std::shared_ptr<UDSSession>;
 class UDSSession : public std::enable_shared_from_this<UDSSession> {
 public:
     UDSSession(const std::string& programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
-               const int32_t pid, const int32_t tokenType);
+               const int32_t pid);
     DISALLOW_COPY_AND_MOVE(UDSSession);
     virtual ~UDSSession() = default;
 
@@ -74,6 +74,11 @@ public:
         return programName_;
     }
 
+    void SetTokenType(int32_t type)
+    {
+        tokenType_ = type;
+    }
+
     int32_t GetTokenType() const
     {
         return tokenType_;
@@ -106,7 +111,7 @@ protected:
     int32_t fd_;
     const int32_t uid_;
     const int32_t pid_;
-    const int32_t tokenType_;
+    int32_t tokenType_;
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t clientFd_ = -1;
 #endif // OHOS_BUILD_MMI_DEBUG

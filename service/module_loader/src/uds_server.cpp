@@ -142,7 +142,8 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
         return ret;
     }
 
-    SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid, tokenType);
+    SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
+    sess->SetTokenType(tokenType);
     if (sess == nullptr) {
         cleanTaskWhenError();
         MMI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
