@@ -91,7 +91,7 @@ int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
     CHKPR(data, ERROR_NULL_POINTER);
 
     uint64_t usec = libinput_event_pointer_get_time_usec(data);
-    double timeDiff = static_cast<double>(usec - lastEventTime_);
+    uint64_t timeDiff = usec - lastEventTime_;
     if (timeDiff <= 0) {
         MMI_HILOGE("The time difference is less than or equal to 0");
         return RET_ERR;
@@ -100,9 +100,9 @@ int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
     double dx = libinput_event_pointer_get_dx(data);
     double dy = libinput_event_pointer_get_dy(data);
     DisplayGroupInfo displayGroupInfo = WinMgr->GetDisplayGroupInfo();
-    double correctionX = (dx / timeDiff) * (static_cast<double>(speed_) / 10.0) *
+    double correctionX = (dx / static_cast<double>(timeDiff)) * (static_cast<double>(speed_) / 10.0) *
                          GetSpeedGain(dx) * static_cast<double>(displayGroupInfo.displaysInfo[0].width);
-    double correctionY = (dy / timeDiff) * (static_cast<double>(speed_) / 10.0) *
+    double correctionY = (dy / static_cast<double>(timeDiff)) * (static_cast<double>(speed_) / 10.0) *
                          GetSpeedGain(dy) * static_cast<double>(displayGroupInfo.displaysInfo[0].height);
     MMI_HILOGD("dx:%{public}lf, dy:%{public}lf, correctionX:%{public}lf, correctionY:%{public}lf,"
                "timeDiff:%{public}lf, width:%{public}d, height:%{public}d",
