@@ -50,7 +50,7 @@ void InputDeviceImpl::OnDevMonitorTask(DevMonitor devMonitor, std::string type, 
 {
     CALL_DEBUG_ENTER;
     devMonitor.second(type, deviceId);
-    MMI_HILOGD("report device changed task, event type:%{public}s", type.c_str());
+    MMI_HILOGD("Report device changed task, event type:%{public}s", type.c_str());
 }
 
 void InputDeviceImpl::OnDevMonitor(std::string type, int32_t deviceId)
@@ -59,9 +59,9 @@ void InputDeviceImpl::OnDevMonitor(std::string type, int32_t deviceId)
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHandler::PostTask(devMonitor_.first,
         std::bind(&InputDeviceImpl::OnDevMonitorTask, this, devMonitor_, type, deviceId))) {
-        MMI_HILOGE("post task failed");
+        MMI_HILOGE("Post task failed");
     }
-    MMI_HILOGD("report device changed, event type:%{public}s", type.c_str());
+    MMI_HILOGD("Report device changed, event type:%{public}s", type.c_str());
 }
 
 void InputDeviceImpl::GetInputDeviceIdsAsync(std::function<void(int32_t, std::vector<int32_t>&)> callback)
@@ -72,7 +72,7 @@ void InputDeviceImpl::GetInputDeviceIdsAsync(std::function<void(int32_t, std::ve
     InputDeviceData data;
     data.ids = std::make_pair(eventHandler, callback);
     if (userData_ == INT32_MAX) {
-        MMI_HILOGE("userData exceeds the maximum");
+        MMI_HILOGE("The userData exceeds the maximum");
         return;
     }
     inputDevices_[userData_] = data;
@@ -89,7 +89,7 @@ void InputDeviceImpl::GetInputDeviceAsync(int32_t deviceId,
     InputDeviceData data;
     data.inputDevice = std::make_pair(eventHandler, callback);
     if (userData_ == INT32_MAX) {
-        MMI_HILOGE("userData exceeds the maximum");
+        MMI_HILOGE("The userData exceeds the maximum");
         return;
     }
     inputDevices_[userData_] = data;
@@ -107,7 +107,7 @@ void InputDeviceImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCode
     InputDeviceData data;
     data.keys = std::make_pair(eventHandler, callback);
     if (userData_ == INT32_MAX) {
-        MMI_HILOGE("userData exceeds the maximum");
+        MMI_HILOGE("The userData exceeds the maximum");
         return;
     }
     inputDevices_[userData_] = data;
@@ -124,7 +124,7 @@ void InputDeviceImpl::GetKeyboardType(int32_t deviceId, std::function<void(int32
     InputDeviceData data;
     data.kbTypes = std::make_pair(eventHandler, callback);
     if (userData_ == INT32_MAX) {
-        MMI_HILOGE("UserData exceeds the maximum");
+        MMI_HILOGE("The userData exceeds the maximum");
         return;
     }
     inputDevices_[userData_] = data;
@@ -138,7 +138,7 @@ void InputDeviceImpl::OnInputDeviceTask(InputDeviceImpl::DevInfo devInfo, int32_
     CHK_PID_AND_TID();
     CHKPV(devData);
     devInfo.second(userData, devData);
-    MMI_HILOGD("report device info task, userData:%{public}d name:%{public}s",
+    MMI_HILOGD("Report device info task, userData:%{public}d name:%{public}s",
         userData, devData->name.c_str());
 }
 
@@ -149,22 +149,22 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, std::shared_ptr<InputDevic
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
-        MMI_HILOGD("find userData failed");
+        MMI_HILOGD("Find userData failed");
         return;
     }
     if (iter->second.cppDev != nullptr) {
         CHKPV(devData);
         iter->second.cppDev(devData);
-        MMI_HILOGD("innerkits interface");
+        MMI_HILOGD("Innerkits interface");
         return;
     }
     auto devInfo = GetDeviceInfo(userData);
     CHKPV(devInfo);
     if (!MMIEventHandler::PostTask(devInfo->first,
         std::bind(&InputDeviceImpl::OnInputDeviceTask, this, *devInfo, userData, devData))) {
-        MMI_HILOGE("post task failed");
+        MMI_HILOGE("Post task failed");
     }
-    MMI_HILOGD("report device info, userData:%{public}d name:%{public}s type:%{public}d",
+    MMI_HILOGD("Report device info, userData:%{public}d name:%{public}s type:%{public}d",
         userData, devData->name.c_str(), devData->deviceType);
 }
 
@@ -172,7 +172,7 @@ void InputDeviceImpl::OnInputDeviceIdsTask(InputDeviceImpl::DevIds devIds, int32
 {
     CHK_PID_AND_TID();
     devIds.second(userData, ids);
-    MMI_HILOGD("report all device, userData:%{public}d devices:(%{public}s)",
+    MMI_HILOGD("Report all device, userData:%{public}d devices:(%{public}s)",
         userData, IdsListToString(ids).c_str());
 }
 
@@ -182,21 +182,21 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> &i
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
-        MMI_HILOGD("find userData failed");
+        MMI_HILOGD("Find userData failed");
         return;
     }
     if (iter->second.cppIds != nullptr) {
         iter->second.cppIds(ids);
-        MMI_HILOGD("innerkits interface");
+        MMI_HILOGD("Innerkits interface");
         return;
     }
     auto devIds = GetDeviceIds(userData);
     CHKPV(devIds);
     if (!MMIEventHandler::PostTask(devIds->first,
         std::bind(&InputDeviceImpl::OnInputDeviceIdsTask, this, *devIds, userData, ids))) {
-        MMI_HILOGE("post task failed");
+        MMI_HILOGE("Post task failed");
     }
-    MMI_HILOGD("report all device, userData:%{public}d device:(%{public}s)",
+    MMI_HILOGD("Report all device, userData:%{public}d device:(%{public}s)",
         userData, IdsListToString(ids).c_str());
 }
 
@@ -213,14 +213,14 @@ void InputDeviceImpl::OnSupportKeys(int32_t userData, const std::vector<bool> &k
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
-        MMI_HILOGD("find userData failed");
+        MMI_HILOGD("Find userData failed");
         return;
     }
     auto devKeys = GetDeviceKeys(userData);
     CHKPV(devKeys);
     if (!MMIEventHandler::PostTask(devKeys->first,
         std::bind(&InputDeviceImpl::OnSupportKeysTask, this, *devKeys, userData, keystrokeAbility))) {
-        MMI_HILOGE("post task failed");
+        MMI_HILOGE("Post task failed");
     }
 }
 

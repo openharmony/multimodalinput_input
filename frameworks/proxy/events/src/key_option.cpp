@@ -70,7 +70,7 @@ bool KeyOption::ReadFromParcel(Parcel &in)
         return false;
     }
     if (preKeysSize > PRE_KEYS_MAX_SIZE) {
-        MMI_HILOGE("preKeys size(%{public}d) exceeds maximum allowed size(%{public}d)", preKeysSize,
+        MMI_HILOGE("The preKeys size(%{public}d) exceeds maximum allowed size(%{public}d)", preKeysSize,
             PRE_KEYS_MAX_SIZE);
         return false;
     }
@@ -89,7 +89,7 @@ bool KeyOption::ReadFromParcel(Parcel &in)
 bool KeyOption::WriteToParcel(Parcel &out) const
 {
     if (preKeys_.size() > PRE_KEYS_MAX_SIZE) {
-        MMI_HILOGE("preKeys size(%{public}zu) exceeds maximum allowed size(%{public}d)", preKeys_.size(),
+        MMI_HILOGE("The preKeys size(%{public}zu) exceeds maximum allowed size(%{public}d)", preKeys_.size(),
             PRE_KEYS_MAX_SIZE);
         return false;
     }

@@ -111,7 +111,7 @@ bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
     if (IsRepeatedKeyEvent(keyEvent)) {
-        MMI_HILOGD("repeat KeyEvent, skip");
+        MMI_HILOGD("Repeat KeyEvent, skip");
         return true;
     }
     keyEvent_ = KeyEvent::Clone(keyEvent);
@@ -119,7 +119,7 @@ bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     MMI_HILOGD("keyCode:%{public}d,keyAction:%{public}s", keyEvent->GetKeyCode(),
         KeyEvent::ActionToString(keyAction));
     for (const auto &keyCode : keyEvent->GetPressedKeys()) {
-        MMI_HILOGD("pressed KeyCode:%{public}d", keyCode);
+        MMI_HILOGD("Pressed KeyCode:%{public}d", keyCode);
     }
     bool handled = false;
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
@@ -240,7 +240,7 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
     }
     subscriber->keyEvent_ = keyEvent_;
     hasEventExecuting = true;
-    MMI_HILOGD("leave, add timer success, subscribeId:%{public}d,"
+    MMI_HILOGD("Leave, add timer success, subscribeId:%{public}d,"
         "duration:%{public}d,timerId:%{public}d",
         subscriber->id_, keyOption->GetFinalKeyDownDuration(), subscriber->timerId_);
     return true;
@@ -326,7 +326,7 @@ bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent
 
         if (!IsPreKeysMatch(keyOption->GetPreKeys(), pressedKeys)) {
             ClearTimer(subscriber);
-            MMI_HILOGD("preKeysMatch failed");
+            MMI_HILOGD("PreKeysMatch failed");
             continue;
         }
 

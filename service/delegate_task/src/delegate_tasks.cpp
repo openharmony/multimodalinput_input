@@ -47,15 +47,15 @@ bool DelegateTasks::Init()
     CALL_DEBUG_ENTER;
     int32_t res = pipe(fds_);
     if (res == -1) {
-        MMI_HILOGE("pipe create failed,errno:%{public}d", errno);
+        MMI_HILOGE("The pipe create failed,errno:%{public}d", errno);
         return false;
     }
     if (fcntl(fds_[0], F_SETFL, O_NONBLOCK) == -1) {
-        MMI_HILOGE("fcntl read failed,errno:%{public}d", errno);
+        MMI_HILOGE("The fcntl read failed,errno:%{public}d", errno);
         return false;
     }
     if (fcntl(fds_[1], F_SETFL, O_NONBLOCK) == -1) {
-        MMI_HILOGE("fcntl write failed,errno:%{public}d", errno);
+        MMI_HILOGE("The fcntl write failed,errno:%{public}d", errno);
         return false;
     }
     return true;
@@ -81,7 +81,7 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
     Future future = promise.get_future();
     auto task = PostTask(callback, &promise);
     if (task == nullptr) {
-        MMI_HILOGE("post sync task failed");
+        MMI_HILOGE("Post sync task failed");
         return ETASKS_POST_SYNCTASK_FAIL;
     }
 
@@ -106,7 +106,7 @@ int32_t DelegateTasks::PostAsyncTask(DTaskCallback callback)
     }
     auto task = PostTask(callback);
     if (task == nullptr) {
-        MMI_HILOGE("post async task failed");
+        MMI_HILOGE("Post async task failed");
         return ETASKS_POST_ASYNCTASK_FAIL;
     }
     return RET_OK;
@@ -147,18 +147,18 @@ DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *
     auto res = write(fds_[1], &data, sizeof(data));
     if (res == -1) {
         RecoveryId(id);
-        MMI_HILOGE("pipe write failed,errno:%{public}d", errno);
+        MMI_HILOGE("Pipe write failed,errno:%{public}d", errno);
         return nullptr;
     }
     TaskPtr task = std::make_shared<Task>(id, callback, promise);
     if (task == nullptr) {
         RecoveryId(id);
-        MMI_HILOGE("make task failed");
+        MMI_HILOGE("Make task failed");
         return nullptr;
     }
     tasks_.push(task);
     std::string taskType = ((promise == nullptr) ? "Async" : "Sync");
-    MMI_HILOGD("post %{public}s", taskType.c_str());
+    MMI_HILOGD("Post %{public}s", taskType.c_str());
     return task->GetSharedPtr();
 }
 } // namespace MMI

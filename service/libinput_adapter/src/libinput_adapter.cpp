@@ -40,7 +40,7 @@ static void HiLogFunc(struct libinput* input, libinput_log_priority priority, co
     CHKPV(input);
     char buffer[256];
     if (vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args) == -1) {
-        MMI_HILOGE("call vsnprintf_s fail");
+        MMI_HILOGE("Call vsnprintf_s fail");
         va_end(args);
         return;
     }
@@ -117,7 +117,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_
     if (rt != 0) {
         libinput_unref(input_);
         udev_unref(udev_);
-        MMI_HILOGE("rt is not 0");
+        MMI_HILOGE("The rt is not 0");
         return false;
     }
     fd_ = libinput_get_fd(input_);
@@ -125,7 +125,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_
         libinput_unref(input_);
         udev_unref(udev_);
         fd_ = -1;
-        MMI_HILOGE("fd_ is less than 0");
+        MMI_HILOGE("The fd_ is less than 0");
         return false;
     }
     return true;
@@ -144,7 +144,7 @@ void LibinputAdapter::EventDispatch(struct epoll_event& ev)
         return;
     }
     if (libinput_dispatch(input_) != 0) {
-        MMI_HILOGE("libinput: Failed to dispatch libinput");
+        MMI_HILOGE("Failed to dispatch libinput");
         return;
     }
     OnEventHandler();
