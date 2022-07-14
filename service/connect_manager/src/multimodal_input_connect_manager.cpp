@@ -165,12 +165,12 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
     }
     auto sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sm == nullptr) {
-        MMI_HILOGE("Get system ability manager fail");
+        MMI_HILOGE("Get system ability manager failed");
         return false;
     }
     auto sa = sm->GetSystemAbility(IMultimodalInputConnect::MULTIMODAL_INPUT_CONNECT_SERVICE_ID);
     if (sa == nullptr) {
-        MMI_HILOGE("Get sa fail");
+        MMI_HILOGE("Get sa failed");
         return false;
     }
 
@@ -187,7 +187,7 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
     sa->AddDeathRecipient(multimodalInputConnectRecipient_);
     multimodalInputConnectService_ = iface_cast<IMultimodalInputConnect>(sa);
     if (multimodalInputConnectService_ == nullptr) {
-        MMI_HILOGE("Get multimodalinput service fail");
+        MMI_HILOGE("Get multimodalinput service failed");
         return false;
     }
     MMI_HILOGI("Get multimodalinput service successful");

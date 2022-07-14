@@ -1085,7 +1085,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
     subscribeId1 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<KeyEvent> keyEvent) {
         PrintEventData(keyEvent);
-        MMI_HILOGD("subscribe key event KEYCODE_POWER down trigger callback");
+        MMI_HILOGD("Subscribe key event KEYCODE_POWER down trigger callback");
     });
     EXPECT_TRUE(subscribeId1 >= 0);
 
@@ -1099,7 +1099,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
     subscribeId2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2,
         [](std::shared_ptr<KeyEvent> keyEvent) {
         PrintEventData(keyEvent);
-        MMI_HILOGD("subscribe key event KEYCODE_POWER up trigger callback");
+        MMI_HILOGD("Subscribe key event KEYCODE_POWER up trigger callback");
     });
     EXPECT_TRUE(subscribeId2 >= 0);
 

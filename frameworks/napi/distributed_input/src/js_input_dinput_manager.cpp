@@ -172,7 +172,7 @@ void JsInputDinputManager::HandleCallBack(CallbackInfo<int32_t>* cb)
             delete cbInfo;
         }, (void *)cb, &cb->asyncWork);
     if (retStatus != napi_ok) {
-        MMI_HILOGE("create async work fail");
+        MMI_HILOGE("Create async work failed");
     }
     napi_queue_async_work(cb->env, cb->asyncWork);
 }
@@ -206,7 +206,7 @@ void JsInputDinputManager::HandleCallBack(CallbackInfo<std::set<int32_t>>* cb)
             delete cbInfo;
         }, (void *)cb, &cb->asyncWork);
     if (retStatus != napi_ok) {
-        MMI_HILOGE("create async work fail");
+        MMI_HILOGE("Create async work failed");
     }
     napi_queue_async_work(cb->env, cb->asyncWork);
 }
@@ -249,7 +249,7 @@ void JsInputDinputManager::CallFunctionAsync(napi_env env, napi_ref handleRef, s
     if (handler != nullptr) {
         CHKRV(env, napi_call_function(env, nullptr, handler, count, object, &result), CALL_FUNCTION);
     } else {
-        MMI_HILOGE("handler is nullptr");
+        MMI_HILOGE("The handler is nullptr");
     }
     uint32_t refCount = 0;
     CHKRV(env, napi_reference_unref(env, handleRef, &refCount), REFERENCE_UNREF);

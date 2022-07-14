@@ -412,12 +412,12 @@ void InputWindowsManager::SelectWindowInfo(const int32_t& logicalX, const int32_
                 continue;
             } else if ((targetWindowId < 0) && (IsInHotArea(logicalX, logicalY, item.pointerHotAreas))) {
                 firstBtnDownWindowId_ = item.id;
-                MMI_HILOGW("find out the dispatch window of this pointer event when the targetWindowId "
+                MMI_HILOGW("Find out the dispatch window of this pointer event when the targetWindowId "
                            "hasn't been setted up yet, window:%{public}d", firstBtnDownWindowId_);
                 break;
             } else if ((targetWindowId >= 0) && (targetWindowId == item.id)) {
                 firstBtnDownWindowId_ = targetWindowId;
-                MMI_HILOGW("find out the dispatch window of this pointer event when the targetWindowId "
+                MMI_HILOGW("Find out the dispatch window of this pointer event when the targetWindowId "
                            "has been setted up already, window:%{public}d", firstBtnDownWindowId_);
                 break;
             } else {
