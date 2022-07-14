@@ -228,7 +228,7 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
 
     std::weak_ptr<Subscriber> weakSubscriber = subscriber;
     subscriber->timerId_ = TimerMgr->AddTimer(keyOption->GetFinalKeyDownDuration(), 1, [this, weakSubscriber] () {
-        MMI_HILOGD("timer callback");
+        MMI_HILOGD("Timer callback");
         auto subscriber = weakSubscriber.lock();
         CHKPV(subscriber);
         OnTimer(subscriber);
@@ -283,7 +283,7 @@ bool KeyEventSubscriber::InitSessionDeleteCallback()
 {
     CALL_DEBUG_ENTER;
     if (callbackInitialized_) {
-        MMI_HILOGD("session delete callback has already been initialized");
+        MMI_HILOGD("Session delete callback has already been initialized");
         return true;
     }
     auto udsServerPtr = InputHandler->GetUDSServer();
@@ -326,7 +326,7 @@ bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent
 
         if (!IsPreKeysMatch(keyOption->GetPreKeys(), pressedKeys)) {
             ClearTimer(subscriber);
-            MMI_HILOGD("PreKeysMatch failed");
+            MMI_HILOGD("preKeysMatch failed");
             continue;
         }
 
@@ -375,7 +375,7 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
         }
 
         if (!IsPreKeysMatch(keyOption->GetPreKeys(), pressedKeys)) {
-            MMI_HILOGD("preKeysMatch failed");
+            MMI_HILOGD("PreKeysMatch failed");
             continue;
         }
 
@@ -417,7 +417,7 @@ bool KeyEventSubscriber::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
     if (keyEvent_ == nullptr) {
-        MMI_HILOGW("keyEvent_ is nullptr");
+        MMI_HILOGW("The keyEvent_ is nullptr");
         keyEvent_ = KeyEvent::Clone(keyEvent);
     }
     CHKPF(keyEvent_);

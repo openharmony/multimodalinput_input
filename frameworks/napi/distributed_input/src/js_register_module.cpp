@@ -13,19 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef I_ANR_LISTENER_H
-#define I_ANR_LISTENER_H
+#include <cinttypes>
+
+#include "js_input_dinput_context.h"
 
 namespace OHOS {
 namespace MMI {
-class IAnrListener {
-public:
-    IAnrListener() = default;
-    virtual ~IAnrListener() = default;
-    virtual void OnAnr(int32_t pid) const;
+static napi_module mmiInputDInputModule = {
+    .nm_version = 1,
+    .nm_flags = 0,
+    .nm_filename = nullptr,
+    .nm_register_func = JsInputDinputContext::Export,
+    .nm_modname = "multimodalInput.distributedInput",
+    .nm_priv = ((void*)0),
+    .reserved = { 0 },
 };
-} // namespace MMI
-} // namespace OHOS
 
-
-#endif // I_ANR_LISTENER_H
+extern "C" __attribute__((constructor)) void RegisterModule(void)
+{
+    napi_module_register(&mmiInputDInputModule);
+}
+}
+}
