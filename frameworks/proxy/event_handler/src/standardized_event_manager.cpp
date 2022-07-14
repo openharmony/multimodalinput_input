@@ -65,7 +65,7 @@ int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> ke
     CHKPR(keyEvent, RET_ERR);
     keyEvent->UpdateId();
     if (keyEvent->GetKeyCode() < 0) {
-        MMI_HILOGE("The keyCode is invalid:%{public}u", keyEvent->GetKeyCode());
+        MMI_HILOGE("KeyCode is invalid:%{public}u", keyEvent->GetKeyCode());
         return RET_ERR;
     }
     int32_t ret = MultimodalInputConnMgr->InjectKeyEvent(keyEvent);

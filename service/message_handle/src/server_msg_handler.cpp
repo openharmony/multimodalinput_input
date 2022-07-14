@@ -145,6 +145,13 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
     if ((action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_UP)
         && targetWindowId_ > 0) {
         pointerEvent->SetTargetWindowId(targetWindowId_);
+        PointerEvent::PointerItem pointerItem;
+        if (!pointerEvent->GetPointerItem(0, pointerItem)) {
+            MMI_HILOGE("Can't find pointer item");
+            return RET_ERR;
+        }
+        pointerItem.SetTargetWindowId(targetWindowId_);
+        pointerEvent->UpdatePointerItem(0, pointerItem);
     }
     auto source = pointerEvent->GetSourceType();
     switch (source) {

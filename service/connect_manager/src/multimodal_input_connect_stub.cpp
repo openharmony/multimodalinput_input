@@ -60,7 +60,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::MOVE_MOUSE, &MultimodalInputConnectStub::StubMoveMouseEvent},
         {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
         {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
-        {IMultimodalInputConnect::SET_ANR_LISTENER, &MultimodalInputConnectStub::StubSetAnrListener}
+        {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener}
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -258,6 +258,11 @@ int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, M
 int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -283,6 +288,11 @@ int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, M
 int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -327,6 +337,10 @@ int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel& data, Mess
 int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -348,6 +362,10 @@ int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, Mess
 int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -377,9 +395,9 @@ int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, Mess
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t ret = SetAnrListener();
+    int32_t ret = SetAnrObserver();
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SetAnrListener failed ret:%{public}d", ret);
+        MMI_HILOGE("Call SetAnrObserver failed ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
