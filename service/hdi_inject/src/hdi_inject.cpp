@@ -56,7 +56,7 @@ bool HdiInject::Init(UDSServer &sess)
 
 int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
 {
-    MMI_HILOGI("into function ManageHdfInject");
+    MMI_HILOGI("Into function ManageHdfInject");
     int32_t sendType = 0;
     pkt >> sendType;
     uint32_t devIndex = 0;
@@ -73,7 +73,7 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
                 MMI_HILOGE("Packet read recv massage failed");
                 return RET_ERR;
             }
-            MMI_HILOGI("hdi server recv massage: devIndex:%{public}d", devIndex);
+            MMI_HILOGI("Hdi server recv massage: devIndex:%{public}d", devIndex);
             OnSetEventInject(speechEvent, devIndex);
             return RET_OK;
         }
@@ -87,7 +87,7 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
                 MMI_HILOGE("Packet read tool hot data failed");
                 return RET_ERR;
             }
-            MMI_HILOGI("recv inject tool hot data, devIndex:%{public}d,status:%{public}d", devIndex, devSatatus);
+            MMI_HILOGI("Recv inject tool hot data, devIndex:%{public}d,status:%{public}d", devIndex, devSatatus);
             OnSetHotPlugs(devIndex, devSatatus);
             return RET_OK;
         }

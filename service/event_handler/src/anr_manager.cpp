@@ -50,7 +50,7 @@ bool AnrManager::TriggerAnr(int64_t time, SessionPtr sess)
     MMI_HILOGD("Current time: %{public}" PRId64 "", time);
     if (time < (earliest + INPUT_UI_TIMEOUT_TIME)) {
         sess->isANRProcess_ = false;
-        MMI_HILOGD("the event reports normally");
+        MMI_HILOGD("The event reports normally");
         return false;
     }
     DfxHisysevent::ApplicationBlockInput(sess);

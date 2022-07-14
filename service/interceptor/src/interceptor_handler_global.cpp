@@ -36,7 +36,7 @@ void InterceptorHandlerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent
 {
     CHKPV(keyEvent);
     if (HandleEvent(keyEvent)) {
-            MMI_HILOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
+            MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 keyEvent->GetKeyCode());
             BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
         return;

@@ -80,7 +80,7 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
     CHKPR(session, RET_ERR);
     if (handlerType == InputHandlerType::MONITOR) {
         if (!session->HasPermission()) {
-            MMI_HILOGE("no permission, can not add monitor");
+            MMI_HILOGE("No permission, can not add monitor");
             return RET_ERR;
         }
         MMI_HILOGD("Register monitor:%{public}d", handlerId);

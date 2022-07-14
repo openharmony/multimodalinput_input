@@ -142,12 +142,12 @@ bool GetNamePropertyBool(const napi_env& env, const napi_value& object, const st
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGD("call napi_typeof fail");
+        MMI_HILOGD("Call napi_typeof failed");
         return false;
     }
     bool value = false;
     if (tmpType != napi_boolean) {
-        MMI_HILOGD("value is not bool");
+        MMI_HILOGD("The value is not bool");
         return value;
     }
 
@@ -162,11 +162,11 @@ std::string GetNamePropertyString(const napi_env& env, const napi_value& object,
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGD("call napi_typeof fail");
+        MMI_HILOGD("Call napi_typeof failed");
         return value;
     }
     if (tmpType != napi_string) {
-        MMI_HILOGD("value is not string");
+        MMI_HILOGD("The value is not string");
         return value;
     }
 
@@ -184,11 +184,11 @@ int32_t GetNamePropertyInt32(const napi_env& env, const napi_value& object, cons
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGD("call napi_typeof fail");
+        MMI_HILOGD("Call napi_typeof failed");
         return value;
     }
     if (tmpType != napi_number) {
-        MMI_HILOGD("value is not number");
+        MMI_HILOGD("The value is not number");
         return value;
     }
     napi_get_value_int32(env, napiValue, &value);
@@ -202,11 +202,11 @@ int64_t GetNamePropertyInt64(const napi_env& env, const napi_value& object, cons
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGD("call napi_typeof fail");
+        MMI_HILOGD("Call napi_typeof failed");
         return value;
     }
     if (tmpType != napi_number) {
-        MMI_HILOGD("value is not number");
+        MMI_HILOGD("The value is not number");
         return value;
     }
     napi_get_value_int64(env, napiValue, &value);
@@ -220,11 +220,11 @@ uint32_t GetNamePropertyUint32(const napi_env& env, const napi_value& object, co
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGD("call napi_typeof fail");
+        MMI_HILOGD("Call napi_typeof failed");
         return value;
     }
     if (tmpType != napi_number) {
-        MMI_HILOGD("value is not number");
+        MMI_HILOGD("The value is not number");
         return value;
     }
     napi_get_value_uint32(env, napiValue, &value);

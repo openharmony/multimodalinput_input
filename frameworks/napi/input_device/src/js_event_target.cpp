@@ -55,7 +55,7 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
     CHKPV(work);
     if ((work->data) == nullptr) {
         delete work;
-        MMI_HILOGE("check work->data is null");
+        MMI_HILOGE("Check work->data is null");
         return;
     }
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
@@ -63,7 +63,7 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
     
     auto addEvent = devMonitor_.find(CHANGED_TYPE);
     if (addEvent == devMonitor_.end()) {
-        MMI_HILOGE("find changed event failed");
+        MMI_HILOGE("Find changed event failed");
         return;
     }
 
@@ -96,7 +96,7 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
     CHKPV(work);
     if ((work->data) == nullptr) {
         delete work;
-        MMI_HILOGE("check work->data is null");
+        MMI_HILOGE("Check work->data is null");
         return;
     }
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
@@ -104,7 +104,7 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
     
     auto removeEvent = devMonitor_.find(CHANGED_TYPE);
     if (removeEvent == devMonitor_.end()) {
-        MMI_HILOGE("find changed event failed");
+        MMI_HILOGE("Find changed event failed");
         return;
     }
 
@@ -136,7 +136,7 @@ void JsEventTarget::TargetOn(std::string type, int32_t deviceId)
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = devMonitor_.find(CHANGED_TYPE);
     if (iter == devMonitor_.end()) {
-        MMI_HILOGE("find %{public}s failed", CHANGED_TYPE.c_str());
+        MMI_HILOGE("Find %{public}s failed", CHANGED_TYPE.c_str());
         return;
     }
 
@@ -223,7 +223,7 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> &ids)
     CHKPV(iter->second);
     if (iter->second->env == nullptr) {
         callback_.erase(iter);
-        MMI_HILOGE("env is nullptr");
+        MMI_HILOGE("The env is nullptr");
         return;
     }
 
@@ -235,7 +235,7 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> &ids)
     int32_t *uData = new (std::nothrow) int32_t(userData);
     if ((uData) == nullptr) {
         delete work;
-        MMI_HILOGE("check uData is null");
+        MMI_HILOGE("Check uData is null");
         return;
     }
     work->data = static_cast<void*>(uData);
@@ -291,13 +291,13 @@ void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDeviceImpl:
     CHKPV(device);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
-        MMI_HILOGE("failed to search for userData");
+        MMI_HILOGE("Failed to search for userData");
         return;
     }
     CHKPV(iter->second);
     if (iter->second->env == nullptr) {
         callback_.erase(iter);
-        MMI_HILOGE("env is nullptr");
+        MMI_HILOGE("The env is nullptr");
         return;
     }
 
@@ -387,7 +387,7 @@ void JsEventTarget::EmitJsKeystrokeAbility(int32_t userData, std::vector<bool> &
     CHKPV(iter->second);
     if (iter->second->env == nullptr) {
         callback_.erase(iter);
-        MMI_HILOGE("env is nullptr");
+        MMI_HILOGE("The env is nullptr");
         return;
     }
 
@@ -419,13 +419,13 @@ void JsEventTarget::EmitJsKeyboardType(int32_t userData, int32_t keyboardType)
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
-        MMI_HILOGE("failed to search for userData");
+        MMI_HILOGE("Failed to search for userData");
         return;
     }
     CHKPV(iter->second);
     if (iter->second->env == nullptr) {
         callback_.erase(iter);
-        MMI_HILOGE("env is nullptr");
+        MMI_HILOGE("The env is nullptr");
         return;
     }
     iter->second->data.keyboardType = keyboardType;
@@ -489,14 +489,14 @@ void JsEventTarget::AddMonitor(napi_env env, std::string type, napi_value handle
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = devMonitor_.find(type);
     if (iter == devMonitor_.end()) {
-        MMI_HILOGE("find %{public}s failed", type.c_str());
+        MMI_HILOGE("Find %{public}s failed", type.c_str());
         return;
     }
 
     for (const auto &temp : iter->second) {
         CHKPC(temp);
         if (JsUtil::IsSameHandle(env, handle, temp->ref)) {
-            MMI_HILOGW("handle already exists");
+            MMI_HILOGW("The handle already exists");
             return;
         }
     }
@@ -519,7 +519,7 @@ void JsEventTarget::RemoveMonitor(napi_env env, std::string type, napi_value han
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = devMonitor_.find(type);
     if (iter == devMonitor_.end()) {
-        MMI_HILOGE("find %{public}s failed", type.c_str());
+        MMI_HILOGE("Find %{public}s failed", type.c_str());
         return;
     }
     if (handle == nullptr) {
@@ -528,7 +528,7 @@ void JsEventTarget::RemoveMonitor(napi_env env, std::string type, napi_value han
     }
     for (auto it = iter->second.begin(); it != iter->second.end(); ++it) {
         if (JsUtil::IsSameHandle(env, handle, (*it)->ref)) {
-            MMI_HILOGD("succeeded in removing monitor");
+            MMI_HILOGD("Succeeded in removing monitor");
             iter->second.erase(it);
             goto monitorLabel;
         }
@@ -570,7 +570,7 @@ std::unique_ptr<JsUtil::CallbackInfo> JsEventTarget::GetCallbackInfo(uv_work_t *
 
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
-        MMI_HILOGE("find userData failed");
+        MMI_HILOGE("Find userData failed");
         return nullptr;
     }
     auto cb = std::move(iter->second);

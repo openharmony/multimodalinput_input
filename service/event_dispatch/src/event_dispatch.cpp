@@ -71,13 +71,13 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     auto session = udsServer->GetSession(fd);
     CHKPV(session);
     if (session->isANRProcess_) {
-        MMI_HILOGD("application not responding");
+        MMI_HILOGD("Application not responding");
         return;
     }
     auto currentTime = GetSysClockTime();
     if (AnrMgr->TriggerAnr(currentTime, session)) {
         session->isANRProcess_ = true;
-        MMI_HILOGW("the pointer event does not report normally, application not response");
+        MMI_HILOGW("The pointer event does not report normally, application not response");
         return;
     }
 
@@ -104,18 +104,18 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
         return RET_ERR;
     }
     DfxHisysevent::OnUpdateTargetKey(key, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
-    MMI_HILOGD("event dispatcher of server:KeyEvent:KeyCode:%{public}d,Action:%{public}d,EventType:%{public}d,"
+    MMI_HILOGD("Event dispatcher of server:KeyEvent:KeyCode:%{public}d,Action:%{public}d,EventType:%{public}d,"
         "Fd:%{public}d", key->GetKeyCode(), key->GetAction(), key->GetEventType(), fd);
     auto session = udsServer.GetSession(fd);
     CHKPR(session, RET_ERR);
     if (session->isANRProcess_) {
-        MMI_HILOGD("application not responding");
+        MMI_HILOGD("Application not responding");
         return RET_OK;
     }
     auto currentTime = GetSysClockTime();
     if (AnrMgr->TriggerAnr(currentTime, session)) {
         session->isANRProcess_ = true;
-        MMI_HILOGW("the key event does not report normally, application not response");
+        MMI_HILOGW("The key event does not report normally, application not response");
         return RET_OK;
     }
 

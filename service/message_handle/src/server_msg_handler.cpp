@@ -96,7 +96,7 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
 #ifdef OHOS_BUILD_HDF
 int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
 {
-    MMI_HILOGI("hdfinject server access hditools info");
+    MMI_HILOGI("Hdfinject server access hditools info");
     CHKPR(sess, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     const int32_t processingCode = MMIHdiInject->ManageHdfInject(sess, pkt);
@@ -367,7 +367,7 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
         size_t size = 0;
         pkt2 << userData << id << name << deviceType << busType << product << vendor << version << phys << uniq << size;
         if (pkt2.ChkRWError()) {
-            MMI_HILOGE("packet write data failed");
+            MMI_HILOGE("Packet write data failed");
             return RET_ERR;
         }
         if (!sess->SendMsg(pkt2)) {
@@ -382,14 +382,14 @@ int32_t ServerMsgHandler::OnInputDevice(SessionPtr sess, NetPacket& pkt)
         << inputDevice->GetVersion() << inputDevice->GetPhys() << inputDevice->GetUniq()
         << inputDevice->GetAxisInfo().size();
     if (pkt2.ChkRWError()) {
-        MMI_HILOGE("packet write basic data failed");
+        MMI_HILOGE("Packet write basic data failed");
         return RET_ERR;
     }
     for (const auto &item : inputDevice->GetAxisInfo()) {
         pkt2 << item.GetAxisType() << item.GetMinimum() << item.GetMaximum() << item.GetFuzz() << item.GetFlat()
             << item.GetResolution();
         if (pkt2.ChkRWError()) {
-            MMI_HILOGE("packet write axis data failed");
+            MMI_HILOGE("Packet write axis data failed");
             return RET_ERR;
         }
     }

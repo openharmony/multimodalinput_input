@@ -29,12 +29,12 @@ int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const DeviceItem&
 {
     CALL_DEBUG_ENTER;
     if (originalEvent.events.empty()) {
-        MMI_HILOGE("manage joystick array failed, inputData is empty");
+        MMI_HILOGE("Manage joystick array failed, inputData is empty");
         return RET_ERR;
     }
     std::vector<DeviceEvent> inputData = originalEvent.events;
     if (inputData.empty()) {
-        MMI_HILOGE("manage finger array failed, inputData is empty");
+        MMI_HILOGE("Manage finger array failed, inputData is empty");
         return RET_ERR;
     }
     TransformPadEventToInputEvent(inputData, inputEventArray);

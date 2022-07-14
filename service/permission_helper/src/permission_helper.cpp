@@ -33,7 +33,7 @@ bool PermissionHelper::CheckPermission(uint32_t required)
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
         return CheckNativePermission(tokenId, required);
     } else {
-        MMI_HILOGE("unsupported token type:%{public}d", tokenType);
+        MMI_HILOGE("Unsupported token type:%{public}d", tokenType);
         return false;
     }
 }
@@ -49,7 +49,7 @@ bool PermissionHelper::CheckMonitor()
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
         return CheckMonitorNative(tokenId, inputMonitor);
     } else {
-        MMI_HILOGE("unsupported token type:%{public}d", tokenType);
+        MMI_HILOGE("Unsupported token type:%{public}d", tokenType);
         return false;
     }
 }
@@ -62,10 +62,10 @@ bool PermissionHelper::CheckHapPermission(uint32_t tokenId, uint32_t required)
         return false;
     }
     if (!((1 << findInfo.apl) & required)) {
-        MMI_HILOGE("check hap permission failed");
+        MMI_HILOGE("Check hap permission failed");
         return false;
     }
-    MMI_HILOGI("check hap permission success");
+    MMI_HILOGI("Check hap permission success");
     return true;
 }
 
@@ -77,10 +77,10 @@ bool PermissionHelper::CheckNativePermission(uint32_t tokenId, uint32_t required
         return false;
     }
     if (!((1 << findInfo.apl) & required)) {
-        MMI_HILOGE("check native permission failed");
+        MMI_HILOGE("Check native permission failed");
         return false;
     }
-    MMI_HILOGI("check native permission success");
+    MMI_HILOGI("Check native permission success");
     return true;
 }
 
@@ -88,10 +88,10 @@ bool PermissionHelper::CheckMonitorHap(uint32_t tokenId, const std::string &requ
 {
     int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, required);
     if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
-        MMI_HILOGE("check hap permission failed ret:%{public}d", ret);
+        MMI_HILOGE("Check hap permission failed ret:%{public}d", ret);
         return false;
     }
-    MMI_HILOGI("check hap permission success");
+    MMI_HILOGI("Check hap permission success");
     return true;
 }
 
@@ -99,10 +99,10 @@ bool PermissionHelper::CheckMonitorNative(uint32_t tokenId, const std::string &r
 {
     int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyNativeToken(tokenId, required);
     if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
-        MMI_HILOGE("check native permission failed ret:%{public}d", ret);
+        MMI_HILOGE("Check native permission failed ret:%{public}d", ret);
         return false;
     }
-    MMI_HILOGI("check native permission success");
+    MMI_HILOGI("Check native permission success");
     return true;
 }
 } // namespace MMI

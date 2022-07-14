@@ -55,7 +55,7 @@ int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_
         if (preUpKeyItem != nullptr) {
             key->RemoveReleasedKeyItems(*preUpKeyItem);
         } else {
-            MMI_HILOGE("preUpKeyItem is null");
+            MMI_HILOGE("The preUpKeyItem is null");
         }
     }
     int64_t time = GetSysClockTime();
@@ -134,7 +134,7 @@ int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_p
         if (preUpKeyItem != nullptr) {
             keyEventPtr->RemoveReleasedKeyItems(*preUpKeyItem);
         } else {
-            MMI_HILOGE("preUpKeyItem is null");
+            MMI_HILOGE("The preUpKeyItem is null");
         }
     }
 

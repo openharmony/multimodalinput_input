@@ -29,7 +29,7 @@ public:
     virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
     virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
     {
-        MMI_HILOGD("report pointer event success");
+        MMI_HILOGD("Report pointer event success");
     };
     virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
 };
@@ -37,13 +37,13 @@ public:
 bool AddMonitorFuzzTeset(const uint8_t* data, size_t /* size */)
 {
     auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
-        MMI_HILOGD("add monitor success");
+        MMI_HILOGD("Add monitor success");
     };
     int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 
     auto PointerEventFun = [](std::shared_ptr<PointerEvent> event) {
-        MMI_HILOGD("add monitor success");
+        MMI_HILOGD("Add monitor success");
     };
     monitorId = InputManager::GetInstance()->AddMonitor(PointerEventFun);
     InputManager::GetInstance()->RemoveMonitor(monitorId);

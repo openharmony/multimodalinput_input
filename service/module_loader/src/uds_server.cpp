@@ -75,12 +75,12 @@ int32_t UDSServer::GetClientPid(int32_t fd) const
 bool UDSServer::SendMsg(int32_t fd, NetPacket& pkt)
 {
     if (fd < 0) {
-        MMI_HILOGE("fd is less than 0");
+        MMI_HILOGE("The fd is less than 0");
         return false;
     }
     auto ses = GetSession(fd);
     if (ses == nullptr) {
-        MMI_HILOGE("fd:%{public}d not found, The message was discarded. errCode:%{public}d",
+        MMI_HILOGE("The fd:%{public}d not found, The message was discarded. errCode:%{public}d",
                    fd, SESSION_NOT_FOUND);
         return false;
     }
@@ -102,14 +102,14 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     int32_t sockFds[2] = {};
 
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
-        MMI_HILOGE("call socketpair fail, errno:%{public}d", errno);
+        MMI_HILOGE("Call socketpair failed, errno:%{public}d", errno);
         return RET_ERR;
     }
 
     serverFd = sockFds[0];
     toReturnClientFd = sockFds[1];
     if (toReturnClientFd < 0) {
-        MMI_HILOGE("call fcntl fail, errno:%{public}d", errno);
+        MMI_HILOGE("Call fcntl failed, errno:%{public}d", errno);
         return RET_ERR;
     }
 
@@ -172,11 +172,11 @@ void UDSServer::AddPermission(SessionPtr sess)
     
     if (Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken) ==
         Security::AccessToken::ATokenTypeEnum::TOKEN_HAP) {
-        MMI_HILOGD("type flag matched");
+        MMI_HILOGD("Type flag matched");
         int32_t result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionMonitor);
-        MMI_HILOGD("verify access result:%{public}d", result);
+        MMI_HILOGD("Verify access result:%{public}d", result);
         if (result != Security::AccessToken::PERMISSION_GRANTED) {
-            MMI_HILOGD("permission is not granted");
+            MMI_HILOGD("Permission is not granted");
             sess->AddPermission(false);
         }
     }
@@ -200,12 +200,12 @@ void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
 
 void UDSServer::OnConnected(SessionPtr s)
 {
-    MMI_HILOGI("session desc:%{public}s", s->GetDescript().c_str());
+    MMI_HILOGI("Session desc:%{public}s", s->GetDescript().c_str());
 }
 
 void UDSServer::OnDisconnected(SessionPtr s)
 {
-    MMI_HILOGI("session desc:%{public}s", s->GetDescript().c_str());
+    MMI_HILOGI("Session desc:%{public}s", s->GetDescript().c_str());
 }
 
 int32_t UDSServer::AddEpoll(EpollEventType type, int32_t fd)
@@ -269,11 +269,11 @@ void UDSServer::OnEpollRecv(int32_t fd, epoll_event& ev)
             OnReadPackets(buf, std::bind(&UDSServer::OnPacket, this, fd, std::placeholders::_1));
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
+                MMI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
                     size, errno);
                 continue;
             }
-            MMI_HILOGE("recv return %{public}zu errno:%{public}d", size, errno);
+            MMI_HILOGE("Recv return %{public}zu errno:%{public}d", size, errno);
             break;
         } else {
             MMI_HILOGE("The client side disconnect with the server. size:0 errno:%{public}d", errno);
@@ -340,7 +340,7 @@ bool UDSServer::AddSession(SessionPtr ses)
     MMI_HILOGD("pid:%{public}d,fd:%{public}d", ses->GetPid(), ses->GetFd());
     auto fd = ses->GetFd();
     if (fd < 0) {
-        MMI_HILOGE("fd is less than 0");
+        MMI_HILOGE("The fd is less than 0");
         return false;
     }
     auto pid = ses->GetPid();
