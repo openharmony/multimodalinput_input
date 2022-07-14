@@ -87,7 +87,7 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         for (const auto& id : pointerIdList) {
             PointerEvent::PointerItem pointeritem;
             if (!pointerEvent->GetPointerItem(id, pointeritem)) {
-                MMI_HILOGW("can't find this poinerItem");
+                MMI_HILOGW("Can't find this poinerItem");
                 continue;
             }
             auto itemPid = WinMgr->GetWindowPid(pointeritem.GetTargetWindowId());

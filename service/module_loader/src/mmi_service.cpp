@@ -369,7 +369,7 @@ void MMIService::OnConnected(SessionPtr s)
 void MMIService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
-    MMI_HILOGW("enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), s->GetFd());
+    MMI_HILOGW("Enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), s->GetFd());
 #ifdef OHOS_BUILD_ENABLE_POINTER
     IPointerDrawingManager::GetInstance()->DeletePointerVisible(s->GetPid());
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -663,7 +663,7 @@ void MMIService::OnThread()
             } else if (mmiEd->event_type == EPOLL_EVENT_ETASK) {
                 OnDelegateTask(ev[i]);
             } else {
-                MMI_HILOGW("unknown epoll event type:%{public}d", mmiEd->event_type);
+                MMI_HILOGW("Unknown epoll event type:%{public}d", mmiEd->event_type);
             }
         }
         TimerMgr->ProcessTimers();

@@ -113,7 +113,7 @@ void InputMonitor::MarkConsumed(int32_t eventId)
 {
     std::lock_guard<std::mutex> guard(mutex_);
     if (consumed_) {
-        MMI_HILOGD("consumed_ is true");
+        MMI_HILOGD("The consumed_ is true");
         return;
     }
     if (monitorId_ < 0) {
@@ -178,23 +178,23 @@ int32_t JsInputMonitor::IsMatch(napi_env jsEnv, napi_value callback)
             return NAPI_ERR;
         }
         if (isEquals) {
-            MMI_HILOGI("js callback match success");
+            MMI_HILOGI("Js callback match success");
             return RET_OK;
         }
-        MMI_HILOGI("js callback match failed");
+        MMI_HILOGI("Js callback match failed");
         return RET_ERR;
     }
-    MMI_HILOGI("js callback match failed");
+    MMI_HILOGI("Js callback match failed");
     return RET_ERR;
 }
 
 int32_t JsInputMonitor::IsMatch(napi_env jsEnv)
 {
     if (jsEnv_ == jsEnv) {
-        MMI_HILOGI("env match success");
+        MMI_HILOGI("Env match success");
         return RET_OK;
     }
-    MMI_HILOGI("env match failed");
+    MMI_HILOGI("Env match failed");
     return RET_ERR;
 }
 
@@ -565,7 +565,7 @@ bool JsInputMonitor::Start()
     CALL_DEBUG_ENTER;
     CHKPF(monitor_);
     if (isMonitoring_) {
-        MMI_HILOGW("js is monitoring");
+        MMI_HILOGW("Js is monitoring");
         return true;
     }
     if (monitor_->Start()) {

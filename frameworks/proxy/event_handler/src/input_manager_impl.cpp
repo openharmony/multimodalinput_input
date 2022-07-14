@@ -619,7 +619,7 @@ void InputManagerImpl::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
     }
     for (auto iter = anrObservers_.begin(); iter != anrObservers_.end(); ++iter) {
         if (*iter == observer) {
-            MMI_HILOGE("observer already exist");
+            MMI_HILOGE("Observer already exist");
             return;
         }
     }

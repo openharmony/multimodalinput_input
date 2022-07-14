@@ -69,28 +69,28 @@ void LibinputAdapter::LoginfoPackagingTool(struct libinput_event *event)
 constexpr static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
         if (path == nullptr) {
-            MMI_HILOGWK("input device path is nullptr");
+            MMI_HILOGWK("Input device path is nullptr");
             return RET_ERR;
         }
         char realPath[PATH_MAX] = {};
         int32_t count = 0;
         while ((realpath(path, realPath) == nullptr) && (count < MAX_RETRY_COUNT)) {
-            MMI_HILOGWK("path is error, count: %{public}d, path:%{public}s", count, path);
+            MMI_HILOGWK("Path is error, count: %{public}d, path:%{public}s", count, path);
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
             ++count;
         }
         if (count >= MAX_RETRY_COUNT) {
-            MMI_HILOGWK("retry %{public}d times realpath failed", count);
+            MMI_HILOGWK("Retry %{public}d times realpath failed", count);
             return RET_ERR;
         }
         int32_t fd = open(realPath, flags);
         int32_t errNo = errno;
-        MMI_HILOGWK("libinput .open_restricted path:%{public}s,fd:%{public}d,errno:%{public}d", path, fd, errNo);
+        MMI_HILOGWK("Libinput .open_restricted path:%{public}s,fd:%{public}d,errno:%{public}d", path, fd, errNo);
         return fd < 0 ? RET_ERR : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)
     {
-        MMI_HILOGI("libinput .close_restricted fd:%{public}d", fd);
+        MMI_HILOGI("Libinput .close_restricted fd:%{public}d", fd);
         close(fd);
     },
 };
@@ -136,7 +136,7 @@ void LibinputAdapter::EventDispatch(struct epoll_event& ev)
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int*>(ev.data.ptr);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_HILOGF("epoll unrecoverable error,"
+        MMI_HILOGF("Epoll unrecoverable error,"
             "The service must be restarted. fd:%{public}d", fd);
         free(ev.data.ptr);
         ev.data.ptr = nullptr;

@@ -53,7 +53,7 @@ void ProcessingKeyboardDevice::TransformKeyBoardEventToInputEvent(const std::vec
         } else if (item.eventType == "KEY_EVENT_LONG_PRESS") {
             TransformKeyLongPressEvent(item, inputEventArray);
         } else {
-            MMI_HILOGW("json file format error");
+            MMI_HILOGW("Json file format error");
         }
     }
 }
