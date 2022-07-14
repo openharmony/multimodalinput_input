@@ -32,8 +32,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MouseEventHandler"};
-const std::array<int32_t, 6> speedNums { 5, 16, 23, 32, 41, 128 };
-const std::array<double, 6> speedGains { 0.6, 1, 1.2, 1.8, 2.1, 2.8 };
+const std::array<int32_t, 6> SPEED_NUMS { 5, 16, 23, 32, 41, 128 };
+const std::array<double, 6> SPEED_GAINS { 0.6, 1.0, 1.2, 1.8, 2.1, 2.8 };
 } // namespace
 MouseEventHandler::MouseEventHandler()
 {
@@ -49,12 +49,12 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
 double MouseEventHandler::GetSpeedGain(const double &speed) const
 {
     int32_t num = static_cast<int32_t>(ceil(abs(speed)));
-    for (size_t i = 0; i < speedNums.size(); ++i) {
-        if (num <= speedNums[i]) {
-            return speedGains[i];
+    for (size_t i = 0; i < SPEED_NUMS.size(); ++i) {
+        if (num <= SPEED_NUMS[i]) {
+            return SPEED_GAINS[i];
         }
     }
-    return speedGains.back();
+    return SPEED_GAINS.back();
 }
 
 int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
@@ -74,9 +74,9 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
     }
 
     int32_t ret = HandleMotionCorrection(data);
-    if (ret == RET_ERR) {
+    if (ret != RET_OK) {
         MMI_HILOGE("Failed to handle motion correction");
-        return RET_ERR;
+        return ret;
     }
 
     WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
@@ -91,11 +91,11 @@ int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
     CHKPR(data, ERROR_NULL_POINTER);
 
     uint64_t usec = libinput_event_pointer_get_time_usec(data);
-    uint64_t timeDiff = usec - lastEventTime_;
-    if (timeDiff <= 0) {
-        MMI_HILOGE("The time difference is less than or equal to 0");
+    if (usec <= lastEventTime_) {
+        MMI_HILOGE("The new time less than or equal to the last time");
         return RET_ERR;
     }
+    uint64_t timeDiff = usec - lastEventTime_;
 
     double dx = libinput_event_pointer_get_dx(data);
     double dy = libinput_event_pointer_get_dy(data);

@@ -57,8 +57,8 @@ private:
 private:
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     int32_t timerId_ { -1 };
-    double absolutionX_ { -1 };
-    double absolutionY_ { -1 };
+    double absolutionX_ { -1.0 };
+    double absolutionY_ { -1.0 };
     int32_t buttonId_ { -1 };
     bool isPressed_ { false };
     int32_t currentDisplayId_ { -1 };
