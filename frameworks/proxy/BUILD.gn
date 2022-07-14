@@ -276,6 +276,7 @@ ohos_unittest("InputManagerTest") {
   }
   sources = [
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
+    "${mmi_path}/test/unittest/common/src/system_info.cpp",
     "${mmi_path}/test/unittest/common/src/window_utils_test.cpp",
     "events/test/input_manager_test.cpp",
   ]
