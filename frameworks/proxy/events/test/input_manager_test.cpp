@@ -17,6 +17,7 @@
 #include "input_handler_type.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
+#include "system_info.h"
 #include "util.h"
 
 namespace OHOS {
@@ -2189,6 +2190,16 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardType, TestSize.Level1)
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     MMI_HILOGD("Stop InputManagerTest_GetKeyboardType");
+}
+
+HWTEST_F(InputManagerTest, InputManagerTest_GetProcCpuUsage, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    SYSTEM_INFO::CpuInfo cpuInfo;
+    const std::string process_name = "multimodalinput";
+    auto usage = cpuInfo.GetProcCpuUsage(process_name);
+    MMI_HILOGD("The CPU usage of the %{public}s process is %{public}.2f", process_name.c_str(), usage);
+    ASSERT_TRUE(usage < SYSTEM_INFO::CPU_USAGE_LOAD && usage != SYSTEM_INFO::CPU_USAGE_UNKONW);
 }
 } // namespace MMI
 } // namespace OHOS
