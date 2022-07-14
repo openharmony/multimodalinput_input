@@ -258,6 +258,11 @@ int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, M
 int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+
     if (!IsRunning()) {
         MMI_HILOGE("service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -283,6 +288,11 @@ int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, M
 int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+
     if (!IsRunning()) {
         MMI_HILOGE("service is not running");
         return MMISERVICE_NOT_RUNNING;
