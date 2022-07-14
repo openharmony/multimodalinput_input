@@ -23,6 +23,7 @@
 #include "nocopyable.h"
 
 #include "net_packet.h"
+#include "proto.h"
 
 namespace OHOS {
 namespace MMI {
@@ -74,8 +75,18 @@ public:
         return programName_;
     }
 
+    void SetTokenType(int32_t type)
+    {
+        tokenType_ = type;
+    }
+
+    int32_t GetTokenType() const
+    {
+        return tokenType_;
+    }
+
     void UpdateDescript();
-    void AddEvent(int32_t id, int64_t time);
+    void SaveANREvent(int32_t id, int64_t time);
     void DelEvents(int32_t id);
     int64_t GetEarliestEventTime() const;
     bool IsEventQueueEmpty();
@@ -97,12 +108,13 @@ protected:
     std::vector<EventTime> events_;
     std::string descript_;
     const std::string programName_;
-    const int32_t moduleType_;
-    int32_t fd_;
-    const int32_t uid_;
-    const int32_t pid_;
+    const int32_t moduleType_ { -1 };
+    int32_t fd_ { -1 };
+    const int32_t uid_ { -1 };
+    const int32_t pid_ { -1 };
+    int32_t tokenType_ { TokenType::TOKEN_INVALID };
 #ifdef OHOS_BUILD_MMI_DEBUG
-    int32_t clientFd_ = -1;
+    int32_t clientFd_ { -1 };
 #endif // OHOS_BUILD_MMI_DEBUG
 };
 } // namespace MMI
