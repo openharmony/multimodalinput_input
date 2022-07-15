@@ -57,6 +57,9 @@ public:
     void TestMarkConsumedStep4();
     void TestMarkConsumedStep5();
     void TestMarkConsumedStep6();
+    int32_t TestAddMonitor(std::shared_ptr<IInputEventConsumer> consumer);
+    void TestRemoveMonitor(int32_t monitorId);
+    void TestMarkConsumed(int32_t monitorId, int32_t eventId);
 };
 
 void InputManagerTest::SetUpTestCase()
@@ -467,7 +470,7 @@ void InputManagerTest::TestMarkConsumedStep3(int32_t monitorId, int32_t eventId)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_MARK_CONSUMED);
-    InputManager::GetInstance()->MarkConsumed(monitorId, eventId);
+    TestMarkConsumed(monitorId, eventId);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
@@ -534,6 +537,24 @@ void InputManagerTest::TestMarkConsumedStep6()
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_FOCUS);
     TestSimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+}
+
+int32_t InputManagerTest::TestAddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
+{
+    AccessMonitor monitor;
+    return InputManager::GetInstance()->AddMonitor(consumer);
+}
+
+void InputManagerTest::TestRemoveMonitor(int32_t monitorId)
+{
+    AccessMonitor monitor;
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
+}
+
+void InputManagerTest::TestMarkConsumed(int32_t monitorId, int32_t eventId)
+{
+    AccessMonitor monitor;
+    InputManager::GetInstance()->MarkConsumed(monitorId, eventId);
 }
 
 /**
@@ -1400,20 +1421,19 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_007, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    VerifyMonitor monitor;
     auto pointerEvent = SetupPointerEvent001();
     ASSERT_TRUE(pointerEvent != nullptr);
 
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    int32_t monitorId = TestAddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     TestSimulateInputEvent(pointerEvent);
 
     if (IsValidHandlerId(monitorId)) {
-        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        TestRemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
@@ -1427,7 +1447,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_001, TestSize.Lev
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    VerifyMonitor monitor;
     const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
     std::vector<int32_t> ids(N_TEST_CASES);
     std::vector<std::shared_ptr<InputEventCallback>> cbs(N_TEST_CASES);
@@ -1435,7 +1454,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_002, TestSize.Lev
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
         cbs[i] = GetPtr<InputEventCallback>();
         ASSERT_TRUE(cbs[i] != nullptr);
-        ids[i] = InputManager::GetInstance()->AddMonitor(cbs[i]);
+        ids[i] = TestAddMonitor(cbs[i]);
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
@@ -1448,7 +1467,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_002, TestSize.Lev
         MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
         ASSERT_TRUE(!sPointerEs.empty());
         if (IsValidHandlerId(id)) {
-            InputManager::GetInstance()->RemoveMonitor(id);
+            TestRemoveMonitor(id);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
@@ -1463,20 +1482,19 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_002, TestSize.Lev
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_003, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    VerifyMonitor monitor;
     auto pointerEvent = SetupPointerEvent003();
     ASSERT_TRUE(pointerEvent != nullptr);
 
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    int32_t monitorId = TestAddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     TestSimulateInputEvent(pointerEvent);
 
     if (IsValidHandlerId(monitorId)) {
-        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        TestRemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
@@ -1490,10 +1508,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_003, TestSize.Lev
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_004, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    VerifyMonitor monitor;
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    int32_t monitorId = TestAddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -1506,7 +1523,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_004, TestSize.Lev
     TestMarkConsumedStep5();
 
     if (IsValidHandlerId(monitorId)) {
-        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        TestRemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
@@ -1520,10 +1537,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_004, TestSize.Lev
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_005, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    VerifyMonitor monitor;
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    int32_t monitorId = TestAddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -1535,7 +1551,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_005, TestSize.Lev
     TestMarkConsumedStep6();
 
     if (IsValidHandlerId(monitorId)) {
-        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        TestRemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
@@ -1549,7 +1565,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_005, TestSize.Lev
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    VerifyMonitor monitor;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
@@ -1567,14 +1582,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
     int32_t monitorId { };
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
-    monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    monitorId = TestAddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     TestSimulateInputEvent(pointerEvent);
 
     if (IsValidHandlerId(monitorId)) {
-        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        TestRemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
@@ -1588,7 +1603,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    VerifyMonitor monitor;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
@@ -1606,14 +1620,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
     int32_t monitorId { };
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
-    monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    monitorId = TestAddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     TestSimulateInputEvent(pointerEvent);
 
     if (IsValidHandlerId(monitorId)) {
-        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        TestRemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
@@ -1627,7 +1641,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    VerifyMonitor monitor;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
@@ -1645,14 +1658,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     int32_t monitorId { };
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
-    monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    monitorId = TestAddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     TestSimulateInputEvent(pointerEvent);
 
     if (IsValidHandlerId(monitorId)) {
-        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        TestRemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
@@ -1666,7 +1679,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    VerifyMonitor monitor;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
@@ -1686,7 +1698,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        ids[i] = InputManager::GetInstance()->AddMonitor(callBackPtr);
+        ids[i] = TestAddMonitor(callBackPtr);
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
@@ -1698,7 +1710,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
         MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
         ASSERT_TRUE(!sPointerEs.empty());
         if (IsValidHandlerId(id)) {
-            InputManager::GetInstance()->RemoveMonitor(id);
+            TestRemoveMonitor(id);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
@@ -1713,7 +1725,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    VerifyMonitor monitor;
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
@@ -1731,14 +1742,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
     int32_t monitorId { };
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
-    monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    monitorId = TestAddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     TestSimulateInputEvent(pointerEvent);
 
     if (IsValidHandlerId(monitorId)) {
-        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        TestRemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
@@ -1922,10 +1933,9 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    VerifyMonitor monitor;
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    int32_t monitorId = TestAddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -1933,7 +1943,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1
     TestSimulateInputEvent(pointerEvent);
 
     if (IsValidHandlerId(monitorId)) {
-        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        TestRemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
@@ -1947,10 +1957,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    VerifyMonitor monitor;
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    int32_t monitorId = TestAddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -1958,7 +1967,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1
     TestSimulateInputEvent(pointerEvent);
 
     if (IsValidHandlerId(monitorId)) {
-        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        TestRemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
@@ -1975,10 +1984,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    VerifyMonitor monitor;
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
-    int32_t monitorId = InputManager::GetInstance()->AddMonitor(callBackPtr);
+    int32_t monitorId = TestAddMonitor(callBackPtr);
     EXPECT_TRUE(IsValidHandlerId(monitorId));
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
@@ -1987,7 +1995,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1
     TestSimulateInputEvent(pointerEvent);
 
     if (IsValidHandlerId(monitorId)) {
-        InputManager::GetInstance()->RemoveMonitor(monitorId);
+        TestRemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
@@ -2001,15 +2009,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_003, TestSize.Level1
 HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    VerifyMonitor monitor;
     const std::vector<int32_t>::size_type N_TEST_CASES { MAX_N_INPUT_HANDLERS - 1 };
     std::vector<int32_t> ids;
     int32_t maxMonitor = 0;
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        auto callBackPtr =  GetPtr<InputEventCallback>();
+        auto callBackPtr = GetPtr<InputEventCallback>();
         ASSERT_TRUE(callBackPtr != nullptr);
-        maxMonitor = InputManager::GetInstance()->AddMonitor(callBackPtr);
+        maxMonitor = TestAddMonitor(callBackPtr);
         if (IsValidHandlerId(maxMonitor)) {
             ids.push_back(maxMonitor);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2025,7 +2032,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
             maxMonitor++;
         }
         if (IsValidHandlerId(id)) {
-            InputManager::GetInstance()->RemoveMonitor(id);
+            TestRemoveMonitor(id);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
         }
     }
@@ -2041,13 +2048,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    VerifyMonitor monitor;
     const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
     std::vector<int32_t> ids;
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
-        int32_t id = InputManager::GetInstance()->AddMonitor(callBackPtr);
+        int32_t id = TestAddMonitor(callBackPtr);
         if (IsValidHandlerId(id)) {
             ids.push_back(id);
             std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -2065,7 +2071,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_001, TestSize.L
         MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
         ASSERT_TRUE(!sPointerEs.empty());
         if (IsValidHandlerId(id)) {
-            InputManager::GetInstance()->RemoveMonitor(id);
+            TestRemoveMonitor(id);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
@@ -2080,7 +2086,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_001, TestSize.L
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    VerifyMonitor monitor;
+    AccessMonitor monitor;
     const std::vector<int32_t>::size_type N_TEST_CASES { 3 };
     std::vector<int32_t> ids;
     auto callBackPtr = GetPtr<InputEventCallback>();
