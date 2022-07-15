@@ -32,8 +32,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MouseEventHandler"};
-const std::array<int32_t, 6> SPEED_NUMS { 5, 16, 23, 32, 41, 128 };
-const std::array<double, 6> SPEED_GAINS { 0.6, 1.0, 1.2, 1.8, 2.1, 2.8 };
 } // namespace
 MouseEventHandler::MouseEventHandler()
 {
@@ -44,17 +42,6 @@ MouseEventHandler::MouseEventHandler()
 std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
 {
     return pointerEvent_;
-}
-
-double MouseEventHandler::GetSpeedGain(const double &speed) const
-{
-    int32_t num = static_cast<int32_t>(ceil(abs(speed)));
-    for (size_t i = 0; i < SPEED_NUMS.size(); ++i) {
-        if (num <= SPEED_NUMS[i]) {
-            return SPEED_GAINS[i];
-        }
-    }
-    return SPEED_GAINS.back();
 }
 
 int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
@@ -73,44 +60,11 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
         return RET_ERR;
     }
 
-    int32_t ret = HandleMotionCorrection(data);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Failed to handle motion correction");
-        return ret;
-    }
-
+    absolutionX_ += libinput_event_pointer_get_dx(data);
+    absolutionY_ += libinput_event_pointer_get_dy(data);
     WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
     pointerEvent_->SetTargetDisplayId(currentDisplayId_);
-    MMI_HILOGD("Change Coordinate : x:%{public}lf,y:%{public}lf", absolutionX_, absolutionY_);
-    return RET_OK;
-}
-
-int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(data, ERROR_NULL_POINTER);
-
-    uint64_t usec = libinput_event_pointer_get_time_usec(data);
-    if (usec <= lastEventTime_) {
-        MMI_HILOGE("The new time less than or equal to the last time");
-        return RET_ERR;
-    }
-    uint64_t timeDiff = usec - lastEventTime_;
-
-    double dx = libinput_event_pointer_get_dx(data);
-    double dy = libinput_event_pointer_get_dy(data);
-    DisplayGroupInfo displayGroupInfo = WinMgr->GetDisplayGroupInfo();
-    double correctionX = (dx / static_cast<double>(timeDiff)) * (static_cast<double>(speed_) / 10.0) *
-                         GetSpeedGain(dx) * static_cast<double>(displayGroupInfo.displaysInfo[0].width);
-    double correctionY = (dy / static_cast<double>(timeDiff)) * (static_cast<double>(speed_) / 10.0) *
-                         GetSpeedGain(dy) * static_cast<double>(displayGroupInfo.displaysInfo[0].height);
-    MMI_HILOGD("dx:%{public}lf, dy:%{public}lf, correctionX:%{public}lf, correctionY:%{public}lf,"
-               "timeDiff:%{public}ju, width:%{public}d, height:%{public}d",
-               dx, dy, correctionX, correctionY,
-               timeDiff, displayGroupInfo.displaysInfo[0].width, displayGroupInfo.displaysInfo[0].height);
-    absolutionX_ += correctionX;
-    absolutionY_ += correctionY;
-    lastEventTime_ = usec;
+    MMI_HILOGD("Change Coordinate : x:%{public}lf,y:%{public}lf",  absolutionX_, absolutionY_);
     return RET_OK;
 }
 
