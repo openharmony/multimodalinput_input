@@ -49,7 +49,6 @@ private:
 };
 namespace OHOS {
 namespace MMI {
-#define InputMgr InputManager::GetInstance()
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerCommand"};
 constexpr int32_t SLEEPTIME = 20;
