@@ -641,7 +641,7 @@ void InputManagerImpl::OnAnr(int32_t pid)
         std::bind(&InputManagerImpl::OnAnrTask, this, anrObservers_, pid))) {
         MMI_HILOGE("Post task failed");
     }
-    MMI_HILOGI("The anr noticed pid:%{public}d", pid);
+    MMI_HILOGI("ANR noticed pid:%{public}d", pid);
 }
 
 void InputManagerImpl::OnAnrTask(std::vector<std::shared_ptr<IAnrObserver>> observers, int32_t pid)

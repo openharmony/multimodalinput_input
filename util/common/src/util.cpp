@@ -443,7 +443,7 @@ std::string StringFmt(const char* str, ...)
     va_start(args, str);
     char buf[MAX_PACKET_BUF_SIZE] = {};
     if (vsnprintf_s(buf, sizeof(buf), sizeof(buf) - 1, str, args) == -1) {
-        MMI_HILOGE("The vsnprintf_s is error");
+        MMI_HILOGE("vsnprintf_s error");
         va_end(args);
         return "";
     }
