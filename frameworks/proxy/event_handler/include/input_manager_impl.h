@@ -122,6 +122,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_MONITOR
 
     std::mutex mtx_;
+    std::mutex handleMtx_;
     std::condition_variable cv_;
     std::thread ehThread_;
     EventHandlerPtr eventHandler_  = nullptr;
