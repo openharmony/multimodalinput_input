@@ -120,10 +120,31 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
     InputMgrImpl->SimulateInputEvent(pointerEvent);
 }
 
-void InputManager::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
+int32_t InputManager::RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener)
+{
+    return InputMgrImpl->RegisterDevListener(type, listener);
+}
+
+int32_t InputManager::UnregisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener)
+{
+    return InputMgrImpl->UnregisterDevListener(type, listener);
+}
+
+int32_t InputManager::GetDeviceIds(std::function<void(std::vector<int32_t>&)> callback)
+{
+    return InputMgrImpl->GetDeviceIds(callback);
+}
+
+int32_t InputManager::GetDevice(int32_t deviceId,
+    std::function<void(std::shared_ptr<InputDevice>)> callback)
+{
+    return InputMgrImpl->GetDevice(deviceId, callback);
+}
+
+int32_t InputManager::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
     std::function<void(std::vector<bool>&)> callback)
 {
-    InputMgrImpl->SupportKeys(deviceId, keyCodes, callback);
+    return InputMgrImpl->SupportKeys(deviceId, keyCodes, callback);
 }
 
 int32_t InputManager::SetPointerVisible(bool visible)
@@ -135,9 +156,9 @@ bool InputManager::IsPointerVisible()
     return InputMgrImpl->IsPointerVisible();
 }
 
-void InputManager::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
+int32_t InputManager::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
 {
-    InputMgrImpl->GetKeyboardType(deviceId, callback);
+    return InputMgrImpl->GetKeyboardType(deviceId, callback);
 }
 
 void InputManager::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)

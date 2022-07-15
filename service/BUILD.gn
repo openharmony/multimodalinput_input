@@ -131,7 +131,6 @@ ohos_shared_library("libmmi-server") {
   sources = [
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
     "delegate_task/src/delegate_tasks.cpp",
-    "device_manager/src/input_device.cpp",
     "device_manager/src/input_device_manager.cpp",
     "dfx/src/dfx_hisysevent.cpp",
     "event_dispatch/src/event_dispatch.cpp",
