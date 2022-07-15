@@ -31,7 +31,7 @@
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
-#include "i_anr_listener.h"
+#include "i_anr_observer.h"
 #include "i_input_event_consumer.h"
 #include "key_option.h"
 #include "mmi_event_handler.h"
@@ -84,14 +84,18 @@ public:
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
 
-    void SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
+    int32_t RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener);
+    int32_t UnregisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener = nullptr);
+    int32_t GetDeviceIds(std::function<void(std::vector<int32_t>&)> callback);
+    int32_t GetDevice(int32_t deviceId, std::function<void(std::shared_ptr<InputDevice>)> callback);
+    int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
         std::function<void(std::vector<bool>&)> callback);
-    void GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
+    int32_t GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
 
     int32_t SetPointerVisible(bool visible);
     bool IsPointerVisible();
 
-    void SetAnrListener(std::shared_ptr<IAnrListener> receiver);
+    void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid);
 
 private:
@@ -108,13 +112,13 @@ private:
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-    void OnAnrTask(std::shared_ptr<IAnrListener> receiver, int32_t pid);
+    void OnAnrTask(std::vector<std::shared_ptr<IAnrObserver>> observers, int32_t pid);
     void OnThread();
 
 private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
     std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
-    std::shared_ptr<IAnrListener> anrReceiver_ = nullptr;
+    std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
 
     DisplayGroupInfo displayGroupInfo_;
 #ifdef OHOS_BUILD_ENABLE_MONITOR

@@ -14,10 +14,9 @@
  */
 
 #include "libinput_adapter.h"
-
 #include <climits>
 #include <cinttypes>
-
+#include <dirent.h>
 #include <fcntl.h>
 #include <sys/epoll.h>
 #include <unistd.h>
@@ -183,6 +182,36 @@ void LibinputAdapter::ReloadDevice()
     CHKPV(input_);
     libinput_suspend(input_);
     libinput_resume(input_);
+}
+
+void LibinputAdapter::RetriggerHotplugEvents()
+{
+    CALL_INFO_TRACE;
+    DIR *pdir = opendir("/sys/class/input");
+    if (pdir == nullptr) {
+        MMI_HILOGE("Failed to open directory: \'/sys/class/input\'");
+        return;
+    }
+    for (struct dirent *pdirent = readdir(pdir); pdirent != nullptr; pdirent = readdir(pdir)) {
+        char path[PATH_MAX];
+        if (sprintf_s(path, sizeof(path), "/sys/class/input/%s/uevent", pdirent->d_name) < 0) {
+            continue;
+        }
+        MMI_HILOGD("trigger \'%{public}s\'", path);
+        FILE *fs = fopen(path, "r+");
+        if (fs == nullptr) {
+            continue;
+        }
+        if (fputs("add", fs) < 0) {
+            MMI_HILOGW("fputs error: %{public}s", strerror(errno));
+        }
+        if (fclose(fs) != 0) {
+            MMI_HILOGW("fclose error: %{public}s", strerror(errno));
+        }
+    }
+    if (closedir(pdir) != 0) {
+        MMI_HILOGW("closedir error: %{public}s", strerror(errno));
+    }
 }
 } // namespace MMI
 } // namespace OHOS

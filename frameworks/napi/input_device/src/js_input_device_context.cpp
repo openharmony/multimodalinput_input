@@ -20,7 +20,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceContext" };
 constexpr size_t MAX_STRING_LEN = 32;
-const std::string CHANGED_TYPE = "changed";
+const std::string CHANGED_TYPE = "change";
 
 const std::string GET_GLOBAL = "napi_get_global";
 const std::string DEFINE_CLASS = "napi_define_class";
@@ -183,7 +183,7 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
 
     JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
     auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
-    jsInputDeviceMgr->RegisterInputDeviceMonitor(env, type, argv[1]);
+    jsInputDeviceMgr->RegisterDevListener(env, type, argv[1]);
     return nullptr;
 }
 
@@ -214,14 +214,14 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
     JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
     auto jsInputDeviceMgr = jsIds->GetJsInputDeviceMgr();
     if (argc == 1) {
-        jsInputDeviceMgr->UnRegisterInputDeviceMonitor(env, type);
+        jsInputDeviceMgr->UnregisterDevListener(env, type);
         return nullptr;
     }
     if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, "The second parameter type is wrong");
         return nullptr;
     }
-    jsInputDeviceMgr->UnRegisterInputDeviceMonitor(env, type, argv[1]);
+    jsInputDeviceMgr->UnregisterDevListener(env, type, argv[1]);
     return nullptr;
 }
 
@@ -306,7 +306,7 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
     }
 
     int32_t data = 0;
-    std::vector<int32_t> keyCode;
+    std::vector<int32_t> keyCodes;
     for (uint32_t i = 0; i < size; ++i) {
         napi_value keyValue = nullptr;
         CHKRP(env, napi_get_element(env, argv[1], i, &keyValue), GET_ELEMENT);
@@ -315,19 +315,19 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
             return nullptr;
         }
         CHKRP(env, napi_get_value_int32(env, keyValue, &data), GET_INT32);
-        keyCode.push_back(data);
+        keyCodes.push_back(data);
     }
 
     JsInputDeviceContext *jsContext = JsInputDeviceContext::GetInstance(env);
     auto jsInputDeviceMgr = jsContext->GetJsInputDeviceMgr();
     if (argc == 2) {
-        return jsInputDeviceMgr->SupportKeys(env, deviceId, keyCode);
+        return jsInputDeviceMgr->SupportKeys(env, deviceId, keyCodes);
     }
     if (!JsUtil::TypeOf(env, argv[2], napi_function)) {
         THROWERR(env, "The third parameter type is wrong");
         return nullptr;
     }
-    return jsInputDeviceMgr->SupportKeys(env, deviceId, keyCode, argv[2]);
+    return jsInputDeviceMgr->SupportKeys(env, deviceId, keyCodes, argv[2]);
 }
 
 napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_info info)

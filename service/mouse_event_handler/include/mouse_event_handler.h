@@ -49,17 +49,21 @@ private:
     void HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem);
  #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t HandleButtonValueInner(libinput_event_pointer* data);
+    int32_t HandleMotionCorrection(libinput_event_pointer* data);
+    double GetSpeedGain(const double &speed) const;
     void DumpInner();
     void InitAbsolution();
 
 private:
-    std::shared_ptr<PointerEvent> pointerEvent_ = nullptr;
-    int32_t timerId_ = -1;
-    double absolutionX_ = -1;
-    double absolutionY_ = -1;
-    int32_t buttonId_ = -1;
-    bool isPressed_ = false;
-    int32_t currentDisplayId_ = -1;
+    std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
+    int32_t timerId_ { -1 };
+    double absolutionX_ { -1.0 };
+    double absolutionY_ { -1.0 };
+    int32_t buttonId_ { -1 };
+    bool isPressed_ { false };
+    int32_t currentDisplayId_ { -1 };
+    int32_t speed_ { 10 };
+    uint64_t lastEventTime_ { 0 };
 };
 
 #define MouseEventHdr MouseEventHandler::GetInstance()
