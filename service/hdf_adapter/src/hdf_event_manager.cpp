@@ -40,10 +40,10 @@ int32_t HdfEventManager::EvdevSimIoctl(int32_t hdindex, int32_t pcmd, void *iobu
     const int32_t size = (pcmd >> IOCTL_CMD_SHIFT) & IOCTL_CMD_MASK;
     int32_t cmd = pcmd & 0xff;
 
-    MMI_HILOGD("The evdev_simioctl index:%{public}d,cmd:%{public}02x,size:%{public}d,"
+    MMI_HILOGD("evdev_simioctl index:%{public}d,cmd:%{public}02x,size:%{public}d,"
                "pcmd:%{public}04x", hdindex, cmd, size, pcmd);
     DrvType drvtype = g_index2DrvType[hdindex - MAX_INPUT_DEVICE_COUNT];
-    MMI_HILOGD("The evdev_simioctl drvtype:%{public}d", drvtype);
+    MMI_HILOGD("evdev_simioctl drvtype:%{public}d", drvtype);
     if (drvtype >= INVALD) {
         MMI_HILOGE("Unknown device type");
         return 0;
@@ -123,7 +123,7 @@ int32_t HdfEventManager::EvdevSimIoctl(int32_t hdindex, int32_t pcmd, void *iobu
         }
     }
     if (ret != EOK) {
-        MMI_HILOGE("Call memcpy_s fail, cmd = %d, ret = %d", cmd, ret);
+        MMI_HILOGE("Call memcpy_s failed, cmd = %d, ret = %d", cmd, ret);
     }
     return RET_OK;
 }
@@ -214,7 +214,7 @@ int32_t HdfEventManager::EvdevIoctl(int32_t hdiindex, int32_t pcmd, void *iobuff
         }
     }
     if (ret != EOK) {
-        MMI_HILOGE("Call memcpy_s fail, cmd = %d, ret = %d", cmd, ret);
+        MMI_HILOGE("Call memcpy_s failed, cmd = %d, ret = %d", cmd, ret);
     }
     return 0;
 }
@@ -266,7 +266,7 @@ int32_t HdfEventManager::GetDeviceCount()
     errno_t ret = memset_s(mountDevIndex_, sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT, 0,
                            sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT);
     if (ret != EOK) {
-        MMI_HILOGE("Call memset_s fail. ret = %d", ret);
+        MMI_HILOGE("Call memset_s failed. ret = %d", ret);
     }
     int32_t devcount = 0;
     if (inputInterface_ != nullptr || inputInterface_->iInputManager != nullptr) {
