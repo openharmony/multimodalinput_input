@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,21 +13,19 @@
  * limitations under the License.
  */
 
-#ifndef I_UDS_SERVER_H
-#define I_UDS_SERVER_H
-
-#include "iremote_broker.h"
-#include "uds_session.h"
+#ifndef I_ANR_OBSERVER_H
+#define I_ANR_OBSERVER_H
 
 namespace OHOS {
 namespace MMI {
-class IUdsServer : public RefBase {
+class IAnrObserver {
 public:
-    virtual int32_t AddSocketPairInfo(const std::string& programName, const int32_t moduleType, const int32_t uid,
-                                      const int32_t pid, int32_t& serverFd, int32_t& toReturnClientFd,
-                                      int32_t& tokenType) = 0;
-    virtual SessionPtr GetSessionByPid(int32_t pid) const = 0;
+    IAnrObserver() = default;
+    virtual ~IAnrObserver() = default;
+    virtual void OnAnr(int32_t pid) const;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_UDS_SERVER_H
+
+
+#endif // I_ANR_OBSERVER_H

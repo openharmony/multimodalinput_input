@@ -42,6 +42,12 @@ protected:
     int32_t StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
     int32_t StubIsPointerVisible(MessageParcel& data, MessageParcel& reply);
     int32_t StubMarkEventProcessed(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSupportKeys(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetDeviceIds(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetDevice(MessageParcel& data, MessageParcel& reply);
+    int32_t StubRegisterInputDeviceMonitor(MessageParcel& data, MessageParcel& reply);
+    int32_t StubUnregisterInputDeviceMonitor(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetKeyboardType(MessageParcel& data, MessageParcel& reply);
     int32_t StubAddInputHandler(MessageParcel& data, MessageParcel& reply);
     int32_t StubRemoveInputHandler(MessageParcel& data, MessageParcel& reply);
     int32_t StubMarkEventConsumed(MessageParcel& data, MessageParcel& reply);
