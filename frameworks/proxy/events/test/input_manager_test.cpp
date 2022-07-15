@@ -163,10 +163,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent005()
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
-    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerId(0);
     pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
     PointerEvent::PointerItem item;
-    item.SetPointerId(1);
+    item.SetPointerId(0);
     item.SetDownTime(downTime);
     item.SetPressed(true);
 
@@ -189,9 +189,9 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent006()
     CHKPP(pointerEvent);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerId(0);
     PointerEvent::PointerItem item;
-    item.SetPointerId(1);
+    item.SetPointerId(0);
     item.SetDownTime(0);
     item.SetPressed(false);
 
@@ -216,10 +216,10 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent007()
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
     pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
-    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerId(0);
     pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
     PointerEvent::PointerItem item;
-    item.SetPointerId(1);
+    item.SetPointerId(0);
     item.SetDownTime(downTime);
     item.SetPressed(false);
 
