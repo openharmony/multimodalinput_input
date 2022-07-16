@@ -17,14 +17,7 @@
 #define WINDOW_UTILS_TEST_H
 
 #include <iostream>
-#include <list>
 
-#include <ui/rs_surface_node.h>
-
-#include "draw/canvas.h"
-#include "nocopyable.h"
-#include "pixel_map.h"
-#include "struct_multimodal.h"
 #include "window.h"
 
 namespace OHOS {
