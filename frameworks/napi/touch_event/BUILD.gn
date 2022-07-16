@@ -46,10 +46,6 @@ ohos_shared_library("touchevent") {
     "//third_party/libuv:uv_static",
   ]
 
-  if (is_mmi_have_libinput || is_mmi_have_hdf) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
-
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
