@@ -60,6 +60,7 @@ protected:
     ConnectCallback funDisconnected_;
 
     CircleStreamBuffer circBuf_;
+    std::mutex mtx_;
     std::condition_variable cv_;
     std::thread recvThread_;
     std::shared_ptr<MMIEventHandler> recvEventHandler_ = nullptr;
