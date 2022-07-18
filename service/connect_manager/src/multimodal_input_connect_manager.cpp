@@ -101,6 +101,42 @@ int32_t MultimodalInputConnectManager::MarkEventProcessed(int32_t eventId)
     return multimodalInputConnectService_->MarkEventProcessed(eventId);
 }
 
+int32_t MultimodalInputConnectManager::RegisterDevListener()
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->RegisterDevListener();
+}
+
+int32_t MultimodalInputConnectManager::UnregisterDevListener()
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->UnregisterDevListener();
+}
+
+int32_t MultimodalInputConnectManager::SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SupportKeys(userData, deviceId, keys);
+}
+
+int32_t MultimodalInputConnectManager::GetDeviceIds(int32_t userData)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->GetDeviceIds(userData);
+}
+
+int32_t MultimodalInputConnectManager::GetDevice(int32_t userData, int32_t id)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->GetDevice(userData, id);
+}
+
+int32_t MultimodalInputConnectManager::GetKeyboardType(int32_t userData, int32_t deviceId)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->GetKeyboardType(userData, deviceId);
+}
+
 int32_t MultimodalInputConnectManager::AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
     HandleEventType eventType)
 {

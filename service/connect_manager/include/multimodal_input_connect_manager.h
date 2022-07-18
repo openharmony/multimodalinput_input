@@ -37,6 +37,12 @@ public:
     int32_t SetPointerVisible(bool visible);
     int32_t IsPointerVisible(bool &visible);
     int32_t MarkEventProcessed(int32_t eventId);
+    int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys);
+    int32_t GetDeviceIds(int32_t userData);
+    int32_t GetDevice(int32_t userData, int32_t id);
+    int32_t RegisterDevListener();
+    int32_t UnregisterDevListener();
+    int32_t GetKeyboardType(int32_t userData, int32_t deviceId);
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
         HandleEventType eventType);
     int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType);

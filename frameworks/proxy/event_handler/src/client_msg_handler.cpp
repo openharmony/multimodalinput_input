@@ -21,6 +21,7 @@
 
 #include "bytrace_adapter.h"
 #include "define_interceptor_manager.h"
+#include "input_device.h"
 #include "input_device_impl.h"
 #include "input_event_data_transformation.h"
 #include "input_handler_manager.h"
@@ -65,9 +66,9 @@ void ClientMsgHandler::Init()
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ClientMsgHandler::OnInputDevice, this)},
         {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ClientMsgHandler::OnInputDeviceIds, this)},
-        {MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY, MsgCallbackBind2(&ClientMsgHandler::OnSupportKeys, this)},
+        {MmiMessageId::INPUT_DEVICE_SUPPORT_KEYS, MsgCallbackBind2(&ClientMsgHandler::OnSupportKeys, this)},
         {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind2(&ClientMsgHandler::OnInputKeyboardType, this)},
-        {MmiMessageId::ADD_INPUT_DEVICE_MONITOR, MsgCallbackBind2(&ClientMsgHandler::OnDevMonitor, this)},
+        {MmiMessageId::ADD_INPUT_DEVICE_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnDevListener, this)},
         {MmiMessageId::NOTICE_ANR, MsgCallbackBind2(&ClientMsgHandler::OnAnr, this)},
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
@@ -199,26 +200,13 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
-    size_t size;
-    auto devData = std::make_shared<InputDeviceImpl::InputDeviceInfo>();
-    pkt >> userData >> devData->id >> devData->name >> devData->deviceType >> devData->busType >> devData->product
-        >> devData->vendor >> devData->version >> devData->phys >> devData->uniq >> size;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read basic data failed");
-        return PACKET_READ_FAIL;
-    }
-    std::vector<InputDeviceImpl::AxisInfo> axisInfo;
-    InputDeviceImpl::AxisInfo axis;
-    for (size_t i = 0; i < size; ++i) {
-        pkt >> axis.axisType >> axis.min >> axis.max >> axis.fuzz >> axis.flat >> axis.resolution;
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet read axis data failed");
-            return PACKET_READ_FAIL;
-        }
-        axisInfo.push_back(axis);
-    }
-    devData->axis = axisInfo;
+    pkt >> userData;
+    std::shared_ptr<InputDevice> devData = InputDevImpl.DevDataUnmarshalling(pkt);
     CHKPR(devData, RET_ERR);
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read device data failed");
+        return RET_ERR;
+    }
     InputDevImpl.OnInputDevice(userData, devData);
     return RET_OK;
 }
@@ -261,7 +249,7 @@ int32_t ClientMsgHandler::OnInputKeyboardType(const UDSClient& client, NetPacket
     return RET_OK;
 }
 
-int32_t ClientMsgHandler::OnDevMonitor(const UDSClient& client, NetPacket& pkt)
+int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
     std::string type;
@@ -271,7 +259,7 @@ int32_t ClientMsgHandler::OnDevMonitor(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
-    InputDeviceImpl::GetInstance().OnDevMonitor(type, deviceId);
+    InputDeviceImpl::GetInstance().OnDevListener(deviceId, type);
     return RET_OK;
 }
 

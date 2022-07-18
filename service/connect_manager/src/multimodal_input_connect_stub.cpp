@@ -51,6 +51,13 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubAddInputEventFilter},
         {IMultimodalInputConnect::SET_POINTER_VISIBLE, &MultimodalInputConnectStub::StubSetPointerVisible},
         {IMultimodalInputConnect::IS_POINTER_VISIBLE, &MultimodalInputConnectStub::StubIsPointerVisible},
+        {IMultimodalInputConnect::REGISTER_DEV_MONITOR, &MultimodalInputConnectStub::StubRegisterInputDeviceMonitor},
+        {IMultimodalInputConnect::UNREGISTER_DEV_MONITOR,
+            &MultimodalInputConnectStub::StubUnregisterInputDeviceMonitor},
+        {IMultimodalInputConnect::GET_DEVICE_IDS, &MultimodalInputConnectStub::StubGetDeviceIds},
+        {IMultimodalInputConnect::GET_DEVICE, &MultimodalInputConnectStub::StubGetDevice},
+        {IMultimodalInputConnect::SUPPORT_KEYS, &MultimodalInputConnectStub::StubSupportKeys},
+        {IMultimodalInputConnect::GET_KEYBOARD_TYPE, &MultimodalInputConnectStub::StubGetKeyboardType},
         {IMultimodalInputConnect::SUBSCRIBE_KEY_EVENT, &MultimodalInputConnectStub::StubSubscribeKeyEvent},
         {IMultimodalInputConnect::UNSUBSCRIBE_KEY_EVENT, &MultimodalInputConnectStub::StubUnsubscribeKeyEvent},
         {IMultimodalInputConnect::MARK_EVENT_PROCESSED, &MultimodalInputConnectStub::StubMarkEventProcessed},
@@ -169,6 +176,70 @@ int32_t MultimodalInputConnectStub::StubMarkEventProcessed(MessageParcel& data, 
         MMI_HILOGE("MarkEventProcessed failed, ret:%{public}d", ret);
         return ret;
     }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData = 0;
+    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t deviceId = -1;
+    READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t size = 0;
+    READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
+    std::vector<int32_t> keys;
+    int32_t key = 0;
+    for (int32_t i = 0; i < size; ++i) {
+        READINT32(data, key, IPC_PROXY_DEAD_OBJECT_ERR);
+        keys.push_back(key);
+    }
+    SupportKeys(userData, deviceId, keys);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetDeviceIds(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData = 0;
+    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
+    GetDeviceIds(userData);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetDevice(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData = 0;
+    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t deviceId = -1;
+    READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
+    GetDevice(userData, deviceId);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubRegisterInputDeviceMonitor(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    RegisterDevListener();
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubUnregisterInputDeviceMonitor(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    UnregisterDevListener();
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetKeyboardType(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData = 0;
+    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t deviceId = -1;
+    READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
+    GetKeyboardType(userData, deviceId);
     return RET_OK;
 }
 
