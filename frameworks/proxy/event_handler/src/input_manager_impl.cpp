@@ -79,9 +79,8 @@ bool InputManagerImpl::InitEventHandler()
         return false;
     }
 
-    std::mutex mtx;
     static constexpr int32_t timeout = 3;
-    std::unique_lock <std::mutex> lck(mtx);
+    std::unique_lock<std::mutex> lck(handleMtx_);
     ehThread_ = std::thread(std::bind(&InputManagerImpl::OnThread, this));
     ehThread_.detach();
     if (cv_.wait_for(lck, std::chrono::seconds(timeout)) == std::cv_status::timeout) {
@@ -110,12 +109,16 @@ void InputManagerImpl::OnThread()
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    SetThreadName("mmi_client_EventHdr");
-    mmiEventHandler_ = std::make_shared<MMIEventHandler>();
-    CHKPV(mmiEventHandler_);
-    auto eventRunner = mmiEventHandler_->GetEventRunner();
+    std::shared_ptr<AppExecFwk::EventRunner> eventRunner = nullptr;
+    {
+        std::lock_guard<std::mutex> lck(handleMtx_);
+        SetThreadName("mmi_client_EventHdr");
+        mmiEventHandler_ = std::make_shared<MMIEventHandler>();
+        CHKPV(mmiEventHandler_);
+        eventRunner = mmiEventHandler_->GetEventRunner();
+        cv_.notify_one();
+    }
     CHKPV(eventRunner);
-    cv_.notify_one();
     eventRunner->Run();
 }
 
