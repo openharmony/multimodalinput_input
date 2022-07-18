@@ -55,6 +55,7 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     }
 #endif
     MsgCallback funs[] = {
+        {MmiMessageId::MARK_PROCESS, MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
 #ifdef OHOS_BUILD_MMI_DEBUG
         {MmiMessageId::BIGPACKET_TEST, MsgCallbackBind2(&ServerMsgHandler::OnBigPacketTest, this)},
@@ -108,10 +109,17 @@ int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
 }
 #endif // OHOS_BUILD_HDF
 
-int32_t ServerMsgHandler::MarkEventProcessed(SessionPtr sess, int32_t eventId)
+int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t eventId = 0;
+    pkt >> eventId;
+    MMI_HILOGD("event is: %{public}d", eventId);
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read data failed");
+        return PACKET_READ_FAIL;
+    }
     sess->DelEvents(eventId);
     return RET_OK;
 }
