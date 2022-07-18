@@ -103,7 +103,9 @@ ohos_executable("vuinput") {
 
   configs = [ ":virtual_device_public_config" ]
 
-  deps = [ "//foundation/multimodalinput/input/tools/vuinput:libmmi-virtual-device" ]
+  deps = [
+    "//foundation/multimodalinput/input/tools/vuinput:libmmi-virtual-device",
+  ]
 
   if (input_enable_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
