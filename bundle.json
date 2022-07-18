@@ -15,7 +15,11 @@
     "features": [
       "input_enable_combinationkey",
       "input_enable_pointer_drawing",
-      "input_enable_interceptor"
+      "input_enable_interceptor",
+      "input_enable_monitor",
+      "input_enable_keyboard",
+      "input_enable_mouse",
+      "input_enable_tp"
     ],
     "adapted_system_type": [
       "standard"

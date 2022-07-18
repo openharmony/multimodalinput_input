@@ -16,6 +16,11 @@ import("//build/ohos.gni")
 mmi_path = "//foundation/multimodalinput/input"
 ability_runtime_path = "//foundation/ability/ability_runtime"
 ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
+input_enable_libinput = true
+input_enable_hdf = false
+input_enable_debug = false
+input_enable_distributed = false
+
 declare_args() {
   resource_schedule_service_enabled = false
   input_enable_combinationkey = true
@@ -31,18 +36,6 @@ declare_args() {
     resource_schedule_service_enabled = true
   }
 }
-
-input_enable_libinput = true
-input_enable_hdf = false
-input_enable_debug = false
-input_enable_combinationkey = true
-input_enable_pointer_drawing = true
-input_enable_monitor = true
-input_enable_interceptor = true
-input_enable_distributed = false
-input_enable_keyboard = true
-input_enable_mouse = true
-input_enable_tp = true
 
 print("input_enable_libinput = ${input_enable_libinput}")
 print("input_enable_hdf = ${input_enable_hdf}")
