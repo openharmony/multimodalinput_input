@@ -141,28 +141,6 @@ int32_t MultimodalInputConnectProxy::IsPointerVisible(bool &visible)
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::MarkEventProcessed(int32_t eventId)
-{
-    CALL_DEBUG_ENTER;
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
-        MMI_HILOGE("Failed to write descriptor");
-        return ERR_INVALID_VALUE;
-    }
-    WRITEINT32(data, eventId, ERR_INVALID_VALUE);
-
-    MessageParcel reply;
-    MessageOption option;
-    sptr<IRemoteObject> remote = Remote();
-    CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(MARK_EVENT_PROCESSED, data, reply, option);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
-        return ret;
-    }
-    return RET_OK;
-}
-
 int32_t MultimodalInputConnectProxy::RegisterDevListener()
 {
     MessageParcel data;

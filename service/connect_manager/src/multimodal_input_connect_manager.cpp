@@ -95,12 +95,6 @@ int32_t MultimodalInputConnectManager::IsPointerVisible(bool &visible)
     return multimodalInputConnectService_->IsPointerVisible(visible);
 }
 
-int32_t MultimodalInputConnectManager::MarkEventProcessed(int32_t eventId)
-{
-    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->MarkEventProcessed(eventId);
-}
-
 int32_t MultimodalInputConnectManager::RegisterDevListener()
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
