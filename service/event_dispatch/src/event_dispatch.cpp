@@ -82,7 +82,7 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     }
     auto pid = udsServer->GetClientPid(fd);
     auto pointerEvent = std::make_shared<PointerEvent>(*point);
-    auto pointerIdList = pointerEvent->GetPointersIdList();
+    auto pointerIdList = pointerEvent->GetPointerIds();
     if (pointerIdList.size() > 1) {
         for (const auto& id : pointerIdList) {
             PointerEvent::PointerItem pointeritem;
@@ -93,7 +93,7 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
             auto itemPid = WinMgr->GetWindowPid(pointeritem.GetTargetWindowId());
             if (itemPid >= 0 && itemPid != pid) {
                 pointerEvent->RemovePointerItem(id);
-                MMI_HILOGD("pointerIdList size: %{public}zu", pointerEvent->GetPointersIdList().size());
+                MMI_HILOGD("pointerIdList size: %{public}zu", pointerEvent->GetPointerIds().size());
             }
         }
     }
