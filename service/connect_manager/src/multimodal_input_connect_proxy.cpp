@@ -30,12 +30,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Multi
 MultimodalInputConnectProxy::MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl) :
     IRemoteProxy<IMultimodalInputConnect>(impl)
 {
-    MMI_HILOGI("enter MultimodalInputConnectProxy");
+    MMI_HILOGI("Enter MultimodalInputConnectProxy");
 }
 
 MultimodalInputConnectProxy::~MultimodalInputConnectProxy()
 {
-    MMI_HILOGI("enter ~MultimodalInputConnectProxy");
+    MMI_HILOGI("Enter ~MultimodalInputConnectProxy");
 }
 
 int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programName,
@@ -62,11 +62,11 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(ALLOC_SOCKET_FD, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     socketFd = reply.ReadFileDescriptor();
-    MMI_HILOGD("socketFd:%{public}d", socketFd);
+    MMI_HILOGD("The socketFd:%{public}d", socketFd);
     return RET_OK;
 }
 
@@ -90,7 +90,7 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(ADD_INPUT_EVENT_FILTER, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("reply readint32 error:%{public}d", ret);
+        MMI_HILOGE("Reply readint32 error:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -113,7 +113,7 @@ int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(SET_POINTER_VISIBLE, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -134,7 +134,7 @@ int32_t MultimodalInputConnectProxy::IsPointerVisible(bool &visible)
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(IS_POINTER_VISIBLE, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     visible = reply.ReadBool();
@@ -157,7 +157,7 @@ int32_t MultimodalInputConnectProxy::MarkEventProcessed(int32_t eventId)
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(MARK_EVENT_PROCESSED, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -313,7 +313,7 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(int32_t handlerId, InputHan
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(ADD_INPUT_HANDLER, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -335,7 +335,7 @@ int32_t MultimodalInputConnectProxy::RemoveInputHandler(int32_t handlerId, Input
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(REMOVE_INPUT_HANDLER, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -357,7 +357,7 @@ int32_t MultimodalInputConnectProxy::MarkEventConsumed(int32_t monitorId, int32_
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(MARK_EVENT_CONSUMED, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -380,7 +380,7 @@ int32_t MultimodalInputConnectProxy::MoveMouseEvent(int32_t offsetX, int32_t off
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(MOVE_MOUSE, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request failed, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -405,7 +405,7 @@ int32_t MultimodalInputConnectProxy::InjectKeyEvent(const std::shared_ptr<KeyEve
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(INJECT_KEY_EVENT, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -433,7 +433,7 @@ int32_t MultimodalInputConnectProxy::SubscribeKeyEvent(int32_t subscribeId, cons
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(SUBSCRIBE_KEY_EVENT, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, result:%{public}d", ret);
+        MMI_HILOGE("Send request failed, result:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -455,7 +455,7 @@ int32_t MultimodalInputConnectProxy::UnsubscribeKeyEvent(int32_t subscribeId)
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(UNSUBSCRIBE_KEY_EVENT, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, result:%{public}d", ret);
+        MMI_HILOGE("Send request failed, result:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -480,7 +480,7 @@ int32_t MultimodalInputConnectProxy::InjectPointerEvent(const std::shared_ptr<Po
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(INJECT_POINTER_EVENT, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -500,7 +500,7 @@ int32_t MultimodalInputConnectProxy::SetAnrObserver()
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(SET_ANR_OBSERVER, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

@@ -46,7 +46,7 @@ void StreamBuffer::Clean()
     Reset();
     errno_t ret = memset_sp(&szBuff_, sizeof(szBuff_), 0, sizeof(szBuff_));
     if (ret != EOK) {
-        MMI_HILOGE("call memset_s fail");
+        MMI_HILOGE("Call memset_s fail");
         return;
     }
 }
@@ -112,7 +112,7 @@ bool StreamBuffer::Read(char *buf, size_t size)
     }
     errno_t ret = memcpy_sp(buf, size, ReadBuf(), size);
     if (ret != EOK) {
-        MMI_HILOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        MMI_HILOGE("Failed to call memcpy_sp. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_READ;
         return false;
     }
@@ -144,7 +144,7 @@ bool StreamBuffer::Write(const char *buf, size_t size)
     }
     errno_t ret = memcpy_sp(&szBuff_[wPos_], GetAvailableBufSize(), buf, size);
     if (ret != EOK) {
-        MMI_HILOGE("memcpy_sp call fail. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        MMI_HILOGE("Failed to call memcpy_sp. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
         rwErrorStatus_ = ErrorStatus::ERROR_STATUS_WRITE;
         return false;
     }

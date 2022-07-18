@@ -170,7 +170,7 @@ void InputEventHandler::OnEvent(void *event)
     idSeed_ += 1;
     const uint64_t maxUInt64 = (std::numeric_limits<uint64_t>::max)() - 1;
     if (idSeed_ >= maxUInt64) {
-        MMI_HILOGE("value is flipped. id:%{public}" PRId64, idSeed_);
+        MMI_HILOGE("The value is flipped. id:%{public}" PRId64, idSeed_);
         idSeed_ = 1;
     }
 

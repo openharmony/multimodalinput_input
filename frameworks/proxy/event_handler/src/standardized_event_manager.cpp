@@ -65,12 +65,12 @@ int32_t StandardizedEventManager::InjectEvent(const std::shared_ptr<KeyEvent> ke
     CHKPR(keyEvent, RET_ERR);
     keyEvent->UpdateId();
     if (keyEvent->GetKeyCode() < 0) {
-        MMI_HILOGE("keyCode is invalid:%{public}u", keyEvent->GetKeyCode());
+        MMI_HILOGE("KeyCode is invalid:%{public}u", keyEvent->GetKeyCode());
         return RET_ERR;
     }
     int32_t ret = MultimodalInputConnMgr->InjectKeyEvent(keyEvent);
     if (ret != 0) {
-        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -91,7 +91,7 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
     }
     int32_t ret = MultimodalInputConnMgr->InjectPointerEvent(pointerEvent);
     if (ret != 0) {
-        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -104,7 +104,7 @@ int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offset
     CALL_DEBUG_ENTER;
     int32_t ret = MultimodalInputConnMgr->MoveMouseEvent(offsetX, offsetY);
     if (ret != 0) {
-        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;

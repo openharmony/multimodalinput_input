@@ -85,7 +85,7 @@ bool MMIClient::StartEventRunner()
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     if (!InputMgrImpl->InitEventHandler()) {
-        MMI_HILOGE("init event handler error");
+        MMI_HILOGE("Init event handler error");
         Stop();
         return false;
     }
@@ -115,12 +115,12 @@ void MMIClient::OnRecvThread()
         CHKPV(recvEventHandler_);
         if (isConnected_ && fd_ >= 0) {
             if (!AddFdListener(fd_)) {
-                MMI_HILOGE("add fd listener return false");
+                MMI_HILOGE("Add fd listener return false");
                 return;
             }
         } else {
             if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME)) {
-                MMI_HILOGE("send reconnect event return false.");
+                MMI_HILOGE("Send reconnect event return false");
                 return;
             }
         }
@@ -141,7 +141,7 @@ bool MMIClient::AddFdListener(int32_t fd)
     CHKPF(fdListener);
     auto errCode = recvEventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener);
     if (errCode != ERR_OK) {
-        MMI_HILOGE("add fd listener error,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
+        MMI_HILOGE("Add fd listener error,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
             recvEventHandler_->GetErrorStr(errCode).c_str());
         return false;
     }
@@ -212,12 +212,12 @@ void MMIClient::OnDisconnected()
         funDisconnected_(*this);
     }
     if (!DelFdListener(fd_)) {
-        MMI_HILOGE("delete fd listener failed");
+        MMI_HILOGE("Delete fd listener failed");
     }
     Close();
     if (!isExit && recvEventHandler_ != nullptr) {
         if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME)) {
-            MMI_HILOGE("send reconnect event return false");
+            MMI_HILOGE("Send reconnect event return false");
         }
     }
 }
@@ -242,14 +242,14 @@ int32_t MMIClient::Socket()
     CALL_DEBUG_ENTER;
     int32_t ret = MultimodalInputConnMgr->AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {
-        MMI_HILOGE("call AllocSocketPair return %{public}d", ret);
+        MMI_HILOGE("Call AllocSocketPair return %{public}d", ret);
         return RET_ERR;
     }
     fd_ = MultimodalInputConnMgr->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
-        MMI_HILOGE("call GetClientSocketFdOfAllocedSocketPair return invalid fd");
+        MMI_HILOGE("Call GetClientSocketFdOfAllocedSocketPair return invalid fd");
     } else {
-        MMI_HILOGD("call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
+        MMI_HILOGD("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
     }
     return fd_;
 }

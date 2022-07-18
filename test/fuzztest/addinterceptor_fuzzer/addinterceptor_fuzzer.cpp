@@ -29,7 +29,7 @@ public:
     virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
     virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
     {
-        MMI_HILOGD("report pointer event success");
+        MMI_HILOGD("Report pointer event success");
     };
     virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
 };
@@ -41,7 +41,7 @@ void AddInterceptorFuzzTest(const uint8_t* data, size_t /* size */)
     InputManager::GetInstance()->RemoveInterceptor(inceptorId);
 
     auto fun = [](std::shared_ptr<KeyEvent> keyEvent) {
-        MMI_HILOGD("add interceptor success");
+        MMI_HILOGD("Add interceptor success");
     };
     inceptorId = InputManager::GetInstance()->AddInterceptor(fun);
     InputManager::GetInstance()->RemoveInterceptor(inceptorId);

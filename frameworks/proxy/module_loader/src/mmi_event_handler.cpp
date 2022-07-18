@@ -44,7 +44,7 @@ bool MMIEventHandler::PostTask(EventHandlerPtr eventHandler, const AppExecFwk::E
 {
     CHKPF(eventHandler);
     if (!eventHandler->PostHighPriorityTask(callback)) {
-        MMI_HILOGE("post task failed");
+        MMI_HILOGE("Post task failed");
         return false;
     }
     return true;

@@ -90,7 +90,7 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
 #ifdef OHOS_BUILD_HDF
 int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
 {
-    MMI_HILOGI("hdfinject server access hditools info");
+    MMI_HILOGI("Hdfinject server access hditools info");
     CHKPR(sess, ERROR_NULL_POINTER);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     const int32_t processingCode = MMIHdiInject->ManageHdfInject(sess, pkt);

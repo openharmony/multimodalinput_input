@@ -68,7 +68,7 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     if (JsInputMonMgr.GetMonitor(id_) == nullptr) {
-        MMI_HILOGE("failed to process pointer event, id:%{public}d", id_);
+        MMI_HILOGE("Failed to process pointer event, id:%{public}d", id_);
         return;
     }
     std::function<void(std::shared_ptr<PointerEvent>)> callback;
@@ -112,7 +112,7 @@ void InputMonitor::MarkConsumed(int32_t eventId)
 {
     std::lock_guard<std::mutex> guard(mutex_);
     if (consumed_) {
-        MMI_HILOGD("consumed_ is true");
+        MMI_HILOGD("The consumed_ is true");
         return;
     }
     if (monitorId_ < 0) {
@@ -131,7 +131,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi
 {
     SetCallback(callback);
     if (monitor_ == nullptr) {
-        MMI_HILOGE("monitor is null");
+        MMI_HILOGE("The monitor is null");
         return;
     }
     monitor_->SetCallback([jsId=id](std::shared_ptr<PointerEvent> pointerEvent) {
@@ -177,23 +177,23 @@ int32_t JsInputMonitor::IsMatch(napi_env jsEnv, napi_value callback)
             return NAPI_ERR;
         }
         if (isEquals) {
-            MMI_HILOGI("js callback match success");
+            MMI_HILOGI("Js callback match success");
             return RET_OK;
         }
-        MMI_HILOGI("js callback match failed");
+        MMI_HILOGI("Js callback match failed");
         return RET_ERR;
     }
-    MMI_HILOGI("js callback match failed");
+    MMI_HILOGI("Js callback match failed");
     return RET_ERR;
 }
 
 int32_t JsInputMonitor::IsMatch(napi_env jsEnv)
 {
     if (jsEnv_ == jsEnv) {
-        MMI_HILOGI("env match success");
+        MMI_HILOGI("Env match success");
         return RET_OK;
     }
-    MMI_HILOGI("env match failed");
+    MMI_HILOGI("Env match failed");
     return RET_ERR;
 }
 
@@ -287,7 +287,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
                 return RET_ERR;
             }
             if (GetJsPointerItem(it, currentPointer) != RET_OK) {
-                MMI_HILOGE("transform pointerItem failed");
+                MMI_HILOGE("Transform pointerItem failed");
                 return RET_ERR;
             }
             if (SetNameProperty(jsEnv_, result, "timestamp", pointerEvent->GetActionTime()) != napi_ok) {
@@ -300,7 +300,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
             }
         }
         if (GetJsPointerItem(it, element) != RET_OK) {
-            MMI_HILOGE("transform pointerItem failed");
+            MMI_HILOGE("Transform pointerItem failed");
             return RET_ERR;
         }
         status = napi_set_element(jsEnv_, pointers, index, element);
@@ -564,7 +564,7 @@ bool JsInputMonitor::Start()
     CALL_DEBUG_ENTER;
     CHKPF(monitor_);
     if (isMonitoring_) {
-        MMI_HILOGW("js is monitoring");
+        MMI_HILOGW("Js is monitoring");
         return true;
     }
     if (monitor_->Start()) {
@@ -617,7 +617,7 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     if (!isMonitoring_) {
-        MMI_HILOGE("js monitor stop");
+        MMI_HILOGE("Js monitor stop");
         return;
     }
     CHKPV(monitor_);
@@ -663,7 +663,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
 {
     CALL_DEBUG_ENTER;
     if (!isMonitoring_) {
-        MMI_HILOGE("js monitor stop");
+        MMI_HILOGE("Js monitor stop");
         return;
     }
     CHKPV(jsEnv_);
@@ -671,7 +671,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
     std::lock_guard<std::mutex> guard(mutex_);
     while (!evQueue_.empty()) {
         if (!isMonitoring_) {
-            MMI_HILOGE("js monitor stop handle callback");
+            MMI_HILOGE("Js monitor stop handle callback");
             break;
         }
         auto pointerEvent = evQueue_.front();

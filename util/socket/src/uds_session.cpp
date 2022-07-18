@@ -52,7 +52,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         return false;
     }
     if (fd_ < 0) {
-        MMI_HILOGE("fd_ is less than 0");
+        MMI_HILOGE("The fd_ is less than 0");
         return false;
     }
 
@@ -65,7 +65,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         auto count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGW("continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
+                MMI_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
                 usleep(SEND_RETRY_SLEEP_TIME);
                 continue;
             }
@@ -89,7 +89,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 void UDSSession::Close()
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("enter fd_:%{public}d.", fd_);
+    MMI_HILOGD("Enter fd_:%{public}d.", fd_);
     if (fd_ >= 0) {
         close(fd_);
         fd_ = -1;
@@ -166,7 +166,7 @@ int64_t UDSSession::GetEarliestEventTime() const
 {
     CALL_DEBUG_ENTER;
     if (events_.empty()) {
-        MMI_HILOGD("events_ is empty");
+        MMI_HILOGD("The events_ is empty");
         return 0;
     }
     return events_.begin()->eventTime;
@@ -175,7 +175,7 @@ int64_t UDSSession::GetEarliestEventTime() const
 bool UDSSession::IsEventQueueEmpty()
 {
     if (events_.empty()) {
-        MMI_HILOGD("events_ is empty");
+        MMI_HILOGD("The events_ is empty");
         return true;
     }
     return false;

@@ -128,18 +128,18 @@ void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInf
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("get mmi client is nullptr");
+        MMI_HILOGE("Get mmi client is nullptr");
         return;
     }
     if (displayGroupInfo.windowsInfo.empty() || displayGroupInfo.displaysInfo.empty()) {
-        MMI_HILOGE("windows info or display info is empty!");
+        MMI_HILOGE("The windows info or display info is empty!");
         return;
     }
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         if ((item.defaultHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
             (item.pointerHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
             item.defaultHotAreas.empty() || item.pointerHotAreas.empty()) {
-            MMI_HILOGE("hot areas check failed! defaultHotAreas:size:%{public}zu,"
+            MMI_HILOGE("Hot areas check failed! defaultHotAreas:size:%{public}zu,"
                        "pointerHotAreas:size:%{public}zu",
                        item.defaultHotAreas.size(), item.pointerHotAreas.size());
             return;
@@ -187,7 +187,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     CHKPV(inputEventConsumer);
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("client init failed");
+        MMI_HILOGE("Client init failed");
         return;
     }
     consumer_ = inputEventConsumer;
@@ -230,7 +230,7 @@ void InputManagerImpl::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consu
     CHK_PID_AND_TID();
     CHKPV(consumer);
     consumer->OnInputEvent(keyEvent);
-    MMI_HILOGD("key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
+    MMI_HILOGD("Key event callback keyCode:%{public}d", keyEvent->GetKeyCode());
 }
 
 void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
@@ -243,9 +243,9 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
     if (!MMIEventHandler::PostTask(eventHandler_,
         std::bind(&InputManagerImpl::OnKeyEventTask, this, consumer_, keyEvent))) {
-        MMI_HILOGE("post task failed");
+        MMI_HILOGE("Post task failed");
     }
-    MMI_HILOGD("key event keyCode:%{public}d", keyEvent->GetKeyCode());
+    MMI_HILOGD("Key event keyCode:%{public}d", keyEvent->GetKeyCode());
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
@@ -257,7 +257,7 @@ void InputManagerImpl::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> c
     CHKPV(consumer);
     CHKPV(pointerEvent);
     consumer->OnInputEvent(pointerEvent);
-    MMI_HILOGD("pointer event callback pointerId:%{public}d", pointerEvent->GetPointerId());
+    MMI_HILOGD("Pointer event callback pointerId:%{public}d", pointerEvent->GetPointerId());
 }
 
 void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
@@ -271,9 +271,9 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     if (!MMIEventHandler::PostTask(eventHandler_,
         std::bind(&InputManagerImpl::OnPointerEventTask, this, consumer_, pointerEvent))) {
-        MMI_HILOGE("post task failed");
+        MMI_HILOGE("Post task failed");
     }
-    MMI_HILOGD("pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
+    MMI_HILOGD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
@@ -390,7 +390,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
     CHKPR(consumer, INVALID_HANDLER_ID);
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("client init failed");
+        MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
     return monitorManager_.AddMonitor(consumer);
@@ -406,7 +406,7 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("client init failed");
+        MMI_HILOGE("Client init failed");
         return;
     }
     monitorManager_.RemoveMonitor(monitorId);
@@ -421,7 +421,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("client init failed");
+        MMI_HILOGE("Client init failed");
         return;
     }
     monitorManager_.MarkConsumed(monitorId, eventId);
@@ -449,7 +449,7 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
     CHKPR(interceptor, INVALID_HANDLER_ID);
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("client init failed");
+        MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
     return InputInterMgr->AddInterceptor(interceptor, HandleEventType::ALL);
@@ -468,7 +468,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
     auto consumer = std::make_shared<MonitorEventConsumer>(interceptor);
     CHKPR(consumer, INVALID_HANDLER_ID);
     if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("client init failed");
+        MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
     return InputInterMgr->AddInterceptor(consumer, HandleEventType::KEY);
@@ -484,7 +484,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("client init failed");
+        MMI_HILOGE("Client init failed");
         return;
     }
     InputInterMgr->RemoveInterceptor(interceptorId);
@@ -540,7 +540,7 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible)
     CALL_DEBUG_ENTER;
     int32_t ret = MultimodalInputConnMgr->SetPointerVisible(visible);
     if (ret != RET_OK) {
-        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
     return ret;
 #else
@@ -556,7 +556,7 @@ bool InputManagerImpl::IsPointerVisible()
     bool visible;
     int32_t ret = MultimodalInputConnMgr->IsPointerVisible(visible);
     if (ret != 0) {
-        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
     return visible;
 #else
@@ -569,7 +569,7 @@ void InputManagerImpl::OnConnected()
 {
     CALL_DEBUG_ENTER;
     if (displayGroupInfo_.windowsInfo.empty() || displayGroupInfo_.displaysInfo.empty()) {
-        MMI_HILOGE("windows info or display info is empty");
+        MMI_HILOGE("The windows info or display info is empty");
         return;
     }
     SendDisplayInfo();
@@ -582,7 +582,7 @@ void InputManagerImpl::SendDisplayInfo()
     CHKPV(client);
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
     if (PackDisplayData(pkt) == RET_ERR) {
-        MMI_HILOGE("pack display info failed");
+        MMI_HILOGE("Pack display info failed");
         return;
     }
     if (!client->SendMessage(pkt)) {
@@ -638,7 +638,7 @@ int32_t InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &ke
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("client init failed");
+        MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
     return InputDevImpl.SupportKeys(deviceId, keyCodes, callback);
@@ -665,14 +665,14 @@ void InputManagerImpl::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
     }
     for (auto iter = anrObservers_.begin(); iter != anrObservers_.end(); ++iter) {
         if (*iter == observer) {
-            MMI_HILOGE("observer already exist");
+            MMI_HILOGE("Observer already exist");
             return;
         }
     }
     anrObservers_.push_back(observer);
     int32_t ret = MultimodalInputConnMgr->SetAnrObserver();
     if (ret != RET_OK) {
-        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
 }
 
@@ -685,9 +685,9 @@ void InputManagerImpl::OnAnr(int32_t pid)
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHandler::PostTask(eventHandler,
         std::bind(&InputManagerImpl::OnAnrTask, this, anrObservers_, pid))) {
-        MMI_HILOGE("post task failed");
+        MMI_HILOGE("Post task failed");
     }
-    MMI_HILOGI("anr noticed pid:%{public}d", pid);
+    MMI_HILOGI("ANR noticed pid:%{public}d", pid);
 }
 
 void InputManagerImpl::OnAnrTask(std::vector<std::shared_ptr<IAnrObserver>> observers, int32_t pid)

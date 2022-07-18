@@ -106,7 +106,7 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
         },
         asyncContext.GetRefPtr(), &asyncContext->work);
     if (status != napi_ok || napi_queue_async_work(env, asyncContext->work) != napi_ok) {
-        MMI_HILOGE("create async work fail");
+        MMI_HILOGE("Create async work failed");
         asyncContext->DecStrongRef(nullptr);
     }
 }
