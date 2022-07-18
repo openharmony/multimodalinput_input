@@ -295,7 +295,7 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
     }
     lastPointerEvent_ = pointerEvent;
 
-    if (pointerEvent->GetPointersIdList().size() != 1) {
+    if (pointerEvent->GetPointerIds().size() != 1) {
         MMI_HILOGD("First press down and last press up intermediate process");
         return;
     }
