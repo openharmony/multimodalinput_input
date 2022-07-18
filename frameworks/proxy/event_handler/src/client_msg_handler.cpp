@@ -20,7 +20,6 @@
 #include <sstream>
 
 #include "bytrace_adapter.h"
-#include "define_interceptor_manager.h"
 #include "input_device.h"
 #include "input_device_impl.h"
 #include "input_event_data_transformation.h"

@@ -21,7 +21,6 @@
 #include "error_multimodal.h"
 
 #include "bytrace_adapter.h"
-#include "define_interceptor_manager.h"
 #include "event_filter_service.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
@@ -452,7 +451,7 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputInterMgr->AddInterceptor(interceptor, HandleEventType::ALL);
+    return interceptorManager_.AddInterceptor(interceptor, HandleEventType::ALL);
 #else 
     MMI_HILOGW("Interceptor function does not support");
     return ERROR_UNSUPPORT;
@@ -471,7 +470,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputInterMgr->AddInterceptor(consumer, HandleEventType::KEY);
+    return interceptorManager_.AddInterceptor(consumer, HandleEventType::KEY);
 #else
     MMI_HILOGW("Keyboard device or interceptor function does not support");
     return ERROR_UNSUPPORT;
@@ -487,7 +486,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
         MMI_HILOGE("Client init failed");
         return;
     }
-    InputInterMgr->RemoveInterceptor(interceptorId);
+    interceptorManager_.RemoveInterceptor(interceptorId);
 #else
     MMI_HILOGW("Interceptor function does not support");
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
