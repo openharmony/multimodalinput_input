@@ -18,6 +18,8 @@
 
 #include <memory>
 
+#include "display_info.h"
+
 namespace OHOS {
 namespace MMI {
 class IPointerDrawingManager {
@@ -27,7 +29,7 @@ public:
 
     static std::shared_ptr<IPointerDrawingManager> GetInstance();
     virtual void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY) {}
-    virtual void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height) {}
+    virtual void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height, Direction direction) {}
     virtual bool Init()
     {
         return true;
