@@ -36,7 +36,6 @@ public:
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     int32_t SetPointerVisible(bool visible);
     int32_t IsPointerVisible(bool &visible);
-    int32_t MarkEventProcessed(int32_t eventId);
     int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys);
     int32_t GetDeviceIds(int32_t userData);
     int32_t GetDevice(int32_t userData, int32_t id);

@@ -410,25 +410,6 @@ int32_t MMIService::IsPointerVisible(bool &visible)
     return RET_OK;
 }
 
-int32_t MMIService::CheckEventProcessed(int32_t pid, int32_t eventId)
-{
-    auto sess = GetSessionByPid(pid);
-    CHKPR(sess, ERROR_NULL_POINTER);
-    return sMsgHandler_.MarkEventProcessed(sess, eventId);
-}
-
-int32_t MMIService::MarkEventProcessed(int32_t eventId)
-{
-    CALL_DEBUG_ENTER;
-    int32_t pid = GetCallingPid();
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckEventProcessed, this, pid, eventId));
-    if (ret != RET_OK) {
-        MMI_HILOGE("Mark event processed failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-
 int32_t MMIService::OnSupportKeys(int32_t pid, int32_t userData, int32_t deviceId, std::vector<int32_t> &keys)
 {
     CALL_DEBUG_ENTER;

@@ -60,7 +60,6 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::GET_KEYBOARD_TYPE, &MultimodalInputConnectStub::StubGetKeyboardType},
         {IMultimodalInputConnect::SUBSCRIBE_KEY_EVENT, &MultimodalInputConnectStub::StubSubscribeKeyEvent},
         {IMultimodalInputConnect::UNSUBSCRIBE_KEY_EVENT, &MultimodalInputConnectStub::StubUnsubscribeKeyEvent},
-        {IMultimodalInputConnect::MARK_EVENT_PROCESSED, &MultimodalInputConnectStub::StubMarkEventProcessed},
         {IMultimodalInputConnect::ADD_INPUT_HANDLER, &MultimodalInputConnectStub::StubAddInputHandler},
         {IMultimodalInputConnect::REMOVE_INPUT_HANDLER, &MultimodalInputConnectStub::StubRemoveInputHandler},
         {IMultimodalInputConnect::MARK_EVENT_CONSUMED, &MultimodalInputConnectStub::StubMarkEventConsumed},
@@ -160,22 +159,6 @@ int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, Me
     }
     WRITEBOOL(reply, visible, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("visible:%{public}d,ret:%{public}d,pid:%{public}d", visible, ret, GetCallingPid());
-    return RET_OK;
-}
-
-int32_t MultimodalInputConnectStub::StubMarkEventProcessed(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!IsRunning()) {
-        MMI_HILOGE("Service is not running");
-    }
-    int32_t eventId;
-    READINT32(data, eventId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = MarkEventProcessed(eventId);
-    if (ret != RET_OK) {
-        MMI_HILOGE("MarkEventProcessed failed, ret:%{public}d", ret);
-        return ret;
-    }
     return RET_OK;
 }
 
