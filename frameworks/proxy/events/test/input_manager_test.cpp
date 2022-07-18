@@ -27,15 +27,15 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) || defined(OHOS_BUILD_ENABLE_POINTER)
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
-#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_POINTER
-#if defined(OHOS_BUILD_ENABLE_POINTER) || (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) ||
+#endif // OHOS_BUILD_ENABLE_KEYBOARD || OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) || (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || \
     defined(OHOS_BUILD_ENABLE_MONITOR))
 constexpr int32_t DEFAULT_POINTER_ID = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_MONITOR)
 constexpr int32_t DEFAULT_DEVICE_ID = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
-#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) &&
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
     defined(OHOS_BUILD_ENABLE_MONITOR)
 constexpr int32_t INDEX_FIRST = 1;
 constexpr int32_t INDEX_SECOND = 2;
@@ -69,7 +69,7 @@ public:
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
     std::shared_ptr<KeyEvent> SetupKeyEvent001();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_MONITOR
-#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) &&
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
     defined(OHOS_BUILD_ENABLE_MONITOR)
     std::shared_ptr<PointerEvent> TestMarkConsumedStep1();
     std::shared_ptr<PointerEvent> TestMarkConsumedStep2();
@@ -451,7 +451,7 @@ std::shared_ptr<KeyEvent> InputManagerTest::SetupKeyEvent001()
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_MONITOR
 
-#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH))
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) \
     && defined(OHOS_BUILD_ENABLE_MONITOR)
 std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep1()
 {
