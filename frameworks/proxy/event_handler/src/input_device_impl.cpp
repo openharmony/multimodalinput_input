@@ -132,11 +132,16 @@ int32_t InputDeviceImpl::GetInputDeviceIdsAsync(FunInputDevIds callback)
     InputDeviceData data;
     data.ids = std::make_pair(eventHandler, callback);
     if (userData_ == INT32_MAX) {
-        MMI_HILOGE("UserData exceeds the maximum");
+        MMI_HILOGE("userData exceeds the maximum");
         return RET_ERR;
     }
+    inputDevices_[userData_] = data;
+    return MultimodalInputConnMgr->GetDeviceIds(userData_++);
+}
+
 int32_t InputDeviceImpl::GetInputDeviceAsync(int32_t deviceId, FunInputDevInfo callback)
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
     CHKPR(eventHandler, RET_ERR);
