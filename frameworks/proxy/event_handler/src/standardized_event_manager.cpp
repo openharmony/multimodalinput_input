@@ -111,62 +111,6 @@ int32_t StandardizedEventManager::MoveMouseEvent(int32_t offsetX, int32_t offset
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
-int32_t StandardizedEventManager::GetDeviceIds(int32_t userData)
-{
-    NetPacket pkt(MmiMessageId::INPUT_DEVICE_IDS);
-    pkt << userData;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write userData failed");
-        return RET_ERR;
-    }
-    return SendMsg(pkt);
-}
-
-int32_t StandardizedEventManager::GetDevice(int32_t userData, int32_t deviceId)
-{
-    NetPacket pkt(MmiMessageId::INPUT_DEVICE);
-    pkt << userData << deviceId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write userData failed");
-        return RET_ERR;
-    }
-    return SendMsg(pkt);
-}
-
-int32_t StandardizedEventManager::SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes)
-{
-    NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYSTROKE_ABILITY);
-    pkt << userData << deviceId << keyCodes;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write keyCodes failed");
-        return RET_ERR;
-    }
-    return SendMsg(pkt);
-}
-
-int32_t StandardizedEventManager::GetKeyboardType(int32_t userData, int32_t deviceId) const
-{
-    NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE);
-    pkt << userData << deviceId;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write userData failed");
-        return PACKET_WRITE_FAIL;
-    }
-    return SendMsg(pkt);
-}
-
-int32_t StandardizedEventManager::RegisterInputDeviceMonitor()
-{
-    NetPacket pkt(MmiMessageId::ADD_INPUT_DEVICE_MONITOR);
-    return SendMsg(pkt);
-}
-
-int32_t StandardizedEventManager::UnRegisterInputDeviceMonitor()
-{
-    NetPacket pkt(MmiMessageId::REMOVE_INPUT_DEVICE_MONITOR);
-    return SendMsg(pkt);
-}
-
 bool StandardizedEventManager::SendMsg(NetPacket& pkt) const
 {
     CHKPF(client_);

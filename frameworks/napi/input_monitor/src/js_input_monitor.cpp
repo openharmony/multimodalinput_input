@@ -25,7 +25,6 @@
 
 namespace OHOS {
 namespace MMI {
-#define InputMgr InputManager::GetInstance()
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitor" };
 constexpr int32_t AXIS_TYPE_SCROLL_VERTICAL = 0;

@@ -26,7 +26,9 @@
 #include "i_anr_observer.h"
 #include "display_info.h"
 #include "error_multimodal.h"
+#include "i_input_device_listener.h"
 #include "i_input_event_consumer.h"
+#include "input_device.h"
 #include "key_option.h"
 
 namespace OHOS {
@@ -202,13 +204,49 @@ public:
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
     /**
+     * @brief Starts listening for an input device event.
+     * @param type Type of the input device event, which is **change**.
+     * @param listener Listener for the input device event.
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener);
+
+    /**
+     * @brief Stops listening for an input device event.
+     * @param type Type of the input device event, which is **change**.
+     * @param listener Listener for the input device event.
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t UnregisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener = nullptr);
+
+    /**
+     * @brief Obtain the information about an input device.
+     * @param callback Callback function, receive reported data.
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t GetDeviceIds(std::function<void(std::vector<int32_t>&)> callback);
+
+    /**
+     * @brief Obtain the information about an input device.
+     * @param deviceId ID of the input device whose information is to be obtained.
+     * @param callback Callback function, receive reported data.
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t GetDevice(int32_t deviceId, std::function<void(std::shared_ptr<InputDevice>)> callback);
+
+    /**
      * @brief Checks whether the specified key codes of an input device are supported.
      * @param deviceId ID of the input device.
      * @param keyCodes Key codes of the input device.
-     * @return Returns a result indicating whether the specified key codes are supported.
+     * @param callback Callback function, receive reported data.
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
-    void SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
+    int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
         std::function<void(std::vector<bool>&)> callback);
 
     /**
@@ -230,10 +268,11 @@ public:
     /**
      * @brief Queries the keyboard type.
      * @param deviceId Indicates the keyboard device ID.
-     * @return Returns the keyboard type.
+     * @param callback 键盘类型结果的回调函数。
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
-    void GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
+    int32_t GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
 
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
 
@@ -244,4 +283,5 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
+#define InputMgr OHOS::MMI::InputManager::GetInstance()
 #endif // INPUT_MANAGER_H

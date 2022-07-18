@@ -79,9 +79,8 @@ bool InputManagerImpl::InitEventHandler()
         return false;
     }
 
-    std::mutex mtx;
     static constexpr int32_t timeout = 3;
-    std::unique_lock <std::mutex> lck(mtx);
+    std::unique_lock<std::mutex> lck(handleMtx_);
     ehThread_ = std::thread(std::bind(&InputManagerImpl::OnThread, this));
     ehThread_.detach();
     if (cv_.wait_for(lck, std::chrono::seconds(timeout)) == std::cv_status::timeout) {
@@ -110,12 +109,17 @@ void InputManagerImpl::OnThread()
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    SetThreadName("mmi_client_EventHdr");
-    mmiEventHandler_ = std::make_shared<MMIEventHandler>();
-    CHKPV(mmiEventHandler_);
-    auto eventRunner = mmiEventHandler_->GetEventRunner();
+    std::shared_ptr<AppExecFwk::EventRunner> eventRunner = nullptr;
+    {
+        std::lock_guard<std::mutex> lck(handleMtx_);
+        SetThreadName("mmi_client_EventHdr");
+        mmiEventHandler_ = std::make_shared<MMIEventHandler>();
+        CHKPV(mmiEventHandler_);
+        eventRunner = mmiEventHandler_->GetEventRunner();
+        CHKPV(eventRunner);
+        cv_.notify_one();
+    }
     CHKPV(eventRunner);
-    cv_.notify_one();
     eventRunner->Run();
 }
 
@@ -586,27 +590,69 @@ void InputManagerImpl::SendDisplayInfo()
     }
 }
 
-void InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
+int32_t InputManagerImpl::RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener)
+{
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("client init failed");
+        return RET_ERR;
+    }
+    return InputDevImpl.RegisterDevListener(type, listener);
+}
+
+int32_t InputManagerImpl::UnregisterDevListener(std::string type,
+    std::shared_ptr<IInputDeviceListener> listener)
+{
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("client init failed");
+        return RET_ERR;
+    }
+    return InputDevImpl.UnregisterDevListener(type, listener);
+}
+
+int32_t InputManagerImpl::GetDeviceIds(std::function<void(std::vector<int32_t>&)> callback)
+{
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("client init failed");
+        return RET_ERR;
+    }
+    return InputDevImpl.GetInputDeviceIdsAsync(callback);
+}
+
+int32_t InputManagerImpl::GetDevice(int32_t deviceId,
+    std::function<void(std::shared_ptr<InputDevice>)> callback)
+{
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("client init failed");
+        return RET_ERR;
+    }
+    return InputDevImpl.GetInputDeviceAsync(deviceId, callback);
+}
+
+int32_t InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
     std::function<void(std::vector<bool>&)> callback)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
-        return;
+        return RET_ERR;
     }
-    InputDevImpl.SupportKeys(deviceId, keyCodes, callback);
+    return InputDevImpl.SupportKeys(deviceId, keyCodes, callback);
 }
 
-void InputManagerImpl::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
+int32_t InputManagerImpl::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
-        return;
+        return RET_ERR;
     }
-    InputDevImpl.GetKeyboardType(deviceId, callback);
+    return InputDevImpl.GetKeyboardType(deviceId, callback);
 }
 
 void InputManagerImpl::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)

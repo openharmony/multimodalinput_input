@@ -84,9 +84,13 @@ public:
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
 
-    void SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
+    int32_t RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener);
+    int32_t UnregisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener = nullptr);
+    int32_t GetDeviceIds(std::function<void(std::vector<int32_t>&)> callback);
+    int32_t GetDevice(int32_t deviceId, std::function<void(std::shared_ptr<InputDevice>)> callback);
+    int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
         std::function<void(std::vector<bool>&)> callback);
-    void GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
+    int32_t GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
 
     int32_t SetPointerVisible(bool visible);
     bool IsPointerVisible();
@@ -122,6 +126,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_MONITOR
 
     std::mutex mtx_;
+    std::mutex handleMtx_;
     std::condition_variable cv_;
     std::thread ehThread_;
     EventHandlerPtr eventHandler_  = nullptr;
