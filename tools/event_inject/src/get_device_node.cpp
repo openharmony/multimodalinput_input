@@ -32,24 +32,24 @@ int32_t GetDeviceNode::GetDeviceNodeName(const std::string &targetName, uint16_t
 {
     std::vector<std::string> devices = ReadDeviceFile();
     if (devices.empty()) {
-        MMI_HILOGE("devices is failed");
+        MMI_HILOGE("Devices is empty");
         return RET_ERR;
     }
     DeviceList deviceList;
     AnalyseDevices(devices, deviceList);
     if (deviceList.empty()) {
-        MMI_HILOGE("device list is null");
+        MMI_HILOGE("Device list is empty");
         return RET_ERR;
     }
     std::string deviceName = deviceList_[targetName];
     auto iter = deviceList.find(deviceName);
     if (iter == deviceList.end()) {
-        MMI_HILOGE("failed for find deviceName:%{public}s", deviceName.c_str());
+        MMI_HILOGE("Failed to find deviceName:%{public}s", deviceName.c_str());
         return RET_ERR;
     }
     size_t targetSize = iter->second.size();
     if (devIndex > targetSize) {
-        MMI_HILOGE("failed for devIndex:%{public}d > targetSize:%{public}zu", devIndex, targetSize);
+        MMI_HILOGE("Failed to devIndex:%{public}d > targetSize:%{public}zu", devIndex, targetSize);
         return RET_ERR;
     }
     std::string nodeRootPath = "/dev/input/";
@@ -85,12 +85,12 @@ std::vector<std::string> GetDeviceNode::ReadDeviceFile()
 {
     char realPath[PATH_MAX] = {};
     if (realpath(DEVICES_INFO_PATH.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("path is error, path:%{public}s", DEVICES_INFO_PATH.c_str());
+        MMI_HILOGE("The path is error, path:%{public}s", DEVICES_INFO_PATH.c_str());
         return {};
     }
     FILE* fp = fopen(DEVICES_INFO_PATH.c_str(), "r");
     if (fp == nullptr) {
-        MMI_HILOGW("open file: %{public}s failed", DEVICES_INFO_PATH.c_str());
+        MMI_HILOGW("Open file: %{public}s failed", DEVICES_INFO_PATH.c_str());
         return {};
     }
     char buf[READ_CMD_BUFF_SIZE] = {};
@@ -99,7 +99,7 @@ std::vector<std::string> GetDeviceNode::ReadDeviceFile()
         deviceStrs.push_back(buf);
     }
     if (fclose(fp) != 0) {
-        MMI_HILOGW("close file: %{public}s failed", DEVICES_INFO_PATH.c_str());
+        MMI_HILOGW("Close file: %{public}s failed", DEVICES_INFO_PATH.c_str());
     }
     return deviceStrs;
 }
@@ -109,7 +109,7 @@ void GetDeviceNode::AnalyseDevices(const std::vector<std::string>& deviceStrs, D
     std::string name;
     for (const auto &item : deviceStrs) {
         if (item.empty()) {
-            MMI_HILOGE("device info is empty");
+            MMI_HILOGE("Device info is empty");
             return;
         }
         std::string temp = item.substr(0, 1);

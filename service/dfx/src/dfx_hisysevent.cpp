@@ -113,7 +113,7 @@ void DfxHisysevent::OnClientConnect(const ClientConnectData &data, OHOS::HiviewD
             "UID", data.uid,
             "MODULE_TYPE", data.moduleType,
             "PROGRAMNAME", data.programName,
-            "MSG", "the client failed to connect to the server");
+            "MSG", "The client failed to connect to the server");
         if (ret != 0) {
             MMI_HILOGE("HiviewDFX Write failed, ret: %{public}d", ret);
         }

@@ -86,7 +86,7 @@ void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
             if (pressedKeyItem != nullptr) {
                 keyEvent_->RemoveReleasedKeyItems(*pressedKeyItem);
             } else {
-                MMI_HILOGW("pressedKeyItem is nullptr");
+                MMI_HILOGW("The pressedKeyItem is nullptr");
             }
             keyEvent_->SetKeyCode(repeatKeyCode_);
             keyEvent_->SetAction(KeyEvent::KEY_ACTION_DOWN);

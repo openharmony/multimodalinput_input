@@ -368,7 +368,7 @@ napi_value JsInputDinputContext::Init(napi_env env, napi_value exports)
     auto instance = CreateInstance(env);
     if (instance == nullptr) {
         napi_throw_error(env, nullptr, "JsInputDeviceContext: failed to create instance");
-        MMI_HILOGW("failed to create instance");
+        MMI_HILOGW("Failed to create instance");
         return nullptr;
     }
     napi_property_descriptor desc[] = {

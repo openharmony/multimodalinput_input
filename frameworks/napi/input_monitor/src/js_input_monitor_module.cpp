@@ -101,7 +101,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
 
     if (argv[1] == nullptr) {
         JsInputMonMgr.RemoveMonitor(env, typeName);
-        MMI_HILOGD("remove all monitor");
+        MMI_HILOGD("Remove all monitor");
         return nullptr;
     }
 

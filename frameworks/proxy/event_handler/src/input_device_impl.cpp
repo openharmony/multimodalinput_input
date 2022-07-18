@@ -48,7 +48,7 @@ int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevLi
     }
     for (const auto &item : iter->second) {
         if (item.second == listener) {
-            MMI_HILOGW("listener already exists");
+            MMI_HILOGW("The listener already exists");
             return RET_ERR;
         }
     }
@@ -98,7 +98,7 @@ listenerLabel:
 void InputDeviceImpl::OnDevListenerTask(const DevListener &devMonitor, const std::string &type, int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("report device change task, event type:%{public}s", type.c_str());
+    MMI_HILOGI("Report device change task, event type:%{public}s", type.c_str());
     if (type == "add") {
         devMonitor.second->OnDeviceAdded(deviceId, type);
         return;
@@ -112,13 +112,13 @@ void InputDeviceImpl::OnDevListener(int32_t deviceId, const std::string &type)
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = devListener_.find("change");
     if (iter == devListener_.end()) {
-        MMI_HILOGE("find change failed");
+        MMI_HILOGE("Find change failed");
         return;
     }
     for (const auto &item : iter->second) {
         if (!MMIEventHandler::PostTask(item.first,
             std::bind(&InputDeviceImpl::OnDevListenerTask, this, item, type, deviceId))) {
-            MMI_HILOGE("post task failed");
+            MMI_HILOGE("Post task failed");
         }
     }
 }
@@ -148,7 +148,7 @@ int32_t InputDeviceImpl::GetInputDeviceAsync(int32_t deviceId, FunInputDevInfo c
     InputDeviceData data;
     data.inputDevice = std::make_pair(eventHandler, callback);
     if (userData_ == INT32_MAX) {
-        MMI_HILOGE("userData exceeds the maximum");
+        MMI_HILOGE("UserData exceeds the maximum");
         return RET_ERR;
     }
     inputDevices_[userData_] = data;
@@ -168,7 +168,7 @@ int32_t InputDeviceImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> keyC
     InputDeviceData data;
     data.keys = std::make_pair(eventHandler, callback);
     if (userData_ == INT32_MAX) {
-        MMI_HILOGE("userData exceeds the maximum");
+        MMI_HILOGE("UserData exceeds the maximum");
         return RET_ERR;
     }
     inputDevices_[userData_] = data;
@@ -196,7 +196,7 @@ void InputDeviceImpl::OnInputDeviceTask(const DevInfo &devInfo, int32_t userData
     CHK_PID_AND_TID();
     CHKPV(devData);
     devInfo.second(devData);
-    MMI_HILOGD("report device info task, userData:%{public}d name:%{public}s",
+    MMI_HILOGD("Report device info task, userData:%{public}d name:%{public}s",
         userData, devData->GetName().c_str());
 }
 
@@ -207,16 +207,16 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, std::shared_ptr<InputDevic
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
-        MMI_HILOGD("find userData failed");
+        MMI_HILOGD("Find userData failed");
         return;
     }
     auto devInfo = GetDeviceInfo(userData);
     CHKPV(devInfo);
     if (!MMIEventHandler::PostTask(devInfo->first,
         std::bind(&InputDeviceImpl::OnInputDeviceTask, this, *devInfo, userData, devData))) {
-        MMI_HILOGE("post task failed");
+        MMI_HILOGE("Post task failed");
     }
-    MMI_HILOGD("report device info, userData:%{public}d name:%{public}s type:%{public}d",
+    MMI_HILOGD("Report device info, userData:%{public}d name:%{public}s type:%{public}d",
         userData, devData->GetName().c_str(), devData->GetType());
 }
 
@@ -224,7 +224,7 @@ void InputDeviceImpl::OnInputDeviceIdsTask(const DevIds &devIds, int32_t userDat
 {
     CHK_PID_AND_TID();
     devIds.second(ids);
-    MMI_HILOGD("report all device, userData:%{public}d devices:(%{public}s)",
+    MMI_HILOGD("Report all device, userData:%{public}d devices:(%{public}s)",
         userData, IdsListToString(ids).c_str());
 }
 
@@ -234,16 +234,16 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> &i
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
-        MMI_HILOGD("find userData failed");
+        MMI_HILOGD("Find userData failed");
         return;
     }
     auto devIds = GetDeviceIds(userData);
     CHKPV(devIds);
     if (!MMIEventHandler::PostTask(devIds->first,
         std::bind(&InputDeviceImpl::OnInputDeviceIdsTask, this, *devIds, userData, ids))) {
-        MMI_HILOGE("post task failed");
+        MMI_HILOGE("Post task failed");
     }
-    MMI_HILOGD("report all device, userData:%{public}d device:(%{public}s)",
+    MMI_HILOGD("Report all device, userData:%{public}d device:(%{public}s)",
         userData, IdsListToString(ids).c_str());
 }
 
@@ -259,14 +259,14 @@ void InputDeviceImpl::OnSupportKeys(int32_t userData, const std::vector<bool> &k
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
-        MMI_HILOGD("find userData failed");
+        MMI_HILOGD("Find userData failed");
         return;
     }
     auto devKeys = GetDeviceKeys(userData);
     CHKPV(devKeys);
     if (!MMIEventHandler::PostTask(devKeys->first,
         std::bind(&InputDeviceImpl::OnSupportKeysTask, this, *devKeys, userData, keystrokeAbility))) {
-        MMI_HILOGE("post task failed");
+        MMI_HILOGE("Post task failed");
     }
 }
 
