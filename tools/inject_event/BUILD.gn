@@ -17,7 +17,7 @@ import("//build/test.gni")
 SUBSYSTEM_DIR = "//foundation/multimodalinput"
 SUBSYSTEM_FRAMEWORKS_DIR = "//foundation/multimodalinput/input/frameworks"
 
-ohos_shared_library("input-manager") {
+ohos_source_set("input-manager") {
   sources = [ "src/input_manager_command.cpp" ]
 
   include_dirs = [

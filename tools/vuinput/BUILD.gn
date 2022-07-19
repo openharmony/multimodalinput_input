@@ -46,7 +46,7 @@ config("virtual_device_public_config") {
   ]
 }
 
-ohos_shared_library("libmmi-virtual-device") {
+ohos_source_set("libmmi-virtual-device") {
   sources = [
     "src/virtual_device.cpp",
     "src/virtual_finger.cpp",

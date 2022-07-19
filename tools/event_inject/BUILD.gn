@@ -47,7 +47,7 @@ config("event_injection_public_config") {
   ]
 }
 
-ohos_shared_library("event-injection") {
+ohos_source_set("event-injection") {
   sources = [
     "src/device_base.cpp",
     "src/get_device_node.cpp",
