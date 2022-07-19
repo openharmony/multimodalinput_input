@@ -15,8 +15,7 @@
 
 #include "virtual_keyboard.h"
 
-#include <linux/input.h>
-#include <linux/uinput.h>
+#include "linux/input-event-codes.h"
 
 namespace OHOS {
 namespace MMI {

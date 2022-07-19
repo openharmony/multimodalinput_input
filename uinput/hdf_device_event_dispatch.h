@@ -16,16 +16,11 @@
 #ifndef HDF_DEVICE_EVENT_DISPATCH_H
 #define HDF_DEVICE_EVENT_DISPATCH_H
 
-#include <linux/input.h>
+#include <cstdint>
 
-#include "input_controller.h"
-#include "input_reporter.h"
 #include "input_type.h"
-#include "nocopyable.h"
-
 #include "inject_thread.h"
-#include "input_manager.h"
-#include "virtual_touch_screen.h"
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace MMI {

@@ -15,10 +15,6 @@
 
 #include "inject_thread.h"
 
-#include <condition_variable>
-#include <mutex>
-#include <unistd.h>
-
 namespace OHOS {
 namespace MMI {
 std::mutex InjectThread::mutex_;

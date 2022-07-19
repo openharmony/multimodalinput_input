@@ -15,12 +15,7 @@
 
 #include "keyboard_inject.h"
 
-#include <cstdio>
-#include <cstring>
-#include <functional>
-#include <iostream>
-#include <mutex>
-
+#include "linux/input-event-codes.h"
 #include "mmi_log.h"
 
 using namespace OHOS::HiviewDFX;
