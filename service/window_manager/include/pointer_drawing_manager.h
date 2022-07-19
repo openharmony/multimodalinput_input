@@ -40,7 +40,7 @@ public:
     virtual ~PointerDrawingManager() = default;
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
     void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY);
-    void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height);
+    void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height, Direction direction);
     void UpdatePointerDevice(bool hasPointerDevice);
     bool Init();
     void DeletePointerVisible(int32_t pid);
@@ -73,7 +73,7 @@ private:
     bool hasPointerDevice_ = false;
     int32_t lastPhysicalX_ = -1;
     int32_t lastPhysicalY_ = -1;
-
+    Direction direction_ = Direction0;
     struct PidInfo {
         int32_t pid { 0 };
         bool visible { false };

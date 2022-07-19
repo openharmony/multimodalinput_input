@@ -97,13 +97,21 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
     if (physicalY < 0) {
         physicalY = 0;
     }
-
     const int32_t cursorUnit = 16;
-    if (physicalX > (displayWidth_ - IMAGE_WIDTH / cursorUnit)) {
-        physicalX = displayWidth_ - IMAGE_WIDTH / cursorUnit;
-    }
-    if (physicalY > (displayHeight_ - IMAGE_HEIGHT / cursorUnit)) {
-        physicalY = displayHeight_ - IMAGE_HEIGHT / cursorUnit;
+    if (direction_ == Direction0 || direction_ == Direction180) {
+        if (physicalX > (displayWidth_ - IMAGE_WIDTH / cursorUnit)) {
+            physicalX = displayWidth_ - IMAGE_WIDTH / cursorUnit;
+        }
+        if (physicalY > (displayHeight_ - IMAGE_HEIGHT / cursorUnit)) {
+            physicalY = displayHeight_ - IMAGE_HEIGHT / cursorUnit;
+        }
+    } else {
+        if (physicalX > (displayHeight_ - IMAGE_HEIGHT / cursorUnit)) {
+            physicalX = displayHeight_ - IMAGE_HEIGHT / cursorUnit;
+        }
+        if (physicalY > (displayWidth_ - IMAGE_WIDTH / cursorUnit)) {
+            physicalY = displayWidth_ - IMAGE_WIDTH / cursorUnit;
+        }
     }
 }
 
@@ -212,13 +220,14 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
     return pixelMap;
 }
 
-void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int32_t height) 
+void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int32_t height, Direction direction)
 {
     CALL_DEBUG_ENTER;
     hasDisplay_ = true;
     displayId_ = displayId;
     displayWidth_ = width;
     displayHeight_ = height;
+    direction_ = direction;
     DrawManager();
 }
 
