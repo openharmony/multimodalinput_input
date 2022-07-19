@@ -28,8 +28,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 constexpr int32_t TIME_WAIT_FOR_OP = 500;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerManualTest" };
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace
 
 class InputManagerManualTest : public testing::Test {
@@ -41,8 +43,10 @@ public:
     void TearDown() {}
 
 protected:
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void AddInputEventFilter();
     void SimulateInputEventHelper(int32_t physicalX, int32_t physicalY, int32_t expectVal);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 private:
     int32_t callbackRet = 0;
 };
@@ -52,6 +56,7 @@ void InputManagerManualTest::SetUp()
     callbackRet = 0;
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 void InputManagerManualTest::AddInputEventFilter()
 {
     CALL_DEBUG_ENTER;
@@ -85,11 +90,7 @@ void InputManagerManualTest::AddInputEventFilter()
     };
 
     int32_t ret = InputManager::GetInstance()->AddInputEventFilter(callback);
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     ASSERT_EQ(ret, RET_OK);
-#else
-    ASSERT_EQ(ret, ERROR_UNSUPPORT);
-#endif
 }
 
 void InputManagerManualTest::SimulateInputEventHelper(int32_t physicalX, int32_t physicalY, int32_t expectVal)
@@ -105,17 +106,13 @@ void InputManagerManualTest::SimulateInputEventHelper(int32_t physicalX, int32_t
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(-1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(pointerId);
 
     MMI_HILOGI("Call InputManager::SimulateInputEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     EXPECT_EQ(callbackRet, expectVal);
-#else
-    EXPECT_EQ(callbackRet, 0);
-#endif
 }
 
 /**
@@ -131,5 +128,6 @@ HWTEST_F(InputManagerManualTest, HandlePointerEventFilter_001, TestSize.Level1)
     SimulateInputEventHelper(10, 10, 1); // set physical x and physical y are 10, will expect value is 1
     SimulateInputEventHelper(0, 0, 2); // set physical x and physical y are not 10, will expect value is 2
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS
