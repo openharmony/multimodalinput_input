@@ -59,9 +59,20 @@ bool ANRManager::TriggerANR(int64_t time, SessionPtr sess)
         return false;
     }
     DfxHisysevent::ApplicationBlockInput(sess);
-    int32_t ret = OHOS::AAFwk::AbilityManagerClient::GetInstance()->SendANRProcessID(sess->GetPid());
-    if (ret != 0) {
-        MMI_HILOGW("AAFwk SendANRProcessID failed, AAFwk errCode: %{public}d", ret);
+    if (anrNoticedPid_ < 0) {
+        MMI_HILOGE("NoticedPid_ is invalid");
+        return true;
+    }
+    NetPacket pkt(MmiMessageId::NOTICE_ANR);
+    pkt << sess->GetPid();
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write key event failed");
+        return true;
+    }
+    auto fd = udsServer_->GetClientFd(anrNoticedPid_);
+    if (!udsServer_->SendMsg(fd, pkt)) {
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return true;
     }
     MMI_HILOGI("AAFwk send ANR process id succeeded");
     return true;
