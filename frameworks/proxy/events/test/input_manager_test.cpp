@@ -25,12 +25,22 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest" };
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) || defined(OHOS_BUILD_ENABLE_POINTER)
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD || OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) || (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || \
+    defined(OHOS_BUILD_ENABLE_MONITOR))
 constexpr int32_t DEFAULT_POINTER_ID = 0;
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_MONITOR)
 constexpr int32_t DEFAULT_DEVICE_ID = 0;
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
+    defined(OHOS_BUILD_ENABLE_MONITOR)
 constexpr int32_t INDEX_FIRST = 1;
 constexpr int32_t INDEX_SECOND = 2;
 constexpr int32_t INDEX_THIRD = 3;
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
 } // namespace
 
 class InputManagerTest : public testing::Test {
@@ -39,18 +49,28 @@ public:
     void TearDown();
     static void SetUpTestCase();
     std::string GetEventDump();
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<PointerEvent> SetupPointerEvent001();
     std::shared_ptr<PointerEvent> SetupPointerEvent002();
     std::shared_ptr<PointerEvent> SetupPointerEvent003();
+#endif // OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_POINTER
     std::shared_ptr<PointerEvent> SetupPointerEvent005();
     std::shared_ptr<PointerEvent> SetupPointerEvent006();
     std::shared_ptr<PointerEvent> SetupPointerEvent007();
     std::shared_ptr<PointerEvent> SetupPointerEvent009();
     std::shared_ptr<PointerEvent> SetupPointerEvent010();
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<PointerEvent> SetupPointerEvent011();
     std::shared_ptr<PointerEvent> SetupPointerEvent012();
     std::shared_ptr<PointerEvent> SetupPointerEvent013();
+#endif // OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
     std::shared_ptr<KeyEvent> SetupKeyEvent001();
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_MONITOR
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
+    defined(OHOS_BUILD_ENABLE_MONITOR)
     std::shared_ptr<PointerEvent> TestMarkConsumedStep1();
     std::shared_ptr<PointerEvent> TestMarkConsumedStep2();
     void TestMarkConsumedStep3(int32_t monitorId, int32_t eventId);
@@ -60,6 +80,7 @@ public:
     int32_t TestAddMonitor(std::shared_ptr<IInputEventConsumer> consumer);
     void TestRemoveMonitor(int32_t monitorId);
     void TestMarkConsumed(int32_t monitorId, int32_t eventId);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
 };
 
 void InputManagerTest::SetUpTestCase()
@@ -83,6 +104,7 @@ std::string InputManagerTest::GetEventDump()
     return TestUtil->GetEventDump();
 }
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent001()
 {
     auto pointerEvent = PointerEvent::Create();
@@ -157,7 +179,9 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent003()
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     return pointerEvent;
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent005()
 {
     auto pointerEvent = PointerEvent::Create();
@@ -291,7 +315,9 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent010()
     pointerEvent->AddPointerItem(item);
     return pointerEvent;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent011()
 {
     auto pointerEvent = PointerEvent::Create();
@@ -405,7 +431,9 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent013()
     pointerEvent->AddPointerItem(item);
     return pointerEvent;
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
 std::shared_ptr<KeyEvent> InputManagerTest::SetupKeyEvent001()
 {
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
@@ -421,7 +449,10 @@ std::shared_ptr<KeyEvent> InputManagerTest::SetupKeyEvent001()
 
     return keyEvent;
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_MONITOR
 
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) \
+    && defined(OHOS_BUILD_ENABLE_MONITOR)
 std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep1()
 {
     auto pointerEvent = PointerEvent::Create();
@@ -556,7 +587,9 @@ void InputManagerTest::TestMarkConsumed(int32_t monitorId, int32_t eventId)
     AccessMonitor monitor;
     InputManager::GetInstance()->MarkConsumed(monitorId, eventId);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 /**
  * @tc.name: MultimodalEventHandler_SimulateKeyEvent_001
  * @tc.desc: Verify simulate the back key is long pressed and lifted
@@ -702,7 +735,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_005, TestSize.Level
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
     TestSimulateInputEvent(injectUpEvent);
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 /**
  * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_001
  * @tc.desc: Verify simulate screen down event
@@ -761,7 +796,9 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_004, Test
     pointerEvent->SetPointerId(-1);
     TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 /**
  * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_005
  * @tc.desc: Verify simulate mouse down event
@@ -950,7 +987,9 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_013, Test
 
     TestSimulateInputEvent(pointerEvent);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 /**
  * @tc.name: MultimodalEventHandler_SimulatePencil2Event_001
  * @tc.desc: Verify simulate pencil2 down event
@@ -1061,7 +1100,9 @@ HWTEST_F(InputManagerTest, InputManager_NotResponse_002, TestSize.Level1)
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 /**
  * @tc.name: InputManagerTest_SubscribeKeyEvent_001
  * @tc.desc: Verify invalid parameter.
@@ -1130,6 +1171,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId2);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 /**
  * @tc.name: TestGetKeystrokeAbility_001
@@ -1147,6 +1189,7 @@ HWTEST_F(InputManagerTest, TestGetKeystrokeAbility_001, TestSize.Level1)
     MMI_HILOGD("Stop TestGetKeystrokeAbility_001");
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
 /**
  * @tc.name: TestInputEventInterceptor_001
  * @tc.desc: Verify mouse down event interceptor
@@ -1337,7 +1380,9 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_005, TestSize.Level1)
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
 
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
 /**
  * @tc.name: TestInputEventInterceptor_006
  * @tc.desc: Verify touchscreen interceptor
@@ -1378,7 +1423,9 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_006, TestSize.Level1)
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_INTERCEPTOR
 
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
 /**
  * @tc.name: TestInputEventInterceptor_007
  * @tc.desc: Verify key interceptor
@@ -1411,7 +1458,9 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_007, TestSize.Level1)
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
 
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
 /**
  * @tc.name: InputManagerTest_OnAddScreenMonitor_001
  * @tc.desc: Verify touchscreen down event monitor
@@ -1555,7 +1604,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_005, TestSize.Lev
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_MONITOR)
 /**
  * @tc.name: InputManagerTest_OnAddTouchPadMonitor_001
  * @tc.desc: Verify touchpad down event monitor
@@ -2038,7 +2089,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
     }
     ASSERT_EQ(maxMonitor, ids.size());
 }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
 
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
 /**
  * @tc.name: InputManagerTest_OnAddKeyboardMonitor_001
  * @tc.desc: Verify Keyboard multiple monitor
@@ -2116,8 +2169,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_002, TestSize.L
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_MONITOR
 
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 /**
  * @tc.name: InputManagerTest_MoveMouse_01
  * @tc.desc: Verify move mouse
@@ -2141,7 +2195,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_02, TestSize.Level1)
     CALL_DEBUG_ENTER;
     InputManager::GetInstance()->MoveMouse(-1000, 100);
 }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 static int32_t deviceIDtest = 0;
 static void GetKeyboardTypeCallback(int32_t keyboardType)
