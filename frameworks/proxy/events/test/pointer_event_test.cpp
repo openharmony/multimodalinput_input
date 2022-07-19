@@ -22,7 +22,9 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+#ifdef OHOS_BUILD_ENABLE_POINTER
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "PointerEventTest"};
+#endif // OHOS_BUILD_ENABLE_POINTER
 using namespace testing::ext;
 } // namespace
 class PointerEventTest : public testing::Test {
@@ -37,6 +39,7 @@ void PointerEventTest::SetUpTestCase()
     ASSERT_TRUE(TestUtil->Init());
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 std::shared_ptr<PointerEvent> PointerEventTest::CreatePointEvent()
 {
     auto pointerEvent = PointerEvent::Create();
@@ -112,6 +115,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSiz
     pointerEvent->SetPressedKeys(pressedKeys);
     TestSimulateInputEvent(pointerEvent);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 /**
  * @tc.name:PointerEventTest_CheckMousePointEvent_001
