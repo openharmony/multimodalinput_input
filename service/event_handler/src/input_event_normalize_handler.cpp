@@ -32,7 +32,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventNormalizeHandler" };
 }
 
-void InputEventNormalizeHandler::HandleLibinputEvent(libinput_event* event)
+void InputEventNormalizeHandler::HandleEvent(libinput_event* event)
 {
     CALL_DEBUG_ENTER;
     CHKPV(event);

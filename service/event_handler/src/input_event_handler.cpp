@@ -224,7 +224,7 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    interceptorHandler_  = std::make_shared<InterceptorHandlerGlobal>();
+    interceptorHandler_  = std::make_shared<EventInterceptorHandler>();
     CHKPR(interceptorHandler_, ERROR_NULL_POINTER);
     tmp->SetNext(interceptorHandler_);
     tmp = interceptorHandler_;
@@ -243,7 +243,7 @@ int32_t InputEventHandler::BuildInputHandlerChain()
     tmp = subscriberHandler_;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-    monitorHandler_ = std::make_shared<InputHandlerManagerGlobal>();
+    monitorHandler_ = std::make_shared<EventMonitorHandler>();
     CHKPR(monitorHandler_, ERROR_NULL_POINTER);
     tmp->SetNext(monitorHandler_);
     tmp = monitorHandler_;
@@ -269,7 +269,7 @@ std::shared_ptr<InputEventNormalizeHandler> InputEventHandler::GetInputEventNorm
     return inputEventNormalizeHandler_;
 }
 
-std::shared_ptr<InterceptorHandlerGlobal> InputEventHandler::GetInterceptorHandler() const
+std::shared_ptr<EventInterceptorHandler> InputEventHandler::GetInterceptorHandler() const
 {
     return interceptorHandler_;
 }
@@ -279,7 +279,7 @@ std::shared_ptr<KeyEventSubscriber> InputEventHandler::GetSubscriberHandler() co
     return subscriberHandler_;
 }
 
-std::shared_ptr<InputHandlerManagerGlobal> InputEventHandler::GetMonitorHandler() const
+std::shared_ptr<EventMonitorHandler> InputEventHandler::GetMonitorHandler() const
 {
     return monitorHandler_;
 }
@@ -322,7 +322,7 @@ int32_t InputEventHandler::OnEventKey(libinput_event *event)
         keyEvent_ = KeyEvent::Create();
     }
     CHKPR(inputEventNormalizeHandler_, ERROR_NULL_POINTER);
-    inputEventNormalizeHandler_->HandleLibinputEvent(event);
+    inputEventNormalizeHandler_->HandleEvent(event);
     return RET_OK;
 }
 
@@ -333,7 +333,7 @@ int32_t InputEventHandler::OnEventPointer(libinput_event *event)
         keyEvent_ = KeyEvent::Create();
     }
     CHKPR(inputEventNormalizeHandler_, ERROR_NULL_POINTER);
-    inputEventNormalizeHandler_->HandleLibinputEvent(event);
+    inputEventNormalizeHandler_->HandleEvent(event);
     return RET_OK;
 }
 
@@ -342,7 +342,7 @@ int32_t InputEventHandler::OnEventTouchpad(libinput_event *event)
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(inputEventNormalizeHandler_, ERROR_NULL_POINTER);
-    inputEventNormalizeHandler_->HandleLibinputEvent(event);
+    inputEventNormalizeHandler_->HandleEvent(event);
     return RET_OK;
 }
 
@@ -350,7 +350,7 @@ int32_t InputEventHandler::OnEventGesture(libinput_event *event)
 {
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(inputEventNormalizeHandler_, ERROR_NULL_POINTER);
-    inputEventNormalizeHandler_->HandleLibinputEvent(event);
+    inputEventNormalizeHandler_->HandleEvent(event);
     return RET_OK;
 }
 
@@ -359,7 +359,7 @@ int32_t InputEventHandler::OnEventTouch(libinput_event *event)
     CHKPR(event, ERROR_NULL_POINTER);
     LibinputAdapter::LoginfoPackagingTool(event);
     CHKPR(inputEventNormalizeHandler_, ERROR_NULL_POINTER);
-    inputEventNormalizeHandler_->HandleLibinputEvent(event);
+    inputEventNormalizeHandler_->HandleEvent(event);
     return RET_OK;
 }
 
@@ -368,7 +368,7 @@ int32_t InputEventHandler::OnTabletToolEvent(libinput_event *event)
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(inputEventNormalizeHandler_, ERROR_NULL_POINTER);
-    inputEventNormalizeHandler_->HandleLibinputEvent(event);
+    inputEventNormalizeHandler_->HandleEvent(event);
     return RET_OK;
 }
 } // namespace MMI

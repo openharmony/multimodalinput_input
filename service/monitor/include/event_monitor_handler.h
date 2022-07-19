@@ -23,17 +23,17 @@
 #include "singleton.h"
 
 #include "i_input_event_handler.h"
-#include "i_input_event_monitor_handler.h"
+#include "i_input_event_collection_handler.h"
 #include "input_handler_type.h"
 #include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class InputHandlerManagerGlobal : public IInputEventHandler {
+class EventMonitorHandler : public IInputEventHandler {
 public:
-    InputHandlerManagerGlobal() = default;
-    DISALLOW_COPY_AND_MOVE(InputHandlerManagerGlobal);
-    ~InputHandlerManagerGlobal() = default;
+    EventMonitorHandler() = default;
+    DISALLOW_COPY_AND_MOVE(EventMonitorHandler);
+    ~EventMonitorHandler() = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -47,10 +47,10 @@ public:
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
     void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
+    bool OnHandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    bool HandleEvent(std::shared_ptr<PointerEvent> PointerEvent);
+    bool OnHandleEvent(std::shared_ptr<PointerEvent> PointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH    
     void Dump(int32_t fd, const std::vector<std::string> &args);
 
@@ -80,7 +80,7 @@ private:
         SessionPtr session_ = nullptr;
     };
 
-    class MonitorCollection : public IInputEventMonitorHandler, protected NoCopyable {
+    class MonitorCollection : public IInputEventCollectionHandler, protected NoCopyable {
     public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent) override;

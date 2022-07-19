@@ -27,7 +27,7 @@ class InputEventNormalizeHandler : public IInputEventHandler {
 public:
     InputEventNormalizeHandler() = default;
     ~InputEventNormalizeHandler() = default;
-    void HandleLibinputEvent(libinput_event* event) override;
+    void HandleEvent(libinput_event* event) override;
     void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     void HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
     void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
