@@ -94,7 +94,6 @@ ohos_source_set("libmmi-virtual-device") {
 
   deps = [ "//utils/native/base:utils" ]
 
-  install_enable = true
   part_name = "input"
 }
 
