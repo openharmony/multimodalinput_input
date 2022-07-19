@@ -14,10 +14,9 @@
  */
 
 #include "libinput_adapter.h"
-
 #include <climits>
 #include <cinttypes>
-
+#include <dirent.h>
 #include <fcntl.h>
 #include <sys/epoll.h>
 #include <unistd.h>
@@ -40,7 +39,7 @@ static void HiLogFunc(struct libinput* input, libinput_log_priority priority, co
     CHKPV(input);
     char buffer[256];
     if (vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args) == -1) {
-        MMI_HILOGE("call vsnprintf_s fail");
+        MMI_HILOGE("Call vsnprintf_s fail");
         va_end(args);
         return;
     }
@@ -70,28 +69,28 @@ void LibinputAdapter::LoginfoPackagingTool(struct libinput_event *event)
 constexpr static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
         if (path == nullptr) {
-            MMI_HILOGWK("input device path is nullptr");
+            MMI_HILOGWK("Input device path is nullptr");
             return RET_ERR;
         }
         char realPath[PATH_MAX] = {};
         int32_t count = 0;
         while ((realpath(path, realPath) == nullptr) && (count < MAX_RETRY_COUNT)) {
-            MMI_HILOGWK("path is error, count: %{public}d, path:%{public}s", count, path);
+            MMI_HILOGWK("Path is error, count: %{public}d, path:%{public}s", count, path);
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
             ++count;
         }
         if (count >= MAX_RETRY_COUNT) {
-            MMI_HILOGWK("retry %{public}d times realpath failed", count);
+            MMI_HILOGWK("Retry %{public}d times realpath failed", count);
             return RET_ERR;
         }
         int32_t fd = open(realPath, flags);
         int32_t errNo = errno;
-        MMI_HILOGWK("libinput .open_restricted path:%{public}s,fd:%{public}d,errno:%{public}d", path, fd, errNo);
+        MMI_HILOGWK("Libinput .open_restricted path:%{public}s,fd:%{public}d,errno:%{public}d", path, fd, errNo);
         return fd < 0 ? RET_ERR : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)
     {
-        MMI_HILOGI("libinput .close_restricted fd:%{public}d", fd);
+        MMI_HILOGI("Libinput .close_restricted fd:%{public}d", fd);
         close(fd);
     },
 };
@@ -102,7 +101,7 @@ LibinputAdapter::~LibinputAdapter() {}
 
 bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_id)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(funInputEvent);
     funInputEvent_ = funInputEvent;
     seat_id_ = seat_id;
@@ -117,7 +116,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_
     if (rt != 0) {
         libinput_unref(input_);
         udev_unref(udev_);
-        MMI_HILOGE("rt is not 0");
+        MMI_HILOGE("The rt is not 0");
         return false;
     }
     fd_ = libinput_get_fd(input_);
@@ -125,7 +124,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_
         libinput_unref(input_);
         udev_unref(udev_);
         fd_ = -1;
-        MMI_HILOGE("fd_ is less than 0");
+        MMI_HILOGE("The fd_ is less than 0");
         return false;
     }
     return true;
@@ -133,18 +132,18 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_
 
 void LibinputAdapter::EventDispatch(struct epoll_event& ev)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(ev.data.ptr);
     auto fd = *static_cast<int*>(ev.data.ptr);
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_HILOGF("epoll unrecoverable error,"
+        MMI_HILOGF("Epoll unrecoverable error,"
             "The service must be restarted. fd:%{public}d", fd);
         free(ev.data.ptr);
         ev.data.ptr = nullptr;
         return;
     }
     if (libinput_dispatch(input_) != 0) {
-        MMI_HILOGE("libinput: Failed to dispatch libinput");
+        MMI_HILOGE("Failed to dispatch libinput");
         return;
     }
     OnEventHandler();
@@ -152,7 +151,7 @@ void LibinputAdapter::EventDispatch(struct epoll_event& ev)
 
 void LibinputAdapter::Stop()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (fd_ >= 0) {
         close(fd_);
         fd_ = -1;
@@ -168,12 +167,50 @@ void LibinputAdapter::ProcessPendingEvents()
 
 void LibinputAdapter::OnEventHandler()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(funInputEvent_);
     libinput_event *event = nullptr;
     while ((event = libinput_get_event(input_))) {
         funInputEvent_(event);
         libinput_event_destroy(event);
+    }
+}
+
+void LibinputAdapter::ReloadDevice()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(input_);
+    libinput_suspend(input_);
+    libinput_resume(input_);
+}
+
+void LibinputAdapter::RetriggerHotplugEvents()
+{
+    CALL_INFO_TRACE;
+    DIR *pdir = opendir("/sys/class/input");
+    if (pdir == nullptr) {
+        MMI_HILOGE("Failed to open directory: \'/sys/class/input\'");
+        return;
+    }
+    for (struct dirent *pdirent = readdir(pdir); pdirent != nullptr; pdirent = readdir(pdir)) {
+        char path[PATH_MAX];
+        if (sprintf_s(path, sizeof(path), "/sys/class/input/%s/uevent", pdirent->d_name) < 0) {
+            continue;
+        }
+        MMI_HILOGD("trigger \'%{public}s\'", path);
+        FILE *fs = fopen(path, "r+");
+        if (fs == nullptr) {
+            continue;
+        }
+        if (fputs("add", fs) < 0) {
+            MMI_HILOGW("fputs error: %{public}s", strerror(errno));
+        }
+        if (fclose(fs) != 0) {
+            MMI_HILOGW("fclose error: %{public}s", strerror(errno));
+        }
+    }
+    if (closedir(pdir) != 0) {
+        MMI_HILOGW("closedir error: %{public}s", strerror(errno));
     }
 }
 } // namespace MMI

@@ -66,44 +66,44 @@ void PointerEvent::PointerItem::SetPressed(bool pressed)
     pressed_ = pressed;
 }
 
-int32_t PointerEvent::PointerItem::GetGlobalX() const
+int32_t PointerEvent::PointerItem::GetDisplayX() const
 {
-    return globalX_;
+    return displayX_;
 }
 
-void PointerEvent::PointerItem::SetGlobalX(int32_t x)
+void PointerEvent::PointerItem::SetDisplayX(int32_t x)
 {
-    globalX_ = x;
+    displayX_ = x;
 }
 
-int32_t PointerEvent::PointerItem::GetGlobalY() const
+int32_t PointerEvent::PointerItem::GetDisplayY() const
 {
-    return globalY_;
+    return displayY_;
 }
 
-void PointerEvent::PointerItem::SetGlobalY(int32_t y)
+void PointerEvent::PointerItem::SetDisplayY(int32_t y)
 {
-    globalY_ = y;
+    displayY_ = y;
 }
 
-int32_t PointerEvent::PointerItem::GetLocalX() const
+int32_t PointerEvent::PointerItem::GetWindowX() const
 {
-    return localX_;
+    return windowX_;
 }
 
-void PointerEvent::PointerItem::SetLocalX(int32_t x)
+void PointerEvent::PointerItem::SetWindowX(int32_t x)
 {
-    localX_ = x;
+    windowX_ = x;
 }
 
-int32_t PointerEvent::PointerItem::GetLocalY() const
+int32_t PointerEvent::PointerItem::GetWindowY() const
 {
-    return localY_;
+    return windowY_;
 }
 
-void PointerEvent::PointerItem::SetLocalY(int32_t y)
+void PointerEvent::PointerItem::SetWindowY(int32_t y)
 {
-    localY_ = y;
+    windowY_ = y;
 }
 
 int32_t PointerEvent::PointerItem::GetWidth() const
@@ -146,44 +146,44 @@ void PointerEvent::PointerItem::SetTiltY(double tiltY)
     tiltY_ = tiltY;
 }
 
-int32_t PointerEvent::PointerItem::GetToolGlobalX() const
+int32_t PointerEvent::PointerItem::GetToolDisplayX() const
 {
-    return toolGlobalX_;
+    return toolDisplayX_;
 }
 
-void PointerEvent::PointerItem::SetToolGlobalX(int32_t x)
+void PointerEvent::PointerItem::SetToolDisplayX(int32_t x)
 {
-    toolGlobalX_ = x;
+    toolDisplayX_ = x;
 }
 
-int32_t PointerEvent::PointerItem::GetToolGlobalY() const
+int32_t PointerEvent::PointerItem::GetToolDisplayY() const
 {
-    return toolGlobalY_;
+    return toolDisplayY_;
 }
 
-void PointerEvent::PointerItem::SetToolGlobalY(int32_t y)
+void PointerEvent::PointerItem::SetToolDisplayY(int32_t y)
 {
-    toolGlobalY_ = y;
+    toolDisplayY_ = y;
 }
 
-int32_t PointerEvent::PointerItem::GetToolLocalX() const
+int32_t PointerEvent::PointerItem::GetToolWindowX() const
 {
-    return toolLocalX_;
+    return toolWindowX_;
 }
 
-void PointerEvent::PointerItem::SetToolLocalX(int32_t x)
+void PointerEvent::PointerItem::SetToolWindowX(int32_t x)
 {
-    toolLocalX_ = x;
+    toolWindowX_ = x;
 }
 
-int32_t PointerEvent::PointerItem::GetToolLocalY() const
+int32_t PointerEvent::PointerItem::GetToolWindowY() const
 {
-    return toolLocalY_;
+    return toolWindowY_;
 }
 
-void PointerEvent::PointerItem::SetToolLocalY(int32_t y)
+void PointerEvent::PointerItem::SetToolWindowY(int32_t y)
 {
-    toolLocalY_ = y;
+    toolWindowY_ = y;
 }
 
 int32_t PointerEvent::PointerItem::GetToolWidth() const
@@ -256,22 +256,32 @@ void PointerEvent::PointerItem::SetToolType(int32_t toolType)
     toolType_ = toolType;
 }
 
+int32_t PointerEvent::PointerItem::GetTargetWindowId() const
+{
+    return targetWindowId_;
+}
+
+void PointerEvent::PointerItem::SetTargetWindowId(int32_t windowId)
+{
+    targetWindowId_ = windowId;
+}
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     return (
         out.WriteInt32(pointerId_) &&
         out.WriteInt64(downTime_) &&
         out.WriteBool(pressed_) &&
-        out.WriteInt32(globalX_) &&
-        out.WriteInt32(globalY_) &&
-        out.WriteInt32(localX_) &&
-        out.WriteInt32(localY_) &&
+        out.WriteInt32(displayX_) &&
+        out.WriteInt32(displayY_) &&
+        out.WriteInt32(windowX_) &&
+        out.WriteInt32(windowY_) &&
         out.WriteInt32(width_) &&
         out.WriteInt32(height_) &&
-        out.WriteInt32(toolGlobalX_) &&
-        out.WriteInt32(toolGlobalY_) &&
-        out.WriteInt32(toolLocalX_) &&
-        out.WriteInt32(toolLocalY_) &&
+        out.WriteInt32(toolDisplayX_) &&
+        out.WriteInt32(toolDisplayY_) &&
+        out.WriteInt32(toolWindowX_) &&
+        out.WriteInt32(toolWindowY_) &&
         out.WriteInt32(toolWidth_) &&
         out.WriteInt32(toolHeight_) &&
         out.WriteDouble(tiltX_) &&
@@ -290,16 +300,16 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(pointerId_) &&
         in.ReadInt64(downTime_) &&
         in.ReadBool(pressed_) &&
-        in.ReadInt32(globalX_) &&
-        in.ReadInt32(globalY_) &&
-        in.ReadInt32(localX_) &&
-        in.ReadInt32(localY_) &&
+        in.ReadInt32(displayX_) &&
+        in.ReadInt32(displayY_) &&
+        in.ReadInt32(windowX_) &&
+        in.ReadInt32(windowY_) &&
         in.ReadInt32(width_) &&
         in.ReadInt32(height_) &&
-        in.ReadInt32(toolGlobalX_) &&
-        in.ReadInt32(toolGlobalY_) &&
-        in.ReadInt32(toolLocalX_) &&
-        in.ReadInt32(toolLocalY_) &&
+        in.ReadInt32(toolDisplayX_) &&
+        in.ReadInt32(toolDisplayY_) &&
+        in.ReadInt32(toolWindowX_) &&
+        in.ReadInt32(toolWindowY_) &&
         in.ReadInt32(toolWidth_) &&
         in.ReadInt32(toolHeight_) &&
         in.ReadDouble(tiltX_) &&
@@ -677,7 +687,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
 bool PointerEvent::IsValidCheckMouseFunc() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (pointers_.size() != 1) {
         MMI_HILOGE("Pointers_ is invalid");
         return false;
@@ -722,7 +732,7 @@ bool PointerEvent::IsValidCheckMouseFunc() const
 
 bool PointerEvent::IsValidCheckMouse() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t mousePointID = GetPointerId();
     if (mousePointID < 0) {
         MMI_HILOGE("MousePointID is invalid");
@@ -760,7 +770,7 @@ bool PointerEvent::IsValidCheckMouse() const
 
 bool PointerEvent::IsValidCheckTouchFunc() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t touchPointID = GetPointerId();
     if (touchPointID < 0) {
         MMI_HILOGE("TouchPointID is invalid");
@@ -788,7 +798,7 @@ bool PointerEvent::IsValidCheckTouchFunc() const
 
 bool PointerEvent::IsValidCheckTouch() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (!IsValidCheckTouchFunc()) {
         MMI_HILOGE("IsValidCheckTouchFunc is invalid");
         return false;
@@ -833,7 +843,7 @@ bool PointerEvent::IsValidCheckTouch() const
 
 bool PointerEvent::IsValid() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t sourceType = GetSourceType();
     if (sourceType != SOURCE_TYPE_MOUSE && sourceType != SOURCE_TYPE_TOUCHSCREEN &&
         sourceType != SOURCE_TYPE_TOUCHPAD) {
@@ -893,12 +903,12 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
         }
         ostream << "DownTime:" << item.GetDownTime()
             << ",IsPressed:" << std::boolalpha << item.IsPressed()
-            << ",GlobalX:" << item.GetGlobalX() << ",GlobalY:" << item.GetGlobalY()
-            << ",LocalX:" << item.GetLocalX() << ",LocalY:" << item.GetLocalY()
+            << ",DisplayX:" << item.GetDisplayX() << ",DisplayY:" << item.GetDisplayY()
+            << ",WindowX:" << item.GetWindowX() << ",WindowY:" << item.GetWindowY()
             << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
             << ",TiltX:" << item.GetTiltX() << ",TiltY:" << item.GetTiltY()
-            << ",ToolGlobalX:" << item.GetToolGlobalX() << ",ToolGlobalY:" << item.GetToolGlobalY()
-            << ",ToolLocalX:" << item.GetToolLocalX() << ",ToolLocalY:" << item.GetToolLocalY()
+            << ",ToolDisplayX:" << item.GetToolDisplayX() << ",ToolDisplayY:" << item.GetToolDisplayY()
+            << ",ToolWindowX:" << item.GetToolWindowX() << ",ToolWindowY:" << item.GetToolWindowY()
             << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
             << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
             << ",LongAxis:" << item.GetLongAxis() << ",ShortAxis:" << item.GetShortAxis()

@@ -36,7 +36,12 @@ public:
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
     virtual int32_t SetPointerVisible(bool visible) override;
     virtual int32_t IsPointerVisible(bool &visible) override;
-    virtual int32_t MarkEventProcessed(int32_t eventId) override;
+    virtual int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys) override;
+    virtual int32_t GetDeviceIds(int32_t userData) override;
+    virtual int32_t GetDevice(int32_t userData, int32_t deviceId) override;
+    virtual int32_t RegisterDevListener() override;
+    virtual int32_t UnregisterDevListener() override;
+    virtual int32_t GetKeyboardType(int32_t userData, int32_t deviceId) override;
     virtual int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
         HandleEventType eventType) override;
     virtual int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType) override;
@@ -46,6 +51,7 @@ public:
     virtual int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
+    virtual int32_t SetAnrObserver() override;
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };

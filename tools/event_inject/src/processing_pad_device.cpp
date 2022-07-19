@@ -24,10 +24,10 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Proce
 int32_t ProcessingPadDevice::TransformJsonDataToInputData(const DeviceItem& fingerEventArrays,
     InputEventArray& inputEventArray)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::vector<DeviceEvent> inputData = fingerEventArrays.events;
     if (inputData.empty()) {
-        MMI_HILOGE("manage finger array faild, inputData is empty.");
+        MMI_HILOGE("Manage finger array failed, inputData is empty.");
         return RET_ERR;
     }
     std::vector<PadEvent> padEventArray;
@@ -51,7 +51,7 @@ void ProcessingPadDevice::TransformPadEventToInputEvent(const std::vector<PadEve
         } else if (item.eventType == "RING_EVENT") {
             TransformRingEvent(item, inputEventArray);
         } else {
-            MMI_HILOGW("json file format error");
+            MMI_HILOGW("Json file format error");
         }
     }
 }

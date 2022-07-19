@@ -19,17 +19,17 @@ using namespace OHOS::MMI;
 
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingKeyboardDevice" };
-constexpr int32_t EVENT_REPROT_COUNTS = 50;
-constexpr int64_t EVENT_REPROT_TIMES = 20;
+constexpr int32_t EVENT_REPORT_COUNTS = 50;
+constexpr int64_t EVENT_REPORT_TIMES = 20;
 } // namespace
 
 int32_t ProcessingKeyboardDevice::TransformJsonDataToInputData(const DeviceItem& fingerEventArrays,
     InputEventArray& inputEventArray)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::vector<DeviceEvent> inputData = fingerEventArrays.events;
     if (inputData.empty()) {
-        MMI_HILOGE("manage KeyBoard array faild, inputData is empty.");
+        MMI_HILOGE("Manage KeyBoard array failed, inputData is empty.");
         return RET_ERR;
     }
     std::vector<KeyBoardEvent> keyBoardEventArray;
@@ -53,7 +53,7 @@ void ProcessingKeyboardDevice::TransformKeyBoardEventToInputEvent(const std::vec
         } else if (item.eventType == "KEY_EVENT_LONG_PRESS") {
             TransformKeyLongPressEvent(item, inputEventArray);
         } else {
-            MMI_HILOGW("json file format error");
+            MMI_HILOGW("Json file format error");
         }
     }
 }
@@ -85,15 +85,15 @@ void ProcessingKeyboardDevice::TransformKeyLongPressEvent(const KeyBoardEvent& k
                                                           InputEventArray& inputEventArray)
 {
     uint16_t keyValue = static_cast<uint16_t>(keyBoardEvent.keyValue);
-    SetKeyPressEvent(inputEventArray, EVENT_REPROT_TIMES, keyValue);
+    SetKeyPressEvent(inputEventArray, EVENT_REPORT_TIMES, keyValue);
     SetSynReport(inputEventArray);
-    int32_t keyEventNum = (keyBoardEvent.blockTime / EVENT_REPROT_COUNTS) + 1;
+    int32_t keyEventNum = (keyBoardEvent.blockTime / EVENT_REPORT_COUNTS) + 1;
     int32_t count = 0;
     while (count++ < keyEventNum) {
-        SetKeyLongPressEvent(inputEventArray, EVENT_REPROT_TIMES, keyValue);
-        SetSynConfigReport(inputEventArray, EVENT_REPROT_TIMES);
+        SetKeyLongPressEvent(inputEventArray, EVENT_REPORT_TIMES, keyValue);
+        SetSynConfigReport(inputEventArray, EVENT_REPORT_TIMES);
     }
-    SetKeyReleaseEvent(inputEventArray, EVENT_REPROT_TIMES, keyValue);
+    SetKeyReleaseEvent(inputEventArray, EVENT_REPORT_TIMES, keyValue);
     SetSynReport(inputEventArray);
 }
 

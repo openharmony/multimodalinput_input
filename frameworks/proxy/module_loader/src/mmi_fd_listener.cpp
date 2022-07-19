@@ -30,11 +30,11 @@ constexpr HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIFdListen
 using namespace AppExecFwk;
 MMIFdListener::MMIFdListener(MMIClientPtr client) : mmiClient_(client)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 }
 MMIFdListener::~MMIFdListener()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 }
 
 void MMIFdListener::OnReadable(int32_t fd)
@@ -51,11 +51,11 @@ void MMIFdListener::OnReadable(int32_t fd)
             mmiClient_->OnRecvMsg(szBuf, size);
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
+                MMI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
                     size, errno);
                 continue;
             }
-            MMI_HILOGE("recv return %{public}zu errno:%{public}d", size, errno);
+            MMI_HILOGE("Recv return %{public}zu errno:%{public}d", size, errno);
             break;
         } else {
             MMI_HILOGD("[Do nothing here]The service side disconnect with the client. size:0 count:%{public}d "
@@ -70,7 +70,7 @@ void MMIFdListener::OnReadable(int32_t fd)
 
 void MMIFdListener::OnShutdown(int32_t fd)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     if (fd < 0) {
         MMI_HILOGE("Invalid fd:%{public}d", fd);
     }
@@ -80,7 +80,7 @@ void MMIFdListener::OnShutdown(int32_t fd)
 
 void MMIFdListener::OnException(int32_t fd)
 {
-    CHK_PIDANDTID();
+    CHK_PID_AND_TID();
     if (fd < 0) {
         MMI_HILOGE("Invalid fd:%{public}d", fd);
     }

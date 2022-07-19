@@ -30,23 +30,29 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Multim
 
 void OnConnected(const IfMMIClient& client)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     InputMgrImpl->OnConnected();
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventInputSubscribeMgr.OnConnected();
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     InputHandlerMgr.OnConnected();
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 }
 
 MultimodalEventHandler::MultimodalEventHandler() {}
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr)
 {
     CHKPR(keyEventPtr, ERROR_NULL_POINTER);
     return EventManager.InjectEvent(keyEventPtr);
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 bool MultimodalEventHandler::InitClient()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (client_ != nullptr) {
         return true;
     }
@@ -62,147 +68,23 @@ bool MultimodalEventHandler::InitClient()
 
 MMIClientPtr MultimodalEventHandler::GetMMIClient()
 {
-    if (client_ != nullptr) {
-        return client_->GetSharedPtr();
-    }
-    MMI_HILOGE("Init client faild");
-    return nullptr;
+    CHKPP(client_);
+    return client_->GetSharedPtr();
 }
 
-int32_t MultimodalEventHandler::GetDeviceIds(int32_t userData)
-{
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return MMI_SERVICE_INVALID;
-    }
-    return EventManager.GetDeviceIds(userData);
-}
-
-int32_t MultimodalEventHandler::GetDevice(int32_t userData, int32_t deviceId)
-{
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return MMI_SERVICE_INVALID;
-    }
-    return EventManager.GetDevice(userData, deviceId);
-}
-
-int32_t MultimodalEventHandler::SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> keyCodes)
-{
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return MMI_SERVICE_INVALID;
-    }
-    return EventManager.SupportKeys(userData, deviceId, keyCodes);
-}
-
-int32_t MultimodalEventHandler::GetKeyboardType(int32_t userData, int32_t deviceId)
-{
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return MMI_SERVICE_INVALID;
-    }
-    return EventManager.GetKeyboardType(userData, deviceId);
-}
-
-int32_t MultimodalEventHandler::RegisterInputDeviceMonitor()
-{
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return MMI_SERVICE_INVALID;
-    }
-    return EventManager.RegisterInputDeviceMonitor();
-}
-
-int32_t MultimodalEventHandler::UnRegisterInputDeviceMonitor()
-{
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return MMI_SERVICE_INVALID;
-    }
-    return EventManager.UnRegisterInputDeviceMonitor();
-}
-
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     return EventManager.InjectPointerEvent(pointerEvent);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MultimodalEventHandler::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 {
     return EventManager.MoveMouseEvent(offsetX, offsetY);
 }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-
-int32_t MultimodalEventHandler::AddInputEventMontior(int32_t keyEventType)
-{
-    CALL_LOG_ENTER;
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return MMI_SERVICE_INVALID;
-    }
-    NetPacket pkt(MmiMessageId::ADD_INPUT_EVENT_MONITOR);
-    pkt << keyEventType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write add keyEventType failed");
-        return MMI_SERVICE_INVALID;
-    }
-    client_->SendMessage(pkt);
-    return RET_OK;
-}
-
-void MultimodalEventHandler::RemoveInputEventMontior(int32_t keyEventType)
-{
-    CALL_LOG_ENTER;
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return;
-    }
-    NetPacket pkt(MmiMessageId::REMOVE_INPUT_EVENT_MONITOR);
-    pkt << keyEventType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write remove keyEventType failed");
-        return;
-    }
-    client_->SendMessage(pkt);
-}
-
-void MultimodalEventHandler::RemoveInputEventTouchpadMontior(int32_t pointerEventType)
-{
-    CALL_LOG_ENTER;
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return;
-    }
-    NetPacket pkt(MmiMessageId::REMOVE_INPUT_EVENT_TOUCHPAD_MONITOR);
-    pkt << InputEvent::EVENT_TYPE_POINTER;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write remove touchpad montior failed");
-        return;
-    }
-    client_->SendMessage(pkt);
-}
-
-int32_t MultimodalEventHandler::AddInputEventTouchpadMontior(int32_t pointerEventType)
-{
-    CALL_LOG_ENTER;
-    if (!InitClient()) {
-        MMI_HILOGE("Init client faild");
-        return MMI_SERVICE_INVALID;
-    }
-    NetPacket pkt(MmiMessageId::ADD_INPUT_EVENT_TOUCHPAD_MONITOR);
-    pkt << InputEvent::EVENT_TYPE_POINTER;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write add touchpad montior failed");
-        return MMI_SERVICE_INVALID;
-    }
-    MMI_HILOGE("send msg before");
-    bool isSuc = client_->SendMessage(pkt);
-    if (isSuc)
-        MMI_HILOGD("sendAdd msg Success");
-    return RET_OK;
-}
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 } // namespace MMI
 } // namespace OHOS

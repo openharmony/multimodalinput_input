@@ -35,7 +35,7 @@ private:
     void TransformKeyClickEvent(const DeviceEvent& padEvent, InputEventArray& inputEventArray);
     void TransformRocker1Event(const DeviceEvent& padEvent, InputEventArray& inputEventArray);
     void TransformRocker2Event(const DeviceEvent& padEvent, InputEventArray& inputEventArray);
-    void TransformDerectionKeyEvent(const DeviceEvent& padEvent, InputEventArray& inputEventArray);
+    void TransformDirectionKeyEvent(const DeviceEvent& padEvent, InputEventArray& inputEventArray);
 };
 } // namespace MMI
 } // namespace OHOS

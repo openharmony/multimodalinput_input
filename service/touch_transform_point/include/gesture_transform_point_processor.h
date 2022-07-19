@@ -30,7 +30,7 @@ public:
     explicit GestureTransformPointProcessor(int32_t deviceId);
     DISALLOW_COPY_AND_MOVE(GestureTransformPointProcessor);
     ~GestureTransformPointProcessor();
-    std::shared_ptr<PointerEvent> OnTouchPadGestrueEvent(struct libinput_event *event);
+    std::shared_ptr<PointerEvent> OnTouchPadGestureEvent(struct libinput_event *event);
 
 private:
     const int32_t defaultPointerId = 0;

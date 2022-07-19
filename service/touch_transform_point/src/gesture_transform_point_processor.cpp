@@ -35,7 +35,7 @@ GestureTransformPointProcessor::~GestureTransformPointProcessor() {}
 
 void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_gesture *data)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(data);
     int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
     double scale = libinput_event_gesture_get_scale(data);
@@ -44,8 +44,8 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_ge
 
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetDownTime(time);
-    pointerItem.SetGlobalX(MouseState->GetMouseCoordsX());
-    pointerItem.SetGlobalY(MouseState->GetMouseCoordsY());
+    pointerItem.SetDisplayX(MouseState->GetMouseCoordsX());
+    pointerItem.SetDisplayY(MouseState->GetMouseCoordsY());
     pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetPointerId(defaultPointerId);
     pointerItem.SetWidth(0);
@@ -77,8 +77,8 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_g
 
     PointerEvent::PointerItem pointerItem;
     pointerEvent_->GetPointerItem(defaultPointerId, pointerItem);
-    pointerItem.SetGlobalX(MouseState->GetMouseCoordsX());
-    pointerItem.SetGlobalY(MouseState->GetMouseCoordsY());
+    pointerItem.SetDisplayX(MouseState->GetMouseCoordsX());
+    pointerItem.SetDisplayY(MouseState->GetMouseCoordsY());
     pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
     pointerEvent_->UpdatePointerItem(defaultPointerId, pointerItem);
 
@@ -102,8 +102,8 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gest
 
     PointerEvent::PointerItem pointerItem;
     pointerEvent_->GetPointerItem(defaultPointerId, pointerItem);
-    pointerItem.SetGlobalX(MouseState->GetMouseCoordsX());
-    pointerItem.SetGlobalY(MouseState->GetMouseCoordsY());
+    pointerItem.SetDisplayX(MouseState->GetMouseCoordsX());
+    pointerItem.SetDisplayY(MouseState->GetMouseCoordsY());
     pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
     pointerEvent_->UpdatePointerItem(defaultPointerId, pointerItem);
 
@@ -116,10 +116,10 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gest
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
 }
 
-std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestrueEvent(
+std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestureEvent(
     struct libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPP(event);
     auto data = libinput_event_get_gesture_event(event);
     CHKPP(data);

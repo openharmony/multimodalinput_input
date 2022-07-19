@@ -18,18 +18,23 @@
 
 #include <uv.h>
 
-#include "input_device_impl.h"
+#include "input_device.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-#include "refbase.h"
 
 namespace OHOS {
 namespace MMI {
 class JsUtil {
 public:
+    struct UserData {
+        int32_t userData { 0 };
+        int32_t deviceId { 0 };
+        napi_value handle = nullptr;
+        std::vector<int32_t> keys;
+    };
     struct CallbackData {
         std::vector<int32_t> ids;
-        std::shared_ptr<InputDeviceImpl::InputDeviceInfo> device { nullptr };
+        std::shared_ptr<InputDevice> device = nullptr;
         std::vector<bool> keystrokeAbility;
         int32_t deviceId { 0 };
         int32_t keyboardType { 0 };
@@ -37,10 +42,12 @@ public:
     struct CallbackInfo {
         CallbackInfo();
         ~CallbackInfo();
-        napi_env env { nullptr };
-        napi_ref ref { nullptr };
-        napi_deferred deferred { nullptr };
+        napi_env env = nullptr;
+        napi_ref ref = nullptr;
+        napi_deferred deferred = nullptr;
+        int32_t errCode { -1 };
         CallbackData data;
+        UserData uData;
     };
     struct DeviceType {
         std::string sourceTypeName;
@@ -52,6 +59,14 @@ public:
     static bool GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_value &object);
     static bool GetDeviceSourceType(const std::unique_ptr<CallbackInfo> &cb, napi_value &object);
     static bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
+    template <typename T>
+    static void DeletePtr(T ptr)
+    {
+        if (ptr != nullptr) {
+            delete ptr;
+            ptr = nullptr;
+        }
+    }
 };
 } // namespace MMI
 } // namespace OHOS

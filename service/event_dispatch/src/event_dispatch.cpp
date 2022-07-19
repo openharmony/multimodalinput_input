@@ -14,186 +14,124 @@
  */
 
 #include "event_dispatch.h"
-
 #include <cinttypes>
 
-#include "ability_manager_client.h"
-#include "hitrace_meter.h"
-#include "input-event-codes.h"
-#include "hisysevent.h"
-
+#include "anr_manager.h"
 #include "bytrace_adapter.h"
-#include "define_interceptor_global.h"
+#include "dfx_hisysevent.h"
 #include "error_multimodal.h"
-#include "event_filter_wrap.h"
+#include "hitrace_meter.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "input_event_monitor_manager.h"
-#include "input_handler_manager_global.h"
-#include "key_event_subscriber.h"
+#include "input-event-codes.h"
 #include "util.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
-constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 } // namespace
 
 EventDispatch::EventDispatch() {}
 
 EventDispatch::~EventDispatch() {}
 
-void EventDispatch::OnEventTouchGetPointEventType(const EventTouch& touch,
-                                                  const int32_t fingerCount,
-                                                  POINT_EVENT_TYPE& pointEventType)
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+void EventDispatch::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
-    if (fingerCount <= 0 || touch.time <= 0 || touch.seatSlot < 0 || touch.eventType < 0) {
-        MMI_HILOGE("The in parameter is error, fingerCount:%{public}d, touch.time:%{public}" PRId64 ","
-                   "touch.seatSlot:%{public}d, touch.eventType:%{public}d",
-                   fingerCount, touch.time, touch.seatSlot, touch.eventType);
-        return;
-    }
-    if (fingerCount == 1) {
-        switch (touch.eventType) {
-            case LIBINPUT_EVENT_TOUCH_DOWN: {
-                pointEventType = PRIMARY_POINT_DOWN;
-                break;
-            }
-            case LIBINPUT_EVENT_TOUCH_UP: {
-                pointEventType = PRIMARY_POINT_UP;
-                break;
-            }
-            case LIBINPUT_EVENT_TOUCH_MOTION: {
-                pointEventType = POINT_MOVE;
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-    } else {
-        switch (touch.eventType) {
-            case LIBINPUT_EVENT_TOUCH_DOWN: {
-                pointEventType = OTHER_POINT_DOWN;
-                break;
-            }
-            case LIBINPUT_EVENT_TOUCH_UP: {
-                pointEventType = OTHER_POINT_UP;
-                break;
-            }
-            case LIBINPUT_EVENT_TOUCH_MOTION: {
-                pointEventType = POINT_MOVE;
-                break;
-            }
-            default: {
-                break;
-            }
-        }
-    }
+    CHKPV(keyEvent);
+    auto udsServer = InputHandler->GetUDSServer();
+    CHKPV(udsServer);
+    DispatchKeyEventPid(*udsServer, keyEvent);
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-bool EventDispatch::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point)
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+void EventDispatch::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    return EventFilterWrap::GetInstance().HandlePointerEventFilter(point);
+    CHKPV(pointerEvent);
+    HandlePointerEvent(pointerEvent);
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
-int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 {
-    CALL_LOG_ENTER;
-    CHKPR(point, ERROR_NULL_POINTER);
-    if (HandlePointerEventFilter(point)) {
-        MMI_HILOGI("Pointer event Filter succeeded");
-        return RET_OK;
-    }
-    if (InterHdlGl->HandleEvent(point)) {
-        BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
-        MMI_HILOGD("Interception is succeeded");
-        return RET_OK;
-    }
-    if (InputHandlerManagerGlobal::GetInstance().HandleEvent(point)) {
-        BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
-        MMI_HILOGD("Monitor is succeeded");
-        return RET_OK;
-    }
+    CALL_DEBUG_ENTER;
+    CHKPV(point);
     auto fd = WinMgr->UpdateTargetPointer(point);
     if (fd < 0) {
         MMI_HILOGE("The fd less than 0, fd: %{public}d", fd);
-        return RET_ERR;
+        DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+        return;
     }
+    DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     auto udsServer = InputHandler->GetUDSServer();
-    CHKPR(udsServer, RET_ERR);
+    CHKPV(udsServer);
     auto session = udsServer->GetSession(fd);
-    CHKPR(session, RET_ERR);
+    CHKPV(session);
     if (session->isANRProcess_) {
-        MMI_HILOGD("application not responsing");
-        return RET_OK;
+        MMI_HILOGD("Application not responding");
+        return;
     }
     auto currentTime = GetSysClockTime();
-    if (TriggerANR(currentTime, session)) {
+    if (ANRMgr->TriggerANR(currentTime, session)) {
         session->isANRProcess_ = true;
-        MMI_HILOGW("the pointer event does not report normally, application not response");
-        return RET_OK;
+        MMI_HILOGW("The pointer event does not report normally, application not response");
+        return;
     }
-
-    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::Marshalling(point, pkt);
-    BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
-
-    if (!udsServer->SendMsg(fd, pkt)) {
-        MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
-        return RET_ERR;
-    }
-    session->AddEvent(point->GetId(), currentTime);
-    return RET_OK;
-}
-
-int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
-{
-    CALL_LOG_ENTER;
-    CHKPR(key, PARAM_INPUT_INVALID);
-    if (!key->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
-        if (InterHdlGl->HandleEvent(key)) {
-            MMI_HILOGD("keyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
-                key->GetKeyCode());
-            BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_INTERCEPT_EVENT);
-            return RET_OK;
+    auto pid = udsServer->GetClientPid(fd);
+    auto pointerEvent = std::make_shared<PointerEvent>(*point);
+    auto pointerIdList = pointerEvent->GetPointersIdList();
+    if (pointerIdList.size() > 1) {
+        for (const auto& id : pointerIdList) {
+            PointerEvent::PointerItem pointeritem;
+            if (!pointerEvent->GetPointerItem(id, pointeritem)) {
+                MMI_HILOGW("Can't find this poinerItem");
+                continue;
+            }
+            auto itemPid = WinMgr->GetWindowPid(pointeritem.GetTargetWindowId());
+            if (itemPid >= 0 && itemPid != pid) {
+                pointerEvent->RemovePointerItem(id);
+                MMI_HILOGD("pointerIdList size: %{public}zu", pointerEvent->GetPointersIdList().size());
+            }
         }
     }
-    if (IKeyCommandManager::GetInstance()->HandleEvent(key)) {
-        MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{public}d", key->GetKeyCode());
-        BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_LAUNCH_EVENT);
-        return RET_OK;
+    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
+    InputEventDataTransformation::Marshalling(pointerEvent, pkt);
+    BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
+    if (!udsServer->SendMsg(fd, pkt)) {
+        MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
+        return;
     }
-    if (KeyEventSubscriber_.SubscribeKeyEvent(key)) {
-        MMI_HILOGD("Subscribe keyEvent filter success. keyCode:%{public}d", key->GetKeyCode());
-        BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
-        return RET_OK;
-    }
+    session->SaveANREvent(point->GetId(), currentTime);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_POINTER
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(key, PARAM_INPUT_INVALID);
     auto fd = WinMgr->UpdateTarget(key);
     if (fd < 0) {
         MMI_HILOGE("Invalid fd, fd: %{public}d", fd);
+        DfxHisysevent::OnUpdateTargetKey(key, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return RET_ERR;
     }
-    MMI_HILOGD("event dispatcher of server:KeyEvent:KeyCode:%{public}d,"
-               "ActionTime:%{public}" PRId64 ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ","
-               "EventType:%{public}d,Flag:%{public}u,"
-               "KeyAction:%{public}d,Fd:%{public}d",
-               key->GetKeyCode(), key->GetActionTime(), key->GetAction(),
-               key->GetActionStartTime(),
-               key->GetEventType(),
-               key->GetFlag(), key->GetKeyAction(), fd);
-    InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
+    DfxHisysevent::OnUpdateTargetKey(key, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+    MMI_HILOGD("Event dispatcher of server:KeyEvent:KeyCode:%{public}d,Action:%{public}d,EventType:%{public}d,"
+        "Fd:%{public}d", key->GetKeyCode(), key->GetAction(), key->GetEventType(), fd);
     auto session = udsServer.GetSession(fd);
     CHKPR(session, RET_ERR);
     if (session->isANRProcess_) {
-        MMI_HILOGD("application not responsing");
+        MMI_HILOGD("Application not responding");
         return RET_OK;
     }
     auto currentTime = GetSysClockTime();
-    if (TriggerANR(currentTime, session)) {
+    if (ANRMgr->TriggerANR(currentTime, session)) {
         session->isANRProcess_ = true;
-        MMI_HILOGW("the key event does not report normally, application not response");
+        MMI_HILOGW("The key event does not report normally, application not response");
         return RET_OK;
     }
 
@@ -209,50 +147,9 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
         MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-    session->AddEvent(key->GetId(), currentTime);
+    session->SaveANREvent(key->GetId(), currentTime);
     return RET_OK;
 }
-
-int32_t EventDispatch::AddInputEventFilter(sptr<IEventFilter> filter)
-{
-    return EventFilterWrap::GetInstance().AddInputEventFilter(filter);
-}
-
-bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
-{
-    CALL_LOG_ENTER;
-    int64_t earlist;
-    if (sess->IsEventQueueEmpty()) {
-        earlist = time;
-    } else {
-        earlist = sess->GetEarlistEventTime();
-    }
-    MMI_HILOGD("Current time: %{public}" PRId64 "", time);
-    if (time < (earlist + INPUT_UI_TIMEOUT_TIME)) {
-        sess->isANRProcess_ = false;
-        MMI_HILOGD("the event reports normally");
-        return false;
-    }
-
-    int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
-        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-        "APPLICATION_BLOCK_INPUT",
-        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
-        "PID", sess->GetPid(),
-        "UID", sess->GetUid(),
-        "PACKAGE_NAME", "",
-        "PROCESS_NAME", "",
-        "MSG", "User input does not respond");
-    if (ret != 0) {
-        MMI_HILOGE("HiviewDFX Write failed, HiviewDFX errCode: %{public}d", ret);
-    }
-
-    ret = OHOS::AAFwk::AbilityManagerClient::GetInstance()->SendANRProcessID(sess->GetPid());
-    if (ret != 0) {
-        MMI_HILOGE("AAFwk SendANRProcessID failed, AAFwk errCode: %{public}d", ret);
-    }
-    MMI_HILOGI("AAFwk send ANR process id succeeded");
-    return true;
-}
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 } // namespace MMI
 } // namespace OHOS

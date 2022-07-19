@@ -97,7 +97,7 @@ int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, con
 
 bool GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> &params)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     uint32_t arrayLength = 0;
     if (napi_get_array_length(env, value, &arrayLength) != napi_ok) {
         MMI_HILOGE("Get array length failed");
@@ -136,7 +136,7 @@ bool GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> 
         }
         MMI_HILOGD("Get int array number:%{public}d", value);
         if (!params.insert(value).second) {
-            MMI_HILOGE("params insert value failed");
+            MMI_HILOGE("Params insert value failed");
             napi_throw_error(env, nullptr, "params insert value failed");
             return false;
         }
@@ -158,7 +158,7 @@ int32_t GetPreSubscribeId(Callbacks &callbacks, KeyEventMonitorInfo *event)
 
 int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMonitorInfo *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     if (callbacks.find(event->eventType) == callbacks.end()) {
         MMI_HILOGD("No callback in %{public}s", event->eventType.c_str());
@@ -199,7 +199,7 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
 int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
     KeyEventMonitorInfo *event, int32_t &subscribeId)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     if (callbacks.count(event->eventType) <= 0) {
         MMI_HILOGE("Callback doesn't exists");
@@ -284,14 +284,14 @@ static void AsyncWorkFn(const napi_env &env, KeyEventMonitorInfo *event, napi_va
     MMI_HILOGD("Status > 0 enter");
     napi_status status = napi_create_object(env, &result);
     if (status != napi_ok) {
-        MMI_HILOGE("create object failed");
+        MMI_HILOGE("Create object failed");
         napi_throw_error(env, nullptr, "create object failed");
         return;
     }
     napi_value arr;
     status = napi_create_array(env, &arr);
     if (status != napi_ok) {
-        MMI_HILOGE("create array failed");
+        MMI_HILOGE("Create array failed");
         napi_throw_error(env, nullptr, "create array failed");
         return;
     }
@@ -301,13 +301,13 @@ static void AsyncWorkFn(const napi_env &env, KeyEventMonitorInfo *event, napi_va
     for (const auto &preKey : preKeys) {
         status = napi_create_int32(env, preKey, &value);
         if (status != napi_ok) {
-            MMI_HILOGE("create int32 failed");
+            MMI_HILOGE("Create int32 failed");
             napi_throw_error(env, nullptr, "create int32 failed");
             return;
         }
         status = napi_set_element(env, arr, i, value);
         if (status != napi_ok) {
-            MMI_HILOGE("set element failed");
+            MMI_HILOGE("Set element failed");
             napi_throw_error(env, nullptr, "set element failed");
             return;
         }
@@ -322,7 +322,7 @@ static void AsyncWorkFn(const napi_env &env, KeyEventMonitorInfo *event, napi_va
 
 void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(reportEvent);
     napi_value resourceName;
     napi_status status = napi_create_string_utf8(reportEvent->env, "AsyncCallback", NAPI_AUTO_LENGTH, &resourceName);

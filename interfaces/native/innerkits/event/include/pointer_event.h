@@ -112,7 +112,7 @@ public:
         AXIS_TYPE_UNKNOWN,
 
         /**
-         * Indicates the vertical scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad,
+         * Indicates the vertical scroll axis. When you scroll the mouse wheel or make certain gestures on the touchpad,
          * the status of the vertical scroll axis changes.
          *
          * @since 9
@@ -120,7 +120,7 @@ public:
         AXIS_TYPE_SCROLL_VERTICAL,
 
         /**
-         * Indicates the horizontal scroll axis. When you scrall the mouse wheel or make certain gestures on the touchpad,
+         * Indicates the horizontal scroll axis. When you scroll the mouse wheel or make certain gestures on the touchpad,
          * the status of the horizontal scroll axis changes.
          *
          * @since 9
@@ -354,15 +354,15 @@ public:
          * @return Returns the x coordinate.
          * @since 9
          */
-        int32_t GetGlobalX() const;
+        int32_t GetDisplayX() const;
 
         /**
          * @brief Sets the x coordinate relative to the upper left corner of the screen.
-         * @param globalX Indicates the x coordinate to set.
+         * @param displayX Indicates the x coordinate to set.
          * @return void
          * @since 9
          */
-        void SetGlobalX(int32_t globalX);
+        void SetDisplayX(int32_t displayX);
 
         /**
          * @brief Obtains the y coordinate relative to the upper left corner of the screen.
@@ -371,22 +371,22 @@ public:
          * @return Returns the y coordinate.
          * @since 9
          */
-        int32_t GetGlobalY() const;
+        int32_t GetDisplayY() const;
 
         /**
          * @brief Sets the y coordinate relative to the upper left corner of the screen.
-         * @param globalY Indicates the y coordinate to set.
+         * @param displayY Indicates the y coordinate to set.
          * @return void
          * @since 9
          */
-        void SetGlobalY(int32_t globalY);
+        void SetDisplayY(int32_t displayY);
 
         /**
          * @brief Obtains the x coordinate of the active window.
          * @return Returns the x coordinate.
          * @since 9
          */
-        int32_t GetLocalX() const;
+        int32_t GetWindowX() const;
 
         /**
          * @brief Sets the x coordinate of the active window.
@@ -394,14 +394,14 @@ public:
          * @return void
          * @since 9
          */
-        void SetLocalX(int32_t x);
+        void SetWindowX(int32_t x);
 
         /**
          * @brief Obtains the y coordinate of the active window.
          * @return Returns the y coordinate.
          * @since 9
          */
-        int32_t GetLocalY() const;
+        int32_t GetWindowY() const;
 
         /**
          * @brief Sets the y coordinate of the active window.
@@ -409,7 +409,7 @@ public:
          * @return void
          * @since 9
          */
-        void SetLocalY(int32_t y);
+        void SetWindowY(int32_t y);
 
         /**
          * @brief Obtains the width of the pressed area.
@@ -447,7 +447,7 @@ public:
          * @return Returns the X coordinate.
          * @since 9
          */
-        int32_t GetToolGlobalX() const;
+        int32_t GetToolDisplayX() const;
 
         /**
          * @brief Sets the X coordinate of the tool area's center point relative to the
@@ -456,7 +456,7 @@ public:
          * @return void
          * @since 9
          */
-        void SetToolGlobalX(int32_t globalX);
+        void SetToolDisplayX(int32_t displayX);
 
         /**
          * @brief Obtains the Y coordinate of the tool area's center point relative to the
@@ -464,7 +464,7 @@ public:
          * @return Returns the Y coordinate.
          * @since 9
          */
-        int32_t GetToolGlobalY() const;
+        int32_t GetToolDisplayY() const;
 
         /**
          * @brief Sets the Y coordinate of the tool area's center point relative to the
@@ -473,7 +473,7 @@ public:
          * @return void
          * @since 9
          */
-        void SetToolGlobalY(int32_t globalY);
+        void SetToolDisplayY(int32_t displayY);
 
         /**
          * @brief Obtains the X coordinate of the tool area's center point relative to the
@@ -481,7 +481,7 @@ public:
          * @return Returns the X coordinate.
          * @since 9
          */
-        int32_t GetToolLocalX() const;
+        int32_t GetToolWindowX() const;
 
         /**
          * @brief Sets the X coordinate of the tool area's center point relative to the
@@ -490,7 +490,7 @@ public:
          * @return void
          * @since 9
          */
-        void SetToolLocalX(int32_t x);
+        void SetToolWindowX(int32_t x);
 
         /**
          * @brief Obtains the Y coordinate of the tool area's center point relative to the
@@ -498,7 +498,7 @@ public:
          * @return Returns the Y coordinate.
          * @since 9
          */
-        int32_t GetToolLocalY() const;
+        int32_t GetToolWindowY() const;
 
         /**
          * @brief Sets the Y coordinate of the tool area's center point relative to the
@@ -507,7 +507,7 @@ public:
          * @return void
          * @since 9
          */
-        void SetToolLocalY(int32_t y);
+        void SetToolWindowY(int32_t y);
 
         /**
          * @brief Obtains the width of the tool area.
@@ -645,6 +645,21 @@ public:
         void SetToolType(int32_t toolType);
 
         /**
+         * @brief 获取当前手指对应的窗口ID
+         * @return Returns the ID of the target window.
+         * @since 9
+         */
+        int32_t GetTargetWindowId() const;
+
+        /**
+         * @brief 设置当前手指对应的窗口ID
+         * @param windowId Indicates the ID of the target window.
+         * @return void
+         * @since 9
+         */
+        void SetTargetWindowId(int32_t windowId);
+
+        /**
          * @brief Writes data to a <b>Parcel</b> object.
          * @param out Indicates the object into which data will be written.
          * @return Returns <b>true</b> if the data is successfully written; returns <b>false</b> otherwise.
@@ -663,18 +678,18 @@ public:
     private:
         int32_t pointerId_ {};
         bool pressed_ { false };
-        int32_t globalX_ {};
-        int32_t globalY_ {};
-        int32_t localX_ {};
-        int32_t localY_ {};
+        int32_t displayX_ {};
+        int32_t displayY_ {};
+        int32_t windowX_ {};
+        int32_t windowY_ {};
         int32_t width_ {};
         int32_t height_ {};
         double  tiltX_ {};
         double  tiltY_ {};
-        int32_t toolGlobalX_ {};
-        int32_t toolGlobalY_ {};
-        int32_t toolLocalX_ {};
-        int32_t toolLocalY_ {};
+        int32_t toolDisplayX_ {};
+        int32_t toolDisplayY_ {};
+        int32_t toolWindowX_ {};
+        int32_t toolWindowY_ {};
         int32_t toolWidth_ {};
         int32_t toolHeight_ {};
         double  pressure_ {};
@@ -683,6 +698,7 @@ public:
         int32_t deviceId_ {};
         int64_t downTime_ {};
         int32_t toolType_ {};
+        int32_t targetWindowId_ { -1 };
     };
 
 public:

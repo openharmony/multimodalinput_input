@@ -23,25 +23,30 @@
 #include <set>
 #include <thread>
 
-#include "nocopyable.h"
-#include "singleton.h"
-
+#include "i_input_event_handler.h"
 #include "key_event.h"
 #include "key_option.h"
 #include "uds_server.h"
 
 namespace OHOS {
 namespace MMI {
-class KeyEventSubscriber : public Singleton<KeyEventSubscriber> {
+class KeyEventSubscriber :  public IInputEventHandler {
 public:
     KeyEventSubscriber() = default;
     ~KeyEventSubscriber() = default;
     DISALLOW_COPY_AND_MOVE(KeyEventSubscriber);
-
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    void HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
             const std::shared_ptr<KeyOption> keyOption);
-    int32_t UnSubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
-    bool SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+    int32_t UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
 private:
     struct Subscriber {
@@ -58,9 +63,10 @@ private:
     void InsertSubScriber(std::shared_ptr<Subscriber> subs);
 
 private:
+    bool SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     bool HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent);
-    bool HandleKeyCanel(const std::shared_ptr<KeyEvent>& keyEvent);
+    bool HandleKeyCancel(const std::shared_ptr<KeyEvent>& keyEvent);
 
     bool IsPreKeysMatch(const std::set<int32_t>& preKeys, const std::vector<int32_t>& pressedKeys) const;
 
@@ -82,8 +88,6 @@ private:
     bool hasEventExecuting { false };
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
 };
-
-#define KeyEventSubscriber_ KeyEventSubscriber::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif  // KEY_EVENT_SUBSCRIBER_H

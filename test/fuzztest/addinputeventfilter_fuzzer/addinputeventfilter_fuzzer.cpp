@@ -28,7 +28,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AddIn
 void AddInputEventFilterFuzzTest(const uint8_t* data, size_t /* size */)
 {
     auto fun = [](std::shared_ptr<PointerEvent> event) ->bool {
-        MMI_HILOGD("add inputevent filter success");
+        MMI_HILOGD("Add inputevent filter success");
         return false;
     };
     InputManager::GetInstance()->AddInputEventFilter(fun);
