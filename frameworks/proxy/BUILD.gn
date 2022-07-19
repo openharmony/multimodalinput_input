@@ -116,7 +116,7 @@ ohos_shared_library("libmmi-client") {
   if (input_enable_mouse) {
     defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
   }
-  if (input_enable_tp) {
+  if (input_enable_touchscreen) {
     defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
   }
 
@@ -265,7 +265,7 @@ ohos_unittest("InputManagerTest") {
   if (input_enable_mouse) {
     defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
   }
-  if (input_enable_tp) {
+  if (input_enable_touchscreen) {
     defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
   }
   if (input_enable_monitor) {
