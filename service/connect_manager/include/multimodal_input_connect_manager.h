@@ -36,7 +36,6 @@ public:
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     int32_t SetPointerVisible(bool visible);
     int32_t IsPointerVisible(bool &visible);
-    int32_t MarkEventProcessed(int32_t eventId);
     int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
         HandleEventType eventType);
     int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType);
