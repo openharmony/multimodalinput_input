@@ -19,7 +19,6 @@
 #include <memory>
 
 #include "nocopyable.h"
-#include "singleton.h"
 
 #include "i_input_event_consumer.h"
 #include "input_handler_type.h"
@@ -30,7 +29,7 @@ class InputMonitorManager {
 public:
     InputMonitorManager() = default;
     DISALLOW_COPY_AND_MOVE(InputMonitorManager);
-
+    ~InputMonitorManager() = default;
 public:
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor);
     void RemoveMonitor(int32_t monitorId);

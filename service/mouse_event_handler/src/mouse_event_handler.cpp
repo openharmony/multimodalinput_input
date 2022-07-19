@@ -46,7 +46,7 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
 
 int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
     CHKPR(pointerEvent_, ERROR_NULL_POINTER);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
@@ -56,13 +56,13 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
     if (currentDisplayId_ == -1) {
         absolutionX_ = -1;
         absolutionY_ = -1;
-        MMI_HILOGI("currentDisplayId_ is -1");
+        MMI_HILOGI("The currentDisplayId_ is -1");
         return RET_ERR;
     }
 
     absolutionX_ += libinput_event_pointer_get_dx(data);
     absolutionY_ += libinput_event_pointer_get_dy(data);
-    WinMgr->UpdateAndAdjustMouseLoction(currentDisplayId_, absolutionX_, absolutionY_);
+    WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
     pointerEvent_->SetTargetDisplayId(currentDisplayId_);
     MMI_HILOGD("Change Coordinate : x:%{public}lf,y:%{public}lf",  absolutionX_, absolutionY_);
     return RET_OK;
@@ -73,10 +73,10 @@ void MouseEventHandler::InitAbsolution()
     if (absolutionX_ != -1 || absolutionY_ != -1 || currentDisplayId_ != -1) {
         return;
     }
-    MMI_HILOGD("init absolution");
+    MMI_HILOGD("Init absolution");
     auto dispalyGroupInfo = WinMgr->GetDisplayGroupInfo();
     if (dispalyGroupInfo.displaysInfo.empty()) {
-        MMI_HILOGI("displayInfo is empty");
+        MMI_HILOGI("The displayInfo is empty");
         return;
     }
     currentDisplayId_ = dispalyGroupInfo.displaysInfo[0].id;
@@ -86,9 +86,9 @@ void MouseEventHandler::InitAbsolution()
 
 int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
-    MMI_HILOGD("current action:%{public}d", pointerEvent_->GetPointerAction());
+    MMI_HILOGD("Current action:%{public}d", pointerEvent_->GetPointerAction());
 
     auto ret = HandleButtonValueInner(data);
     if (ret != RET_OK) {
@@ -110,7 +110,7 @@ int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)
         isPressed_ = true;
         buttonId_ = pointerEvent_->GetButtonId();
     } else {
-        MMI_HILOGE("unknown state, state:%{public}u", state);
+        MMI_HILOGE("Unknown state, state:%{public}u", state);
         return RET_ERR;
     }
     return RET_OK;
@@ -118,7 +118,7 @@ int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)
 
 int32_t MouseEventHandler::HandleButtonValueInner(libinput_event_pointer* data)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
 
     uint32_t button = libinput_event_pointer_get_button(data);
@@ -156,7 +156,7 @@ int32_t MouseEventHandler::HandleButtonValueInner(libinput_event_pointer* data)
             break;
         }
         default: {
-            MMI_HILOGE("unknown btn, btn:%{public}u", button);
+            MMI_HILOGE("Unknown btn, btn:%{public}u", button);
             return RET_ERR;
         }
     }
@@ -165,7 +165,7 @@ int32_t MouseEventHandler::HandleButtonValueInner(libinput_event_pointer* data)
 
 int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
     if (buttonId_ == PointerEvent::BUTTON_NONE && pointerEvent_->GetButtonId() != PointerEvent::BUTTON_NONE) {
         pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
@@ -173,12 +173,12 @@ int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
     if (TimerMgr->IsExist(timerId_)) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
         TimerMgr->ResetTimer(timerId_);
-        MMI_HILOGD("axis update");
+        MMI_HILOGD("Axis update");
     } else {
         static constexpr int32_t timeout = 100;
         std::weak_ptr<MouseEventHandler> weakPtr = shared_from_this();
         timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
-            CALL_LOG_ENTER;
+            CALL_DEBUG_ENTER;
             auto sharedPtr = weakPtr.lock();
             CHKPV(sharedPtr);
             MMI_HILOGD("timer:%{public}d", sharedPtr->timerId_);
@@ -186,11 +186,13 @@ int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
             auto pointerEvent = sharedPtr->GetPointerEvent();
             CHKPV(pointerEvent);
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
-            InputHandler->OnMouseEventEndTimerHandler(pointerEvent);
+            auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+            CHKPV(inputEventNormalizeHandler);
+            inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
         });
 
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
-        MMI_HILOGD("axis begin");
+        MMI_HILOGD("Axis begin");
     }
 
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
@@ -207,14 +209,14 @@ int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
 void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t deviceId,
                                         PointerEvent::PointerItem& pointerItem)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(data);
     auto mouseInfo = WinMgr->GetMouseInfo();
-    MouseState->SetMouseCoords(mouseInfo.globalX, mouseInfo.globalY);
-    pointerItem.SetGlobalX(mouseInfo.globalX);
-    pointerItem.SetGlobalY(mouseInfo.globalY);
-    pointerItem.SetLocalX(0);
-    pointerItem.SetLocalY(0);
+    MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
+    pointerItem.SetDisplayX(mouseInfo.physicalX);
+    pointerItem.SetDisplayY(mouseInfo.physicalY);
+    pointerItem.SetWindowX(0);
+    pointerItem.SetWindowY(0);
     pointerItem.SetPointerId(0);
     pointerItem.SetPressed(isPressed_);
 
@@ -240,7 +242,7 @@ void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t de
 
 int32_t MouseEventHandler::Normalize(struct libinput_event *event)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     auto data = libinput_event_get_pointer_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
@@ -263,7 +265,7 @@ int32_t MouseEventHandler::Normalize(struct libinput_event *event)
             break;
         }
         default: {
-            MMI_HILOGE("unknow type:%{public}d", type);
+            MMI_HILOGE("Unknow type:%{public}d", type);
             return RET_ERR;
         }
     }
@@ -276,25 +278,25 @@ int32_t MouseEventHandler::Normalize(struct libinput_event *event)
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 void MouseEventHandler::HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPV(pointerEvent_);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     InitAbsolution();
     absolutionX_ += offsetX;
     absolutionY_ += offsetY;
-    WinMgr->UpdateAndAdjustMouseLoction(currentDisplayId_, absolutionX_, absolutionY_);
+    WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
 }
 
 void MouseEventHandler::HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     auto mouseInfo = WinMgr->GetMouseInfo();
     CHKPV(pointerEvent_);
-    MouseState->SetMouseCoords(mouseInfo.globalX, mouseInfo.globalY);
-    pointerItem.SetGlobalX(mouseInfo.globalX);
-    pointerItem.SetGlobalY(mouseInfo.globalY);
-    pointerItem.SetLocalX(0);
-    pointerItem.SetLocalY(0);
+    MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
+    pointerItem.SetDisplayX(mouseInfo.physicalX);
+    pointerItem.SetDisplayY(mouseInfo.physicalY);
+    pointerItem.SetWindowX(0);
+    pointerItem.SetWindowY(0);
     pointerItem.SetPointerId(0);
     pointerItem.SetPressed(isPressed_);
 
@@ -318,7 +320,7 @@ void MouseEventHandler::HandlePostMoveMouse(PointerEvent::PointerItem& pointerIt
 
 bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     CHKPF(pointerEvent_);
     bool bHasPoinerDevice = InputDevMgr->HasPointerDevice();
     if (!bHasPoinerDevice) {
@@ -341,18 +343,17 @@ void MouseEventHandler::DumpInner()
 
 void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     PointerEvent::PointerItem item;
-    pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);
     CHKPV(pointerEvent_);
-    mprintf(fd, "---------------------[Mouse Device State Information]--------------------");
+    pointerEvent_->GetPointerItem(pointerEvent_->GetPointerId(), item);
+    mprintf(fd, "Mouse device state information:\t");
     mprintf(fd,
-            "PointerId:%d | SourceType:%s | PointerAction:%s | ButtonId:%d | AgentWindowId:%d | TargetWindowId:%d "
-            "| DownTime:%" PRId64 " | IsPressed:%s | LocalX:%d | LocalY:%d | Width:%d | Height:%d | Pressure:%lf \t",
+            "PointerId:%d | SourceType:%s | PointerAction:%s | WindowX:%d | WindowY:%d | ButtonId:%d "
+            "| AgentWindowId:%d | TargetWindowId:%d | DownTime:%" PRId64 " | IsPressed:%s \t",
             pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
-            pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(), pointerEvent_->GetTargetWindowId(),
-            item.GetDownTime(), item.IsPressed() ? "true" : "false", item.GetLocalX(),  item.GetLocalY(),
-            item.GetWidth(), item.GetHeight(), item.GetPressure());
+            item.GetWindowX(), item.GetWindowY(), pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(),
+            pointerEvent_->GetTargetWindowId(), item.GetDownTime(), item.IsPressed() ? "true" : "false");
 }
 } // namespace MMI
 } // namespace OHOS

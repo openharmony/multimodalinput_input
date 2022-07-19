@@ -62,16 +62,31 @@ config("multimodalinput_mmi_public_config") {
 
 group("multimodalinput_mmi_packages") {
   deps = [
-    "frameworks/napi/input_consumer:inputconsumer",
     "frameworks/napi/input_device:inputdevice",
-    "frameworks/napi/input_event_client:inputeventclient",
-    "frameworks/napi/input_monitor:inputmonitor",
     "frameworks/napi/key_code:keycode",
-    "frameworks/napi/mouse:mouse",
+    "frameworks/napi/key_event:keyevent",
+    "frameworks/napi/mouse_event:mouseevent",
+    "frameworks/napi/touch_event:touchevent",
     "frameworks/proxy:libmmi-client",
     "service:libmmi-server",
     "tools/inject_event:uinput",
   ]
+
+  if (input_enable_distributed) {
+    deps += [ "frameworks/napi/distributed_input:distributedinput" ]
+  }
+  if (mmi_enable_monitor) {
+    deps += [ "frameworks/napi/input_monitor:inputmonitor" ]
+  }
+  if (mmi_enable_mouse) {
+    deps += [ "frameworks/napi/mouse:mouse" ]
+  }
+  if (mmi_enable_keyboard) {
+    deps += [
+      "frameworks/napi/input_consumer:inputconsumer",
+      "frameworks/napi/input_event_client:inputeventclient",
+    ]
+  }
 }
 
 group("mmi_debug_tools") {
@@ -84,7 +99,7 @@ group("mmi_debug_tools") {
     "patch/diff_libinput_mmi:libinput-record-mmi",
     "patch/diff_libinput_mmi:libinput-tablet-mmi",
     "tools/event_inject:mmi-event-injection",
-    "tools/virtual_device_manager:mmi-virtual-device-manager",
+    "tools/vuinput:vuinput",
     "//third_party/eudev:udevadm",
   ]
 }
@@ -93,7 +108,7 @@ group("ut_mmi_debug_tools") {
   testonly = true
   deps = [
     "tools/event_inject:ut-event-injection-out",
-    "tools/virtual_device_manager:ut-virtual-device-out",
+    "tools/vuinput:ut-virtual-device-out",
   ]
 }
 

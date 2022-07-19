@@ -607,7 +607,7 @@ const char* KeyEvent::ActionToString(int32_t action)
 
 const char* KeyEvent::KeyCodeToString(int32_t keyCode)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     static const std::map <int32_t, std::string> keyCodeToString = {
         {KEYCODE_FN, "KEYCODE_FN"},
         {KEYCODE_UNKNOWN, "KEYCODE_UNKNOWN"},
@@ -1019,7 +1019,7 @@ std::shared_ptr<KeyEvent> KeyEvent::Clone(std::shared_ptr<KeyEvent> keyEvent)
 
 bool KeyEvent::IsValidKeyItem() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t sameKeyCodeNum = 0;
     int32_t keyCode = GetKeyCode();
     int32_t action = GetKeyAction();
@@ -1032,20 +1032,20 @@ bool KeyEvent::IsValidKeyItem() const
             }
         }
         if (it->GetKeyCode() <= KEYCODE_UNKNOWN) {
-            MMI_HILOGE("keyCode is invalid");
+            MMI_HILOGE("The keyCode is invalid");
             return false;
         }
         if (it->GetDownTime() <= 0) {
-            MMI_HILOGE("downtime is invalid");
+            MMI_HILOGE("The downtime is invalid");
             return false;
         }
         if (action != KEY_ACTION_UP && it->IsPressed() == false) {
-            MMI_HILOGE("isPressed is invalid");
+            MMI_HILOGE("The isPressed is invalid");
             return false;
         }
         if (action == KEY_ACTION_UP && it->IsPressed() == false) {
             if (it->GetKeyCode() != keyCode) {
-                MMI_HILOGE("keyCode is invalid when isPressed is false");
+                MMI_HILOGE("The keyCode is invalid when isPressed is false");
                 return false;
             }
         }
@@ -1068,7 +1068,7 @@ bool KeyEvent::IsValidKeyItem() const
 
 bool KeyEvent::IsValid() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t keyCode = GetKeyCode();
     if (keyCode <= KEYCODE_UNKNOWN) {
         MMI_HILOGE("KeyCode_ is invalid");

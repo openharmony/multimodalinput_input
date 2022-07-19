@@ -59,7 +59,7 @@ void InjectionEventDispatch::InitManageFunction()
     };
 
     for (auto &it : funs) {
-        if (!RegistInjectEvent(it)) {
+        if (!RegisterInjectEvent(it)) {
             MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
             continue;
         }
@@ -68,14 +68,14 @@ void InjectionEventDispatch::InitManageFunction()
 
 int32_t InjectionEventDispatch::OnJson()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (injectArgvs_.size() < ARGVS_CODE_INDEX) {
-        MMI_HILOGE("path is error");
+        MMI_HILOGE("Path is error");
         return RET_ERR;
     }
     std::string jsonBuf = ReadJsonFile(injectArgvs_.at(JSON_FILE_PATH_INDEX));
     if (jsonBuf.empty()) {
-        MMI_HILOGE("read file failed");
+        MMI_HILOGE("Read file failed");
         return RET_ERR;
     }
     bool logStatus = false;
@@ -92,11 +92,11 @@ std::string InjectionEventDispatch::GetFunId() const
     return funId_;
 }
 
-bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const std::vector<std::string> &argv)
+bool InjectionEventDispatch::VerifyArgvs(const int32_t &argc, const std::vector<std::string> &argv)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (argc < ARGV_VALID || argv.at(ARGVS_TARGET_INDEX).empty()) {
-        MMI_HILOGE("Invaild Input Para, Plase Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
+        MMI_HILOGE("Invalid Input Para, Please Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
         return false;
     }
 
@@ -122,15 +122,15 @@ bool InjectionEventDispatch::VirifyArgvs(const int32_t &argc, const std::vector<
 
 void InjectionEventDispatch::Run()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     std::string id = GetFunId();
     auto fun = GetFun(id);
     CHKPV(fun);
     auto ret = (*fun)();
     if (ret == RET_OK) {
-        MMI_HILOGI("inject function success id:%{public}s", id.c_str());
+        MMI_HILOGI("Inject function success id:%{public}s", id.c_str());
     } else {
-        MMI_HILOGE("inject function failed id:%{public}s", id.c_str());
+        MMI_HILOGE("Inject function failed id:%{public}s", id.c_str());
     }
 }
 
@@ -141,16 +141,16 @@ int32_t InjectionEventDispatch::ExecuteFunction(std::string funId)
     }
     auto fun = GetFun(funId);
     if (!fun) {
-        MMI_HILOGE("event injection Unknown fuction id:%{public}s", funId.c_str());
+        MMI_HILOGE("Event injection Unknown fuction id:%{public}s", funId.c_str());
         return false;
     }
     MMI_HILOGI("Inject tools into function:%{public}s", funId.c_str());
     int32_t ret = RET_ERR;
     ret = (*fun)();
     if (ret == RET_OK) {
-        MMI_HILOGI("inject function success id:%{public}s", funId.c_str());
+        MMI_HILOGI("Inject function success id:%{public}s", funId.c_str());
     } else {
-        MMI_HILOGE("inject function failed id:%{public}s", funId.c_str());
+        MMI_HILOGE("Inject function failed id:%{public}s", funId.c_str());
     }
 
     return ret;
@@ -167,7 +167,7 @@ int32_t InjectionEventDispatch::OnHelp()
 int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText) const
 {
     if (deviceNameText.empty()) {
-        MMI_HILOGE("deviceNameText is empty");
+        MMI_HILOGE("The deviceNameText is empty");
         return RET_ERR;
     }
     for (const auto &item : allDevices_) {
@@ -231,15 +231,15 @@ bool InjectionEventDispatch::CheckEventValue(const std::string& inputType, const
     const std::string& inputValue)
 {
     if (!(CheckType(inputType))) {
-        MMI_HILOGE("input error in type, type:%{public}s", inputType.c_str());
+        MMI_HILOGE("Input error in type, type:%{public}s", inputType.c_str());
         return false;
     }
     if (!(CheckCode(inputCode))) {
-        MMI_HILOGE("input error in code, code:%{public}s", inputCode.c_str());
+        MMI_HILOGE("Input error in code, code:%{public}s", inputCode.c_str());
         return false;
     }
     if (!(CheckValue(inputValue))) {
-        MMI_HILOGE("input error in value, value:%{public}s", inputValue.c_str());
+        MMI_HILOGE("Input error in value, value:%{public}s", inputValue.c_str());
         return false;
     }
     return true;
@@ -253,17 +253,17 @@ int32_t InjectionEventDispatch::OnSendEvent()
     }
     std::string deviceNode = injectArgvs_[SEND_EVENT_DEV_NODE_INDEX];
     if (deviceNode.empty()) {
-        MMI_HILOGE("device node:%{public}s is not exit", deviceNode.c_str());
+        MMI_HILOGE("Device node:%{public}s is not existent", deviceNode.c_str());
         return RET_ERR;
     }
     char realPath[PATH_MAX] = {};
     if (realpath(deviceNode.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("path is error, path:%{public}s", deviceNode.c_str());
+        MMI_HILOGE("Path is error, path:%{public}s", deviceNode.c_str());
         return RET_ERR;
     }
     int32_t fd = open(realPath, O_RDWR);
     if (fd < 0) {
-        MMI_HILOGE("open device node:%{public}s failed, errCode:%{public}d", deviceNode.c_str(), FILE_OPEN_FAIL);
+        MMI_HILOGE("Open device node:%{public}s failed, errCode:%{public}d", deviceNode.c_str(), FILE_OPEN_FAIL);
         return RET_ERR;
     }
     struct timeval tm;
@@ -280,7 +280,7 @@ int32_t InjectionEventDispatch::OnSendEvent()
     event.value = static_cast<int32_t>(std::stoi(injectArgvs_[SEND_EVENT_VALUE_INDEX]));
     int32_t ret = write(fd, &event, sizeof(event));
     if (ret != sizeof(event)) {
-        MMI_HILOGE("send event to device node faild.");
+        MMI_HILOGE("Send event to device node failed.");
         return RET_ERR;
     }
     if (fd >= 0) {

@@ -28,8 +28,15 @@
 
 #include "if_mmi_client.h"
 #include "input_device_impl.h"
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+#include "input_interceptor_manager.h"
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
+#endif // OHOS_BUILD_ENABLE_MONITOR
+#include "i_anr_observer.h"
 #include "i_input_event_consumer.h"
+#include "key_option.h"
 #include "mmi_event_handler.h"
 #include "pointer_event.h"
 
@@ -46,13 +53,22 @@ public:
     EventHandlerPtr GetCurrentEventHandler() const;
     
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    int32_t SubscribeKeyEvent(
+        std::shared_ptr<KeyOption> keyOption,
+        std::function<void(std::shared_ptr<KeyEvent>)> callback
+    );
+    void UnsubscribeKeyEvent(int32_t subscriberId);
     int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);
 
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     int32_t PackDisplayData(NetPacket &pkt);
 
     int32_t AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor);
@@ -71,12 +87,19 @@ public:
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
 
-    void SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
+    int32_t RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener);
+    int32_t UnregisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener = nullptr);
+    int32_t GetDeviceIds(std::function<void(std::vector<int32_t>&)> callback);
+    int32_t GetDevice(int32_t deviceId, std::function<void(std::shared_ptr<InputDevice>)> callback);
+    int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,
         std::function<void(std::vector<bool>&)> callback);
-    void GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
+    int32_t GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
 
     int32_t SetPointerVisible(bool visible);
     bool IsPointerVisible();
+
+    void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
+    void OnAnr(int32_t pid);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
@@ -84,20 +107,32 @@ private:
     void PrintDisplayInfo();
     void SendDisplayInfo();
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<KeyEvent> keyEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    void OnAnrTask(std::vector<std::shared_ptr<IAnrObserver>> observers, int32_t pid);
     void OnThread();
 
 private:
     sptr<EventFilterService> eventFilterService_ {nullptr};
     std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
+    std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
 
     DisplayGroupInfo displayGroupInfo_;
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     InputMonitorManager monitorManager_;
+#endif // OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    InputInterceptorManager interceptorManager_;
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 
     std::mutex mtx_;
+    std::mutex handleMtx_;
     std::condition_variable cv_;
     std::thread ehThread_;
     EventHandlerPtr eventHandler_  = nullptr;

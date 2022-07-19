@@ -29,6 +29,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
+const std::string FOUNDATION = "foundation";
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 } // namespace
 
@@ -51,7 +52,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         return false;
     }
     if (fd_ < 0) {
-        MMI_HILOGE("fd_ is less than 0");
+        MMI_HILOGE("The fd_ is less than 0");
         return false;
     }
 
@@ -64,7 +65,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         auto count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGW("continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
+                MMI_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
                 usleep(SEND_RETRY_SLEEP_TIME);
                 continue;
             }
@@ -87,8 +88,8 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
 
 void UDSSession::Close()
 {
-    CALL_LOG_ENTER;
-    MMI_HILOGD("enter fd_:%{public}d.", fd_);
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("Enter fd_:%{public}d.", fd_);
     if (fd_ >= 0) {
         close(fd_);
         fd_ = -1;
@@ -123,16 +124,20 @@ bool UDSSession::SendMsg(NetPacket& pkt) const
     return SendMsg(buf.Data(), buf.Size());
 }
 
-void UDSSession::AddEvent(int32_t id, int64_t time)
+void UDSSession::SaveANREvent(int32_t id, int64_t time)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
+    if (GetTokenType() == TokenType::TOKEN_NATIVE || GetProgramName() == FOUNDATION) {
+        MMI_HILOGD("Is native event");
+        return;
+    }
     EventTime eventTime = {id, time};
     events_.push_back(eventTime);
 }
 
 void UDSSession::DelEvents(int32_t id)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t count = 0;
     for (auto &item : events_) {
         ++count;
@@ -142,17 +147,26 @@ void UDSSession::DelEvents(int32_t id)
             break;
         }
     }
+    if (events_.empty()) {
+        isANRProcess_ = false;
+        return;
+    }
+    int64_t endTime = 0;
+    if (!AddInt64(events_.begin()->eventTime, INPUT_UI_TIMEOUT_TIME, endTime)) {
+        MMI_HILOGE("The addition of endTime overflows");
+        return;
+    }
     auto currentTime = GetSysClockTime();
-    if (events_.empty() || (currentTime < (events_.begin()->eventTime + INPUT_UI_TIMEOUT_TIME))) {
+    if (currentTime < endTime) {
         isANRProcess_ = false;
     }
 }
 
-int64_t UDSSession::GetEarlistEventTime() const
+int64_t UDSSession::GetEarliestEventTime() const
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (events_.empty()) {
-        MMI_HILOGD("events_ is empty");
+        MMI_HILOGD("The events_ is empty");
         return 0;
     }
     return events_.begin()->eventTime;
@@ -161,20 +175,10 @@ int64_t UDSSession::GetEarlistEventTime() const
 bool UDSSession::IsEventQueueEmpty()
 {
     if (events_.empty()) {
-        MMI_HILOGD("events_ is empty");
+        MMI_HILOGD("The events_ is empty");
         return true;
     }
     return false;
-}
-
-void UDSSession::AddPermission(bool hasPermission)
-{
-    hasPermission_ = hasPermission;
-}
-
-bool UDSSession::HasPermission()
-{
-    return hasPermission_;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -24,14 +24,14 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Proce
 int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const DeviceItem& originalEvent,
     InputEventArray& inputEventArray)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (originalEvent.events.empty()) {
-        MMI_HILOGE("manage game pad array faild, inputData is empty");
+        MMI_HILOGE("Manage game pad array failed, inputData is empty");
         return RET_ERR;
     }
     std::vector<DeviceEvent> inputData = originalEvent.events;
     if (inputData.empty()) {
-        MMI_HILOGE("manage finger array faild, inputData is empty");
+        MMI_HILOGE("Manage finger array failed, inputData is empty");
         return RET_ERR;
     }
     TransformPadEventToInputEvent(inputData, inputEventArray);
@@ -43,7 +43,7 @@ void ProcessingGamePadDevice::TransformPadEventToInputEvent(const std::vector<De
 {
     for (const auto &item : inputData) {
         if (item.eventType.empty()) {
-            MMI_HILOGW("not find eventType");
+            MMI_HILOGW("Not find eventType");
             return;
         }
         if (item.eventType == "KEY_EVENT_PRESS") {
@@ -52,14 +52,14 @@ void ProcessingGamePadDevice::TransformPadEventToInputEvent(const std::vector<De
             TransformKeyReleaseEvent(item, inputEventArray);
         } else if (item.eventType == "KEY_EVENT_CLICK") {
             TransformKeyClickEvent(item, inputEventArray);
-        } else if (item.eventType == "DERECTION_KEY") {
-            TransformDerectionKeyEvent(item, inputEventArray);
+        } else if (item.eventType == "DIRECTION_KEY") {
+            TransformDirectionKeyEvent(item, inputEventArray);
         } else if (item.eventType == "ROCKER_1") {
             TransformRocker1Event(item, inputEventArray);
         } else if (item.eventType == "ROCKER_2") {
             TransformRocker2Event(item, inputEventArray);
         } else {
-            MMI_HILOGW("json file format error");
+            MMI_HILOGW("Format json file error");
         }
     }
 }
@@ -90,11 +90,11 @@ void ProcessingGamePadDevice::TransformKeyClickEvent(const DeviceEvent& padEvent
 void ProcessingGamePadDevice::TransformRocker1Event(const DeviceEvent& padEvent, InputEventArray& inputEventArray)
 {
     if (padEvent.direction.empty()) {
-        MMI_HILOGW("not find direction");
+        MMI_HILOGW("Not find direction");
         return;
     }
     if (padEvent.event.empty()) {
-        MMI_HILOGW("not find event");
+        MMI_HILOGW("Not find event");
         return;
     }
     std::string direction = padEvent.direction;
@@ -116,7 +116,7 @@ void ProcessingGamePadDevice::TransformRocker1Event(const DeviceEvent& padEvent,
             value = item;
             SetEvAbsZ(inputEventArray, 0, value);
         } else {
-            MMI_HILOGW("unknown direction move type");
+            MMI_HILOGW("Unknown direction move type");
         }
         SetSynReport(inputEventArray);
     }
@@ -132,7 +132,7 @@ void ProcessingGamePadDevice::TransformRocker1Event(const DeviceEvent& padEvent,
     } else if (direction == "lt") {
         SetEvAbsZ(inputEventArray, 0, 0);
     } else {
-        MMI_HILOGW("unknown direction type");
+        MMI_HILOGW("Unknown direction type");
     }
     SetSynReport(inputEventArray);
 }
@@ -140,11 +140,11 @@ void ProcessingGamePadDevice::TransformRocker1Event(const DeviceEvent& padEvent,
 void ProcessingGamePadDevice::TransformRocker2Event(const DeviceEvent& padEvent, InputEventArray& inputEventArray)
 {
     if (padEvent.direction.empty()) {
-        MMI_HILOGW("not find direction");
+        MMI_HILOGW("Not find direction");
         return;
     }
     if (padEvent.event.empty()) {
-        MMI_HILOGW("not find event");
+        MMI_HILOGW("Not find event");
         return;
     }
     std::string direction = padEvent.direction;
@@ -166,7 +166,7 @@ void ProcessingGamePadDevice::TransformRocker2Event(const DeviceEvent& padEvent,
             value = item;
             SetEvAbsRz(inputEventArray, 0, value);
         } else {
-            MMI_HILOGW("unknown direction move type");
+            MMI_HILOGW("Unknown direction move type");
         }
         SetSynReport(inputEventArray);
     }
@@ -182,15 +182,15 @@ void ProcessingGamePadDevice::TransformRocker2Event(const DeviceEvent& padEvent,
     } else if (direction == "rt") {
         SetEvAbsRz(inputEventArray, 0, 0);
     } else {
-        MMI_HILOGW("unknown direction type");
+        MMI_HILOGW("Unknown direction type");
     }
     SetSynReport(inputEventArray);
 }
 
-void ProcessingGamePadDevice::TransformDerectionKeyEvent(const DeviceEvent& padEvent, InputEventArray& inputEventArray)
+void ProcessingGamePadDevice::TransformDirectionKeyEvent(const DeviceEvent& padEvent, InputEventArray& inputEventArray)
 {
     if (padEvent.direction.empty()) {
-        MMI_HILOGW("not find direction");
+        MMI_HILOGW("Not find direction");
         return;
     }
     std::string direction = padEvent.direction;
@@ -215,6 +215,6 @@ void ProcessingGamePadDevice::TransformDerectionKeyEvent(const DeviceEvent& padE
         SetEvAbsHat0Y(inputEventArray, padEvent.blockTime, 0);
         SetSynReport(inputEventArray);
     }  else {
-        MMI_HILOGW("unknown direction type");
+        MMI_HILOGW("Unknown direction type");
     }
 }

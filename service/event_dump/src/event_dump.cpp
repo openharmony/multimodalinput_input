@@ -33,7 +33,6 @@
 #include "key_event_subscriber.h"
 #include "mouse_event_handler.h"
 #include "securec.h"
-#include "uds_server.h"
 #include "util.h"
 #include "util_ex.h"
 
@@ -66,7 +65,7 @@ void ChkConfig(int32_t fd)
 
 void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     int32_t optionIndex = 0;
     struct option dumpOptions[] = {
         {"help", no_argument, 0, 'h'},
@@ -74,10 +73,18 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         {"devicelist", no_argument, 0, 'l'},
         {"windows", no_argument, 0, 'w'},
         {"udsserver", no_argument, 0, 'u'},
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         {"subscriber", no_argument, 0, 's'},
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_MONITOR
         {"monitor", no_argument, 0, 'o'},
+#endif // OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
         {"interceptor", no_argument, 0, 'i'},
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_POINTER
         {"mouse", no_argument, 0, 'm'},
+#endif // OHOS_BUILD_ENABLE_POINTER
         {NULL, 0, 0, 0}
     };
     char **argv = new char *[args.size()];
@@ -111,25 +118,40 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
             }
             case 'u': {
                 auto udsServer = InputHandler->GetUDSServer();
+                CHKPV(udsServer);
                 udsServer->Dump(fd, args);
                 break;
             }
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
             case 's': {
-                KeyEventSubscriber_.Dump(fd, args);
+                auto subscriberHandler = InputHandler->GetSubscriberHandler();
+                CHKPV(subscriberHandler);
+                subscriberHandler->Dump(fd, args);
                 break;
             }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_MONITOR
             case 'o': {
-                InputHandlerManagerGlobal::GetInstance().Dump(fd, args);
+                auto monitorHandler = InputHandler->GetMonitorHandler();
+                CHKPV(monitorHandler);
+                monitorHandler->Dump(fd, args);
                 break;
             }
+#endif // OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
             case 'i': {
-                InterceptorHandlerGlobal::GetInstance()->Dump(fd, args);
+                auto interceptorHandler = InputHandler->GetInterceptorHandler();
+                CHKPV(interceptorHandler);
+                interceptorHandler->Dump(fd, args);
                 break;
             }
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_POINTER
             case 'm': {
                 MouseEventHdr->Dump(fd, args);
                 break;
             }
+#endif // OHOS_BUILD_ENABLE_POINTER
             default: {
                 mprintf(fd, "cmd param is error\n");
                 DumpHelp(fd);
@@ -152,53 +174,15 @@ void EventDump::DumpEventHelp(int32_t fd, const std::vector<std::string> &args)
 void EventDump::DumpHelp(int32_t fd)
 {
     mprintf(fd, "Usage:\t");
-    mprintf(fd, "      -h: dump help\t");
-    mprintf(fd, "      -d: dump the device information\t");
-    mprintf(fd, "      -l: dump the device list information\t");
-    mprintf(fd, "      -w: dump the windows information\t");
-    mprintf(fd, "      -u: dump the uds_server information\t");
-    mprintf(fd, "      -o: dump the monitor information\t");
-    mprintf(fd, "      -s: dump the subscriber information\t");
-    mprintf(fd, "      -i: dump the interceptor information\t");
-    mprintf(fd, "      -m: dump the mouse information\t");
-}
-
-void EventDump::Init(UDSServer& uds)
-{
-    udsServer_ = &uds;
-}
-
-void EventDump::InsertDumpInfo(const std::string& str)
-{
-    if (str.empty()) {
-        MMI_HILOGE("The in parameter str is empty, errCode:%{public}d", PARAM_INPUT_INVALID);
-        return;
-    }
-    std::lock_guard<std::mutex> guard(mu_);
-
-    static constexpr int32_t vecMaxSize = 300;
-    if (dumpInfo_.size() > vecMaxSize) {
-        dumpInfo_.erase(dumpInfo_.begin());
-    }
-    dumpInfo_.push_back(str);
-}
-
-void EventDump::InsertFormat(std::string str, ...)
-{
-    if (str.empty()) {
-        MMI_HILOGE("The in parameter str is empty, errCode:%{public}d", PARAM_INPUT_INVALID);
-        return;
-    }
-    va_list args;
-    va_start(args, str);
-    char buf[MAX_PACKET_BUF_SIZE] = {};
-    if (vsnprintf_s(buf, MAX_PACKET_BUF_SIZE, MAX_PACKET_BUF_SIZE - 1, str.c_str(), args) == -1) {
-        MMI_HILOGE("vsnprintf_s error");
-        va_end(args);
-        return;
-    }
-    va_end(args);
-    InsertDumpInfo(buf);
+    mprintf(fd, "      -h, --help: dump help\t");
+    mprintf(fd, "      -d, --device: dump the device information\t");
+    mprintf(fd, "      -l, --devicelist: dump the device list information\t");
+    mprintf(fd, "      -w, --windows,: dump the windows information\t");
+    mprintf(fd, "      -u, --udsserver: dump the uds_server information\t");
+    mprintf(fd, "      -o, --monitor: dump the monitor information\t");
+    mprintf(fd, "      -s, --subscriber: dump the subscriber information\t");
+    mprintf(fd, "      -i, --interceptor: dump the interceptor information\t");
+    mprintf(fd, "      -m, --mouse: dump the mouse information\t");
 }
 } // namespace MMI
 } // namespace OHOS

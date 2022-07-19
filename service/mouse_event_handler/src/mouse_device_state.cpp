@@ -32,18 +32,18 @@ MouseDeviceState::~MouseDeviceState() {}
 
 int32_t MouseDeviceState::GetMouseCoordsX() const
 {
-    return mouseCoord_.globleX;
+    return mouseCoord_.physicalX;
 }
 
 int32_t MouseDeviceState::GetMouseCoordsY() const
 {
-    return mouseCoord_.globleY;
+    return mouseCoord_.physicalY;
 }
 
 void MouseDeviceState::SetMouseCoords(const int32_t x, const int32_t y)
 {
-    mouseCoord_.globleX = x;
-    mouseCoord_.globleY = y;
+    mouseCoord_.physicalX = x;
+    mouseCoord_.physicalY = y;
 }
 
 bool MouseDeviceState::IsLeftBtnPressed()

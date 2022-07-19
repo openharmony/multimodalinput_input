@@ -24,17 +24,17 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSCl
 
 UDSClient::UDSClient()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 }
 
 UDSClient::~UDSClient()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
 }
 
 int32_t UDSClient::ConnectTo()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (Socket() < 0) {
         MMI_HILOGE("Socket failed");
         return RET_ERR;
@@ -51,7 +51,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
         return false;
     }
     if (fd_ < 0) {
-        MMI_HILOGE("fd_ is less than 0");
+        MMI_HILOGE("The fd_ is less than 0");
         return false;
     }
 
@@ -64,7 +64,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
         auto count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGW("continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
+                MMI_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
                 usleep(SEND_RETRY_SLEEP_TIME);
                 continue;
             }
@@ -98,7 +98,7 @@ bool UDSClient::SendMsg(const NetPacket& pkt) const
 
 bool UDSClient::StartClient(MsgClientFunCallback fun)
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     if (isRunning_ || isConnected_) {
         MMI_HILOGE("Client is connected or started");
         return false;
@@ -113,7 +113,7 @@ bool UDSClient::StartClient(MsgClientFunCallback fun)
 
 void UDSClient::Stop()
 {
-    CALL_LOG_ENTER;
+    CALL_DEBUG_ENTER;
     isExit = true;
     isRunning_ = false;
     Close();
