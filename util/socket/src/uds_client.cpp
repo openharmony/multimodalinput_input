@@ -51,7 +51,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
         return false;
     }
     if (fd_ < 0) {
-        MMI_HILOGE("fd_ is less than 0");
+        MMI_HILOGE("The fd_ is less than 0");
         return false;
     }
 
@@ -64,7 +64,7 @@ bool UDSClient::SendMsg(const char *buf, size_t size) const
         auto count = send(fd_, &buf[idx], remSize, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGW("continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
+                MMI_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
                 usleep(SEND_RETRY_SLEEP_TIME);
                 continue;
             }

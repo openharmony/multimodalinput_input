@@ -28,6 +28,9 @@
 
 #include "if_mmi_client.h"
 #include "input_device_impl.h"
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+#include "input_interceptor_manager.h"
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -51,9 +54,9 @@ public:
     
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     int32_t SubscribeKeyEvent(
-		std::shared_ptr<KeyOption> keyOption,
+        std::shared_ptr<KeyOption> keyOption,
         std::function<void(std::shared_ptr<KeyEvent>)> callback
-	);
+    );
     void UnsubscribeKeyEvent(int32_t subscriberId);
     int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);
 
@@ -124,6 +127,9 @@ private:
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     InputMonitorManager monitorManager_;
 #endif // OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    InputInterceptorManager interceptorManager_;
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 
     std::mutex mtx_;
     std::mutex handleMtx_;

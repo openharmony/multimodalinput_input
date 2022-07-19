@@ -27,7 +27,7 @@ int32_t ProcessingPadDevice::TransformJsonDataToInputData(const DeviceItem& fing
     CALL_DEBUG_ENTER;
     std::vector<DeviceEvent> inputData = fingerEventArrays.events;
     if (inputData.empty()) {
-        MMI_HILOGE("manage finger array failed, inputData is empty.");
+        MMI_HILOGE("Manage finger array failed, inputData is empty.");
         return RET_ERR;
     }
     std::vector<PadEvent> padEventArray;
@@ -51,7 +51,7 @@ void ProcessingPadDevice::TransformPadEventToInputEvent(const std::vector<PadEve
         } else if (item.eventType == "RING_EVENT") {
             TransformRingEvent(item, inputEventArray);
         } else {
-            MMI_HILOGW("json file format error");
+            MMI_HILOGW("Json file format error");
         }
     }
 }

@@ -36,7 +36,6 @@ public:
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) = 0;
     virtual int32_t SetPointerVisible(bool visible) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
-    virtual int32_t MarkEventProcessed(int32_t eventId) = 0;
     virtual int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys) = 0;
     virtual int32_t GetDeviceIds(int32_t userData) = 0;
     virtual int32_t GetDevice(int32_t userData, int32_t id) = 0;
@@ -58,7 +57,6 @@ public:
         ADD_INPUT_EVENT_FILTER = 1,
         SET_POINTER_VISIBLE = 2,
         IS_POINTER_VISIBLE = 3,
-        MARK_EVENT_PROCESSED = 4,
         SUBSCRIBE_KEY_EVENT = 6,
         UNSUBSCRIBE_KEY_EVENT = 7,
         ADD_INPUT_HANDLER = 8,

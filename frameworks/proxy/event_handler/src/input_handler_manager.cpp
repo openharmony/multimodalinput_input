@@ -74,7 +74,7 @@ void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
     MMI_HILOGD("Mark consumed state, monitor:%{public}d,event:%{public}d", monitorId, eventId);
     int32_t ret = MultimodalInputConnMgr->MarkEventConsumed(monitorId, eventId);
     if (ret != 0) {
-        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
 }
 
@@ -103,7 +103,7 @@ void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handle
 {
     int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerId, handlerType, eventType);
     if (ret != 0) {
-        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
 }
 
@@ -128,7 +128,7 @@ void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType h
     MMI_HILOGD("Remove handler:%{public}d from server", handlerId);
     int32_t ret = MultimodalInputConnMgr->RemoveInputHandler(handlerId, handlerType);
     if (ret != 0) {
-        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
 }
 
@@ -174,7 +174,7 @@ void InputHandlerManager::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> co
     CHKPV(consumer);
     CHKPV(keyEvent);
     consumer->OnInputEvent(keyEvent);
-    MMI_HILOGD("key event callback id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
+    MMI_HILOGD("Key event callback id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
 }
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)
@@ -187,9 +187,9 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEve
     CHKPV(consumer);
     if (!PostTask(handlerId,
         std::bind(&InputHandlerManager::OnKeyEventTask, this, consumer, handlerId, keyEvent))) {
-        MMI_HILOGE("post task failed");
+        MMI_HILOGE("Post task failed");
     }
-    MMI_HILOGD("key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
+    MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
@@ -201,7 +201,7 @@ void InputHandlerManager::OnPointerEventTask(std::shared_ptr<IInputEventConsumer
     CHKPV(consumer);
     CHKPV(pointerEvent);
     consumer->OnInputEvent(pointerEvent);
-    MMI_HILOGD("pointer event callback id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
+    MMI_HILOGD("Pointer event callback id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
 }
 
 void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
@@ -214,9 +214,9 @@ void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<Pointe
     CHKPV(consumer);
     if (!PostTask(handlerId,
         std::bind(&InputHandlerManager::OnPointerEventTask, this, consumer, handlerId, pointerEvent))) {
-        MMI_HILOGE("post task failed");
+        MMI_HILOGE("Post task failed");
     }
-    MMI_HILOGD("pointer event id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
+    MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
