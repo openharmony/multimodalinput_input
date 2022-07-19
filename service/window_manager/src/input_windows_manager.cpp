@@ -345,7 +345,7 @@ void InputWindowsManager::AdjustDisplayCoordinate(
     if (displayInfo.direction == Direction0 || displayInfo.direction == Direction180) {
         width = displayInfo.width;
         height = displayInfo.height;
-    } else (displayInfo.direction == Direction90 || displayInfo.direction == Direction270) {
+    } else {
         height = displayInfo.width;
         width = displayInfo.height;
     }

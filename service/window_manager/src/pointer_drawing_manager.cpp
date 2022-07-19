@@ -105,7 +105,7 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
         if (physicalY > (displayHeight_ - IMAGE_HEIGHT / cursorUnit)) {
             physicalY = displayHeight_ - IMAGE_HEIGHT / cursorUnit;
         }
-    } else (direction_ == Direction90 || direction_ == Direction270) {
+    } else {
         if (physicalX > (displayHeight_ - IMAGE_HEIGHT / cursorUnit)) {
             physicalX = displayHeight_ - IMAGE_HEIGHT / cursorUnit;
         }
