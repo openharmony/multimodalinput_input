@@ -30,6 +30,7 @@ declare_args() {
   input_enable_keyboard = true
   input_enable_mouse = true
   input_enable_touchscreen = true
+  input_enable_input_device = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -48,3 +49,4 @@ print("input_enable_distributed = ${input_enable_distributed}")
 print("input_enable_keyboard = ${input_enable_keyboard}")
 print("input_enable_mouse = ${input_enable_mouse}")
 print("input_enable_touchscreen = ${input_enable_touchscreen}")
+print("input_enable_input_device = ${input_enable_input_device}")

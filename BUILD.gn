@@ -93,6 +93,9 @@ group("input_jsapi_group") {
         "frameworks/napi/input_event_client:inputeventclient",
       ]
     }
+    if (input_enable_input_device) {
+      deps += [ "frameworks/napi/input_device:inputdevice" ]
+    }
   }
 }
 
