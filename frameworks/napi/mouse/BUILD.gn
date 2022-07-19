@@ -23,11 +23,11 @@ config("libmouse_config") {
   ]
 
   defines = [ "OHOS_BUILD" ]
-  if (input_enable_libinput) {
+  if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
-  if (input_enable_hdf) {
+  if (input_feature_hdf) {
     defines += [ "OHOS_BUILD_HDF" ]
   }
 }

@@ -27,15 +27,15 @@ config("libmmi_util_public_config") {
 
   defines = [ "OHOS_BUILD" ]
 
-  if (input_enable_debug) {
+  if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (input_enable_libinput) {
+  if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
-  if (input_enable_hdf) {
+  if (input_feature_hdf) {
     defines += [ "OHOS_BUILD_HDF" ]
   }
 }
@@ -94,21 +94,21 @@ ohos_unittest("ut-mmi-util-out") {
     "${mmi_path}/interfaces/native/innerkits/event/include",
   ]
 
-  if (input_enable_libinput) {
+  if (input_feature_libinput) {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   defines = [ "OHOS_BUILD" ]
 
-  if (input_enable_debug) {
+  if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (input_enable_libinput) {
+  if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
-  if (input_enable_hdf) {
+  if (input_feature_hdf) {
     defines += [ "OHOS_BUILD_HDF" ]
   }
 
@@ -156,21 +156,21 @@ ohos_unittest("RunShellUtilTest") {
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 
-  if (input_enable_libinput) {
+  if (input_feature_libinput) {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
   defines = [ "OHOS_BUILD" ]
 
-  if (input_enable_debug) {
+  if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (input_enable_libinput) {
+  if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
-  if (input_enable_hdf) {
+  if (input_feature_hdf) {
     defines += [ "OHOS_BUILD_HDF" ]
   }
 
