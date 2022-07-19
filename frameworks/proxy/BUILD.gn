@@ -268,6 +268,9 @@ ohos_unittest("InputManagerTest") {
   if (mmi_enable_tp) {
     cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
   }
+  if (mmi_enable_interceptor) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_INTERCEPTOR" ]
+  }
   if (mmi_enable_monitor) {
     cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR" ]
   }
@@ -320,6 +323,12 @@ ohos_unittest("InputManagerManualTest") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
+  if (mmi_enable_mouse) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
+  }
+  if (mmi_enable_tp) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
+  }
   sources = [ "events/test/input_manager_manual_test.cpp" ]
 
   configs = [ ":libmmi_test_util" ]
@@ -357,6 +366,9 @@ ohos_unittest("PointerEventTest") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
+  if (mmi_enable_mouse) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
+  }
   sources = [
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
     "${mmi_path}/test/unittest/common/src/window_utils_test.cpp",
