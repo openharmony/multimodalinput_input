@@ -221,7 +221,7 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
     return pixelMap;
 }
 
-void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int32_t height, Direction direction) 
+void PointerDrawingManager::OnDisplayInfo(int32_t displayId, int32_t width, int32_t height, Direction direction)
 {
     CALL_DEBUG_ENTER;
     hasDisplay_ = true;
