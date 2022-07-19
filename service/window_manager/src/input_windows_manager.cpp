@@ -60,7 +60,7 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
 {
     int32_t displayId = inputEvent->GetTargetDisplayId();
     if (displayId < 0) {
-        MMI_HILOGD("target display is -1");
+        MMI_HILOGD("Target display is -1");
         if (displayGroupInfo_.displaysInfo.empty()) {
             return displayId;
         }
@@ -412,12 +412,12 @@ void InputWindowsManager::SelectWindowInfo(const int32_t& logicalX, const int32_
                 continue;
             } else if ((targetWindowId < 0) && (IsInHotArea(logicalX, logicalY, item.pointerHotAreas))) {
                 firstBtnDownWindowId_ = item.id;
-                MMI_HILOGW("find out the dispatch window of this pointer event when the targetWindowId "
+                MMI_HILOGW("Find out the dispatch window of this pointer event when the targetWindowId "
                            "hasn't been setted up yet, window:%{public}d", firstBtnDownWindowId_);
                 break;
             } else if ((targetWindowId >= 0) && (targetWindowId == item.id)) {
                 firstBtnDownWindowId_ = targetWindowId;
-                MMI_HILOGW("find out the dispatch window of this pointer event when the targetWindowId "
+                MMI_HILOGW("Find out the dispatch window of this pointer event when the targetWindowId "
                            "has been setted up already, window:%{public}d", firstBtnDownWindowId_);
                 break;
             } else {
@@ -439,7 +439,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdateDisplayId(displayId)) {
-        MMI_HILOGE("This display:%{public}d is not exist", displayId);
+        MMI_HILOGE("This display:%{public}d is not existent", displayId);
         return RET_ERR;
     }
     pointerEvent->SetTargetDisplayId(displayId);
@@ -466,7 +466,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     WindowInfo* touchWindow = nullptr;
     SelectWindowInfo(logicalX, logicalY, pointerEvent, touchWindow);
     if (touchWindow == nullptr) {
-        MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
+        MMI_HILOGE("The touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
         return RET_ERR;
     }
     pointerEvent->SetTargetWindowId(touchWindow->id);
@@ -494,7 +494,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdateDisplayId(displayId)) {
-        MMI_HILOGE("This display is not exist");
+        MMI_HILOGE("This display is not existent");
         return RET_ERR;
     }
     pointerEvent->SetTargetDisplayId(displayId);
@@ -540,7 +540,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
     if (touchWindow == nullptr) {
-        MMI_HILOGE("touchWindow is nullptr, logicalX:%{public}d, logicalY:%{public}d",
+        MMI_HILOGE("The touchWindow is nullptr, logicalX:%{public}d, logicalY:%{public}d",
             logicalX, logicalY);
         return RET_ERR;
     }

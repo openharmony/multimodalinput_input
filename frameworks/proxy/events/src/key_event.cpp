@@ -1032,20 +1032,20 @@ bool KeyEvent::IsValidKeyItem() const
             }
         }
         if (it->GetKeyCode() <= KEYCODE_UNKNOWN) {
-            MMI_HILOGE("keyCode is invalid");
+            MMI_HILOGE("The keyCode is invalid");
             return false;
         }
         if (it->GetDownTime() <= 0) {
-            MMI_HILOGE("downtime is invalid");
+            MMI_HILOGE("The downtime is invalid");
             return false;
         }
         if (action != KEY_ACTION_UP && it->IsPressed() == false) {
-            MMI_HILOGE("isPressed is invalid");
+            MMI_HILOGE("The isPressed is invalid");
             return false;
         }
         if (action == KEY_ACTION_UP && it->IsPressed() == false) {
             if (it->GetKeyCode() != keyCode) {
-                MMI_HILOGE("keyCode is invalid when isPressed is false");
+                MMI_HILOGE("The keyCode is invalid when isPressed is false");
                 return false;
             }
         }

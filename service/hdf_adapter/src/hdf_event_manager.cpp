@@ -123,7 +123,7 @@ int32_t HdfEventManager::EvdevSimIoctl(int32_t hdindex, int32_t pcmd, void *iobu
         }
     }
     if (ret != EOK) {
-        MMI_HILOGE("call memcpy_s fail, cmd = %d, ret = %d", cmd, ret);
+        MMI_HILOGE("Call memcpy_s failed, cmd = %d, ret = %d", cmd, ret);
     }
     return RET_OK;
 }
@@ -214,7 +214,7 @@ int32_t HdfEventManager::EvdevIoctl(int32_t hdiindex, int32_t pcmd, void *iobuff
         }
     }
     if (ret != EOK) {
-        MMI_HILOGE("call memcpy_s fail, cmd = %d, ret = %d", cmd, ret);
+        MMI_HILOGE("Call memcpy_s failed, cmd = %d, ret = %d", cmd, ret);
     }
     return 0;
 }
@@ -266,7 +266,7 @@ int32_t HdfEventManager::GetDeviceCount()
     errno_t ret = memset_s(mountDevIndex_, sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT, 0,
                            sizeof(DevDesc) * TOTAL_INPUT_DEVICE_COUNT);
     if (ret != EOK) {
-        MMI_HILOGE("call memset_s fail. ret = %d", ret);
+        MMI_HILOGE("Call memset_s failed. ret = %d", ret);
     }
     int32_t devcount = 0;
     if (inputInterface_ != nullptr || inputInterface_->iInputManager != nullptr) {

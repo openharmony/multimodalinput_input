@@ -242,7 +242,7 @@ static void PrintEventJoyStickAxisInfo(const std::string &axisName, const EventJ
 void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
     const int32_t abilityId, const int32_t focusId, const int64_t preHandlerTime)
 {
-    MMI_HILOGD("event dispatcher of server, EventJoyStickAxis:physical:%{public}s,"
+    MMI_HILOGD("Event dispatcher of server, EventJoyStickAxis:physical:%{public}s,"
                "fd:%{public}d,preHandlerTime:%{public}" PRId64 ","
                "time:%{public}" PRId64 ",deviceType:%{public}u,eventType:%{public}d,deviceName:%{public}s",
                r.physical, fd, preHandlerTime, r.time, r.deviceType,
@@ -460,7 +460,7 @@ static bool CheckFileExtendName(const std::string& filePath, const std::string& 
 {
     std::string::size_type pos = filePath.find_last_of('.');
     if (pos == std::string::npos) {
-        MMI_HILOGE("file is not find extension");
+        MMI_HILOGE("File is not find extension");
         return false;
     }
     return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
@@ -470,7 +470,7 @@ static int32_t GetFileSize(const std::string& filePath)
 {
     struct stat statbuf = {0};
     if (stat(filePath.c_str(), &statbuf) != 0) {
-        MMI_HILOGE("get file size error");
+        MMI_HILOGE("Get file size error");
         return INVALID_FILE_SIZE;
     }
     return statbuf.st_size;
@@ -486,7 +486,7 @@ static std::string ReadFile(const std::string &filePath)
         dataStr += buf;
     }
     if (fclose(fp) != 0) {
-        MMI_HILOGW("close file failed");
+        MMI_HILOGW("Close file failed");
     }
     return dataStr;
 }
@@ -530,7 +530,7 @@ void ReadProFile(const std::string &filePath, int32_t deviceId,
         return;
     }
     if (!IsFileExists(realPath)) {
-        MMI_HILOGE("File not exist");
+        MMI_HILOGE("File is not existent");
         return;
     }
     if (!CheckFileExtendName(realPath, "pro")) {
@@ -595,16 +595,16 @@ void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
 std::string ReadJsonFile(const std::string &filePath)
 {
     if (filePath.empty()) {
-        MMI_HILOGE("filePath is empty");
+        MMI_HILOGE("FilePath is empty");
         return "";
     }
     char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("path is error");
+        MMI_HILOGE("Path is error");
         return "";
     }
     if (!IsValidJsonPath(realPath)) {
-        MMI_HILOGE("file path is error");
+        MMI_HILOGE("File path is error");
         return "";
     }
     if (!CheckFileExtendName(realPath, "json")) {
@@ -612,12 +612,12 @@ std::string ReadJsonFile(const std::string &filePath)
         return "";
     }
     if (!IsFileExists(realPath)) {
-        MMI_HILOGE("file not exist");
+        MMI_HILOGE("File is not existent");
         return "";
     }
     int32_t fileSize = GetFileSize(realPath);
     if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
-        MMI_HILOGE("file size out of read range");
+        MMI_HILOGE("File size out of read range");
         return "";
     }
     return ReadFile(filePath);
@@ -639,7 +639,7 @@ int32_t ReadTomlFile(const std::string &filePath, DeviceConfig& devConf)
         return RET_ERR;
     }
     if (!IsFileExists(realPath)) {
-        MMI_HILOGE("File not exist");
+        MMI_HILOGE("File is not existent");
         return RET_ERR;
     }
     if (!CheckFileExtendName(realPath, "TOML")) {

@@ -34,7 +34,6 @@ public:
 
     void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
-    int32_t MarkEventProcessed(SessionPtr sess, int32_t eventId);
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType,
         HandleEventType eventType);
@@ -58,17 +57,12 @@ public:
     int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 protected:
+    int32_t MarkProcessed(SessionPtr sess, NetPacket& pkt);
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_HDF
     int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
 #endif
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
-    int32_t OnInputDevice(SessionPtr sess, NetPacket& pkt);
-    int32_t OnInputDeviceIds(SessionPtr sess, NetPacket& pkt);
-    int32_t OnSupportKeys(SessionPtr sess, NetPacket& pkt);
-    int32_t OnInputKeyboardType(SessionPtr sess, NetPacket& pkt);
-    int32_t OnAddInputDeviceMonitor(SessionPtr sess, NetPacket& pkt);
-    int32_t OnRemoveInputDeviceMonitor(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_MMI_DEBUG

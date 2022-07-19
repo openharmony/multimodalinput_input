@@ -28,12 +28,12 @@ int32_t ProcessingPenDevice::TransformJsonDataToInputData(const DeviceItem& penE
 {
     CALL_DEBUG_ENTER;
     if (penEventArrays.events.empty()) {
-        MMI_HILOGE("manage pen array failed, inputData is empty.");
+        MMI_HILOGE("Manage pen array failed, inputData is empty.");
         return RET_ERR;
     }
     std::vector<DeviceEvent> inputData = penEventArrays.events;
     if (inputData.empty()) {
-        MMI_HILOGE("manage pen array failed, inputData is empty.");
+        MMI_HILOGE("Manage pen array failed, inputData is empty.");
         return RET_ERR;
     }
     std::vector<PenEvent> penEventArray;
@@ -69,7 +69,7 @@ void ProcessingPenDevice::SetPenApproachPadEvent(const PenEvent& penEvent, Input
     } else if (penEvent.eventType == "RUBBER_TOUCH") {
         SetBtnRubber(inputEventArray, 0, 1);
     } else {
-        MMI_HILOGW("unknown eventType type");
+        MMI_HILOGW("Unknown eventType type");
     }
 
     SetMscSerial(inputEventArray, 0);
@@ -98,13 +98,13 @@ void ProcessingPenDevice::SetPenSlidePadEvent(const PenEvent& penEvent, InputEve
         } else if (previousPressure > 0) {
             SetAbsPressure(inputEventArray, 0, penEvent.pressure);
         } else {
-            MMI_HILOGW("unknown previousPressure type");
+            MMI_HILOGW("Unknown previousPressure type");
         }
     } else if ((penEvent.pressure == 0) && (previousPressure > 0)) {
         SetAbsPressure(inputEventArray, 0, penEvent.pressure);
         SetBtnTouch(inputEventArray, 0, 0);
     } else {
-        MMI_HILOGW("unknown pressure type");
+        MMI_HILOGW("Unknown pressure type");
     }
     previousPressure = penEvent.pressure;
     SetAbsDistance(inputEventArray, 0, penEvent.distance);
@@ -127,7 +127,7 @@ void ProcessingPenDevice::SetPenLeavePadEvent(const PenEvent& penEvent, InputEve
     } else if (penEvent.eventType == "RUBBER_TOUCH") {
         SetBtnRubber(inputEventArray, 0, 0);
     } else {
-        MMI_HILOGW("unknown eventType type");
+        MMI_HILOGW("Unknown eventType type");
     }
 
     SetMscSerial(inputEventArray, 0);
@@ -191,7 +191,7 @@ int32_t ProcessingPenDevice::AnalysisPenSlidePadEvent(const DeviceEvent& event, 
         penEvent.pressure = event.pressure;
         penEvent.distance = event.distance;
     } else {
-        MMI_HILOGW("unknown eventType type");
+        MMI_HILOGW("Unknown eventType type");
     }
     penEventArray.push_back(penEvent);
 

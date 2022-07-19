@@ -34,7 +34,7 @@ bool PermissionHelper::CheckPermission(uint32_t required)
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
         return CheckNativePermission(tokenId, required);
     } else {
-        MMI_HILOGE("unsupported token type:%{public}d", tokenType);
+        MMI_HILOGE("Unsupported token type:%{public}d", tokenType);
         return false;
     }
 }
@@ -48,7 +48,7 @@ bool PermissionHelper::CheckMonitor()
         (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE)) {
         return CheckMonitorPermission(tokenId);
     } else {
-        MMI_HILOGE("unsupported token type:%{public}d", tokenType);
+        MMI_HILOGE("Unsupported token type:%{public}d", tokenType);
         return false;
     }
 }
@@ -61,10 +61,10 @@ bool PermissionHelper::CheckHapPermission(uint32_t tokenId, uint32_t required)
         return false;
     }
     if (!((1 << findInfo.apl) & required)) {
-        MMI_HILOGE("check hap permission failed");
+        MMI_HILOGE("Check hap permission failed");
         return false;
     }
-    MMI_HILOGI("check hap permission success");
+    MMI_HILOGI("Check hap permission success");
     return true;
 }
 
@@ -76,10 +76,10 @@ bool PermissionHelper::CheckNativePermission(uint32_t tokenId, uint32_t required
         return false;
     }
     if (!((1 << findInfo.apl) & required)) {
-        MMI_HILOGE("check native permission failed");
+        MMI_HILOGE("Check native permission failed");
         return false;
     }
-    MMI_HILOGI("check native permission success");
+    MMI_HILOGI("Check native permission success");
     return true;
 }
 
@@ -88,10 +88,10 @@ bool PermissionHelper::CheckMonitorPermission(uint32_t tokenId)
     static const std::string inputMonitor = "ohos.permission.INPUT_MONITORING";
     int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, inputMonitor);
     if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
-        MMI_HILOGE("check monitor permission failed ret:%{public}d", ret);
+        MMI_HILOGE("Check monitor permission failed ret:%{public}d", ret);
         return false;
     }
-    MMI_HILOGI("check monitor permission success");
+    MMI_HILOGI("Check monitor permission success");
     return true;
 }
 
@@ -105,7 +105,7 @@ int32_t PermissionHelper::GetTokenType()
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
         return TokenType::TOKEN_NATIVE;
     } else {
-        MMI_HILOGW("unsupported token type:%{public}d", tokenType);
+        MMI_HILOGW("Unsupported token type:%{public}d", tokenType);
         return TokenType::TOKEN_INVALID;
     }
 }

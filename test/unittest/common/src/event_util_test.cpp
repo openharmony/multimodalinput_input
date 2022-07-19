@@ -17,7 +17,6 @@
 
 #include <iomanip>
 
-#include "input_transfer_station.h"
 #include "mmi_log.h"
 #include "window_utils_test.h"
 
@@ -113,8 +112,6 @@ bool EventUtilTest::Init()
     auto listener_ = GetPtr<InputEventConsumer>();
     CHKPF(listener_);
     MMI::InputManager::GetInstance()->SetWindowInputEventConsumer(listener_);
-    Rosen::InputTransferStation::GetInstance().SetInputListener(window_->GetWindowId(), listener_);
-    Rosen::InputTransferStation::GetInstance().AddInputWindow(window_);
     return true;
 }
 

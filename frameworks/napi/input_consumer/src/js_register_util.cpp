@@ -136,7 +136,7 @@ bool GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> 
         }
         MMI_HILOGD("Get int array number:%{public}d", value);
         if (!params.insert(value).second) {
-            MMI_HILOGE("params insert value failed");
+            MMI_HILOGE("Params insert value failed");
             napi_throw_error(env, nullptr, "params insert value failed");
             return false;
         }
@@ -284,14 +284,14 @@ static void AsyncWorkFn(const napi_env &env, KeyEventMonitorInfo *event, napi_va
     MMI_HILOGD("Status > 0 enter");
     napi_status status = napi_create_object(env, &result);
     if (status != napi_ok) {
-        MMI_HILOGE("create object failed");
+        MMI_HILOGE("Create object failed");
         napi_throw_error(env, nullptr, "create object failed");
         return;
     }
     napi_value arr;
     status = napi_create_array(env, &arr);
     if (status != napi_ok) {
-        MMI_HILOGE("create array failed");
+        MMI_HILOGE("Create array failed");
         napi_throw_error(env, nullptr, "create array failed");
         return;
     }
@@ -301,13 +301,13 @@ static void AsyncWorkFn(const napi_env &env, KeyEventMonitorInfo *event, napi_va
     for (const auto &preKey : preKeys) {
         status = napi_create_int32(env, preKey, &value);
         if (status != napi_ok) {
-            MMI_HILOGE("create int32 failed");
+            MMI_HILOGE("Create int32 failed");
             napi_throw_error(env, nullptr, "create int32 failed");
             return;
         }
         status = napi_set_element(env, arr, i, value);
         if (status != napi_ok) {
-            MMI_HILOGE("set element failed");
+            MMI_HILOGE("Set element failed");
             napi_throw_error(env, nullptr, "set element failed");
             return;
         }
