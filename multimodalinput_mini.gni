@@ -16,21 +16,21 @@ import("//build/ohos.gni")
 mmi_path = "//foundation/multimodalinput/input"
 ability_runtime_path = "//foundation/ability/ability_runtime"
 ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
-input_enable_libinput = true
-input_enable_hdf = false
-input_enable_debug = false
-input_enable_distributed = false
+input_feature_libinput = true
+input_feature_hdf = false
+input_feature_debug = false
+input_feature_distributed = false
 
 declare_args() {
   resource_schedule_service_enabled = false
-  input_enable_combination_key = true
-  input_enable_pointer_drawing = true
-  input_enable_interceptor = true
-  input_enable_monitor = true
-  input_enable_keyboard = true
-  input_enable_mouse = true
-  input_enable_touchscreen = true
-  input_enable_input_device = true
+  input_feature_combination_key = true
+  input_feature_pointer_drawing = true
+  input_feature_interceptor = true
+  input_feature_monitor = true
+  input_feature_keyboard = true
+  input_feature_mouse = true
+  input_feature_touchscreen = true
+  input_feature_input_device = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -38,15 +38,15 @@ declare_args() {
   }
 }
 
-print("input_enable_libinput = ${input_enable_libinput}")
-print("input_enable_hdf = ${input_enable_hdf}")
-print("input_enable_debug = ${input_enable_debug}")
-print("input_enable_combination_key = ${input_enable_combination_key}")
-print("input_enable_pointer_drawing = ${input_enable_pointer_drawing}")
-print("input_enable_monitor = ${input_enable_monitor}")
-print("input_enable_interceptor = ${input_enable_interceptor}")
-print("input_enable_distributed = ${input_enable_distributed}")
-print("input_enable_keyboard = ${input_enable_keyboard}")
-print("input_enable_mouse = ${input_enable_mouse}")
-print("input_enable_touchscreen = ${input_enable_touchscreen}")
-print("input_enable_input_device = ${input_enable_input_device}")
+print("input_feature_libinput = ${input_feature_libinput}")
+print("input_feature_hdf = ${input_feature_hdf}")
+print("input_feature_debug = ${input_feature_debug}")
+print("input_feature_combination_key = ${input_feature_combination_key}")
+print("input_feature_pointer_drawing = ${input_feature_pointer_drawing}")
+print("input_feature_monitor = ${input_feature_monitor}")
+print("input_feature_interceptor = ${input_feature_interceptor}")
+print("input_feature_distributed = ${input_feature_distributed}")
+print("input_feature_keyboard = ${input_feature_keyboard}")
+print("input_feature_mouse = ${input_feature_mouse}")
+print("input_feature_touchscreen = ${input_feature_touchscreen}")
+print("input_feature_input_device = ${input_feature_input_device}")

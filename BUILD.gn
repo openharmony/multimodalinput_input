@@ -78,22 +78,22 @@ group("input_jsapi_group") {
       "frameworks/napi/mouse_event:mouseevent",
       "frameworks/napi/touch_event:touchevent",
     ]
-    if (input_enable_distributed) {
+    if (input_feature_distributed) {
       deps += [ "frameworks/napi/distributed_input:distributedinput" ]
     }
-    if (input_enable_monitor) {
+    if (input_feature_monitor) {
       deps += [ "frameworks/napi/input_monitor:inputmonitor" ]
     }
-    if (input_enable_mouse) {
+    if (input_feature_mouse) {
       deps += [ "frameworks/napi/mouse:mouse" ]
     }
-    if (input_enable_keyboard) {
+    if (input_feature_keyboard) {
       deps += [
         "frameworks/napi/input_consumer:inputconsumer",
         "frameworks/napi/input_event_client:inputeventclient",
       ]
     }
-    if (input_enable_input_device) {
+    if (input_feature_input_device) {
       deps += [ "frameworks/napi/input_device:inputdevice" ]
     }
   }

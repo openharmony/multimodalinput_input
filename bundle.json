@@ -13,13 +13,13 @@
       "SystemCapability.multimodalinput.input"
     ],
     "features": [
-      "input_enable_combination_key",
-      "input_enable_pointer_drawing",
-      "input_enable_interceptor",
-      "input_enable_monitor",
-      "input_enable_keyboard",
-      "input_enable_mouse",
-      "input_enable_touchscreen"
+      "input_feature_combination_key",
+      "input_feature_pointer_drawing",
+      "input_feature_interceptor",
+      "input_feature_monitor",
+      "input_feature_keyboard",
+      "input_feature_mouse",
+      "input_feature_touchscreen"
     ],
     "adapted_system_type": [
       "standard"

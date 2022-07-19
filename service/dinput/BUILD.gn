@@ -24,7 +24,7 @@ config("mmi_dinput_config") {
     "${dinput_path}/include",
   ]
 
-  if (input_enable_distributed) {
+  if (input_feature_distributed) {
     include_dirs += [
       "//foundation/distributedhardware/distributed_input/common/include",
       "//foundation/distributedhardware/distributed_input/frameworks/include",
@@ -32,7 +32,7 @@ config("mmi_dinput_config") {
     ]
   }
 }
-if (input_enable_distributed) {
+if (input_feature_distributed) {
   ohos_source_set("mmi_dinput_service") {
     sources = [
       "${dinput_path}/src/call_dinput_service.cpp",
@@ -52,7 +52,7 @@ if (input_enable_distributed) {
       "safwk:system_ability_fwk",
     ]
 
-    if (input_enable_distributed) {
+    if (input_feature_distributed) {
       external_deps += [ "distributed_input:libdinput_sdk" ]
     }
   }

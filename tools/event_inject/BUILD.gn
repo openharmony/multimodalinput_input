@@ -28,11 +28,11 @@ config("event_injection_config") {
 
   defines = [ "OHOS_BUILD" ]
 
-  if (input_enable_debug) {
+  if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (input_enable_libinput) {
+  if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 }
@@ -79,7 +79,7 @@ ohos_shared_library("event-injection") {
     "//third_party/cJSON:cjson_static",
   ]
 
-  if (input_enable_libinput) {
+  if (input_feature_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 
@@ -125,7 +125,7 @@ ohos_unittest("ut-event-injection-out") {
     "${mmi_path}/uinput",
   ]
 
-  if (input_enable_libinput) {
+  if (input_feature_libinput) {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
@@ -147,11 +147,11 @@ ohos_unittest("ut-event-injection-out") {
 
   defines = [ "OHOS_BUILD" ]
 
-  if (input_enable_debug) {
+  if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (input_enable_libinput) {
+  if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
@@ -165,7 +165,7 @@ ohos_unittest("ut-event-injection-out") {
     "//third_party/googletest:gtest_main",
   ]
 
-  if (input_enable_libinput) {
+  if (input_feature_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 
@@ -186,16 +186,16 @@ ohos_executable("mmi-event-injection") {
     "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 
-  if (input_enable_libinput) {
+  if (input_feature_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
   defines = [ "OHOS_BUILD" ]
 
-  if (input_enable_debug) {
+  if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (input_enable_libinput) {
+  if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
