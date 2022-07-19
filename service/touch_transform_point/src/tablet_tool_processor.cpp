@@ -44,7 +44,7 @@ std::shared_ptr<PointerEvent> TabletToolProcessor::OnEvent(struct libinput_event
             break;
         }
         case LIBINPUT_EVENT_TABLET_TOOL_PROXIMITY: {
-            MMI_HILOGE("proximity event");
+            MMI_HILOGE("Proximity event");
             return nullptr;
         }
         case LIBINPUT_EVENT_TABLET_TOOL_TIP: {

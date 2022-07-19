@@ -56,11 +56,11 @@ void InputManagerManualTest::AddInputEventFilter()
 {
     CALL_DEBUG_ENTER;
     auto callback = [this](std::shared_ptr<PointerEvent> pointer) -> bool {
-        MMI_HILOGD("callback enter");
+        MMI_HILOGD("Callback enter");
         CHKPF(pointer);
         const std::vector<int32_t> ids = pointer->GetPointersIdList();
         if (ids.empty()) {
-            MMI_HILOGE("ids is empty");
+            MMI_HILOGE("The ids is empty");
             return false;
         }
 

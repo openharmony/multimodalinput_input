@@ -221,7 +221,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     auto keyOption = std::make_shared<KeyOption>();
     if ((keyOption) == nullptr) {
         delete event;
-        MMI_HILOGE("check keyOption is null");
+        MMI_HILOGE("Check keyOption is null");
         return nullptr;
     }
     if (GetEventInfo(env, info, event, keyOption) < 0) {
@@ -236,7 +236,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         int32_t subscribeId = -1;
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
         if (subscribeId < 0) {
-            MMI_HILOGD("subscribeId invalid:%{public}d", subscribeId);
+            MMI_HILOGD("SubscribeId invalid:%{public}d", subscribeId);
             napi_delete_reference(env, event->callback[0]);
             delete event;
             return nullptr;
@@ -265,7 +265,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     auto keyOption = std::make_shared<KeyOption>();
     if ((keyOption) == nullptr) {
         delete event;
-        MMI_HILOGE("check keyOption is null");
+        MMI_HILOGE("Check keyOption is null");
         return nullptr;
     }
     if (GetEventInfo(env, info, event, keyOption) < 0) {

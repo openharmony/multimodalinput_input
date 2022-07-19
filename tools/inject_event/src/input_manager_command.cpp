@@ -49,7 +49,6 @@ private:
 };
 namespace OHOS {
 namespace MMI {
-#define InputMgr InputManager::GetInstance()
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerCommand"};
 constexpr int32_t SLEEPTIME = 20;
@@ -142,7 +141,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         case 'm': {
                             if (optind >= argc) {
                                 std::cout << "too few arguments to function" << std::endl;
-                                ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
                             if (!StrToInt(optarg, px) || !StrToInt(argv[optind], py)) {
@@ -167,12 +165,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         case 'd': {
                             if (!StrToInt(optarg, buttonId)) {
                                 std::cout << "invalid button press command" << std::endl;
-                                ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
                             if (buttonId > MOUSE_ID) {
                                 std::cout << "invalid button press command" << std::endl;
-                                ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
                             std::cout << "press down" << buttonId << std::endl;
@@ -195,12 +191,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         case 'u': {
                             if (!StrToInt(optarg, buttonId)) {
                                 std::cout << "invalid raise button command" << std::endl;
-                                ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
                             if (buttonId > MOUSE_ID) {
                                 std::cout << "invalid raise button command" << std::endl;
-                                ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
                             std::cout << "lift up button " << buttonId << std::endl;
@@ -223,7 +217,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         case 's': {
                             if (!StrToInt(optarg, scrollValue)) {
                                 std::cout << "invalid  scroll button command" << std::endl;
-                                ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
                             std::cout << "scroll wheel " << scrollValue << std::endl;
@@ -272,12 +265,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         case 'c': {
                             if (!StrToInt(optarg, buttonId)) {
                                 std::cout << "invalid click button command" << std::endl;
-                                ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
                             if (buttonId > MOUSE_ID) {
                                 std::cout << "invalid button press command" << std::endl;
-                                ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
                             std::cout << "click   " << buttonId << std::endl;
@@ -319,7 +310,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             static constexpr int32_t maxClickIntervalTimeMs = 450;
                             if (argc < 6 || argc > 8) {
                                 std::cout << "wrong number of parameters" << std::endl;
-                                ShowUsage();
                                 return RET_ERR;
                             }
                             if (!StrToInt(optarg, px) ||
@@ -400,7 +390,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             int32_t taktTime = 0;
                             if (!StrToInt(optarg, taktTime)) {
                                 std::cout << "invalid command to interval time" << std::endl;
-                                ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
                             const int64_t minTaktTimeMs = 1;
@@ -470,12 +459,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         case 'u': {
                             if (!StrToInt(optarg, keyCode)) {
                                 std::cout << "invalid button press command" << std::endl;
-                                ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
                             std::vector<int32_t>::iterator iter = std::find(downKey.begin(), downKey.end(), keyCode);
                             if (iter != downKey.end()) {
-                                std::cout << "You raised the key " << keyCode << std::endl;
+                                std::cout << "you raised the key " << keyCode << std::endl;
                                 auto KeyEvent = KeyEvent::Create();
                                 CHKPR(KeyEvent, ERROR_NULL_POINTER);
                                 KeyEvent->SetKeyCode(keyCode);
@@ -488,7 +476,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 iter = downKey.erase(iter);
                                 break;
                             } else {
-                                std::cout << "Please press the " << keyCode << " key first "<< std::endl;
+                                std::cout << "please press the " << keyCode << " key first "<< std::endl;
                                 return EVENT_REG_FAIL;
                             }
                         }
@@ -496,7 +484,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             int32_t taktTime = 0;
                             if (!StrToInt(optarg, taktTime)) {
                                 std::cout << "invalid command to interval time" << std::endl;
-                                ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
                             const int64_t minTaktTimeMs = 1;
@@ -536,7 +523,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             if (argc < moveArgcSeven) {
                                 std::cout << "argc:" << argc << std::endl;
                                 std::cout << "wrong number of parameters" << std::endl;
-                                ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
                             if (argv[optind + 3] == nullptr || argv[optind + 3][0] == '-') {
@@ -545,8 +531,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     (!StrToInt(argv[optind], py1)) ||
                                     (!StrToInt(argv[optind + 1], px2)) ||
                                     (!StrToInt(argv[optind + 2], py2))) {
-                                        std::cout << "invalid command to input value" << std::endl;
-                                        ShowUsage();
+                                        std::cout << "invalid coordinate value" << std::endl;
                                         return EVENT_REG_FAIL;
                                 }
                             } else {
@@ -555,8 +540,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     (!StrToInt(argv[optind + 1], px2)) ||
                                     (!StrToInt(argv[optind + 2], py2)) ||
                                     (!StrToInt(argv[optind + 3], totalTimeMs))) {
-                                        std::cout << "invalid command to input value" << std::endl;
-                                        ShowUsage();
+                                        std::cout << "invalid coordinate value or total times" << std::endl;
                                         return EVENT_REG_FAIL;
                                 }
                             }
@@ -568,6 +552,9 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << std::endl;
                                 return EVENT_REG_FAIL;
                             }
+                            std::cout << "start coordinate: ("<< px1 << ", "  << py1 << ")" << std::endl;
+                            std::cout << "  end coordinate: ("<< px2 << ", "  << py2 << ")" << std::endl;
+                            std::cout << "     total times: " << totalTimeMs << " ms" << std::endl;
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
@@ -617,11 +604,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         case 'd': {
                             if (optind >= argc) {
                                 std::cout << "too few arguments to function" << std::endl;
-                                ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
                             if (!StrToInt(optarg, px1) || !StrToInt(argv[optind], py1)) {
-                                std::cout << "invalid command to input value" << std::endl;
+                                std::cout << "invalid coordinate value" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
                             std::cout << "touch down " << px1 << " " << py1 << std::endl;
@@ -641,11 +627,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                         }
                         case 'u': {
                             if (optind >= argc) {
-                                ShowUsage();
+                                std::cout << "too few arguments to function" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
                             if (!StrToInt(optarg, px1) || !StrToInt(argv[optind], py1)) {
-                                std::cout << "invalid command to input value" << std::endl;
+                                std::cout << "invalid coordinate value" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
                             std::cout << "touch up " << px1 << " " << py1 << std::endl;
@@ -688,11 +674,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                             } else {
                                 std::cout << "parameter error, unable to run" << std::endl;
-                                ShowUsage();
                                 return RET_ERR;
                             }
-                            std::cout << "touch screen click interval time:" << intervalTimeMs << "ms" << std::endl;
-                            std::cout << "single finger touch screen click " << px1 << " " << py1 << std::endl;
+                            std::cout << "   click coordinate: ("<< px1 << ", "  << py1 << ")" << std::endl;
+                            std::cout << "click interval time: " << intervalTimeMs      << "ms" << std::endl;
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
                             PointerEvent::PointerItem item;
@@ -719,7 +704,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             int32_t taktTime = 0;
                             if (!StrToInt(optarg, taktTime)) {
                                 std::cout << "invalid command to interval time" << std::endl;
-                                ShowUsage();
                                 return EVENT_REG_FAIL;
                             }
                             const int64_t minTaktTimeMs = 1;
@@ -739,7 +723,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             if ((argc != dragArgcSeven) && (argc != dragArgcCommandNine)) {
                                 std::cout << "argc:" << argc << std::endl;
                                 std::cout << "wrong number of parameters" << std::endl;
-                                ShowUsage();
                                 return RET_ERR;
                             }
                             totalTimeMs = 1000;
@@ -749,8 +732,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     (!StrToInt(argv[optind], py1)) ||
                                     (!StrToInt(argv[optind + 1], px2)) ||
                                     (!StrToInt(argv[optind + 2], py2))) {
-                                        std::cout << "Invalid input command" << std::endl;
-                                        ShowUsage();
+                                        std::cout << "invalid coordinate value" << std::endl;
                                         return RET_ERR;
                                 }
                             } else {
@@ -760,8 +742,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     (!StrToInt(argv[optind + 2], py2)) ||
                                     (!StrToInt(argv[optind + 3], pressTimems)) ||
                                     (!StrToInt(argv[optind + 4], totalTimeMs))) {
-                                        std::cout << "Invalid input coordinate or time" << std::endl;
-                                        ShowUsage();
+                                        std::cout << "invalid input coordinate or time" << std::endl;
                                         return RET_ERR;
                                 }
                             }
@@ -883,12 +864,14 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-s <key>                  --scroll <key>      -positive values are sliding backwards" << std::endl;
     std::cout << "-i <time>                 --interval <time>   -the program interval for the (time) milliseconds";
     std::cout << std::endl;
+    std::cout << std::endl;
     std::cout << "                                               negative values are sliding forwards"  << std::endl;
     std::cout << "-K  --keyboard                                                " << std::endl;
     std::cout << "commands for keyboard:                                        " << std::endl;
     std::cout << "-d <key>                   --down   <key>     -press down a key" << std::endl;
     std::cout << "-u <key>                   --up     <key>     -release a key   " << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
+    std::cout << std::endl;
     std::cout << std::endl;
     std::cout << "-T  --touch                                                   " << std::endl;
     std::cout << "commands for touch:                                           " << std::endl;
@@ -900,9 +883,9 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-c <dx1> <dy1> [click interval]               -touch screen click dx1 dy1"         << std::endl;
     std::cout << "-i <time>                  --interval <time>  -the program interval for the (time) milliseconds";
     std::cout << std::endl;
-    std::cout << "-g <dx1> <dy1> <dx2> <dy2> [Press time] [total time]     -drag, "                       << std::endl;
+    std::cout << "-g <dx1> <dy1> <dx2> <dy2> [press time] [total time]     -drag, "                       << std::endl;
     std::cout << "  [Press time] not less than 500ms and [total time] - [Press time] not less than 500ms" << std::endl;
-    std::cout << "  Otherwise the operation result may produce error or invalid operation"              << std::endl;
+    std::cout << "  Otherwise the operation result may produce error or invalid operation"                << std::endl;
     std::cout << "                                                              " << std::endl;
     std::cout << "-?  --help                                                    " << std::endl;
 }

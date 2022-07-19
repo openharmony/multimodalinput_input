@@ -26,6 +26,7 @@ namespace MMI {
 class InputDevice {
 public:
     InputDevice() = default;
+    ~InputDevice() = default;
     DISALLOW_COPY_AND_MOVE(InputDevice);
 
     void SetId(int32_t deviceId);
@@ -34,8 +35,8 @@ public:
     std::string GetName() const;
     void SetType(int32_t deviceType);
     int32_t GetType() const;
-    void SetBusType(int32_t bus);
-    int32_t GetBusType() const;
+    void SetBus(int32_t bus);
+    int32_t GetBus() const;
     void SetVersion(int32_t version);
     int32_t GetVersion() const;
     void SetProduct(int32_t product);
@@ -49,6 +50,9 @@ public:
 
     class AxisInfo {
     public:
+        AxisInfo() = default;
+        AxisInfo(int32_t type, int32_t min, int32_t max, int32_t fuzz, int32_t flat, int32_t resolution);
+        ~AxisInfo() = default;
         void SetAxisType(int32_t type);
         int32_t GetAxisType() const;
         void SetMinimum(int32_t min);
@@ -72,18 +76,19 @@ public:
     };
     void AddAxisInfo(AxisInfo axis);
     std::vector<AxisInfo> GetAxisInfo();
+    InputDevice(int32_t id, std::string name, int32_t deviceType, int32_t bus, int32_t version, int32_t product,
+                int32_t vendor, std::string phys, std::string uniq, std::vector<AxisInfo> axis);
 private:
-    int32_t id_ {0};
+    int32_t id_ {-1};
     std::string name_ {"null"};
-    int32_t deviceType_ {0};
-    std::vector<AxisInfo> axis_;
-    int32_t bus_ {0};
-    int32_t version_ {0};
-    int32_t product_ {0};
-    int32_t vendor_ {0};
+    int32_t type_ {0};
+    int32_t bus_ {-1};
+    int32_t version_ {-1};
+    int32_t product_ {-1};
+    int32_t vendor_ {-1};
     std::string phys_ {"null"};
     std::string uniq_ {"null"};
-    
+    std::vector<AxisInfo> axis_;
     std::vector<int32_t> deviceIdList_;
 };
 } // namespace MMI
