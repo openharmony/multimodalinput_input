@@ -19,7 +19,7 @@
 #include <set>
 
 #include "i_input_event_handler.h"
-#include "i_input_event_monitor_handler.h"
+#include "i_input_event_collection_handler.h"
 #include "input_handler_type.h"
 #include "nocopyable.h"
 #include "singleton.h"
@@ -27,11 +27,11 @@
 
 namespace OHOS {
 namespace MMI {
-class InterceptorHandlerGlobal : public IInputEventHandler {
+class EventInterceptorHandler : public IInputEventHandler {
 public:
-    InterceptorHandlerGlobal() = default;
-    DISALLOW_COPY_AND_MOVE(InterceptorHandlerGlobal);
-    ~InterceptorHandlerGlobal() = default;
+    EventInterceptorHandler() = default;
+    DISALLOW_COPY_AND_MOVE(EventInterceptorHandler);
+    ~EventInterceptorHandler() = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -45,9 +45,9 @@ public:
         HandleEventType eventType, SessionPtr session);
     void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent);
+    bool OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-    bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    bool OnHandleEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void Dump(int32_t fd, const std::vector<std::string> &args);
 
 private:
@@ -78,7 +78,7 @@ private:
         SessionPtr session_ = nullptr;
     };
 
-    class InterceptorCollection : public IInputEventMonitorHandler, protected NoCopyable {
+    class InterceptorCollection : public IInputEventCollectionHandler, protected NoCopyable {
     public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent) override;

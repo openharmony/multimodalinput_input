@@ -69,7 +69,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    bool HandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
 private:
     bool ParseJson();
     std::string GetConfigFilePath() const;

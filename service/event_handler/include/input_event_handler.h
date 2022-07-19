@@ -24,8 +24,8 @@
 #include "event_dispatch.h"
 #include "i_event_filter.h"
 #include "i_input_event_handler.h"
-#include "interceptor_handler_global.h"
-#include "input_handler_manager_global.h"
+#include "event_interceptor_handler.h"
+#include "event_monitor_handler.h"
 #include "key_event_subscriber.h"
 #include "mouse_event_handler.h"
 #include "event_filter_wrap.h"
@@ -48,9 +48,9 @@ public:
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
 
     std::shared_ptr<InputEventNormalizeHandler> GetInputEventNormalizeHandler() const;
-    std::shared_ptr<InterceptorHandlerGlobal> GetInterceptorHandler() const;
+    std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const;
     std::shared_ptr<KeyEventSubscriber> GetSubscriberHandler() const;
-    std::shared_ptr<InputHandlerManagerGlobal> GetMonitorHandler() const;
+    std::shared_ptr<EventMonitorHandler> GetMonitorHandler() const;
 
 protected:
     int32_t OnEventDeviceAdded(libinput_event *event);
@@ -72,9 +72,9 @@ private:
 
     std::shared_ptr<InputEventNormalizeHandler> inputEventNormalizeHandler_ = nullptr;
     std::shared_ptr<EventFilterWrap> eventfilterHandler_ = nullptr;
-    std::shared_ptr<InterceptorHandlerGlobal> interceptorHandler_ = nullptr;
+    std::shared_ptr<EventInterceptorHandler> interceptorHandler_ = nullptr;
     std::shared_ptr<KeyEventSubscriber> subscriberHandler_ = nullptr;
-    std::shared_ptr<InputHandlerManagerGlobal> monitorHandler_ = nullptr;
+    std::shared_ptr<EventMonitorHandler> monitorHandler_ = nullptr;
 
     uint64_t idSeed_ = 0;
 };

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "interceptor_handler_global.h"
+#include "event_interceptor_handler.h"
 
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
@@ -28,14 +28,14 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InterceptorHandlerGlobal" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventInterceptorHandler" };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void InterceptorHandlerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+void EventInterceptorHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
-    if (HandleEvent(keyEvent)) {
+    if (OnHandleEvent(keyEvent)) {
             MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
                 keyEvent->GetKeyCode());
             BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
@@ -47,10 +47,10 @@ void InterceptorHandlerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-void InterceptorHandlerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void EventInterceptorHandler::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    if (HandleEvent(pointerEvent)) {
+    if (OnHandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Interception is succeeded");
         return;
@@ -61,10 +61,10 @@ void InterceptorHandlerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> 
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-void InterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void EventInterceptorHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    if (HandleEvent(pointerEvent)) {
+    if (OnHandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Interception is succeeded");
         return;
@@ -74,7 +74,7 @@ void InterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> po
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-int32_t InterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
+int32_t EventInterceptorHandler::AddInputHandler(int32_t handlerId,
     InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
 {
     CALL_INFO_TRACE;
@@ -93,7 +93,7 @@ int32_t InterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
     return interceptors_.AddInterceptor(interceptor);
 }
 
-void InterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,
+void EventInterceptorHandler::RemoveInputHandler(int32_t handlerId,
     InputHandlerType handlerType, SessionPtr session)
 {
     CALL_INFO_TRACE;
@@ -105,7 +105,7 @@ void InterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,
     }
 }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-bool InterceptorHandlerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
+bool EventInterceptorHandler::OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGD("Handle KeyEvent");
     CHKPF(keyEvent);
@@ -118,7 +118,7 @@ bool InterceptorHandlerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-bool InterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
+bool EventInterceptorHandler::OnHandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT)) {
@@ -129,7 +129,7 @@ bool InterceptorHandlerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointer
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-void InterceptorHandlerGlobal::InitSessionLostCallback()
+void EventInterceptorHandler::InitSessionLostCallback()
 {
     if (sessionLostCallbackInitialized_)  {
         MMI_HILOGE("Init session is failed");
@@ -138,17 +138,17 @@ void InterceptorHandlerGlobal::InitSessionLostCallback()
     auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPV(udsServerPtr);
     udsServerPtr->AddSessionDeletedCallback(std::bind(
-        &InterceptorHandlerGlobal::OnSessionLost, this, std::placeholders::_1));
+        &EventInterceptorHandler::OnSessionLost, this, std::placeholders::_1));
     sessionLostCallbackInitialized_ = true;
     MMI_HILOGD("The callback on session deleted is registered successfully");
 }
 
-void InterceptorHandlerGlobal::OnSessionLost(SessionPtr session)
+void EventInterceptorHandler::OnSessionLost(SessionPtr session)
 {
     interceptors_.OnSessionLost(session);
 }
 
-void InterceptorHandlerGlobal::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
+void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
 {
     CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
@@ -167,7 +167,7 @@ void InterceptorHandlerGlobal::SessionHandler::SendToClient(std::shared_ptr<KeyE
     }
 }
 
-void InterceptorHandlerGlobal::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
+void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     CHKPV(pointerEvent);
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
@@ -188,7 +188,7 @@ void InterceptorHandlerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poin
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
+bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
     if (interceptors_.empty()) {
@@ -210,7 +210,7 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
+bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
     if (interceptors_.empty()) {
@@ -230,7 +230,7 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-int32_t InterceptorHandlerGlobal::InterceptorCollection::AddInterceptor(const SessionHandler& interceptor)
+int32_t EventInterceptorHandler::InterceptorCollection::AddInterceptor(const SessionHandler& interceptor)
 {
     if (interceptors_.size() >= MAX_N_INPUT_INTERCEPTORS) {
         MMI_HILOGE("The number of interceptors exceeds limit");
@@ -244,7 +244,7 @@ int32_t InterceptorHandlerGlobal::InterceptorCollection::AddInterceptor(const Se
     return RET_OK;
 }
 
-void InterceptorHandlerGlobal::InterceptorCollection::RemoveInterceptor(const SessionHandler& interceptor)
+void EventInterceptorHandler::InterceptorCollection::RemoveInterceptor(const SessionHandler& interceptor)
 {
     std::set<SessionHandler>::const_iterator tItr = interceptors_.find(interceptor);
     if (tItr != interceptors_.cend()) {
@@ -253,7 +253,7 @@ void InterceptorHandlerGlobal::InterceptorCollection::RemoveInterceptor(const Se
     MMI_HILOGD("Unregister interceptor successfully");
 }
 
-void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr session)
+void EventInterceptorHandler::InterceptorCollection::OnSessionLost(SessionPtr session)
 {
     CALL_INFO_TRACE;
     std::set<SessionHandler>::const_iterator cItr = interceptors_.cbegin();
@@ -265,12 +265,12 @@ void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr s
         }
     }
 }
-void InterceptorHandlerGlobal::Dump(int32_t fd, const std::vector<std::string> &args)
+void EventInterceptorHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     return interceptors_.Dump(fd, args);
 }
 
-void InterceptorHandlerGlobal::InterceptorCollection::Dump(int32_t fd, const std::vector<std::string> &args)
+void EventInterceptorHandler::InterceptorCollection::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Interceptor information:\t");

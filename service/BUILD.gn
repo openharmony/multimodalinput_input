@@ -190,10 +190,10 @@ ohos_shared_library("libmmi-server") {
     }
   }
   if (mmi_enable_monitor) {
-    sources += [ "monitor/src/input_handler_manager_global.cpp" ]
+    sources += [ "monitor/src/event_monitor_handler.cpp" ]
   }
   if (mmi_enable_interceptor) {
-    sources += [ "interceptor/src/interceptor_handler_global.cpp" ]
+    sources += [ "interceptor/src/event_interceptor_handler.cpp" ]
   }
 
   configs = [ ":libmmi_server_config" ]

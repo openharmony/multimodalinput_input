@@ -27,9 +27,9 @@
 
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "input_handler_manager_global.h"
+#include "event_monitor_handler.h"
 #include "input_windows_manager.h"
-#include "interceptor_handler_global.h"
+#include "event_interceptor_handler.h"
 #include "key_event_subscriber.h"
 #include "mouse_event_handler.h"
 #include "securec.h"
