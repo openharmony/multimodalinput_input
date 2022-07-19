@@ -56,7 +56,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     CALL_DEBUG_ENTER;
     auto iter = inputDevice_.find(id);
     if (iter == inputDevice_.end()) {
-        MMI_HILOGE("failed to search for the device");
+        MMI_HILOGE("Failed to search for the device");
         return nullptr;
     }
 
@@ -210,7 +210,7 @@ void InputDeviceManager::AddDevListener(SessionPtr sess, std::function<void(int3
     CALL_DEBUG_ENTER;
     auto ret = devListener_.insert({ sess, callback });
     if (!ret.second) {
-        MMI_HILOGE("session is duplicated");
+        MMI_HILOGE("Session is duplicated");
         return;
     }
 }
@@ -220,7 +220,7 @@ void InputDeviceManager::RemoveDevListener(SessionPtr sess)
     CALL_DEBUG_ENTER;
     auto iter = devListener_.find(sess);
     if (iter == devListener_.end()) {
-        MMI_HILOGE("session does not exist");
+        MMI_HILOGE("Session does not exist");
         return;
     }
     devListener_.erase(iter);
@@ -244,13 +244,13 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     CHKPV(inputDevice);
     for (const auto& item : inputDevice_) {
         if (item.second == inputDevice) {
-            MMI_HILOGI("the device already exists");
+            MMI_HILOGI("The device is already existent");
             DfxHisysevent::OnDeviceConnect(item.first, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
             return;
         }
     }
     if (nextId_ == INT32_MAX) {
-        MMI_HILOGE("the nextId_ exceeded the upper limit");
+        MMI_HILOGE("The nextId_ exceeded the upper limit");
         DfxHisysevent::OnDeviceConnect(INT32_MAX, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
     }
@@ -264,7 +264,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     if (IsPointerDevice(inputDevice)) {
         NotifyPointerDevice(true);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "true");
-        MMI_HILOGI("set para input.pointer.device true");
+        MMI_HILOGI("Set para input.pointer.device true");
     }
     DfxHisysevent::OnDeviceConnect(nextId_ - 1, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
 }
@@ -304,7 +304,7 @@ void InputDeviceManager::ScanPointerDevice()
     if (!hasPointerDevice) {
         NotifyPointerDevice(false);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "false");
-        MMI_HILOGI("set para input.pointer.device false");
+        MMI_HILOGI("Set para input.pointer.device false");
     }
 }
 
@@ -343,11 +343,11 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
     CHKPR(inputDevice, INVALID_DEVICE_ID);
     for (const auto& item : inputDevice_) {
         if (item.second == inputDevice) {
-            MMI_HILOGI("find input device id success");
+            MMI_HILOGI("Find input device id success");
             return item.first;
         }
     }
-    MMI_HILOGE("find input device id failed");
+    MMI_HILOGE("Find input device id failed");
     return INVALID_DEVICE_ID;
 }
 
@@ -370,7 +370,7 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
         for (const auto &axis : axisinfo) {
             auto iter = axisType.find(axis.GetAxisType());
             if (iter == axisType.end()) {
-                MMI_HILOGE("AxisType is not found");
+                MMI_HILOGE("The axisType is not found");
                 return;
             }
             mprintf(fd,

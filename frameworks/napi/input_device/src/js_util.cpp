@@ -114,11 +114,11 @@ napi_value JsUtil::GetDeviceInfo(const std::unique_ptr<CallbackInfo> &cb)
     CHKRP(cb->env, napi_set_named_property(cb->env, object, "phys", phys), SET_NAMED_PROPERTY);
 
     if (!GetDeviceSourceType(cb, object)) {
-        MMI_HILOGE("get device source type failed");
+        MMI_HILOGE("Get device source type failed");
         return nullptr;
     }
     if (!GetDeviceAxisInfo(cb, object)) {
-        MMI_HILOGE("get device axis failed");
+        MMI_HILOGE("Get device axis failed");
         return nullptr;
     }
     return object;
@@ -145,7 +145,7 @@ bool JsUtil::GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_val
     for (const auto &item : cb->data.device->GetAxisInfo()) {
         auto iter = axisType.find(item.GetAxisType());
         if (iter == axisType.end()) {
-            MMI_HILOGD("find axisType failed");
+            MMI_HILOGD("Find axisType failed");
         }
         CHKRF(cb->env, napi_create_object(cb->env, &axisRange), CREATE_OBJECT);
         CHKRF(cb->env, napi_set_named_property(cb->env, axisRange, "source", sourceType), SET_NAMED_PROPERTY);

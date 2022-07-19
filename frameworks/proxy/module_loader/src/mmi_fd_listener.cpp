@@ -51,11 +51,11 @@ void MMIFdListener::OnReadable(int32_t fd)
             mmiClient_->OnRecvMsg(szBuf, size);
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGD("continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
+                MMI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
                     size, errno);
                 continue;
             }
-            MMI_HILOGE("recv return %{public}zu errno:%{public}d", size, errno);
+            MMI_HILOGE("Recv return %{public}zu errno:%{public}d", size, errno);
             break;
         } else {
             MMI_HILOGD("[Do nothing here]The service side disconnect with the client. size:0 count:%{public}d "

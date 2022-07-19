@@ -12,24 +12,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef I_INPUT_INTERCEPTOR_MANAGER_H
-#define I_INPUT_INTERCEPTOR_MANAGER_H
 
-#include "nocopyable.h"
-#include "singleton.h"
+#ifndef CALL_DINPUT_DEATH_RECIPIENT_H
+#define CALL_DINPUT_DEATH_RECIPIENT_H
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
 
-#include "i_input_event_consumer.h"
+#include "iremote_broker.h"
 
 namespace OHOS {
 namespace MMI {
-class IInputInterceptorManager : public DelayedSingleton<IInputInterceptorManager> {
+class CALLDinputDeathRecipient : public IRemoteObject::DeathRecipient {
 public:
-    IInputInterceptorManager() = default;
-    ~IInputInterceptorManager() = default;
-    DISALLOW_COPY_AND_MOVE(IInputInterceptorManager);
-    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
-    void RemoveInterceptor(int32_t interceptorId);
+    explicit CALLDinputDeathRecipient(const std::function<void(const wptr<IRemoteObject> &object)>
+                                                  &deathCallback);
+    ~CALLDinputDeathRecipient() = default;
+    void OnRemoteDied(const wptr<IRemoteObject> &object) override;
+
+private:
+    std::function<void(const wptr<IRemoteObject> &object)> deathCallback_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_INPUT_INTERCEPTOR_MANAGER_H
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
+#endif // REMOTE_INPUT_ABILITY_DEATH_RECIPIENT_H

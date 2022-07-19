@@ -20,7 +20,6 @@
 #include <sstream>
 
 #include "bytrace_adapter.h"
-#include "define_interceptor_manager.h"
 #include "input_device.h"
 #include "input_device_impl.h"
 #include "input_event_data_transformation.h"
@@ -109,7 +108,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     CHKPR(key, ERROR_NULL_POINTER);
     int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, key);
     if (ret != RET_OK) {
-        MMI_HILOGE("read netPacket failed");
+        MMI_HILOGE("Read netPacket failed");
         return RET_ERR;
     }
     int32_t fd = 0;
@@ -118,7 +117,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read fd failed");
         return PACKET_READ_FAIL;
     }
-    MMI_HILOGD("key event dispatcher of client, Fd:%{public}d", fd);
+    MMI_HILOGD("Key event dispatcher of client, Fd:%{public}d", fd);
     PrintEventData(key);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(eventProcessedCallback_);
@@ -157,7 +156,7 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     int32_t ret = InputEventDataTransformation::NetPacketToKeyEvent(pkt, keyEvent);
     if (ret != RET_OK) {
-        MMI_HILOGE("read net packet failed");
+        MMI_HILOGE("Read net packet failed");
         return RET_ERR;
     }
     int32_t fd = -1;
@@ -310,9 +309,17 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
-    int32_t ret = MultimodalInputConnMgr->MarkEventProcessed(eventId);
-    if (ret != 0) {
-        MMI_HILOGE("send to server failed, ret:%{public}d", ret);
+    CALL_DEBUG_ENTER;
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
+    CHKPV(client);
+    NetPacket pkt(MmiMessageId::MARK_PROCESS);
+    pkt << eventId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write event failed");
+        return;
+    }
+    if (!client->SendMessage(pkt)) {
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
 }
