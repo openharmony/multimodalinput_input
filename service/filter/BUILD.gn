@@ -60,13 +60,13 @@ ohos_source_set("mmi_event_filter_proxy") {
   if (input_enable_keyboard) {
     defines += [ "OHOS_BUILD_ENABLE_KEYBOARD" ]
   }
-  if (input_enable_tp) {
+  if (input_enable_touchscreen) {
     defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
   }
   if (input_enable_mouse) {
     defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
   }
-  if (input_enable_tp) {
+  if (input_enable_touchscreen) {
     defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
   }
 

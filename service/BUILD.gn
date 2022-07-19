@@ -78,7 +78,7 @@ config("libmmi_server_config") {
     defines += [ "OHOS_BUILD_HDF" ]
   }
 
-  if (input_enable_combinationkey) {
+  if (input_enable_combination_key) {
     defines += [ "OHOS_BUILD_ENABLE_COMBINATION_KEY" ]
   }
 
@@ -105,7 +105,7 @@ config("libmmi_server_config") {
     defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
   }
 
-  if (input_enable_tp) {
+  if (input_enable_touchscreen) {
     defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
   }
   if (input_enable_monitor) {
@@ -162,12 +162,12 @@ ohos_shared_library("libmmi-server") {
       "event_package/src/event_package.cpp",
       "subscriber/src/key_event_subscriber.cpp",
     ]
-    if (input_enable_combinationkey) {
+    if (input_enable_combination_key) {
       sources += [ "key_command/src/key_command_manager.cpp" ]
     }
   }
 
-  if (input_enable_mouse || input_enable_tp) {
+  if (input_enable_mouse || input_enable_touchscreen) {
     sources += [ "touch_transform_point/src/touch_transform_point_manager.cpp" ]
     if (input_enable_mouse) {
       sources += [
@@ -182,7 +182,7 @@ ohos_shared_library("libmmi-server") {
         sources += [ "window_manager/src/i_pointer_drawing_manager.cpp" ]
       }
     }
-    if (input_enable_tp) {
+    if (input_enable_touchscreen) {
       sources += [
         "touch_transform_point/src/tablet_tool_processor.cpp",
         "touch_transform_point/src/touch_transform_point_processor.cpp",
@@ -325,7 +325,7 @@ ohos_unittest("ut-mmi-service-out") {
   if (input_enable_mouse) {
     defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
   }
-  if (input_enable_tp) {
+  if (input_enable_touchscreen) {
     defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
   }
   if (input_enable_monitor) {
