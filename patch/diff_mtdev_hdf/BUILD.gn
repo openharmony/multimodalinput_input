@@ -80,5 +80,5 @@ ohos_shared_library("libmtdev-hdf") {
 
   public_deps = [ ":patch_gen_mtdev-third" ]
 
-  part_name = "multimodalinput_base"
+  part_name = "input"
 }

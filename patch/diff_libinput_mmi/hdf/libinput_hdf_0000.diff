@@ -60,7 +60,7 @@ diff -Naur old/BUILD.gn new/BUILD.gn
 +    "//third_party/patch_mtdev_hdf:libmtdev-hdf",
    ]
  
-   part_name = "multimodalinput_base"
+   part_name = "input"
 @@ -86,92 +91,3 @@
  ## Build libinput-third.so }}}
  
