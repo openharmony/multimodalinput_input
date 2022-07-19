@@ -612,8 +612,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     if (displayInfo->direction == Direction0 || displayInfo->direction == Direction180) {
         width = displayInfo->width;
         height = displayInfo->height;
-    }
-    if (displayInfo->direction == Direction90 || displayInfo->direction == Direction270) {
+    } else {
         height = displayInfo->width;
         width = displayInfo->height;
     }
