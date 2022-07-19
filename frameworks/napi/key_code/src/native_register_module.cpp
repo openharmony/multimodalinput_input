@@ -14,6 +14,7 @@
  */
 
 #include "js_key_code.h"
+#include "node_api.h"
 
 namespace OHOS {
 namespace MMI {
