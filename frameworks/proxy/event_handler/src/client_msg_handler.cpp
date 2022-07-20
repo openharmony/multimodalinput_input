@@ -101,7 +101,6 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-
 int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
 {
     auto key = KeyEvent::Create();
