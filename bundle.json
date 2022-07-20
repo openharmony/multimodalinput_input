@@ -12,7 +12,16 @@
     "syscap": [
       "SystemCapability.multimodalinput.input"
     ],
-    "features": [],
+    "features": [
+      "input_feature_combination_key",
+      "input_feature_pointer_drawing",
+      "input_feature_interceptor",
+      "input_feature_monitor",
+      "input_feature_keyboard",
+      "input_feature_mouse",
+      "input_feature_touchscreen",
+      "input_feature_input_device"
+    ],
     "adapted_system_type": [
       "standard"
     ],
@@ -55,6 +64,7 @@
     "build": {
       "sub_component": [
         "//foundation/multimodalinput/input:multimodalinput_mmi_packages",
+        "//foundation/multimodalinput/input:input_jsapi_group",
         "//foundation/multimodalinput/input/sa_profile:multimodalinput_sa_profile",
         "//foundation/multimodalinput/input:multimodalinput.rc",
         "//foundation/multimodalinput/input/patch:patch_packages",
