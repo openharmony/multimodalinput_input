@@ -206,7 +206,7 @@ void MMIClient::RegisterDisconnectedFunction(ConnectCallback fun)
 void MMIClient::OnDisconnected()
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Disconnected from server, fd:%{public}d", fd_);
+    MMI_HILOGI("Disconnected from server, fd:%{public}d", fd_);
     isConnected_ = false;
     if (funDisconnected_) {
         funDisconnected_(*this);
@@ -225,7 +225,7 @@ void MMIClient::OnDisconnected()
 void MMIClient::OnConnected()
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Connection to server succeeded, fd:%{public}d", GetFd());
+    MMI_HILOGI("Connection to server succeeded, fd:%{public}d", GetFd());
     isConnected_ = true;
     if (funConnected_) {
         funConnected_(*this);
@@ -249,7 +249,7 @@ int32_t MMIClient::Socket()
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
         MMI_HILOGE("Call GetClientSocketFdOfAllocedSocketPair return invalid fd");
     } else {
-        MMI_HILOGD("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
+        MMI_HILOGI("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
     }
     return fd_;
 }
