@@ -127,6 +127,7 @@ void InputEventNormalizeHandler::HandlePointerEvent(std::shared_ptr<PointerEvent
             item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
             item.GetDeviceId());
     }
+    WinMgr->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
