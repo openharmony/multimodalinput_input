@@ -174,7 +174,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
     }
     return RET_OK;
 #else
-    MMI_HILOGW("Pointer and tp device does not support");
+    MMI_HILOGW("Pointer and touchscreen device does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
@@ -363,7 +363,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
     CHKPR(consumer, INVALID_HANDLER_ID);
     return AddMonitor(consumer);
 #else
-    MMI_HILOGW("Keyboard device or function does not support");
+    MMI_HILOGW("Keyboard device or monitor function does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD || OHOS_BUILD_ENABLE_MONITOR
 }
@@ -377,7 +377,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerE
     CHKPR(consumer, INVALID_HANDLER_ID);
     return AddMonitor(consumer);
 #else
-    MMI_HILOGW("Pointer/tp device or monitor function does not support");
+    MMI_HILOGW("Pointer/touchscreen device or monitor function does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_MONITOR ||  OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
 }
@@ -520,7 +520,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
     }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
     #ifndef OHOS_BUILD_ENABLE_TOUCH
-        MMI_HILOGW("Tp device does not support");
+        MMI_HILOGW("Touchscreen device does not support");
         return;
     #endif
    }
@@ -529,7 +529,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
         MMI_HILOGE("Failed to inject pointer event");
     }
 #else
-    MMI_HILOGW("Pointer and tp device does not support");
+    MMI_HILOGW("Pointer and touchscreen device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
