@@ -36,6 +36,7 @@ input_enable_distributed = false
 mmi_enable_keyboard = true
 mmi_enable_mouse = true
 mmi_enable_tp = true
+mmi_enable_input_device = true
 
 print("is_mmi_have_libinput = ${is_mmi_have_libinput}")
 print("is_mmi_have_hdf = ${is_mmi_have_hdf}")

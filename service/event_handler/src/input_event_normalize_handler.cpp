@@ -222,7 +222,7 @@ int32_t InputEventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
         MMI_HILOGD("This touch pad event is up remove this finger");
-        if (pointerEvent->GetPointersIdList().empty()) {
+        if (pointerEvent->GetPointerIds().empty()) {
             MMI_HILOGD("This touch pad event is final finger up remove this finger");
             pointerEvent->Reset();
         }
@@ -285,7 +285,7 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
         MMI_HILOGD("This touch event is up remove this finger");
-        if (pointerEvent->GetPointersIdList().empty()) {
+        if (pointerEvent->GetPointerIds().empty()) {
             MMI_HILOGD("This touch event is final finger up remove this finger");
             pointerEvent->Reset();
         }

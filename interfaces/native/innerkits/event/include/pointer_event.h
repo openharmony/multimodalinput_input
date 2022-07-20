@@ -841,7 +841,7 @@ public:
      * @return Returns all the pointer IDs.
      * @since 9
      */
-    std::vector<int32_t> GetPointersIdList() const;
+    std::vector<int32_t> GetPointerIds() const;
 
     /**
      * @brief Obtains the source type of this event.
