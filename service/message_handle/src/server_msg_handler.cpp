@@ -18,7 +18,7 @@
 #include <cinttypes>
 
 #include "event_dump.h"
-#include "event_package.h"
+#include "key_event_handler.h"
 #include "hos_key_event.h"
 #include "event_interceptor_handler.h"
 #include "input_device_manager.h"

@@ -26,11 +26,11 @@
 
 namespace OHOS {
 namespace MMI {
-class EventPackage {
+class KeyEventHandler {
 public:
-    EventPackage();
-    DISALLOW_COPY_AND_MOVE(EventPackage);
-    virtual ~EventPackage();
+    KeyEventHandler();
+    DISALLOW_COPY_AND_MOVE(KeyEventHandler);
+    virtual ~KeyEventHandler();
     int32_t PackageKeyEvent(libinput_event *event, EventKeyboard& key);
     int32_t PackageKeyEvent(libinput_event *event, std::shared_ptr<KeyEvent> kevnPtr);
     static int32_t PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key);

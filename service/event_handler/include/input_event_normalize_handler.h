@@ -19,7 +19,7 @@
 #include <memory>
 
 #include "i_input_event_handler.h"
-#include "event_package.h"
+#include "key_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -45,7 +45,7 @@ private:
 private:
     int32_t timerId_ = -1;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    EventPackage eventPackage_;
+    KeyEventHandler eventPackage_;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 };
 } // namespace MMI
