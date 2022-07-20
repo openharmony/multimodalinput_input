@@ -420,7 +420,7 @@ int32_t HdfEventManager::DeviceRemoveHandle(uint32_t devIndex, uint32_t devType)
 }
 
 
-void HdfEventManager::GetEventCallback(const EventPackage **pkgs, uint32_t count, uint32_t devIndex)
+void HdfEventManager::GetEventCallback(const KeyEventHandler **pkgs, uint32_t count, uint32_t devIndex)
 {
     static constexpr uint16_t byteSize = 8;
     CHKPV(pkgs);
