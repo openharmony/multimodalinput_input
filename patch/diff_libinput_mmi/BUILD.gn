@@ -18,7 +18,7 @@ gen_src_dir = "//third_party/libinput"
 gen_dst_dir = root_out_dir + "/diff_libinput_mmi"
 patches_root_dir = "//foundation/multimodalinput/input/patch"
 build_gn_dir = "$patches_root_dir/diff_libinput_mmi/libinput"
-if (is_mmi_have_hdf) {
+if (input_feature_hdf) {
   build_gn_dir = "$patches_root_dir/diff_libinput_mmi/hdf"
 }
 
@@ -68,7 +68,7 @@ action("apply_patch") {
     "$gen_dst_dir/tools/libinput-debug-tablet.c",
   ]
 
-  if (is_mmi_have_libinput) {
+  if (input_feature_libinput) {
     outputs += [
       "$gen_dst_dir/hm_src/hm_missing.h",
       "$gen_dst_dir/hm_src/hm_missing.c",
@@ -98,11 +98,11 @@ config("libinput-third_config") {
     "$gen_dst_dir/include",
   ]
 
-  if (is_mmi_have_libinput) {
+  if (input_feature_libinput) {
     include_dirs += [ "$gen_dst_dir/hm_src" ]
   }
 
-  if (is_mmi_have_hdf) {
+  if (input_feature_hdf) {
     include_dirs += [ "$root_out_dir/diff_mtdev_hdf/include" ]
   }
 
@@ -114,7 +114,7 @@ config("libinput-third_config") {
     "-Wno-string-conversion",
   ]
 
-  if (is_mmi_have_libinput) {
+  if (input_feature_libinput) {
     cflags += [
       "-DHAVE_LIBINPUT_LOG_CONSOLE_ENABLE",
       "-DHAVE_LIBINPUT_LOG_ENABLE",
@@ -130,7 +130,7 @@ config("libinput-third_public_config") {
     "$gen_dst_dir/src",
   ]
 
-  if (is_mmi_have_hdf) {
+  if (input_feature_hdf) {
     include_dirs += [ "$root_out_dir/diff_mtdev_hdf/include" ]
   }
 
@@ -184,14 +184,14 @@ ohos_source_set("patch_gen_libinput-third-mmi") {
 
   public_deps = [ "//third_party/eudev:libudev" ]
 
-  if (is_mmi_have_libinput) {
+  if (input_feature_libinput) {
     public_deps += [
       "//third_party/libevdev:libevdev",
       "//third_party/mtdev:libmtdev",
     ]
   }
 
-  if (is_mmi_have_hdf) {
+  if (input_feature_hdf) {
     public_deps += [
       "//foundation/multimodalinput/input/patch/diff_libevdev_hdf:libevdev-hdf",
       "//foundation/multimodalinput/input/patch/diff_mtdev_hdf:libmtdev-hdf",
@@ -210,14 +210,14 @@ ohos_shared_library("libinput-third-mmi") {
 
   public_deps = [ "//third_party/eudev:libudev" ]
 
-  if (is_mmi_have_libinput) {
+  if (input_feature_libinput) {
     public_deps += [
       "//third_party/libevdev:libevdev",
       "//third_party/mtdev:libmtdev",
     ]
   }
 
-  if (is_mmi_have_hdf) {
+  if (input_feature_hdf) {
     public_deps += [
       "//foundation/multimodalinput/input/patch/diff_libevdev_hdf:libevdev-hdf",
       "//foundation/multimodalinput/input/patch/diff_mtdev_hdf:libmtdev-hdf",
@@ -227,7 +227,7 @@ ohos_shared_library("libinput-third-mmi") {
   part_name = "input"
 }
 
-if (is_mmi_have_libinput) {
+if (input_feature_libinput) {
   ohos_source_set("patch_gen_libinput-debug") {
     part_name = "input"
     sources = [

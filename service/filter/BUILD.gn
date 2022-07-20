@@ -35,7 +35,7 @@ ohos_source_set("mmi_event_filter_service") {
 
   configs = [ ":mmi_event_filter_config" ]
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
@@ -55,19 +55,19 @@ ohos_source_set("mmi_event_filter_proxy") {
 
   configs = [ ":mmi_event_filter_config" ]
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
-  if (mmi_enable_keyboard) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_KEYBOARD" ]
+  if (input_feature_keyboard) {
+    defines += [ "OHOS_BUILD_ENABLE_KEYBOARD" ]
   }
-  if (mmi_enable_tp) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
+  if (input_feature_touchscreen) {
+    defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
   }
-  if (mmi_enable_mouse) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
+  if (input_feature_mouse) {
+    defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
   }
-  if (mmi_enable_tp) {
-    cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
+  if (input_feature_touchscreen) {
+    defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
   }
 
   external_deps = [

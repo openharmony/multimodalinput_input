@@ -13,7 +13,7 @@
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-if (input_enable_distributed) {
+if (input_feature_distributed) {
   distributed_input_path = "${mmi_path}/frameworks/napi/distributed_input"
   config("libdistributedinput_config") {
     visibility = [ ":*" ]
@@ -24,13 +24,13 @@ if (input_enable_distributed) {
       "${distributed_input_path}/include",
     ]
 
-    cflags = [ "-DOHOS_BUILD" ]
-    if (is_mmi_have_libinput) {
-      cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+    defines = [ "OHOS_BUILD" ]
+    if (input_feature_libinput) {
+      defines += [ "OHOS_BUILD_LIBINPUT" ]
     }
 
-    if (is_mmi_have_hdf) {
-      cflags += [ "-DOHOS_BUILD_HDF" ]
+    if (input_feature_hdf) {
+      defines += [ "OHOS_BUILD_HDF" ]
     }
   }
 
