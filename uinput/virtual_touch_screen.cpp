@@ -15,6 +15,9 @@
 
 #include "virtual_touch_screen.h"
 
+#include "linux/input-event-codes.h"
+#include "linux/uinput.h"
+
 namespace OHOS {
 namespace MMI {
 const std::vector<uint32_t> &VirtualTouchScreen::GetEventTypes() const

@@ -15,11 +15,10 @@
 
 #include "hdf_device_event_dispatch.h"
 
-#include <cstdio>
-#include <cstring>
-#include <functional>
+#include <memory>
 
 #include "mmi_log.h"
+#include "virtual_touch_screen.h"
 
 using namespace OHOS::HiviewDFX;
 namespace OHOS {

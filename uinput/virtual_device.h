@@ -17,11 +17,8 @@
 #define VIRTUAL_DEVICE_H
 
 #include <cstdint>
-#include <functional>
-#include <iostream>
 #include <vector>
 
-#include "linux/input.h"
 #include "linux/uinput.h"
 #include "nocopyable.h"
 

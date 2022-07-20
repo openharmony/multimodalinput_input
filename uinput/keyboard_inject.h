@@ -16,15 +16,14 @@
 #ifndef KEYBOARD_INJECT_H
 #define KEYBOARD_INJECT_H
 
-#include <iostream>
 #include <map>
+#include <memory>
 #include <mutex>
 
 #include "nocopyable.h"
 #include "singleton.h"
 
 #include "inject_thread.h"
-#include "virtual_keyboard.h"
 
 namespace OHOS {
 namespace MMI {
