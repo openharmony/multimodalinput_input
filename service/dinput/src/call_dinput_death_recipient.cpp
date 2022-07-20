@@ -12,22 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DEFINE_INTERCEPTOR_MANAGER_H
-#define DEFINE_INTERCEPTOR_MANAGER_H
 
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    #include "input_interceptor_manager.h"
-#else
-    #include "i_input_interceptor_manager.h"
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#include "call_dinput_death_recipient.h"
+
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    #define InputInterMgr InputInterceptorManager::GetInstance()
-#else
-    #define InputInterMgr IInputInterceptorManager::GetInstance()
-#endif
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "CallDinputDeathRecipient" };
+} // namespace
+CALLDinputDeathRecipient::CALLDinputDeathRecipient(
+    const std::function<void(const wptr<IRemoteObject> &object)> &deathCallback)
+    : deathCallback_(deathCallback) {}
+
+void CALLDinputDeathRecipient::OnRemoteDied(const OHOS::wptr<OHOS::IRemoteObject> &object)
+{
+    CHKPV(deathCallback_);
+    deathCallback_(object);
+}
 } // namespace MMI
 } // namespace OHOS
-#endif // DEFINE_INTERCEPTOR_MANAGER_H

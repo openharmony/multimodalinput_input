@@ -48,8 +48,6 @@ config("libmmi_test_util") {
     "${mmi_path}/test/unittest/common/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket/include",
-    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
-    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/window/window_manager/wm/include",
     "//third_party/googletest/googletest/include",
@@ -58,6 +56,7 @@ config("libmmi_test_util") {
 
 ohos_source_set("libmmi-common") {
   sources = [
+    "events/src/input_device.cpp",
     "events/src/input_event.cpp",
     "events/src/key_event.cpp",
     "events/src/key_option.cpp",
@@ -123,8 +122,6 @@ ohos_shared_library("libmmi-client") {
 
   if (mmi_enable_interceptor) {
     sources += [ "event_handler/src/input_interceptor_manager.cpp" ]
-  } else {
-    sources += [ "event_handler/src/i_input_interceptor_manager.cpp" ]
   }
 
   if (mmi_enable_monitor) {
@@ -271,11 +268,15 @@ ohos_unittest("InputManagerTest") {
   if (mmi_enable_tp) {
     cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
   }
+  if (mmi_enable_interceptor) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_INTERCEPTOR" ]
+  }
   if (mmi_enable_monitor) {
     cflags += [ "-DOHOS_BUILD_ENABLE_MONITOR" ]
   }
   sources = [
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
+    "${mmi_path}/test/unittest/common/src/system_info.cpp",
     "${mmi_path}/test/unittest/common/src/window_utils_test.cpp",
     "events/test/input_manager_test.cpp",
   ]
@@ -286,8 +287,6 @@ ohos_unittest("InputManagerTest") {
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
-    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
-    "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
@@ -324,6 +323,12 @@ ohos_unittest("InputManagerManualTest") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
+  if (mmi_enable_mouse) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
+  }
+  if (mmi_enable_tp) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_TOUCH" ]
+  }
   sources = [ "events/test/input_manager_manual_test.cpp" ]
 
   configs = [ ":libmmi_test_util" ]
@@ -361,6 +366,9 @@ ohos_unittest("PointerEventTest") {
     cflags += [ "-DOHOS_BUILD_HDF" ]
   }
 
+  if (mmi_enable_mouse) {
+    cflags += [ "-DOHOS_BUILD_ENABLE_POINTER" ]
+  }
   sources = [
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
     "${mmi_path}/test/unittest/common/src/window_utils_test.cpp",
@@ -373,8 +381,6 @@ ohos_unittest("PointerEventTest") {
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
     "//foundation/ability/ability_runtime/frameworks/native/ability/native:abilitykit_native",
-    "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
-    "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]

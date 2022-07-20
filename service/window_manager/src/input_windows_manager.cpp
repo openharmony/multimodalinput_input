@@ -76,7 +76,7 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
 {
     int32_t displayId = inputEvent->GetTargetDisplayId();
     if (displayId < 0) {
-        MMI_HILOGD("target display is -1");
+        MMI_HILOGD("Target display is -1");
         if (displayGroupInfo_.displaysInfo.empty()) {
             return displayId;
         }
@@ -172,7 +172,8 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
     if (!displayGroupInfo.displaysInfo.empty()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
         IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo.displaysInfo[0].id,
-            displayGroupInfo.displaysInfo[0].width, displayGroupInfo.displaysInfo[0].height);
+            displayGroupInfo.displaysInfo[0].width, displayGroupInfo.displaysInfo[0].height,
+            displayGroupInfo.displaysInfo[0].direction);
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
     PrintDisplayInfo();
@@ -249,13 +250,14 @@ void InputWindowsManager::RotateTouchScreen(DisplayInfo info, LogicalCoordinate&
         int32_t temp = coord.x;
         coord.x = info.height - coord.y;
         coord.y = temp;
-        MMI_HILOGD("logicalX:%{public}d, logicalY:%{public}d", coord.x, coord.y);
+        MMI_HILOGD("physicalX:%{public}d, physicalY:%{public}d", coord.x, coord.y);
         return;
     }
     if (direction == Direction180) {
         MMI_HILOGD("direction is Direction180");
         coord.x = info.width - coord.x;
         coord.y = info.height - coord.y;
+        MMI_HILOGD("physicalX:%{public}d, physicalY:%{public}d", coord.x, coord.y);
         return;
     }
     if (direction == Direction270) {
@@ -263,6 +265,7 @@ void InputWindowsManager::RotateTouchScreen(DisplayInfo info, LogicalCoordinate&
         int32_t temp = coord.y;
         coord.y = info.width - coord.x;
         coord.x = temp;
+        MMI_HILOGD("physicalX:%{public}d, physicalY:%{public}d", coord.x, coord.y);
     }
 }
 
@@ -278,7 +281,7 @@ void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
     touchInfo.point.y = coord.y;
     touchInfo.toolRect.point.x = static_cast<int32_t>(libinput_event_touch_get_tool_x_transformed(touch, info.width));
     touchInfo.toolRect.point.y = static_cast<int32_t>(libinput_event_touch_get_tool_y_transformed(touch, info.height));
-    touchInfo.toolRect.width =  static_cast<int32_t>(
+    touchInfo.toolRect.width = static_cast<int32_t>(
         libinput_event_touch_get_tool_width_transformed(touch, info.width));
     touchInfo.toolRect.height = static_cast<int32_t>(
         libinput_event_touch_get_tool_height_transformed(touch, info.height));
@@ -342,8 +345,18 @@ const DisplayGroupInfo& InputWindowsManager::GetDisplayGroupInfo()
 bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const
 {
     for (const auto &item : rects) {
-        if (((x >= item.x) && (x < (item.x + item.width))) &&
-            (y >= item.y) && (y < (item.y + item.height))) {
+        int32_t displayMaxX = 0;
+        int32_t displayMaxY = 0;
+        if (!AddInt32(item.x, item.width, displayMaxX)) {
+            MMI_HILOGE("The addition of displayMaxX overflows");
+            return false;
+        }
+        if (!AddInt32(item.y, item.height, displayMaxY)) {
+            MMI_HILOGE("The addition of displayMaxY overflows");
+            return false;
+        }
+        if (((x >= item.x) && (x < displayMaxX)) &&
+            (y >= item.y) && (y < displayMaxY)) {
             return true;
         }
     }
@@ -360,8 +373,7 @@ void InputWindowsManager::AdjustDisplayCoordinate(
     if (displayInfo.direction == Direction0 || displayInfo.direction == Direction180) {
         width = displayInfo.width;
         height = displayInfo.height;
-    }
-    if (displayInfo.direction == Direction90 || displayInfo.direction == Direction270) {
+    } else {
         height = displayInfo.width;
         width = displayInfo.height;
     }
@@ -416,12 +428,12 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(const int32_t& l
                 continue;
             } else if ((targetWindowId < 0) && (IsInHotArea(logicalX, logicalY, item.pointerHotAreas))) {
                 firstBtnDownWindowId_ = item.id;
-                MMI_HILOGW("find out the dispatch window of this pointer event when the targetWindowId "
+                MMI_HILOGW("Find out the dispatch window of this pointer event when the targetWindowId "
                            "hasn't been setted up yet, window:%{public}d", firstBtnDownWindowId_);
                 break;
             } else if ((targetWindowId >= 0) && (targetWindowId == item.id)) {
                 firstBtnDownWindowId_ = targetWindowId;
-                MMI_HILOGW("find out the dispatch window of this pointer event when the targetWindowId "
+                MMI_HILOGW("Find out the dispatch window of this pointer event when the targetWindowId "
                            "has been setted up already, window:%{public}d", firstBtnDownWindowId_);
                 break;
             } else {
@@ -443,7 +455,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdateDisplayId(displayId)) {
-        MMI_HILOGE("This display:%{public}d is not exist", displayId);
+        MMI_HILOGE("This display:%{public}d is not existent", displayId);
         return RET_ERR;
     }
     pointerEvent->SetTargetDisplayId(displayId);
@@ -456,8 +468,16 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     auto physicalDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPR(physicalDisplayInfo, ERROR_NULL_POINTER);
-    int32_t logicalX = pointerItem.GetDisplayX() + physicalDisplayInfo->x;
-    int32_t logicalY = pointerItem.GetDisplayY() + physicalDisplayInfo->y;
+    int32_t logicalX = 0;
+    int32_t logicalY = 0;
+    if (!AddInt32(pointerItem.GetDisplayX(), physicalDisplayInfo->x, logicalX)) {
+        MMI_HILOGE("The addition of logicalX overflows");
+        return RET_ERR;
+    }
+    if (!AddInt32(pointerItem.GetDisplayY(), physicalDisplayInfo->y, logicalY)) {
+        MMI_HILOGE("The addition of logicalY overflows");
+        return RET_ERR;
+    }
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
     auto touchWindow = SelectWindowInfo(logicalX, logicalY, pointerEvent);
     if (!touchWindow) {
@@ -466,19 +486,19 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
-    int32_t localX = logicalX - touchWindow->area.x;
-    int32_t localY = logicalY - touchWindow->area.y;
-    pointerItem.SetWindowX(localX);
-    pointerItem.SetWindowY(localY);
+    int32_t screenX = logicalX - touchWindow->area.x;
+    int32_t screenY = logicalY - touchWindow->area.y;
+    pointerItem.SetWindowX(screenX);
+    pointerItem.SetWindowY(screenY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
 
     MMI_HILOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
                "logicalX:%{public}d,logicalY:%{public}d,"
-               "displayX:%{public}d,displayY:%{public}d,localX:%{public}d,localY:%{public}d",
+               "displayX:%{public}d,displayY:%{public}d,screenX:%{public}d,screenY:%{public}d",
                fd, touchWindow->pid, touchWindow->id, touchWindow->agentWindowId,
-               logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), localX, localY);
+               logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), screenX, screenY);
     return fd;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -489,7 +509,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdateDisplayId(displayId)) {
-        MMI_HILOGE("This display is not exist");
+        MMI_HILOGE("This display is not existent");
         return RET_ERR;
     }
     pointerEvent->SetTargetDisplayId(displayId);
@@ -506,8 +526,16 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     int32_t physicalX = pointerItem.GetDisplayX();
     int32_t physicalY = pointerItem.GetDisplayY();
     AdjustDisplayCoordinate(*physicDisplayInfo, physicalX, physicalY);
-    int32_t logicalX = physicalX + physicDisplayInfo->x;
-    int32_t logicalY = physicalY + physicDisplayInfo->y;
+    int32_t logicalX = 0;
+    int32_t logicalY = 0;
+    if (!AddInt32(physicalX, physicDisplayInfo->x, logicalX)) {
+        MMI_HILOGE("The addition of logicalX overflows");
+        return RET_ERR;
+    }
+    if (!AddInt32(physicalY, physicDisplayInfo->y, logicalY)) {
+        MMI_HILOGE("The addition of logicalY overflows");
+        return RET_ERR;
+    }
     WindowInfo *touchWindow = nullptr;
     auto targetWindowId = pointerItem.GetTargetWindowId();
     for (auto &item : displayGroupInfo_.windowsInfo) {
@@ -527,28 +555,28 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
     if (touchWindow == nullptr) {
-        MMI_HILOGE("touchWindow is nullptr, logicalX:%{public}d, logicalY:%{public}d",
+        MMI_HILOGE("The touchWindow is nullptr, logicalX:%{public}d, logicalY:%{public}d",
             logicalX, logicalY);
         return RET_ERR;
     }
-    auto localX = logicalX - touchWindow->area.x;
-    auto localY = logicalY - touchWindow->area.y;
+    auto screenX = logicalX - touchWindow->area.x;
+    auto screenY = logicalY - touchWindow->area.y;
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     pointerItem.SetDisplayX(physicalX);
     pointerItem.SetDisplayY(physicalY);
-    pointerItem.SetWindowX(localX);
-    pointerItem.SetWindowY(localY);
+    pointerItem.SetWindowX(screenX);
+    pointerItem.SetWindowY(screenY);
     pointerItem.SetToolWindowX(pointerItem.GetToolDisplayX() + physicDisplayInfo->x - touchWindow->area.x);
     pointerItem.SetToolWindowY(pointerItem.GetToolDisplayY() + physicDisplayInfo->y - touchWindow->area.y);
     pointerItem.SetTargetWindowId(touchWindow->id);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
     MMI_HILOGD("pid:%{public}d,fd:%{public}d,logicalX:%{public}d,logicalY:%{public}d,"
-               "physicalX:%{public}d,physicalY:%{public}d,localX:%{public}d,localY:%{public}d,"
+               "physicalX:%{public}d,physicalY:%{public}d,screenX:%{public}d,screenY:%{public}d,"
                "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",
                touchWindow->pid, fd, logicalX, logicalY, physicalX, physicalY,
-               localX, localY, displayId, pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
+               screenX, screenY, displayId, pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
     return fd;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -599,11 +627,29 @@ bool InputWindowsManager::IsInsideDisplay(const DisplayInfo& displayInfo, int32_
 void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& physicalX,
     int32_t& physicalY, int32_t& displayId)
 {
-    int32_t logicalX = physicalX + displayInfo.x;
-    int32_t logicalY = physicalY + displayInfo.y;
+    int32_t logicalX = 0;
+    int32_t logicalY = 0;
+    if (!AddInt32(physicalX, displayInfo.x, logicalX)) {
+        MMI_HILOGE("The addition of logicalX overflows");
+        return;
+    }
+    if (!AddInt32(physicalY, displayInfo.y, logicalY)) {
+        MMI_HILOGE("The addition of logicalY overflows");
+        return;
+    }
     for (const auto &item : displayGroupInfo_.displaysInfo) {
-        if ((logicalX >= item.x && logicalX < item.x + item.width) &&
-            (logicalY >= item.y && logicalY < item.y + item.height)) {
+        int32_t displayMaxX = 0;
+        int32_t displayMaxY = 0;
+        if (!AddInt32(item.x, item.width, displayMaxX)) {
+            MMI_HILOGE("The addition of displayMaxX overflows");
+            return;
+        }
+        if (!AddInt32(item.y, item.height, displayMaxY)) {
+            MMI_HILOGE("The addition of displayMaxY overflows");
+            return;
+        }
+        if ((logicalX >= item.x && logicalX < displayMaxX) &&
+            (logicalY >= item.y && logicalY < displayMaxY)) {
             physicalX = logicalX - item.x;
             physicalY = logicalY - item.y;
             displayId = item.id;
@@ -621,18 +667,29 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     if (!IsInsideDisplay(*displayInfo, integerX, integerY)) {
         FindPhysicalDisplay(*displayInfo, integerX, integerY, displayId);
     }
+
+    int32_t width = 0;
+    int32_t height = 0;
+    if (displayInfo->direction == Direction0 || displayInfo->direction == Direction180) {
+        width = displayInfo->width;
+        height = displayInfo->height;
+    } else {
+        height = displayInfo->width;
+        width = displayInfo->height;
+    }
+
     if (displayId == lastDisplayId) {
         if (integerX < 0) {
             integerX = 0;
         }
-        if (integerX >= displayInfo->width) {
-            integerX = displayInfo->width - 1;
+        if (integerX >= width) {
+            integerX = width - 1;
         }
         if (integerY < 0) {
             integerY = 0;
         }
-        if (integerY >= displayInfo->height) {
-            integerY = displayInfo->height - 1;
+        if (integerY >= height) {
+            integerY = height - 1;
         }
     }
     x = static_cast<double>(integerX);

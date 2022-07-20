@@ -38,7 +38,7 @@ int32_t EventFilterStub::OnRemoteRequest(
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != IEventFilter::GetDescriptor()) {
-        MMI_HILOGE("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
+        MMI_HILOGE("Get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
 
@@ -47,7 +47,7 @@ int32_t EventFilterStub::OnRemoteRequest(
             return StubHandlePointerEvent(data, reply);
         }
         default: {
-            MMI_HILOGE("unknown code:%{public}u, go switch defaut", code);
+            MMI_HILOGE("Unknown code:%{public}u, go switch defaut", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
     }
@@ -58,12 +58,12 @@ int32_t EventFilterStub::StubHandlePointerEvent(MessageParcel& data, MessageParc
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> event = PointerEvent::Create();
     if (event == nullptr) {
-        MMI_HILOGE("event is nullptr");
+        MMI_HILOGE("The event is nullptr");
         return RET_ERR;
     }
 
     if (!event->ReadFromParcel(data)) {
-        MMI_HILOGE("read data error");
+        MMI_HILOGE("Read data error");
         return RET_ERR;
     }
 

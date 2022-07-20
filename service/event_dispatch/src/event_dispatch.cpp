@@ -71,29 +71,29 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     auto session = udsServer->GetSession(fd);
     CHKPV(session);
     if (session->isANRProcess_) {
-        MMI_HILOGD("application not responding");
+        MMI_HILOGD("Application not responding");
         return;
     }
     auto currentTime = GetSysClockTime();
-    if (AnrMgr->TriggerAnr(currentTime, session)) {
+    if (ANRMgr->TriggerANR(currentTime, session)) {
         session->isANRProcess_ = true;
-        MMI_HILOGW("the pointer event does not report normally, application not response");
+        MMI_HILOGW("The pointer event does not report normally, application not response");
         return;
     }
     auto pid = udsServer->GetClientPid(fd);
     auto pointerEvent = std::make_shared<PointerEvent>(*point);
-    auto pointerIdList = pointerEvent->GetPointersIdList();
+    auto pointerIdList = pointerEvent->GetPointerIds();
     if (pointerIdList.size() > 1) {
         for (const auto& id : pointerIdList) {
             PointerEvent::PointerItem pointeritem;
             if (!pointerEvent->GetPointerItem(id, pointeritem)) {
-                MMI_HILOGW("can't find this poinerItem");
+                MMI_HILOGW("Can't find this poinerItem");
                 continue;
             }
             auto itemPid = WinMgr->GetWindowPid(pointeritem.GetTargetWindowId());
             if (itemPid >= 0 && itemPid != pid) {
                 pointerEvent->RemovePointerItem(id);
-                MMI_HILOGD("pointerIdList size: %{public}zu", pointerEvent->GetPointersIdList().size());
+                MMI_HILOGD("pointerIdList size: %{public}zu", pointerEvent->GetPointerIds().size());
             }
         }
     }
@@ -104,7 +104,7 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
-    session->AddEvent(point->GetId(), currentTime);
+    session->SaveANREvent(point->GetId(), currentTime);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_POINTER
 
@@ -120,18 +120,18 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
         return RET_ERR;
     }
     DfxHisysevent::OnUpdateTargetKey(key, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
-    MMI_HILOGD("event dispatcher of server:KeyEvent:KeyCode:%{public}d,Action:%{public}d,EventType:%{public}d,"
+    MMI_HILOGD("Event dispatcher of server:KeyEvent:KeyCode:%{public}d,Action:%{public}d,EventType:%{public}d,"
         "Fd:%{public}d", key->GetKeyCode(), key->GetAction(), key->GetEventType(), fd);
     auto session = udsServer.GetSession(fd);
     CHKPR(session, RET_ERR);
     if (session->isANRProcess_) {
-        MMI_HILOGD("application not responding");
+        MMI_HILOGD("Application not responding");
         return RET_OK;
     }
     auto currentTime = GetSysClockTime();
-    if (AnrMgr->TriggerAnr(currentTime, session)) {
+    if (ANRMgr->TriggerANR(currentTime, session)) {
         session->isANRProcess_ = true;
-        MMI_HILOGW("the key event does not report normally, application not response");
+        MMI_HILOGW("The key event does not report normally, application not response");
         return RET_OK;
     }
 
@@ -147,7 +147,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
         MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-    session->AddEvent(key->GetId(), currentTime);
+    session->SaveANREvent(key->GetId(), currentTime);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

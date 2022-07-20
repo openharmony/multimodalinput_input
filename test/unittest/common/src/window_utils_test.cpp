@@ -15,15 +15,8 @@
 
 #include "window_utils_test.h"
 
-#include <display_type.h>
-
 #include "define_multimodal.h"
-#include "image/bitmap.h"
-#include "image_source.h"
-#include "image_type.h"
-#include "image_utils.h"
 #include "mmi_log.h"
-#include "pixel_map.h"
 
 namespace OHOS {
 namespace MMI {
@@ -37,6 +30,7 @@ std::string windowName = "WindowUtilsTest";
 
 WindowUtilsTest::~WindowUtilsTest()
 {
+    ClearTestWindow();
 }
 
 std::shared_ptr<WindowUtilsTest> WindowUtilsTest::GetInstance()

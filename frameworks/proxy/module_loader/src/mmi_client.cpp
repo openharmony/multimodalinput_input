@@ -85,16 +85,15 @@ bool MMIClient::StartEventRunner()
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     if (!InputMgrImpl->InitEventHandler()) {
-        MMI_HILOGE("init event handler error");
+        MMI_HILOGE("Init event handler error");
         Stop();
         return false;
     }
 
-    std::mutex mtx;
     static constexpr int32_t outTime = 3;
+    std::unique_lock <std::mutex> lck(mtx_);
     recvThread_ = std::thread(std::bind(&MMIClient::OnRecvThread, this));
     recvThread_.detach();
-    std::unique_lock <std::mutex> lck(mtx);
     if (cv_.wait_for(lck, std::chrono::seconds(outTime)) == std::cv_status::timeout) {
         MMI_HILOGE("Recv thread start timeout");
         Stop();
@@ -108,23 +107,25 @@ void MMIClient::OnRecvThread()
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     SetThreadName("mmi_client_RecvEventHdr");
-
     auto runner = EventRunner::Create(false);
     CHKPV(runner);
-    recvEventHandler_ = std::make_shared<MMIEventHandler>(runner, GetSharedPtr());
-    CHKPV(recvEventHandler_);
-    if (isConnected_ && fd_ >= 0) {
-        if (!AddFdListener(fd_)) {
-            MMI_HILOGE("add fd listener return false");
-            return;
+    {
+        std::lock_guard<std::mutex> lck(mtx_);
+        recvEventHandler_ = std::make_shared<MMIEventHandler>(runner, GetSharedPtr());
+        CHKPV(recvEventHandler_);
+        if (isConnected_ && fd_ >= 0) {
+            if (!AddFdListener(fd_)) {
+                MMI_HILOGE("Add fd listener return false");
+                return;
+            }
+        } else {
+            if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME)) {
+                MMI_HILOGE("Send reconnect event return false");
+                return;
+            }
         }
-    } else {
-        if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME)) {
-            MMI_HILOGE("send reconnect event return false.");
-            return;
-        }
+        cv_.notify_one();
     }
-    cv_.notify_one();
     runner->Run();
 }
 
@@ -140,7 +141,7 @@ bool MMIClient::AddFdListener(int32_t fd)
     CHKPF(fdListener);
     auto errCode = recvEventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener);
     if (errCode != ERR_OK) {
-        MMI_HILOGE("add fd listener error,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
+        MMI_HILOGE("Add fd listener error,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
             recvEventHandler_->GetErrorStr(errCode).c_str());
         return false;
     }
@@ -211,12 +212,12 @@ void MMIClient::OnDisconnected()
         funDisconnected_(*this);
     }
     if (!DelFdListener(fd_)) {
-        MMI_HILOGE("delete fd listener failed");
+        MMI_HILOGE("Delete fd listener failed");
     }
     Close();
     if (!isExit && recvEventHandler_ != nullptr) {
         if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME)) {
-            MMI_HILOGE("send reconnect event return false");
+            MMI_HILOGE("Send reconnect event return false");
         }
     }
 }
@@ -241,14 +242,14 @@ int32_t MMIClient::Socket()
     CALL_DEBUG_ENTER;
     int32_t ret = MultimodalInputConnMgr->AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {
-        MMI_HILOGE("call AllocSocketPair return %{public}d", ret);
+        MMI_HILOGE("Call AllocSocketPair return %{public}d", ret);
         return RET_ERR;
     }
     fd_ = MultimodalInputConnMgr->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
-        MMI_HILOGE("call GetClientSocketFdOfAllocedSocketPair return invalid fd");
+        MMI_HILOGE("Call GetClientSocketFdOfAllocedSocketPair return invalid fd");
     } else {
-        MMI_HILOGD("call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
+        MMI_HILOGD("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
     }
     return fd_;
 }

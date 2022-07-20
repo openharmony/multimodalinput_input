@@ -24,8 +24,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputInterceptorManager" };
 } // namespace
 
-InputInterceptorManager::InputInterceptorManager() {}
-
 int32_t InputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor,
     HandleEventType eventType)
 {

@@ -458,8 +458,8 @@ diff -Naur old/include/config.h new/include/config.h
  #define ffs __builtin_ffs
 +
 +#ifdef HAVE_LIBINPUT_LOG_ENABLE
-+#define _LIBINPUT_LOG_DIR "/data/libinput"
-+#define _LIBINPUT_LOG_PATH "/data/libinput/libinput.log"
++#define _LIBINPUT_LOG_DIR "/data/log/libinput"
++#define _LIBINPUT_LOG_PATH "/data/log/libinput/libinput.log"
 +#endif
 +
 +

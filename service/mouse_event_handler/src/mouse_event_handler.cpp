@@ -56,7 +56,7 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
     if (currentDisplayId_ == -1) {
         absolutionX_ = -1;
         absolutionY_ = -1;
-        MMI_HILOGI("currentDisplayId_ is -1");
+        MMI_HILOGI("The currentDisplayId_ is -1");
         return RET_ERR;
     }
 
@@ -73,10 +73,10 @@ void MouseEventHandler::InitAbsolution()
     if (absolutionX_ != -1 || absolutionY_ != -1 || currentDisplayId_ != -1) {
         return;
     }
-    MMI_HILOGD("init absolution");
+    MMI_HILOGD("Init absolution");
     auto dispalyGroupInfo = WinMgr->GetDisplayGroupInfo();
     if (dispalyGroupInfo.displaysInfo.empty()) {
-        MMI_HILOGI("displayInfo is empty");
+        MMI_HILOGI("The displayInfo is empty");
         return;
     }
     currentDisplayId_ = dispalyGroupInfo.displaysInfo[0].id;
@@ -88,7 +88,7 @@ int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)
 {
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
-    MMI_HILOGD("current action:%{public}d", pointerEvent_->GetPointerAction());
+    MMI_HILOGD("Current action:%{public}d", pointerEvent_->GetPointerAction());
 
     auto ret = HandleButtonValueInner(data);
     if (ret != RET_OK) {
@@ -110,7 +110,7 @@ int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)
         isPressed_ = true;
         buttonId_ = pointerEvent_->GetButtonId();
     } else {
-        MMI_HILOGE("unknown state, state:%{public}u", state);
+        MMI_HILOGE("Unknown state, state:%{public}u", state);
         return RET_ERR;
     }
     return RET_OK;
@@ -156,7 +156,7 @@ int32_t MouseEventHandler::HandleButtonValueInner(libinput_event_pointer* data)
             break;
         }
         default: {
-            MMI_HILOGE("unknown btn, btn:%{public}u", button);
+            MMI_HILOGE("Unknown btn, btn:%{public}u", button);
             return RET_ERR;
         }
     }
@@ -173,7 +173,7 @@ int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
     if (TimerMgr->IsExist(timerId_)) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
         TimerMgr->ResetTimer(timerId_);
-        MMI_HILOGD("axis update");
+        MMI_HILOGD("Axis update");
     } else {
         static constexpr int32_t timeout = 100;
         std::weak_ptr<MouseEventHandler> weakPtr = shared_from_this();
@@ -192,7 +192,7 @@ int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
         });
 
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
-        MMI_HILOGD("axis begin");
+        MMI_HILOGD("Axis begin");
     }
 
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
@@ -265,7 +265,7 @@ int32_t MouseEventHandler::Normalize(struct libinput_event *event)
             break;
         }
         default: {
-            MMI_HILOGE("unknow type:%{public}d", type);
+            MMI_HILOGE("Unknow type:%{public}d", type);
             return RET_ERR;
         }
     }
