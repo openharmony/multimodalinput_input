@@ -15,8 +15,6 @@
 
 #include "hdf_device_event_manager.h"
 
-#include <cstring>
-#include <functional>
 #include <unistd.h>
 
 #include "hdf_device_event_dispatch.h"
