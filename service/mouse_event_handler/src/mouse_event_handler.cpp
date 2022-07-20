@@ -272,6 +272,7 @@ int32_t MouseEventHandler::Normalize(struct libinput_event *event)
     int32_t deviceId = InputDevMgr->FindInputDeviceId(libinput_event_get_device(event));
     PointerEvent::PointerItem pointerItem;
     HandlePostInner(data, deviceId, pointerItem);
+    WinMgr->UpdateTargetPointer(pointerEvent_);
     DumpInner();
     return result;
 }

@@ -40,6 +40,7 @@ public:
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
 
     void Init(UDSServer& udsServer);
+    int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent) const;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -72,8 +73,8 @@ public:
     const DisplayGroupInfo& GetDisplayGroupInfo();
 #endif // OHOS_BUILD_ENABLE_POINTER
     void Dump(int32_t fd, const std::vector<std::string> &args);
-    int32_t GetWindowPid(const int32_t windowId, const DisplayGroupInfo& displayGroupInfo) const;
-    int32_t GetWindowPid(const int32_t windowId) const;
+    int32_t GetWindowPid(int32_t windowId, const DisplayGroupInfo& displayGroupInfo) const;
+    int32_t GetWindowPid(int32_t windowId) const;
 
 private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -97,8 +98,8 @@ private:
 #endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    void SelectWindowInfo(const int32_t& logicalX, const int32_t& logicalY,
-        const std::shared_ptr<PointerEvent>& pointerEvent, WindowInfo*& touchWindow);
+    std::optional<WindowInfo> SelectWindowInfo(const int32_t& logicalX, const int32_t& logicalY,
+        const std::shared_ptr<PointerEvent>& pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
