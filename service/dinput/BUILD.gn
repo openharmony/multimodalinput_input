@@ -24,7 +24,7 @@ config("mmi_dinput_config") {
     "${dinput_path}/include",
   ]
 
-  if (input_enable_distributed) {
+  if (input_feature_distributed) {
     include_dirs += [
       "//foundation/distributedhardware/distributed_input/common/include",
       "//foundation/distributedhardware/distributed_input/frameworks/include",
@@ -32,7 +32,7 @@ config("mmi_dinput_config") {
     ]
   }
 }
-if (input_enable_distributed) {
+if (input_feature_distributed) {
   ohos_source_set("mmi_dinput_service") {
     sources = [
       "${dinput_path}/src/call_dinput_service.cpp",
@@ -43,8 +43,8 @@ if (input_enable_distributed) {
 
     configs = [ ":mmi_dinput_config" ]
 
-    cflags = [ "-DOHOS_BUILD" ]
-    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
+    defines = [ "OHOS_BUILD" ]
+    defines += [ "OHOS_DISTRIBUTED_INPUT_MODEL" ]
 
     external_deps = [
       "hiviewdfx_hilog_native:libhilog",
@@ -52,7 +52,7 @@ if (input_enable_distributed) {
       "safwk:system_ability_fwk",
     ]
 
-    if (input_enable_distributed) {
+    if (input_feature_distributed) {
       external_deps += [ "distributed_input:libdinput_sdk" ]
     }
   }
@@ -66,8 +66,8 @@ if (input_enable_distributed) {
 
     configs = [ ":mmi_dinput_config" ]
 
-    cflags = [ "-DOHOS_BUILD" ]
-    cflags += [ "-DOHOS_DISTRIBUTED_INPUT_MODEL" ]
+    defines = [ "OHOS_BUILD" ]
+    defines += [ "OHOS_DISTRIBUTED_INPUT_MODEL" ]
     external_deps = [
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",
