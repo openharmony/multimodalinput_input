@@ -19,16 +19,15 @@
 #include <memory>
 
 #include "nocopyable.h"
-#include "singleton.h"
 
 #include "i_input_event_consumer.h"
 #include "input_handler_type.h"
 
 namespace OHOS {
 namespace MMI {
-class InputInterceptorManager : public DelayedSingleton<InputInterceptorManager> {
+class InputInterceptorManager {
 public:
-    InputInterceptorManager();
+    InputInterceptorManager() = default;
     DISALLOW_COPY_AND_MOVE(InputInterceptorManager);
     ~InputInterceptorManager() = default;
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor, HandleEventType eventType);

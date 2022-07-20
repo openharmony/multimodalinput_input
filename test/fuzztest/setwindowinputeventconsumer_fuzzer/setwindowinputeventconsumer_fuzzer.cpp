@@ -29,7 +29,7 @@ public:
     virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
     virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
     {
-        MMI_HILOGD("report pointer event success");
+        MMI_HILOGD("Report pointer event success");
     };
     virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
 };

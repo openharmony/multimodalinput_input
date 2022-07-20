@@ -32,7 +32,7 @@ public:
     virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
     virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
     {
-        MMI_HILOGD("report pointer event success");
+        MMI_HILOGD("Report pointer event success");
     };
     virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
 };
@@ -72,7 +72,7 @@ void SubscribeKeyEventFuzzTest(const uint8_t* data, size_t size)
     startPos += GetObject<int32_t>(finalKey, data + startPos, size - startPos);
     keyOption->SetFinalKey(finalKey);
     auto fun = [](std::shared_ptr<KeyEvent> event) {
-        MMI_HILOGD("subscribe keyevent success");
+        MMI_HILOGD("Subscribe keyevent success");
     };
     int32_t subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, fun);
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);

@@ -46,7 +46,7 @@ private:
 Context::Context(const std::string& node)
     : node_(node)
 {
-    MMI_HILOGD("open device node: \'%{public}s\'.", node_.c_str());
+    MMI_HILOGD("Open device node: \'%{public}s\'.", node_.c_str());
     fd_ = open(node_.c_str(), O_RDWR);
     if (fd_ < 0) {
         MMI_HILOGE("Failed to open device node: \'%{public}s\'.", node_.c_str());
@@ -111,7 +111,7 @@ std::string TransformPointTest::GetDeviceNodeName()
 bool TransformPointTest::SendEvent(const Context& ctx, struct input_event* event)
 {
     CALL_INFO_TRACE;
-    MMI_HILOGD("send input event.");
+    MMI_HILOGD("Send input event.");
     struct timeval tv;
     if (gettimeofday(&tv, nullptr)) {
         MMI_HILOGE("Failed to get current time.");
@@ -148,7 +148,7 @@ bool TransformPointTest::SendEvents(const Context& ctx, struct input_event* even
 int TransformPointTest::Execute(const std::string& command, std::vector<std::string>& results)
 {
     CALL_INFO_TRACE;
-    MMI_HILOGD("execute command: %{public}s.", command.c_str());
+    MMI_HILOGD("Execute command: %{public}s.", command.c_str());
     char buffer[DEFAULT_BUF_SIZE] {};
     FILE* pin = popen(command.c_str(), "r");
     if (!pin) {
@@ -160,7 +160,7 @@ int TransformPointTest::Execute(const std::string& command, std::vector<std::str
             results.push_back(buffer);
         }
     }
-    MMI_HILOGD("close phandle.");
+    MMI_HILOGD("Close phandle.");
     return pclose(pin);
 }
 
@@ -209,7 +209,7 @@ void TransformPointTest::GetInputDeviceNodes(std::map<std::string, std::string>&
 bool TransformPointTest::SetupVirtualStylus()
 {
     CALL_INFO_TRACE;
-    MMI_HILOGD("setup virtual stylus.");
+    MMI_HILOGD("Setup virtual stylus.");
     if (!virtualPen_.SetUp()) {
         MMI_HILOGE("Failed to setup virtual stylus.");
         return false;
@@ -226,7 +226,7 @@ bool TransformPointTest::SetupVirtualStylus()
         MMI_HILOGE("No virtual stylus is found.");
         return false;
     }
-    MMI_HILOGD("node name : \'%{public}s\'.", cItr->second.c_str());
+    MMI_HILOGD("Node name : \'%{public}s\'.", cItr->second.c_str());
     std::ostringstream ss;
     ss << "/dev/input/" << cItr->second;
     devNode_ = ss.str();

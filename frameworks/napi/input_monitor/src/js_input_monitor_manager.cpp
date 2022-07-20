@@ -40,7 +40,7 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
     std::lock_guard<std::mutex> guard(mutex_);
     for (const auto& item : monitors_) {
         if ((item != nullptr) && (item->IsMatch(jsEnv, callback) != RET_ERR)) {
-            MMI_HILOGD("add js monitor failed");
+            MMI_HILOGD("Add js monitor failed");
             return;
         }
     }
@@ -153,7 +153,7 @@ bool JsInputMonitorManager::AddEnv(napi_env env, napi_callback_info cbInfo)
 {
     CALL_DEBUG_ENTER;
     if (IsExisting(env)) {
-        MMI_HILOGD("Env is already exists");
+        MMI_HILOGD("Env is already existent");
         return true;
     }
     napi_value thisVar = nullptr;

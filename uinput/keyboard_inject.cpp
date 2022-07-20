@@ -46,7 +46,7 @@ KeyboardInject::KeyboardInject()
     }
     injectThread_ = std::make_unique<InjectThread>();
     if (injectThread_ == nullptr) {
-        MMI_HILOGE("injectThread_ is null");
+        MMI_HILOGE("The injectThread_ is null");
         return;
     }
     g_pKeyboard = std::make_unique<VirtualKeyboard>();

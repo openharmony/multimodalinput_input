@@ -102,7 +102,7 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
     displayGroupInfo.windowsInfo = windowsInfos;
     displayGroupInfo.displaysInfo = displaysInfos;
     InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
-    MMI_HILOGD("update display info success");
+    MMI_HILOGD("Update display info success");
 }
 } // namespace MMI
 } // namespace OHOS
