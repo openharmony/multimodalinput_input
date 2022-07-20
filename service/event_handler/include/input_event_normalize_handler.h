@@ -45,7 +45,7 @@ private:
 private:
     int32_t timerId_ = -1;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    KeyEventHandler eventPackage_;
+    KeyEventHandler keyEventHandler_;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 };
 } // namespace MMI
