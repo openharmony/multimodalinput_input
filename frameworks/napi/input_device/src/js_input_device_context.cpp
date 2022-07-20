@@ -20,7 +20,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceContext" };
 constexpr size_t MAX_STRING_LEN = 32;
-const std::string CHANGED_TYPE = "changed";
+const std::string CHANGED_TYPE = "change";
 
 const std::string GET_GLOBAL = "napi_get_global";
 const std::string DEFINE_CLASS = "napi_define_class";
