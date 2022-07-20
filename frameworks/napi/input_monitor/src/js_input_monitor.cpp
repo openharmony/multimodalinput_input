@@ -78,7 +78,7 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
             if (JsInputMonMgr.GetMonitor(id_)->GetTypeName() != "touch") {
                 return;
             }
-            if (pointerEvent->GetPointersIdList().size() == 1) {
+            if (pointerEvent->GetPointerIds().size() == 1) {
                 if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
                     consumed_ = false;
                 }
@@ -88,7 +88,7 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
             if (JsInputMonMgr.GetMonitor(id_)->GetTypeName() != "mouse") {
                 return;
             }
-            if (pointerEvent->GetPointersIdList().size() == 1) {
+            if (pointerEvent->GetPointerIds().size() == 1) {
                 if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
                     consumed_ = false;
                 }
@@ -262,7 +262,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
         return RET_ERR;
     }
     std::vector<PointerEvent::PointerItem> pointerItems;
-    for (const auto &item : pointerEvent->GetPointersIdList()) {
+    for (const auto &item : pointerEvent->GetPointerIds()) {
         PointerEvent::PointerItem pointerItem;
         if (!pointerEvent->GetPointerItem(item, pointerItem)) {
             MMI_HILOGE("Get pointer item failed");
@@ -390,7 +390,7 @@ int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> 
     }
     uint32_t index = 0;
     int32_t currentPointerId = pointerEvent->GetPointerId();
-    std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
+    std::vector<int32_t> pointerIds { pointerEvent->GetPointerIds() };
     for (const auto& pointerId : pointerIds) {
         if (pointerId == currentPointerId) {
             PointerEvent::PointerItem item;
