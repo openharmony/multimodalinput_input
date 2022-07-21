@@ -394,6 +394,12 @@ const char* PointerEvent::DumpPointerAction() const
         case PointerEvent::POINTER_ACTION_BUTTON_UP: {
             return "button-up";
         }
+        case PointerEvent::POINTER_ACTION_LEAVE: {
+            return "leave";
+        }
+        case PointerEvent::POINTER_ACTION_ENTER: {
+            return "enter";
+        }
         default: {
             break;
         }
