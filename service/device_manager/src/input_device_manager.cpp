@@ -257,7 +257,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         return;
     }
     if (IsPointerDevice(inputDevice) && !HasPointerDevice()) {
-        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER);
+        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
     }
     inputDevice_[nextId_] = inputDevice;
     for (const auto &item : devListener_) {
@@ -288,7 +288,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
         }
     }
     if (IsPointerDevice(inputDevice) && !HasPointerDevice()) {
-        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE);
+        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
     }
     for (const auto &item : devListener_) {
         CHKPC(item.first);

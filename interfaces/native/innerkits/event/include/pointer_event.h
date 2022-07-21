@@ -103,9 +103,19 @@ public:
      */
     static constexpr int32_t POINTER_ACTION_BUTTON_UP = 9;
 
-    static constexpr int32_t POINTER_ACTION_LEAVE = 10;
+    /**
+     * 指针进入窗口
+     *
+     * @since 9
+     */
+    static constexpr int32_t POINTER_ACTION_ENTER_WINDOW = 10;
 
-    static constexpr int32_t POINTER_ACTION_ENTER = 11;
+    /**
+     * 指针离开窗口
+     *
+     * @since 9
+     */
+    static constexpr int32_t POINTER_ACTION_LEAVE_WINDOW = 11;
 
     enum AxisType {
         /**
