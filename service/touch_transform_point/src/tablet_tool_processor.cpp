@@ -61,6 +61,7 @@ std::shared_ptr<PointerEvent> TabletToolProcessor::OnEvent(struct libinput_event
     }
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->UpdateId();
+    WinMgr->UpdateTargetPointer(pointerEvent_);
     return pointerEvent_;
 }
 
