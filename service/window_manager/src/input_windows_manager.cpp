@@ -609,10 +609,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
-    int32_t screenX = logicalX - touchWindow->area.x;
-    int32_t screenY = logicalY - touchWindow->area.y;
-    pointerItem.SetWindowX(screenX);
-    pointerItem.SetWindowY(screenY);
+    int32_t windowX = logicalX - touchWindow->area.x;
+    int32_t windowY = logicalY - touchWindow->area.y;
+    pointerItem.SetWindowX(windowX);
+    pointerItem.SetWindowY(windowY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
@@ -620,9 +620,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 
     MMI_HILOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
                "logicalX:%{public}d,logicalY:%{public}d,"
-               "displayX:%{public}d,displayY:%{public}d,screenX:%{public}d,screenY:%{public}d",
+               "displayX:%{public}d,displayY:%{public}d,windowX:%{public}d,windowY:%{public}d",
                fd, touchWindow->pid, touchWindow->id, touchWindow->agentWindowId,
-               logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), screenX, screenY);
+               logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), windowX, windowY);
     return fd;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -683,24 +683,24 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             logicalX, logicalY);
         return RET_ERR;
     }
-    auto screenX = logicalX - touchWindow->area.x;
-    auto screenY = logicalY - touchWindow->area.y;
+    auto windowX = logicalX - touchWindow->area.x;
+    auto windowY = logicalY - touchWindow->area.y;
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     pointerItem.SetDisplayX(physicalX);
     pointerItem.SetDisplayY(physicalY);
-    pointerItem.SetWindowX(screenX);
-    pointerItem.SetWindowY(screenY);
+    pointerItem.SetWindowX(windowX);
+    pointerItem.SetWindowY(windowY);
     pointerItem.SetToolWindowX(pointerItem.GetToolDisplayX() + physicDisplayInfo->x - touchWindow->area.x);
     pointerItem.SetToolWindowY(pointerItem.GetToolDisplayY() + physicDisplayInfo->y - touchWindow->area.y);
     pointerItem.SetTargetWindowId(touchWindow->id);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
     MMI_HILOGD("pid:%{public}d,fd:%{public}d,logicalX:%{public}d,logicalY:%{public}d,"
-               "physicalX:%{public}d,physicalY:%{public}d,screenX:%{public}d,screenY:%{public}d,"
+               "physicalX:%{public}d,physicalY:%{public}d,windowX:%{public}d,windowY:%{public}d,"
                "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",
                touchWindow->pid, fd, logicalX, logicalY, physicalX, physicalY,
-               screenX, screenY, displayId, pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
+               windowX, windowY, displayId, pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
     return fd;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
