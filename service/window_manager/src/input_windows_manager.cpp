@@ -518,7 +518,7 @@ bool InputWindowsManager::UpdateDisplayId(int32_t& displayId)
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
 std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX, int32_t logicalY,
-        const std::shared_ptr<PointerEvent>& pointerEvent)
+    const std::shared_ptr<PointerEvent>& pointerEvent)
 {
     int32_t action = pointerEvent->GetPointerAction();
     if ((firstBtnDownWindowId_ == -1) ||
