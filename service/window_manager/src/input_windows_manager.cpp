@@ -17,8 +17,11 @@
 
 #include <cstdlib>
 #include <cstdio>
+
 #include "dfx_hisysevent.h"
+#include "input_device_manager.h"
 #include "i_pointer_drawing_manager.h"
+#include "mouse_event_handler.h"
 #include "util.h"
 #include "util_ex.h"
 
@@ -176,7 +179,108 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
             displayGroupInfo.displaysInfo[0].direction);
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
+    if (InputDevMgr->HasPointerDevice()) {
+        NotifyPointerToWindow();
+    }
     PrintDisplayInfo();
+}
+
+void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
+{
+    CALL_INFO_TRACE;
+    CHKPV(udsServer_);
+    auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
+    pointerEvent->UpdateId();
+    const MouseLocation &mouseLocation = GetMouseInfo();
+    lastLogicX_ = mouseLocation.physicalX;
+    lastLogicY_ = mouseLocation.physicalY;
+    auto touchWindow = SelectWindowInfo(lastLogicX_, lastLogicY_, pointerEvent);
+    if (!touchWindow) {
+        MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
+        return;
+    }
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetWindowX(lastLogicX_ - touchWindow->area.x);
+    pointerItem.SetWindowY(lastLogicY_ - touchWindow->area.y);
+    pointerItem.SetDisplayX(lastLogicX_);
+    pointerItem.SetDisplayY(lastLogicY_);
+
+    pointerEvent->SetTargetWindowId(touchWindow->id);
+    pointerEvent->AddPointerItem(pointerItem);
+    pointerEvent->SetPointerAction(pointerAction);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    lastWindowInfo_ = *touchWindow;
+
+    auto fd = udsServer_->GetClientFd(touchWindow->pid);
+    auto sess = udsServer_->GetSession(fd);
+    CHKPV(sess);
+
+    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
+    InputEventDataTransformation::Marshalling(pointerEvent, pkt);
+    if (!sess->SendMsg(pkt)) {
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return;
+    }
+}
+
+void InputWindowsManager::DispatchPointer(int32_t pointerAction)
+{
+    CALL_INFO_TRACE;
+    CHKPV(udsServer_);
+    if (lastPointerEvent_ == nullptr) {
+        SendPointerEvent(pointerAction);
+        return;
+    }
+    auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
+    pointerEvent->UpdateId();
+    
+    PointerEvent::PointerItem lastPointerItem;
+    int32_t lastPointerId = lastPointerEvent_->GetPointerId();
+    if (!lastPointerEvent_->GetPointerItem(lastPointerId, lastPointerItem)) {
+        MMI_HILOGE("GetPointerItem:%{public}d fail", lastPointerId);
+        return;
+    }
+    PointerEvent::PointerItem currentPointerItem;
+    currentPointerItem.SetWindowX(lastLogicX_ - lastWindowInfo_.area.x);
+    currentPointerItem.SetWindowY(lastLogicY_ - lastWindowInfo_.area.y);
+    currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
+    currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
+
+    pointerEvent->SetTargetWindowId(lastWindowInfo_.id);
+    pointerEvent->AddPointerItem(currentPointerItem);
+    pointerEvent->SetPointerAction(pointerAction);
+    pointerEvent->SetSourceType(lastPointerEvent_->GetSourceType());
+
+    auto fd = udsServer_->GetClientFd(lastWindowInfo_.pid);
+    auto sess = udsServer_->GetSession(fd);
+    CHKPV(sess);
+
+    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
+    InputEventDataTransformation::Marshalling(pointerEvent, pkt);
+    if (!sess->SendMsg(pkt)) {
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return;
+    }
+}
+
+void InputWindowsManager::NotifyPointerToWindow()
+{
+    CALL_INFO_TRACE;
+    for (const auto &item : displayGroupInfo_.windowsInfo) {
+        if (item.id == lastWindowInfo_.id) {
+            DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE);
+            break;
+        }
+    }
+    for (const auto &item : displayGroupInfo_.windowsInfo) {
+        if ((IsInHotArea(lastLogicX_, lastLogicX_, item.pointerHotAreas)) && (lastWindowInfo_.id != item.id)) {
+            lastWindowInfo_ = item;
+            break;
+        }
+    }
+    DispatchPointer(PointerEvent::POINTER_ACTION_ENTER);
 }
 
 void InputWindowsManager::PrintDisplayInfo()
@@ -413,8 +517,8 @@ bool InputWindowsManager::UpdateDisplayId(int32_t& displayId)
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(const int32_t& logicalX,
-    const int32_t& logicalY, const std::shared_ptr<PointerEvent>& pointerEvent)
+std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX, int32_t logicalY,
+    const std::shared_ptr<PointerEvent>& pointerEvent)
 {
     int32_t action = pointerEvent->GetPointerAction();
     if ((firstBtnDownWindowId_ == -1) ||
@@ -447,6 +551,25 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(const int32_t& l
         }
     }
     return std::nullopt;
+}
+
+void InputWindowsManager::UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
+    const std::shared_ptr<PointerEvent>& pointerEvent, const WindowInfo& touchWindow)
+{
+    CHKPV(pointerEvent);
+    if (lastWindowInfo_.id != touchWindow.id) {
+        DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE);
+        lastLogicX_ = logicalX;
+        lastLogicY_ = logicalY;
+        lastPointerEvent_ = pointerEvent;
+        lastWindowInfo_ = touchWindow;
+        DispatchPointer(PointerEvent::POINTER_ACTION_ENTER);
+        return;
+    }
+    lastLogicX_ = logicalX;
+    lastLogicY_ = logicalY;
+    lastPointerEvent_ = pointerEvent;
+    lastWindowInfo_ = touchWindow;
 }
 
 int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
@@ -493,6 +616,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
+    UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
 
     MMI_HILOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
                "logicalX:%{public}d,logicalY:%{public}d,"

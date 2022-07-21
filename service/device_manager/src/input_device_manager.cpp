@@ -17,7 +17,9 @@
 
 #include <parameters.h>
 #include <unordered_map>
+
 #include "dfx_hisysevent.h"
+#include "input_windows_manager.h"
 #include "key_event_value_transformation.h"
 #include "util_ex.h"
 
@@ -254,6 +256,9 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         DfxHisysevent::OnDeviceConnect(INT32_MAX, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
     }
+    if (IsPointerDevice(inputDevice) && !HasPointerDevice()) {
+        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER);
+    }
     inputDevice_[nextId_] = inputDevice;
     for (const auto &item : devListener_) {
         CHKPC(item.first);
@@ -281,6 +286,9 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
             inputDevice_.erase(it);
             break;
         }
+    }
+    if (IsPointerDevice(inputDevice) && !HasPointerDevice()) {
+        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE);
     }
     for (const auto &item : devListener_) {
         CHKPC(item.first);

@@ -103,6 +103,10 @@ public:
      */
     static constexpr int32_t POINTER_ACTION_BUTTON_UP = 9;
 
+    static constexpr int32_t POINTER_ACTION_LEAVE = 10;
+
+    static constexpr int32_t POINTER_ACTION_ENTER = 11;
+
     enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.
