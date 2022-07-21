@@ -51,7 +51,7 @@
         "access_token",
         "hiviewdfx_hilog_native",
         "ability_base",
-        "samgr_standard",
+        "samgr",
         "common"
       ],
       "third_party": [
