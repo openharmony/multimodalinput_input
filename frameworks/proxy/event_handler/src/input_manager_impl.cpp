@@ -201,6 +201,7 @@ int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
+    std::lock_guard<std::mutex> guard(mtx_);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPR(keyOption, RET_ERR);
     CHKPR(callback, RET_ERR);
@@ -215,6 +216,7 @@ void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
+    std::lock_guard<std::mutex> guard(mtx_);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventInputSubscribeMgr.UnsubscribeKeyEvent(subscriberId);
 #else
