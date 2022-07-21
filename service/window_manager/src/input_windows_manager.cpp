@@ -156,7 +156,8 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
     if (!displayGroupInfo.displaysInfo.empty()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
         IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo.displaysInfo[0].id,
-            displayGroupInfo.displaysInfo[0].width, displayGroupInfo.displaysInfo[0].height);
+            displayGroupInfo.displaysInfo[0].width, displayGroupInfo.displaysInfo[0].height,
+            displayGroupInfo.displaysInfo[0].direction);
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
     PrintDisplayInfo();
@@ -344,8 +345,7 @@ void InputWindowsManager::AdjustDisplayCoordinate(
     if (displayInfo.direction == Direction0 || displayInfo.direction == Direction180) {
         width = displayInfo.width;
         height = displayInfo.height;
-    }
-    if (displayInfo.direction == Direction90 || displayInfo.direction == Direction270) {
+    } else {
         height = displayInfo.width;
         width = displayInfo.height;
     }
@@ -606,18 +606,27 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     if (!IsInsideDisplay(*displayInfo, integerX, integerY)) {
         FindPhysicalDisplay(*displayInfo, integerX, integerY, displayId);
     }
+    int32_t width = 0;
+    int32_t height = 0;
+    if (displayInfo->direction == Direction0 || displayInfo->direction == Direction180) {
+        width = displayInfo->width;
+        height = displayInfo->height;
+    } else {
+        height = displayInfo->width;
+        width = displayInfo->height;
+    }
     if (displayId == lastDisplayId) {
         if (integerX < 0) {
             integerX = 0;
         }
-        if (integerX >= displayInfo->width) {
-            integerX = displayInfo->width - 1;
+        if (integerX >= width) {
+            integerX = width - 1;
         }
         if (integerY < 0) {
             integerY = 0;
         }
-        if (integerY >= displayInfo->height) {
-            integerY = displayInfo->height - 1;
+        if (integerY >= height) {
+            integerY = height - 1;
         }
     }
     x = static_cast<double>(integerX);
