@@ -258,8 +258,8 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     }
     if (IsPointerDevice(inputDevice) && !HasPointerDevice()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
-        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER);
-#endif //OHOS_BUILD_ENABLE_POINTER
+        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+#endif // OHOS_BUILD_ENABLE_POINTER
     }
     inputDevice_[nextId_] = inputDevice;
     for (const auto &item : devListener_) {
@@ -291,7 +291,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     }
     if (IsPointerDevice(inputDevice) && !HasPointerDevice()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
-        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE);
+        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
     for (const auto &item : devListener_) {

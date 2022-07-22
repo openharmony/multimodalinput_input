@@ -273,7 +273,7 @@ void InputWindowsManager::NotifyPointerToWindow()
     CALL_INFO_TRACE;
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         if (item.id == lastWindowInfo_.id) {
-            DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE);
+            DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
             break;
         }
     }
@@ -283,7 +283,7 @@ void InputWindowsManager::NotifyPointerToWindow()
             break;
         }
     }
-    DispatchPointer(PointerEvent::POINTER_ACTION_ENTER);
+    DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -562,12 +562,12 @@ void InputWindowsManager::UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
 {
     CHKPV(pointerEvent);
     if (lastWindowInfo_.id != touchWindow.id) {
-        DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE);
+        DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
         lastLogicX_ = logicalX;
         lastLogicY_ = logicalY;
         lastPointerEvent_ = pointerEvent;
         lastWindowInfo_ = touchWindow;
-        DispatchPointer(PointerEvent::POINTER_ACTION_ENTER);
+        DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
         return;
     }
     lastLogicX_ = logicalX;
