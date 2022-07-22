@@ -59,7 +59,7 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 {
     CALL_DEBUG_ENTER;
     CHKPV(point);
-    auto fd = WinMgr->UpdateTargetPointer(point);
+    auto fd = WinMgr->GetClientFd(point);
     if (fd < 0) {
         MMI_HILOGE("The fd less than 0, fd: %{public}d", fd);
         DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
