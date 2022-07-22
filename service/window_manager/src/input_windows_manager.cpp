@@ -180,11 +180,14 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
     if (InputDevMgr->HasPointerDevice()) {
+#ifdef OHOS_BUILD_ENABLE_POINTER
         NotifyPointerToWindow();
+#endif // OHOS_BUILD_ENABLE_POINTER
     }
     PrintDisplayInfo();
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
 {
     CALL_INFO_TRACE;
@@ -282,6 +285,7 @@ void InputWindowsManager::NotifyPointerToWindow()
     }
     DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 void InputWindowsManager::PrintDisplayInfo()
 {
