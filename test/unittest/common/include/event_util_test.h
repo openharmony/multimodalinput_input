@@ -136,21 +136,24 @@ void TestSimulateInputEvent(EventType& event, const TestScene& testScene = TestS
     EXPECT_TRUE((static_cast<int32_t>(testScene) ^ TestUtil->CompareDump(event)));
 }
 
-class VerifyMonitor {
+class AccessMonitor {
 public:
-    VerifyMonitor()
+    AccessMonitor()
     {
+        currentID_ = GetSelfTokenID();
         AccessTokenIDEx tokenIdEx = { 0 };
         tokenIdEx = AccessTokenKit::AllocHapToken(infoManagerTestInfoParms_, infoManagerTestPolicyPrams_);
-        tokenID_ = tokenIdEx.tokenIdExStruct.tokenID;
-        SetSelfTokenID(tokenID_);
+        monitorID_ = tokenIdEx.tokenIdExStruct.tokenID;
+        SetSelfTokenID(monitorID_);
     }
-    ~VerifyMonitor()
+    ~AccessMonitor()
     {
-        AccessTokenKit::DeleteToken(tokenID_);
+        AccessTokenKit::DeleteToken(monitorID_);
+        SetSelfTokenID(currentID_);
     }
 private:
-    AccessTokenID tokenID_ = 0;
+    AccessTokenID currentID_ = 0;
+    AccessTokenID monitorID_ = 0;
 };
 } // namespace MMI
 } // namespace OHOS
