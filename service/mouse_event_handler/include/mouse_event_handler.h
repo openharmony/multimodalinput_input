@@ -63,7 +63,6 @@ private:
     bool isPressed_ { false };
     int32_t currentDisplayId_ { -1 };
     int32_t speed_ { 10 };
-    uint64_t lastEventTime_ { 0 };
 };
 
 #define MouseEventHdr MouseEventHandler::GetInstance()
