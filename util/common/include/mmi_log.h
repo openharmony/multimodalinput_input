@@ -112,13 +112,17 @@ public:
         : logfn_ { logfn }, tag_ { tag }, level_ { level }
     {
         if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, tag_, level_)) {
-            logfn_("in %{public}s, enter");
+            if (logfn_ != nullptr) {
+                logfn_("in %{public}s, enter");
+            }
         }
     }
     ~InnerFunctionTracer()
     {
         if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, tag_, level_)) {
-            logfn_("in %{public}s, leave");
+            if (logfn_ != nullptr) {
+                logfn_("in %{public}s, leave");
+            }
         }
     }
 private:
