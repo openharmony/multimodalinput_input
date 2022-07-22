@@ -104,14 +104,14 @@ public:
     static constexpr int32_t POINTER_ACTION_BUTTON_UP = 9;
 
     /**
-     * 指针进入窗口
+     * Indicates that the pointer enters the window.
      *
      * @since 9
      */
     static constexpr int32_t POINTER_ACTION_ENTER_WINDOW = 10;
 
     /**
-     * 指针离开窗口
+     * * Indicates that the pointer leaves the window.
      *
      * @since 9
      */
@@ -659,14 +659,14 @@ public:
         void SetToolType(int32_t toolType);
 
         /**
-         * @brief 获取当前手指对应的窗口ID
+         * @brief Obtains the ID of the window corresponding to the finger touch position.
          * @return Returns the ID of the target window.
          * @since 9
          */
         int32_t GetTargetWindowId() const;
 
         /**
-         * @brief 设置当前手指对应的窗口ID
+         * @brief Sets the ID of the window corresponding to the finger touch position.
          * @param windowId Indicates the ID of the target window.
          * @return void
          * @since 9
