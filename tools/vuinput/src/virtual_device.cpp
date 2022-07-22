@@ -14,6 +14,9 @@
  */
 
 #include "virtual_device.h"
+
+#include <sys/stat.h>
+
 #include "virtual_finger.h"
 #include "virtual_gamepad.h"
 #include "virtual_joystick.h"
@@ -45,6 +48,7 @@ namespace MMI {
 namespace {
 constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int32_t INVALID_FILE_SIZE = -1;
+constexpr int32_t FILE_POWER = 0777;
 const std::string PROC_PATH = "/proc";
 const std::string VIRTUAL_DEVICE_NAME = "vuinput";
 const std::string g_pid = std::to_string(getpid());
@@ -416,6 +420,16 @@ bool VirtualDevice::SetPhys(const std::string& deviceName)
     return true;
 }
 
+bool VirtualDevice::DoIoctl(int32_t fd, int32_t request, const uint32_t value)
+{
+    int32_t rc = ioctl(fd, request, value);
+    if (rc < 0) {
+        std::cout << "Failed to ioctl" << std::endl;
+        return false;
+    }
+    return true;
+}
+
 void VirtualDevice::SetDeviceId()
 {
     uinputDev_.id.bustype = busTtype_;
@@ -547,6 +561,9 @@ bool VirtualDevice::AddDevice(const std::string& startDeviceName)
     if (!CreateHandle(startDeviceName)) {
         std::cout << "Failed to start device: " << startDeviceName <<std::endl;
         return false;
+    }
+    if (!IsFileExists(g_folderPath)) {
+        mkdir(g_folderPath.c_str(), FILE_POWER);
     }
     std::string symbolFile;
     symbolFile.append(g_folderPath).append(g_pid).append("_").append(startDeviceName);
