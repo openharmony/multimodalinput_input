@@ -394,11 +394,11 @@ const char* PointerEvent::DumpPointerAction() const
         case PointerEvent::POINTER_ACTION_BUTTON_UP: {
             return "button-up";
         }
-        case PointerEvent::POINTER_ACTION_LEAVE: {
-            return "leave";
+        case PointerEvent::POINTER_ACTION_ENTER_WINDOW: {
+            return "enter-window";
         }
-        case PointerEvent::POINTER_ACTION_ENTER: {
-            return "enter";
+        case PointerEvent::POINTER_ACTION_LEAVE_WINDOW: {
+            return "leave-window";
         }
         default: {
             break;
