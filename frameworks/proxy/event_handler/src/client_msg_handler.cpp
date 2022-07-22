@@ -306,6 +306,7 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
     CALL_DEBUG_ENTER;
