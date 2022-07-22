@@ -135,7 +135,7 @@ void InputEventNormalizeHandler::HandlePointerEvent(std::shared_ptr<PointerEvent
 void InputEventNormalizeHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (nextHandler_ == nullptr) {
-        MMI_HILOGW("Touch device does not support");
+        MMI_HILOGW("Touchscreen device does not support");
         return;
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -271,7 +271,7 @@ int32_t InputEventNormalizeHandler::HandleGestureEvent(libinput_event* event)
 int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
 {
     if (nextHandler_ == nullptr) {
-        MMI_HILOGW("TP device does not support");
+        MMI_HILOGW("Touchscreen device does not support");
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -299,7 +299,7 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
 int32_t InputEventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
 {
     if (nextHandler_ == nullptr) {
-        MMI_HILOGW("TP device does not support");
+        MMI_HILOGW("Touchscreen device does not support");
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
