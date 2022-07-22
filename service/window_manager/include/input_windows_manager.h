@@ -78,8 +78,8 @@ public:
     int32_t GetWindowPid(int32_t windowId) const;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void DispatchPointer(int32_t pointerAction);
-#endif // OHOS_BUILD_ENABLE_POINTER
     void SendPointerEvent(int32_t pointerAction);
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
