@@ -126,7 +126,7 @@ public:
         }
     }
 private:
-    HilogFunc logfn_;
+    HilogFunc logfn_ { nullptr };
     const char* tag_ { nullptr };
     LogLevel level_ { LOG_LEVEL_MIN };
 };
