@@ -48,6 +48,7 @@ namespace MMI {
 namespace {
 constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int32_t INVALID_FILE_SIZE = -1;
+constexpr int32_t FILE_POWER = 0777;
 const std::string PROC_PATH = "/proc";
 const std::string VIRTUAL_DEVICE_NAME = "vuinput";
 const std::string g_pid = std::to_string(getpid());
@@ -562,7 +563,7 @@ bool VirtualDevice::AddDevice(const std::string& startDeviceName)
         return false;
     }
     if (!IsFileExists(g_folderPath)) {
-        mkdir(g_folderPath.c_str(), 0777);
+        mkdir(g_folderPath.c_str(), FILE_POWER);
     }
     std::string symbolFile;
     symbolFile.append(g_folderPath).append(g_pid).append("_").append(startDeviceName);
