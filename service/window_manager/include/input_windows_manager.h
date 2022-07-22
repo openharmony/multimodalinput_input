@@ -76,7 +76,9 @@ public:
     void Dump(int32_t fd, const std::vector<std::string> &args);
     int32_t GetWindowPid(int32_t windowId, const DisplayGroupInfo& displayGroupInfo) const;
     int32_t GetWindowPid(int32_t windowId) const;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     void DispatchPointer(int32_t pointerAction);
+#endif // OHOS_BUILD_ENABLE_POINTER
     void SendPointerEvent(int32_t pointerAction);
 
 private:
@@ -88,8 +90,8 @@ private:
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent, const WindowInfo& touchWindow);
-#endif // OHOS_BUILD_ENABLE_POINTER
     void NotifyPointerToWindow();
+#endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
