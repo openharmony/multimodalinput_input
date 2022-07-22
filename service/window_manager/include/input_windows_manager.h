@@ -61,7 +61,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     bool TouchPointToDisplayPoint(struct libinput_event_touch* touch,
         EventTouch& touchInfo, int32_t& targetDisplayId);
