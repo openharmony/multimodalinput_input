@@ -207,7 +207,7 @@ void InputDeviceImpl::OnInputDevice(int32_t userData, std::shared_ptr<InputDevic
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
-        MMI_HILOGD("Find userData failed");
+        MMI_HILOGI("Find userData failed");
         return;
     }
     auto devInfo = GetDeviceInfo(userData);
@@ -234,7 +234,7 @@ void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> &i
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
-        MMI_HILOGD("Find userData failed");
+        MMI_HILOGI("Find userData failed");
         return;
     }
     auto devIds = GetDeviceIds(userData);
@@ -259,7 +259,7 @@ void InputDeviceImpl::OnSupportKeys(int32_t userData, const std::vector<bool> &k
     std::lock_guard<std::mutex> guard(mtx_);
     auto iter = inputDevices_.find(userData);
     if (iter == inputDevices_.end()) {
-        MMI_HILOGD("Find userData failed");
+        MMI_HILOGI("Find userData failed");
         return;
     }
     auto devKeys = GetDeviceKeys(userData);
@@ -283,7 +283,7 @@ void InputDeviceImpl::OnKeyboardType(int32_t userData, int32_t keyboardType)
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
     if (auto iter = inputDevices_.find(userData); iter == inputDevices_.end()) {
-        MMI_HILOGD("Find userData failed");
+        MMI_HILOGI("Find userData failed");
         return;
     }
     auto devKbTypes = GetKeyboardTypes(userData);
