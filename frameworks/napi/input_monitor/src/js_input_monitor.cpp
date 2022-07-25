@@ -31,6 +31,15 @@ constexpr int32_t AXIS_TYPE_SCROLL_VERTICAL = 0;
 constexpr int32_t AXIS_TYPE_SCROLL_HORIZONTAL = 1;
 constexpr int32_t AXIS_TYPE_PINCH = 2;
 constexpr int32_t NAPI_ERR = 3;
+constexpr int32_t CANCEL = 0;
+constexpr int32_t MOVE = 1;
+constexpr int32_t BUTTON_DOWN = 2;
+constexpr int32_t BUTTON_UP = 3;
+constexpr int32_t AXIS_BEGIN = 4;
+constexpr int32_t AXIS_UPDATE = 5;
+constexpr int32_t AXIS_END = 6;
+constexpr int32_t MIDDLE = 1;
+constexpr int32_t RIGHT = 2;
 } // namespace
 
 bool InputMonitor::Start()
@@ -321,14 +330,9 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
     return RET_OK;
 }
 
-MapFun JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item)
+MapFun JsInputMonitor::GetFuns(const PointerEvent::PointerItem& item)
 {
     MapFun mapFun;
-    mapFun["actionTime"] = std::bind(&PointerEvent::GetActionTime, pointerEvent);
-    mapFun["button"] = std::bind(&PointerEvent::GetButtonId, pointerEvent);
-    mapFun["screenId"] = std::bind(&PointerEvent::GetTargetDisplayId, pointerEvent);
-    mapFun["windowId"] = std::bind(&PointerEvent::GetTargetWindowId, pointerEvent);
-    mapFun["deviceId"] = std::bind(&PointerEvent::PointerItem::GetDeviceId, item);
     mapFun["windowX"] = std::bind(&PointerEvent::PointerItem::GetDisplayX, item);
     mapFun["windowY"] = std::bind(&PointerEvent::PointerItem::GetDisplayY, item);
     mapFun["screenX"] = std::bind(&PointerEvent::PointerItem::GetWindowX, item);
@@ -339,7 +343,18 @@ MapFun JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent,
 bool JsInputMonitor::SetMouseProperty(const std::shared_ptr<PointerEvent> pointerEvent,
     const PointerEvent::PointerItem& item, napi_value result)
 {
-    auto mapFun = GetFuns(pointerEvent, item);
+    int32_t buttonId = pointerEvent->GetButtonId();
+    if (buttonId == PointerEvent::MOUSE_BUTTON_MIDDLE) {
+        buttonId = MIDDLE;
+    } else if (buttonId == PointerEvent::MOUSE_BUTTON_RIGHT) {
+        buttonId = RIGHT;
+    }
+    if (SetNameProperty(jsEnv_, result, "button", buttonId) != napi_ok) {
+        THROWERR(jsEnv_, "Set property failed");
+        return false;
+    }
+
+    auto mapFun = GetFuns(item);
     for (const auto& it : mapFun) {
         if (SetNameProperty(jsEnv_, result, it.first, it.second()) != napi_ok) {
             THROWERR(jsEnv_, "Set property failed");
@@ -398,10 +413,6 @@ int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> 
                 MMI_HILOGE("Invalid pointer: %{public}d", pointerId);
                 return RET_ERR;
             }
-            if (SetNameProperty(jsEnv_, result, "id", currentPointerId) != napi_ok) {
-                THROWERR(jsEnv_, "Set property of id failed");
-                return false;
-            }
             if (!SetMouseProperty(pointerEvent, item, result)) {
                 MMI_HILOGE("Set property of mouse failed");
                 return RET_ERR;
@@ -440,9 +451,15 @@ bool JsInputMonitor::GetPressedButtons(const std::set<int32_t>& pressedButtons, 
         return false;
     }
     uint32_t index = 0;
-    for (const auto &it : pressedButtons) {
+    for (const auto &item : pressedButtons) {
+        int32_t buttonId = item;
+        if (buttonId == PointerEvent::MOUSE_BUTTON_MIDDLE) {
+            buttonId = MIDDLE;
+        } else if (buttonId == PointerEvent::MOUSE_BUTTON_RIGHT) {
+            buttonId = RIGHT;
+        }
         napi_value element = nullptr;
-        if (napi_create_int32(jsEnv_, it, &element) != napi_ok) {
+        if (napi_create_int32(jsEnv_, buttonId, &element) != napi_ok) {
             THROWERR(jsEnv_, "Napi create int32 failed");
             return false;
         }
@@ -530,11 +547,47 @@ bool JsInputMonitor::GetPressedKey(const std::vector<int32_t>& pressedKeys, napi
     return true;
 }
 
+int32_t JsInputMonitor::TransformTsActionValue(int32_t pointerAction)
+{
+    switch (pointerAction) {
+        case PointerEvent::POINTER_ACTION_CANCEL: {
+            return CANCEL;
+        }
+        case PointerEvent::POINTER_ACTION_MOVE: {
+            return MOVE;
+        }
+        case PointerEvent::POINTER_ACTION_BUTTON_DOWN: {
+            return BUTTON_DOWN;
+        }
+        case PointerEvent::POINTER_ACTION_BUTTON_UP: {
+            return BUTTON_UP;
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_BEGIN: {
+            return AXIS_BEGIN;
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_UPDATE: {
+            return AXIS_UPDATE;
+        }
+        case PointerEvent::POINTER_ACTION_AXIS_END: {
+            return AXIS_END;
+        }
+        default: {
+            MMI_HILOGE("Abnormal pointer action");
+            return RET_ERR;
+        }
+    }
+}
+
 int32_t JsInputMonitor::TransformMousePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    if (SetNameProperty(jsEnv_, result, "action", pointerEvent->GetPointerAction()) != napi_ok) {
+    int32_t actionValue = TransformTsActionValue(pointerEvent->GetPointerAction());
+    if (actionValue == RET_ERR) {
+        MMI_HILOGE("Transform Action Value failed");
+        return RET_ERR;
+    }
+    if (SetNameProperty(jsEnv_, result, "action", actionValue) != napi_ok) {
         THROWERR(jsEnv_, "Set property of action failed");
         return RET_ERR;
     }
