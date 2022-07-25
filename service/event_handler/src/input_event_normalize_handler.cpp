@@ -200,7 +200,7 @@ int32_t InputEventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandlePointerEvent(pointerEvent);
 #ifndef OHOS_BUILD_ENABLE_INTERCEPTOR
-    MMI_HILOGW("Pointer handle module dose not support");
+    MMI_HILOGW("Pointer handle module does not support");
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -218,7 +218,7 @@ int32_t InputEventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     nextHandler_->HandlePointerEvent(pointerEvent);
 #ifndef OHOS_BUILD_ENABLE_INTERCEPTOR
-    MMI_HILOGW("Pointer handle module dose not support");
+    MMI_HILOGW("Pointer handle module does not support");
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
@@ -262,7 +262,7 @@ int32_t InputEventNormalizeHandler::HandleGestureEvent(libinput_event* event)
                item.GetWidth(), item.GetHeight());
     nextHandler_->HandlePointerEvent(pointerEvent);
 #ifndef OHOS_BUILD_ENABLE_INTERCEPTOR
-    MMI_HILOGW("Pointer handle module dose not support");
+    MMI_HILOGW("Pointer handle module does not support");
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -281,7 +281,7 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
 #ifndef OHOS_BUILD_ENABLE_INTERCEPTOR
-    MMI_HILOGW("TP handle module dose not support");
+    MMI_HILOGW("TP handle module does not support");
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
@@ -309,7 +309,7 @@ int32_t InputEventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
 #ifndef OHOS_BUILD_ENABLE_INTERCEPTOR
-    MMI_HILOGW("TP handle module dose not support");
+    MMI_HILOGW("TP handle module does not support");
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
         pointerEvent->Reset();
