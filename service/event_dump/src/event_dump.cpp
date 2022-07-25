@@ -149,7 +149,6 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 MouseEventHdr->Dump(fd, args);
 #else
                 mprintf(fd, "Pointer device does not support");
-                MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
                 break;
             }
