@@ -47,6 +47,11 @@ public:
         {LIBINPUT_LEFT_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_LEFT},
         {LIBINPUT_RIGHT_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_RIGHT},
         {LIBINPUT_MIDDLE_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_MIDDLE},
+        {LIBINPUT_SIDE_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_SIDE},
+        {LIBINPUT_EXTRA_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_EXTRA},
+        {LIBINPUT_FORWARD_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_FORWARD},
+        {LIBINPUT_BACK_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_BACK},
+        {LIBINPUT_TASK_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_TASK},
     };
 public:
     MouseDeviceState();
@@ -60,9 +65,9 @@ public:
     void GetPressedButtons(std::vector<int32_t>& pressedButtons);
     std::map<uint32_t, int32_t> GetMouseBtnState() const;
     void MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState);
+    int32_t LibinputChangeToPointer(const uint32_t keyValue);
 
 private:
-    int32_t LibinputChangeToPointer(const uint32_t keyValue);
     void ChangeMouseState(const BUTTON_STATE btnState, int32_t& btnStateCount);
 
 private:
