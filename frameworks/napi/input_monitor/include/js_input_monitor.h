@@ -87,7 +87,7 @@ private:
         const PointerEvent::PointerItem& item, napi_value result);
     bool GetAxesValue(const std::shared_ptr<PointerEvent> pointerEvent, napi_value element);
     bool GetPressedKeys(const std::vector<int32_t>& pressedKeys, napi_value result);
-    bool GetPressedButtons(const std::set<int32_t>& pressedButtons, napi_value result);
+    bool GetPressedButtons(std::set<int32_t>& pressedButtons, napi_value result);
     bool HasKeyCode(const std::vector<int32_t>& pressedKeys, int32_t keyCode);
     bool GetPressedKey(const std::vector<int32_t>& pressedKeys, napi_value result);
     MapFun GetFuns(const PointerEvent::PointerItem& item);

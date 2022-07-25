@@ -441,7 +441,7 @@ int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> 
     return RET_OK;
 }
 
-bool JsInputMonitor::GetPressedButtons(const std::set<int32_t>& pressedButtons, napi_value result)
+bool JsInputMonitor::GetPressedButtons(std::set<int32_t>& pressedButtons, napi_value result)
 {
     CALL_DEBUG_ENTER;
     napi_value value = nullptr;
