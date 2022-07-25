@@ -441,7 +441,7 @@ int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> 
     return RET_OK;
 }
 
-bool JsInputMonitor::GetPressedButtons(std::set<int32_t>& pressedButtons, napi_value result)
+bool JsInputMonitor::GetPressedButtons(const std::set<int32_t>& pressedButtons, napi_value result)
 {
     CALL_DEBUG_ENTER;
     napi_value value = nullptr;
@@ -451,14 +451,15 @@ bool JsInputMonitor::GetPressedButtons(std::set<int32_t>& pressedButtons, napi_v
         return false;
     }
     uint32_t index = 0;
-    for (auto &item : pressedButtons) {
-        if (item == PointerEvent::MOUSE_BUTTON_MIDDLE) {
-            item = MIDDLE;
-        } else if (item == PointerEvent::MOUSE_BUTTON_RIGHT) {
-            item = RIGHT;
+    for (const auto &item : pressedButtons) {
+        int32_t buttonId = item;
+        if (buttonId == PointerEvent::MOUSE_BUTTON_MIDDLE) {
+            buttonId = MIDDLE;
+        } else if (buttonId == PointerEvent::MOUSE_BUTTON_RIGHT) {
+            buttonId = RIGHT;
         }
         napi_value element = nullptr;
-        if (napi_create_int32(jsEnv_, item, &element) != napi_ok) {
+        if (napi_create_int32(jsEnv_, buttonId, &element) != napi_ok) {
             THROWERR(jsEnv_, "Napi create int32 failed");
             return false;
         }
