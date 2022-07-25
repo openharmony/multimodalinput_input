@@ -451,15 +451,14 @@ bool JsInputMonitor::GetPressedButtons(const std::set<int32_t>& pressedButtons, 
         return false;
     }
     uint32_t index = 0;
-    for (const auto &it : pressedButtons) {
-        int32_t buttonId = it;
-        if (buttonId == PointerEvent::MOUSE_BUTTON_MIDDLE) {
-            buttonId = MIDDLE;
-        } else if (buttonId == PointerEvent::MOUSE_BUTTON_RIGHT) {
-            buttonId = RIGHT;
+    for (auto &item : pressedButtons) {
+        if (item == PointerEvent::MOUSE_BUTTON_MIDDLE) {
+            item = MIDDLE;
+        } else if (item == PointerEvent::MOUSE_BUTTON_RIGHT) {
+            item = RIGHT;
         }
         napi_value element = nullptr;
-        if (napi_create_int32(jsEnv_, buttonId, &element) != napi_ok) {
+        if (napi_create_int32(jsEnv_, item, &element) != napi_ok) {
             THROWERR(jsEnv_, "Napi create int32 failed");
             return false;
         }
