@@ -120,7 +120,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 CHKPV(subscriberHandler);
                 subscriberHandler->Dump(fd, args);
 #else
-                MMI_HILOGW("Keyboard device does not support");
+                mprintf(fd, "Keyboard device does not support");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
                 break;
             }
@@ -130,7 +130,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 CHKPV(monitorHandler);
                 monitorHandler->Dump(fd, args);
 #else
-                MMI_HILOGW("Monitor function does not support");
+                mprintf(fd, "Monitor function does not support");
 #endif // OHOS_BUILD_ENABLE_MONITOR
                 break;
             }
@@ -140,7 +140,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 CHKPV(interceptorHandler);
                 interceptorHandler->Dump(fd, args);
 #else
-                MMI_HILOGW("Interceptor function does not support");
+                mprintf(fd, "Interceptor function does not support");
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
                 break;
             }
@@ -148,6 +148,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 #ifdef OHOS_BUILD_ENABLE_POINTER
                 MouseEventHdr->Dump(fd, args);
 #else
+                mprintf(fd, "Pointer device does not support");
                 MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
                 break;
