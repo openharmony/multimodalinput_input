@@ -60,9 +60,16 @@ config("multimodalinput_mmi_public_config") {
   include_dirs = [ "util/common/include/" ]
 }
 
-group("multimodalinput_mmi_packages") {
+group("multimodalinput_mmi_base") {
+  deps = []
+}
+
+group("multimodalinput_mmi_frameworks") {
+  deps = [ "frameworks/proxy:libmmi-client" ]
+}
+
+group("multimodalinput_mmi_service") {
   deps = [
-    "frameworks/proxy:libmmi-client",
     "service:libmmi-server",
     "tools/inject_event:uinput",
   ]
