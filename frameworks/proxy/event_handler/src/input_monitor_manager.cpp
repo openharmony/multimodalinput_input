@@ -14,8 +14,7 @@
  */
 
 #include "input_monitor_manager.h"
-
-#include "input_handler_manager.h"
+#include "multimodal_input_connect_manager.h"
 #include "util.h"
 
 namespace OHOS {
@@ -24,20 +23,31 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputMonitorManager" };
 } // namespace
 
+InputMonitorManager::InputMonitorManager() {}
+InputMonitorManager::~InputMonitorManager() {}
+
 int32_t InputMonitorManager::AddMonitor(std::shared_ptr<IInputEventConsumer> monitor)
 {
     CHKPR(monitor, INVALID_HANDLER_ID);
-    return InputHandlerMgr.AddHandler(InputHandlerType::MONITOR, monitor);
+    return AddHandler(InputHandlerType::MONITOR, monitor);
 }
 
 void InputMonitorManager::RemoveMonitor(int32_t monitorId)
 {
-    InputHandlerMgr.RemoveHandler(monitorId, InputHandlerType::MONITOR);
+    RemoveHandler(monitorId, InputHandlerType::MONITOR);
 }
 
 void InputMonitorManager::MarkConsumed(int32_t monitorId, int32_t eventId)
 {
-    InputHandlerMgr.MarkConsumed(monitorId, eventId);
+    MMI_HILOGD("Mark consumed state, monitor:%{public}d,event:%{public}d", monitorId, eventId);
+    if (!HasHandler(monitorId)) {
+        MMI_HILOGW("Failed to find the monitorId");
+        return;
+    }
+    int32_t ret = MultimodalInputConnMgr->MarkEventConsumed(eventId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

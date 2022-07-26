@@ -148,12 +148,14 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
         && targetWindowId_ > 0) {
         pointerEvent->SetTargetWindowId(targetWindowId_);
         PointerEvent::PointerItem pointerItem;
-        if (!pointerEvent->GetPointerItem(0, pointerItem)) {
+        auto pointerIds = pointerEvent->GetPointerIds();
+        auto id = pointerIds.front();
+        if (!pointerEvent->GetPointerItem(id, pointerItem)) {
             MMI_HILOGE("Can't find pointer item");
             return RET_ERR;
         }
         pointerItem.SetTargetWindowId(targetWindowId_);
-        pointerEvent->UpdatePointerItem(0, pointerItem);
+        pointerEvent->UpdatePointerItem(id, pointerItem);
     }
     auto source = pointerEvent->GetSourceType();
     switch (source) {
@@ -224,44 +226,45 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 }
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType,
+int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType,
     HandleEventType eventType)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    MMI_HILOGD("handler:%{public}d, handlerType:%{public}d", handlerId, handlerType);
+    MMI_HILOGD("handlerType:%{public}d", handlerType);
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         auto interceptorHandler = InputHandler->GetInterceptorHandler();
         CHKPR(interceptorHandler, ERROR_NULL_POINTER);
-        return interceptorHandler->AddInputHandler(handlerId, handlerType, eventType, sess);
+        return interceptorHandler->AddInputHandler(handlerType, eventType, sess);
     }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     if (handlerType == InputHandlerType::MONITOR) {
         auto monitorHandler = InputHandler->GetMonitorHandler();
         CHKPR(monitorHandler, ERROR_NULL_POINTER);
-        return monitorHandler->AddInputHandler(handlerId, handlerType, sess);
+        return monitorHandler->AddInputHandler(handlerType, eventType, sess);
     }
 #endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
 
-int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType)
+int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType,
+                                               HandleEventType eventType)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    MMI_HILOGD("OnRemoveInputHandler handler:%{public}d,handlerType:%{public}d", handlerId, handlerType);
+    MMI_HILOGD("OnRemoveInputHandler handlerType:%{public}d eventType:%{public}u", handlerType, eventType);
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         auto interceptorHandler = InputHandler->GetInterceptorHandler();
         CHKPR(interceptorHandler, ERROR_NULL_POINTER);
-        interceptorHandler->RemoveInputHandler(handlerId, handlerType, sess);
+        interceptorHandler->RemoveInputHandler(handlerType, eventType, sess);
     }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     if (handlerType == InputHandlerType::MONITOR) {
         auto monitorHandler = InputHandler->GetMonitorHandler();
         CHKPR(monitorHandler, ERROR_NULL_POINTER);
-        monitorHandler->RemoveInputHandler(handlerId, handlerType, sess);
+        monitorHandler->RemoveInputHandler(handlerType, eventType, sess);
     }
 #endif // OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
@@ -269,12 +272,12 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, int32_t handlerI
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t monitorId, int32_t eventId)
+int32_t ServerMsgHandler::OnMarkConsumed(SessionPtr sess, int32_t eventId)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     auto monitorHandler = InputHandler->GetMonitorHandler();
     CHKPR(monitorHandler, ERROR_NULL_POINTER);
-    monitorHandler->MarkConsumed(monitorId, eventId, sess);
+    monitorHandler->MarkConsumed(eventId, sess);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_MONITOR

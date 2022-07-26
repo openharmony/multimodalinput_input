@@ -111,7 +111,7 @@ public:
     static constexpr int32_t POINTER_ACTION_ENTER_WINDOW = 10;
 
     /**
-     * * Indicates that the pointer leaves the window.
+     * Indicates that the pointer leaves the window.
      *
      * @since 9
      */
