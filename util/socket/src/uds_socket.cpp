@@ -100,7 +100,7 @@ int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isNonBlock)
             fd, flags, errno, FCNTL_FAIL);
         return flags;
     }
-    MMI_HILOGD("F_GETFL fd:%{public}d,flags:%{public}d", fd, flags);
+    MMI_HILOGI("F_GETFL fd:%{public}d,flags:%{public}d", fd, flags);
     uint32_t mask = static_cast<uint32_t>(flags);
     mask |= O_NONBLOCK;
     if (!isNonBlock) {
@@ -112,7 +112,7 @@ int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isNonBlock)
             fd, flags, errno, FCNTL_FAIL);
         return flags;
     }
-    MMI_HILOGD("F_SETFL fd:%{public}d,flags:%{public}d", fd, flags);
+    MMI_HILOGI("F_SETFL fd:%{public}d,flags:%{public}d", fd, flags);
     return flags;
 }
 
