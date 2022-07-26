@@ -91,8 +91,10 @@ int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
     CHKPR(data, ERROR_NULL_POINTER);
     double dx = libinput_event_pointer_get_dx(data);
     double dy = libinput_event_pointer_get_dy(data);
-    double correctionX = dx * static_cast<double>(speed_) / 10.0 * GetSpeedGain(dx);
-    double correctionY = dy * static_cast<double>(speed_) / 10.0 * GetSpeedGain(dy);
+    double vin = (fmax(abs(dx), abs(dy)) + fmin(abs(dx), abs(dy))) / 2.0;
+    double gain = GetSpeedGain(vin);
+    double correctionX = dx * gain * static_cast<double>(speed_) / 10.0;
+    double correctionY = dy * gain * static_cast<double>(speed_) / 10.0;
     MMI_HILOGD("dx:%{public}lf, dy:%{public}lf, correctionX:%{public}lf, correctionY:%{public}lf",
                dx, dy, correctionX, correctionY);
     absolutionX_ += correctionX;
