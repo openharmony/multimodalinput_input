@@ -74,12 +74,12 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(InputHandlerType handlerType,
     HandleEventType eventType, SessionPtr session)
 {
     CALL_INFO_TRACE;
-    InitSessionLostCallback();
     CHKPR(session, RET_ERR);
-    if (eventType == HANDLE_EVENT_TYPE_NONE) {
+    if ((eventType & HANDLE_EVENT_TYPE_ALL) == HANDLE_EVENT_TYPE_NONE) {
         MMI_HILOGE("Invalid event type");
         return RET_ERR;
     }
+    InitSessionLostCallback();
     SessionHandler mon { handlerType, eventType, session };
     return monitors_.AddMonitor(mon);
 }
@@ -209,11 +209,6 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHa
                    monitors_.size(), INVALID_MONITOR_MON);
         return RET_ERR;
     }
-    if (monitor.eventType_ == HANDLE_EVENT_TYPE_NONE) {
-        MMI_HILOGE("Event type is NONE");
-        return RET_ERR;
-    }
-    
     bool isFound = false;
     auto iter = monitors_.find(monitor);
     if (iter != monitors_.end()) {

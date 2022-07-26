@@ -62,13 +62,13 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
         MMI_HILOGE("Invalid event type");
         return INVALID_HANDLER_ID;
     }
-    const HandleEventType eType = GetEventType();
+    const HandleEventType currentType = GetEventType();
     MMI_HILOGD("Register new handler:%{public}d", handlerId);
     if (RET_OK == AddLocal(handlerId, handlerType, eventType, consumer)) {
         MMI_HILOGD("New handler successfully registered, report to server");
-        const HandleEventType hType = GetEventType();
-        if (eType != hType) {
-            AddToServer(handlerType, hType);
+        const HandleEventType newType = GetEventType();
+        if (currentType != newType) {
+            AddToServer(handlerType, newType);
         }
     } else {
         handlerId = INVALID_HANDLER_ID;
@@ -81,12 +81,12 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
     CALL_INFO_TRACE;
     MMI_HILOGD("Unregister handler:%{public}d,type:%{public}d", handlerId, handlerType);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
-    const HandleEventType eType = GetEventType();
+    const HandleEventType currentType = GetEventType();
     if (RET_OK == RemoveLocal(handlerId, handlerType)) {
         MMI_HILOGD("Handler:%{public}d unregistered, report to server", handlerId);
-        const HandleEventType hType = GetEventType();
-        if (eType != hType) {
-            RemoveFromServer(handlerType, hType);
+        const HandleEventType newType = GetEventType();
+        if (currentType != newType) {
+            RemoveFromServer(handlerType, newType);
         }
     }
 }

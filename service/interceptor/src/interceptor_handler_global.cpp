@@ -79,8 +79,8 @@ int32_t InterceptorHandlerGlobal::AddInputHandler(InputHandlerType handlerType,
 {
     CALL_INFO_TRACE;
     CHKPR(session, RET_ERR);
-    if (handlerType != InputHandlerType::INTERCEPTOR) {
-        MMI_HILOGW("Invalid handler type:%{public}d", handlerType);
+    if ((eventType & HANDLE_EVENT_TYPE_ALL) == HANDLE_EVENT_TYPE_NONE) {
+        MMI_HILOGE("Invalid event type");
         return RET_ERR;
     }
     InitSessionLostCallback();
@@ -227,10 +227,6 @@ int32_t InterceptorHandlerGlobal::InterceptorCollection::AddInterceptor(const Se
 {
     if (interceptors_.size() >= MAX_N_INPUT_INTERCEPTORS) {
         MMI_HILOGE("The number of interceptors exceeds limit");
-        return RET_ERR;
-    }
-    if (interceptor.eventType_ == HANDLE_EVENT_TYPE_NONE) {
-        MMI_HILOGE("Event type is NONE");
         return RET_ERR;
     }
     bool isFound = false;
