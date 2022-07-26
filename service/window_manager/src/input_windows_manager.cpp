@@ -620,7 +620,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
-    UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
+    if (InputDevMgr->HasPointerDevice()) {
+        UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
+    }
 
     MMI_HILOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
                "logicalX:%{public}d,logicalY:%{public}d,"
