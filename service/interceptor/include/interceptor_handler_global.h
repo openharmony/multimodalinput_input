@@ -41,9 +41,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
-        HandleEventType eventType, SessionPtr session);
-    void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
+    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session);
+    void RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -57,22 +56,15 @@ private:
 private:
     class SessionHandler {
     public:
-        SessionHandler(int32_t id, InputHandlerType handlerType, HandleEventType eventType,
-            SessionPtr session) : id_(id), handlerType_(handlerType), eventType_(eventType),
-            session_(session) { }
+        SessionHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
+            : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
+              session_(session) { }
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
         bool operator<(const SessionHandler& other) const
         {
-            if (id_ != other.id_) {
-                return (id_ < other.id_);
-            }
-            if (handlerType_ != other.handlerType_) {
-                return (handlerType_ < other.handlerType_);
-            }
             return (session_ < other.session_);
         }
-        int32_t id_;
         InputHandlerType handlerType_;
         HandleEventType eventType_;
         SessionPtr session_ = nullptr;

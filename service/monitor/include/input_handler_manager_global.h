@@ -43,9 +43,9 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
-    void RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType, SessionPtr session);
-    void MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session);
+    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session);
+    void RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session);
+    void MarkConsumed(int32_t eventId, SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool HandleEvent(std::shared_ptr<KeyEvent> KeyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -61,22 +61,17 @@ private:
 private:
     class SessionHandler {
     public:
-        SessionHandler(int32_t id, InputHandlerType handlerType, SessionPtr session)
-            : id_(id), handlerType_(handlerType), session_(session) { }
+        SessionHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
+            : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
+              session_(session) { }
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
         bool operator<(const SessionHandler& other) const
         {
-            if (id_ != other.id_) {
-                return (id_ < other.id_);
-            }
-            if (handlerType_ != other.handlerType_) {
-                return (handlerType_ < other.handlerType_);
-            }
             return (session_ < other.session_);
         }
-        int32_t id_;
         InputHandlerType handlerType_;
+        HandleEventType eventType_;
         SessionPtr session_ = nullptr;
     };
 
@@ -90,9 +85,9 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         int32_t AddMonitor(const SessionHandler& mon);
         void RemoveMonitor(const SessionHandler& mon);
-        void MarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr session);
+        void MarkConsumed(int32_t eventId, SessionPtr session);
 
-        bool HasMonitor(int32_t monitorId, SessionPtr session);
+        bool HasMonitor(SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
         void UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH

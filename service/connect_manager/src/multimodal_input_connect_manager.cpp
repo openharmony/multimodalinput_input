@@ -57,13 +57,13 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
     }
 
     const std::string programName(GetProgramName());
-    int32_t result = multimodalInputConnectService_->AllocSocketFd(programName, moduleType, socketFd_);
+    int32_t result = multimodalInputConnectService_->AllocSocketFd(programName, moduleType, socketFd_, tokenType_);
     if (result != RET_OK) {
         MMI_HILOGE("AllocSocketFd has error:%{public}d", result);
         return RET_ERR;
     }
 
-    MMI_HILOGI("AllocSocketPair success. socketFd_:%{public}d", socketFd_);
+    MMI_HILOGI("AllocSocketPair success. socketFd_:%{public}d tokenType_:%{public}d", socketFd_, tokenType_);
     return RET_OK;
 }
 
@@ -131,23 +131,22 @@ int32_t MultimodalInputConnectManager::GetKeyboardType(int32_t userData, int32_t
     return multimodalInputConnectService_->GetKeyboardType(userData, deviceId);
 }
 
-int32_t MultimodalInputConnectManager::AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
-    HandleEventType eventType)
+int32_t MultimodalInputConnectManager::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->AddInputHandler(handlerId, handlerType, eventType);
+    return multimodalInputConnectService_->AddInputHandler(handlerType, eventType);
 }
 
-int32_t MultimodalInputConnectManager::RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType)
+int32_t MultimodalInputConnectManager::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->RemoveInputHandler(handlerId, handlerType);
+    return multimodalInputConnectService_->RemoveInputHandler(handlerType, eventType);
 }
 
-int32_t MultimodalInputConnectManager::MarkEventConsumed(int32_t monitorId, int32_t eventId)
+int32_t MultimodalInputConnectManager::MarkEventConsumed(int32_t eventId)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->MarkEventConsumed(monitorId, eventId);
+    return multimodalInputConnectService_->MarkEventConsumed(eventId);
 }
 
 int32_t MultimodalInputConnectManager::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)

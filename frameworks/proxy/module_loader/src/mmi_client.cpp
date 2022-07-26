@@ -71,6 +71,7 @@ bool MMIClient::Start()
         Stop();
         return false;
     }
+    msgHandler_.InitProcessedCallback();
     if (!StartEventRunner()) {
         MMI_HILOGE("Start runner failed");
         Stop();
