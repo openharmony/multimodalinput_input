@@ -24,6 +24,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputInterceptorManager" };
 } // namespace
 
+InputInterceptorManager::InputInterceptorManager() {}
+InputInterceptorManager::~InputInterceptorManager() {}
+
 int32_t InputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor,
     HandleEventType eventType)
 {
@@ -31,12 +34,12 @@ int32_t InputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsu
         MMI_HILOGE("No interceptor was specified.");
         return INVALID_HANDLER_ID;
     }
-    return InputHandlerMgr.AddHandler(InputHandlerType::INTERCEPTOR, interceptor, eventType);
+    return AddHandler(InputHandlerType::INTERCEPTOR, interceptor, eventType);
 }
 
 void InputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
-    InputHandlerMgr.RemoveHandler(interceptorId, InputHandlerType::INTERCEPTOR);
+    RemoveHandler(interceptorId, InputHandlerType::INTERCEPTOR);
 }
 } // namespace MMI
 } // namespace OHOS
