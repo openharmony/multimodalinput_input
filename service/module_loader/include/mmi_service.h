@@ -50,7 +50,7 @@ public:
     virtual void OnStop() override;
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
-        int32_t &toReturnClientFd) override;
+        int32_t &toReturnClientFd, int32_t &tokenType) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
     virtual int32_t SetPointerVisible(bool visible) override;
     virtual int32_t IsPointerVisible(bool &visible) override;
@@ -60,10 +60,9 @@ public:
     virtual int32_t RegisterDevListener() override;
     virtual int32_t UnregisterDevListener() override;
     virtual int32_t GetKeyboardType(int32_t userData, int32_t deviceId) override;
-    virtual int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
-        HandleEventType eventType) override;
-    virtual int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType) override;
-    virtual int32_t MarkEventConsumed(int32_t monitorId, int32_t eventId) override;
+    virtual int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType) override;
+    virtual int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType) override;
+    virtual int32_t MarkEventConsumed(int32_t eventId) override;
     virtual int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
     virtual int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
     virtual int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
@@ -84,7 +83,7 @@ protected:
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t CheckPointerVisible(bool &visible);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-    int32_t CheckEventProcessed(int32_t pid, int32_t eventId);
+    int32_t CheckEventProcessed(int32_t pid, int32_t eventId, int32_t type);
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);
     int32_t OnGetDeviceIds(int32_t pid, int32_t userData);
@@ -92,11 +91,10 @@ protected:
     int32_t OnSupportKeys(int32_t pid, int32_t userData, int32_t deviceId, std::vector<int32_t> &keys);
     int32_t OnGetKeyboardType(int32_t pid, int32_t userData, int32_t deviceId);
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-    int32_t CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType,
-        HandleEventType eventType);
-    int32_t CheckRemoveInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType);
+    int32_t CheckAddInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType);
+    int32_t CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
-    int32_t CheckMarkConsumed(int32_t pid, int32_t monitorId, int32_t eventId);
+    int32_t CheckMarkConsumed(int32_t pid, int32_t eventId);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

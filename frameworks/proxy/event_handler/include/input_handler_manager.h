@@ -29,29 +29,36 @@
 
 namespace OHOS {
 namespace MMI {
-class InputHandlerManager : public Singleton<InputHandlerManager> {
+class InputHandlerManager {
 public:
-    InputHandlerManager() = default;
+    InputHandlerManager();
+    virtual ~InputHandlerManager();
     DISALLOW_COPY_AND_MOVE(InputHandlerManager);
-    int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
-        HandleEventType eventType = HandleEventType::ALL);
-    void RemoveHandler(int32_t handlerId, InputHandlerType handlerType);
-    void MarkConsumed(int32_t monitorId, int32_t eventId);
+
+public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    void OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent);
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    void OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent);
+    void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #endif
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     void OnConnected();
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+    bool HasHandler(int32_t handlerId);
+    virtual InputHandlerType GetHandlerType() const = 0;
+    HandleEventType GetEventType() const;
+
+protected:
+    int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
+        HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
+    void RemoveHandler(int32_t handlerId, InputHandlerType handlerType);
 
 private:
     struct Handler {
         int32_t handlerId_ { 0 };
         InputHandlerType handlerType_ { NONE };
-        HandleEventType eventType_ { HandleEventType::ALL };
+        HandleEventType eventType_ { HANDLE_EVENT_TYPE_ALL };
         std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
         EventHandlerPtr eventHandler_ { nullptr };
     };
@@ -60,10 +67,9 @@ private:
     int32_t GetNextId();
     int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType,
         HandleEventType eventType, std::shared_ptr<IInputEventConsumer> monitor);
-    void AddToServer(int32_t handlerId, InputHandlerType handlerType,
-        HandleEventType eventType);
+    void AddToServer(InputHandlerType handlerType, HandleEventType eventType);
     int32_t RemoveLocal(int32_t handlerId, InputHandlerType handlerType);
-    void RemoveFromServer(int32_t handlerId, InputHandlerType handlerType);
+    void RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType);
 
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
     EventHandlerPtr GetEventHandler(int32_t handlerId);
@@ -75,14 +81,16 @@ private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
         std::shared_ptr<PointerEvent> pointerEvent);
+    void OnDispatchEventProcessed(int32_t eventId);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 private:
     std::mutex mtxHandlers_;
     std::map<int32_t, Handler> inputHandlers_;
+    std::map<int32_t, int32_t> processedEvents_;
+    std::function<void(int32_t)> monitorCallback_ { nullptr };
     int32_t nextId_ { 1 };
 };
 } // namespace MMI
 } // namespace OHOS
-#define InputHandlerMgr InputHandlerManager::GetInstance()
 #endif // INPUT_HANDLER_MANAGER_H

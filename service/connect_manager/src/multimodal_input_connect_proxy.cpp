@@ -39,7 +39,7 @@ MultimodalInputConnectProxy::~MultimodalInputConnectProxy()
 }
 
 int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programName,
-    const int32_t moduleType, int32_t &socketFd)
+    const int32_t moduleType, int32_t &socketFd, int32_t &tokenType)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -66,7 +66,8 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
         return RET_ERR;
     }
     socketFd = reply.ReadFileDescriptor();
-    MMI_HILOGD("The socketFd:%{public}d", socketFd);
+    READINT32(reply, tokenType, IPC_PROXY_DEAD_OBJECT_ERR);
+    MMI_HILOGD("socketFd:%{public}d tokenType:%{public}d", socketFd, tokenType);
     return RET_OK;
 }
 
@@ -273,7 +274,7 @@ int32_t MultimodalInputConnectProxy::GetKeyboardType(int32_t userData, int32_t d
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
+int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerType,
     HandleEventType eventType)
 {
     CALL_DEBUG_ENTER;
@@ -282,9 +283,8 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(int32_t handlerId, InputHan
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, handlerId, ERR_INVALID_VALUE);
     WRITEINT32(data, handlerType, ERR_INVALID_VALUE);
-    WRITEINT32(data, eventType, ERR_INVALID_VALUE);
+    WRITEUINT32(data, eventType, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -297,7 +297,7 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(int32_t handlerId, InputHan
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType)
+int32_t MultimodalInputConnectProxy::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -305,8 +305,8 @@ int32_t MultimodalInputConnectProxy::RemoveInputHandler(int32_t handlerId, Input
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, handlerId, ERR_INVALID_VALUE);
     WRITEINT32(data, handlerType, ERR_INVALID_VALUE);
+    WRITEUINT32(data, eventType, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -319,7 +319,7 @@ int32_t MultimodalInputConnectProxy::RemoveInputHandler(int32_t handlerId, Input
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::MarkEventConsumed(int32_t monitorId, int32_t eventId)
+int32_t MultimodalInputConnectProxy::MarkEventConsumed(int32_t eventId)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -327,7 +327,6 @@ int32_t MultimodalInputConnectProxy::MarkEventConsumed(int32_t monitorId, int32_
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, monitorId, ERR_INVALID_VALUE);
     WRITEINT32(data, eventId, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
