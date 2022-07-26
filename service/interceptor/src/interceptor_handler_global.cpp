@@ -74,33 +74,27 @@ void InterceptorHandlerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> po
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-int32_t InterceptorHandlerGlobal::AddInputHandler(int32_t handlerId,
-    InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
+int32_t InterceptorHandlerGlobal::AddInputHandler(InputHandlerType handlerType,
+    HandleEventType eventType, SessionPtr session)
 {
     CALL_INFO_TRACE;
     CHKPR(session, RET_ERR);
-    if (!IsValidHandlerId(handlerId)) {
-        MMI_HILOGE("Invalid handler");
-        return RET_ERR;
-    }
-    if (handlerType != InputHandlerType::INTERCEPTOR) {
-        MMI_HILOGW("Invalid handler type:%{public}d", handlerType);
+    if ((eventType & HANDLE_EVENT_TYPE_ALL) == HANDLE_EVENT_TYPE_NONE) {
+        MMI_HILOGE("Invalid event type");
         return RET_ERR;
     }
     InitSessionLostCallback();
-    MMI_HILOGD("Register interceptor:%{public}d", handlerId);
-    SessionHandler interceptor { handlerId, handlerType, eventType, session };
+    SessionHandler interceptor { handlerType, eventType, session };
     return interceptors_.AddInterceptor(interceptor);
 }
 
-void InterceptorHandlerGlobal::RemoveInputHandler(int32_t handlerId,
-    InputHandlerType handlerType, SessionPtr session)
+void InterceptorHandlerGlobal::RemoveInputHandler(InputHandlerType handlerType,
+    HandleEventType eventType, SessionPtr session)
 {
     CALL_INFO_TRACE;
     CHKPV(session);
     if (handlerType == InputHandlerType::INTERCEPTOR) {
-        MMI_HILOGD("Unregister interceptor:%{public}d", handlerId);
-        SessionHandler interceptor { handlerId, handlerType, HandleEventType::ALL, session };
+        SessionHandler interceptor { handlerType, eventType, session };
         interceptors_.RemoveInterceptor(interceptor);
     }
 }
@@ -152,7 +146,7 @@ void InterceptorHandlerGlobal::SessionHandler::SendToClient(std::shared_ptr<KeyE
 {
     CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
-    pkt << id_;
+    pkt << handlerType_;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write key event failed");
         return;
@@ -171,8 +165,8 @@ void InterceptorHandlerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poin
 {
     CHKPV(pointerEvent);
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
-    MMI_HILOGD("Service SendToClient id:%{public}d,InputHandlerType:%{public}d", id_, handlerType_);
-    pkt << id_ << handlerType_;
+    MMI_HILOGD("Service send to client InputHandlerType:%{public}d", handlerType_);
+    pkt << handlerType_;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write pointer event failed");
         return;
@@ -198,8 +192,7 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     bool isInterceptor = false;
     for (const auto &interceptor : interceptors_) {
-        if (interceptor.eventType_ == HandleEventType::KEY
-            || interceptor.eventType_ == HandleEventType::ALL) {
+        if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_KEY) == HANDLE_EVENT_TYPE_KEY) {
             interceptor.SendToClient(keyEvent);
             MMI_HILOGD("Key event was intercepted");
             isInterceptor = true;
@@ -220,7 +213,7 @@ bool InterceptorHandlerGlobal::InterceptorCollection::HandleEvent(std::shared_pt
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     bool isInterceptor = false;
     for (const auto &interceptor : interceptors_) {
-        if (interceptor.eventType_ == HandleEventType::ALL) {
+        if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
             interceptor.SendToClient(pointerEvent);
             MMI_HILOGD("Pointer event was intercepted");
             isInterceptor = true;
@@ -236,21 +229,55 @@ int32_t InterceptorHandlerGlobal::InterceptorCollection::AddInterceptor(const Se
         MMI_HILOGE("The number of interceptors exceeds limit");
         return RET_ERR;
     }
-    auto ret = interceptors_.insert(interceptor);
-    if (!ret.second) {
-        MMI_HILOGW("Duplicate interceptors");
+    bool isFound = false;
+    auto iter = interceptors_.find(interceptor);
+    if (iter != interceptors_.end()) {
+        if (iter->eventType_ == interceptor.eventType_) {
+            MMI_HILOGD("Interceptor with event type (%{public}u) already exists", interceptor.eventType_);
+            return RET_OK;
+        }
+        isFound = true;
+        interceptors_.erase(iter);
     }
-    MMI_HILOGD("Register interceptor successfully");
+
+    auto [sIter, isOk] = interceptors_.insert(interceptor);
+    if (!isOk) {
+        if (isFound) {
+            MMI_HILOGE("Internal error: interceptor has been removed");
+        } else {
+            MMI_HILOGE("Failed to add interceptor");
+        }
+        return RET_ERR;
+    }
+
+    if (isFound) {
+        MMI_HILOGD("Event type is updated: %{public}u", interceptor.eventType_);
+    } else {
+        MMI_HILOGD("Service AddInterceptor Success");
+    }
     return RET_OK;
 }
 
 void InterceptorHandlerGlobal::InterceptorCollection::RemoveInterceptor(const SessionHandler& interceptor)
 {
-    std::set<SessionHandler>::const_iterator tItr = interceptors_.find(interceptor);
-    if (tItr != interceptors_.cend()) {
-        interceptors_.erase(tItr);
+    std::set<SessionHandler>::const_iterator iter = interceptors_.find(interceptor);
+    if (iter == interceptors_.cend()) {
+        MMI_HILOGE("Interceptor does not exist");
+        return;
     }
-    MMI_HILOGD("Unregister interceptor successfully");
+
+    interceptors_.erase(iter);
+    if (interceptor.eventType_ == HANDLE_EVENT_TYPE_NONE) {
+        MMI_HILOGD("Unregister interceptor successfully");
+        return;
+    }
+
+    auto [sIter, isOk] = interceptors_.insert(interceptor);
+    if (!isOk) {
+        MMI_HILOGE("Internal error, interceptor has been removed");
+        return;
+    }
+    MMI_HILOGD("Event type is updated: %{public}u", interceptor.eventType_);
 }
 
 void InterceptorHandlerGlobal::InterceptorCollection::OnSessionLost(SessionPtr session)
@@ -279,9 +306,9 @@ void InterceptorHandlerGlobal::InterceptorCollection::Dump(int32_t fd, const std
         SessionPtr session = item.session_;
         CHKPV(session);
         mprintf(fd,
-                "interceptor id:%d | handlerType:%d | eventType:%d | Pid:%d | Uid:%d | Fd:%d "
+                "handlerType:%d | eventType:%d | Pid:%d | Uid:%d | Fd:%d "
                 "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
-                item.id_, item.handlerType_, item.eventType_,
+                item.handlerType_, item.eventType_,
                 session->GetPid(), session->GetUid(),
                 session->GetFd(),
                 session->GetEarliestEventTime(), session->GetDescript().c_str());
