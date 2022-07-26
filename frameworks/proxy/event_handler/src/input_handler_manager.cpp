@@ -47,10 +47,19 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
         MMI_HILOGE("Exceeded limit of 32-bit maximum number of integers");
         return INVALID_HANDLER_ID;
     }
+
+    if (eventType == HANDLE_EVENT_TYPE_NONE) {
+        MMI_HILOGE("Invalid event type");
+        return INVALID_HANDLER_ID;
+    }
+    const HandleEventType currentType = GetEventType();
     MMI_HILOGD("Register new handler:%{public}d", handlerId);
     if (RET_OK == AddLocal(handlerId, handlerType, eventType, consumer)) {
         MMI_HILOGD("New handler successfully registered, report to server");
-        AddToServer(handlerId, handlerType, eventType);
+        const HandleEventType newType = GetEventType();
+        if (currentType != newType) {
+            AddToServer(handlerType, newType);
+        }
     } else {
         handlerId = INVALID_HANDLER_ID;
     }
@@ -62,19 +71,13 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
     CALL_INFO_TRACE;
     MMI_HILOGD("Unregister handler:%{public}d,type:%{public}d", handlerId, handlerType);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
+    const HandleEventType currentType = GetEventType();
     if (RET_OK == RemoveLocal(handlerId, handlerType)) {
         MMI_HILOGD("Handler:%{public}d unregistered, report to server", handlerId);
-        RemoveFromServer(handlerId, handlerType);
-    }
-}
-
-void InputHandlerManager::MarkConsumed(int32_t monitorId, int32_t eventId)
-{
-    CALL_INFO_TRACE;
-    MMI_HILOGD("Mark consumed state, monitor:%{public}d,event:%{public}d", monitorId, eventId);
-    int32_t ret = MultimodalInputConnMgr->MarkEventConsumed(monitorId, eventId);
-    if (ret != 0) {
-        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+        const HandleEventType newType = GetEventType();
+        if (currentType != newType) {
+            RemoveFromServer(handlerType, newType);
+        }
     }
 }
 
@@ -98,10 +101,9 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
     return RET_OK;
 }
 
-void InputHandlerManager::AddToServer(int32_t handlerId, InputHandlerType handlerType,
-    HandleEventType eventType)
+void InputHandlerManager::AddToServer(InputHandlerType handlerType, HandleEventType eventType)
 {
-    int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerId, handlerType, eventType);
+    int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerType, eventType);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
@@ -123,10 +125,9 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
     return RET_OK;
 }
 
-void InputHandlerManager::RemoveFromServer(int32_t handlerId, InputHandlerType handlerType)
+void InputHandlerManager::RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType)
 {
-    MMI_HILOGD("Remove handler:%{public}d from server", handlerId);
-    int32_t ret = MultimodalInputConnMgr->RemoveInputHandler(handlerId, handlerType);
+    int32_t ret = MultimodalInputConnMgr->RemoveInputHandler(handlerType, eventType);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
@@ -177,19 +178,25 @@ void InputHandlerManager::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> co
     MMI_HILOGD("Key event callback id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
 }
 
-void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<KeyEvent> keyEvent)
+void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHK_PID_AND_TID();
     CHKPV(keyEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_INTERCEPT_EVENT);
-    auto consumer = FindHandler(handlerId);
-    CHKPV(consumer);
-    if (!PostTask(handlerId,
-        std::bind(&InputHandlerManager::OnKeyEventTask, this, consumer, handlerId, keyEvent))) {
-        MMI_HILOGE("Post task failed");
+    for (const auto &handler : inputHandlers_) {
+        if ((handler.second.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
+            continue;
+        }
+        int32_t handlerId = handler.first;
+        auto consumer = handler.second.consumer_;
+        CHKPV(consumer);
+        if (!PostTask(handlerId,
+            std::bind(&InputHandlerManager::OnKeyEventTask, this, consumer, handlerId, keyEvent))) {
+            MMI_HILOGE("Post task failed");
+        }
+        MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
     }
-    MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
@@ -204,29 +211,57 @@ void InputHandlerManager::OnPointerEventTask(std::shared_ptr<IInputEventConsumer
     MMI_HILOGD("Pointer event callback id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
 }
 
-void InputHandlerManager::OnInputEvent(int32_t handlerId, std::shared_ptr<PointerEvent> pointerEvent)
+void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHK_PID_AND_TID();
     CHKPV(pointerEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
-    auto consumer = FindHandler(handlerId);
-    CHKPV(consumer);
-    if (!PostTask(handlerId,
-        std::bind(&InputHandlerManager::OnPointerEventTask, this, consumer, handlerId, pointerEvent))) {
-        MMI_HILOGE("Post task failed");
+    for (const auto &iter : inputHandlers_) {
+        if ((iter.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
+            continue;
+        }
+        int32_t handlerId = iter.first;
+        auto consumer = iter.second.consumer_;
+        CHKPV(consumer);
+        if (!PostTask(handlerId,
+            std::bind(&InputHandlerManager::OnPointerEventTask, this, consumer, handlerId, pointerEvent))) {
+            MMI_HILOGE("Post task failed");
+        }
+        MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
     }
-    MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 void InputHandlerManager::OnConnected()
 {
     CALL_DEBUG_ENTER;
-    for (auto &inputHandler : inputHandlers_) {
-        AddToServer(inputHandler.second.handlerId_, inputHandler.second.handlerType_, inputHandler.second.eventType_);
+    HandleEventType eventType = GetEventType();
+    if (eventType != HANDLE_EVENT_TYPE_NONE) {
+        AddToServer(GetHandlerType(), eventType);
     }
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+
+bool InputHandlerManager::HasHandler(int32_t handlerId)
+{
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    auto iter = inputHandlers_.find(handlerId);
+    return (iter != inputHandlers_.end());
+}
+
+HandleEventType InputHandlerManager::GetEventType() const
+{
+    if (inputHandlers_.empty()) {
+        MMI_HILOGD("InputHandlers is empty");
+        return HANDLE_EVENT_TYPE_NONE;
+    }
+    HandleEventType eventType { HANDLE_EVENT_TYPE_NONE };
+    for (const auto &inputHandler : inputHandlers_) {
+        eventType |= inputHandler.second.eventType_;
+    }
+    return eventType;
+}
 } // namespace MMI
 } // namespace OHOS
