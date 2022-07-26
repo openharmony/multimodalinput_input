@@ -68,41 +68,33 @@ void InputHandlerManagerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> p
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-int32_t InputHandlerManagerGlobal::AddInputHandler(int32_t handlerId,
-    InputHandlerType handlerType, SessionPtr session)
+int32_t InputHandlerManagerGlobal::AddInputHandler(InputHandlerType handlerType,
+    HandleEventType eventType, SessionPtr session)
 {
     CALL_INFO_TRACE;
-    InitSessionLostCallback();
-    if (!IsValidHandlerId(handlerId)) {
-        MMI_HILOGE("Invalid handler");
+    CHKPR(session, RET_ERR);
+    if ((eventType & HANDLE_EVENT_TYPE_ALL) == HANDLE_EVENT_TYPE_NONE) {
+        MMI_HILOGE("Invalid event type");
         return RET_ERR;
     }
-    CHKPR(session, RET_ERR);
-    if (handlerType == InputHandlerType::MONITOR) {
-        MMI_HILOGD("Register monitor:%{public}d", handlerId);
-        SessionHandler mon { handlerId, handlerType, session };
-        return monitors_.AddMonitor(mon);
-    }
-    MMI_HILOGW("Invalid handler type:%{public}d", handlerType);
-    return RET_ERR;
+    InitSessionLostCallback();
+    SessionHandler mon { handlerType, eventType, session };
+    return monitors_.AddMonitor(mon);
 }
 
-void InputHandlerManagerGlobal::RemoveInputHandler(int32_t handlerId,
-    InputHandlerType handlerType, SessionPtr session)
+void InputHandlerManagerGlobal::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+                                                   SessionPtr session)
 {
     CALL_INFO_TRACE;
     if (handlerType == InputHandlerType::MONITOR) {
-        MMI_HILOGD("Unregister monitor:%{public}d", handlerId);
-        SessionHandler monitor { handlerId, handlerType, session };
+        SessionHandler monitor { handlerType, eventType, session };
         monitors_.RemoveMonitor(monitor);
     }
 }
 
-void InputHandlerManagerGlobal::MarkConsumed(int32_t handlerId, int32_t eventId, SessionPtr session)
+void InputHandlerManagerGlobal::MarkConsumed(int32_t eventId, SessionPtr session)
 {
-    CALL_INFO_TRACE;
-    MMI_HILOGD("Mark consumed state, monitor:%{public}d", handlerId);
-    monitors_.MarkConsumed(handlerId, eventId, session);
+    monitors_.MarkConsumed(eventId, session);
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -161,7 +153,7 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Key
 {
     CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
-    pkt << id_;
+    pkt << handlerType_;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write key event failed");
         return;
@@ -180,8 +172,8 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poi
 {
     CHKPV(pointerEvent);
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
-    MMI_HILOGD("Service SendToClient id:%{public}d,InputHandlerType:%{public}d", id_, handlerType_);
-    pkt << id_ << handlerType_;
+    MMI_HILOGD("Service SendToClient InputHandlerType:%{public}d", handlerType_);
+    pkt << handlerType_;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write pointer event failed");
         return;
@@ -203,28 +195,61 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHa
                    monitors_.size(), INVALID_MONITOR_MON);
         return RET_ERR;
     }
-    auto ret = monitors_.insert(monitor);
-    if (ret.second) {
-        MMI_HILOGD("Service AddMonitor Success");
+    bool isFound = false;
+    auto iter = monitors_.find(monitor);
+    if (iter != monitors_.end()) {
+        if (iter->eventType_ == monitor.eventType_) {
+            MMI_HILOGD("Monitor with event type (%{public}u) already exists", monitor.eventType_);
+            return RET_OK;
+        }
+        isFound = true;
+        monitors_.erase(iter);
+    }
+
+    auto [sIter, isOk] = monitors_.insert(monitor);
+    if (!isOk) {
+        if (isFound) {
+            MMI_HILOGE("Internal error: monitor has been removed");
+        } else {
+            MMI_HILOGE("Failed to add monitor");
+        }
+        return RET_ERR;
+    }
+
+    if (isFound) {
+        MMI_HILOGD("Event type is updated: %{public}u", monitor.eventType_);
     } else {
-        MMI_HILOGW("Duplicate monitors");
+        MMI_HILOGD("Service Add Monitor Success");
     }
     return RET_OK;
 }
 
 void InputHandlerManagerGlobal::MonitorCollection::RemoveMonitor(const SessionHandler& monitor)
 {
-    std::set<SessionHandler>::const_iterator tItr = monitors_.find(monitor);
-    if (tItr != monitors_.end()) {
-        monitors_.erase(tItr);
-        MMI_HILOGD("Service RemoveMonitor Success");
+    auto iter = monitors_.find(monitor);
+    if (iter == monitors_.cend()) {
+        MMI_HILOGE("Monitor does not exist");
+        return;
     }
+
+    monitors_.erase(iter);
+    if (monitor.eventType_ == HANDLE_EVENT_TYPE_NONE) {
+        MMI_HILOGD("Unregister monitor successfully");
+        return;
+    }
+
+    auto [sIter, isOk] = monitors_.insert(monitor);
+    if (!isOk) {
+        MMI_HILOGE("Internal error, monitor has been removed");
+        return;
+    }
+    MMI_HILOGD("Event type is updated: %{public}u", monitor.eventType_);
 }
 
-void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t monitorId, int32_t eventId, SessionPtr session)
+void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t eventId, SessionPtr session)
 {
-    if (!HasMonitor(monitorId, session)) {
-        MMI_HILOGW("Specified monitor does not exist, monitor:%{public}d", monitorId);
+    if (!HasMonitor(session)) {
+        MMI_HILOGW("Specified monitor does not exist");
         return;
     }
     if (isMonitorConsumed_) {
@@ -258,7 +283,9 @@ bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<K
     CHKPF(keyEvent);
     MMI_HILOGD("There are currently %{public}zu monitors", monitors_.size());
     for (const auto &mon : monitors_) {
-        mon.SendToClient(keyEvent);
+        if ((mon.eventType_ & HANDLE_EVENT_TYPE_KEY) == HANDLE_EVENT_TYPE_KEY) {
+            mon.SendToClient(keyEvent);
+        }
     }
     return false;
 }
@@ -280,9 +307,9 @@ bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<P
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(int32_t monitorId, SessionPtr session)
+bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(SessionPtr session)
 {
-    SessionHandler monitor { monitorId, InputHandlerType::MONITOR, session };
+    SessionHandler monitor { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_ALL, session };
     return (monitors_.find(monitor) != monitors_.end());
 }
 
@@ -317,7 +344,9 @@ void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<Point
     CHKPV(pointerEvent);
     MMI_HILOGD("There are currently %{public}zu monitors", monitors_.size());
     for (const auto &monitor : monitors_) {
-        monitor.SendToClient(pointerEvent);
+        if ((monitor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
+            monitor.SendToClient(pointerEvent);
+        }
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -348,9 +377,9 @@ void InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::v
         SessionPtr session = item.session_;
         CHKPV(session);
         mprintf(fd,
-                "monitor id:%d | handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
+                "handlerType:%d | Pid:%d | Uid:%d | Fd:%d "
                 "| EarliestEventTime:%" PRId64 " | Descript:%s \t",
-                item.id_, item.handlerType_, session->GetPid(),
+                item.handlerType_, session->GetPid(),
                 session->GetUid(), session->GetFd(),
                 session->GetEarliestEventTime(), session->GetDescript().c_str());
     }

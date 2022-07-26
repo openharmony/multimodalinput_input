@@ -35,12 +35,11 @@ public:
     void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-    int32_t OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType,
-        HandleEventType eventType);
-    int32_t OnRemoveInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType);
+    int32_t OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType);
+    int32_t OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-    int32_t OnMarkConsumed(SessionPtr sess, int32_t monitorId, int32_t eventId);
+    int32_t OnMarkConsumed(SessionPtr sess, int32_t eventId);
 #endif // OHOS_BUILD_ENABLE_MONITOR
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnSubscribeKeyEvent(IUdsServer *server, int32_t pid,
