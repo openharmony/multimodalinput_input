@@ -267,7 +267,7 @@ void PrintWMSInfo(const std::string& str, const int32_t fd, const int32_t abilit
     } else {
         MMI_HILOGD("WMS:windowId:%{public}d", focusId);
     }
-    MMI_HILOGD("CALL_AMS, fd:%{public}d,abilityID:%{public}d", fd, abilityId);
+    MMI_HILOGI("CALL_AMS, fd:%{public}d,abilityID:%{public}d", fd, abilityId);
 }
 
 int32_t GetPid()
