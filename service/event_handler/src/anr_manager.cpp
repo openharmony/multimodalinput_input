@@ -48,7 +48,7 @@ bool ANRManager::TriggerANR(int32_t type, int64_t time, SessionPtr sess)
     }
 
     if (sess->CheckAnrStatus(type)) {
-        MMI_HILOGD("application not responding");
+        MMI_HILOGW("application not responding");
         return true;
     }
     int64_t earliest;
