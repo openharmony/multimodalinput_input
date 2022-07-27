@@ -50,7 +50,7 @@ private:
  #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t HandleButtonValueInner(libinput_event_pointer* data);
     int32_t HandleMotionCorrection(libinput_event_pointer* data);
-    double GetSpeedGain(const double &speed) const;
+    void GetSpeedGain(const double &speed, double& gain, double& diffNum) const;
     void DumpInner();
     void InitAbsolution();
 
