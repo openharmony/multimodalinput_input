@@ -315,7 +315,7 @@ bool KeyCommandManager::ParseConfig()
 {
     std::string vendorConfig = "/vendor/etc/ability_launch_config.json";
     std::string defaultConfig = "/system/etc/multimodalinput/ability_launch_config.json";
-    return ParseJson(vendorConfig) && ParseJson(defaultConfig);
+    return ParseJson(vendorConfig) || ParseJson(defaultConfig);
 }
 
 bool KeyCommandManager::ParseJson(const std::string configFile)
