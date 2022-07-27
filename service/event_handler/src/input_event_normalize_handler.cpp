@@ -176,6 +176,8 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     nextHandler_->HandleKeyEvent(keyEvent);
     KeyRepeat->SelectAutoRepeat(keyEvent);
     MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+#else
+        MMI_HILOGW("Keyboard device does not support");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
@@ -199,9 +201,8 @@ int32_t InputEventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     pointerEvent->SetPressedKeys(pressedKeys);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandlePointerEvent(pointerEvent);
-#ifndef OHOS_BUILD_ENABLE_INTERCEPTOR
-    MMI_HILOGW("Pointer handle module dose not support");
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#else
+        MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
@@ -217,9 +218,6 @@ int32_t InputEventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     nextHandler_->HandlePointerEvent(pointerEvent);
-#ifndef OHOS_BUILD_ENABLE_INTERCEPTOR
-    MMI_HILOGW("Pointer handle module dose not support");
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
@@ -229,6 +227,8 @@ int32_t InputEventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
             pointerEvent->Reset();
         }
     }
+#else
+    MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
@@ -261,9 +261,8 @@ int32_t InputEventNormalizeHandler::HandleGestureEvent(libinput_event* event)
                item.GetDisplayX(), item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(),
                item.GetWidth(), item.GetHeight());
     nextHandler_->HandlePointerEvent(pointerEvent);
-#ifndef OHOS_BUILD_ENABLE_INTERCEPTOR
-    MMI_HILOGW("Pointer handle module dose not support");
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#else
+    MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
@@ -280,9 +279,6 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
-#ifndef OHOS_BUILD_ENABLE_INTERCEPTOR
-    MMI_HILOGW("TP handle module dose not support");
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
@@ -292,6 +288,8 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
             pointerEvent->Reset();
         }
     }
+#else
+    MMI_HILOGW("Touchscreen device does not support");
 #endif // OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
 }
@@ -308,12 +306,11 @@ int32_t InputEventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
-#ifndef OHOS_BUILD_ENABLE_INTERCEPTOR
-    MMI_HILOGW("TP handle module dose not support");
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
         pointerEvent->Reset();
     }
+#else
+    MMI_HILOGW("Touchscreen device does not support");
 #endif // OHOS_BUILD_ENABLE_TOUCH
     return RET_OK;
 }
