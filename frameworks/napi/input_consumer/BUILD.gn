@@ -23,13 +23,13 @@ config("libinputeventclient_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
   ]
 
-  cflags = [ "-DOHOS_BUILD" ]
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  defines = [ "OHOS_BUILD" ]
+  if (input_feature_libinput) {
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+  if (input_feature_hdf) {
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 }
 
@@ -46,10 +46,6 @@ ohos_shared_library("inputconsumer") {
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/util:libmmi-util",
   ]
-
-  if (is_mmi_have_libinput || is_mmi_have_hdf) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
 
   external_deps = [
     "drivers_interface_input:hdi_input",

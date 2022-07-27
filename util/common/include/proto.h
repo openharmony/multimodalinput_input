@@ -203,6 +203,7 @@ enum KeyboardType {
 enum TokenType : int32_t {
     TOKEN_INVALID = -1,
     TOKEN_HAP = 0,
-    TOKEN_NATIVE,
+    TOKEN_NATIVE = 1,
+    TOKEN_SHELL = 2
 };
 #endif // PROTO_H

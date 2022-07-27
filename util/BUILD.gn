@@ -25,18 +25,18 @@ config("libmmi_util_public_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
   ]
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  if (input_feature_debug) {
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  if (input_feature_libinput) {
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+  if (input_feature_hdf) {
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 }
 
@@ -94,22 +94,22 @@ ohos_unittest("ut-mmi-util-out") {
     "${mmi_path}/interfaces/native/innerkits/event/include",
   ]
 
-  if (is_mmi_have_libinput) {
+  if (input_feature_libinput) {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  if (input_feature_debug) {
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  if (input_feature_libinput) {
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+  if (input_feature_hdf) {
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   sources = [
@@ -156,22 +156,22 @@ ohos_unittest("RunShellUtilTest") {
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 
-  if (is_mmi_have_libinput) {
+  if (input_feature_libinput) {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  if (input_feature_debug) {
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  if (input_feature_libinput) {
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+  if (input_feature_hdf) {
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   sources = [ "common/test/run_shell_util_test.cpp" ]

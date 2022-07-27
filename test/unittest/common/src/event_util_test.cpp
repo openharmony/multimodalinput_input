@@ -119,7 +119,7 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& p
 {
     const int precision = 2;
     std::ostringstream ostream;
-    std::vector<int32_t> pointerIds { pointerEvent->GetPointersIdList() };
+    std::vector<int32_t> pointerIds { pointerEvent->GetPointerIds() };
     ostream << "ClientMsgHandler: in OnPointerEvent"
          << ",EventType:" << pointerEvent->GetEventType()
          << ",ActionTime:" << pointerEvent->GetActionTime()

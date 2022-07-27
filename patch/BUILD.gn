@@ -20,14 +20,14 @@ group("patch_packages") {
     "prebuild_eudev:prebuild_eudev",
   ]
 
-  if (is_mmi_have_hdf) {
+  if (input_feature_hdf) {
     deps += [
       "diff_libevdev_hdf:libevdev-hdf",
       "diff_mtdev_hdf:libmtdev-hdf",
     ]
   }
 
-  if (is_mmi_have_libinput) {
+  if (input_feature_libinput) {
     deps += [
       "prebuild_libinput:prebuild_libinput",
       "//third_party/eudev:libudev",

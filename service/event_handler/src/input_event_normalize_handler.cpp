@@ -127,6 +127,7 @@ void InputEventNormalizeHandler::HandlePointerEvent(std::shared_ptr<PointerEvent
             item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetPressure(),
             item.GetDeviceId());
     }
+    WinMgr->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
@@ -134,11 +135,12 @@ void InputEventNormalizeHandler::HandlePointerEvent(std::shared_ptr<PointerEvent
 void InputEventNormalizeHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (nextHandler_ == nullptr) {
-        MMI_HILOGW("Touch device does not support");
+        MMI_HILOGW("Touchscreen device does not support");
         return;
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPV(pointerEvent);
+    WinMgr->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandleTouchEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
@@ -222,7 +224,7 @@ int32_t InputEventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
         MMI_HILOGD("This touch pad event is up remove this finger");
-        if (pointerEvent->GetPointersIdList().empty()) {
+        if (pointerEvent->GetPointerIds().empty()) {
             MMI_HILOGD("This touch pad event is final finger up remove this finger");
             pointerEvent->Reset();
         }
@@ -269,7 +271,7 @@ int32_t InputEventNormalizeHandler::HandleGestureEvent(libinput_event* event)
 int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
 {
     if (nextHandler_ == nullptr) {
-        MMI_HILOGW("TP device does not support");
+        MMI_HILOGW("Touchscreen device does not support");
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -285,7 +287,7 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
         MMI_HILOGD("This touch event is up remove this finger");
-        if (pointerEvent->GetPointersIdList().empty()) {
+        if (pointerEvent->GetPointerIds().empty()) {
             MMI_HILOGD("This touch event is final finger up remove this finger");
             pointerEvent->Reset();
         }
@@ -297,7 +299,7 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
 int32_t InputEventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
 {
     if (nextHandler_ == nullptr) {
-        MMI_HILOGW("TP device does not support");
+        MMI_HILOGW("Touchscreen device does not support");
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH

@@ -22,13 +22,13 @@ config("libmouse_config") {
     "//foundation/multimodalinput/input/util/network/include",
   ]
 
-  cflags = [ "-DOHOS_BUILD" ]
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  defines = [ "OHOS_BUILD" ]
+  if (input_feature_libinput) {
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+  if (input_feature_hdf) {
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 }
 
@@ -46,10 +46,6 @@ ohos_shared_library("mouse") {
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/libuv:uv_static",
   ]
-
-  if (is_mmi_have_libinput || is_mmi_have_hdf) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",

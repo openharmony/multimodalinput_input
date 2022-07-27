@@ -17,7 +17,9 @@
 
 #include <parameters.h>
 #include <unordered_map>
+
 #include "dfx_hisysevent.h"
+#include "input_windows_manager.h"
 #include "key_event_value_transformation.h"
 #include "util_ex.h"
 
@@ -254,6 +256,11 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         DfxHisysevent::OnDeviceConnect(INT32_MAX, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
     }
+    if (IsPointerDevice(inputDevice) && !HasPointerDevice()) {
+#ifdef OHOS_BUILD_ENABLE_POINTER
+        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+#endif // OHOS_BUILD_ENABLE_POINTER
+    }
     inputDevice_[nextId_] = inputDevice;
     for (const auto &item : devListener_) {
         CHKPC(item.first);
@@ -281,6 +288,11 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
             inputDevice_.erase(it);
             break;
         }
+    }
+    if (IsPointerDevice(inputDevice) && !HasPointerDevice()) {
+#ifdef OHOS_BUILD_ENABLE_POINTER
+        WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+#endif // OHOS_BUILD_ENABLE_POINTER
     }
     for (const auto &item : devListener_) {
         CHKPC(item.first);
@@ -313,7 +325,7 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device* device)
     CHKPF(device);
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
     MMI_HILOGD("udev tag:%{public}d", static_cast<int32_t>(udevTags));
-    return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK | 
+    return udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK |
     EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD);
 }
 

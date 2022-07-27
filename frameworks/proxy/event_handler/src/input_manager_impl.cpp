@@ -174,7 +174,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
     }
     return RET_OK;
 #else
-    MMI_HILOGW("Pointer and tp device does not support");
+    MMI_HILOGW("Pointer and touchscreen device does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
@@ -201,6 +201,7 @@ int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
+    std::lock_guard<std::mutex> guard(mtx_);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPR(keyOption, RET_ERR);
     CHKPR(callback, RET_ERR);
@@ -215,6 +216,7 @@ void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
+    std::lock_guard<std::mutex> guard(mtx_);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventInputSubscribeMgr.UnsubscribeKeyEvent(subscriberId);
 #else
@@ -363,7 +365,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent
     CHKPR(consumer, INVALID_HANDLER_ID);
     return AddMonitor(consumer);
 #else
-    MMI_HILOGW("Keyboard device or function does not support");
+    MMI_HILOGW("Keyboard device or monitor function does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD || OHOS_BUILD_ENABLE_MONITOR
 }
@@ -377,7 +379,7 @@ int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<PointerE
     CHKPR(consumer, INVALID_HANDLER_ID);
     return AddMonitor(consumer);
 #else
-    MMI_HILOGW("Pointer/tp device or monitor function does not support");
+    MMI_HILOGW("Pointer/touchscreen device or monitor function does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_MONITOR ||  OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
 }
@@ -392,7 +394,7 @@ int32_t InputManagerImpl::AddMonitor(std::shared_ptr<IInputEventConsumer> consum
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return monitorManager_.AddMonitor(consumer);
+    return IMonitorMgr->AddMonitor(consumer);
 #else
     MMI_HILOGI("Monitor function does not support");
     return ERROR_UNSUPPORT;
@@ -408,7 +410,7 @@ void InputManagerImpl::RemoveMonitor(int32_t monitorId)
         MMI_HILOGE("Client init failed");
         return;
     }
-    monitorManager_.RemoveMonitor(monitorId);
+    IMonitorMgr->RemoveMonitor(monitorId);
 #else
     MMI_HILOGI("Monitor function does not support");
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -423,7 +425,7 @@ void InputManagerImpl::MarkConsumed(int32_t monitorId, int32_t eventId)
         MMI_HILOGE("Client init failed");
         return;
     }
-    monitorManager_.MarkConsumed(monitorId, eventId);
+    IMonitorMgr->MarkConsumed(monitorId, eventId);
 #else
     MMI_HILOGI("Monitor function does not support");
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -451,8 +453,8 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return interceptorManager_.AddInterceptor(interceptor, HandleEventType::ALL);
-#else 
+    return InputInterMgr->AddInterceptor(interceptor, HANDLE_EVENT_TYPE_ALL);
+#else
     MMI_HILOGW("Interceptor function does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -470,7 +472,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return interceptorManager_.AddInterceptor(consumer, HandleEventType::KEY);
+    return InputInterMgr->AddInterceptor(consumer, HANDLE_EVENT_TYPE_KEY);
 #else
     MMI_HILOGW("Keyboard device or interceptor function does not support");
     return ERROR_UNSUPPORT;
@@ -486,7 +488,7 @@ void InputManagerImpl::RemoveInterceptor(int32_t interceptorId)
         MMI_HILOGE("Client init failed");
         return;
     }
-    interceptorManager_.RemoveInterceptor(interceptorId);
+    InputInterMgr->RemoveInterceptor(interceptorId);
 #else
     MMI_HILOGW("Interceptor function does not support");
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -520,7 +522,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
     }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
     #ifndef OHOS_BUILD_ENABLE_TOUCH
-        MMI_HILOGW("Tp device does not support");
+        MMI_HILOGW("Touchscreen device does not support");
         return;
     #endif
    }
@@ -529,7 +531,7 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
         MMI_HILOGE("Failed to inject pointer event");
     }
 #else
-    MMI_HILOGW("Pointer and tp device does not support");
+    MMI_HILOGW("Pointer and touchscreen device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 

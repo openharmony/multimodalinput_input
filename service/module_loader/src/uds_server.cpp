@@ -275,7 +275,7 @@ void UDSServer::OnEpollEvent(epoll_event& ev)
         return;
     }
     if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_HILOGD("EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
+        MMI_HILOGI("EPOLLERR or EPOLLHUP fd:%{public}d,ev.events:0x%{public}x", fd, ev.events);
         ReleaseSession(fd, ev);
     } else if (ev.events & EPOLLIN) {
         OnEpollRecv(fd, ev);
@@ -317,7 +317,7 @@ SessionPtr UDSServer::GetSessionByPid(int32_t pid) const
 bool UDSServer::AddSession(SessionPtr ses)
 {
     CHKPF(ses);
-    MMI_HILOGD("pid:%{public}d,fd:%{public}d", ses->GetPid(), ses->GetFd());
+    MMI_HILOGI("pid:%{public}d,fd:%{public}d", ses->GetPid(), ses->GetFd());
     auto fd = ses->GetFd();
     if (fd < 0) {
         MMI_HILOGE("The fd is less than 0");
@@ -342,7 +342,7 @@ bool UDSServer::AddSession(SessionPtr ses)
 void UDSServer::DelSession(int32_t fd)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("fd:%{public}d", fd);
+    MMI_HILOGI("fd:%{public}d", fd);
     if (fd < 0) {
         MMI_HILOGE("The fd less than 0, errCode:%{public}d", PARAM_INPUT_INVALID);
         return;

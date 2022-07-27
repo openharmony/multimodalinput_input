@@ -103,6 +103,20 @@ public:
      */
     static constexpr int32_t POINTER_ACTION_BUTTON_UP = 9;
 
+    /**
+     * Indicates that the pointer enters the window.
+     *
+     * @since 9
+     */
+    static constexpr int32_t POINTER_ACTION_ENTER_WINDOW = 10;
+
+    /**
+     * Indicates that the pointer leaves the window.
+     *
+     * @since 9
+     */
+    static constexpr int32_t POINTER_ACTION_LEAVE_WINDOW = 11;
+
     enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.
@@ -645,14 +659,14 @@ public:
         void SetToolType(int32_t toolType);
 
         /**
-         * @brief 获取当前手指对应的窗口ID
+         * @brief Obtains the ID of the window corresponding to the finger touch position.
          * @return Returns the ID of the target window.
          * @since 9
          */
         int32_t GetTargetWindowId() const;
 
         /**
-         * @brief 设置当前手指对应的窗口ID
+         * @brief Sets the ID of the window corresponding to the finger touch position.
          * @param windowId Indicates the ID of the target window.
          * @return void
          * @since 9
@@ -841,7 +855,7 @@ public:
      * @return Returns all the pointer IDs.
      * @since 9
      */
-    std::vector<int32_t> GetPointersIdList() const;
+    std::vector<int32_t> GetPointerIds() const;
 
     /**
      * @brief Obtains the source type of this event.

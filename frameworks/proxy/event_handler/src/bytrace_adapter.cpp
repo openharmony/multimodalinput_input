@@ -14,6 +14,12 @@
  */
 #include "bytrace_adapter.h"
 
+#include <string>
+
+#include "define_multimodal.h"
+#include "hitrace_meter.h"
+#include "mmi_log.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {

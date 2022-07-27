@@ -101,7 +101,6 @@ void ClientMsgHandler::OnMsgHandler(const UDSClient& client, NetPacket& pkt)
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-
 int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
 {
     auto key = KeyEvent::Create();
@@ -117,7 +116,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read fd failed");
         return PACKET_READ_FAIL;
     }
-    MMI_HILOGD("Key event dispatcher of client, Fd:%{public}d", fd);
+    MMI_HILOGI("Key event dispatcher of client, Fd:%{public}d", fd);
     PrintEventData(key);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(eventProcessedCallback_);
@@ -140,7 +139,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     MMI_HILOGD("Pointer event dispatcher of client:");
     PrintEventData(pointerEvent);
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
-        MMI_HILOGD("Operation canceled.");
+        MMI_HILOGI("Operation canceled.");
     }
     pointerEvent->SetProcessedCallback(eventProcessedCallback_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
@@ -266,8 +265,8 @@ int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
 int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
-    int32_t handlerId;
-    pkt >> handlerId;
+    InputHandlerType handlerType;
+    pkt >> handlerType;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read handler failed");
         return RET_ERR;
@@ -279,7 +278,20 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
         return RET_ERR;
     }
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
-    InputHandlerMgr.OnInputEvent(handlerId, keyEvent);
+    switch (handlerType) {
+        case INTERCEPTOR: {
+            InputInterMgr->OnInputEvent(keyEvent);
+            break;
+        }
+        case MONITOR: {
+            IMonitorMgr->OnInputEvent(keyEvent);
+            break;
+        }
+        default: {
+            MMI_HILOGW("Failed to intercept or monitor on the event");
+            break;
+        }
+    }
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -288,14 +300,13 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
 int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
-    int32_t handlerId;
     InputHandlerType handlerType;
-    pkt >> handlerId >> handlerType;
+    pkt >> handlerType;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read Pointer data failed");
         return RET_ERR;
     }
-    MMI_HILOGD("Client handlerId:%{public}d,handlerType:%{public}d", handlerId, handlerType);
+    MMI_HILOGD("Client handlerType:%{public}d", handlerType);
     auto pointerEvent = PointerEvent::Create();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     if (InputEventDataTransformation::Unmarshalling(pkt, pointerEvent) != ERR_OK) {
@@ -303,10 +314,24 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
         return RET_ERR;
     }
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
-    InputHandlerMgr.OnInputEvent(handlerId, pointerEvent);
+    switch (handlerType) {
+        case INTERCEPTOR: {
+            InputInterMgr->OnInputEvent(pointerEvent);
+            break;
+        }
+        case MONITOR: {
+            IMonitorMgr->OnInputEvent(pointerEvent);
+            break;
+        }
+        default: {
+            MMI_HILOGW("Failed to intercept or monitor on the event");
+            break;
+        }
+    }
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
     CALL_DEBUG_ENTER;

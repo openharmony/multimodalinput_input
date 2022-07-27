@@ -15,12 +15,9 @@
 #ifndef BYTRACE_ADAPTER_H
 #define BYTRACE_ADAPTER_H
 
-#include <string.h>
+#include <memory>
 
-#include "hitrace_meter.h"
-#include "error_multimodal.h"
 #include "key_event.h"
-#include "mmi_log.h"
 #include "pointer_event.h"
 
 namespace OHOS {
