@@ -41,6 +41,7 @@ InputHandlerManager::InputHandlerManager()
 InputHandlerManager::~InputHandlerManager()
 {
     monitorCallback_ = nullptr;
+}
 
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
     std::shared_ptr<IInputEventConsumer> consumer, HandleEventType eventType)
