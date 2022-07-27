@@ -195,12 +195,9 @@ int64_t UDSSession::GetEarliestEventTime(int32_t type) const
 
 bool UDSSession::IsEventQueueEmpty(int32_t type)
 {
+    CALL_DEBUG_ENTER;
     auto iter = events_.find(type);
-    if (iter != events_.end() && (!iter->second.empty())) {
-        return false;
-    }
-    MMI_HILOGD("events is empty type:%{public}d", type);
-    return true;
+    return (iter != events_.end() && (!iter->second.empty()));
 }
 } // namespace MMI
 } // namespace OHOS
