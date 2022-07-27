@@ -179,11 +179,13 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
             displayGroupInfo.displaysInfo[0].direction);
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (InputDevMgr->HasPointerDevice()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
         NotifyPointerToWindow();
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     PrintDisplayInfo();
 }
 
