@@ -154,12 +154,14 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
         && targetWindowId_ > 0) {
         pointerEvent->SetTargetWindowId(targetWindowId_);
         PointerEvent::PointerItem pointerItem;
-        if (!pointerEvent->GetPointerItem(0, pointerItem)) {
+        auto pointerIds = pointerEvent->GetPointersIdList();
+        auto id = pointerIds.front();
+        if (!pointerEvent->GetPointerItem(id, pointerItem)) {
             MMI_HILOGE("Can't find pointer item");
             return RET_ERR;
         }
         pointerItem.SetTargetWindowId(targetWindowId_);
-        pointerEvent->UpdatePointerItem(0, pointerItem);
+        pointerEvent->UpdatePointerItem(id, pointerItem);
     }
     auto source = pointerEvent->GetSourceType();
     switch (source) {
