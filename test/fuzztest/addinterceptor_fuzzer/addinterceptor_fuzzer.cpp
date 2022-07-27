@@ -36,7 +36,7 @@ public:
 
 void AddInterceptorFuzzTest(const uint8_t* data, size_t /* size */)
 {
-    auto consumer = std::make_shared<InputEventConsumerTest>(); 
+    auto consumer = std::make_shared<InputEventConsumerTest>();
     int32_t inceptorId = InputManager::GetInstance()->AddInterceptor(consumer);
     InputManager::GetInstance()->RemoveInterceptor(inceptorId);
 

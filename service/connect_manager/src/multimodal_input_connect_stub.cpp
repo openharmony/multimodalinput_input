@@ -86,7 +86,7 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
     sptr<ConnectReqParcel> req = data.ReadParcelable<ConnectReqParcel>();
     CHKPR(req, ERROR_NULL_POINTER);
     MMI_HILOGD("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
-    
+
     int32_t clientFd = INVALID_SOCKET_FD;
     int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
     if (ret != RET_OK) {

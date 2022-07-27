@@ -148,7 +148,7 @@ int32_t MultimodalInputConnectProxy::RegisterDevListener()
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    
+
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();

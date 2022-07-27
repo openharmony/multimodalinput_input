@@ -147,7 +147,7 @@ bool TabletToolProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
     double tiltY = libinput_event_tablet_tool_get_tilt_y(event);
     double pressure = libinput_event_tablet_tool_get_pressure(event);
     int32_t toolType = GetToolType(event);
-    
+
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionStartTime(time);
     pointerEvent_->SetTargetDisplayId(targetDisplayId);

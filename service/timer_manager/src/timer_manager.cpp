@@ -60,11 +60,11 @@ int32_t TimerManager::TakeNextTimerId()
 {
     uint64_t timerSlot = 0;
     uint64_t one = 1;
-    
+
     for (const auto &timer : timers_) {
         timerSlot |= (one << timer->id);
     }
-    
+
     for (int32_t i = 0; i < MAX_TIMER_COUNT; i++) {
         if ((timerSlot & (one << i)) == 0) {
             return i;
