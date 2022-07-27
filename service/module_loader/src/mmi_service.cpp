@@ -320,7 +320,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     int32_t &toReturnClientFd)
 {
     MMI_HILOGI("Enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
-    
+
     toReturnClientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t pid = GetCallingPid();

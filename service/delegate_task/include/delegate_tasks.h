@@ -65,7 +65,7 @@ public:
     using TaskPtr = Task::TaskPtr;
     using Promise = Task::Promise;
     using Future = Task::Future;
-    
+
 public:
     DelegateTasks() = default;
     virtual ~DelegateTasks() = default;
