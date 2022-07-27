@@ -318,7 +318,7 @@ int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid,
     auto sess = server->GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
     auto subscriberHandler = InputHandler->GetSubscriberHandler();
-    CHKPR(subscriberHandler, ERROR_NULL_POINTER);    
+    CHKPR(subscriberHandler, ERROR_NULL_POINTER);
     return subscriberHandler->UnsubscribeKeyEvent(sess, subscribeId);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

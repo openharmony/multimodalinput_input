@@ -298,7 +298,7 @@ bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
         MMI_HILOGE("There hasn't any pointer device");
         return false;
     }
-    
+
     PointerEvent::PointerItem pointerItem;
     HandleMotionMoveMouse(offsetX, offsetY);
     HandlePostMoveMouse(pointerItem);

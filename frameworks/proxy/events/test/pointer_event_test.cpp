@@ -323,7 +323,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_001, TestSize.L
     pointerEvent1->SetPointerId(0);
     pointerEvent1->SetPointerAction(PointerEvent::POINTER_ACTION_UNKNOWN);
     ASSERT_TRUE(!pointerEvent1->IsValid());
-    
+
     auto pointerEvent2 = PointerEvent::Create();
     ASSERT_NE(pointerEvent2, nullptr);
     pointerEvent2->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);

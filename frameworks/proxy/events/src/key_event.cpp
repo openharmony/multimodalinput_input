@@ -1023,7 +1023,7 @@ bool KeyEvent::IsValidKeyItem() const
     int32_t sameKeyCodeNum = 0;
     int32_t keyCode = GetKeyCode();
     int32_t action = GetKeyAction();
-    
+
     for (auto it = keys_.begin(); it != keys_.end(); ++it) {
         if (it->GetKeyCode() == keyCode) {
             if (++sameKeyCodeNum > 1) {
@@ -1049,7 +1049,7 @@ bool KeyEvent::IsValidKeyItem() const
                 return false;
             }
         }
-        
+
         auto item = it;
         for (++item; item != keys_.end(); item++) {
             if (it->GetKeyCode() == item->GetKeyCode()) {
@@ -1058,7 +1058,7 @@ bool KeyEvent::IsValidKeyItem() const
             }
         }
     }
-    
+
     if (sameKeyCodeNum == 0) {
         MMI_HILOGE("Keyitems keyCode is not exist equal item with keyEvent keyCode");
         return false;
@@ -1074,19 +1074,19 @@ bool KeyEvent::IsValid() const
         MMI_HILOGE("KeyCode_ is invalid");
         return false;
     }
-    
+
     if (GetActionTime() <= 0) {
         MMI_HILOGE("Actiontime is invalid");
         return false;
     }
-    
+
     int32_t action = GetKeyAction();
     if (action != KEY_ACTION_CANCEL && action != KEY_ACTION_UP &&
         action != KEY_ACTION_DOWN) {
         MMI_HILOGE("Action is invalid");
         return false;
     }
-    
+
     if (!IsValidKeyItem()) {
         MMI_HILOGE("IsValidKeyItem is invalid");
         return false;
@@ -1148,7 +1148,7 @@ std::ostream& operator<<(std::ostream& ostream, KeyEvent& keyEvent)
         << ",KeyAction:" << KeyEvent::ActionToString(keyEvent.GetKeyAction())
         << ",EventNumber:" << keyEvent.GetId()
         << ",keyItemsCount:" << keyItems.size() << std::endl;
-    
+
     for (const auto& item : keyItems) {
         ostream << "DeviceNumber:" << item.GetDeviceId()
             << ",KeyCode:" << item.GetKeyCode()

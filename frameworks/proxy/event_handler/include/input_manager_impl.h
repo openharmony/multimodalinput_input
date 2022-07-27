@@ -51,7 +51,7 @@ public:
     bool InitEventHandler();
     MMIEventHandlerPtr GetEventHandler() const;
     EventHandlerPtr GetCurrentEventHandler() const;
-    
+
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     int32_t SubscribeKeyEvent(
         std::shared_ptr<KeyOption> keyOption,
