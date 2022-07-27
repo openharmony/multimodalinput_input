@@ -454,7 +454,7 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
         return RET_ERR;
     }
     return InputInterMgr->AddInterceptor(interceptor, HANDLE_EVENT_TYPE_ALL);
-#else 
+#else
     MMI_HILOGW("Interceptor function does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR

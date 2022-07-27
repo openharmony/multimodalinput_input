@@ -238,7 +238,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
     auto pointerEvent = PointerEvent::Create();
     CHKPV(pointerEvent);
     pointerEvent->UpdateId();
-    
+
     PointerEvent::PointerItem lastPointerItem;
     int32_t lastPointerId = lastPointerEvent_->GetPointerId();
     if (!lastPointerEvent_->GetPointerItem(lastPointerId, lastPointerItem)) {
