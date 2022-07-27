@@ -32,7 +32,7 @@ namespace MMI {
 class InputHandlerManager {
 public:
     InputHandlerManager();
-    virtual ~InputHandlerManager();
+    virtual ~InputHandlerManager() = default;
     DISALLOW_COPY_AND_MOVE(InputHandlerManager);
 
 public:

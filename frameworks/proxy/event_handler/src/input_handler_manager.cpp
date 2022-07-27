@@ -38,11 +38,6 @@ InputHandlerManager::InputHandlerManager()
     monitorCallback_ = std::bind(&InputHandlerManager::OnDispatchEventProcessed, this, std::placeholders::_1);
 }
 
-InputHandlerManager::~InputHandlerManager()
-{
-    monitorCallback_ = nullptr;
-}
-
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
     std::shared_ptr<IInputEventConsumer> consumer, HandleEventType eventType)
 {
@@ -289,8 +284,11 @@ void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtxHandlers_);
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
+    CHKPV(client);
     auto iter = processedEvents_.find(eventId);
     if (iter == processedEvents_.end()) {
+        MMI_HILOGE("EventId not in processedEvents_");
         return;
     }
     int32_t count = iter->second;
@@ -300,8 +298,6 @@ void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId)
         processedEvents_.emplace(eventId, count);
         return;
     }
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
     NetPacket pkt(MmiMessageId::MARK_PROCESS);
     pkt << eventId << ANR_MONITOR;;
     if (pkt.ChkRWError()) {
