@@ -134,7 +134,7 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
     }
     eventData->fd = fd;
     eventData->event_type = type;
-    MMI_HILOGD("userdata:[fd:%{public}d,type:%{public}d]", eventData->fd, eventData->event_type);
+    MMI_HILOGI("userdata:[fd:%{public}d,type:%{public}d]", eventData->fd, eventData->event_type);
 
     struct epoll_event ev = {};
     ev.events = EPOLLIN;
@@ -195,7 +195,7 @@ bool MMIService::InitLibinputService()
         EpollClose();
         return false;
     }
-    MMI_HILOGD("AddEpoll, epollfd: %{public}d, fd: %{public}d", mmiFd_, inputFd);
+    MMI_HILOGI("AddEpoll, epollfd: %{public}d, fd: %{public}d", mmiFd_, inputFd);
     return true;
 }
 
@@ -221,7 +221,7 @@ bool MMIService::InitService()
         EpollClose();
         return false;
     }
-    MMI_HILOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
+    MMI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
     return true;
 }
 
@@ -238,7 +238,7 @@ bool MMIService::InitDelegateTasks()
         EpollClose();
         return false;
     }
-    MMI_HILOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
+    MMI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
     return true;
 }
 
