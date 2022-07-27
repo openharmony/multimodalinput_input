@@ -154,7 +154,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
         && targetWindowId_ > 0) {
         pointerEvent->SetTargetWindowId(targetWindowId_);
         PointerEvent::PointerItem pointerItem;
-        auto pointerIds = pointerEvent->GetPointerIds();
+        auto pointerIds = pointerEvent->GetPointersIdList();
         auto id = pointerIds.front();
         if (!pointerEvent->GetPointerItem(id, pointerItem)) {
             MMI_HILOGE("Can't find pointer item");
