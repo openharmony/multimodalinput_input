@@ -34,6 +34,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MouseEventHandler"};
 const std::array<int32_t, 6> SPEED_NUMS { 5, 16, 23, 32, 41, 128 };
 const std::array<double, 6> SPEED_GAINS { 0.6, 1.0, 1.2, 1.8, 2.1, 2.8 };
+const std::array<double, 6> SPEED_DIFF_NUMS { 0.0, -2.0, -2.0, 2.6, 28.2, 73.3 };
 } // namespace
 MouseEventHandler::MouseEventHandler()
 {
@@ -46,15 +47,18 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
     return pointerEvent_;
 }
 
-double MouseEventHandler::GetSpeedGain(const double &speed) const
+void MouseEventHandler::GetSpeedGain(const double& speed, double& gain, double& diffNum) const
 {
     int32_t num = static_cast<int32_t>(ceil(abs(speed)));
     for (size_t i = 0; i < SPEED_NUMS.size(); ++i) {
         if (num <= SPEED_NUMS[i]) {
-            return SPEED_GAINS[i];
+            gain = SPEED_GAINS[i];
+            diffNum = SPEED_DIFF_NUMS[i];
+            return;
         }
     }
-    return SPEED_GAINS.back();
+    gain = SPEED_GAINS.back();
+    diffNum = SPEED_DIFF_NUMS.back();
 }
 
 int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
@@ -92,9 +96,11 @@ int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
     double dx = libinput_event_pointer_get_dx(data);
     double dy = libinput_event_pointer_get_dy(data);
     double vin = (fmax(abs(dx), abs(dy)) + fmin(abs(dx), abs(dy))) / 2.0;
-    double gain = GetSpeedGain(vin);
-    double correctionX = dx * gain * static_cast<double>(speed_) / 10.0;
-    double correctionY = dy * gain * static_cast<double>(speed_) / 10.0;
+    double gain;
+    double diffNum;
+    GetSpeedGain(vin, gain, diffNum);
+    double correctionX = (dx * gain + diffNum) * static_cast<double>(speed_) / 10.0;
+    double correctionY = (dy * gain + diffNum) * static_cast<double>(speed_) / 10.0;
     MMI_HILOGD("dx:%{public}lf, dy:%{public}lf, correctionX:%{public}lf, correctionY:%{public}lf",
                dx, dy, correctionX, correctionY);
     absolutionX_ += correctionX;
