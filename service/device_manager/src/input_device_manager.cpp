@@ -256,7 +256,6 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         DfxHisysevent::OnDeviceConnect(INT32_MAX, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
     }
-
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (IsPointerDevice(inputDevice) && !HasPointerDevice()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
