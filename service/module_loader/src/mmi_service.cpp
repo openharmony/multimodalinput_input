@@ -134,7 +134,7 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
     }
     eventData->fd = fd;
     eventData->event_type = type;
-    MMI_HILOGD("userdata:[fd:%{public}d,type:%{public}d]", eventData->fd, eventData->event_type);
+    MMI_HILOGI("userdata:[fd:%{public}d,type:%{public}d]", eventData->fd, eventData->event_type);
 
     struct epoll_event ev = {};
     ev.events = EPOLLIN;
@@ -195,7 +195,7 @@ bool MMIService::InitLibinputService()
         EpollClose();
         return false;
     }
-    MMI_HILOGD("AddEpoll, epollfd: %{public}d, fd: %{public}d", mmiFd_, inputFd);
+    MMI_HILOGI("AddEpoll, epollfd: %{public}d, fd: %{public}d", mmiFd_, inputFd);
     return true;
 }
 
@@ -221,7 +221,7 @@ bool MMIService::InitService()
         EpollClose();
         return false;
     }
-    MMI_HILOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
+    MMI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, epollFd_);
     return true;
 }
 
@@ -238,7 +238,7 @@ bool MMIService::InitDelegateTasks()
         EpollClose();
         return false;
     }
-    MMI_HILOGD("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
+    MMI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
     return true;
 }
 
@@ -320,7 +320,7 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     int32_t &toReturnClientFd)
 {
     MMI_HILOGI("Enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
-    
+
     toReturnClientFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     int32_t pid = GetCallingPid();
@@ -609,23 +609,22 @@ int32_t MMIService::GetKeyboardType(int32_t userData, int32_t deviceId)
 }
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-int32_t MMIService::CheckAddInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType,
+int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType,
     HandleEventType eventType)
 {
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnAddInputHandler(sess, handlerId, handlerType, eventType);
+    return sMsgHandler_.OnAddInputHandler(sess, handlerType, eventType);
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
-int32_t MMIService::AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
-    HandleEventType eventType)
+int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckAddInput, this, pid, handlerId, handlerType, eventType));
+        std::bind(&MMIService::CheckAddInput, this, pid, handlerType, eventType));
     if (ret != RET_OK) {
         MMI_HILOGE("Add input handler failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -635,21 +634,21 @@ int32_t MMIService::AddInputHandler(int32_t handlerId, InputHandlerType handlerT
 }
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-int32_t MMIService::CheckRemoveInput(int32_t pid, int32_t handlerId, InputHandlerType handlerType)
+int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType)
 {
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnRemoveInputHandler(sess, handlerId, handlerType);
+    return sMsgHandler_.OnRemoveInputHandler(sess, handlerType, eventType);
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
-int32_t MMIService::RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType)
+int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckRemoveInput, this, pid, handlerId, handlerType));
+        std::bind(&MMIService::CheckRemoveInput, this, pid, handlerType, eventType));
     if (ret != RET_OK) {
         MMI_HILOGE("Remove input handler failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -659,21 +658,21 @@ int32_t MMIService::RemoveInputHandler(int32_t handlerId, InputHandlerType handl
 }
 
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-int32_t MMIService::CheckMarkConsumed(int32_t pid, int32_t monitorId, int32_t eventId)
+int32_t MMIService::CheckMarkConsumed(int32_t pid, int32_t eventId)
 {
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnMarkConsumed(sess, monitorId, eventId);
+    return sMsgHandler_.OnMarkConsumed(sess, eventId);
 }
 #endif // OHOS_BUILD_ENABLE_MONITOR
 
-int32_t MMIService::MarkEventConsumed(int32_t monitorId, int32_t eventId)
+int32_t MMIService::MarkEventConsumed(int32_t eventId)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckMarkConsumed, this, pid, monitorId, eventId));
+        std::bind(&MMIService::CheckMarkConsumed, this, pid, eventId));
     if (ret != RET_OK) {
         MMI_HILOGE("Mark event consumed failed, ret:%{public}d", ret);
         return RET_ERR;

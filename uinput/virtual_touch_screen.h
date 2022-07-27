@@ -16,8 +16,10 @@
 #ifndef VIRTUAL_TOUCH_SCREEN_H
 #define VIRTUAL_TOUCH_SCREEN_H
 
-#include "linux/input.h"
+#include <cstdint>
+#include <vector>
 
+#include "nocopyable.h"
 #include "virtual_device.h"
 
 namespace OHOS {

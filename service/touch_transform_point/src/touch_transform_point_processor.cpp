@@ -58,7 +58,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
         MMI_HILOGE("TouchDownPointToDisplayPoint failed");
         return false;
     }
-    auto pointIds = pointerEvent_->GetPointersIdList();
+    auto pointIds = pointerEvent_->GetPointerIds();
     int64_t time = GetSysClockTime();
     if (pointIds.empty()) {
         pointerEvent_->SetActionStartTime(time);
@@ -90,7 +90,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
-    PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(), pointerEvent_->GetPointersIdList().size());
+    PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerIds().size());
     return true;
 }
 
@@ -129,7 +129,7 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
     item.SetToolHeight(touchInfo.toolRect.height);
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
-    PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(), pointerEvent_->GetPointersIdList().size());
+    PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerIds().size());
     return true;
 }
 
@@ -190,6 +190,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
     }
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->UpdateId();
+    WinMgr->UpdateTargetPointer(pointerEvent_);
     return pointerEvent_;
 }
 

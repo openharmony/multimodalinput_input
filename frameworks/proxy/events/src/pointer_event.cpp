@@ -394,6 +394,12 @@ const char* PointerEvent::DumpPointerAction() const
         case PointerEvent::POINTER_ACTION_BUTTON_UP: {
             return "button-up";
         }
+        case PointerEvent::POINTER_ACTION_ENTER_WINDOW: {
+            return "enter-window";
+        }
+        case PointerEvent::POINTER_ACTION_LEAVE_WINDOW: {
+            return "leave-window";
+        }
         default: {
             break;
         }
@@ -478,7 +484,7 @@ void PointerEvent::ClearButtonPressed()
     pressedButtons_.clear();
 }
 
-std::vector<int32_t> PointerEvent::GetPointersIdList() const
+std::vector<int32_t> PointerEvent::GetPointerIds() const
 {
     std::vector<int32_t> pointerIdList;
     for (auto &item : pointers_) {
@@ -877,7 +883,7 @@ bool PointerEvent::IsValid() const
 std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
 {
     const int precision = 2;
-    std::vector<int32_t> pointerIds { pointerEvent.GetPointersIdList() };
+    std::vector<int32_t> pointerIds { pointerEvent.GetPointerIds() };
     ostream << "EventType:" << InputEvent::EventTypeToString(pointerEvent.GetEventType())
          << ",ActionTime:" << pointerEvent.GetActionTime()
          << ",Action:" << pointerEvent.GetAction()

@@ -15,10 +15,6 @@
 
 #include "virtual_device.h"
 
-#include <cerrno>
-#include <cinttypes>
-#include <cstring>
-
 #include <fcntl.h>
 #include <securec.h>
 #include <unistd.h>

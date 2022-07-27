@@ -51,7 +51,7 @@ public:
     bool InitEventHandler();
     MMIEventHandlerPtr GetEventHandler() const;
     EventHandlerPtr GetCurrentEventHandler() const;
-    
+
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     int32_t SubscribeKeyEvent(
         std::shared_ptr<KeyOption> keyOption,
@@ -124,13 +124,6 @@ private:
     std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
 
     DisplayGroupInfo displayGroupInfo_;
-#ifdef OHOS_BUILD_ENABLE_MONITOR
-    InputMonitorManager monitorManager_;
-#endif // OHOS_BUILD_ENABLE_MONITOR
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    InputInterceptorManager interceptorManager_;
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
-
     std::mutex mtx_;
     std::mutex handleMtx_;
     std::condition_variable cv_;

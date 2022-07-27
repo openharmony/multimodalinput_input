@@ -22,7 +22,7 @@ ohos_executable("mmi-server") {
     "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 
-  if (is_mmi_have_libinput) {
+  if (input_feature_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 
@@ -33,18 +33,18 @@ ohos_executable("mmi-server") {
     "samgr_standard:samgr_proxy",
   ]
 
-  cflags = [ "-DOHOS_BUILD" ]
+  defines = [ "OHOS_BUILD" ]
 
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
+  if (input_feature_debug) {
+    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
+  if (input_feature_libinput) {
+    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
+  if (input_feature_hdf) {
+    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   install_enable = true

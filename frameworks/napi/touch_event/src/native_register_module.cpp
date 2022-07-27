@@ -14,6 +14,7 @@
  */
 
 #include "js_touch_event.h"
+#include "node_api.h"
 
 namespace OHOS {
 namespace MMI {

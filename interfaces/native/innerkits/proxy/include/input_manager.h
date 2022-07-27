@@ -274,6 +274,12 @@ public:
      */
     int32_t GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
 
+    /**
+     * @brief 设置应用程序无响应观察者
+     * @param observer 设置观察值，当应用无响应时，通知观察者
+     * @return void
+     * @since 9
+     */
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
 
 private:

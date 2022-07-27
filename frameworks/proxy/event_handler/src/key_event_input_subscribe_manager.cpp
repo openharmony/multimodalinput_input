@@ -61,7 +61,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         MMI_HILOGE("PreKeys number invalid");
         return INVALID_SUBSCRIBE_ID;
     }
-    
+
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
@@ -92,7 +92,7 @@ int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
         MMI_HILOGE("The subscribe id is less than 0");
         return RET_ERR;
     }
-    
+
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
@@ -144,7 +144,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
         MMI_HILOGE("Leave, the subscribe id is less than 0");
         return RET_ERR;
     }
-    
+
     std::lock_guard<std::mutex> guard(mtx_);
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
     auto info = GetSubscribeKeyEvent(subscribeId);

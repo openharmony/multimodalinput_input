@@ -16,16 +16,12 @@
 #ifndef HDF_DEVICE_EVENT_MANAGER_H
 #define HDF_DEVICE_EVENT_MANAGER_H
 
-#include <iostream>
+#include <cstdint>
 #include <thread>
 
-#include "hdf_device_event_dispatch.h"
 #include "inject_thread.h"
-#include "input_controller.h"
 #include "input_manager.h"
-#include "input_reporter.h"
 #include "input_type.h"
-#include "keyboard_inject.h"
 
 namespace OHOS {
 namespace MMI {

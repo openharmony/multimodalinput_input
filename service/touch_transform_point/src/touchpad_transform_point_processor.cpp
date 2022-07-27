@@ -57,7 +57,7 @@ void TouchPadTransformPointProcessor::OnEventTouchPadDown(struct libinput_event 
     CHKPV(device);
 
     int64_t time = GetSysClockTime();
-    auto pointIds = pointerEvent_->GetPointersIdList();
+    auto pointIds = pointerEvent_->GetPointerIds();
     if (pointIds.empty()) {
         pointerEvent_->SetActionStartTime(time);
     }
@@ -185,7 +185,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent_->UpdateId();
     MMI_HILOGD("Pointer event dispatcher of server:");
-    PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(), pointerEvent_->GetPointersIdList().size());
+    PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerIds().size());
     return pointerEvent_;
 }
 

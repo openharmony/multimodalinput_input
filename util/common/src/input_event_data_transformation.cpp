@@ -164,7 +164,7 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
         pkt << btnId;
     }
 
-    std::vector<int32_t> pointerIds { event->GetPointersIdList() };
+    std::vector<int32_t> pointerIds { event->GetPointerIds() };
     pkt << pointerIds.size();
     for (const auto &pointerId : pointerIds) {
         PointerEvent::PointerItem item;
