@@ -164,6 +164,68 @@ napi_value JsMouseContext::IsPointerVisible(napi_env env, napi_callback_info inf
     return jsmouseMgr->IsPointerVisible(env, argv[0]);
 }
 
+napi_value JsMouseContext::EnterCaptureMode(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 1 || argc > 2) {
+        THROWERR(env, "the number of parameters is not as expected");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        THROWERR(env, "The first parameter type is wrong");
+        return nullptr;
+    }
+
+    int32_t windowId = 0;
+    CHKRP(env, napi_get_value_int32(env, argv[0], &windowId), GET_BOOL);
+
+    JsMouseContext *jsPointer = JsMouseContext::GetInstance(env);
+    auto jsmouseMgr = jsPointer->GetJsMouseMgr();
+    if(argc == 1)
+    {
+        return jsmouseMgr->EnterCaptureMode(env,windowId);
+    }
+    if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
+        THROWERR(env, "The second parameter type is wrong");
+        return nullptr;
+    }
+    return jsmouseMgr->EnterCaptureMode(env, windowId, argv[1]);
+}
+
+napi_value JsMouseContext::LeaveCaptureMode(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 1 || argc > 2) {
+        THROWERR(env, "the number of parameters is not as expected");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        THROWERR(env, "The first parameter type is wrong");
+        return nullptr;
+    }
+
+    int32_t windowId = 0;
+    CHKRP(env, napi_get_value_int32(env, argv[0], &windowId), GET_BOOL);
+
+    JsMouseContext *jsPointer = JsMouseContext::GetInstance(env);
+    auto jsmouseMgr = jsPointer->GetJsMouseMgr();
+    if(argc == 1)
+    {
+        return jsmouseMgr->LeaveCaptureMode(env,windowId);
+    }
+    if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
+        THROWERR(env, "The second parameter type is wrong");
+        return nullptr;
+    }
+    return jsmouseMgr->LeaveCaptureMode(env, windowId, argv[1]);
+}
+
 napi_value JsMouseContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -175,6 +237,8 @@ napi_value JsMouseContext::Export(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_FUNCTION("setPointerVisible", SetPointerVisible),
         DECLARE_NAPI_STATIC_FUNCTION("isPointerVisible", IsPointerVisible),
+        DECLARE_NAPI_STATIC_FUNCTION("setCaptureMode", EnterCaptureMode),
+        DECLARE_NAPI_STATIC_FUNCTION("setCaptureMode", LeaveCaptureMode),
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     return exports;

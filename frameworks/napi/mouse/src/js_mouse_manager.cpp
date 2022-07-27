@@ -157,5 +157,51 @@ napi_value JsMouseManager::IsPointerVisible(napi_env env, napi_value handle)
     AsyncCallbackWork(asyncContext);
     return promise;
 }
+
+napi_value JsMouseManager::EnterCaptureMode(napi_env env, int32_t windowId, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    if(asyncContext == nullptr) {
+        THROWERR(env,"create AsyncContext failed");
+        return nullptr;
+    }
+
+    asyncContext->errorCode = InputManager::GetInstance()->EnterCaptureMode(windowId);
+    asyncContext->reserve << ReturnType::VOID;
+
+    napi_value promise = nullptr;
+    if(handle != nullptr) {
+        CHKRP(env, napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(env, napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsMouseManager::LeaveCaptureMode(napi_env env, int32_t windowId, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    if(asyncContext == nullptr) {
+        THROWERR(env,"create AsyncContext failed");
+        return nullptr;
+    }
+
+    asyncContext->errorCode = InputManager::GetInstance()->LeaveCaptureMode(windowId);
+    asyncContext->reserve << ReturnType::VOID;
+
+    napi_value promise = nullptr;
+    if(handle != nullptr) {
+        CHKRP(env, napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(env, napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
 } // namespace MMI
 } // namespace OHOS
