@@ -389,6 +389,7 @@ int32_t MMIService::SetPointerVisible(bool visible)
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
 }
+
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MMIService::CheckPointerVisible(bool &visible)
 {
@@ -413,29 +414,35 @@ int32_t MMIService::IsPointerVisible(bool &visible)
 int32_t MMIService::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventHandler::SetPointerSpeed,
         MouseEventHdr, speed));
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer speed failed,return %{public}d", ret);
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t MMIService::ReadPointerSpeed(int32_t &speed)
 {
     speed = MouseEventHandler::GetInstance()->GetPointerSpeed();
     return RET_OK;
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 int32_t MMIService::GetPointerSpeed(int32_t &speed)
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadPointerSpeed, this, std::ref(speed)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer speed failed,return %{public}d", ret);
         return RET_ERR;
     }
+#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
 
