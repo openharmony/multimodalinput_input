@@ -97,7 +97,7 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
              * count of the smart pointer is guaranteed to be 1.
              */
             asyncContext->DecStrongRef(nullptr);
-            napi_value results[2]={0};
+            napi_value results[2] = { 0 };
             getResult(asyncContext, results);
             if (asyncContext->deferred) {
                 if (asyncContext->errorCode == RET_OK) {
