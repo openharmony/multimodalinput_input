@@ -575,6 +575,13 @@ void InputManagerImpl::OnConnected()
     }
     SendDisplayInfo();
     PrintDisplayInfo();
+    if (anrObservers_.empty()) {
+        return;
+    }
+    int32_t ret = MultimodalInputConnMgr->SetAnrObserver();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+    }
 }
 
 void InputManagerImpl::SendDisplayInfo()
