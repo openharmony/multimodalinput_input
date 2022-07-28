@@ -58,6 +58,8 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::GET_DEVICE, &MultimodalInputConnectStub::StubGetDevice},
         {IMultimodalInputConnect::SUPPORT_KEYS, &MultimodalInputConnectStub::StubSupportKeys},
         {IMultimodalInputConnect::GET_KEYBOARD_TYPE, &MultimodalInputConnectStub::StubGetKeyboardType},
+        {IMultimodalInputConnect::SET_POINTER_SPEED, &MultimodalInputConnectStub::StubSetPointerSpeed},
+        {IMultimodalInputConnect::GET_POINTER_SPEED, &MultimodalInputConnectStub::StubGetPointerSpeed},
         {IMultimodalInputConnect::SUBSCRIBE_KEY_EVENT, &MultimodalInputConnectStub::StubSubscribeKeyEvent},
         {IMultimodalInputConnect::UNSUBSCRIBE_KEY_EVENT, &MultimodalInputConnectStub::StubUnsubscribeKeyEvent},
         {IMultimodalInputConnect::ADD_INPUT_HANDLER, &MultimodalInputConnectStub::StubAddInputHandler},
@@ -159,6 +161,41 @@ int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, Me
     }
     WRITEBOOL(reply, visible, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("visible:%{public}d,ret:%{public}d,pid:%{public}d", visible, ret, GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+    int32_t speed;
+    READINT32(data, speed, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetPointerSpeed(speed);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer speed failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check fail");
+        return CHECK_PERMISSION_FAIL;
+    }
+    int32_t speed;
+    int32_t ret = GetPointerSpeed(speed);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call get pointer speed failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    WRITEINT32(reply, speed, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("Pointer speed:%{public}d,ret:%{public}d", speed, ret);
     return RET_OK;
 }
 

@@ -26,6 +26,9 @@
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr int32_t DEFAULT_SPEED = 10;
+} // namespace
 class MouseEventHandler : public DelayedSingleton<MouseEventHandler>,
     public std::enable_shared_from_this<MouseEventHandler> {
 public:
@@ -38,6 +41,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    int32_t SetPointerSpeed(int32_t speed);
+    int32_t GetPointerSpeed() const;
 
 private:
     int32_t HandleMotionInner(libinput_event_pointer* data);
@@ -60,6 +65,7 @@ private:
     int32_t buttonId_ = -1;
     bool isPressed_ = false;
     int32_t currentDisplayId_ = -1;
+    int32_t speed_ = DEFAULT_SPEED;
 };
 
 #define MouseEventHdr MouseEventHandler::GetInstance()

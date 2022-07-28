@@ -266,6 +266,21 @@ public:
     bool IsPointerVisible();
 
     /**
+     * @brief 设置鼠标移动速度(取值范围1到20)。
+     * @param speed 客户端设置的鼠标移动速度.
+     * @return 鼠标移动速度设置成功返回RET_OK；设置失败返回RET_ERR。
+     * @since 9
+     */
+    int32_t SetPointerSpeed(int32_t speed);
+
+    /**
+     * @brief 获取鼠标移动速度。
+     * @return 获取成功返回鼠标移动速度；获取失败返回RET_ERR。
+     * @since 9
+     */
+    int32_t GetPointerSpeed();
+
+    /**
      * @brief Queries the keyboard type.
      * @param deviceId Indicates the keyboard device ID.
      * @param callback 键盘类型结果的回调函数。
