@@ -410,6 +410,35 @@ int32_t MMIService::IsPointerVisible(bool &visible)
     return RET_OK;
 }
 
+int32_t MMIService::SetPointerSpeed(int32_t speed)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventHandler::SetPointerSpeed,
+        MouseEventHdr, speed));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer speed failed,return %{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::ReadPointerSpeed(int32_t &speed)
+{
+    speed = MouseEventHandler::GetInstance()->GetPointerSpeed();
+    return RET_OK;
+}
+
+int32_t MMIService::GetPointerSpeed(int32_t &speed)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadPointerSpeed, this, std::ref(speed)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pointer speed failed,return %{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t MMIService::OnSupportKeys(int32_t pid, int32_t userData, int32_t deviceId, std::vector<int32_t> &keys)
 {
     CALL_DEBUG_ENTER;

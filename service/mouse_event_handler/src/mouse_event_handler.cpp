@@ -32,6 +32,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MouseEventHandler"};
+constexpr int32_t MIN_SPEED = 1;
+constexpr int32_t MAX_SPEED = 20;
 } // namespace
 MouseEventHandler::MouseEventHandler()
 {
@@ -325,6 +327,27 @@ void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
             pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
             item.GetWindowX(), item.GetWindowY(), pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(),
             pointerEvent_->GetTargetWindowId(), item.GetDownTime(), item.IsPressed() ? "true" : "false");
+}
+
+int32_t MouseEventHandler::SetPointerSpeed(int32_t speed)
+{
+    CALL_DEBUG_ENTER;
+    if (speed < MIN_SPEED) {
+        speed_ = MIN_SPEED;
+    } else if (speed > MAX_SPEED) {
+        speed_ = MAX_SPEED;
+    } else {
+        speed_ = speed;
+    }
+    MMI_HILOGD("Set pointer speed:%{public}d", speed_);
+    return RET_OK;
+}
+
+int32_t MouseEventHandler::GetPointerSpeed() const
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("Get pointer speed:%{public}d", speed_);
+    return speed_;
 }
 } // namespace MMI
 } // namespace OHOS
