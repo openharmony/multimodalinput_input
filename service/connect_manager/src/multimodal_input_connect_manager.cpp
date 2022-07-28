@@ -95,6 +95,18 @@ int32_t MultimodalInputConnectManager::IsPointerVisible(bool &visible)
     return multimodalInputConnectService_->IsPointerVisible(visible);
 }
 
+int32_t MultimodalInputConnectManager::SetPointerSpeed(int32_t speed)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetPointerSpeed(speed);
+}
+
+int32_t MultimodalInputConnectManager::GetPointerSpeed(int32_t &speed)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->GetPointerSpeed(speed);
+}
+
 int32_t MultimodalInputConnectManager::RegisterDevListener()
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
