@@ -90,11 +90,10 @@ bool MMIClient::StartEventRunner()
         return false;
     }
 
-    std::mutex mtx;
     static constexpr int32_t outTime = 3;
+    std::unique_lock <std::mutex> lck(mtx_);
     recvThread_ = std::thread(std::bind(&MMIClient::OnRecvThread, this));
     recvThread_.detach();
-    std::unique_lock <std::mutex> lck(mtx);
     if (cv_.wait_for(lck, std::chrono::seconds(outTime)) == std::cv_status::timeout) {
         MMI_HILOGE("Recv thread start timeout");
         Stop();
@@ -108,23 +107,25 @@ void MMIClient::OnRecvThread()
     CALL_LOG_ENTER;
     CHK_PIDANDTID();
     SetThreadName("mmi_client_RecvEventHdr");
-
     auto runner = EventRunner::Create(false);
     CHKPV(runner);
-    recvEventHandler_ = std::make_shared<MMIEventHandler>(runner, GetSharedPtr());
-    CHKPV(recvEventHandler_);
-    if (isConnected_ && fd_ >= 0) {
-        if (!AddFdListener(fd_)) {
-            MMI_HILOGE("add fd listener return false");
-            return;
+    {
+        std::lock_guard<std::mutex> lck(mtx_);
+        recvEventHandler_ = std::make_shared<MMIEventHandler>(runner, GetSharedPtr());
+        CHKPV(recvEventHandler_);
+        if (isConnected_ && fd_ >= 0) {
+            if (!AddFdListener(fd_)) {
+                MMI_HILOGE("add fd listener return false");
+                return;
+            }
+        } else {
+            if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME)) {
+                MMI_HILOGE("send reconnect event return false.");
+                return;
+            }
         }
-    } else {
-        if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME)) {
-            MMI_HILOGE("send reconnect event return false.");
-            return;
-        }
+        cv_.notify_one();
     }
-    cv_.notify_one();
     runner->Run();
 }
 
