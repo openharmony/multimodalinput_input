@@ -261,7 +261,7 @@ int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
     return RET_OK;
 }
 
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR))
 int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
@@ -280,11 +280,15 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_INTERCEPT_EVENT);
     switch (handlerType) {
         case INTERCEPTOR: {
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
             InputInterMgr->OnInputEvent(keyEvent);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
             break;
         }
         case MONITOR: {
+#ifdef OHOS_BUILD_ENABLE_MONITOR
             IMonitorMgr->OnInputEvent(keyEvent);
+#endif // OHOS_BUILD_ENABLE_MONITOR
             break;
         }
         default: {
@@ -294,9 +298,10 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
     }
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
+    (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR))
 int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
@@ -316,11 +321,15 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
     switch (handlerType) {
         case INTERCEPTOR: {
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
             InputInterMgr->OnInputEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
             break;
         }
         case MONITOR: {
+#ifdef OHOS_BUILD_ENABLE_MONITOR
             IMonitorMgr->OnInputEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_MONITOR
             break;
         }
         default: {
@@ -330,7 +339,7 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     }
     return RET_OK;
 }
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#endif
 
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
