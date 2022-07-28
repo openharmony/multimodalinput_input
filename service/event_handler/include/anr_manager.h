@@ -38,7 +38,7 @@ private:
     int32_t anrNoticedPid_ { -1 };
     UDSServer *udsServer_ = nullptr;;
 };
-} // namespace MMI 
+} // namespace MMI
 } // namespace OHOS
 #define ANRMgr OHOS::MMI::ANRManager::GetInstance()
 #endif // ANR_MANAGER_H
