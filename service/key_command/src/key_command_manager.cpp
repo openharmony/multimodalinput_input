@@ -276,16 +276,17 @@ std::string KeyCommandManager::GenerateKey(const ShortcutKey& key)
     return std::string(ss.str());
 }
 
-std::string KeyCommandManager::GetConfigFilePath() const
+bool KeyCommandManager::ParseConfig()
 {
-    std::string defaultConfig = "/product/multimodalinput/ability_launch_config.json";
-    return FileExists(defaultConfig) ? defaultConfig : "/system/etc/multimodalinput/ability_launch_config.json";
+    std::string vendorConfig = "/vendor/etc/ability_launch_config.json";
+    std::string defaultConfig = "/system/etc/multimodalinput/ability_launch_config.json";
+    return ParseJson(vendorConfig) || ParseJson(defaultConfig);
 }
 
-bool KeyCommandManager::ParseJson()
+bool KeyCommandManager::ParseJson(const std::string configFile)
 {
     CALL_LOG_ENTER;
-    std::string jsonStr = ReadJsonFile(GetConfigFilePath());
+    std::string jsonStr = ReadJsonFile(configFile);
     if (jsonStr.empty()) {
         MMI_HILOGE("configFile read failed");
         return false;
@@ -349,7 +350,7 @@ bool KeyCommandManager::HandleEvent(const std::shared_ptr<KeyEvent> key)
     }
     ResetLastMatchedKey();
     if (shortcutKeys_.empty()) {
-        if (!ParseJson()) {
+        if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");
             return false;
         }
