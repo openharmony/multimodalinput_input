@@ -13,30 +13,30 @@
  * limitations under the License.
  */
 
-#ifndef JS_MOUSE_CONTEXT_H
-#define JS_MOUSE_CONTEXT_H
-#include "js_mouse_manager.h"
+#ifndef JS_POINTER_CONTEXT_H
+#define JS_POINTER_CONTEXT_H
+#include "js_pointer_manager.h"
 
 namespace OHOS {
 namespace MMI {
-class JsMouseContext {
+class JsPointerContext {
 public:
-    JsMouseContext();
-    DISALLOW_COPY_AND_MOVE(JsMouseContext);
-    ~JsMouseContext() = default;
+    JsPointerContext();
+    DISALLOW_COPY_AND_MOVE(JsPointerContext);
+    ~JsPointerContext() = default;
     static napi_value Export(napi_env env, napi_value exports);
     static napi_value SetPointerVisible(napi_env env, napi_callback_info info);
     static napi_value IsPointerVisible(napi_env env, napi_callback_info info);
-    std::shared_ptr<JsMouseManager> GetJsMouseMgr() const;
+    std::shared_ptr<JsPointerManager> GetJsPointerMgr() const;
 
 private:
     static napi_value CreateInstance(napi_env env);
-    static JsMouseContext* GetInstance(napi_env env);
+    static JsPointerContext* GetInstance(napi_env env);
     static napi_value CreateJsObject(napi_env env, napi_callback_info info);
-    std::shared_ptr<JsMouseManager> mgr_ {nullptr};
+    std::shared_ptr<JsPointerManager> mgr_ {nullptr};
     napi_ref contextRef_ {nullptr};
 };
 } // namespace MMI
 } // namespace OHOS
 
-#endif // JS_MOUSE_CONTEXT_H
+#endif // JS_POINTER_CONTEXT_H

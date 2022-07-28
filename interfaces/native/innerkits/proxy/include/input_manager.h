@@ -253,7 +253,7 @@ public:
      * @brief Sets whether the pointer icon is visible.
      * @param visible Whether the pointer icon is visible. The value <b>true</b> indicates that
      * the pointer icon is visible, and the value <b>false</b> indicates the opposite.
-     * @return void
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 9
      */
     int32_t SetPointerVisible(bool visible);
