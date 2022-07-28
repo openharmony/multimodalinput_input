@@ -197,7 +197,7 @@ bool UDSSession::IsEventQueueEmpty(int32_t type)
 {
     CALL_DEBUG_ENTER;
     auto iter = events_.find(type);
-    return (iter != events_.end() && (!iter->second.empty()));
+    return (iter == events_.end() || (iter->second.empty()));
 }
 } // namespace MMI
 } // namespace OHOS
