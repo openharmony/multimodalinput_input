@@ -43,12 +43,13 @@ protected:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnSubscribeKeyEventCallback(const UDSClient& client, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR))
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || \
+    defined(OHOS_BUILD_ENABLE_MONITOR))
     int32_t ReportKeyEvent(const UDSClient& client, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
     (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR))
-    int32_t ReportPointerEvent(const UDSClient& client, NetPacket& pkt );
+    int32_t ReportPointerEvent(const UDSClient& client, NetPacket& pkt);
 #endif
     int32_t OnInputDevice(const UDSClient& client, NetPacket& pkt);
     int32_t OnInputDeviceIds(const UDSClient& client, NetPacket& pkt);
