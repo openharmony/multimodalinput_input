@@ -317,7 +317,7 @@ void MMIService::OnStop()
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType,
-     int32_t &toReturnClientFd, int32_t &tokenType)
+    int32_t &toReturnClientFd, int32_t &tokenType)
 {
     MMI_HILOGI("Enter, programName:%{public}s,moduleType:%{public}d", programName.c_str(), moduleType);
 

@@ -299,7 +299,7 @@ void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId)
         return;
     }
     NetPacket pkt(MmiMessageId::MARK_PROCESS);
-    pkt << eventId << ANR_MONITOR;;
+    pkt << eventId << ANR_MONITOR;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write event failed");
         return;
