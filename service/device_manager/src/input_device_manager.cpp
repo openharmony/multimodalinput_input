@@ -256,11 +256,13 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         DfxHisysevent::OnDeviceConnect(INT32_MAX, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
     }
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (IsPointerDevice(inputDevice) && !HasPointerDevice()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
         WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     inputDevice_[nextId_] = inputDevice;
     for (const auto &item : devListener_) {
         CHKPC(item.first);
@@ -289,11 +291,13 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
             break;
         }
     }
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (IsPointerDevice(inputDevice) && !HasPointerDevice()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
         WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     for (const auto &item : devListener_) {
         CHKPC(item.first);
         item.second(deviceId, "remove");

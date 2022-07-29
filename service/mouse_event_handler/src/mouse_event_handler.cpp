@@ -35,6 +35,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MouseE
 const std::array<int32_t, 6> SPEED_NUMS { 5, 16, 23, 32, 41, 128 };
 const std::array<double, 6> SPEED_GAINS { 0.6, 1.0, 1.2, 1.8, 2.1, 2.8 };
 const std::array<double, 6> SPEED_DIFF_NUMS { 0.0, -2.0, -5.0, -19.0, -28.6, -57.3 };
+constexpr int32_t MIN_SPEED = 1;
+constexpr int32_t MAX_SPEED = 20;
 } // namespace
 MouseEventHandler::MouseEventHandler()
 {
@@ -359,6 +361,27 @@ void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
             pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
             item.GetWindowX(), item.GetWindowY(), pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(),
             pointerEvent_->GetTargetWindowId(), item.GetDownTime(), item.IsPressed() ? "true" : "false");
+}
+
+int32_t MouseEventHandler::SetPointerSpeed(int32_t speed)
+{
+    CALL_DEBUG_ENTER;
+    if (speed < MIN_SPEED) {
+        speed_ = MIN_SPEED;
+    } else if (speed > MAX_SPEED) {
+        speed_ = MAX_SPEED;
+    } else {
+        speed_ = speed;
+    }
+    MMI_HILOGD("Set pointer speed:%{public}d", speed_);
+    return RET_OK;
+}
+
+int32_t MouseEventHandler::GetPointerSpeed() const
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("Get pointer speed:%{public}d", speed_);
+    return speed_;
 }
 } // namespace MMI
 } // namespace OHOS

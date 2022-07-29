@@ -35,10 +35,12 @@ void OnConnected(const IfMMIClient& client)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventInputSubscribeMgr.OnConnected();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     IMonitorMgr->OnConnected();
+#endif // OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     InputInterMgr->OnConnected();
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 }
 
 MultimodalEventHandler::MultimodalEventHandler() {}

@@ -70,6 +70,23 @@ void InputEventCallback::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
     }
 }
 
+void WindowEventConsumer::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    threadId_ = GetThisThreadId();
+    MMI_HILOGD("Consumer callback keyEvent is threadId:%{public}" PRIu64, threadId_);
+}
+
+void WindowEventConsumer::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
+{
+    threadId_ = GetThisThreadId();
+    MMI_HILOGD("Consumer callback pointerEvent is threadId:%{public}" PRIu64, threadId_);
+}
+
+uint64_t WindowEventConsumer::GetConsumerThreadId()
+{
+    return threadId_;
+}
+
 void EventUtilTest::AddEventDump(std::string eventDump)
 {
     CALL_DEBUG_ENTER;
