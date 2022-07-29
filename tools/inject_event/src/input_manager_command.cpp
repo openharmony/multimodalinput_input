@@ -548,7 +548,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             const int64_t maxTotalTimeMs = 15000;
                             if ((totalTimeMs < minTotalTimeMs) || (totalTimeMs > maxTotalTimeMs)) {
                                 std::cout << "total time is out of range:" << std::endl;
-                                std::cout << minTotalTimeMs << " <= " << totalTimeMs << " <= " << maxTotalTimeMs;
+                                std::cout << minTotalTimeMs << " <= " << "total times" << " <= " << maxTotalTimeMs;
                                 std::cout << std::endl;
                                 return EVENT_REG_FAIL;
                             }
