@@ -342,9 +342,17 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
-    int32_t ret = MultimodalInputConnectManager::GetInstance()->MarkEventProcessed(eventId);
-    if (ret != 0) {
-        MMI_HILOGE("send to server fail, ret:%{public}d", ret);
+    CALL_LOG_ENTER;
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
+    CHKPV(client);
+    NetPacket pkt(MmiMessageId::MARK_PROCESS);
+    pkt << eventId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write event failed");
+        return;
+    }
+    if (!client->SendMessage(pkt)) {
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
 }

@@ -51,7 +51,6 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubAddInputEventFilter},
         {IMultimodalInputConnect::SET_POINTER_VISIBLE, &MultimodalInputConnectStub::StubSetPointerVisible},
         {IMultimodalInputConnect::IS_POINTER_VISIBLE, &MultimodalInputConnectStub::StubIsPointerVisible},
-        {IMultimodalInputConnect::MARK_EVENT_PROCESSED, &MultimodalInputConnectStub::StubMarkEventProcessed},
         {IMultimodalInputConnect::ADD_INPUT_HANDLER, &MultimodalInputConnectStub::StubAddInputHandler},
         {IMultimodalInputConnect::REMOVE_INPUT_HANDLER, &MultimodalInputConnectStub::StubRemoveInputHandler},
         {IMultimodalInputConnect::MARK_EVENT_CONSUMED, &MultimodalInputConnectStub::StubMarkEventConsumed},
@@ -155,25 +154,6 @@ int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, Me
         return IPC_STUB_WRITE_PARCEL_ERR;
     }
     MMI_HILOGD("visible:%{public}d,ret:%{public}d,pid:%{public}d", visible, ret, GetCallingPid());
-    return RET_OK;
-}
-
-int32_t MultimodalInputConnectStub::StubMarkEventProcessed(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_LOG_ENTER;
-    if (!IsRunning()) {
-        MMI_HILOGE("service is not running");
-    }
-    int32_t eventId;
-    if (!data.ReadInt32(eventId)) {
-        MMI_HILOGE("Read eventId failed");
-        return IPC_PROXY_DEAD_OBJECT_ERR;
-    }
-    int32_t ret = MarkEventProcessed(eventId);
-    if (ret != RET_OK) {
-        MMI_HILOGE("MarkEventProcessed failed, ret:%{public}d", ret);
-        return ret;
-    }
     return RET_OK;
 }
 
