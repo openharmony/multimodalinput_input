@@ -121,19 +121,47 @@ int32_t EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_HILOGE("The fd less than 0, fd: %{public}d", fd);
         return RET_ERR;
     }
-    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::Marshalling(point, pkt);
-    BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
     auto udsServer = InputHandler->GetUDSServer();
-    if (udsServer == nullptr) {
-        MMI_HILOGE("UdsServer is a nullptr");
-        return RET_ERR;
+    CHKPR(udsServer, RET_ERR);
+    auto session = udsServer->GetSession(fd);
+    CHKPR(session, RET_ERR);
+    if (session->isANRProcess_) {
+        MMI_HILOGD("application not responsing");
+        return RET_OK;
+    }
+    auto currentTime = GetSysClockTime();
+    if (TriggerANR(currentTime, session)) {
+        session->isANRProcess_ = true;
+        MMI_HILOGW("the pointer event does not report normally, application not response");
+        return RET_OK;
     }
 
+    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
+    auto pid = udsServer->GetClientPid(fd);
+    auto pointerEvent = std::make_shared<PointerEvent>(*point);
+    auto pointerIdList = pointerEvent->GetPointersIdList();
+    if (pointerIdList.size() > 1) {
+        for (const auto& id : pointerIdList) {
+            PointerEvent::PointerItem pointeritem;
+            if (!pointerEvent->GetPointerItem(id, pointeritem)) {
+                MMI_HILOGW("can't find this poinerItem");
+                continue;
+            }
+            auto itemPid = WinMgr->GetWindowPid(pointeritem.GetTargetWindowId());
+            if (itemPid >=0 && itemPid != pid) {
+                pointerEvent->RemovePointerItem(id);
+                MMI_HILOGD("pointerIdList size: %{public}zu", pointerEvent->GetPointersIdList().size());
+            }
+        }
+    }
+
+    InputEventDataTransformation::Marshalling(pointerEvent, pkt);
+    BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return RET_ERR;
     }
+    session->AddEvent(point->GetId(), currentTime);
     return RET_OK;
 }
 
@@ -173,6 +201,18 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
                key->GetEventType(),
                key->GetFlag(), key->GetKeyAction(), fd);
     InputHandlerManagerGlobal::GetInstance().HandleEvent(key);
+    auto session = udsServer.GetSession(fd);
+    CHKPR(session, RET_ERR);
+    if (session->isANRProcess_) {
+        MMI_HILOGD("application not responsing");
+        return RET_OK;
+    }
+    auto currentTime = GetSysClockTime();
+    if (TriggerANR(currentTime, session)) {
+        session->isANRProcess_ = true;
+        MMI_HILOGW("the key event does not report normally, application not response");
+        return RET_OK;
+    }
 
     NetPacket pkt(MmiMessageId::ON_KEYEVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
@@ -186,6 +226,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
         MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
+    session->AddEvent(key->GetId(), currentTime);
     return RET_OK;
 }
 
@@ -203,7 +244,6 @@ bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
     } else {
         earlist = sess->GetEarlistEventTime();
     }
-
     if (time < (earlist + INPUT_UI_TIMEOUT_TIME)) {
         sess->isANRProcess_ = false;
         MMI_HILOGD("the event reports normally");
@@ -227,6 +267,7 @@ bool EventDispatch::TriggerANR(int64_t time, SessionPtr sess)
     if (ret != 0) {
         MMI_HILOGE("AAFwk SendANRProcessID failed, AAFwk errCode: %{public}d", ret);
     }
+    MMI_HILOGI("AAFwk send ANR process id succeeded");
     return true;
 }
 } // namespace MMI
