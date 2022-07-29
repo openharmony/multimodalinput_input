@@ -360,7 +360,7 @@ void ClientMsgHandler::OnEventProcessed(int32_t eventId, int32_t eventType)
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::MARK_PROCESS);
-    pkt << eventId << eventType;;
+    pkt << eventId << eventType;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write event failed");
         return;
