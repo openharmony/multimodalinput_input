@@ -256,6 +256,16 @@ void PointerEvent::PointerItem::SetToolType(int32_t toolType)
     toolType_ = toolType;
 }
 
+int32_t PointerEvent::PointerItem::GetTargetWindowId() const
+{
+    return targetWindowId_;
+}
+
+void PointerEvent::PointerItem::SetTargetWindowId(int32_t windowId)
+{
+    targetWindowId_ = windowId;
+}
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     return (

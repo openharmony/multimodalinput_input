@@ -308,7 +308,7 @@ static napi_module mmiModule = {
     .nm_flags = 0,
     .nm_filename = nullptr,
     .nm_register_func = MmiInit,
-    .nm_modname = "inputConsumer",
+    .nm_modname = "multimodalInput.inputConsumer",
     .nm_priv = ((void*)0),
     .reserved = { 0 },
 };
