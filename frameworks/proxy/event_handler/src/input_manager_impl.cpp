@@ -569,17 +569,23 @@ bool InputManagerImpl::IsPointerVisible()
 int32_t InputManagerImpl::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ret = MultimodalInputConnMgr->SetPointerSpeed(speed);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to set pointer speed");
         return RET_ERR;
     }
     return RET_OK;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 int32_t InputManagerImpl::GetPointerSpeed()
 {
     CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t speed;
     int32_t ret = MultimodalInputConnMgr->GetPointerSpeed(speed);
     if (ret != RET_OK) {
@@ -587,6 +593,10 @@ int32_t InputManagerImpl::GetPointerSpeed()
         return RET_ERR;
     }
     return speed;
+#else
+    return ERROR_UNSUPPORT;
+    MMI_HILOGW("Pointer device does not support");
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 void InputManagerImpl::OnConnected()
