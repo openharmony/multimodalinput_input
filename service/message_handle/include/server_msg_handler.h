@@ -33,7 +33,6 @@ public:
 
     void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
-    int32_t MarkEventProcessed(SessionPtr sess, int32_t eventId);
     int32_t OnAddInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType,
         HandleEventType eventType);
     int32_t OnRemoveInputHandler(SessionPtr sess, int32_t handlerId, InputHandlerType handlerType);
@@ -43,6 +42,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
 protected:
+    int32_t MarkProcessed(SessionPtr sess, NetPacket& pkt);
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
 #ifdef OHOS_BUILD_HDF
     int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
