@@ -126,7 +126,7 @@ int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
 
 int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
 {
-    CALL_DEBUG_ENTER;
+    CALL_LOG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t eventId = 0;
     pkt >> eventId;
