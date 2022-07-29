@@ -92,7 +92,7 @@ group("input_jsapi_group") {
       deps += [ "frameworks/napi/input_monitor:inputmonitor" ]
     }
     if (input_feature_mouse) {
-      deps += [ "frameworks/napi/mouse:mouse" ]
+      deps += [ "frameworks/napi/pointer:pointer" ]
     }
     if (input_feature_keyboard) {
       deps += [

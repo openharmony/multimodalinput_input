@@ -389,6 +389,7 @@ int32_t MMIService::SetPointerVisible(bool visible)
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return RET_OK;
 }
+
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 int32_t MMIService::CheckPointerVisible(bool &visible)
 {
@@ -407,6 +408,41 @@ int32_t MMIService::IsPointerVisible(bool &visible)
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    return RET_OK;
+}
+
+int32_t MMIService::SetPointerSpeed(int32_t speed)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventHandler::SetPointerSpeed,
+        MouseEventHdr, speed));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer speed failed,return %{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+int32_t MMIService::ReadPointerSpeed(int32_t &speed)
+{
+    speed = MouseEventHandler::GetInstance()->GetPointerSpeed();
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+int32_t MMIService::GetPointerSpeed(int32_t &speed)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadPointerSpeed, this, std::ref(speed)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pointer speed failed,return %{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
 
@@ -445,7 +481,7 @@ int32_t MMIService::SupportKeys(int32_t userData, int32_t deviceId, std::vector<
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnSupportKeys, this,
         pid, userData, deviceId, keys));
     if (ret != RET_OK) {
-        MMI_HILOGE("OnRegisterDevListener failed, ret:%{public}d", ret);
+        MMI_HILOGE("Support keys info process failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -480,7 +516,7 @@ int32_t MMIService::GetDeviceIds(int32_t userData)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetDeviceIds, this, pid, userData));
     if (ret != RET_OK) {
-        MMI_HILOGE("OnRegisterDevListener failed, ret:%{public}d", ret);
+        MMI_HILOGE("Get deviceids failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -519,7 +555,7 @@ int32_t MMIService::GetDevice(int32_t userData, int32_t deviceId)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetDevice, this, pid, userData, deviceId));
     if (ret != RET_OK) {
-        MMI_HILOGE("OnRegisterDevListener failed, ret:%{public}d", ret);
+        MMI_HILOGE("Get input device info failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -552,7 +588,7 @@ int32_t MMIService::RegisterDevListener()
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnRegisterDevListener, this, pid));
     if (ret != RET_OK) {
-        MMI_HILOGE("OnRegisterDevListener failed, ret:%{public}d", ret);
+        MMI_HILOGE("Register device listener failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -571,7 +607,7 @@ int32_t MMIService::UnregisterDevListener()
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnUnregisterDevListener, this, pid));
     if (ret != RET_OK) {
-        MMI_HILOGE("OnRegisterDevListener failed, ret:%{public}d", ret);
+        MMI_HILOGE("Unregister device listener failed failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -602,7 +638,7 @@ int32_t MMIService::GetKeyboardType(int32_t userData, int32_t deviceId)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetKeyboardType, this,
         pid, userData, deviceId));
     if (ret != RET_OK) {
-        MMI_HILOGE("OnRegisterDevListener failed, ret:%{public}d", ret);
+        MMI_HILOGE("Get keyboard type failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -792,7 +828,7 @@ int32_t MMIService::SetAnrObserver()
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&ANRManager::SetANRNoticedPid, ANRMgr, pid));
     if (ret != RET_OK) {
-        MMI_HILOGE("The unsubscribe key event processed failed, ret:%{public}d", ret);
+        MMI_HILOGE("Set ANRNoticed pid failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;

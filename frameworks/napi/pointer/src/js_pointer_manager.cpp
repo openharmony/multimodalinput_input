@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#include "js_mouse_manager.h"
+#include "js_pointer_manager.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsMouseManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsPointerManager" };
 
 enum class ReturnType {
     VOID,
@@ -49,25 +49,32 @@ AsyncContext::~AsyncContext()
     }
 }
 
-napi_value getResult(sptr<AsyncContext> asyncContext)
+void getResult(sptr<AsyncContext> asyncContext, napi_value * results)
 {
     CALL_DEBUG_ENTER;
     napi_env env = asyncContext->env;
-    napi_value results;
+    if (asyncContext->errorCode == RET_OK) {
+        CHKRV(env, napi_get_undefined(env, &results[0]), GET_UNDEFINED);
+    } else {
+        CHKRV(env, napi_create_object(env, &results[0]), CREATE_OBJECT);
+        napi_value errCode = nullptr;
+        CHKRV(env, napi_create_int32(env, asyncContext->errorCode, &errCode), CREATE_INT32);
+        CHKRV(env, napi_set_named_property(env, results[0], "code", errCode), SET_NAMED_PROPERTY);
+    }
+
     ReturnType resultType;
     asyncContext->reserve >> resultType;
     if (resultType == ReturnType::BOOL) {
         bool temp;
         asyncContext->reserve >> temp;
-        CHKRP(env, napi_get_boolean(env, temp, &results), CREATE_BOOL);
+        CHKRV(env, napi_get_boolean(env, temp, &results[1]), CREATE_BOOL);
     } else if (resultType == ReturnType::NUMBER) {
         int32_t temp;
         asyncContext->reserve >> temp;
-        CHKRP(env, napi_create_int32(env, temp, &results), CREATE_INT32);
+        CHKRV(env, napi_create_int32(env, temp, &results[1]), CREATE_INT32);
     } else {
-        CHKRP(env, napi_get_undefined(env, &results), GET_UNDEFINED);
+        CHKRV(env, napi_get_undefined(env, &results[1]), GET_UNDEFINED);
     }
-    return results;
 }
 
 void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
@@ -90,18 +97,19 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
              * count of the smart pointer is guaranteed to be 1.
              */
             asyncContext->DecStrongRef(nullptr);
-            napi_value result = getResult(asyncContext);
+            napi_value results[2] = { 0 };
+            getResult(asyncContext, results);
             if (asyncContext->deferred) {
                 if (asyncContext->errorCode == RET_OK) {
-                    CHKRV(env, napi_resolve_deferred(env, asyncContext->deferred, result), RESOLVE_DEFERRED);
+                    CHKRV(env, napi_resolve_deferred(env, asyncContext->deferred, results[1]), RESOLVE_DEFERRED);
                 } else {
-                    CHKRV(env, napi_reject_deferred(env, asyncContext->deferred, result), REJECT_DEFERRED);
+                    CHKRV(env, napi_reject_deferred(env, asyncContext->deferred, results[0]), REJECT_DEFERRED);
                 }
             } else {
                 napi_value callback = nullptr;
                 CHKRV(env, napi_get_reference_value(env, asyncContext->callback, &callback), GET_REFERENCE);
                 napi_value callResult = nullptr;
-                CHKRV(env, napi_call_function(env, nullptr, callback, 1, &result, &callResult), CALL_FUNCTION);
+                CHKRV(env, napi_call_function(env, nullptr, callback, 2, results, &callResult), CALL_FUNCTION);
             }
         },
         asyncContext.GetRefPtr(), &asyncContext->work);
@@ -111,7 +119,7 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
     }
 }
 
-napi_value JsMouseManager::SetPointerVisible(napi_env env, bool visible, napi_value handle)
+napi_value JsPointerManager::SetPointerVisible(napi_env env, bool visible, napi_value handle)
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
@@ -134,7 +142,7 @@ napi_value JsMouseManager::SetPointerVisible(napi_env env, bool visible, napi_va
     return promise;
 }
 
-napi_value JsMouseManager::IsPointerVisible(napi_env env, napi_value handle)
+napi_value JsPointerManager::IsPointerVisible(napi_env env, napi_value handle)
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);

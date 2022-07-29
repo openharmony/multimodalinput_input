@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef JS_MOUSE_MANAGER_H
-#define JS_MOUSE_MANAGER_H
+#ifndef JS_POINTER_MANAGER_H
+#define JS_POINTER_MANAGER_H
 
 #include <memory>
 
@@ -56,6 +56,7 @@ const std::string GET_REFERENCE = "napi_get_reference_value";
 const std::string CALL_FUNCTION = "napi_call_function";
 const std::string CREATE_BOOL = "napi_get_boolean";
 const std::string CREATE_INT32 = "napi_create_int32";
+const std::string CREATE_OBJECT = "napi_create_object";
 } // namespace
 
 class JsCommon {
@@ -74,11 +75,11 @@ struct AsyncContext : RefBase {
     ~AsyncContext();
 };
 
-class JsMouseManager {
+class JsPointerManager {
 public:
-    JsMouseManager() = default;
-    ~JsMouseManager() = default;
-    DISALLOW_COPY_AND_MOVE(JsMouseManager);
+    JsPointerManager() = default;
+    ~JsPointerManager() = default;
+    DISALLOW_COPY_AND_MOVE(JsPointerManager);
 
     void ResetEnv();
     napi_value SetPointerVisible(napi_env env, bool visible, napi_value handle = nullptr);
@@ -87,4 +88,4 @@ public:
 } // namespace MMI
 } // namespace OHOS
 
-#endif // JS_MOUSE_MANAGER_H
+#endif // JS_POINTER_MANAGER_H
