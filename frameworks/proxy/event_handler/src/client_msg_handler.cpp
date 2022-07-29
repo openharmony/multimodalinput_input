@@ -342,7 +342,7 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 
 void ClientMsgHandler::OnEventProcessed(int32_t eventId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_LOG_ENTER;
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::MARK_PROCESS);
