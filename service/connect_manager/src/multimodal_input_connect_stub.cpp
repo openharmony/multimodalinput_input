@@ -275,7 +275,7 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
     int32_t handlerType;
     READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if ((handlerType == InputHandlerType::INTERCEPTOR) &&
-        (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE))) {
+        (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE))) {
         MMI_HILOGE("Interceptor permission check failed");
         return CHECK_PERMISSION_FAIL;
     }
@@ -303,7 +303,7 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
     int32_t handlerType;
     READINT32(data, handlerType, IPC_PROXY_DEAD_OBJECT_ERR);
     if ((handlerType == InputHandlerType::INTERCEPTOR) &&
-        (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE))) {
+        (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE))) {
         MMI_HILOGE("Interceptor permission check failed");
         return CHECK_PERMISSION_FAIL;
     }
