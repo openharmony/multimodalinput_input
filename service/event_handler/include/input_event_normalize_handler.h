@@ -32,8 +32,10 @@ public:
     void HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
     void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
     int32_t AddHandleTimer(int32_t timeout = 300);
-   
+
 private:
+    int32_t OnEventDeviceAdded(libinput_event *event);
+    int32_t OnEventDeviceRemoved(libinput_event *event);
     int32_t HandleKeyboardEvent(libinput_event* event);
     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
     int32_t HandleTouchPadEvent(libinput_event* event);

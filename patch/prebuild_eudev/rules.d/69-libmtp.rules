@@ -332,7 +332,7 @@ ATTR{idVendor}=="0502", ATTR{idProduct}=="38a5", SYMLINK+="libmtp-%k", MODE="660
 ATTR{idVendor}=="0502", ATTR{idProduct}=="38bb", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
 # Acer Liquid Liquid Z6E
 ATTR{idVendor}=="0502", ATTR{idProduct}=="3938", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
-# Acer Iconia One 10 B3-A40 
+# Acer Iconia One 10 B3-A40
 ATTR{idVendor}=="0502", ATTR{idProduct}=="394b", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
 # SanDisk Sansa m230/m240
 ATTR{idVendor}=="0781", ATTR{idProduct}=="7400", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
@@ -1956,7 +1956,7 @@ ATTR{idVendor}=="17ef", ATTR{idProduct}=="79af", SYMLINK+="libmtp-%k", MODE="660
 ATTR{idVendor}=="17ef", ATTR{idProduct}=="79b7", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
 # Lenovo Tab 3 10 Plus
 ATTR{idVendor}=="17ef", ATTR{idProduct}=="79de", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
-# Lenovo TB3-850M 
+# Lenovo TB3-850M
 ATTR{idVendor}=="17ef", ATTR{idProduct}=="79de", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
 # Lenovo B Smartphone
 ATTR{idVendor}=="17ef", ATTR{idProduct}=="7a18", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
@@ -2454,13 +2454,13 @@ ATTR{idVendor}=="2a47", ATTR{idProduct}=="901b", SYMLINK+="libmtp-%k", MODE="660
 ATTR{idVendor}=="2a47", ATTR{idProduct}=="9039", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
 # bq U Plus
 ATTR{idVendor}=="2a47", ATTR{idProduct}=="f003", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
-# Prestigio 5505 DUO 
+# Prestigio 5505 DUO
 ATTR{idVendor}=="29e4", ATTR{idProduct}=="1103", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
 # MediaTek 5508 DUO
 ATTR{idVendor}=="29e4", ATTR{idProduct}=="1201", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
-# Prestigio 5504 DUO 
+# Prestigio 5504 DUO
 ATTR{idVendor}=="29e4", ATTR{idProduct}=="1203", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
-# Prestigio 3405 DUO 
+# Prestigio 3405 DUO
 ATTR{idVendor}=="29e4", ATTR{idProduct}=="3201", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
 # Prestigio Multipad Color 8
 ATTR{idVendor}=="29e4", ATTR{idProduct}=="b001", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
@@ -2470,7 +2470,7 @@ ATTR{idVendor}=="29e4", ATTR{idProduct}=="b003", SYMLINK+="libmtp-%k", MODE="660
 ATTR{idVendor}=="201e", ATTR{idProduct}=="42ab", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
 # Haier CT715
 ATTR{idVendor}=="201e", ATTR{idProduct}=="a0c1", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
-# Gensis GT-7305 
+# Gensis GT-7305
 ATTR{idVendor}=="040d", ATTR{idProduct}=="885c", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
 # Oppo Find 5
 ATTR{idVendor}=="22d9", ATTR{idProduct}=="2764", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
@@ -2522,7 +2522,7 @@ ATTR{idVendor}=="2916", ATTR{idProduct}=="914d", SYMLINK+="libmtp-%k", MODE="660
 ATTR{idVendor}=="2916", ATTR{idProduct}=="f003", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
 # Fly Evo Tech 4
 ATTR{idVendor}=="2970", ATTR{idProduct}=="2008", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
-# Fly 5S 
+# Fly 5S
 ATTR{idVendor}=="2970", ATTR{idProduct}=="4002", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"
 # Wileyfox Spark Plus
 ATTR{idVendor}=="2970", ATTR{idProduct}=="2008", SYMLINK+="libmtp-%k", MODE="660", GROUP="audio", ENV{ID_MTP_DEVICE}="1", ENV{ID_MEDIA_PLAYER}="1"

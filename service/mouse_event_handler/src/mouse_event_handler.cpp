@@ -32,6 +32,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MouseEventHandler"};
+constexpr int32_t MIN_SPEED = 1;
+constexpr int32_t MAX_SPEED = 20;
 } // namespace
 MouseEventHandler::MouseEventHandler()
 {
@@ -100,13 +102,15 @@ int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
-        pointerEvent_->DeleteReleaseButton(button);
+        int32_t buttonId = MouseState->LibinputChangeToPointer(button);
+        pointerEvent_->DeleteReleaseButton(buttonId);
         isPressed_ = false;
         buttonId_ = PointerEvent::BUTTON_NONE;
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_PRESSED);
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-        pointerEvent_->SetButtonPressed(button);
+        int32_t buttonId = MouseState->LibinputChangeToPointer(button);
+        pointerEvent_->SetButtonPressed(buttonId);
         isPressed_ = true;
         buttonId_ = pointerEvent_->GetButtonId();
     } else {
@@ -122,44 +126,12 @@ int32_t MouseEventHandler::HandleButtonValueInner(libinput_event_pointer* data)
     CHKPR(data, ERROR_NULL_POINTER);
 
     uint32_t button = libinput_event_pointer_get_button(data);
-    switch (button) {
-        case BTN_LEFT: {
-            pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
-            break;
-        }
-        case BTN_RIGHT: {
-            pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_RIGHT);
-            break;
-        }
-        case BTN_MIDDLE: {
-            pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_MIDDLE);
-            break;
-        }
-        case BTN_SIDE: {
-            pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_SIDE);
-            break;
-        }
-        case BTN_EXTRA: {
-            pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_EXTRA);
-            break;
-        }
-        case BTN_FORWARD: {
-            pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_FORWARD);
-            break;
-        }
-        case BTN_BACK: {
-            pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_BACK);
-            break;
-        }
-        case BTN_TASK: {
-            pointerEvent_->SetButtonId(PointerEvent::MOUSE_BUTTON_TASK);
-            break;
-        }
-        default: {
-            MMI_HILOGE("Unknown btn, btn:%{public}u", button);
-            return RET_ERR;
-        }
+    int32_t buttonId = MouseState->LibinputChangeToPointer(button);
+    if (buttonId == PointerEvent::BUTTON_NONE) {
+        MMI_HILOGE("Unknown btn, btn:%{public}u", button);
+        return RET_ERR;
     }
+    pointerEvent_->SetButtonId(buttonId);
     return RET_OK;
 }
 
@@ -272,6 +244,7 @@ int32_t MouseEventHandler::Normalize(struct libinput_event *event)
     int32_t deviceId = InputDevMgr->FindInputDeviceId(libinput_event_get_device(event));
     PointerEvent::PointerItem pointerItem;
     HandlePostInner(data, deviceId, pointerItem);
+    WinMgr->UpdateTargetPointer(pointerEvent_);
     DumpInner();
     return result;
 }
@@ -327,7 +300,7 @@ bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
         MMI_HILOGE("There hasn't any pointer device");
         return false;
     }
-    
+
     PointerEvent::PointerItem pointerItem;
     HandleMotionMoveMouse(offsetX, offsetY);
     HandlePostMoveMouse(pointerItem);
@@ -354,6 +327,27 @@ void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
             pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
             item.GetWindowX(), item.GetWindowY(), pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(),
             pointerEvent_->GetTargetWindowId(), item.GetDownTime(), item.IsPressed() ? "true" : "false");
+}
+
+int32_t MouseEventHandler::SetPointerSpeed(int32_t speed)
+{
+    CALL_DEBUG_ENTER;
+    if (speed < MIN_SPEED) {
+        speed_ = MIN_SPEED;
+    } else if (speed > MAX_SPEED) {
+        speed_ = MAX_SPEED;
+    } else {
+        speed_ = speed;
+    }
+    MMI_HILOGD("Set pointer speed:%{public}d", speed_);
+    return RET_OK;
+}
+
+int32_t MouseEventHandler::GetPointerSpeed() const
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("Get pointer speed:%{public}d", speed_);
+    return speed_;
 }
 } // namespace MMI
 } // namespace OHOS

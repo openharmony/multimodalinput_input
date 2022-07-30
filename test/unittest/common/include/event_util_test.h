@@ -123,6 +123,16 @@ public:
     virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
 };
 
+class WindowEventConsumer : public IInputEventConsumer {
+public:
+    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override;
+    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override;
+    virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
+    uint64_t GetConsumerThreadId();
+private:
+    mutable uint64_t threadId_ = 0;
+};
+
 int64_t GetNanoTime();
 template<typename sharedType>
 std::shared_ptr<sharedType> GetPtr()

@@ -36,16 +36,17 @@ public:
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) = 0;
     virtual int32_t SetPointerVisible(bool visible) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
+    virtual int32_t SetPointerSpeed(int32_t speed) = 0;
+    virtual int32_t GetPointerSpeed(int32_t &speed) = 0;
     virtual int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys) = 0;
     virtual int32_t GetDeviceIds(int32_t userData) = 0;
     virtual int32_t GetDevice(int32_t userData, int32_t id) = 0;
     virtual int32_t RegisterDevListener() = 0;
     virtual int32_t UnregisterDevListener() = 0;
     virtual int32_t GetKeyboardType(int32_t userData, int32_t deviceId) = 0;
-    virtual int32_t AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
-        HandleEventType eventType) = 0;
-    virtual int32_t RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType) = 0;
-    virtual int32_t MarkEventConsumed(int32_t monitorId, int32_t eventId) = 0;
+    virtual int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType) = 0;
+    virtual int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType) = 0;
+    virtual int32_t MarkEventConsumed(int32_t eventId) = 0;
     virtual int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) = 0;
     virtual int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) = 0;
     virtual int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) = 0;
@@ -72,6 +73,8 @@ public:
         REGISTER_DEV_MONITOR = 18,
         UNREGISTER_DEV_MONITOR = 19,
         GET_KEYBOARD_TYPE = 20,
+        SET_POINTER_SPEED = 21,
+        GET_POINTER_SPEED = 22
     };
 
     enum {

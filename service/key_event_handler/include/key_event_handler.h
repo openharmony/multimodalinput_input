@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef EVENT_PACKAGE_H
-#define EVENT_PACKAGE_H
+#ifndef KEY_EVENT_HANDLER_H
+#define KEY_EVENT_HANDLER_H
 
 #include "nocopyable.h"
 
@@ -38,4 +38,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // EVENT_PACKAGE_H
+#endif // KEY_EVENT_HANDLER_H

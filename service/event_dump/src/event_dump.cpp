@@ -73,18 +73,10 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         {"devicelist", no_argument, 0, 'l'},
         {"windows", no_argument, 0, 'w'},
         {"udsserver", no_argument, 0, 'u'},
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         {"subscriber", no_argument, 0, 's'},
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-#ifdef OHOS_BUILD_ENABLE_MONITOR
         {"monitor", no_argument, 0, 'o'},
-#endif // OHOS_BUILD_ENABLE_MONITOR
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
         {"interceptor", no_argument, 0, 'i'},
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
-#ifdef OHOS_BUILD_ENABLE_POINTER
         {"mouse", no_argument, 0, 'm'},
-#endif // OHOS_BUILD_ENABLE_POINTER
         {NULL, 0, 0, 0}
     };
     char **argv = new char *[args.size()];
@@ -122,36 +114,44 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 udsServer->Dump(fd, args);
                 break;
             }
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
             case 's': {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
                 auto subscriberHandler = InputHandler->GetSubscriberHandler();
                 CHKPV(subscriberHandler);
                 subscriberHandler->Dump(fd, args);
+#else
+                mprintf(fd, "Keyboard device does not support");
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
                 break;
             }
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-#ifdef OHOS_BUILD_ENABLE_MONITOR
             case 'o': {
+#ifdef OHOS_BUILD_ENABLE_MONITOR
                 auto monitorHandler = InputHandler->GetMonitorHandler();
                 CHKPV(monitorHandler);
                 monitorHandler->Dump(fd, args);
+#else
+                mprintf(fd, "Monitor function does not support");
+#endif // OHOS_BUILD_ENABLE_MONITOR
                 break;
             }
-#endif // OHOS_BUILD_ENABLE_MONITOR
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
             case 'i': {
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
                 auto interceptorHandler = InputHandler->GetInterceptorHandler();
                 CHKPV(interceptorHandler);
                 interceptorHandler->Dump(fd, args);
-                break;
-            }
+#else
+                mprintf(fd, "Interceptor function does not support");
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
-#ifdef OHOS_BUILD_ENABLE_POINTER
-            case 'm': {
-                MouseEventHdr->Dump(fd, args);
                 break;
             }
+            case 'm': {
+#ifdef OHOS_BUILD_ENABLE_POINTER
+                MouseEventHdr->Dump(fd, args);
+#else
+                mprintf(fd, "Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
+                break;
+            }
             default: {
                 mprintf(fd, "cmd param is error\n");
                 DumpHelp(fd);

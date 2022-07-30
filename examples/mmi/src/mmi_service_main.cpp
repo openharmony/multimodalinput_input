@@ -31,7 +31,6 @@ int32_t main(int32_t argc, const char *argv[])
     constexpr int32_t sleepTime = 10 * 60;
     while (1) {
         std::this_thread::sleep_for(std::chrono::seconds(sleepTime));
-        
     }
     service->OnStop();
     service->OnDump();

@@ -461,12 +461,12 @@ int32_t HdfEventManager::DeviceAddHandle(uint32_t devIndex, uint32_t devType)
 constexpr struct libinput_interface _hdfinterface = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
         int32_t fd = -1;
-        MMI_HILOGD("libinput .open_restricted path:%{public}s,fd:%{public}d", path, fd);
+        MMI_HILOGI("libinput .open_restricted path:%{public}s,fd:%{public}d", path, fd);
         return fd < 0 ? -errno : fd;
     },
     .close_restricted = [](int32_t fd, void *user_data)
     {
-        MMI_HILOGD("libinput .close_restricted fd:%{public}d", fd);
+        MMI_HILOGI("libinput .close_restricted fd:%{public}d", fd);
     },
 };
 libinput *HdfEventManager::HdfLibinputInit()

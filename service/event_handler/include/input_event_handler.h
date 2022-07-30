@@ -29,14 +29,13 @@
 #include "key_event_subscriber.h"
 #include "mouse_event_handler.h"
 #include "event_filter_wrap.h"
-#include "msg_handler.h"
 #include "input_event_normalize_handler.h"
 
 namespace OHOS {
 namespace MMI {
 using EventFun = std::function<int32_t(libinput_event *event)>;
 using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
-class InputEventHandler : public MsgHandler<MmiMessageId, EventFun>, public DelayedSingleton<InputEventHandler> {
+class InputEventHandler : public DelayedSingleton<InputEventHandler> {
 public:
     InputEventHandler();
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
@@ -52,22 +51,10 @@ public:
     std::shared_ptr<KeyEventSubscriber> GetSubscriberHandler() const;
     std::shared_ptr<EventMonitorHandler> GetMonitorHandler() const;
 
-protected:
-    int32_t OnEventDeviceAdded(libinput_event *event);
-    int32_t OnEventDeviceRemoved(libinput_event *event);
-    int32_t OnEventPointer(libinput_event *event);
-    int32_t OnEventTouch(libinput_event *event);
-    int32_t OnEventGesture(libinput_event *event);
-    int32_t OnEventTouchpad(libinput_event *event);
-    int32_t OnTabletToolEvent(libinput_event *event);
-    int32_t OnEventKey(libinput_event *event);
-
 private:
-    int32_t OnEventHandler(libinput_event *event);
     int32_t BuildInputHandlerChain();
 
     UDSServer *udsServer_ = nullptr;
-    NotifyDeviceChange notifyDeviceChange_;
     std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
 
     std::shared_ptr<InputEventNormalizeHandler> inputEventNormalizeHandler_ = nullptr;

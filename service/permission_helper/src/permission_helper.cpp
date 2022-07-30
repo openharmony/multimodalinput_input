@@ -33,6 +33,9 @@ bool PermissionHelper::CheckPermission(uint32_t required)
         return CheckHapPermission(tokenId, required);
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
         return CheckNativePermission(tokenId, required);
+    } else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
+        MMI_HILOGI("token type is shell");
+        return true;
     } else {
         MMI_HILOGE("Unsupported token type:%{public}d", tokenType);
         return false;
@@ -47,6 +50,9 @@ bool PermissionHelper::CheckMonitor()
     if ((tokenType == OHOS::Security::AccessToken::TOKEN_HAP) ||
         (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE)) {
         return CheckMonitorPermission(tokenId);
+    } else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
+        MMI_HILOGI("token type is shell");
+        return true;
     } else {
         MMI_HILOGE("Unsupported token type:%{public}d", tokenType);
         return false;
@@ -104,6 +110,8 @@ int32_t PermissionHelper::GetTokenType()
         return TokenType::TOKEN_HAP;
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
         return TokenType::TOKEN_NATIVE;
+    }  else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
+        return TokenType::TOKEN_SHELL;
     } else {
         MMI_HILOGW("Unsupported token type:%{public}d", tokenType);
         return TokenType::TOKEN_INVALID;

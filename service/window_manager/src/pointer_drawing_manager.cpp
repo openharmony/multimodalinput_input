@@ -53,7 +53,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
             displayId, physicalX, physicalY);
         return;
     }
-    
+
     CreatePointerWindow(displayId, physicalX, physicalY);
     CHKPV(pointerWindow_);
     sptr<OHOS::Surface> layer = GetLayer();

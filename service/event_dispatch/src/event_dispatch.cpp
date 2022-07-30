@@ -29,7 +29,9 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) || defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
+#endif // OHOS_BUILD_ENABLE_KEYBOARD ||  OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace
 
 EventDispatch::EventDispatch() {}
@@ -59,7 +61,7 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
 {
     CALL_DEBUG_ENTER;
     CHKPV(point);
-    auto fd = WinMgr->UpdateTargetPointer(point);
+    auto fd = WinMgr->GetClientFd(point);
     if (fd < 0) {
         MMI_HILOGE("The fd less than 0, fd: %{public}d", fd);
         DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);

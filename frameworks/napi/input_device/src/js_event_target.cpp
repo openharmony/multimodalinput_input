@@ -60,7 +60,6 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
     }
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
     JsUtil::DeletePtr<uv_work_t*>(work);
-    
     auto addEvent = devListener_.find(CHANGED_TYPE);
     if (addEvent == devListener_.end()) {
         MMI_HILOGE("Find change event failed");
@@ -101,7 +100,6 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
     }
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
     JsUtil::DeletePtr<uv_work_t*>(work);
-    
     auto removeEvent = devListener_.find(CHANGED_TYPE);
     if (removeEvent == devListener_.end()) {
         MMI_HILOGE("Find change event failed");

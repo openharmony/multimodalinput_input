@@ -141,6 +141,48 @@ int32_t MultimodalInputConnectProxy::IsPointerVisible(bool &visible)
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectProxy::SetPointerSpeed(int32_t speed)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, speed, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(SET_POINTER_SPEED, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::GetPointerSpeed(int32_t &speed)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(GET_POINTER_SPEED, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    speed = reply.ReadInt32();
+    return RET_OK;
+}
+
 int32_t MultimodalInputConnectProxy::RegisterDevListener()
 {
     MessageParcel data;
@@ -148,7 +190,7 @@ int32_t MultimodalInputConnectProxy::RegisterDevListener()
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    
+
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -273,7 +315,7 @@ int32_t MultimodalInputConnectProxy::GetKeyboardType(int32_t userData, int32_t d
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::AddInputHandler(int32_t handlerId, InputHandlerType handlerType,
+int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerType,
     HandleEventType eventType)
 {
     CALL_DEBUG_ENTER;
@@ -282,9 +324,8 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(int32_t handlerId, InputHan
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, handlerId, ERR_INVALID_VALUE);
     WRITEINT32(data, handlerType, ERR_INVALID_VALUE);
-    WRITEINT32(data, eventType, ERR_INVALID_VALUE);
+    WRITEUINT32(data, eventType, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -297,7 +338,7 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(int32_t handlerId, InputHan
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::RemoveInputHandler(int32_t handlerId, InputHandlerType handlerType)
+int32_t MultimodalInputConnectProxy::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -305,8 +346,8 @@ int32_t MultimodalInputConnectProxy::RemoveInputHandler(int32_t handlerId, Input
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, handlerId, ERR_INVALID_VALUE);
     WRITEINT32(data, handlerType, ERR_INVALID_VALUE);
+    WRITEUINT32(data, eventType, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -319,7 +360,7 @@ int32_t MultimodalInputConnectProxy::RemoveInputHandler(int32_t handlerId, Input
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::MarkEventConsumed(int32_t monitorId, int32_t eventId)
+int32_t MultimodalInputConnectProxy::MarkEventConsumed(int32_t eventId)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -327,7 +368,6 @@ int32_t MultimodalInputConnectProxy::MarkEventConsumed(int32_t monitorId, int32_
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEINT32(data, monitorId, ERR_INVALID_VALUE);
     WRITEINT32(data, eventId, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
