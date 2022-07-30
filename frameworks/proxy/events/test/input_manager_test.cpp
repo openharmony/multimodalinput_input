@@ -2262,6 +2262,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetProcCpuUsage, TestSize.Level1)
     ASSERT_TRUE(usage < SYSTEM_INFO::CPU_USAGE_LOAD && usage != SYSTEM_INFO::CPU_USAGE_UNKONW);
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 /**
  * @tc.name: InputManagerTest_SetWindowInputEventConsumer_001
  * @tc.desc: Verify pointerEvent report eventHandler
@@ -2294,7 +2295,9 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, Tes
     uint64_t consumerThreadId = consumer->GetConsumerThreadId();
     EXPECT_EQ(runnerThreadId, consumerThreadId);
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 /**
  * @tc.name: InputManagerTest_SetWindowInputEventConsumer_002
  * @tc.desc: Verify keyEvent report eventHandler
@@ -2328,5 +2331,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_002, Tes
     uint64_t consumerThreadId = consumer->GetConsumerThreadId();
     EXPECT_EQ(runnerThreadId, consumerThreadId);
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 } // namespace MMI
 } // namespace OHOS
