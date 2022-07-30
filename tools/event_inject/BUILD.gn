@@ -92,7 +92,7 @@ ohos_unittest("ut-event-injection-out") {
   module_out_path = module_output_path
   include_dirs = [
     "//drivers/peripheral/input/interfaces/include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//third_party/googletest/googletest/include",
     "//third_party/cJSON",
     "${mmi_path}/frameworks/proxy/event_handler",
@@ -170,9 +170,9 @@ ohos_unittest("ut-event-injection-out") {
   }
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "utils_base:utils",
   ]
 }
 
