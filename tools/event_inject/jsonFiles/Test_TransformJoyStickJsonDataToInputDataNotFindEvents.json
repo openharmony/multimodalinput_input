@@ -1,6 +1,6 @@
  [
-     { 
-     "deviceName": "joystick", 
+     {
+     "deviceName": "joystick",
      "event":[
                 {"eventType": "KEY_EVENT_CLICK", "keyValue": 288 ,"blockTime":100},
                 {"eventType": "KEY_EVENT_CLICK", "blockTime":100},
@@ -10,8 +10,8 @@
                 {"eventType": "DIRECTION_KEY2"}
             ]
     },
-    { 
-     "deviceName": "joystick", 
+    {
+     "deviceName": "joystick",
      "event":[
                 {"eventType": "KEY_EVENT_CLICK", "keyValue": 288}
             ]

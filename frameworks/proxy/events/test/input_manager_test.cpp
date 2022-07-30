@@ -28,10 +28,10 @@ constexpr int32_t TIME_WAIT_FOR_OP = 100;
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) || defined(OHOS_BUILD_ENABLE_POINTER)
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD || OHOS_BUILD_ENABLE_POINTER
-#if defined(OHOS_BUILD_ENABLE_POINTER) || (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || \
+#if defined(OHOS_BUILD_ENABLE_POINTER) && (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || \
     defined(OHOS_BUILD_ENABLE_MONITOR))
 constexpr int32_t DEFAULT_POINTER_ID = 0;
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_MONITOR)
 constexpr int32_t DEFAULT_DEVICE_ID = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
@@ -2260,6 +2260,73 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetProcCpuUsage, TestSize.Level1)
     auto usage = cpuInfo.GetProcCpuUsage(process_name);
     MMI_HILOGD("The CPU usage of the %{public}s process is %{public}.2f", process_name.c_str(), usage);
     ASSERT_TRUE(usage < SYSTEM_INFO::CPU_USAGE_LOAD && usage != SYSTEM_INFO::CPU_USAGE_UNKONW);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetWindowInputEventConsumer_001
+ * @tc.desc: Verify pointerEvent report eventHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto runner = AppExecFwk::EventRunner::Create(true);
+    ASSERT_TRUE(runner != nullptr);
+    auto eventHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
+    ASSERT_TRUE(eventHandler != nullptr);
+    uint64_t runnerThreadId = 0;
+
+    auto fun = [&]() {
+        runnerThreadId = GetThisThreadId();
+        MMI_HILOGD("Create eventHandler is threadId:%{public}" PRIu64, runnerThreadId);
+        ASSERT_TRUE(runnerThreadId != 0);
+    };
+    eventHandler->PostSyncTask(fun, AppExecFwk::EventHandler::Priority::HIGH);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    auto consumer = GetPtr<WindowEventConsumer>();
+    ASSERT_TRUE(consumer != nullptr);
+    MMI::InputManager::GetInstance()->SetWindowInputEventConsumer(consumer, eventHandler);
+    auto pointerEvent = SetupPointerEvent005();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    uint64_t consumerThreadId = consumer->GetConsumerThreadId();
+    EXPECT_EQ(runnerThreadId, consumerThreadId);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetWindowInputEventConsumer_002
+ * @tc.desc: Verify keyEvent report eventHandler
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    const std::string threadTest = "threadNameTest";
+    auto runner = AppExecFwk::EventRunner::Create(threadTest);
+    ASSERT_TRUE(runner != nullptr);
+    auto eventHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
+    ASSERT_TRUE(eventHandler != nullptr);
+    uint64_t runnerThreadId = 0;
+
+    auto fun = [&]() {
+        runnerThreadId = GetThisThreadId();
+        MMI_HILOGD("Create eventHandler is threadId:%{public}" PRIu64, runnerThreadId);
+        ASSERT_TRUE(runnerThreadId != 0);
+    };
+    eventHandler->PostSyncTask(fun, AppExecFwk::EventHandler::Priority::HIGH);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    auto consumer = GetPtr<WindowEventConsumer>();
+    ASSERT_TRUE(consumer != nullptr);
+    MMI::InputManager::GetInstance()->SetWindowInputEventConsumer(consumer, eventHandler);
+    auto keyEvent = SetupKeyEvent001();
+    ASSERT_TRUE(keyEvent != nullptr);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    uint64_t consumerThreadId = consumer->GetConsumerThreadId();
+    EXPECT_EQ(runnerThreadId, consumerThreadId);
 }
 } // namespace MMI
 } // namespace OHOS

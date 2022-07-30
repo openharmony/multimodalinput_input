@@ -307,7 +307,7 @@ HWTEST_F(VirtualDeviceTest, Test_FindDevice_addTrue, TestSize.Level1)
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
     std::vector<std::string> argvList;
     argvList.push_back("binName ");
-    argvList.push_back("start ");
+    argvList.push_back("start");
     argvList.push_back("mouse");
     auto ret = device.CommandBranch(argvList);
     EXPECT_TRUE(ret);

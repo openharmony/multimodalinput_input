@@ -274,8 +274,8 @@ void DfxHisysevent::ApplicationBlockInput(const SessionPtr& sess)
         OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
         "PID", sess->GetPid(),
         "UID", sess->GetUid(),
-        "PACKAGE_NAME", "",
-        "PROCESS_NAME", "",
+        "PACKAGE_NAME", sess->GetProgramName(),
+        "PROCESS_NAME", sess->GetProgramName(),
         "MSG", "User input does not respond");
     if (ret != 0) {
         MMI_HILOGE("HiviewDFX Write failed, ret: %{public}d", ret);

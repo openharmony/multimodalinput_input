@@ -51,7 +51,7 @@ void MMIFdListener::OnReadable(int32_t fd)
             mmiClient_->OnRecvMsg(szBuf, size);
         } else if (size < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
-                MMI_HILOGD("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
+                MMI_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK size:%{public}zu errno:%{public}d",
                     size, errno);
                 continue;
             }

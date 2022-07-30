@@ -30,6 +30,7 @@ public:
     bool CreateKey();
     bool SetAbsResolution();
     bool SetPhys(const std::string& deviceName);
+    bool DoIoctl(int32_t fd, int32_t request, const uint32_t value);
     void SetDeviceId();
     static std::vector<std::string> BrowseDirectory(const std::string& filePath);
     static std::string ReadFile(const std::string& filePath);
