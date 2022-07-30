@@ -39,7 +39,7 @@ MultimodalInputConnectProxy::~MultimodalInputConnectProxy()
 }
 
 int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programName,
-    const int32_t moduleType, int32_t &socketFd)
+    const int32_t moduleType, int32_t &socketFd, int32_t &tokenType)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -66,7 +66,8 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
         return RET_ERR;
     }
     socketFd = reply.ReadFileDescriptor();
-    MMI_HILOGD("The socketFd:%{public}d", socketFd);
+    READINT32(reply, tokenType, IPC_PROXY_DEAD_OBJECT_ERR);
+    MMI_HILOGD("socketFd:%{public}d tokenType:%{public}d", socketFd, tokenType);
     return RET_OK;
 }
 

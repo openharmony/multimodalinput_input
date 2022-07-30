@@ -32,7 +32,8 @@ public:
     static constexpr int32_t MULTIMODAL_INPUT_CONNECT_SERVICE_ID = 3101;
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.multimodalinput.IConnectManager");
 
-    virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &socketFd) = 0;
+    virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
+        int32_t &socketFd, int32_t &tokenType) = 0;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) = 0;
     virtual int32_t SetPointerVisible(bool visible) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;

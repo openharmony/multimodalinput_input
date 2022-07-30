@@ -114,13 +114,14 @@ int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
     CALL_DEBUG_ENTER;
     CHKPR(sess, ERROR_NULL_POINTER);
     int32_t eventId = 0;
-    pkt >> eventId;
+    int32_t eventType = 0;
+    pkt >> eventId >> eventType;
     MMI_HILOGD("event is: %{public}d", eventId);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read data failed");
         return PACKET_READ_FAIL;
     }
-    sess->DelEvents(eventId);
+    sess->DelEvents(eventType, eventId);
     return RET_OK;
 }
 
