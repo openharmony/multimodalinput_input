@@ -85,6 +85,7 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
         std::lock_guard<std::mutex> guard(mutex_);
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
             if (JsInputMonMgr.GetMonitor(id_)->GetTypeName() != "touch") {
+                pointerEvent->MarkProcessed();
                 return;
             }
             if (pointerEvent->GetPointerIds().size() == 1) {
@@ -733,6 +734,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
         napi_value napiPointer = nullptr;
         auto status = napi_create_object(jsEnv_, &napiPointer);
         if (status != napi_ok) {
+            pointerEvent->MarkProcessed();
             break;
         }
         auto ret = RET_ERR;
@@ -742,19 +744,23 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
             ret = TransformMousePointerEvent(pointerEvent, napiPointer);
         }
         if (ret != RET_OK || napiPointer == nullptr) {
+            pointerEvent->MarkProcessed();
             break;
         }
         napi_value callback = nullptr;
         status = napi_get_reference_value(jsEnv_, receiver_, &callback);
         if (status != napi_ok) {
+            pointerEvent->MarkProcessed();
             break;
         }
         napi_value result = nullptr;
         status = napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result);
         if (status != napi_ok) {
+            pointerEvent->MarkProcessed();
             break;
         }
         if (typeName == "touch") {
+            pointerEvent->MarkProcessed();
             bool retValue = false;
             status = napi_get_value_bool(jsEnv_, result, &retValue);
             if (status != napi_ok) {

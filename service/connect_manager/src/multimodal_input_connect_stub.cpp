@@ -90,7 +90,8 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
     MMI_HILOGD("clientName:%{public}s,moduleId:%{public}d", req->data.clientName.c_str(), req->data.moduleId);
 
     int32_t clientFd = INVALID_SOCKET_FD;
-    int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd);
+    int32_t tokenType = PerHelper->GetTokenType();
+    int32_t ret = AllocSocketFd(req->data.clientName, req->data.moduleId, clientFd, tokenType);
     if (ret != RET_OK) {
         MMI_HILOGE("AllocSocketFd failed pid:%{public}d, go switch default", pid);
         if (clientFd >= 0) {
@@ -99,7 +100,8 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
         return ret;
     }
     reply.WriteFileDescriptor(clientFd);
-    MMI_HILOGI("Send clientFd to client, clientFd = %{public}d", clientFd);
+    WRITEINT32(reply, tokenType, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGI("send clientFd to client, clientFd:%{public}d, tokenType:%{public}d", clientFd, tokenType);
     close(clientFd);
     return RET_OK;
 }

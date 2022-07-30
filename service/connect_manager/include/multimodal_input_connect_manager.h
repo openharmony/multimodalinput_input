@@ -33,6 +33,10 @@ public:
     static std::shared_ptr<MultimodalInputConnectManager> GetInstance();
     int32_t AllocSocketPair(const int32_t moduleType);
     int32_t GetClientSocketFdOfAllocedSocketPair() const;
+    int32_t GetTokenType() const
+    {
+        return tokenType_;
+    }
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     int32_t SetPointerVisible(bool visible);
     int32_t IsPointerVisible(bool &visible);
@@ -64,7 +68,8 @@ private:
     sptr<IMultimodalInputConnect> multimodalInputConnectService_ = nullptr;
     sptr<IRemoteObject::DeathRecipient> multimodalInputConnectRecipient_ = nullptr;
     std::mutex lock_;
-    int32_t socketFd_ = IMultimodalInputConnect::INVALID_SOCKET_FD;
+    int32_t socketFd_ { IMultimodalInputConnect::INVALID_SOCKET_FD };
+    int32_t tokenType_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS

@@ -25,11 +25,12 @@ namespace MMI {
 typedef std::function<int32_t(const UDSClient&, NetPacket&)> ClientMsgFun;
 class ClientMsgHandler : public MsgHandler<MmiMessageId, ClientMsgFun> {
 public:
-    ClientMsgHandler();
+    ClientMsgHandler() = default;
     virtual ~ClientMsgHandler();
     DISALLOW_COPY_AND_MOVE(ClientMsgHandler);
 
     void Init();
+    void InitProcessedCallback();
     void OnMsgHandler(const UDSClient& client, NetPacket& pkt);
 
 protected:
@@ -59,10 +60,11 @@ protected:
     int32_t OnAnr(const UDSClient& client, NetPacket& pkt);
 
 private:
-    static void OnEventProcessed(int32_t eventId);
+    static void OnEventProcessed(int32_t eventId, int32_t eventType);
+    static void OnDispatchEventProcessed(int32_t eventId);
 
 private:
-    std::function<void(int32_t)> eventProcessedCallback_;
+    std::function<void(int32_t)> dispatchCallback_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
