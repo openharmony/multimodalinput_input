@@ -36,28 +36,33 @@ void ANRManager::Init(UDSServer& udsServer)
     udsServer_->AddSessionDeletedCallback(std::bind(&ANRManager::OnSessionLost, this, std::placeholders::_1));
 }
 
-bool ANRManager::TriggerANR(int64_t time, SessionPtr sess)
+bool ANRManager::TriggerANR(int32_t type, int64_t time, SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
     CHKPF(udsServer_);
     CHKPF(sess);
     MMI_HILOGD("Current time: %{public}" PRId64 "", time);
-    if (sess->GetTokenType() ==TokenType::TOKEN_NATIVE || sess->GetProgramName() == FOUNDATION) {
+    if (sess->GetTokenType() != TokenType::TOKEN_HAP || sess->GetProgramName() == FOUNDATION) {
         MMI_HILOGD("Native event");
         return false;
     }
 
+    if (sess->CheckAnrStatus(type)) {
+        MMI_HILOGW("application not responding");
+        return true;
+    }
     int64_t earliest;
-    if (sess->IsEventQueueEmpty()) {
+    if (sess->IsEventQueueEmpty(type)) {
         earliest = time;
     } else {
-        earliest = sess->GetEarliestEventTime();
+        earliest = sess->GetEarliestEventTime(type);
     }
     if (time < (earliest + INPUT_UI_TIMEOUT_TIME)) {
-        sess->isANRProcess_ = false;
-        MMI_HILOGD("The event reports normally");
+        sess->SetAnrStatus(type, false);
+        MMI_HILOGD("the event reports normally");
         return false;
     }
+    sess->SetAnrStatus(type, true);
     DfxHisysevent::ApplicationBlockInput(sess);
     if (anrNoticedPid_ < 0) {
         MMI_HILOGE("NoticedPid_ is invalid");
