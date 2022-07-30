@@ -24,6 +24,7 @@
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "input-event-codes.h"
+#include "proto.h"
 #include "util.h"
 
 namespace OHOS {
@@ -31,6 +32,7 @@ namespace MMI {
 namespace {
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) || defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
+constexpr int32_t ANR_DISPATCH = 0;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD ||  OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace
 
@@ -72,14 +74,9 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
     CHKPV(udsServer);
     auto session = udsServer->GetSession(fd);
     CHKPV(session);
-    if (session->isANRProcess_) {
-        MMI_HILOGD("Application not responding");
-        return;
-    }
     auto currentTime = GetSysClockTime();
-    if (ANRMgr->TriggerANR(currentTime, session)) {
-        session->isANRProcess_ = true;
-        MMI_HILOGW("The pointer event does not report normally, application not response");
+    if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
+        MMI_HILOGW("the pointer event does not report normally, application not response");
         return;
     }
     auto pid = udsServer->GetClientPid(fd);
@@ -106,7 +103,7 @@ void EventDispatch::HandlePointerEvent(std::shared_ptr<PointerEvent> point)
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
-    session->SaveANREvent(point->GetId(), currentTime);
+    session->SaveANREvent(ANR_DISPATCH, point->GetId(), currentTime);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_POINTER
 
@@ -126,14 +123,9 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
         "Fd:%{public}d", key->GetKeyCode(), key->GetAction(), key->GetEventType(), fd);
     auto session = udsServer.GetSession(fd);
     CHKPR(session, RET_ERR);
-    if (session->isANRProcess_) {
-        MMI_HILOGD("Application not responding");
-        return RET_OK;
-    }
     auto currentTime = GetSysClockTime();
-    if (ANRMgr->TriggerANR(currentTime, session)) {
-        session->isANRProcess_ = true;
-        MMI_HILOGW("The key event does not report normally, application not response");
+    if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
+        MMI_HILOGW("the key event does not report normally, application not response");
         return RET_OK;
     }
 
@@ -149,7 +141,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
         MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-    session->SaveANREvent(key->GetId(), currentTime);
+    session->SaveANREvent(ANR_DISPATCH, key->GetId(), currentTime);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

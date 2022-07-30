@@ -40,16 +40,12 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ClientMsgHandler"};
+constexpr int32_t ANR_DISPATCH = 0;
 } // namespace
-
-ClientMsgHandler::ClientMsgHandler()
-{
-    eventProcessedCallback_ = std::bind(&ClientMsgHandler::OnEventProcessed, std::placeholders::_1);
-}
 
 ClientMsgHandler::~ClientMsgHandler()
 {
-    eventProcessedCallback_ = std::function<void(int32_t)>();
+    dispatchCallback_ = nullptr;
 }
 
 void ClientMsgHandler::Init()
@@ -83,6 +79,20 @@ void ClientMsgHandler::Init()
             MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
             continue;
         }
+    }
+}
+
+void ClientMsgHandler::InitProcessedCallback()
+{
+    CALL_DEBUG_ENTER;
+    int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
+    if (tokenType == TokenType::TOKEN_HAP) {
+        MMI_HILOGI("Current session is hap");
+        dispatchCallback_ = std::bind(&ClientMsgHandler::OnDispatchEventProcessed, std::placeholders::_1);
+    } else if (tokenType == static_cast<int32_t>(TokenType::TOKEN_NATIVE)) {
+        MMI_HILOGI("Current session is native");
+    } else {
+        MMI_HILOGW("Current session is unknown tokenType:%{public}d", tokenType);
     }
 }
 
@@ -121,7 +131,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     MMI_HILOGI("Key event dispatcher of client, Fd:%{public}d", fd);
     PrintEventData(key);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
-    key->SetProcessedCallback(eventProcessedCallback_);
+    key->SetProcessedCallback(dispatchCallback_);
     InputMgrImpl->OnKeyEvent(key);
     key->MarkProcessed();
     return RET_OK;
@@ -143,7 +153,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOGI("Operation canceled.");
     }
-    pointerEvent->SetProcessedCallback(eventProcessedCallback_);
+    pointerEvent->SetProcessedCallback(dispatchCallback_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
     InputMgrImpl->OnPointerEvent(pointerEvent);
     return RET_OK;
@@ -344,13 +354,13 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-void ClientMsgHandler::OnEventProcessed(int32_t eventId)
+void ClientMsgHandler::OnEventProcessed(int32_t eventId, int32_t eventType)
 {
     CALL_DEBUG_ENTER;
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::MARK_PROCESS);
-    pkt << eventId;
+    pkt << eventId << eventType;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write event failed");
         return;
@@ -359,6 +369,12 @@ void ClientMsgHandler::OnEventProcessed(int32_t eventId)
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
+}
+
+void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId)
+{
+    CALL_DEBUG_ENTER;
+    OnEventProcessed(eventId, ANR_DISPATCH);
 }
 
 int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
