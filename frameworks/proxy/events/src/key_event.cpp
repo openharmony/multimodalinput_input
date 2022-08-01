@@ -494,9 +494,9 @@ KeyEvent::KeyEvent(int32_t eventType) : InputEvent(eventType) {}
 
 KeyEvent::KeyEvent(const KeyEvent& other)
     : InputEvent(other),
-    keyCode_(other.keyCode_),
-    keys_(other.keys_),
-    keyAction_(other.keyAction_) {}
+      keyCode_(other.keyCode_),
+      keys_(other.keys_),
+      keyAction_(other.keyAction_) {}
 
 KeyEvent::~KeyEvent() {}
 

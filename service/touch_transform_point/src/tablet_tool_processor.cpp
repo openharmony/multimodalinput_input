@@ -24,8 +24,7 @@ constexpr int32_t DEFAULT_POINTER_ID { 0 };
 } // namespace
 
 TabletToolProcessor::TabletToolProcessor(int32_t deviceId)
-    : deviceId_(deviceId)
-{}
+    : deviceId_(deviceId) {}
 
 std::shared_ptr<PointerEvent> TabletToolProcessor::OnEvent(struct libinput_event* event)
 {

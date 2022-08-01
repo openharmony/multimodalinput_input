@@ -326,10 +326,10 @@ PointerEvent::PointerEvent(int32_t eventType) : InputEvent(eventType) {}
 
 PointerEvent::PointerEvent(const PointerEvent& other)
     : InputEvent(other), pointerId_(other.pointerId_), pointers_(other.pointers_),
-    pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
-    pointerAction_(other.pointerAction_), buttonId_(other.buttonId_),
-    axes_(other.axes_), axisValues_(other.axisValues_),
-    pressedKeys_(other.pressedKeys_) {}
+      pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
+      pointerAction_(other.pointerAction_), buttonId_(other.buttonId_),
+      axes_(other.axes_), axisValues_(other.axisValues_),
+      pressedKeys_(other.pressedKeys_) {}
 
 PointerEvent::~PointerEvent() {}
 

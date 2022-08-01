@@ -32,13 +32,9 @@ MMIEventHandler::MMIEventHandler() : MMIEventHandler(EventRunner::Create(false),
 }
 
 MMIEventHandler::MMIEventHandler(const std::shared_ptr<EventRunner> &runner, MMIClientPtr client)
-    : EventHandler(runner), mmiClient_(client)
-{
-}
+    : EventHandler(runner), mmiClient_(client) {}
 
-MMIEventHandler::~MMIEventHandler()
-{
-}
+MMIEventHandler::~MMIEventHandler() {}
 
 bool MMIEventHandler::PostTask(EventHandlerPtr eventHandler, const AppExecFwk::EventHandler::Callback &callback)
 {
