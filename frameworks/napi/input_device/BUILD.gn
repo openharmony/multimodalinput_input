@@ -13,7 +13,7 @@
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-config("libinputdevice_config") {
+config("inputdevice_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
@@ -41,7 +41,7 @@ ohos_shared_library("inputdevice") {
     "src/native_register_module.cpp",
   ]
 
-  configs = [ ":libinputdevice_config" ]
+  configs = [ ":inputdevice_config" ]
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
