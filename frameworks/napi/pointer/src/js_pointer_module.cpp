@@ -13,23 +13,23 @@
  * limitations under the License.
  */
 
-#include "js_mouse_context.h"
+#include "js_pointer_context.h"
 
 namespace OHOS {
 namespace MMI {
-static napi_module mmiMouseModule = {
+static napi_module mmiPointerModule = {
     .nm_version = 1,
     .nm_flags = 0,
     .nm_filename = nullptr,
-    .nm_register_func = JsMouseContext::Export,
-    .nm_modname = "multimodalInput.mouse",
+    .nm_register_func = JsPointerContext::Export,
+    .nm_modname = "multimodalInput.pointer",
     .nm_priv = ((void*)0),
     .reserved = { 0 },
 };
 
 extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
-    napi_module_register(&mmiMouseModule);
+    napi_module_register(&mmiPointerModule);
 }
 } // namespace MMI
 } // namespace OHOS

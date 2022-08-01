@@ -351,11 +351,6 @@ char* MmiBasename(char* path)
     return pBasename;
 }
 
-std::string GetStackInfo()
-{
-    return std::string();
-}
-
 void SetThreadName(const std::string& name)
 {
     prctl(PR_SET_NAME, name.c_str());

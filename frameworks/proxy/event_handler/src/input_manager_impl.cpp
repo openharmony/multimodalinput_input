@@ -454,7 +454,7 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
         return RET_ERR;
     }
     return InputInterMgr->AddInterceptor(interceptor, HANDLE_EVENT_TYPE_ALL);
-#else 
+#else
     MMI_HILOGW("Interceptor function does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -566,6 +566,39 @@ bool InputManagerImpl::IsPointerVisible()
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
+int32_t InputManagerImpl::SetPointerSpeed(int32_t speed)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = MultimodalInputConnMgr->SetPointerSpeed(speed);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set pointer speed");
+        return RET_ERR;
+    }
+    return RET_OK;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::GetPointerSpeed()
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t speed;
+    int32_t ret = MultimodalInputConnMgr->GetPointerSpeed(speed);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pointer speed failed");
+        return RET_ERR;
+    }
+    return speed;
+#else
+    return ERROR_UNSUPPORT;
+    MMI_HILOGW("Pointer device does not support");
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
 void InputManagerImpl::OnConnected()
 {
     CALL_DEBUG_ENTER;
@@ -575,6 +608,13 @@ void InputManagerImpl::OnConnected()
     }
     SendDisplayInfo();
     PrintDisplayInfo();
+    if (anrObservers_.empty()) {
+        return;
+    }
+    int32_t ret = MultimodalInputConnMgr->SetAnrObserver();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+    }
 }
 
 void InputManagerImpl::SendDisplayInfo()

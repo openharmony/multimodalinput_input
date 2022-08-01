@@ -103,7 +103,7 @@ void KeyAutoRepeat::AddHandleTimer(int32_t timeout)
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
         auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
         CHKPV(inputEventNormalizeHandler);
-        inputEventNormalizeHandler->HandleKeyEvent(this->keyEvent_);   
+        inputEventNormalizeHandler->HandleKeyEvent(this->keyEvent_);
         int32_t triggertime = KeyRepeat->GetIntervalTime(keyEvent_->GetDeviceId());
         this->AddHandleTimer(triggertime);
     });

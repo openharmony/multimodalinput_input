@@ -41,9 +41,9 @@ public:
  */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformJoyStickJsonDataToInputData.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputData.json";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -73,9 +73,9 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJsonDataToInputData, TestSi
  */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindEvents, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindEvents.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindEvents.json";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -104,9 +104,9 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
  */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataEventsIsEmpty.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataEventsIsEmpty.json";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -135,9 +135,9 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
  */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindKeyValue, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindKeyValue.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindKeyValue.json";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -166,9 +166,9 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
  */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindKeyValueInThro, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindKeyValueInThro.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindKeyValueInThro.json";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -197,9 +197,9 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
  */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindEventInRocker, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindEventInRocker.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindEventInRocker.json";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -229,9 +229,9 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInRocker,
          TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInRocker.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInRocker.json";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -261,9 +261,9 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInDirectionKey,
          TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInDirectionKey.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInDirectionKey.json";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -292,9 +292,9 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
  */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindAnyEventType, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataNotFindAnyEventType.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindAnyEventType.json";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -324,9 +324,9 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
  */
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataHasBlockTime, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformJoyStickJsonDataToInputDataHasBlockTime.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start joystick &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataHasBlockTime.json";
+    std::string startDeviceCmd = "vuinput start joystick & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";

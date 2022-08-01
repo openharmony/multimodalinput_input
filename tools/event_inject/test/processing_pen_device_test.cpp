@@ -41,9 +41,9 @@ public:
  */
 HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputData, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformPenJsonDataToInputData.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformPenJsonDataToInputData.json";
+    std::string startDeviceCmd = "vuinput start touchpad & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -73,9 +73,9 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputData, TestSize
  */
 HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataNotfindEvents, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformPenJsonDataToInputDataNotfindEvents.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataNotfindEvents.json";
+    std::string startDeviceCmd = "vuinput start touchpad & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -104,9 +104,9 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataNotfindEve
  */
 HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformPenJsonDataToInputDataEventsIsEmpty.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataEventsIsEmpty.json";
+    std::string startDeviceCmd = "vuinput start touchpad & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -135,9 +135,9 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataEventsIsEm
  */
 HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApproachEventError, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformPenJsonDataToInputDataApproachEventError.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataApprochEventError.json";
+    std::string startDeviceCmd = "vuinput start touchpad & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -166,9 +166,9 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApproachEv
  */
 HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataSlideEventError, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformPenJsonDataToInputDataSlideEventError.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataSlideEventError.json";
+    std::string startDeviceCmd = "vuinput start touchpad & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -197,9 +197,9 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataSlideEvent
  */
 HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEventError, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformPenJsonDataToInputDataLeaveEventError.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataLeaveEventError.json";
+    std::string startDeviceCmd = "vuinput start touchpad & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -228,9 +228,9 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEvent
  */
 HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApproachEventEventTypeError, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformPenJsonDataToInputDataApproachEventEventTypeError.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataApprochEventEventTypeError.json";
+    std::string startDeviceCmd = "vuinput start touchpad & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -259,9 +259,9 @@ HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataApproachEv
  */
 HWTEST_F(ProcessingPenDeviceTest, Test_TransformPenJsonDataToInputDataLeaveEventEventTypeError, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformPenJsonDataToInputDataLeaveEventEventTypeError.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformPenJsonDataToInputDataLeaveEventEventTypeError.json";
+    std::string startDeviceCmd = "vuinput start touchpad & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";

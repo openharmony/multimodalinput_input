@@ -50,10 +50,12 @@ public:
     virtual void OnStop() override;
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
-        int32_t &toReturnClientFd) override;
+        int32_t &toReturnClientFd, int32_t &tokenType) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
     virtual int32_t SetPointerVisible(bool visible) override;
     virtual int32_t IsPointerVisible(bool &visible) override;
+    virtual int32_t SetPointerSpeed(int32_t speed) override;
+    virtual int32_t GetPointerSpeed(int32_t &speed) override;
     virtual int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys) override;
     virtual int32_t GetDeviceIds(int32_t userData) override;
     virtual int32_t GetDevice(int32_t userData, int32_t deviceId) override;
@@ -83,6 +85,9 @@ protected:
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t CheckPointerVisible(bool &visible);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ReadPointerSpeed(int32_t &speed);
+#endif // OHOS_BUILD_ENABLE_POINTER
     int32_t CheckEventProcessed(int32_t pid, int32_t eventId);
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);

@@ -13,37 +13,37 @@
  * limitations under the License.
  */
 
-#include "js_mouse_context.h"
+#include "js_pointer_context.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsMouseContext" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsPointerContext" };
 } // namespace
 
-JsMouseContext::JsMouseContext() : mgr_(std::make_shared<JsMouseManager>()) {}
+JsPointerContext::JsPointerContext() : mgr_(std::make_shared<JsPointerManager>()) {}
 
-napi_value JsMouseContext::CreateInstance(napi_env env)
+napi_value JsPointerContext::CreateInstance(napi_env env)
 {
     CALL_DEBUG_ENTER;
     napi_value global = nullptr;
     CHKRP(env, napi_get_global(env, &global), GET_GLOBAL);
 
-    constexpr char className[] = "JsMouseContext";
+    constexpr char className[] = "JsPointerContext";
     napi_value jsClass = nullptr;
     napi_property_descriptor desc[] = {};
-    napi_status status = napi_define_class(env, className, sizeof(className), JsMouseContext::CreateJsObject,
+    napi_status status = napi_define_class(env, className, sizeof(className), JsPointerContext::CreateJsObject,
                                            nullptr, sizeof(desc) / sizeof(desc[0]), nullptr, &jsClass);
     CHKRP(env, status, DEFINE_CLASS);
 
-    status = napi_set_named_property(env, global, "multimodalinput_mouse_class", jsClass);
+    status = napi_set_named_property(env, global, "multimodalinput_pointer_class", jsClass);
     CHKRP(env, status, SET_NAMED_PROPERTY);
 
     napi_value jsInstance = nullptr;
     CHKRP(env, napi_new_instance(env, jsClass, 0, nullptr, &jsInstance), NEW_INSTANCE);
-    CHKRP(env, napi_set_named_property(env, global, "multimodal_mouse", jsInstance), SET_NAMED_PROPERTY);
+    CHKRP(env, napi_set_named_property(env, global, "multimodal_pointer", jsInstance), SET_NAMED_PROPERTY);
 
-    JsMouseContext *jsContext = nullptr;
+    JsPointerContext *jsContext = nullptr;
     CHKRP(env, napi_unwrap(env, jsInstance, (void**)&jsContext), UNWRAP);
     CHKPP(jsContext);
     CHKRP(env, napi_create_reference(env, jsInstance, 1, &(jsContext->contextRef_)), CREATE_REFERENCE);
@@ -53,18 +53,18 @@ napi_value JsMouseContext::CreateInstance(napi_env env)
     return jsInstance;
 }
 
-napi_value JsMouseContext::CreateJsObject(napi_env env, napi_callback_info info)
+napi_value JsPointerContext::CreateJsObject(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     napi_value thisVar = nullptr;
     void *data = nullptr;
     CHKRP(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data), GET_CB_INFO);
 
-    JsMouseContext *jsContext = new (std::nothrow) JsMouseContext();
+    JsPointerContext *jsContext = new (std::nothrow) JsPointerContext();
     CHKPP(jsContext);
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void* data, void* hin) {
         MMI_HILOGI("jsvm ends");
-        JsMouseContext *context = static_cast<JsMouseContext*>(data);
+        JsPointerContext *context = static_cast<JsPointerContext*>(data);
         delete context;
     }, nullptr, nullptr);
     if (status != napi_ok) {
@@ -77,27 +77,27 @@ napi_value JsMouseContext::CreateJsObject(napi_env env, napi_callback_info info)
     return thisVar;
 }
 
-JsMouseContext* JsMouseContext::GetInstance(napi_env env)
+JsPointerContext* JsPointerContext::GetInstance(napi_env env)
 {
     CALL_DEBUG_ENTER;
     napi_value global = nullptr;
     CHKRP(env, napi_get_global(env, &global), GET_GLOBAL);
 
     bool result = false;
-    CHKRP(env, napi_has_named_property(env, global, "multimodal_mouse", &result), HAS_NAMED_PROPERTY);
+    CHKRP(env, napi_has_named_property(env, global, "multimodal_pointer", &result), HAS_NAMED_PROPERTY);
     if (!result) {
-        THROWERR(env, "multimodal_mouse was not found");
+        THROWERR(env, "multimodal_pointer was not found");
         return nullptr;
     }
 
     napi_value object = nullptr;
-    CHKRP(env, napi_get_named_property(env, global, "multimodal_mouse", &object), SET_NAMED_PROPERTY);
+    CHKRP(env, napi_get_named_property(env, global, "multimodal_pointer", &object), SET_NAMED_PROPERTY);
     if (object == nullptr) {
         THROWERR(env, "object is nullptr");
         return nullptr;
     }
 
-    JsMouseContext *instance = nullptr;
+    JsPointerContext *instance = nullptr;
     CHKRP(env, napi_unwrap(env, object, (void**)&instance), UNWRAP);
     if (instance == nullptr) {
         THROWERR(env, "instance is nullptr");
@@ -106,12 +106,12 @@ JsMouseContext* JsMouseContext::GetInstance(napi_env env)
     return instance;
 }
 
-std::shared_ptr<JsMouseManager> JsMouseContext::GetJsMouseMgr() const
+std::shared_ptr<JsPointerManager> JsPointerContext::GetJsPointerMgr() const
 {
     return mgr_;
 }
 
-napi_value JsMouseContext::SetPointerVisible(napi_env env, napi_callback_info info)
+napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
@@ -128,19 +128,19 @@ napi_value JsMouseContext::SetPointerVisible(napi_env env, napi_callback_info in
     bool visible = true;
     CHKRP(env, napi_get_value_bool(env, argv[0], &visible), GET_BOOL);
 
-    JsMouseContext *jsPointer = JsMouseContext::GetInstance(env);
-    auto jsmouseMgr = jsPointer->GetJsMouseMgr();
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     if (argc == 1) {
-        return jsmouseMgr->SetPointerVisible(env, visible);
+        return jsPointerMgr->SetPointerVisible(env, visible);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, "The second parameter type is wrong");
         return nullptr;
     }
-    return jsmouseMgr->SetPointerVisible(env, visible, argv[1]);
+    return jsPointerMgr->SetPointerVisible(env, visible, argv[1]);
 }
 
-napi_value JsMouseContext::IsPointerVisible(napi_env env, napi_callback_info info)
+napi_value JsPointerContext::IsPointerVisible(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 1;
@@ -151,20 +151,20 @@ napi_value JsMouseContext::IsPointerVisible(napi_env env, napi_callback_info inf
         return nullptr;
     }
 
-    JsMouseContext *jsPointer = JsMouseContext::GetInstance(env);
-    auto jsmouseMgr = jsPointer->GetJsMouseMgr();
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     if (argc == 0) {
-        return jsmouseMgr->IsPointerVisible(env);
+        return jsPointerMgr->IsPointerVisible(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
         THROWERR(env, "The first parameter type is wrong");
         return nullptr;
     }
 
-    return jsmouseMgr->IsPointerVisible(env, argv[0]);
+    return jsPointerMgr->IsPointerVisible(env, argv[0]);
 }
 
-napi_value JsMouseContext::Export(napi_env env, napi_value exports)
+napi_value JsPointerContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
     auto instance = CreateInstance(env);

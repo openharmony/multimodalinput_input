@@ -51,7 +51,7 @@ HWTEST_F(InjectionEventDispatchTest, Test_Init, TestSize.Level1)
  */
 HWTEST_F(InjectionEventDispatchTest, Test_OnJson, TestSize.Level1)
 {
-    const std::string path = "temp/Test_InjectionEventDispatchTestOnJson.json";
+    const std::string path = "/data/json/Test_InjectionEventDispatchTestOnJson.json";
     InjectionEventDispatch injectionEventDispatch;
     injectionEventDispatch.injectArgvs_.push_back("json");
     injectionEventDispatch.injectArgvs_.push_back(path);
