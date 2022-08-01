@@ -28,8 +28,6 @@ ohos_source_set("input-manager") {
     "//foundation/multimodalinput/input/util/common/include",
   ]
 
-  defines = [ "OHOS_BUILD" ]
-
   deps = [
     "$SUBSYSTEM_FRAMEWORKS_DIR/proxy:libmmi-client",
     "//foundation/multimodalinput/input/util:libmmi-util",
@@ -53,8 +51,6 @@ ohos_executable("uinput") {
     "$SUBSYSTEM_DIR/interfaces/native/innerkits/multimodalinput_proxy/include",
   ]
 
-  defines = [ "OHOS_BUILD" ]
-
   deps = [ "$SUBSYSTEM_DIR/input/tools/inject_event:input-manager" ]
 
   external_deps = [
@@ -71,8 +67,6 @@ ohos_unittest("InjectEventTest") {
   include_dirs = [ "include" ]
 
   sources = [ "test/inject_event_test.cpp" ]
-
-  defines = [ "OHOS_BUILD" ]
 
   deps = [
     "$SUBSYSTEM_DIR/input/tools/inject_event:input-manager",

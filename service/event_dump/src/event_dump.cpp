@@ -45,9 +45,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Event
 void ChkConfig(int32_t fd)
 {
     mprintf(fd, "ChkMMIConfig: ");
-#ifdef OHOS_BUILD
-    mprintf(fd, "OHOS_BUILD");
-#endif
 #ifdef OHOS_BUILD_LIBINPUT
     mprintf(fd, "OHOS_BUILD_LIBINPUT");
 #endif

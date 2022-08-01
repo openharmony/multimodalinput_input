@@ -24,7 +24,7 @@ if (input_feature_distributed) {
       "${distributed_input_path}/include",
     ]
 
-    defines = [ "OHOS_BUILD" ]
+    defines = []
     if (input_feature_libinput) {
       defines += [ "OHOS_BUILD_LIBINPUT" ]
     }
