@@ -40,8 +40,6 @@ ohos_source_set("mmi_connect_manager_service") {
 
   configs = [ ":mmi_connect_manager_config" ]
 
-  defines = [ "OHOS_BUILD" ]
-
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "hiviewdfx_hilog_native:libhilog",
@@ -61,8 +59,6 @@ ohos_source_set("mmi_connect_manager_proxy") {
   ]
 
   configs = [ ":mmi_connect_manager_config" ]
-
-  defines = [ "OHOS_BUILD" ]
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
