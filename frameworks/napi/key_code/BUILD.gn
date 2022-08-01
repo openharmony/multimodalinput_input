@@ -13,7 +13,7 @@
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-config("libkeyCode_config") {
+config("keyCode_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
@@ -38,7 +38,7 @@ ohos_shared_library("keycode") {
     "src/native_register_module.cpp",
   ]
 
-  configs = [ ":libkeyCode_config" ]
+  configs = [ ":keyCode_config" ]
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",

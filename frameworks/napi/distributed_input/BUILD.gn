@@ -15,7 +15,7 @@ import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
 if (input_feature_distributed) {
   distributed_input_path = "${mmi_path}/frameworks/napi/distributed_input"
-  config("libdistributedinput_config") {
+  config("distributedinput_config") {
     visibility = [ ":*" ]
 
     include_dirs = [
@@ -41,7 +41,7 @@ if (input_feature_distributed) {
       "src/js_register_module.cpp",
     ]
 
-    configs = [ ":libdistributedinput_config" ]
+    configs = [ ":distributedinput_config" ]
 
     deps = [
       "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
