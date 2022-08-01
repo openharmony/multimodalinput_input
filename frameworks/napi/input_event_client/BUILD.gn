@@ -13,7 +13,7 @@
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-config("libinputeventclient_config") {
+config("inputeventclient_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
@@ -39,7 +39,7 @@ ohos_shared_library("inputeventclient") {
     "src/js_register_util.cpp",
   ]
 
-  configs = [ ":libinputeventclient_config" ]
+  configs = [ ":inputeventclient_config" ]
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",

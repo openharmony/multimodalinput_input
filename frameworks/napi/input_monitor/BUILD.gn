@@ -13,7 +13,7 @@
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-config("libinputmonitor_config") {
+config("inputmonitor_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
@@ -40,7 +40,7 @@ ohos_shared_library("inputmonitor") {
     "src/js_input_monitor_util.cpp",
   ]
 
-  configs = [ ":libinputmonitor_config" ]
+  configs = [ ":inputmonitor_config" ]
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",

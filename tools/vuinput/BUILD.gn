@@ -15,7 +15,7 @@
 import("//build/ohos.gni")
 import("//build/test.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
-config("virtual_device_config") {
+config("libmmi_virtual_device_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
@@ -76,7 +76,7 @@ ohos_source_set("libmmi-virtual-device") {
     "src/virtual_trackpad_sys_ctrl.cpp",
   ]
 
-  configs = [ ":virtual_device_config" ]
+  configs = [ ":libmmi_virtual_device_config" ]
 
   defines = [ "OHOS_BUILD" ]
 
