@@ -308,7 +308,6 @@ void MMIService::OnStop()
 {
     CHK_PID_AND_TID();
     UdsStop();
-    InputHandler->Clear();
     libinputAdapter_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;
 #ifdef OHOS_RSS_CLIENT

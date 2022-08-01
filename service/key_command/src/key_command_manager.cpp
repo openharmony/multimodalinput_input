@@ -271,7 +271,7 @@ bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
 void KeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
-    if (HandleEvent(keyEvent)) {
+    if (OnHandleEvent(keyEvent)) {
         MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{public}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
         return;
@@ -372,7 +372,7 @@ void KeyCommandManager::Print()
     }
 }
 
-bool KeyCommandManager::HandleEvent(const std::shared_ptr<KeyEvent> key)
+bool KeyCommandManager::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
     if (IsKeyMatch(lastMatchedKey_, key)) {

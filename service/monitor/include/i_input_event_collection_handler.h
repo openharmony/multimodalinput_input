@@ -13,29 +13,28 @@
  * limitations under the License.
  */
 
-#ifndef EVENT_PACKAGE_H
-#define EVENT_PACKAGE_H
+#ifndef I_INPUT_EVENT_MONITOR_HANDLER_H
+#define I_INPUT_EVENT_MONITOR_HANDLER_H
 
-#include "nocopyable.h"
+#include <mutex>
 
-#include "input_windows_manager.h"
 #include "key_event.h"
 #include "pointer_event.h"
-#include "uds_server.h"
-#include "util.h"
+#include "uds_session.h"
 
 namespace OHOS {
 namespace MMI {
-class EventPackage {
+class IInputEventCollectionHandler {
 public:
-    EventPackage();
-    DISALLOW_COPY_AND_MOVE(EventPackage);
-    virtual ~EventPackage();
-    int32_t PackageKeyEvent(libinput_event *event, EventKeyboard& key);
-    int32_t PackageKeyEvent(libinput_event *event, std::shared_ptr<KeyEvent> kevnPtr);
-    static int32_t PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key);
-    static int32_t KeyboardToKeyEvent(const EventKeyboard& key, std::shared_ptr<KeyEvent> keyEventPtr);
+    static constexpr int32_t DEFAULT_INTERCEPTOR = 10;
+    static constexpr int32_t DEFAULT_MONITOR = 20;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    virtual bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent) = 0;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    virtual bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent) = 0;
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // EVENT_PACKAGE_H
+#endif // I_INPUT_EVENT_MONITOR_HANDLER_H

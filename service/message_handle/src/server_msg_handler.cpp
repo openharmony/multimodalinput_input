@@ -18,19 +18,19 @@
 #include <cinttypes>
 
 #include "event_dump.h"
-#include "event_package.h"
+#include "event_interceptor_handler.h"
+#include "event_monitor_handler.h"
 #include "hos_key_event.h"
-#include "interceptor_handler_global.h"
 #include "input_device_manager.h"
-#include "input_event.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
-#include "input_handler_manager_global.h"
+#include "input_event.h"
 #include "input_windows_manager.h"
+#include "key_event_handler.h"
 #include "key_event_subscriber.h"
 #include "mmi_func_callback.h"
-#include "time_cost_chk.h"
 #include "mouse_event_handler.h"
+#include "time_cost_chk.h"
 #ifdef OHOS_BUILD_HDF
 #include "hdi_inject.h"
 #endif

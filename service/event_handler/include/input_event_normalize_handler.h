@@ -19,7 +19,7 @@
 #include <memory>
 
 #include "i_input_event_handler.h"
-#include "event_package.h"
+#include "key_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -27,13 +27,15 @@ class InputEventNormalizeHandler : public IInputEventHandler {
 public:
     InputEventNormalizeHandler() = default;
     ~InputEventNormalizeHandler() = default;
-    void HandleLibinputEvent(libinput_event* event) override;
+    void HandleEvent(libinput_event* event) override;
     void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
     void HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
     void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
     int32_t AddHandleTimer(int32_t timeout = 300);
 
 private:
+    int32_t OnEventDeviceAdded(libinput_event *event);
+    int32_t OnEventDeviceRemoved(libinput_event *event);
     int32_t HandleKeyboardEvent(libinput_event* event);
     void Repeat(const std::shared_ptr<KeyEvent> keyEvent);
     int32_t HandleTouchPadEvent(libinput_event* event);
@@ -44,8 +46,9 @@ private:
 
 private:
     int32_t timerId_ = -1;
+    std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    EventPackage eventPackage_;
+    KeyEventHandler keyEventHandler_;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 };
 } // namespace MMI

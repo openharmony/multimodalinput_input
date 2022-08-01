@@ -21,7 +21,7 @@ config("libmmi_server_config") {
     "device_scalability/include",
     "delegate_task/include",
     "event_dispatch/include",
-    "event_package/include",
+    "key_event_handler/include",
     "event_handler/include",
     "event_dump/include",
     "monitor/include",
@@ -159,7 +159,7 @@ ohos_shared_library("libmmi-server") {
 
   if (input_feature_keyboard) {
     sources += [
-      "event_package/src/event_package.cpp",
+      "key_event_handler/src/key_event_handler.cpp",
       "subscriber/src/key_event_subscriber.cpp",
     ]
     if (input_feature_combination_key) {
@@ -190,10 +190,10 @@ ohos_shared_library("libmmi-server") {
     }
   }
   if (input_feature_monitor) {
-    sources += [ "monitor/src/input_handler_manager_global.cpp" ]
+    sources += [ "monitor/src/event_monitor_handler.cpp" ]
   }
   if (input_feature_interceptor) {
-    sources += [ "interceptor/src/interceptor_handler_global.cpp" ]
+    sources += [ "interceptor/src/event_interceptor_handler.cpp" ]
   }
 
   configs = [ ":libmmi_server_config" ]
@@ -278,7 +278,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_scalability/include",
     "${mmi_path}/service/event_dispatch/include",
-    "${mmi_path}/service/event_package/include",
+    "${mmi_path}/service/key_event_handler/include",
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/hdi_inject/include",
     "${mmi_path}/service/event_dump/include",
