@@ -34,11 +34,10 @@ InputEvent::InputEvent(int32_t eventType) : eventType_(eventType)
 
 InputEvent::InputEvent(const InputEvent& other)
     : eventType_(other.eventType_), id_(other.id_), actionTime_(other.actionTime_),
-    action_(other.action_), actionStartTime_(other.actionStartTime_),
-    deviceId_(other.deviceId_), targetDisplayId_(other.targetDisplayId_),
-    targetWindowId_(other.targetWindowId_), agentWindowId_(other.agentWindowId_),
-    bitwise_(other.bitwise_), processedCallback_(other.processedCallback_)
-{}
+      action_(other.action_), actionStartTime_(other.actionStartTime_),
+      deviceId_(other.deviceId_), targetDisplayId_(other.targetDisplayId_),
+      targetWindowId_(other.targetWindowId_), agentWindowId_(other.agentWindowId_),
+      bitwise_(other.bitwise_), processedCallback_(other.processedCallback_) {}
 
 InputEvent::~InputEvent() {}
 

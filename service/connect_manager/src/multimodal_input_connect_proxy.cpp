@@ -27,8 +27,8 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectProxy" };
 } // namespace
 
-MultimodalInputConnectProxy::MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl) :
-    IRemoteProxy<IMultimodalInputConnect>(impl)
+MultimodalInputConnectProxy::MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl)
+    : IRemoteProxy<IMultimodalInputConnect>(impl)
 {
     MMI_HILOGI("Enter MultimodalInputConnectProxy");
 }

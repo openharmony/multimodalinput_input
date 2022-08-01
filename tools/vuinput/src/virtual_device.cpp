@@ -265,8 +265,7 @@ VirtualDevice::VirtualDevice(const std::string& deviceName, uint16_t busType,
       busTtype_(busType),
       vendorId_(vendorId),
       productId_(productId),
-      version_(1)
-{}
+      version_(1) {}
 
 VirtualDevice::~VirtualDevice()
 {

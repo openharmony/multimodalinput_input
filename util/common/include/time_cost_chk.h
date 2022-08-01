@@ -37,8 +37,7 @@ public:
           strReason_(strReason),
           uiTime_(tmChk),
           llParam1_(static_cast<int64_t>(llParam1)),
-          llParam2_(llParam2) {
-    }
+          llParam2_(llParam2) {}
 
     ~TimeCostChk(void)
     {
