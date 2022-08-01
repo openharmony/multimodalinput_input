@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#ifndef INTERCEPTOR_HANDLER_GLOBAL_H
-#define INTERCEPTOR_HANDLER_GLOBAL_H
+#ifndef EVENT_INTERCEPTOR_HANDLER_H
+#define EVENT_INTERCEPTOR_HANDLER_H
 
 #include <set>
 
 #include "i_input_event_handler.h"
-#include "i_input_event_monitor_handler.h"
+#include "i_input_event_collection_handler.h"
 #include "input_handler_type.h"
 #include "nocopyable.h"
 #include "singleton.h"
@@ -27,11 +27,11 @@
 
 namespace OHOS {
 namespace MMI {
-class InterceptorHandlerGlobal : public IInputEventHandler {
+class EventInterceptorHandler : public IInputEventHandler {
 public:
-    InterceptorHandlerGlobal() = default;
-    DISALLOW_COPY_AND_MOVE(InterceptorHandlerGlobal);
-    ~InterceptorHandlerGlobal() = default;
+    EventInterceptorHandler() = default;
+    DISALLOW_COPY_AND_MOVE(EventInterceptorHandler);
+    ~EventInterceptorHandler() = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -44,9 +44,9 @@ public:
     int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session);
     void RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent);
+    bool OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-    bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent);
+    bool OnHandleEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void Dump(int32_t fd, const std::vector<std::string> &args);
 
 private:
@@ -70,7 +70,7 @@ private:
         SessionPtr session_ = nullptr;
     };
 
-    class InterceptorCollection : public IInputEventMonitorHandler, protected NoCopyable {
+    class InterceptorCollection : public IInputEventCollectionHandler, protected NoCopyable {
     public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         virtual bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent) override;
@@ -91,4 +91,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // INTERCEPTOR_HANDLER_GLOBAL_H
+#endif // EVENT_INTERCEPTOR_HANDLER_H

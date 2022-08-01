@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "input_handler_manager_global.h"
+#include "event_monitor_handler.h"
 
 #include "anr_manager.h"
 #include "bytrace_adapter.h"
@@ -28,25 +28,25 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManagerGlobal" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventMonitorHandler" };
 constexpr int32_t ANR_MONITOR = 1;
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void InputHandlerManagerGlobal::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+void EventMonitorHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
-    HandleEvent(keyEvent);
+    OnHandleEvent(keyEvent);
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-void InputHandlerManagerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void EventMonitorHandler::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    if (HandleEvent(pointerEvent)) {
+    if (OnHandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Monitor is succeeded");
         return;
@@ -57,10 +57,10 @@ void InputHandlerManagerGlobal::HandlePointerEvent(std::shared_ptr<PointerEvent>
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-void InputHandlerManagerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void EventMonitorHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    if (HandleEvent(pointerEvent)) {
+    if (OnHandleEvent(pointerEvent)) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP);
         MMI_HILOGD("Monitor is succeeded");
         return;
@@ -70,7 +70,7 @@ void InputHandlerManagerGlobal::HandleTouchEvent(std::shared_ptr<PointerEvent> p
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-int32_t InputHandlerManagerGlobal::AddInputHandler(InputHandlerType handlerType,
+int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
     HandleEventType eventType, SessionPtr session)
 {
     CALL_INFO_TRACE;
@@ -84,7 +84,7 @@ int32_t InputHandlerManagerGlobal::AddInputHandler(InputHandlerType handlerType,
     return monitors_.AddMonitor(mon);
 }
 
-void InputHandlerManagerGlobal::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
                                                    SessionPtr session)
 {
     CALL_INFO_TRACE;
@@ -94,13 +94,13 @@ void InputHandlerManagerGlobal::RemoveInputHandler(InputHandlerType handlerType,
     }
 }
 
-void InputHandlerManagerGlobal::MarkConsumed(int32_t eventId, SessionPtr session)
+void EventMonitorHandler::MarkConsumed(int32_t eventId, SessionPtr session)
 {
     monitors_.MarkConsumed(eventId, session);
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
+bool EventMonitorHandler::OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     MMI_HILOGD("Handle KeyEvent");
     CHKPF(keyEvent);
@@ -117,7 +117,7 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
+bool EventMonitorHandler::OnHandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
     if (pointerEvent->HasFlag(InputEvent::EVENT_FLAG_NO_MONITOR)) {
@@ -133,7 +133,7 @@ bool InputHandlerManagerGlobal::HandleEvent(std::shared_ptr<PointerEvent> pointe
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-void InputHandlerManagerGlobal::InitSessionLostCallback()
+void EventMonitorHandler::InitSessionLostCallback()
 {
     if (sessionLostCallbackInitialized_)  {
         return;
@@ -141,17 +141,17 @@ void InputHandlerManagerGlobal::InitSessionLostCallback()
     auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPV(udsServerPtr);
     udsServerPtr->AddSessionDeletedCallback(std::bind(
-        &InputHandlerManagerGlobal::OnSessionLost, this, std::placeholders::_1));
+        &EventMonitorHandler::OnSessionLost, this, std::placeholders::_1));
     sessionLostCallbackInitialized_ = true;
     MMI_HILOGD("The callback on session deleted is registered successfully");
 }
 
-void InputHandlerManagerGlobal::OnSessionLost(SessionPtr session)
+void EventMonitorHandler::OnSessionLost(SessionPtr session)
 {
     monitors_.OnSessionLost(session);
 }
 
-void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
+void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent> keyEvent) const
 {
     CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
@@ -170,7 +170,7 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Key
     }
 }
 
-void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
+void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     CHKPV(pointerEvent);
     CHKPV(session_);
@@ -202,7 +202,7 @@ void InputHandlerManagerGlobal::SessionHandler::SendToClient(std::shared_ptr<Poi
     }
 }
 
-int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHandler& monitor)
+int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler& monitor)
 {
     if (monitors_.size() >= MAX_N_INPUT_MONITORS) {
         MMI_HILOGE("The number of monitors exceeds the maximum:%{public}zu,monitors,errCode:%{public}d",
@@ -238,7 +238,7 @@ int32_t InputHandlerManagerGlobal::MonitorCollection::AddMonitor(const SessionHa
     return RET_OK;
 }
 
-void InputHandlerManagerGlobal::MonitorCollection::RemoveMonitor(const SessionHandler& monitor)
+void EventMonitorHandler::MonitorCollection::RemoveMonitor(const SessionHandler& monitor)
 {
     auto iter = monitors_.find(monitor);
     if (iter == monitors_.cend()) {
@@ -260,7 +260,7 @@ void InputHandlerManagerGlobal::MonitorCollection::RemoveMonitor(const SessionHa
     MMI_HILOGD("Event type is updated: %{public}u", monitor.eventType_);
 }
 
-void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t eventId, SessionPtr session)
+void EventMonitorHandler::MonitorCollection::MarkConsumed(int32_t eventId, SessionPtr session)
 {
     if (!HasMonitor(session)) {
         MMI_HILOGW("Specified monitor does not exist");
@@ -292,7 +292,7 @@ void InputHandlerManagerGlobal::MonitorCollection::MarkConsumed(int32_t eventId,
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
+bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
     MMI_HILOGD("There are currently %{public}zu monitors", monitors_.size());
@@ -306,7 +306,7 @@ bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<K
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
+bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -321,14 +321,14 @@ bool InputHandlerManagerGlobal::MonitorCollection::HandleEvent(std::shared_ptr<P
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-bool InputHandlerManagerGlobal::MonitorCollection::HasMonitor(SessionPtr session)
+bool EventMonitorHandler::MonitorCollection::HasMonitor(SessionPtr session)
 {
     SessionHandler monitor { InputHandlerType::MONITOR, HANDLE_EVENT_TYPE_ALL, session };
     return (monitors_.find(monitor) != monitors_.end());
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent)
+void EventMonitorHandler::MonitorCollection::UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
@@ -353,7 +353,7 @@ void InputHandlerManagerGlobal::MonitorCollection::UpdateConsumptionState(std::s
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<PointerEvent> pointerEvent)
+void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     MMI_HILOGD("There are currently %{public}zu monitors", monitors_.size());
@@ -365,7 +365,7 @@ void InputHandlerManagerGlobal::MonitorCollection::Monitor(std::shared_ptr<Point
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-void InputHandlerManagerGlobal::MonitorCollection::OnSessionLost(SessionPtr session)
+void EventMonitorHandler::MonitorCollection::OnSessionLost(SessionPtr session)
 {
     CALL_INFO_TRACE;
     std::set<SessionHandler>::const_iterator cItr = monitors_.cbegin();
@@ -377,12 +377,12 @@ void InputHandlerManagerGlobal::MonitorCollection::OnSessionLost(SessionPtr sess
         }
     }
 }
-void InputHandlerManagerGlobal::Dump(int32_t fd, const std::vector<std::string> &args)
+void EventMonitorHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     return monitors_.Dump(fd, args);
 }
 
-void InputHandlerManagerGlobal::MonitorCollection::Dump(int32_t fd, const std::vector<std::string> &args)
+void EventMonitorHandler::MonitorCollection::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Monitor information:\t");

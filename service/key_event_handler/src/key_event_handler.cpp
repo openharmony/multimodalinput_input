@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "event_package.h"
+#include "key_event_handler.h"
 
 #include "input_device_manager.h"
 #include "key_map_manager.h"
@@ -21,18 +21,18 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventPackage" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventHandler" };
 const std::string VIRTUAL_KEYBOARD = "virtual_keyboard";
 constexpr uint32_t SEAT_KEY_COUNT_ONE = 1;
 constexpr uint32_t SEAT_KEY_COUNT_ZERO = 0;
 constexpr uint32_t KEYSTATUS = 0;
 } // namespace
 
-EventPackage::EventPackage() {}
+KeyEventHandler::KeyEventHandler() {}
 
-EventPackage::~EventPackage() {}
+KeyEventHandler::~KeyEventHandler() {}
 
-int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_ptr<KeyEvent> key)
+int32_t KeyEventHandler::PackageKeyEvent(struct libinput_event *event, std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, PARAM_INPUT_INVALID);
@@ -91,7 +91,7 @@ int32_t EventPackage::PackageKeyEvent(struct libinput_event *event, std::shared_
     return RET_OK;
 }
 
-int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key)
+int32_t KeyEventHandler::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key)
 {
     const std::string uid = GetUUid();
     errno_t ret = memcpy_s(key.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size());
@@ -119,7 +119,7 @@ int32_t EventPackage::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& k
     return RET_OK;
 }
 
-int32_t EventPackage::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_ptr<KeyEvent> keyEventPtr)
+int32_t KeyEventHandler::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_ptr<KeyEvent> keyEventPtr)
 {
     CHKPR(keyEventPtr, ERROR_NULL_POINTER);
     keyEventPtr->UpdateId();
