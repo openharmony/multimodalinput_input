@@ -59,7 +59,7 @@ bool MouseEventHandler::GetSpeedGain(const double& vin, double& gain) const
     int32_t num = static_cast<int32_t>(ceil(abs(vin)));
     for (size_t i = 0; i < SPEED_NUMS.size(); ++i) {
         if (num <= SPEED_NUMS[i]) {
-           gain = (SPEED_GAINS[i] * vin + SPEED_DIFF_NUMS[i]) / vin;
+            gain = (SPEED_GAINS[i] * vin + SPEED_DIFF_NUMS[i]) / vin;
         }
     }
     gain = (SPEED_GAINS.back() * vin + SPEED_DIFF_NUMS.back()) / vin;
