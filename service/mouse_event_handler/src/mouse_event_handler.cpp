@@ -31,10 +31,11 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MouseEventHandler"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MouseEventHandler" };
 const std::array<int32_t, 6> SPEED_NUMS { 5, 16, 23, 32, 41, 128 };
 const std::array<double, 6> SPEED_GAINS { 0.6, 1.0, 1.2, 1.8, 2.1, 2.8 };
 const std::array<double, 6> SPEED_DIFF_NUMS { 0.0, -2.0, -5.0, -19.0, -28.6, -57.3 };
+constexpr double DOUBLE_ZERO = 1e-6;
 constexpr int32_t MIN_SPEED = 1;
 constexpr int32_t MAX_SPEED = 20;
 } // namespace
@@ -51,6 +52,10 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
 
 double MouseEventHandler::GetSpeedGain(const double& vin) const
 {
+    if (fabs(vin) < DOUBLE_ZERO) {
+        MMI_HILOGE("The value of the parameter passed in is 0");
+        return false;
+    }
     int32_t num = static_cast<int32_t>(ceil(abs(vin)));
     for (size_t i = 0; i < SPEED_NUMS.size(); ++i) {
         if (num <= SPEED_NUMS[i]) {
