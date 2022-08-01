@@ -1,6 +1,6 @@
  [
     {
-     "deviceName": "mouse", 
+     "deviceName": "mouse",
      "events":[
                 {"eventType": "KEY_EVENT_PRESS", "keyValue": 272},
                 {"eventType": "KEY_EVENT_RELEASE", "keyValue": 272},

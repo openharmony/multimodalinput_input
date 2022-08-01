@@ -1,6 +1,6 @@
  [
-       { 
-        "deviceName": "pen", 
+       {
+        "deviceName": "pen",
         "events":[
                 {"eventType": "RUBBER_TOUCH", "xPos":12971, "yPos":16270, "tiltX":10,"tiltY":5, "pressure":4200,  "distance":40},
                 {},
