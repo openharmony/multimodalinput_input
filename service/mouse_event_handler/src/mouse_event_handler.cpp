@@ -52,7 +52,7 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
 
 bool MouseEventHandler::GetSpeedGain(const double& vin, double& gain) const
 {
-    if (fabs(vin) < DOUBLE_ZERO) {
+    if (abs(vin) < DOUBLE_ZERO) {
         MMI_HILOGE("The value of the parameter passed in is 0");
         return false;
     }
@@ -60,6 +60,7 @@ bool MouseEventHandler::GetSpeedGain(const double& vin, double& gain) const
     for (size_t i = 0; i < SPEED_NUMS.size(); ++i) {
         if (num <= SPEED_NUMS[i]) {
             gain = (SPEED_GAINS[i] * vin + SPEED_DIFF_NUMS[i]) / vin;
+            return true;
         }
     }
     gain = (SPEED_GAINS.back() * vin + SPEED_DIFF_NUMS.back()) / vin;
