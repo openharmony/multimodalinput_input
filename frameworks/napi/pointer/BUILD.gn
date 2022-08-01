@@ -13,7 +13,7 @@
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-config("libpointer_config") {
+config("pointer_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
@@ -39,7 +39,7 @@ ohos_shared_library("pointer") {
     "src/js_pointer_module.cpp",
   ]
 
-  configs = [ ":libpointer_config" ]
+  configs = [ ":pointer_config" ]
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
