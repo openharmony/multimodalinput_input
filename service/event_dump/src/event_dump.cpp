@@ -87,12 +87,10 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         if (argv[i] == nullptr) {
             MMI_HILOGE("alloc failure");
             goto RELEASE_RES;
-            return;
         }
         if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != EOK) {
             MMI_HILOGE("strcpy_s error");
             goto RELEASE_RES;
-            return;
         }
     }
     optind = 1;
