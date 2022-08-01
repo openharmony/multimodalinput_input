@@ -50,7 +50,7 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
     return pointerEvent_;
 }
 
-double MouseEventHandler::GetSpeedGain(const double& vin) const
+bool MouseEventHandler::GetSpeedGain(const double& vin, double& gain) const
 {
     if (fabs(vin) < DOUBLE_ZERO) {
         MMI_HILOGE("The value of the parameter passed in is 0");
@@ -59,10 +59,11 @@ double MouseEventHandler::GetSpeedGain(const double& vin) const
     int32_t num = static_cast<int32_t>(ceil(abs(vin)));
     for (size_t i = 0; i < SPEED_NUMS.size(); ++i) {
         if (num <= SPEED_NUMS[i]) {
-           return (SPEED_GAINS[i] * vin + SPEED_DIFF_NUMS[i]) / vin;
+           gain = (SPEED_GAINS[i] * vin + SPEED_DIFF_NUMS[i]) / vin;
         }
     }
-    return (SPEED_GAINS.back() * vin + SPEED_DIFF_NUMS.back()) / vin;
+    gain = (SPEED_GAINS.back() * vin + SPEED_DIFF_NUMS.back()) / vin;
+    return true;
 }
 
 int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
@@ -100,8 +101,13 @@ int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
     double dx = libinput_event_pointer_get_dx(data);
     double dy = libinput_event_pointer_get_dy(data);
     double vin = (fmax(abs(dx), abs(dy)) + fmin(abs(dx), abs(dy))) / 2.0;
-    double correctionX = dx * GetSpeedGain(vin) * static_cast<double>(speed_) / 10.0;
-    double correctionY = dy * GetSpeedGain(vin) * static_cast<double>(speed_) / 10.0;
+    double gain;
+    if (!GetSpeedGain(vin, gain)) {
+        MMI_HILOGE("Get speed gain failed");
+        return RET_ERR;
+    }
+    double correctionX = dx * gain * static_cast<double>(speed_) / 10.0;
+    double correctionY = dy * gain * static_cast<double>(speed_) / 10.0;
     MMI_HILOGD("Get and process the movement coordinates, dx:%{public}lf, dy:%{public}lf,"
                "correctionX:%{public}lf, correctionY:%{public}lf",
                dx, dy, correctionX, correctionY);
