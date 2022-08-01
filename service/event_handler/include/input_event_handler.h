@@ -43,7 +43,6 @@ public:
     void Init(UDSServer& udsServer);
     void OnEvent(void *event);
     UDSServer *GetUDSServer() const;
-    std::shared_ptr<KeyEvent> GetKeyEvent() const;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
 
     std::shared_ptr<InputEventNormalizeHandler> GetInputEventNormalizeHandler() const;
@@ -55,8 +54,6 @@ private:
     int32_t BuildInputHandlerChain();
 
     UDSServer *udsServer_ = nullptr;
-    std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
-
     std::shared_ptr<InputEventNormalizeHandler> inputEventNormalizeHandler_ = nullptr;
     std::shared_ptr<EventFilterWrap> eventfilterHandler_ = nullptr;
     std::shared_ptr<EventInterceptorHandler> interceptorHandler_ = nullptr;

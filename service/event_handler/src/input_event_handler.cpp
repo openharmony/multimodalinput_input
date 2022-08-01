@@ -125,11 +125,6 @@ UDSServer* InputEventHandler::GetUDSServer() const
     return udsServer_;
 }
 
-std::shared_ptr<KeyEvent> InputEventHandler::GetKeyEvent() const
-{
-    return keyEvent_;
-}
-
 std::shared_ptr<InputEventNormalizeHandler> InputEventHandler::GetInputEventNormalizeHandler() const
 {
     return inputEventNormalizeHandler_;
