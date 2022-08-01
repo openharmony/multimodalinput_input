@@ -331,9 +331,13 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
     return RET_OK;
 }
 
-MapFun JsInputMonitor::GetFuns(const PointerEvent::PointerItem& item)
+MapFun JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item)
 {
     MapFun mapFun;
+    mapFun["actionTime"] = std::bind(&PointerEvent::GetActionTime, pointerEvent);
+    mapFun["screenId"] = std::bind(&PointerEvent::GetTargetDisplayId, pointerEvent);
+    mapFun["windowId"] = std::bind(&PointerEvent::GetTargetWindowId, pointerEvent);
+    mapFun["deviceId"] = std::bind(&PointerEvent::PointerItem::GetDeviceId, item);
     mapFun["windowX"] = std::bind(&PointerEvent::PointerItem::GetDisplayX, item);
     mapFun["windowY"] = std::bind(&PointerEvent::PointerItem::GetDisplayY, item);
     mapFun["screenX"] = std::bind(&PointerEvent::PointerItem::GetWindowX, item);
@@ -355,7 +359,7 @@ bool JsInputMonitor::SetMouseProperty(const std::shared_ptr<PointerEvent> pointe
         return false;
     }
 
-    auto mapFun = GetFuns(item);
+    auto mapFun = GetFuns(pointerEvent, item);
     for (const auto& it : mapFun) {
         if (SetNameProperty(jsEnv_, result, it.first, it.second()) != napi_ok) {
             THROWERR(jsEnv_, "Set property failed");
@@ -413,6 +417,10 @@ int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> 
             if (!pointerEvent->GetPointerItem(pointerId, item)) {
                 MMI_HILOGE("Invalid pointer: %{public}d", pointerId);
                 return RET_ERR;
+            }
+            if (SetNameProperty(jsEnv_, result, "id", currentPointerId) != napi_ok) {
+                THROWERR(jsEnv_, "Set property of id failed");
+                return false;
             }
             if (!SetMouseProperty(pointerEvent, item, result)) {
                 MMI_HILOGE("Set property of mouse failed");
