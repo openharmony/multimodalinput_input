@@ -739,12 +739,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_005, TestSize.Level
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_001
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_001
  * @tc.desc: Verify simulate screen down event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_SimulatePoniterEvent_001, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_SimulatePointerEvent_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent001() };
@@ -753,12 +753,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulatePoniterEvent_001, TestSize.L
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_002
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_002
  * @tc.desc: Verify simulate screen move event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_SimulatePoniterEvent_002, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_SimulatePointerEvent_002, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent002() };
@@ -767,12 +767,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulatePoniterEvent_002, TestSize.L
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_003
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_003
  * @tc.desc: Verify simulate screen up event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_003, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_003, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent003() };
@@ -781,12 +781,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_003, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_004
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_004
  * @tc.desc: Verify simulate screen exception event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_004, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_004, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     auto pointerEvent = PointerEvent::Create();
@@ -800,12 +800,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_004, Test
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_005
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_005
  * @tc.desc: Verify simulate mouse down event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_005, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_005, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent005() };
@@ -814,12 +814,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_005, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_006
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_006
  * @tc.desc: Verify simulate mouse move event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_006, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_006, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent006() };
@@ -828,12 +828,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_006, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_007
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_007
  * @tc.desc: Verify simulate mouse up event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_007, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_007, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent007() };
@@ -842,12 +842,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_007, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_008
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_008
  * @tc.desc: Verify simulate mouse exception event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_008, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_008, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     auto pointerEvent = PointerEvent::Create();
@@ -859,12 +859,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_008, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_009
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_009
  * @tc.desc: Verify simulate mouse VERTICAL axis event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_009, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_009, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent009() };
@@ -873,12 +873,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_009, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_010
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_010
  * @tc.desc: Verify simulate mouse VERTICAL HORIZONTAL axis event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_010, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_010, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent010() };
@@ -887,12 +887,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_010, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_011
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_011
  * @tc.desc: Verify simulate mouse AXIS_BEGIN event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_011, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_011, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     auto pointerEvent = PointerEvent::Create();
@@ -921,12 +921,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_011, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_012
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_012
  * @tc.desc: Verify simulate mouse AXIS_UPDATE event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_012, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_012, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     auto pointerEvent = PointerEvent::Create();
@@ -955,12 +955,12 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_012, Test
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulatePoniterEvent_013
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_013
  * @tc.desc: Verify simulate mouse AXIS_END event
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePoniterEvent_013, TestSize.Level1)
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_013, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     auto pointerEvent = PointerEvent::Create();
