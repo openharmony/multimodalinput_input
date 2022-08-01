@@ -46,6 +46,7 @@ private:
 
 private:
     int32_t timerId_ = -1;
+    std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventHandler keyEventHandler_;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
