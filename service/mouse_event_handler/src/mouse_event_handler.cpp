@@ -101,7 +101,7 @@ int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
     double dx = libinput_event_pointer_get_dx(data);
     double dy = libinput_event_pointer_get_dy(data);
     double vin = (fmax(abs(dx), abs(dy)) + fmin(abs(dx), abs(dy))) / 2.0;
-    double gain;
+    double gain { 0.0 };
     if (!GetSpeedGain(vin, gain)) {
         MMI_HILOGE("Get speed gain failed");
         return RET_ERR;
