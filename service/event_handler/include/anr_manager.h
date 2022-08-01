@@ -30,7 +30,7 @@ public:
     DISALLOW_COPY_AND_MOVE(ANRManager);
     ~ANRManager() = default;
     void Init(UDSServer& udsServer);
-    bool TriggerANR(int64_t time, SessionPtr sess);
+    bool TriggerANR(int32_t type, int64_t time, SessionPtr sess);
     int32_t SetANRNoticedPid(int32_t anrPid);
     void OnSessionLost(SessionPtr session);
 
@@ -38,7 +38,7 @@ private:
     int32_t anrNoticedPid_ { -1 };
     UDSServer *udsServer_ = nullptr;;
 };
-} // namespace MMI 
+} // namespace MMI
 } // namespace OHOS
 #define ANRMgr OHOS::MMI::ANRManager::GetInstance()
 #endif // ANR_MANAGER_H

@@ -41,9 +41,9 @@ public:
  */
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputData, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformGamePadJsonDataToInputData.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputData.json";
+    std::string startDeviceCmd = "vuinput start gamepad & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -73,9 +73,9 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputData, 
  */
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNotFindEvents, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformGamePadJsonDataToInputDataNotFindEvents.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindEvents.json";
+    std::string startDeviceCmd = "vuinput start gamepad & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -104,9 +104,9 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
  */
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformGamePadJsonDataToInputDataEventsIsEmpty.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputDataEventsIsEmpty.json";
+    std::string startDeviceCmd = "vuinput start gamepad & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -135,9 +135,9 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataEv
  */
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNotFindKeyValueInPress, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformGamePadJsonDataToInputDataNotFindKeyValueInPress.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindKeyValueInPress.json";
+    std::string startDeviceCmd = "vuinput start gamepad & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -166,9 +166,9 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
  */
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNotFindEventInRocker, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformGamePadJsonDataToInputDataNotFindEventInRocker.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindEventInRocker.json";
+    std::string startDeviceCmd = "vuinput start gamepad & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -197,9 +197,9 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
  */
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRocker, TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRocker.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRocker.json";
+    std::string startDeviceCmd = "vuinput start gamepad & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -229,9 +229,10 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRockerDirectionKey,
          TestSize.Level1)
 {
-    const std::string path = "temp/Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRockerDirectionKey.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start gamepad &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
+    const std::string path =
+     "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRockerDirectionKey.json";
+    std::string startDeviceCmd = "vuinput start gamepad & ";
+    std::string closeDeviceCmd = "vuinput close all";
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";

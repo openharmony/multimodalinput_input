@@ -13,11 +13,11 @@
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-config("libmouse_config") {
+config("libpointer_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//foundation/multimodalinput/input/frameworks/napi/mouse/include",
+    "//foundation/multimodalinput/input/frameworks/napi/pointer/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/util/network/include",
   ]
@@ -32,14 +32,14 @@ config("libmouse_config") {
   }
 }
 
-ohos_shared_library("mouse") {
+ohos_shared_library("pointer") {
   sources = [
-    "src/js_mouse_context.cpp",
-    "src/js_mouse_manager.cpp",
-    "src/js_mouse_module.cpp",
+    "src/js_pointer_context.cpp",
+    "src/js_pointer_manager.cpp",
+    "src/js_pointer_module.cpp",
   ]
 
-  configs = [ ":libmouse_config" ]
+  configs = [ ":libpointer_config" ]
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
