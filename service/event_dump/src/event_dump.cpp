@@ -85,7 +85,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     for (size_t i = 0; i < args.size(); ++i) {
         argv[i] = new (std::nothrow) char[args[i].size() + 1];
         if (argv[i] == nullptr) {
-            MMI_HILOGE("alloc failure");
+            MMI_HILOGE("Failed to allocate memory");
             goto RELEASE_RES;
         }
         if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != EOK) {

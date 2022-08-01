@@ -69,7 +69,7 @@ napi_value JsPointerContext::CreateJsObject(napi_env env, napi_callback_info inf
     }, nullptr, nullptr);
     if (status != napi_ok) {
         delete jsContext;
-        THROWERR(env, "failed to wrap native instance");
+        THROWERR(env, "Failed to wrap native instance");
         return nullptr;
     }
     return thisVar;
