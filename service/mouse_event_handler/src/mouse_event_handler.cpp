@@ -109,8 +109,8 @@ int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
     double correctionX = dx * gain * static_cast<double>(speed_) / 10.0;
     double correctionY = dy * gain * static_cast<double>(speed_) / 10.0;
     MMI_HILOGD("Get and process the movement coordinates, dx:%{public}lf, dy:%{public}lf,"
-               "correctionX:%{public}lf, correctionY:%{public}lf",
-               dx, dy, correctionX, correctionY);
+               "correctionX:%{public}lf, correctionY:%{public}lf, gain:%{public}lf",
+               dx, dy, correctionX, correctionY, gain);
     absolutionX_ += correctionX;
     absolutionY_ += correctionY;
     return RET_OK;
