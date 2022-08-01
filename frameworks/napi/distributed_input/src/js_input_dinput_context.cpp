@@ -93,7 +93,7 @@ napi_value JsInputDinputContext::JsConstructor(napi_env env, napi_callback_info 
     }, nullptr, nullptr);
     if (status != napi_ok) {
         delete jsContext;
-        THROWERR(env, "failed to wrap native instance");
+        THROWERR(env, "Failed to wrap native instance");
         return nullptr;
     }
     return thisVar;
