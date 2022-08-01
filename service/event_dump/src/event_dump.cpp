@@ -79,9 +79,16 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         {"mouse", no_argument, 0, 'm'},
         {NULL, 0, 0, 0}
     };
-    char **argv = new char *[args.size()];
+    char **argv = new (std::nothrow) char *[args.size()];
+    CHKPV(argv);
+    (void)memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*));
     for (size_t i = 0; i < args.size(); ++i) {
-        argv[i] = new char[args[i].size() + 1];
+        argv[i] = new (std::nothrow) char[args[i].size() + 1];
+        if (argv[i] == nullptr) {
+            MMI_HILOGE("alloc failure");
+            goto RELEASE_RES;
+            return;
+        }
         if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != EOK) {
             MMI_HILOGE("strcpy_s error");
             goto RELEASE_RES;
