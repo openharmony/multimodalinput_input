@@ -1630,7 +1630,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_001, TestSize.L
     pointerEvent->SetPointerId(0);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
-    int32_t monitorId { };
+    int32_t monitorId {};
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
     monitorId = TestAddMonitor(callBackPtr);
@@ -1668,7 +1668,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_002, TestSize.L
     pointerEvent->SetPointerId(0);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
-    int32_t monitorId { };
+    int32_t monitorId {};
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
     monitorId = TestAddMonitor(callBackPtr);
@@ -1706,7 +1706,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     pointerEvent->SetPointerId(0);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
-    int32_t monitorId { };
+    int32_t monitorId {};
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
     monitorId = TestAddMonitor(callBackPtr);
@@ -1790,7 +1790,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
     pointerEvent->SetPointerId(0);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
-    int32_t monitorId { };
+    int32_t monitorId {};
     auto callBackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callBackPtr != nullptr);
     monitorId = TestAddMonitor(callBackPtr);
@@ -1823,7 +1823,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_001, TestSize
     int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
-    PointerEvent::PointerItem item { };
+    PointerEvent::PointerItem item {};
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
     item.SetPressed(true);
@@ -1862,7 +1862,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_002, TestSize
     int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
-    PointerEvent::PointerItem item { };
+    PointerEvent::PointerItem item {};
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
     item.SetPressed(true);
@@ -1901,7 +1901,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_003, TestSize
     int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
-    PointerEvent::PointerItem item { };
+    PointerEvent::PointerItem item {};
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
     item.SetPressed(false);
@@ -1940,7 +1940,7 @@ HWTEST_F(InputManagerTest, InputManager_TouchPadSimulateInputEvent_004, TestSize
     int64_t actionTime = GetSysClockTime();
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
-    PointerEvent::PointerItem item { };
+    PointerEvent::PointerItem item {};
     item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(actionTime);
     item.SetPressed(true);

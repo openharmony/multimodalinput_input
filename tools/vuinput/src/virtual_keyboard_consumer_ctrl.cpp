@@ -25,8 +25,8 @@ AbsInfo absInfos[] = {
 };
 } // namespace
 
-VirtualKeyboardConsumerCtrl::VirtualKeyboardConsumerCtrl() : VirtualDevice("Virtual KeyboardConsumerCtrl",
-    BUS_USB, 0x24ae, 0x4035)
+VirtualKeyboardConsumerCtrl::VirtualKeyboardConsumerCtrl()
+    : VirtualDevice("Virtual KeyboardConsumerCtrl", BUS_USB, 0x24ae, 0x4035)
 {
     eventTypes_ = { EV_KEY, EV_REL, EV_ABS, EV_MSC };
     abs_ = { ABS_VOLUME };

@@ -17,8 +17,7 @@
 
 namespace OHOS {
 namespace MMI {
-VirtualKnobMouse::VirtualKnobMouse() : VirtualDevice("Virtual KnobMouse",
-    BUS_USB, 0x5ac, 0x202)
+VirtualKnobMouse::VirtualKnobMouse() : VirtualDevice("Virtual KnobMouse", BUS_USB, 0x5ac, 0x202)
 {
     eventTypes_ = { EV_KEY, EV_REL, EV_MSC };
     keys_ = { BTN_LEFT, BTN_RIGHT, BTN_MIDDLE, BTN_SIDE, BTN_EXTRA };

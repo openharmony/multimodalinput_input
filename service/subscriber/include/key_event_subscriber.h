@@ -51,9 +51,7 @@ public:
 private:
     struct Subscriber {
         Subscriber(int32_t id, SessionPtr sess, std::shared_ptr<KeyOption> keyOption)
-            : id_(id), sess_(sess), keyOption_(keyOption), timerId_(-1)
-        {
-        }
+            : id_(id), sess_(sess), keyOption_(keyOption), timerId_(-1) {}
         int32_t id_ { -1 };
         SessionPtr sess_ { nullptr };
         std::shared_ptr<KeyOption> keyOption_ { nullptr };
