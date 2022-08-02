@@ -67,8 +67,7 @@ bool PermissionHelper::CheckHapPermission(uint32_t tokenId, uint32_t required)
         return false;
     }
     if (!((1 << findInfo.apl) & required)) {
-        MMI_HILOGE("Check hap permission failed, name:%{public}s, apl:%{public}d, required:%{public}d",
-            findInfo.bundleName.c_str(), findInfo.apl, required);
+        MMI_HILOGE("Check hap permission failed");
         return false;
     }
     MMI_HILOGI("Check hap permission success");
@@ -79,8 +78,7 @@ bool PermissionHelper::CheckNativePermission(uint32_t tokenId, uint32_t required
 {
     OHOS::Security::AccessToken::NativeTokenInfo findInfo;
     if (OHOS::Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, findInfo) != 0) {
-        MMI_HILOGE("GetNativeTokenInfo failed, name:%{public}s, apl:%{public}d, required:%{public}d",
-            findInfo.processName.c_str(), findInfo.apl, required);
+        MMI_HILOGE("GetNativeTokenInfo failed");
         return false;
     }
     if (!((1 << findInfo.apl) & required)) {
