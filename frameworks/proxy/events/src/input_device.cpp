@@ -19,8 +19,8 @@ namespace OHOS {
 namespace MMI {
 InputDevice::InputDevice(int32_t id, std::string name, int32_t deviceType, int32_t bus, int32_t version,
     int32_t product, int32_t vendor, std::string phys, std::string uniq, std::vector<AxisInfo> axis)
-    :id_(id), name_(name), type_(deviceType), bus_(bus), version_(version), product_(product),
-    vendor_(vendor), phys_(phys), uniq_(uniq), axis_(axis) {}
+    : id_(id), name_(name), type_(deviceType), bus_(bus), version_(version), product_(product),
+      vendor_(vendor), phys_(phys), uniq_(uniq), axis_(axis) {}
 
 void InputDevice::SetId(int32_t deviceId)
 {

@@ -17,8 +17,7 @@
 
 namespace OHOS {
 namespace MMI {
-VirtualTrackpadSysCtrl::VirtualTrackpadSysCtrl() : VirtualDevice("Virtual TrackpadSysCtrl",
-    BUS_USB, 0x62a, 0x8255)
+VirtualTrackpadSysCtrl::VirtualTrackpadSysCtrl() : VirtualDevice("Virtual TrackpadSysCtrl", BUS_USB, 0x62a, 0x8255)
 {
     eventTypes_ = { EV_KEY, EV_MSC };
     keys_ = { KEY_POWER, KEY_SLEEP, KEY_WAKEUP };

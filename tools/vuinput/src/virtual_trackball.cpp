@@ -17,8 +17,7 @@
 
 namespace OHOS {
 namespace MMI {
-VirtualTrackball::VirtualTrackball() : VirtualDevice("Virtual Trackball",
-    BUS_USB, 0x47d, 0x2041)
+VirtualTrackball::VirtualTrackball() : VirtualDevice("Virtual Trackball", BUS_USB, 0x47d, 0x2041)
 {
     eventTypes_ = { EV_KEY, EV_REL, EV_MSC };
     keys_ = { BTN_LEFT, BTN_RIGHT, BTN_MIDDLE, BTN_SIDE };

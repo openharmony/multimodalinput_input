@@ -17,8 +17,7 @@
 
 namespace OHOS {
 namespace MMI {
-VirtualKnob::VirtualKnob() : VirtualDevice("Virtual Knob",
-    BUS_USB, 0x5ac, 0x202)
+VirtualKnob::VirtualKnob() : VirtualDevice("Virtual Knob", BUS_USB, 0x5ac, 0x202)
 {
     eventTypes_ = { EV_KEY, EV_MSC, EV_LED, EV_REP };
     miscellaneous_ = { MSC_SCAN };

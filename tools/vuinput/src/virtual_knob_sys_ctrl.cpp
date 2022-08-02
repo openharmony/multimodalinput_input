@@ -17,8 +17,7 @@
 
 namespace OHOS {
 namespace MMI {
-VirtualKnobSysCtrl::VirtualKnobSysCtrl() : VirtualDevice("Virtual KnobSysCtrl",
-    BUS_USB, 0x5ac, 0x202)
+VirtualKnobSysCtrl::VirtualKnobSysCtrl() : VirtualDevice("Virtual KnobSysCtrl", BUS_USB, 0x5ac, 0x202)
 {
     eventTypes_ = { EV_KEY, EV_MSC };
     keys_ = { KEY_POWER, KEY_SLEEP, KEY_WAKEUP };

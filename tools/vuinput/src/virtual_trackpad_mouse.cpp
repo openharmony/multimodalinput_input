@@ -17,8 +17,7 @@
 
 namespace OHOS {
 namespace MMI {
-VirtualTrackpadMouse::VirtualTrackpadMouse() : VirtualDevice("Virtual TrackPadMouse",
-    BUS_USB, 0x62a, 0x8255)
+VirtualTrackpadMouse::VirtualTrackpadMouse() : VirtualDevice("Virtual TrackPadMouse", BUS_USB, 0x62a, 0x8255)
 {
     eventTypes_ = { EV_KEY, EV_REL, EV_MSC };
     keys_ = { BTN_LEFT, BTN_RIGHT, BTN_MIDDLE, BTN_SIDE, BTN_EXTRA };

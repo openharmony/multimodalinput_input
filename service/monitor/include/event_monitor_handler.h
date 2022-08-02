@@ -63,7 +63,7 @@ private:
     public:
         SessionHandler(InputHandlerType handlerType, HandleEventType eventType, SessionPtr session)
             : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
-              session_(session) { }
+              session_(session) {}
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
         bool operator<(const SessionHandler& other) const
