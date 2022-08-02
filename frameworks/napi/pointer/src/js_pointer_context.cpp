@@ -69,9 +69,7 @@ napi_value JsPointerContext::CreateJsObject(napi_env env, napi_callback_info inf
     }, nullptr, nullptr);
     if (status != napi_ok) {
         delete jsContext;
-        MMI_HILOGE("%{public}s failed", std::string(WRAP).c_str());
-        auto infoTemp = std::string(__FUNCTION__)+ ": " + std::string(WRAP) + " failed";
-        napi_throw_error(env, nullptr, infoTemp.c_str());
+        THROWERR(env, "Failed to wrap native instance");
         return nullptr;
     }
     return thisVar;
