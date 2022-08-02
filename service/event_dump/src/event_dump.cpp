@@ -40,6 +40,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
+constexpr int32_t MAX_COMMAND_COUNT = 32;
 } // namespace
 
 void ChkConfig(int32_t fd)
@@ -66,19 +67,10 @@ void ChkConfig(int32_t fd)
 void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    int32_t optionIndex = 0;
-    struct option dumpOptions[] = {
-        {"help", no_argument, 0, 'h'},
-        {"device", no_argument, 0, 'd'},
-        {"devicelist", no_argument, 0, 'l'},
-        {"windows", no_argument, 0, 'w'},
-        {"udsserver", no_argument, 0, 'u'},
-        {"subscriber", no_argument, 0, 's'},
-        {"monitor", no_argument, 0, 'o'},
-        {"interceptor", no_argument, 0, 'i'},
-        {"mouse", no_argument, 0, 'm'},
-        {NULL, 0, 0, 0}
-    };
+    if (args.size() > MAX_COMMAND_COUNT) {
+        MMI_HILOGE("More than 32 commands");
+        return;
+    }
     char **argv = new (std::nothrow) char *[args.size()];
     CHKPV(argv);
     if (memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*)) != EOK) {
@@ -99,6 +91,19 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     optind = 1;
     int32_t c;
+    int32_t optionIndex = 0;
+    struct option dumpOptions[] = {
+        {"help", no_argument, 0, 'h'},
+        {"device", no_argument, 0, 'd'},
+        {"devicelist", no_argument, 0, 'l'},
+        {"windows", no_argument, 0, 'w'},
+        {"udsserver", no_argument, 0, 'u'},
+        {"subscriber", no_argument, 0, 's'},
+        {"monitor", no_argument, 0, 'o'},
+        {"interceptor", no_argument, 0, 'i'},
+        {"mouse", no_argument, 0, 'm'},
+        {NULL, 0, 0, 0}
+    };
     while ((c = getopt_long (args.size(), argv, "hdlwusoim", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
