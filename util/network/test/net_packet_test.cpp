@@ -253,7 +253,7 @@ HWTEST_F(NetPacketTest, ReadError, TestSize.Level1)
     NetPacket pkt(MmiMessageId::REGISTER_APP_INFO);
     pkt << p1 << p2;
     EXPECT_FALSE(pkt.ChkRWError());
-    
+
     int32_t r1 = 0;
     std::string r2;
     pkt >> r1 >> r2;
