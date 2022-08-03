@@ -20,7 +20,7 @@ config("libmmi_virtual_device_config") {
 
   include_dirs = [
     "include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//util/common/include",
   ]
 
@@ -42,7 +42,7 @@ config("libmmi_virtual_device_config") {
 config("virtual_device_public_config") {
   include_dirs = [
     "include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
   ]
 }
 
@@ -92,9 +92,8 @@ ohos_source_set("libmmi-virtual-device") {
     defines += [ "OHOS_BUILD_HDF" ]
   }
 
-  deps = [ "//utils/native/base:utils" ]
-
   part_name = "input"
+  external_deps = [ "c_utils:utils" ]
 }
 
 ohos_executable("vuinput") {
@@ -132,7 +131,7 @@ ohos_unittest("ut-virtual-device-out") {
   module_out_path = module_output_path
   include_dirs = [
     "${mmi_path}/tools/vuinput/include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "${mmi_path}/util/common",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network",
@@ -174,7 +173,7 @@ ohos_unittest("ut-virtual-device-out") {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
-    "utils_base:utils",
   ]
 }
