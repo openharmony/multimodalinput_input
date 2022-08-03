@@ -31,7 +31,11 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MouseEventHandler"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MouseEventHandler" };
+const std::array<int32_t, 6> SPEED_NUMS { 5, 16, 23, 32, 41, 128 };
+const std::array<double, 6> SPEED_GAINS { 0.6, 1.0, 1.2, 1.8, 2.1, 2.8 };
+const std::array<double, 6> SPEED_DIFF_NUMS { 0.0, -2.0, -5.0, -19.0, -28.6, -57.3 };
+constexpr double DOUBLE_ZERO = 1e-6;
 constexpr int32_t MIN_SPEED = 1;
 constexpr int32_t MAX_SPEED = 20;
 } // namespace
@@ -44,6 +48,23 @@ MouseEventHandler::MouseEventHandler()
 std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
 {
     return pointerEvent_;
+}
+
+bool MouseEventHandler::GetSpeedGain(const double& vin, double& gain) const
+{
+    if (abs(vin) < DOUBLE_ZERO) {
+        MMI_HILOGE("The value of the parameter passed in is 0");
+        return false;
+    }
+    int32_t num = static_cast<int32_t>(ceil(abs(vin)));
+    for (size_t i = 0; i < SPEED_NUMS.size(); ++i) {
+        if (num <= SPEED_NUMS[i]) {
+            gain = (SPEED_GAINS[i] * vin + SPEED_DIFF_NUMS[i]) / vin;
+            return true;
+        }
+    }
+    gain = (SPEED_GAINS.back() * vin + SPEED_DIFF_NUMS.back()) / vin;
+    return true;
 }
 
 int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
@@ -62,11 +83,37 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
         return RET_ERR;
     }
 
-    absolutionX_ += libinput_event_pointer_get_dx(data);
-    absolutionY_ += libinput_event_pointer_get_dy(data);
+    int32_t ret = HandleMotionCorrection(data);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to handle motion correction");
+        return ret;
+    }
+
     WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
     pointerEvent_->SetTargetDisplayId(currentDisplayId_);
-    MMI_HILOGD("Change Coordinate : x:%{public}lf,y:%{public}lf",  absolutionX_, absolutionY_);
+    MMI_HILOGD("Change Coordinate : x:%{public}lf,y:%{public}lf", absolutionX_, absolutionY_);
+    return RET_OK;
+}
+
+int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(data, ERROR_NULL_POINTER);
+    double dx = libinput_event_pointer_get_dx(data);
+    double dy = libinput_event_pointer_get_dy(data);
+    double vin = (fmax(abs(dx), abs(dy)) + fmin(abs(dx), abs(dy))) / 2.0;
+    double gain { 0.0 };
+    if (!GetSpeedGain(vin, gain)) {
+        MMI_HILOGE("Get speed gain failed");
+        return RET_ERR;
+    }
+    double correctionX = dx * gain * static_cast<double>(speed_) / 10.0;
+    double correctionY = dy * gain * static_cast<double>(speed_) / 10.0;
+    MMI_HILOGD("Get and process the movement coordinates, dx:%{public}lf, dy:%{public}lf,"
+               "correctionX:%{public}lf, correctionY:%{public}lf, gain:%{public}lf",
+               dx, dy, correctionX, correctionY, gain);
+    absolutionX_ += correctionX;
+    absolutionY_ += correctionY;
     return RET_OK;
 }
 
