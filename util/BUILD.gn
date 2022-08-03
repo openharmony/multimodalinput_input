@@ -62,8 +62,8 @@ ohos_shared_library("libmmi-util") {
 
   public_deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//commonlibrary/c_utils/base:utils",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
-    "//utils/native/base:utils",
   ]
 
   part_name = "input"
@@ -72,9 +72,9 @@ ohos_shared_library("libmmi-util") {
 ohos_unittest("ut-mmi-util-out") {
   module_out_path = module_output_path
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//third_party/googletest/googletest/include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "${mmi_path}/frameworks/proxy/event_handler",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader",
@@ -133,9 +133,9 @@ ohos_unittest("ut-mmi-util-out") {
 ohos_unittest("RunShellUtilTest") {
   module_out_path = module_output_path
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//third_party/googletest/googletest/include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "${mmi_path}/frameworks/proxy/event_handler",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader",
