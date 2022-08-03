@@ -623,6 +623,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+
     if (InputDevMgr->HasPointerDevice()) {
         UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
     }
