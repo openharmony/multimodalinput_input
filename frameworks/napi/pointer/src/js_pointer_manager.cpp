@@ -195,7 +195,7 @@ napi_value JsPointerManager::GetPointerSpeed(napi_env env, napi_value handle)
         THROWERR(env, "Create AsyncContext failed");
         return nullptr;
     }
-    int32_t pointerSpeed= InputManager::GetInstance()->GetPointerSpeed();
+    int32_t pointerSpeed = InputManager::GetInstance()->GetPointerSpeed();
     if (pointerSpeed != RET_ERR) {
         asyncContext->errorCode = ERR_OK;
         asyncContext->reserve << ReturnType::NUMBER << pointerSpeed;
