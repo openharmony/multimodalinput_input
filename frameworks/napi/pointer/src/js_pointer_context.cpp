@@ -19,6 +19,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsPointerContext" };
+constexpr int32_t STANDARD_SPEED = 5;
+constexpr int32_t MAX_SPEED = 10;
+constexpr int32_t MIN_SPEED = 1;
 } // namespace
 
 JsPointerContext::JsPointerContext() : mgr_(std::make_shared<JsPointerManager>()) {}
@@ -162,6 +165,62 @@ napi_value JsPointerContext::IsPointerVisible(napi_env env, napi_callback_info i
     return jsPointerMgr->IsPointerVisible(env, argv[0]);
 }
 
+napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 1 || argc > 2) {
+        THROWERR(env, "The number of parameters is not as expected");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        THROWERR(env, "The first parameter type is wrong");
+        return nullptr;
+    }
+    int32_t pointerSpeed = STANDARD_SPEED;
+    CHKRP(env, napi_get_value_int32(env, argv[0], &pointerSpeed), GET_INT32);
+    if (pointerSpeed < MIN_SPEED) {
+        pointerSpeed = MIN_SPEED;
+    } else if (pointerSpeed > MAX_SPEED) {
+        pointerSpeed = MAX_SPEED;
+    }
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (argc == 1) {
+        return jsPointerMgr->SetPointerSpeed(env, pointerSpeed);
+    }
+    if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
+        THROWERR(env, "The second parameter type is wrong");
+        return nullptr;
+    }
+    return jsPointerMgr->SetPointerSpeed(env, pointerSpeed, argv[1]);
+}
+
+napi_value JsPointerContext::GetPointerSpeed(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc > 1) {
+        THROWERR(env, "The number of parameters is not as expected");
+        return nullptr;
+    }
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (argc == 0) {
+        return jsPointerMgr->GetPointerSpeed(env);
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
+        THROWERR(env, "The first parameter type is wrong");
+        return nullptr;
+    }
+
+    return jsPointerMgr->GetPointerSpeed(env, argv[0]);
+}
+
 napi_value JsPointerContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -173,6 +232,8 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_FUNCTION("setPointerVisible", SetPointerVisible),
         DECLARE_NAPI_STATIC_FUNCTION("isPointerVisible", IsPointerVisible),
+        DECLARE_NAPI_STATIC_FUNCTION("setPointerSpeed", SetPointerSpeed),
+        DECLARE_NAPI_STATIC_FUNCTION("getPointerSpeed", GetPointerSpeed),
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     return exports;
