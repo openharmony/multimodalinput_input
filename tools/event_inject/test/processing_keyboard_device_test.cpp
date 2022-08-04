@@ -41,15 +41,9 @@ public:
  */
 HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputData, TestSize.Level1)
 {
-#ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformKeyBoardJsonDataToInputData.json";
     std::string startDeviceCmd = "vuinput start keyboard & ";
     std::string closeDeviceCmd = "vuinput close all";
-#else
-    const std::string path = "temp/Test_TransformKeyBoardJsonDataToInputData.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start keyboard &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
-#endif
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -79,15 +73,9 @@ HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputData
  */
 HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
-#ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformKeyBoardJsonDataToInputDataEventsIsEmpty.json";
     std::string startDeviceCmd = "vuinput start keyboard & ";
     std::string closeDeviceCmd = "vuinput close all";
-#else
-    const std::string path = "temp/Test_TransformKeyBoardJsonDataToInputDataEventsIsEmpty.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start keyboard &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
-#endif
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";

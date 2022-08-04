@@ -46,9 +46,6 @@ constexpr int32_t MAX_COMMAND_COUNT = 32;
 void ChkConfig(int32_t fd)
 {
     mprintf(fd, "ChkMMIConfig: ");
-#ifdef OHOS_BUILD
-    mprintf(fd, "OHOS_BUILD");
-#endif
 #ifdef OHOS_BUILD_LIBINPUT
     mprintf(fd, "OHOS_BUILD_LIBINPUT");
 #endif
