@@ -64,7 +64,7 @@ config("libmmi_server_config") {
     ]
   }
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -302,7 +302,7 @@ ohos_unittest("ut-mmi-service-out") {
     "window_manager/test/input_windows_manager_test.cpp",
   ]
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -363,7 +363,7 @@ ohos_unittest("TransformPointTest") {
 
   sources = [ "touch_transform_point/test/transform_point_test.cpp" ]
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]

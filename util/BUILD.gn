@@ -25,7 +25,7 @@ config("libmmi_util_public_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
   ]
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -98,7 +98,7 @@ ohos_unittest("ut-mmi-util-out") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -160,7 +160,7 @@ ohos_unittest("RunShellUtilTest") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]

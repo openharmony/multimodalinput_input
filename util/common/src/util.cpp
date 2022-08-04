@@ -30,9 +30,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#ifndef OHOS_BUILD
-#include <execinfo.h>
-#endif // OHOS_BUILD
 #include "config_multimodal.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
@@ -352,29 +349,6 @@ char* MmiBasename(char* path)
     }
 
     return pBasename;
-}
-
-std::string GetStackInfo()
-{
-#ifndef OHOS_BUILD
-    static constexpr size_t bufferSize = 1024;
-    void* buffer[bufferSize];
-    const int32_t nptrs = backtrace(buffer, bufferSize);
-    char** strings = backtrace_symbols(buffer, nptrs);
-    if (strings == nullptr) {
-        perror("backtrace_symbols");
-        return std::string();
-    }
-
-    std::ostringstream oss;
-    for (int32_t i = 1; i < nptrs; i++) {
-        oss << strings[i] << std::endl;
-    }
-    free(strings);
-    return std::string(oss.str());
-#else
-    return std::string();
-#endif
 }
 
 void SetThreadName(const std::string& name)

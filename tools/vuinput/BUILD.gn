@@ -24,7 +24,7 @@ config("libmmi_virtual_device_config") {
     "//util/common/include",
   ]
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -78,7 +78,7 @@ ohos_source_set("libmmi-virtual-device") {
 
   configs = [ ":libmmi_virtual_device_config" ]
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -108,7 +108,7 @@ ohos_executable("vuinput") {
   if (input_feature_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -148,7 +148,7 @@ ohos_unittest("ut-virtual-device-out") {
 
   configs = [ ":virtual_device_public_config" ]
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]

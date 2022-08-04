@@ -22,7 +22,7 @@ config("keyEvent_config") {
     "//foundation/multimodalinput/input/util/network/include",
   ]
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
   if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
