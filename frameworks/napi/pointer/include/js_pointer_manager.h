@@ -57,6 +57,7 @@ const std::string CALL_FUNCTION = "napi_call_function";
 const std::string CREATE_BOOL = "napi_get_boolean";
 const std::string CREATE_INT32 = "napi_create_int32";
 const std::string CREATE_OBJECT = "napi_create_object";
+const std::string GET_INT32 = "napi_get_int32";
 } // namespace
 
 class JsCommon {
@@ -84,6 +85,8 @@ public:
     void ResetEnv();
     napi_value SetPointerVisible(napi_env env, bool visible, napi_value handle = nullptr);
     napi_value IsPointerVisible(napi_env env, napi_value handle = nullptr);
+    napi_value SetPointerSpeed(napi_env env, int32_t pointerSpeed, napi_value handle = nullptr);
+    napi_value GetPointerSpeed(napi_env env, napi_value handle = nullptr);
 };
 } // namespace MMI
 } // namespace OHOS
