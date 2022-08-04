@@ -114,8 +114,10 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
         napi_value eventType = nullptr;
         CHKRV(item->env, napi_create_string_utf8(item->env, REMOVE_EVENT.c_str(), NAPI_AUTO_LENGTH, &eventType),
              CREATE_STRING_UTF8);
+
         napi_value deviceId = nullptr;
         CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &deviceId), CREATE_INT32);
+        
         napi_value object = nullptr;
         CHKRV(item->env, napi_create_object(item->env, &object), CREATE_OBJECT);
         CHKRV(item->env, napi_set_named_property(item->env, object, "type", eventType), SET_NAMED_PROPERTY);
@@ -123,6 +125,7 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
 
         napi_value handler = nullptr;
         CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE);
+
         napi_value ret = nullptr;
         CHKRV(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION);
     }
@@ -165,7 +168,6 @@ void JsEventTarget::OnDeviceRemoved(int32_t deviceId, const std::string &type)
         MMI_HILOGE("Find %{public}s failed", CHANGED_TYPE.c_str());
         return;
     }
-
     for (auto & item : changeEvent->second) {
         CHKPC(item);
         CHKPC(item->env);
