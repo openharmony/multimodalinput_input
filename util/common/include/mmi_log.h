@@ -135,25 +135,26 @@ template<class Event>
 static void PrintEventData(std::shared_ptr<Event> event, int32_t actionType, int32_t itemNum)
 {
     constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MMILOG"};
-
-    static int64_t nowTimeUSec = 0;
-    static int32_t dropped = 0;
-    if (event->GetAction() == EVENT_TYPE_POINTER) {
-        if ((actionType == POINTER_ACTION_MOVE) && (event->GetActionTime() - nowTimeUSec <= TIMEOUT)) {
-            ++dropped;
-            return;
+    if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+        static int64_t nowTimeUSec = 0;
+        static int32_t dropped = 0;
+        if (event->GetAction() == EVENT_TYPE_POINTER) {
+            if ((actionType == POINTER_ACTION_MOVE) && (event->GetActionTime() - nowTimeUSec <= TIMEOUT)) {
+                ++dropped;
+                return;
+            }
+            if (actionType == POINTER_ACTION_UP && itemNum == FINAL_FINGER) {
+                MMI_HILOGD("This touch process discards %{public}d high frequent events", dropped);
+                dropped = 0;
+            }
+            nowTimeUSec = event->GetActionTime();
         }
-        if (actionType == POINTER_ACTION_UP && itemNum == FINAL_FINGER) {
-            MMI_HILOGD("This touch process discards %{public}d high frequent events", dropped);
-            dropped = 0;
+        std::stringstream sStream;
+        sStream << *event;
+        std::string sLine;
+        while (std::getline(sStream, sLine)) {
+            MMI_HILOGD("%{public}s", sLine.c_str());
         }
-        nowTimeUSec = event->GetActionTime();
-    }
-    std::stringstream sStream;
-    sStream << *event;
-    std::string sLine;
-    while (std::getline(sStream, sLine)) {
-        MMI_HILOGD("%{public}s", sLine.c_str());
     }
 }
 
@@ -161,12 +162,13 @@ template<class Event>
 static void PrintEventData(std::shared_ptr<Event> event)
 {
     constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MMILOG"};
-
-    std::stringstream sStream;
-    sStream << *event;
-    std::string sLine;
-    while (std::getline(sStream, sLine)) {
-        MMI_HILOGD("%{public}s", sLine.c_str());
+    if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+        std::stringstream sStream;
+        sStream << *event;
+        std::string sLine;
+        while (std::getline(sStream, sLine)) {
+            MMI_HILOGD("%{public}s", sLine.c_str());
+        }
     }
 }
 } // namespace MMI
