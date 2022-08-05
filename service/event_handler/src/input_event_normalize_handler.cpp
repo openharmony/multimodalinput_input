@@ -120,7 +120,7 @@ int32_t InputEventNormalizeHandler::OnEventDeviceRemoved(libinput_event *event)
     return RET_OK;
 }
 
-void InputEventNormalizeHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+void InputEventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Keyboard device does not support");
@@ -133,7 +133,7 @@ void InputEventNormalizeHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEve
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
-void InputEventNormalizeHandler::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void InputEventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Pointer device does not support");
@@ -165,7 +165,7 @@ void InputEventNormalizeHandler::HandlePointerEvent(std::shared_ptr<PointerEvent
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-void InputEventNormalizeHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void InputEventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Touchscreen device does not support");

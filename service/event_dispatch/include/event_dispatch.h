@@ -31,13 +31,13 @@ public:
     DISALLOW_COPY_AND_MOVE(EventDispatch);
     virtual ~EventDispatch();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+    void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    void HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+    void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+    void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key);
