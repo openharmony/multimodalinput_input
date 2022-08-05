@@ -33,7 +33,7 @@ constexpr int32_t ANR_MONITOR = 1;
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void EventMonitorHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+void EventMonitorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
     OnHandleEvent(keyEvent);
@@ -43,7 +43,7 @@ void EventMonitorHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-void EventMonitorHandler::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void EventMonitorHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     if (OnHandleEvent(pointerEvent)) {
@@ -57,7 +57,7 @@ void EventMonitorHandler::HandlePointerEvent(std::shared_ptr<PointerEvent> point
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-void EventMonitorHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void EventMonitorHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     if (OnHandleEvent(pointerEvent)) {
