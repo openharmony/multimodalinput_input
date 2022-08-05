@@ -28,9 +28,9 @@ public:
     InputEventNormalizeHandler() = default;
     ~InputEventNormalizeHandler() = default;
     void HandleEvent(libinput_event* event) override;
-    void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
-    void HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
-    void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+    void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
+    void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
+    void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     int32_t AddHandleTimer(int32_t timeout = 300);
 
 private:
