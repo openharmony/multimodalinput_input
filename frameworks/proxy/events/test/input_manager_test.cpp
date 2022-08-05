@@ -1370,11 +1370,11 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
 
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
         ids[i] = InputManager::GetInstance()->AddInterceptor(interceptor);
-    #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
-    #else
+#else
         EXPECT_EQ(ids[i], ERROR_UNSUPPORT);
-    #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
@@ -1383,11 +1383,11 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
     for (const auto& id : ids) {
         std::string sPointerEs = InputManagerTest::GetEventDump();
         MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
-    #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
         ASSERT_TRUE(!sPointerEs.empty());
-    #else
+#else
         ASSERT_TRUE(sPointerEs.empty());
-    #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
         if (IsValidHandlerId(id)) {
             InputManager::GetInstance()->RemoveInterceptor(id);
         }
@@ -1760,11 +1760,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_002, TestSize.Lev
         cbs[i] = GetPtr<InputEventCallback>();
         ASSERT_TRUE(cbs[i] != nullptr);
         ids[i] = TestAddMonitor(cbs[i]);
-    #ifdef OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_MONITOR
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
-    #else
+#else
         EXPECT_EQ(ids[i], ERROR_UNSUPPORT);
-    #endif // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
@@ -1774,11 +1774,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_002, TestSize.Lev
     for (const auto& id : ids) {
         std::string sPointerEs = InputManagerTest::GetEventDump();
         MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
-    #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
         ASSERT_TRUE(!sPointerEs.empty());
-    #else
+#else
         ASSERT_TRUE(sPointerEs.empty());
-    #endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
         if (IsValidHandlerId(id)) {
             TestRemoveMonitor(id);
         }
@@ -2042,11 +2042,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
     ASSERT_TRUE(callBackPtr != nullptr);
     for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
         ids[i] = TestAddMonitor(callBackPtr);
-    #ifdef OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_MONITOR
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
-    #else
+#else
         EXPECT_EQ(ids[i], ERROR_UNSUPPORT);
-    #endif // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
@@ -2055,11 +2055,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
     for (const auto& id : ids) {
         std::string sPointerEs = InputManagerTest::GetEventDump();
         MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
-    #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_MONITOR)
         ASSERT_TRUE(!sPointerEs.empty());
-    #else
+#else
         ASSERT_TRUE(sPointerEs.empty());
-    #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
         if (IsValidHandlerId(id)) {
             TestRemoveMonitor(id);
         }
@@ -2472,11 +2472,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_001, TestSize.L
     for (const auto& id : ids) {
         std::string sPointerEs = InputManagerTest::GetEventDump();
         MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
-    #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
         ASSERT_TRUE(!sPointerEs.empty());
-    #else
+#else
         ASSERT_TRUE(sPointerEs.empty());
-    #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_MONITOR
         if (IsValidHandlerId(id)) {
             TestRemoveMonitor(id);
         }
