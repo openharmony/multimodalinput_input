@@ -46,9 +46,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     lastPhysicalX_ = physicalX;
     lastPhysicalY_ = physicalY;
     if (pointerWindow_ != nullptr) {
-        if (IsPointerVisible()) {
-            pointerWindow_->MoveTo(physicalX, physicalY);
-        }
+        pointerWindow_->MoveTo(physicalX, physicalY);
         MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
             displayId, physicalX, physicalY);
         return;
