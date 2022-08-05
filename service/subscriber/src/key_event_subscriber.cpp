@@ -33,7 +33,7 @@ constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void KeyEventSubscriber::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+void KeyEventSubscriber::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
     if (SubscribeKeyEvent(keyEvent)) {
@@ -47,7 +47,7 @@ void KeyEventSubscriber::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-void KeyEventSubscriber::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void KeyEventSubscriber::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
@@ -56,7 +56,7 @@ void KeyEventSubscriber::HandlePointerEvent(std::shared_ptr<PointerEvent> pointe
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-void KeyEventSubscriber::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void KeyEventSubscriber::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);

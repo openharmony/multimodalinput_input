@@ -268,7 +268,7 @@ bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void KeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+void KeyCommandManager::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
     if (OnHandleEvent(keyEvent)) {
@@ -282,7 +282,7 @@ void KeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-void KeyCommandManager::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void KeyCommandManager::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
@@ -291,7 +291,7 @@ void KeyCommandManager::HandlePointerEvent(std::shared_ptr<PointerEvent> pointer
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-void KeyCommandManager::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void KeyCommandManager::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);

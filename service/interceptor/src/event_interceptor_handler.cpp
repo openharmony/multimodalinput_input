@@ -32,7 +32,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Event
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void EventInterceptorHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
     if (OnHandleEvent(keyEvent)) {
@@ -47,7 +47,7 @@ void EventInterceptorHandler::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-void EventInterceptorHandler::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void EventInterceptorHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     if (OnHandleEvent(pointerEvent)) {
@@ -61,7 +61,7 @@ void EventInterceptorHandler::HandlePointerEvent(std::shared_ptr<PointerEvent> p
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-void EventInterceptorHandler::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void EventInterceptorHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     if (OnHandleEvent(pointerEvent)) {
