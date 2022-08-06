@@ -234,7 +234,7 @@ ohos_shared_library("libmmi-server") {
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 
   if (input_feature_pointer_drawing) {
