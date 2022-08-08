@@ -882,53 +882,8 @@ bool PointerEvent::IsValid() const
 
 std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
 {
-    const int precision = 2;
-    std::vector<int32_t> pointerIds { pointerEvent.GetPointerIds() };
-    ostream << "EventType:" << InputEvent::EventTypeToString(pointerEvent.GetEventType())
-         << ",ActionTime:" << pointerEvent.GetActionTime()
-         << ",Action:" << pointerEvent.GetAction()
-         << ",ActionStartTime:" << pointerEvent.GetActionStartTime()
-         << ",Flag:" << pointerEvent.GetFlag()
-         << ",PointerAction:" << pointerEvent.DumpPointerAction()
-         << ",SourceType:" << pointerEvent.DumpSourceType()
-         << ",ButtonId:" << pointerEvent.GetButtonId()
-         << ",VerticalAxisValue:" << std::fixed << std::setprecision(precision)
-         << pointerEvent.GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
-         << ",HorizontalAxisValue:" << std::fixed << std::setprecision(precision)
-         << pointerEvent.GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)
-         << ",PinchAxisValue:" << std::fixed << std::setprecision(precision)
-         << pointerEvent.GetAxisValue(PointerEvent::AXIS_TYPE_PINCH)
-         << ",PointerCount:" << pointerIds.size()
-         << ",EventNumber:" << pointerEvent.GetId() << std::endl;
-
-    for (const auto& pointerId : pointerIds) {
-        PointerEvent::PointerItem item;
-        if (!pointerEvent.GetPointerItem(pointerId, item)) {
-            MMI_HILOGE("Invalid pointer: %{public}d.", pointerId);
-            return ostream;
-        }
-        ostream << "DownTime:" << item.GetDownTime()
-            << ",IsPressed:" << std::boolalpha << item.IsPressed()
-            << ",DisplayX:" << item.GetDisplayX() << ",DisplayY:" << item.GetDisplayY()
-            << ",WindowX:" << item.GetWindowX() << ",WindowY:" << item.GetWindowY()
-            << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
-            << ",TiltX:" << item.GetTiltX() << ",TiltY:" << item.GetTiltY()
-            << ",ToolDisplayX:" << item.GetToolDisplayX() << ",ToolDisplayY:" << item.GetToolDisplayY()
-            << ",ToolWindowX:" << item.GetToolWindowX() << ",ToolWindowY:" << item.GetToolWindowY()
-            << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
-            << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
-            << ",LongAxis:" << item.GetLongAxis() << ",ShortAxis:" << item.GetShortAxis()
-            << std::endl;
-    }
-    std::vector<int32_t> pressedKeys = pointerEvent.GetPressedKeys();
-    std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
-    if (cItr != pressedKeys.cend()) {
-        ostream << "Pressed keyCode: [" << *cItr++;
-        for (; cItr != pressedKeys.cend(); ++cItr) {
-            ostream << "," << *cItr;
-        }
-        ostream << "]" << std::endl;
-    }
+    ostream << "PointerAction:" << pointerEvent.DumpPointerAction()
+        << ",ButtonId:" << pointerEvent.GetButtonId() << std::endl;
     return ostream;
 }
 } // namespace MMI
