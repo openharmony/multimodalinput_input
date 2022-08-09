@@ -18,6 +18,7 @@
 
 #include "ability_manager_client.h"
 #include "cJSON.h"
+#include "config_policy_utils.h"
 #include "file_ex.h"
 #include "bytrace_adapter.h"
 #include "error_multimodal.h"
