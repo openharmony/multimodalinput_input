@@ -313,9 +313,17 @@ std::string KeyCommandManager::GenerateKey(const ShortcutKey& key)
 
 bool KeyCommandManager::ParseConfig()
 {
-    std::string vendorConfig = "/vendor/etc/ability_launch_config.json";
+    const char *testPathSuffix = "/etc/multimodalinput/ability_launch_config.json";
+    char buf[MAX_PATH_LEN] = { 0 };
+    char *filePath = GetOneCfgFile(testPathSuffix, buf, MAX_PATH_LEN);
     std::string defaultConfig = "/system/etc/multimodalinput/ability_launch_config.json";
-    return ParseJson(vendorConfig) || ParseJson(defaultConfig);
+    if (!filePath || strlen(filePath) == 0 || strlen(filePath) > MAX_PATH_LEN) {
+        MMI_HILOGD("can not get customization config file");
+        return ParseJson(defaultConfig);
+    }
+    std::string customConfig = filePath;
+    MMI_HILOGD("The configuration file path is :%{public}s", customConfig.c_str());
+    return ParseJson(customConfig) || ParseJson(defaultConfig);
 }
 
 bool KeyCommandManager::ParseJson(const std::string configFile)
