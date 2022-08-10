@@ -87,6 +87,7 @@ public:
     napi_value IsPointerVisible(napi_env env, napi_value handle = nullptr);
     napi_value SetPointerSpeed(napi_env env, int32_t pointerSpeed, napi_value handle = nullptr);
     napi_value GetPointerSpeed(napi_env env, napi_value handle = nullptr);
+    napi_value SetPointerLocation(napi_env env, napi_value handle, int32_t x, int32_t y);
 };
 } // namespace MMI
 } // namespace OHOS
