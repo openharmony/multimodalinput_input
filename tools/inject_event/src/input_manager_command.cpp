@@ -77,18 +77,18 @@ int32_t InputManagerCommand::NextPos(int64_t begTimeMs, int64_t curtTimeMs, int3
     double tmpTimeMs = static_cast<double>(curtTimeMs - begTimeMs) / totalTimeMs;
     int32_t offsetPos = std::ceil(tmpTimeMs * (endPos - begPos));
     int32_t retPos = 0;
-    if (offsetPos > 0) {
-        if (!AddInt32(offsetPos, begPos, retPos)) {
+    if (offsetPos == 0) {
+        return begPos;
+    } else if (offsetPos > 0) {
+        if (!AddInt32(begPos, offsetPos, retPos)) {
             return begPos;
         }
         return retPos > endPos ? endPos : retPos;
-    } else {
-        if (!AddInt32(offsetPos, begPos, retPos)) {
-            return begPos;
-        }
-        return retPos < endPos ? endPos : retPos;
     }
-    return begPos;
+    if (!AddInt32(begPos, offsetPos, retPos)) {
+        return begPos;
+    }
+    return retPos < endPos ? endPos : retPos;
 }
 
 int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
