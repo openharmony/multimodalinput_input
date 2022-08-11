@@ -205,45 +205,45 @@ public:
 
     /**
      * @brief Starts listening for an input device event.
-     * @param type Type of the input device event, which is **change**.
-     * @param listener Listener for the input device event.
-     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @param type Indicates the type of the input device event, which is <b>change</b>.
+     * @param listener Indicates the listener for the input device event.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener);
 
     /**
      * @brief Stops listening for an input device event.
-     * @param type Type of the input device event, which is **change**.
-     * @param listener Listener for the input device event.
-     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @param type Indicates the type of the input device event, which is <b>change</b>.
+     * @param listener Indicates the listener for the input device event.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t UnregisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener = nullptr);
 
     /**
-     * @brief Obtain the information about an input device.
-     * @param callback Callback function, receive reported data.
-     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @brief Obtains the information about an input device.
+     * @param callback Indicates the callback used to receive the reported data.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t GetDeviceIds(std::function<void(std::vector<int32_t>&)> callback);
 
     /**
-     * @brief Obtain the information about an input device.
-     * @param deviceId ID of the input device whose information is to be obtained.
-     * @param callback Callback function, receive reported data.
-     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @brief Obtains the information about an input device.
+     * @param deviceId Indicates the ID of the input device whose information is to be obtained.
+     * @param callback Indicates the callback used to receive the reported data.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t GetDevice(int32_t deviceId, std::function<void(std::shared_ptr<InputDevice>)> callback);
 
     /**
      * @brief Checks whether the specified key codes of an input device are supported.
-     * @param deviceId ID of the input device.
-     * @param keyCodes Key codes of the input device.
+     * @param deviceId Indicates the ID of the input device.
+     * @param keyCodes Indicates the key codes of the input device.
      * @param callback Callback function, receive reported data.
-     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
@@ -253,7 +253,7 @@ public:
      * @brief Sets whether the pointer icon is visible.
      * @param visible Whether the pointer icon is visible. The value <b>true</b> indicates that
      * the pointer icon is visible, and the value <b>false</b> indicates the opposite.
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t SetPointerVisible(bool visible);
@@ -266,16 +266,16 @@ public:
     bool IsPointerVisible();
 
     /**
-     * @brief 设置鼠标移动速度(取值范围1到20)。
-     * @param speed 客户端设置的鼠标移动速度.
-     * @return 鼠标移动速度设置成功返回RET_OK；设置失败返回RET_ERR。
+     * @brief Sets the mouse pointer speed, which ranges from 1 to 20.
+     * @param speed Indicates the mouse pointer speed to set.
+     * @return Returns <b>RET_OK</b> if success; returns <b>RET_ERR</b> otherwise.
      * @since 9
      */
     int32_t SetPointerSpeed(int32_t speed);
 
     /**
-     * @brief 获取鼠标移动速度。
-     * @return 获取成功返回鼠标移动速度；获取失败返回RET_ERR。
+     * @brief Obtains the mouse pointer speed.
+     * @return Returns the mouse pointer speed if the operation is successful; returns <b>RET_ERR</b> otherwise.
      * @since 9
      */
     int32_t GetPointerSpeed();
@@ -284,14 +284,14 @@ public:
      * @brief Queries the keyboard type.
      * @param deviceId Indicates the keyboard device ID.
      * @param callback Callback used to return the keyboard type.
-     * @return Returns **0** if success; returns a non-0 value otherwise.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
 
     /**
      * @brief Sets the observer for events indicating that the application does not respond.
-     * @param observer Observer for events indicating that the application does not respond.
+     * @param observer Indicates the observer for events indicating that the application does not respond.
      * @return void
      * @since 9
      */
