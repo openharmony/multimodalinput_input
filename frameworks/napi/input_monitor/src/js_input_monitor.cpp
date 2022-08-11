@@ -675,6 +675,12 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
             MMI_HILOGE("js monitor stop handle callback");
             break;
         }
+        napi_handle_scope scope = nullptr;
+        napi_open_handle_scope(jsEnv_, &scope);
+        if (scope == nullptr) {
+            MMI_HILOGE("scope is nullptr");
+            return;
+        }
         auto pointerEvent = evQueue_.front();
         CHKPC(pointerEvent);
         evQueue_.pop();
@@ -714,6 +720,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
                 MarkConsumed(eventId);
             }
         }
+        napi_close_handle_scope(jsEnv_, scope);
     }
     --jsTaskNum_;
 }
