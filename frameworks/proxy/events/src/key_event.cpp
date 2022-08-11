@@ -560,10 +560,11 @@ void KeyEvent::AddPressedKeyItems(const KeyItem& keyItem)
 
 void KeyEvent::RemoveReleasedKeyItems(const KeyItem& keyItem)
 {
+    int32_t keyCode = keyItem.GetKeyCode();
     std::vector<KeyItem> tempKeyItems = keys_;
     keys_.clear();
     for (const auto &item : tempKeyItems) {
-        if (item.GetKeyCode() != keyItem.GetKeyCode()) {
+        if (item.GetKeyCode() != keyCode) {
             keys_.push_back(item);
         }
     }
