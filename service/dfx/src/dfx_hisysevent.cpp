@@ -19,6 +19,14 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DfxHisysevent" };
 constexpr int32_t INVALID_DEVICE_ID = -1;
+constexpr uint32_t REPORT_DISPATCH_TIMES = 100;
+constexpr uint32_t REPORT_COMBO_START_TIMES = 100;
+constexpr uint32_t POINTER_CLEAR_TIMES = 10;
+constexpr int32_t CONVERSION_US_TO_MS = 1000;
+constexpr int32_t TIMES_LEVEL1 = 10;
+constexpr int32_t TIMES_LEVEL2 = 25;
+constexpr int32_t TIMES_LEVEL3 = 30;
+constexpr int32_t TIMES_LEVEL4 = 50;
 } // namespace
 
 void DfxHisysevent::OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type)
@@ -279,6 +287,107 @@ void DfxHisysevent::ApplicationBlockInput(const SessionPtr& sess)
         "MSG", "User input does not respond");
     if (ret != 0) {
         MMI_HILOGE("HiviewDFX Write failed, ret: %{public}d", ret);
+    }
+}
+
+void DfxHisysevent::CalcKeyDispTimes()
+{
+    int64_t endTime = GetSysClockTime();
+    dispCastTime_.totalTimes++;
+    int64_t castTime = (endTime - dispatchStartTime_)  / CONVERSION_US_TO_MS;
+    if (castTime <= TIMES_LEVEL1) {
+        dispCastTime_.below10msTimes++;
+    } else if (castTime <= TIMES_LEVEL2) {
+        dispCastTime_.below25msTimes++;
+    } else if (castTime <= TIMES_LEVEL4) {
+        dispCastTime_.below50msTimes++;
+    } else {
+        dispCastTime_.above50msTimes++;
+    }
+}
+
+void DfxHisysevent::CalcPointerDispTimes()
+{
+    int64_t endTime = GetSysClockTime();
+    dispCastTime_.sampleCount++;
+    int64_t castTime = (endTime - dispatchStartTime_)  / CONVERSION_US_TO_MS;
+    if (dispCastTime_.sampleCount == POINTER_CLEAR_TIMES) {
+        dispCastTime_.sampleCount = 0;
+        dispCastTime_.totalTimes++;
+        if (castTime <= TIMES_LEVEL1) {
+            dispCastTime_.below10msTimes++;
+        } else if (castTime <= TIMES_LEVEL2) {
+            dispCastTime_.below25msTimes++;
+        } else if (castTime <= TIMES_LEVEL4) {
+            dispCastTime_.below50msTimes++;
+        } else {
+            dispCastTime_.above50msTimes++;
+        }
+    }
+}
+
+void DfxHisysevent::ReportDispTimes()
+{
+    if (dispCastTime_.totalTimes >= REPORT_DISPATCH_TIMES) {
+        int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
+            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+            "INPUT_DISPATCH_TIME",
+            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+            "BELOW10MS", dispCastTime_.below10msTimes,
+            "BELOW25MS", dispCastTime_.below25msTimes,
+            "BELOW50MS", dispCastTime_.below50msTimes,
+            "ABOVE50MS", dispCastTime_.above50msTimes,
+            "MSG", "The costing time to dispatch event");
+        if (ret != 0) {
+            MMI_HILOGE("HiviewDFX Write failed, ret: %{public}d", ret);
+        } else {
+            dispCastTime_.sampleCount = 0;
+            dispCastTime_.totalTimes = 0;
+            dispCastTime_.below10msTimes = 0;
+            dispCastTime_.below25msTimes = 0;
+            dispCastTime_.below50msTimes = 0;
+            dispCastTime_.above50msTimes = 0;
+        }
+    }
+}
+
+void DfxHisysevent::CalcComboStartTimes(const int32_t keyDownDuration)
+{
+    int64_t endTime = GetSysClockTime();
+    comboStartCastTime_.totalTimes++;
+    int64_t castTime = (endTime - comboStartTime_) / CONVERSION_US_TO_MS - keyDownDuration;
+    if (castTime <= TIMES_LEVEL1) {
+        comboStartCastTime_.below10msTimes++;
+    } else if (castTime <= TIMES_LEVEL3) {
+        comboStartCastTime_.below30msTimes++;
+    } else if (castTime <= TIMES_LEVEL4) {
+        comboStartCastTime_.below50msTimes++;
+    } else {
+        comboStartCastTime_.above50msTimes++;
+    }
+}
+
+void DfxHisysevent::ReportComboStartTimes()
+{
+    if (comboStartCastTime_.totalTimes >= REPORT_COMBO_START_TIMES) {
+        int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
+            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+            "COMBO_START_TIME",
+            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+            "BELOW10MS", comboStartCastTime_.below10msTimes,
+            "BELOW30MS", comboStartCastTime_.below30msTimes,
+            "BELOW50MS", comboStartCastTime_.below50msTimes,
+            "ABOVE50MS", comboStartCastTime_.above50msTimes,
+            "MSG", "The costing time to launch application of combination");
+        if (ret != 0) {
+            MMI_HILOGE("HiviewDFX Write failed, ret: %{public}d", ret);
+        } else {
+            comboStartCastTime_.totalTimes = 0;
+            comboStartCastTime_.below10msTimes = 0;
+            comboStartCastTime_.below30msTimes = 0;
+            comboStartCastTime_.below50msTimes = 0;
+            comboStartCastTime_.above50msTimes = 0;
+        }
     }
 }
 }

@@ -29,6 +29,21 @@ namespace OHOS {
 namespace MMI {
 class DfxHisysevent {
 public:
+    struct DispCastTime {
+        uint32_t sampleCount;
+        uint32_t totalTimes;
+        uint32_t below10msTimes;
+        uint32_t below25msTimes;
+        uint32_t below50msTimes;
+        uint32_t above50msTimes;
+    };
+    struct ComboStartCastTime {
+        uint32_t totalTimes;
+        uint32_t below10msTimes;
+        uint32_t below30msTimes;
+        uint32_t below50msTimes;
+        uint32_t above50msTimes;
+    };
     struct ClientConnectData {
         int32_t pid { -1 };
         int32_t uid { -1 };
@@ -50,6 +65,24 @@ public:
     static void OnZorderWindowChanged(int32_t oldZorderFirstWindowId, int32_t newZorderFirstWindowId,
         int32_t oldZorderFirstWindowPid, int32_t newZorderFirstWindowPid);
     static void ApplicationBlockInput(const SessionPtr& sess);
+    static void CalcKeyDispTimes();
+    static void CalcPointerDispTimes();
+    static void CalcComboStartTimes(int32_t keyDownDuration);
+    static void ReportDispTimes();
+    static void ReportComboStartTimes();
+    static inline void GetComboStartTime()
+    {
+        comboStartTime_ = GetSysClockTime();
+    }
+    static inline void GetDispStartTime()
+    {
+        dispatchStartTime_ = GetSysClockTime();
+    }
+private:
+    static inline int64_t dispatchStartTime_ { 0 };
+    static inline int64_t comboStartTime_ { 0 };
+    static inline DispCastTime dispCastTime_ { 0 };
+    static inline ComboStartCastTime comboStartCastTime_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
