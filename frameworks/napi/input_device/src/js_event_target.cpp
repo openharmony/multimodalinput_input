@@ -615,6 +615,9 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
 
     for (const auto &temp : iter->second) {
         CHKPC(temp);
+        if (temp->env != env) {
+            continue;
+        }
         if (JsUtil::IsSameHandle(env, handle, temp->ref)) {
             MMI_HILOGW("The handle already exists");
             return;
@@ -647,6 +650,9 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
         goto monitorLabel;
     }
     for (auto it = iter->second.begin(); it != iter->second.end(); ++it) {
+        if ((*it)->env != env) {
+            continue;
+        }
         if (JsUtil::IsSameHandle(env, handle, (*it)->ref)) {
             MMI_HILOGD("Succeeded in removing monitor");
             iter->second.erase(it);
