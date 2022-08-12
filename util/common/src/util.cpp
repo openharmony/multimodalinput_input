@@ -57,8 +57,6 @@ const std::string CONFIG_ITEM_REPEAT = "Key.autorepeat";
 const std::string CONFIG_ITEM_DELAY = "Key.autorepeat.delaytime";
 const std::string CONFIG_ITEM_INTERVAL = "Key.autorepeat.intervaltime";
 const std::string CONFIG_ITEM_TYPE = "Key.keyboard.type";
-const std::string DATA_PATH = "/data";
-const std::string INPUT_PATH = "/system/etc/multimodalinput/";
 const std::string KEY_PATH = "/vendor/etc/keymap/";
 constexpr size_t BUF_TID_SIZE = 10;
 constexpr size_t BUF_CMD_SIZE = 512;
@@ -496,12 +494,6 @@ static bool IsValidPath(const std::string &rootDir, const std::string &filePath)
     return (filePath.compare(0, rootDir.size(), rootDir) == 0);
 }
 
-static bool IsValidJsonPath(const std::string &filePath)
-{
-    return IsValidPath(DATA_PATH, filePath) ||
-        IsValidPath(INPUT_PATH, filePath);
-}
-
 static bool IsValidProPath(const std::string &filePath)
 {
     return IsValidPath(KEY_PATH, filePath);
@@ -601,10 +593,6 @@ std::string ReadJsonFile(const std::string &filePath)
     char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
         MMI_HILOGE("path is error");
-        return "";
-    }
-    if (!IsValidJsonPath(realPath)) {
-        MMI_HILOGE("file path is error");
         return "";
     }
     if (!CheckFileExtendName(realPath, "json")) {
