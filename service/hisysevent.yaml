@@ -160,3 +160,19 @@ Z_ORDER_WINDOW_CHANGE:
   OLD_ZORDER_FIRST_WINDOWPID: {type: INT32, desc: old zorder first windowpid}
   NEW_ZORDER_FIRST_WINDOWPID: {type: INT32, desc: new zorder first windowpid}
   MSG: {type: STRING, desc: message}
+
+INPUT_DISPATCH_TIME:
+  __BASE: {type: STATISTIC, level: MINOR, desc: input dispatch time}
+  BELOW10MS: {type: UINT32, desc: times below 10ms}
+  BELOW25MS: {type: UINT32, desc: times below 25ms}
+  BELOW50MS: {type: UINT32, desc: times below 50ms}
+  ABOVE50MS: {type: UINT32, desc: times above 50ms}
+  MSG: {type: STRING, desc: message}
+
+COMBO_START_TIME:
+  __BASE: {type: STATISTIC, level: MINOR, desc: combo start time}
+  BELOW10MS: {type: UINT32, desc: times below 10ms}
+  BELOW30MS: {type: UINT32, desc: times below 30ms}
+  BELOW50MS: {type: UINT32, desc: times below 50ms}
+  ABOVE50MS: {type: UINT32, desc: times above 50ms}
+  MSG: {type: STRING, desc: message}
