@@ -85,6 +85,7 @@ private:
         lastMatchedKey_.preKeys.clear();
         lastMatchedKey_.finalKey = -1;
         lastMatchedKey_.timerId = -1;
+        lastMatchedKey_.keyDownDuration = 0;
     }
     bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
     ShortcutKey lastMatchedKey_;
