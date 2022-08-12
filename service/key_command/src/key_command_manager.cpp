@@ -314,7 +314,7 @@ std::string KeyCommandManager::GenerateKey(const ShortcutKey& key)
 
 bool KeyCommandManager::ParseConfig()
 {
-    const char *testPathSuffix = "/etc/multimodalinput/ability_launch_config.json";
+    const char *testPathSuffix = "etc/multimodalinput/ability_launch_config.json";
     char buf[MAX_PATH_LEN] = { 0 };
     char *filePath = GetOneCfgFile(testPathSuffix, buf, MAX_PATH_LEN);
     std::string defaultConfig = "/system/etc/multimodalinput/ability_launch_config.json";
