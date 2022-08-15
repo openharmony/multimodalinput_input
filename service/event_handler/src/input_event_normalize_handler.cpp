@@ -204,7 +204,7 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         lastPressedKey = pressedKeys.back();
         MMI_HILOGD("The last repeat button, keyCode:%{public}d", lastPressedKey);
     }
-    auto packageResult = keyEventHandler_.PackageKeyEvent(event, keyEvent_);
+    auto packageResult = keyEventHandler_.Normalize(event, keyEvent_);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_HILOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
