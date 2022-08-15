@@ -39,6 +39,9 @@
 #include "key_option.h"
 #include "mmi_event_handler.h"
 #include "pointer_event.h"
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+#include "call_dinput_service.h"
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 
 namespace OHOS {
 namespace MMI {
@@ -103,6 +106,16 @@ public:
 
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid);
+	
+    int32_t SetPointerLocation(int32_t x, int32_t y);
+    using DeviceUniqId = std::tuple<int32_t, int32_t, int32_t, int32_t, int32_t, std::string>;
+    int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId);
+    
+    int32_t GetRemoteInputAbility(std::string deviceId, std::function<void(std::set<int32_t>)> remoteTypes);
+    int32_t PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+    int32_t UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+    int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
+    int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
@@ -133,6 +146,9 @@ private:
     std::thread ehThread_;
     EventHandlerPtr eventHandler_  = nullptr;
     MMIEventHandlerPtr mmiEventHandler_ = nullptr;
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    sptr<CallDinputService> callDinputService_ = nullptr;
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 };
 } // namespace MMI
 } // namespace OHOS
