@@ -20,8 +20,6 @@
 
 #include "input_windows_manager.h"
 #include "key_event.h"
-#include "pointer_event.h"
-#include "uds_server.h"
 #include "util.h"
 
 namespace OHOS {
@@ -31,10 +29,7 @@ public:
     KeyEventHandler();
     DISALLOW_COPY_AND_MOVE(KeyEventHandler);
     virtual ~KeyEventHandler();
-    int32_t PackageKeyEvent(libinput_event *event, EventKeyboard& key);
-    int32_t PackageKeyEvent(libinput_event *event, std::shared_ptr<KeyEvent> kevnPtr);
-    static int32_t PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key);
-    static int32_t KeyboardToKeyEvent(const EventKeyboard& key, std::shared_ptr<KeyEvent> keyEventPtr);
+    int32_t Normalize(libinput_event *event, std::shared_ptr<KeyEvent> keyEvent);
 };
 } // namespace MMI
 } // namespace OHOS
