@@ -487,16 +487,16 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "wrong number of parameters" << std::endl;
                                 return RET_ERR;
                             }
-                            int32_t pressTimeMs = 3000;
                             if (argc >= 4) {
                                 if (!StrToInt(optarg, keyCode)) {
                                     std::cout << "invalid key code value" << std::endl;
                                     return RET_ERR;
                                 }
                             }
+			     int32_t pressTimeMs = 3000;
                             if (argc >= 5) {
                                 if (!StrToInt(argv[optind], pressTimeMs)) {
-                                    std::cout << "invalid key code value or press times" << std::endl;
+                                    std::cout << "invalid key code value or press time" << std::endl;
                                     return RET_ERR;
                                 }
                             }
@@ -504,14 +504,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             static constexpr int32_t maxKeyCode = 5000;
                             if ((keyCode < minKeyCode) || (keyCode > maxKeyCode)) {
                                 std::cout << "key code is out of range:" << minKeyCode << " <= "
-                                    << "key codes" << " <= " << maxKeyCode << std::endl;
+                                    << keyCode << " <= " << maxKeyCode << std::endl;
                                 return RET_ERR;
                             }
                             static constexpr int32_t minPressTimeMs = 3000;
                             static constexpr int32_t maxPressTimeMs = 15000;
                             if ((pressTimeMs < minPressTimeMs) || (pressTimeMs > maxPressTimeMs)) {
                                 std::cout << "press time is out of range:" << minPressTimeMs << " ms" << " <= "
-                                    << "press times" << " <= " << maxPressTimeMs << " ms" << std::endl;
+                                    << pressTimeMs << " <= " << maxPressTimeMs << " ms" << std::endl;
                                 return RET_ERR;
                             }
                             std::cout << " key code: " << keyCode << std::endl
