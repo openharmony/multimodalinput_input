@@ -162,9 +162,9 @@ int32_t InputManager::SetPointerSpeed(int32_t speed)
     return InputMgrImpl->SetPointerSpeed(speed);
 }
 
-int32_t InputManager::GetPointerSpeed()
+int32_t InputManager::GetPointerSpeed(int32_t &speed)
 {
-    return InputMgrImpl->GetPointerSpeed();
+    return InputMgrImpl->GetPointerSpeed(speed);
 }
 
 int32_t InputManager::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)

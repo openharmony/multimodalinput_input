@@ -2698,20 +2698,22 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_001, TestSize.Level1)
     CALL_DEBUG_ENTER;
     const int32_t speed = -1;
     InputManager::GetInstance()->SetPointerSpeed(speed);
-    int32_t speed1 = InputManager::GetInstance()->GetPointerSpeed();
+    int32_t speed1;
+    InputManager::GetInstance()->GetPointerSpeed(speed1);
     ASSERT_EQ(speed1, 1);
+    InputManager::GetInstance()->MoveMouse(-2000, -2000);
     InputManager::GetInstance()->MoveMouse(50, 50);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(100, 150);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(300, 350);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(400, 450);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(500, 550);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(700, 1000);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
 /**
@@ -2725,21 +2727,22 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_002, TestSize.Level1)
     CALL_DEBUG_ENTER;
     const int32_t speed = 1;
     InputManager::GetInstance()->SetPointerSpeed(speed);
-    int32_t speed1 = InputManager::GetInstance()->GetPointerSpeed();
+    int32_t speed1;
+    InputManager::GetInstance()->GetPointerSpeed(speed1);
     ASSERT_EQ(speed1, speed);
     InputManager::GetInstance()->MoveMouse(-2000, -2000);
     InputManager::GetInstance()->MoveMouse(50, 50);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(100, 150);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(300, 350);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(400, 450);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(500, 550);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(700, 1000);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
 /**
@@ -2751,23 +2754,24 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_002, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_003, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    const int32_t speed = 10;
+    const int32_t speed = 4;
     InputManager::GetInstance()->SetPointerSpeed(speed);
-    int32_t speed1 = InputManager::GetInstance()->GetPointerSpeed();
+    int32_t speed1;
+    InputManager::GetInstance()->GetPointerSpeed(speed1);
     ASSERT_EQ(speed1, speed);
     InputManager::GetInstance()->MoveMouse(-2000, -2000);
     InputManager::GetInstance()->MoveMouse(50, 50);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(100, 150);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(300, 350);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(400, 450);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(500, 550);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(700, 1000);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
 /**
@@ -2779,23 +2783,24 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_003, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_004, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    const int32_t speed = 20;
+    const int32_t speed = 11;
     InputManager::GetInstance()->SetPointerSpeed(speed);
-    int32_t speed1 = InputManager::GetInstance()->GetPointerSpeed();
+    int32_t speed1;
+    InputManager::GetInstance()->GetPointerSpeed(speed1);
     ASSERT_EQ(speed1, speed);
     InputManager::GetInstance()->MoveMouse(-2000, -2000);
     InputManager::GetInstance()->MoveMouse(50, 50);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(100, 150);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(300, 350);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(400, 450);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(500, 550);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(700, 1000);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
 /**
@@ -2807,23 +2812,24 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_004, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_005, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    const int32_t speed = 30;
+    const int32_t speed = 20;
     InputManager::GetInstance()->SetPointerSpeed(speed);
-    int32_t speed1 = InputManager::GetInstance()->GetPointerSpeed();
-    ASSERT_EQ(speed1, 20);
+    int32_t speed1;
+    InputManager::GetInstance()->GetPointerSpeed(speed1);
+    ASSERT_EQ(speed1, 11);
     InputManager::GetInstance()->MoveMouse(-2000, -2000);
     InputManager::GetInstance()->MoveMouse(50, 50);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(100, 150);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(300, 350);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(400, 450);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(500, 550);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(700, 1000);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 } // namespace MMI
 } // namespace OHOS
