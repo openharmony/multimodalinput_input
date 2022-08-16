@@ -493,7 +493,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     return RET_ERR;
                                 }
                             }
-			    int32_t pressTimeMs = 3000;
+                            int32_t pressTimeMs = 3000;
                             if (argc >= 5) {
                                 if (!StrToInt(argv[optind], pressTimeMs)) {
                                     std::cout << "invalid key code value or press time" << std::endl;
