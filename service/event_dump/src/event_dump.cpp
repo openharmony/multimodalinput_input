@@ -64,8 +64,20 @@ void ChkConfig(int32_t fd)
 void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    if (args.size() > MAX_COMMAND_COUNT) {
-        MMI_HILOGE("More than 32 commands");
+    int32_t count = 0;
+    for (const auto &str : args) {
+        if (str.find("--") == 0) {
+            ++count;
+            continue;
+        }
+        if (str.find("-") == 0) {
+            count += str.size() - 1;
+            continue;
+        }
+    }
+    if (count > MAX_COMMAND_COUNT) {
+        MMI_HILOGE("cmd param number not more than 32");
+        mprintf(fd, "cmd param number not more than 32\n");
         return;
     }
     int32_t optionIndex = 0;
@@ -188,7 +200,7 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -h, --help: dump help\t");
     mprintf(fd, "      -d, --device: dump the device information\t");
     mprintf(fd, "      -l, --devicelist: dump the device list information\t");
-    mprintf(fd, "      -w, --windows,: dump the windows information\t");
+    mprintf(fd, "      -w, --windows: dump the windows information\t");
     mprintf(fd, "      -u, --udsserver: dump the uds_server information\t");
     mprintf(fd, "      -o, --monitor: dump the monitor information\t");
     mprintf(fd, "      -s, --subscriber: dump the subscriber information\t");
