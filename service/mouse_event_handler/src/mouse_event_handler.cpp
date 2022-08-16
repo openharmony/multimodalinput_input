@@ -37,7 +37,7 @@ const std::array<double, 6> SPEED_GAINS { 0.6, 1.0, 1.2, 1.8, 2.1, 2.8 };
 const std::array<double, 6> SPEED_DIFF_NUMS { 0.0, -2.0, -5.0, -19.0, -28.6, -57.3 };
 constexpr double DOUBLE_ZERO = 1e-6;
 constexpr int32_t MIN_SPEED = 1;
-constexpr int32_t MAX_SPEED = 20;
+constexpr int32_t MAX_SPEED = 11;
 } // namespace
 MouseEventHandler::MouseEventHandler()
 {
