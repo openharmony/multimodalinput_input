@@ -607,6 +607,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("The addition of logicalY overflows");
         return RET_ERR;
     }
+    IPointerDrawingManager::GetInstance()->OnDisplayInfo(physicalDisplayInfo->id,
+        physicalDisplayInfo->width, physicalDisplayInfo->height, physicalDisplayInfo->direction);
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
     auto touchWindow = SelectWindowInfo(logicalX, logicalY, pointerEvent);
     if (!touchWindow) {
