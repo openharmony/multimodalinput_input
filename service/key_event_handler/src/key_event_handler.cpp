@@ -22,9 +22,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventHandler" };
-const std::string VIRTUAL_KEYBOARD = "virtual_keyboard";
-constexpr uint32_t SEAT_KEY_COUNT_ONE = 1;
-constexpr uint32_t SEAT_KEY_COUNT_ZERO = 0;
 constexpr uint32_t KEYSTATUS = 0;
 } // namespace
 
@@ -32,12 +29,12 @@ KeyEventHandler::KeyEventHandler() {}
 
 KeyEventHandler::~KeyEventHandler() {}
 
-int32_t KeyEventHandler::PackageKeyEvent(struct libinput_event *event, std::shared_ptr<KeyEvent> key)
+int32_t KeyEventHandler::Normalize(struct libinput_event *event, std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, PARAM_INPUT_INVALID);
-    CHKPR(key, ERROR_NULL_POINTER);
-    key->UpdateId();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    keyEvent->UpdateId();
     auto data = libinput_event_get_keyboard_event(event);
     CHKPR(data, ERROR_NULL_POINTER);
 
@@ -49,23 +46,23 @@ int32_t KeyEventHandler::PackageKeyEvent(struct libinput_event *event, std::shar
     keyCode = KeyMapMgr->TransferDeviceKeyValue(device, keyCode);
     int32_t keyAction = (libinput_event_keyboard_get_key_state(data) == 0) ?
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
-    auto preAction = key->GetAction();
+    auto preAction = keyEvent->GetAction();
     if (preAction == KeyEvent::KEY_ACTION_UP) {
-        auto preUpKeyItem = key->GetKeyItem();
+        auto preUpKeyItem = keyEvent->GetKeyItem();
         if (preUpKeyItem != nullptr) {
-            key->RemoveReleasedKeyItems(*preUpKeyItem);
+            keyEvent->RemoveReleasedKeyItems(*preUpKeyItem);
         } else {
             MMI_HILOGE("The preUpKeyItem is null");
         }
     }
     int64_t time = GetSysClockTime();
-    key->SetActionTime(time);
-    key->SetAction(keyAction);
-    key->SetDeviceId(deviceId);
-    key->SetKeyCode(keyCode);
-    key->SetKeyAction(keyAction);
-    if (key->GetPressedKeys().empty()) {
-        key->SetActionStartTime(time);
+    keyEvent->SetActionTime(time);
+    keyEvent->SetAction(keyAction);
+    keyEvent->SetDeviceId(deviceId);
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(keyAction);
+    if (keyEvent->GetPressedKeys().empty()) {
+        keyEvent->SetActionStartTime(time);
     }
 
     KeyEvent::KeyItem item;
@@ -76,98 +73,17 @@ int32_t KeyEventHandler::PackageKeyEvent(struct libinput_event *event, std::shar
     item.SetPressed(isKeyPressed);
 
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
-        key->AddPressedKeyItems(item);
+        keyEvent->AddPressedKeyItems(item);
     }
     if (keyAction == KeyEvent::KEY_ACTION_UP) {
-        auto pressedKeyItem = key->GetKeyItem(keyCode);
+        auto pressedKeyItem = keyEvent->GetKeyItem(keyCode);
         if (pressedKeyItem != nullptr) {
             item.SetDownTime(pressedKeyItem->GetDownTime());
         } else {
             MMI_HILOGE("Find pressed key failed, keyCode:%{public}d", keyCode);
         }
-        key->RemoveReleasedKeyItems(item);
-        key->AddPressedKeyItems(item);
-    }
-    return RET_OK;
-}
-
-int32_t KeyEventHandler::PackageVirtualKeyEvent(VirtualKey& event, EventKeyboard& key)
-{
-    const std::string uid = GetUUid();
-    errno_t ret = memcpy_s(key.uuid, MAX_UUIDSIZE, uid.c_str(), uid.size());
-    if (ret != EOK) {
-        MMI_HILOGE("Memcpy data failed");
-        return RET_ERR;
-    }
-    ret = memcpy_s(key.deviceName, MAX_UUIDSIZE, VIRTUAL_KEYBOARD.c_str(), VIRTUAL_KEYBOARD.size());
-    if (ret != EOK) {
-        MMI_HILOGE("Memcpy data failed");
-        return RET_ERR;
-    }
-    key.time = event.keyDownDuration;
-    key.key = event.keyCode;
-    key.isIntercepted = event.isIntercepted;
-    key.state = (enum KEY_STATE)event.isPressed;
-    key.eventType = LIBINPUT_EVENT_KEYBOARD_KEY;
-    key.deviceType = DEVICE_TYPE_VIRTUAL_KEYBOARD;
-    key.unicode = 0;
-    if (event.isPressed) {
-        key.seat_key_count = SEAT_KEY_COUNT_ONE;
-    } else {
-        key.seat_key_count = SEAT_KEY_COUNT_ZERO;
-    }
-    return RET_OK;
-}
-
-int32_t KeyEventHandler::KeyboardToKeyEvent(const EventKeyboard& key, std::shared_ptr<KeyEvent> keyEventPtr)
-{
-    CHKPR(keyEventPtr, ERROR_NULL_POINTER);
-    keyEventPtr->UpdateId();
-    KeyEvent::KeyItem keyItem;
-    int32_t keyCode = static_cast<int32_t>(key.key);
-    int32_t keyAction = (key.state == KEY_STATE_PRESSED) ?
-        (KeyEvent::KEY_ACTION_DOWN) : (KeyEvent::KEY_ACTION_UP);
-    int32_t deviceId = key.deviceId;
-    auto preAction = keyEventPtr->GetAction();
-    if (preAction == KeyEvent::KEY_ACTION_UP) {
-        auto preUpKeyItem = keyEventPtr->GetKeyItem();
-        if (preUpKeyItem != nullptr) {
-            keyEventPtr->RemoveReleasedKeyItems(*preUpKeyItem);
-        } else {
-            MMI_HILOGE("The preUpKeyItem is null");
-        }
-    }
-
-    int64_t time = GetSysClockTime();
-    keyEventPtr->SetActionTime(time);
-    keyEventPtr->SetAction(keyAction);
-    keyEventPtr->SetDeviceId(deviceId);
-    keyEventPtr->SetKeyCode(keyCode);
-    keyEventPtr->SetKeyAction(keyAction);
-
-    if (keyEventPtr->GetPressedKeys().empty()) {
-        keyEventPtr->SetActionStartTime(time);
-    }
-
-    bool isKeyPressed = (key.state == KEY_STATE_PRESSED) ? (true) : (false);
-    keyItem.SetDownTime(time);
-    keyItem.SetKeyCode(keyCode);
-    keyItem.SetDeviceId(deviceId);
-    keyItem.SetPressed(isKeyPressed);
-
-    if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
-        keyEventPtr->AddPressedKeyItems(keyItem);
-    } else if (keyAction == KeyEvent::KEY_ACTION_UP) {
-        auto pressedKeyItem = keyEventPtr->GetKeyItem(keyCode);
-        if (pressedKeyItem != nullptr) {
-            keyItem.SetDownTime(pressedKeyItem->GetDownTime());
-        } else {
-            MMI_HILOGW("Find pressed key failed, keyCode:%{public}d", keyCode);
-        }
-        keyEventPtr->RemoveReleasedKeyItems(keyItem);
-        keyEventPtr->AddPressedKeyItems(keyItem);
-    } else {
-        MMI_HILOGW("Unknown keyAction type");
+        keyEvent->RemoveReleasedKeyItems(item);
+        keyEvent->AddPressedKeyItems(item);
     }
     return RET_OK;
 }
