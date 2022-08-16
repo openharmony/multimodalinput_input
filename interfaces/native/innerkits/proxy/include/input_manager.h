@@ -266,7 +266,7 @@ public:
     bool IsPointerVisible();
 
     /**
-     * @brief Sets the mouse pointer speed, which ranges from 1 to 20.
+     * @brief Sets the mouse pointer speed, which ranges from 1 to 11.
      * @param speed Indicates the mouse pointer speed to set.
      * @return Returns <b>RET_OK</b> if success; returns <b>RET_ERR</b> otherwise.
      * @since 9
@@ -275,10 +275,11 @@ public:
 
     /**
      * @brief Obtains the mouse pointer speed.
+     * @param speed Indicates the mouse pointer speed to get.
      * @return Returns the mouse pointer speed if the operation is successful; returns <b>RET_ERR</b> otherwise.
      * @since 9
      */
-    int32_t GetPointerSpeed();
+    int32_t GetPointerSpeed(int32_t &speed);
 
     /**
      * @brief Queries the keyboard type.
