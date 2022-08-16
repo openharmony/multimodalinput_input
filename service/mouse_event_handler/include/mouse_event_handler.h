@@ -27,7 +27,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t DEFAULT_SPEED = 10;
+constexpr int32_t DEFAULT_SPEED = 5;
 } // namespace
 class MouseEventHandler : public DelayedSingleton<MouseEventHandler>,
     public std::enable_shared_from_this<MouseEventHandler> {

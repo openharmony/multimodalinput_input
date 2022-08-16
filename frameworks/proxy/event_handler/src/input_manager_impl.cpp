@@ -577,17 +577,16 @@ int32_t InputManagerImpl::SetPointerSpeed(int32_t speed)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-int32_t InputManagerImpl::GetPointerSpeed()
+int32_t InputManagerImpl::GetPointerSpeed(int32_t &speed)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t speed;
     int32_t ret = MultimodalInputConnMgr->GetPointerSpeed(speed);
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer speed failed");
         return RET_ERR;
     }
-    return speed;
+    return RET_OK;
 #else
     return ERROR_UNSUPPORT;
     MMI_HILOGW("Pointer device does not support");
