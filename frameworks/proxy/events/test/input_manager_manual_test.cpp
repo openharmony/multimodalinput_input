@@ -15,24 +15,81 @@
 
 #include <gtest/gtest.h>
 
+#include "accesstoken_kit.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_handler_manager.h"
 #include "input_manager.h"
 #include "multimodal_event_handler.h"
+#include "nativetoken_kit.h"
 #include "pointer_event.h"
 #include "proto.h"
 #include "run_shell_util.h"
+#include "token_setproc.h"
 
 namespace OHOS {
 namespace MMI {
+using namespace Security::AccessToken;
+using Security::AccessToken::AccessTokenID;
 namespace {
 using namespace testing::ext;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 constexpr int32_t TIME_WAIT_FOR_OP = 500;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerManualTest" };
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+HapInfoParams infoManagerTestInfoParms = {
+    .bundleName = "accesstoken_test",
+    .userID = 1,
+    .instIndex = 0,
+    .appIDDesc = "test"
+};
+
+PermissionDef infoManagerTestPermDef = {
+    .permissionName = "ohos.permission.test",
+    .bundleName = "accesstoken_test",
+    .grantMode = 1,
+    .label = "label",
+    .labelId = 1,
+    .description = "test input event filter",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_CORE
+};
+
+PermissionStateFull infoManagerTestState = {
+    .grantFlags = {1},
+    .grantStatus = {PermissionState::PERMISSION_GRANTED},
+    .isGeneral = true,
+    .permissionName = "ohos.permission.test",
+    .resDeviceID = {"local"}
+};
+
+HapPolicyParams infoManagerTestPolicyPrams = {
+    .apl = APL_SYSTEM_CORE,
+    .domain = "test.domain",
+    .permList = {infoManagerTestPermDef},
+    .permStateList = {infoManagerTestState}
+};
 } // namespace
+
+class AccessToken {
+public:
+    AccessToken()
+    {
+        currentID_ = GetSelfTokenID();
+        AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(infoManagerTestInfoParms, infoManagerTestPolicyPrams);
+        accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
+        SetSelfTokenID(accessID_);
+    }
+    ~AccessToken()
+    {
+        AccessTokenKit::DeleteToken(accessID_);
+        SetSelfTokenID(currentID_);
+    }
+private:
+    AccessTokenID currentID_ = 0;
+    AccessTokenID accessID_ = 0;
+};
 
 class InputManagerManualTest : public testing::Test {
 public:
@@ -88,7 +145,7 @@ void InputManagerManualTest::AddInputEventFilter()
         callbackRet = 2;
         return false;
     };
-
+    AccessToken accessToken;
     int32_t ret = InputManager::GetInstance()->AddInputEventFilter(callback);
     ASSERT_EQ(ret, RET_OK);
 }
