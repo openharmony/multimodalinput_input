@@ -28,6 +28,7 @@
 #include "time_cost_chk.h"
 #include "timer_manager.h"
 #include "touch_transform_point_manager.h"
+#include "device_config.h"
 
 namespace OHOS {
 namespace MMI {
@@ -114,6 +115,7 @@ int32_t InputEventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
     InputDevMgr->OnInputDeviceAdded(device);
     KeyMapMgr->ParseDeviceConfigFile(device);
     KeyRepeat->AddDeviceConfig(device);
+    configManagement_.AddDeviceProfile(device);
     return RET_OK;
 }
 
@@ -125,6 +127,7 @@ int32_t InputEventNormalizeHandler::OnEventDeviceRemoved(libinput_event *event)
     KeyMapMgr->RemoveKeyValue(device);
     KeyRepeat->RemoveDeviceConfig(device);
     InputDevMgr->OnInputDeviceRemoved(device);
+    configManagement_.RemoveDeviceProfile(device);
     return RET_OK;
 }
 

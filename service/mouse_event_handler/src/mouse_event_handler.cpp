@@ -67,7 +67,7 @@ bool MouseEventHandler::GetSpeedGain(const double& vin, double& gain) const
     return true;
 }
 
-int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
+int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data, int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
@@ -83,7 +83,7 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
         return RET_ERR;
     }
 
-    int32_t ret = HandleMotionCorrection(data);
+    int32_t ret = HandleMotionCorrection(data, deviceId);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to handle motion correction");
         return ret;
@@ -95,7 +95,7 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
     return RET_OK;
 }
 
-int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
+int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data, int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
@@ -107,8 +107,14 @@ int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
         MMI_HILOGE("Get speed gain failed");
         return RET_ERR;
     }
-    double correctionX = dx * gain * static_cast<double>(speed_) / 10.0;
-    double correctionY = dy * gain * static_cast<double>(speed_) / 10.0;
+    int32_t speedTmp = 0;
+    if (isJsPointerSpeed_){
+        speedTmp = speed_;
+    } else {
+        speedTmp = GetPointerSpeedWithDeviceId(deviceId);
+    }
+    double correctionX = dx * gain * static_cast<double>(speedTmp) / 10.0;
+    double correctionY = dy * gain * static_cast<double>(speedTmp) / 10.0;
     MMI_HILOGD("Get and process the movement coordinates, dx:%{public}lf, dy:%{public}lf,"
                "correctionX:%{public}lf, correctionY:%{public}lf, gain:%{public}lf",
                dx, dy, correctionX, correctionY, gain);
@@ -269,10 +275,11 @@ int32_t MouseEventHandler::Normalize(struct libinput_event *event)
     pointerEvent_->ClearAxisValue();
     int32_t result;
     const int32_t type = libinput_event_get_type(event);
+    int32_t deviceId = InputDevMgr->FindInputDeviceId(libinput_event_get_device(event));
     switch (type) {
         case LIBINPUT_EVENT_POINTER_MOTION:
         case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE: {
-            result = HandleMotionInner(data);
+            result = HandleMotionInner(data, deviceId);
             break;
         }
         case LIBINPUT_EVENT_POINTER_BUTTON: {
@@ -288,7 +295,7 @@ int32_t MouseEventHandler::Normalize(struct libinput_event *event)
             return RET_ERR;
         }
     }
-    int32_t deviceId = InputDevMgr->FindInputDeviceId(libinput_event_get_device(event));
+
     PointerEvent::PointerItem pointerItem;
     HandlePostInner(data, deviceId, pointerItem);
     WinMgr->UpdateTargetPointer(pointerEvent_);
@@ -387,7 +394,49 @@ int32_t MouseEventHandler::SetPointerSpeed(int32_t speed)
         speed_ = speed;
     }
     MMI_HILOGD("Set pointer speed:%{public}d", speed_);
+    isJsPointerSpeed_ = true;
     return RET_OK;
+}
+
+int32_t MouseEventHandler::SetPointerSpeedWithDeviceId(int32_t deviceId, int32_t speed)
+{
+    CALL_DEBUG_ENTER;
+    int32_t speedTmp = speed;
+    if (speed < MIN_SPEED) {
+        speedTmp = MIN_SPEED;
+    } else if (speed > MAX_SPEED) {
+        speedTmp = MAX_SPEED;
+    } else {
+        speedTmp = speed;
+    }
+    MMI_HILOGD("Set pointer speed:%{public}d", speedTmp);
+    pointerDeviceSpeeds[deviceId] = speedTmp;
+    // Notify
+    return RET_OK;
+}
+
+int32_t MouseEventHandler::RemovePointerSpeed(int32_t deviceId)
+{
+    CALL_DEBUG_ENTER;
+    auto it = pointerDeviceSpeeds.find(deviceId);
+    if (it == pointerDeviceSpeeds.end()) {
+        pointerDeviceSpeeds.erase(it);
+        MMI_HILOGD("remove pointer speed with deviceId:%{public}d", deviceId);
+    }
+    // notify
+    return RET_OK;
+}
+
+int32_t MouseEventHandler::GetPointerSpeedWithDeviceId(int32_t deviceId) const
+{
+    CALL_DEBUG_ENTER;
+    auto it = pointerDeviceSpeeds.find(deviceId);
+    if (it == pointerDeviceSpeeds.end()) {
+        MMI_HILOGD("Not find speed with deviceId:%{public}d", deviceId);
+        return speed_;
+    }
+    MMI_HILOGD("Get pointer speed:%{public}d", speed_);
+    return pointerDeviceSpeeds.at(deviceId);
 }
 
 int32_t MouseEventHandler::GetPointerSpeed() const
