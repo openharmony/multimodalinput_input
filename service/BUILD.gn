@@ -141,6 +141,7 @@ ohos_shared_library("libmmi-server") {
     "event_handler/src/key_auto_repeat.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
     "event_handler/src/key_map_manager.cpp",
+    "event_handler/src/device_config.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
     "message_handle/src/server_msg_handler.cpp",
     "module_loader/src/mmi_service.cpp",

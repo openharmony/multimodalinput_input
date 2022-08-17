@@ -23,6 +23,7 @@
 #include "singleton.h"
 
 #include "pointer_event.h"
+#include <map>
 
 namespace OHOS {
 namespace MMI {
@@ -42,10 +43,13 @@ public:
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t SetPointerSpeed(int32_t speed);
+    int32_t SetPointerSpeedWithDeviceId(int32_t deviceId, int32_t speed);
+    int32_t RemovePointerSpeed(int32_t deviceId);
     int32_t GetPointerSpeed() const;
+    int32_t GetPointerSpeedWithDeviceId(int32_t deviceId) const;
 
 private:
-    int32_t HandleMotionInner(libinput_event_pointer* data);
+    int32_t HandleMotionInner(libinput_event_pointer* data, int32_t deviceId);
     int32_t HandleButtonInner(libinput_event_pointer* data);
     int32_t HandleAxisInner(libinput_event_pointer* data);
     void HandlePostInner(libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem& pointerItem);
@@ -54,7 +58,7 @@ private:
     void HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem);
  #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t HandleButtonValueInner(libinput_event_pointer* data);
-    int32_t HandleMotionCorrection(libinput_event_pointer* data);
+    int32_t HandleMotionCorrection(libinput_event_pointer* data, int32_t deviceId);
     bool GetSpeedGain(const double &vin, double& gain) const;
     void DumpInner();
     void InitAbsolution();
@@ -68,6 +72,8 @@ private:
     bool isPressed_ { false };
     int32_t currentDisplayId_ { -1 };
     int32_t speed_ { DEFAULT_SPEED };
+    std::map<int32_t, int32_t> pointerDeviceSpeeds;
+    bool isJsPointerSpeed_ { false };
 };
 
 #define MouseEventHdr MouseEventHandler::GetInstance()
