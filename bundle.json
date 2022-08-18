@@ -94,7 +94,6 @@
           "header": {
             "header_files": [
               "proxy/include/display_info.h",
-              "proxy/include/input_manager.h",
               "event/include/key_event.h",
               "event/include/pointer_event.h",
               "event/include/input_event.h"
