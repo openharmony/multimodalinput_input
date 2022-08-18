@@ -341,27 +341,35 @@ std::shared_ptr<InputDevice> InputDeviceImpl::DevDataUnmarshalling(NetPacket &pk
     int32_t deviceId;
     pkt >> deviceId;
     devData->SetId(deviceId);
+
     std::string name;
     pkt >> name;
     devData->SetName(name);
+
     int32_t deviceType;
     pkt >> deviceType;
     devData->SetType(deviceType);
+
     int32_t bus;
     pkt >> bus;
     devData->SetBus(bus);
+
     int32_t product;
     pkt >> product;
     devData->SetProduct(product);
+
     int32_t vendor;
     pkt >> vendor;
     devData->SetVendor(vendor);
+
     int32_t version;
     pkt >> version;
     devData->SetVersion(version);
+
     std::string phys;
     pkt >> phys;
     devData->SetPhys(phys);
+
     std::string uniq;
     pkt >> uniq;
     devData->SetUniq(uniq);
@@ -374,18 +382,23 @@ std::shared_ptr<InputDevice> InputDeviceImpl::DevDataUnmarshalling(NetPacket &pk
         int32_t type;
         pkt >> type;
         axis.SetAxisType(type);
+
         int32_t min;
         pkt >> min;
         axis.SetMinimum(min);
+
         int32_t max;
         pkt >> max;
         axis.SetMaximum(max);
+
         int32_t fuzz;
         pkt >> fuzz;
         axis.SetFuzz(fuzz);
+
         int32_t flat;
         pkt >> flat;
         axis.SetFlat(flat);
+
         int32_t resolution;
         pkt >> resolution;
         axis.SetResolution(resolution);
