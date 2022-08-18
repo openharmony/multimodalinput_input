@@ -30,6 +30,13 @@ namespace MMI {
 namespace {
 constexpr int32_t DEFAULT_SPEED = 5;
 } // namespace
+
+struct AccelerateCurve {
+    std::vector<int32_t> speeds;
+    std::vector<double> slopes;
+    std::vector<double> diffNums;
+};
+
 class MouseEventHandler : public DelayedSingleton<MouseEventHandler>,
     public std::enable_shared_from_this<MouseEventHandler> {
 public:
@@ -49,20 +56,20 @@ public:
     int32_t GetPointerSpeedByDeviceId(int32_t deviceId) const;
 
 private:
-    int32_t HandleMotionInner(libinput_event_pointer* data, int32_t deviceId);
-    int32_t HandleButtonInner(libinput_event_pointer* data);
-    int32_t HandleAxisInner(libinput_event_pointer* data);
-    void HandlePostInner(libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem& pointerItem);
+    int32_t HandleMotionInner(struct libinput_event_pointer* data, int32_t deviceId);
+    int32_t HandleButtonInner(struct libinput_event_pointer* data);
+    int32_t HandleAxisInner(struct libinput_event_pointer* data);
+    void HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem& pointerItem);
  #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem);
  #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    int32_t HandleButtonValueInner(libinput_event_pointer* data);
-    int32_t HandleMotionCorrection(libinput_event_pointer* data, int32_t deviceId);
-    bool GetSpeedGain(const double &vin, double& gain) const;
+    int32_t HandleButtonValueInner(struct libinput_event_pointer* data);
+    int32_t HandleMotionAccelerate(struct libinput_event_pointer* data, int32_t deviceId);
+    bool GetSpeedGain(double vin, double& gain, int32_t deviceId) const;
     void DumpInner();
     void InitAbsolution();
-    int32_t GetSpeed(int32_t deviceId);
+    int32_t GetSpeed(int32_t deviceId) const;
 
 private:
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };

@@ -198,7 +198,7 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
         return;
     }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        session_->SaveANREvent(ANR_MONITOR, pointerEvent->GetId(), currentTime);
+        ANRMgr->AddTimer(ANR_MONITOR, pointerEvent->GetId(), currentTime, session_);
     }
 }
 

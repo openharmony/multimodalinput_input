@@ -19,6 +19,7 @@
 #include "nocopyable.h"
 
 #include "event_dispatch.h"
+#include "i_event_filter.h"
 #include "input_handler_type.h"
 #include "key_option.h"
 #include "msg_handler.h"
@@ -54,6 +55,9 @@ public:
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 protected:
     int32_t MarkProcessed(SessionPtr sess, NetPacket& pkt);
