@@ -328,6 +328,16 @@ int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid,
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+int32_t ServerMsgHandler::AddInputEventFilter(sptr<IEventFilter> filter)
+{
+    auto filterHandler = InputHandler->GetFilterHandler();
+    CHKPR(filterHandler, ERROR_NULL_POINTER);
+    filterHandler->AddInputEventFilter(filter);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
 #ifdef OHOS_BUILD_MMI_DEBUG
 int32_t ServerMsgHandler::OnBigPacketTest(SessionPtr sess, NetPacket& pkt)
 {
