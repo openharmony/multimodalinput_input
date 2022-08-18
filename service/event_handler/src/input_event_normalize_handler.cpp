@@ -28,12 +28,13 @@
 #include "time_cost_chk.h"
 #include "timer_manager.h"
 #include "touch_transform_point_manager.h"
-#include "device_config.h"
+#include "device_config_file_parser.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventNormalizeHandler" };
+DeviceConfigManagement configManagement_;
 }
 
 void InputEventNormalizeHandler::HandleEvent(libinput_event* event)
@@ -115,7 +116,7 @@ int32_t InputEventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
     InputDevMgr->OnInputDeviceAdded(device);
     KeyMapMgr->ParseDeviceConfigFile(device);
     KeyRepeat->AddDeviceConfig(device);
-    configManagement_.AddDeviceProfile(device);
+    configManagement_.OnDeviceAdd(device);
     return RET_OK;
 }
 
@@ -127,7 +128,7 @@ int32_t InputEventNormalizeHandler::OnEventDeviceRemoved(libinput_event *event)
     KeyMapMgr->RemoveKeyValue(device);
     KeyRepeat->RemoveDeviceConfig(device);
     InputDevMgr->OnInputDeviceRemoved(device);
-    configManagement_.RemoveDeviceProfile(device);
+    configManagement_.OnDeviceRemove(device);
     return RET_OK;
 }
 

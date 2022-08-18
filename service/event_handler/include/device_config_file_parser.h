@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DEVICE_CONFIG_H
-#define DEVICE_CONFIG_H
+#ifndef DEVICE_CONFIG_FILE_PARSER_H
+#define DEVICE_CONFIG_FILE_PARSER_H
 
 #include <map>
 #include <string>
@@ -22,8 +22,7 @@ struct libinput_device;
 
 namespace OHOS {
 namespace MMI {
-
-enum ConfigFileItem
+enum class ConfigFileItem
 {
     INVALID = -1,
     POINTER_BASE = 0,
@@ -31,7 +30,6 @@ enum ConfigFileItem
     KEYBOARD_BASE = 1000,
     KEY_XXXX,
 };
-
 class DeviceConfigManagement {
 public:
     DeviceConfigManagement() = default;
@@ -54,13 +52,12 @@ layout = 110
      */
 
 public:
-
-    int32_t AddDeviceProfile(struct libinput_device *device);
-    void RemoveDeviceProfile(struct libinput_device *device);
-    std::string GetEventFileName(struct libinput_device *device);
+    int32_t OnDeviceAdd(struct libinput_device *device);
+    void OnDeviceRemove(struct libinput_device *device);
+    std::string CombDeviceFileName(struct libinput_device *device);
 private:
-    typedef int32_t DeviceId;
-    std::map<DeviceId, std::map<ConfigFileItem, int32_t>> deviceListConfig;
+    using DeviceId = int32_t;
+    std::map<DeviceId, std::map<ConfigFileItem, int32_t>> deviceConfigs_;
 
 private:
     int32_t DeviceClassification(struct libinput_device *device, DeviceId deviceId);
@@ -70,4 +67,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // DEVICE_CONFIG_H
+#endif // DEVICE_CONFIG_FILE_PARSER_H

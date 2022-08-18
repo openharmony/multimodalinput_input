@@ -50,7 +50,6 @@ private:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventHandler keyEventHandler_;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-    DeviceConfigManagement configManagement_;
 };
 } // namespace MMI
 } // namespace OHOS
