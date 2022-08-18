@@ -32,9 +32,19 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MouseEventHandler" };
-const std::array<int32_t, 6> SPEED_NUMS { 5, 16, 23, 32, 41, 128 };
-const std::array<double, 6> SPEED_GAINS { 0.6, 1.0, 1.2, 1.8, 2.1, 2.8 };
-const std::array<double, 6> SPEED_DIFF_NUMS { 0.0, -2.0, -5.0, -19.0, -28.6, -57.3 };
+const std::vector<AccelerateCurve> ACCELERATE_CURVES {
+    { { 8, 32, 128 }, { 0.16, 0.30, 0.56 }, { 0.0, -1.12, -9.44 } },
+    { { 8, 32, 128 }, { 0.32, 0.60, 1.12 }, { 0.0, -2.24, -18.88 } },
+    { { 8, 32, 128 }, { 0.48, 0.90, 1.68 }, { 0.0, -3.36, -28.32 } },
+    { { 8, 32, 128 }, { 0.64, 1.20, 2.24 }, { 0.0, -4.48, -37.76 } },
+    { { 8, 32, 128 }, { 0.80, 1.50, 2.80 }, { 0.0, -5.60, -47.20 } },
+    { { 8, 32, 128 }, { 0.86, 1.95, 3.64 }, { 0.0, -8.72, -62.80 } },
+    { { 8, 32, 128 }, { 0.92, 2.40, 4.48 }, { 0.0, -11.84, -78.40 } },
+    { { 8, 32, 128 }, { 0.98, 2.85, 5.32 }, { 0.0, -14.96, -94.00 } },
+    { { 8, 32, 128 }, { 1.04, 3.30, 6.16 }, { 0.0, -18.08, -109.60 } },
+    { { 8, 32, 128 }, { 1.10, 3.75, 7.00 }, { 0.0, -21.20, -125.20 } },
+    { { 8, 32, 128 }, { 1.16, 4.20, 7.84 }, { 0.0, -24.32, -140.80 } }
+    };
 constexpr double DOUBLE_ZERO = 1e-6;
 constexpr int32_t MIN_SPEED = 1;
 constexpr int32_t MAX_SPEED = 11;
@@ -50,24 +60,29 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
     return pointerEvent_;
 }
 
-bool MouseEventHandler::GetSpeedGain(const double& vin, double& gain) const
+bool MouseEventHandler::GetSpeedGain(double vin, double& gain) const
 {
-    if (abs(vin) < DOUBLE_ZERO) {
+    if (fabs(vin) < DOUBLE_ZERO) {
         MMI_HILOGE("The value of the parameter passed in is 0");
         return false;
     }
-    int32_t num = static_cast<int32_t>(ceil(abs(vin)));
-    for (size_t i = 0; i < SPEED_NUMS.size(); ++i) {
-        if (num <= SPEED_NUMS[i]) {
-            gain = (SPEED_GAINS[i] * vin + SPEED_DIFF_NUMS[i]) / vin;
+    if (speed_ < 1) {
+        MMI_HILOGE("The speed value can't be less than 1");
+        return false;
+    }
+    const AccelerateCurve& curve = ACCELERATE_CURVES[speed_ - 1];
+    int32_t num = static_cast<int32_t>(ceil(fabs(vin)));
+    for (size_t i = 0; i < curve.speeds.size(); ++i) {
+        if (num <= curve.speeds[i]) {
+            gain = (curve.slopes[i] * vin + curve.diffNums[i]) / vin;
             return true;
         }
     }
-    gain = (SPEED_GAINS.back() * vin + SPEED_DIFF_NUMS.back()) / vin;
+    gain = (curve.slopes.back() * vin + curve.diffNums.back()) / vin;
     return true;
 }
 
-int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
+int32_t MouseEventHandler::HandleMotionInner(struct libinput_event_pointer* data)
 {
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
@@ -83,7 +98,7 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
         return RET_ERR;
     }
 
-    int32_t ret = HandleMotionCorrection(data);
+    int32_t ret = HandleMotionAccelerate(data);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to handle motion correction");
         return ret;
@@ -95,9 +110,8 @@ int32_t MouseEventHandler::HandleMotionInner(libinput_event_pointer* data)
     return RET_OK;
 }
 
-int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
+int32_t MouseEventHandler::HandleMotionAccelerate(struct libinput_event_pointer* data)
 {
-    CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
     double dx = libinput_event_pointer_get_dx(data);
     double dy = libinput_event_pointer_get_dy(data);
@@ -107,8 +121,8 @@ int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data)
         MMI_HILOGE("Get speed gain failed");
         return RET_ERR;
     }
-    double correctionX = dx * gain * static_cast<double>(speed_) / 10.0;
-    double correctionY = dy * gain * static_cast<double>(speed_) / 10.0;
+    double correctionX = dx * gain;
+    double correctionY = dy * gain;
     MMI_HILOGD("Get and process the movement coordinates, dx:%{public}lf, dy:%{public}lf,"
                "correctionX:%{public}lf, correctionY:%{public}lf, gain:%{public}lf",
                dx, dy, correctionX, correctionY, gain);
@@ -133,7 +147,7 @@ void MouseEventHandler::InitAbsolution()
     absolutionY_ = dispalyGroupInfo.displaysInfo[0].height * 1.0 / 2;
 }
 
-int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)
+int32_t MouseEventHandler::HandleButtonInner(struct libinput_event_pointer* data)
 {
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
@@ -167,7 +181,7 @@ int32_t MouseEventHandler::HandleButtonInner(libinput_event_pointer* data)
     return RET_OK;
 }
 
-int32_t MouseEventHandler::HandleButtonValueInner(libinput_event_pointer* data)
+int32_t MouseEventHandler::HandleButtonValueInner(struct libinput_event_pointer* data)
 {
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
@@ -182,7 +196,7 @@ int32_t MouseEventHandler::HandleButtonValueInner(libinput_event_pointer* data)
     return RET_OK;
 }
 
-int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
+int32_t MouseEventHandler::HandleAxisInner(struct libinput_event_pointer* data)
 {
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
@@ -225,7 +239,7 @@ int32_t MouseEventHandler::HandleAxisInner(libinput_event_pointer* data)
     return RET_OK;
 }
 
-void MouseEventHandler::HandlePostInner(libinput_event_pointer* data, int32_t deviceId,
+void MouseEventHandler::HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId,
                                         PointerEvent::PointerItem& pointerItem)
 {
     CALL_DEBUG_ENTER;
