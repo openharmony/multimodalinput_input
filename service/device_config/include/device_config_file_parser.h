@@ -27,30 +27,11 @@ enum class ConfigFileItem
     INVALID = -1,
     POINTER_BASE = 0,
     POINTER_SPEED,
-    KEYBOARD_BASE = 1000,
-    KEY_XXXX,
 };
 class DeviceConfigManagement {
 public:
     DeviceConfigManagement() = default;
     ~DeviceConfigManagement() = default;
-    /*
-/etc/mouse/common.conf
-button_count = TTTTTTT
-
-/etc/mouse/1a-2b-3c-d.conf   => device id: 30, 35
-include /etc/mouse/common.conf
-speed = 100
-30 => {1 => 100, 2 => 3, }
-/etc/mouse/1a-2b-3c-e.conf   => device id: 40
-speed = 200
-
-/etc/keyboard/01-20-3c-k.conf   => device id: 10, 15
-layout = 104
-/etc/keyboard/01-24-3c-l.conf   => device id: 20
-layout = 110
-     */
-
 public:
     int32_t OnDeviceAdd(struct libinput_device *device);
     void OnDeviceRemove(struct libinput_device *device);
@@ -58,7 +39,6 @@ public:
 private:
     using DeviceId = int32_t;
     std::map<DeviceId, std::map<ConfigFileItem, int32_t>> deviceConfigs_;
-
 private:
     int32_t DeviceClassification(struct libinput_device *device, DeviceId deviceId);
     int32_t DeviceConfiguration(struct libinput_device *device, DeviceId deviceId);

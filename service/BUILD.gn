@@ -17,6 +17,7 @@ mmi_service_path = "${mmi_path}/service"
 
 config("libmmi_server_config") {
   include_dirs = [
+    "device_config/include",
     "device_manager/include",
     "device_scalability/include",
     "delegate_task/include",
@@ -131,6 +132,7 @@ ohos_shared_library("libmmi-server") {
   sources = [
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
     "delegate_task/src/delegate_tasks.cpp",
+    "device_config/src/device_config_file_parser.cpp",
     "device_manager/src/input_device_manager.cpp",
     "dfx/src/dfx_hisysevent.cpp",
     "event_dispatch/src/event_dispatch.cpp",
@@ -141,7 +143,6 @@ ohos_shared_library("libmmi-server") {
     "event_handler/src/key_auto_repeat.cpp",
     "event_handler/src/key_event_value_transformation.cpp",
     "event_handler/src/key_map_manager.cpp",
-    "event_handler/src/device_config_file_parser.cpp",
     "libinput_adapter/src/libinput_adapter.cpp",
     "message_handle/src/server_msg_handler.cpp",
     "module_loader/src/mmi_service.cpp",
