@@ -15,6 +15,7 @@
 #ifndef UDS_SESSION_H
 #define UDS_SESSION_H
 
+#include <list>
 #include <memory>
 
 #include <sys/socket.h>
@@ -96,8 +97,9 @@ public:
     }
 
     void UpdateDescript();
-    void SaveANREvent(int32_t type, int32_t id, int64_t time);
-    void DelEvents(int32_t type, int32_t id);
+    void SaveANREvent(int32_t type, int32_t id, int64_t time, int32_t timerId);
+    std::vector<int32_t> GetTimerIds(int32_t type);
+    std::list<int32_t> DelEvents(int32_t type, int32_t id);
     int64_t GetEarliestEventTime(int32_t type = 0) const;
     bool IsEventQueueEmpty(int32_t type = 0);
 
@@ -113,6 +115,7 @@ protected:
     struct EventTime {
         int32_t id { 0 };
         int64_t eventTime { 0 };
+        int32_t timerId { -1 };
     };
     std::map<int32_t, std::vector<EventTime>> events_;
     std::map<int32_t, bool> isAnrProcess_;
