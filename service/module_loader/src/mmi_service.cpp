@@ -346,8 +346,8 @@ int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter)
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     CHKPR(filter, ERROR_NULL_POINTER);
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputEventHandler::AddInputEventFilter,
-        InputHandler, filter));
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&ServerMsgHandler::AddInputEventFilter,
+        &sMsgHandler_, filter));
     if (ret != RET_OK) {
         MMI_HILOGE("Add event filter failed,return %{public}d", ret);
         return ret;
