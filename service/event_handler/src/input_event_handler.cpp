@@ -145,13 +145,9 @@ std::shared_ptr<EventMonitorHandler> InputEventHandler::GetMonitorHandler() cons
     return monitorHandler_;
 }
 
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-int32_t InputEventHandler::AddInputEventFilter(sptr<IEventFilter> filter)
+std::shared_ptr<EventFilterWrap> InputEventHandler::GetFilterHandler() const
 {
-    CHKPR(eventfilterHandler_, ERROR_NULL_POINTER);
-    eventfilterHandler_->AddInputEventFilter(filter);
-    return RET_OK;
+    return eventfilterHandler_;
 }
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
 } // namespace OHOS

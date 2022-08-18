@@ -220,7 +220,7 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     KeyRepeat->SelectAutoRepeat(keyEvent_);
     MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
 #else
-        MMI_HILOGW("Keyboard device does not support");
+    MMI_HILOGW("Keyboard device does not support");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
@@ -247,7 +247,7 @@ int32_t InputEventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandlePointerEvent(pointerEvent);
 #else
-        MMI_HILOGW("Pointer device does not support");
+    MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
