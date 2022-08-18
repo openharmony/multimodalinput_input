@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 
+#include "anr_manager.h"
 #include "event_dump.h"
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
@@ -121,7 +122,7 @@ int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
         MMI_HILOGE("Packet read data failed");
         return PACKET_READ_FAIL;
     }
-    sess->DelEvents(eventType, eventId);
+    ANRMgr->MarkProcessed(eventType, eventId, sess);
     return RET_OK;
 }
 
@@ -327,6 +328,16 @@ int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid,
     return subscriberHandler->UnsubscribeKeyEvent(sess, subscribeId);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+int32_t ServerMsgHandler::AddInputEventFilter(sptr<IEventFilter> filter)
+{
+    auto filterHandler = InputHandler->GetFilterHandler();
+    CHKPR(filterHandler, ERROR_NULL_POINTER);
+    filterHandler->AddInputEventFilter(filter);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_MMI_DEBUG
 int32_t ServerMsgHandler::OnBigPacketTest(SessionPtr sess, NetPacket& pkt)

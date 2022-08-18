@@ -203,7 +203,6 @@ napi_value JsPointerManager::GetPointerSpeed(napi_env env, napi_value handle)
     if (handle != nullptr) {
         CHKRP(env, napi_create_reference(env, handle, initial_refcount, &asyncContext->callback), CREATE_REFERENCE);
         CHKRP(env, napi_get_undefined(env, &promise), GET_UNDEFINED);
-        napi_delete_reference(env, asyncContext->callback);
     } else {
         CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
     }
