@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 
+#include "anr_manager.h"
 #include "event_dump.h"
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
@@ -121,7 +122,7 @@ int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
         MMI_HILOGE("Packet read data failed");
         return PACKET_READ_FAIL;
     }
-    sess->DelEvents(eventType, eventId);
+    ANRMgr->MarkProcessed(eventType, eventId, sess);
     return RET_OK;
 }
 
