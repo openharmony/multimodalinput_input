@@ -46,7 +46,7 @@ public:
     int32_t SetPointerSpeedWithDeviceId(int32_t deviceId, int32_t speed);
     int32_t RemovePointerSpeed(int32_t deviceId);
     int32_t GetPointerSpeed() const;
-    int32_t GetPointerSpeedWithDeviceId(int32_t deviceId) const;
+    int32_t GetPointerSpeedByDeviceId(int32_t deviceId) const;
 
 private:
     int32_t HandleMotionInner(libinput_event_pointer* data, int32_t deviceId);
@@ -62,6 +62,7 @@ private:
     bool GetSpeedGain(const double &vin, double& gain) const;
     void DumpInner();
     void InitAbsolution();
+    int32_t GetSpeed(int32_t deviceId);
 
 private:
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
@@ -73,7 +74,7 @@ private:
     int32_t currentDisplayId_ { -1 };
     int32_t speed_ { DEFAULT_SPEED };
     std::map<int32_t, int32_t> pointerDeviceSpeeds;
-    bool isJsPointerSpeed_ { false };
+    bool isSpeedSetByUser_ { false };
 };
 
 #define MouseEventHdr MouseEventHandler::GetInstance()

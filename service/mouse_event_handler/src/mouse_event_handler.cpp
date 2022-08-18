@@ -38,7 +38,21 @@ const std::array<double, 6> SPEED_DIFF_NUMS { 0.0, -2.0, -5.0, -19.0, -28.6, -57
 constexpr double DOUBLE_ZERO = 1e-6;
 constexpr int32_t MIN_SPEED = 1;
 constexpr int32_t MAX_SPEED = 11;
+int32_t PointerSpeedCheck(int32_t speed)
+{
+    if (speed < MIN_SPEED) {
+        MMI_HILOGW("Set pointer speed less than minimum speed:%{public}d", speed);
+        return MIN_SPEED;
+    } else if (speed > MAX_SPEED) {
+        MMI_HILOGW("Set pointer speed greater than the maximum value speed:%{public}d", speed);
+        return MAX_SPEED;
+    } else {
+        return speed;
+    }
+}
 } // namespace
+
+
 MouseEventHandler::MouseEventHandler()
 {
     pointerEvent_ = PointerEvent::Create();
@@ -48,6 +62,15 @@ MouseEventHandler::MouseEventHandler()
 std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
 {
     return pointerEvent_;
+}
+
+int32_t MouseEventHandler::GetSpeed(int32_t deviceId)
+{
+    if (isSpeedSetByUser_) {
+        return speed_;
+    } else {
+        return GetPointerSpeedByDeviceId(deviceId);
+    }
 }
 
 bool MouseEventHandler::GetSpeedGain(const double& vin, double& gain) const
@@ -107,14 +130,9 @@ int32_t MouseEventHandler::HandleMotionCorrection(libinput_event_pointer* data, 
         MMI_HILOGE("Get speed gain failed");
         return RET_ERR;
     }
-    int32_t speedTmp = 0;
-    if (isJsPointerSpeed_){
-        speedTmp = speed_;
-    } else {
-        speedTmp = GetPointerSpeedWithDeviceId(deviceId);
-    }
-    double correctionX = dx * gain * static_cast<double>(speedTmp) / 10.0;
-    double correctionY = dy * gain * static_cast<double>(speedTmp) / 10.0;
+    int32_t speed = GetSpeed(deviceId);
+    double correctionX = dx * gain * static_cast<double>(speed) / 10.0;
+    double correctionY = dy * gain * static_cast<double>(speed) / 10.0;
     MMI_HILOGD("Get and process the movement coordinates, dx:%{public}lf, dy:%{public}lf,"
                "correctionX:%{public}lf, correctionY:%{public}lf, gain:%{public}lf",
                dx, dy, correctionX, correctionY, gain);
@@ -386,31 +404,17 @@ void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 int32_t MouseEventHandler::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;
-    if (speed < MIN_SPEED) {
-        speed_ = MIN_SPEED;
-    } else if (speed > MAX_SPEED) {
-        speed_ = MAX_SPEED;
-    } else {
-        speed_ = speed;
-    }
+    speed_ = PointerSpeedCheck(speed);
     MMI_HILOGD("Set pointer speed:%{public}d", speed_);
-    isJsPointerSpeed_ = true;
+    isSpeedSetByUser_ = true;
     return RET_OK;
 }
 
 int32_t MouseEventHandler::SetPointerSpeedWithDeviceId(int32_t deviceId, int32_t speed)
 {
     CALL_DEBUG_ENTER;
-    int32_t speedTmp = speed;
-    if (speed < MIN_SPEED) {
-        speedTmp = MIN_SPEED;
-    } else if (speed > MAX_SPEED) {
-        speedTmp = MAX_SPEED;
-    } else {
-        speedTmp = speed;
-    }
-    MMI_HILOGD("Set pointer speed:%{public}d", speedTmp);
-    pointerDeviceSpeeds[deviceId] = speedTmp;
+    pointerDeviceSpeeds[deviceId] = PointerSpeedCheck(speed);
+    MMI_HILOGD("Set pointer speed:%{public}d", pointerDeviceSpeeds[deviceId]);
     // Notify
     return RET_OK;
 }
@@ -427,7 +431,7 @@ int32_t MouseEventHandler::RemovePointerSpeed(int32_t deviceId)
     return RET_OK;
 }
 
-int32_t MouseEventHandler::GetPointerSpeedWithDeviceId(int32_t deviceId) const
+int32_t MouseEventHandler::GetPointerSpeedByDeviceId(int32_t deviceId) const
 {
     CALL_DEBUG_ENTER;
     auto it = pointerDeviceSpeeds.find(deviceId);

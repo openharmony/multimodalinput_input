@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "device_config.h"
-
+#include "device_config_file_parser.h"
+#include <fstream>
 #include "libinput.h"
 #include "input_device.h"
 #include "error_multimodal.h"
@@ -26,15 +26,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DeviceConfigManagement" };
 constexpr int32_t INVALID_DEVICE_ID = -1;
-
-
-inline bool IsNumqq(const std::string &str)
-{
-    std::istringstream sin(str);
-    double num;
-    sin >> num;
-    return num;
-}
+constexpr int32_t COMMENT_SUBSCRIPT = 0;
 } // namespace
 
 enum evdev_device_udev_tags {
@@ -52,7 +44,7 @@ enum evdev_device_udev_tags {
     EVDEV_UDEV_TAG_SWITCH = 1 << 11,
 };
 
-std::string DeviceConfigManagement::GetEventFileName(struct libinput_device *device)
+std::string DeviceConfigManagement::CombDeviceFileName(struct libinput_device *device)
 {
     CALL_DEBUG_ENTER;
     CHKPS(device);
@@ -70,13 +62,13 @@ std::string DeviceConfigManagement::GetEventFileName(struct libinput_device *dev
 ConfigFileItem DeviceConfigManagement::ConfigItemName2Id(const std::string &name)
 {
     static const std::map<const std::string, ConfigFileItem> configList = {
-        {"speed", POINTER_SPEED},
+        {"speed", ConfigFileItem::POINTER_SPEED},
     };
 
     auto iter = configList.find(name);
     if (iter == configList.end()) {
         MMI_HILOGE("Device config file remove failed");
-        return INVALID;
+        return ConfigFileItem::INVALID;
     }
     return configList.at(name);
 }
@@ -84,41 +76,46 @@ ConfigFileItem DeviceConfigManagement::ConfigItemName2Id(const std::string &name
 std::map<ConfigFileItem, int32_t> DeviceConfigManagement::ReadConfigFile(const std::string &filePath)
 {
     std::map<ConfigFileItem, int32_t> configList;
-    FILE* fp = fopen(filePath.c_str(), "r");
-    if (fp == nullptr) {
-        MMI_HILOGE("Config file open failed");
+    std::ifstream cfgFile(filePath);
+    if (!cfgFile.is_open()) {
+        MMI_HILOGE("Failed to open config file");
         return configList;
     }
-    char buf[256] = {};
-    std::string dataStr;
+    std::string tmp;
 
-    while (fgets(buf, sizeof(buf), fp) != nullptr) {
-        dataStr = buf;
-        int32_t keyLen = dataStr.find_first_of(":");
-        std::string key = dataStr.substr(0 , keyLen);
-        std::string value = dataStr.substr(keyLen + 1);
-        if (!IsNumqq(value)) {
-           continue;
+    while (std::getline(cfgFile, tmp)) {
+        RemoveSpace(tmp);
+        size_t pos = tmp.find('#');
+        if (pos != tmp.npos && pos != COMMENT_SUBSCRIPT) {
+            continue;
         }
+        if (tmp.empty() || tmp.front() == '#') {
+            continue;
+        }
+        pos = tmp.find('=');
+        if (pos == (tmp.size() - 1) || pos == tmp.npos) {
+            continue;
+        }
+        std::string key = tmp.substr(0, pos);
+        std::string value = tmp.substr(pos + 1);
         configList[ConfigItemName2Id(key)] = std::stoi(value);
     }
-    if (fclose(fp) != 0) {
-        MMI_HILOGW("Close file failed");
-    }
+    cfgFile.close();
     return configList;
 }
 
 int32_t DeviceConfigManagement::DeviceConfiguration(struct libinput_device *device, DeviceId deviceId)
 {
     CALL_DEBUG_ENTER;
-    std::string fileName = "/vendor/etc/pointer/" + GetEventFileName(device) + ".TOML";
+    std::string fileName = "/vendor/etc/pointer/" + CombDeviceFileName(device) + ".TOML";
     auto configList = ReadConfigFile(fileName);
     if (configList.empty()) {
         MMI_HILOGE("configList is empty");
         return RET_ERR;
     }
-    deviceListConfig[deviceId] = configList;
-    int32_t ret = MouseEventHdr->SetPointerSpeedWithDeviceId(deviceId, configList[POINTER_SPEED]);
+    deviceConfigs_[deviceId] = configList;
+    int32_t ret = MouseEventHdr->SetPointerSpeedWithDeviceId(deviceId,
+        configList[ConfigFileItem::POINTER_SPEED]);
     if (ret != RET_OK) {
         MMI_HILOGE("Pointer speed set failed, ret : %{public}d", ret);
     }
@@ -140,7 +137,7 @@ int32_t DeviceConfigManagement::DeviceClassification(struct libinput_device *dev
     return RET_ERR;
 }
 
-int32_t DeviceConfigManagement::AddDeviceProfile(struct libinput_device *device)
+int32_t DeviceConfigManagement::OnDeviceAdd(struct libinput_device *device)
 {
     CALL_DEBUG_ENTER;
     CHKPR(device, ERROR_NULL_POINTER);
@@ -152,13 +149,13 @@ int32_t DeviceConfigManagement::AddDeviceProfile(struct libinput_device *device)
     return DeviceClassification(device, deviceId);
 }
 
-void DeviceConfigManagement::RemoveDeviceProfile(struct libinput_device *device)
+void DeviceConfigManagement::OnDeviceRemove(struct libinput_device *device)
 {
     CALL_DEBUG_ENTER;
     CHKPV(device);
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
-    auto iter = deviceListConfig.find(deviceId);
-    if (iter == deviceListConfig.end()) {
+    auto iter = deviceConfigs_.find(deviceId);
+    if (iter == deviceConfigs_.end()) {
         MMI_HILOGE("Device config file remove failed");
         return;
     }
@@ -166,7 +163,7 @@ void DeviceConfigManagement::RemoveDeviceProfile(struct libinput_device *device)
     if (ret != RET_OK) {
         MMI_HILOGE("Pointer speed set failed, ret : %{public}d", ret);
     }
-    deviceListConfig.erase(iter);
+    deviceConfigs_.erase(iter);
 }
 } // namespace MMI
 } // namespace OHOS
