@@ -71,6 +71,11 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     virtual int32_t SetAnrObserver() override;
+    virtual int32_t StartRemoteCooperate(const std::string& localDeviceId) override;
+    virtual int32_t StartRemoteCooperateResult(bool isSucess, int32_t xPercent, int32_t yPercent) override;
+    virtual int32_t StopRemoteCooperate() override;
+    virtual int32_t StopRemoteCooperateResult(bool isSucess) override;
+    virtual int32_t StartCooperateOtherResult(const std::string& srcNetworkId) override;
 
 #ifdef OHOS_RSS_CLIENT
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
