@@ -265,6 +265,9 @@ public:
      */
     bool IsPointerVisible();
 
+    int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle);
+    int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle);
+
     /**
      * @brief Sets the mouse pointer speed, which ranges from 1 to 11.
      * @param speed Indicates the mouse pointer speed to set.

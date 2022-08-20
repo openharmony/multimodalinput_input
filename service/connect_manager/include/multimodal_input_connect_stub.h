@@ -40,6 +40,8 @@ protected:
     int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply);
     int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetPointerStyle(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetPointerStyle(MessageParcel& data, MessageParcel& reply);
     int32_t StubIsPointerVisible(MessageParcel& data, MessageParcel& reply);
     int32_t StubSupportKeys(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetDeviceIds(MessageParcel& data, MessageParcel& reply);

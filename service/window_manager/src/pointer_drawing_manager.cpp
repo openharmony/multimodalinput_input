@@ -332,5 +332,19 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
     UpdatePointerVisible();
     return RET_OK;
 }
+int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("Window type:%{public}d set pointer style:%{public}d success", windowId, pointerStyle);
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    pointerStyle = 0;
+    MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, pointerStyle);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
