@@ -448,7 +448,7 @@ int32_t MMIService::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
         IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, pointerStyle));
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer style failed,return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }

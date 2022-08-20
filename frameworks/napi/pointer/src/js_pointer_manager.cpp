@@ -233,7 +233,7 @@ napi_value JsPointerManager::SetPointerLocation(napi_env env, napi_value handle,
     return promise;
 }
 
-napi_value JsPointerManager::SetPointerStyle(napi_env env, int windowid, int pointerStyle, napi_value handle)
+napi_value JsPointerManager::SetPointerStyle(napi_env env, int32_t windowid, int32_t pointerStyle, napi_value handle)
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
@@ -255,7 +255,7 @@ napi_value JsPointerManager::SetPointerStyle(napi_env env, int windowid, int poi
     return promise;
 }
 
-napi_value JsPointerManager::GetPointerStyle(napi_env env, int windowid, napi_value handle)
+napi_value JsPointerManager::GetPointerStyle(napi_env env, int32_t windowid, napi_value handle)
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);

@@ -413,9 +413,9 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
         DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_NORTH_SOUTH_WEST_EAST", middle_btn_north_south_west_east),
     };
     napi_value result = nullptr;
-    CHKRP(env, napi_define_class(env, "MOUSE_ICON", NAPI_AUTO_LENGTH, EnumConstructor, nullptr,
+    CHKRP(env, napi_define_class(env, "PointerStyle", NAPI_AUTO_LENGTH, EnumConstructor, nullptr,
         sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
-    CHKRP(env, napi_set_named_property(env, exports, "MOUSE_ICON", result), SET_NAMED_PROPERTY);
+    CHKRP(env, napi_set_named_property(env, exports, "PointerStyle", result), SET_NAMED_PROPERTY);
     return exports;
 }
 
