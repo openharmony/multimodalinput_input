@@ -263,7 +263,7 @@ napi_value JsPointerManager::GetPointerStyle(napi_env env, int32_t windowid, nap
         THROWERR(env, "Create AsyncContext failed");
         return nullptr;
     }
-    int pointerStyle = 0;
+    int32_t pointerStyle = 0;
     asyncContext->errorCode = InputManager::GetInstance()->GetPointerStyle(windowid, pointerStyle);
     asyncContext->reserve << ReturnType::NUMBER << pointerStyle;
     napi_value promise = nullptr;
