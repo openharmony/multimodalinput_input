@@ -441,6 +441,30 @@ int32_t MMIService::GetPointerSpeed(int32_t &speed)
     return RET_OK;
 }
 
+int32_t MMIService::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerStyle,
+        IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, pointerStyle));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer style failed,return %{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::GetPointerStyle,
+        IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, std::ref(pointerStyle)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pointer style failed,return %{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t MMIService::OnSupportKeys(int32_t pid, int32_t userData, int32_t deviceId, std::vector<int32_t> &keys)
 {
     CALL_DEBUG_ENTER;

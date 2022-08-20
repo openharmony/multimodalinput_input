@@ -45,6 +45,8 @@ public:
     bool Init();
     void DeletePointerVisible(int32_t pid);
     int32_t SetPointerVisible(int32_t pid, bool visible);
+    int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle);
+    int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle);
     bool IsPointerVisible();
 
 public:
