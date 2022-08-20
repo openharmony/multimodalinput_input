@@ -536,7 +536,7 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible)
     CALL_DEBUG_ENTER;
     int32_t ret = MultimodalInputConnMgr->SetPointerVisible(visible);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+        MMI_HILOGE("Set pointer visible failed, ret:%{public}d", ret);
     }
     return ret;
 #else
@@ -552,7 +552,7 @@ bool InputManagerImpl::IsPointerVisible()
     bool visible;
     int32_t ret = MultimodalInputConnMgr->IsPointerVisible(visible);
     if (ret != 0) {
-        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+        MMI_HILOGE("Get pointer visible failed, ret:%{public}d", ret);
     }
     return visible;
 #else
@@ -602,7 +602,7 @@ int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, int32_t pointerStyle
     }
     int32_t ret = MultimodalInputConnMgr->SetPointerStyle(windowId, pointerStyle);
     if (ret != RET_OK) {
-        MMI_HILOGE("Failed to send to server, ret:%{public}d", ret);
+        MMI_HILOGE("Set pointer style failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -617,7 +617,7 @@ int32_t InputManagerImpl::GetPointerStyle(int32_t windowId, int32_t &pointerStyl
     }
     int32_t ret = MultimodalInputConnMgr->GetPointerStyle(windowId, pointerStyle);
     if (ret != RET_OK) {
-        MMI_HILOGE("Failed to send to server, ret:%{public}d", ret);
+        MMI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -637,7 +637,7 @@ void InputManagerImpl::OnConnected()
     }
     int32_t ret = MultimodalInputConnMgr->SetAnrObserver();
     if (ret != RET_OK) {
-        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+        MMI_HILOGE("Set anr observerfailed, ret:%{public}d", ret);
     }
 }
 
@@ -737,7 +737,7 @@ void InputManagerImpl::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
     anrObservers_.push_back(observer);
     int32_t ret = MultimodalInputConnMgr->SetAnrObserver();
     if (ret != RET_OK) {
-        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+        MMI_HILOGE("Set anr observer failed, ret:%{public}d", ret);
     }
 }
 
