@@ -27,6 +27,8 @@ public:
     static napi_value Export(napi_env env, napi_value exports);
     static napi_value SetPointerVisible(napi_env env, napi_callback_info info);
     static napi_value IsPointerVisible(napi_env env, napi_callback_info info);
+    static napi_value SetPointerStyle(napi_env env, napi_callback_info info);
+    static napi_value GetPointerStyle(napi_env env, napi_callback_info info);
     std::shared_ptr<JsPointerManager> GetJsPointerMgr() const;
     static napi_value SetPointerSpeed(napi_env env, napi_callback_info info);
     static napi_value GetPointerSpeed(napi_env env, napi_callback_info info);
@@ -36,6 +38,8 @@ private:
     static napi_value CreateInstance(napi_env env);
     static JsPointerContext* GetInstance(napi_env env);
     static napi_value CreateJsObject(napi_env env, napi_callback_info info);
+    static napi_value EnumConstructor(napi_env env, napi_callback_info info);
+    static napi_value CreatePointerStyle(napi_env env, napi_value exports);
     std::shared_ptr<JsPointerManager> mgr_ {nullptr};
     napi_ref contextRef_ {nullptr};
 };

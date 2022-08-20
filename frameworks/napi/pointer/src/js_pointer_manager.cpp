@@ -232,5 +232,49 @@ napi_value JsPointerManager::SetPointerLocation(napi_env env, napi_value handle,
     AsyncCallbackWork(asyncContext);
     return promise;
 }
+
+napi_value JsPointerManager::SetPointerStyle(napi_env env, int32_t windowid, int32_t pointerStyle, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    if (asyncContext == nullptr) {
+        THROWERR(env, "Create AsyncContext failed");
+        return nullptr;
+    }
+    asyncContext->errorCode = InputManager::GetInstance()->SetPointerStyle(windowid, pointerStyle);
+    asyncContext->reserve << ReturnType::VOID;
+
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(env, napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(env, napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::GetPointerStyle(napi_env env, int32_t windowid, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    if (asyncContext == nullptr) {
+        THROWERR(env, "Create AsyncContext failed");
+        return nullptr;
+    }
+    int32_t pointerStyle = 0;
+    asyncContext->errorCode = InputManager::GetInstance()->GetPointerStyle(windowid, pointerStyle);
+    asyncContext->reserve << ReturnType::NUMBER << pointerStyle;
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(env, napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(env, napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
 } // namespace MMI
 } // namespace OHOS
