@@ -471,7 +471,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
                                 KeyEvent::KeyItem item1;
                                 item1.SetKeyCode(keyCode);
-                                item1.SetPressed(true);
+                                item1.SetPressed(false);
                                 KeyEvent->AddKeyItem(item1);
                                 InputManager::GetInstance()->SimulateInputEvent(KeyEvent);
                                 iter = downKey.erase(iter);
