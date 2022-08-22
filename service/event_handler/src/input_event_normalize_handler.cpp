@@ -323,8 +323,27 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
+    if (DInputMgr->CheckTouchEvent(event)) {
+        MMI_HILOGW("Touch event filter out");
+        ResetTouchUpEvent(pointerEvent, event);
+        return RET_OK;
+    }
+#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
+    ResetTouchUpEvent(pointerEvent, event);
+#else
+    MMI_HILOGW("Touchscreen device does not support");
+#endif // OHOS_BUILD_ENABLE_TOUCH
+    return RET_OK;
+}
+
+void InputEventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent,
+    struct libinput_event *event)
+{
+    CHKPV(pointerEvent);
+    CHKPV(event);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCH_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
@@ -334,10 +353,6 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
             pointerEvent->Reset();
         }
     }
-#else
-    MMI_HILOGW("Touchscreen device does not support");
-#endif // OHOS_BUILD_ENABLE_TOUCH
-    return RET_OK;
 }
 
 int32_t InputEventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
