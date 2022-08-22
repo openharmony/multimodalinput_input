@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "display_info.h"
+#include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
@@ -28,8 +29,9 @@ public:
     virtual ~IPointerDrawingManager() = default;
 
     static std::shared_ptr<IPointerDrawingManager> GetInstance();
-    virtual void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY) {}
-    virtual void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height, Direction direction) {}
+    virtual void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+        const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT) {}
+    virtual void OnDisplayInfo(int32_t displayId, WinInfo &info, int32_t width, int32_t height, Direction direction) {}
     virtual bool Init()
     {
         return true;
@@ -47,6 +49,7 @@ public:
     {
         return 0;
     }
+    virtual void DrawPointerStyle() {}
     virtual bool IsPointerVisible()
     {
         return false;

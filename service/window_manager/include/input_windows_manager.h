@@ -37,7 +37,7 @@ struct MouseLocation {
 class InputWindowsManager : public DelayedSingleton<InputWindowsManager> {
 public:
     InputWindowsManager();
-    virtual ~InputWindowsManager();
+    virtual ~InputWindowsManager() = default;
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
 
     void Init(UDSServer& udsServer);
@@ -72,6 +72,9 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     const DisplayGroupInfo& GetDisplayGroupInfo();
+    int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle);
+    std::optional<int> GetPointerStyle(int32_t pid, int32_t windowId) const;
+    bool IsNeedRefreshLayer(int32_t windowId);
 #endif // OHOS_BUILD_ENABLE_POINTER
     void Dump(int32_t fd, const std::vector<std::string> &args);
     int32_t GetWindowPid(int32_t windowId, const DisplayGroupInfo& displayGroupInfo) const;
@@ -91,6 +94,8 @@ private:
     void UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent, const WindowInfo& touchWindow);
     void NotifyPointerToWindow();
+    void OnSessionLost(SessionPtr session);
+    void UpdatePointerStyle();
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
@@ -108,6 +113,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     std::optional<WindowInfo> SelectWindowInfo(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent);
+    std::optional<WindowInfo> GetWindowInfo(int32_t logicalX, int32_t logicalY);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
@@ -123,11 +129,12 @@ private:
 private:
     UDSServer* udsServer_ = nullptr;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t firstBtnDownWindowId_ = -1;
-    int32_t lastLogicX_ = -1;
-    int32_t lastLogicY_ = -1;
+    int32_t firstBtnDownWindowId_ { -1 };
+    int32_t lastLogicX_ { -1 };
+    int32_t lastLogicY_ { -1 };
     WindowInfo lastWindowInfo_;
-    std::shared_ptr<PointerEvent> lastPointerEvent_ = nullptr;
+    std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
+    std::map<int32_t, std::map<int32_t, int32_t>> pointerStyle_;
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
     MouseLocation mouseLocation_ = {-1, -1}; // physical coord

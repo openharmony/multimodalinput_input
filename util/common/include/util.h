@@ -64,6 +64,7 @@ void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
 std::string StringFmt(const char* str, ...);
 std::string ReadJsonFile(const std::string &filePath);
 std::string ReadUinputToolFile(const std::string &filePath);
+int32_t ReadCursorStyleFile(const std::string &filePath);
 int32_t ReadTomlFile(const std::string &filePath, DeviceConfig& devConf);
 int32_t ReadConfigFile(const std::string &realPath, DeviceConfig& devConf);
 int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value, DeviceConfig& devConf);
