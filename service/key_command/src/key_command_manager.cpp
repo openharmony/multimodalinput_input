@@ -23,7 +23,6 @@
 #include "bytrace_adapter.h"
 #include "error_multimodal.h"
 #include "mmi_log.h"
-#include "string_wrapper.h"
 #include "timer_manager.h"
 
 namespace OHOS {
@@ -513,11 +512,9 @@ void KeyCommandManager::LaunchAbility(ShortcutKey key)
     for (const auto &entity : key.ability.entities) {
         want.AddEntity(entity);
     }
-    AAFwk::WantParams wParams;
     for (const auto &item : key.ability.params) {
-        wParams.SetParam(item.first, AAFwk::String::Box(item.second));
+        want.SetParam(item.first, item.second);
     }
-    want.SetParams(wParams);
     DfxHisysevent::CalcComboStartTimes(lastMatchedKey_.keyDownDuration);
     DfxHisysevent::ReportComboStartTimes();
     MMI_HILOGD("Start launch ability, bundleName:%{public}s", key.ability.bundleName.c_str());
