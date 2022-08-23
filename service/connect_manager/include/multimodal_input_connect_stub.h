@@ -60,6 +60,7 @@ protected:
     int32_t StubSetAnrListener(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetInputDevice(MessageParcel& data, MessageParcel& reply);
     int32_t StubStartRemoteCooperate(MessageParcel& data, MessageParcel& reply);
     int32_t StubStartRemoteCooperateRes(MessageParcel& data, MessageParcel& reply);
     int32_t StubStopRemoteCooperate(MessageParcel& data, MessageParcel& reply);
