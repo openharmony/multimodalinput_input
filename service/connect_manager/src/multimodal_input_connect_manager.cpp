@@ -57,13 +57,13 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
     }
 
     const std::string programName(GetProgramName());
-    int32_t result = multimodalInputConnectService_->AllocSocketFd(programName, moduleType, socketFd_);
+    int32_t result = multimodalInputConnectService_->AllocSocketFd(programName, moduleType, socketFd_, tokenType_);
     if (result != RET_OK) {
         MMI_HILOGE("AllocSocketFd has error:%{public}d", result);
         return RET_ERR;
     }
 
-    MMI_HILOGI("AllocSocketPair success. socketFd_:%{public}d", socketFd_);
+    MMI_HILOGI("AllocSocketPair success. socketFd_:%{public}d tokenType_:%{public}d", socketFd_, tokenType_);
     return RET_OK;
 }
 
@@ -93,6 +93,30 @@ int32_t MultimodalInputConnectManager::IsPointerVisible(bool &visible)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->IsPointerVisible(visible);
+}
+
+int32_t MultimodalInputConnectManager::SetPointerSpeed(int32_t speed)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetPointerSpeed(speed);
+}
+
+int32_t MultimodalInputConnectManager::GetPointerSpeed(int32_t &speed)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->GetPointerSpeed(speed);
+}
+
+int32_t MultimodalInputConnectManager::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetPointerStyle(windowId, pointerStyle);
+}
+
+int32_t MultimodalInputConnectManager::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->GetPointerStyle(windowId, pointerStyle);
 }
 
 int32_t MultimodalInputConnectManager::RegisterDevListener()

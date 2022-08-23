@@ -151,9 +151,20 @@ int32_t InputManager::SetPointerVisible(bool visible)
 {
     return InputMgrImpl->SetPointerVisible(visible);
 }
+
 bool InputManager::IsPointerVisible()
 {
     return InputMgrImpl->IsPointerVisible();
+}
+
+int32_t InputManager::SetPointerSpeed(int32_t speed)
+{
+    return InputMgrImpl->SetPointerSpeed(speed);
+}
+
+int32_t InputManager::GetPointerSpeed(int32_t &speed)
+{
+    return InputMgrImpl->GetPointerSpeed(speed);
 }
 
 int32_t InputManager::GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback)
@@ -164,6 +175,53 @@ int32_t InputManager::GetKeyboardType(int32_t deviceId, std::function<void(int32
 void InputManager::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
 {
     InputMgrImpl->SetAnrObserver(observer);
+}
+
+int32_t InputManager::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
+{
+    return InputMgrImpl->SetPointerStyle(windowId, pointerStyle);
+}
+
+int32_t InputManager::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
+{
+    return InputMgrImpl->GetPointerStyle(windowId, pointerStyle);
+}
+
+int32_t InputManager::SetPointerLocation(int32_t x, int32_t y)
+{
+    return InputManagerImpl::GetInstance()->SetPointerLocation(x, y);
+}
+
+int32_t InputManager::SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId)
+{
+    return InputManagerImpl::GetInstance()->SetInputDeviceSeatName(seatName, deviceUniqId);
+}
+
+int32_t InputManager::GetRemoteInputAbility(std::string deviceId,
+    std::function<void(std::set<int32_t>)> remoteTypes)
+{
+    return InputManagerImpl::GetInstance()->GetRemoteInputAbility(deviceId, remoteTypes);
+}
+int32_t InputManager::PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
+{
+    return InputManagerImpl::GetInstance()->PrepareRemoteInput(deviceId, callback);
+}
+
+int32_t InputManager::UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
+{
+    return InputManagerImpl::GetInstance()->UnprepareRemoteInput(deviceId, callback);
+}
+
+int32_t InputManager::StartRemoteInput(const std::string& deviceId,
+    uint32_t inputAbility, std::function<void(int32_t)> callback)
+{
+    return InputManagerImpl::GetInstance()->StartRemoteInput(deviceId, inputAbility, callback);
+}
+
+int32_t InputManager::StopRemoteInput(const std::string& deviceId, uint32_t inputAbility,
+    std::function<void(int32_t)> callback)
+{
+    return InputManagerImpl::GetInstance()->StopRemoteInput(deviceId, inputAbility, callback);
 }
 } // namespace MMI
 } // namespace OHOS

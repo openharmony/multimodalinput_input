@@ -254,7 +254,7 @@ struct DisplayGroupInfo {
      * @since 9
      */
     std::vector<WindowInfo> windowsInfo;
-    
+
     /**
      * Physical screen information list
      *

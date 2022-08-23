@@ -41,15 +41,9 @@ public:
  */
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
-#ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformTouchScreenJsonDataToInputData.json";
     std::string startDeviceCmd = "vuinput start touchscreen & ";
     std::string closeDeviceCmd = "vuinput close all";
-#else
-    const std::string path = "temp/Test_TransformTouchScreenJsonDataToInputData.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchscreen &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
-#endif
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -79,15 +73,9 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, Tes
  */
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
-#ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJsonDataToInputDataEventsIsEmpty.json";
     std::string startDeviceCmd = "vuinput start touchscreen & ";
     std::string closeDeviceCmd = "vuinput close all";
-#else
-    const std::string path = "temp/Test_TransformJsonDataToInputDataEventsIsEmpty.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchscreen &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
-#endif
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -117,15 +105,9 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEvent
  */
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataSingleEventsIsEmpty, TestSize.Level1)
 {
-#ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJsonDataToInputDataSingleEventsIsEmpty.json";
     std::string startDeviceCmd = "vuinput start touchscreen & ";
     std::string closeDeviceCmd = "vuinput close all";
-#else
-    const std::string path = "temp/Test_TransformJsonDataToInputDataSingleEventsIsEmpty.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start touchscreen &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
-#endif
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";

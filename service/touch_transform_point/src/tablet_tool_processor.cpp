@@ -24,8 +24,7 @@ constexpr int32_t DEFAULT_POINTER_ID { 0 };
 } // namespace
 
 TabletToolProcessor::TabletToolProcessor(int32_t deviceId)
-    : deviceId_(deviceId)
-{}
+    : deviceId_(deviceId) {}
 
 std::shared_ptr<PointerEvent> TabletToolProcessor::OnEvent(struct libinput_event* event)
 {
@@ -147,7 +146,7 @@ bool TabletToolProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
     double tiltY = libinput_event_tablet_tool_get_tilt_y(event);
     double pressure = libinput_event_tablet_tool_get_pressure(event);
     int32_t toolType = GetToolType(event);
-    
+
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionStartTime(time);
     pointerEvent_->SetTargetDisplayId(targetDisplayId);

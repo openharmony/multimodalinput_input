@@ -36,13 +36,13 @@ public:
     ~KeyEventSubscriber() = default;
     DISALLOW_COPY_AND_MOVE(KeyEventSubscriber);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+    void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    void HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+    void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+    void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
             const std::shared_ptr<KeyOption> keyOption);
@@ -51,9 +51,7 @@ public:
 private:
     struct Subscriber {
         Subscriber(int32_t id, SessionPtr sess, std::shared_ptr<KeyOption> keyOption)
-            : id_(id), sess_(sess), keyOption_(keyOption), timerId_(-1)
-        {
-        }
+            : id_(id), sess_(sess), keyOption_(keyOption), timerId_(-1) {}
         int32_t id_ { -1 };
         SessionPtr sess_ { nullptr };
         std::shared_ptr<KeyOption> keyOption_ { nullptr };

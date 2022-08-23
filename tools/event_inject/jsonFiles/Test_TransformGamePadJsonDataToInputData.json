@@ -1,6 +1,6 @@
  [
-    { 
-     "deviceName": "gamePad", 
+    {
+     "deviceName": "gamePad",
      "events":[
                 {"eventType": "KEY_EVENT_CLICK", "keyValue": 310},
                 {"eventType": "KEY_EVENT_CLICK", "keyValue": 311},
@@ -31,14 +31,14 @@
                 {"eventType": "ROCKER_2", "direction":"rt", "event":[74,90,112,138,152,160,166,170,172,165,153,136,113,74]}
             ]
     },
-    { 
-     "deviceName": "gamePad", 
+    {
+     "deviceName": "gamePad",
      "events":[
                 {"eventType": "KEY_EVENT_CLICK", "keyValue": 310,"blockTime":100}
               ]
     },
-        { 
-     "deviceName": "gamePad", 
+        {
+     "deviceName": "gamePad",
      "events":[
                 {"eventType": "KEY_EVENT_CLICK", "keyValue": 310,"blockTime":100}
               ]

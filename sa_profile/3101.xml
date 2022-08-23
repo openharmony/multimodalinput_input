@@ -18,7 +18,7 @@
         <name>3101</name>
         <libpath>libmmi-server.z.so</libpath>
         <run-on-create>true</run-on-create>
-        <distributed>false</distributed>
+        <distributed>true</distributed>
         <dump-level>1</dump-level>
     </systemability>
 </info>

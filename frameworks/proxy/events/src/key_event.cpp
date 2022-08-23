@@ -494,9 +494,9 @@ KeyEvent::KeyEvent(int32_t eventType) : InputEvent(eventType) {}
 
 KeyEvent::KeyEvent(const KeyEvent& other)
     : InputEvent(other),
-    keyCode_(other.keyCode_),
-    keys_(other.keys_),
-    keyAction_(other.keyAction_) {}
+      keyCode_(other.keyCode_),
+      keys_(other.keys_),
+      keyAction_(other.keyAction_) {}
 
 KeyEvent::~KeyEvent() {}
 
@@ -560,10 +560,11 @@ void KeyEvent::AddPressedKeyItems(const KeyItem& keyItem)
 
 void KeyEvent::RemoveReleasedKeyItems(const KeyItem& keyItem)
 {
+    int32_t keyCode = keyItem.GetKeyCode();
     std::vector<KeyItem> tempKeyItems = keys_;
     keys_.clear();
     for (const auto &item : tempKeyItems) {
-        if (item.GetKeyCode() != keyItem.GetKeyCode()) {
+        if (item.GetKeyCode() != keyCode) {
             keys_.push_back(item);
         }
     }
@@ -1023,7 +1024,7 @@ bool KeyEvent::IsValidKeyItem() const
     int32_t sameKeyCodeNum = 0;
     int32_t keyCode = GetKeyCode();
     int32_t action = GetKeyAction();
-    
+
     for (auto it = keys_.begin(); it != keys_.end(); ++it) {
         if (it->GetKeyCode() == keyCode) {
             if (++sameKeyCodeNum > 1) {
@@ -1049,7 +1050,7 @@ bool KeyEvent::IsValidKeyItem() const
                 return false;
             }
         }
-        
+
         auto item = it;
         for (++item; item != keys_.end(); item++) {
             if (it->GetKeyCode() == item->GetKeyCode()) {
@@ -1058,7 +1059,7 @@ bool KeyEvent::IsValidKeyItem() const
             }
         }
     }
-    
+
     if (sameKeyCodeNum == 0) {
         MMI_HILOGE("Keyitems keyCode is not exist equal item with keyEvent keyCode");
         return false;
@@ -1074,19 +1075,19 @@ bool KeyEvent::IsValid() const
         MMI_HILOGE("KeyCode_ is invalid");
         return false;
     }
-    
+
     if (GetActionTime() <= 0) {
         MMI_HILOGE("Actiontime is invalid");
         return false;
     }
-    
+
     int32_t action = GetKeyAction();
     if (action != KEY_ACTION_CANCEL && action != KEY_ACTION_UP &&
         action != KEY_ACTION_DOWN) {
         MMI_HILOGE("Action is invalid");
         return false;
     }
-    
+
     if (!IsValidKeyItem()) {
         MMI_HILOGE("IsValidKeyItem is invalid");
         return false;
@@ -1139,32 +1140,8 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
 
 std::ostream& operator<<(std::ostream& ostream, KeyEvent& keyEvent)
 {
-    std::vector<KeyEvent::KeyItem> keyItems { keyEvent.GetKeyItems() };
     ostream << "KeyCode:" << keyEvent.GetKeyCode()
-        << ",ActionTime:" << keyEvent.GetActionTime()
-        << ",ActionStartTime:" << keyEvent.GetActionStartTime()
-        << ",EventType:" << InputEvent::EventTypeToString(keyEvent.GetEventType())
-        << ",Flag:" << keyEvent.GetFlag()
-        << ",KeyAction:" << KeyEvent::ActionToString(keyEvent.GetKeyAction())
-        << ",EventNumber:" << keyEvent.GetId()
-        << ",keyItemsCount:" << keyItems.size() << std::endl;
-    
-    for (const auto& item : keyItems) {
-        ostream << "DeviceNumber:" << item.GetDeviceId()
-            << ",KeyCode:" << item.GetKeyCode()
-            << ",DownTime:" << item.GetDownTime()
-            << ",IsPressed:" << std::boolalpha << item.IsPressed()
-            << std::endl;
-    }
-    std::vector<int32_t> pressedKeys = keyEvent.GetPressedKeys();
-    std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
-    if (cItr != pressedKeys.cend()) {
-        ostream << "Pressed keyCode: [" << *cItr++;
-        for (; cItr != pressedKeys.cend(); ++cItr) {
-            ostream << "," << *cItr;
-        }
-        ostream << "]" << std::endl;
-    }
+        << ",KeyAction:" << KeyEvent::ActionToString(keyEvent.GetKeyAction()) << std::endl;
     return ostream;
 }
 } // namespace MMI

@@ -56,15 +56,9 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileIsEmpty, TestSiz
  */
 HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileNotEmpty, TestSize.Level1)
 {
-#ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJsonDataCheckFileNotEmpty.json";
     std::string startDeviceCmd = "vuinput start all & ";
     std::string closeDeviceCmd = "vuinput close all";
-#else
-    const std::string path = "temp/Test_TransformJsonDataCheckFileNotEmpty.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start all &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
-#endif
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";
@@ -93,15 +87,9 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileNotEmpty, TestSi
  */
 HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataGetDeviceNodeError, TestSize.Level1)
 {
-#ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_TransformJsonDataGetDeviceNodeError.json";
     std::string startDeviceCmd = "vuinput start all & ";
     std::string closeDeviceCmd = "vuinput close all";
-#else
-    const std::string path = "temp/Test_TransformJsonDataGetDeviceNodeError.json";
-    std::string startDeviceCmd = "./mmi-virtual-deviced.out start all &";
-    std::string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
-#endif
     FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "start device failed";

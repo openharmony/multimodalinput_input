@@ -179,11 +179,13 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
             displayGroupInfo.displaysInfo[0].direction);
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (InputDevMgr->HasPointerDevice()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
         NotifyPointerToWindow();
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     PrintDisplayInfo();
 }
 
@@ -238,7 +240,7 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
     auto pointerEvent = PointerEvent::Create();
     CHKPV(pointerEvent);
     pointerEvent->UpdateId();
-    
+
     PointerEvent::PointerItem lastPointerItem;
     int32_t lastPointerId = lastPointerEvent_->GetPointerId();
     if (!lastPointerEvent_->GetPointerItem(lastPointerId, lastPointerItem)) {
@@ -605,6 +607,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("The addition of logicalY overflows");
         return RET_ERR;
     }
+    IPointerDrawingManager::GetInstance()->OnDisplayInfo(physicalDisplayInfo->id,
+        physicalDisplayInfo->width, physicalDisplayInfo->height, physicalDisplayInfo->direction);
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
     auto touchWindow = SelectWindowInfo(logicalX, logicalY, pointerEvent);
     if (!touchWindow) {
@@ -620,9 +624,11 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (InputDevMgr->HasPointerDevice()) {
         UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
     }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
     MMI_HILOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
                "logicalX:%{public}d,logicalY:%{public}d,"
@@ -811,19 +817,21 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     if (displayId == lastDisplayId) {
         if (integerX < 0) {
             integerX = 0;
+            x = static_cast<double>(integerX);
         }
         if (integerX >= width) {
             integerX = width - 1;
+            x = static_cast<double>(integerX);
         }
         if (integerY < 0) {
             integerY = 0;
+            y = static_cast<double>(integerY);
         }
         if (integerY >= height) {
             integerY = height - 1;
+            y = static_cast<double>(integerY);
         }
     }
-    x = static_cast<double>(integerX);
-    y = static_cast<double>(integerY);
     mouseLocation_.physicalX = integerX;
     mouseLocation_.physicalY = integerY;
     MMI_HILOGD("Mouse Data: physicalX:%{public}d,physicalY:%{public}d, displayId:%{public}d",

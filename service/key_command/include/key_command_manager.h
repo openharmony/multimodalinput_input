@@ -61,21 +61,21 @@ public:
     DISALLOW_COPY_AND_MOVE(KeyCommandManager);
     ~KeyCommandManager() = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    void HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+    void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    void HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+    void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    void HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+    void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    bool HandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
 private:
-    bool ParseJson();
-    std::string GetConfigFilePath() const;
+    bool ParseJson(const std::string configFile);
     void LaunchAbility(ShortcutKey key);
     std::string GenerateKey(const ShortcutKey& key);
     void Print();
+    bool ParseConfig();
     bool IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey);
     bool HandleKeyDown(ShortcutKey &shortcutKey);
@@ -85,6 +85,7 @@ private:
         lastMatchedKey_.preKeys.clear();
         lastMatchedKey_.finalKey = -1;
         lastMatchedKey_.timerId = -1;
+        lastMatchedKey_.keyDownDuration = 0;
     }
     bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
     ShortcutKey lastMatchedKey_;

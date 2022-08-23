@@ -46,9 +46,8 @@ public:
 protected:
     virtual void OnConnected() override;
     virtual void OnDisconnected() override;
-    
+
     bool StartEventRunner();
-    void OnEventHandlerThread();
     void OnRecvThread();
     bool AddFdListener(int32_t fd);
     bool DelFdListener(int32_t fd);
