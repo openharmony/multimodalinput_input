@@ -500,7 +500,6 @@ void InputWindowsManager::OnSessionLost(SessionPtr session)
     if (it != pointerStyle_.end()) {
         pointerStyle_.erase(it);
         MMI_HILOGD("Clear the pointer style map, pd:%{public}d", pid);
-        return;
     }
 }
 
@@ -553,8 +552,7 @@ void InputWindowsManager::UpdatePointerStyle()
             std::map<int32_t, int32_t> tmpPointerStyle = {{windowItem.id, DEFAULT_POINTER_STYLE}};
             auto iter = pointerStyle_.insert(std::make_pair(pid, tmpPointerStyle));
             if (!iter.second) {
-                MMI_HILOGE("The pd is duplicated");
-                return;
+                MMI_HILOGW("The pd is duplicated");
             }
             continue;
         }
@@ -567,8 +565,7 @@ void InputWindowsManager::UpdatePointerStyle()
             }
             auto iter = it->second.insert(std::make_pair(windowItem.id, DEFAULT_POINTER_STYLE));
             if (!iter.second) {
-                MMI_HILOGE("The window type is duplicated");
-                return;
+                MMI_HILOGW("The window type is duplicated");
             }
         }
     }
