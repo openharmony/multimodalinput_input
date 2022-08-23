@@ -17,6 +17,7 @@ mmi_service_path = "${mmi_path}/service"
 
 config("libmmi_server_config") {
   include_dirs = [
+    "input_device_cooperate/include",
     "device_manager/include",
     "device_scalability/include",
     "delegate_task/include",
@@ -51,6 +52,7 @@ config("libmmi_server_config") {
     "//foundation/multimodalinput/input/util/network/include",
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
     "//third_party/cJSON",
+    "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core/include",
   ]
 
   if (input_feature_hdf) {
@@ -110,6 +112,10 @@ config("libmmi_server_config") {
   }
   if (input_feature_monitor) {
     defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
+  }
+
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
 }
 
@@ -429,6 +435,10 @@ ohos_shared_library("libmmi-server") {
     "window_manager/src/input_windows_manager.cpp",
   ]
 
+  if (input_feature_input_cooperation) {
+    sources += [ "input_device_cooperate/src/device_profile_adapter.cpp" ]
+  }
+
   if (input_feature_hdf) {
     sources += [
       "hdf_adapter/src/hdf_event_manager.cpp",
@@ -544,7 +554,9 @@ ohos_shared_library("libmmi-server") {
     "ability_runtime:ability_manager",
     "access_token:libaccesstoken_sdk",
     "config_policy:configpolicy_util",
+    "device_info_manager:distributed_device_profile_client",
     "drivers_interface_input:hdi_input",
+    "dsoftbus:softbus_client",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
