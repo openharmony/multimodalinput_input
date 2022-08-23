@@ -76,7 +76,8 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::REMOTE_COOPERATE_STOP, &MultimodalInputConnectStub::StubStopRemoteCooperate},
         {IMultimodalInputConnect::REMOTE_COOPERATE_STOP_RES, &MultimodalInputConnectStub::StubStopRemoteCooperateRes},
         {IMultimodalInputConnect::REMOTE_COOPERATE_STOP_OTHER_RES,
-            &MultimodalInputConnectStub::StubStartCooperateOtherRes}
+            &MultimodalInputConnectStub::StubStartCooperateOtherRes},
+        {IMultimodalInputConnect::SET_CAPTURE_MODE, &MultimodalInputConnectStub::StubSetMouseCaptureMode},
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -638,6 +639,20 @@ int32_t MultimodalInputConnectStub::StubStartCooperateOtherRes(MessageParcel& da
     int32_t ret = StartCooperateOtherResult(peerNetworkId);
     if (ret != RET_OK) {
         MMI_HILOGE("Call StartCooperateOtherRes failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetMouseCaptureMode(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t windowId = -1;
+    bool isCaptureMode = false;
+    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, isCaptureMode, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetMouseCaptureMode(windowId, isCaptureMode);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Fail to call SetMouseCaptureMode, ret:%{public}d", ret);
     }
     return ret;
 }

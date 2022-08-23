@@ -1081,5 +1081,16 @@ int32_t MMIService::StartCooperateOtherResult(const std::string& srcNetworkId)
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     return RET_OK;
 }
+
+int32_t MMIService::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::SetMouseCaptureMode,
+        InputWindowsManager::GetInstance(), windowId, isCaptureMode));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set capture failed,return %{public}d", ret);
+    }
+    return ret;;
+}
 } // namespace MMI
 } // namespace OHOS

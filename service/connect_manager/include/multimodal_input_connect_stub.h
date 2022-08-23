@@ -65,6 +65,7 @@ protected:
     int32_t StubStopRemoteCooperate(MessageParcel& data, MessageParcel& reply);
     int32_t StubStopRemoteCooperateRes(MessageParcel& data, MessageParcel& reply);
     int32_t StubStartCooperateOtherRes(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetMouseCaptureMode(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace MMI
 } // namespace OHOS
