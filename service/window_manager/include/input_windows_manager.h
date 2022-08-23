@@ -63,7 +63,7 @@ public:
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    bool TouchPointToDisplayPoint(struct libinput_event_touch* touch,
+    bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
         EventTouch& touchInfo, int32_t& targetDisplayId);
     void RotateTouchScreen(DisplayInfo info, LogicalCoordinate& coord) const;
     bool TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord, int32_t& displayId) const;

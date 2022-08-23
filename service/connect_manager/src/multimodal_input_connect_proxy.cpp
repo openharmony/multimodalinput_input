@@ -571,6 +571,30 @@ int32_t MultimodalInputConnectProxy::SetAnrObserver()
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectProxy::SetInputDevice(const std::string& dhid, const std::string& screenId)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+
+    WRITESTRING(data, dhid, ERR_INVALID_VALUE);
+    WRITESTRING(data, screenId, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(SET_INPUT_DEVICE_TO_SCREEN, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, result:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
 int32_t MultimodalInputConnectProxy::StartRemoteCooperate(const std::string& localDeviceId)
 {
     CALL_INFO_TRACE;
