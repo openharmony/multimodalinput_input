@@ -60,6 +60,7 @@ public:
     virtual int32_t StopRemoteCooperate() override;
     virtual int32_t StopRemoteCooperateResult(bool isSucess) override;
     virtual int32_t StartCooperateOtherResult(const std::string &srcNetworkId) override;
+    virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) override;
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };

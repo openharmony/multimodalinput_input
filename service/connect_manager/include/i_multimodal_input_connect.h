@@ -61,6 +61,7 @@ public:
     virtual int32_t StopRemoteCooperate() = 0;
     virtual int32_t StopRemoteCooperateResult(bool isSucess) = 0;
     virtual int32_t StartCooperateOtherResult(const std::string &srcNetworkId) = 0;
+    virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) = 0;
     enum {
         ALLOC_SOCKET_FD = 0,
         ADD_INPUT_EVENT_FILTER = 1,
@@ -85,6 +86,7 @@ public:
         GET_POINTER_SPEED = 22,
         SET_POINTER_STYLE = 23,
         GET_POINTER_STYLE = 24,
+        SET_CAPTURE_MODE = 25,
         REMOTE_COOPERATE_START = 35,
         REMOTE_COOPERATE_START_RES = 36,
         REMOTE_COOPERATE_STOP = 37,

@@ -223,5 +223,15 @@ int32_t InputManager::StopRemoteInput(const std::string& deviceId, uint32_t inpu
 {
     return InputManagerImpl::GetInstance()->StopRemoteInput(deviceId, inputAbility, callback);
 }
+
+int32_t InputManager::EnterCaptureMode(int32_t windowId)
+{
+    return InputMgrImpl->EnterCaptureMode(windowId);
+}
+
+int32_t InputManager::LeaveCaptureMode(int32_t windowId)
+{
+    return InputMgrImpl->LeaveCaptureMode(windowId);
+}
 } // namespace MMI
 } // namespace OHOS

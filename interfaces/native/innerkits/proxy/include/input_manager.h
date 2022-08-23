@@ -363,7 +363,7 @@ public:
      * 否则返回小于 <b>0</b> 的值
      */
     int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
-	
+
     /**
      * @brief 设定输入设备的席位名称.
      * @param seatName 席位名称
@@ -373,6 +373,22 @@ public:
      */
     using DeviceUniqId = std::tuple<int32_t, int32_t, int32_t, int32_t, int32_t, std::string>;
     int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId);
+
+    /**
+     * @brief 进入捕获模式
+     * @param windowId 窗口id.
+     * @return 进入捕获模式成功或失败.
+     * @since 9
+     */
+
+    int32_t EnterCaptureMode(int32_t windowId);
+    /**
+     * @brief 退出捕获模式
+     * @param windowId 窗口id.
+     * @return 退出捕获模式成功或失败.
+     * @since 9
+     */
+    int32_t LeaveCaptureMode(int32_t windowId);
 
 private:
     InputManager() = default;

@@ -167,7 +167,8 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& p
             << ",ToolWindowX:" << item.GetToolWindowX() << ",ToolWindowY:" << item.GetToolWindowY()
             << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
             << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
-            << ",LongAxis:" << item.GetLongAxis() << ",ShortAxis:" << item.GetShortAxis();
+            << ",LongAxis:" << item.GetLongAxis() << ",ShortAxis:" << item.GetShortAxis()
+            << ",RawDeltaX:" << item.GetRawDeltaX() << ",RawDeltaY:" << item.GetRawDeltaY();
     }
     return ostream.str();
 }

@@ -80,7 +80,8 @@ public:
     void DispatchPointer(int32_t pointerAction);
     void SendPointerEvent(int32_t pointerAction);
 #endif // OHOS_BUILD_ENABLE_POINTER
-
+    int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
+    bool GetMouseIsCaptureMode() const;
 private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const;
@@ -131,6 +132,10 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
     MouseLocation mouseLocation_ = {-1, -1}; // physical coord
+    struct CaptureModeInfo {
+        int32_t windowId { -1 };
+        bool isCaptureMode { false };
+    } captureModeInfo_;
 };
 } // namespace MMI
 } // namespace OHOS
