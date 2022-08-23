@@ -96,7 +96,7 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
     if (layer == nullptr) {
         pointerWindow_->Destroy();
         pointerWindow_ = nullptr;
-        MMI_HILOGE("Init layer is failed, get layer is nullptr");
+        MMI_HILOGE("Init layer is failed, Layer is nullptr");
         return RET_ERR;
     }
 
@@ -118,10 +118,10 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
     };
     OHOS::SurfaceError ret = layer->FlushBuffer(buffer, -1, flushConfig);
     if (ret != OHOS::SURFACE_ERROR_OK) {
-        MMI_HILOGE("Init layer is failed, FlushBuffer return ret:%{public}s", SurfaceErrorStr(ret).c_str());
+        MMI_HILOGE("Init layer failed, FlushBuffer return ret:%{public}s", SurfaceErrorStr(ret).c_str());
         return RET_ERR;
     }
-    MMI_HILOGD("Init layer is success");
+    MMI_HILOGD("Init layer success");
     UpdatePointerVisible();
     return RET_OK;
 }
@@ -484,7 +484,6 @@ void PointerDrawingManager::DrawPointerStyle()
 
         DrawPointer(displayId_, lastPhysicalX_, lastPhysicalY_, MOUSE_ICON(mouseStyle));
         MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", mouseStyle);
-        return;
     }
 }
 
