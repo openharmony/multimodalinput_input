@@ -33,6 +33,8 @@ public:
     static napi_value SetPointerSpeed(napi_env env, napi_callback_info info);
     static napi_value GetPointerSpeed(napi_env env, napi_callback_info info);
     static napi_value SetPointerLocation(napi_env env, napi_callback_info info);
+    static napi_value EnterCaptureMode(napi_env env, napi_callback_info info);
+    static napi_value LeaveCaptureMode(napi_env env, napi_callback_info info);
 
 private:
     static napi_value CreateInstance(napi_env env);
