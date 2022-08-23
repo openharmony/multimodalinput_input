@@ -15,14 +15,14 @@
 
 #include "key_command_manager.h"
 
-
+#include "dfx_hisysevent.h"
 #include "ability_manager_client.h"
 #include "cJSON.h"
+#include "config_policy_utils.h"
 #include "file_ex.h"
 #include "bytrace_adapter.h"
 #include "error_multimodal.h"
 #include "mmi_log.h"
-#include "string_wrapper.h"
 #include "timer_manager.h"
 
 namespace OHOS {
@@ -268,10 +268,10 @@ bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void KeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+void KeyCommandManager::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
-    if (HandleEvent(keyEvent)) {
+    if (OnHandleEvent(keyEvent)) {
         MMI_HILOGD("The keyEvent start launch an ability, keyCode:%{public}d", keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_LAUNCH_EVENT);
         return;
@@ -282,7 +282,7 @@ void KeyCommandManager::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-void KeyCommandManager::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void KeyCommandManager::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
@@ -291,7 +291,7 @@ void KeyCommandManager::HandlePointerEvent(std::shared_ptr<PointerEvent> pointer
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-void KeyCommandManager::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void KeyCommandManager::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
@@ -311,16 +311,25 @@ std::string KeyCommandManager::GenerateKey(const ShortcutKey& key)
     return std::string(ss.str());
 }
 
-std::string KeyCommandManager::GetConfigFilePath() const
+bool KeyCommandManager::ParseConfig()
 {
-    std::string defaultConfig = "/product/multimodalinput/ability_launch_config.json";
-    return FileExists(defaultConfig) ? defaultConfig : "/system/etc/multimodalinput/ability_launch_config.json";
+    const char *testPathSuffix = "/etc/multimodalinput/ability_launch_config.json";
+    char buf[MAX_PATH_LEN] = { 0 };
+    char *filePath = GetOneCfgFile(testPathSuffix, buf, MAX_PATH_LEN);
+    std::string defaultConfig = "/system/etc/multimodalinput/ability_launch_config.json";
+    if (!filePath || strlen(filePath) == 0 || strlen(filePath) > MAX_PATH_LEN) {
+        MMI_HILOGD("can not get customization config file");
+        return ParseJson(defaultConfig);
+    }
+    std::string customConfig = filePath;
+    MMI_HILOGD("The configuration file path is :%{public}s", customConfig.c_str());
+    return ParseJson(customConfig) || ParseJson(defaultConfig);
 }
 
-bool KeyCommandManager::ParseJson()
+bool KeyCommandManager::ParseJson(const std::string configFile)
 {
     CALL_DEBUG_ENTER;
-    std::string jsonStr = ReadJsonFile(GetConfigFilePath());
+    std::string jsonStr = ReadJsonFile(configFile);
     if (jsonStr.empty()) {
         MMI_HILOGE("Read configFile failed");
         return false;
@@ -371,20 +380,21 @@ void KeyCommandManager::Print()
     }
 }
 
-bool KeyCommandManager::HandleEvent(const std::shared_ptr<KeyEvent> key)
+bool KeyCommandManager::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
     if (IsKeyMatch(lastMatchedKey_, key)) {
         MMI_HILOGE("The same key is waiting timeout, skip");
         return true;
     }
+    DfxHisysevent::GetComboStartTime();
     if (lastMatchedKey_.timerId >= 0) {
         MMI_HILOGE("Remove timer:%{public}d", lastMatchedKey_.timerId);
         TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
     }
     ResetLastMatchedKey();
     if (shortcutKeys_.empty()) {
-        if (!ParseJson()) {
+        if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");
             return false;
         }
@@ -502,11 +512,11 @@ void KeyCommandManager::LaunchAbility(ShortcutKey key)
     for (const auto &entity : key.ability.entities) {
         want.AddEntity(entity);
     }
-    AAFwk::WantParams wParams;
     for (const auto &item : key.ability.params) {
-        wParams.SetParam(item.first, AAFwk::String::Box(item.second));
+        want.SetParam(item.first, item.second);
     }
-    want.SetParams(wParams);
+    DfxHisysevent::CalcComboStartTimes(lastMatchedKey_.keyDownDuration);
+    DfxHisysevent::ReportComboStartTimes();
     MMI_HILOGD("Start launch ability, bundleName:%{public}s", key.ability.bundleName.c_str());
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {

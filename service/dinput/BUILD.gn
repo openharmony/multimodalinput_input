@@ -43,8 +43,7 @@ if (input_feature_distributed) {
 
     configs = [ ":mmi_dinput_config" ]
 
-    defines = [ "OHOS_BUILD" ]
-    defines += [ "OHOS_DISTRIBUTED_INPUT_MODEL" ]
+    defines = [ "OHOS_DISTRIBUTED_INPUT_MODEL" ]
 
     external_deps = [
       "hiviewdfx_hilog_native:libhilog",
@@ -66,8 +65,7 @@ if (input_feature_distributed) {
 
     configs = [ ":mmi_dinput_config" ]
 
-    defines = [ "OHOS_BUILD" ]
-    defines += [ "OHOS_DISTRIBUTED_INPUT_MODEL" ]
+    defines = [ "OHOS_DISTRIBUTED_INPUT_MODEL" ]
     external_deps = [
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_core",

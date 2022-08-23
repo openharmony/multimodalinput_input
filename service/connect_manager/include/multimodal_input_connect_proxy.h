@@ -32,10 +32,14 @@ public:
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectProxy);
     virtual ~MultimodalInputConnectProxy() override;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
-        int32_t &socketFd) override;
+        int32_t &socketFd, int32_t &tokenType) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
     virtual int32_t SetPointerVisible(bool visible) override;
     virtual int32_t IsPointerVisible(bool &visible) override;
+    virtual int32_t SetPointerSpeed(int32_t speed) override;
+    virtual int32_t GetPointerSpeed(int32_t &speed) override;
+    virtual int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle) override;
+    virtual int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle) override;
     virtual int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys) override;
     virtual int32_t GetDeviceIds(int32_t userData) override;
     virtual int32_t GetDevice(int32_t userData, int32_t deviceId) override;
@@ -51,6 +55,11 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     virtual int32_t SetAnrObserver() override;
+    virtual int32_t StartRemoteCooperate(const std::string &localDeviceId) override;
+    virtual int32_t StartRemoteCooperateResult(bool isSucess, int32_t xPercent, int32_t yPercent) override;
+    virtual int32_t StopRemoteCooperate() override;
+    virtual int32_t StopRemoteCooperateResult(bool isSucess) override;
+    virtual int32_t StartCooperateOtherResult(const std::string &srcNetworkId) override;
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };

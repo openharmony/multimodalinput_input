@@ -13,7 +13,7 @@
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-config("libmouseEvent_config") {
+config("mouseEvent_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
@@ -22,7 +22,7 @@ config("libmouseEvent_config") {
     "//foundation/multimodalinput/input/util/network/include",
   ]
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
   if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
@@ -38,7 +38,7 @@ ohos_shared_library("mouseevent") {
     "src/native_register_module.cpp",
   ]
 
-  configs = [ ":libmouseEvent_config" ]
+  configs = [ ":mouseEvent_config" ]
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",

@@ -26,7 +26,7 @@ config("event_injection_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
   ]
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -92,7 +92,7 @@ ohos_unittest("ut-event-injection-out") {
   module_out_path = module_output_path
   include_dirs = [
     "//drivers/peripheral/input/interfaces/include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//third_party/googletest/googletest/include",
     "//third_party/cJSON",
     "${mmi_path}/frameworks/proxy/event_handler",
@@ -145,7 +145,7 @@ ohos_unittest("ut-event-injection-out") {
     "test/send_message_test.cpp",
   ]
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -170,9 +170,9 @@ ohos_unittest("ut-event-injection-out") {
   }
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "utils_base:utils",
   ]
 }
 
@@ -189,7 +189,7 @@ ohos_executable("mmi-event-injection") {
   if (input_feature_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]

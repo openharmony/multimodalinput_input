@@ -34,7 +34,7 @@ EventFilterWrap::~EventFilterWrap()
     CALL_DEBUG_ENTER;
 }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void EventFilterWrap::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+void EventFilterWrap::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
@@ -44,7 +44,7 @@ void EventFilterWrap::HandleKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-void EventFilterWrap::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void EventFilterWrap::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     if (HandlePointerEventFilter(pointerEvent)) {
@@ -57,7 +57,7 @@ void EventFilterWrap::HandlePointerEvent(std::shared_ptr<PointerEvent> pointerEv
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-void EventFilterWrap::HandleTouchEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void EventFilterWrap::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     if (HandlePointerEventFilter(pointerEvent)) {

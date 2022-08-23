@@ -172,9 +172,9 @@ void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
         std::shared_ptr<UDSSession> udsSession = item.second;
         CHKPV(udsSession);
         mprintf(fd,
-                "Uid:%d | Pid:%d | Fd:%d | Descript:%s\t",
+                "Uid:%d | Pid:%d | Fd:%d | TokenType:%d | Descript:%s\t",
                 udsSession->GetUid(), udsSession->GetPid(), udsSession->GetFd(),
-                udsSession->GetDescript().c_str());
+                udsSession->GetTokenType(), udsSession->GetDescript().c_str());
     }
 }
 

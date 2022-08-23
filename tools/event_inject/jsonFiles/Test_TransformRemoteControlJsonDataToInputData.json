@@ -1,6 +1,6 @@
  [
     {
-     "deviceName": "remoteControl", 
+     "deviceName": "remoteControl",
      "events":[
                 {"eventType": "KEY_EVENT_CLICK", "keyValue": 1},
                 {"eventType": "KEY_EVENT_CLICK", "keyValue": 96},

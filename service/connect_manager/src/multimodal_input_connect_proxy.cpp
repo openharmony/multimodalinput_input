@@ -27,8 +27,8 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectProxy" };
 } // namespace
 
-MultimodalInputConnectProxy::MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl) :
-    IRemoteProxy<IMultimodalInputConnect>(impl)
+MultimodalInputConnectProxy::MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl)
+    : IRemoteProxy<IMultimodalInputConnect>(impl)
 {
     MMI_HILOGI("Enter MultimodalInputConnectProxy");
 }
@@ -39,7 +39,7 @@ MultimodalInputConnectProxy::~MultimodalInputConnectProxy()
 }
 
 int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programName,
-    const int32_t moduleType, int32_t &socketFd)
+    const int32_t moduleType, int32_t &socketFd, int32_t &tokenType)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -66,7 +66,8 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
         return RET_ERR;
     }
     socketFd = reply.ReadFileDescriptor();
-    MMI_HILOGD("The socketFd:%{public}d", socketFd);
+    READINT32(reply, tokenType, IPC_PROXY_DEAD_OBJECT_ERR);
+    MMI_HILOGD("socketFd:%{public}d tokenType:%{public}d", socketFd, tokenType);
     return RET_OK;
 }
 
@@ -141,6 +142,94 @@ int32_t MultimodalInputConnectProxy::IsPointerVisible(bool &visible)
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectProxy::SetPointerSpeed(int32_t speed)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEINT32(data, speed, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(SET_POINTER_SPEED, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::GetPointerSpeed(int32_t &speed)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(GET_POINTER_SPEED, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    speed = reply.ReadInt32();
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return RET_ERR;
+    }
+
+    WRITEINT32(data, windowId, RET_ERR);
+    WRITEINT32(data, pointerStyle, RET_ERR);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(SET_POINTER_STYLE, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return RET_ERR;
+    }
+    WRITEINT32(data, windowId, RET_ERR);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(GET_POINTER_STYLE, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    pointerStyle = reply.ReadInt32();
+    return RET_OK;
+}
+
 int32_t MultimodalInputConnectProxy::RegisterDevListener()
 {
     MessageParcel data;
@@ -148,7 +237,7 @@ int32_t MultimodalInputConnectProxy::RegisterDevListener()
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    
+
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -480,6 +569,107 @@ int32_t MultimodalInputConnectProxy::SetAnrObserver()
         return ret;
     }
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::StartRemoteCooperate(const std::string& localDeviceId)
+{
+    CALL_INFO_TRACE;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITESTRING(data, localDeviceId, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(REMOTE_COOPERATE_START, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::StartRemoteCooperateResult(bool isSucess, int32_t xPercent, int32_t yPercent)
+{
+    CALL_INFO_TRACE;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEBOOL(data, isSucess, ERR_INVALID_VALUE);
+    WRITEINT32(data, xPercent, ERR_INVALID_VALUE);
+    WRITEINT32(data, yPercent, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(REMOTE_COOPERATE_START_RES, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::StopRemoteCooperate()
+{
+    CALL_INFO_TRACE;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(REMOTE_COOPERATE_STOP, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::StopRemoteCooperateResult(bool isSucess)
+{
+    CALL_INFO_TRACE;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITEBOOL(data, isSucess, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(REMOTE_COOPERATE_STOP_RES, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectProxy::StartCooperateOtherResult(const std::string& srcNetworkId)
+{
+    CALL_INFO_TRACE;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITESTRING(data, srcNetworkId, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(REMOTE_COOPERATE_STOP_OTHER_RES, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

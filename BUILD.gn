@@ -47,9 +47,9 @@ ohos_executable("uinput_inject") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_input:hdi_input",
     "hiviewdfx_hilog_native:libhilog",
-    "utils_base:utils",
   ]
 
   part_name = "input"
@@ -79,7 +79,6 @@ group("input_jsapi_group") {
   deps = []
   if (support_jsapi) {
     deps += [
-      "frameworks/napi/input_device:inputdevice",
       "frameworks/napi/key_code:keycode",
       "frameworks/napi/key_event:keyevent",
       "frameworks/napi/mouse_event:mouseevent",
@@ -92,7 +91,7 @@ group("input_jsapi_group") {
       deps += [ "frameworks/napi/input_monitor:inputmonitor" ]
     }
     if (input_feature_mouse) {
-      deps += [ "frameworks/napi/mouse:mouse" ]
+      deps += [ "frameworks/napi/pointer:pointer" ]
     }
     if (input_feature_keyboard) {
       deps += [

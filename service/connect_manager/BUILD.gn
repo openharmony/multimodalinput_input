@@ -40,14 +40,16 @@ ohos_source_set("mmi_connect_manager_service") {
 
   configs = [ ":mmi_connect_manager_config" ]
 
-  defines = [ "OHOS_BUILD" ]
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+  }
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 }
 
@@ -60,14 +62,22 @@ ohos_source_set("mmi_connect_manager_proxy") {
     "${mmi_connect_manager_path}/src/multimodal_input_connect_proxy.cpp",
   ]
 
+  if (input_feature_input_cooperation) {
+    sources += [
+      "${mmi_connect_manager_path}/src/multimodal_input_connect_remoter.cpp",
+    ]
+  }
+
   configs = [ ":mmi_connect_manager_config" ]
 
-  defines = [ "OHOS_BUILD" ]
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+  }
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 }

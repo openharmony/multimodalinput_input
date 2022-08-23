@@ -27,9 +27,9 @@
 
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "input_handler_manager_global.h"
+#include "event_monitor_handler.h"
 #include "input_windows_manager.h"
-#include "interceptor_handler_global.h"
+#include "event_interceptor_handler.h"
 #include "key_event_subscriber.h"
 #include "mouse_event_handler.h"
 #include "securec.h"
@@ -40,14 +40,12 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
+constexpr int32_t MAX_COMMAND_COUNT = 32;
 } // namespace
 
 void ChkConfig(int32_t fd)
 {
     mprintf(fd, "ChkMMIConfig: ");
-#ifdef OHOS_BUILD
-    mprintf(fd, "OHOS_BUILD");
-#endif
 #ifdef OHOS_BUILD_LIBINPUT
     mprintf(fd, "OHOS_BUILD_LIBINPUT");
 #endif
@@ -66,6 +64,22 @@ void ChkConfig(int32_t fd)
 void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
+    int32_t count = 0;
+    for (const auto &str : args) {
+        if (str.find("--") == 0) {
+            ++count;
+            continue;
+        }
+        if (str.find("-") == 0) {
+            count += str.size() - 1;
+            continue;
+        }
+    }
+    if (count > MAX_COMMAND_COUNT) {
+        MMI_HILOGE("cmd param number not more than 32");
+        mprintf(fd, "cmd param number not more than 32\n");
+        return;
+    }
     int32_t optionIndex = 0;
     struct option dumpOptions[] = {
         {"help", no_argument, 0, 'h'},
@@ -79,13 +93,22 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         {"mouse", no_argument, 0, 'm'},
         {NULL, 0, 0, 0}
     };
-    char **argv = new char *[args.size()];
+    char **argv = new (std::nothrow) char *[args.size()];
+    CHKPV(argv);
+    if (memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*)) != EOK) {
+        MMI_HILOGE("Call memset_s failed");
+        delete[] argv;
+        return;
+    }
     for (size_t i = 0; i < args.size(); ++i) {
-        argv[i] = new char[args[i].size() + 1];
+        argv[i] = new (std::nothrow) char[args[i].size() + 1];
+        if (argv[i] == nullptr) {
+            MMI_HILOGE("Failed to allocate memory");
+            goto RELEASE_RES;
+        }
         if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != EOK) {
             MMI_HILOGE("strcpy_s error");
             goto RELEASE_RES;
-            return;
         }
     }
     optind = 1;
@@ -177,7 +200,7 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -h, --help: dump help\t");
     mprintf(fd, "      -d, --device: dump the device information\t");
     mprintf(fd, "      -l, --devicelist: dump the device list information\t");
-    mprintf(fd, "      -w, --windows,: dump the windows information\t");
+    mprintf(fd, "      -w, --windows: dump the windows information\t");
     mprintf(fd, "      -u, --udsserver: dump the uds_server information\t");
     mprintf(fd, "      -o, --monitor: dump the monitor information\t");
     mprintf(fd, "      -s, --subscriber: dump the subscriber information\t");

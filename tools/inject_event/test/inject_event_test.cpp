@@ -154,7 +154,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKey_001, TestSize.Level1)
     char command1[] = {"uinput"};
     char command2[] = {"-K"};
     char command3[] = {"-d"};
-    char command4[] = {"1"};
+    char command4[] = {"16"};
     char *argv[] = {command1, command2, command3, command4};
     int32_t result = inputManagerCommand->ParseCommand(4, argv);
     EXPECT_EQ(OHOS::ERR_OK, result);
@@ -162,7 +162,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKey_001, TestSize.Level1)
 
 /**
  * @tc.name:InjectEvent_InjectKey_002
- * @tc.desc: test inject key down interface
+ * @tc.desc: test inject key up interface
  * @tc.type: FUNC
  * @tc.require:SR000GGQBJ
  */
@@ -172,17 +172,19 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKey_002, TestSize.Level1)
     char command1[] = {"uinput"};
     char command2[] = {"-K"};
     char command3[] = {"-d"};
-    char command4[] = {"1"};
-    char command5[] = {"-d"};
-    char command6[] = {"2"};
-    char *argv[] = {command1, command2, command3, command4, command5, command6};
-    int32_t result = inputManagerCommand->ParseCommand(6, argv);
+    char command4[] = {"16"};
+    char command5[] = {"-i"};
+    char command6[] = {"1000"};
+    char command7[] = {"-u"};
+    char command8[] = {"16"};
+    char *argv[] = {command1, command2, command3, command4, command5, command6, command7, command8};
+    int32_t result = inputManagerCommand->ParseCommand(8, argv);
     EXPECT_EQ(OHOS::ERR_OK, result);
 }
 
 /**
  * @tc.name:InjectEvent_InjectKey_003
- * @tc.desc: test inject key up interface
+ * @tc.desc: test inject press and hold the key interface
  * @tc.type: FUNC
  * @tc.require:SR000GGQBJ
  */
@@ -191,18 +193,16 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKey_003, TestSize.Level1)
     std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
     char command1[] = {"uinput"};
     char command2[] = {"-K"};
-    char command3[] = {"-d"};
-    char command4[] = {"1"};
-    char command5[] = {"-u"};
-    char command6[] = {"1"};
-    char *argv[] = {command1, command2, command3, command4, command5, command6};
-    int32_t result = inputManagerCommand->ParseCommand(6, argv);
+    char command3[] = {"-l"};
+    char command4[] = {"17"};
+    char *argv[] = {command1, command2, command3, command4};
+    int32_t result = inputManagerCommand->ParseCommand(4, argv);
     EXPECT_EQ(OHOS::ERR_OK, result);
 }
 
 /**
  * @tc.name:InjectEvent_InjectTouch_001
- * @tc.desc: test inject touch move interface
+ * @tc.desc: test inject touch screen smooth movement interface
  * @tc.type: FUNC
  * @tc.require:SR000GGQBJ
  */
