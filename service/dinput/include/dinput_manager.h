@@ -39,6 +39,7 @@ public:
     static const uint32_t DEFAULT_ABILITY;
     static const uint32_t MOUSE_ABILITY;
     static const uint32_t KEYBOARD_ABILITY;
+    static const uint32_t TOUCH_ABILITY;
     static const uint32_t FULL_ABILITY;
 public:
     DInputManager() = default;
@@ -49,6 +50,7 @@ public:
     bool IsDistributedInput(uint32_t inputAbility);
     bool IsNeedFilterOut(const std::string& deviceId, const std::shared_ptr<KeyEvent>& key);
     bool CheckWhiteList(const std::shared_ptr<KeyEvent>& key, bool &jumpIntercept);
+    bool CheckTouchEvent(struct libinput_event* event);
     OHOS::DistributedHardware::DistributedInput::DInputServerType GetDInputServerType(uint32_t inputAbility);
 
     int32_t PrepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput);

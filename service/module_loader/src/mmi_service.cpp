@@ -441,6 +441,30 @@ int32_t MMIService::GetPointerSpeed(int32_t &speed)
     return RET_OK;
 }
 
+int32_t MMIService::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerStyle,
+        IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, pointerStyle));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer style failed,return %{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::GetPointerStyle,
+        IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, std::ref(pointerStyle)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pointer style failed,return %{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t MMIService::OnSupportKeys(int32_t pid, int32_t userData, int32_t deviceId, std::vector<int32_t> &keys)
 {
     CALL_DEBUG_ENTER;
@@ -975,6 +999,86 @@ int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
         return Str16ToStr8(arg);
     });
     MMIEventDump->ParseCommand(fd, argList);
+    return RET_OK;
+}
+
+int32_t MMIService::StartRemoteCooperate(const std::string& remoteDeviceId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceCooperateSM::StartRemoteCooperate,
+        InputDevCooSM, remoteDeviceId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Start remote cooperate failed,return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+
+int32_t MMIService::StartRemoteCooperateResult(bool isSucess, int32_t xPercent, int32_t yPercent)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    MMI_HILOGI("StartRemoteCooperateResult:[%{public}d]", isSucess);
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceCooperateSM::StartRemoteCooperateResult,
+        InputDevCooSM, isSucess, xPercent, yPercent));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Start remote cooperate res failed,return %{public}d", ret);
+        return ret;
+    }
+#else
+    (void)(isSucess);
+    (void)(xPercent);
+    (void)(yPercent);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+
+int32_t MMIService::StopRemoteCooperate()
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceCooperateSM::StopRemoteCooperate,
+        InputDevCooSM));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Stop remote cooperate failed,return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+
+int32_t MMIService::StopRemoteCooperateResult(bool isSucess)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    MMI_HILOGI("Enter MMI StopRemoteCooperateResult [%{public}d]", isSucess);
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceCooperateSM::StopRemoteCooperateResult,
+        InputDevCooSM, isSucess));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Stop remote cooperate res failed,return %{public}d", ret);
+        return ret;
+    }
+#else
+    (void)(isSucess);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+int32_t MMIService::StartCooperateOtherResult(const std::string& srcNetworkId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    MMI_HILOGI("Enter MMI StartCooperateOtherResult [%{public}s]", srcNetworkId.c_str());
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceCooperateSM::StartCooperateOtherResult,
+        InputDevCooSM, srcNetworkId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Start remote other res failed,return %{public}d", ret);
+        return ret;
+    }
+#else
+    (void)(srcNetworkId);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     return RET_OK;
 }
 } // namespace MMI

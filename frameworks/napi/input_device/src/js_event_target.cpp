@@ -78,19 +78,21 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
             return;
         }
         napi_value eventType = nullptr;
-        CHKRV(item->env, napi_create_string_utf8(item->env, ADD_EVENT.c_str(), NAPI_AUTO_LENGTH, &eventType),
-             CREATE_STRING_UTF8);
+        CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, ADD_EVENT.c_str(), NAPI_AUTO_LENGTH, &eventType),
+                CREATE_STRING_UTF8, scope);
         napi_value deviceId = nullptr;
-        CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &deviceId), CREATE_INT32);
+        CHKRV_SCOPE(item->env, napi_create_int32(item->env, item->data.deviceId, &deviceId), CREATE_INT32, scope);
         napi_value object = nullptr;
-        CHKRV(item->env, napi_create_object(item->env, &object), CREATE_OBJECT);
-        CHKRV(item->env, napi_set_named_property(item->env, object, "type", eventType), SET_NAMED_PROPERTY);
-        CHKRV(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY);
-
+        CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "type", eventType),
+                SET_NAMED_PROPERTY, scope);
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId),
+                SET_NAMED_PROPERTY, scope);
         napi_value handler = nullptr;
-        CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE);
+        CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE, scope);
         napi_value ret = nullptr;
-        CHKRV(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION);
+        CHKRV_SCOPE(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret),
+                CALL_FUNCTION, scope);
         napi_close_handle_scope(item->env, scope);
     }
 }
@@ -125,22 +127,27 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
             return;
         }
         napi_value eventType = nullptr;
-        CHKRV(item->env, napi_create_string_utf8(item->env, REMOVE_EVENT.c_str(), NAPI_AUTO_LENGTH, &eventType),
-             CREATE_STRING_UTF8);
+        CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, REMOVE_EVENT.c_str(), NAPI_AUTO_LENGTH,
+             &eventType),
+             CREATE_STRING_UTF8, scope);
 
         napi_value deviceId = nullptr;
-        CHKRV(item->env, napi_create_int32(item->env, item->data.deviceId, &deviceId), CREATE_INT32);
+        CHKRV_SCOPE(item->env, napi_create_int32(item->env, item->data.deviceId, &deviceId),
+             CREATE_INT32, scope);
         
         napi_value object = nullptr;
-        CHKRV(item->env, napi_create_object(item->env, &object), CREATE_OBJECT);
-        CHKRV(item->env, napi_set_named_property(item->env, object, "type", eventType), SET_NAMED_PROPERTY);
-        CHKRV(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY);
+        CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "type", eventType),
+             SET_NAMED_PROPERTY, scope);
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId),
+             SET_NAMED_PROPERTY, scope);
 
         napi_value handler = nullptr;
-        CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE);
+        CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE, scope);
 
         napi_value ret = nullptr;
-        CHKRV(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION);
+        CHKRV_SCOPE(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret),
+             CALL_FUNCTION, scope);
         napi_close_handle_scope(item->env, scope);
     }
 }
@@ -220,19 +227,20 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
         return;
     }
     napi_value arr = nullptr;
-    CHKRV(cb->env, napi_create_array(cb->env, &arr), CREATE_ARRAY);
+    CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &arr), CREATE_ARRAY, scope);
     uint32_t index = 0;
     napi_value value = nullptr;
     for (const auto &item : cb->data.ids) {
-        CHKRV(cb->env, napi_create_int32(cb->env, item, &value), CREATE_INT32);
-        CHKRV(cb->env, napi_set_element(cb->env, arr, index, value), SET_ELEMENT);
+        CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, item, &value), CREATE_INT32, scope);
+        CHKRV_SCOPE(cb->env, napi_set_element(cb->env, arr, index, value), SET_ELEMENT, scope);
         ++index;
     }
 
     napi_value handler = nullptr;
-    CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE);
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE, scope);
     napi_value result = nullptr;
-    CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &arr, &result), CALL_FUNCTION);
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &arr, &result),
+         CALL_FUNCTION, scope);
     napi_close_handle_scope(cb->env, scope);
 }
 
@@ -256,15 +264,15 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
         return;
     }
     napi_value arr = nullptr;
-    CHKRV(cb->env, napi_create_array(cb->env, &arr), CREATE_ARRAY);
+    CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &arr), CREATE_ARRAY, scope);
     uint32_t index = 0;
     napi_value value = nullptr;
     for (const auto &item : cb->data.ids) {
-        CHKRV(cb->env, napi_create_int32(cb->env, item, &value), CREATE_INT32);
-        CHKRV(cb->env, napi_set_element(cb->env, arr, index, value), SET_ELEMENT);
+        CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, item, &value), CREATE_INT32, scope);
+        CHKRV_SCOPE(cb->env, napi_set_element(cb->env, arr, index, value), SET_ELEMENT, scope);
         ++index;
     }
-    CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, arr), RESOLVE_DEFERRED);
+    CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, arr), RESOLVE_DEFERRED, scope);
     napi_close_handle_scope(cb->env, scope);
 }
 
@@ -330,11 +338,16 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
         return;
     }
     napi_value object = JsUtil::GetDeviceInfo(cb);
-    CHKPV(object);
+    if (object == nullptr) {
+        MMI_HILOGE("Check object is null");
+        napi_close_handle_scope(cb->env, scope);
+        return;
+    }
     napi_value handler = nullptr;
-    CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE);
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE, scope);
     napi_value result = nullptr;
-    CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &result), CALL_FUNCTION);
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &result), CALL_FUNCTION,
+         scope);
     napi_close_handle_scope(cb->env, scope);
 }
 
@@ -357,8 +370,12 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
         return;
     }
     napi_value object = JsUtil::GetDeviceInfo(cb);
-    CHKPV(object);
-    CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED);
+    if (object == nullptr) {
+        MMI_HILOGE("Check object is null");
+        napi_close_handle_scope(cb->env, scope);
+        return;
+    }
+    CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED, scope);
     napi_close_handle_scope(cb->env, scope);
 }
 
@@ -421,17 +438,17 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
         return;
     }
     napi_value keyAbility = nullptr;
-    CHKRV(cb->env, napi_create_array(cb->env, &keyAbility), CREATE_ARRAY);
+    CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &keyAbility), CREATE_ARRAY, scope);
     for (size_t i = 0; i < cb->data.keystrokeAbility.size(); ++i) {
         napi_value ret = nullptr;
         napi_value isSupport = nullptr;
-        CHKRV(cb->env, napi_create_int32(cb->env, cb->data.keystrokeAbility[i] ? 1 : 0, &ret),
-            CREATE_INT32);
-        CHKRV(cb->env, napi_coerce_to_bool(cb->env, ret, &isSupport), COERCE_TO_BOOL);
-        CHKRV(cb->env, napi_set_element(cb->env, keyAbility, static_cast<uint32_t>(i), isSupport),
-            SET_ELEMENT);
+        CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, cb->data.keystrokeAbility[i] ? 1 : 0, &ret),
+            CREATE_INT32, scope);
+        CHKRV_SCOPE(cb->env, napi_coerce_to_bool(cb->env, ret, &isSupport), COERCE_TO_BOOL, scope);
+        CHKRV_SCOPE(cb->env, napi_set_element(cb->env, keyAbility, static_cast<uint32_t>(i), isSupport),
+            SET_ELEMENT, scope);
     }
-    CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, keyAbility), RESOLVE_DEFERRED);
+    CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, keyAbility), RESOLVE_DEFERRED, scope);
     napi_close_handle_scope(cb->env, scope);
 }
 
@@ -455,23 +472,23 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
         return;
     }
     napi_value keyAbility = nullptr;
-    CHKRV(cb->env, napi_create_array(cb->env, &keyAbility), CREATE_ARRAY);
+    CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &keyAbility), CREATE_ARRAY, scope);
     for (size_t i = 0; i < cb->data.keystrokeAbility.size(); ++i) {
         napi_value ret = nullptr;
         napi_value isSupport = nullptr;
-        CHKRV(cb->env, napi_create_int32(cb->env, cb->data.keystrokeAbility[i] ? 1 : 0, &ret),
-            CREATE_INT32);
-        CHKRV(cb->env, napi_coerce_to_bool(cb->env, ret, &isSupport), COERCE_TO_BOOL);
-        CHKRV(cb->env, napi_set_element(cb->env, keyAbility, static_cast<uint32_t>(i), isSupport),
-            SET_ELEMENT);
+        CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, cb->data.keystrokeAbility[i] ? 1 : 0, &ret),
+            CREATE_INT32, scope);
+        CHKRV_SCOPE(cb->env, napi_coerce_to_bool(cb->env, ret, &isSupport), COERCE_TO_BOOL, scope);
+        CHKRV_SCOPE(cb->env, napi_set_element(cb->env, keyAbility, static_cast<uint32_t>(i), isSupport),
+            SET_ELEMENT, scope);
     }
 
     napi_value handler = nullptr;
-    CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler),
-          GET_REFERENCE);
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler),
+          GET_REFERENCE, scope);
     napi_value result = nullptr;
-    CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &keyAbility, &result),
-          CALL_FUNCTION);
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &keyAbility, &result),
+          CALL_FUNCTION, scope);
     napi_close_handle_scope(cb->env, scope);
 }
 
@@ -572,11 +589,13 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
         return;
     }
     napi_value keyboardType = nullptr;
-    CHKRV(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &keyboardType), CREATE_INT32);
+    CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &keyboardType),
+         CREATE_INT32, scope);
     napi_value handler = nullptr;
-    CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE);
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE, scope);
     napi_value result = nullptr;
-    CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &keyboardType, &result), CALL_FUNCTION);
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &keyboardType, &result),
+         CALL_FUNCTION, scope);
     napi_close_handle_scope(cb->env, scope);
 }
 
@@ -600,8 +619,10 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
         return;
     }
     napi_value keyboardType = nullptr;
-    CHKRV(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &keyboardType), CREATE_INT32);
-    CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, keyboardType), RESOLVE_DEFERRED);
+    CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &keyboardType),
+         CREATE_INT32, scope);
+    CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, keyboardType),
+         RESOLVE_DEFERRED, scope);
     napi_close_handle_scope(cb->env, scope);
 }
 

@@ -28,7 +28,8 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN,
 const uint32_t DInputManager::DEFAULT_ABILITY = 0;
 const uint32_t DInputManager::MOUSE_ABILITY = 1;
 const uint32_t DInputManager::KEYBOARD_ABILITY = 2;
-const uint32_t DInputManager::FULL_ABILITY = 3;
+const uint32_t DInputManager::TOUCH_ABILITY = 4;
+const uint32_t DInputManager::FULL_ABILITY = 7;
 
 void DInputManager::SetMouseLocation(const DMouseLocation& info)
 {
@@ -78,6 +79,23 @@ bool DInputManager::CheckWhiteList(const std::shared_ptr<KeyEvent>& key, bool &j
             MMI_HILOGW("Events are filtered");
         }
     }
+    return false;
+}
+
+bool DInputManager::CheckTouchEvent(struct libinput_event* event)
+{
+    CALL_INFO_TRACE;
+    CHKPF(event);
+    DInputServerType type = GetDInputServerType(DInputManager::TOUCH_ABILITY);
+    if (type == DInputServerType::SINK_SERVER_TYPE) {
+        auto touchEvent = libinput_event_get_touch_event(event);
+        CHKPF(touchEvent);
+        int32_t absX = static_cast<int32_t>(libinput_event_touch_get_x(touchEvent));
+        int32_t absY = static_cast<int32_t>(libinput_event_touch_get_y(touchEvent));
+        MMI_HILOGI("Check touch event absX:%{public}d, absY:%{public}d", absX, absY);
+        return DistributedInputKit::IsTouchEventNeedFilterOut(absX, absY);
+    }
+    MMI_HILOGI("Get dinput server type:%{public}d does not need to be filtered", type);
     return false;
 }
 

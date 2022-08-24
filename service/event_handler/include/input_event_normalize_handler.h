@@ -50,6 +50,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventHandler keyEventHandler_;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+    void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
 };
 } // namespace MMI
 } // namespace OHOS

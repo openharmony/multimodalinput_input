@@ -31,7 +31,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerDrawingManager" };
-const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_icon/angle.png";
+const std::string IMAGE_POINTER_JPEG_PATH = "/system/etc/multimodalinput/mouse_icon/Default_NW.png";
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -330,6 +330,20 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
     CALL_DEBUG_ENTER;
     UpdatePidInfo(pid, visible);
     UpdatePointerVisible();
+    return RET_OK;
+}
+int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("Window type:%{public}d set pointer style:%{public}d success", windowId, pointerStyle);
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    pointerStyle = 0;
+    MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, pointerStyle);
     return RET_OK;
 }
 } // namespace MMI
