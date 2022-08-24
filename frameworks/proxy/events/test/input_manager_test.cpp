@@ -2696,8 +2696,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_002, Tes
 HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_001, TestSize.Level1)
 {
     bool isVisible { true };
-    if (MMI::InputManager::GetInstance()->SetPointerVisible(isVisible) == RET_OK) {
-        ASSERT_TRUE(MMI::InputManager::GetInstance()->IsPointerVisible() == isVisible);
+    if (InputManager::GetInstance()->SetPointerVisible(isVisible) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->IsPointerVisible() == isVisible);
     }
 }
 
@@ -2710,8 +2710,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_001, TestSize.Leve
 HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_002, TestSize.Level1)
 {
     bool isVisible { false };
-    if (MMI::InputManager::GetInstance()->SetPointerVisible(isVisible) == RET_OK) {
-        ASSERT_TRUE(MMI::InputManager::GetInstance()->IsPointerVisible() == isVisible);
+    if (InputManager::GetInstance()->SetPointerVisible(isVisible) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->IsPointerVisible() == isVisible);
     }
 }
 
