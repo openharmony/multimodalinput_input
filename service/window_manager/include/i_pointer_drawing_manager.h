@@ -39,6 +39,14 @@ public:
     {
         return 0;
     }
+    virtual int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle)
+    {
+        return 0;
+    }
+    virtual int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle)
+    {
+        return 0;
+    }
     virtual bool IsPointerVisible()
     {
         return false;

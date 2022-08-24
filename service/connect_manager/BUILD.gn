@@ -40,6 +40,10 @@ ohos_source_set("mmi_connect_manager_service") {
 
   configs = [ ":mmi_connect_manager_config" ]
 
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+  }
+
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "hiviewdfx_hilog_native:libhilog",
@@ -58,7 +62,17 @@ ohos_source_set("mmi_connect_manager_proxy") {
     "${mmi_connect_manager_path}/src/multimodal_input_connect_proxy.cpp",
   ]
 
+  if (input_feature_input_cooperation) {
+    sources += [
+      "${mmi_connect_manager_path}/src/multimodal_input_connect_remoter.cpp",
+    ]
+  }
+
   configs = [ ":mmi_connect_manager_config" ]
+
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+  }
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
