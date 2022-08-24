@@ -604,6 +604,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetDisplayY(py2);
                             pointerEvent->SetActionTime(endTimeMs);
                             pointerEvent->UpdatePointerItem(0, item);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
+
+                            item.SetDisplayX(px2);
+                            item.SetDisplayY(py2);
+                            pointerEvent->SetActionTime(endTimeMs + BLOCK_TIME_MS);
+                            pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             optind =  optind + THREE_MORE_COMMAND;
