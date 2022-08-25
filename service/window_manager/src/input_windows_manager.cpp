@@ -514,12 +514,12 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, int3
     
     auto iter = it->second.find(windowId);
     if (iter == it->second.end()) {
-        MMI_HILOGE("The window type is invalid");
+        MMI_HILOGE("The window id is invalid");
         return RET_ERR;
     }
     
     iter->second = pointerStyle;
-    MMI_HILOGD("Window type:%{public}d set pointer style:%{public}d success", windowId, pointerStyle);
+    MMI_HILOGD("Window id:%{public}d set pointer style:%{public}d success", windowId, pointerStyle);
     return RET_OK;
 }
 
@@ -534,7 +534,7 @@ std::optional<int> InputWindowsManager::GetPointerStyle(int32_t pid, int32_t win
     
     auto iter = it->second.find(windowId);
     if (iter == it->second.end()) {
-        MMI_HILOGE("The window type is Invalid");
+        MMI_HILOGE("The window id is Invalid");
         return std::nullopt;
     }
     
