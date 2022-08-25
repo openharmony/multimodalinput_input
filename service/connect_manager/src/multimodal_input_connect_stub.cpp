@@ -572,13 +572,13 @@ int32_t MultimodalInputConnectStub::StubStartRemoteCooperateRes(MessageParcel& d
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    bool isSucess;
-    READBOOL(data, isSucess, IPC_PROXY_DEAD_OBJECT_ERR);
+    bool isSuccess;
+    READBOOL(data, isSuccess, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t xPercent;
     READINT32(data, xPercent, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t yPercent;
     READINT32(data, yPercent, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = StartRemoteCooperateResult(isSucess, xPercent, yPercent);
+    int32_t ret = StartRemoteCooperateResult(isSuccess, xPercent, yPercent);
     if (ret != RET_OK) {
         MMI_HILOGE("Call StartRemoteCooperateResult failed, ret:%{public}d", ret);
     }
@@ -614,9 +614,9 @@ int32_t MultimodalInputConnectStub::StubStopRemoteCooperateRes(MessageParcel& da
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    bool isSucess;
-    READBOOL(data, isSucess, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = StopRemoteCooperateResult(isSucess);
+    bool isSuccess;
+    READBOOL(data, isSuccess, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = StopRemoteCooperateResult(isSuccess);
     if (ret != RET_OK) {
         MMI_HILOGE("Call StopRemoteCooperateResult failed, ret:%{public}d", ret);
     }

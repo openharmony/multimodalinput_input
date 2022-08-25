@@ -55,6 +55,10 @@ config("libmmi_server_config") {
     "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core/include",
   ]
 
+  if (input_feature_input_cooperation) {
+    include_dirs += [ "input_device_cooperate/include" ]
+  }
+
   if (input_feature_hdf) {
     include_dirs += [
       "hdf_adapter/include",
@@ -439,6 +443,10 @@ ohos_shared_library("libmmi-server") {
     sources += [
       "input_device_cooperate/src/device_profile_adapter.cpp",
       "input_device_cooperate/src/distributed_input_adapter.cpp",
+      "input_device_cooperate/src/i_input_device_cooperate_state.cpp",
+      "input_device_cooperate/src/input_device_cooperate_state_free.cpp",
+      "input_device_cooperate/src/input_device_cooperate_state_in.cpp",
+      "input_device_cooperate/src/input_device_cooperate_state_out.cpp",
     ]
   }
 
