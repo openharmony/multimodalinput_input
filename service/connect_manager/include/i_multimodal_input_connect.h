@@ -56,6 +56,13 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) = 0;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t SetAnrObserver() = 0;
+    virtual int32_t RegisterCooperateListener() = 0;
+    virtual int32_t UnregisterCooperateListener() = 0;
+    virtual int32_t EnableInputDeviceCooperate(int32_t userData, bool enabled) = 0;
+    virtual int32_t StartInputDeviceCooperate(int32_t userData, const std::string &sinkDeviceId,
+        int32_t srcInputDeviceId) = 0;
+    virtual int32_t StopDeviceCooperate(int32_t userData) = 0;
+    virtual int32_t GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId) = 0;
     virtual int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) = 0;
     virtual int32_t StartRemoteCooperate(const std::string& localDeviceId) = 0;
     virtual int32_t StartRemoteCooperateResult(bool isSuccess, int32_t xPercent, int32_t yPercent) = 0;
@@ -86,12 +93,18 @@ public:
         GET_POINTER_SPEED = 22,
         SET_POINTER_STYLE = 23,
         GET_POINTER_STYLE = 24,
-        SET_INPUT_DEVICE_TO_SCREEN = 30,
-        REMOTE_COOPERATE_START = 35,
-        REMOTE_COOPERATE_START_RES = 36,
-        REMOTE_COOPERATE_STOP = 37,
-        REMOTE_COOPERATE_STOP_RES = 38,
-        REMOTE_COOPERATE_STOP_OTHER_RES = 39,
+        REGISTER_COOPERATE_MONITOR = 30,
+        UNREGISTER_COOPERATE_MONITOR = 31,
+        ENABLE_INPUT_DEVICE_COOPERATE = 32,
+        START_INPUT_DEVICE_COOPERATE = 33,
+        STOP_DEVICE_COOPERATE = 34,
+        GET_INPUT_DEVICE_COOPERATE_STATE = 35,
+        REMOTE_COOPERATE_START = 40,
+        REMOTE_COOPERATE_START_RES = 41,
+        REMOTE_COOPERATE_STOP = 42,
+        REMOTE_COOPERATE_STOP_RES = 43,
+        REMOTE_COOPERATE_STOP_OTHER_RES = 44,
+        SET_INPUT_DEVICE_TO_SCREEN = 50,
     };
 
     enum {
