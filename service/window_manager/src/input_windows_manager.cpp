@@ -22,6 +22,7 @@
 #include "input_device_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_handler.h"
+#include "pointer_drawing_manager.h"
 #include "util.h"
 #include "util_ex.h"
 
@@ -29,15 +30,17 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManager"};
+constexpr int32_t DEFAULT_POINTER_STYLE = 0;
+constexpr size_t MAX_WINDOW_COUNT = 20;
 } // namespace
 
 InputWindowsManager::InputWindowsManager() {}
 
-InputWindowsManager::~InputWindowsManager() {}
-
 void InputWindowsManager::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
+    CHKPV(udsServer_);
+    udsServer_->AddSessionDeletedCallback(std::bind(&InputWindowsManager::OnSessionLost, this, std::placeholders::_1));
 }
 
 int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEvent) const
@@ -172,11 +175,26 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
     CheckFocusWindowChange(displayGroupInfo);
     CheckZorderWindowChange(displayGroupInfo);
     displayGroupInfo_ = displayGroupInfo;
+    UpdatePointerStyle();
+
     if (!displayGroupInfo.displaysInfo.empty()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
+        const MouseLocation &mouseLocation = GetMouseInfo();
+        int32_t logicX = mouseLocation.physicalX;
+        int32_t logicY = mouseLocation.physicalY;
+        std::optional<WindowInfo> windowInfo = GetWindowInfo(logicX, logicY);
+        if (!windowInfo) {
+            MMI_HILOGE("The windowInfo is nullptr");
+            return;
+        }
+        int32_t windowPid = GetWindowPid(windowInfo->id);
+        WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
         IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo.displaysInfo[0].id,
-            displayGroupInfo.displaysInfo[0].width, displayGroupInfo.displaysInfo[0].height,
+            info, displayGroupInfo.displaysInfo[0].width, displayGroupInfo.displaysInfo[0].height,
             displayGroupInfo.displaysInfo[0].direction);
+        if (InputDevMgr->HasPointerDevice()) {
+            IPointerDrawingManager::GetInstance()->DrawPointerStyle();
+        }
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -202,7 +220,7 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     lastLogicY_ = mouseLocation.physicalY;
     auto touchWindow = SelectWindowInfo(lastLogicX_, lastLogicY_, pointerEvent);
     if (!touchWindow) {
-        MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
+        MMI_HILOGE("TouchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
         return;
     }
     PointerEvent::PointerItem pointerItem;
@@ -449,6 +467,112 @@ const DisplayGroupInfo& InputWindowsManager::GetDisplayGroupInfo()
 {
     return displayGroupInfo_;
 }
+
+bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+    const MouseLocation &mouseLocation = GetMouseInfo();
+    int32_t logicX = mouseLocation.physicalX;
+    int32_t logicY = mouseLocation.physicalY;
+    std::optional<WindowInfo> touchWindow = GetWindowInfo(logicX, logicY);
+    if (!touchWindow) {
+        MMI_HILOGE("TouchWindow is nullptr");
+        return false;
+    }
+    if (touchWindow->id == windowId) {
+        MMI_HILOGD("Need refresh pointer style, focusWindow type:%{public}d, window type:%{public}d",
+            touchWindow->id, windowId);
+        return true;
+    }
+
+    MMI_HILOGD("Not need refresh pointer style, focusWindow type:%{public}d, window type:%{public}d",
+        touchWindow->id, windowId);
+    return false;
+}
+
+void InputWindowsManager::OnSessionLost(SessionPtr session)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(session);
+    int32_t pid = session->GetPid();
+
+    auto it = pointerStyle_.find(pid);
+    if (it != pointerStyle_.end()) {
+        pointerStyle_.erase(it);
+        MMI_HILOGD("Clear the pointer style map, pd:%{public}d", pid);
+    }
+}
+
+int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    auto it = pointerStyle_.find(pid);
+    if (it == pointerStyle_.end()) {
+        MMI_HILOGE("The pointer style map is not include param pd:%{public}d", pid);
+        return RET_ERR;
+    }
+    
+    auto iter = it->second.find(windowId);
+    if (iter == it->second.end()) {
+        MMI_HILOGE("The window id is invalid");
+        return RET_ERR;
+    }
+    
+    iter->second = pointerStyle;
+    MMI_HILOGD("Window id:%{public}d set pointer style:%{public}d success", windowId, pointerStyle);
+    return RET_OK;
+}
+
+std::optional<int> InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId) const
+{
+    CALL_DEBUG_ENTER;
+    auto it = pointerStyle_.find(pid);
+    if (it == pointerStyle_.end()) {
+        MMI_HILOGE("The pointer style map is not include param pd, %{public}d", pid);
+        return std::nullopt;
+    }
+    
+    auto iter = it->second.find(windowId);
+    if (iter == it->second.end()) {
+        MMI_HILOGE("The window id is Invalid");
+        return std::nullopt;
+    }
+    
+    MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, iter->second);
+    return iter->second;
+}
+
+void InputWindowsManager::UpdatePointerStyle()
+{
+    CALL_DEBUG_ENTER;
+    for (const auto& windowItem : displayGroupInfo_.windowsInfo) {
+        int32_t pid = windowItem.pid;
+        auto it = pointerStyle_.find(pid);
+        if (it == pointerStyle_.end()) {
+            std::map<int32_t, int32_t> tmpPointerStyle = {{windowItem.id, DEFAULT_POINTER_STYLE}};
+            auto iter = pointerStyle_.insert(std::make_pair(pid, tmpPointerStyle));
+            if (!iter.second) {
+                MMI_HILOGW("The pd is duplicated");
+            }
+            continue;
+        }
+
+        auto subIter = it->second.find(windowItem.id);
+        if (subIter == it->second.end()) {
+            if (it->second.size() == MAX_WINDOW_COUNT) {
+                MMI_HILOGD("The window count:%{public}zu exceeds limit in same pd", it->second.size());
+                it->second.erase(it->second.begin());
+            }
+            auto iter = it->second.insert(std::make_pair(windowItem.id, DEFAULT_POINTER_STYLE));
+            if (!iter.second) {
+                MMI_HILOGW("The window type is duplicated");
+            }
+        }
+    }
+
+    MMI_HILOGD("Number of pointer style:%{public}zu", pointerStyle_.size());
+}
+
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -559,6 +683,23 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
     return std::nullopt;
 }
 
+std::optional<WindowInfo> InputWindowsManager::GetWindowInfo(int32_t logicalX, int32_t logicalY)
+{
+    CALL_DEBUG_ENTER;
+    for (const auto& item : displayGroupInfo_.windowsInfo) {
+        if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
+            MMI_HILOGD("Skip the untouchable window to continue searching, "
+                       "window:%{public}d, flags:%{public}d", item.id, item.flags);
+            continue;
+        } else if (IsInHotArea(logicalX, logicalY, item.pointerHotAreas)) {
+            return std::make_optional(item);
+        } else {
+            MMI_HILOGW("Continue searching for the dispatch window");
+        }
+    }
+    return std::nullopt;
+}
+
 void InputWindowsManager::UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
     const std::shared_ptr<PointerEvent>& pointerEvent, const WindowInfo& touchWindow)
 {
@@ -607,14 +748,25 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("The addition of logicalY overflows");
         return RET_ERR;
     }
-    IPointerDrawingManager::GetInstance()->OnDisplayInfo(physicalDisplayInfo->id,
-        physicalDisplayInfo->width, physicalDisplayInfo->height, physicalDisplayInfo->direction);
-    IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(), pointerItem.GetDisplayY());
+
     auto touchWindow = SelectWindowInfo(logicalX, logicalY, pointerEvent);
     if (!touchWindow) {
         MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
         return RET_ERR;
     }
+
+    std::optional<int32_t> pointerStyleInfo = GetPointerStyle(touchWindow->pid, touchWindow->id);
+    if (!pointerStyleInfo) {
+        MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
+        return RET_ERR;
+    }
+    int32_t mouseStyle = pointerStyleInfo.value();
+    WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
+    IPointerDrawingManager::GetInstance()->OnDisplayInfo(physicalDisplayInfo->id, info,
+        physicalDisplayInfo->width, physicalDisplayInfo->height, physicalDisplayInfo->direction);
+    IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
+        pointerItem.GetDisplayY(), MOUSE_ICON(mouseStyle));
+
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     int32_t windowX = logicalX - touchWindow->area.x;
