@@ -442,7 +442,7 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, in
             return RET_ERR;
         }
     }
-    MMI_HILOGD("Window type:%{public}d set pointer style:%{public}d success", windowId, pointerStyle);
+    MMI_HILOGD("Window id:%{public}d set pointer style:%{public}d success", windowId, pointerStyle);
     return RET_OK;
 }
 
@@ -456,7 +456,7 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, in
     }
 
     pointerStyle = pointerStyleInfo.value();
-    MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, pointerStyle);
+    MMI_HILOGD("Window id:%{public}d get pointer style:%{public}d success", windowId, pointerStyle);
     return RET_OK;
 }
 
