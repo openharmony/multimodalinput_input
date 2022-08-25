@@ -54,6 +54,7 @@ const std::string CONFIG_ITEM_REPEAT = "Key.autorepeat";
 const std::string CONFIG_ITEM_DELAY = "Key.autorepeat.delaytime";
 const std::string CONFIG_ITEM_INTERVAL = "Key.autorepeat.intervaltime";
 const std::string CONFIG_ITEM_TYPE = "Key.keyboard.type";
+const std::string CURSORSTYLE_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DATA_PATH = "/data";
 const std::string INPUT_PATH = "/system/etc/multimodalinput/";
 const std::string KEY_PATH = "/vendor/etc/keymap/";
@@ -692,6 +693,30 @@ int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value
         }
     } else if (configItem == CONFIG_ITEM_TYPE) {
         devConf.keyboardType = stoi(value);
+    }
+    return RET_OK;
+}
+
+int32_t ReadCursorStyleFile(const std::string &filePath)
+{
+    CALL_DEBUG_ENTER;
+    if (filePath.empty()) {
+        MMI_HILOGE("FilePath is empty");
+        return RET_ERR;
+    }
+    if (!IsFileExists(filePath)) {
+        MMI_HILOGE("File is not existent");
+        return RET_ERR;
+    }
+    char realPath[PATH_MAX] = {};
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("Path is error");
+        return RET_ERR;
+    }
+    int32_t fileSize = GetFileSize(realPath);
+    if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
+        MMI_HILOGE("File size out of read range");
+        return RET_ERR;
     }
     return RET_OK;
 }
