@@ -300,13 +300,12 @@ public:
      * @since 9
      */
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
-    
+
     /**
      * @brief 设置鼠标光标的位置.
      * @param x x 坐标
      * @param y y 坐标
-     * @return 如果设置成功，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值
+     * @return 0表示返回成功，否则表示返回失败
      */
     int32_t SetPointerLocation(int32_t x, int32_t y);
 
@@ -314,8 +313,7 @@ public:
      * @brief 获取远端输入能力.
      * @param deviceId 远端的deviceId
      * @param remoteTypes 返回远端输入能力
-     * @return 如果获取成功，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值
+     * @return 0表示返回成功，否则表示返回失败
      * @since 9
      */
     int32_t GetRemoteInputAbility(std::string deviceId, std::function<void(std::set<int32_t>)> remoteTypes);
@@ -326,8 +324,7 @@ public:
      * @param callback 准备分布式的回调，如果准备分布式执行完了，此回调被调用
      * 如果准备分布式成功，则返回大于或等于 <b>0</b> 的值
      * 否则返回小于 <b>0</b> 的值.
-     * @return 如果准备分布式被成功调用，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值
+     * @return 0表示返回成功，否则表示返回失败
      */
     int32_t PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
 
@@ -337,8 +334,7 @@ public:
      * @param callback 取消准备分布式的回调，如果取消准备分布式执行完了，此回调被调用
      * 如果取消准备分布式成功，则返回大于或等于 <b>0</b> 的值
      * 否则返回小于 <b>0</b> 的值.
-     * @return 如果取消准备分布式被成功调用，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值
+     * @return 0表示返回成功，否则表示返回失败
      */
     int32_t UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
 
@@ -348,8 +344,7 @@ public:
      * @param callback 开始分布式的回调，如果开始分布式执行完了，此回调被调用
      * 如果开始分布式成功，则返回大于或等于 <b>0</b> 的值
      * 否则返回小于 <b>0</b> 的值.
-     * @return 如果取消准备分布式被成功调用，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值
+     * @return 0表示返回成功，否则表示返回失败
      */
     int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
 
@@ -359,20 +354,17 @@ public:
      * @param callback 取消分布式的回调，如果取消分布式执行完了，此回调被调用
      * 如果取消分布式成功，则返回大于或等于 <b>0</b> 的值
      * 否则返回小于 <b>0</b> 的值.
-     * @return 如果取消分布式被成功调用，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值
+     * @return 0表示返回成功，否则表示返回失败
      */
     int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
-	
+
     /**
-     * @brief 设定输入设备的席位名称.
-     * @param seatName 席位名称
-     * @param deviceUniqId 返回输入设备的唯一ID
-     * @return 如果设定输入设备的席位名称成功调用，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值
+     * @brief 设置指定输入设备对应的屏幕ID
+     * @param dhid 输入设备唯一ID
+     * @param screenId 输入设备对应的屏幕ID
+     * @return 0表示返回成功，否则表示返回失败
      */
-    using DeviceUniqId = std::tuple<int32_t, int32_t, int32_t, int32_t, int32_t, std::string>;
-    int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId);
+    int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
 
 private:
     InputManager() = default;

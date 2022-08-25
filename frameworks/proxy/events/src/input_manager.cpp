@@ -187,14 +187,14 @@ int32_t InputManager::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
     return InputMgrImpl->GetPointerStyle(windowId, pointerStyle);
 }
 
+int32_t InputManager::SetInputDevice(const std::string& dhid, const std::string& screenId)
+{
+    return InputMgrImpl->SetInputDevice(dhid, screenId);
+}
+
 int32_t InputManager::SetPointerLocation(int32_t x, int32_t y)
 {
     return InputManagerImpl::GetInstance()->SetPointerLocation(x, y);
-}
-
-int32_t InputManager::SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId)
-{
-    return InputManagerImpl::GetInstance()->SetInputDeviceSeatName(seatName, deviceUniqId);
 }
 
 int32_t InputManager::GetRemoteInputAbility(std::string deviceId,
@@ -202,6 +202,7 @@ int32_t InputManager::GetRemoteInputAbility(std::string deviceId,
 {
     return InputManagerImpl::GetInstance()->GetRemoteInputAbility(deviceId, remoteTypes);
 }
+
 int32_t InputManager::PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
 {
     return InputManagerImpl::GetInstance()->PrepareRemoteInput(deviceId, callback);

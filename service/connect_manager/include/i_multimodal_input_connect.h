@@ -56,6 +56,7 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) = 0;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t SetAnrObserver() = 0;
+    virtual int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) = 0;
     virtual int32_t StartRemoteCooperate(const std::string& localDeviceId) = 0;
     virtual int32_t StartRemoteCooperateResult(bool isSuccess, int32_t xPercent, int32_t yPercent) = 0;
     virtual int32_t StopRemoteCooperate() = 0;
@@ -85,6 +86,7 @@ public:
         GET_POINTER_SPEED = 22,
         SET_POINTER_STYLE = 23,
         GET_POINTER_STYLE = 24,
+        SET_INPUT_DEVICE_TO_SCREEN = 30,
         REMOTE_COOPERATE_START = 35,
         REMOTE_COOPERATE_START_RES = 36,
         REMOTE_COOPERATE_STOP = 37,
