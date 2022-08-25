@@ -2522,6 +2522,46 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_002, TestSize.L
 }
 
 /**
+ * @tc.name: InputManagerTest_RemoteControlAutoRepeat
+ * @tc.desc: After the key is pressed, repeatedly trigger the key to press the input
+ * @tc.type: FUNC
+ * @tc.require: I530XB
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_RemoteControlAutoRepeat, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_A);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    TestSimulateInputEvent(injectDownEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectUpEvent != nullptr);
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitUp;
+    kitUp.SetKeyCode(KeyEvent::KEYCODE_A);
+    kitUp.SetPressed(false);
+    kitUp.SetDownTime(downTime);
+    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectUpEvent->RemoveReleasedKeyItems(kitUp);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    TestSimulateInputEvent(injectUpEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
+
+/**
  * @tc.name: InputManagerTest_MoveMouse_01
  * @tc.desc: Verify move mouse
  * @tc.type: FUNC
