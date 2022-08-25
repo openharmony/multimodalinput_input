@@ -433,11 +433,11 @@ napi_value JsPointerContext::EnumConstructor(napi_env env, napi_callback_info in
 napi_value JsPointerContext::EnterCaptureMode(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    size_t argc = 2;
-    napi_value argv[2];
+    size_t argc = 1;
+    napi_value argv[1];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1 || argc > 2) {
-        THROWERR(env, "the number of parameters is not as expected");
+        THROWERR(env, "The number of parameters is not as expected");
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
@@ -488,7 +488,7 @@ napi_value JsPointerContext::LeaveCaptureMode(napi_env env, napi_callback_info i
         THROWERR(env, "The second parameter type is wrong");
         return nullptr;
     }
-    return jsPointerMgr      ->LeaveCaptureMode(env, windowId, argv[1]);
+    return jsPointerMgr->LeaveCaptureMode(env, windowId, argv[1]);
 }
 
 napi_value JsPointerContext::Export(napi_env env, napi_value exports)
@@ -506,6 +506,8 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getPointerSpeed", GetPointerSpeed),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerStyle", SetPointerStyle),
         DECLARE_NAPI_STATIC_FUNCTION("getPointerStyle", GetPointerStyle),
+        DECLARE_NAPI_STATIC_FUNCTION("enterCaptureMode", EnterCaptureMode),
+        DECLARE_NAPI_STATIC_FUNCTION("leaveCaptureMode", LeaveCaptureMode),
     };
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreatePointerStyle(env, exports) == nullptr) {
