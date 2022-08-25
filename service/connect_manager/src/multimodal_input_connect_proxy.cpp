@@ -615,7 +615,7 @@ int32_t MultimodalInputConnectProxy::StartRemoteCooperate(const std::string& loc
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::StartRemoteCooperateResult(bool isSucess, int32_t xPercent, int32_t yPercent)
+int32_t MultimodalInputConnectProxy::StartRemoteCooperateResult(bool isSuccess, int32_t xPercent, int32_t yPercent)
 {
     CALL_INFO_TRACE;
     MessageParcel data;
@@ -623,7 +623,7 @@ int32_t MultimodalInputConnectProxy::StartRemoteCooperateResult(bool isSucess, i
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEBOOL(data, isSucess, ERR_INVALID_VALUE);
+    WRITEBOOL(data, isSuccess, ERR_INVALID_VALUE);
     WRITEINT32(data, xPercent, ERR_INVALID_VALUE);
     WRITEINT32(data, yPercent, ERR_INVALID_VALUE);
     MessageParcel reply;
@@ -656,7 +656,7 @@ int32_t MultimodalInputConnectProxy::StopRemoteCooperate()
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::StopRemoteCooperateResult(bool isSucess)
+int32_t MultimodalInputConnectProxy::StopRemoteCooperateResult(bool isSuccess)
 {
     CALL_INFO_TRACE;
     MessageParcel data;
@@ -664,7 +664,7 @@ int32_t MultimodalInputConnectProxy::StopRemoteCooperateResult(bool isSucess)
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    WRITEBOOL(data, isSucess, ERR_INVALID_VALUE);
+    WRITEBOOL(data, isSuccess, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();

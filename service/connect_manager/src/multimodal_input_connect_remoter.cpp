@@ -51,13 +51,13 @@ int32_t MultimodalInputConnectRemoter::StartRemoteCooperate(const std::string &l
     return proxy->StartRemoteCooperate(localDeviceId);
 }
 
-int32_t MultimodalInputConnectRemoter::StartRemoteCooperateResult(const std::string &remoteDeviceId, bool isSucess,
+int32_t MultimodalInputConnectRemoter::StartRemoteCooperateResult(const std::string &remoteDeviceId, bool isSuccess,
     int32_t xPercent, int32_t yPercent)
 {
     CALL_DEBUG_ENTER;
     auto proxy = GetProxyById(remoteDeviceId);
     CHKPR(proxy, RET_ERR);
-    return proxy->StartRemoteCooperateResult(isSucess, xPercent, yPercent);
+    return proxy->StartRemoteCooperateResult(isSuccess, xPercent, yPercent);
 }
 
 int32_t MultimodalInputConnectRemoter::StopRemoteCooperate(const std::string &remoteDeviceId)
@@ -68,12 +68,12 @@ int32_t MultimodalInputConnectRemoter::StopRemoteCooperate(const std::string &re
     return proxy->StopRemoteCooperate();
 }
 
-int32_t MultimodalInputConnectRemoter::StopRemoteCooperateResult(const std::string &remoteDeviceId, bool isSucess)
+int32_t MultimodalInputConnectRemoter::StopRemoteCooperateResult(const std::string &remoteDeviceId, bool isSuccess)
 {
     CALL_DEBUG_ENTER;
     auto proxy = GetProxyById(remoteDeviceId);
     CHKPR(proxy, RET_ERR);
-    return proxy->StopRemoteCooperateResult(isSucess);
+    return proxy->StopRemoteCooperateResult(isSuccess);
 }
 
 int32_t MultimodalInputConnectRemoter::StartCooperateOtherResult(const std::string &remoteDeviceId,
