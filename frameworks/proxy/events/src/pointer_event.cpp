@@ -884,6 +884,16 @@ std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
 {
     ostream << "PointerAction:" << pointerEvent.DumpPointerAction()
         << ",ButtonId:" << pointerEvent.GetButtonId() << std::endl;
+    std::vector<int32_t> pointerIds { pointerEvent.GetPointerIds() };
+    for (const auto& pointerId : pointerIds) {
+        PointerEvent::PointerItem item;
+        if (!pointerEvent.GetPointerItem(pointerId, item)) {
+            MMI_HILOGE("Invalid pointer: %{public}d.", pointerId);
+            return ostream;
+        }
+        ostream << "DisplayX:" << item.GetDisplayX() << ",DisplayY:" << item.GetDisplayY()
+            << ",WindowX:" << item.GetWindowX() << ",WindowY:" << item.GetWindowY() << std::endl;
+    }
     return ostream;
 }
 } // namespace MMI

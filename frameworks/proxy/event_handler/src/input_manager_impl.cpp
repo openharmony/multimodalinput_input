@@ -765,6 +765,24 @@ void InputManagerImpl::OnAnrTask(std::vector<std::shared_ptr<IAnrObserver>> obse
     }
 }
 
+int32_t InputManagerImpl::SetInputDevice(const std::string& dhid, const std::string& screenId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetInputDevice(dhid, screenId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    (void)(dhid);
+    (void)(screenId);
+    MMI_HILOGW("Enable input device cooperate does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+}
+
 int32_t InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
 {
     CALL_INFO_TRACE;
@@ -778,23 +796,6 @@ int32_t InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
     return RET_OK;
 #else
     MMI_HILOGW("Set pointer location dose not support");
-    return RET_OK;
-#endif // OHOS_DISTRIBUTED_INPUT_MODEL
-}
-
-int32_t InputManagerImpl::SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId)
-{
-    CALL_INFO_TRACE;
-#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MultimodalInputConnectManager::GetInstance()->SetInputDeviceSeatName(seatName, deviceUniqId);
-    if (ret != RET_OK) {
-        MMI_HILOGE("SetInputDeviceSeatName has send to server fail, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    return RET_OK;
-#else
-    MMI_HILOGW("Set input device seat name dose not support");
     return RET_OK;
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
 }

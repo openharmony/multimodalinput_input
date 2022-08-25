@@ -50,6 +50,9 @@ public:
     std::shared_ptr<EventMonitorHandler> GetMonitorHandler() const;
     std::shared_ptr<EventFilterWrap> GetFilterHandler() const;
 
+    void SetJumpInterceptState(bool isJump);
+    bool GetJumpInterceptState() const;
+
 private:
     int32_t BuildInputHandlerChain();
 
@@ -61,6 +64,7 @@ private:
     std::shared_ptr<EventMonitorHandler> monitorHandler_ = nullptr;
 
     uint64_t idSeed_ = 0;
+    bool isJumpIntercept_ = false;
 };
 #define InputHandler InputEventHandler::GetInstance()
 } // namespace MMI
