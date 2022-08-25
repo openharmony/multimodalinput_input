@@ -415,11 +415,15 @@ void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
         libinput_event_touch_get_tool_height_transformed(touch, info.height));
 }
 
-bool InputWindowsManager::TouchPointToDisplayPoint(struct libinput_event_touch* touch,
+bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
     EventTouch& touchInfo, int32_t& physicalDisplayId)
 {
     CHKPF(touch);
-    auto info = FindPhysicalDisplayInfo("default0");
+    std::string screenId = InputDevMgr->GetScreenId(deviceId);
+    if (screenId.empty()) {
+        screenId = "default0";
+    }
+    auto info = FindPhysicalDisplayInfo(screenId);
     CHKPF(info);
     physicalDisplayId = info->id;
     if ((info->width <= 0) || (info->height <= 0)) {
