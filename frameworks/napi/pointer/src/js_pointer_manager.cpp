@@ -282,7 +282,7 @@ napi_value JsPointerManager::EnterCaptureMode(napi_env env, int32_t windowId, na
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     if(asyncContext == nullptr) {
-        THROWERR(env,"create AsyncContext failed");
+        THROWERR(env, "create AsyncContext failed");
         return nullptr;
     }
     asyncContext->errorCode = InputManager::GetInstance()->EnterCaptureMode(windowId);
@@ -304,7 +304,7 @@ napi_value JsPointerManager::LeaveCaptureMode(napi_env env, int32_t windowId, na
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     if(asyncContext == nullptr) {
-        THROWERR(env,"create AsyncContext failed");
+        THROWERR(env, "Create AsyncContext failed");
         return nullptr;
     }
 
