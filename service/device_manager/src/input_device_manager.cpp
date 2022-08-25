@@ -28,6 +28,9 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceManager"};
 constexpr int32_t INVALID_DEVICE_ID = -1;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+constexpr int32_t INVALID_DEVICE_FD = -1;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 constexpr int32_t SUPPORT_KEY = 1;
 
 constexpr int32_t ABS_MT_TOUCH_MAJOR = 0x30;
@@ -40,6 +43,8 @@ constexpr int32_t ABS_MT_WIDTH_MAJOR = 0x32;
 constexpr int32_t ABS_MT_WIDTH_MINOR = 0x33;
 
 constexpr int32_t BUS_BLUETOOTH = 0X5;
+
+const std::string UNKNOWN_SCREEN_ID = "";
 
 std::unordered_map<int32_t, std::string> axisType = {
     {ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR"},
@@ -411,6 +416,39 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
                 deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
                 inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor());
     }
+}
+
+int32_t InputDeviceManager::SetInputDevice(const std::string& dhid, const std::string& screenId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    if (dhid.empty()) {
+        MMI_HILOGE("hdid is empty");
+        return RET_ERR;
+    }
+    if (screenId.empty()) {
+        MMI_HILOGE("screenId is empty");
+        return RET_ERR;
+    }
+    inputDeviceScreens_[dhid] = screenId;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+
+const std::string& InputDeviceManager::GetScreenId(int32_t deviceId) const
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    auto item = inputDevice_.find(deviceId);
+    if (item != inputDevice_.end()) {
+        auto iter = inputDeviceScreens_.find(item->second.dhid_);
+        if (iter != inputDeviceScreens_.end()) {
+            return iter->second;
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    MMI_HILOGE("Find input device screen id failed");
+    return UNKNOWN_SCREEN_ID;
 }
 } // namespace MMI
 } // namespace OHOS
