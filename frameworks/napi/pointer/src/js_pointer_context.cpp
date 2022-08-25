@@ -433,8 +433,8 @@ napi_value JsPointerContext::EnumConstructor(napi_env env, napi_callback_info in
 napi_value JsPointerContext::EnterCaptureMode(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    size_t argc = 1;
-    napi_value argv[1];
+    size_t argc = 2;
+    napi_value argv[2];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1 || argc > 2) {
         THROWERR(env, "The number of parameters is not as expected");
