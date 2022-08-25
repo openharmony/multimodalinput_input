@@ -2614,7 +2614,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetProcCpuUsage, TestSize.Level1)
  * @tc.name: InputManagerTest_SetWindowInputEventConsumer_001
  * @tc.desc: Verify pointerEvent report eventHandler
  * @tc.type: FUNC
- * @tc.require:
+ * @tc.require: I5HMDY
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, TestSize.Level1)
 {
@@ -2651,7 +2651,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, Tes
  * @tc.name: InputManagerTest_SetWindowInputEventConsumer_002
  * @tc.desc: Verify keyEvent report eventHandler
  * @tc.type: FUNC
- * @tc.require:
+ * @tc.require: I5HMDY
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_002, TestSize.Level1)
 {
@@ -2824,6 +2824,73 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_005, TestSize.Level1)
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     InputManager::GetInstance()->MoveMouse(700, 1000);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+}
+/**
+ * @tc.name: InputManagerTest_SetPointerVisible_001
+ * @tc.desc: Sets whether the pointer icon is visible
+ * @tc.type: FUNC
+ * @tc.require: I530VT
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_001, TestSize.Level1)
+{
+    bool isVisible { true };
+    if (InputManager::GetInstance()->SetPointerVisible(isVisible) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->IsPointerVisible() == isVisible);
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_SetPointerVisible_002
+ * @tc.desc: Sets whether the pointer icon is visible
+ * @tc.type: FUNC
+ * @tc.require: I530VT
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_002, TestSize.Level1)
+{
+    bool isVisible { false };
+    if (InputManager::GetInstance()->SetPointerVisible(isVisible) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->IsPointerVisible() == isVisible);
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_RemoteControlAutoRepeat
+ * @tc.desc: After the key is pressed, repeatedly trigger the key to press the input
+ * @tc.type: FUNC
+ * @tc.require: I530XB
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_RemoteControlAutoRepeat, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_A);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    TestSimulateInputEvent(injectDownEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectUpEvent != nullptr);
+    downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitUp;
+    kitUp.SetKeyCode(KeyEvent::KEYCODE_A);
+    kitUp.SetPressed(false);
+    kitUp.SetDownTime(downTime);
+    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectUpEvent->RemoveReleasedKeyItems(kitUp);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    TestSimulateInputEvent(injectUpEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 } // namespace MMI
 } // namespace OHOS
