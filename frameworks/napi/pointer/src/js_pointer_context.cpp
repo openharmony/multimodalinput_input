@@ -467,7 +467,7 @@ napi_value JsPointerContext::LeaveCaptureMode(napi_env env, napi_callback_info i
     napi_value argv[2];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1 || argc > 2) {
-        THROWERR(env, "the number of parameters is not as expected");
+        THROWERR(env, "The number of parameters is not as expected");
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
