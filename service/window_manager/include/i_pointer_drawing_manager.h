@@ -31,7 +31,8 @@ public:
     static std::shared_ptr<IPointerDrawingManager> GetInstance();
     virtual void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
         const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT) {}
-    virtual void OnDisplayInfo(int32_t displayId, WinInfo &info, int32_t width, int32_t height, Direction direction) {}
+    virtual void OnDisplayInfo(const DisplayInfo& displayInfo, const WinInfo &info) {}
+    virtual void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo, const WinInfo &info) {}
     virtual bool Init()
     {
         return true;
