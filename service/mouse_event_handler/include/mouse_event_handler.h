@@ -50,6 +50,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed() const;
+    void OnDisplayLost(int32_t displayId);
 
 private:
     int32_t HandleMotionInner(struct libinput_event_pointer* data);

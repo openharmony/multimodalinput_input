@@ -58,8 +58,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     
     AdjustMouseFocus(ICON_TYPE(mouseIcons_[mouseStyle].alignmentWay), physicalX, physicalY);
     if (pointerWindow_ != nullptr) {
-        pointerWindow_->MoveTo(physicalX, physicalY);
-
+        pointerWindow_->MoveTo(physicalX + displayInfo_.x, physicalY + displayInfo_.y);
         if (lastMouseStyle_ == mouseStyle) {
             MMI_HILOGD("The lastMouseStyle is equal with mouseStyle");
             return;
@@ -70,7 +69,6 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
             MMI_HILOGE("Init layer failed");
             return;
         }
-
         MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
             displayId, physicalX, physicalY);
         return;
@@ -157,19 +155,19 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
         physicalY = 0;
     }
     const int32_t cursorUnit = 16;
-    if (direction_ == Direction0 || direction_ == Direction180) {
-        if (physicalX > (displayWidth_ - IMAGE_WIDTH / cursorUnit)) {
-            physicalX = displayWidth_ - IMAGE_WIDTH / cursorUnit;
+    if (displayInfo_.direction == Direction0 || displayInfo_.direction == Direction180) {
+        if (physicalX > (displayInfo_.width - IMAGE_WIDTH / cursorUnit)) {
+            physicalX = displayInfo_.width - IMAGE_WIDTH / cursorUnit;
         }
-        if (physicalY > (displayHeight_ - IMAGE_HEIGHT / cursorUnit)) {
-            physicalY = displayHeight_ - IMAGE_HEIGHT / cursorUnit;
+        if (physicalY > (displayInfo_.height - IMAGE_HEIGHT / cursorUnit)) {
+            physicalY = displayInfo_.height - IMAGE_HEIGHT / cursorUnit;
         }
     } else {
-        if (physicalX > (displayHeight_ - IMAGE_HEIGHT / cursorUnit)) {
-            physicalX = displayHeight_ - IMAGE_HEIGHT / cursorUnit;
+        if (physicalX > (displayInfo_.height - IMAGE_HEIGHT / cursorUnit)) {
+            physicalX = displayInfo_.height - IMAGE_HEIGHT / cursorUnit;
         }
-        if (physicalY > (displayWidth_ - IMAGE_WIDTH / cursorUnit)) {
-            physicalY = displayWidth_ - IMAGE_WIDTH / cursorUnit;
+        if (physicalY > (displayInfo_.width - IMAGE_WIDTH / cursorUnit)) {
+            physicalY = displayInfo_.width - IMAGE_WIDTH / cursorUnit;
         }
     }
 }
@@ -279,18 +277,31 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
     return pixelMap;
 }
 
-void PointerDrawingManager::OnDisplayInfo(int32_t displayId, WinInfo &info, int32_t width,
-    int32_t height, Direction direction)
+void PointerDrawingManager::OnDisplayInfo(const DisplayInfo& displayInfo, const WinInfo &info)
 {
     CALL_DEBUG_ENTER;
     hasDisplay_ = true;
-    displayId_ = displayId;
-    displayWidth_ = width;
-    displayHeight_ = height;
-    direction_ = direction;
+    displayInfo_ = displayInfo;
     windowId_ = info.windowId;
     pid_ = info.windowPid;
     DrawManager();
+}
+
+void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo, const WinInfo &info)
+{
+    CALL_DEBUG_ENTER;
+    for (const auto& item : displayGroupInfo.displaysInfo) {
+        if (item.id == displayInfo_.id) {
+            DrawManager();
+            OnDisplayInfo(item, info);
+            return;
+        }
+    }
+    OnDisplayInfo(displayGroupInfo.displaysInfo[0], info);
+    MouseEventHdr->OnDisplayLost(displayInfo_.id);
+    DrawManager();
+    MMI_HILOGD("displayId_:%{public}d, displayWidth_:%{public}d, displayHeight_:%{public}d",
+        displayInfo_.id, displayInfo_.width, displayInfo_.height);
 }
 
 void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
@@ -311,16 +322,14 @@ void PointerDrawingManager::DrawManager()
         }
         int32_t mouseStyle = pointerStyleInfo.value();
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
-            DrawPointer(displayId_, displayWidth_/2, displayHeight_/2, MOUSE_ICON(mouseStyle));
+            DrawPointer(displayInfo_.id, displayInfo_.width / 2, displayInfo_.height / 2, MOUSE_ICON(mouseStyle));
             MMI_HILOGD("Draw manager, mouseStyle:%{public}d, last physical is initial value", mouseStyle);
             return;
         }
-       
-        DrawPointer(displayId_, lastPhysicalX_, lastPhysicalY_, MOUSE_ICON(mouseStyle));
+        DrawPointer(displayInfo_.id, lastPhysicalX_, lastPhysicalY_, MOUSE_ICON(mouseStyle));
         MMI_HILOGD("Draw manager, mouseStyle:%{public}d", mouseStyle);
         return;
     }
-
     if (!hasPointerDevice_ && pointerWindow_ != nullptr) {
         MMI_HILOGD("Destroy draw pointer");
         pointerWindow_->Destroy();
@@ -477,12 +486,12 @@ void PointerDrawingManager::DrawPointerStyle()
         int32_t mouseStyle = pointerStyleInfo.value();
 
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
-            DrawPointer(displayId_, displayWidth_/2, displayHeight_/2, MOUSE_ICON(mouseStyle));
+            DrawPointer(displayInfo_.id, displayInfo_.width / 2, displayInfo_.height / 2, MOUSE_ICON(mouseStyle));
             MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", mouseStyle);
             return;
         }
 
-        DrawPointer(displayId_, lastPhysicalX_, lastPhysicalY_, MOUSE_ICON(mouseStyle));
+        DrawPointer(displayInfo_.id, lastPhysicalX_, lastPhysicalY_, MOUSE_ICON(mouseStyle));
         MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", mouseStyle);
     }
 }
