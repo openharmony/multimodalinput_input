@@ -21,6 +21,9 @@
 
 #include "bytrace_adapter.h"
 #include "input_device.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+#include "input_device_cooperate_impl.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_impl.h"
 #include "input_event_data_transformation.h"
 #include "input_handler_manager.h"
@@ -73,6 +76,11 @@ void ClientMsgHandler::Init()
     (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR))
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+        {MmiMessageId::COOPERATION_ADD_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnCooperationListiner, this)},
+        {MmiMessageId::COOPERATION_MESSAGE, MsgCallbackBind2(&ClientMsgHandler::OnCooperationMessage, this)},
+        {MmiMessageId::COOPERATION_GET_STATE, MsgCallbackBind2(&ClientMsgHandler::OnCooperationState, this)},
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     };
     for (auto& it : funs) {
         if (!RegistrationEvent(it)) {
@@ -390,5 +398,50 @@ int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
     InputMgrImpl->OnAnr(pid);
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+int32_t ClientMsgHandler::OnCooperationListiner(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    std::string deviceId;
+    CooperationMessage msg;
+    pkt >> deviceId >> msg;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read type failed");
+        return RET_ERR;
+    }
+    InputDevCooperateImpl.OnDevCooperateListener(deviceId, msg);
+    return RET_OK;
+}
+
+int32_t ClientMsgHandler::OnCooperationMessage(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    std::string deviceId;
+    CooperationMessage msg;
+    pkt >> userData >> deviceId >> msg;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read device Data failed");
+        return RET_ERR;
+    }
+    InputDevCooperateImpl.OnCooprationMessage(userData, deviceId, msg);
+    return RET_OK;
+}
+
+int32_t ClientMsgHandler::OnCooperationState(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t userData;
+    bool state;
+    pkt >> userData >> state;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read device Data failed");
+        return RET_ERR;
+    }
+    InputDevCooperateImpl.OnCooperationState(userData, state);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace MMI
 } // namespace OHOS

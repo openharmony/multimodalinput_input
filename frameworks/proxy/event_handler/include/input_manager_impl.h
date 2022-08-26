@@ -28,6 +28,7 @@
 
 #include "if_mmi_client.h"
 #include "input_device_impl.h"
+#include "input_device_cooperate_impl.h"
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
 #include "input_interceptor_manager.h"
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -117,6 +118,13 @@ public:
     int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
     int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
 
+    int32_t RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener);
+    int32_t UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener = nullptr);
+    int32_t EnableInputDeviceCooperate(bool enabled, std::function<void(std::string, CooperationMessage)> callback);
+    int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
+        std::function<void(std::string, CooperationMessage)> callback);
+    int32_t StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback);
+    int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
 
 private:
