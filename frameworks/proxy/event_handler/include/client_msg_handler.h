@@ -58,6 +58,11 @@ protected:
     int32_t OnInputKeyboardType(const UDSClient& client, NetPacket& pkt);
     int32_t OnDevListener(const UDSClient& client, NetPacket& pkt);
     int32_t OnAnr(const UDSClient& client, NetPacket& pkt);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t OnCooperationListiner(const UDSClient& client, NetPacket& pkt);
+    int32_t OnCooperationMessage(const UDSClient& client, NetPacket& pkt);
+    int32_t OnCooperationState(const UDSClient& client, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
     static void OnEventProcessed(int32_t eventId, int32_t eventType);
