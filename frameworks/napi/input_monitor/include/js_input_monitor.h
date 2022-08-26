@@ -100,6 +100,7 @@ private:
     bool isMonitoring_ = false;
     std::queue<std::shared_ptr<PointerEvent>> evQueue_;
     std::mutex mutex_;
+    std::mutex evQueueMutex_;
     int32_t jsTaskNum_ = 0;
 };
 } // namespace MMI
