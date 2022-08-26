@@ -103,10 +103,10 @@ int32_t MouseEventHandler::HandleMotionInner(struct libinput_event_pointer* data
         MMI_HILOGE("Failed to handle motion correction");
         return ret;
     }
-
     WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
     pointerEvent_->SetTargetDisplayId(currentDisplayId_);
-    MMI_HILOGD("Change Coordinate : x:%{public}lf,y:%{public}lf", absolutionX_, absolutionY_);
+    MMI_HILOGD("Change coordinate: x:%{public}lf, y:%{public}lf, currentDisplayId_:%{public}d",
+        absolutionX_, absolutionY_, currentDisplayId_);
     return RET_OK;
 }
 
@@ -319,6 +319,17 @@ void MouseEventHandler::HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY)
     absolutionX_ += offsetX;
     absolutionY_ += offsetY;
     WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
+}
+
+void MouseEventHandler::OnDisplayLost(int32_t displayId)
+{
+    if (currentDisplayId_ != displayId) {
+        currentDisplayId_ = -1;
+        absolutionX_ = -1;
+        absolutionY_ = -1;
+        InitAbsolution();
+        WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
+    }
 }
 
 void MouseEventHandler::HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem)
