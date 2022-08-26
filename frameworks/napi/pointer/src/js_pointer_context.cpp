@@ -449,9 +449,8 @@ napi_value JsPointerContext::EnterCaptureMode(napi_env env, napi_callback_info i
     CHKRP(env, napi_get_value_int32(env, argv[0], &windowId), GET_BOOL);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
-    if(argc == 1)
-    {
-        return jsPointerMgr->EnterCaptureMode(env,windowId);
+    if(argc == 1) {
+        return jsPointerMgr->EnterCaptureMode(env, windowId);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, "The second parameter type is wrong");
@@ -480,9 +479,8 @@ napi_value JsPointerContext::LeaveCaptureMode(napi_env env, napi_callback_info i
 
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
-    if(argc == 1)
-    {
-        return jsPointerMgr->LeaveCaptureMode(env,windowId);
+    if(argc == 1) {
+        return jsPointerMgr->LeaveCaptureMode(env, windowId);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
         THROWERR(env, "The second parameter type is wrong");
