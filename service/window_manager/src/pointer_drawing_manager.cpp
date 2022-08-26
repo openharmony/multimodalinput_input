@@ -277,7 +277,7 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
     return pixelMap;
 }
 
-void PointerDrawingManager::OnDisplayInfo(const DisplayInfo& displayInfo,const WinInfo &info)
+void PointerDrawingManager::OnDisplayInfo(const DisplayInfo& displayInfo, const WinInfo &info)
 {
     CALL_DEBUG_ENTER;
     hasDisplay_ = true;
@@ -287,7 +287,7 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayInfo& displayInfo,const W
     DrawManager();
 }
 
-void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo,const WinInfo &info)
+void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo, const WinInfo &info)
 {
     CALL_DEBUG_ENTER;
     for (const auto& item : displayGroupInfo.displaysInfo) {
