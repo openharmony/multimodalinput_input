@@ -100,7 +100,7 @@ private:
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey);
     bool HandleKeyDown(ShortcutKey &shortcutKey);
     bool HandleKeyCancel(ShortcutKey &shortcutKey);
-    bool HandleSequence(Sequence& sequence);
+    bool HandleSequence(Sequence& sequence, bool &isLaunchAbility);
     bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
     bool AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent);
