@@ -651,7 +651,7 @@ bool KeyCommandManager::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
     CHKPF(keyEvent);
     if (shortcutKeys_.empty()) {
         MMI_HILOGD("No shortkeys configuration data");
-        return true;
+        return false;
     }
     if (IsKeyMatch(lastMatchedKey_, keyEvent)) {
         MMI_HILOGE("The same key is waiting timeout, skip");
@@ -702,7 +702,7 @@ bool KeyCommandManager::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
     CHKPF(keyEvent);
     if (sequences_.empty()) {
         MMI_HILOGD("No sequences configuration data");
-        return true;
+        return false;
     }
 
     if (!AddSequenceKey(keyEvent)) {
@@ -714,9 +714,10 @@ bool KeyCommandManager::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
         filterSequences_ = sequences_;
     }
 
+    bool isLaunchAbility = false;
     std::vector<Sequence> tempSeqs;
     for (Sequence& item : filterSequences_) {
-        if (HandleSequence(item)) {
+        if (HandleSequence(item, isLaunchAbility)) {
             tempSeqs.push_back(item);
         }
     }
@@ -727,7 +728,7 @@ bool KeyCommandManager::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
     } else {
         filterSequences_ = tempSeqs;
     }
-    return true;
+    return isLaunchAbility;
 }
 
 bool KeyCommandManager::AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent)
@@ -773,7 +774,7 @@ bool KeyCommandManager::AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent)
     return true;
 }
 
-bool KeyCommandManager::HandleSequence(Sequence &sequence)
+bool KeyCommandManager::HandleSequence(Sequence &sequence, bool &isLaunchAbility)
 {
     CALL_DEBUG_ENTER;
     size_t keysSize = keys_.size();
@@ -799,6 +800,7 @@ bool KeyCommandManager::HandleSequence(Sequence &sequence)
         if (sequence.abilityStartDelay == 0) {
             MMI_HILOGD("Start launch ability immediately");
             LaunchAbility(sequence);
+            isLaunchAbility = true;
             return true;
         }
         sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay, 1, [this, sequence] () {
@@ -810,6 +812,7 @@ bool KeyCommandManager::HandleSequence(Sequence &sequence)
             return false;
         }
         MMI_HILOGD("Add timer success");
+        isLaunchAbility = true;
     }
     return true;
 }
