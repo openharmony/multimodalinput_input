@@ -189,9 +189,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
         }
         int32_t windowPid = GetWindowPid(windowInfo->id);
         WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
-        IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo.displaysInfo[0].id,
-            info, displayGroupInfo.displaysInfo[0].width, displayGroupInfo.displaysInfo[0].height,
-            displayGroupInfo.displaysInfo[0].direction);
+        IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo, info);
         if (InputDevMgr->HasPointerDevice()) {
             IPointerDrawingManager::GetInstance()->DrawPointerStyle();
         }
@@ -752,7 +750,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("The addition of logicalY overflows");
         return RET_ERR;
     }
-
     auto touchWindow = SelectWindowInfo(logicalX, logicalY, pointerEvent);
     if (!touchWindow) {
         MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
@@ -766,8 +763,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     int32_t mouseStyle = pointerStyleInfo.value();
     WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
-    IPointerDrawingManager::GetInstance()->OnDisplayInfo(physicalDisplayInfo->id, info,
-        physicalDisplayInfo->width, physicalDisplayInfo->height, physicalDisplayInfo->direction);
+    IPointerDrawingManager::GetInstance()->OnDisplayInfo(*physicalDisplayInfo, info);
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
         pointerItem.GetDisplayY(), MOUSE_ICON(mouseStyle));
 
@@ -919,6 +915,7 @@ bool InputWindowsManager::IsInsideDisplay(const DisplayInfo& displayInfo, int32_
 void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& physicalX,
     int32_t& physicalY, int32_t& displayId)
 {
+    CALL_DEBUG_ENTER;
     int32_t logicalX = 0;
     int32_t logicalY = 0;
     if (!AddInt32(physicalX, displayInfo.x, logicalX)) {
@@ -959,7 +956,10 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     if (!IsInsideDisplay(*displayInfo, integerX, integerY)) {
         FindPhysicalDisplay(*displayInfo, integerX, integerY, displayId);
     }
-
+    if (displayId != lastDisplayId) {
+        displayInfo = GetPhysicalDisplay(displayId);
+        CHKPV(displayInfo);
+    }
     int32_t width = 0;
     int32_t height = 0;
     if (displayInfo->direction == Direction0 || displayInfo->direction == Direction180) {
@@ -969,25 +969,20 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
         height = displayInfo->width;
         width = displayInfo->height;
     }
-
-    if (displayId == lastDisplayId) {
-        if (integerX < 0) {
-            integerX = 0;
-            x = static_cast<double>(integerX);
-        }
-        if (integerX >= width) {
-            integerX = width - 1;
-            x = static_cast<double>(integerX);
-        }
-        if (integerY < 0) {
-            integerY = 0;
-            y = static_cast<double>(integerY);
-        }
-        if (integerY >= height) {
-            integerY = height - 1;
-            y = static_cast<double>(integerY);
-        }
+    if (integerX < 0) {
+        integerX = 0;
     }
+    if (integerX >= width) {
+        integerX = width - 1;
+    }
+    if (integerY < 0) {
+        integerY = 0;
+    }
+    if (integerY >= height) {
+        integerY = height - 1;
+    }
+    x = static_cast<double>(integerX);
+    y = static_cast<double>(integerY);
     mouseLocation_.physicalX = integerX;
     mouseLocation_.physicalY = integerY;
     MMI_HILOGD("Mouse Data: physicalX:%{public}d,physicalY:%{public}d, displayId:%{public}d",
