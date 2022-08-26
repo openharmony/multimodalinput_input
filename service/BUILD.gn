@@ -56,7 +56,11 @@ config("libmmi_server_config") {
   ]
 
   if (input_feature_input_cooperation) {
-    include_dirs += [ "input_device_cooperate/include" ]
+    include_dirs += [
+      "input_device_cooperate/include",
+      "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
+      "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include",
+    ]
   }
 
   if (input_feature_hdf) {
@@ -441,10 +445,12 @@ ohos_shared_library("libmmi-server") {
 
   if (input_feature_input_cooperation) {
     sources += [
+      "input_device_cooperate/src/cooperate_event_handler.cpp",
       "input_device_cooperate/src/cooperate_event_manager.cpp",
       "input_device_cooperate/src/device_profile_adapter.cpp",
       "input_device_cooperate/src/distributed_input_adapter.cpp",
       "input_device_cooperate/src/i_input_device_cooperate_state.cpp",
+      "input_device_cooperate/src/input_device_cooperate_sm.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_free.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_in.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_out.cpp",
@@ -552,16 +558,20 @@ ohos_shared_library("libmmi-server") {
     "//third_party/json:nlohmann_json_static",
   ]
 
-  if (input_feature_input_cooperation) {
-    deps += [ "//foundation/distributedhardware/distributed_input/interfaces/inner_kits:libdinput_sdk" ]
-  }
-
   if (input_feature_libinput || input_feature_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 
   if (resource_schedule_service_enabled) {
     deps += [ "//foundation/resourceschedule/resource_schedule_service/ressched/interfaces/innerkits/ressched_client:ressched_client" ]
+  }
+
+  if (input_feature_input_cooperation) {
+    deps += [
+      "//base/notification/eventhandler/frameworks/eventhandler:libeventhandler",
+      "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core:distributed_device_profile_client",
+      "//foundation/distributedhardware/distributed_input/interfaces/inner_kits:libdinput_sdk",
+    ]
   }
 
   external_deps = [
@@ -582,6 +592,13 @@ ohos_shared_library("libmmi-server") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  if (input_feature_input_cooperation) {
+    external_deps += [
+      "device_manager:devicemanagersdk",
+      "dsoftbus:softbus_client",
+    ]
+  }
 
   if (input_feature_pointer_drawing) {
     external_deps += [ "window_manager:libwm" ]
