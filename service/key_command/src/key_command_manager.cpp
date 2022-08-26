@@ -636,8 +636,9 @@ bool KeyCommandManager::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         }
         isParseConfig_ = true;
     }
-
-    if (!HandleShortKeys(key) && !HandleSequences(key)) {
+    bool ret = HandleShortKeys(key);
+    ret &= HandleSequences(key);
+    if (!ret) {
         MMI_HILOGE("Handle key event failed");
         return false;
     }
