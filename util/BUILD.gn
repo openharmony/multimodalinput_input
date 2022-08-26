@@ -46,6 +46,7 @@ ohos_shared_library("libmmi-util") {
     "common/src/klog.cpp",
     "common/src/run_shell_util.cpp",
     "common/src/util.cpp",
+    "common/src/util_napi.cpp",
     "common/src/uuid.cpp",
     "network/src/circle_stream_buffer.cpp",
     "network/src/net_packet.cpp",
@@ -63,6 +64,7 @@ ohos_shared_library("libmmi-util") {
   public_deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//commonlibrary/c_utils/base:utils",
+    "//foundation/arkui/napi:ace_napi",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
   ]
 
