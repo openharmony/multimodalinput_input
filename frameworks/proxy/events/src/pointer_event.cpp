@@ -265,7 +265,17 @@ void PointerEvent::PointerItem::SetTargetWindowId(int32_t windowId)
 {
     targetWindowId_ = windowId;
 }
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+RawData PointerEvent::PointerItem::GetRawData() const
+{
+    return rawData_;
+}
 
+void PointerEvent::PointerItem::SetRawData(const RawData& rawData)
+{
+    rawData_ = rawData;
+}
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     return (
@@ -290,7 +300,12 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(longAxis_) &&
         out.WriteInt32(shortAxis_) &&
         out.WriteInt32(toolType_) &&
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+        out.WriteInt32(deviceId_) &&
+        rawData_.WriteToParcel(out)
+#else
         out.WriteInt32(deviceId_)
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     );
 }
 
@@ -318,7 +333,12 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(longAxis_) &&
         in.ReadInt32(shortAxis_) &&
         in.ReadInt32(toolType_) &&
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+        in.ReadInt32(deviceId_) &&
+        rawData_.ReadFromParcel(in)
+#else
         in.ReadInt32(deviceId_)
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     );
 }
 

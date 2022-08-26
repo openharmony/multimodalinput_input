@@ -42,7 +42,7 @@ public:
     void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
         const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT);
     void OnDisplayInfo(int32_t displayId, WinInfo &info, int32_t width, int32_t height, Direction direction);
-    void UpdatePointerDevice(bool hasPointerDevice);
+    void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible);
     bool Init();
     void DeletePointerVisible(int32_t pid);
     int32_t SetPointerVisible(int32_t pid, bool visible);
@@ -50,6 +50,7 @@ public:
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle);
     void DrawPointerStyle();
     bool IsPointerVisible();
+    void SetPointerLocation(int32_t pid, int32_t x, int32_t y);
     void AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
 
 public:
