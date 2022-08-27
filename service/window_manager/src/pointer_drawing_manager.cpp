@@ -33,8 +33,14 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerDrawingManager" };
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
-constexpr int32_t realImageWidth = 40;
-constexpr int32_t realImageHeight = 40;
+constexpr int32_t PAD_SCREEN_WIDTH = 2560;
+constexpr int32_t PHONE_SCREEN_WIDTH = 2160;
+constexpr int32_t SMALL_ICON_WIDTH = 40;
+constexpr int32_t SMALL_ICON_HEIGHT = 40;
+constexpr int32_t MIDDLE_ICON_WIDTH = 60;
+constexpr int32_t MIDDLE_ICON_HEIGHT = 60;
+constexpr int32_t LARGE_ICON_WIDTH = 80;
+constexpr int32_t LARGE_ICON_HEIGHT = 80;
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -129,12 +135,12 @@ void PointerDrawingManager::AdjustMouseFocus(ICON_TYPE iconType, int32_t &physic
     CALL_DEBUG_ENTER;
     switch (iconType) {
         case ANGLE_SW: {
-            physicalY -= realImageHeight;
+            physicalY -= imageHeight_;
             break;
         }
         case ANGLE_CENTER: {
-            physicalX -= realImageWidth / 2;
-            physicalY -= realImageHeight / 2;
+            physicalX -= imageWidth_ / 2;
+            physicalY -= imageHeight_ / 2;
             break;
         }
         case ANGLE_NW:
@@ -156,18 +162,18 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
     }
     const int32_t cursorUnit = 16;
     if (displayInfo_.direction == Direction0 || displayInfo_.direction == Direction180) {
-        if (physicalX > (displayInfo_.width - IMAGE_WIDTH / cursorUnit)) {
-            physicalX = displayInfo_.width - IMAGE_WIDTH / cursorUnit;
+        if (physicalX > (displayInfo_.width - imageWidth_ / cursorUnit)) {
+            physicalX = displayInfo_.width - imageWidth_ / cursorUnit;
         }
-        if (physicalY > (displayInfo_.height - IMAGE_HEIGHT / cursorUnit)) {
-            physicalY = displayInfo_.height - IMAGE_HEIGHT / cursorUnit;
+        if (physicalY > (displayInfo_.height - imageHeight_ / cursorUnit)) {
+            physicalY = displayInfo_.height - imageHeight_ / cursorUnit;
         }
     } else {
-        if (physicalX > (displayInfo_.height - IMAGE_HEIGHT / cursorUnit)) {
-            physicalX = displayInfo_.height - IMAGE_HEIGHT / cursorUnit;
+        if (physicalX > (displayInfo_.height - imageHeight_ / cursorUnit)) {
+            physicalX = displayInfo_.height - imageHeight_ / cursorUnit;
         }
-        if (physicalY > (displayInfo_.width - IMAGE_WIDTH / cursorUnit)) {
-            physicalY = displayInfo_.width - IMAGE_WIDTH / cursorUnit;
+        if (physicalY > (displayInfo_.width - imageWidth_ / cursorUnit)) {
+            physicalY = displayInfo_.width - imageWidth_ / cursorUnit;
         }
     }
 }
@@ -270,6 +276,11 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
     MMI_HILOGD("Get supported format ret:%{public}u", ret);
 
     OHOS::Media::DecodeOptions decodeOpts;
+    decodeOpts.desiredSize = {
+        .width = imageWidth_,
+        .height = imageHeight_
+    };
+
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
     if (pixelMap == nullptr) {
         MMI_HILOGE("The pixelMap is nullptr");
@@ -284,6 +295,19 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo, co
     displayInfo_ = displayInfo;
     windowId_ = info.windowId;
     pid_ = info.windowPid;
+
+    if ((displayInfo_.width >= PHONE_SCREEN_WIDTH) || (displayInfo_.height >= PHONE_SCREEN_WIDTH)) {
+        if ((displayInfo_.width == PAD_SCREEN_WIDTH) || (displayInfo_.height == PAD_SCREEN_WIDTH)) {
+            imageWidth_ = MIDDLE_ICON_WIDTH;
+            imageHeight_ = MIDDLE_ICON_HEIGHT;
+        } else {
+            imageWidth_ = LARGE_ICON_WIDTH;
+            imageHeight_ = LARGE_ICON_HEIGHT;
+        }
+    } else {
+        imageWidth_ = SMALL_ICON_WIDTH;
+        imageHeight_ = SMALL_ICON_HEIGHT;
+    }
 }
 
 void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo, const WinInfo &info)
@@ -528,16 +552,16 @@ void PointerDrawingManager::InitStyle()
         {TEXT_CURSOR, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "TextCursor_Center.png"}},
         {ZOOM_IN, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ZoomIn_Center.png"}},
         {ZOOM_OUT, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ZoomOut_Center.png"}},
-        {MIDDLE_BTN_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_East_Center.png"}},
-        {MIDDLE_BTN_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_West_Center.png"}},
-        {MIDDLE_BTN_SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_South_Center.png"}},
-        {MIDDLE_BTN_NORTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_North_Center.png"}},
-        {MIDDLE_BTN_NORTH_SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_NS_Center.png"}},
-        {MIDDLE_BTN_NORTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_NE_Center.png"}},
-        {MIDDLE_BTN_NORTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_NW_Center.png"}},
-        {MIDDLE_BTN_SOUTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_SE_Center.png"}},
-        {MIDDLE_BTN_SOUTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_SW_Center.png"}},
-        {MIDDLE_BTN_NORTH_SOUTH_WEST_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBin_NSWE_Center.png"}},
+        {MIDDLE_BTN_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_East_Center.png"}},
+        {MIDDLE_BTN_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_West_Center.png"}},
+        {MIDDLE_BTN_SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_South_Center.png"}},
+        {MIDDLE_BTN_NORTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_North_Center.png"}},
+        {MIDDLE_BTN_NORTH_SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_NS_Center.png"}},
+        {MIDDLE_BTN_NORTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_NE_Center.png"}},
+        {MIDDLE_BTN_NORTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_NW_Center.png"}},
+        {MIDDLE_BTN_SOUTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_SE_Center.png"}},
+        {MIDDLE_BTN_SOUTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_SW_Center.png"}},
+        {MIDDLE_BTN_NORTH_SOUTH_WEST_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_NSWE_Center.png"}},
     };
     for (auto iter = mouseIcons_.begin(); iter != mouseIcons_.end();) {
         if ((ReadCursorStyleFile(iter->second.iconPath)) != RET_OK) {
