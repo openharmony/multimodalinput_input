@@ -83,6 +83,8 @@ private:
     int32_t lastMouseStyle_ { 0 };
     int32_t pid_ { 0 };
     int32_t windowId_ { 0 };
+    int32_t imageWidth_ { 0 };
+    int32_t imageHeight_ { 0 };
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     struct PidInfo {
         int32_t pid { 0 };
