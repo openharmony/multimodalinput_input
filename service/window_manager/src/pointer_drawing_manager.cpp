@@ -278,7 +278,7 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
     OHOS::Media::DecodeOptions decodeOpts;
     decodeOpts.desiredSize = {
         .width = imageWidth_,
-        .height = imageHeight_,
+        .height = imageHeight_
     };
 
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
