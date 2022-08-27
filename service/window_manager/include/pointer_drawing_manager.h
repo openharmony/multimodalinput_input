@@ -42,7 +42,7 @@ public:
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
     void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
         const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT);
-    void OnDisplayInfo(const DisplayInfo& displayInfo, const WinInfo &info);
+    void UpdateDisplayInfo(const DisplayInfo& displayInfo, const WinInfo &info);
     void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo, const WinInfo &info);
     void UpdatePointerDevice(bool hasPointerDevice);
     bool Init();
