@@ -2759,7 +2759,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointerVisible_002, TestSize.Leve
  * @tc.name: InputManagerTest_SetPointSpeed_001
  * @tc.desc: Abnormal speed value processing
  * @tc.type: FUNC
- * @tc.require:
+ * @tc.require: I530XP I530UX
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_001, TestSize.Level1)
 {
@@ -2788,7 +2788,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_001, TestSize.Level1)
  * @tc.name: InputManagerTest_SetPointSpeed_002
  * @tc.desc: Normal speed value processing
  * @tc.type: FUNC
- * @tc.require:
+ * @tc.require: I530XP I530UX
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_002, TestSize.Level1)
 {
@@ -2817,7 +2817,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_002, TestSize.Level1)
  * @tc.name: InputManagerTest_SetPointSpeed_003
  * @tc.desc: Normal speed value processing
  * @tc.type: FUNC
- * @tc.require:
+ * @tc.require: I530XP I530UX
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_003, TestSize.Level1)
 {
@@ -2846,7 +2846,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_003, TestSize.Level1)
  * @tc.name: InputManagerTest_SetPointSpeed_004
  * @tc.desc: Normal speed value processing
  * @tc.type: FUNC
- * @tc.require:
+ * @tc.require: I530XP I530UX
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_004, TestSize.Level1)
 {
@@ -2875,7 +2875,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_004, TestSize.Level1)
  * @tc.name: InputManagerTest_SetPointSpeed_005
  * @tc.desc: Abnormal speed value processing
  * @tc.type: FUNC
- * @tc.require:
+ * @tc.require: I530XP I530UX
  */
 HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_005, TestSize.Level1)
 {
@@ -2898,6 +2898,24 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_005, TestSize.Level1)
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(700, 1000);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+}
+
+/**
+ * @tc.name: InputManagerTest_SetPointerStyle_001
+ * @tc.desc: Sets whether the pointer icon is visible
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointerStyle_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    uint32_t windowId = window->GetWindowId();
+    int32_t pointerStyle;
+    if (InputManager::GetInstance()->SetPointerStyle(windowId, MOUSE_ICON::CROSS) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
+        ASSERT_EQ(pointerStyle, MOUSE_ICON::DEFAULT);
+    }
 }
 } // namespace MMI
 } // namespace OHOS
