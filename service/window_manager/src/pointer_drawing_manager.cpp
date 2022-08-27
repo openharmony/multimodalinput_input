@@ -277,14 +277,13 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
     return pixelMap;
 }
 
-void PointerDrawingManager::OnDisplayInfo(const DisplayInfo& displayInfo, const WinInfo &info)
+void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo, const WinInfo &info)
 {
     CALL_DEBUG_ENTER;
     hasDisplay_ = true;
     displayInfo_ = displayInfo;
     windowId_ = info.windowId;
     pid_ = info.windowPid;
-    DrawManager();
 }
 
 void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo, const WinInfo &info)
@@ -292,14 +291,14 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupIn
     CALL_DEBUG_ENTER;
     for (const auto& item : displayGroupInfo.displaysInfo) {
         if (item.id == displayInfo_.id) {
+            UpdateDisplayInfo(item, info);
             DrawManager();
-            OnDisplayInfo(item, info);
             return;
         }
     }
-    OnDisplayInfo(displayGroupInfo.displaysInfo[0], info);
-    MouseEventHdr->OnDisplayLost(displayInfo_.id);
+    UpdateDisplayInfo(displayGroupInfo.displaysInfo[0], info);
     DrawManager();
+    MouseEventHdr->OnDisplayLost(displayInfo_.id);
     MMI_HILOGD("displayId_:%{public}d, displayWidth_:%{public}d, displayHeight_:%{public}d",
         displayInfo_.id, displayInfo_.width, displayInfo_.height);
 }

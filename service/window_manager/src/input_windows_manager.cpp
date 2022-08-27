@@ -763,7 +763,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     int32_t mouseStyle = pointerStyleInfo.value();
     WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
-    IPointerDrawingManager::GetInstance()->OnDisplayInfo(*physicalDisplayInfo, info);
+    IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicalDisplayInfo, info);
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
         pointerItem.GetDisplayY(), MOUSE_ICON(mouseStyle));
 
