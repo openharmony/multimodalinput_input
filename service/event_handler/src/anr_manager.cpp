@@ -30,7 +30,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ANRMa
 constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 const std::string FOUNDATION = "foundation";
 constexpr int32_t ANR_DISPATCH = 0;
-constexpr int32_t ANR_MONITOR = 0;
+constexpr int32_t ANR_MONITOR = 1;
 } // namespace
 
 void ANRManager::Init(UDSServer& udsServer)
@@ -96,7 +96,12 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
             return;
         }
         MMI_HILOGI("ANR remove all timers");
-        RemoveTimers(sess);
+        std::vector<int32_t> timerIds = sess->GetTimerIds(type);
+        for (int32_t item : timerIds) {
+            if (item != -1) {
+                TimerMgr->RemoveTimer(item);
+            }
+        }
     });
     sess->SaveANREvent(type, id, currentTime, timerId);
 }
