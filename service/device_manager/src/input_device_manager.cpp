@@ -549,12 +549,13 @@ std::string InputDeviceManager::GetOriginNetworkId(const std::string &dhid)
 
 void InputDeviceManager::GetLocalDeviceId(std::string &local)
 {
+    local = "";
     auto localNode = std::make_shared<NodeBasicInfo>();
     CHKPV(localNode);
     int32_t errCode = GetLocalNodeDeviceInfo(BUNDLE_NAME.c_str(), localNode);
     if (errCode != RET_OK) {
         MMI_HILOGE("GetLocalNodeDeviceInfo errCode: %{public}d", errCode);
-        local = "";
+        return;
     }
     local = localNode->networkId;
 }
