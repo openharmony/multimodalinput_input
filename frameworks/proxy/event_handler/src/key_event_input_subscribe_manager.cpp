@@ -50,6 +50,39 @@ KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(
     ++KeyEventInputSubscribeManager::subscribeIdManager_;
 }
 
+bool operator<(const KeyOption &first, const KeyOption &second)
+{
+    if (first.GetFinalKey() != second.GetFinalKey()) {
+        return (first.GetFinalKey() < second.GetFinalKey());
+    }
+    const std::set<int32_t> sPrekeys { first.GetPreKeys() };
+    const std::set<int32_t> tPrekeys { second.GetPreKeys() };
+    std::set<int32_t>::const_iterator sIter = sPrekeys.cbegin();
+    std::set<int32_t>::const_iterator tIter = tPrekeys.cbegin();
+    for (; sIter != sPrekeys.cend() && tIter != tPrekeys.cend(); ++sIter, ++tIter) {
+        if (*sIter != *tIter) {
+            return (*sIter < *tIter);
+        }
+    }
+    if (sIter != sPrekeys.cend() || tIter != tPrekeys.cend()) {
+        return (tIter != tPrekeys.cend());
+    }
+    if (first.IsFinalKeyDown() ^ second.IsFinalKeyDown()) {
+        return second.IsFinalKeyDown();
+    }
+    return (first.GetFinalKeyDownDuration() < second.GetFinalKeyDownDuration());
+}
+
+bool KeyEventInputSubscribeManager::SubscribeKeyEventInfo::operator<(const SubscribeKeyEventInfo &other) const
+{
+    if (keyOption_ == nullptr) {
+        return (other.keyOption_ != nullptr);
+    } else if (other.keyOption_ == nullptr) {
+        return false;
+    }
+    return (*keyOption_ < *other.keyOption_);
+}
+
 int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
     std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
@@ -67,22 +100,27 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         MMI_HILOGE("Client init failed");
         return INVALID_SUBSCRIBE_ID;
     }
+
+    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    CHKPR(eventHandler, INVALID_SUBSCRIBE_ID);
+    auto [tIter, isOk] = subscribeInfos_.emplace(keyOption, callback, eventHandler);
+    if (!isOk) {
+        MMI_HILOGW("Subscription is duplicated");
+        return tIter->GetSubscribeId();
+    }
+    if (EventManager.SubscribeKeyEvent(*tIter) != RET_OK) {
+        MMI_HILOGE("Subscribing key event failed");
+    }
+
+    MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
+        "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuration:%{public}d",
+        tIter->GetSubscribeId(), keyOption->GetFinalKey(),
+        keyOption->IsFinalKeyDown() ? "true" : "false",
+        keyOption->GetFinalKeyDownDuration());
     for (const auto &preKey : preKeys) {
         MMI_HILOGD("prekey:%{public}d", preKey);
     }
-    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
-    CHKPR(eventHandler, INVALID_SUBSCRIBE_ID);
-    SubscribeKeyEventInfo subscribeInfo(keyOption, callback, eventHandler);
-    MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
-        "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuration:%{public}d",
-        subscribeInfo.GetSubscribeId(), keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
-        keyOption->GetFinalKeyDownDuration());
-    subscribeInfos_.push_back(subscribeInfo);
-    if (EventManager.SubscribeKeyEvent(subscribeInfo) != RET_OK) {
-        MMI_HILOGE("Leave, subscribe key event failed");
-        return INVALID_SUBSCRIBE_ID;
-    }
-    return subscribeInfo.GetSubscribeId();
+    return tIter->GetSubscribeId();
 }
 
 int32_t KeyEventInputSubscribeManager::UnsubscribeKeyEvent(int32_t subscribeId)
@@ -162,7 +200,7 @@ void KeyEventInputSubscribeManager::OnConnected()
 {
     CALL_DEBUG_ENTER;
     if (subscribeInfos_.empty()) {
-        MMI_HILOGE("Leave, subscribeInfos_ is empty");
+        MMI_HILOGD("Leave, subscribeInfos_ is empty");
         return;
     }
     for (const auto& subscriberInfo : subscribeInfos_) {
