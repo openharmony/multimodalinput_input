@@ -36,6 +36,7 @@ int32_t InputDeviceCooperateImpl::RegisterCooperateListener(InputDevCooperateLis
 {
     CALL_DEBUG_ENTER;
     CHKPR(listener, RET_ERR);
+    std::lock_guard<std::mutex> guard(mtx_);
     for (const auto &item : devCooperateListener_) {
         if (item.second == listener) {
             MMI_HILOGW("The listener already exists");
@@ -57,6 +58,7 @@ int32_t InputDeviceCooperateImpl::RegisterCooperateListener(InputDevCooperateLis
 int32_t InputDeviceCooperateImpl::UnregisterCooperateListener(InputDevCooperateListenerPtr listener)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     if (listener == nullptr) {
         devCooperateListener_.clear();
         goto listenerLabel;
@@ -145,6 +147,7 @@ int32_t InputDeviceCooperateImpl::GetInputDeviceCooperateState(
 void InputDeviceCooperateImpl::OnDevCooperateListener(const std::string deviceId, CooperationMessage msg)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     for (const auto &item : devCooperateListener_) {
         if (!MMIEventHandler::PostTask(item.first,
             std::bind(&InputDeviceCooperateImpl::OnDevCooperateListenerTask, this, item, deviceId, msg))) {
