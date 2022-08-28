@@ -727,7 +727,6 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
             return;
         }
         uv_queue_work(loop, work, [](uv_work_t *work){}, &JsInputMonitor::JsCallback);
-        std::lock_guard<std::mutex> guard(mutex_);
     }
 }
 
