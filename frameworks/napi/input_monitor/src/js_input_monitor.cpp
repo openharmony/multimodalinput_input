@@ -699,14 +699,13 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
     CHKPV(monitor_);
     CHKPV(pointerEvent);
     {
-        std::lock_guard<std::mutex> guard(evQueueMutex_);
+        std::lock_guard<std::mutex> guard(mutex_);
         std::queue<std::shared_ptr<PointerEvent>> tmp;
         std::swap(evQueue_, tmp);
         evQueue_.push(pointerEvent);
     }
     int32_t num = 0;
     {
-        std::lock_guard<std::mutex> guard(mutex_);
         num = jsTaskNum_;
         jsTaskNum_ = 1;
     }
