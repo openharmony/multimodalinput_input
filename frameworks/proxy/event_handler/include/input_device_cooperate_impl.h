@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_INPUT_DEVICE_COOPERATE_IMPL_H
-#define OHOS_INPUT_DEVICE_COOPERATE_IMPL_H
+#ifndef INPUT_DEVICE_COOPERATE_IMPL_H
+#define INPUT_DEVICE_COOPERATE_IMPL_H
 
 #include <functional>
 #include <list>
@@ -80,4 +80,4 @@ private:
 } // namespace MMI
 } // namespace OHOS
 #define InputDevCooperateImpl OHOS::MMI::InputDeviceCooperateImpl::GetInstance()
-#endif // OHOS_INPUT_DEVICE_COOPERATE_IMPL_H
+#endif // INPUT_DEVICE_COOPERATE_IMPL_H
