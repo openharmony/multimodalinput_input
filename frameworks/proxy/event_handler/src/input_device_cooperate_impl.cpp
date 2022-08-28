@@ -184,6 +184,7 @@ void InputDeviceCooperateImpl::OnCooperationState(int32_t userData, bool state)
 
 int32_t InputDeviceCooperateImpl::GetUserData()
 {
+    std::lock_guard<std::mutex> guard(mtx_);
     return userData_;
 }
 
