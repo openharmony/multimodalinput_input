@@ -549,9 +549,9 @@ std::string InputDeviceManager::GetOriginNetworkId(const std::string &dhid)
 
 void InputDeviceManager::GetLocalDeviceId(std::string &local)
 {
-    auto localNode = std::make_unique<NodeBasicInfo>();
+    auto localNode = std::make_shared<NodeBasicInfo>();
     CHKPV(localNode);
-    int32_t errCode = GetLocalNodeDeviceInfo(BUNDLE_NAME.c_str(), localNode.get());
+    int32_t errCode = GetLocalNodeDeviceInfo(BUNDLE_NAME.c_str(), localNode);
     if (errCode != RET_OK) {
         MMI_HILOGE("GetLocalNodeDeviceInfo errCode: %{public}d", errCode);
         local = "";
