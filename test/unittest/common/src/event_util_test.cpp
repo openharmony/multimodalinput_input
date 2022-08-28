@@ -18,7 +18,6 @@
 #include <iomanip>
 
 #include "mmi_log.h"
-#include "window_utils_test.h"
 
 namespace OHOS {
 namespace MMI {
