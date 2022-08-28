@@ -721,7 +721,7 @@ int32_t ReadCursorStyleFile(const std::string &filePath)
     return RET_OK;
 }
 
-std::string StringPrintf(const char *format, ...) const
+std::string StringPrintf(const char *format, ...)
 {
     char space[1024];
 

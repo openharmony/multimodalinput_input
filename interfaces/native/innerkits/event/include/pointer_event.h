@@ -27,6 +27,9 @@
 #include "parcel.h"
 
 #include "input_event.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+#include "raw_data.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 namespace OHOS {
 namespace MMI {
@@ -717,7 +720,7 @@ public:
          * @return void
          * @since 9
          */
-        void SetRawDx(int32_t rawDy);
+        void SetRawDy(int32_t rawDy);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     private:
         int32_t pointerId_ {};

@@ -329,7 +329,10 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
         if (it->second.inputDeviceOrigin_ == inputDevice) {
             deviceId = it->first;
             DfxHisysevent::OnDeviceDisconnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
-            inputDevice_.erase(it);
+            {
+                std::lock_guard<std::mutex> guard(mutex_);
+                inputDevice_.erase(it);
+            }
             break;
         }
     }
