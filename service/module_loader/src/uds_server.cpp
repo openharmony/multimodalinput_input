@@ -116,7 +116,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
-    MMI_HILOGD("alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
+    MMI_HILOGD("Alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
                serverFd, toReturnClientFd, sockFds[1]);
     auto closeSocketFdWhenError = [&serverFd, &toReturnClientFd] {
         close(serverFd);
@@ -286,7 +286,7 @@ void UDSServer::DumpSession(const std::string &title)
 {
     MMI_HILOGD("in %s: %s", __func__, title.c_str());
     int32_t i = 0;
-    for (auto& [key, value] : sessionsMap_) {
+    for (auto &[key, value] : sessionsMap_) {
         CHKPV(value);
         MMI_HILOGD("%d, %s", i, value->GetDescript().c_str());
         i++;
@@ -368,7 +368,7 @@ void UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callba
 void UDSServer::NotifySessionDeleted(SessionPtr ses)
 {
     CALL_DEBUG_ENTER;
-    for (const auto& callback : callbacks_) {
+    for (const auto &callback : callbacks_) {
         callback(ses);
     }
 }

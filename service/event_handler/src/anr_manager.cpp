@@ -30,10 +30,10 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ANRMa
 constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 const std::string FOUNDATION = "foundation";
 constexpr int32_t ANR_DISPATCH = 0;
-constexpr int32_t ANR_MONITOR = 0;
+constexpr int32_t ANR_MONITOR = 1;
 } // namespace
 
-void ANRManager::Init(UDSServer& udsServer)
+void ANRManager::Init(UDSServer &udsServer)
 {
     CALL_DEBUG_ENTER;
     udsServer_ = &udsServer;
@@ -81,7 +81,7 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
         sess->SetAnrStatus(type, true);
         DfxHisysevent::ApplicationBlockInput(sess);
         if (anrNoticedPid_ < 0) {
-            MMI_HILOGE("anrNoticedPid_ is invalid");
+            MMI_HILOGE("The anrNoticedPid_ is invalid");
             return;
         }
         NetPacket pkt(MmiMessageId::NOTICE_ANR);
@@ -96,8 +96,14 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
             return;
         }
         MMI_HILOGI("ANR remove all timers");
-        RemoveTimers(sess);
+        std::vector<int32_t> timerIds = sess->GetTimerIds(type);
+        for (int32_t item : timerIds) {
+            if (item != -1) {
+                TimerMgr->RemoveTimer(item);
+            }
+        }
     });
+    MMI_HILOGD("Save anr event anrType:%{public}d eventId:%{public}d timeId:%{public}d", type, id, timerId);
     sess->SaveANREvent(type, id, currentTime, timerId);
 }
 
@@ -124,7 +130,7 @@ void ANRManager::OnSessionLost(SessionPtr session)
     CALL_DEBUG_ENTER;
     CHKPV(session);
     if (anrNoticedPid_ == session->GetPid()) {
-        MMI_HILOGD("anrNoticedPid_ is invalid");
+        MMI_HILOGD("The anrNoticedPid_ is invalid");
         anrNoticedPid_ = -1;
     }
     MMI_HILOGI("SessionLost remove all Timers");

@@ -54,6 +54,7 @@ const std::string CONFIG_ITEM_REPEAT = "Key.autorepeat";
 const std::string CONFIG_ITEM_DELAY = "Key.autorepeat.delaytime";
 const std::string CONFIG_ITEM_INTERVAL = "Key.autorepeat.intervaltime";
 const std::string CONFIG_ITEM_TYPE = "Key.keyboard.type";
+const std::string CURSORSTYLE_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DATA_PATH = "/data";
 const std::string INPUT_PATH = "/system/etc/multimodalinput/";
 const std::string KEY_PATH = "/vendor/etc/keymap/";
@@ -134,7 +135,7 @@ std::string GetThisThreadIdOfString()
         char buf[BUF_TID_SIZE] = {};
         const int32_t ret = sprintf_s(buf, BUF_TID_SIZE, "%06d", tid);
         if (ret < 0) {
-            printf("ERR: in %s, #%d, call sprintf_s fail, ret = %d.", __func__, __LINE__, ret);
+            printf("ERR: in %s, #%d, call sprintf_s failed, ret = %d.", __func__, __LINE__, ret);
             return threadLocalId;
         }
         buf[BUF_TID_SIZE - 1] = '\0';
@@ -236,7 +237,7 @@ static void PrintEventJoyStickAxisInfo(const std::string &axisName, const EventJ
                r.standardValue, r.isChanged);
 }
 
-void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
+void PrintEventJoyStickAxisInfo(const EventJoyStickAxis &r, const int32_t fd,
     const int32_t abilityId, const int32_t focusId, const int64_t preHandlerTime)
 {
     MMI_HILOGD("Event dispatcher of server, EventJoyStickAxis:physical:%{public}s,"
@@ -256,7 +257,7 @@ void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
     PrintEventJoyStickAxisInfo(std::string("abs_rz"), r.abs_rz);
 }
 
-void PrintWMSInfo(const std::string& str, const int32_t fd, const int32_t abilityId, const int32_t focusId)
+void PrintWMSInfo(const std::string &str, const int32_t fd, const int32_t abilityId, const int32_t focusId)
 {
     MMI_HILOGD("MMIWMS:windowId:%{public}s", str.c_str());
     if (focusId == -1) {
@@ -272,7 +273,7 @@ int32_t GetPid()
     return static_cast<int32_t>(getpid());
 }
 
-std::string GetFileName(const std::string& strPath)
+std::string GetFileName(const std::string &strPath)
 {
     size_t nPos = strPath.find_last_of('/');
     if (strPath.npos == nPos)
@@ -296,21 +297,21 @@ const char* GetProgramName()
     }
     FILE *fp = fopen(buf, "rb");
     if (fp == nullptr) {
-        KMSG_LOGE("fp is nullptr, filename = %s.", buf);
+        KMSG_LOGE("The fp is nullptr, filename = %s.", buf);
         return "";
     }
     static constexpr size_t bufLineSize = 512;
     char bufLine[bufLineSize] = { 0 };
     if ((fgets(bufLine, bufLineSize, fp) == nullptr)) {
-        KMSG_LOGE("fgets fail.");
+        KMSG_LOGE("fgets failed.");
         if (fclose(fp) != 0) {
-            KMSG_LOGW("close file: %s failed", buf);
+            KMSG_LOGW("Close file:%s failed", buf);
         }
         fp = nullptr;
         return "";
     }
     if (fclose(fp) != 0) {
-        KMSG_LOGW("close file: %s failed", buf);
+        KMSG_LOGW("Close file:%s failed", buf);
     }
     fp = nullptr;
 
@@ -322,7 +323,7 @@ const char* GetProgramName()
     }
     const size_t copySize = std::min(tempName.size(), PROGRAM_NAME_SIZE - 1);
     if (copySize == 0) {
-        KMSG_LOGE("copySize is 0.");
+        KMSG_LOGE("The copySize is 0.");
         return "";
     }
     errno_t ret = memcpy_s(programName, PROGRAM_NAME_SIZE, tempName.c_str(), copySize);
@@ -351,7 +352,7 @@ char* MmiBasename(char* path)
     return pBasename;
 }
 
-void SetThreadName(const std::string& name)
+void SetThreadName(const std::string &name)
 {
     prctl(PR_SET_NAME, name.c_str());
 }
@@ -425,12 +426,12 @@ std::string StringFmt(const char* str, ...)
     return buf;
 }
 
-static bool IsFileExists(const std::string& fileName)
+static bool IsFileExists(const std::string &fileName)
 {
     return (access(fileName.c_str(), F_OK) == 0);
 }
 
-static bool CheckFileExtendName(const std::string& filePath, const std::string& checkExtension)
+static bool CheckFileExtendName(const std::string &filePath, const std::string &checkExtension)
 {
     std::string::size_type pos = filePath.find_last_of('.');
     if (pos == std::string::npos) {
@@ -440,7 +441,7 @@ static bool CheckFileExtendName(const std::string& filePath, const std::string& 
     return (filePath.substr(pos + 1, filePath.npos) == checkExtension);
 }
 
-static int32_t GetFileSize(const std::string& filePath)
+static int32_t GetFileSize(const std::string &filePath)
 {
     struct stat statbuf = {0};
     if (stat(filePath.c_str(), &statbuf) != 0) {
@@ -597,7 +598,7 @@ std::string ReadJsonFile(const std::string &filePath)
     return ReadFile(filePath);
 }
 
-int32_t ReadTomlFile(const std::string &filePath, DeviceConfig& devConf)
+int32_t ReadTomlFile(const std::string &filePath, DeviceConfig &devConf)
 {
     if (filePath.empty()) {
         MMI_HILOGE("FilePath is empty");
@@ -627,7 +628,7 @@ int32_t ReadTomlFile(const std::string &filePath, DeviceConfig& devConf)
     return RET_OK;
 }
 
-int32_t ReadConfigFile(const std::string &realPath, DeviceConfig& devConf)
+int32_t ReadConfigFile(const std::string &realPath, DeviceConfig &devConf)
 {
     CALL_DEBUG_ENTER;
     std::ifstream cfgFile(realPath);
@@ -665,7 +666,7 @@ int32_t ReadConfigFile(const std::string &realPath, DeviceConfig& devConf)
     return RET_OK;
 }
 
-int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value, DeviceConfig& devConf)
+int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value, DeviceConfig &devConf)
 {
     CALL_DEBUG_ENTER;
     if (configItem.empty() || value.empty()) {
@@ -694,6 +695,47 @@ int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value
         devConf.keyboardType = stoi(value);
     }
     return RET_OK;
+}
+
+int32_t ReadCursorStyleFile(const std::string &filePath)
+{
+    CALL_DEBUG_ENTER;
+    if (filePath.empty()) {
+        MMI_HILOGE("FilePath is empty");
+        return RET_ERR;
+    }
+    if (!IsFileExists(filePath)) {
+        MMI_HILOGE("File is not existent");
+        return RET_ERR;
+    }
+    char realPath[PATH_MAX] = {};
+    if (realpath(filePath.c_str(), realPath) == nullptr) {
+        MMI_HILOGE("Path is error");
+        return RET_ERR;
+    }
+    int32_t fileSize = GetFileSize(realPath);
+    if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
+        MMI_HILOGE("File size out of read range");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+std::string StringPrintf(const char *format, ...)
+{
+    char space[1024];
+
+    va_list ap;
+    va_start(ap, format);
+    std::string result;
+    int32_t ret = vsnprintf_s(space, sizeof(space), sizeof(space) - 1, format, ap);
+    if (ret >= RET_OK && (size_t)ret < sizeof(space)) {
+        result = space;
+    } else {
+        MMI_HILOGE("The buffer is overflow");
+    } 
+    va_end(ap);
+    return result;
 }
 } // namespace MMI
 } // namespace OHOS

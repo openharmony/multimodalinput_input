@@ -96,7 +96,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointManager::OnLibinputTabletToolEv
         CHKPP(processor);
         auto ret = processors_.emplace(deviceId, processor);
         if (!ret.second) {
-            MMI_HILOGE("Duplicate device record: %{public}d", deviceId);
+            MMI_HILOGE("Duplicate device record:%{public}d", deviceId);
         }
     }
     return processor->OnEvent(event);

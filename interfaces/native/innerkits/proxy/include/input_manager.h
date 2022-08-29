@@ -23,10 +23,12 @@
 #include "event_handler.h"
 #include "nocopyable.h"
 
+#include "cooperation_message.h"
 #include "i_anr_observer.h"
 #include "display_info.h"
 #include "error_multimodal.h"
 #include "i_input_device_listener.h"
+#include "i_input_device_cooperate_listener.h"
 #include "i_input_event_consumer.h"
 #include "input_device.h"
 #include "key_option.h"
@@ -300,13 +302,12 @@ public:
      * @since 9
      */
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
-    
+
     /**
      * @brief 设置鼠标光标的位置.
      * @param x x 坐标
      * @param y y 坐标
-     * @return 如果设置成功，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值
+     * @return 0表示返回成功，否则表示返回失败
      */
     int32_t SetPointerLocation(int32_t x, int32_t y);
 
@@ -314,8 +315,7 @@ public:
      * @brief 获取远端输入能力.
      * @param deviceId 远端的deviceId
      * @param remoteTypes 返回远端输入能力
-     * @return 如果获取成功，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值
+     * @return 0表示返回成功，否则表示返回失败
      * @since 9
      */
     int32_t GetRemoteInputAbility(std::string deviceId, std::function<void(std::set<int32_t>)> remoteTypes);
@@ -326,8 +326,7 @@ public:
      * @param callback 准备分布式的回调，如果准备分布式执行完了，此回调被调用
      * 如果准备分布式成功，则返回大于或等于 <b>0</b> 的值
      * 否则返回小于 <b>0</b> 的值.
-     * @return 如果准备分布式被成功调用，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值
+     * @return 0表示返回成功，否则表示返回失败
      */
     int32_t PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
 
@@ -337,8 +336,7 @@ public:
      * @param callback 取消准备分布式的回调，如果取消准备分布式执行完了，此回调被调用
      * 如果取消准备分布式成功，则返回大于或等于 <b>0</b> 的值
      * 否则返回小于 <b>0</b> 的值.
-     * @return 如果取消准备分布式被成功调用，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值
+     * @return 0表示返回成功，否则表示返回失败
      */
     int32_t UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
 
@@ -348,8 +346,7 @@ public:
      * @param callback 开始分布式的回调，如果开始分布式执行完了，此回调被调用
      * 如果开始分布式成功，则返回大于或等于 <b>0</b> 的值
      * 否则返回小于 <b>0</b> 的值.
-     * @return 如果取消准备分布式被成功调用，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值
+     * @return 0表示返回成功，否则表示返回失败
      */
     int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
 
@@ -359,21 +356,70 @@ public:
      * @param callback 取消分布式的回调，如果取消分布式执行完了，此回调被调用
      * 如果取消分布式成功，则返回大于或等于 <b>0</b> 的值
      * 否则返回小于 <b>0</b> 的值.
-     * @return 如果取消分布式被成功调用，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值
+     * @return 0表示返回成功，否则表示返回失败
      */
     int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
-	
-    /**
-     * @brief 设定输入设备的席位名称.
-     * @param seatName 席位名称
-     * @param deviceUniqId 返回输入设备的唯一ID
-     * @return 如果设定输入设备的席位名称成功调用，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值
-     */
-    using DeviceUniqId = std::tuple<int32_t, int32_t, int32_t, int32_t, int32_t, std::string>;
-    int32_t SetInputDeviceSeatName(const std::string& seatName, DeviceUniqId& deviceUniqId);
 
+    /**
+     * @brief 设置指定输入设备对应的屏幕ID
+     * @param dhid 输入设备唯一ID
+     * @param screenId 输入设备对应的屏幕ID
+     * @return 0表示返回成功，否则表示返回失败
+     */
+    int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
+
+    /**
+     * @brief 注册键鼠穿越管理事件监听。
+     * @param listener 穿越管理事件监听回调。
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener);
+
+    /**
+     * @brief 注销键鼠穿越管理事件监听。
+     * @param listener 事件监听回调.
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener = nullptr);
+
+    /**
+     * @brief 开启/关闭键鼠穿越管理接口。
+     * @param enabled 开启/关闭。
+     * @param callback 开启/关闭键鼠穿越，此回调被调用
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t EnableInputDeviceCooperate(bool enabled, std::function<void(std::string, CooperationMessage)> callback);
+
+    /**
+     * @brief 启动跨设备键鼠穿越。
+     * @param sinkDeviceId 键鼠穿越目标设备描述符（networkID）
+     * @param srcInputDeviceId 键鼠穿越待穿越输入外设标识符（设备ID句柄）
+     * @param callback 启动跨设备键鼠穿越，此回调被调用
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
+        std::function<void(std::string, CooperationMessage)> callback);
+
+    /**
+     * @brief 停止跨设备键鼠穿越。
+     * @param callback 停止跨设备键鼠穿越，此回调被调用
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback);
+
+    /**
+     * @brief 获取指定设备键鼠穿越状态。
+     * @param deviceId 指定设备描述符。
+     * @param callback 获取穿越管理设备状态，此回调被调用
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

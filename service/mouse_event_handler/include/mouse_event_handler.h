@@ -46,6 +46,9 @@ public:
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
     int32_t Normalize(struct libinput_event *event);
     void Dump(int32_t fd, const std::vector<std::string> &args);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    void SetAbsolutionLocation(int32_t xPercent, int32_t yPercent);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -53,22 +56,25 @@ public:
     int32_t SetPointerSpeedWithDeviceId(int32_t deviceId, int32_t speed);
     int32_t RemovePointerSpeed(int32_t deviceId);
     int32_t GetPointerSpeed() const;
+    void OnDisplayLost(int32_t displayId);
     int32_t GetPointerSpeedByDeviceId(int32_t deviceId) const;
 
 private:
     int32_t HandleMotionInner(struct libinput_event_pointer* data, int32_t deviceId);
     int32_t HandleButtonInner(struct libinput_event_pointer* data);
     int32_t HandleAxisInner(struct libinput_event_pointer* data);
-    void HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem& pointerItem);
+    void HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem &pointerItem);
  #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
-    void HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem);
+    void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
  #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t HandleButtonValueInner(struct libinput_event_pointer* data);
     int32_t HandleMotionAccelerate(struct libinput_event_pointer* data, int32_t deviceId);
-    bool GetSpeedGain(double vin, double& gain, int32_t deviceId) const;
-    void DumpInner();
+    bool GetSpeedGain(double vin, double& gain, int32_t deviceId) const;    void DumpInner();
     void InitAbsolution();
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    void SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, libinput_event_pointer* data);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     int32_t GetSpeed(int32_t deviceId) const;
 
 private:

@@ -25,7 +25,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Manage
 constexpr int64_t INJECT_SLEEP_TIMES = 10;
 } // namespace
 
-int32_t ManageInjectDevice::TransformJsonData(const DeviceItems& configData)
+int32_t ManageInjectDevice::TransformJsonData(const DeviceItems &configData)
 {
     CALL_DEBUG_ENTER;
     if (configData.empty()) {
@@ -63,12 +63,12 @@ int32_t ManageInjectDevice::TransformJsonData(const DeviceItems& configData)
     return RET_OK;
 }
 
-int32_t ManageInjectDevice::SendEvent(const InputEventArray& inputEventArray)
+int32_t ManageInjectDevice::SendEvent(const InputEventArray &inputEventArray)
 {
     return SendEventToDeviceNode(inputEventArray);
 }
 
-int32_t ManageInjectDevice::SendEventToDeviceNode(const InputEventArray& inputEventArray)
+int32_t ManageInjectDevice::SendEventToDeviceNode(const InputEventArray &inputEventArray)
 {
     CALL_DEBUG_ENTER;
     std::string deviceNode = inputEventArray.target;
