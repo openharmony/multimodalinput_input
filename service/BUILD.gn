@@ -56,6 +56,14 @@ config("libmmi_server_config") {
     "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core/include",
   ]
 
+  if (input_feature_input_cooperation) {
+    include_dirs += [
+      "input_device_cooperate/include",
+      "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core/include",
+      "//foundation/distributedhardware/device_manager/interfaces/inner_kits/native_cpp/include",
+    ]
+  }
+
   if (input_feature_hdf) {
     include_dirs += [
       "hdf_adapter/include",
@@ -343,71 +351,71 @@ ohos_prebuilt_etc("drawing_pointer_image_ZoomOut_Center") {
   relative_install_dir = "multimodalinput/mouse_icon"
 }
 
-ohos_prebuilt_etc("drawing_pointer_image_MiddleBin_East_Center") {
-  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBin_East_Center.png"
+ohos_prebuilt_etc("drawing_pointer_image_MiddleBtn_East_Center") {
+  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBtn_East_Center.png"
   part_name = "input"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput/mouse_icon"
 }
 
-ohos_prebuilt_etc("drawing_pointer_image_MiddleBin_West_Center") {
-  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBin_West_Center.png"
+ohos_prebuilt_etc("drawing_pointer_image_MiddleBtn_West_Center") {
+  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBtn_West_Center.png"
   part_name = "input"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput/mouse_icon"
 }
 
-ohos_prebuilt_etc("drawing_pointer_image_MiddleBin_South_Center") {
-  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBin_South_Center.png"
+ohos_prebuilt_etc("drawing_pointer_image_MiddleBtn_South_Center") {
+  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBtn_South_Center.png"
   part_name = "input"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput/mouse_icon"
 }
 
-ohos_prebuilt_etc("drawing_pointer_image_MiddleBin_North_Center") {
-  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBin_North_Center.png"
+ohos_prebuilt_etc("drawing_pointer_image_MiddleBtn_North_Center") {
+  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBtn_North_Center.png"
   part_name = "input"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput/mouse_icon"
 }
 
-ohos_prebuilt_etc("drawing_pointer_image_MiddleBin_NS_Center") {
-  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBin_NS_Center.png"
+ohos_prebuilt_etc("drawing_pointer_image_MiddleBtn_NS_Center") {
+  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBtn_NS_Center.png"
   part_name = "input"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput/mouse_icon"
 }
 
-ohos_prebuilt_etc("drawing_pointer_image_MiddleBin_NE_Center") {
-  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBin_NE_Center.png"
+ohos_prebuilt_etc("drawing_pointer_image_MiddleBtn_NE_Center") {
+  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBtn_NE_Center.png"
   part_name = "input"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput/mouse_icon"
 }
 
-ohos_prebuilt_etc("drawing_pointer_image_MiddleBin_NW_Center") {
-  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBin_NW_Center.png"
+ohos_prebuilt_etc("drawing_pointer_image_MiddleBtn_NW_Center") {
+  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBtn_NW_Center.png"
   part_name = "input"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput/mouse_icon"
 }
 
-ohos_prebuilt_etc("drawing_pointer_image_MiddleBin_SE_Center") {
-  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBin_SE_Center.png"
+ohos_prebuilt_etc("drawing_pointer_image_MiddleBtn_SE_Center") {
+  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBtn_SE_Center.png"
   part_name = "input"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput/mouse_icon"
 }
 
-ohos_prebuilt_etc("drawing_pointer_image_MiddleBin_SW_Center") {
-  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBin_SW_Center.png"
+ohos_prebuilt_etc("drawing_pointer_image_MiddleBtn_SW_Center") {
+  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBtn_SW_Center.png"
   part_name = "input"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput/mouse_icon"
 }
 
-ohos_prebuilt_etc("drawing_pointer_image_MiddleBin_NSWE_Center") {
-  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBin_NSWE_Center.png"
+ohos_prebuilt_etc("drawing_pointer_image_MiddleBtn_NSWE_Center") {
+  source = "//foundation/multimodalinput/input/util/source_icon/MiddleBtn_NSWE_Center.png"
   part_name = "input"
   subsystem_name = "multimodalinput"
   relative_install_dir = "multimodalinput/mouse_icon"
@@ -439,8 +447,15 @@ ohos_shared_library("libmmi-server") {
 
   if (input_feature_input_cooperation) {
     sources += [
+      "input_device_cooperate/src/cooperate_event_handler.cpp",
+      "input_device_cooperate/src/cooperate_event_manager.cpp",
       "input_device_cooperate/src/device_profile_adapter.cpp",
       "input_device_cooperate/src/distributed_input_adapter.cpp",
+      "input_device_cooperate/src/i_input_device_cooperate_state.cpp",
+      "input_device_cooperate/src/input_device_cooperate_sm.cpp",
+      "input_device_cooperate/src/input_device_cooperate_state_free.cpp",
+      "input_device_cooperate/src/input_device_cooperate_state_in.cpp",
+      "input_device_cooperate/src/input_device_cooperate_state_out.cpp",
     ]
   }
 
@@ -503,16 +518,16 @@ ohos_shared_library("libmmi-server") {
     ":drawing_pointer_image_HandOpen_Center",
     ":drawing_pointer_image_HandPointing_NW",
     ":drawing_pointer_image_Help_NW",
-    ":drawing_pointer_image_MiddleBin_East_Center",
-    ":drawing_pointer_image_MiddleBin_NE_Center",
-    ":drawing_pointer_image_MiddleBin_NSWE_Center",
-    ":drawing_pointer_image_MiddleBin_NS_Center",
-    ":drawing_pointer_image_MiddleBin_NW_Center",
-    ":drawing_pointer_image_MiddleBin_North_Center",
-    ":drawing_pointer_image_MiddleBin_SE_Center",
-    ":drawing_pointer_image_MiddleBin_SW_Center",
-    ":drawing_pointer_image_MiddleBin_South_Center",
-    ":drawing_pointer_image_MiddleBin_West_Center",
+    ":drawing_pointer_image_MiddleBtn_East_Center",
+    ":drawing_pointer_image_MiddleBtn_NE_Center",
+    ":drawing_pointer_image_MiddleBtn_NSWE_Center",
+    ":drawing_pointer_image_MiddleBtn_NS_Center",
+    ":drawing_pointer_image_MiddleBtn_NW_Center",
+    ":drawing_pointer_image_MiddleBtn_North_Center",
+    ":drawing_pointer_image_MiddleBtn_SE_Center",
+    ":drawing_pointer_image_MiddleBtn_SW_Center",
+    ":drawing_pointer_image_MiddleBtn_South_Center",
+    ":drawing_pointer_image_MiddleBtn_West_Center",
     ":drawing_pointer_image_Move_Center",
     ":drawing_pointer_image_NESW_Center",
     ":drawing_pointer_image_NWSE_Center",
@@ -545,16 +560,20 @@ ohos_shared_library("libmmi-server") {
     "//third_party/json:nlohmann_json_static",
   ]
 
-  if (input_feature_input_cooperation) {
-    deps += [ "//foundation/distributedhardware/distributed_input/interfaces/inner_kits:libdinput_sdk" ]
-  }
-
   if (input_feature_libinput || input_feature_hdf) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 
   if (resource_schedule_service_enabled) {
     deps += [ "//foundation/resourceschedule/resource_schedule_service/ressched/interfaces/innerkits/ressched_client:ressched_client" ]
+  }
+
+  if (input_feature_input_cooperation) {
+    deps += [
+      "//base/notification/eventhandler/frameworks/eventhandler:libeventhandler",
+      "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core:distributed_device_profile_client",
+      "//foundation/distributedhardware/distributed_input/interfaces/inner_kits:libdinput_sdk",
+    ]
   }
 
   external_deps = [
@@ -575,6 +594,13 @@ ohos_shared_library("libmmi-server") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  if (input_feature_input_cooperation) {
+    external_deps += [
+      "device_manager:devicemanagersdk",
+      "dsoftbus:softbus_client",
+    ]
+  }
 
   if (input_feature_pointer_drawing) {
     external_deps += [ "window_manager:libwm" ]

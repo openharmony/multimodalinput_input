@@ -71,7 +71,7 @@ public:
             if (napi_create_promise(env, &cb->deferred, &cb->promise) != napi_ok) {
                 delete cb;
                 cb = nullptr;
-                napi_throw_error(env, nullptr, "failed to create promise");
+                napi_throw_error(env, nullptr, "Failed to create promise");
             }
         } else {
             cb->ref = handle;

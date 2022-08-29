@@ -180,7 +180,7 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
     auto currentTime = GetSysClockTime();
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         if (ANRMgr->TriggerANR(ANR_MONITOR, currentTime, session_)) {
-            MMI_HILOGW("the pointer event does not report normally, application not response");
+            MMI_HILOGW("The pointer event does not report normally, application not response");
             return;
         }
     }
@@ -231,7 +231,7 @@ int32_t EventMonitorHandler::MonitorCollection::AddMonitor(const SessionHandler&
     }
 
     if (isFound) {
-        MMI_HILOGD("Event type is updated: %{public}u", monitor.eventType_);
+        MMI_HILOGD("Event type is updated:%{public}u", monitor.eventType_);
     } else {
         MMI_HILOGD("Service Add Monitor Success");
     }
@@ -257,7 +257,7 @@ void EventMonitorHandler::MonitorCollection::RemoveMonitor(const SessionHandler&
         MMI_HILOGE("Internal error, monitor has been removed");
         return;
     }
-    MMI_HILOGD("Event type is updated: %{public}u", monitor.eventType_);
+    MMI_HILOGD("Event type is updated:%{public}u", monitor.eventType_);
 }
 
 void EventMonitorHandler::MonitorCollection::MarkConsumed(int32_t eventId, SessionPtr session)
