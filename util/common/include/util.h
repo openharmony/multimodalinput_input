@@ -40,20 +40,20 @@ int64_t GetMillisTime();
 std::string GetUUid();
 std::string GetThisThreadIdOfString();
 uint64_t GetThisThreadId();
-size_t StringToken(std::string& str, const std::string& sep, std::string& token);
-size_t StringSplit(const std::string& str, const std::string& sep, std::vector<std::string>& vecList);
-std::string IdsListToString(const std::vector<int32_t>& list, const std::string& sep = ", ");
-void LocalTime(tm& t, time_t curTime = 0);
-std::string Strftime(const std::string& format = "%F %T", time_t curTime = 0);
-void PrintEventJoyStickAxisInfo(const EventJoyStickAxis& r, const int32_t fd,
+size_t StringToken(std::string &str, const std::string &sep, std::string &token);
+size_t StringSplit(const std::string &str, const std::string &sep, std::vector<std::string> &vecList);
+std::string IdsListToString(const std::vector<int32_t> &list, const std::string &sep = ", ");
+void LocalTime(tm &t, time_t curTime = 0);
+std::string Strftime(const std::string &format = "%F %T", time_t curTime = 0);
+void PrintEventJoyStickAxisInfo(const EventJoyStickAxis &r, const int32_t fd,
     const int32_t abilityId, const int32_t focusId, const int64_t preHandlerTime);
-void PrintWMSInfo(const std::string& str, const int32_t fd, const int32_t abilityId, const int32_t focusId);
+void PrintWMSInfo(const std::string &str, const int32_t fd, const int32_t abilityId, const int32_t focusId);
 int32_t GetPid();
-std::string GetFileName(const std::string& strPath);
+std::string GetFileName(const std::string &strPath);
 const char* GetProgramName();
 char* MmiBasename(char* path);
-void SetThreadName(const std::string& name);
-const std::string& GetThreadName();
+void SetThreadName(const std::string &name);
+const std::string &GetThreadName();
 void AddId(std::vector<int32_t> &list, int32_t id);
 size_t CalculateDifference(const std::vector<int32_t> &list1, std::vector<int32_t> &list2,
     std::vector<int32_t> &difList);
@@ -64,9 +64,11 @@ void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
 std::string StringFmt(const char* str, ...);
 std::string ReadJsonFile(const std::string &filePath);
 std::string ReadUinputToolFile(const std::string &filePath);
-int32_t ReadTomlFile(const std::string &filePath, DeviceConfig& devConf);
-int32_t ReadConfigFile(const std::string &realPath, DeviceConfig& devConf);
-int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value, DeviceConfig& devConf);
+int32_t ReadCursorStyleFile(const std::string &filePath);
+int32_t ReadTomlFile(const std::string &filePath, DeviceConfig &devConf);
+int32_t ReadConfigFile(const std::string &realPath, DeviceConfig &devConf);
+int32_t ConfigItemSwitch(const std::string &configItem, const std::string &value, DeviceConfig &devConf);
+std::string StringPrintf(const char *format, ...);
 inline bool IsNum(const std::string &str)
 {
     std::istringstream sin(str);

@@ -35,7 +35,7 @@ void HdfDeviceEventManager::ConnectHDFInit()
 {
     int32_t ret = GetInputInterface(&inputInterface_);
     if (ret != 0) {
-        MMI_HILOGE("Initialize fail");
+        MMI_HILOGE("Initialize failed");
         return;
     }
 

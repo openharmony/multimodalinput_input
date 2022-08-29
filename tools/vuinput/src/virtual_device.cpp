@@ -130,7 +130,7 @@ void RemoveDir(const std::string& filePath)
         }
     }
     if (closedir(dir) != 0) {
-        std::cout << "close dir:" << filePath << "failed" << std::endl;
+        std::cout << "Close dir:" << filePath << "failed" << std::endl;
     }
     if (std::remove(filePath.c_str()) != 0) {
         std::cout << "Remove dir:" << filePath <<"failed" << std::endl;
@@ -335,7 +335,7 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
         }
     }
     if (std::remove((g_folderPath + fileName).c_str()) != 0) {
-        std::cout << "remove file failed" << std::endl;
+        std::cout << "Remove file failed" << std::endl;
     }
     return false;
 }
@@ -446,12 +446,12 @@ bool VirtualDevice::SetUp()
     }
 
     if (strncpy_s(uinputDev_.name, sizeof(uinputDev_.name), deviceName_.c_str(), deviceName_.size()) != 0) {
-        std::cout << "failed to copied device name: " << uinputDev_.name << std::endl;
+        std::cout << "Failed to copied device name: " << uinputDev_.name << std::endl;
         return false;
     };
     SetDeviceId();
     if (!SetAbsResolution()) {
-        std::cout << "failed to set uinput abs resolution" << std::endl;
+        std::cout << "Failed to set uinput abs resolution" << std::endl;
         return false;
     }
     if (!SetPhys(deviceName_)) {

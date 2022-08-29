@@ -26,6 +26,9 @@
 
 #include "anr_manager.h"
 #include "event_dump.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+#include "input_device_cooperate_sm.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
@@ -67,7 +70,7 @@ void CheckDefineOutput(const char* fmt, Ts... args)
     char buf[MAX_PACKET_BUF_SIZE] = {};
     int32_t ret = snprintf_s(buf, MAX_PACKET_BUF_SIZE, MAX_PACKET_BUF_SIZE - 1, fmt, args...);
     if (ret == -1) {
-        KMSG_LOGI("call snprintf_s fail.ret = %d", ret);
+        KMSG_LOGI("Call snprintf_s failed.ret = %d", ret);
         return;
     }
     KMSG_LOGI("%s", buf);
@@ -188,11 +191,11 @@ bool MMIService::InitLibinputService()
     auto inputFd = libinputAdapter_.GetInputFd();
     auto ret = AddEpoll(EPOLL_EVENT_INPUT, inputFd);
     if (ret <  0) {
-        MMI_HILOGE("AddEpoll error ret: %{public}d", ret);
+        MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
         EpollClose();
         return false;
     }
-    MMI_HILOGI("AddEpoll, epollfd: %{public}d, fd: %{public}d", mmiFd_, inputFd);
+    MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, inputFd);
     return true;
 }
 
@@ -262,7 +265,9 @@ int32_t MMIService::Init()
         MMI_HILOGE("Saservice init failed");
         return SASERVICE_INIT_FAIL;
     }
-
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    InputDevCooSM->Init();
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     MMI_HILOGD("Input msg handler init");
     InputHandler->Init(*this);
     if (!InitLibinputService()) {
@@ -365,7 +370,7 @@ void MMIService::OnConnected(SessionPtr s)
 void MMIService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
-    MMI_HILOGW("Enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), s->GetFd());
+    MMI_HILOGW("Enter, session desc:%{public}s, fd:%{public}d", s->GetDescript().c_str(), s->GetFd());
 #ifdef OHOS_BUILD_ENABLE_POINTER
     IPointerDrawingManager::GetInstance()->DeletePointerVisible(s->GetPid());
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -1002,6 +1007,240 @@ int32_t MMIService::Dump(int32_t fd, const std::vector<std::u16string> &args)
     return RET_OK;
 }
 
+int32_t MMIService::RegisterCooperateListener()
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnRegisterCooperateListener, this, pid));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnRegisterCooperateListener failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+
+int32_t MMIService::UnregisterCooperateListener()
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnUnregisterCooperateListener, this, pid));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnUnregisterCooperateListener failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+
+int32_t MMIService::EnableInputDeviceCooperate(int32_t userData, bool enabled)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&MMIService::OnEnableInputDeviceCooperate, this, pid, userData, enabled));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnEnableInputDeviceCooperate failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+#else
+    (void)(userData);
+    (void)(enabled);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+
+int32_t MMIService::StartInputDeviceCooperate(int32_t userData, const std::string &sinkDeviceId,
+    int32_t srcInputDeviceId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&MMIService::OnStartInputDeviceCooperate, this, pid, userData, sinkDeviceId, srcInputDeviceId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnStartInputDeviceCooperate failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+#else
+    (void)(userData);
+    (void)(sinkDeviceId);
+    (void)(srcInputDeviceId);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+
+int32_t MMIService::StopDeviceCooperate(int32_t userData)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnStopDeviceCooperate, this, pid, userData));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnStopDeviceCooperate failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+#else
+    (void)(userData);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+
+int32_t MMIService::GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&MMIService::OnGetInputDeviceCooperateState, this, pid, userData, deviceId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnGetInputDeviceCooperateState failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+#else
+    (void)(userData);
+    (void)(deviceId);
+    MMI_HILOGW("Get input device cooperate state does not support");
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+int32_t MMIService::SetInputDevice(const std::string& dhid, const std::string& screenId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceManager::SetInputDevice,
+        InputDevMgr, dhid, screenId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set input device screen id failed,return %{public}d", ret);
+        return ret;
+    }
+#else
+    (void)(dhid);
+    (void)(screenId);
+    MMI_HILOGW("Enable input device cooperate does not support");
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    return RET_OK;
+}
+
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+int32_t MMIService::OnRegisterCooperateListener(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    CHKPR(event, RET_ERR);
+    event->type = CooperateEventManager::EventType::LISTENER;
+    event->sess = sess;
+    event->msgId = MmiMessageId::COOPERATION_ADD_LISTENER;
+    CooperateEventMgr->RemoveCooperationEvent(event);
+    return RET_OK;
+}
+
+int32_t MMIService::OnUnregisterCooperateListener(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    auto sess = GetSession(GetClientFd(pid));
+    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    CHKPR(event, RET_ERR);
+    event->type = CooperateEventManager::EventType::LISTENER;
+    event->sess = sess;
+    CooperateEventMgr->RemoveCooperationListenerEvent(event);
+    return RET_OK;
+}
+
+int32_t MMIService::OnEnableInputDeviceCooperate(int32_t pid, int32_t userData, bool enabled)
+{
+    CALL_DEBUG_ENTER;
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    CHKPR(event, RET_ERR);
+    event->type = CooperateEventManager::EventType::ENABLE;
+    event->sess = sess;
+    event->msgId = MmiMessageId::COOPERATION_MESSAGE;
+    event->userData = userData;
+    CooperateEventMgr->RemoveCooperationEvent(event);
+    InputDevCooSM->EnableInputDeviceCooperate(enabled);
+    std::string deviceId =  "";
+    CooperationMessage msg =
+        enabled ? CooperationMessage::OPEN_SUCCESS : CooperationMessage::CLOSE_SUCCESS;
+    NetPacket pkt(MmiMessageId::COOPERATION_MESSAGE);
+    pkt << userData << deviceId << msg;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write data failed");
+        return RET_ERR;
+    }
+    if (!sess->SendMsg(pkt)) {
+        MMI_HILOGE("Sending failed");
+        return MSG_SEND_FAIL;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnStartInputDeviceCooperate(int32_t pid, int32_t userData, const std::string &sinkDeviceId,
+    int32_t srcInputDeviceId)
+{
+    CALL_DEBUG_ENTER;
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    CHKPR(event, RET_ERR);
+    event->type = CooperateEventManager::EventType::START;
+    event->sess = sess;
+    event->msgId = MmiMessageId::COOPERATION_MESSAGE;
+    event->userData = userData;
+    CooperateEventMgr->RemoveCooperationEvent(event);
+    int32_t ret = InputDevCooSM->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnStartInputDeviceCooperate failed, ret:%{public}d", ret);
+        CooperateEventMgr->OnErrorMessage(event->type, CooperationMessage::INFO_FAIL);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnStopDeviceCooperate(int32_t pid, int32_t userData)
+{
+    CALL_DEBUG_ENTER;
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    CHKPR(event, RET_ERR);
+    event->type = CooperateEventManager::EventType::STOP;
+    event->sess = sess;
+    event->msgId = MmiMessageId::COOPERATION_MESSAGE;
+    event->userData = userData;
+    CooperateEventMgr->RemoveCooperationEvent(event);
+    int32_t ret = InputDevCooSM->StopInputDeviceCooperate();
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnStopDeviceCooperate failed, ret:%{public}d", ret);
+        CooperateEventMgr->OnErrorMessage(event->type, CooperationMessage::STOP_FAIL);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::OnGetInputDeviceCooperateState(int32_t pid, int32_t userData, const std::string &deviceId)
+{
+    CALL_DEBUG_ENTER;
+    auto sess = GetSession(GetClientFd(pid));
+    CHKPR(sess, RET_ERR);
+    sptr<CooperateEventManager::EventInfo> event = new (std::nothrow) CooperateEventManager::EventInfo();
+    CHKPR(event, RET_ERR);
+    event->type = CooperateEventManager::EventType::STATE;
+    event->sess = sess;
+    event->msgId = MmiMessageId::COOPERATION_GET_STATE;
+    event->userData = userData;
+    CooperateEventMgr->RemoveCooperationEvent(event);
+    InputDevCooSM->GetCooperateState(deviceId);
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+
 int32_t MMIService::StartRemoteCooperate(const std::string& remoteDeviceId)
 {
     CALL_DEBUG_ENTER;
@@ -1016,19 +1255,19 @@ int32_t MMIService::StartRemoteCooperate(const std::string& remoteDeviceId)
     return RET_OK;
 }
 
-int32_t MMIService::StartRemoteCooperateResult(bool isSucess, int32_t xPercent, int32_t yPercent)
+int32_t MMIService::StartRemoteCooperateResult(bool isSuccess, int32_t xPercent, int32_t yPercent)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    MMI_HILOGI("StartRemoteCooperateResult:[%{public}d]", isSucess);
+    MMI_HILOGI("StartRemoteCooperateResult:[%{public}d]", isSuccess);
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceCooperateSM::StartRemoteCooperateResult,
-        InputDevCooSM, isSucess, xPercent, yPercent));
+        InputDevCooSM, isSuccess, xPercent, yPercent));
     if (ret != RET_OK) {
         MMI_HILOGE("Start remote cooperate res failed,return %{public}d", ret);
         return ret;
     }
 #else
-    (void)(isSucess);
+    (void)(isSuccess);
     (void)(xPercent);
     (void)(yPercent);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
@@ -1049,19 +1288,19 @@ int32_t MMIService::StopRemoteCooperate()
     return RET_OK;
 }
 
-int32_t MMIService::StopRemoteCooperateResult(bool isSucess)
+int32_t MMIService::StopRemoteCooperateResult(bool isSuccess)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    MMI_HILOGI("Enter MMI StopRemoteCooperateResult [%{public}d]", isSucess);
+    MMI_HILOGI("Enter MMI StopRemoteCooperateResult [%{public}d]", isSuccess);
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceCooperateSM::StopRemoteCooperateResult,
-        InputDevCooSM, isSucess));
+        InputDevCooSM, isSuccess));
     if (ret != RET_OK) {
         MMI_HILOGE("Stop remote cooperate res failed,return %{public}d", ret);
         return ret;
     }
 #else
-    (void)(isSucess);
+    (void)(isSuccess);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     return RET_OK;
 }
