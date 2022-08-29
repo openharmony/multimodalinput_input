@@ -133,7 +133,7 @@ bool GetNamedPropertyBool(const napi_env& env, const napi_value& object, const s
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGE("Call napi_typeof fail");
+        MMI_HILOGE("Call napi_typeof failed");
         return false;
     }
     if (tmpType != napi_boolean) {
@@ -153,7 +153,7 @@ std::string GetNamedPropertyString(const napi_env& env, const napi_value& object
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGE("Call napi_typeof fail");
+        MMI_HILOGE("Call napi_typeof failed");
         return value;
     }
     if (tmpType != napi_string) {
@@ -175,7 +175,7 @@ int32_t GetNamedPropertyInt32(const napi_env& env, const napi_value& object, con
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGE("Call napi_typeof fail");
+        MMI_HILOGE("Call napi_typeof failed");
         return value;
     }
     if (tmpType != napi_number) {
@@ -193,7 +193,7 @@ int64_t GetNamedPropertyInt64(const napi_env& env, const napi_value& object, con
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGE("Call napi_typeof fail");
+        MMI_HILOGE("Call napi_typeof failed");
         return value;
     }
     if (tmpType != napi_number) {
@@ -211,7 +211,7 @@ uint32_t GetNamedPropertyUint32(const napi_env& env, const napi_value& object, c
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGE("Call napi_typeof fail");
+        MMI_HILOGE("Call napi_typeof failed");
         return value;
     }
     if (tmpType != napi_number) {

@@ -70,7 +70,7 @@ void CheckDefineOutput(const char* fmt, Ts... args)
     char buf[MAX_PACKET_BUF_SIZE] = {};
     int32_t ret = snprintf_s(buf, MAX_PACKET_BUF_SIZE, MAX_PACKET_BUF_SIZE - 1, fmt, args...);
     if (ret == -1) {
-        KMSG_LOGI("call snprintf_s fail.ret = %d", ret);
+        KMSG_LOGI("Call snprintf_s failed.ret = %d", ret);
         return;
     }
     KMSG_LOGI("%s", buf);
@@ -191,11 +191,11 @@ bool MMIService::InitLibinputService()
     auto inputFd = libinputAdapter_.GetInputFd();
     auto ret = AddEpoll(EPOLL_EVENT_INPUT, inputFd);
     if (ret <  0) {
-        MMI_HILOGE("AddEpoll error ret: %{public}d", ret);
+        MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
         EpollClose();
         return false;
     }
-    MMI_HILOGI("AddEpoll, epollfd: %{public}d, fd: %{public}d", mmiFd_, inputFd);
+    MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, inputFd);
     return true;
 }
 
@@ -370,7 +370,7 @@ void MMIService::OnConnected(SessionPtr s)
 void MMIService::OnDisconnected(SessionPtr s)
 {
     CHKPV(s);
-    MMI_HILOGW("Enter, session desc:%{public}s, fd: %{public}d", s->GetDescript().c_str(), s->GetFd());
+    MMI_HILOGW("Enter, session desc:%{public}s, fd:%{public}d", s->GetDescript().c_str(), s->GetFd());
 #ifdef OHOS_BUILD_ENABLE_POINTER
     IPointerDrawingManager::GetInstance()->DeletePointerVisible(s->GetPid());
 #endif // OHOS_BUILD_ENABLE_POINTER

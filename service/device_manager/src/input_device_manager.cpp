@@ -135,7 +135,7 @@ std::vector<bool> InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<
         keystrokeAbility.insert(keystrokeAbility.end(), keyCodes.size(), false);
         return keystrokeAbility;
     }
-    for (const auto& item : keyCodes) {
+    for (const auto &item : keyCodes) {
         bool ret = false;
         for (const auto &it : KeyMapMgr->InputTransferKeyValue(deviceId, item)) {
             ret |= libinput_device_has_key(iter->second.inputDeviceOrigin_, it) == SUPPORT_KEY;
@@ -261,7 +261,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     CALL_DEBUG_ENTER;
     CHKPV(inputDevice);
     bool hasLocalPointer = false;
-    for (const auto& item : inputDevice_) {
+    for (const auto &item : inputDevice_) {
         if (item.second.inputDeviceOrigin_ == inputDevice) {
             MMI_HILOGI("The device is already existent");
             DfxHisysevent::OnDeviceConnect(item.first, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
@@ -415,7 +415,7 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
 {
     CALL_DEBUG_ENTER;
     CHKPR(inputDevice, INVALID_DEVICE_ID);
-    for (const auto& item : inputDevice_) {
+    for (const auto &item : inputDevice_) {
         if (item.second.inputDeviceOrigin_ == inputDevice) {
             MMI_HILOGI("Find input device id success");
             return item.first;

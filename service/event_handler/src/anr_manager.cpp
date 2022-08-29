@@ -33,7 +33,7 @@ constexpr int32_t ANR_DISPATCH = 0;
 constexpr int32_t ANR_MONITOR = 1;
 } // namespace
 
-void ANRManager::Init(UDSServer& udsServer)
+void ANRManager::Init(UDSServer &udsServer)
 {
     CALL_DEBUG_ENTER;
     udsServer_ = &udsServer;
@@ -81,7 +81,7 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
         sess->SetAnrStatus(type, true);
         DfxHisysevent::ApplicationBlockInput(sess);
         if (anrNoticedPid_ < 0) {
-            MMI_HILOGE("anrNoticedPid_ is invalid");
+            MMI_HILOGE("The anrNoticedPid_ is invalid");
             return;
         }
         NetPacket pkt(MmiMessageId::NOTICE_ANR);
@@ -129,7 +129,7 @@ void ANRManager::OnSessionLost(SessionPtr session)
     CALL_DEBUG_ENTER;
     CHKPV(session);
     if (anrNoticedPid_ == session->GetPid()) {
-        MMI_HILOGD("anrNoticedPid_ is invalid");
+        MMI_HILOGD("The anrNoticedPid_ is invalid");
         anrNoticedPid_ = -1;
     }
     MMI_HILOGI("SessionLost remove all Timers");

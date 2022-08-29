@@ -1380,7 +1380,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
 
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    for (const auto& id : ids) {
+    for (const auto &id : ids) {
         std::string sPointerEs = InputManagerTest::GetEventDump();
         MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
@@ -1771,7 +1771,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_002, TestSize.Lev
     auto pointerEvent = SetupPointerEvent002();
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    for (const auto& id : ids) {
+    for (const auto &id : ids) {
         std::string sPointerEs = InputManagerTest::GetEventDump();
         MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
@@ -2052,7 +2052,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
 
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    for (const auto& id : ids) {
+    for (const auto &id : ids) {
         std::string sPointerEs = InputManagerTest::GetEventDump();
         MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_MONITOR)
@@ -2427,7 +2427,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_004, TestSize.Level1
     ASSERT_TRUE(pointerEvent != nullptr);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     maxMonitor = 0;
-    for (const auto& id : ids) {
+    for (const auto &id : ids) {
         if (!InputManagerTest::GetEventDump().empty()) {
             maxMonitor++;
         }
@@ -2469,7 +2469,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_001, TestSize.L
     ASSERT_TRUE(injectEvent != nullptr);
     InputManager::GetInstance()->SimulateInputEvent(injectEvent);
 
-    for (const auto& id : ids) {
+    for (const auto &id : ids) {
         std::string sPointerEs = InputManagerTest::GetEventDump();
         MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
@@ -2510,7 +2510,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddKeyboardMonitor_002, TestSize.L
     injectEvent->SetKeyCode(KeyEvent::KEYCODE_UNKNOWN);
     InputManager::GetInstance()->SimulateInputEvent(injectEvent);
 
-    for (const auto& id : ids) {
+    for (const auto &id : ids) {
         std::string sPointerEs = InputManagerTest::GetEventDump();
         MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
         ASSERT_TRUE(sPointerEs.empty());
@@ -2590,27 +2590,27 @@ static void GetKeyboardTypeCallback(int32_t keyboardType)
 {
     switch (keyboardType) {
         case KEYBOARD_TYPE_NONE: {
-            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType: %{public}s", deviceIDtest, "None");
+            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType:%{public}s", deviceIDtest, "None");
             break;
             }
         case KEYBOARD_TYPE_UNKNOWN: {
-            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType: %{public}s", deviceIDtest, "unknown");
+            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType:%{public}s", deviceIDtest, "unknown");
             break;
         }
         case KEYBOARD_TYPE_ALPHABETICKEYBOARD: {
-            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType: %{public}s", deviceIDtest, "alphabetickeyboard");
+            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType:%{public}s", deviceIDtest, "alphabetickeyboard");
             break;
         }
         case KEYBOARD_TYPE_DIGITALKEYBOARD: {
-            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType: %{public}s", deviceIDtest, "digitalkeyboard");
+            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType:%{public}s", deviceIDtest, "digitalkeyboard");
             break;
         }
         case KEYBOARD_TYPE_HANDWRITINGPEN: {
-            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType: %{public}s", deviceIDtest, "handwritingpen");
+            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType:%{public}s", deviceIDtest, "handwritingpen");
             break;
         }
         case KEYBOARD_TYPE_REMOTECONTROL: {
-            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType: %{public}s", deviceIDtest, "remotecontrol");
+            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType:%{public}s", deviceIDtest, "remotecontrol");
             break;
         }
         default: {
