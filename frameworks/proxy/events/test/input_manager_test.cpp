@@ -2902,7 +2902,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointSpeed_005, TestSize.Level1)
 
 /**
  * @tc.name: InputManagerTest_SetPointerStyle_001
- * @tc.desc: Sets whether the pointer icon is visible
+ * @tc.desc: Sets the pointer style of the window
  * @tc.type: FUNC
  * @tc.require: I530XS
  */
@@ -2914,7 +2914,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointerStyle_001, TestSize.Level1
     int32_t pointerStyle;
     if (InputManager::GetInstance()->SetPointerStyle(windowId, MOUSE_ICON::CROSS) == RET_OK) {
         ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
-        ASSERT_EQ(pointerStyle, MOUSE_ICON::DEFAULT);
+        ASSERT_EQ(pointerStyle, MOUSE_ICON::CROSS);
     }
 }
 } // namespace MMI
