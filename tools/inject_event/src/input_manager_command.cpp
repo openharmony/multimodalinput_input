@@ -418,6 +418,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 std::vector<int32_t> downKey;
                 int32_t keyCode = 0;
                 int32_t isCombinationKey = 0;
+                int64_t time = GetSysClockTime();
                 while ((c = getopt_long(argc, argv, "d:u:l:i:", keyboardSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'd': {
@@ -436,8 +437,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 KeyEvent::KeyItem item[downKey.size()];
                                 for (size_t i = 0; i < downKey.size(); i++) {
                                     KeyEvent->SetKeyCode(keyCode);
+                                    KeyEvent->SetActionTime(time);
                                     KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
                                     item[i].SetKeyCode(downKey[i]);
+                                    item[i].SetDownTime(time);
                                     item[i].SetPressed(true);
                                     KeyEvent->AddKeyItem(item[i]);
                                 }
@@ -448,9 +451,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             auto KeyEvent = KeyEvent::Create();
                             CHKPR(KeyEvent, ERROR_NULL_POINTER);
                             KeyEvent->SetKeyCode(keyCode);
+                            KeyEvent->SetActionTime(time);
                             KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
                             KeyEvent::KeyItem item1;
                             item1.SetKeyCode(keyCode);
+                            item1.SetDownTime(time);
                             item1.SetPressed(true);
                             KeyEvent->AddKeyItem(item1);
                             InputManager::GetInstance()->SimulateInputEvent(KeyEvent);
@@ -468,9 +473,11 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 auto KeyEvent = KeyEvent::Create();
                                 CHKPR(KeyEvent, ERROR_NULL_POINTER);
                                 KeyEvent->SetKeyCode(keyCode);
+                                KeyEvent->SetActionTime(time);
                                 KeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
                                 KeyEvent::KeyItem item1;
                                 item1.SetKeyCode(keyCode);
+                                item1.SetDownTime(time);
                                 item1.SetPressed(false);
                                 KeyEvent->AddKeyItem(item1);
                                 InputManager::GetInstance()->SimulateInputEvent(KeyEvent);
@@ -656,6 +663,14 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
                             pointerEvent->SetActionTime(endTimeMs);
+                            pointerEvent->UpdatePointerItem(0, item);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                            std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
+
+                            item.SetDisplayX(px2);
+                            item.SetDisplayY(py2);
+                            pointerEvent->SetActionTime(endTimeMs + BLOCK_TIME_MS);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);

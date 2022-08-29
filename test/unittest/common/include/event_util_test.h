@@ -30,6 +30,7 @@
 
 #include "input_manager.h"
 #include "singleton.h"
+#include "window_utils_test.h"
 
 namespace OHOS {
 namespace MMI {
