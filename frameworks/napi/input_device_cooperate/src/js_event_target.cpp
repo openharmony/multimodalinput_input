@@ -15,7 +15,6 @@
 
 #include "js_event_target.h"
 
-#include <mutex>
 #include <new>
 
 #include <uv.h>
@@ -27,18 +26,12 @@
 #include "mmi_log.h"
 #include "util_napi.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsEventTarget" };
-std::mutex mutex_;
 constexpr std::string_view COOPERATION = "cooperation";
 } // namespace
-
-JsEventTarget::JsEventTarget()
-{
-    auto ret = cooperateListener_.insert({ COOPERATION, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
-    CK(ret.second, VAL_NOT_EXP);
-}
 
 void JsEventTarget::EmitJsEnable(int32_t userData, std::string deviceId, CooperateMessages msg)
 {
@@ -46,7 +39,7 @@ void JsEventTarget::EmitJsEnable(int32_t userData, std::string deviceId, Coopera
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
-        MMI_HILOGE("Failed to search for userData");
+        THROWERR(iter->second->env, "failed to search for userData");
         return;
     }
     CHKPV(iter->second);
@@ -61,7 +54,12 @@ void JsEventTarget::EmitJsEnable(int32_t userData, std::string deviceId, Coopera
     uv_work_s *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
-    CHKPV(uData);
+    if (uData == nullptr) {
+        MMI_HILOGE("uData is nullptr");
+        delete work;
+        work = nullptr;
+        return;
+    }
     work->data = static_cast<void*>(uData);
     int32_t result;
     if (iter->second->ref == nullptr) {
@@ -98,7 +96,12 @@ void JsEventTarget::EmitJsStart(int32_t userData, std::string deviceId, Cooperat
     uv_work_s *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
-    CHKPV(uData);
+    if (uData == nullptr) {
+        MMI_HILOGE("uData is nullptr");
+        delete work;
+        work = nullptr;
+        return;
+    }
     work->data = static_cast<void*>(uData);
     int32_t result;
     if (iter->second->ref == nullptr) {
@@ -135,7 +138,12 @@ void JsEventTarget::EmitJsStop(int32_t userData, std::string deviceId, Cooperate
     uv_work_s *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
-    CHKPV(uData);
+    if (uData == nullptr) {
+        MMI_HILOGE("uData is nullptr");
+        delete work;
+        work = nullptr;
+        return;
+    }
     work->data = static_cast<void*>(uData);
     int32_t result;
     if (iter->second->ref == nullptr) {
@@ -172,7 +180,12 @@ void JsEventTarget::EmitJsGetState(int32_t userData, bool state)
     uv_work_s *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
-    CHKPV(uData);
+    if (uData == nullptr) {
+        MMI_HILOGE("uData is null");
+        delete work;
+        work = nullptr;
+        return;
+    }
     work->data = static_cast<void*>(uData);
     int32_t result;
     if (iter->second->ref == nullptr) {
@@ -198,9 +211,9 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
         return;
     }
 
-    for (const auto &temp : iter->second) {
-        CHKPC(temp);
-        if (JsUtil::IsSameHandle(env, handle, temp->ref)) {
+    for (const auto &item : iter->second) {
+        CHKPC(item);
+        if (JsUtil::IsSameHandle(env, handle, item->ref)) {
             MMI_HILOGE("The handle already exists");
             return;
         }
@@ -208,7 +221,11 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     napi_ref ref = nullptr;
     CHKRV(env, napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
     auto monitor = std::make_unique<JsUtil::CallbackInfo>();
-    CHKPV(monitor);
+    if (monitor == nullptr) {
+        napi_delete_reference(env, ref);
+        MMI_HILOGE("monitor is nullptr");
+        return;
+    }
     monitor->env = env;
     monitor->ref = ref;
     iter->second.push_back(std::move(monitor));
@@ -296,7 +313,6 @@ void JsEventTarget::OnCooperateMessage(const std::string &deviceId, CooperateMes
         if (result != 0) {
             MMI_HILOGE("uv_queue_work faild");
             JsUtil::DeletePtr<uv_work_t*>(work);
-            return;
         }
     }
 }
@@ -313,10 +329,17 @@ void JsEventTarget::CallEnablePromsieWork(uv_work_t *work, int32_t status)
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
     CHKPV(cb);
     CHKPV(cb->env);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
 
     napi_value object = JsUtil::GetEnableInfo(cb);
-    CHKPV(object);
-    CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED);
+    if (object == nullptr) {
+        MMI_HILOGE("object is nullptr");
+        napi_close_handle_scope(cb->env, scope);
+        return;
+    }
+    CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED, scope);
+    napi_close_handle_scope(cb->env, scope);
 }
 
 void JsEventTarget::CallEnableAsyncWork(uv_work_t *work, int32_t status)
@@ -330,14 +353,21 @@ void JsEventTarget::CallEnableAsyncWork(uv_work_t *work, int32_t status)
     }
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
     CHKPV(cb);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
 
     napi_value object = JsUtil::GetEnableInfo(cb);
-    CHKPV(object);
+    if (object == nullptr) {
+        MMI_HILOGE("object is nullptr");
+        napi_close_handle_scope(cb->env, scope);
+    }
     napi_value handler = nullptr;
-    CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE);
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
-    CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &result), CALL_FUNCTION);
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &result), CALL_FUNCTION, scope);
+    napi_close_handle_scope(cb->env, scope);
 }
+
 void JsEventTarget::CallStartPromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
@@ -350,10 +380,16 @@ void JsEventTarget::CallStartPromiseWork(uv_work_t *work, int32_t status)
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
     CHKPV(cb);
     CHKPV(cb->env);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
 
     napi_value object = JsUtil::GetStartInfo(cb);
-    CHKPV(object);
-    CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED);
+    if (object == nullptr) {
+        MMI_HILOGE("object is nullptr");
+        napi_close_handle_scope(cb->env, scope);
+    }
+    CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED, scope);
+    napi_close_handle_scope(cb->env, scope);
 }
 
 void JsEventTarget::CallStartAsyncWork(uv_work_t *work, int32_t status)
@@ -367,13 +403,19 @@ void JsEventTarget::CallStartAsyncWork(uv_work_t *work, int32_t status)
     }
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
     CHKPV(cb);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
 
     napi_value object = JsUtil::GetStartInfo(cb);
-    CHKPV(object);
+    if (object == nullptr) {
+        MMI_HILOGE("object is nullptr");
+        napi_close_handle_scope(cb->env, scope);
+    }
     napi_value handler = nullptr;
-    CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE);
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
-    CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &result), CALL_FUNCTION);
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &result), CALL_FUNCTION, scope);
+    napi_close_handle_scope(cb->env, scope);
 }
 
 void JsEventTarget::CallStopPromiseWork(uv_work_t *work, int32_t status)
@@ -388,10 +430,16 @@ void JsEventTarget::CallStopPromiseWork(uv_work_t *work, int32_t status)
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
     CHKPV(cb);
     CHKPV(cb->env);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
 
     napi_value object = JsUtil::GetStopInfo(cb);
-    CHKPV(object);
-    CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED);
+    if (object == nullptr) {
+        MMI_HILOGE("object is nullptr");
+        napi_close_handle_scope(cb->env scope);
+    }
+    CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED, scope);
+    napi_close_handle_scope(cb->env scope);
 }
 
 void JsEventTarget::CallStopAsyncWork(uv_work_t *work, int32_t status)
@@ -405,13 +453,19 @@ void JsEventTarget::CallStopAsyncWork(uv_work_t *work, int32_t status)
     }
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
     CHKPV(cb);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
 
     napi_value object = JsUtil::GetStopInfo(cb);
-    CHKPV(object);
+    if (object == nullptr) {
+        MMI_HILOGE("object is nullptr");
+        napi_close_handle_scope(cb->env, scope);
+    }
     napi_value handler = nullptr;
-    CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE);
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
-    CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &result), CALL_FUNCTION);
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &result), CALL_FUNCTION, scope);
+    napi_close_handle_scope(cb->env, scope);
 }
 
 void JsEventTarget::CallGetStatePromiseWork(uv_work_t *work, int32_t status)
@@ -426,10 +480,16 @@ void JsEventTarget::CallGetStatePromiseWork(uv_work_t *work, int32_t status)
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
     CHKPV(cb);
     CHKPV(cb->env);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
 
     napi_value object = JsUtil::GetGetStateInfo(cb);
-    CHKPV(object);
-    CHKRV(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED);
+    if (object == nullptr) {
+        MMI_HILOGE("object is nullptr");
+        napi_close_handle_scope(cb->env, scope);
+    }
+    CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED, scope);
+    napi_close_handle_scope(cb->env, scope);
 }
 
 void JsEventTarget::CallGetStateAsyncWork(uv_work_t *work, int32_t status)
@@ -443,13 +503,19 @@ void JsEventTarget::CallGetStateAsyncWork(uv_work_t *work, int32_t status)
     }
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
     CHKPV(cb);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(cb->env, &scope);
 
     napi_value object = JsUtil::GetGetStateInfo(cb);
-    CHKPV(object);
+    if (object == nullptr) {
+        MMI_HILOGE("object is nullptr");
+        napi_close_handle_scope(cb->env, scope);
+    }
     napi_value handler = nullptr;
-    CHKRV(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE);
+    CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
-    CHKRV(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &result), CALL_FUNCTION);
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &result), CALL_FUNCTION, scope);
+    napi_close_handle_scope(cb->env, scope);
 }
 
 void JsEventTarget::EmitCooperateMessageEvent(uv_work_t *work, int32_t status)
@@ -473,25 +539,30 @@ void JsEventTarget::EmitCooperateMessageEvent(uv_work_t *work, int32_t status)
     }
 
     for (const auto &item : messageEvent->second) {
+        napi_handle_scope scope = nullptr;
+        napi_open_handle_scope(item->env, &scope);
         CHKPC(item->env);
         if (item->ref != (*temp)->ref) {
             continue;
         }
         napi_value deviceDescriptor = nullptr;
-        CHKRV(item->env, napi_create_string_utf8(item->env, item->data.deviceDescriptor.c_str(),
-            NAPI_AUTO_LENGTH, &deviceDescriptor), CREATE_STRING);
+        CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, item->data.deviceDescriptor.c_str(),
+            NAPI_AUTO_LENGTH, &deviceDescriptor), CREATE_STRING, scope);
         napi_value evemtMsg = nullptr;
-        CHKRV(item->env, napi_create_int32(item->env, static_cast<int32_t>(item->data.msg), &evemtMsg), CREATE_INT32);
+        CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(item->data.msg), &evemtMsg),
+            CREATE_INT32, scope);
         napi_value object = nullptr;
-        CHKRV(item->env, napi_create_object(item->env, &object), CREATE_OBJECT);
-        CHKRV(item->env, napi_set_named_property(item->env, object, "deviceDescriptor", deviceDescriptor),
-            SET_NAMED_PROPERTY);
-        CHKRV(item->env, napi_set_named_property(item->env, object, "evemtMsg", evemtMsg), SET_NAMED_PROPERTY);
+        CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "deviceDescriptor", deviceDescriptor),
+            SET_NAMED_PROPERTY, scope);
+        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "evemtMsg", evemtMsg),
+            SET_NAMED_PROPERTY, scope);
 
         napi_value handler = nullptr;
-        CHKRV(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE);
+        CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE, scope);
         napi_value ret = nullptr;
-        CHKRV(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION);
+        CHKRV_SCOPE(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION, scope);
+        napi_close_handle_scope(item->env, scope);
     }
 }
 
@@ -513,4 +584,5 @@ std::unique_ptr<JsUtil::CallbackInfo> JsEventTarget::GetCallbackInfo(uv_work_t *
     callback_.erase(iter);
     return cb;
 }
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS

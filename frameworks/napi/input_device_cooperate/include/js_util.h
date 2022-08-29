@@ -25,7 +25,8 @@
 
 #include "cooperate_messages.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 class JsUtil {
 public:
     struct UserData {
@@ -63,7 +64,7 @@ public:
     static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
 
     template <typename T>
-    static void DeletePtr(T ptr)
+    static void DeletePtr(T &ptr)
     {
         if (ptr != nullptr) {
             delete ptr;
@@ -71,5 +72,6 @@ public:
         }
     }
 };
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 #endif // JS_UTIL_H

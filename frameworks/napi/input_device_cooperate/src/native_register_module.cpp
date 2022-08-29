@@ -17,7 +17,8 @@
 
 #include "js_input_device_cooperate_context.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 static napi_module mmiInputDeviceCooperateMoudle = {
     .nm_version = 1,
     .nm_flags = 0,
@@ -32,4 +33,5 @@ extern "C" __attribute__((constructor)) void RegisterModule(void)
 {
     napi_module_register(&mmiInputDeviceCooperateMoudle);
 }
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
