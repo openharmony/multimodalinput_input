@@ -81,7 +81,7 @@ int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, con
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGE("Call napi_typeof fail");
+        MMI_HILOGE("Call napi_typeof failed");
         napi_throw_error(env, nullptr, "call napi_typeof failed");
         return value;
     }
@@ -206,7 +206,7 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
         return JS_CALLBACK_EVENT_FAILED;
     }
     auto &info = callbacks[event->eventType];
-    MMI_HILOGD("EventType: %{public}s, keyEventMonitorInfos: %{public}zu",
+    MMI_HILOGD("EventType:%{public}s, keyEventMonitorInfos:%{public}zu",
         event->eventType.c_str(), info.size());
     napi_value handler1 = nullptr;
     napi_status status;
@@ -252,7 +252,7 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
                 }
                 delete monitorInfo;
                 monitorInfo = nullptr;
-                MMI_HILOGD("Callback has deleted, size: %{public}zu", info.size());
+                MMI_HILOGD("Callback has deleted, size:%{public}zu", info.size());
                 return JS_CALLBACK_EVENT_SUCCESS;
             }
             ++iter;
@@ -271,9 +271,9 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
         }
         delete monitorInfo;
         monitorInfo = nullptr;
-        MMI_HILOGD("Callback has deleted, size: %{public}zu", info.size());
+        MMI_HILOGD("Callback has deleted, size:%{public}zu", info.size());
     }
-    MMI_HILOGD("Callback size: %{public}zu", info.size());
+    MMI_HILOGD("Callback size:%{public}zu", info.size());
     return JS_CALLBACK_EVENT_SUCCESS;
 }
 

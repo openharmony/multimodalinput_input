@@ -45,7 +45,7 @@ int32_t UDSSocket::EpollCreat(int32_t size)
     return epollFd_;
 }
 
-int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, int32_t epollFd)
+int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event, int32_t epollFd)
 {
     if (fd < 0) {
         MMI_HILOGE("Invalid fd");
@@ -72,7 +72,7 @@ int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, i
     return ret;
 }
 
-int32_t UDSSocket::EpollWait(struct epoll_event& events, int32_t maxevents, int32_t timeout, int32_t epollFd)
+int32_t UDSSocket::EpollWait(struct epoll_event &events, int32_t maxevents, int32_t timeout, int32_t epollFd)
 {
     if (epollFd < 0) {
         epollFd = epollFd_;
@@ -116,7 +116,7 @@ int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isNonBlock)
     return flags;
 }
 
-void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, UDSSocket::PacketCallBackFun callbackFun)
+void UDSSocket::OnReadPackets(CircleStreamBuffer &circBuf, UDSSocket::PacketCallBackFun callbackFun)
 {
     constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
     for (int32_t i = 0; i < ONCE_PROCESS_NETPACKET_LIMIT; i++) {
@@ -140,7 +140,7 @@ void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, UDSSocket::PacketCall
         }
         NetPacket pkt(head->idMsg);
         if ((head->size > 0) && (!pkt.Write(&buf[headSize], head->size))) {
-            MMI_HILOGW("Error writing data in the NetPacket. It will be retried next time. messageid: %{public}d,"
+            MMI_HILOGW("Error writing data in the NetPacket. It will be retried next time. messageid:%{public}d,"
                 "size:%{public}d", head->idMsg, head->size);
             break;
         }

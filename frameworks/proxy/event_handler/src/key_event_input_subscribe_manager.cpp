@@ -203,7 +203,7 @@ void KeyEventInputSubscribeManager::OnConnected()
         MMI_HILOGD("Leave, subscribeInfos_ is empty");
         return;
     }
-    for (const auto& subscriberInfo : subscribeInfos_) {
+    for (const auto &subscriberInfo : subscribeInfos_) {
         if (EventManager.SubscribeKeyEvent(subscriberInfo) != RET_OK) {
             MMI_HILOGE("Subscribe key event failed");
         }
@@ -217,7 +217,7 @@ const KeyEventInputSubscribeManager::SubscribeKeyEventInfo* KeyEventInputSubscri
         MMI_HILOGE("Invalid input param id:%{public}d", id);
         return nullptr;
     }
-    for (const auto& subscriber : subscribeInfos_) {
+    for (const auto &subscriber : subscribeInfos_) {
         if (subscriber.GetSubscribeId() == id) {
             return &subscriber;
         }

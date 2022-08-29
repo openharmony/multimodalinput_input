@@ -39,15 +39,15 @@ private:
     static napi_value InitInputAbilityTypeEnum(napi_env env, napi_value exports);
     static napi_value EnumTypeConstructor(napi_env env, napi_callback_info info);
 
-    static napi_value GetParameter(napi_env env, napi_callback_info info, napi_ref& first);
+    static napi_value GetParameter(napi_env env, napi_callback_info info, napi_ref &first);
     static napi_value GetParameter(napi_env env, napi_callback_info info,
-        std::string& first, napi_ref& second);
+        std::string &first, napi_ref &second);
     static napi_value GetParameter(napi_env env, napi_callback_info info,
-        int32_t& first, int32_t& second, napi_ref& third);
+        int32_t &first, int32_t &second, napi_ref &third);
     static napi_value GetParameter(napi_env env, napi_callback_info info,
-        std::string& first, int32_t second, napi_ref& third);
+        std::string &first, int32_t second, napi_ref &third);
     static napi_value GetParameter(napi_env env, napi_callback_info info,
-        std::string& first, std::vector<uint32_t>& second, napi_ref& third);
+        std::string &first, std::vector<uint32_t> &second, napi_ref &third);
     static bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
     std::shared_ptr<JsInputDinputManager> GetJsInputDinputMgr() const;
     napi_ref contextRef_ { nullptr };

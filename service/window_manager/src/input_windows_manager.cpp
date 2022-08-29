@@ -117,7 +117,7 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> i
 int32_t InputWindowsManager::GetWindowPid(int32_t windowId) const
 {
     int32_t windowPid = -1;
-    for (const auto& item : displayGroupInfo_.windowsInfo) {
+    for (const auto &item : displayGroupInfo_.windowsInfo) {
         if (item.id == windowId) {
             windowPid = item.pid;
             break;
@@ -129,7 +129,7 @@ int32_t InputWindowsManager::GetWindowPid(int32_t windowId) const
 int32_t InputWindowsManager::GetWindowPid(int32_t windowId, const DisplayGroupInfo& displayGroupInfo) const
 {
     int32_t windowPid = -1;
-    for (auto &item : displayGroupInfo.windowsInfo) {
+    for (const auto &item : displayGroupInfo.windowsInfo) {
         if (item.id == windowId) {
             windowPid = item.pid;
             break;
@@ -657,7 +657,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         ((action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) && (pointerEvent->GetPressedButtons().size() == 1)) ||
         ((action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty()))) {
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
-        for (const auto& item : displayGroupInfo_.windowsInfo) {
+        for (const auto &item : displayGroupInfo_.windowsInfo) {
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
                 MMI_HILOGD("Skip the untouchable window to continue searching, "
                            "window:%{public}d, flags:%{public}d", item.id, item.flags);

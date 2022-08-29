@@ -157,7 +157,7 @@ int32_t MultimodalInputConnectProxy::SetPointerSpeed(int32_t speed)
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(SET_POINTER_SPEED, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -177,7 +177,7 @@ int32_t MultimodalInputConnectProxy::GetPointerSpeed(int32_t &speed)
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(GET_POINTER_SPEED, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     speed = reply.ReadInt32();
@@ -244,7 +244,7 @@ int32_t MultimodalInputConnectProxy::RegisterDevListener()
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(REGISTER_DEV_MONITOR, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -264,7 +264,7 @@ int32_t MultimodalInputConnectProxy::UnregisterDevListener()
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(UNREGISTER_DEV_MONITOR, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -291,7 +291,7 @@ int32_t MultimodalInputConnectProxy::SupportKeys(int32_t userData, int32_t devic
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(SUPPORT_KEYS, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -312,7 +312,7 @@ int32_t MultimodalInputConnectProxy::GetDeviceIds(int32_t userData)
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(GET_DEVICE_IDS, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -334,7 +334,7 @@ int32_t MultimodalInputConnectProxy::GetDevice(int32_t userData, int32_t deviceI
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(GET_DEVICE, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -356,7 +356,7 @@ int32_t MultimodalInputConnectProxy::GetKeyboardType(int32_t userData, int32_t d
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(GET_KEYBOARD_TYPE, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;

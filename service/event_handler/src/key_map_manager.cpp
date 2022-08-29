@@ -117,14 +117,14 @@ std::vector<int32_t> KeyMapManager::InputTransferKeyValue(int32_t deviceId, int3
 {
     std::vector<int32_t> sysKey;
     if (auto iter = configKeyValue_.find(deviceId); iter != configKeyValue_.end()) {
-        for (auto it : iter->second) {
+        for (const auto &it : iter->second) {
             if (it.second == keyCode) {
                 sysKey.push_back(it.first);
             }
         }
         return sysKey;
     } else if (auto itr = configKeyValue_.find(defaultKeyId_); itr != configKeyValue_.end()) {
-        for (auto it : itr->second) {
+        for (const auto &it : itr->second) {
             if (it.second == keyCode) {
                 sysKey.push_back(it.first);
             }

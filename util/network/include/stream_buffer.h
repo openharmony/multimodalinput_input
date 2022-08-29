@@ -34,19 +34,19 @@ class StreamBuffer {
 public:
     StreamBuffer() = default;
     virtual ~StreamBuffer() = default;
-    explicit StreamBuffer(const StreamBuffer& buf);
-    virtual StreamBuffer& operator=(const StreamBuffer& other);
+    explicit StreamBuffer(const StreamBuffer &buf);
+    virtual StreamBuffer &operator=(const StreamBuffer &other);
     DISALLOW_MOVE(StreamBuffer);
     
     void Reset();
     void Clean();
     bool SeekReadPos(int32_t n);
 
-    bool Read(std::string& buf);
-    bool Write(const std::string& buf);
+    bool Read(std::string &buf);
+    bool Write(const std::string &buf);
 
-    bool Read(StreamBuffer& buf);
-    bool Write(const StreamBuffer& buf);
+    bool Read(StreamBuffer &buf);
+    bool Write(const StreamBuffer &buf);
 
     bool Read(char *buf, size_t size);
     virtual bool Write(const char *buf, size_t size);
@@ -57,13 +57,13 @@ public:
     int32_t GetAvailableBufSize() const;
 
     bool ChkRWError() const;
-    const std::string& GetErrorStatusRemark() const;
+    const std::string &GetErrorStatusRemark() const;
     const char *Data() const;
 
     template<typename T>
-    bool Read(T& data);
+    bool Read(T &data);
     template<typename T>
-    bool Write(const T& data);
+    bool Write(const T &data);
     template<typename T>
     bool Read(std::vector<T> &data);
     template<typename T>
@@ -73,12 +73,12 @@ public:
     const char *WriteBuf() const;
 
     template<typename T>
-    StreamBuffer& operator >> (T& data);
+    StreamBuffer &operator >> (T &data);
     template<typename T>
-    StreamBuffer& operator << (const T& data);
+    StreamBuffer &operator << (const T &data);
 
 protected:
-    bool Clone(const StreamBuffer& buf);
+    bool Clone(const StreamBuffer &buf);
 
 protected:
     enum class ErrorStatus {

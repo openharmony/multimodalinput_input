@@ -121,7 +121,7 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
     }
     reply.WriteFileDescriptor(clientFd);
     WRITEINT32(reply, tokenType, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGI("send clientFd to client, clientFd:%{public}d, tokenType:%{public}d", clientFd, tokenType);
+    MMI_HILOGI("Send clientFd to client, clientFd:%{public}d, tokenType:%{public}d", clientFd, tokenType);
     close(clientFd);
     return RET_OK;
 }
@@ -190,7 +190,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerSpeed(MessageParcel& data, Mes
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check fail");
+        MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
     }
     int32_t speed;
@@ -207,7 +207,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, Mes
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check fail");
+        MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
     }
     int32_t speed;
@@ -409,7 +409,7 @@ int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, M
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("permission check failed");
+        MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
     }
 
@@ -439,7 +439,7 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data,
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("permission check failed");
+        MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
     }
 
@@ -488,7 +488,7 @@ int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, Mess
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("permission check failed");
+        MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
     }
     if (!IsRunning()) {
@@ -513,7 +513,7 @@ int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, 
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("permission check failed");
+        MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
     }
     if (!IsRunning()) {

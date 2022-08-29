@@ -131,7 +131,7 @@ uint32_t JsInputDinputManager::GetAbilityType(std::vector<uint32_t> abilities)
 {
     CALL_LOG_ENTER;
     uint32_t inputAbility = 0;
-    for (const auto& item : abilities) {
+    for (const auto &item : abilities) {
         inputAbility |= item;
     }
     return inputAbility & (InputAbilityType::MOUSE | InputAbilityType::KEYBOARD);
@@ -217,9 +217,9 @@ napi_value JsInputDinputManager::MakeInputAbilityObj(napi_env env, std::set<int3
     napi_value resultArry = nullptr;
     int32_t i = 0;
     CHKRP(env, napi_create_array(env, &resultArry), CREATE_ARRAY);
-    for (const auto& deviceType : types) {
+    for (const auto &deviceType : types) {
         MMI_HILOGD("deviceType:%{public}d", deviceType);
-        for (const auto& item : deviceTypeMap) {
+        for (const auto &item : deviceTypeMap) {
             MMI_HILOGD("deviceType:%{public}d, item.second:%{public}d", deviceType, item.second);
             if (deviceType & item.second) {
                 CHKRP(env, napi_create_int32(env, item.first, &returnResult), CREATE_INT32);
