@@ -37,14 +37,14 @@ void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> key
     CHKPV(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (!InputHandler->GetJumpInterceptState() && OnHandleEvent(keyEvent)) {
-        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
+        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{puiblic}d",
             keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
         return;
     }
 #else
     if (OnHandleEvent(keyEvent)) {
-        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode: %{puiblic}d",
+        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{puiblic}d",
             keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
         return;
@@ -260,7 +260,7 @@ int32_t EventInterceptorHandler::InterceptorCollection::AddInterceptor(const Ses
     }
 
     if (isFound) {
-        MMI_HILOGD("Event type is updated: %{public}u", interceptor.eventType_);
+        MMI_HILOGD("Event type is updated:%{public}u", interceptor.eventType_);
     } else {
         MMI_HILOGD("Service AddInterceptor Success");
     }
@@ -286,7 +286,7 @@ void EventInterceptorHandler::InterceptorCollection::RemoveInterceptor(const Ses
         MMI_HILOGE("Internal error, interceptor has been removed");
         return;
     }
-    MMI_HILOGD("Event type is updated: %{public}u", interceptor.eventType_);
+    MMI_HILOGD("Event type is updated:%{public}u", interceptor.eventType_);
 }
 
 void EventInterceptorHandler::InterceptorCollection::OnSessionLost(SessionPtr session)

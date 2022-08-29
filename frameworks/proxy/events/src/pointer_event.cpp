@@ -516,7 +516,7 @@ void PointerEvent::ClearButtonPressed()
 std::vector<int32_t> PointerEvent::GetPointerIds() const
 {
     std::vector<int32_t> pointerIdList;
-    for (auto &item : pointers_) {
+    for (const auto &item : pointers_) {
         pointerIdList.push_back(item.GetPointerId());
     }
     return pointerIdList;

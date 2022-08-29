@@ -178,14 +178,14 @@ bool StreamBuffer::ChkRWError() const
     return (rwErrorStatus_ != ErrorStatus::ERROR_STATUS_OK);
 }
 
-const std::string& StreamBuffer::GetErrorStatusRemark() const
+const std::string &StreamBuffer::GetErrorStatusRemark() const
 {
     static const std::vector<std::pair<ErrorStatus, std::string>> remark {
         {ErrorStatus::ERROR_STATUS_OK, "OK"},
         {ErrorStatus::ERROR_STATUS_READ, "READ_ERROR"},
         {ErrorStatus::ERROR_STATUS_WRITE, "WRITE_ERROR"},
     };
-    for (const auto& it : remark) {
+    for (const auto &it : remark) {
         if (it.first == rwErrorStatus_) {
             return it.second;
         }

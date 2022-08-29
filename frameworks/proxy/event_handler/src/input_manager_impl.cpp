@@ -33,10 +33,10 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
-    explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)>& monitor)
+    explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<PointerEvent>)> &monitor)
         : monitor_ (monitor) {}
 
-    explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<KeyEvent>)>& monitor)
+    explicit MonitorEventConsumer(const std::function<void(std::shared_ptr<KeyEvent>)> &monitor)
         : keyMonitor_ (monitor) {}
 
     void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
@@ -291,7 +291,7 @@ int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
 {
     uint32_t num = static_cast<uint32_t>(displayGroupInfo_.windowsInfo.size());
     pkt << num;
-    for (const auto& item : displayGroupInfo_.windowsInfo) {
+    for (const auto &item : displayGroupInfo_.windowsInfo) {
         pkt << item.id << item.pid << item.uid << item.area
             << item.defaultHotAreas << item.pointerHotAreas
             << item.agentWindowId << item.flags;
@@ -307,7 +307,7 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
 {
     uint32_t num = static_cast<uint32_t>(displayGroupInfo_.displaysInfo.size());
     pkt << num;
-    for (const auto& item : displayGroupInfo_.displaysInfo) {
+    for (const auto &item : displayGroupInfo_.displaysInfo) {
         pkt << item.id << item.x << item.y << item.width
             << item.height << item.name << item.uniq << item.direction;
     }
@@ -659,7 +659,7 @@ int32_t InputManagerImpl::RegisterDevListener(std::string type, std::shared_ptr<
 {
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("client init failed");
+        MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
     return InputDevImpl.RegisterDevListener(type, listener);
@@ -670,7 +670,7 @@ int32_t InputManagerImpl::UnregisterDevListener(std::string type,
 {
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("client init failed");
+        MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
     return InputDevImpl.UnregisterDevListener(type, listener);
@@ -680,7 +680,7 @@ int32_t InputManagerImpl::GetDeviceIds(std::function<void(std::vector<int32_t>&)
 {
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("client init failed");
+        MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
     return InputDevImpl.GetInputDeviceIdsAsync(callback);
@@ -691,7 +691,7 @@ int32_t InputManagerImpl::GetDevice(int32_t deviceId,
 {
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("client init failed");
+        MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
     return InputDevImpl.GetInputDeviceAsync(deviceId, callback);
@@ -759,13 +759,13 @@ void InputManagerImpl::OnAnrTask(std::vector<std::shared_ptr<IAnrObserver>> obse
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    for (auto &observer : observers) {
+    for (const auto &observer : observers) {
         CHKPV(observer);
         observer->OnAnr(pid);
     }
 }
 
-int32_t InputManagerImpl::SetInputDevice(const std::string& dhid, const std::string& screenId)
+int32_t InputManagerImpl::SetInputDevice(const std::string &dhid, const std::string &screenId)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
@@ -790,7 +790,7 @@ int32_t InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MultimodalInputConnectManager::GetInstance()->SetPointerLocation(x, y);
     if (ret != RET_OK) {
-        MMI_HILOGE("SetPointerLocation has send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("SetPointerLocation has send to server failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -813,7 +813,7 @@ int32_t InputManagerImpl::GetRemoteInputAbility(std::string deviceId,
     callDinputService_->SetRemoteAbilityCallback(remoteTypes);
     int32_t ret = MultimodalInputConnectManager::GetInstance()->GetRemoteInputAbility(deviceId, callDinputService_);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -823,7 +823,7 @@ int32_t InputManagerImpl::GetRemoteInputAbility(std::string deviceId,
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
 }
 
-int32_t InputManagerImpl::PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
+int32_t InputManagerImpl::PrepareRemoteInput(const std::string &deviceId, std::function<void(int32_t)> callback)
 {
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     CALL_INFO_TRACE;
@@ -835,7 +835,7 @@ int32_t InputManagerImpl::PrepareRemoteInput(const std::string& deviceId, std::f
     callDinputService_->SetPrepareCallback(callback);
     int32_t ret = MultimodalInputConnectManager::GetInstance()->PrepareRemoteInput(deviceId, callDinputService_);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -845,7 +845,7 @@ int32_t InputManagerImpl::PrepareRemoteInput(const std::string& deviceId, std::f
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
 }
 
-int32_t InputManagerImpl::UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
+int32_t InputManagerImpl::UnprepareRemoteInput(const std::string &deviceId, std::function<void(int32_t)> callback)
 {
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     CALL_INFO_TRACE;
@@ -857,7 +857,7 @@ int32_t InputManagerImpl::UnprepareRemoteInput(const std::string& deviceId, std:
     callDinputService_->SetUnprepareCallback(callback);
     int32_t ret = MultimodalInputConnectManager::GetInstance()->UnprepareRemoteInput(deviceId, callDinputService_);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -867,7 +867,7 @@ int32_t InputManagerImpl::UnprepareRemoteInput(const std::string& deviceId, std:
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
 }
 
-int32_t InputManagerImpl::StartRemoteInput(const std::string& deviceId,
+int32_t InputManagerImpl::StartRemoteInput(const std::string &deviceId,
     uint32_t inputAbility, std::function<void(int32_t)> callback)
 {
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
@@ -881,7 +881,7 @@ int32_t InputManagerImpl::StartRemoteInput(const std::string& deviceId,
     int32_t ret = MultimodalInputConnectManager::GetInstance()->StartRemoteInput(deviceId,
         inputAbility, callDinputService_);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -891,7 +891,7 @@ int32_t InputManagerImpl::StartRemoteInput(const std::string& deviceId,
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
 }
 
-int32_t InputManagerImpl::StopRemoteInput(const std::string& deviceId,
+int32_t InputManagerImpl::StopRemoteInput(const std::string &deviceId,
     uint32_t inputAbility, std::function<void(int32_t)> callback)
 {
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
@@ -905,7 +905,7 @@ int32_t InputManagerImpl::StopRemoteInput(const std::string& deviceId,
     int32_t ret = MultimodalInputConnectManager::GetInstance()->StopRemoteInput(deviceId,
         inputAbility, callDinputService_);
     if (ret != RET_OK) {
-        MMI_HILOGE("Send to server fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;

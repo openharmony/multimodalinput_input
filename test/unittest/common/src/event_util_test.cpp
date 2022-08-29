@@ -149,7 +149,7 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& p
          << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
          << ",HorizontalAxisValue:" << std::fixed << std::setprecision(precision)
          << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL);
-    for (const auto& pointerId : pointerIds) {
+    for (const auto &pointerId : pointerIds) {
         PointerEvent::PointerItem item;
         if (!pointerEvent->GetPointerItem(pointerId, item)) {
             MMI_HILOGE("Invalid pointer:%{public}d.", pointerId);

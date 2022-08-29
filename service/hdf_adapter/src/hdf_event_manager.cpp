@@ -134,7 +134,7 @@ int32_t HdfEventManager::EvdevIoctl(int32_t hdiindex, int32_t pcmd, void *iobuff
     MMI_HILOGD("index:%{public}d,cmd:%{public}02x,size:%{public}d,"
         "pcmd:%{public}04x", hdiindex, cmd, size, pcmd);
     DeviceInfo *deviceinfo = nullptr;
-    for (auto &item : globleThis_->hdflist_){
+    for (const auto &item : globleThis_->hdflist_) {
         if (item.index == hdiindex) {
             deviceinfo = static_cast<DeviceInfo*>(item->deviceinfo);
             break;
@@ -307,14 +307,14 @@ void HdfEventManager::SetupCallback()
     if (ret != 0 || inputInterface_ == nullptr
         || inputInterface_->iInputManager == nullptr
         || inputInterface_->iInputReporter == nullptr) {
-        MMI_HILOGD("%{public}s:%{public}d inputInterface_ init fail", __func__, __LINE__);
+        MMI_HILOGD("%{public}s:%{public}d inputInterface_ init failed", __func__, __LINE__);
     }
 
     ret = GetInputInterfaceFromInject(&injectInterface_);
     if (ret != 0 || injectInterface_ == nullptr
         || injectInterface_->iInputManager == nullptr
         || injectInterface_->iInputReporter == nullptr) {
-        MMI_HILOGD("%{public}s:%{public}d injectInterface_ init fail", __func__, __LINE__);
+        MMI_HILOGD("%{public}s:%{public}d injectInterface_ init failed", __func__, __LINE__);
     }
 
     eventCallBack_.EventPkgCallback = globleThis_->GetEventCallback;
