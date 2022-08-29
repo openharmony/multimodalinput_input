@@ -292,7 +292,7 @@ void DistributedInputAdapter::UnPrepareStopDInputCallbackSink::OnResult(const st
 }
 
 int32_t DistributedInputAdapter::MouseStateChangeCallbackImpl::OnSimulationEvent(uint32_t type, uint32_t code,
-                                                                                int32_t value)
+    int32_t value)
 {
     DistributedAdapter->OnSimulationEvent(type, code, value);
     return RET_OK;
