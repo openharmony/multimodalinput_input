@@ -23,7 +23,7 @@
 #include <string>
 
 #include "cooperate_event_handler.h"
-#include "event_package.h"
+#include "define_multimodal.h"
 
 namespace OHOS {
 namespace MMI {

@@ -47,8 +47,8 @@ public:
         bool state;
     };
 
+    void AddCooperationEvent(sptr<EventInfo> event);
     void RemoveCooperationEvent(sptr<EventInfo> event);
-    void RemoveCooperationListenerEvent(sptr<EventInfo> event);
     void OnCooperateMessage(CooperationMessage msg, const std::string &deviceId = "");
     void OnEnable(CooperationMessage msg, const std::string &deviceId = "");
     void OnStart(CooperationMessage msg, const std::string &deviceId = "");
