@@ -67,27 +67,27 @@ public:
         int32_t GetResolution() const;
 
     private:
-        int32_t axisType_ {0};
-        int32_t minimum_ {0};
-        int32_t maximum_ {0};
-        int32_t fuzz_ {0};
-        int32_t flat_ {0};
-        int32_t resolution_ {0};
+        int32_t axisType_ { 0 };
+        int32_t minimum_ { 0 };
+        int32_t maximum_ { 0 };
+        int32_t fuzz_ { 0 };
+        int32_t flat_ { 0 };
+        int32_t resolution_ { 0 };
     };
     void AddAxisInfo(AxisInfo axis);
     std::vector<AxisInfo> GetAxisInfo();
     InputDevice(int32_t id, std::string name, int32_t deviceType, int32_t bus, int32_t version, int32_t product,
                 int32_t vendor, std::string phys, std::string uniq, std::vector<AxisInfo> axis);
 private:
-    int32_t id_ {-1};
-    std::string name_ {"null"};
-    int32_t type_ {0};
-    int32_t bus_ {-1};
-    int32_t version_ {-1};
-    int32_t product_ {-1};
-    int32_t vendor_ {-1};
-    std::string phys_ {"null"};
-    std::string uniq_ {"null"};
+    int32_t id_ { -1 };
+    std::string name_ { "null" };
+    int32_t type_ { 0 };
+    int32_t bus_ { -1 };
+    int32_t version_ { -1 };
+    int32_t product_ { -1 };
+    int32_t vendor_ { -1 };
+    std::string phys_ { "null" };
+    std::string uniq_ { "null" };
     std::vector<AxisInfo> axis_;
     std::vector<int32_t> deviceIdList_;
 };

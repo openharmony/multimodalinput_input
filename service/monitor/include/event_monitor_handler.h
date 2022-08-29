@@ -18,6 +18,8 @@
 
 #include <mutex>
 #include <set>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "nocopyable.h"
 #include "singleton.h"
@@ -72,7 +74,7 @@ private:
         }
         InputHandlerType handlerType_;
         HandleEventType eventType_;
-        SessionPtr session_ = nullptr;
+        SessionPtr session_ { nullptr };
     };
 
     class MonitorCollection : public IInputEventCollectionHandler, protected NoCopyable {
@@ -97,10 +99,15 @@ private:
         void OnSessionLost(SessionPtr session);
         void Dump(int32_t fd, const std::vector<std::string> &args);
 
-        std::set<SessionHandler> monitors_;
-        std::shared_ptr<PointerEvent> lastPointerEvent_ = nullptr;
-        int32_t downEventId_ { -1 };
+    struct ConsumptionState {
+        std::unordered_set<int32_t> eventIds_;
         bool isMonitorConsumed_ { false };
+        std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
+    };
+
+    private:
+        std::set<SessionHandler> monitors_;
+        std::unordered_map<int32_t, ConsumptionState> states_;
     };
 
 private:
