@@ -23,7 +23,8 @@
 #include "js_input_device_cooperate_manager.h"
 #include "nocopyable.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 class JsInputDeviceCooperateContext {
 public:
     JsInputDeviceCooperateContext();
@@ -50,8 +51,8 @@ private:
     static JsInputDeviceCooperateContext *GetInstance(napi_env env);
     static void DeclareDeviceCooperateInterface(napi_env env, napi_value exports);
     static void DeclareDeviceCooperateData(napi_env env, napi_value exports);
-    static napi_value CreateInt32(napi_env env, CooperateMessages msg);
     static napi_value EnumClassConstructor(napi_env env, napi_callback_info info);
 };
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 #endif // JS_INPUT_DEVICE_COOPERATE_CONTEXT_H

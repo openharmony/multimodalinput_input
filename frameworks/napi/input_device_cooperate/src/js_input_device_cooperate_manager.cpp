@@ -16,7 +16,6 @@
 #include "js_input_device_cooperate_manager.h"
 
 #include <functional>
-#include <mutex>
 
 #include "constants.h"
 #include "define_multimodal.h"
@@ -25,10 +24,10 @@
 #include "mmi_log.h"
 #include "util_napi.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceCooperateContext" };
-std::mutex mutex_;
 } // namespace
 
 napi_value JsInputDeviceCooperateManager::Enable(napi_env env, bool enable, napi_value handle)
@@ -37,6 +36,10 @@ napi_value JsInputDeviceCooperateManager::Enable(napi_env env, bool enable, napi
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevCooperateImpl.GetUserData();
     napi_value result = CreateCallbackInfo(env, handle, userData);
+    if (result == nullptr) {
+        MMI_HILOGE("create callback info failed");
+        return nullptr;
+    }
     auto callback = std::bind(EmitJsEnable, userData, std::placeholders::_1, std::placeholders::_2);
     InputMgr->EnableInputDeviceCooperate(enable, callback);
     return result;
@@ -49,6 +52,10 @@ napi_value JsInputDeviceCooperateManager::Start(napi_env env, const std::string 
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevCooperateImpl.GetUserData();
     napi_value result = CreateCallbackInfo(env, handle, userData);
+    if (result == nullptr) {
+        MMI_HILOGE("create callback info failed");
+        return nullptr;
+    }
     auto callback = std::bind(EmitJsStart, userData, std::placeholders::_1, std::placeholders::_2);
     InputMgr->StartInputDeviceCooperate(sinkDeviceDescriptor, srcInputDeviceId, callback);
     return result;
@@ -60,6 +67,10 @@ napi_value JsInputDeviceCooperateManager::Stop(napi_env env, napi_value handle)
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevCooperateImpl.GetUserData();
     napi_value result = CreateCallbackInfo(env, handle, userData);
+    if (result == nullptr) {
+        MMI_HILOGE("create callback info failed");
+        return nullptr;
+    }
     auto callback = std::bind(EmitJsStop, userData, std::placeholders::_1, std::placeholders::_2);
     InputMgr->StopDeviceCooperate(callback);
     return result;
@@ -71,6 +82,10 @@ napi_value JsInputDeviceCooperateManager::GetState(napi_env env, const std::stri
     std::lock_guard<std::mutex> guard(mutex_);
     int32_t userData = InputDevCooperateImpl.GetUserData();
     napi_value result = CreateCallbackInfo(env, handle, userData);
+    if (result == nullptr) {
+        MMI_HILOGE("create callback info failed");
+        return nullptr;
+    }
     auto callback = std::bind(EmitJsGetState, userData, std::placeholders::_1);
     InputMgr->GetInputDeviceCooperateState(deviceDescriptor, callback);
     return result;
@@ -93,4 +108,5 @@ void JsInputDeviceCooperateManager::ResetEnv()
     CALL_INFO_TRACE;
     JsEventTarget::ResetEnv();
 }
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
