@@ -39,7 +39,7 @@ static void HiLogFunc(struct libinput* input, libinput_log_priority priority, co
     CHKPV(input);
     char buffer[256];
     if (vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args) == -1) {
-        MMI_HILOGE("Call vsnprintf_s fail");
+        MMI_HILOGE("Call vsnprintf_s failed");
         va_end(args);
         return;
     }
@@ -75,7 +75,7 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
         char realPath[PATH_MAX] = {};
         int32_t count = 0;
         while ((realpath(path, realPath) == nullptr) && (count < MAX_RETRY_COUNT)) {
-            MMI_HILOGWK("Path is error, count: %{public}d, path:%{public}s", count, path);
+            MMI_HILOGWK("Path is error, count:%{public}d, path:%{public}s", count, path);
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
             ++count;
         }
@@ -203,14 +203,14 @@ void LibinputAdapter::RetriggerHotplugEvents()
             continue;
         }
         if (fputs("add", fs) < 0) {
-            MMI_HILOGW("fputs error: %{public}s", strerror(errno));
+            MMI_HILOGW("fputs error:%{public}s", strerror(errno));
         }
         if (fclose(fs) != 0) {
-            MMI_HILOGW("fclose error: %{public}s", strerror(errno));
+            MMI_HILOGW("fclose error:%{public}s", strerror(errno));
         }
     }
     if (closedir(pdir) != 0) {
-        MMI_HILOGW("closedir error: %{public}s", strerror(errno));
+        MMI_HILOGW("closedir error:%{public}s", strerror(errno));
     }
 }
 } // namespace MMI

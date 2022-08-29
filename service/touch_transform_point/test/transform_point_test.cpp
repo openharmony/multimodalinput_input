@@ -148,7 +148,7 @@ bool TransformPointTest::SendEvents(const Context& ctx, struct input_event* even
 int TransformPointTest::Execute(const std::string& command, std::vector<std::string>& results)
 {
     CALL_INFO_TRACE;
-    MMI_HILOGD("Execute command: %{public}s.", command.c_str());
+    MMI_HILOGD("Execute command:%{public}s.", command.c_str());
     char buffer[DEFAULT_BUF_SIZE] {};
     FILE* pin = popen(command.c_str(), "r");
     if (!pin) {
@@ -177,8 +177,8 @@ void TransformPointTest::GetInputDeviceNodes(std::map<std::string, std::string>&
     const std::string kname { "Name=\"" };
     const std::string kevent { "event" };
     std::string name;
-    for (const auto& item : results) {
-        MMI_HILOGD("item : %{public}s.", item.c_str());
+    for (const auto &item : results) {
+        MMI_HILOGD("item:%{public}s.", item.c_str());
         if (item[0] == 'N') {
             std::string::size_type spos = item.find(kname);
             if (spos != std::string::npos) {

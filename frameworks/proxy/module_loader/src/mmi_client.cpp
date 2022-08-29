@@ -71,7 +71,6 @@ bool MMIClient::Start()
         Stop();
         return false;
     }
-    msgHandler_.InitProcessedCallback();
     if (!StartEventRunner()) {
         MMI_HILOGE("Start runner failed");
         Stop();
@@ -228,6 +227,7 @@ void MMIClient::OnConnected()
     CALL_DEBUG_ENTER;
     MMI_HILOGI("Connection to server succeeded, fd:%{public}d", GetFd());
     isConnected_ = true;
+    msgHandler_.InitProcessedCallback();
     if (funConnected_) {
         funConnected_(*this);
     }

@@ -43,7 +43,7 @@ int32_t CallDinputProxy::HandlePrepareDinput(const std::string &deviceId, int32_
     CHKPR(remote, ERROR_NULL_POINTER);
     int32_t ret = remote->SendRequest(HANDLE_PREPARE_DINPUT, data, reply, option);
     if (ret != NO_ERROR) {
-        MMI_HILOGW("send request fail, result:%{public}d", ret);
+        MMI_HILOGW("Send request failed, result:%{public}d", ret);
         return false;
     }
     return ret;
@@ -65,7 +65,7 @@ int32_t CallDinputProxy::HandleUnprepareDinput(const std::string &deviceId, int3
     CHKPR(remote, ERROR_NULL_POINTER);
     int32_t ret = remote->SendRequest(HANDLE_UNPREPARE_DINPUT, data, reply, option);
     if (ret != NO_ERROR) {
-        MMI_HILOGW("send request fail, result:%{public}d", ret);
+        MMI_HILOGW("Send request failed, result:%{public}d", ret);
         return false;
     }
     return ret;
@@ -88,7 +88,7 @@ int32_t CallDinputProxy::HandleStartDinput(const std::string &deviceId, uint32_t
     CHKPR(remote, ERROR_NULL_POINTER);
     int32_t ret = remote->SendRequest(HANDLE_START_DINPUT, data, reply, option);
     if (ret != NO_ERROR) {
-        MMI_HILOGW("send request fail, result:%{public}d", ret);
+        MMI_HILOGW("Send request failed, result:%{public}d", ret);
         return false;
     }
     return ret;
@@ -111,7 +111,7 @@ int32_t CallDinputProxy::HandleStopDinput(const std::string &deviceId, uint32_t 
     CHKPR(remote, ERROR_NULL_POINTER);
     int32_t ret = remote->SendRequest(HANDLE_STOP_DINPUT, data, reply, option);
     if (ret != NO_ERROR) {
-        MMI_HILOGW("send request fail, result:%{public}d", ret);
+        MMI_HILOGW("Send request failed, result:%{public}d", ret);
         return false;
     }
     return ret;
@@ -126,7 +126,7 @@ int32_t CallDinputProxy::HandleRemoteInputAbility(const std::set<int32_t> &remot
         return false;
     }
     WRITEINT32(data, remoteInputAbility.size(), RET_ERR);
-    for (const auto& item : remoteInputAbility) {
+    for (const auto &item : remoteInputAbility) {
         WRITEINT32(data, item, RET_ERR);
     }
     MessageParcel reply;
@@ -135,7 +135,7 @@ int32_t CallDinputProxy::HandleRemoteInputAbility(const std::set<int32_t> &remot
     CHKPR(remote, ERROR_NULL_POINTER);
     int32_t ret = remote->SendRequest(HANDLE_REMOTE_INPUT_ABILITY, data, reply, option);
     if (ret != NO_ERROR) {
-        MMI_HILOGW("send request fail, result:%{public}d", ret);
+        MMI_HILOGW("Send request failed, result:%{public}d", ret);
         return false;
     }
     return ret;

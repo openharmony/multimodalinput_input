@@ -165,7 +165,7 @@ void KeyEventSubscriber::OnSessionDelete(SessionPtr sess)
 }
 
 bool KeyEventSubscriber::IsPreKeysMatch(
-    const std::set<int32_t>& preKeys, const std::vector<int32_t>& pressedKeys) const
+    const std::set<int32_t> &preKeys, const std::vector<int32_t> &pressedKeys) const
 {
     if (preKeys.size() != pressedKeys.size()) {
         return false;
@@ -182,7 +182,7 @@ bool KeyEventSubscriber::IsPreKeysMatch(
 }
 
 void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
-    const std::shared_ptr<Subscriber>& subscriber)
+    const std::shared_ptr<Subscriber> &subscriber)
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
@@ -203,8 +203,8 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     }
 }
 
-bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
-    const std::shared_ptr<KeyEvent>& keyEvent)
+bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber> &subscriber,
+    const std::shared_ptr<KeyEvent> &keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
@@ -215,7 +215,7 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
         return true;
     }
 
-    auto& keyOption = subscriber->keyOption_;
+    auto &keyOption = subscriber->keyOption_;
     if (keyOption->GetFinalKeyDownDuration() <= 0) {
         MMI_HILOGE("Leave, duration <= 0");
         return true;
@@ -246,7 +246,7 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber>& subscriber,
     return true;
 }
 
-void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber>& subscriber)
+void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber> &subscriber)
 {
     CALL_DEBUG_ENTER;
     CHKPV(subscriber);
@@ -295,7 +295,7 @@ bool KeyEventSubscriber::InitSessionDeleteCallback()
     return true;
 }
 
-bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent)
+bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
@@ -304,7 +304,7 @@ bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     RemoveKeyCode(keyCode, pressedKeys);
     for (const auto &subscriber : subscribers_) {
-        auto& keyOption = subscriber->keyOption_;
+        auto &keyOption = subscriber->keyOption_;
         MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
             "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuration:%{public}d",
             subscriber->id_, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
@@ -345,7 +345,7 @@ bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent
     return handled;
 }
 
-bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
+bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
@@ -354,12 +354,12 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     RemoveKeyCode(keyCode, pressedKeys);
     for (const auto &subscriber : subscribers_) {
-        auto& keyOption = subscriber->keyOption_;
+        auto &keyOption = subscriber->keyOption_;
         MMI_HILOGD("subscribeId:%{public}d,keyOption->finalKey:%{public}d,"
             "keyOption->isFinalKeyDown:%{public}s,keyOption->finalKeyDownDuration:%{public}d",
             subscriber->id_, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
             keyOption->GetFinalKeyDownDuration());
-        for (auto keyCode : keyOption->GetPreKeys()) {
+        for (const auto &keyCode : keyOption->GetPreKeys()) {
             MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
         }
 
@@ -403,7 +403,7 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent)
     return handled;
 }
 
-bool KeyEventSubscriber::HandleKeyCancel(const std::shared_ptr<KeyEvent>& keyEvent)
+bool KeyEventSubscriber::HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
@@ -424,7 +424,7 @@ bool KeyEventSubscriber::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     return true;
 }
 
-void KeyEventSubscriber::RemoveKeyCode(int32_t keyCode, std::vector<int32_t>& keyCodes)
+void KeyEventSubscriber::RemoveKeyCode(int32_t keyCode, std::vector<int32_t> &keyCodes)
 {
     for (auto it = keyCodes.begin(); it != keyCodes.end(); ++it) {
         if (*it == keyCode) {

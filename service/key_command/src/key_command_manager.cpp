@@ -600,7 +600,7 @@ void KeyCommandManager::Print()
     for (const auto &item : shortcutKeys_) {
         MMI_HILOGD("row:%{public}d", row++);
         auto &shortcutKey = item.second;
-        for (auto prekey: shortcutKey.preKeys) {
+        for (const auto &prekey : shortcutKey.preKeys) {
             MMI_HILOGD("preKey:%{public}d", prekey);
         }
         MMI_HILOGD("finalKey:%{public}d, keyDownDuration:%{public}d, triggerType:%{public}d,"
@@ -663,7 +663,7 @@ bool KeyCommandManager::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
     }
     ResetLastMatchedKey();
-    for (auto& item : shortcutKeys_) {
+    for (auto &item : shortcutKeys_) {
         ShortcutKey &shortcutKey = item.second;
         if (!IsKeyMatch(shortcutKey, keyEvent)) {
             MMI_HILOGD("Not key matched, next");
@@ -900,7 +900,7 @@ bool KeyCommandManager::HandleKeyCancel(ShortcutKey &shortcutKey)
     auto timerId = shortcutKey.timerId;
     shortcutKey.timerId = -1;
     TimerMgr->RemoveTimer(timerId);
-    MMI_HILOGD("timerId: %{public}d", timerId);
+    MMI_HILOGD("timerId:%{public}d", timerId);
     return false;
 }
 

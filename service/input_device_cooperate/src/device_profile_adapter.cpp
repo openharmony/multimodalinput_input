@@ -36,15 +36,10 @@ const std::string SERVICE_TYPE = "InputDeviceCooperation";
 const std::string CHARACTERISTICS_NAME = "CurrentState";
 } // namespace
 
-DeviceProfileAdapter::DeviceProfileAdapter()
-    :profileEventCallback_(std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>()) {}
-
 DeviceProfileAdapter::~DeviceProfileAdapter()
 {
-    DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvent(ProfileEvent::EVENT_PROFILE_CHANGED,
-                                                                          profileEventCallback_);
-    std::lock_guard<std::mutex> guard(adapterLock);
-    profileEventCallback_ = nullptr;
+    std::lock_guard<std::mutex> guard(adapterLock_);
+    profileEventCallbacks_.clear();
     callbacks_.clear();
 }
 
@@ -65,8 +60,9 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     SyncOptions syncOptions;
     std::for_each(deviceIds.begin(), deviceIds.end(),
                   [&syncOptions](auto &deviceId) { syncOptions.AddDevice(deviceId); });
+    auto syncCallback = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
     ret =
-        DistributedDeviceProfileClient::GetInstance().SyncDeviceProfile(syncOptions, profileEventCallback_);
+        DistributedDeviceProfileClient::GetInstance().SyncDeviceProfile(syncOptions, syncCallback);
     if (ret != 0) {
         MMI_HILOGE("Sync device profile failed");
     }
@@ -97,14 +93,14 @@ bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
     return jsonObject[CHARACTERISTICS_NAME].get<bool>();
 }
 
-int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &deviceId, ProfileEventCallback callback)
+int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &deviceId, DPCallback callback)
 {
     CHKPR(callback, RET_ERR);
     if (deviceId.empty()) {
         MMI_HILOGE("DeviceId is nullptr");
         return RET_ERR;
     }
-    std::lock_guard<std::mutex> guard(adapterLock);
+    std::lock_guard<std::mutex> guard(adapterLock_);
     auto callbackIter = callbacks_.find(deviceId);
     if (callbackIter != callbacks_.end()) {
         callbackIter->second = callback;
@@ -117,7 +113,6 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &d
         MMI_HILOGE("Register profile listener failed");
         return RET_ERR;
     }
-    callbacks_.erase(callbackIter);
     return RET_OK;
 }
 
@@ -127,14 +122,14 @@ int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string 
         MMI_HILOGE("DeviceId is empty");
         return RET_ERR;
     }
-    std::lock_guard<std::mutex> guard(adapterLock);
+    std::lock_guard<std::mutex> guard(adapterLock_);
     auto it = profileEventCallbacks_.find(deviceId);
     if (it != profileEventCallbacks_.end()) {
         std::list<ProfileEvent> profileEvents;
         profileEvents.emplace_back(ProfileEvent::EVENT_PROFILE_CHANGED);
         std::list<ProfileEvent> failedEvents;
         DistributedDeviceProfileClient::GetInstance().UnsubscribeProfileEvents(profileEvents,
-            it.second, failedEvents);
+            it->second, failedEvents);
         profileEventCallbacks_.erase(it);
     }
     auto callbackIter = callbacks_.find(deviceId);
@@ -163,7 +158,7 @@ int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &deviceI
     subscribeInfos.emplace_back(syncEventInfo);
     std::list<ProfileEvent> failedEvents;
     auto it = profileEventCallbacks_.find(deviceId);
-    if (it == profileEventCallbacks_.end() || it.second == nullptr) {
+    if (it == profileEventCallbacks_.end() || it->second == nullptr) {
         profileEventCallbacks_[deviceId] = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
     }
     return DistributedDeviceProfileClient::GetInstance().SubscribeProfileEvents(
@@ -189,7 +184,7 @@ void DeviceProfileAdapter::OnProfileChanged(const std::string &deviceId)
 void DeviceProfileAdapter::ProfileEventCallbackImpl::OnProfileChanged(
     const ProfileChangeNotification &changeNotification)
 {
-    CALL_INFO_TRACE
+    CALL_INFO_TRACE;
     std::string deviceId = changeNotification.GetDeviceId();
     DProfileAdapter->OnProfileChanged(deviceId);
 }

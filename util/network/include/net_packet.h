@@ -31,12 +31,12 @@ class NetPacket : public StreamBuffer {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NetPacket" };
 public:
     explicit NetPacket(MmiMessageId msgId);
-    NetPacket(const NetPacket& pkt);
-    NetPacket& operator = (const NetPacket& pkt);
+    NetPacket(const NetPacket &pkt);
+    NetPacket &operator = (const NetPacket &pkt);
     DISALLOW_MOVE(NetPacket);
     virtual ~NetPacket();
 
-    virtual void MakeData(StreamBuffer& buf) const;
+    virtual void MakeData(StreamBuffer &buf) const;
 
     size_t GetSize() const
     {

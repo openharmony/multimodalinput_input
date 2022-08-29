@@ -162,7 +162,7 @@ void JsEventTarget::OnDeviceAdded(int32_t deviceId, const std::string &type)
         return;
     }
 
-    for (auto & item : changeEvent->second) {
+    for (auto &item : changeEvent->second) {
         CHKPC(item);
         CHKPC(item->env);
         uv_loop_s *loop = nullptr;
@@ -189,7 +189,7 @@ void JsEventTarget::OnDeviceRemoved(int32_t deviceId, const std::string &type)
         MMI_HILOGE("Find %{public}s failed", CHANGED_TYPE.c_str());
         return;
     }
-    for (auto & item : changeEvent->second) {
+    for (auto &item : changeEvent->second) {
         CHKPC(item);
         CHKPC(item->env);
         uv_loop_s *loop = nullptr;

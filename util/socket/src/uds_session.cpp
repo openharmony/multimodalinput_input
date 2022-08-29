@@ -35,7 +35,7 @@ constexpr int32_t ANR_DISPATCH = 0;
 constexpr int32_t ANR_MONITOR = 1;
 } // namespace
 
-UDSSession::UDSSession(const std::string& programName, const int32_t moduleType, const int32_t fd,
+UDSSession::UDSSession(const std::string &programName, const int32_t moduleType, const int32_t fd,
     const int32_t uid, const int32_t pid)
     : programName_(programName),
       moduleType_(moduleType),
@@ -120,7 +120,7 @@ void UDSSession::UpdateDescript()
     descript_ = oss.str().c_str();
 }
 
-bool UDSSession::SendMsg(NetPacket& pkt) const
+bool UDSSession::SendMsg(NetPacket &pkt) const
 {
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Read and write status is error");
