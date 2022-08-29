@@ -60,7 +60,7 @@ public:
     static bool GetDeviceSourceType(const std::unique_ptr<CallbackInfo> &cb, napi_value &object);
     static bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
     template <typename T>
-    static void DeletePtr(T ptr)
+    static void DeletePtr(T &ptr)
     {
         if (ptr != nullptr) {
             delete ptr;
