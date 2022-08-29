@@ -32,13 +32,13 @@ class UDSSession;
 using SessionPtr = std::shared_ptr<UDSSession>;
 class UDSSession : public std::enable_shared_from_this<UDSSession> {
 public:
-    UDSSession(const std::string& programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
+    UDSSession(const std::string &programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
                const int32_t pid);
     DISALLOW_COPY_AND_MOVE(UDSSession);
     virtual ~UDSSession() = default;
 
     bool SendMsg(const char *buf, size_t size) const;
-    bool SendMsg(NetPacket& pkt) const;
+    bool SendMsg(NetPacket &pkt) const;
     void Close();
 
     int32_t GetUid() const

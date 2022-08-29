@@ -28,11 +28,11 @@ public:
     GetDeviceNode();
     ~GetDeviceNode() = default;
     DISALLOW_COPY_AND_MOVE(GetDeviceNode);
-    int32_t GetDeviceNodeName(const std::string& targetName, uint16_t devIndex, std::string& deviceNode);
+    int32_t GetDeviceNodeName(const std::string &targetName, uint16_t devIndex, std::string &deviceNode);
 private:
     void InitDeviceInfo();
     std::vector<std::string> ReadDeviceFile();
-    void AnalyseDevices(const std::vector<std::string>& cmdResult, DeviceList& deviceList) const;
+    void AnalyseDevices(const std::vector<std::string> &cmdResult, DeviceList &deviceList) const;
 private:
     std::map<std::string, std::string> deviceList_;
 };

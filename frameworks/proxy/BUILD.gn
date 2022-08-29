@@ -63,12 +63,19 @@ ohos_source_set("libmmi-common") {
     "events/src/pointer_event.cpp",
   ]
 
+  if (input_feature_input_cooperation) {
+    sources += [ "events/src/raw_data.cpp" ]
+  }
+
   defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+  }
   public_configs = [ ":libmmi_client_config" ]
 
   external_deps = [
@@ -94,6 +101,9 @@ ohos_shared_library("libmmi-client") {
     "module_loader/src/mmi_event_handler.cpp",
     "module_loader/src/mmi_fd_listener.cpp",
   ]
+  if (input_feature_input_cooperation) {
+    sources += [ "event_handler/src/input_device_cooperate_impl.cpp" ]
+  }
 
   defines = []
 
@@ -127,8 +137,13 @@ ohos_shared_library("libmmi-client") {
   if (input_feature_monitor) {
     sources += [ "event_handler/src/input_monitor_manager.cpp" ]
   }
+
   if (input_feature_keyboard) {
     sources += [ "event_handler/src/key_event_input_subscribe_manager.cpp" ]
+  }
+
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
 
   configs = [

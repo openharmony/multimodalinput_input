@@ -38,7 +38,7 @@ public:
     const std::string& GetDebugInfo() const
     {
         std::string str;
-        for (auto& it : callbacks_) {
+        for (auto &it : callbacks_) {
             str += std::to_string(it.first);
             str += ',';
         }

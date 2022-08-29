@@ -31,11 +31,11 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "CallD
 int32_t CallDinputStub::OnRemoteRequest(
     uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
 {
-    MMI_HILOGI("enter, code:%{public}d", code);
+    MMI_HILOGI("Enter, code:%{public}d", code);
 
     std::u16string descriptor = data.ReadInterfaceToken();
     if (descriptor != ICallDinput::GetDescriptor()) {
-        MMI_HILOGW("get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
+        MMI_HILOGW("Get unexpect descriptor:%{public}s", Str16ToStr8(descriptor).c_str());
         return ERR_INVALID_STATE;
     }
 
@@ -56,7 +56,7 @@ int32_t CallDinputStub::OnRemoteRequest(
             return StubHandleRemoteInputAbility(data, reply);
         }
         default: {
-            MMI_HILOGW("unknown code:%{public}u, go switch defaut", code);
+            MMI_HILOGW("Unknown code:%{public}u, go switch defaut", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
     }
