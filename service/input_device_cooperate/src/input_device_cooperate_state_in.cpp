@@ -15,8 +15,7 @@
 
 #include "input_device_cooperate_state_in.h"
 
-#include "cooperate_messages.h"
-#include "define_multimodal.h"
+#include "cooperation_message.h"
 #include "distributed_input_adapter.h"
 #include "input_device_cooperate_sm.h"
 #include "input_device_manager.h"

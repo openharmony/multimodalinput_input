@@ -149,17 +149,18 @@ private:
 
     class MouseStateChangeCallbackImpl : public DistributedHardware::DistributedInput::SimulationEventListenerStub {
     public:
-        int32_t OnMouseDownEvent(uint32_t type, uint32_t code, int32_t value) override;
+        int32_t OnSimulationEvent(uint32_t type, uint32_t code, int32_t value) override;
     };
     
     void SaveCallback(CallbackType type, DInputCallback callback);
     void AddTimer(const CallbackType &type);
-    int32_t RemoveTimer(const CallbackType &type);
+    void RemoveTimer(const CallbackType &type);
     void ProcessDInputCallback(CallbackType type, int32_t status);
+    void OnSimulationEvent(uint32_t type, uint32_t code, int32_t value);
     std::map<CallbackType, TimerInfo> watchingMap_;
     std::map<CallbackType, DInputCallback> callbackMap_;
     MouseStateChangeCallback mouseStateChangeCallback_ = { nullptr };
-    sptr<DistributedHardware::DistributedInput::SimulationEventListener> mouseListener_ { nullptr };
+    sptr<MouseStateChangeCallbackImpl> mouseListener_ { nullptr };
     std::mutex adapterLock_;
 };
 

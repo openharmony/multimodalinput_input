@@ -82,7 +82,8 @@ public:
     virtual int32_t GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId) override;
     virtual int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) override;
     virtual int32_t StartRemoteCooperate(const std::string& localDeviceId) override;
-    virtual int32_t StartRemoteCooperateResult(bool isSuccess, int32_t xPercent, int32_t yPercent) override;
+    virtual int32_t StartRemoteCooperateResult(bool isSuccess, const std::string& startDhid,
+        int32_t xPercent, int32_t yPercent) override;
     virtual int32_t StopRemoteCooperate() override;
     virtual int32_t StopRemoteCooperateResult(bool isSuccess) override;
     virtual int32_t StartCooperateOtherResult(const std::string& srcNetworkId) override;
@@ -129,6 +130,12 @@ protected:
         int32_t srcInputDeviceId);
     int32_t OnStopDeviceCooperate(int32_t pid, int32_t userData);
     int32_t OnGetInputDeviceCooperateState(int32_t pid, int32_t userData, const std::string &deviceId);
+    void OnStartRemoteCooperate(const std::string& remoteDeviceId);
+    void OnStartRemoteCooperateResult(bool isSuccess,
+        const std::string& startDhid, int32_t xPercent, int32_t yPercent);
+    void OnStopRemoteCooperate();
+    void OnStopRemoteCooperateResult(bool isSuccess);
+    void OnStartCooperateOtherResult(const std::string& srcNetworkId);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     bool InitLibinputService();
     bool InitService();

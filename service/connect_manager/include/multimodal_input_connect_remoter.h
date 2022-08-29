@@ -32,7 +32,7 @@ public:
     static std::shared_ptr<MultimodalInputConnectRemoter> GetInstance();
     int32_t StartRemoteCooperate(const std::string &localDeviceId, const std::string &remoteDeviceId);
     int32_t StartRemoteCooperateResult(const std::string &remoteDeviceId, bool isSuccess,
-        int32_t xPercent, int32_t yPercent);
+        const std::string &startDhid, int32_t xPercent, int32_t yPercent);
     int32_t StopRemoteCooperate(const std::string &remoteDeviceId);
     int32_t StopRemoteCooperateResult(const std::string &remoteDeviceId, bool isSuccess);
     int32_t StartCooperateOtherResult(const std::string &remoteDeviceId, const std::string &srcNetworkId);
@@ -46,7 +46,6 @@ private:
     std::mutex lock_;
     std::map<std::string, sptr<IMultimodalInputConnect>> mmiRemoteServices_;
     std::map<std::string, sptr<IRemoteObject::DeathRecipient>> mmiDeathRecipients_;
-    std::map<std::string, struct RemoterInfo> connectRemoters_;
 };
 } // namespace MMI
 } // namespace OHOS

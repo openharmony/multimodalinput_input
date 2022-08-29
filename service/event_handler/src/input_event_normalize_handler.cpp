@@ -251,7 +251,7 @@ bool InputEventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent
     if (state == CooperateState::STATE_IN) {
         int32_t deviceId = keyEvent->GetDeviceId();
         if (InputDevMgr->IsRemote(deviceId)) {
-            auto networkId = InputDevMgr->GetOrginNetworkId(deviceId);
+            auto networkId = InputDevMgr->GetOriginNetworkId(deviceId);
             return !IsNeedFilterOut(networkId, keyEvent);
         }
     } else if (state == CooperateState::STATE_OUT) {
@@ -276,7 +276,6 @@ bool InputEventNormalizeHandler::IsNeedFilterOut(const std::string& deviceId, co
 {
     CALL_DEBUG_ENTER;
     std::vector<OHOS::MMI::KeyEvent::KeyItem> KeyItems = keyEvent->GetKeyItems();
-    MMI_HILOGI("KeyItems size :%{public}lu", KeyItems.size());
     std::vector<int32_t> KeyItemsForDInput;
     KeyItemsForDInput.reserve(KeyItems.size());
     for (const auto& item : KeyItems) {
