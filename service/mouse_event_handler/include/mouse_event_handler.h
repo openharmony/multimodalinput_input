@@ -70,7 +70,8 @@ private:
  #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t HandleButtonValueInner(struct libinput_event_pointer* data);
     int32_t HandleMotionAccelerate(struct libinput_event_pointer* data, int32_t deviceId);
-    bool GetSpeedGain(double vin, double& gain, int32_t deviceId) const;    void DumpInner();
+    bool GetSpeedGain(double vin, double& gain, int32_t deviceId) const;
+    void DumpInner();
     void InitAbsolution();
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     void SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, libinput_event_pointer* data);
