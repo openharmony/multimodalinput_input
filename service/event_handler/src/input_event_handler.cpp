@@ -154,16 +154,6 @@ std::shared_ptr<EventMonitorHandler> InputEventHandler::GetMonitorHandler() cons
     return monitorHandler_;
 }
 
-void InputEventHandler::SetJumpInterceptState(bool isJump)
-{
-    isJumpIntercept_ = isJump;
-}
-
-bool InputEventHandler::GetJumpInterceptState() const
-{
-    return isJumpIntercept_;
-}
-
 std::shared_ptr<EventFilterWrap> InputEventHandler::GetFilterHandler() const
 {
     return eventfilterHandler_;
