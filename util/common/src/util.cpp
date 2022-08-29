@@ -720,5 +720,22 @@ int32_t ReadCursorStyleFile(const std::string &filePath)
     }
     return RET_OK;
 }
+
+std::string StringPrintf(const char *format, ...)
+{
+    char space[1024];
+
+    va_list ap;
+    va_start(ap, format);
+    std::string result;
+    int32_t ret = vsnprintf_s(space, sizeof(space), sizeof(space) - 1, format, ap);
+    if (ret >= RET_OK && (size_t)ret < sizeof(space)) {
+        result = space;
+    } else {
+        MMI_HILOGE("The buffer is overflow");
+    } 
+    va_end(ap);
+    return result;
+}
 } // namespace MMI
 } // namespace OHOS

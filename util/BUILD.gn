@@ -38,6 +38,10 @@ config("libmmi_util_public_config") {
   if (input_feature_hdf) {
     defines += [ "OHOS_BUILD_HDF" ]
   }
+
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+  }
 }
 
 ohos_shared_library("libmmi-util") {
@@ -112,6 +116,10 @@ ohos_unittest("ut-mmi-util-out") {
     defines += [ "OHOS_BUILD_HDF" ]
   }
 
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+  }
+
   sources = [
     "common/test/util_test.cpp",
     "network/test/net_packet_test.cpp",
@@ -172,6 +180,10 @@ ohos_unittest("RunShellUtilTest") {
 
   if (input_feature_hdf) {
     defines += [ "OHOS_BUILD_HDF" ]
+  }
+
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
 
   sources = [ "common/test/run_shell_util_test.cpp" ]

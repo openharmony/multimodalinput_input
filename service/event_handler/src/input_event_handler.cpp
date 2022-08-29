@@ -66,7 +66,11 @@ void InputEventHandler::OnEvent(void *event)
     MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
                "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType, beginTime);
     CHKPV(inputEventNormalizeHandler_);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    InputDevCooSM->HandleLibinputEvent(event);
+#else
     inputEventNormalizeHandler_->HandleEvent(lpEvent);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     int64_t endTime = GetSysClockTime();
     int64_t lostTime = endTime - beginTime;
     MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
@@ -77,6 +81,9 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 {
     inputEventNormalizeHandler_ = std::make_shared<InputEventNormalizeHandler>();
     CHKPR(inputEventNormalizeHandler_, ERROR_NULL_POINTER);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    InputDevCooSM->SetNext(inputEventNormalizeHandler_);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #if !defined(OHOS_BUILD_ENABLE_KEYBOARD) && !defined(OHOS_BUILD_ENABLE_POINTER) && !defined(OHOS_BUILD_ENABLE_TOUCH)
     return RET_OK;
 #endif // !OHOS_BUILD_ENABLE_KEYBOARD && !OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_TOUCH
@@ -159,5 +166,17 @@ std::shared_ptr<EventFilterWrap> InputEventHandler::GetFilterHandler() const
 {
     return eventfilterHandler_;
 }
+
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+void InputEventHandler::SetJumpInterceptState(bool isJump)
+{
+    isJumpIntercept_ = isJump;
+}
+
+bool InputEventHandler::GetJumpInterceptState() const
+{
+    return isJumpIntercept_;
+}
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace MMI
 } // namespace OHOS

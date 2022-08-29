@@ -327,11 +327,15 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupIn
         displayInfo_.id, displayInfo_.width, displayInfo_.height);
 }
 
-void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice)
+void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible)
 {
     CALL_DEBUG_ENTER;
     hasPointerDevice_ = hasPointerDevice;
+    UpdatePidInfo(getpid(), isPointerVisible);
     DrawManager();
+    if (isPointerVisible) {
+        UpdatePointerVisible();
+    }
 }
 
 void PointerDrawingManager::DrawManager()
@@ -436,6 +440,19 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
     UpdatePidInfo(pid, visible);
     UpdatePointerVisible();
     return RET_OK;
+}
+
+void PointerDrawingManager::SetPointerLocation(int32_t pid, int32_t x, int32_t y)
+{
+    CALL_DEBUG_ENTER;
+    FixCursorPosition(x, y);
+    lastPhysicalX_ = x;
+    lastPhysicalY_ = y;
+    if (pointerWindow_ != nullptr) {
+        pointerWindow_->MoveTo(x, y);
+        UpdatePidInfo(pid, true);
+        SetPointerVisible(pid, true);
+    }
 }
 
 int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle)

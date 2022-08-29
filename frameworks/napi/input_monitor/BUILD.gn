@@ -30,6 +30,10 @@ config("inputmonitor_config") {
   if (input_feature_hdf) {
     defines += [ "OHOS_BUILD_HDF" ]
   }
+
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+  }
 }
 
 ohos_shared_library("inputmonitor") {
