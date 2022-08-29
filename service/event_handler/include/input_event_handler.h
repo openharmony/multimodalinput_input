@@ -54,9 +54,6 @@ public:
     bool GetJumpInterceptState() const;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 
-    void SetJumpInterceptState(bool isJump);
-    bool GetJumpInterceptState() const;
-
 private:
     int32_t BuildInputHandlerChain();
 
@@ -68,7 +65,9 @@ private:
     std::shared_ptr<EventMonitorHandler> monitorHandler_ = nullptr;
 
     uint64_t idSeed_ = 0;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
     bool isJumpIntercept_ = false;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 };
 #define InputHandler InputEventHandler::GetInstance()
 } // namespace MMI

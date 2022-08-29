@@ -15,7 +15,6 @@
 
 #include "input_device_cooperate_state_free.h"
 
-#include "define_multimodal.h"
 #include "input_device_cooperate_sm.h"
 #include "input_device_manager.h"
 #include "mouse_event_handler.h"

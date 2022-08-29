@@ -25,7 +25,9 @@
 #include <unistd.h>
 
 #include "libinput.h"
-
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+#include "input_device_cooperate_sm.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "key_command_manager.h"
 #include "timer_manager.h"
 #include "util.h"
@@ -67,7 +69,7 @@ void InputEventHandler::OnEvent(void *event)
                "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType, beginTime);
     CHKPV(inputEventNormalizeHandler_);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    InputDevCooSM->HandleLibinputEvent(event);
+    InputDevCooSM->HandleEvent(lpEvent);
 #else
     inputEventNormalizeHandler_->HandleEvent(lpEvent);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
@@ -150,16 +152,6 @@ std::shared_ptr<KeyEventSubscriber> InputEventHandler::GetSubscriberHandler() co
 std::shared_ptr<EventMonitorHandler> InputEventHandler::GetMonitorHandler() const
 {
     return monitorHandler_;
-}
-
-void InputEventHandler::SetJumpInterceptState(bool isJump)
-{
-    isJumpIntercept_ = isJump;
-}
-
-bool InputEventHandler::GetJumpInterceptState() const
-{
-    return isJumpIntercept_;
 }
 
 std::shared_ptr<EventFilterWrap> InputEventHandler::GetFilterHandler() const

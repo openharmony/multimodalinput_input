@@ -16,7 +16,6 @@
 #include "i_input_device_cooperate_state.h"
 
 #include "cooperate_event_manager.h"
-#include "define_multimodal.h"
 #include "distributed_input_adapter.h"
 #include "input_device_cooperate_sm.h"
 #include "input_device_manager.h"
@@ -41,7 +40,7 @@ int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetwor
 {
     CALL_DEBUG_ENTER;
     std::string sinkNetworkId = InputDevMgr->GetOriginNetworkId(startInputDeviceId);
-    int32_t ret;
+    int32_t ret = RET_ERR;
     if (NeedPrepare(srcNetworkId, sinkNetworkId)) {
         InputDevCooSM->UpdatePreparedDevices(srcNetworkId, sinkNetworkId);
         ret = DistributedAdapter->PrepareRemoteInput(

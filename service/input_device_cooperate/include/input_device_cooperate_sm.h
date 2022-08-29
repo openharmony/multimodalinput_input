@@ -22,7 +22,6 @@
 #include "device_manager_callback.h"
 #include "distributed_input_adapter.h"
 #include "dm_device_info.h"
-#include "event_package.h"
 #include "i_input_device_cooperate_state.h"
 #include "i_input_event_handler.h"
 
@@ -72,13 +71,12 @@ public:
     void StopRemoteCooperate();
     void StopRemoteCooperateResult(bool isSuccess);
     void StartCooperateOtherResult(const std::string &srcNetworkId);
-    void HandleLibinputEvent(struct libinput_event *event) override;
+    void HandleEvent(struct libinput_event *event) override;
     void UpdateState(CooperateState state);
     void UpdatePreparedDevices(const std::string &srcNetworkId, const std::string &sinkNetworkId);
     std::pair<std::string, std::string> GetPreparedDevices() const;
-    std::shared_ptr<IInputDeviceCooperateState> GetCurrentState() const;
     CooperateState GetCurrentCooperateState() const;
-    const std::string &GetSrcNetworkId() const;
+    std::string GetSrcNetworkId() const;
     void OnCooperateChanged(const std::string &networkId, bool isOpen);
     void OnKeyboardOnline(const std::string &dhid);
     void OnPointerOffline(const std::string &dhid, const std::string &sinkNetworkId,
@@ -88,6 +86,8 @@ public:
     void OnDeviceOffline(const std::string &networkId);
     void OnStartFinish(bool isSuccess, const std::string &remoteNetworkId, int32_t startInputDeviceId);
     void OnStopFinish(bool isSuccess, const std::string &remoteNetworkId);
+    bool IsStarting() const;
+    bool IsStopping() const;
     void Dump(int32_t fd, const std::vector<std::string> &args);
 
 private:
@@ -98,7 +98,6 @@ private:
     void NotifyRemoteStartSucess(const std::string &remoteNetworkId, const std::string &startDhid);
     void NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId);
     bool UpdateMouseLocation();
-
     std::shared_ptr<IInputDeviceCooperateState> currentStateSM_ { nullptr };
     std::pair<std::string, std::string> preparedNetworkId_;
     std::string startDhid_ ;

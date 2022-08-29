@@ -36,6 +36,12 @@ namespace {
     std::string pointerEventIntercept = "PointerEventIntercept";
     std::string touchEventIntercept = "TouchEventIntercept";
     std::string keyEventIntercept = "KeyEventIntercept";
+    std::string startEvent = "StartEvent";
+    std::string launchEvent = "LaunchEvent";
+    std::string stopEvent = "StopEvent";
+    constexpr int32_t START_ID = 1;
+    constexpr int32_t LAUNCH_ID = 2;
+    constexpr int32_t STOP_ID = 3;
 }
 
 void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent)
@@ -185,6 +191,48 @@ void BytraceAdapter::StartBytrace(
                 FinishAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, pointerEventIntercept, eventId);
             } else {
                 FinishAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, touchEventIntercept, eventId);
+            }
+        }
+    }
+}
+
+void BytraceAdapter::StartBytrace(TraceBtn traceBtn, EventType eventType)
+{
+    std::string checkKeyCode;
+    if (traceBtn == TRACE_START) {
+        switch (eventType) {
+            case START_EVENT: {
+                StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, startEvent, START_ID);
+                checkKeyCode = "crossing startId:" + std::to_string(START_ID);
+                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, checkKeyCode);
+                break;
+            }
+            case LAUNCH_EVENT: {
+                StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, launchEvent, LAUNCH_ID);
+                checkKeyCode = "crossing launchId:" + std::to_string(LAUNCH_ID);
+                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, checkKeyCode);
+                break;
+            }
+            case STOP_EVENT: {
+                StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, stopEvent, STOP_ID);
+                checkKeyCode = "crossing stopId:" + std::to_string(STOP_ID);
+                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, checkKeyCode);
+                break;
+            }
+        }
+    } else {
+        switch (eventType) {
+            case START_EVENT: {
+                FinishAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, keyEventIntercept, START_ID);
+                break;
+            }
+            case LAUNCH_EVENT: {
+                FinishAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, keyEventIntercept, LAUNCH_ID);
+                break;
+            }
+            case STOP_EVENT: {
+                FinishAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, keyEventIntercept, STOP_ID);
+                break;
             }
         }
     }
