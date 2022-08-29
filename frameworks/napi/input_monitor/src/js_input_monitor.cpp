@@ -353,8 +353,8 @@ MapFun JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent,
     mapFun["screenX"] = std::bind(&PointerEvent::PointerItem::GetWindowX, item);
     mapFun["screenY"] = std::bind(&PointerEvent::PointerItem::GetWindowY, item);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    mapFun["rawDeltaX"] = std::bind(&PointerEvent::PointerItem::GetRawDataDx, item);
-    mapFun["rawDeltaY"] = std::bind(&PointerEvent::PointerItem::GetRawDataDy, item);
+    mapFun["rawDeltaX"] = std::bind(&PointerEvent::PointerItem::GetRawDx, item);
+    mapFun["rawDeltaY"] = std::bind(&PointerEvent::PointerItem::GetRawDy, item);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     return mapFun;
 }

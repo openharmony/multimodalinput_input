@@ -33,16 +33,16 @@ config("mmi_connect_manager_config") {
 
 ohos_source_set("mmi_connect_manager_service") {
   part_name = "input"
-  sources = [
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_stub.cpp",
-  ]
+  sources =
+      [ "${mmi_connect_manager_path}/src/multimodal_input_connect_stub.cpp" ]
+
+  if (!input_feature_input_cooperation) {
+    sources += [
+      "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
+    ]
+  }
 
   configs = [ ":mmi_connect_manager_config" ]
-
-  if (input_feature_input_cooperation) {
-    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
-  }
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
@@ -69,10 +69,6 @@ ohos_source_set("mmi_connect_manager_proxy") {
   }
 
   configs = [ ":mmi_connect_manager_config" ]
-
-  if (input_feature_input_cooperation) {
-    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
-  }
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",

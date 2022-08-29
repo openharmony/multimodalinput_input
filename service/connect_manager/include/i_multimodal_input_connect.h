@@ -65,7 +65,8 @@ public:
     virtual int32_t GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId) = 0;
     virtual int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) = 0;
     virtual int32_t StartRemoteCooperate(const std::string& localDeviceId) = 0;
-    virtual int32_t StartRemoteCooperateResult(bool isSuccess, int32_t xPercent, int32_t yPercent) = 0;
+    virtual int32_t StartRemoteCooperateResult(bool isSuccess, const std::string& startDhid,
+        int32_t xPercent, int32_t yPercent) = 0;
     virtual int32_t StopRemoteCooperate() = 0;
     virtual int32_t StopRemoteCooperateResult(bool isSuccess) = 0;
     virtual int32_t StartCooperateOtherResult(const std::string &srcNetworkId) = 0;

@@ -738,7 +738,8 @@ int32_t MultimodalInputConnectProxy::StartRemoteCooperate(const std::string& loc
     return ret;
 }
 
-int32_t MultimodalInputConnectProxy::StartRemoteCooperateResult(bool isSuccess, int32_t xPercent, int32_t yPercent)
+int32_t MultimodalInputConnectProxy::StartRemoteCooperateResult(bool isSuccess,
+    const std::string& startDhid, int32_t xPercent, int32_t yPercent)
 {
     CALL_INFO_TRACE;
     MessageParcel data;
@@ -747,6 +748,7 @@ int32_t MultimodalInputConnectProxy::StartRemoteCooperateResult(bool isSuccess, 
         return ERR_INVALID_VALUE;
     }
     WRITEBOOL(data, isSuccess, ERR_INVALID_VALUE);
+    WRITESTRING(data, startDhid, ERR_INVALID_VALUE);
     WRITEINT32(data, xPercent, ERR_INVALID_VALUE);
     WRITEINT32(data, yPercent, ERR_INVALID_VALUE);
     MessageParcel reply;
