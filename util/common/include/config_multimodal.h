@@ -48,7 +48,11 @@ namespace MMI {
 #define MAX_THREAD_DEATH_TIME (6*1000)      // Thread death threshold time
 #define MMISEVER_WMS_DEVICE_ADDED 1         // notifyDeviceChange@Device added
 #define MMISEVER_WMS_DEVICE_REMOVE 2        // notifyDeviceChange@Device removed
-#define SEND_RETRY_LIMIT 32
+#ifndef OHOS_BUILD_ENABLE_COOPERATE
+    #define SEND_RETRY_LIMIT 32
+#else
+    #define SEND_RETRY_LIMIT 2
+#endif
 #define SEND_RETRY_SLEEP_TIME 10000
 #define ONCE_PROCESS_NETPACKET_LIMIT 100
 #define MAX_RECV_LIMIT 32

@@ -27,6 +27,9 @@
 #include "parcel.h"
 
 #include "input_event.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+#include "raw_data.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 namespace OHOS {
 namespace MMI {
@@ -688,7 +691,37 @@ public:
          * @since 9
          */
         bool ReadFromParcel(Parcel &in);
-
+		
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+        /**
+         * @brief 获取原始X坐标数值.
+         * @return  返回原始X坐标值.
+         * @since 9
+         */
+        int32_t GetRawDx() const;
+		
+        /**
+         * @brief 设置原始X坐标值.
+         * @param rawDx 待设置的原始X坐标值.
+         * @return void
+         * @since 9
+         */
+        void SetRawDx(int32_t rawDx);
+        /**
+         * @brief 获取原始Y坐标数值.
+         * @return  返回原始Y坐标值.
+         * @since 9
+         */
+        int32_t GetRawDy() const;
+		
+        /**
+         * @brief 设置原始Y坐标值.
+         * @param rawDy 待设置的原始Y坐标值.
+         * @return void
+         * @since 9
+         */
+        void SetRawDy(int32_t rawDy);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     private:
         int32_t pointerId_ {};
         bool pressed_ { false };
@@ -713,6 +746,10 @@ public:
         int64_t downTime_ {};
         int32_t toolType_ {};
         int32_t targetWindowId_ { -1 };
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+        int32_t rawDx_;
+        int32_t rawDy_;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     };
 
 public:

@@ -45,6 +45,9 @@ public:
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
     int32_t Normalize(struct libinput_event *event);
     void Dump(int32_t fd, const std::vector<std::string> &args);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    void SetAbsolutionLocation(int32_t xPercent, int32_t yPercent);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -66,6 +69,9 @@ private:
     bool GetSpeedGain(double vin, double& gain) const;
     void DumpInner();
     void InitAbsolution();
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    void SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, libinput_event_pointer* data);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };

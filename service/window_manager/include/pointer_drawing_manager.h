@@ -44,7 +44,7 @@ public:
         const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT);
     void UpdateDisplayInfo(const DisplayInfo& displayInfo, const WinInfo &info);
     void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo, const WinInfo &info);
-    void UpdatePointerDevice(bool hasPointerDevice);
+    void UpdatePointerDevice(bool hasPointerDevicee, bool isPointerVisible);
     bool Init();
     void DeletePointerVisible(int32_t pid);
     int32_t SetPointerVisible(int32_t pid, bool visible);
@@ -52,6 +52,7 @@ public:
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle);
     void DrawPointerStyle();
     bool IsPointerVisible();
+    void SetPointerLocation(int32_t pid, int32_t x, int32_t y);
     void AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
 
 public:
