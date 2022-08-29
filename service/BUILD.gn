@@ -52,7 +52,6 @@ config("libmmi_server_config") {
     "//foundation/multimodalinput/input/util/network/include",
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
     "//third_party/cJSON",
-    "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core/include",
   ]
 
   if (input_feature_input_cooperation) {
@@ -569,8 +568,9 @@ ohos_shared_library("libmmi-server") {
   if (input_feature_input_cooperation) {
     deps += [
       "//base/notification/eventhandler/frameworks/eventhandler:libeventhandler",
-      "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core:distributed_device_profile_client",
+      "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core:distributed_device_profile_client",
       "//foundation/distributedhardware/distributed_input/interfaces/inner_kits:libdinput_sdk",
+      "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
     ]
   }
 
