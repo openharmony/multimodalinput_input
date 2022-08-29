@@ -19,7 +19,8 @@
 #include "mmi_log.h"
 #include "util_napi.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsUtil" };
 } // namespace
@@ -84,4 +85,5 @@ bool JsUtil::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
     CHKRF(env, napi_strict_equals(env, handle, handlerTemp, &isEqual), STRICT_EQUALS);
     return isEqual;
 }
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS

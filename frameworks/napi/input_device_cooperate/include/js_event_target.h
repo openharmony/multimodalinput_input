@@ -19,22 +19,24 @@
 #include <cstdint>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include <napi/native_api.h>
+#include <nocopyable.h>
 #include <uv.h>
 
 #include "cooperate_messages.h"
 #include "i_input_device_cooperate_listener.h"
 #include "js_util.h"
-#include "nocopyable.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 class JsEventTarget : public IInputDeviceCooperateListener, public std::enable_shared_from_this<JsEventTarget> {
 public:
-    JsEventTarget();
+    JsEventTarget() = default;
     ~JsEventTarget() = default;
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
 
@@ -55,6 +57,7 @@ private:
         cooperateListener_ = {};
     inline static std::map<int32_t, std::unique_ptr<JsUtil::CallbackInfo>> callback_ = {};
     bool isListeningProcess_ = false;
+    std::mutex mutex_;
 
     static void CallEnablePromsieWork(uv_work_t *work, int32_t status);
     static void CallEnableAsyncWork(uv_work_t *work, int32_t status);
@@ -68,5 +71,6 @@ private:
 
     static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfo(uv_work_t *work);
 };
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 #endif // JS_EVENT_TARGET_H
