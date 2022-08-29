@@ -103,6 +103,7 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
             }
         }
     });
+    MMI_HILOGD("Save anr event anrType:%{public}d eventId:%{public}d timeId:%{public}d", type, id, timerId);
     sess->SaveANREvent(type, id, currentTime, timerId);
 }
 
