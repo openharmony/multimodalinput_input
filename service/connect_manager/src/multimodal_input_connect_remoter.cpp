@@ -52,12 +52,12 @@ int32_t MultimodalInputConnectRemoter::StartRemoteCooperate(const std::string &l
 }
 
 int32_t MultimodalInputConnectRemoter::StartRemoteCooperateResult(const std::string &remoteDeviceId, bool isSuccess,
-    int32_t xPercent, int32_t yPercent)
+    const std::string &startDhid, int32_t xPercent, int32_t yPercent)
 {
     CALL_DEBUG_ENTER;
     auto proxy = GetProxyById(remoteDeviceId);
     CHKPR(proxy, RET_ERR);
-    return proxy->StartRemoteCooperateResult(isSuccess, xPercent, yPercent);
+    return proxy->StartRemoteCooperateResult(isSuccess, startDhid, xPercent, yPercent);
 }
 
 int32_t MultimodalInputConnectRemoter::StopRemoteCooperate(const std::string &remoteDeviceId)

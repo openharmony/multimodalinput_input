@@ -34,13 +34,13 @@ DistributedInputAdapter::DistributedInputAdapter()
 {
     mouseListener_ = new (std::nothrow) MouseStateChangeCallbackImpl();
     CHKPL(mouseListener_);
-    DistributedInputKit::RegisterEventListener(mouseListener_);
+    DistributedInputKit::RegisterSimulationEventListener(mouseListener_);
 }
 
 DistributedInputAdapter::~DistributedInputAdapter()
 {
     std::lock_guard<std::mutex> guard(adapterLock_);
-    DistributedInputKit::UnregisterEventListener(mouseListener_);
+    DistributedInputKit::UnregisterSimulationEventListener(mouseListener_);
     mouseListener_ = nullptr;
     callbackMap_.clear();
 }
@@ -156,7 +156,7 @@ int32_t DistributedInputAdapter::UnregisterEventCallback(MouseStateChangeCallbac
 void DistributedInputAdapter::SaveCallback(CallbackType type, DInputCallback callback)
 {
     std::lock_guard<std::mutex> guard(adapterLock_);
-    CHKPR(callback, RET_ERR);
+    CHKPV(callback);
     callbackMap_[type] = callback;
     AddTimer(type);
 }
@@ -206,6 +206,13 @@ void DistributedInputAdapter::ProcessDInputCallback(CallbackType type, int32_t s
     }
     it->second(status == RET_OK);
     callbackMap_.erase(it);
+}
+
+void DistributedInputAdapter::OnSimulationEvent(uint32_t type, uint32_t code, int32_t value)
+{
+    std::lock_guard<std::mutex> guard(adapterLock_);
+    CHKPV(mouseStateChangeCallback_);
+    mouseStateChangeCallback_(type, code, value);
 }
 
 void DistributedInputAdapter::StartDInputCallback::OnResult(const std::string &devId, const uint32_t &inputTypes,
@@ -284,12 +291,10 @@ void DistributedInputAdapter::UnPrepareStopDInputCallbackSink::OnResult(const st
     DistributedAdapter->ProcessDInputCallback(CallbackType::UnPrepareStopDInputCallbackSink, status);
 }
 
-int32_t DistributedInputAdapter::MouseStateChangeCallbackImpl::OnMouseDownEvent(uint32_t type, uint32_t code,
+int32_t DistributedInputAdapter::MouseStateChangeCallbackImpl::OnSimulationEvent(uint32_t type, uint32_t code,
                                                                                 int32_t value)
 {
-    std::lock_guard<std::mutex> guard(adapterLock_);
-    CHKPR(DistributedAdapter->mouseStateChangeCallback_, RET_ERR);
-    DistributedAdapter->mouseStateChangeCallback_(type, code, value);
+    DistributedAdapter->OnSimulationEvent(type, code, value);
     return RET_OK;
 }
 } // namespace MMI
