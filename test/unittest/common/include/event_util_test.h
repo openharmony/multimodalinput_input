@@ -21,6 +21,7 @@
 #include <list>
 #include <mutex>
 #include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -122,7 +123,16 @@ public:
     virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override;
     virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override;
     virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
+    int32_t GetLastEventId() const;
+
+private:
+    mutable int32_t lastPointerEventId_ { -1 };
 };
+
+inline int32_t InputEventCallback::GetLastEventId() const
+{
+    return lastPointerEventId_;
+}
 
 class WindowEventConsumer : public IInputEventConsumer {
 public:
@@ -131,7 +141,7 @@ public:
     virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
     uint64_t GetConsumerThreadId();
 private:
-    mutable uint64_t threadId_ = 0;
+    mutable uint64_t threadId_ { 0 };
 };
 
 int64_t GetNanoTime();
@@ -151,20 +161,20 @@ class AccessMonitor {
 public:
     AccessMonitor()
     {
-        currentID_ = GetSelfTokenID();
+        currentId_ = GetSelfTokenID();
         AccessTokenIDEx tokenIdEx = { 0 };
         tokenIdEx = AccessTokenKit::AllocHapToken(infoManagerTestInfoParms_, infoManagerTestPolicyPrams_);
-        monitorID_ = tokenIdEx.tokenIdExStruct.tokenID;
-        SetSelfTokenID(monitorID_);
+        monitorId_ = tokenIdEx.tokenIdExStruct.tokenID;
+        SetSelfTokenID(monitorId_);
     }
     ~AccessMonitor()
     {
-        AccessTokenKit::DeleteToken(monitorID_);
-        SetSelfTokenID(currentID_);
+        AccessTokenKit::DeleteToken(monitorId_);
+        SetSelfTokenID(currentId_);
     }
 private:
-    AccessTokenID currentID_ = 0;
-    AccessTokenID monitorID_ = 0;
+    AccessTokenID currentId_ { 0 };
+    AccessTokenID monitorId_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
