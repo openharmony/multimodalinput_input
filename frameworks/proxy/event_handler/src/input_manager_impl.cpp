@@ -22,6 +22,7 @@
 
 #include "bytrace_adapter.h"
 #include "event_filter_service.h"
+#include "input_device_cooperate_impl.h"
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -913,6 +914,114 @@ int32_t InputManagerImpl::StopRemoteInput(const std::string &deviceId,
     MMI_HILOGW("Stop remote input dose not support");
     return RET_OK;
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
+}
+
+int32_t InputManagerImpl::RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("client init failed");
+        return RET_ERR;
+    }
+    return InputDevCooperateImpl.RegisterCooperateListener(listener);
+#else
+    MMI_HILOGW("Cooperate does not support");
+    (void)(listener);
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+}
+
+int32_t InputManagerImpl::UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("client init failed");
+        return RET_ERR;
+    }
+    return InputDevCooperateImpl.UnregisterCooperateListener(listener);
+#else
+    MMI_HILOGW("Cooperate does not support");
+    (void)(listener);
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+}
+
+int32_t InputManagerImpl::EnableInputDeviceCooperate(bool enabled,
+    std::function<void(std::string, CooperationMessage)> callback)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("client init failed");
+        return RET_ERR;
+    }
+    return InputDevCooperateImpl.EnableInputDeviceCooperate(enabled, callback);
+#else
+    MMI_HILOGW("Cooperate does not support");
+    (void)(enabled);
+    (void)(callback);
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+}
+
+int32_t InputManagerImpl::StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
+    std::function<void(std::string, CooperationMessage)> callback)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("client init failed");
+        return RET_ERR;
+    }
+    return InputDevCooperateImpl.StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, callback);
+#else
+    MMI_HILOGW("Cooperate does not support");
+    (void)(sinkDeviceId);
+    (void)(srcInputDeviceId);
+    (void)(callback);
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+}
+
+int32_t InputManagerImpl::StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("client init failed");
+        return RET_ERR;
+    }
+    return InputDevCooperateImpl.StopDeviceCooperate(callback);
+#else
+    MMI_HILOGW("Cooperate does not support");
+    (void)(callback);
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+}
+
+int32_t InputManagerImpl::GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("client init failed");
+        return RET_ERR;
+    }
+    return InputDevCooperateImpl.GetInputDeviceCooperateState(deviceId, callback);
+#else
+    MMI_HILOGW("Cooperate does not support");
+    (void)(deviceId);
+    (void)(callback);
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 }
 } // namespace MMI
 } // namespace OHOS

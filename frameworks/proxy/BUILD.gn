@@ -101,6 +101,9 @@ ohos_shared_library("libmmi-client") {
     "module_loader/src/mmi_event_handler.cpp",
     "module_loader/src/mmi_fd_listener.cpp",
   ]
+  if (input_feature_input_cooperation) {
+    sources += [ "event_handler/src/input_device_cooperate_impl.cpp" ]
+  }
 
   defines = []
 
