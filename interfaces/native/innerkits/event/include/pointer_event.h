@@ -722,6 +722,7 @@ public:
          */
         void SetRawDy(int32_t rawDy);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+
         /**
          * @brief 获取 x 坐标的偏移量。
          * 对于指针输入事件，该值为目标屏幕上的 x 坐标相对偏移量。
@@ -752,7 +753,6 @@ public:
          * @since 9
          */
         void SetRawDeltaY(int32_t rawDeltaY);
-
     private:
         int32_t pointerId_ {};
         bool pressed_ { false };
