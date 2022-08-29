@@ -1257,7 +1257,7 @@ int32_t MMIService::StartRemoteCooperateResult(bool isSuccess,
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    MMI_HILOGI("StartRemoteCooperateResult:[%{public}d]",isSuccess);
+    MMI_HILOGI("StartRemoteCooperateResult:[%{public}d]", isSuccess);
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnStartRemoteCooperateResult,
         this, isSuccess, startDhid, xPercent, yPercent));
     if (ret != RET_OK) {
@@ -1345,6 +1345,6 @@ void MMIService::OnStartCooperateOtherResult(const std::string& srcNetworkId)
 {
     InputDevCooSM->StartCooperateOtherResult(srcNetworkId);
 }
-#endif //OHOS_BUILD_ENABLE_COOPERATE
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace MMI
 } // namespace OHOS

@@ -42,7 +42,6 @@ namespace {
     constexpr int32_t START_ID = 1;
     constexpr int32_t LAUNCH_ID = 2;
     constexpr int32_t STOP_ID = 3;
-
 }
 
 void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent)
@@ -221,7 +220,7 @@ void BytraceAdapter::StartBytrace(TraceBtn traceBtn, EventType eventType)
                 break;
             }
         }
-    }else {
+    } else {
         switch (eventType) {
             case START_EVENT: {
                 FinishAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, keyEventIntercept, START_ID);
