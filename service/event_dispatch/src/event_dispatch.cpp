@@ -83,7 +83,7 @@ void EventDispatch::HandlePointerEventInner(const std::shared_ptr<PointerEvent> 
     CHKPV(point);
     auto fd = WinMgr->GetClientFd(point);
     if (fd < 0) {
-        MMI_HILOGE("The fd less than 0, fd: %{public}d", fd);
+        MMI_HILOGE("The fd less than 0, fd:%{public}d", fd);
         DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
     }
@@ -98,7 +98,7 @@ void EventDispatch::HandlePointerEventInner(const std::shared_ptr<PointerEvent> 
     CHKPV(session);
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
-        MMI_HILOGW("the pointer event does not report normally, application not response");
+        MMI_HILOGW("The pointer event does not report normally, application not response");
         return;
     }
     auto pid = udsServer->GetClientPid(fd);
@@ -114,7 +114,7 @@ void EventDispatch::HandlePointerEventInner(const std::shared_ptr<PointerEvent> 
             auto itemPid = WinMgr->GetWindowPid(pointeritem.GetTargetWindowId());
             if (itemPid >= 0 && itemPid != pid) {
                 pointerEvent->RemovePointerItem(id);
-                MMI_HILOGD("pointerIdList size: %{public}zu", pointerEvent->GetPointerIds().size());
+                MMI_HILOGD("pointerIdList size:%{public}zu", pointerEvent->GetPointerIds().size());
             }
         }
     }
@@ -136,7 +136,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
     CHKPR(key, PARAM_INPUT_INVALID);
     auto fd = WinMgr->UpdateTarget(key);
     if (fd < 0) {
-        MMI_HILOGE("Invalid fd, fd: %{public}d", fd);
+        MMI_HILOGE("Invalid fd, fd:%{public}d", fd);
         DfxHisysevent::OnUpdateTargetKey(key, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return RET_ERR;
     }
@@ -147,7 +147,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
     CHKPR(session, RET_ERR);
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
-        MMI_HILOGW("the key event does not report normally, application not response");
+        MMI_HILOGW("The key event does not report normally, application not response");
         return RET_OK;
     }
 

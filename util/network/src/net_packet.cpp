@@ -21,13 +21,13 @@ namespace OHOS {
 namespace MMI {
 NetPacket::NetPacket(MmiMessageId msgId) : msgId_(msgId) {}
 
-NetPacket::NetPacket(const NetPacket& pkt) : NetPacket(pkt.GetMsgId())
+NetPacket::NetPacket(const NetPacket &pkt) : NetPacket(pkt.GetMsgId())
 {
     Clone(pkt);
 }
 NetPacket::~NetPacket() {}
 
-void NetPacket::MakeData(StreamBuffer& buf) const
+void NetPacket::MakeData(StreamBuffer &buf) const
 {
     PACKHEAD head = {msgId_, wPos_};
     buf << head;

@@ -62,22 +62,22 @@ private:
 
 private:
     bool SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
-    bool HandleKeyDown(const std::shared_ptr<KeyEvent>& keyEvent);
-    bool HandleKeyUp(const std::shared_ptr<KeyEvent>& keyEvent);
-    bool HandleKeyCancel(const std::shared_ptr<KeyEvent>& keyEvent);
+    bool HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent);
+    bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent);
+    bool HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyEvent);
 
-    bool IsPreKeysMatch(const std::set<int32_t>& preKeys, const std::vector<int32_t>& pressedKeys) const;
+    bool IsPreKeysMatch(const std::set<int32_t> &preKeys, const std::vector<int32_t> &pressedKeys) const;
 
     void NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
-            const std::shared_ptr<Subscriber>& subscriber);
+            const std::shared_ptr<Subscriber> &subscriber);
 
-    bool AddTimer(const std::shared_ptr<Subscriber>& subscriber, const std::shared_ptr<KeyEvent>& keyEvent);
-    void ClearTimer(const std::shared_ptr<Subscriber>& subscriber);
+    bool AddTimer(const std::shared_ptr<Subscriber> &subscriber, const std::shared_ptr<KeyEvent> &keyEvent);
+    void ClearTimer(const std::shared_ptr<Subscriber> &subscriber);
     void OnTimer(const std::shared_ptr<Subscriber> subscriber);
     void OnSessionDelete(SessionPtr sess);
     bool InitSessionDeleteCallback();
     bool CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
-    void RemoveKeyCode(int32_t keyCode, std::vector<int32_t>& keyCodes);
+    void RemoveKeyCode(int32_t keyCode, std::vector<int32_t> &keyCodes);
     bool IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
 
 private:

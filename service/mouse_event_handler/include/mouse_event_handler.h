@@ -59,14 +59,14 @@ private:
     int32_t HandleMotionInner(struct libinput_event_pointer* data);
     int32_t HandleButtonInner(struct libinput_event_pointer* data);
     int32_t HandleAxisInner(struct libinput_event_pointer* data);
-    void HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem& pointerItem);
+    void HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem &pointerItem);
  #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
-    void HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem);
+    void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
  #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t HandleButtonValueInner(struct libinput_event_pointer* data);
     int32_t HandleMotionAccelerate(struct libinput_event_pointer* data);
-    bool GetSpeedGain(double vin, double& gain) const;
+    bool GetSpeedGain(double vin, double &gain) const;
     void DumpInner();
     void InitAbsolution();
 #ifdef OHOS_BUILD_ENABLE_COOPERATE

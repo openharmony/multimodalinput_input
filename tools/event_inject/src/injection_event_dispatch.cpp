@@ -58,7 +58,7 @@ void InjectionEventDispatch::InitManageFunction()
         {"json", std::bind(&InjectionEventDispatch::OnJson, this)},
     };
 
-    for (auto &it : funs) {
+    for (const auto &it : funs) {
         if (!RegisterInjectEvent(it)) {
             MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
             continue;
@@ -164,7 +164,7 @@ int32_t InjectionEventDispatch::OnHelp()
     return RET_OK;
 }
 
-int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText) const
+int32_t InjectionEventDispatch::GetDeviceIndex(const std::string &deviceNameText) const
 {
     if (deviceNameText.empty()) {
         MMI_HILOGE("The deviceNameText is empty");
@@ -179,7 +179,7 @@ int32_t InjectionEventDispatch::GetDeviceIndex(const std::string& deviceNameText
     return RET_ERR;
 }
 
-bool InjectionEventDispatch::CheckValue(const std::string& inputValue)
+bool InjectionEventDispatch::CheckValue(const std::string &inputValue)
 {
     if ((inputValue.length()) > INPUT_VALUE_LENGTH) {
         MMI_HILOGE("The value entered is out of range, value:%{public}s", inputValue.c_str());
@@ -195,7 +195,7 @@ bool InjectionEventDispatch::CheckValue(const std::string& inputValue)
     return false;
 }
 
-bool InjectionEventDispatch::CheckCode(const std::string& inputCode)
+bool InjectionEventDispatch::CheckCode(const std::string &inputCode)
 {
     if ((inputCode.length()) > INPUT_CODE_LENGTH) {
         MMI_HILOGE("The value entered is out of range, code:%{public}s", inputCode.c_str());
@@ -211,7 +211,7 @@ bool InjectionEventDispatch::CheckCode(const std::string& inputCode)
     return false;
 }
 
-bool InjectionEventDispatch::CheckType(const std::string& inputType)
+bool InjectionEventDispatch::CheckType(const std::string &inputType)
 {
     if ((inputType.length()) > INPUT_TYPE_LENGTH) {
         MMI_HILOGE("The value entered is out of range, type:%{public}s", inputType.c_str());
@@ -227,8 +227,8 @@ bool InjectionEventDispatch::CheckType(const std::string& inputType)
     return false;
 }
 
-bool InjectionEventDispatch::CheckEventValue(const std::string& inputType, const std::string& inputCode,
-    const std::string& inputValue)
+bool InjectionEventDispatch::CheckEventValue(const std::string &inputType, const std::string &inputCode,
+    const std::string &inputValue)
 {
     if (!(CheckType(inputType))) {
         MMI_HILOGE("Input error in type, type:%{public}s", inputType.c_str());

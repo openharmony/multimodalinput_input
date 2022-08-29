@@ -43,10 +43,10 @@ public:
     int32_t ExecuteFunction(std::string funId);
     int32_t GetDevTypeIndex(int32_t devIndex) const;
     int32_t GetDevIndexType(int32_t devType) const;
-    int32_t GetDeviceIndex(const std::string& deviceNameText) const;
+    int32_t GetDeviceIndex(const std::string &deviceNameText) const;
     std::string GetFunId() const;
-    bool VerifyArgvs(const int32_t& argc, const std::vector<std::string>& argv);
-    bool RegisterInjectEvent(InjectFunctionMap& msg)
+    bool VerifyArgvs(const int32_t &argc, const std::vector<std::string> &argv);
+    bool RegisterInjectEvent(InjectFunctionMap &msg)
     {
         auto it = injectFuns_.find(msg.id);
         if (it != injectFuns_.end()) {
@@ -72,11 +72,11 @@ private:
     std::map<std::string, InjectFunction> injectFuns_;
     std::map<std::string, int32_t> sendEventType_;
     std::vector<DeviceInformation> allDevices_ = {};
-    bool CheckType(const std::string& inputType);
-    bool CheckCode(const std::string& inputCode);
-    bool CheckValue(const std::string& inputValue);
-    bool CheckEventValue(const std::string& inputType, const std::string& inputCode,
-    const std::string& inputValue);
+    bool CheckType(const std::string &inputType);
+    bool CheckCode(const std::string &inputCode);
+    bool CheckValue(const std::string &inputValue);
+    bool CheckEventValue(const std::string &inputType, const std::string &inputCode,
+    const std::string &inputValue);
 };
 } // namespace MMI
 } // namespace OHOS

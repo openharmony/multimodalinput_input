@@ -64,7 +64,7 @@ std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
     return pointerEvent_;
 }
 
-bool MouseEventHandler::GetSpeedGain(double vin, double& gain) const
+bool MouseEventHandler::GetSpeedGain(double vin, double &gain) const
 {
     if (fabs(vin) < DOUBLE_ZERO) {
         MMI_HILOGE("The value of the parameter passed in is 0");
@@ -244,7 +244,7 @@ int32_t MouseEventHandler::HandleAxisInner(struct libinput_event_pointer* data)
 }
 
 void MouseEventHandler::HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId,
-                                        PointerEvent::PointerItem& pointerItem)
+                                        PointerEvent::PointerItem &pointerItem)
 {
     CALL_DEBUG_ENTER;
     CHKPV(data);

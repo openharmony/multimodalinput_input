@@ -74,7 +74,7 @@ void ClientMsgHandler::Init()
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     };
-    for (auto& it : funs) {
+    for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
             MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
             continue;

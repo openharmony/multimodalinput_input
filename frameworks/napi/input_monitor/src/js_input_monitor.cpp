@@ -374,7 +374,7 @@ bool JsInputMonitor::SetMouseProperty(const std::shared_ptr<PointerEvent> pointe
     }
 
     auto mapFun = GetFuns(pointerEvent, item);
-    for (const auto& it : mapFun) {
+    for (const auto &it : mapFun) {
         if (SetNameProperty(jsEnv_, result, it.first, it.second()) != napi_ok) {
             THROWERR(jsEnv_, "Set property failed");
             return false;
@@ -429,7 +429,7 @@ int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> 
         if (pointerId == currentPointerId) {
             PointerEvent::PointerItem item;
             if (!pointerEvent->GetPointerItem(pointerId, item)) {
-                MMI_HILOGE("Invalid pointer: %{public}d", pointerId);
+                MMI_HILOGE("Invalid pointer:%{public}d", pointerId);
                 return RET_ERR;
             }
             if (SetNameProperty(jsEnv_, result, "id", currentPointerId) != napi_ok) {

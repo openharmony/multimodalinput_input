@@ -203,7 +203,7 @@ napi_value JsInputDinputContext::GetRemoteInputAbility(napi_env env, napi_callba
     return nullptr;
 }
 
-napi_value JsInputDinputContext::GetParameter(napi_env env, napi_callback_info info, napi_ref& first)
+napi_value JsInputDinputContext::GetParameter(napi_env env, napi_callback_info info, napi_ref &first)
 {
     CALL_LOG_ENTER;
     size_t argc = ARGC_NUM_1;
@@ -228,7 +228,7 @@ napi_value JsInputDinputContext::GetParameter(napi_env env, napi_callback_info i
 }
 
 napi_value JsInputDinputContext::GetParameter(napi_env env, napi_callback_info info,
-    std::string& first, napi_ref& second)
+    std::string &first, napi_ref &second)
 {
     CALL_LOG_ENTER;
     size_t argc = ARGC_NUM_2;
@@ -262,7 +262,7 @@ napi_value JsInputDinputContext::GetParameter(napi_env env, napi_callback_info i
 }
 
 napi_value JsInputDinputContext::GetParameter(napi_env env, napi_callback_info info,
-    int32_t& first, int32_t& second, napi_ref& third)
+    int32_t &first, int32_t &second, napi_ref &third)
 {
     CALL_LOG_ENTER;
     size_t argc = ARGC_NUM_3;
@@ -297,7 +297,7 @@ napi_value JsInputDinputContext::GetParameter(napi_env env, napi_callback_info i
 }
 
 napi_value JsInputDinputContext::GetParameter(napi_env env, napi_callback_info info,
-    std::string& first, std::vector<uint32_t>& second, napi_ref& third)
+    std::string &first, std::vector<uint32_t> &second, napi_ref &third)
 {
     CALL_LOG_ENTER;
     size_t argc = ARGC_NUM_3;
