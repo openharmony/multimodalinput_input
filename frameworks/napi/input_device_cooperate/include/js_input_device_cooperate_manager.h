@@ -17,14 +17,16 @@
 #define JS_INPUT_DEVICE_COOPERATE_MANAGER_H
 
 #include <cstdint>
+#include <mutex>
 #include <string>
 
 #include <napi/native_api.h>
+#include <nocopyable.h>
 
 #include "js_event_target.h"
-#include "nocopyable.h"
 
-namespace OHOS::MMI {
+namespace OHOS {
+namespace MMI {
 class JsInputDeviceCooperateManager : public JsEventTarget {
 public:
     JsInputDeviceCooperateManager() = default;
@@ -39,6 +41,10 @@ public:
     void RegisterListener(napi_env env, const std::string &type, napi_value handle);
     void UnregisterListener(napi_env env, const std::string &type, napi_value handle = nullptr);
     void ResetEnv();
+
+private:
+    std::mutex mutex_;
 };
-} // namespace OHOS::MMI
+} // namespace MMI
+} // namespace OHOS
 #endif // JS_INPUT_DEVICE_COOPERATE_MANAGER_H
