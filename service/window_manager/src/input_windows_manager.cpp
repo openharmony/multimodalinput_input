@@ -652,6 +652,7 @@ bool InputWindowsManager::UpdateDisplayId(int32_t& displayId)
 std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX, int32_t logicalY,
     const std::shared_ptr<PointerEvent>& pointerEvent)
 {
+    CALL_DEBUG_ENTER;
     int32_t action = pointerEvent->GetPointerAction();
     if ((firstBtnDownWindowId_ == -1) ||
         ((action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) && (pointerEvent->GetPressedButtons().size() == 1)) ||
@@ -794,6 +795,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     auto displayId = pointerEvent->GetTargetDisplayId();
     if (!UpdateDisplayId(displayId)) {
