@@ -19,7 +19,7 @@
 #include <memory>
 #include <mutex>
 
-#include "cooperate_messages.h"
+#include "cooperation_message.h"
 #include "js_input_device_cooperate_manager.h"
 #include "nocopyable.h"
 
@@ -39,7 +39,7 @@ public:
     static napi_value On(napi_env env, napi_callback_info info);
     static napi_value Off(napi_env env, napi_callback_info info);
 
-    std::shared_ptr<JsInputDeviceCooperateManager> GetJsInputDeviceCooperateMgr() const;
+    std::shared_ptr<JsInputDeviceCooperateManager> GetJsInputDeviceCooperateMgr();
 
 private:
     std::shared_ptr<JsInputDeviceCooperateManager> mgr_ = nullptr;

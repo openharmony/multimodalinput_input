@@ -28,7 +28,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceCooperateContext" };
 constexpr const char *INPUT_DEVICE_CLASS = "multimodalinput_input_device_class";
-constexpr const char *INPUT_DEVICE_COOPERATE "multimodal_input_device_cooperate";
+constexpr const char *INPUT_DEVICE_COOPERATE = "multimodal_input_device_cooperate";
 } // namespace
 
 JsInputDeviceCooperateContext::JsInputDeviceCooperateContext()
@@ -266,7 +266,7 @@ napi_value JsInputDeviceCooperateContext::Off(napi_env env, napi_callback_info i
     return nullptr;
 }
 
-std::shared_ptr<JsInputDeviceCooperateManager> JsInputDeviceCooperateContext::GetJsInputDeviceCooperateMgr() const
+std::shared_ptr<JsInputDeviceCooperateManager> JsInputDeviceCooperateContext::GetJsInputDeviceCooperateMgr()
 {
     std::lock_guard<std::mutex> guard(mutex_);
     return mgr_;
@@ -367,27 +367,38 @@ JsInputDeviceCooperateContext *JsInputDeviceCooperateContext::GetInstance(napi_e
 void JsInputDeviceCooperateContext::DeclareDeviceCooperateInterface(napi_env env, napi_value exports)
 {
     napi_value openSuccess = nullptr;
-    CHKRV(env, napi_create_int32(CooperateMessages::MSG_COOPERATE_OPEN_SUCCESS), &openSuccess, CREATE_INT32);
+    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::OPEN_SUCCESS), &openSuccess),
+        CREATE_INT32);
     napi_value openFail = nullptr;
-    CHKRV(env, napi_create_int32(CooperateMessages::MSG_COOPERATE_OPEN_FAIL), &openFail, CREATE_INT32);
+    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::OPEN_FAIL), &openFail),
+        CREATE_INT32);
     napi_value infoStart = nullptr;
-    CHKRV(env, napi_create_int32(CooperateMessages::MSG_COOPERATE_INFO_START) &infoStart, CREATE_INT32);
+    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::INFO_START), &infoStart),
+        CREATE_INT32);
     napi_value infoSuccess = nullptr;
-    CHKRV(env, napi_create_int32(CooperateMessages::MSG_COOPERATE_INFO_SUCCESS), &infoSuccess, CREATE_INT32);
+    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::INFO_SUCCESS), &infoSuccess),
+        CREATE_INT32);
     napi_value infoFail = nullptr;
-    CHKRV(env, napi_create_int32(CooperateMessages::MSG_COOPERATE_INFO_FAIL, &infoFail, CREATE_INT32);
+    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::INFO_FAIL), &infoFail),
+        CREATE_INT32);
     napi_value close = nullptr;
-    CHKRV(env, napi_create_int32(CooperateMessages::MSG_COOPERATE_CLOSE, &close, CREATE_INT32);
+    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::CLOSE), &close),
+        CREATE_INT32);
     napi_value closeSuccess = nullptr;
-    CHKRV(env, napi_create_int32(CooperateMessages::MSG_COOPERATE_CLOSE_SUCCESS, &closeSuccess, CREATE_INT32);
+    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::CLOSE_SUCCESS), &closeSuccess),
+        CREATE_INT32);
     napi_value stop = nullptr;
-    CHKRV(env, napi_crete_int32(CooperateMessages::MSG_COOPERATE_STOP, &stop, CREATE_INT32);
+    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::STOP), &stop),
+        CREATE_INT32);
     napi_value stopSuccess = nullptr;
-    CHKRV(env, napi_create_int32(CooperateMessages::MSG_COOPERATE_STOP_SUCCESS, &stopSuccess, CREATE_INT32);
+    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::STOP_SUCCESS), &stopSuccess),
+        CREATE_INT32);
     napi_value stateOn = nullptr;
-    CHKRV(env, napi_craete_int32(CooperateMessages::MSG_COOPERATE_STATE_ON, &stateOn, CREATE_INT32);
+    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::STATE_ON), &stateOn),
+        CREATE_INT32);
     napi_value stateOff = nullptr;
-    CHKRV(env, napi_create_int32(CooperateMessages::MSG_COOPERATE_STATE_OFF, &stateOff, CREATE_INT32);
+    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::STATE_OFF), &stateOff),
+        CREATE_INT32);
 
     napi_property_descriptor msg[] = {
         DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_OPEN_SUCCESS", openSuccess),
