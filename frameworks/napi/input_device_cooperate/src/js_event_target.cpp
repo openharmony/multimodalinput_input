@@ -31,9 +31,10 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsEventTarget" };
 constexpr std::string_view COOPERATION = "cooperation";
+std::mutex mutex_;
 } // namespace
 
-void JsEventTarget::EmitJsEnable(int32_t userData, std::string deviceId, CooperateMessages msg)
+void JsEventTarget::EmitJsEnable(int32_t userData, std::string deviceId, CooperationMessage msg)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -48,7 +49,7 @@ void JsEventTarget::EmitJsEnable(int32_t userData, std::string deviceId, Coopera
         MMI_HILOGE("The env is nullptr");
         return;
     }
-    iter->second->data.enableResult = (msg == CooperateMessages::MSG_COOPERATE_OPEN_SUCCESS ? true : false);
+    iter->second->data.enableResult = (msg == CooperationMessage::OPEN_SUCCESS ? true : false);
     uv_loop_s *loop = nullptr;
     CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
     uv_work_s *work = new (std::nothrow) uv_work_t;
@@ -75,7 +76,7 @@ void JsEventTarget::EmitJsEnable(int32_t userData, std::string deviceId, Coopera
     }
 }
 
-void JsEventTarget::EmitJsStart(int32_t userData, std::string deviceId, CooperateMessages msg)
+void JsEventTarget::EmitJsStart(int32_t userData, std::string deviceId, CooperationMessage msg)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -90,7 +91,7 @@ void JsEventTarget::EmitJsStart(int32_t userData, std::string deviceId, Cooperat
         MMI_HILOGE("The env is nullptr");
         return;
     }
-    iter->second->data.startResult = (msg == CooperateMessages::MSG_COOPERATE_INFO_SUCCESS ? true : false);
+    iter->second->data.startResult = (msg == CooperationMessage::INFO_SUCCESS ? true : false);
     uv_loop_s *loop = nullptr;
     CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
     uv_work_s *work = new (std::nothrow) uv_work_t;
@@ -117,7 +118,7 @@ void JsEventTarget::EmitJsStart(int32_t userData, std::string deviceId, Cooperat
     }
 }
 
-void JsEventTarget::EmitJsStop(int32_t userData, std::string deviceId, CooperateMessages msg)
+void JsEventTarget::EmitJsStop(int32_t userData, std::string deviceId, CooperationMessage msg)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -132,7 +133,7 @@ void JsEventTarget::EmitJsStop(int32_t userData, std::string deviceId, Cooperate
         MMI_HILOGE("The env is nullptr");
         return;
     }
-    iter->second->data.stopResult = (msg == CooperateMessages::MSG_COOPERATE_STOP_SUCCESS ? true : false);
+    iter->second->data.stopResult = (msg == CooperationMessage::STOP_SUCCESS ? true : false);
     uv_loop_s *loop = nullptr;
     CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
     uv_work_s *work = new (std::nothrow) uv_work_t;
@@ -289,7 +290,7 @@ void JsEventTarget::ResetEnv()
     InputMgr->UnregisterCooperateListener(shared_from_this());
 }
 
-void JsEventTarget::OnCooperateMessage(const std::string &deviceId, CooperateMessages &msg)
+void JsEventTarget::OnCooperateMessage(const std::string &deviceId, CooperationMessage msg)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -436,10 +437,10 @@ void JsEventTarget::CallStopPromiseWork(uv_work_t *work, int32_t status)
     napi_value object = JsUtil::GetStopInfo(cb);
     if (object == nullptr) {
         MMI_HILOGE("object is nullptr");
-        napi_close_handle_scope(cb->env scope);
+        napi_close_handle_scope(cb->env, scope);
     }
     CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED, scope);
-    napi_close_handle_scope(cb->env scope);
+    napi_close_handle_scope(cb->env, scope);
 }
 
 void JsEventTarget::CallStopAsyncWork(uv_work_t *work, int32_t status)

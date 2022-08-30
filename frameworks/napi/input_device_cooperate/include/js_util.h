@@ -23,7 +23,7 @@
 
 #include <napi/native_api.h>
 
-#include "cooperate_messages.h"
+#include "cooperation_message.h"
 
 namespace OHOS {
 namespace MMI {
@@ -42,7 +42,7 @@ public:
         bool stopResult = false;
         bool cooperateOpened = false;
         std::string deviceDescriptor;
-        CooperateMessages msg = CooperateMessages::MSG_COOPERATE_OPEN_SUCCESS;
+        CooperationMessage msg = CooperationMessage::OPEN_SUCCESS;
     };
 
     struct CallbackInfo {

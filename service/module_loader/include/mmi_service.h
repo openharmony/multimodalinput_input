@@ -130,12 +130,12 @@ protected:
         int32_t srcInputDeviceId);
     int32_t OnStopDeviceCooperate(int32_t pid, int32_t userData);
     int32_t OnGetInputDeviceCooperateState(int32_t pid, int32_t userData, const std::string &deviceId);
-    void OnStartRemoteCooperate(const std::string& remoteDeviceId);
-    void OnStartRemoteCooperateResult(bool isSuccess,
+    int32_t OnStartRemoteCooperate(const std::string& remoteDeviceId);
+    int32_t OnStartRemoteCooperateResult(bool isSuccess,
         const std::string& startDhid, int32_t xPercent, int32_t yPercent);
-    void OnStopRemoteCooperate();
-    void OnStopRemoteCooperateResult(bool isSuccess);
-    void OnStartCooperateOtherResult(const std::string& srcNetworkId);
+    int32_t OnStopRemoteCooperate();
+    int32_t OnStopRemoteCooperateResult(bool isSuccess);
+    int32_t OnStartCooperateOtherResult(const std::string& srcNetworkId);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     bool InitLibinputService();
     bool InitService();
