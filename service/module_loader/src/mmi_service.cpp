@@ -1320,30 +1320,35 @@ int32_t MMIService::StartCooperateOtherResult(const std::string& srcNetworkId)
 }
 
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-void MMIService::OnStartRemoteCooperate(const std::string& remoteDeviceId)
+int32_t MMIService::OnStartRemoteCooperate(const std::string& remoteDeviceId)
 {
     InputDevCooSM->StartRemoteCooperate(remoteDeviceId);
+    return RET_OK;
 }
 
-void MMIService::OnStartRemoteCooperateResult(bool isSuccess,
+int32_t MMIService::OnStartRemoteCooperateResult(bool isSuccess,
     const std::string& startDhid, int32_t xPercent, int32_t yPercent)
 {
     InputDevCooSM->StartRemoteCooperateResult(isSuccess, startDhid, xPercent, yPercent);
+    return RET_OK;
 }
 
-void MMIService::OnStopRemoteCooperate()
+int32_t MMIService::OnStopRemoteCooperate()
 {
     InputDevCooSM->StopRemoteCooperate();
+    return RET_OK;
 }
 
-void MMIService::OnStopRemoteCooperateResult(bool isSuccess)
+int32_t MMIService::OnStopRemoteCooperateResult(bool isSuccess)
 {
     InputDevCooSM->StopRemoteCooperateResult(isSuccess);
+    return RET_OK;
 }
 
-void MMIService::OnStartCooperateOtherResult(const std::string& srcNetworkId)
+int32_t MMIService::OnStartCooperateOtherResult(const std::string& srcNetworkId)
 {
     InputDevCooSM->StartCooperateOtherResult(srcNetworkId);
+    return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace MMI
