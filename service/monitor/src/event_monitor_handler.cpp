@@ -377,8 +377,6 @@ void EventMonitorHandler::MonitorCollection::UpdateConsumptionState(std::shared_
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
         MMI_HILOGD("Last lift up");
         state.eventIds_.clear();
-    } else {
-        // nothing to do
     }
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
