@@ -440,7 +440,7 @@ void JsEventTarget::CallStopPromiseWork(uv_work_t *work, int32_t status)
         napi_close_handle_scope(cb->env, scope);
     }
     CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED, scope);
-    napi_close_handle_scope(cb->env,scope);
+    napi_close_handle_scope(cb->env, scope);
 }
 
 void JsEventTarget::CallStopAsyncWork(uv_work_t *work, int32_t status)
