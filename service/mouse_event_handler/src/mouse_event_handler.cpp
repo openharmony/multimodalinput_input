@@ -48,7 +48,7 @@ const std::vector<AccelerateCurve> ACCELERATE_CURVES {
     };
 constexpr double DOUBLE_ZERO = 1e-6;
 constexpr int32_t MIN_SPEED = 1;
-constexpr int32_t MAX_SPEED = 20;
+constexpr int32_t MAX_SPEED = 11;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 constexpr int32_t PERCENT_CONST = 100;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
