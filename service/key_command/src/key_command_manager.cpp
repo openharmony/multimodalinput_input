@@ -29,6 +29,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t MAX_PREKEYS_NUM = 4;
+constexpr int32_t MAX_SEQUENCEKEYS_NUM = 10;
+constexpr int64_t MAX_DELAY_TIME = 3000000;
+constexpr int64_t SECONDS_SYSTEM = 1000;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandManager" };
 struct JsonParser {
     JsonParser() = default;
@@ -45,54 +48,54 @@ struct JsonParser {
     cJSON *json_ { nullptr };
 };
 
-bool GetPreKeys(cJSON* jsonData, ShortcutKey &shortcutKey)
+bool GetPreKeys(const cJSON* jsonData, ShortcutKey &shortcutKey)
 {
     if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("The jsonData is not object");
+        MMI_HILOGE("jsonData is not object");
         return false;
     }
     cJSON* preKey = cJSON_GetObjectItemCaseSensitive(jsonData, "preKey");
     if (!cJSON_IsArray(preKey)) {
-        MMI_HILOGE("The preKey number must be array");
+        MMI_HILOGE("preKey number must be array");
         return false;
     }
     int32_t preKeySize = cJSON_GetArraySize(preKey);
     if (preKeySize > MAX_PREKEYS_NUM) {
-        MMI_HILOGE("The preKeySize number must less and equal four");
+        MMI_HILOGE("preKeySize number must less and equal four");
         return false;
     }
     for (int32_t i = 0; i < preKeySize; ++i) {
         cJSON *preKeyJson = cJSON_GetArrayItem(preKey, i);
         if (!cJSON_IsNumber(preKeyJson)) {
-            MMI_HILOGE("The preKeyJson is not number");
+            MMI_HILOGE("preKeyJson is not number");
             return false;
         }
         if (preKeyJson->valueint < 0) {
-            MMI_HILOGE("The preKeyJson must be number and bigger or equal than 0");
+            MMI_HILOGE("preKeyJson must be number and bigger or equal than 0");
             return false;
         }
         if (!shortcutKey.preKeys.emplace(preKeyJson->valueint).second) {
-            MMI_HILOGE("The preKeyJson must be unduplicated");
+            MMI_HILOGE("preKeyJson must be unduplicated");
             return false;
         }
     }
     return true;
 }
 
-bool GetTrigger(cJSON* jsonData, int32_t &triggerType)
+bool GetTrigger(const cJSON* jsonData, int32_t &triggerType)
 {
     if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("The jsonData is not object");
+        MMI_HILOGE("jsonData is not object");
         return false;
     }
     cJSON *trigger = cJSON_GetObjectItemCaseSensitive(jsonData, "trigger");
     if (!cJSON_IsString(trigger)) {
-        MMI_HILOGE("The trigger is not string");
+        MMI_HILOGE("trigger is not string");
         return false;
     }
     if (((std::strcmp(trigger->valuestring, "key_up") != 0)
         && (std::strcmp(trigger->valuestring, "key_down") != 0))) {
-        MMI_HILOGE("The trigger must be one of [key_up, key_down]");
+        MMI_HILOGE("trigger must be one of [key_up, key_down]");
         return false;
     }
     if (std::strcmp(trigger->valuestring, "key_up") == 0) {
@@ -103,44 +106,44 @@ bool GetTrigger(cJSON* jsonData, int32_t &triggerType)
     return true;
 }
 
-bool GetKeyDownDuration(cJSON* jsonData, int32_t &keyDownDurationInt)
+bool GetKeyDownDuration(const cJSON* jsonData, int32_t &keyDownDurationInt)
 {
     if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("The jsonData is not object");
+        MMI_HILOGE("jsonData is not object");
         return false;
     }
     cJSON *keyDownDuration = cJSON_GetObjectItemCaseSensitive(jsonData, "keyDownDuration");
     if (!cJSON_IsNumber(keyDownDuration)) {
-        MMI_HILOGE("The keyDownDuration is not number");
+        MMI_HILOGE("keyDownDuration is not number");
         return false;
     }
     if (keyDownDuration->valueint < 0) {
-        MMI_HILOGE("The keyDownDuration must be number and bigger and equal zero");
+        MMI_HILOGE("keyDownDuration must be number and bigger and equal zero");
         return false;
     }
     keyDownDurationInt = keyDownDuration->valueint;
     return true;
 }
 
-bool GetKeyFinalKey(cJSON* jsonData, int32_t &finalKeyInt)
+bool GetKeyFinalKey(const cJSON* jsonData, int32_t &finalKeyInt)
 {
     if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("The jsonData is not object");
+        MMI_HILOGE("jsonData is not object");
         return false;
     }
     cJSON *finalKey = cJSON_GetObjectItemCaseSensitive(jsonData, "finalKey");
     if (!cJSON_IsNumber(finalKey)) {
-        MMI_HILOGE("The finalKey must be number");
+        MMI_HILOGE("finalKey must be number");
         return false;
     }
     finalKeyInt = finalKey->valueint;
     return true;
 }
 
-void GetKeyVal(cJSON* json, const std::string &key, std::string &value)
+void GetKeyVal(const cJSON* json, const std::string &key, std::string &value)
 {
     if (!cJSON_IsObject(json)) {
-        MMI_HILOGE("The json is not object");
+        MMI_HILOGE("json is not object");
         return;
     }
     cJSON *valueJson = cJSON_GetObjectItemCaseSensitive(json, key.c_str());
@@ -150,22 +153,22 @@ void GetKeyVal(cJSON* json, const std::string &key, std::string &value)
     return;
 }
 
-bool GetEntities(cJSON* jsonAbility, Ability &ability)
+bool GetEntities(const cJSON* jsonAbility, Ability &ability)
 {
     if (!cJSON_IsObject(jsonAbility)) {
-        MMI_HILOGE("The jsonAbility is not object");
+        MMI_HILOGE("jsonAbility is not object");
         return false;
     }
     cJSON *entities = cJSON_GetObjectItemCaseSensitive(jsonAbility, "entities");
     if (!cJSON_IsArray(entities)) {
-        MMI_HILOGE("The entities must be array");
+        MMI_HILOGE("entities must be array");
         return false;
     }
     int32_t entitySize = cJSON_GetArraySize(entities);
     for (int32_t i = 0; i < entitySize; i++) {
         cJSON* entity = cJSON_GetArrayItem(entities, i);
         if (!cJSON_IsString(entity)) {
-            MMI_HILOGE("The entity is not string");
+            MMI_HILOGE("entity is not string");
             return false;
         }
         ability.entities.push_back(entity->valuestring);
@@ -173,32 +176,32 @@ bool GetEntities(cJSON* jsonAbility, Ability &ability)
     return true;
 }
 
-bool GetParams(cJSON* jsonAbility, Ability &ability)
+bool GetParams(const cJSON* jsonAbility, Ability &ability)
 {
     if (!cJSON_IsObject(jsonAbility)) {
-        MMI_HILOGE("The jsonAbility is not object");
+        MMI_HILOGE("jsonAbility is not object");
         return false;
     }
     cJSON *params = cJSON_GetObjectItemCaseSensitive(jsonAbility, "params");
     if (!cJSON_IsArray(params)) {
-        MMI_HILOGE("The params must be array");
+        MMI_HILOGE("params must be array");
         return false;
     }
     int32_t paramsSize = cJSON_GetArraySize(params);
     for (int32_t i = 0; i < paramsSize; ++i) {
         cJSON* param = cJSON_GetArrayItem(params, i);
         if (!cJSON_IsObject(param)) {
-            MMI_HILOGE("The param must be object");
+            MMI_HILOGE("param must be object");
             return false;
         }
         cJSON* key = cJSON_GetObjectItemCaseSensitive(param, "key");
         if (!cJSON_IsString(key)) {
-            MMI_HILOGE("The key is not string");
+            MMI_HILOGE("key is not string");
             return false;
         }
         cJSON* value = cJSON_GetObjectItemCaseSensitive(param, "value");
         if (!cJSON_IsString(value)) {
-            MMI_HILOGE("The value is not string");
+            MMI_HILOGE("value is not string");
             return false;
         }
         auto ret = ability.params.emplace(key->valuestring, value->valuestring);
@@ -209,10 +212,10 @@ bool GetParams(cJSON* jsonAbility, Ability &ability)
     return true;
 }
 
-bool PackageAbility(cJSON* jsonAbility, Ability &ability)
+bool PackageAbility(const cJSON* jsonAbility, Ability &ability)
 {
     if (!cJSON_IsObject(jsonAbility)) {
-        MMI_HILOGE("The jsonAbility is not object");
+        MMI_HILOGE("JsonAbility is not object");
         return false;
     }
     GetKeyVal(jsonAbility, "bundleName", ability.bundleName);
@@ -222,20 +225,20 @@ bool PackageAbility(cJSON* jsonAbility, Ability &ability)
     GetKeyVal(jsonAbility, "deviceId", ability.deviceId);
     GetKeyVal(jsonAbility, "uri", ability.uri);
     if (!GetEntities(jsonAbility, ability)) {
-        MMI_HILOGE("Entities to failed");
+        MMI_HILOGE("Get centities failed");
         return false;
     }
     if (!GetParams(jsonAbility, ability)) {
-        MMI_HILOGE("Params to failed");
+        MMI_HILOGE("Get params failed");
         return false;
     }
     return true;
 }
 
-bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
+bool ConvertToShortcutKey(const cJSON* jsonData, ShortcutKey &shortcutKey)
 {
     if (!cJSON_IsObject(jsonData)) {
-        MMI_HILOGE("The jsonData is not object");
+        MMI_HILOGE("jsonData is not object");
         return false;
     }
     if (!GetPreKeys(jsonData, shortcutKey)) {
@@ -256,12 +259,264 @@ bool ConvertToShortcutKey(cJSON* jsonData, ShortcutKey &shortcutKey)
     }
     cJSON *ability = cJSON_GetObjectItemCaseSensitive(jsonData, "ability");
     if (!cJSON_IsObject(ability)) {
-        MMI_HILOGE("The ability is not object");
+        MMI_HILOGE("ability is not object");
         return false;
     }
     if (!PackageAbility(ability, shortcutKey.ability)) {
         MMI_HILOGE("Package ability failed");
         return false;
+    }
+    return true;
+}
+
+bool GetKeyCode(const cJSON* jsonData, int32_t &keyCodeInt)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("jsonData is not object");
+        return false;
+    }
+    cJSON *keyCode = cJSON_GetObjectItemCaseSensitive(jsonData, "keyCode");
+    if (!cJSON_IsNumber(keyCode)) {
+        MMI_HILOGE("keyCode is not number");
+        return false;
+    }
+    if (keyCode->valueint < 0) {
+        MMI_HILOGE("keyCode must be number and bigger and equal zero");
+        return false;
+    }
+    keyCodeInt = keyCode->valueint;
+    return true;
+}
+
+bool GetKeyAction(const cJSON* jsonData, int32_t &keyActionInt)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("jsonData is not object");
+        return false;
+    }
+    cJSON *keyAction = cJSON_GetObjectItemCaseSensitive(jsonData, "keyAction");
+    if (!cJSON_IsNumber(keyAction)) {
+        MMI_HILOGE("keyAction is not number");
+        return false;
+    }
+    if ((keyAction->valueint != KeyEvent::KEY_ACTION_DOWN) && (keyAction->valueint != KeyEvent::KEY_ACTION_UP)) {
+        MMI_HILOGE("keyAction must be down or up");
+        return false;
+    }
+    keyActionInt = keyAction->valueint;
+    return true;
+}
+
+bool GetDelay(const cJSON* jsonData, int64_t &delayInt)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("jsonData is not object");
+        return false;
+    }
+    cJSON *delay = cJSON_GetObjectItemCaseSensitive(jsonData, "delay");
+    if (!cJSON_IsNumber(delay)) {
+        MMI_HILOGE("delay is not number");
+        return false;
+    }
+    if ((delay->valueint < 0) || (delay->valueint > MAX_DELAY_TIME)) {
+        MMI_HILOGE("delay must be number and bigger and equal zero and less than max delay");
+        return false;
+    }
+    delayInt = delay->valueint * SECONDS_SYSTEM;
+    return true;
+}
+
+bool GetAlibityStartDelay(const cJSON* jsonData, int64_t &abilityStartDelayInt)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("jsonData is not object");
+        return false;
+    }
+    cJSON *abilityStartDelay = cJSON_GetObjectItemCaseSensitive(jsonData, "abilityStartDelay");
+    if (!cJSON_IsNumber(abilityStartDelay)) {
+        MMI_HILOGE("abilityStartDelay is not number");
+        return false;
+    }
+    if ((abilityStartDelay->valueint < 0) || (abilityStartDelay->valueint > MAX_DELAY_TIME)) {
+        MMI_HILOGE("abilityStartDelay must be number and bigger and equal zero and less than max delay time");
+        return false;
+    }
+    abilityStartDelayInt = abilityStartDelay->valueint * SECONDS_SYSTEM;
+    return true;
+}
+
+bool PackageSequenceKey(const cJSON* sequenceKeysJson, SequenceKey &sequenceKey)
+{
+    if (!cJSON_IsObject(sequenceKeysJson)) {
+        MMI_HILOGE("sequenceKeysJson is not object");
+        return false;
+    }
+    if (!GetKeyCode(sequenceKeysJson, sequenceKey.keyCode)) {
+        MMI_HILOGE("Get keyCode failed");
+        return false;
+    }
+    if (!GetKeyAction(sequenceKeysJson, sequenceKey.keyAction)) {
+        MMI_HILOGE("Get keyAction failed");
+        return false;
+    }
+    if (!GetDelay(sequenceKeysJson, sequenceKey.delay)) {
+        MMI_HILOGE("Get delay failed");
+        return false;
+    }
+    return true;
+}
+
+bool GetSequenceKeys(const cJSON* jsonData, Sequence &sequence)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("jsonData is not object");
+        return false;
+    }
+    cJSON* sequenceKeys = cJSON_GetObjectItemCaseSensitive(jsonData, "sequenceKeys");
+    if (!cJSON_IsArray(sequenceKeys)) {
+        MMI_HILOGE("sequenceKeys number must be array");
+        return false;
+    }
+    int32_t sequenceKeysSize = cJSON_GetArraySize(sequenceKeys);
+    if (sequenceKeysSize > MAX_SEQUENCEKEYS_NUM) {
+        MMI_HILOGE("sequenceKeysSize number must less and equal %{public}d", MAX_SEQUENCEKEYS_NUM);
+        return false;
+    }
+    for (int32_t i = 0; i < sequenceKeysSize; ++i) {
+        cJSON *sequenceKeysJson = cJSON_GetArrayItem(sequenceKeys, i);
+        if (!cJSON_IsObject(sequenceKeysJson)) {
+            MMI_HILOGE("sequenceKeysJson is not object");
+            return false;
+        }
+        SequenceKey sequenceKey;
+        if (!PackageSequenceKey(sequenceKeysJson, sequenceKey)) {
+            MMI_HILOGE("Packege sequenceKey failed");
+            return false;
+        }
+        sequence.sequenceKeys.push_back(sequenceKey);
+    }
+    return true;
+}
+
+bool IsSequenceKeysValid(const Sequence &sequence)
+{
+    if (sequence.sequenceKeys.empty()) {
+        MMI_HILOGE("sequenceKeys can not be empty");
+        return false;
+    }
+
+    if (sequence.sequenceKeys.size() > MAX_SEQUENCEKEYS_NUM) {
+        MMI_HILOGE("sequenceKeys size must less or equal to %{public}d", MAX_SEQUENCEKEYS_NUM);
+        return false;
+    }
+
+    std::map<int32_t, SequenceKey> sequenceKeys;
+    for (const SequenceKey& item : sequence.sequenceKeys) {
+        if (sequenceKeys.find(item.keyCode) == sequenceKeys.end()) {
+            auto it = sequenceKeys.emplace(item.keyCode, item);
+            if (!it.second) {
+                MMI_HILOGE("Emplace duplicated");
+                return false;
+            }
+        } else {
+            if (sequenceKeys[item.keyCode].keyAction == item.keyAction) {
+                MMI_HILOGE("sequenceKeys illegal");
+                return false;
+            }
+            sequenceKeys[item.keyCode].keyAction = item.keyAction;
+            sequenceKeys[item.keyCode].delay = item.delay;
+        }
+    }
+    return true;
+}
+
+bool ConvertToKeySequence(const cJSON* jsonData, Sequence &sequence)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("jsonData is not object");
+        return false;
+    }
+    if (!GetSequenceKeys(jsonData, sequence)) {
+        MMI_HILOGE("Get sequenceKeys failed");
+        return false;
+    }
+    if (!IsSequenceKeysValid(sequence)) {
+        MMI_HILOGE("Sequence invalid");
+        return false;
+    }
+    if (!GetAlibityStartDelay(jsonData, sequence.abilityStartDelay)) {
+        MMI_HILOGE("Get abilityStartDelay failed");
+        return false;
+    }
+    cJSON *ability = cJSON_GetObjectItemCaseSensitive(jsonData, "ability");
+    if (!cJSON_IsObject(ability)) {
+        MMI_HILOGE("ability is not object");
+        return false;
+    }
+    if (!PackageAbility(ability, sequence.ability)) {
+        MMI_HILOGE("Package ability failed");
+        return false;
+    }
+    return true;
+}
+
+std::string GenerateKey(const ShortcutKey& key)
+{
+    std::set<int32_t> preKeys = key.preKeys;
+    std::stringstream ss;
+    for (const auto& preKey : preKeys) {
+        ss << preKey << ",";
+    }
+    ss << key.finalKey << ",";
+    ss << key.triggerType;
+    return std::string(ss.str());
+}
+
+bool ParseShortcutKeys(const JsonParser& parser, std::map<std::string, ShortcutKey>& shortcutKeyMap)
+{
+    cJSON* shortkeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "Shortkeys");
+    if (!cJSON_IsArray(shortkeys)) {
+        MMI_HILOGE("shortkeys is not array");
+        return false;
+    }
+    int32_t shortkeysSize = cJSON_GetArraySize(shortkeys);
+    for (int32_t i = 0; i < shortkeysSize; ++i) {
+        ShortcutKey shortcutKey;
+        cJSON *shortkey = cJSON_GetArrayItem(shortkeys, i);
+        if (!cJSON_IsObject(shortkey)) {
+            continue;
+        }
+        if (!ConvertToShortcutKey(shortkey, shortcutKey)) {
+            continue;
+        }
+        std::string key = GenerateKey(shortcutKey);
+        if (shortcutKeyMap.find(key) == shortcutKeyMap.end()) {
+            if (!shortcutKeyMap.emplace(key, shortcutKey).second) {
+                MMI_HILOGW("Duplicate shortcutKey:%{public}s", key.c_str());
+            }
+        }
+    }
+    return true;
+}
+
+bool ParseSequences(const JsonParser& parser, std::vector<Sequence>& sequenceVec)
+{
+    cJSON* sequences = cJSON_GetObjectItemCaseSensitive(parser.json_, "Sequences");
+    if (!cJSON_IsArray(sequences)) {
+        MMI_HILOGE("sequences is not array");
+        return false;
+    }
+    int32_t sequencesSize = cJSON_GetArraySize(sequences);
+    for (int32_t i = 0; i < sequencesSize; ++i) {
+        Sequence seq;
+        cJSON *sequence = cJSON_GetArrayItem(sequences, i);
+        if (!cJSON_IsObject(sequence)) {
+            continue;
+        }
+        if (!ConvertToKeySequence(sequence, seq)) {
+            continue;
+        }
+        sequenceVec.push_back(seq);
     }
     return true;
 }
@@ -299,26 +554,14 @@ void KeyCommandManager::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-std::string KeyCommandManager::GenerateKey(const ShortcutKey& key)
-{
-    std::set<int32_t> preKeys = key.preKeys;
-    std::stringstream ss;
-    for (const auto &preKey : preKeys) {
-        ss << preKey << ",";
-    }
-    ss << key.finalKey << ",";
-    ss << key.triggerType;
-    return std::string(ss.str());
-}
-
 bool KeyCommandManager::ParseConfig()
 {
     const char *testPathSuffix = "/etc/multimodalinput/ability_launch_config.json";
     char buf[MAX_PATH_LEN] = { 0 };
     char *filePath = GetOneCfgFile(testPathSuffix, buf, MAX_PATH_LEN);
     std::string defaultConfig = "/system/etc/multimodalinput/ability_launch_config.json";
-    if (!filePath || strlen(filePath) == 0 || strlen(filePath) > MAX_PATH_LEN) {
-        MMI_HILOGD("can not get customization config file");
+    if (filePath == NULL || filePath[0] == '\0' || strlen(filePath) > MAX_PATH_LEN) {
+        MMI_HILOGD("Can not get customization config file");
         return ParseJson(defaultConfig);
     }
     std::string customConfig = filePath;
@@ -326,7 +569,7 @@ bool KeyCommandManager::ParseConfig()
     return ParseJson(customConfig) || ParseJson(defaultConfig);
 }
 
-bool KeyCommandManager::ParseJson(const std::string configFile)
+bool KeyCommandManager::ParseJson(const std::string &configFile)
 {
     CALL_DEBUG_ENTER;
     std::string jsonStr = ReadJsonFile(configFile);
@@ -337,53 +580,80 @@ bool KeyCommandManager::ParseJson(const std::string configFile)
     JsonParser parser;
     parser.json_ = cJSON_Parse(jsonStr.c_str());
     if (!cJSON_IsObject(parser.json_)) {
-        MMI_HILOGE("The parser is not object");
+        MMI_HILOGE("Parser.json_ is not object");
         return false;
     }
-    cJSON* shortkeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "Shortkeys");
-    if (!cJSON_IsArray(shortkeys)) {
-        MMI_HILOGE("The shortkeys in config file is empty");
+
+    if (!ParseShortcutKeys(parser, shortcutKeys_) || !ParseSequences(parser, sequences_)) {
+        MMI_HILOGE("Parse configFile failed");
         return false;
     }
-    int32_t shortkeysSize = cJSON_GetArraySize(shortkeys);
-    for (int32_t i = 0; i < shortkeysSize; ++i) {
-        ShortcutKey shortcutKey;
-        cJSON *shortkey = cJSON_GetArrayItem(shortkeys, i);
-        if (!cJSON_IsObject(shortkey)) {
-            continue;
-        }
-        if (!ConvertToShortcutKey(shortkey, shortcutKey)) {
-            continue;
-        }
-        if (shortcutKeys_.find(GenerateKey(shortcutKey)) == shortcutKeys_.end()) {
-            if (!shortcutKeys_.emplace(GenerateKey(shortcutKey), shortcutKey).second) {
-                MMI_HILOGW("Duplicate shortcutKey:%{public}s", GenerateKey(shortcutKey).c_str());
-            }
-        }
-    }
+    Print();
+    PrintSeq();
     return true;
 }
 
 void KeyCommandManager::Print()
 {
-    uint32_t count = shortcutKeys_.size();
-    MMI_HILOGD("shortcutKey count:%{public}u", count);
+    MMI_HILOGD("shortcutKey count:%{public}zu", shortcutKeys_.size());
+    int32_t row = 0;
     for (const auto &item : shortcutKeys_) {
+        MMI_HILOGD("row:%{public}d", row++);
         auto &shortcutKey = item.second;
         for (const auto &prekey : shortcutKey.preKeys) {
             MMI_HILOGD("preKey:%{public}d", prekey);
         }
-        MMI_HILOGD("finalKey:%{public}d,keyDownDuration:%{public}d,triggerType:%{public}d,"
-            " bundleName:%{public}s,abilityName:%{public}s", shortcutKey.finalKey,
-            shortcutKey.keyDownDuration, shortcutKey.triggerType,
-            shortcutKey.ability.bundleName.c_str(), shortcutKey.ability.abilityName.c_str());
+        MMI_HILOGD("finalKey:%{public}d, keyDownDuration:%{public}d, triggerType:%{public}d,"
+                   " bundleName:%{public}s, abilityName:%{public}s", shortcutKey.finalKey,
+                   shortcutKey.keyDownDuration, shortcutKey.triggerType,
+                   shortcutKey.ability.bundleName.c_str(), shortcutKey.ability.abilityName.c_str());
+    }
+}
+
+void KeyCommandManager::PrintSeq()
+{
+    MMI_HILOGD("sequences count:%{public}zu", sequences_.size());
+    int32_t row = 0;
+    for (const auto &item : sequences_) {
+        MMI_HILOGD("row:%{public}d", row++);
+        for (const auto& sequenceKey : item.sequenceKeys) {
+            MMI_HILOGD("keyCode:%{public}d, keyAction:%{public}d, delay:%{public}" PRId64,
+                       sequenceKey.keyCode, sequenceKey.keyAction, sequenceKey.delay);
+        }
+        MMI_HILOGD("bundleName:%{public}s, abilityName:%{public}s",
+                   item.ability.bundleName.c_str(), item.ability.abilityName.c_str());
     }
 }
 
 bool KeyCommandManager::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
-    if (IsKeyMatch(lastMatchedKey_, key)) {
+    CHKPF(key);
+    if (!isParseConfig_) {
+        if (!ParseConfig()) {
+            MMI_HILOGE("Parse configFile failed");
+            return false;
+        }
+        isParseConfig_ = true;
+    }
+    bool ret = HandleShortKeys(key);
+    ret &= HandleSequences(key);
+    if (!ret) {
+        MMI_HILOGE("Handle key event failed");
+        return false;
+    }
+    return true;
+}
+
+bool KeyCommandManager::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+    if (shortcutKeys_.empty()) {
+        MMI_HILOGD("No shortkeys configuration data");
+        return false;
+    }
+    if (IsKeyMatch(lastMatchedKey_, keyEvent)) {
         MMI_HILOGE("The same key is waiting timeout, skip");
         return true;
     }
@@ -393,16 +663,9 @@ bool KeyCommandManager::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
     }
     ResetLastMatchedKey();
-    if (shortcutKeys_.empty()) {
-        if (!ParseConfig()) {
-            MMI_HILOGE("Parse configFile failed");
-            return false;
-        }
-        Print();
-    }
     for (auto &item : shortcutKeys_) {
         ShortcutKey &shortcutKey = item.second;
-        if (!IsKeyMatch(shortcutKey, key)) {
+        if (!IsKeyMatch(shortcutKey, keyEvent)) {
             MMI_HILOGD("Not key matched, next");
             continue;
         }
@@ -410,7 +673,7 @@ bool KeyCommandManager::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
             return HandleKeyDown(shortcutKey);
         } else if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_UP) {
-            return HandleKeyUp(key, shortcutKey);
+            return HandleKeyUp(keyEvent, shortcutKey);
         } else {
             return HandleKeyCancel(shortcutKey);
         }
@@ -418,9 +681,146 @@ bool KeyCommandManager::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
     return false;
 }
 
+bool KeyCommandManager::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
+{
+    for (size_t i = keys_.size(); i > 0; --i) {
+        if (keys_[i-1].keyCode == sequenceKey.keyCode) {
+            if (keys_[i-1].keyAction == sequenceKey.keyAction) {
+                MMI_HILOGD("Is repeat key, keyCode:%{public}d", sequenceKey.keyCode);
+                return true;
+            }
+            MMI_HILOGD("Is not repeat key");
+            return false;
+        }
+    }
+    return false;
+}
+
+bool KeyCommandManager::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+    if (sequences_.empty()) {
+        MMI_HILOGD("No sequences configuration data");
+        return false;
+    }
+
+    if (!AddSequenceKey(keyEvent)) {
+        MMI_HILOGW("Add new sequence key failed");
+        return false;
+    }
+
+    if (filterSequences_.empty()) {
+        filterSequences_ = sequences_;
+    }
+
+    bool isLaunchAbility = false;
+    std::vector<Sequence> tempSeqs;
+    for (Sequence& item : filterSequences_) {
+        if (HandleSequence(item, isLaunchAbility)) {
+            tempSeqs.push_back(item);
+        }
+    }
+
+    if (tempSeqs.empty()) {
+        MMI_HILOGD("No matching sequence found");
+        ResetSequenceKeys();
+    } else {
+        filterSequences_ = tempSeqs;
+    }
+    return isLaunchAbility;
+}
+
+bool KeyCommandManager::AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+    SequenceKey sequenceKey;
+    sequenceKey.keyCode = keyEvent->GetKeyCode();
+    sequenceKey.keyAction = keyEvent->GetKeyAction();
+    sequenceKey.actionTime = keyEvent->GetActionTime();
+    size_t size = keys_.size();
+    if (size > 0) {
+        if (keys_[size - 1].actionTime > sequenceKey.actionTime) {
+            MMI_HILOGE("The current event time is greater than the last event time");
+            ResetSequenceKeys();
+            return false;
+        }
+        if ((sequenceKey.actionTime - keys_[size - 1].actionTime) > MAX_DELAY_TIME) {
+            MMI_HILOGD("The delay time is greater than the maximum delay time");
+            ResetSequenceKeys();
+        } else {
+            if (IsRepeatKeyEvent(sequenceKey)) {
+                MMI_HILOGD("This is a repeat key event, don't add");
+                return false;
+            }
+            keys_[size - 1].delay = sequenceKey.actionTime - keys_[size - 1].actionTime;
+            for (Sequence& item : filterSequences_) {
+                if (item.timerId >= 0) {
+                    MMI_HILOGD("The key sequence change, close the timer");
+                    TimerMgr->RemoveTimer(item.timerId);
+                    item.timerId = -1;
+                }
+            }
+        }
+    }
+
+    keys_.push_back(sequenceKey);
+    if (keys_.size() > MAX_SEQUENCEKEYS_NUM) {
+        MMI_HILOGD("The save key size more than the max size");
+        ResetSequenceKeys();
+        return false;
+    }
+    return true;
+}
+
+bool KeyCommandManager::HandleSequence(Sequence &sequence, bool &isLaunchAbility)
+{
+    CALL_DEBUG_ENTER;
+    size_t keysSize = keys_.size();
+    size_t sequenceKeysSize = sequence.sequenceKeys.size();
+    if (keysSize > sequenceKeysSize) {
+        MMI_HILOGD("The save sequence not matching ability sequence");
+        return false;
+    }
+
+    for (size_t i = 0; i < keysSize; ++i) {
+        if (keys_[i] != sequence.sequenceKeys[i]) {
+            MMI_HILOGD("The keyCode or keyAction not matching");
+            return false;
+        }
+        int64_t delay = sequence.sequenceKeys[i].delay;
+        if (((i + 1) != keysSize) && (delay != 0) && (keys_[i].delay <= delay)) {
+            MMI_HILOGD("Delay is not matching");
+            return false;
+        }
+    }
+
+    if (keysSize == sequenceKeysSize) {
+        if (sequence.abilityStartDelay == 0) {
+            MMI_HILOGD("Start launch ability immediately");
+            LaunchAbility(sequence);
+            isLaunchAbility = true;
+            return true;
+        }
+        sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay, 1, [this, sequence] () {
+            MMI_HILOGD("Timer callback");
+            LaunchAbility(sequence);
+        });
+        if (sequence.timerId < 0) {
+            MMI_HILOGE("Add Timer failed");
+            return false;
+        }
+        MMI_HILOGD("Add timer success");
+        isLaunchAbility = true;
+    }
+    return true;
+}
+
 bool KeyCommandManager::IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key)
 {
     CALL_DEBUG_ENTER;
+    CHKPF(key);
     if ((key->GetKeyCode() != shortcutKey.finalKey) || (shortcutKey.triggerType != key->GetKeyAction())) {
         return false;
     }
@@ -442,6 +842,7 @@ bool KeyCommandManager::IsKeyMatch(const ShortcutKey &shortcutKey, const std::sh
 
 bool KeyCommandManager::SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key)
 {
+    CHKPF(key);
     return keyCode == key->GetKeyCode();
 }
 
@@ -458,7 +859,7 @@ bool KeyCommandManager::HandleKeyDown(ShortcutKey &shortcutKey)
         LaunchAbility(shortcutKey);
     });
     if (shortcutKey.timerId < 0) {
-        MMI_HILOGE("Timer add failed");
+        MMI_HILOGE("Add Timer failed");
         return false;
     }
     MMI_HILOGD("Add timer success");
@@ -469,6 +870,7 @@ bool KeyCommandManager::HandleKeyDown(ShortcutKey &shortcutKey)
 bool KeyCommandManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey)
 {
     CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
     if (shortcutKey.keyDownDuration == 0) {
         MMI_HILOGD("Start launch ability immediately");
         LaunchAbility(shortcutKey);
@@ -478,7 +880,7 @@ bool KeyCommandManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     CHKPF(keyItem);
     auto upTime = keyEvent->GetActionTime();
     auto downTime = keyItem->GetDownTime();
-    MMI_HILOGD("UpTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",
+    MMI_HILOGD("upTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",
         upTime, downTime, shortcutKey.keyDownDuration);
     if (upTime - downTime >= static_cast<int64_t>(shortcutKey.keyDownDuration) * 1000) {
         MMI_HILOGD("Skip, upTime - downTime >= duration");
@@ -502,7 +904,7 @@ bool KeyCommandManager::HandleKeyCancel(ShortcutKey &shortcutKey)
     return false;
 }
 
-void KeyCommandManager::LaunchAbility(ShortcutKey key)
+void KeyCommandManager::LaunchAbility(const ShortcutKey &key)
 {
     AAFwk::Want want;
     want.SetElementName(key.ability.deviceId, key.ability.bundleName, key.ability.abilityName);
@@ -520,10 +922,34 @@ void KeyCommandManager::LaunchAbility(ShortcutKey key)
     MMI_HILOGD("Start launch ability, bundleName:%{public}s", key.ability.bundleName.c_str());
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {
-        MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s,err:%{public}d", key.ability.bundleName.c_str(), err);
+        MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", key.ability.bundleName.c_str(), err);
     }
     ResetLastMatchedKey();
     MMI_HILOGD("End launch ability, bundleName:%{public}s", key.ability.bundleName.c_str());
+}
+
+void KeyCommandManager::LaunchAbility(const Sequence &sequence)
+{
+    AAFwk::Want want;
+    want.SetElementName(sequence.ability.deviceId, sequence.ability.bundleName, sequence.ability.abilityName);
+    want.SetAction(sequence.ability.action);
+    want.SetUri(sequence.ability.uri);
+    want.SetType(sequence.ability.uri);
+    for (const auto &entity : sequence.ability.entities) {
+        want.AddEntity(entity);
+    }
+    for (const auto &item : sequence.ability.params) {
+        want.SetParam(item.first, item.second);
+    }
+    DfxHisysevent::CalcComboStartTimes(sequence.abilityStartDelay);
+    DfxHisysevent::ReportComboStartTimes();
+    MMI_HILOGD("Start launch ability, bundleName:%{public}s", sequence.ability.bundleName.c_str());
+    ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+    if (err != ERR_OK) {
+        MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d",
+                   sequence.ability.bundleName.c_str(), err);
+    }
+    MMI_HILOGD("End launch ability, bundleName:%{public}s", sequence.ability.bundleName.c_str());
 }
 
 void ShortcutKey::Print() const
@@ -531,7 +957,7 @@ void ShortcutKey::Print() const
     for (const auto &prekey: preKeys) {
         MMI_HILOGI("Eventkey matched, preKey:%{public}d", prekey);
     }
-    MMI_HILOGD("Eventkey matched, finalKey:%{public}d,bundleName:%{public}s",
+    MMI_HILOGD("Eventkey matched, finalKey:%{public}d, bundleName:%{public}s",
         finalKey, ability.bundleName.c_str());
 }
 } // namespace MMI
