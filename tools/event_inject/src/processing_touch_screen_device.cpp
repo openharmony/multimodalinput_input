@@ -71,7 +71,7 @@ void ProcessingTouchScreenDevice::AnalysisTouchScreenDate(const std::vector<Devi
     TouchScreenInputEvent touchScreenInputEvent = {};
     for (const auto &item : inputData) {
         touchScreenInputEvent.groupNumber = 0;
-        for (const auto &posXYItem : item.posXY) {
+        for (auto &posXYItem : item.posXY) {
             touchScreenCoordinates.xPos = posXYItem.xPos;
             touchScreenCoordinates.yPos = posXYItem.yPos;
             touchScreenInputEvent.events.push_back(touchScreenCoordinates);
@@ -87,7 +87,7 @@ void ProcessingTouchScreenDevice::AnalysisSingleTouchScreenDate(const std::vecto
     std::vector<TouchSingleEventData> &touchSingleEventDatas)
 {
     TouchSingleEventData touchSingleEventData = {};
-    for (const auto &item : inputData) {
+    for (auto &item : inputData) {
         touchSingleEventData = {};
         touchSingleEventData.eventType = item.eventType;
         touchSingleEventData.trackingId = item.trackingId;

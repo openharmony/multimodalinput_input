@@ -58,7 +58,7 @@ void InjectionEventDispatch::InitManageFunction()
         {"json", std::bind(&InjectionEventDispatch::OnJson, this)},
     };
 
-    for (const auto &it : funs) {
+    for (auto &it : funs) {
         if (!RegisterInjectEvent(it)) {
             MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
             continue;
