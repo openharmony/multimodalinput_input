@@ -160,7 +160,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     return false;
                                 }
                                 std::string arg3 = argvOffset[2];
-                                if (!arg3.empty() > 0 && arg3.at(0) == '-') {
+                                if (!arg3.empty() && arg3.at(0) == '-') {
                                     return false;
                                 }
                                 if ((argCount >= 5) && isTraceOption(std::string(argvOffset[4]))) {
