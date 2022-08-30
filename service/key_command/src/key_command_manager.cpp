@@ -415,7 +415,7 @@ bool IsSequenceKeysValid(const Sequence &sequence)
         if (sequenceKeys.find(item.keyCode) == sequenceKeys.end()) {
             auto it = sequenceKeys.emplace(item.keyCode, item);
             if (!it.second) {
-                MMI_HILOGE("Emplace failed");
+                MMI_HILOGE("Emplace duplicated");
                 return false;
             }
         } else {
@@ -441,7 +441,7 @@ bool ConvertToKeySequence(const cJSON* jsonData, Sequence &sequence)
         return false;
     }
     if (!IsSequenceKeysValid(sequence)) {
-        MMI_HILOGE("Sequence illegal");
+        MMI_HILOGE("Sequence invalid");
         return false;
     }
     if (!GetAlibityStartDelay(jsonData, sequence.abilityStartDelay)) {
@@ -742,7 +742,7 @@ bool KeyCommandManager::AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent)
     size_t size = keys_.size();
     if (size > 0) {
         if (keys_[size - 1].actionTime > sequenceKey.actionTime) {
-            MMI_HILOGE("The current event time is longer than the last event time");
+            MMI_HILOGE("The current event time is greater than the last event time");
             ResetSequenceKeys();
             return false;
         }
@@ -808,7 +808,7 @@ bool KeyCommandManager::HandleSequence(Sequence &sequence, bool &isLaunchAbility
             LaunchAbility(sequence);
         });
         if (sequence.timerId < 0) {
-            MMI_HILOGE("Timer add failed");
+            MMI_HILOGE("Add Timer failed");
             return false;
         }
         MMI_HILOGD("Add timer success");
@@ -859,7 +859,7 @@ bool KeyCommandManager::HandleKeyDown(ShortcutKey &shortcutKey)
         LaunchAbility(shortcutKey);
     });
     if (shortcutKey.timerId < 0) {
-        MMI_HILOGE("Timer add failed");
+        MMI_HILOGE("Add Timer failed");
         return false;
     }
     MMI_HILOGD("Add timer success");
