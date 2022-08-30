@@ -19,7 +19,6 @@
 #include <cstdint>
 #include <map>
 #include <memory>
-#include <mutex>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -28,7 +27,7 @@
 #include <nocopyable.h>
 #include <uv.h>
 
-#include "cooperate_messages.h"
+#include "cooperation_message.h"
 #include "i_input_device_cooperate_listener.h"
 #include "js_util.h"
 
@@ -40,9 +39,9 @@ public:
     ~JsEventTarget() = default;
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
 
-    static void EmitJsEnable(int32_t userData, std::string deviceId, CooperateMessages msg);
-    static void EmitJsStart(int32_t userData, std::string, CooperateMessages msg);
-    static void EmitJsStop(int32_t userData, std::string, CooperateMessages msg);
+    static void EmitJsEnable(int32_t userData, std::string deviceId, CooperationMessage msg);
+    static void EmitJsStart(int32_t userData, std::string, CooperationMessage msg);
+    static void EmitJsStop(int32_t userData, std::string, CooperationMessage msg);
     static void EmitJsGetState(int32_t userData, bool state);
 
     void AddListener(napi_env env, const std::string &type, napi_value handle);
@@ -50,14 +49,13 @@ public:
     napi_value CreateCallbackInfo(napi_env, napi_value handle, int32_t userData);
     void ResetEnv();
 
-    void OnCooperateMessage(const std::string &deviceId, CooperateMessages &msg) override;
+    void OnCooperateMessage(const std::string &deviceId, CooperationMessage msg) override;
 
 private:
     inline static std::map<std::string_view, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>>
         cooperateListener_ = {};
     inline static std::map<int32_t, std::unique_ptr<JsUtil::CallbackInfo>> callback_ = {};
     bool isListeningProcess_ = false;
-    std::mutex mutex_;
 
     static void CallEnablePromsieWork(uv_work_t *work, int32_t status);
     static void CallEnableAsyncWork(uv_work_t *work, int32_t status);
