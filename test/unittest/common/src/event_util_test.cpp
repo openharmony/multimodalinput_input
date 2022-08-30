@@ -56,6 +56,7 @@ void InputEventCallback::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent
         TestUtil->SetRecvFlag(RECV_FLAG::RECV_MONITOR);
         ASSERT_TRUE(pointerEvent != nullptr);
         TestUtil->AddEventDump(TestUtil->DumpInputEvent(pointerEvent));
+        lastPointerEventId_ = pointerEvent->GetId();
     }
 }
 

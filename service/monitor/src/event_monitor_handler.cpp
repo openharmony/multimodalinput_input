@@ -266,25 +266,35 @@ void EventMonitorHandler::MonitorCollection::MarkConsumed(int32_t eventId, Sessi
         MMI_HILOGW("Specified monitor does not exist");
         return;
     }
-    if (isMonitorConsumed_) {
-        MMI_HILOGW("Event consumed");
+    auto tIter = states_.begin();
+    for (; tIter != states_.end(); ++tIter) {
+        const auto &eventIds = tIter->second.eventIds_;
+        if (eventIds.find(eventId) != eventIds.cend()) {
+            break;
+        }
+    }
+    if (tIter == states_.end()) {
+        MMI_HILOGE("No operation corresponding to this event");
         return;
     }
-    if ((downEventId_ < 0) || (lastPointerEvent_ == nullptr)) {
-        MMI_HILOGI("No touch event or press event without a previous finger is not handled");
+    ConsumptionState &state = tIter->second;
+
+    if (state.isMonitorConsumed_) {
+        MMI_HILOGE("Corresponding operation has been marked as consumed");
         return;
     }
-    if (downEventId_ > eventId) {
-        MMI_HILOGW("A new process has began %{public}d,%{public}d", downEventId_, eventId);
+    state.isMonitorConsumed_ = true;
+    if (state.lastPointerEvent_ == nullptr) {
+        MMI_HILOGE("No former touch event");
         return;
     }
-    isMonitorConsumed_ = true;
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     MMI_HILOGD("Cancel operation");
-    auto pointerEvent = std::make_shared<PointerEvent>(*lastPointerEvent_);
+    auto pointerEvent = std::make_shared<PointerEvent>(*state.lastPointerEvent_);
+    CHKPV(pointerEvent);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetActionTime(GetSysClockTime());
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
-#ifdef OHOS_BUILD_ENABLE_TOUCH
     auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
     CHKPV(inputEventNormalizeHandler);
     inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
@@ -314,7 +324,8 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<Pointer
 #endif // OHOS_BUILD_ENABLE_TOUCH
     Monitor(pointerEvent);
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        return isMonitorConsumed_;
+        auto iter = states_.find(pointerEvent->GetDeviceId());
+        return (iter != states_.end() ? iter->second.isMonitorConsumed_ : false);
     }
     MMI_HILOGI("This is not a touch-screen event");
     return false;
@@ -330,24 +341,42 @@ bool EventMonitorHandler::MonitorCollection::HasMonitor(SessionPtr session)
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 void EventMonitorHandler::MonitorCollection::UpdateConsumptionState(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
     if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         return;
     }
-    lastPointerEvent_ = pointerEvent;
+    auto sIter = states_.find(pointerEvent->GetDeviceId());
+    if (sIter == states_.end()) {
+        auto [tIter, isOk] = states_.emplace(pointerEvent->GetDeviceId(), ConsumptionState());
+        if (!isOk) {
+            MMI_HILOGE("Failed to emplace consumption state");
+            return;
+        }
+        sIter = tIter;
+    }
+    ConsumptionState &state = sIter->second;
+    auto [tIter, isOk] = state.eventIds_.emplace(pointerEvent->GetId());
+    if (!isOk) {
+        MMI_HILOGW("Failed to stash event");
+    }
+    state.lastPointerEvent_ = pointerEvent;
 
     if (pointerEvent->GetPointerIds().size() != 1) {
-        MMI_HILOGD("First press down and last press up intermediate process");
+        MMI_HILOGD("In intermediate process");
         return;
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
         MMI_HILOGD("First press down");
-        downEventId_ = pointerEvent->GetId();
-        isMonitorConsumed_ = false;
+        state.eventIds_.clear();
+        auto [tIter, isOk] = state.eventIds_.emplace(pointerEvent->GetId());
+        if (!isOk) {
+            MMI_HILOGW("Event number is duplicated");
+        }
+        state.isMonitorConsumed_ = false;
     } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
-        MMI_HILOGD("Last press up");
-        downEventId_ = -1;
-        lastPointerEvent_.reset();
+        MMI_HILOGD("Last lift up");
+        state.eventIds_.clear();
     }
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -377,6 +406,7 @@ void EventMonitorHandler::MonitorCollection::OnSessionLost(SessionPtr session)
         }
     }
 }
+
 void EventMonitorHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     return monitors_.Dump(fd, args);
