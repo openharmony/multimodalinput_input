@@ -584,10 +584,13 @@ bool KeyCommandManager::ParseJson(const std::string &configFile)
         return false;
     }
 
-    if (!ParseShortcutKeys(parser, shortcutKeys_) || !ParseSequences(parser, sequences_)) {
+    bool ret = ParseShortcutKeys(parser, shortcutKeys_);
+    ret |= ParseSequences(parser, sequences_);
+    if (!ret) {
         MMI_HILOGE("Parse configFile failed");
         return false;
     }
+
     Print();
     PrintSeq();
     return true;
