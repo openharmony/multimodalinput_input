@@ -20,6 +20,7 @@
 #include "input_device_cooperate_sm.h"
 #include "input_device_manager.h"
 #include "mouse_event_handler.h"
+#include "multimodal_input_connect_remoter.h"
 
 namespace OHOS {
 namespace MMI {
@@ -32,15 +33,15 @@ InputDeviceCooperateStateOut::InputDeviceCooperateStateOut(const std::string& st
 {
 }
 
-int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate()
+int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
-    std::string srcNetworkId = InputDevCooSM->GetSrcNetworkId();
+    std::string srcNetworkId = networkId;
     if (srcNetworkId.empty()) {
         std::pair<std::string, std::string> prepared = InputDevCooSM->GetPreparedDevices();
         srcNetworkId = prepared.first;
     }
-    int32_t ret = IInputDeviceCooperateState::StopInputDeviceCooperate(srcNetworkId);
+    int32_t ret = RemoteMgr->StopRemoteCooperate(networkId);
     if (ret != RET_OK) {
         MMI_HILOGE("Stop input device cooperate fail");
         return ret;
