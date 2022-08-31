@@ -40,8 +40,11 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
     pkt << size;
     for (const auto &item : keys) {
         pkt << item.GetKeyCode() << item.GetDownTime()
-            << item.GetDeviceId() << item.IsPressed();
+            << item.GetDeviceId() << item.IsPressed() << item.GetUnicode();
     }
+    pkt << key->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY)
+        << key->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY)
+        << key->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write key event failed");
         return RET_ERR;
@@ -86,8 +89,18 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
             return RET_ERR;
         }
         keyItem.SetPressed(isPressed);
+        uint32_t unicode;
+        pkt >> unicode;
+        keyItem.SetUnicode(unicode);
         key->AddKeyItem(keyItem);
     }
+    bool state = false;
+    pkt >> state;
+    key->SetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY, state);
+    pkt >> state;
+    key->SetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY, state);
+    pkt >> state;
+    key->SetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, state);
     return RET_OK;
 }
 
