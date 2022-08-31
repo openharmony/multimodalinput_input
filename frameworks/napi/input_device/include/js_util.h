@@ -40,8 +40,6 @@ public:
         int32_t keyboardType { 0 };
     };
     struct CallbackInfo {
-        CallbackInfo();
-        ~CallbackInfo();
         napi_env env = nullptr;
         napi_ref ref = nullptr;
         napi_deferred deferred = nullptr;
@@ -59,6 +57,7 @@ public:
     static bool GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_value &object);
     static bool GetDeviceSourceType(const std::unique_ptr<CallbackInfo> &cb, napi_value &object);
     static bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
+    static void DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback);
     template <typename T>
     static void DeletePtr(T &ptr)
     {
