@@ -1164,7 +1164,7 @@ int32_t MMIService::OnEnableInputDeviceCooperate(int32_t pid, int32_t userData, 
     CooperationMessage msg =
         enabled ? CooperationMessage::OPEN_SUCCESS : CooperationMessage::CLOSE_SUCCESS;
     NetPacket pkt(MmiMessageId::COOPERATION_MESSAGE);
-    pkt << userData << deviceId << msg;
+    pkt << userData << deviceId << static_cast<int32_t>(msg);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write data failed");
         return RET_ERR;
