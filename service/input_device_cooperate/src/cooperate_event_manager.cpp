@@ -118,7 +118,7 @@ void CooperateEventManager::NotifyCooperateMessage(
     CALL_DEBUG_ENTER;
     CHKPV(sess);
     NetPacket pkt(msgId);
-    pkt << userData << deviceId << msg;
+    pkt << userData << deviceId << static_cast<int32_t>(msg);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write data failed");
         return;

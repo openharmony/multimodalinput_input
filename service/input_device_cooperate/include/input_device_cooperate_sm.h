@@ -76,7 +76,6 @@ public:
     void UpdatePreparedDevices(const std::string &srcNetworkId, const std::string &sinkNetworkId);
     std::pair<std::string, std::string> GetPreparedDevices() const;
     CooperateState GetCurrentCooperateState() const;
-    std::string GetSrcNetworkId() const;
     void OnCooperateChanged(const std::string &networkId, bool isOpen);
     void OnKeyboardOnline(const std::string &dhid);
     void OnPointerOffline(const std::string &dhid, const std::string &sinkNetworkId,

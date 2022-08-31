@@ -629,7 +629,7 @@ int32_t MultimodalInputConnectStub::StubStartInputDeviceCooperate(MessageParcel&
     READINT32(data, srcInputDeviceId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = StartInputDeviceCooperate(userData, sinkDeviceId, srcInputDeviceId);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call RegisterCooperateEvent failed ret:%{public}d", ret);
+        MMI_HILOGE("Call StartInputDeviceCooperate failed ret:%{public}d", ret);
     }
     return ret;
 }
