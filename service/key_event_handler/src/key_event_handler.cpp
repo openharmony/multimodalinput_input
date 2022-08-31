@@ -17,6 +17,7 @@
 
 #include "input_device_manager.h"
 #include "key_map_manager.h"
+#include "key_unicode_transformation.h"
 
 namespace OHOS {
 namespace MMI {
@@ -71,6 +72,7 @@ int32_t KeyEventHandler::Normalize(struct libinput_event *event, std::shared_ptr
     item.SetKeyCode(keyCode);
     item.SetDeviceId(deviceId);
     item.SetPressed(isKeyPressed);
+    item.SetUnicode(KeyCodeToUnicode(keyCode, keyEvent));
 
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         keyEvent->AddPressedKeyItems(item);

@@ -466,6 +466,7 @@ ohos_shared_library("libmmi-server") {
   if (input_feature_keyboard) {
     sources += [
       "key_event_handler/src/key_event_handler.cpp",
+      "key_event_handler/src/key_unicode_transformation.cpp",
       "subscriber/src/key_event_subscriber.cpp",
     ]
     if (input_feature_combination_key) {

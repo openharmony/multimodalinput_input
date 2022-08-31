@@ -28,6 +28,34 @@ namespace MMI {
 class KeyEvent : public InputEvent {
 public:
     /**
+     * 未知的功能按键
+     *
+     * @since 9
+     */
+    static const int32_t UNKOWN_FUNCTION_KEY = -1;
+
+    /**
+     * Num Lock功能按键
+     *
+     * @since 9
+     */
+    static const int32_t NUM_LOCK_FUNCTION_KEY = 0;
+
+    /**
+     * Caps Lock功能按键
+     *
+     * @since 9
+     */
+    static const int32_t CAPS_LOCK_FUNCTION_KEY = 1;
+
+    /**
+     * Scroll Lock功能按键
+     *
+     * @since 9
+     */
+    static const int32_t SCROLL_LOCK_FUNCTION_KEY = 2;
+
+    /**
      * Function (Fn) key
      *
      * @since 9
@@ -2898,6 +2926,21 @@ public:
          */
         void SetPressed(bool pressed);
 
+        /**
+         * @brief 设置当前按键对应的unicode值
+         * @param unicode 指定的unicode值
+         * @return 空
+         * @since 9
+         */
+        void SetUnicode(uint32_t unicode);
+
+        /**
+         * @brief 获取当前按键的unicode值
+         * @return 返回unicode值
+         * @since 9
+         */
+        uint32_t GetUnicode() const;
+
     public:
         /**
          * @brief Writes data to a <b>Parcel</b> object.
@@ -2920,6 +2963,7 @@ public:
         int32_t deviceId_ = -1;
         int32_t keyCode_ = -1;
         int64_t downTime_ = 0;
+        uint32_t unicode_ { 0 };
     };
 
 public:
@@ -3055,6 +3099,31 @@ public:
      */
     bool IsValid() const;
 
+    /**
+     * @brief 把指定的按键转换为功能按键。
+     * @param keyCode 待转换的键值。
+     * @return 返回转换后的功能按键。
+     * @since 9
+     */
+    int32_t TransitionFunctionKey(int32_t keyCode);
+
+    /**
+     * @brief 给指定的功能按键设置使能状态。
+     * @param funcKey 指定的功能按键。
+     * @param value 待设置的功能按键状态。
+     * @return 返回是否设置成功。
+     * @since 9
+     */
+    int32_t SetFunctionKey(int32_t funcKey, int32_t value);
+
+    /**
+     * @brief 获取指定功能按键的使能状态。
+     * @param funcKey 指定的功能按键。
+     * @return 返回指定功能按键的使能状态。
+     * @since 9
+     */
+    bool GetFunctionKey(int32_t funcKey) const;
+
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.
@@ -3087,6 +3156,9 @@ private:
     int32_t keyCode_ = -1;
     std::vector<KeyItem> keys_;
     int32_t keyAction_ = 0;
+    bool numLock_ { false };
+    bool capsLock_ { false };
+    bool scrollLock_ { false };
 };
 
 std::ostream& operator<<(std::ostream&, KeyEvent&);
