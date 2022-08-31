@@ -374,6 +374,12 @@ bool JsInputMonitor::SetMouseProperty(const std::shared_ptr<PointerEvent> pointe
     }
 
     auto mapFun = GetFuns(pointerEvent, item);
+    auto iter = mapFun.find("rawDeltaX");
+    if (iter != mapFun.end()) {
+        MMI_HILOGE("rawDeltaX: %{public}lld, windowX: %{public}lld",
+            iter->second(), mapFun["windowX"]());
+    }
+
     for (const auto &it : mapFun) {
         if (SetNameProperty(jsEnv_, result, it.first, it.second()) != napi_ok) {
             THROWERR(jsEnv_, "Set property failed");

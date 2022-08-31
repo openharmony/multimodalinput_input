@@ -207,7 +207,7 @@ int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& p
         return RET_ERR;
     }
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read device Data failed");
+        MMI_HILOGE("Packet read cooperate msg failed");
         return RET_ERR;
     }
     InputDevImpl.OnInputDeviceIds(userData, inputDeviceIds);
@@ -222,7 +222,7 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
     std::shared_ptr<InputDevice> devData = InputDevImpl.DevDataUnmarshalling(pkt);
     CHKPR(devData, RET_ERR);
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read device data failed");
+        MMI_HILOGE("Packet read cooperate msg failed");
         return RET_ERR;
     }
     InputDevImpl.OnInputDevice(userData, devData);
@@ -404,13 +404,13 @@ int32_t ClientMsgHandler::OnCooperationListiner(const UDSClient& client, NetPack
 {
     CALL_DEBUG_ENTER;
     std::string deviceId;
-    CooperationMessage msg;
-    pkt >> deviceId >> msg;
+    int32_t nType;
+    pkt >> deviceId >> nType;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
-    InputDevCooperateImpl.OnDevCooperateListener(deviceId, msg);
+    InputDevCooperateImpl.OnDevCooperateListener(deviceId, CooperationMessage(nType));
     return RET_OK;
 }
 
@@ -419,13 +419,13 @@ int32_t ClientMsgHandler::OnCooperationMessage(const UDSClient& client, NetPacke
     CALL_DEBUG_ENTER;
     int32_t userData;
     std::string deviceId;
-    CooperationMessage msg;
-    pkt >> userData >> deviceId >> msg;
+    int32_t nType;
+    pkt >> userData >> deviceId >> nType;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read device data failed");
+        MMI_HILOGE("Packet read cooperate msg failed");
         return RET_ERR;
     }
-    InputDevCooperateImpl.OnCooprationMessage(userData, deviceId, msg);
+    InputDevCooperateImpl.OnCooprationMessage(userData, deviceId, CooperationMessage(nType));
     return RET_OK;
 }
 
@@ -436,7 +436,7 @@ int32_t ClientMsgHandler::OnCooperationState(const UDSClient& client, NetPacket&
     bool state;
     pkt >> userData >> state;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read device Data failed");
+        MMI_HILOGE("Packet read cooperate msg failed");
         return RET_ERR;
     }
     InputDevCooperateImpl.OnCooperationState(userData, state);
