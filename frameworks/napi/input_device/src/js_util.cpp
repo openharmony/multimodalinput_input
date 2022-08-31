@@ -209,14 +209,12 @@ bool JsUtil::TypeOf(napi_env env, napi_value value, napi_valuetype type)
     return true;
 }
 
-JsUtil::CallbackInfo::CallbackInfo() {}
-
-JsUtil::CallbackInfo::~CallbackInfo()
+void JsUtil::DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback)
 {
     CALL_DEBUG_ENTER;
-    if (ref != nullptr && env != nullptr) {
-        CHKRV(env, napi_delete_reference(env, ref), DELETE_REFERENCE);
-        env = nullptr;
+    if (callback->ref != nullptr && callback->env != nullptr) {
+        CHKRV(callback->env, napi_delete_reference(callback->env, callback->ref), DELETE_REFERENCE);
+        callback->env = nullptr;
     }
 }
 } // namespace MMI
