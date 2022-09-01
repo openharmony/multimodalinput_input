@@ -66,10 +66,10 @@ void LibinputAdapter::LoginfoPackagingTool(struct libinput_event *event)
     InitHiLogFunc(context);
 }
 
-int32_t LibinputAdapter::DeviceLedUpdate(struct libinput_device *device, int32_t funcKey, bool isEnable)
+int32_t LibinputAdapter::DeviceLedUpdate(struct libinput_device *device, int32_t funcKey, bool enable)
 {
     CHKPR(device, RET_ERR);
-    return libinput_set_led_state(device, funcKey, isEnable);
+    return libinput_set_led_state(device, funcKey, enable);
 }
 
 constexpr static libinput_interface LIBINPUT_INTERFACE = {
