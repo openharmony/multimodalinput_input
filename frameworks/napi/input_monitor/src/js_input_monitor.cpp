@@ -376,8 +376,8 @@ bool JsInputMonitor::SetMouseProperty(const std::shared_ptr<PointerEvent> pointe
     auto mapFun = GetFuns(pointerEvent, item);
     auto iter = mapFun.find("rawDeltaX");
     if (iter != mapFun.end()) {
-        MMI_HILOGE("rawDeltaX: %{public}lld, windowX: %{public}lld",
-            iter->second(), mapFun["windowX"]());
+        MMI_HILOGE("rawDeltaX: %{public}" PRId64 ", windowX: %{public}" PRId64 "",
+            static_cast<int64_t>(iter->second()), static_cast<int64_t>(mapFun["windowX"]()));
     }
 
     for (const auto &it : mapFun) {

@@ -227,21 +227,9 @@ void DistributedInputAdapter::StopDInputCallback::OnResult(const std::string &de
     DistributedAdapter->ProcessDInputCallback(CallbackType::StopDInputCallback, status);
 }
 
-void DistributedInputAdapter::StartDInputCallbackDHIds::OnResultFds(const std::string &srcId,
-    const std::string &sinkId, const int32_t &status)
-{
-    CALL_DEBUG_ENTER;
-}
-
 void DistributedInputAdapter::StartDInputCallbackDHIds::OnResultDhids(const std::string &devId, const int32_t &status)
 {
     DistributedAdapter->ProcessDInputCallback(CallbackType::StartDInputCallbackDHIds, status);
-}
-
-void DistributedInputAdapter::StopDInputCallbackDHIds::OnResultFds(const std::string &srcId, const std::string &sinkId,
-                                                                   const int32_t &status)
-{
-    CALL_DEBUG_ENTER;
 }
 
 void DistributedInputAdapter::StopDInputCallbackDHIds::OnResultDhids(const std::string &devId, const int32_t &status)
@@ -249,21 +237,9 @@ void DistributedInputAdapter::StopDInputCallbackDHIds::OnResultDhids(const std::
     DistributedAdapter->ProcessDInputCallback(CallbackType::StopDInputCallbackDHIds, status);
 }
 
-void DistributedInputAdapter::StartDInputCallbackFds::OnResultFds(const std::string &srcId, const std::string &sinkId,
-                                                                  const int32_t &status)
-{
-    CALL_DEBUG_ENTER;
-}
-
 void DistributedInputAdapter::StartDInputCallbackFds::OnResultDhids(const std::string &devId, const int32_t &status)
 {
     DistributedAdapter->ProcessDInputCallback(CallbackType::StartDInputCallbackFds, status);
-}
-
-void DistributedInputAdapter::StopDInputCallbackFds::OnResultFds(const std::string &srcId, const std::string &sinkId,
-                                                                 const int32_t &status)
-{
-    CALL_DEBUG_ENTER;
 }
 
 void DistributedInputAdapter::StopDInputCallbackFds::OnResultDhids(const std::string &devId, const int32_t &status)
