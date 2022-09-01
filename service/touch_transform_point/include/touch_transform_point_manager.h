@@ -28,8 +28,10 @@
 
 namespace OHOS {
 namespace MMI {
-class TouchTransformPointManager : public DelayedSingleton<TouchTransformPointManager> {
+class TouchTransformPointManager final {
+    DECLARE_DELAYED_SINGLETON(TouchTransformPointManager);
 public:
+    DISALLOW_COPY_AND_MOVE(TouchTransformPointManager);
     std::shared_ptr<PointerEvent> OnLibInput(struct libinput_event *event, INPUT_DEVICE_TYPE deviceType);
 
 private:
@@ -49,7 +51,7 @@ private:
     std::map<int32_t, std::shared_ptr<GestureTransformPointProcessor>> gesturePro_;
 };
 
-#define TouchTransformPointManger TouchTransformPointManager::GetInstance()
+#define TouchTransformPointManger ::OHOS::DelayedSingleton<TouchTransformPointManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // TOUCH_TRANSFORM_POINT_MANAGER_H

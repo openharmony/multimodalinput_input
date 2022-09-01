@@ -20,7 +20,6 @@
 #include <memory>
 #include <set>
 
-#include <nocopyable.h>
 #include <singleton.h>
 
 #include "key_event.h"
@@ -31,7 +30,9 @@ namespace OHOS {
 namespace MMI {
 bool operator<(const KeyOption &first, const KeyOption &second);
 
-class KeyEventInputSubscribeManager : public Singleton<KeyEventInputSubscribeManager> {
+class KeyEventInputSubscribeManager final {
+    DECLARE_SINGLETON(KeyEventInputSubscribeManager);
+
 public:
     class SubscribeKeyEventInfo {
     public:
@@ -70,9 +71,7 @@ public:
     };
 
 public:
-    KeyEventInputSubscribeManager() = default;
-    ~KeyEventInputSubscribeManager() = default;
-    DISALLOW_COPY_AND_MOVE(KeyEventInputSubscribeManager);
+    DISALLOW_MOVE(KeyEventInputSubscribeManager);
 
     int32_t SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
         std::function<void(std::shared_ptr<KeyEvent>)> callback);
@@ -93,7 +92,7 @@ private:
     std::mutex mtx_;
 };
 
-#define KeyEventInputSubscribeMgr KeyEventInputSubscribeManager::GetInstance()
+#define KeyEventInputSubscribeMgr ::OHOS::Singleton<KeyEventInputSubscribeManager>::GetInstance()
 }  // namespace MMI
 }  // namespace OHOS
 #endif  // KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H

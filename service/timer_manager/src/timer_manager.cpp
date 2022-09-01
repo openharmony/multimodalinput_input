@@ -26,6 +26,9 @@ constexpr int32_t NONEXISTENT_ID = -1;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TimerManager" };
 } // namespace
 
+TimerManager::TimerManager() {}
+TimerManager::~TimerManager() {}
+
 int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
 {
     return AddTimerInternal(intervalMs, repeatCount, callback);

@@ -43,7 +43,7 @@ int32_t InputDeviceCooperateImpl::RegisterCooperateListener(InputDevCooperateLis
             return RET_ERR;
         }
     }
-    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    auto eventHandler = InputMgrImpl.GetCurrentEventHandler();
     CHKPR(eventHandler, RET_ERR);
     auto monitor = std::make_pair(eventHandler, listener);
     devCooperateListener_.push_back(monitor);
@@ -82,7 +82,7 @@ int32_t InputDeviceCooperateImpl::EnableInputDeviceCooperate(bool enabled, FuncC
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    auto eventHandler = InputMgrImpl.GetCurrentEventHandler();
     CHKPR(eventHandler, RET_ERR);
     CooperateEvent event;
     event.msg = std::make_pair(eventHandler, callback);
@@ -99,7 +99,7 @@ int32_t InputDeviceCooperateImpl::StartInputDeviceCooperate(const std::string &s
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    auto eventHandler = InputMgrImpl.GetCurrentEventHandler();
     CHKPR(eventHandler, RET_ERR);
     CooperateEvent event;
     event.msg = std::make_pair(eventHandler, callback);
@@ -115,7 +115,7 @@ int32_t InputDeviceCooperateImpl::StopDeviceCooperate(FuncCooperationMessage cal
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    auto eventHandler = InputMgrImpl.GetCurrentEventHandler();
     CHKPR(eventHandler, RET_ERR);
     CooperateEvent event;
     event.msg = std::make_pair(eventHandler, callback);
@@ -132,7 +132,7 @@ int32_t InputDeviceCooperateImpl::GetInputDeviceCooperateState(
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    auto eventHandler = InputMgrImpl.GetCurrentEventHandler();
     CHKPR(eventHandler, RET_ERR);
     CooperateEvent event;
     event.state = std::make_pair(eventHandler, callback);

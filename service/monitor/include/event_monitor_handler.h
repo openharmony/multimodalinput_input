@@ -22,7 +22,6 @@
 #include <unordered_set>
 
 #include "nocopyable.h"
-#include "singleton.h"
 
 #include "i_input_event_handler.h"
 #include "i_input_event_collection_handler.h"

@@ -25,10 +25,10 @@
 
 namespace OHOS {
 namespace MMI {
-class KeyMapManager : public DelayedSingleton<KeyMapManager> {
+class KeyMapManager final {
+    DECLARE_DELAYED_SINGLETON(KeyMapManager);
 public:
-    KeyMapManager() = default;
-    ~KeyMapManager() = default;
+    DISALLOW_COPY_AND_MOVE(KeyMapManager);
     void GetConfigKeyValue(const std::string &fileName, int32_t deviceId);
     void ParseDeviceConfigFile(struct libinput_device *device);
     void RemoveKeyValue(struct libinput_device *device);
@@ -43,7 +43,7 @@ private:
     int32_t defaultKeyId_ = -1;
 };
 
-#define KeyMapMgr KeyMapManager::GetInstance()
+#define KeyMapMgr ::OHOS::DelayedSingleton<KeyMapManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // KEY_MAP_MANAGER_H

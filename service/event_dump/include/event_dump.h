@@ -16,7 +16,6 @@
 #ifndef EVENT_DUMP_H
 #define EVENT_DUMP_H
 
-#include "nocopyable.h"
 #include "singleton.h"
 
 #include "define_multimodal.h"
@@ -24,16 +23,16 @@
 
 namespace OHOS {
 namespace MMI {
-class EventDump : public DelayedSingleton<EventDump> {
+class EventDump final {
+    DECLARE_DELAYED_SINGLETON(EventDump);
 public:
-    EventDump() = default;
     DISALLOW_COPY_AND_MOVE(EventDump);
     void ParseCommand(int32_t fd, const std::vector<std::string> &args);
     void DumpEventHelp(int32_t fd, const std::vector<std::string> &args);
     void DumpHelp(int32_t fd);
 };
 
-#define MMIEventDump EventDump::GetInstance()
+#define MMIEventDump ::OHOS::DelayedSingleton<EventDump>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // EVENT_DUMP_H

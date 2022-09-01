@@ -28,10 +28,10 @@
 
 namespace OHOS {
 namespace MMI {
-class KeyAutoRepeat : public DelayedSingleton<KeyAutoRepeat> {
+class KeyAutoRepeat final {
+    DECLARE_DELAYED_SINGLETON(KeyAutoRepeat);
 public:
-    KeyAutoRepeat() = default;
-    ~KeyAutoRepeat() = default;
+    DISALLOW_COPY_AND_MOVE(KeyAutoRepeat);
     int32_t AddDeviceConfig(struct libinput_device *device);
     void SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent);
     void AddHandleTimer(int32_t timeout);
@@ -48,7 +48,7 @@ private:
     std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
 };
 
-#define KeyRepeat KeyAutoRepeat::GetInstance()
+#define KeyRepeat ::OHOS::DelayedSingleton<KeyAutoRepeat>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // KEY_AUTO_REPEAT_H

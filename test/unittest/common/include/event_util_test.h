@@ -84,8 +84,10 @@ enum class RECV_FLAG : uint32_t {
     RECV_MARK_CONSUMED,
 };
 
-class EventUtilTest : public DelayedSingleton<EventUtilTest> {
+class EventUtilTest final {
+    DECLARE_DELAYED_SINGLETON(EventUtilTest);
 public:
+    DISALLOW_COPY_AND_MOVE(EventUtilTest);
     bool Init();
     std::string GetEventDump();
     void AddEventDump(std::string eventDump);
@@ -109,7 +111,7 @@ private:
     std::condition_variable conditionVariable_;
 };
 
-#define TestUtil EventUtilTest::GetInstance()
+#define TestUtil ::OHOS::DelayedSingleton<EventUtilTest>::GetInstance()
 
 class InputEventConsumer : public IInputEventConsumer {
 public:
