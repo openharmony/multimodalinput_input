@@ -18,7 +18,6 @@
 
 #include <vector>
 
-#include "nocopyable.h"
 #include "singleton.h"
 
 #include "net_packet.h"
@@ -46,11 +45,11 @@
 
 namespace OHOS {
 namespace MMI {
-class InputManagerImpl : public DelayedSingleton<InputManagerImpl> {
+class InputManagerImpl final {
+    DECLARE_SINGLETON(InputManagerImpl);
+
 public:
-    virtual ~InputManagerImpl() = default;
-    DISALLOW_COPY_AND_MOVE(InputManagerImpl);
-    InputManagerImpl() = default;
+    DISALLOW_MOVE(InputManagerImpl);
 
     bool InitEventHandler();
     MMIEventHandlerPtr GetEventHandler() const;
@@ -160,7 +159,8 @@ private:
     sptr<CallDinputService> callDinputService_ = nullptr;
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
 };
+
+#define InputMgrImpl ::OHOS::Singleton<InputManagerImpl>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define InputMgrImpl OHOS::MMI::InputManagerImpl::GetInstance()
 #endif // INPUT_MANAGER_IMPL_H

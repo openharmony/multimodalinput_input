@@ -20,8 +20,6 @@
 #include <map>
 #include <mutex>
 
-#include "singleton.h"
-
 #include "input_handler_type.h"
 #include "i_input_event_consumer.h"
 #include "mmi_event_handler.h"

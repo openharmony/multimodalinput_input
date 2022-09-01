@@ -87,6 +87,9 @@ uint64_t WindowEventConsumer::GetConsumerThreadId()
     return threadId_;
 }
 
+EventUtilTest::EventUtilTest() {}
+EventUtilTest::~EventUtilTest() {}
+
 void EventUtilTest::AddEventDump(std::string eventDump)
 {
     CALL_DEBUG_ENTER;

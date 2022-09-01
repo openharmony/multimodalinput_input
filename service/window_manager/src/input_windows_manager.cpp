@@ -35,6 +35,7 @@ constexpr size_t MAX_WINDOW_COUNT = 20;
 } // namespace
 
 InputWindowsManager::InputWindowsManager() {}
+InputWindowsManager::~InputWindowsManager() {}
 
 void InputWindowsManager::Init(UDSServer& udsServer)
 {

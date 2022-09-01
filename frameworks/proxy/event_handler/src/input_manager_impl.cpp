@@ -67,6 +67,9 @@ private:
     std::function<void(std::shared_ptr<AxisEvent>)> axisMonitor_;
 };
 
+InputManagerImpl::InputManagerImpl() {}
+InputManagerImpl::~InputManagerImpl() {}
+
 bool InputManagerImpl::InitEventHandler()
 {
     CALL_DEBUG_ENTER;
@@ -188,7 +191,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     consumer_ = inputEventConsumer;
     eventHandler_ = eventHandler;
     if (eventHandler_ == nullptr) {
-        eventHandler_ = InputMgrImpl->GetCurrentEventHandler();
+        eventHandler_ = InputMgrImpl.GetCurrentEventHandler();
     }
 }
 

@@ -23,6 +23,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "CooperateEventManager"};
 } // namespace
 
+CooperateEventManager::CooperateEventManager() {}
+CooperateEventManager::~CooperateEventManager() {}
+
 void CooperateEventManager::AddCooperationEvent(sptr<EventInfo> event)
 {
     CALL_DEBUG_ENTER;

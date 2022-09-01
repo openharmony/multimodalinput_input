@@ -45,6 +45,9 @@ constexpr int32_t MOUSE_ABS_LOCATION_X = 50;
 constexpr int32_t MOUSE_ABS_LOCATION_Y = 50;
 } // namespace
 
+InputDeviceCooperateSM::InputDeviceCooperateSM() {}
+InputDeviceCooperateSM::~InputDeviceCooperateSM() {}
+
 void InputDeviceCooperateSM::Init()
 {
     preparedNetworkId_ = std::make_pair("", "");

@@ -19,7 +19,6 @@
 #include "iremote_object.h"
 #include "iremote_proxy.h"
 #include "nocopyable.h"
-#include "singleton.h"
 #include "system_ability.h"
 
 #include "i_multimodal_input_connect.h"

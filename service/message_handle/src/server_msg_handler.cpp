@@ -227,7 +227,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         MMI_HILOGE("Packet read display info failed");
         return RET_ERR;
     }
-    InputWindowsManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
+    WinMgr->UpdateDisplayInfo(displayGroupInfo);
     return RET_OK;
 }
 
