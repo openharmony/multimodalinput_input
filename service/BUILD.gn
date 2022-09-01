@@ -419,6 +419,13 @@ ohos_prebuilt_etc("drawing_pointer_image_MiddleBtn_NSWE_Center") {
   relative_install_dir = "multimodalinput/mouse_icon"
 }
 
+ohos_prebuilt_etc("multimodalinput.para.dac") {
+  source = "${mmi_path}/etc/multimodalinput.para.dac"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  module_install_dir = "etc/param"
+}
+
 ohos_shared_library("libmmi-server") {
   sources = [
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
@@ -546,6 +553,7 @@ ohos_shared_library("libmmi-server") {
     ":drawing_pointer_image_ZoomIn_Center",
     ":drawing_pointer_image_ZoomOut_Center",
     ":mmi_device_config.ini",
+    ":multimodalinput.para.dac",
     ":multimodalinput_config_ability.json",
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
