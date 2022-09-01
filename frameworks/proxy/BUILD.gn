@@ -161,7 +161,6 @@ ohos_shared_library("libmmi-client") {
   part_name = "input"
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_input:hdi_input",
     "eventhandler:libeventhandler",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
