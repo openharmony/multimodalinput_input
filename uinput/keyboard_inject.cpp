@@ -48,6 +48,8 @@ KeyboardInject::KeyboardInject()
     g_pKeyboard->SetUp();
 }
 
+KeyboardInject::~KeyboardInject() {}
+
 void KeyboardInject::InjectKeyEvent(uint16_t code, uint32_t value) const
 {
     std::lock_guard<std::mutex> keyboardLock(mutex_);

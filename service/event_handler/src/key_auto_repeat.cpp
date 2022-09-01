@@ -32,6 +32,9 @@ constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t OPEN_AUTO_REPEAT = 1;
 } // namespace
 
+KeyAutoRepeat::KeyAutoRepeat() {}
+KeyAutoRepeat::~KeyAutoRepeat() {}
+
 std::map<int32_t, DeviceConfig> KeyAutoRepeat::GetDeviceConfig() const
 {
     return deviceConfig_;

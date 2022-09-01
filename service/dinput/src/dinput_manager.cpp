@@ -31,6 +31,9 @@ const uint32_t DInputManager::KEYBOARD_ABILITY = 2;
 const uint32_t DInputManager::TOUCH_ABILITY = 4;
 const uint32_t DInputManager::FULL_ABILITY = 7;
 
+DInputManager::DInputManager() {}
+DInputManager::~DInputManager() {}
+
 void DInputManager::SetMouseLocation(const DMouseLocation& info)
 {
     mouseLocation_ = info;

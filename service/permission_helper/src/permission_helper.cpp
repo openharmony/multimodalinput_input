@@ -24,6 +24,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "PermissionHelper"};
 } // namespace
 
+PermissionHelper::PermissionHelper() {}
+PermissionHelper::~PermissionHelper() {}
+
 bool PermissionHelper::CheckPermission(uint32_t required)
 {
     CALL_DEBUG_ENTER;

@@ -29,11 +29,11 @@ enum RES_STATUS : uint8_t {
     REG_STATUS_SYNCED = 1
 };
 
-class MultimodalEventHandler : public Singleton<MultimodalEventHandler> {
+class MultimodalEventHandler final {
+    DECLARE_SINGLETON(MultimodalEventHandler);
+
 public:
-    MultimodalEventHandler();
-    ~MultimodalEventHandler() = default;
-    DISALLOW_COPY_AND_MOVE(MultimodalEventHandler);
+    DISALLOW_MOVE(MultimodalEventHandler);
 
     MMIClientPtr GetMMIClient();
     bool InitClient();
@@ -51,7 +51,7 @@ private:
     MMIClientPtr client_ = nullptr;
 };
 
-#define MMIEventHdl MultimodalEventHandler::GetInstance()
+#define MMIEventHdl ::OHOS::Singleton<MultimodalEventHandler>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // MULTIMODAL_EVENT_HANDLER_H

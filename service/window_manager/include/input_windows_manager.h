@@ -34,12 +34,10 @@ struct MouseLocation {
     int32_t physicalY { 0 };
 };
 
-class InputWindowsManager : public DelayedSingleton<InputWindowsManager> {
+class InputWindowsManager final {
+    DECLARE_DELAYED_SINGLETON(InputWindowsManager);
 public:
-    InputWindowsManager();
-    virtual ~InputWindowsManager() = default;
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
-
     void Init(UDSServer& udsServer);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent) const;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -139,7 +137,8 @@ private:
     DisplayGroupInfo displayGroupInfo_;
     MouseLocation mouseLocation_ = {-1, -1}; // physical coord
 };
+
+#define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define WinMgr InputWindowsManager::GetInstance()
 #endif // INPUT_WINDOWS_MANAGER_H
