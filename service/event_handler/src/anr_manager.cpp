@@ -33,6 +33,9 @@ constexpr int32_t ANR_DISPATCH = 0;
 constexpr int32_t ANR_MONITOR = 1;
 } // namespace
 
+ANRManager::ANRManager() {}
+ANRManager::~ANRManager() {}
+
 void ANRManager::Init(UDSServer &udsServer)
 {
     CALL_DEBUG_ENTER;

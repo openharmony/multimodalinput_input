@@ -68,6 +68,9 @@ std::unordered_map<int32_t, std::string> axisType = {
 };
 } // namespace
 
+InputDeviceManager::InputDeviceManager() {}
+InputDeviceManager::~InputDeviceManager() {}
+
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) const
 {
     CALL_DEBUG_ENTER;

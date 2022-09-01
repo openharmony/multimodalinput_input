@@ -431,7 +431,7 @@ int32_t MMIService::SetPointerSpeed(int32_t speed)
 #ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t MMIService::ReadPointerSpeed(int32_t &speed)
 {
-    speed = MouseEventHandler::GetInstance()->GetPointerSpeed();
+    speed = MouseEventHdr->GetPointerSpeed();
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER

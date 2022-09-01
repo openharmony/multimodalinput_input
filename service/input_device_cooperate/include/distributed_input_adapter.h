@@ -38,13 +38,11 @@
 
 namespace OHOS {
 namespace MMI {
-class DistributedInputAdapter : public DelayedSingleton<DistributedInputAdapter> {
+class DistributedInputAdapter final {
+    DECLARE_DELAYED_SINGLETON(DistributedInputAdapter);
 public:
     using DInputCallback = std::function<void(bool)>;
     using MouseStateChangeCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
-
-    DistributedInputAdapter();
-    ~DistributedInputAdapter();
     DISALLOW_COPY_AND_MOVE(DistributedInputAdapter);
 
     bool IsNeedFilterOut(const std::string &deviceId,
@@ -164,7 +162,7 @@ private:
     std::mutex adapterLock_;
 };
 
-#define DistributedAdapter DistributedInputAdapter::GetInstance()
+#define DistributedAdapter ::OHOS::DelayedSingleton<DistributedInputAdapter>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 

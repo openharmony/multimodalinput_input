@@ -47,7 +47,8 @@ enum class CooperateMsg {
     COOPERATE_NULL = 10,
 };
 
-class InputDeviceCooperateSM : public DelayedSingleton<InputDeviceCooperateSM>, public IInputEventHandler {
+class InputDeviceCooperateSM final : public IInputEventHandler {
+    DECLARE_DELAYED_SINGLETON(InputDeviceCooperateSM);
     class DeviceInitCallBack : public DistributedHardware::DmInitCallback {
         void OnRemoteDied() override;
     };
@@ -59,7 +60,6 @@ class InputDeviceCooperateSM : public DelayedSingleton<InputDeviceCooperateSM>, 
         void OnDeviceOffline(const DistributedHardware::DmDeviceInfo &deviceInfo) override;
     };
 public:
-    InputDeviceCooperateSM() = default;
     DISALLOW_COPY_AND_MOVE(InputDeviceCooperateSM);
     void Init();
     void EnableInputDeviceCooperate(bool enabled);
@@ -110,7 +110,8 @@ private:
     std::atomic<bool> isStopping_ { false };
     std::pair<int32_t, int32_t> mouseLocation_ { std::make_pair(0, 0) };
 };
-#define InputDevCooSM InputDeviceCooperateSM::GetInstance()
+
+#define InputDevCooSM ::OHOS::DelayedSingleton<InputDeviceCooperateSM>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_DEVICE_COOPERATE_SM_H

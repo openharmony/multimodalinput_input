@@ -26,7 +26,9 @@
 
 namespace OHOS {
 namespace MMI {
-class HdiInject {
+class HdiInject final {
+    DECLARE_DELAYED_SINGLETON(HdiInject);
+
 enum HdiInfoType {
     GET_STATUS_INFO = 1001,
     SET_HOT_PLUGS = 1002,
@@ -49,6 +51,7 @@ struct DeviceInformation {
     char chipName[32];
 };
 public:
+    DISALLOW_COPY_AND_MOVE(HdiInject);
     bool Init(UDSServer &sess);
     void StartHdiserver();
     void ShowAllDeviceInfo();
@@ -75,7 +78,7 @@ private:
     std::vector<DeviceInformation> deviceArray_ = {};
 };
 
-#define MMIHdiInject DelayedSingleton<HdiInject>::GetInstance()
+#define MMIHdiInject ::OHOS::DelayedSingleton<HdiInject>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // OHOS_BUILD_HDF

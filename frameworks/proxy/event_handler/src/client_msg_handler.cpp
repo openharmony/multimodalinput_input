@@ -140,7 +140,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     PrintEventData(key);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(dispatchCallback_);
-    InputMgrImpl->OnKeyEvent(key);
+    InputMgrImpl.OnKeyEvent(key);
     key->MarkProcessed();
     return RET_OK;
 }
@@ -163,7 +163,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     }
     pointerEvent->SetProcessedCallback(dispatchCallback_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
-    InputMgrImpl->OnPointerEvent(pointerEvent);
+    InputMgrImpl.OnPointerEvent(pointerEvent);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -277,7 +277,7 @@ int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
-    InputDeviceImpl::GetInstance().OnDevListener(deviceId, type);
+    InputDevImpl.OnDevListener(deviceId, type);
     return RET_OK;
 }
 
@@ -395,7 +395,7 @@ int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
         return RET_ERR;
     }
     MMI_HILOGI("Client pid:%{public}d", pid);
-    InputMgrImpl->OnAnr(pid);
+    InputMgrImpl.OnAnr(pid);
     return RET_OK;
 }
 

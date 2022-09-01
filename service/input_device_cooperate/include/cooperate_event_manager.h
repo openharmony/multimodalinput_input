@@ -29,11 +29,10 @@
 
 namespace OHOS {
 namespace MMI {
-class CooperateEventManager : public DelayedSingleton<CooperateEventManager> {
+class CooperateEventManager final {
+    DECLARE_DELAYED_SINGLETON(CooperateEventManager);
 public:
-    CooperateEventManager() = default;
     DISALLOW_COPY_AND_MOVE(CooperateEventManager);
-    ~CooperateEventManager() = default;
 
     enum EventType { LISTENER, ENABLE, START, STOP, STATE };
 
@@ -71,7 +70,8 @@ private:
         {EventType::STATE, nullptr}
     };
 };
-#define CooperateEventMgr CooperateEventManager::GetInstance()
+
+#define CooperateEventMgr ::OHOS::DelayedSingleton<CooperateEventManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // COOPERATE_EVENT_MANAGER_H

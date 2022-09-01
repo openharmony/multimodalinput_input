@@ -18,7 +18,6 @@
 #include <set>
 
 #include "iremote_object.h"
-#include "nocopyable.h"
 #include "singleton.h"
 
 #include "if_mmi_client.h"
@@ -28,11 +27,11 @@
 namespace OHOS {
 namespace MMI {
 class NetPacket;
-class StandardizedEventManager {
+class StandardizedEventManager final {
+    DECLARE_SINGLETON(StandardizedEventManager);
+
 public:
-    StandardizedEventManager();
-    ~StandardizedEventManager();
-    DISALLOW_COPY_AND_MOVE(StandardizedEventManager);
+    DISALLOW_MOVE(StandardizedEventManager);
 
     void SetClientHandle(MMIClientPtr client);
     const std::set<std::string> *GetRegisterEvent();
@@ -57,7 +56,7 @@ protected:
     MMIClientPtr client_ = nullptr;
 };
 
-#define EventManager OHOS::Singleton<StandardizedEventManager>::GetInstance()
+#define EventManager ::OHOS::Singleton<StandardizedEventManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // STANDARDIZED_EVENT_MANAGER_H

@@ -26,7 +26,8 @@
 
 namespace OHOS {
 namespace MMI {
-class MouseDeviceState : public DelayedSingleton<MouseDeviceState> {
+class MouseDeviceState final {
+    DECLARE_DELAYED_SINGLETON(MouseDeviceState);
 public:
     const int32_t mouseBtnMax = 8;
     enum LIBINPUT_BUTTON_CODE {
@@ -54,10 +55,7 @@ public:
         {LIBINPUT_TASK_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_TASK},
     };
 public:
-    MouseDeviceState();
-    ~MouseDeviceState();
     DISALLOW_COPY_AND_MOVE(MouseDeviceState);
-
     int32_t GetMouseCoordsX() const;
     int32_t GetMouseCoordsY() const;
     void SetMouseCoords(const int32_t x, const int32_t y);
@@ -75,7 +73,7 @@ private:
     std::map<uint32_t, int32_t> mouseBtnState_;
 };
 
-#define MouseState MouseDeviceState::GetInstance()
+#define MouseState ::OHOS::DelayedSingleton<MouseDeviceState>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // MOUSE_DEVICE_STATE_H

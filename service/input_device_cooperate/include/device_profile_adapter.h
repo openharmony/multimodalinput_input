@@ -28,7 +28,8 @@
 
 namespace OHOS {
 namespace MMI {
-class DeviceProfileAdapter : public DelayedSingleton<DeviceProfileAdapter> {
+class DeviceProfileAdapter final {
+    DECLARE_DELAYED_SINGLETON(DeviceProfileAdapter);
     class ProfileEventCallbackImpl : public DeviceProfile::IProfileEventCallback {
     public:
         void OnSyncCompleted(const DeviceProfile::SyncResult &syncResults) override;
@@ -37,8 +38,6 @@ class DeviceProfileAdapter : public DelayedSingleton<DeviceProfileAdapter> {
 public:
     using ProfileEventCallback = std::shared_ptr<DeviceProfile::IProfileEventCallback>;
     using DPCallback = std::function<void(const std::string &, bool)>;
-    DeviceProfileAdapter() = default;
-    ~DeviceProfileAdapter();
     DISALLOW_COPY_AND_MOVE(DeviceProfileAdapter);
 
     int32_t UpdateCrossingSwitchState(bool state);
@@ -55,7 +54,7 @@ private:
     std::map<std::string, DeviceProfileAdapter::DPCallback> callbacks_;
 };
 
-#define DProfileAdapter DeviceProfileAdapter::GetInstance()
+#define DProfileAdapter ::OHOS::DelayedSingleton<DeviceProfileAdapter>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 
