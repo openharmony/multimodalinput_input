@@ -15,6 +15,7 @@
 
 #include "touch_transform_point_processor.h"
 
+#include "event_log_helper.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -90,7 +91,8 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
-    PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerIds().size());
+    EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
+        pointerEvent_->GetPointerIds().size());
     return true;
 }
 
@@ -129,7 +131,8 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
     item.SetToolHeight(touchInfo.toolRect.height);
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
-    PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerIds().size());
+    EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
+        pointerEvent_->GetPointerIds().size());
     return true;
 }
 

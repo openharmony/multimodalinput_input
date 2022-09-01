@@ -1151,17 +1151,6 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
     return true;
 }
 
-std::ostream& operator<<(std::ostream& ostream, KeyEvent& keyEvent)
-{
-    ostream << "KeyCode:" << keyEvent.GetKeyCode()
-        << ",KeyAction:" << KeyEvent::ActionToString(keyEvent.GetKeyAction())
-        << ",NumLock:" << keyEvent.GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY)
-        << ",CapsLock:" << keyEvent.GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY)
-        << ",ScrollLock:" << keyEvent.GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY)
-        << std::endl;
-    return ostream;
-}
-
 int32_t KeyEvent::TransitionFunctionKey(int32_t keyCode)
 {
     switch (keyCode) {

@@ -19,6 +19,7 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+#include "event_log_helper.h"
 #include "net_packet.h"
 #include "proto.h"
 #include "util.h"
@@ -82,12 +83,7 @@ int32_t StandardizedEventManager::InjectPointerEvent(std::shared_ptr<PointerEven
     CALL_INFO_TRACE;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     MMI_HILOGD("Inject pointer event:");
-    std::stringstream sStream;
-    sStream << *pointerEvent;
-    std::string sLine;
-    while (std::getline(sStream, sLine)) {
-        MMI_HILOGD("%{public}s", sLine.c_str());
-    }
+    EventLogHelper::PrintEventData(pointerEvent);
     int32_t ret = MultimodalInputConnMgr->InjectPointerEvent(pointerEvent);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
