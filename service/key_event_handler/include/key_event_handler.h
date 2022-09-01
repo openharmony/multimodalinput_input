@@ -16,7 +16,7 @@
 #ifndef KEY_EVENT_HANDLER_H
 #define KEY_EVENT_HANDLER_H
 
-#include "nocopyable.h"
+#include "singleton.h"
 
 #include "input_windows_manager.h"
 #include "key_event.h"
@@ -24,13 +24,18 @@
 
 namespace OHOS {
 namespace MMI {
-class KeyEventHandler {
+class KeyEventHandler final {
+    DECLARE_DELAYED_SINGLETON(KeyEventHandler);
 public:
-    KeyEventHandler();
     DISALLOW_COPY_AND_MOVE(KeyEventHandler);
-    virtual ~KeyEventHandler();
+    std::shared_ptr<KeyEvent> GetKeyEvent() const;
     int32_t Normalize(libinput_event *event, std::shared_ptr<KeyEvent> keyEvent);
+    void ResetKeyEvent(struct libinput_device* device);
+
+private:
+    std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
 };
+#define KeyEventHdr ::OHOS::DelayedSingleton<KeyEventHandler>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // KEY_EVENT_HANDLER_H

@@ -70,6 +70,9 @@ public:
     bool IsRemote(struct libinput_device *inputDevice) const;
     bool IsRemote(int32_t id) const;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+    bool IsKeyboardDevice(struct libinput_device* device) const;
+    bool IsPointerDevice(struct libinput_device* device) const;
+    struct libinput_device* GetKeyboardDevice() const;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasPointerDevice();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -78,11 +81,10 @@ public:
 
 private:
     void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);
-    bool IsPointerDevice(struct libinput_device* device) const;
+    bool IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const;
     void ScanPointerDevice();
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     std::string MakeNetworkId(const char *phys) const;
-    bool IsKeyboard(struct libinput_device *device) const;
     void OnDInputDeviceRemove(struct libinput_device *inputDevice);
     std::string Sha256(const std::string &in) const;
     std::string GenerateDescriptor(struct libinput_device *inputDevice, bool isRemote) const;
