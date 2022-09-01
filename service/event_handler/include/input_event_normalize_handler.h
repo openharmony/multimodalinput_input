@@ -19,7 +19,6 @@
 #include <memory>
 
 #include "i_input_event_handler.h"
-#include "key_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -51,10 +50,6 @@ private:
 
 private:
     int32_t timerId_ = -1;
-    std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    KeyEventHandler keyEventHandler_;
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
 };
 } // namespace MMI
