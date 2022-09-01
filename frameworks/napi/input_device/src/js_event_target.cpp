@@ -686,6 +686,7 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
         }
         if (JsUtil::IsSameHandle(env, handle, (*it)->ref)) {
             MMI_HILOGD("Succeeded in removing monitor");
+            JsUtil::DeleteCallbackInfo(std::move(*it));
             iter->second.erase(it);
             goto monitorLabel;
         }
