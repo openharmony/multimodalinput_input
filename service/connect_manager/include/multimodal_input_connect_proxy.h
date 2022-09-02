@@ -68,6 +68,9 @@ public:
     virtual int32_t StopRemoteCooperate() override;
     virtual int32_t StopRemoteCooperateResult(bool isSuccess) override;
     virtual int32_t StartCooperateOtherResult(const std::string &srcNetworkId) override;
+    virtual int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
+    virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
+
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
 };

@@ -24,6 +24,10 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "KeyEvent"};
 } // namespace
+const int32_t KeyEvent::UNKOWN_FUNCTION_KEY = -1;
+const int32_t KeyEvent::NUM_LOCK_FUNCTION_KEY = 0;
+const int32_t KeyEvent::CAPS_LOCK_FUNCTION_KEY = 1;
+const int32_t KeyEvent::SCROLL_LOCK_FUNCTION_KEY = 2;
 const int32_t KeyEvent::KEYCODE_FN = 0;
 const int32_t KeyEvent::KEYCODE_UNKNOWN = -1;
 const int32_t KeyEvent::KEYCODE_HOME = 1;

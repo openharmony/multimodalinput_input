@@ -29,6 +29,7 @@
 #include "input_windows_manager.h"
 #include "key_event_handler.h"
 #include "key_event_subscriber.h"
+#include "libinput_adapter.h"
 #include "mmi_func_callback.h"
 #include "mouse_event_handler.h"
 #include "time_cost_chk.h"
@@ -135,6 +136,38 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
     MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
+{
+    CALL_INFO_TRACE;
+    const auto &keyEvent = KeyEventHdr->GetKeyEvent();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    state = keyEvent->GetFunctionKey(funcKey);
+    MMI_HILOGD("Get the function key:%{public}d status as %{public}s", funcKey, state ? "open" : "close");
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
+{
+    CALL_INFO_TRACE;
+    auto device = InputDevMgr->GetKeyboardDevice();
+    CHKPR(device, ERROR_NULL_POINTER);
+    if (LibinputAdapter::DeviceLedUpdate(device, funcKey, enable) != RET_OK) {
+        MMI_HILOGE("Failed to set the keyboard led");
+        return RET_ERR;
+    }
+    int32_t state = libinput_get_funckey_state(device, funcKey);
+
+    auto keyEvent = KeyEventHdr->GetKeyEvent();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    int32_t ret = keyEvent->SetFunctionKey(funcKey, state);
+    if (ret != funcKey) {
+        MMI_HILOGE("Failed to enable the function key");
+        return RET_ERR;
+    }
+    MMI_HILOGD("Update function key:%{public}d succeed", funcKey);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
