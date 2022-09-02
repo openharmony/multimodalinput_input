@@ -227,12 +227,25 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     pointerItem.SetWindowY(lastLogicY_ - touchWindow->area.y);
     pointerItem.SetDisplayX(lastLogicX_);
     pointerItem.SetDisplayY(lastLogicY_);
+    pointerItem.SetPointerId(0);
 
+    pointerEvent->SetTargetDisplayId(-1);
+    auto displayId = pointerEvent->GetTargetDisplayId();
+    if (!UpdateDisplayId(displayId)) {
+        MMI_HILOGE("This display:%{public}d is not existent", displayId);
+        return;
+    }
+    pointerEvent->SetTargetDisplayId(displayId);
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
+    pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(pointerItem);
     pointerEvent->SetPointerAction(pointerAction);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    int64_t time = GetSysClockTime();
+    pointerEvent->SetActionTime(time);
+    pointerEvent->SetActionStartTime(time);
+
     lastWindowInfo_ = *touchWindow;
 
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
@@ -270,12 +283,19 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
     currentPointerItem.SetWindowY(lastLogicY_ - lastWindowInfo_.area.y);
     currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
     currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
+    currentPointerItem.SetPointerId(0);
 
+    pointerEvent->SetTargetDisplayId(lastPointerEvent_->GetTargetDisplayId());
     pointerEvent->SetTargetWindowId(lastWindowInfo_.id);
     pointerEvent->SetAgentWindowId(lastWindowInfo_.agentWindowId);
+    pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(currentPointerItem);
     pointerEvent->SetPointerAction(pointerAction);
     pointerEvent->SetSourceType(lastPointerEvent_->GetSourceType());
+    int64_t time = GetSysClockTime();
+    pointerEvent->SetActionTime(time);
+    pointerEvent->SetActionStartTime(time);
+    pointerEvent->SetDeviceId(lastPointerEvent_->GetDeviceId());
 
     auto fd = udsServer_->GetClientFd(lastWindowInfo_.pid);
     auto sess = udsServer_->GetSession(fd);
