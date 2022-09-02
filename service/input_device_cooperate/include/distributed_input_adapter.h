@@ -103,25 +103,21 @@ private:
 
     class StartDInputCallbackDHIds : public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
-        void OnResultFds(const std::string &srcId, const std::string &sinkId, const int32_t &status) override;
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
     };
 
     class StopDInputCallbackDHIds : public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
-        void OnResultFds(const std::string &srcId, const std::string &sinkId, const int32_t &status) override;
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
     };
 
     class StartDInputCallbackFds : public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
-        void OnResultFds(const std::string &srcId, const std::string &sinkId, const int32_t &status) override;
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
     };
 
     class StopDInputCallbackFds : public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
-        void OnResultFds(const std::string &srcId, const std::string &sinkId, const int32_t &status) override;
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
     };
 

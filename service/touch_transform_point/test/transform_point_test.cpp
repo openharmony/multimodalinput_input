@@ -75,12 +75,12 @@ public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
     static std::string GetDeviceNodeName();
-    bool SendEvent(const Context& ctx, struct input_event* event);
-    bool SendEvents(const Context& ctx, struct input_event* events, size_t nevents);
     static int Execute(const std::string& command, std::vector<std::string>& results);
     static void GetInputDeviceNodes(std::map<std::string, std::string>& nodes);
     static bool SetupVirtualStylus();
     static bool IsVirtualStylusOn();
+    bool SendEvent(const Context& ctx, struct input_event* event);
+    bool SendEvents(const Context& ctx, struct input_event* events, size_t nevents);
 
 private:
     static VirtualPen virtualPen_;

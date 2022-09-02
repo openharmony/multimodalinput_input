@@ -49,19 +49,19 @@ public:
 
     void RemoveEnv(napi_env env);
 private:
+    JsInputMonitorManager() = default;
+
     bool IsExisting(napi_env env);
 
     void RemoveEnv(std::map<napi_env, napi_ref>::iterator it);
 
     void RemoveAllEnv();
 
-    JsInputMonitorManager() = default;
-
 private:
-    int32_t nextId_ {0};
-    std::mutex mutex_;
     std::list<std::shared_ptr<JsInputMonitor>> monitors_;
     std::map<napi_env, napi_ref> envManager_;
+    int32_t nextId_ { 0 };
+    std::mutex mutex_;
 };
 
 #define JsInputMonMgr JsInputMonitorManager::GetInstance()

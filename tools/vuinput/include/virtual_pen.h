@@ -23,8 +23,8 @@ namespace MMI {
 class VirtualPen : public VirtualDevice {
 public:
     VirtualPen();
-    ~VirtualPen() = default;
     DISALLOW_COPY_AND_MOVE(VirtualPen);
+    ~VirtualPen() = default;
 };
 } // namespace MMI
 } // namespace OHOS

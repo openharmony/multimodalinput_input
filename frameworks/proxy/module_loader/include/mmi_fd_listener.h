@@ -23,15 +23,15 @@ namespace MMI {
 class MMIFdListener : public AppExecFwk::FileDescriptorListener {
 public:
     explicit MMIFdListener(MMIClientPtr client);
-    virtual ~MMIFdListener();
     DISALLOW_COPY_AND_MOVE(MMIFdListener);
+    virtual ~MMIFdListener();
 
     virtual void OnReadable(int32_t fd) override;
     virtual void OnShutdown(int32_t fd) override;
     virtual void OnException(int32_t fd) override;
 
 private:
-    MMIClientPtr mmiClient_ = nullptr;
+    MMIClientPtr mmiClient_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

@@ -25,8 +25,8 @@ namespace MMI {
 class SendMessage {
 public:
     SendMessage() = default;
-    ~SendMessage() = default;
     DISALLOW_COPY_AND_MOVE(SendMessage);
+    ~SendMessage() = default;
     int32_t GetDevIndexName(const std::string& deviceName);
 };
 } // namespace MMI

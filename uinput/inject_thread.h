@@ -38,12 +38,12 @@ struct InjectInputEvent {
 
 class InjectThread {
 public:
+    static constexpr int32_t TOUCH_SCREEN_DEVICE_ID = 1;
+    static constexpr int32_t KEYBOARD_DEVICE_ID = 2;
     InjectThread() = default;
     virtual ~InjectThread() = default;
     void InjectFunc() const;
     void WaitFunc(InjectInputEvent injectInputEvent) const;
-    static constexpr int32_t TOUCH_SCREEN_DEVICE_ID = 1;
-    static constexpr int32_t KEYBOARD_DEVICE_ID = 2;
 
 private:
     static std::mutex mutex_;
