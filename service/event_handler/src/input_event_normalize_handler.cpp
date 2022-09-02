@@ -226,7 +226,7 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     BytraceAdapter::StartBytrace(keyEvent);
     PrintEventData(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    if (!CheckKeyboardWhiteList(keyEvent_)) {
+    if (!CheckKeyboardWhiteList(keyEvent)) {
         MMI_HILOGI("Check white list return false, keyboard event dropped");
         return RET_OK;
     }
@@ -246,6 +246,11 @@ bool InputEventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     InputHandler->SetJumpInterceptState(false);
+    int32_t keyCode = keyEvent->GetKeyCode();
+    if(keyCode == KeyEvent::KEYCODE_BACK || keyCode == KeyEvent::KEYCODE_VOLUME_UP
+        || keyCode == KeyEvent::KEYCODE_VOLUME_DOWN || keyCode == KeyEvent::KEYCODE_POWER) {
+        return true;
+    }
     CooperateState state = InputDevCooSM->GetCurrentCooperateState();
     MMI_HILOGI("Get current cooperate state:%{public}d", state);
     if (state == CooperateState::STATE_IN) {
