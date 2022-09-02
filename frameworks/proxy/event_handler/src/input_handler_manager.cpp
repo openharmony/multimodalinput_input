@@ -30,7 +30,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManager" };
-constexpr int32_t ANR_MONITOR = 1;
 } // namespace
 
 InputHandlerManager::InputHandlerManager()

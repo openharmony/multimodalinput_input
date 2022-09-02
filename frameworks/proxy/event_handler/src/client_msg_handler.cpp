@@ -43,7 +43,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ClientMsgHandler"};
-constexpr int32_t ANR_DISPATCH = 0;
 } // namespace
 
 ClientMsgHandler::~ClientMsgHandler()
@@ -362,13 +361,13 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-void ClientMsgHandler::OnEventProcessed(int32_t eventId, int32_t eventType)
+void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId)
 {
     CALL_DEBUG_ENTER;
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::MARK_PROCESS);
-    pkt << eventId << eventType;
+    pkt << eventId << ANR_DISPATCH;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write event failed");
         return;
@@ -377,12 +376,6 @@ void ClientMsgHandler::OnEventProcessed(int32_t eventId, int32_t eventType)
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
-}
-
-void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId)
-{
-    CALL_DEBUG_ENTER;
-    OnEventProcessed(eventId, ANR_DISPATCH);
 }
 
 int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
