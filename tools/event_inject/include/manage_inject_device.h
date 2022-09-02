@@ -25,8 +25,8 @@ namespace MMI {
 class ManageInjectDevice {
 public:
     ManageInjectDevice() = default;
-    ~ManageInjectDevice() = default;
     DISALLOW_COPY_AND_MOVE(ManageInjectDevice);
+    ~ManageInjectDevice() = default;
     int32_t TransformJsonData(const DeviceItems &configData);
 private:
     int32_t SendEvent(const InputEventArray &inputEventArray);

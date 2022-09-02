@@ -64,10 +64,10 @@ public:
         bool operator<(const SubscribeKeyEventInfo &other) const;
 
     private:
-        int32_t subscribeId_ { -1 };
         std::shared_ptr<KeyOption> keyOption_ { nullptr };
         std::function<void(std::shared_ptr<KeyEvent>)> callback_ { nullptr };
         EventHandlerPtr eventHandler_ { nullptr };
+        int32_t subscribeId_ { -1 };
     };
 
 public:

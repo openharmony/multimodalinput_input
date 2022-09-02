@@ -59,9 +59,9 @@ private:
     static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfo(uv_work_t *work);
 
 private:
-    bool isListeningProcess_ {false};
     inline static std::map<int32_t, std::unique_ptr<JsUtil::CallbackInfo>> callback_ {};
     inline static std::map<std::string, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>> devListener_ {};
+    bool isListeningProcess_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
