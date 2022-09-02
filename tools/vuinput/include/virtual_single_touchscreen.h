@@ -22,8 +22,8 @@ namespace MMI {
 class VirtualSingleTouchScreen : public VirtualDevice {
 public:
     VirtualSingleTouchScreen();
-    ~VirtualSingleTouchScreen() = default;
     DISALLOW_COPY_AND_MOVE(VirtualSingleTouchScreen);
+    ~VirtualSingleTouchScreen() = default;
 };
 } // namespace MMI
 } // namespace OHOS

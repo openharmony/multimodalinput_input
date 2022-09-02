@@ -23,8 +23,8 @@ namespace MMI {
 class VirtualRemoteControl : public VirtualDevice {
 public:
     VirtualRemoteControl();
-    ~VirtualRemoteControl() = default;
     DISALLOW_COPY_AND_MOVE(VirtualRemoteControl);
+    ~VirtualRemoteControl() = default;
 };
 } // namespace MMI
 } // namespace OHOS
