@@ -66,6 +66,12 @@ void LibinputAdapter::LoginfoPackagingTool(struct libinput_event *event)
     InitHiLogFunc(context);
 }
 
+int32_t LibinputAdapter::DeviceLedUpdate(struct libinput_device *device, int32_t funcKey, bool enable)
+{
+    CHKPR(device, RET_ERR);
+    return libinput_set_led_state(device, funcKey, enable);
+}
+
 constexpr static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
         if (path == nullptr) {

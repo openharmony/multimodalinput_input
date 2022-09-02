@@ -68,6 +68,9 @@ std::unordered_map<int32_t, std::string> axisType = {
 };
 } // namespace
 
+InputDeviceManager::InputDeviceManager() {}
+InputDeviceManager::~InputDeviceManager() {}
+
 std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) const
 {
     CALL_DEBUG_ENTER;
@@ -143,6 +146,17 @@ std::vector<bool> InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<
         keystrokeAbility.push_back(ret);
     }
     return keystrokeAbility;
+}
+
+bool InputDeviceManager::IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const
+{
+    for (const auto &key : keyCodes) {
+        int32_t value = InputTransformationKeyValue(key);
+        if (libinput_device_keyboard_has_key(device, value) == SUPPORT_KEY) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool InputDeviceManager::GetDeviceConfig(int32_t deviceId, int32_t &keyboardType)
@@ -292,7 +306,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     }
     ++nextId_;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    if (IsKeyboard(inputDevice)) {
+    if (IsKeyboardDevice(inputDevice)) {
         InputDevCooSM->OnKeyboardOnline(info.dhid_);
     }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
@@ -386,9 +400,17 @@ bool InputDeviceManager::IsPointerDevice(struct libinput_device* device) const
 {
     CHKPF(device);
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
-    MMI_HILOGD("udev tag:%{public}d", static_cast<int32_t>(udevTags));
+    MMI_HILOGD("The current device udev tag:%{public}d", static_cast<int32_t>(udevTags));
     return (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK |
     EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;
+}
+
+bool InputDeviceManager::IsKeyboardDevice(struct libinput_device* device) const
+{
+    CHKPF(device);
+    enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
+    MMI_HILOGD("The current device udev tag:%{public}d", static_cast<int32_t>(udevTags));
+    return udevTags & EVDEV_UDEV_TAG_KEYBOARD;
 }
 
 void InputDeviceManager::Attach(std::shared_ptr<IDeviceObserver> observer)
@@ -423,6 +445,23 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
     }
     MMI_HILOGE("Find input device id failed");
     return INVALID_DEVICE_ID;
+}
+
+struct libinput_device* InputDeviceManager::GetKeyboardDevice() const
+{
+    CALL_DEBUG_ENTER;
+    std::vector<int32_t> keyCodes;
+    keyCodes.push_back(KeyEvent::KEYCODE_Q);
+    keyCodes.push_back(KeyEvent::KEYCODE_NUMPAD_1);
+    for (const auto &item : inputDevice_) {
+        const auto &device = item.second.inputDeviceOrigin_;
+        if (IsMatchKeys(device, keyCodes)) {
+            MMI_HILOGI("Find keyboard device success");
+            return device;
+        }
+    }
+    MMI_HILOGW("No keyboard device is currently available");
+    return nullptr;
 }
 
 void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
@@ -550,9 +589,9 @@ std::string InputDeviceManager::GetOriginNetworkId(const std::string &dhid)
 void InputDeviceManager::GetLocalDeviceId(std::string &local)
 {
     local = "";
-    auto localNode = std::make_shared<NodeBasicInfo>();
+    auto localNode = std::make_unique<NodeBasicInfo>();
     CHKPV(localNode);
-    int32_t errCode = GetLocalNodeDeviceInfo(BUNDLE_NAME.c_str(), localNode);
+    int32_t errCode = GetLocalNodeDeviceInfo(BUNDLE_NAME.c_str(), localNode.get());
     if (errCode != RET_OK) {
         MMI_HILOGE("GetLocalNodeDeviceInfo errCode: %{public}d", errCode);
         return;
@@ -620,14 +659,6 @@ std::string InputDeviceManager::MakeNetworkId(const char *phys) const
         networkId = strList[1];
     }
     return networkId;
-}
-
-bool InputDeviceManager::IsKeyboard(struct libinput_device *device) const
-{
-    CHKPF(device);
-    enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
-    MMI_HILOGD("udev tag:%{public}d", static_cast<int32_t>(udevTags));
-    return udevTags & EVDEV_UDEV_TAG_KEYBOARD;
 }
 
 std::string InputDeviceManager::Sha256(const std::string &in) const

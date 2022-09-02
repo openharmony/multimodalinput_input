@@ -84,7 +84,7 @@ bool MMIClient::StartEventRunner()
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    if (!InputMgrImpl->InitEventHandler()) {
+    if (!InputMgrImpl.InitEventHandler()) {
         MMI_HILOGE("Init event handler failed");
         Stop();
         return false;
@@ -262,7 +262,7 @@ void MMIClient::Stop()
     if (recvEventHandler_ != nullptr) {
         recvEventHandler_->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);
     }
-    auto eventHandler = InputMgrImpl->GetEventHandler();
+    auto eventHandler = InputMgrImpl.GetEventHandler();
     CHKPV(eventHandler);
     eventHandler->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);
 }

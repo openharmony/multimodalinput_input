@@ -32,7 +32,9 @@
 
 namespace OHOS {
 namespace MMI {
-class InputDeviceManager : public DelayedSingleton<InputDeviceManager>, public IDeviceObject {
+class InputDeviceManager final : public IDeviceObject {
+    DECLARE_DELAYED_SINGLETON(InputDeviceManager);
+
     struct InputDeviceInfo {
         struct libinput_device *inputDeviceOrigin_ { nullptr };
         std::string networkIdOrigin_;
@@ -40,7 +42,6 @@ class InputDeviceManager : public DelayedSingleton<InputDeviceManager>, public I
         std::string dhid_;
     };
 public:
-    InputDeviceManager() = default;
     DISALLOW_COPY_AND_MOVE(InputDeviceManager);
     void OnInputDeviceAdded(struct libinput_device *inputDevice);
     void OnInputDeviceRemoved(struct libinput_device *inputDevice);
@@ -70,6 +71,9 @@ public:
     bool IsRemote(struct libinput_device *inputDevice) const;
     bool IsRemote(int32_t id) const;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+    bool IsKeyboardDevice(struct libinput_device* device) const;
+    bool IsPointerDevice(struct libinput_device* device) const;
+    struct libinput_device* GetKeyboardDevice() const;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasPointerDevice();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -78,11 +82,10 @@ public:
 
 private:
     void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);
-    bool IsPointerDevice(struct libinput_device* device) const;
+    bool IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const;
     void ScanPointerDevice();
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     std::string MakeNetworkId(const char *phys) const;
-    bool IsKeyboard(struct libinput_device *device) const;
     void OnDInputDeviceRemove(struct libinput_device *inputDevice);
     std::string Sha256(const std::string &in) const;
     std::string GenerateDescriptor(struct libinput_device *inputDevice, bool isRemote) const;
@@ -94,7 +97,7 @@ private:
     std::map<SessionPtr, std::function<void(int32_t, const std::string&)>> devListener_;
 };
 
-#define InputDevMgr InputDeviceManager::GetInstance()
+#define InputDevMgr ::OHOS::DelayedSingleton<InputDeviceManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_DEVICE_MANAGER_H

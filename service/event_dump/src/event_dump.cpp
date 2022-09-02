@@ -46,6 +46,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Event
 constexpr int32_t MAX_COMMAND_COUNT = 32;
 } // namespace
 
+EventDump::EventDump() {}
+EventDump::~EventDump() {}
+
 void ChkConfig(int32_t fd)
 {
     mprintf(fd, "ChkMMIConfig: ");

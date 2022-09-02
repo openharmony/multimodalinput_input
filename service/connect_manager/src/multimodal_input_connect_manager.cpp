@@ -212,7 +212,7 @@ int32_t MultimodalInputConnectManager::SetAnrObserver()
 int32_t MultimodalInputConnectManager::RegisterCooperateListener()
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
-    return multimodalInputConnectService_->RegisterDevListener();
+    return multimodalInputConnectService_->RegisterCooperateListener();
 }
 
 int32_t MultimodalInputConnectManager::UnregisterCooperateListener()

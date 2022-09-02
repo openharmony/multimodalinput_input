@@ -47,6 +47,9 @@ constexpr int32_t HDF_DEVICE_FD_DEFAULT_STATUS = -1;
 constexpr int32_t EVENT_PACKAGE_ARROW_SIZE = 1;
 } // namespace
 
+HdiInject::HdiInject() {}
+HdiInject::~HdiInject() {}
+
 bool HdiInject::Init(UDSServer &sess)
 {
     udsServerPtr_ = &sess;

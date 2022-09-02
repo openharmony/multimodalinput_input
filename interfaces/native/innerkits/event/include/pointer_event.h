@@ -27,9 +27,6 @@
 #include "parcel.h"
 
 #include "input_event.h"
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-#include "raw_data.h"
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 namespace OHOS {
 namespace MMI {
@@ -692,7 +689,6 @@ public:
          */
         bool ReadFromParcel(Parcel &in);
 		
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
         /**
          * @brief 获取原始X坐标数值.
          * @return  返回原始X坐标值.
@@ -721,7 +717,6 @@ public:
          * @since 9
          */
         void SetRawDy(int32_t rawDy);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 
         /**
          * @brief 获取 x 坐标的偏移量。
@@ -777,10 +772,8 @@ public:
         int64_t downTime_ {};
         int32_t toolType_ {};
         int32_t targetWindowId_ { -1 };
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-        int32_t rawDx_;
-        int32_t rawDy_;
-#endif // OHOS_BUILD_ENABLE_COOPERATE
+        int32_t rawDx_ {};
+        int32_t rawDy_ {};
         int32_t rawDeltaX_ {};
         int32_t rawDeltaY_ {};
     };

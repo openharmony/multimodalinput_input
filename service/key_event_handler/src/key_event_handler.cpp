@@ -17,6 +17,7 @@
 
 #include "input_device_manager.h"
 #include "key_map_manager.h"
+#include "key_unicode_transformation.h"
 
 namespace OHOS {
 namespace MMI {
@@ -28,6 +29,11 @@ constexpr uint32_t KEYSTATUS = 0;
 KeyEventHandler::KeyEventHandler() {}
 
 KeyEventHandler::~KeyEventHandler() {}
+
+std::shared_ptr<KeyEvent> KeyEventHandler::GetKeyEvent() const
+{
+    return keyEvent_;
+}
 
 int32_t KeyEventHandler::Normalize(struct libinput_event *event, std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -71,11 +77,20 @@ int32_t KeyEventHandler::Normalize(struct libinput_event *event, std::shared_ptr
     item.SetKeyCode(keyCode);
     item.SetDeviceId(deviceId);
     item.SetPressed(isKeyPressed);
+    item.SetUnicode(KeyCodeToUnicode(keyCode, keyEvent));
 
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         keyEvent->AddPressedKeyItems(item);
     }
     if (keyAction == KeyEvent::KEY_ACTION_UP) {
+        int32_t funcKey = keyEvent->TransitionFunctionKey(keyCode);
+        if (funcKey != KeyEvent::UNKOWN_FUNCTION_KEY) {
+            int32_t ret = keyEvent->SetFunctionKey(funcKey, libinput_get_funckey_state(device, funcKey));
+            if (ret == funcKey) {
+                MMI_HILOGD("Set function key:%{public}d to state:%{public}d succeed",
+                           funcKey, keyEvent->GetFunctionKey(funcKey));
+            }
+        }
         auto pressedKeyItem = keyEvent->GetKeyItem(keyCode);
         if (pressedKeyItem != nullptr) {
             item.SetDownTime(pressedKeyItem->GetDownTime());
@@ -86,6 +101,24 @@ int32_t KeyEventHandler::Normalize(struct libinput_event *event, std::shared_ptr
         keyEvent->AddPressedKeyItems(item);
     }
     return RET_OK;
+}
+
+void KeyEventHandler::ResetKeyEvent(struct libinput_device* device)
+{
+    if (InputDevMgr->IsKeyboardDevice(device) || InputDevMgr->IsPointerDevice(device)) {
+        if (keyEvent_ == nullptr) {
+            keyEvent_ = KeyEvent::Create();
+        }
+        CHKPV(keyEvent_);
+        const std::vector<int32_t> funcKeys = {
+            KeyEvent::NUM_LOCK_FUNCTION_KEY,
+            KeyEvent::CAPS_LOCK_FUNCTION_KEY,
+            KeyEvent::SCROLL_LOCK_FUNCTION_KEY
+        };
+        for (const auto &funcKey : funcKeys) {
+            keyEvent_->SetFunctionKey(funcKey, libinput_get_funckey_state(device, funcKey));
+        }
+    }
 }
 } // namespace MMI
 } // namespace OHOS

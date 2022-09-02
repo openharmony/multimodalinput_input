@@ -353,8 +353,8 @@ MapFun JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent,
     mapFun["screenX"] = std::bind(&PointerEvent::PointerItem::GetWindowX, item);
     mapFun["screenY"] = std::bind(&PointerEvent::PointerItem::GetWindowY, item);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    mapFun["rawDeltaX"] = std::bind(&PointerEvent::PointerItem::GetRawDataDx, item);
-    mapFun["rawDeltaY"] = std::bind(&PointerEvent::PointerItem::GetRawDataDy, item);
+    mapFun["rawDeltaX"] = std::bind(&PointerEvent::PointerItem::GetRawDx, item);
+    mapFun["rawDeltaY"] = std::bind(&PointerEvent::PointerItem::GetRawDy, item);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     return mapFun;
 }
@@ -374,6 +374,12 @@ bool JsInputMonitor::SetMouseProperty(const std::shared_ptr<PointerEvent> pointe
     }
 
     auto mapFun = GetFuns(pointerEvent, item);
+    auto iter = mapFun.find("rawDeltaX");
+    if (iter != mapFun.end()) {
+        MMI_HILOGE("rawDeltaX: %{public}lld, windowX: %{public}lld",
+            iter->second(), mapFun["windowX"]());
+    }
+
     for (const auto &it : mapFun) {
         if (SetNameProperty(jsEnv_, result, it.first, it.second()) != napi_ok) {
             THROWERR(jsEnv_, "Set property failed");

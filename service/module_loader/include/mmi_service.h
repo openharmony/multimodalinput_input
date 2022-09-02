@@ -21,7 +21,6 @@
 #include <thread>
 
 #include "iremote_object.h"
-#include "nocopyable.h"
 #include "singleton.h"
 #include "system_ability.h"
 
@@ -40,7 +39,7 @@ namespace OHOS {
 namespace MMI {
 
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
-class MMIService : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
+class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MMIService);
     DECLEAR_SYSTEM_ABILITY(MMIService);
     DISALLOW_COPY_AND_MOVE(MMIService);
@@ -82,7 +81,8 @@ public:
     virtual int32_t GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId) override;
     virtual int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) override;
     virtual int32_t StartRemoteCooperate(const std::string& localDeviceId) override;
-    virtual int32_t StartRemoteCooperateResult(bool isSuccess, int32_t xPercent, int32_t yPercent) override;
+    virtual int32_t StartRemoteCooperateResult(bool isSuccess, const std::string& startDhid,
+        int32_t xPercent, int32_t yPercent) override;
     virtual int32_t StopRemoteCooperate() override;
     virtual int32_t StopRemoteCooperateResult(bool isSuccess) override;
     virtual int32_t StartCooperateOtherResult(const std::string& srcNetworkId) override;
@@ -130,6 +130,12 @@ protected:
         int32_t srcInputDeviceId);
     int32_t OnStopDeviceCooperate(int32_t pid, int32_t userData);
     int32_t OnGetInputDeviceCooperateState(int32_t pid, int32_t userData, const std::string &deviceId);
+    int32_t OnStartRemoteCooperate(const std::string& remoteDeviceId);
+    int32_t OnStartRemoteCooperateResult(bool isSuccess,
+        const std::string& startDhid, int32_t xPercent, int32_t yPercent);
+    int32_t OnStopRemoteCooperate();
+    int32_t OnStopRemoteCooperateResult(bool isSuccess);
+    int32_t OnStartCooperateOtherResult(const std::string& srcNetworkId);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     bool InitLibinputService();
     bool InitService();
