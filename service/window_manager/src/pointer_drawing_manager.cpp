@@ -452,6 +452,10 @@ void PointerDrawingManager::SetPointerLocation(int32_t pid, int32_t x, int32_t y
         pointerWindow_->MoveTo(x, y);
         UpdatePidInfo(pid, true);
         SetPointerVisible(pid, true);
+        int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_));
+        if (ret != RET_OK) {
+            MMI_HILOGE("Init layer failed");
+        }
     }
 }
 
