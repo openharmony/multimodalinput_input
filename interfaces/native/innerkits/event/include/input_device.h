@@ -26,8 +26,8 @@ namespace MMI {
 class InputDevice {
 public:
     InputDevice() = default;
-    ~InputDevice() = default;
     DISALLOW_COPY_AND_MOVE(InputDevice);
+    ~InputDevice() = default;
 
     void SetId(int32_t deviceId);
     int32_t GetId() const;

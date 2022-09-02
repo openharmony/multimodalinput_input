@@ -53,7 +53,7 @@ protected:
     bool SendMsg(NetPacket& pkt) const;
 
 protected:
-    MMIClientPtr client_ = nullptr;
+    MMIClientPtr client_ { nullptr };
 };
 
 #define EventManager ::OHOS::Singleton<StandardizedEventManager>::GetInstance()

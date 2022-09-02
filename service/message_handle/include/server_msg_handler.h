@@ -72,8 +72,8 @@ protected:
     int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_MMI_DEBUG
 private:
-    UDSServer *udsServer_ = nullptr;
-    int32_t targetWindowId_ = -1;
+    UDSServer *udsServer_ { nullptr };
+    int32_t targetWindowId_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS
