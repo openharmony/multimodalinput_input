@@ -46,7 +46,7 @@ ohos_shared_library("inputdevice") {
 
   configs = [ ":inputdevice_config" ]
 
-  deps = ["//foundation/multimodalinput/input/frameworks/proxy:libmmi-client"]
+  deps = [ "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client" ]
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
