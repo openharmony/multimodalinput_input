@@ -820,5 +820,48 @@ int32_t MultimodalInputConnectProxy::StartCooperateOtherResult(const std::string
     }
     return ret;
 }
+
+int32_t MultimodalInputConnectProxy::GetFunctionKeyState(int32_t funcKey, bool &state)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    WRITEINT32(data, funcKey, ERR_INVALID_VALUE);
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(GET_FUNCTION_KEY_STATE, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    READBOOL(reply, state, ERR_INVALID_VALUE);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::SetFunctionKeyState(int32_t funcKey, bool enable)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    WRITEINT32(data, funcKey, ERR_INVALID_VALUE);
+    WRITEBOOL(data, enable, ERR_INVALID_VALUE);
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(SET_FUNCTION_KEY_STATE, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS

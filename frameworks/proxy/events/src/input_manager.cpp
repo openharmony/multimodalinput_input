@@ -256,5 +256,15 @@ int32_t InputManager::GetInputDeviceCooperateState(const std::string &deviceId, 
 {
     return InputMgrImpl.GetInputDeviceCooperateState(deviceId, callback);
 }
+
+bool InputManager::GetFunctionKeyState(int32_t funcKey)
+{
+    return InputMgrImpl.GetFunctionKeyState(funcKey);
+}
+
+int32_t InputManager::SetFunctionKeyState(int32_t funcKey, bool enable)
+{
+    return InputMgrImpl.SetFunctionKeyState(funcKey, enable);
+}
 } // namespace MMI
 } // namespace OHOS
