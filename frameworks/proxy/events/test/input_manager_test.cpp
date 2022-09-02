@@ -50,6 +50,10 @@ public:
     std::shared_ptr<PointerEvent> SetupPointerEvent011();
     std::shared_ptr<PointerEvent> SetupPointerEvent012();
     std::shared_ptr<PointerEvent> SetupPointerEvent013();
+    std::shared_ptr<PointerEvent> SetupmouseEvent001();
+    std::shared_ptr<PointerEvent> SetupmouseEvent002();
+    std::shared_ptr<PointerEvent> SetupTouchScreenEvent001();
+    std::shared_ptr<PointerEvent> SetupTouchScreenEvent002();
     std::shared_ptr<KeyEvent> SetupKeyEvent001();
     std::shared_ptr<PointerEvent> TestMarkConsumedStep1();
     std::shared_ptr<PointerEvent> TestMarkConsumedStep2();
@@ -547,6 +551,90 @@ void InputManagerTest::TestMarkConsumedStep6()
     TestSimulateInputEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+}
+
+std::shared_ptr<PointerEvent> InputManagerTest::SetupmouseEvent001()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDownTime(0);
+    item.SetPressed(false);
+
+    item.SetDisplayX(10);
+    item.SetDisplayY(10);
+    item.SetWindowX(10);
+    item.SetWindowY(10);
+
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetPressure(0);
+    item.SetDeviceId(0);
+    pointerEvent->AddPointerItem(item);
+    return pointerEvent;
+}
+
+std::shared_ptr<PointerEvent> InputManagerTest::SetupmouseEvent002()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDownTime(0);
+    item.SetPressed(false);
+
+    item.SetDisplayX(50);
+    item.SetDisplayY(50);
+    item.SetWindowX(70);
+    item.SetWindowY(70);
+
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetPressure(0);
+    item.SetDeviceId(0);
+    pointerEvent->AddPointerItem(item);
+    return pointerEvent;
+}
+
+std::shared_ptr<PointerEvent> InputManagerTest::SetupTouchScreenEvent001()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(10);
+    item.SetDisplayY(10);
+    item.SetPressure(5);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    return pointerEvent;
+}
+
+std::shared_ptr<PointerEvent> InputManagerTest::SetupTouchScreenEvent002()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(50);
+    item.SetDisplayY(50);
+    item.SetPressure(5);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    return pointerEvent;
 }
 
 int32_t InputManagerTest::TestAddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
@@ -3015,6 +3103,65 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_007, TestSize.Level
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::UNKOWN_FUNCTION_KEY, false);
     result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::UNKOWN_FUNCTION_KEY);
     ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputManagerTest_TouchScreenHotArea_001
+ * @tc.desc: Touch event Search window by defaultHotAreas
+ * @tc.type: FUNC
+ * @tc.require: I5HMCB
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TouchScreenHotArea_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent { SetupTouchScreenEvent001() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    ASSERT_EQ(pointerEvent->GetSourceType(), PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+}
+
+/**
+ * @tc.name: InputManagerTest_TouchScreenHotArea_002
+ * @tc.desc: Touch event Search window by pointerHotAreas
+ * @tc.type: FUNC
+ * @tc.require: I5HMCB
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_TouchScreenHotArea_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent { SetupTouchScreenEvent002() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    ASSERT_EQ(pointerEvent->GetSourceType(), PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+}
+
+/**
+ * @tc.name: InputManagerTest_MouseHotArea_001
+ * @tc.desc: mouse event Search window by pointerHotAreas
+ * @tc.type: FUNC
+ * @tc.require: I5HMCB
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_MouseHotArea_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent { SetupmouseEvent001() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    ASSERT_EQ(pointerEvent->GetSourceType(), PointerEvent::SOURCE_TYPE_MOUSE);
+}
+
+/**
+ * @tc.name: InputManagerTest_MouseHotArea_002
+ * @tc.desc: mouse event Search window by pointerHotAreas
+ * @tc.type: FUNC
+ * @tc.require: I5HMCB
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_MouseHotArea_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent { SetupmouseEvent002() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    ASSERT_EQ(pointerEvent->GetSourceType(), PointerEvent::SOURCE_TYPE_MOUSE);
 }
 } // namespace MMI
 } // namespace OHOS
