@@ -22,8 +22,8 @@ namespace MMI {
 class VirtualKnobMouse : public VirtualDevice {
 public:
     VirtualKnobMouse();
-    ~VirtualKnobMouse() = default;
     DISALLOW_COPY_AND_MOVE(VirtualKnobMouse);
+    ~VirtualKnobMouse() = default;
 };
 } // namespace MMI
 } // namespace OHOS

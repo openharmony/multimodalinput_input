@@ -146,8 +146,8 @@ private:
     void OnThread();
 
 private:
-    sptr<EventFilterService> eventFilterService_ {nullptr};
-    std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
+    sptr<EventFilterService> eventFilterService_ { nullptr };
+    std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
 
     DisplayGroupInfo displayGroupInfo_;
@@ -155,10 +155,10 @@ private:
     std::mutex handleMtx_;
     std::condition_variable cv_;
     std::thread ehThread_;
-    EventHandlerPtr eventHandler_  = nullptr;
-    MMIEventHandlerPtr mmiEventHandler_ = nullptr;
+    EventHandlerPtr eventHandler_  { nullptr };
+    MMIEventHandlerPtr mmiEventHandler_ { nullptr };
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    sptr<CallDinputService> callDinputService_ = nullptr;
+    sptr<CallDinputService> callDinputService_ { nullptr };
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
 };
 

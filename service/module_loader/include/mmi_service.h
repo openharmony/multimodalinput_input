@@ -152,7 +152,7 @@ protected:
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
-    int32_t mmiFd_ = -1;
+    int32_t mmiFd_ { -1 };
     std::mutex mu_;
     std::thread t_;
 #ifdef OHOS_RSS_CLIENT
