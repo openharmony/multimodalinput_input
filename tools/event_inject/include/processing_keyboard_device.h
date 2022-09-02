@@ -29,8 +29,8 @@ class ProcessingKeyboardDevice : public DeviceBase {
     };
 public:
     ProcessingKeyboardDevice() = default;
-    ~ProcessingKeyboardDevice() = default;
     DISALLOW_COPY_AND_MOVE(ProcessingKeyboardDevice);
+    ~ProcessingKeyboardDevice() = default;
     int32_t TransformJsonDataToInputData(const DeviceItem& inputEventArrays, InputEventArray& inputEventArray);
 private:
     int32_t AnalysisKeyBoardEvent(const std::vector<DeviceEvent>& inputData, std::vector<KeyBoardEvent>& keyBoardEvent);

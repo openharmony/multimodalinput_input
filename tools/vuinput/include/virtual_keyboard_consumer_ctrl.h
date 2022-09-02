@@ -22,8 +22,8 @@ namespace MMI {
 class VirtualKeyboardConsumerCtrl : public VirtualDevice {
 public:
     VirtualKeyboardConsumerCtrl();
-    ~VirtualKeyboardConsumerCtrl() = default;
     DISALLOW_COPY_AND_MOVE(VirtualKeyboardConsumerCtrl);
+    ~VirtualKeyboardConsumerCtrl() = default;
 };
 } // namespace MMI
 } // namespace OHOS

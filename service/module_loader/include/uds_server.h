@@ -35,7 +35,6 @@ enum EpollEventType {
     EPOLL_EVENT_SOCKET,
     EPOLL_EVENT_SIGNAL,
     EPOLL_EVENT_ETASK,
-
     EPOLL_EVENT_END,
 };
 
@@ -74,7 +73,7 @@ protected:
     void NotifySessionDeleted(SessionPtr ses);
 
 protected:
-    MsgServerFunCallback recvFun_ = nullptr;
+    MsgServerFunCallback recvFun_ { nullptr };
     std::map<int32_t, SessionPtr> sessionsMap_;
     std::map<int32_t, int32_t> idxPidMap_;
     std::map<int32_t, CircleStreamBuffer> circleBufMap_;
