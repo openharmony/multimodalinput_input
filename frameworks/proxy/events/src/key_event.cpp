@@ -464,6 +464,15 @@ void KeyEvent::KeyItem::SetPressed(bool pressed)
     pressed_ = pressed;
 }
 
+void KeyEvent::KeyItem::SetUnicode(uint32_t unicode)
+{
+    unicode_ = unicode;
+}
+
+uint32_t KeyEvent::KeyItem::GetUnicode() const
+{
+    return unicode_;
+}
 
 bool KeyEvent::KeyItem::WriteToParcel(Parcel &out) const
 {
@@ -1141,8 +1150,73 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
 std::ostream& operator<<(std::ostream& ostream, KeyEvent& keyEvent)
 {
     ostream << "KeyCode:" << keyEvent.GetKeyCode()
-        << ",KeyAction:" << KeyEvent::ActionToString(keyEvent.GetKeyAction()) << std::endl;
+        << ",KeyAction:" << KeyEvent::ActionToString(keyEvent.GetKeyAction())
+        << ",NumLock:" << keyEvent.GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY)
+        << ",CapsLock:" << keyEvent.GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY)
+        << ",ScrollLock:" << keyEvent.GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY)
+        << std::endl;
     return ostream;
+}
+
+int32_t KeyEvent::TransitionFunctionKey(int32_t keyCode)
+{
+    switch (keyCode) {
+        case KEYCODE_NUM_LOCK: {
+            return NUM_LOCK_FUNCTION_KEY;
+        }
+        case KEYCODE_CAPS_LOCK: {
+            return CAPS_LOCK_FUNCTION_KEY;
+        }
+        case KEYCODE_SCROLL_LOCK: {
+            return SCROLL_LOCK_FUNCTION_KEY;
+        }
+        default: {
+            MMI_HILOGW("Unknown key code");
+            return UNKOWN_FUNCTION_KEY;
+        }
+    }
+}
+
+bool KeyEvent::GetFunctionKey(int32_t funcKey) const
+{
+    switch (funcKey) {
+        case NUM_LOCK_FUNCTION_KEY: {
+            return numLock_;
+        }
+        case CAPS_LOCK_FUNCTION_KEY: {
+            return capsLock_;
+        }
+        case SCROLL_LOCK_FUNCTION_KEY: {
+            return scrollLock_;
+        }
+        default: {
+            MMI_HILOGW("Unknown function key");
+            return false;
+        }
+    }
+}
+
+int32_t KeyEvent::SetFunctionKey(int32_t funcKey, int32_t value)
+{
+    bool state = static_cast<bool>(value);
+    switch (funcKey) {
+        case NUM_LOCK_FUNCTION_KEY: {
+            numLock_ = state;
+            return funcKey;
+        }
+        case CAPS_LOCK_FUNCTION_KEY: {
+            capsLock_ = state;
+            return funcKey;
+        }
+        case SCROLL_LOCK_FUNCTION_KEY: {
+            scrollLock_ = state;
+            return funcKey;
+        }
+        default: {
+            MMI_HILOGW("Unknown function key");
+            return UNKOWN_FUNCTION_KEY;
+        }
+    }
 }
 } // namespace MMI
 } // namespace OHOS

@@ -33,6 +33,7 @@ public:
     DISALLOW_COPY_AND_MOVE(LibinputAdapter);
     virtual ~LibinputAdapter();
     static void LoginfoPackagingTool(struct libinput_event *event);
+    static int32_t DeviceLedUpdate(struct libinput_device *device, int32_t funcKey, bool enable);
     bool Init(FunInputEvent funInputEvent, const std::string& seat_id = "seat0");
     void EventDispatch(struct epoll_event& ev);
     void Stop();

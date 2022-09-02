@@ -18,7 +18,7 @@
 
 #include <memory>
 
-#include "nocopyable.h"
+#include "singleton.h"
 
 #include "input_handler_manager.h"
 #include "i_input_event_consumer.h"
@@ -30,8 +30,6 @@ class InputMonitorManager : public InputHandlerManager {
     DECLARE_DELAYED_SINGLETON(InputMonitorManager);
 public:
     DISALLOW_COPY_AND_MOVE(InputMonitorManager);
-
-public:
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor);
     void RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
@@ -51,7 +49,7 @@ inline bool InputMonitorManager::IsValidMonitorId(int32_t monitorId)
     return IsValidHandlerId(monitorId);
 }
 
-#define IMonitorMgr DelayedSingleton<InputMonitorManager>::GetInstance()
+#define IMonitorMgr ::OHOS::DelayedSingleton<InputMonitorManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_MONITOR_MANAGER_H

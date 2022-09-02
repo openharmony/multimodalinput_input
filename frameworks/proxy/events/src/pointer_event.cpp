@@ -265,24 +265,27 @@ void PointerEvent::PointerItem::SetTargetWindowId(int32_t windowId)
 {
     targetWindowId_ = windowId;
 }
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
+
 int32_t PointerEvent::PointerItem::GetRawDx() const
 {
     return rawDx_;
 }
+
 void PointerEvent::PointerItem::SetRawDx(int32_t rawDx)
 {
     rawDx_ = rawDx;
 }
+
 int32_t PointerEvent::PointerItem::GetRawDy() const
 {
     return rawDy_;
 }
-void PointerEvent::PointerItem::SetRawDx(int32_t rawDy)
+
+void PointerEvent::PointerItem::SetRawDy(int32_t rawDy)
 {
     rawDy_ = rawDy;
 }
-#endif // OHOS_BUILD_ENABLE_COOPERATE
+
 int32_t PointerEvent::PointerItem::GetRawDeltaX() const
 {
     return rawDeltaX_;
@@ -327,13 +330,10 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(longAxis_) &&
         out.WriteInt32(shortAxis_) &&
         out.WriteInt32(toolType_) &&
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
         out.WriteInt32(deviceId_) &&
         out.WriteInt32(rawDx_) &&
         out.WriteInt32(rawDy_)&&
-#else
         out.WriteInt32(deviceId_)&&
-#endif // OHOS_BUILD_ENABLE_COOPERATE
         out.WriteInt32(rawDeltaX_) &&
         out.WriteInt32(rawDeltaY_)
     );
@@ -363,13 +363,9 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(longAxis_) &&
         in.ReadInt32(shortAxis_) &&
         in.ReadInt32(toolType_) &&
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
         in.ReadInt32(deviceId_) &&
         in.ReadInt32(rawDx_) &&
         in.ReadInt32(rawDy_)&&
-#else
-        in.ReadInt32(deviceId_)&&
-#endif // OHOS_BUILD_ENABLE_COOPERATE
         in.ReadInt32(rawDeltaX_) &&
         in.ReadInt32(rawDeltaY_)
     );

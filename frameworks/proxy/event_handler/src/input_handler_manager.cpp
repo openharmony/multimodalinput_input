@@ -90,7 +90,7 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType,
     HandleEventType eventType, std::shared_ptr<IInputEventConsumer> monitor)
 {
-    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    auto eventHandler = InputMgrImpl.GetCurrentEventHandler();
     CHKPR(eventHandler, RET_ERR);
     InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,

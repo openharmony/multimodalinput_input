@@ -63,10 +63,6 @@ ohos_source_set("libmmi-common") {
     "events/src/pointer_event.cpp",
   ]
 
-  if (input_feature_input_cooperation) {
-    sources += [ "events/src/raw_data.cpp" ]
-  }
-
   defines = []
 
   if (input_feature_debug) {

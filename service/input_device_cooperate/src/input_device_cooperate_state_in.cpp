@@ -15,8 +15,7 @@
 
 #include "input_device_cooperate_state_in.h"
 
-#include "cooperate_messages.h"
-#include "define_multimodal.h"
+#include "cooperation_message.h"
 #include "distributed_input_adapter.h"
 #include "input_device_cooperate_sm.h"
 #include "input_device_manager.h"
@@ -34,7 +33,7 @@ InputDeviceCooperateStateIn::InputDeviceCooperateStateIn(const std::string &star
 int32_t InputDeviceCooperateStateIn::StartInputDeviceCooperate(const std::string &remoteNetworkId,
     int32_t startInputDeviceId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     if (remoteNetworkId.empty()) {
         MMI_HILOGE("RemoteNetworkId is empty");
         return RET_ERR;
@@ -70,11 +69,10 @@ int32_t InputDeviceCooperateStateIn::ProcessStart(const std::string &remoteNetwo
     }
 }
 
-int32_t InputDeviceCooperateStateIn::StopInputDeviceCooperate()
+int32_t InputDeviceCooperateStateIn::StopInputDeviceCooperate(const std::string &networkId)
 {
     CALL_DEBUG_ENTER;
-    std::string sink = InputDevMgr->GetOriginNetworkId(startDhid_);
-    int32_t ret = IInputDeviceCooperateState::StopInputDeviceCooperate(sink);
+    int32_t ret = RemoteMgr->StopRemoteCooperate(networkId);
     if (ret != RET_OK) {
         MMI_HILOGE("Stop input device cooperate fail");
         return ret;

@@ -22,7 +22,6 @@
 #include "device_manager_callback.h"
 #include "distributed_input_adapter.h"
 #include "dm_device_info.h"
-#include "event_package.h"
 #include "i_input_device_cooperate_state.h"
 #include "i_input_event_handler.h"
 
@@ -48,7 +47,8 @@ enum class CooperateMsg {
     COOPERATE_NULL = 10,
 };
 
-class InputDeviceCooperateSM : public DelayedSingleton<InputDeviceCooperateSM>, public IInputEventHandler {
+class InputDeviceCooperateSM final : public IInputEventHandler {
+    DECLARE_DELAYED_SINGLETON(InputDeviceCooperateSM);
     class DeviceInitCallBack : public DistributedHardware::DmInitCallback {
         void OnRemoteDied() override;
     };
@@ -60,7 +60,6 @@ class InputDeviceCooperateSM : public DelayedSingleton<InputDeviceCooperateSM>, 
         void OnDeviceOffline(const DistributedHardware::DmDeviceInfo &deviceInfo) override;
     };
 public:
-    InputDeviceCooperateSM() = default;
     DISALLOW_COPY_AND_MOVE(InputDeviceCooperateSM);
     void Init();
     void EnableInputDeviceCooperate(bool enabled);
@@ -72,13 +71,11 @@ public:
     void StopRemoteCooperate();
     void StopRemoteCooperateResult(bool isSuccess);
     void StartCooperateOtherResult(const std::string &srcNetworkId);
-    void HandleLibinputEvent(struct libinput_event *event) override;
+    void HandleEvent(struct libinput_event *event) override;
     void UpdateState(CooperateState state);
     void UpdatePreparedDevices(const std::string &srcNetworkId, const std::string &sinkNetworkId);
     std::pair<std::string, std::string> GetPreparedDevices() const;
-    std::shared_ptr<IInputDeviceCooperateState> GetCurrentState() const;
     CooperateState GetCurrentCooperateState() const;
-    const std::string &GetSrcNetworkId() const;
     void OnCooperateChanged(const std::string &networkId, bool isOpen);
     void OnKeyboardOnline(const std::string &dhid);
     void OnPointerOffline(const std::string &dhid, const std::string &sinkNetworkId,
@@ -88,6 +85,8 @@ public:
     void OnDeviceOffline(const std::string &networkId);
     void OnStartFinish(bool isSuccess, const std::string &remoteNetworkId, int32_t startInputDeviceId);
     void OnStopFinish(bool isSuccess, const std::string &remoteNetworkId);
+    bool IsStarting() const;
+    bool IsStopping() const;
     void Dump(int32_t fd, const std::vector<std::string> &args);
 
 private:
@@ -98,7 +97,6 @@ private:
     void NotifyRemoteStartSucess(const std::string &remoteNetworkId, const std::string &startDhid);
     void NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId);
     bool UpdateMouseLocation();
-
     std::shared_ptr<IInputDeviceCooperateState> currentStateSM_ { nullptr };
     std::pair<std::string, std::string> preparedNetworkId_;
     std::string startDhid_ ;
@@ -112,7 +110,8 @@ private:
     std::atomic<bool> isStopping_ { false };
     std::pair<int32_t, int32_t> mouseLocation_ { std::make_pair(0, 0) };
 };
-#define InputDevCooSM InputDeviceCooperateSM::GetInstance()
+
+#define InputDevCooSM ::OHOS::DelayedSingleton<InputDeviceCooperateSM>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_DEVICE_COOPERATE_SM_H
