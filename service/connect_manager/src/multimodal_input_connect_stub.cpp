@@ -88,7 +88,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::REMOTE_COOPERATE_STOP, &MultimodalInputConnectStub::StubStopRemoteCooperate},
         {IMultimodalInputConnect::REMOTE_COOPERATE_STOP_RES, &MultimodalInputConnectStub::StubStopRemoteCooperateRes},
         {IMultimodalInputConnect::REMOTE_COOPERATE_STOP_OTHER_RES,
-            &MultimodalInputConnectStub::StubStartCooperateOtherRes}
+            &MultimodalInputConnectStub::StubStartCooperateOtherRes},
+        {IMultimodalInputConnect::GET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubGetFunctionKeyState},
+        {IMultimodalInputConnect::SET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubSetFunctionKeyState}
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -801,6 +803,54 @@ int32_t MultimodalInputConnectStub::StubSetInputDevice(MessageParcel& data, Mess
         return ret;
     }
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetFunctionKeyState(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t funcKey { 0 };
+    bool state  { false };
+    READINT32(data, funcKey, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = GetFunctionKeyState(funcKey, state);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetKeyboardEnableState failed ret:%{public}d", ret);
+        return ret;
+    }
+
+    WRITEBOOL(reply, state, IPC_PROXY_DEAD_OBJECT_ERR);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetFunctionKeyState(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t funcKey { 0 };
+    bool enable  { false };
+    READINT32(data, funcKey, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetFunctionKeyState(funcKey, enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetFunctionKeyState failed ret:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

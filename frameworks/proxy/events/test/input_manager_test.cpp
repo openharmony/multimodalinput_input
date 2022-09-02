@@ -2917,5 +2917,104 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointerStyle_001, TestSize.Level1
         ASSERT_EQ(pointerStyle, MOUSE_ICON::CROSS);
     }
 }
+
+/**
+ * @tc.name: InputManagerTest_FunctionKeyState_001
+ * @tc.desc: Set NumLock for the keyboard enablement state to true
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY, true);
+    InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY);
+}
+
+/**
+ * @tc.name: InputManagerTest_FunctionKeyState_002
+ * @tc.desc: Set NumLock for the keyboard enablement state to false
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY, false);
+    bool result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputManagerTest_FunctionKeyState_003
+ * @tc.desc: Set ScrollLock for the keyboard enablement state to true
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, true);
+    InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY);
+}
+
+/**
+ * @tc.name: InputManagerTest_FunctionKeyState_004
+ * @tc.desc: Set ScrollLock for the keyboard enablement state to false
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_004, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, false);
+    bool result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputManagerTest_FunctionKeyState_005
+ * @tc.desc: Set CapsLock for the keyboard enablement state to true
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_005, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY, true);
+    InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+}
+
+/**
+ * @tc.name: InputManagerTest_FunctionKeyState_006
+ * @tc.desc: Set CapsLock for the keyboard enablement state to false
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_006, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY, false);
+    bool result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: InputManagerTest_FunctionKeyState_007
+ * @tc.desc: Set other function keys
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_007, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::UNKOWN_FUNCTION_KEY, true);
+    bool result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::UNKOWN_FUNCTION_KEY);
+    ASSERT_FALSE(result);
+    
+    InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::UNKOWN_FUNCTION_KEY, false);
+    result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::UNKOWN_FUNCTION_KEY);
+    ASSERT_FALSE(result);
+}
 } // namespace MMI
 } // namespace OHOS
