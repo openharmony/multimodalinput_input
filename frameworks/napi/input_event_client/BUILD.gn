@@ -21,6 +21,7 @@ config("inputeventclient_config") {
     "//foundation/multimodalinput/input/frameworks/napi/input_consumer/include",
     "//foundation/multimodalinput/input/tools/event_inject/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
+    "//commonlibrary/c_utils/base/include",
   ]
 
   defines = []
@@ -41,17 +42,10 @@ ohos_shared_library("inputeventclient") {
 
   configs = [ ":inputeventclient_config" ]
 
-  deps = [
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
-    "//foundation/multimodalinput/input/util:libmmi-util",
-    "//third_party/libuv:uv_static",
-  ]
+  deps = [ "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client" ]
 
   external_deps = [
-    "c_utils:utils",
-    "drivers_interface_input:hdi_input",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
     "napi:ace_napi",
   ]
 
