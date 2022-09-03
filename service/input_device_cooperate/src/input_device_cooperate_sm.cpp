@@ -425,17 +425,21 @@ void InputDeviceCooperateSM::OnPointerOffline(const std::string &dhid, const std
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
-    if (cooperateState_ == CooperateState::STATE_FREE || startDhid_ != dhid) {
+    if (cooperateState_ == CooperateState::STATE_FREE) {
+        Reset();
         return;
     }
-    if (cooperateState_ == CooperateState::STATE_OUT) {
+    if (cooperateState_ == CooperateState::STATE_IN && startDhid_ == dhid) {
+        Reset();
+        return;
+    }
+    if (cooperateState_ == CooperateState::STATE_OUT && startDhid_ == dhid) {
         std::string src = srcNetworkId_;
         if (src.empty()) {
             src = preparedNetworkId_.first;
         }
         DistributedAdapter->StopRemoteInput(src, sinkNetworkId, keyboards, [this, src](bool isSuccess) {});
     }
-    Reset();
 }
 
 void InputDeviceCooperateSM::HandleEvent(libinput_event *event)
