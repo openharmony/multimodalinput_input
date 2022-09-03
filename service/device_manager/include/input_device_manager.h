@@ -86,7 +86,6 @@ private:
     void ScanPointerDevice();
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     std::string MakeNetworkId(const char *phys) const;
-    bool IsKeyboard(struct libinput_device *device) const;
     std::string Sha256(const std::string &in) const;
     std::string GenerateDescriptor(struct libinput_device *inputDevice, bool isRemote) const;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
