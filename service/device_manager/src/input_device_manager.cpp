@@ -345,7 +345,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
             deviceId = it->first;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
             removedInfo = it->second;
-            dhids = GetPointerKeyboardDhids(deviceId);
+            dhids = GetCooperateDhids(deviceId);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
             DfxHisysevent::OnDeviceDisconnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
             inputDevice_.erase(it);
@@ -505,10 +505,10 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
 }
 
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(int32_t pointerId)
+std::vector<std::string> InputDeviceManager::GetCooperateDhids(int32_t deviceId)
 {
     std::vector<std::string> dhids;
-    auto iter = inputDevice_.find(pointerId);
+    auto iter = inputDevice_.find(deviceId);
     if (iter == inputDevice_.end()) {
         MMI_HILOGI("Find pointer id failed");
         return dhids;
@@ -536,7 +536,7 @@ std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(int32_t poi
     return dhids;
 }
 
-std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(const std::string &dhid)
+std::vector<std::string> InputDeviceManager::GetCooperateDhids(const std::string &dhid)
 {
     int32_t pointerId = -1;
     for (const auto &iter : inputDevice_) {
@@ -545,7 +545,7 @@ std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(const std::
             break;
         }
     }
-    return GetPointerKeyboardDhids(pointerId);
+    return GetCooperateDhids(pointerId);
 }
 
 std::string InputDeviceManager::GetOriginNetworkId(int32_t id)
