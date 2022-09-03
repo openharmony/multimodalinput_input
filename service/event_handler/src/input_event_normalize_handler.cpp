@@ -246,6 +246,11 @@ bool InputEventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     InputHandler->SetJumpInterceptState(false);
+    int32_t keyCode = keyEvent->GetKeyCode();
+    if(keyCode == KeyEvent::KEYCODE_BACK || keyCode == KeyEvent::KEYCODE_VOLUME_UP
+        || keyCode == KeyEvent::KEYCODE_VOLUME_DOWN || keyCode == KeyEvent::KEYCODE_POWER) {
+        return true;
+    }
     CooperateState state = InputDevCooSM->GetCurrentCooperateState();
     MMI_HILOGI("Get current cooperate state:%{public}d", state);
     if (state == CooperateState::STATE_IN) {
