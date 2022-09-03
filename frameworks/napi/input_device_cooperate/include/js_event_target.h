@@ -35,7 +35,7 @@ namespace OHOS {
 namespace MMI {
 class JsEventTarget : public IInputDeviceCooperateListener, public std::enable_shared_from_this<JsEventTarget> {
 public:
-    JsEventTarget() = default;
+    JsEventTarget();
     ~JsEventTarget() = default;
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
 

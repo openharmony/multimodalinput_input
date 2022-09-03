@@ -34,6 +34,13 @@ constexpr std::string_view COOPERATION = "cooperation";
 std::mutex mutex_;
 } // namespace
 
+JsEventTarget::JsEventTarget()
+{
+    CALL_DEBUG_ENTER;
+    auto ret = cooperateListener_.insert({ COOPERATION, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
+    CK(ret.second, VAL_NOT_EXP);
+}
+
 void JsEventTarget::EmitJsEnable(int32_t userData, std::string deviceId, CooperationMessage msg)
 {
     CALL_INFO_TRACE;
@@ -49,7 +56,8 @@ void JsEventTarget::EmitJsEnable(int32_t userData, std::string deviceId, Coopera
         MMI_HILOGE("The env is nullptr");
         return;
     }
-    iter->second->data.enableResult = (msg == CooperationMessage::OPEN_SUCCESS ? true : false);
+    iter->second->data.enableResult =
+        (msg == CooperationMessage::OPEN_SUCCESS || msg == CooperationMessage::CLOSE_SUCCESS) ? true : false;
     uv_loop_s *loop = nullptr;
     CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
     uv_work_s *work = new (std::nothrow) uv_work_t;
