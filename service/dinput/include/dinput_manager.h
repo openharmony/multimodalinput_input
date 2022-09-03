@@ -51,7 +51,6 @@ public:
     bool IsDistributedInput(uint32_t inputAbility);
     bool IsNeedFilterOut(const std::string& deviceId, const std::shared_ptr<KeyEvent>& key);
     bool CheckWhiteList(const std::shared_ptr<KeyEvent>& key, bool &jumpIntercept);
-    bool CheckTouchEvent(struct libinput_event* event);
     OHOS::DistributedHardware::DistributedInput::DInputServerType GetDInputServerType(uint32_t inputAbility);
 
     int32_t PrepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput);

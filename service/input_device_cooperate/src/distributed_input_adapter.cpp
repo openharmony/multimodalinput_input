@@ -50,6 +50,12 @@ bool DistributedInputAdapter::IsNeedFilterOut(const std::string &deviceId, const
     return DistributedInputKit::IsNeedFilterOut(deviceId, event);
 }
 
+bool DistributedInputAdapter::IsTouchEventNeedFilterOut(uint32_t absX, uint32_t absY)
+{
+    TouchScreenEvent touchScreenEvent{ absX, absY };
+    return DistributedInputKit::IsTouchEventNeedFilterOut(touchScreenEvent);
+}
+
 int32_t DistributedInputAdapter::StartRemoteInput(const std::string &deviceId, const std::vector<std::string> &dhIds,
                                                   DInputCallback callback)
 {

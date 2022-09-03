@@ -65,8 +65,8 @@ public:
     std::string GetOriginNetworkId(const std::string &dhid);
     void GetLocalDeviceId(std::string &local);
     std::string GetDhid(int32_t deviceId) const;
-    std::vector<std::string> GetPointerKeyboardDhids(int32_t pointerId);
-    std::vector<std::string> GetPointerKeyboardDhids(const std::string &dhid);
+    std::vector<std::string> GetCooperateDhids(int32_t deviceId);
+    std::vector<std::string> GetCooperateDhids(const std::string &dhid);
     bool HasLocalPointerDevice() const;
     bool IsRemote(struct libinput_device *inputDevice) const;
     bool IsRemote(int32_t id) const;
