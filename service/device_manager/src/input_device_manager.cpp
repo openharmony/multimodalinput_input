@@ -306,7 +306,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     }
     ++nextId_;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    if (IsKeyboard(inputDevice)) {
+    if (IsKeyboardDevice(inputDevice)) {
         InputDevCooSM->OnKeyboardOnline(info.dhid_);
     }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
@@ -653,14 +653,6 @@ std::string InputDeviceManager::MakeNetworkId(const char *phys) const
         networkId = strList[1];
     }
     return networkId;
-}
-
-bool InputDeviceManager::IsKeyboard(struct libinput_device *device) const
-{
-    CHKPF(device);
-    enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
-    MMI_HILOGD("udev tag:%{public}d", static_cast<int32_t>(udevTags));
-    return udevTags & EVDEV_UDEV_TAG_KEYBOARD;
 }
 
 std::string InputDeviceManager::Sha256(const std::string &in) const
