@@ -46,7 +46,7 @@ protected:
     int32_t PrepareAndStart(const std::string &srcNetworkId, int32_t startInputDeviceId);
     bool NeedPrepare(const std::string &srcNetworkId, const std::string &sinkNetworkId);
     void OnPrepareDistributedInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId);
-    int32_t StartDistributedInput(int32_t startInputDeviceId);
+    int32_t StartRemoteInput(int32_t startInputDeviceId);
     virtual void OnStartRemoteInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId);
 
 protected:

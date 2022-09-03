@@ -72,6 +72,8 @@ public:
     int32_t RegisterEventCallback(MouseStateChangeCallback callback);
     int32_t UnregisterEventCallback(MouseStateChangeCallback callback);
 
+    bool IsTouchEventNeedFilterOut(uint32_t absX, uint32_t absY);
+
 private:
     enum class CallbackType {
         StartDInputCallback,

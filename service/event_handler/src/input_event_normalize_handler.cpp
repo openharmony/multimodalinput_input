@@ -396,7 +396,7 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    if (DInputMgr->CheckTouchEvent(event)) {
+    if (InputDevCooSM->CheckTouchEvent(event)) {
         MMI_HILOGW("Touch event filter out");
         ResetTouchUpEvent(pointerEvent, event);
         return RET_OK;
