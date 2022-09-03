@@ -337,11 +337,16 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     CHKPV(inputDevice);
     int32_t deviceId = INVALID_DEVICE_ID;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    OnDInputDeviceRemove(inputDevice);
+    struct InputDeviceInfo removedInfo;
+    std::vector<std::string> dhids;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second.inputDeviceOrigin_ == inputDevice) {
             deviceId = it->first;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+            removedInfo = it->second;
+            dhids = GetPointerKeyboardDhids(deviceId);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
             DfxHisysevent::OnDeviceDisconnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
             inputDevice_.erase(it);
             break;
@@ -359,26 +364,15 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
         item.second(deviceId, "remove");
     }
     ScanPointerDevice();
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    if (IsPointerDevice(inputDevice)) {
+        InputDevCooSM->OnPointerOffline(removedInfo.dhid_, removedInfo.networkIdOrigin_, dhids);
+    }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     if (deviceId == INVALID_DEVICE_ID) {
         DfxHisysevent::OnDeviceDisconnect(INVALID_DEVICE_ID, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
     }
 }
-
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-void InputDeviceManager::OnDInputDeviceRemove(struct libinput_device *inputDevice)
-{
-    if (!IsPointerDevice(inputDevice)) {
-        return;
-    }
-    for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
-        if (it->second.inputDeviceOrigin_ == inputDevice) {
-            std::vector<std::string> dhids =  GetPointerKeyboardDhids(it->first);
-            InputDevCooSM->OnPointerOffline(it->second.dhid_, it->second.networkIdOrigin_, dhids);
-            break;
-        }
-    }
-}
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 void InputDeviceManager::ScanPointerDevice()
 {
