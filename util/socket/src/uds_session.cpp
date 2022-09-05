@@ -157,7 +157,7 @@ std::vector<int32_t> UDSSession::GetTimerIds(int32_t type)
 std::list<int32_t> UDSSession::DelEvents(int32_t type, int32_t id)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Delete events, anrtype:%{public}d, id:%{public}d", type, id);
+    MMI_HILOGD("Delete events, anr type:%{public}d, id:%{public}d", type, id);
     auto iter = events_.find(type);
     if (iter == events_.end()) {
         MMI_HILOGE("Current events have no event type:%{public}d", type);
@@ -170,7 +170,7 @@ std::list<int32_t> UDSSession::DelEvents(int32_t type, int32_t id)
         if (item.id > id) {
             break;
         }
-        MMI_HILOGD("Delete event, anrtype:%{public}d, id:%{public}d, timerId:%{public}d", type, item.id, item.timerId);
+        MMI_HILOGD("Delete event, anr type:%{public}d, id:%{public}d, timerId:%{public}d", type, item.id, item.timerId);
         timerIds.push_back(item.timerId);
         ++canDelEventCount;
     }
@@ -184,7 +184,7 @@ std::list<int32_t> UDSSession::DelEvents(int32_t type, int32_t id)
         isAnrProcess_[type] = false;
         return timerIds;
     }
-    MMI_HILOGD("First event, anrtype:%{public}d, id:%{public}d, timerId:%{public}d", type,
+    MMI_HILOGD("First event, anr type:%{public}d, id:%{public}d, timerId:%{public}d", type,
         events.begin()->id, events.begin()->timerId);
     int64_t endTime = 0;
     if (!AddInt64(events.begin()->eventTime, INPUT_UI_TIMEOUT_TIME, endTime)) {
