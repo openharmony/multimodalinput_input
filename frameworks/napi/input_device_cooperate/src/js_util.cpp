@@ -55,7 +55,7 @@ napi_value JsUtil::GetStopInfo(const std::unique_ptr<CallbackInfo> &cb)
     return GetResult(cb->env, cb->data.stopResult);
 }
 
-napi_value JsUtil::GetGetStateInfo(const std::unique_ptr<CallbackInfo> &cb)
+napi_value JsUtil::GetStateInfo(const std::unique_ptr<CallbackInfo> &cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
