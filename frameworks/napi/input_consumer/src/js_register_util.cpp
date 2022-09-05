@@ -331,7 +331,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     CALL_DEBUG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
-    KeyEventMonitorInfoWorker *dataWorker = (KeyEventMonitorInfoWorker *)work->data;
+    KeyEventMonitorInfoWorker *dataWorker = static_cast<KeyEventMonitorInfoWorker *>(work->data);
     if (dataWorker == nullptr) {
         delete work;
         work = nullptr;
@@ -358,10 +358,10 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     napi_value result = nullptr;
     AsyncWorkFn(dataWorker->env, event, result);
     napi_value callResult = nullptr;
-    status = napi_call_function(dataWorker->env, nullptr, callback, 1, &result, &callResult);
-    if (status != napi_ok) {
+    napi_status ret = napi_call_function(dataWorker->env, nullptr, callback, 1, &result, &callResult);
+    if (ret != napi_ok) {
         napi_close_handle_scope(dataWorker->env, scope);
-        MMI_HILOGE("Call function failed, status:%{public}d", static_cast<int32_t>(status));
+        MMI_HILOGE("Call function failed, ret:%{public}d", static_cast<int32_t>(ret));
         napi_throw_error(dataWorker->env, nullptr, "Call function failed");
         return;
     }
