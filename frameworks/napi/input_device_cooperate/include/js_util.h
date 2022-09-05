@@ -59,7 +59,7 @@ public:
     static napi_value GetEnableInfo(const std::unique_ptr<CallbackInfo> &cb);
     static napi_value GetStartInfo(const std::unique_ptr<CallbackInfo> &cb);
     static napi_value GetStopInfo(const std::unique_ptr<CallbackInfo> &cb);
-    static napi_value GetGetStateInfo(const std::unique_ptr<CallbackInfo> &cb);
+    static napi_value GetStateInfo(const std::unique_ptr<CallbackInfo> &cb);
     static napi_value GetResult(napi_env env, bool result);
     static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
 
