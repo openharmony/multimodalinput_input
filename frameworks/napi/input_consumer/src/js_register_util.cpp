@@ -330,6 +330,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
 {
     CALL_DEBUG_ENTER;
     CHKPV(work);
+    CHKPV(work->data);
     KeyEventMonitorInfoWorker *dataWorker = (KeyEventMonitorInfoWorker *)work->data;
     if (dataWorker == nullptr) {
         delete work;
@@ -349,6 +350,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     napi_value callback = nullptr;
     if (napi_get_reference_value(dataWorker->env, event->callback[0], &callback) != napi_ok) {
         MMI_HILOGE("Event get reference value failed");
+        napi_close_handle_scope(dataWorker->env, scope);
         napi_throw_error(dataWorker->env, nullptr, "Event get reference value failed");
         return;
     }
@@ -358,6 +360,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     napi_value callResult = nullptr;
     status = napi_call_function(dataWorker->env, nullptr, callback, 1, &result, &callResult);
     if (status != napi_ok) {
+        napi_close_handle_scope(dataWorker->env, scope);
         MMI_HILOGE("Call function failed, status:%{public}d", static_cast<int32_t>(status));
         napi_throw_error(dataWorker->env, nullptr, "Call function failed");
         return;
@@ -390,9 +393,7 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
     int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, UvQueueWorkAsyncCallback);
     if (ret != 0) {
         delete dataWorker;
-        dataWorker = nullptr;
         delete work;
-        work = nullptr;
     }
 }
 } // namespace MMI
