@@ -332,6 +332,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     CALL_DEBUG_ENTER;
     CHKPV(work);
     CHKPV(work->data);
+    (void)status;
     KeyEventMonitorInfoWorker *dataWorker = static_cast<KeyEventMonitorInfoWorker *>(work->data);
     if (dataWorker == nullptr) {
         delete work;
@@ -389,7 +390,7 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
 
     dataWorker->env = reportEvent->env;
     dataWorker->reportEvent = reportEvent;
-    work->data = (void *)dataWorker;
+    work->data = static_cast<void *>(dataWorker);
 
     int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, UvQueueWorkAsyncCallback);
     if (ret != 0) {
