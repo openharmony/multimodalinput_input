@@ -118,7 +118,7 @@ int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
     int32_t eventId = 0;
     int32_t eventType = 0;
     pkt >> eventId >> eventType;
-    MMI_HILOGD("Event is:%{public}d", eventId);
+    MMI_HILOGD("Event type:%{public}d, id:%{public}d", eventType, eventId);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read data failed");
         return PACKET_READ_FAIL;
