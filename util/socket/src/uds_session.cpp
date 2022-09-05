@@ -131,33 +131,45 @@ bool UDSSession::SendMsg(NetPacket& pkt) const
     return SendMsg(buf.Data(), buf.Size());
 }
 
-void UDSSession::SaveANREvent(int32_t type, int32_t id, int64_t time)
+void UDSSession::SaveANREvent(int32_t type, int32_t id, int64_t time, int32_t timerId)
 {
     CALL_DEBUG_ENTER;
-    if (GetTokenType() != TokenType::TOKEN_HAP || GetProgramName() == FOUNDATION) {
-        MMI_HILOGD("Is native event");
-        return;
-    }
-    EventTime eventTime = {id, time};
+    EventTime eventTime = { id, time, timerId };
     auto iter = events_.find(type);
     if (iter != events_.end()) {
         iter->second.push_back(eventTime);
     }
 }
 
-void UDSSession::DelEvents(int32_t type, int32_t id)
+std::vector<int32_t> UDSSession::GetTimerIds(int32_t type)
 {
-    CALL_DEBUG_ENTER;
-    MMI_HILOGE("del events id:%{public}d type:%{public}d", id, type);
     auto iter = events_.find(type);
     if (iter == events_.end()) {
-        MMI_HILOGE("events_ not contain event type:%{public}d", type);
-        return;
+        MMI_HILOGE("events_ have no event type:%{public}d", type);
+        return {};
+    }
+    std::vector<int32_t> Timers;
+    for (auto &item : iter->second) {
+        Timers.push_back(item.timerId);
+    }
+    return Timers;
+}
+
+std::list<int32_t> UDSSession::DelEvents(int32_t type, int32_t id)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGE("Delete events id:%{public}d type:%{public}d", id, type);
+    auto iter = events_.find(type);
+    if (iter == events_.end()) {
+        MMI_HILOGE("events_ have no event type:%{public}d", type);
+        return {};
     }
     auto &events = iter->second;
     int32_t count = 0;
+    std::list<int32_t> timerIds;
     for (auto &item : events) {
         ++count;
+        timerIds.push_back(item.timerId);
         if (item.id == id) {
             events.erase(events.begin(), events.begin() + count);
             MMI_HILOGD("Delete events");
@@ -166,17 +178,18 @@ void UDSSession::DelEvents(int32_t type, int32_t id)
     }
     if (events.empty()) {
         isAnrProcess_[type] = false;
-        return;
+        return timerIds;
     }
     int64_t endTime = 0;
     if (!AddInt64(events.begin()->eventTime, INPUT_UI_TIMEOUT_TIME, endTime)) {
         MMI_HILOGE("The addition of endTime overflows");
-        return;
+        return timerIds;
     }
     auto currentTime = GetSysClockTime();
     if (currentTime < endTime) {
         isAnrProcess_[type] = false;
     }
+    return timerIds;
 }
 
 int64_t UDSSession::GetEarliestEventTime(int32_t type) const
