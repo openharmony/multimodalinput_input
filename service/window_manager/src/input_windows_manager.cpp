@@ -327,8 +327,9 @@ void InputWindowsManager::NotifyPointerToWindow()
         }
     }
     for (const auto &item : displayGroupInfo_.windowsInfo) {
-        if ((IsInHotArea(lastLogicX_, lastLogicX_, item.pointerHotAreas)) && (lastWindowInfo_.id != item.id)) {
+        if ((IsInHotArea(lastLogicX_, lastLogicY_, item.pointerHotAreas)) && (lastWindowInfo_.id != item.id)) {
             lastWindowInfo_ = item;
+            MMI_HILOGI("Pointer select new window:%{public}d", item.id);
             break;
         }
     }
