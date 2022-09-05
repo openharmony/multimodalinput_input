@@ -85,23 +85,6 @@ bool DInputManager::CheckWhiteList(const std::shared_ptr<KeyEvent>& key, bool &j
     return false;
 }
 
-bool DInputManager::CheckTouchEvent(struct libinput_event* event)
-{
-    CALL_INFO_TRACE;
-    CHKPF(event);
-    DInputServerType type = GetDInputServerType(DInputManager::TOUCH_ABILITY);
-    if (type == DInputServerType::SINK_SERVER_TYPE) {
-        auto touchEvent = libinput_event_get_touch_event(event);
-        CHKPF(touchEvent);
-        int32_t absX = static_cast<int32_t>(libinput_event_touch_get_x(touchEvent));
-        int32_t absY = static_cast<int32_t>(libinput_event_touch_get_y(touchEvent));
-        MMI_HILOGI("Check touch event absX:%{public}d, absY:%{public}d", absX, absY);
-        return DistributedInputKit::IsTouchEventNeedFilterOut(absX, absY);
-    }
-    MMI_HILOGI("Get dinput server type:%{public}d does not need to be filtered", type);
-    return false;
-}
-
 DInputServerType DInputManager::GetDInputServerType(uint32_t inputAbility)
 {
     CALL_INFO_TRACE;

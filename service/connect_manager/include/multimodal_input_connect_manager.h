@@ -66,7 +66,10 @@ public:
     int32_t StopDeviceCooperate(int32_t userData);
     int32_t GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId);
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
+    int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
+    int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
+
 private:
     MultimodalInputConnectManager() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);
@@ -77,9 +80,9 @@ private:
     void NotifyDeath();
     sptr<IMultimodalInputConnect> multimodalInputConnectService_ = nullptr;
     sptr<IRemoteObject::DeathRecipient> multimodalInputConnectRecipient_ = nullptr;
-    std::mutex lock_;
     int32_t socketFd_ { IMultimodalInputConnect::INVALID_SOCKET_FD };
     int32_t tokenType_ { -1 };
+    std::mutex lock_;
 };
 } // namespace MMI
 } // namespace OHOS

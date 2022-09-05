@@ -22,8 +22,8 @@ namespace MMI {
 class VirtualStylus : public VirtualDevice {
 public:
     VirtualStylus();
-    ~VirtualStylus() = default;
     DISALLOW_COPY_AND_MOVE(VirtualStylus);
+    ~VirtualStylus() = default;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -30,8 +30,8 @@ using MsgClientFunCallback = std::function<void(const UDSClient&, NetPacket&)>;
 class UDSClient : public UDSSocket {
 public:
     UDSClient();
-    virtual ~UDSClient();
     DISALLOW_COPY_AND_MOVE(UDSClient);
+    virtual ~UDSClient();
 
     virtual int32_t Socket() = 0;
     virtual void Stop();
@@ -51,9 +51,9 @@ protected:
     bool StartClient(MsgClientFunCallback fun);
 
 protected:
-    bool isExit = false;
-    bool isRunning_ = false;
-    bool isConnected_ = false;
+    bool isExit { false };
+    bool isRunning_ { false };
+    bool isConnected_ { false };
     MsgClientFunCallback recvFun_;
 };
 } // namespace MMI

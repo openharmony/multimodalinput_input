@@ -59,7 +59,7 @@ void InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkId)
 {
     CALL_DEBUG_ENTER;
     std::string sink = InputDevMgr->GetOriginNetworkId(startDhid_);
-    std::vector<std::string>  dhids = InputDevMgr->GetPointerKeyboardDhids(startDhid_);
+    std::vector<std::string>  dhids = InputDevMgr->GetCooperateDhids(startDhid_);
     int32_t ret = DistributedAdapter->StopRemoteInput(srcNetworkId, sink, dhids, [this, srcNetworkId](bool isSuccess) {
         this->OnStopRemoteInput(isSuccess, srcNetworkId);
         });

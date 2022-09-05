@@ -65,8 +65,8 @@ public:
         return &it->second;
     }
 private:
-    std::string funId_ = "";
-    int32_t argvNum_ = 0;
+    std::string funId_ { "" };
+    int32_t argvNum_ { 0 };
     ManageInjectDevice manageInjectDevice_;
     std::vector<std::string> injectArgvs_;
     std::map<std::string, InjectFunction> injectFuns_;

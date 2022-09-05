@@ -333,7 +333,6 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(deviceId_) &&
         out.WriteInt32(rawDx_) &&
         out.WriteInt32(rawDy_)&&
-        out.WriteInt32(deviceId_)&&
         out.WriteInt32(rawDeltaX_) &&
         out.WriteInt32(rawDeltaY_)
     );

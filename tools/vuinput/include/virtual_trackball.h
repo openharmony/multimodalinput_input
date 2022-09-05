@@ -22,8 +22,8 @@ namespace MMI {
 class VirtualTrackball : public VirtualDevice {
 public:
     VirtualTrackball();
-    ~VirtualTrackball() = default;
     DISALLOW_COPY_AND_MOVE(VirtualTrackball);
+    ~VirtualTrackball() = default;
 };
 } // namespace MMI
 } // namespace OHOS

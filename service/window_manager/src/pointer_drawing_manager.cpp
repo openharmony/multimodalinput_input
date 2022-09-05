@@ -331,11 +331,8 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
 {
     CALL_DEBUG_ENTER;
     hasPointerDevice_ = hasPointerDevice;
-    UpdatePidInfo(getpid(), isPointerVisible);
+    SetPointerVisible(getpid(), isPointerVisible);
     DrawManager();
-    if (isPointerVisible) {
-        UpdatePointerVisible();
-    }
 }
 
 void PointerDrawingManager::DrawManager()
@@ -438,7 +435,7 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
 {
     CALL_DEBUG_ENTER;
     UpdatePidInfo(pid, visible);
-    UpdatePointerVisible();
+    InitLayer(MOUSE_ICON(lastMouseStyle_));
     return RET_OK;
 }
 
@@ -450,7 +447,6 @@ void PointerDrawingManager::SetPointerLocation(int32_t pid, int32_t x, int32_t y
     lastPhysicalY_ = y;
     if (pointerWindow_ != nullptr) {
         pointerWindow_->MoveTo(x, y);
-        UpdatePidInfo(pid, true);
         SetPointerVisible(pid, true);
     }
 }

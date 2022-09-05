@@ -232,15 +232,32 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     pointerItem.SetWindowY(lastLogicY_ - touchWindow->area.y);
     pointerItem.SetDisplayX(lastLogicX_);
     pointerItem.SetDisplayY(lastLogicY_);
+    pointerItem.SetPointerId(0);
 
+    pointerEvent->SetTargetDisplayId(-1);
+    auto displayId = pointerEvent->GetTargetDisplayId();
+    if (!UpdateDisplayId(displayId)) {
+        MMI_HILOGE("This display:%{public}d is not existent", displayId);
+        return;
+    }
+    pointerEvent->SetTargetDisplayId(displayId);
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
+    pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(pointerItem);
     pointerEvent->SetPointerAction(pointerAction);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    int64_t time = GetSysClockTime();
+    pointerEvent->SetActionTime(time);
+    pointerEvent->SetActionStartTime(time);
+
     lastWindowInfo_ = *touchWindow;
 
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
+    if (fd == RET_ERR) {
+        auto windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
+        fd = udsServer_->GetClientFd(windowInfo->pid);
+    }
     auto sess = udsServer_->GetSession(fd);
     CHKPV(sess);
 
@@ -275,14 +292,25 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
     currentPointerItem.SetWindowY(lastLogicY_ - lastWindowInfo_.area.y);
     currentPointerItem.SetDisplayX(lastPointerItem.GetDisplayX());
     currentPointerItem.SetDisplayY(lastPointerItem.GetDisplayY());
+    currentPointerItem.SetPointerId(0);
 
+    pointerEvent->SetTargetDisplayId(lastPointerEvent_->GetTargetDisplayId());
     pointerEvent->SetTargetWindowId(lastWindowInfo_.id);
     pointerEvent->SetAgentWindowId(lastWindowInfo_.agentWindowId);
+    pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(currentPointerItem);
     pointerEvent->SetPointerAction(pointerAction);
     pointerEvent->SetSourceType(lastPointerEvent_->GetSourceType());
+    int64_t time = GetSysClockTime();
+    pointerEvent->SetActionTime(time);
+    pointerEvent->SetActionStartTime(time);
+    pointerEvent->SetDeviceId(lastPointerEvent_->GetDeviceId());
 
     auto fd = udsServer_->GetClientFd(lastWindowInfo_.pid);
+    if (fd == RET_ERR) {
+        auto windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
+        fd = udsServer_->GetClientFd(windowInfo->pid);
+    }
     auto sess = udsServer_->GetSession(fd);
     CHKPV(sess);
 
@@ -789,9 +817,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     CHKPR(udsServer_, ERROR_NULL_POINTER);
     auto fd = udsServer_->GetClientFd(touchWindow->pid);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    if (InputDevMgr->HasPointerDevice()) {
-        UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
-    }
+    UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
     MMI_HILOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
@@ -808,6 +834,10 @@ int32_t InputWindowsManager::SetMouseCaptureMode(int32_t windowId, bool isCaptur
     if (windowId < 0) {
         MMI_HILOGE("Windowid(%{public}d) is invalid", windowId);
         return RET_ERR;
+    }
+    if ((captureModeInfo_.isCaptureMode == isCaptureMode) && !isCaptureMode) {
+        MMI_HILOGE("Windowid:(%{public}d) is not capture mode", windowId);
+        return RET_OK;
     }
     captureModeInfo_.windowId = windowId;
     captureModeInfo_.isCaptureMode = isCaptureMode;
