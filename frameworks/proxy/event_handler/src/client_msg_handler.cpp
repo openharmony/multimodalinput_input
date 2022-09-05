@@ -403,9 +403,10 @@ int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
 int32_t ClientMsgHandler::OnCooperationListiner(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
+    int32_t userData;
     std::string deviceId;
     int32_t nType;
-    pkt >> deviceId >> nType;
+    pkt >> userData >> deviceId >> nType;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read type failed");
         return RET_ERR;
