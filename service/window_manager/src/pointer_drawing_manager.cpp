@@ -557,7 +557,7 @@ void PointerDrawingManager::InitStyle()
         {HAND_OPEN, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "HandOpen_Center.png"}},
         {HAND_POINTING, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "HandPointing_NW.png"}},
         {HELP, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Help_NW.png"}},
-        {CURSOR_MOVE, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Move_Center.png"}},
+        {MOVE, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Move_Center.png"}},
         {RESIZE_LEFT_RIGHT, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ResizeLeftRight_Center.png"}},
         {RESIZE_UP_DOWN, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ResizeUpDown_Center.png"}},
         {SCREENSHOT_CHOOSE, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ScreenshotCross_Center.png"}},
