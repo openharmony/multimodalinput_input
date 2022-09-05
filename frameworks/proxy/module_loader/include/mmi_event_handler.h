@@ -34,12 +34,11 @@ using MMIEventHandlerPtr = std::shared_ptr<MMIEventHandler>;
 using EventHandlerPtr = std::shared_ptr<AppExecFwk::EventHandler>;
 class MMIEventHandler : public AppExecFwk::EventHandler {
 public:
+    static bool PostTask(EventHandlerPtr eventHandler, const AppExecFwk::EventHandler::Callback &callback);
     MMIEventHandler();
+    DISALLOW_COPY_AND_MOVE(MMIEventHandler);
     MMIEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner, MMIClientPtr client);
     virtual ~MMIEventHandler();
-    DISALLOW_COPY_AND_MOVE(MMIEventHandler);
-    static bool PostTask(EventHandlerPtr eventHandler, const AppExecFwk::EventHandler::Callback &callback);
-
     const std::string& GetErrorStr(ErrCode code) const;
     MMIEventHandlerPtr GetSharedPtr();
 
@@ -51,7 +50,7 @@ protected:
     virtual void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
 
 private:
-    MMIClientPtr mmiClient_ = nullptr;
+    MMIClientPtr mmiClient_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

@@ -38,7 +38,7 @@ private:
     void OnEventTouchPadPinchUpdate(libinput_event_gesture *data);
     void OnEventTouchPadPinchEnd(libinput_event_gesture *data);
 private:
-    int32_t deviceId_ {0};
+    int32_t deviceId_ { 0 };
     std::shared_ptr<PointerEvent> pointerEvent_ = nullptr;
 };
 } // namespace MMI

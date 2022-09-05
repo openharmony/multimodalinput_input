@@ -26,8 +26,8 @@ typedef std::function<int32_t(const UDSClient&, NetPacket&)> ClientMsgFun;
 class ClientMsgHandler : public MsgHandler<MmiMessageId, ClientMsgFun> {
 public:
     ClientMsgHandler() = default;
-    virtual ~ClientMsgHandler();
     DISALLOW_COPY_AND_MOVE(ClientMsgHandler);
+    virtual ~ClientMsgHandler();
 
     void Init();
     void InitProcessedCallback();

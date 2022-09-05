@@ -20,6 +20,9 @@ config("inputdevice_config") {
     "//foundation/multimodalinput/input/frameworks/napi/input_device/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/util/network/include",
+    "//commonlibrary/c_utils/base/include",
+    "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
+    "//foundation/multimodalinput/input/frameworks/proxy/module_loader/include",
   ]
 
   defines = []
@@ -43,11 +46,7 @@ ohos_shared_library("inputdevice") {
 
   configs = [ ":inputdevice_config" ]
 
-  deps = [
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
-    "//foundation/multimodalinput/input/util:libmmi-util",
-    "//third_party/libuv:uv_static",
-  ]
+  deps = [ "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client" ]
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",

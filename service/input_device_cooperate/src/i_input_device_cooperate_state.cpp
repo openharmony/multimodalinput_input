@@ -52,7 +52,7 @@ int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetwor
             InputDevCooSM->UpdatePreparedDevices("", "");
         }
     } else {
-        ret = StartDistributedInput(startInputDeviceId);
+        ret = StartRemoteInput(startInputDeviceId);
         if (ret != RET_OK) {
             MMI_HILOGE("Start remoteNetworkId input fail");
             InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
@@ -71,17 +71,17 @@ void IInputDeviceCooperateState::OnPrepareDistributedInput(
     } else {
         std::string taskName = "start_dinput_task";
         std::function<void()> handleStartDinputFunc =
-            std::bind(&IInputDeviceCooperateState::StartDistributedInput, this, startInputDeviceId);
+            std::bind(&IInputDeviceCooperateState::StartRemoteInput, this, startInputDeviceId);
         CHKPV(eventHandler_);
         eventHandler_->PostTask(handleStartDinputFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
     }
 }
 
-int32_t IInputDeviceCooperateState::StartDistributedInput(int32_t startInputDeviceId)
+int32_t IInputDeviceCooperateState::StartRemoteInput(int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     std::pair<std::string, std::string> networkIds = InputDevCooSM->GetPreparedDevices();
-    std::vector<std::string> dhids = InputDevMgr->GetPointerKeyboardDhids(startInputDeviceId);
+    std::vector<std::string> dhids = InputDevMgr->GetCooperateDhids(startInputDeviceId);
     if (dhids.empty()) {
         InputDevCooSM->OnStartFinish(false, networkIds.first, startInputDeviceId);
         return RET_OK;

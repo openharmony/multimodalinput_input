@@ -333,8 +333,8 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
     CHKRP(env, napi_create_int32(env, MOUSE_ICON::HAND_POINTING, &hand_pointing), CREATE_INT32);
     napi_value help = nullptr;
     CHKRP(env, napi_create_int32(env, MOUSE_ICON::HELP, &help), CREATE_INT32);
-    napi_value cursor_move = nullptr;
-    CHKRP(env, napi_create_int32(env, MOUSE_ICON::CURSOR_MOVE, &cursor_move), CREATE_INT32);
+    napi_value move = nullptr;
+    CHKRP(env, napi_create_int32(env, MOUSE_ICON::CURSOR_MOVE, &move), CREATE_INT32);
     napi_value resize_up_down = nullptr;
     CHKRP(env, napi_create_int32(env, MOUSE_ICON::RESIZE_LEFT_RIGHT, &resize_up_down), CREATE_INT32);
     napi_value resize_left_right = nullptr;
@@ -393,7 +393,7 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
         DECLARE_NAPI_STATIC_PROPERTY("HAND_OPEN", hand_open),
         DECLARE_NAPI_STATIC_PROPERTY("HAND_POINTING", hand_pointing),
         DECLARE_NAPI_STATIC_PROPERTY("HELP", help),
-        DECLARE_NAPI_STATIC_PROPERTY("CURSOR_MOVE", cursor_move),
+        DECLARE_NAPI_STATIC_PROPERTY("MOVE", move),
         DECLARE_NAPI_STATIC_PROPERTY("RESIZE_LEFT_RIGHT", resize_left_right),
         DECLARE_NAPI_STATIC_PROPERTY("RESIZE_UP_DOWN", resize_up_down),
         DECLARE_NAPI_STATIC_PROPERTY("SCREENSHOT_CHOOSE", screenshot_choose),

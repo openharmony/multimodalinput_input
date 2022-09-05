@@ -127,6 +127,8 @@ public:
     int32_t StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback);
     int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
+    bool GetFunctionKeyState(int32_t funcKey);
+    int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
@@ -146,8 +148,8 @@ private:
     void OnThread();
 
 private:
-    sptr<EventFilterService> eventFilterService_ {nullptr};
-    std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
+    sptr<EventFilterService> eventFilterService_ { nullptr };
+    std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
 
     DisplayGroupInfo displayGroupInfo_;
@@ -155,10 +157,10 @@ private:
     std::mutex handleMtx_;
     std::condition_variable cv_;
     std::thread ehThread_;
-    EventHandlerPtr eventHandler_  = nullptr;
-    MMIEventHandlerPtr mmiEventHandler_ = nullptr;
+    EventHandlerPtr eventHandler_  { nullptr };
+    MMIEventHandlerPtr mmiEventHandler_ { nullptr };
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    sptr<CallDinputService> callDinputService_ = nullptr;
+    sptr<CallDinputService> callDinputService_ { nullptr };
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
 };
 

@@ -32,28 +32,28 @@ public:
      *
      * @since 9
      */
-    static const int32_t UNKOWN_FUNCTION_KEY = -1;
+    static const int32_t UNKOWN_FUNCTION_KEY;
 
     /**
      * Num Lock功能按键
      *
      * @since 9
      */
-    static const int32_t NUM_LOCK_FUNCTION_KEY = 0;
+    static const int32_t NUM_LOCK_FUNCTION_KEY;
 
     /**
      * Caps Lock功能按键
      *
      * @since 9
      */
-    static const int32_t CAPS_LOCK_FUNCTION_KEY = 1;
+    static const int32_t CAPS_LOCK_FUNCTION_KEY;
 
     /**
      * Scroll Lock功能按键
      *
      * @since 9
      */
-    static const int32_t SCROLL_LOCK_FUNCTION_KEY = 2;
+    static const int32_t SCROLL_LOCK_FUNCTION_KEY;
 
     /**
      * Function (Fn) key

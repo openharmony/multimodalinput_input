@@ -257,14 +257,24 @@ int32_t InputManager::GetInputDeviceCooperateState(const std::string &deviceId, 
     return InputMgrImpl.GetInputDeviceCooperateState(deviceId, callback);
 }
 
+bool InputManager::GetFunctionKeyState(int32_t funcKey)
+{
+    return InputMgrImpl.GetFunctionKeyState(funcKey);
+}
+
+int32_t InputManager::SetFunctionKeyState(int32_t funcKey, bool enable)
+{
+    return InputMgrImpl.SetFunctionKeyState(funcKey, enable);
+}
+
 int32_t InputManager::EnterCaptureMode(int32_t windowId)
 {
-    return InputMgrImpl->EnterCaptureMode(windowId);
+    return InputMgrImpl.EnterCaptureMode(windowId);
 }
 
 int32_t InputManager::LeaveCaptureMode(int32_t windowId)
 {
-    return InputMgrImpl->LeaveCaptureMode(windowId);
+    return InputMgrImpl.LeaveCaptureMode(windowId);
 }
 } // namespace MMI
 } // namespace OHOS

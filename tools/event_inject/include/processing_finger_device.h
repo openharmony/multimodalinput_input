@@ -38,8 +38,8 @@ class ProcessingFingerDevice : public DeviceBase {
     };
 public:
     ProcessingFingerDevice() = default;
-    ~ProcessingFingerDevice() = default;
     DISALLOW_COPY_AND_MOVE(ProcessingFingerDevice);
+    ~ProcessingFingerDevice() = default;
     int32_t TransformJsonDataToInputData(const DeviceItem &inputEventArrays, InputEventArray &inputEventArray);
 private:
     void AnalysisTouchPadFingerDate(const std::vector<DeviceEvent> &inputData,

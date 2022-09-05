@@ -20,6 +20,7 @@ config("mouseEvent_config") {
     "//foundation/multimodalinput/input/frameworks/napi/mouse_event/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/util/network/include",
+    "//commonlibrary/c_utils/base/include",
   ]
 
   defines = []
@@ -40,11 +41,7 @@ ohos_shared_library("mouseevent") {
 
   configs = [ ":mouseEvent_config" ]
 
-  deps = [
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
-    "//foundation/multimodalinput/input/util:libmmi-util",
-    "//third_party/libuv:uv_static",
-  ]
+  deps = []
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",

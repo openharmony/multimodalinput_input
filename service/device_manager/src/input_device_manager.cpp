@@ -337,11 +337,16 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     CHKPV(inputDevice);
     int32_t deviceId = INVALID_DEVICE_ID;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    OnDInputDeviceRemove(inputDevice);
+    struct InputDeviceInfo removedInfo;
+    std::vector<std::string> dhids;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second.inputDeviceOrigin_ == inputDevice) {
             deviceId = it->first;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+            removedInfo = it->second;
+            dhids = GetCooperateDhids(deviceId);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
             DfxHisysevent::OnDeviceDisconnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
             inputDevice_.erase(it);
             break;
@@ -359,26 +364,15 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
         item.second(deviceId, "remove");
     }
     ScanPointerDevice();
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    if (IsPointerDevice(inputDevice)) {
+        InputDevCooSM->OnPointerOffline(removedInfo.dhid_, removedInfo.networkIdOrigin_, dhids);
+    }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     if (deviceId == INVALID_DEVICE_ID) {
         DfxHisysevent::OnDeviceDisconnect(INVALID_DEVICE_ID, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
     }
 }
-
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-void InputDeviceManager::OnDInputDeviceRemove(struct libinput_device *inputDevice)
-{
-    if (!IsPointerDevice(inputDevice)) {
-        return;
-    }
-    for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
-        if (it->second.inputDeviceOrigin_ == inputDevice) {
-            std::vector<std::string> dhids =  GetPointerKeyboardDhids(it->first);
-            InputDevCooSM->OnPointerOffline(it->second.dhid_, it->second.networkIdOrigin_, dhids);
-            break;
-        }
-    }
-}
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 void InputDeviceManager::ScanPointerDevice()
 {
@@ -511,10 +505,10 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
 }
 
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(int32_t pointerId)
+std::vector<std::string> InputDeviceManager::GetCooperateDhids(int32_t deviceId)
 {
     std::vector<std::string> dhids;
-    auto iter = inputDevice_.find(pointerId);
+    auto iter = inputDevice_.find(deviceId);
     if (iter == inputDevice_.end()) {
         MMI_HILOGI("Find pointer id failed");
         return dhids;
@@ -542,7 +536,7 @@ std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(int32_t poi
     return dhids;
 }
 
-std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(const std::string &dhid)
+std::vector<std::string> InputDeviceManager::GetCooperateDhids(const std::string &dhid)
 {
     int32_t pointerId = -1;
     for (const auto &iter : inputDevice_) {
@@ -551,7 +545,7 @@ std::vector<std::string> InputDeviceManager::GetPointerKeyboardDhids(const std::
             break;
         }
     }
-    return GetPointerKeyboardDhids(pointerId);
+    return GetCooperateDhids(pointerId);
 }
 
 std::string InputDeviceManager::GetOriginNetworkId(int32_t id)
@@ -663,17 +657,24 @@ std::string InputDeviceManager::MakeNetworkId(const char *phys) const
 
 std::string InputDeviceManager::Sha256(const std::string &in) const
 {
+    unsigned char out[SHA256_DIGEST_LENGTH * 2 + 1] = {0};
     SHA256_CTX ctx;
     SHA256_Init(&ctx);
-    SHA256_Update(&ctx, reinterpret_cast<const u_char *>(in.c_str()), in.size());
-    u_char digest[SHA_DIGEST_LENGTH];
-    SHA256_Final(digest, &ctx);
-
-    std::string out;
-    for (size_t i = 0; i < SHA_DIGEST_LENGTH; i++) {
-        out += StringPrintf("%02x", digest[i]);
+    SHA256_Update(&ctx, in.data(), in.size());
+    SHA256_Final(&out[SHA256_DIGEST_LENGTH], &ctx);
+    // here we translate sha256 hash to hexadecimal. each 8-bit char will be presented by two characters([0-9a-f])
+    constexpr int32_t WIDTH = 4;
+    constexpr unsigned char MASK = 0x0F;
+    const char* hexCode = "0123456789abcdef";
+    constexpr int32_t DOUBLE_TIMES = 2;
+    for (int32_t i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
+        unsigned char value = out[SHA256_DIGEST_LENGTH + i];
+        // uint8_t is 2 digits in hexadecimal.
+        out[i * DOUBLE_TIMES] = hexCode[(value >> WIDTH) & MASK];
+        out[i * DOUBLE_TIMES + 1] = hexCode[value & MASK];
     }
-    return out;
+    out[SHA256_DIGEST_LENGTH * DOUBLE_TIMES] = 0;
+    return reinterpret_cast<char*>(out);
 }
 
 std::string InputDeviceManager::GenerateDescriptor(struct libinput_device *inputDevice, bool isRemote) const

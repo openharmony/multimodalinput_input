@@ -23,8 +23,8 @@ namespace MMI {
 class TabletToolProcessor : public TransformPointProcessor {
 public:
     explicit TabletToolProcessor(int32_t deviceId);
-    virtual ~TabletToolProcessor() = default;
     DISALLOW_COPY_AND_MOVE(TabletToolProcessor);
+    virtual ~TabletToolProcessor() = default;
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
 
 private:

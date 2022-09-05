@@ -31,6 +31,9 @@ public:
     virtual ~MMIClient() override;
 
     int32_t Socket() override;
+    bool Start() override;
+    void RegisterConnectedFunction(ConnectCallback fun) override;
+    void RegisterDisconnectedFunction(ConnectCallback fun) override;
     virtual void Stop() override;
     virtual bool SendMessage(const NetPacket& pkt) const override;
     virtual bool GetCurrentConnectedStatus() const override;
@@ -39,30 +42,24 @@ public:
     virtual void OnDisconnect() override;
     virtual MMIClientPtr GetSharedPtr() override;
 
-    bool Start() override;
-    void RegisterConnectedFunction(ConnectCallback fun) override;
-    void RegisterDisconnectedFunction(ConnectCallback fun) override;
-
 protected:
-    virtual void OnConnected() override;
-    virtual void OnDisconnected() override;
-
     bool StartEventRunner();
     void OnRecvThread();
     bool AddFdListener(int32_t fd);
     bool DelFdListener(int32_t fd);
     void OnPacket(NetPacket& pkt);
+    virtual void OnConnected() override;
+    virtual void OnDisconnected() override;
 
 protected:
     ClientMsgHandler msgHandler_;
     ConnectCallback funConnected_;
     ConnectCallback funDisconnected_;
-
     CircleStreamBuffer circBuf_;
     std::mutex mtx_;
     std::condition_variable cv_;
     std::thread recvThread_;
-    std::shared_ptr<MMIEventHandler> recvEventHandler_ = nullptr;
+    std::shared_ptr<MMIEventHandler> recvEventHandler_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
