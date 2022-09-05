@@ -65,7 +65,7 @@ napi_value JsInputDeviceCooperateContext::Enable(napi_env env, napi_callback_inf
     napi_value argv[2] = {};
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
-    if (argc != 0 && argc != 2) {
+    if (argc != 1 && argc != 2) {
         THROWERR(env, "Wrong number of parameters");
         MMI_HILOGE("Wrong number of parameters");
         return nullptr;
@@ -393,6 +393,9 @@ void JsInputDeviceCooperateContext::DeclareDeviceCooperateInterface(napi_env env
     napi_value stopSuccess = nullptr;
     CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::STOP_SUCCESS), &stopSuccess),
         CREATE_INT32);
+    napi_value stopFail = nullptr;
+    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::STOP_FAIL), &stopFail),
+        CREATE_INT32);
     napi_value stateOn = nullptr;
     CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::STATE_ON), &stateOn),
         CREATE_INT32);
@@ -410,6 +413,7 @@ void JsInputDeviceCooperateContext::DeclareDeviceCooperateInterface(napi_env env
         DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_CLOSE_SUCCESS", closeSuccess),
         DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STOP", stop),
         DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STOP_SUCCESS", stopSuccess),
+        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STOP_FAIL", stopFail),
         DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STATE_ON", stateOn),
         DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STATE_OFF", stateOff),
     };
