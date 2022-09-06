@@ -180,6 +180,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
 
     if (!displayGroupInfo.displaysInfo.empty()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
+        IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
         const MouseLocation &mouseLocation = GetMouseInfo();
         int32_t logicX = mouseLocation.physicalX;
         int32_t logicY = mouseLocation.physicalY;
@@ -190,7 +191,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
         }
         int32_t windowPid = GetWindowPid(windowInfo->id);
         WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
-        IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo, info);
+        IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
         if (InputDevMgr->HasPointerDevice()) {
             IPointerDrawingManager::GetInstance()->DrawPointerStyle();
         }
@@ -801,9 +802,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
         return RET_ERR;
     }
+    IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicalDisplayInfo);
     int32_t mouseStyle = pointerStyleInfo.value();
     WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
-    IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicalDisplayInfo, info);
+    IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
         pointerItem.GetDisplayY(), MOUSE_ICON(mouseStyle));
 
