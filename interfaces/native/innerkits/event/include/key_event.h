@@ -3160,8 +3160,6 @@ private:
     bool capsLock_ { false };
     bool scrollLock_ { false };
 };
-
-std::ostream& operator<<(std::ostream&, KeyEvent&);
 } // namespace MMI
 } // namespace OHOS
 #endif // KEY_EVENT_H
