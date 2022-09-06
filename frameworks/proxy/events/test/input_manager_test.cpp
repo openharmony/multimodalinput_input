@@ -1180,7 +1180,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_013, Test
  * @tc.name: InputManagerTest_MouseEventEnterAndLeave_001
  * @tc.desc: Verify that the mouse moves away from the window
  * @tc.type: FUNC
- * @tc.require:
+ * @tc.require: I5HMF3 I5HMEF
  */
 HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_001, TestSize.Level1)
 {
@@ -1196,7 +1196,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_001, TestSiz
  * @tc.name: InputManagerTest_MouseEventEnterAndLeave_002
  * @tc.desc: Verify return mouse away from the window
  * @tc.type: FUNC
- * @tc.require:
+ * @tc.require: I5HMF3 I5HMEF
  */
 HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_002, TestSize.Level1)
 {
@@ -1212,7 +1212,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_002, TestSiz
  * @tc.name: InputManagerTest_MouseEventEnterAndLeave_003
  * @tc.desc: Verify that the home button and mouse leave the window
  * @tc.type: FUNC
- * @tc.require:
+ * @tc.require: I5HMF3 I5HMEF
  */
 HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_003, TestSize.Level1)
 {
@@ -1228,7 +1228,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_003, TestSiz
  * @tc.name: InputManagerTest_MouseEventEnterAndLeave_004
  * @tc.desc: Verify that the mouse moves to the navigation bar to leave the window
  * @tc.type: FUNC
- * @tc.require:
+ * @tc.require: I5HMF3 I5HMEF
  */
 HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_004, TestSize.Level1)
 {

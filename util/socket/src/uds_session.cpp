@@ -24,6 +24,7 @@
 #include <unistd.h>
 
 #include "uds_socket.h"
+#include "proto.h"
 
 namespace OHOS {
 namespace MMI {
@@ -31,8 +32,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSSession" };
 constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 const std::string FOUNDATION = "foundation";
-constexpr int32_t ANR_DISPATCH = 0;
-constexpr int32_t ANR_MONITOR = 1;
 } // namespace
 
 UDSSession::UDSSession(const std::string &programName, const int32_t moduleType, const int32_t fd,
@@ -145,7 +144,7 @@ std::vector<int32_t> UDSSession::GetTimerIds(int32_t type)
 {
     auto iter = events_.find(type);
     if (iter == events_.end()) {
-        MMI_HILOGE("events_ have no event type:%{public}d", type);
+        MMI_HILOGE("Current events have no event type:%{public}d", type);
         return {};
     }
     std::vector<int32_t> Timers;
@@ -158,28 +157,35 @@ std::vector<int32_t> UDSSession::GetTimerIds(int32_t type)
 std::list<int32_t> UDSSession::DelEvents(int32_t type, int32_t id)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGE("Delete events id:%{public}d type:%{public}d", id, type);
+    MMI_HILOGD("Delete events, anr type:%{public}d, id:%{public}d", type, id);
     auto iter = events_.find(type);
     if (iter == events_.end()) {
-        MMI_HILOGE("events_ have no event type:%{public}d", type);
+        MMI_HILOGE("Current events have no event type:%{public}d", type);
         return {};
     }
     auto &events = iter->second;
-    int32_t count = 0;
+    int32_t canDelEventCount = 0;
     std::list<int32_t> timerIds;
     for (auto &item : events) {
-        ++count;
-        timerIds.push_back(item.timerId);
-        if (item.id == id) {
-            events.erase(events.begin(), events.begin() + count);
-            MMI_HILOGD("Delete events");
+        if (item.id > id) {
             break;
         }
+        MMI_HILOGD("Delete event, anr type:%{public}d, id:%{public}d, timerId:%{public}d", type, item.id, item.timerId);
+        timerIds.push_back(item.timerId);
+        ++canDelEventCount;
     }
+    if (canDelEventCount == 0) {
+        MMI_HILOGW("Can not find event:%{public}d", id);
+        return timerIds;
+    }
+    events.erase(events.begin(), events.begin() + canDelEventCount);
+
     if (events.empty()) {
         isAnrProcess_[type] = false;
         return timerIds;
     }
+    MMI_HILOGD("First event, anr type:%{public}d, id:%{public}d, timerId:%{public}d", type,
+        events.begin()->id, events.begin()->timerId);
     int64_t endTime = 0;
     if (!AddInt64(events.begin()->eventTime, INPUT_UI_TIMEOUT_TIME, endTime)) {
         MMI_HILOGE("The addition of endTime overflows");
@@ -198,7 +204,7 @@ int64_t UDSSession::GetEarliestEventTime(int32_t type) const
     auto iter = events_.find(type);
     if (iter != events_.end()) {
         if (iter->second.empty()) {
-            MMI_HILOGD("events is empty");
+            MMI_HILOGD("Current events is empty");
             return 0;
         }
         return iter->second.begin()->eventTime;
