@@ -334,7 +334,7 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(toolType_) &&
         out.WriteInt32(deviceId_) &&
         out.WriteInt32(rawDx_) &&
-        out.WriteInt32(rawDy_)&&
+        out.WriteInt32(rawDy_) &&
         out.WriteInt32(rawDeltaX_) &&
         out.WriteInt32(rawDeltaY_)
     );
@@ -366,7 +366,7 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(toolType_) &&
         in.ReadInt32(deviceId_) &&
         in.ReadInt32(rawDx_) &&
-        in.ReadInt32(rawDy_)&&
+        in.ReadInt32(rawDy_) &&
         in.ReadInt32(rawDeltaX_) &&
         in.ReadInt32(rawDeltaY_)
     );
