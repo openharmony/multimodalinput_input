@@ -51,7 +51,7 @@ constexpr double DOUBLE_ZERO = 1e-6;
 constexpr int32_t MIN_SPEED = 1;
 constexpr int32_t MAX_SPEED = 11;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-constexpr int32_t PERCENT_CONST = 100;
+constexpr double PERCENT_CONST = 100.0;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace
 MouseEventHandler::MouseEventHandler()
@@ -443,7 +443,7 @@ void MouseEventHandler::SetDxDyForDInput(PointerEvent::PointerItem& pointerItem,
     MMI_HILOGD("MouseEventHandler SetDxDyForDInput : dx:%{public}d, dy:%{public}d", rawDx, rawDy);
 }
 
-void MouseEventHandler::SetAbsolutionLocation(int32_t xPercent, int32_t yPercent)
+void MouseEventHandler::SetAbsolutionLocation(double xPercent, double yPercent)
 {
     MMI_HILOGI("MouseEventHandler cross screen location : xPercent:%{public}d, yPercent:%{public}d",
         xPercent, yPercent);
