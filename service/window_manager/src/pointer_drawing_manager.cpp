@@ -321,6 +321,8 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupIn
         }
     }
     UpdateDisplayInfo(displayGroupInfo.displaysInfo[0], info);
+    lastPhysicalX_ = displayGroupInfo.displaysInfo[0].width / 2;
+    lastPhysicalY_ = displayGroupInfo.displaysInfo[0].height / 2;
     DrawManager();
     MouseEventHdr->OnDisplayLost(displayInfo_.id);
     MMI_HILOGD("displayId_:%{public}d, displayWidth_:%{public}d, displayHeight_:%{public}d",
