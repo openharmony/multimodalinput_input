@@ -727,7 +727,6 @@ bool KeyCommandManager::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
 
     if (tempSeqs.empty()) {
         MMI_HILOGD("No matching sequence found");
-        ResetSequenceKeys();
     } else {
         filterSequences_ = tempSeqs;
     }
@@ -768,12 +767,11 @@ bool KeyCommandManager::AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent)
         }
     }
 
-    keys_.push_back(sequenceKey);
-    if (keys_.size() > MAX_SEQUENCEKEYS_NUM) {
+    if (size > MAX_SEQUENCEKEYS_NUM) {
         MMI_HILOGD("The save key size more than the max size");
-        ResetSequenceKeys();
         return false;
     }
+    keys_.push_back(sequenceKey);
     return true;
 }
 
@@ -793,7 +791,7 @@ bool KeyCommandManager::HandleSequence(Sequence &sequence, bool &isLaunchAbility
             return false;
         }
         int64_t delay = sequence.sequenceKeys[i].delay;
-        if (((i + 1) != keysSize) && (delay != 0) && (keys_[i].delay <= delay)) {
+        if (((i + 1) != keysSize) && (delay != 0) && (keys_[i].delay >= delay)) {
             MMI_HILOGD("Delay is not matching");
             return false;
         }
