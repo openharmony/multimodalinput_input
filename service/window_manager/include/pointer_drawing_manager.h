@@ -46,8 +46,9 @@ public:
     ~PointerDrawingManager() = default;
     void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
         const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT);
-    void UpdateDisplayInfo(const DisplayInfo& displayInfo, const WinInfo &info);
-    void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo, const WinInfo &info);
+    void UpdateDisplayInfo(const DisplayInfo& displayInfo);
+    void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo);
+    void OnWindowInfo(const WinInfo &info);
     void UpdatePointerDevice(bool hasPointerDevicee, bool isPointerVisible);
     bool Init();
     void DeletePointerVisible(int32_t pid);
