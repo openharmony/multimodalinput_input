@@ -217,14 +217,17 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     const MouseLocation &mouseLocation = GetMouseInfo();
     lastLogicX_ = mouseLocation.physicalX;
     lastLogicY_ = mouseLocation.physicalY;
-    auto touchWindow = SelectWindowInfo(lastLogicX_, lastLogicY_, pointerEvent);
-    if (!touchWindow) {
-        MMI_HILOGE("TouchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
-        return;
+    if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW) {
+        auto touchWindow = GetWindowInfo(lastLogicX_, lastLogicY_);
+        if (!touchWindow) {
+            MMI_HILOGE("TouchWindow is nullptr");
+            return;
+        }
+        lastWindowInfo_ = *touchWindow;
     }
     PointerEvent::PointerItem pointerItem;
-    pointerItem.SetWindowX(lastLogicX_ - touchWindow->area.x);
-    pointerItem.SetWindowY(lastLogicY_ - touchWindow->area.y);
+    pointerItem.SetWindowX(lastLogicX_ - lastWindowInfo_.area.x);
+    pointerItem.SetWindowY(lastLogicY_ - lastWindowInfo_.area.y);
     pointerItem.SetDisplayX(lastLogicX_);
     pointerItem.SetDisplayY(lastLogicY_);
     pointerItem.SetPointerId(0);
@@ -236,8 +239,8 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
         return;
     }
     pointerEvent->SetTargetDisplayId(displayId);
-    pointerEvent->SetTargetWindowId(touchWindow->id);
-    pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
+    pointerEvent->SetTargetWindowId(lastWindowInfo_.id);
+    pointerEvent->SetAgentWindowId(lastWindowInfo_.agentWindowId);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(pointerItem);
     pointerEvent->SetPointerAction(pointerAction);
@@ -246,13 +249,7 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     pointerEvent->SetActionTime(time);
     pointerEvent->SetActionStartTime(time);
 
-    lastWindowInfo_ = *touchWindow;
-
-    auto fd = udsServer_->GetClientFd(touchWindow->pid);
-    if (fd == RET_ERR) {
-        auto windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
-        fd = udsServer_->GetClientFd(windowInfo->pid);
-    }
+    auto fd = udsServer_->GetClientFd(lastWindowInfo_.pid);
     auto sess = udsServer_->GetSession(fd);
     CHKPV(sess);
 
@@ -281,6 +278,16 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
     if (!lastPointerEvent_->GetPointerItem(lastPointerId, lastPointerItem)) {
         MMI_HILOGE("GetPointerItem:%{public}d fail", lastPointerId);
         return;
+    }
+    if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW) {
+        auto windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
+        if (!windowInfo) {
+            MMI_HILOGE("windowInfo is nullptr");
+            return;
+        }
+        if (windowInfo->id != lastWindowInfo_.id) {
+            lastWindowInfo_ = *windowInfo;
+        }
     }
     PointerEvent::PointerItem currentPointerItem;
     currentPointerItem.SetWindowX(lastLogicX_ - lastWindowInfo_.area.x);
