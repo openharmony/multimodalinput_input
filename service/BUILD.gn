@@ -584,14 +584,10 @@ ohos_shared_library("libmmi-server") {
   }
 
   external_deps = [
-    "ability_base:base",
     "ability_base:want",
     "ability_runtime:ability_manager",
     "access_token:libaccesstoken_sdk",
     "config_policy:configpolicy_util",
-    "device_info_manager:distributed_device_profile_client",
-    "drivers_interface_input:hdi_input",
-    "dsoftbus:softbus_client",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
@@ -599,7 +595,6 @@ ohos_shared_library("libmmi-server") {
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
     "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
   ]
 
   if (input_feature_input_cooperation) {
