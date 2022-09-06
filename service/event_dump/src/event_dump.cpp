@@ -43,7 +43,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
-constexpr int32_t MAX_COMMAND_COUNT = 32;
+constexpr size_t MAX_COMMAND_COUNT { 32 };
 } // namespace
 
 EventDump::EventDump() {}
@@ -70,7 +70,7 @@ void ChkConfig(int32_t fd)
 void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    int32_t count = 0;
+    size_t count = 0;
     for (const auto &str : args) {
         if (str.find("--") == 0) {
             ++count;
