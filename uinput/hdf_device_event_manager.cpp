@@ -26,7 +26,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "HdfDeviceEventManager"};
 constexpr int32_t SLEEP_TIME = 50000;
-constexpr uint32_t CALL_NUMBER = 70;
+constexpr int32_t CALL_NUMBER = 70;
 } // namespace
 
 HdfDeviceEventManager::HdfDeviceEventManager() {}
@@ -35,7 +35,7 @@ HdfDeviceEventManager::~HdfDeviceEventManager() {}
 
 void HdfDeviceEventManager::ConnectHDFInit()
 {
-    uint32_t count = 0;
+    int32_t count = 0;
     do {
         inputInterface_ = IInputInterfaces::Get();
         usleep(SLEEP_TIME);
