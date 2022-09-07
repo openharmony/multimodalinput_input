@@ -36,6 +36,7 @@
 #include "mmi_func_callback.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "napi_constants.h"
 #include "proto.h"
 #include "time_cost_chk.h"
 #include "util.h"
