@@ -987,7 +987,8 @@ void InputManagerCommand::ShowUsage()
     std::cout << "The option are:                                " << std::endl;
     std::cout << "-M  --mouse                                    " << std::endl;
     std::cout << "commands for mouse:                            " << std::endl;
-    std::cout << "-m <dx> <dy>              --move   <dx> <dy>  -move to relative position (dx,dy) "    << std::endl;
+    std::cout << "-m <dx> <dy>              --move   <dx> <dy>  -move to relative position (dx,dy),"    << std::endl;
+    std::cout << "   <dx1> <dy1> <dx2> <dy2> [soomth time] --trace -dx1 dy1 to dx2 dy2 smooth movement" << std::endl;
     std::cout << "-d <key>                  --down   key        -press down a button, "                 << std::endl;
     std::cout << "                                               0 is the left button, 1 is the right," << std::endl;
     std::cout << "                                               2 is the middle"   << std::endl;
@@ -1007,13 +1008,10 @@ void InputManagerCommand::ShowUsage()
     std::cout << "   key value:6 - button back"     << std::endl;
     std::cout << "   key value:7 - button task"     << std::endl;
     std::cout << "-s <key>                  --scroll <key>      -positive values are sliding backwards" << std::endl;
-    std::cout << "-v <px1> <py1> <py2> <py2> [soomth time]"  << std::endl;
-    std::cout << "  --movement <px1> <py1> <py2> <py2> [soomth time] -dx1 dy1 to dx2 dy2 smooth movement";
-    std::cout << std::endl;
     std::cout << "-i <time>                 --interval <time>   -the program interval for the (time) milliseconds";
     std::cout << std::endl;
-    std::cout << std::endl;
     std::cout << "                                               negative values are sliding forwards"  << std::endl;
+    std::cout << std::endl;
     std::cout << "-K  --keyboard                                                " << std::endl;
     std::cout << "commands for keyboard:                                        " << std::endl;
     std::cout << "-d <key>                   --down   <key>     -press down a key" << std::endl;
