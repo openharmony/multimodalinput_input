@@ -28,6 +28,7 @@
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
 #include "input-event-codes.h"
+#include "napi_constants.h"
 #include "proto.h"
 #include "util.h"
 

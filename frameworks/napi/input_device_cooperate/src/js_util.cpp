@@ -15,8 +15,8 @@
 
 #include "js_util.h"
 
-#include "constants.h"
 #include "mmi_log.h"
+#include "napi_constants.h"
 #include "util_napi.h"
 
 namespace OHOS {

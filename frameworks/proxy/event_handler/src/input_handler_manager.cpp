@@ -14,17 +14,18 @@
  */
 
 #include "input_handler_manager.h"
-#include <cinttypes>
 
-#include "mmi_log.h"
-#include "net_packet.h"
-#include "proto.h"
+#include <cinttypes>
 
 #include "bytrace_adapter.h"
 #include "input_handler_type.h"
 #include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "mmi_log.h"
+#include "napi_constants.h"
+#include "net_packet.h"
+#include "proto.h"
 
 namespace OHOS {
 namespace MMI {
