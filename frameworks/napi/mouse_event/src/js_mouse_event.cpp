@@ -16,16 +16,13 @@
 #include "js_mouse_event.h"
 
 #include "mmi_log.h"
+#include "napi_constants.h"
 #include "util_napi.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsMouseEvent" };
-const std::string DEFINE_CLASS = "napi_define_class";
-const std::string SET_NAMED_PROPERTY = "napi_set_named_property";
-const std::string CREATE_INT32 = "napi_create_int32";
-const std::string GET_CB_INFO = "napi_get_cb_info";
 
 enum class Action : int32_t {
     CANCEL = 0,

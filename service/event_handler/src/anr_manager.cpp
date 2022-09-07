@@ -16,10 +16,11 @@
 #include "anr_manager.h"
 
 #include "ability_manager_client.h"
-#include "dfx_hisysevent.h"
 
+#include "dfx_hisysevent.h"
 #include "input_event_handler.h"
 #include "mmi_log.h"
+#include "napi_constants.h"
 #include "proto.h"
 #include "timer_manager.h"
 
