@@ -30,8 +30,11 @@ KeyEventHandler::KeyEventHandler() {}
 
 KeyEventHandler::~KeyEventHandler() {}
 
-std::shared_ptr<KeyEvent> KeyEventHandler::GetKeyEvent() const
+std::shared_ptr<KeyEvent> KeyEventHandler::GetKeyEvent()
 {
+    if (keyEvent_ == nullptr) {
+        keyEvent_ = KeyEvent::Create();
+    }
     return keyEvent_;
 }
 
