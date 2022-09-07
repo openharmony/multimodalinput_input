@@ -37,9 +37,9 @@ ohos_shared_library("inputdevicecooperate") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
-    "utils_base:utils",
   ]
 
   relative_install_dir = "module/multimodalinput"
