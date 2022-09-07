@@ -316,7 +316,7 @@ int32_t MultimodalInputConnectStub::StubRegisterInputDeviceMonitor(MessageParcel
     CALL_DEBUG_ENTER;
     int32_t ret = RegisterDevListener();
     if (ret != RET_OK) {
-        MMI_HILOGE("Register DevListener failed ret:%{public}d", ret);
+        MMI_HILOGE("Call RegisterInputDeviceMonitor failed ret:%{public}d", ret);
     }
     return ret;
 }
@@ -326,7 +326,7 @@ int32_t MultimodalInputConnectStub::StubUnregisterInputDeviceMonitor(MessageParc
     CALL_DEBUG_ENTER;
     int32_t ret = UnregisterDevListener();
     if (ret != RET_OK) {
-        MMI_HILOGE("Unregister DevListener failed ret:%{public}d", ret);
+        MMI_HILOGE("Call UnregisterInputDeviceMonitor failed ret:%{public}d", ret);
     }
     return ret;
 }
@@ -340,7 +340,7 @@ int32_t MultimodalInputConnectStub::StubGetKeyboardType(MessageParcel& data, Mes
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = GetKeyboardType(userData, deviceId);
     if (ret != RET_OK) {
-        MMI_HILOGE("Get Keyboard Type failed ret:%{public}d", ret);
+        MMI_HILOGE("Call GetKeyboardType failed ret:%{public}d", ret);
     }
     return ret;
 }
