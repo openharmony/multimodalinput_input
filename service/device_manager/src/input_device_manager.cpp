@@ -15,12 +15,14 @@
 
 #include "input_device_manager.h"
 
+#include <linux/input.h>
 #include <parameters.h>
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include <openssl/sha.h>
 #include <regex>
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include <unordered_map>
+
 #include "dfx_hisysevent.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
@@ -40,15 +42,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputD
 constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t SUPPORT_KEY = 1;
 
-constexpr int32_t ABS_MT_TOUCH_MAJOR = 0x30;
-constexpr int32_t ABS_MT_TOUCH_MINOR = 0x31;
-constexpr int32_t ABS_MT_ORIENTATION = 0x34;
-constexpr int32_t ABS_MT_POSITION_X  = 0x35;
-constexpr int32_t ABS_MT_POSITION_Y = 0x36;
-constexpr int32_t ABS_MT_PRESSURE = 0x3a;
-constexpr int32_t ABS_MT_WIDTH_MAJOR = 0x32;
-constexpr int32_t ABS_MT_WIDTH_MINOR = 0x33;
-constexpr int32_t BUS_BLUETOOTH = 0X5;
 const std::string UNKNOWN_SCREEN_ID = "";
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 const char *SPLIT_SYMBOL = "|";

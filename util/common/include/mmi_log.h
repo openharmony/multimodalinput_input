@@ -28,9 +28,7 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
-} // namespace
+inline constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
 } // namespace MMI
 } // namespace OHOS
 
@@ -95,13 +93,11 @@ constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr int32_t EVENT_TYPE_POINTER = 0X00020000;
-constexpr int32_t TIMEOUT = 100000;
-constexpr int32_t POINTER_ACTION_UP = 4;
-constexpr int32_t POINTER_ACTION_MOVE = 3;
-constexpr int32_t FINAL_FINGER = 1;
-} // namespace
+inline constexpr int32_t EVENT_TYPE_POINTER = 0X00020000;
+inline constexpr int32_t TIMEOUT = 100000;
+inline constexpr int32_t POINTER_ACTION_UP = 4;
+inline constexpr int32_t POINTER_ACTION_MOVE = 3;
+inline constexpr int32_t FINAL_FINGER = 1;
 
 class InnerFunctionTracer {
 public:

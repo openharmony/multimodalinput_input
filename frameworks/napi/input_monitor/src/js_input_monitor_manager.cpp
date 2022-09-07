@@ -18,13 +18,13 @@
 #include <uv.h>
 
 #include "define_multimodal.h"
+#include "napi_constants.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorManager" };
 
-const std::string GET_CB_INFO = "napi_get_cb_info";
 const std::string REFERENCE_UNREF = "napi_reference_unref";
 } // namespace
 
