@@ -28,6 +28,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyMapManager" };
 } // namespace
 
+KeyMapManager::KeyMapManager() {}
+KeyMapManager::~KeyMapManager() {}
+
 void KeyMapManager::GetConfigKeyValue(const std::string &fileName, int32_t deviceId)
 {
     CALL_DEBUG_ENTER;

@@ -18,7 +18,6 @@
 
 #include <vector>
 
-#include "nocopyable.h"
 #include "singleton.h"
 
 #include "net_packet.h"
@@ -46,11 +45,11 @@
 
 namespace OHOS {
 namespace MMI {
-class InputManagerImpl : public DelayedSingleton<InputManagerImpl> {
+class InputManagerImpl final {
+    DECLARE_SINGLETON(InputManagerImpl);
+
 public:
-    virtual ~InputManagerImpl() = default;
-    DISALLOW_COPY_AND_MOVE(InputManagerImpl);
-    InputManagerImpl() = default;
+    DISALLOW_MOVE(InputManagerImpl);
 
     bool InitEventHandler();
     MMIEventHandlerPtr GetEventHandler() const;
@@ -126,6 +125,8 @@ public:
     int32_t StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback);
     int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
+    bool GetFunctionKeyState(int32_t funcKey);
+    int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
@@ -145,22 +146,23 @@ private:
     void OnThread();
 
 private:
-    sptr<EventFilterService> eventFilterService_ {nullptr};
-    std::shared_ptr<IInputEventConsumer> consumer_ = nullptr;
+    sptr<EventFilterService> eventFilterService_ { nullptr };
+    std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
 
-    DisplayGroupInfo displayGroupInfo_;
+    DisplayGroupInfo displayGroupInfo_ {};
     std::mutex mtx_;
     std::mutex handleMtx_;
     std::condition_variable cv_;
     std::thread ehThread_;
-    EventHandlerPtr eventHandler_  = nullptr;
-    MMIEventHandlerPtr mmiEventHandler_ = nullptr;
+    EventHandlerPtr eventHandler_  { nullptr };
+    MMIEventHandlerPtr mmiEventHandler_ { nullptr };
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    sptr<CallDinputService> callDinputService_ = nullptr;
+    sptr<CallDinputService> callDinputService_ { nullptr };
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
 };
+
+#define InputMgrImpl ::OHOS::Singleton<InputManagerImpl>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#define InputMgrImpl OHOS::MMI::InputManagerImpl::GetInstance()
 #endif // INPUT_MANAGER_IMPL_H

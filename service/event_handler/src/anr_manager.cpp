@@ -16,10 +16,11 @@
 #include "anr_manager.h"
 
 #include "ability_manager_client.h"
-#include "dfx_hisysevent.h"
 
+#include "dfx_hisysevent.h"
 #include "input_event_handler.h"
 #include "mmi_log.h"
+#include "napi_constants.h"
 #include "proto.h"
 #include "timer_manager.h"
 
@@ -29,9 +30,11 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ANRManager" };
 constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 const std::string FOUNDATION = "foundation";
-constexpr int32_t ANR_DISPATCH = 0;
-constexpr int32_t ANR_MONITOR = 1;
+constexpr int32_t MAX_ANR_TIMER_COUNT = 50;
 } // namespace
+
+ANRManager::ANRManager() {}
+ANRManager::~ANRManager() {}
 
 void ANRManager::Init(UDSServer &udsServer)
 {
@@ -48,6 +51,9 @@ void ANRManager::MarkProcessed(int32_t eventType, int32_t eventId, SessionPtr se
     for (int32_t item : timerIds) {
         if (item != -1) {
             TimerMgr->RemoveTimer(item);
+            anrTimerCount_--;
+            MMI_HILOGD("Remove anr timer, anr type:%{public}d, eventId:%{public}d, timer id:%{public}d, count:%{public}d",
+                eventType, eventId, item, anrTimerCount_);
         }
     }
 }
@@ -59,12 +65,14 @@ void ANRManager::RemoveTimers(SessionPtr sess)
     for (int32_t item : DispatchTimerIds) {
         if (item != -1) {
             TimerMgr->RemoveTimer(item);
+            anrTimerCount_--;
         }
     }
     std::vector<int32_t> MonitorTimerIds = sess->GetTimerIds(ANR_MONITOR);
     for (int32_t item : MonitorTimerIds) {
         if (item != -1) {
             TimerMgr->RemoveTimer(item);
+            anrTimerCount_--;
         }
     }
 }
@@ -73,13 +81,19 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
 {
     CHKPV(sess);
     if (sess->GetTokenType() != TokenType::TOKEN_HAP || sess->GetProgramName() == FOUNDATION) {
-        MMI_HILOGD("Ignore native event");
+        MMI_HILOGD("Not application event, skip. pid:%{public}d, anr type:%{public}d", sess->GetPid(), type);
         return;
     }
-    int32_t timerId = TimerMgr->AddTimer(INPUT_UI_TIMEOUT_TIME, 1, [this, type, sess]() {
+    if (anrTimerCount_ >= MAX_ANR_TIMER_COUNT) {
+        MMI_HILOGD("Add anr timer failed, anrtimer count reached the maximum number:%{public}d", MAX_ANR_TIMER_COUNT);
+        return;
+    }
+    int32_t timerId = TimerMgr->AddTimer(INPUT_UI_TIMEOUT_TIME, 1, [this, id, type, sess]() {
         CHKPV(sess);
         sess->SetAnrStatus(type, true);
         DfxHisysevent::ApplicationBlockInput(sess);
+        MMI_HILOGE("Application not responding. pid:%{public}d, anr type:%{public}d, eventId:%{public}d",
+            sess->GetPid(), type, id);
         if (anrNoticedPid_ < 0) {
             MMI_HILOGE("The anrNoticedPid_ is invalid");
             return;
@@ -95,15 +109,23 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
             MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
             return;
         }
-        MMI_HILOGI("ANR remove all timers");
         std::vector<int32_t> timerIds = sess->GetTimerIds(type);
         for (int32_t item : timerIds) {
             if (item != -1) {
                 TimerMgr->RemoveTimer(item);
+                anrTimerCount_--;
+                MMI_HILOGD("Clear anr timer, type:%{public}d, timer id:%{public}d, count:%{public}d",
+                    type, item, anrTimerCount_);
             }
         }
     });
-    MMI_HILOGD("Save anr event anrType:%{public}d eventId:%{public}d timeId:%{public}d", type, id, timerId);
+    if (timerId < 0) {
+        MMI_HILOGD("Add anr timer failed, timer count reached the maximum number");
+        return;
+    }
+    anrTimerCount_++;
+    MMI_HILOGD("Add anr timer success, anr type:%{public}d, eventId:%{public}d, timer id:%{public}d, count:%{public}d",
+        type, id, timerId, anrTimerCount_);
     sess->SaveANREvent(type, id, currentTime, timerId);
 }
 
@@ -112,16 +134,15 @@ bool ANRManager::TriggerANR(int32_t type, int64_t time, SessionPtr sess)
     CALL_DEBUG_ENTER;
     CHKPF(udsServer_);
     CHKPF(sess);
-    MMI_HILOGD("Current time:%{public}" PRId64 "", time);
     if (sess->GetTokenType() != TokenType::TOKEN_HAP || sess->GetProgramName() == FOUNDATION) {
-        MMI_HILOGD("Native event");
+        MMI_HILOGD("Not application event, skip. pid:%{public}d, anr type:%{public}d", sess->GetPid(), type);
         return false;
     }
     if (sess->CheckAnrStatus(type)) {
-        MMI_HILOGW("Application not responding");
+        MMI_HILOGD("Application not responding. pid:%{public}d, anr type:%{public}d", sess->GetPid(), type);
         return true;
     }
-    MMI_HILOGI("AAFwk send ANR process id succeeded");
+    MMI_HILOGD("Event dispatch normal");
     return false;
 }
 

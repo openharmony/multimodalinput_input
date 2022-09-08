@@ -14,23 +14,23 @@
  */
 
 #include "input_handler_manager.h"
-#include <cinttypes>
 
-#include "mmi_log.h"
-#include "net_packet.h"
-#include "proto.h"
+#include <cinttypes>
 
 #include "bytrace_adapter.h"
 #include "input_handler_type.h"
 #include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "mmi_log.h"
+#include "napi_constants.h"
+#include "net_packet.h"
+#include "proto.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManager" };
-constexpr int32_t ANR_MONITOR = 1;
 } // namespace
 
 InputHandlerManager::InputHandlerManager()
@@ -90,7 +90,7 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType,
     HandleEventType eventType, std::shared_ptr<IInputEventConsumer> monitor)
 {
-    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    auto eventHandler = InputMgrImpl.GetCurrentEventHandler();
     CHKPR(eventHandler, RET_ERR);
     InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,

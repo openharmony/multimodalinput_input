@@ -212,7 +212,7 @@ int32_t MultimodalInputConnectManager::SetAnrObserver()
 int32_t MultimodalInputConnectManager::RegisterCooperateListener()
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
-    return multimodalInputConnectService_->RegisterDevListener();
+    return multimodalInputConnectService_->RegisterCooperateListener();
 }
 
 int32_t MultimodalInputConnectManager::UnregisterCooperateListener()
@@ -250,6 +250,18 @@ int32_t MultimodalInputConnectManager::SetInputDevice(const std::string& dhid, c
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->SetInputDevice(dhid, screenId);
+}
+
+int32_t MultimodalInputConnectManager::GetFunctionKeyState(int32_t funcKey, bool &state)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetFunctionKeyState(funcKey, state);
+}
+
+int32_t MultimodalInputConnectManager::SetFunctionKeyState(int32_t funcKey, bool enable)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetFunctionKeyState(funcKey, enable);
 }
 
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()

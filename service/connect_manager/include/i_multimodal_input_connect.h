@@ -28,6 +28,49 @@ namespace OHOS {
 namespace MMI {
 class IMultimodalInputConnect : public IRemoteBroker {
 public:
+    enum {
+        ALLOC_SOCKET_FD = 0,
+        ADD_INPUT_EVENT_FILTER = 1,
+        SET_POINTER_VISIBLE = 2,
+        IS_POINTER_VISIBLE = 3,
+        SUBSCRIBE_KEY_EVENT = 6,
+        UNSUBSCRIBE_KEY_EVENT = 7,
+        ADD_INPUT_HANDLER = 8,
+        REMOVE_INPUT_HANDLER = 9,
+        MARK_EVENT_CONSUMED = 10,
+        MOVE_MOUSE = 11,
+        INJECT_KEY_EVENT = 12,
+        INJECT_POINTER_EVENT = 13,
+        SET_ANR_OBSERVER = 14,
+        SUPPORT_KEYS = 15,
+        GET_DEVICE_IDS = 16,
+        GET_DEVICE = 17,
+        REGISTER_DEV_MONITOR = 18,
+        UNREGISTER_DEV_MONITOR = 19,
+        GET_KEYBOARD_TYPE = 20,
+        SET_POINTER_SPEED = 21,
+        GET_POINTER_SPEED = 22,
+        SET_POINTER_STYLE = 23,
+        GET_POINTER_STYLE = 24,
+        SET_FUNCTION_KEY_STATE = 25,
+        GET_FUNCTION_KEY_STATE = 26,
+        REGISTER_COOPERATE_MONITOR = 30,
+        UNREGISTER_COOPERATE_MONITOR = 31,
+        ENABLE_INPUT_DEVICE_COOPERATE = 32,
+        START_INPUT_DEVICE_COOPERATE = 33,
+        STOP_DEVICE_COOPERATE = 34,
+        GET_INPUT_DEVICE_COOPERATE_STATE = 35,
+        REMOTE_COOPERATE_START = 40,
+        REMOTE_COOPERATE_START_RES = 41,
+        REMOTE_COOPERATE_STOP = 42,
+        REMOTE_COOPERATE_STOP_RES = 43,
+        REMOTE_COOPERATE_STOP_OTHER_RES = 44,
+        SET_INPUT_DEVICE_TO_SCREEN = 50,
+    };
+
+    enum {
+        CONNECT_MODULE_TYPE_MMI_CLIENT = 0,
+    };
     static constexpr int32_t INVALID_SOCKET_FD = -1;
     static constexpr int32_t MULTIMODAL_INPUT_CONNECT_SERVICE_ID = 3101;
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.multimodalinput.IConnectManager");
@@ -65,51 +108,13 @@ public:
     virtual int32_t GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId) = 0;
     virtual int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) = 0;
     virtual int32_t StartRemoteCooperate(const std::string& localDeviceId) = 0;
-    virtual int32_t StartRemoteCooperateResult(bool isSuccess, int32_t xPercent, int32_t yPercent) = 0;
+    virtual int32_t StartRemoteCooperateResult(bool isSuccess, const std::string& startDhid,
+        int32_t xPercent, int32_t yPercent) = 0;
     virtual int32_t StopRemoteCooperate() = 0;
     virtual int32_t StopRemoteCooperateResult(bool isSuccess) = 0;
     virtual int32_t StartCooperateOtherResult(const std::string &srcNetworkId) = 0;
-    enum {
-        ALLOC_SOCKET_FD = 0,
-        ADD_INPUT_EVENT_FILTER = 1,
-        SET_POINTER_VISIBLE = 2,
-        IS_POINTER_VISIBLE = 3,
-        SUBSCRIBE_KEY_EVENT = 6,
-        UNSUBSCRIBE_KEY_EVENT = 7,
-        ADD_INPUT_HANDLER = 8,
-        REMOVE_INPUT_HANDLER = 9,
-        MARK_EVENT_CONSUMED = 10,
-        MOVE_MOUSE = 11,
-        INJECT_KEY_EVENT = 12,
-        INJECT_POINTER_EVENT = 13,
-        SET_ANR_OBSERVER = 14,
-        SUPPORT_KEYS = 15,
-        GET_DEVICE_IDS = 16,
-        GET_DEVICE = 17,
-        REGISTER_DEV_MONITOR = 18,
-        UNREGISTER_DEV_MONITOR = 19,
-        GET_KEYBOARD_TYPE = 20,
-        SET_POINTER_SPEED = 21,
-        GET_POINTER_SPEED = 22,
-        SET_POINTER_STYLE = 23,
-        GET_POINTER_STYLE = 24,
-        REGISTER_COOPERATE_MONITOR = 30,
-        UNREGISTER_COOPERATE_MONITOR = 31,
-        ENABLE_INPUT_DEVICE_COOPERATE = 32,
-        START_INPUT_DEVICE_COOPERATE = 33,
-        STOP_DEVICE_COOPERATE = 34,
-        GET_INPUT_DEVICE_COOPERATE_STATE = 35,
-        REMOTE_COOPERATE_START = 40,
-        REMOTE_COOPERATE_START_RES = 41,
-        REMOTE_COOPERATE_STOP = 42,
-        REMOTE_COOPERATE_STOP_RES = 43,
-        REMOTE_COOPERATE_STOP_OTHER_RES = 44,
-        SET_INPUT_DEVICE_TO_SCREEN = 50,
-    };
-
-    enum {
-        CONNECT_MODULE_TYPE_MMI_CLIENT = 0,
-    };
+    virtual int32_t GetFunctionKeyState(int32_t funckey, bool &state) = 0;
+    virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

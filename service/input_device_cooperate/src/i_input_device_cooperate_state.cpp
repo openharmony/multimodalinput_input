@@ -16,12 +16,10 @@
 #include "i_input_device_cooperate_state.h"
 
 #include "cooperate_event_manager.h"
-#include "define_multimodal.h"
 #include "distributed_input_adapter.h"
 #include "input_device_cooperate_sm.h"
 #include "input_device_manager.h"
 #include "mouse_event_handler.h"
-#include "multimodal_input_connect_remoter.h"
 
 namespace OHOS {
 namespace MMI {
@@ -39,9 +37,9 @@ IInputDeviceCooperateState::IInputDeviceCooperateState()
 
 int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetworkId, int32_t startInputDeviceId)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::string sinkNetworkId = InputDevMgr->GetOriginNetworkId(startInputDeviceId);
-    int32_t ret;
+    int32_t ret = RET_ERR;
     if (NeedPrepare(srcNetworkId, sinkNetworkId)) {
         InputDevCooSM->UpdatePreparedDevices(srcNetworkId, sinkNetworkId);
         ret = DistributedAdapter->PrepareRemoteInput(
@@ -54,7 +52,7 @@ int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetwor
             InputDevCooSM->UpdatePreparedDevices("", "");
         }
     } else {
-        ret = StartDistributedInput(startInputDeviceId);
+        ret = StartRemoteInput(startInputDeviceId);
         if (ret != RET_OK) {
             MMI_HILOGE("Start remoteNetworkId input fail");
             InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
@@ -73,17 +71,17 @@ void IInputDeviceCooperateState::OnPrepareDistributedInput(
     } else {
         std::string taskName = "start_dinput_task";
         std::function<void()> handleStartDinputFunc =
-            std::bind(&IInputDeviceCooperateState::StartDistributedInput, this, startInputDeviceId);
+            std::bind(&IInputDeviceCooperateState::StartRemoteInput, this, startInputDeviceId);
         CHKPV(eventHandler_);
         eventHandler_->PostTask(handleStartDinputFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
     }
 }
 
-int32_t IInputDeviceCooperateState::StartDistributedInput(int32_t startInputDeviceId)
+int32_t IInputDeviceCooperateState::StartRemoteInput(int32_t startInputDeviceId)
 {
     CALL_DEBUG_ENTER;
     std::pair<std::string, std::string> networkIds = InputDevCooSM->GetPreparedDevices();
-    std::vector<std::string> dhids = InputDevMgr->GetPointerKeyboardDhids(startInputDeviceId);
+    std::vector<std::string> dhids = InputDevMgr->GetCooperateDhids(startInputDeviceId);
     if (dhids.empty()) {
         InputDevCooSM->OnStartFinish(false, networkIds.first, startInputDeviceId);
         return RET_OK;
@@ -112,12 +110,6 @@ bool IInputDeviceCooperateState::NeedPrepare(const std::string &srcNetworkId, co
     bool isNeed =  !(srcNetworkId == prepared.first && sinkNetworkId == prepared.second);
     MMI_HILOGI("NeedPrepare?: %{public}s", isNeed ? "true" : "false");
     return isNeed;
-}
-
-int32_t IInputDeviceCooperateState::StopInputDeviceCooperate(const std::string &remoteNetworkId)
-{
-    CALL_DEBUG_ENTER;
-    return RemoteMgr->StopRemoteCooperate(remoteNetworkId);
 }
 } // namespace MMI
 } // namespace OHOS

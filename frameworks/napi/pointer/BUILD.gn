@@ -44,7 +44,6 @@ ohos_shared_library("pointer") {
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
     "//foundation/multimodalinput/input/util:libmmi-util",
-    "//third_party/libuv:uv_static",
   ]
 
   external_deps = [

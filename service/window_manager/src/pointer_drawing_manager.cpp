@@ -288,13 +288,11 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
     return pixelMap;
 }
 
-void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo, const WinInfo &info)
+void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
     hasDisplay_ = true;
     displayInfo_ = displayInfo;
-    windowId_ = info.windowId;
-    pid_ = info.windowPid;
 
     if ((displayInfo_.width >= PHONE_SCREEN_WIDTH) || (displayInfo_.height >= PHONE_SCREEN_WIDTH)) {
         if ((displayInfo_.width == PAD_SCREEN_WIDTH) || (displayInfo_.height == PAD_SCREEN_WIDTH)) {
@@ -310,32 +308,39 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo, co
     }
 }
 
-void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo, const WinInfo &info)
+void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
     for (const auto& item : displayGroupInfo.displaysInfo) {
         if (item.id == displayInfo_.id) {
-            UpdateDisplayInfo(item, info);
-            DrawManager();
+            UpdateDisplayInfo(item);
             return;
         }
     }
-    UpdateDisplayInfo(displayGroupInfo.displaysInfo[0], info);
-    DrawManager();
+    UpdateDisplayInfo(displayGroupInfo.displaysInfo[0]);
+    lastPhysicalX_ = displayGroupInfo.displaysInfo[0].width / 2;
+    lastPhysicalY_ = displayGroupInfo.displaysInfo[0].height / 2;
     MouseEventHdr->OnDisplayLost(displayInfo_.id);
+    pointerWindow_->Destroy();
+    pointerWindow_ = nullptr;
     MMI_HILOGD("displayId_:%{public}d, displayWidth_:%{public}d, displayHeight_:%{public}d",
         displayInfo_.id, displayInfo_.width, displayInfo_.height);
+}
+
+void PointerDrawingManager::OnWindowInfo(const WinInfo &info)
+{
+    CALL_DEBUG_ENTER;
+    windowId_ = info.windowId;
+    pid_ = info.windowPid;
+    DrawManager();
 }
 
 void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible)
 {
     CALL_DEBUG_ENTER;
     hasPointerDevice_ = hasPointerDevice;
-    UpdatePidInfo(getpid(), isPointerVisible);
+    SetPointerVisible(getpid(), isPointerVisible);
     DrawManager();
-    if (isPointerVisible) {
-        UpdatePointerVisible();
-    }
 }
 
 void PointerDrawingManager::DrawManager()
@@ -438,7 +443,7 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
 {
     CALL_DEBUG_ENTER;
     UpdatePidInfo(pid, visible);
-    UpdatePointerVisible();
+    InitLayer(MOUSE_ICON(lastMouseStyle_));
     return RET_OK;
 }
 
@@ -450,7 +455,6 @@ void PointerDrawingManager::SetPointerLocation(int32_t pid, int32_t x, int32_t y
     lastPhysicalY_ = y;
     if (pointerWindow_ != nullptr) {
         pointerWindow_->MoveTo(x, y);
-        UpdatePidInfo(pid, true);
         SetPointerVisible(pid, true);
     }
 }

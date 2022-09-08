@@ -33,10 +33,6 @@ ohos_source_set("input-manager") {
     "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 
-  external_deps = [
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-  ]
   subsystem_name = "multimodalinput"
   part_name = "input"
 }
@@ -49,14 +45,11 @@ ohos_executable("uinput") {
     "$SUBSYSTEM_FRAMEWORKS_DIR/test/tools/inject_event/include",
     "out/ohos-arm-release/innerkits/ohos-arm/c_utils/utils/include/string_ex.h",
     "$SUBSYSTEM_DIR/interfaces/native/innerkits/multimodalinput_proxy/include",
+    "//commonlibrary/c_utils/base/include",
   ]
 
   deps = [ "$SUBSYSTEM_DIR/input/tools/inject_event:input-manager" ]
 
-  external_deps = [
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
-  ]
   subsystem_name = "multimodalinput"
   part_name = "input"
 }

@@ -188,5 +188,151 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_005, TestSize.Level1)
     KeyEvent2->AddKeyItem(item1);
     ASSERT_TRUE(KeyEvent2->IsValid());
 }
+
+/**
+ * @tc.name: KeyEventTest_GetFunctionKey_001
+ * @tc.desc: Set Numlock for keyevent to false
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_001, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY, false);
+    bool result = keyEvent->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeyEventTest_GetFunctionKey_002
+ * @tc.desc: Set Numlock for keyevent to true
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_002, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY, true);
+    bool result = keyEvent->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY);
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: KeyEventTest_GetFunctionKey_003
+ * @tc.desc: Set Capslock for keyevent to false
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_003, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY, false);
+    bool result = keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeyEventTest_GetFunctionKey_004
+ * @tc.desc: Set Capslock for keyevent to true
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_004, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY, true);
+    bool result = keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: KeyEventTest_GetFunctionKey_005
+ * @tc.desc: Set Scrolllock for keyevent to false
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_005, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, false);
+    bool result = keyEvent->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY);
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeyEventTest_GetFunctionKey_006
+ * @tc.desc: Set Scrolllock for keyevent to true
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_GetFunctionKey_006, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, true);
+    bool result = keyEvent->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY);
+    ASSERT_TRUE(result);
+}
+
+/**
+ * @tc.name: KeyEventTest_TransitionFunctionKey_001
+ * @tc.desc: Transition keycode to function key
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_TransitionFunctionKey_001, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t lockCode = keyEvent->TransitionFunctionKey(KeyEvent::KEYCODE_NUM_LOCK);
+    ASSERT_EQ(lockCode, KeyEvent::NUM_LOCK_FUNCTION_KEY);
+}
+
+/**
+ * @tc.name: KeyEventTest_TransitionFunctionKey_002
+ * @tc.desc: Transition keycode to function key
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_TransitionFunctionKey_002, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t lockCode = keyEvent->TransitionFunctionKey(KeyEvent::KEYCODE_SCROLL_LOCK);
+    ASSERT_EQ(lockCode, KeyEvent::SCROLL_LOCK_FUNCTION_KEY);
+}
+
+/**
+ * @tc.name: KeyEventTest_TransitionFunctionKey_003
+ * @tc.desc: Transition keycode to function key
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_TransitionFunctionKey_003, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t lockCode = keyEvent->TransitionFunctionKey(KeyEvent::KEYCODE_CAPS_LOCK);
+    ASSERT_EQ(lockCode, KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+}
+
+/**
+ * @tc.name: KeyEventTest_TransitionFunctionKey_004
+ * @tc.desc: Transition not support keycode to function key
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_TransitionFunctionKey_004, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    int32_t lockCode = keyEvent->TransitionFunctionKey(KeyEvent::KEYCODE_A);
+    ASSERT_EQ(lockCode, KeyEvent::UNKOWN_FUNCTION_KEY);
+}
 } // namespace MMI
 } // namespace OHOS

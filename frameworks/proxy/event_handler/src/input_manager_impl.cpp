@@ -67,6 +67,9 @@ private:
     std::function<void(std::shared_ptr<AxisEvent>)> axisMonitor_;
 };
 
+InputManagerImpl::InputManagerImpl() {}
+InputManagerImpl::~InputManagerImpl() {}
+
 bool InputManagerImpl::InitEventHandler()
 {
     CALL_DEBUG_ENTER;
@@ -188,7 +191,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     consumer_ = inputEventConsumer;
     eventHandler_ = eventHandler;
     if (eventHandler_ == nullptr) {
-        eventHandler_ = InputMgrImpl->GetCurrentEventHandler();
+        eventHandler_ = InputMgrImpl.GetCurrentEventHandler();
     }
 }
 
@@ -1022,6 +1025,38 @@ int32_t InputManagerImpl::GetInputDeviceCooperateState(const std::string &device
     (void)(callback);
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+}
+
+bool InputManagerImpl::GetFunctionKeyState(int32_t funcKey)
+{
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    CALL_DEBUG_ENTER;
+    bool state { false };
+    int32_t ret = MultimodalInputConnMgr->GetFunctionKeyState(funcKey, state);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+    }
+    return state;
+#else
+    MMI_HILOGW("Keyboard device does not support");
+    return false;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
+
+int32_t InputManagerImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
+{
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->SetFunctionKeyState(funcKey, enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+#else
+    MMI_HILOGW("Keyboard device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 } // namespace MMI
 } // namespace OHOS

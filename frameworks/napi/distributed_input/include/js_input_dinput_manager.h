@@ -31,6 +31,11 @@
 #define PARAMERTER_NUM 1
 namespace OHOS {
 namespace MMI {
+enum InputAbilityType {
+    MOUSE = 1,
+    KEYBOARD = 2,
+    TOUCHPAD = 4,
+};
 template <class T>
 class CallbackInfo {
 public:
@@ -42,11 +47,6 @@ public:
     int32_t mouseX = 0;
     int32_t mouseY = 0;
     T returnResult;
-};
-enum InputAbilityType {
-    MOUSE = 1,
-    KEYBOARD = 2,
-    TOUCHPAD = 4,
 };
 
 class JsInputDinputManager {

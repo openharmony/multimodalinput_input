@@ -24,6 +24,7 @@ config("libmmi_client_config") {
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "event_handler/include",
+    "events/include",
     "module_loader/include",
   ]
 }
@@ -62,10 +63,6 @@ ohos_source_set("libmmi-common") {
     "events/src/key_option.cpp",
     "events/src/pointer_event.cpp",
   ]
-
-  if (input_feature_input_cooperation) {
-    sources += [ "events/src/raw_data.cpp" ]
-  }
 
   defines = []
 
@@ -165,7 +162,6 @@ ohos_shared_library("libmmi-client") {
   part_name = "input"
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_input:hdi_input",
     "eventhandler:libeventhandler",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",

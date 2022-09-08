@@ -15,26 +15,14 @@
 
 #include "js_event_target.h"
 
+#include "napi_constants.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsEventTarget" };
-const std::string CREATE_ARRAY = "napi_create_array";
-const std::string CREATE_INT32 = "napi_create_int32";
-const std::string SET_ELEMENT = "napi_set_element";
-const std::string SET_NAMED_PROPERTY = "napi_set_named_property";
-const std::string CREATE_REFERENCE = "napi_create_reference";
-const std::string GET_REFERENCE = "napi_get_reference_value";
-const std::string CALL_FUNCTION = "napi_call_function";
-const std::string RESOLVE_DEFERRED = "napi_resolve_deferred";
-const std::string GET_UV_LOOP = "napi_get_uv_event_loop";
-const std::string CREATE_STRING_UTF8 = "napi_create_string_utf8";
-const std::string CREATE_OBJECT = "napi_create_object";
-const std::string COERCE_TO_BOOL = "napi_coerce_to_bool";
-const std::string CREATE_PROMISE = "napi_create_promise";
 
 std::mutex mutex_;
-const std::string CHANGED_TYPE = "change";
 const std::string ADD_EVENT = "add";
 const std::string REMOVE_EVENT = "remove";
 } // namespace
@@ -242,6 +230,7 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
     CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &arr, &result),
          CALL_FUNCTION, scope);
     napi_close_handle_scope(cb->env, scope);
+    JsUtil::DeleteCallbackInfo(std::move(cb));
 }
 
 void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
@@ -274,6 +263,7 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
     }
     CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, arr), RESOLVE_DEFERRED, scope);
     napi_close_handle_scope(cb->env, scope);
+    JsUtil::DeleteCallbackInfo(std::move(cb));
 }
 
 void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> &ids)
@@ -347,8 +337,9 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE, scope);
     napi_value result = nullptr;
     CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &result), CALL_FUNCTION,
-         scope);
+        scope);
     napi_close_handle_scope(cb->env, scope);
+    JsUtil::DeleteCallbackInfo(std::move(cb));
 }
 
 void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
@@ -377,6 +368,7 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     }
     CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED, scope);
     napi_close_handle_scope(cb->env, scope);
+    JsUtil::DeleteCallbackInfo(std::move(cb));
 }
 
 void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDevice> device)
@@ -450,6 +442,7 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
     }
     CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, keyAbility), RESOLVE_DEFERRED, scope);
     napi_close_handle_scope(cb->env, scope);
+    JsUtil::DeleteCallbackInfo(std::move(cb));
 }
 
 void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
@@ -490,6 +483,7 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
     CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &keyAbility, &result),
           CALL_FUNCTION, scope);
     napi_close_handle_scope(cb->env, scope);
+    JsUtil::DeleteCallbackInfo(std::move(cb));
 }
 
 void JsEventTarget::EmitSupportKeys(int32_t userData, std::vector<bool> &keystrokeAbility)
@@ -590,13 +584,14 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
     }
     napi_value keyboardType = nullptr;
     CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &keyboardType),
-         CREATE_INT32, scope);
+        CREATE_INT32, scope);
     napi_value handler = nullptr;
     CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE, scope);
     napi_value result = nullptr;
     CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &keyboardType, &result),
-         CALL_FUNCTION, scope);
+        CALL_FUNCTION, scope);
     napi_close_handle_scope(cb->env, scope);
+    JsUtil::DeleteCallbackInfo(std::move(cb));
 }
 
 void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
@@ -624,6 +619,7 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
     CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, keyboardType),
          RESOLVE_DEFERRED, scope);
     napi_close_handle_scope(cb->env, scope);
+    JsUtil::DeleteCallbackInfo(std::move(cb));
 }
 
 void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_value handle)
@@ -678,6 +674,7 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
         }
         if (JsUtil::IsSameHandle(env, handle, (*it)->ref)) {
             MMI_HILOGD("Succeeded in removing monitor");
+            JsUtil::DeleteCallbackInfo(std::move(*it));
             iter->second.erase(it);
             goto monitorLabel;
         }

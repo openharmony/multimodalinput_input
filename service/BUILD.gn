@@ -53,7 +53,6 @@ config("libmmi_server_config") {
     "//foundation/multimodalinput/input/util/network/include",
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
     "//third_party/cJSON",
-    "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core/include",
   ]
 
   if (input_feature_input_cooperation) {
@@ -421,6 +420,13 @@ ohos_prebuilt_etc("drawing_pointer_image_MiddleBtn_NSWE_Center") {
   relative_install_dir = "multimodalinput/mouse_icon"
 }
 
+ohos_prebuilt_etc("multimodalinput.para.dac") {
+  source = "${mmi_path}/etc/multimodalinput.para.dac"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  module_install_dir = "etc/param"
+}
+
 ohos_shared_library("libmmi-server") {
   sources = [
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
@@ -469,6 +475,7 @@ ohos_shared_library("libmmi-server") {
   if (input_feature_keyboard) {
     sources += [
       "key_event_handler/src/key_event_handler.cpp",
+      "key_event_handler/src/key_unicode_transformation.cpp",
       "subscriber/src/key_event_subscriber.cpp",
     ]
     if (input_feature_combination_key) {
@@ -548,6 +555,7 @@ ohos_shared_library("libmmi-server") {
     ":drawing_pointer_image_ZoomIn_Center",
     ":drawing_pointer_image_ZoomOut_Center",
     ":mmi_device_config.ini",
+    ":multimodalinput.para.dac",
     ":multimodalinput_config_ability.json",
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
@@ -571,20 +579,17 @@ ohos_shared_library("libmmi-server") {
   if (input_feature_input_cooperation) {
     deps += [
       "//base/notification/eventhandler/frameworks/eventhandler:libeventhandler",
-      "//foundation/deviceprofile/device_profile_core/interfaces/innerkits/core:distributed_device_profile_client",
+      "//foundation/deviceprofile/device_info_manager/interfaces/innerkits/core:distributed_device_profile_client",
       "//foundation/distributedhardware/distributed_input/interfaces/inner_kits:libdinput_sdk",
+      "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
     ]
   }
 
   external_deps = [
-    "ability_base:base",
     "ability_base:want",
     "ability_runtime:ability_manager",
     "access_token:libaccesstoken_sdk",
     "config_policy:configpolicy_util",
-    "device_info_manager:distributed_device_profile_client",
-    "drivers_interface_input:hdi_input",
-    "dsoftbus:softbus_client",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
@@ -592,7 +597,6 @@ ohos_shared_library("libmmi-server") {
     "ipc:ipc_core",
     "multimedia_image_standard:image_native",
     "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
   ]
 
   if (input_feature_input_cooperation) {

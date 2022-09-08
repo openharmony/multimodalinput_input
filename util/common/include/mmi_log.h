@@ -28,9 +28,7 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
-} // namespace
+inline constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
 } // namespace MMI
 } // namespace OHOS
 
@@ -95,13 +93,11 @@ constexpr uint32_t MMI_LOG_DOMAIN = 0xD002800;
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr int32_t EVENT_TYPE_POINTER = 0X00020000;
-constexpr int32_t TIMEOUT = 100000;
-constexpr int32_t POINTER_ACTION_UP = 4;
-constexpr int32_t POINTER_ACTION_MOVE = 3;
-constexpr int32_t FINAL_FINGER = 1;
-} // namespace
+inline constexpr int32_t EVENT_TYPE_POINTER = 0X00020000;
+inline constexpr int32_t TIMEOUT = 100000;
+inline constexpr int32_t POINTER_ACTION_UP = 4;
+inline constexpr int32_t POINTER_ACTION_MOVE = 3;
+inline constexpr int32_t FINAL_FINGER = 1;
 
 class InnerFunctionTracer {
 public:
@@ -130,47 +126,6 @@ private:
     const char* tag_ { nullptr };
     LogLevel level_ { LOG_LEVEL_MIN };
 };
-
-template<class Event>
-static void PrintEventData(std::shared_ptr<Event> event, int32_t actionType, int32_t itemNum)
-{
-    constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MMILOG"};
-    if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
-        static int64_t nowTimeUSec = 0;
-        static int32_t dropped = 0;
-        if (event->GetAction() == EVENT_TYPE_POINTER) {
-            if ((actionType == POINTER_ACTION_MOVE) && (event->GetActionTime() - nowTimeUSec <= TIMEOUT)) {
-                ++dropped;
-                return;
-            }
-            if (actionType == POINTER_ACTION_UP && itemNum == FINAL_FINGER) {
-                MMI_HILOGD("This touch process discards %{public}d high frequent events", dropped);
-                dropped = 0;
-            }
-            nowTimeUSec = event->GetActionTime();
-        }
-        std::stringstream sStream;
-        sStream << *event;
-        std::string sLine;
-        while (std::getline(sStream, sLine)) {
-            MMI_HILOGD("%{public}s", sLine.c_str());
-        }
-    }
-}
-
-template<class Event>
-static void PrintEventData(std::shared_ptr<Event> event)
-{
-    constexpr ::OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MMILOG"};
-    if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
-        std::stringstream sStream;
-        sStream << *event;
-        std::string sLine;
-        while (std::getline(sStream, sLine)) {
-            MMI_HILOGD("%{public}s", sLine.c_str());
-        }
-    }
-}
 } // namespace MMI
 } // namespace OHOS
 

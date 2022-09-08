@@ -18,7 +18,7 @@
 
 #include <memory>
 
-#include "nocopyable.h"
+#include "singleton.h"
 
 #include "input_handler_manager.h"
 #include "i_input_event_consumer.h"
@@ -40,7 +40,7 @@ inline InputHandlerType InputInterceptorManager::GetHandlerType() const
     return InputHandlerType::INTERCEPTOR;
 }
 
-#define InputInterMgr DelayedSingleton<InputInterceptorManager>::GetInstance()
+#define InputInterMgr ::OHOS::DelayedSingleton<InputInterceptorManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_INTERCEPTOR_MANAGER_H

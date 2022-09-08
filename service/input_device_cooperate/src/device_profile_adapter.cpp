@@ -36,6 +36,8 @@ const std::string SERVICE_TYPE = "InputDeviceCooperation";
 const std::string CHARACTERISTICS_NAME = "CurrentState";
 } // namespace
 
+DeviceProfileAdapter::DeviceProfileAdapter() {}
+
 DeviceProfileAdapter::~DeviceProfileAdapter()
 {
     std::lock_guard<std::mutex> guard(adapterLock_);

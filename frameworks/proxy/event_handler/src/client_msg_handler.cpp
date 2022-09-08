@@ -20,6 +20,7 @@
 #include <sstream>
 
 #include "bytrace_adapter.h"
+#include "event_log_helper.h"
 #include "input_device.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_impl.h"
@@ -35,6 +36,7 @@
 #include "mmi_func_callback.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "napi_constants.h"
 #include "proto.h"
 #include "time_cost_chk.h"
 #include "util.h"
@@ -43,7 +45,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ClientMsgHandler"};
-constexpr int32_t ANR_DISPATCH = 0;
 } // namespace
 
 ClientMsgHandler::~ClientMsgHandler()
@@ -137,10 +138,10 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         return PACKET_READ_FAIL;
     }
     MMI_HILOGI("Key event dispatcher of client, Fd:%{public}d", fd);
-    PrintEventData(key);
+    EventLogHelper::PrintEventData(key);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(dispatchCallback_);
-    InputMgrImpl->OnKeyEvent(key);
+    InputMgrImpl.OnKeyEvent(key);
     key->MarkProcessed();
     return RET_OK;
 }
@@ -157,13 +158,13 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         return RET_ERR;
     }
     MMI_HILOGD("Pointer event dispatcher of client:");
-    PrintEventData(pointerEvent);
+    EventLogHelper::PrintEventData(pointerEvent);
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOGI("Operation canceled.");
     }
     pointerEvent->SetProcessedCallback(dispatchCallback_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
-    InputMgrImpl->OnPointerEvent(pointerEvent);
+    InputMgrImpl.OnPointerEvent(pointerEvent);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -207,7 +208,7 @@ int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& p
         return RET_ERR;
     }
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read device Data failed");
+        MMI_HILOGE("Packet read cooperate msg failed");
         return RET_ERR;
     }
     InputDevImpl.OnInputDeviceIds(userData, inputDeviceIds);
@@ -222,7 +223,7 @@ int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
     std::shared_ptr<InputDevice> devData = InputDevImpl.DevDataUnmarshalling(pkt);
     CHKPR(devData, RET_ERR);
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read device data failed");
+        MMI_HILOGE("Packet read cooperate msg failed");
         return RET_ERR;
     }
     InputDevImpl.OnInputDevice(userData, devData);
@@ -277,7 +278,7 @@ int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
         MMI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
-    InputDeviceImpl::GetInstance().OnDevListener(deviceId, type);
+    InputDevImpl.OnDevListener(deviceId, type);
     return RET_OK;
 }
 
@@ -362,13 +363,13 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-void ClientMsgHandler::OnEventProcessed(int32_t eventId, int32_t eventType)
+void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId)
 {
     CALL_DEBUG_ENTER;
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::MARK_PROCESS);
-    pkt << eventId << eventType;
+    pkt << eventId << ANR_DISPATCH;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write event failed");
         return;
@@ -377,12 +378,6 @@ void ClientMsgHandler::OnEventProcessed(int32_t eventId, int32_t eventType)
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
-}
-
-void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId)
-{
-    CALL_DEBUG_ENTER;
-    OnEventProcessed(eventId, ANR_DISPATCH);
 }
 
 int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
@@ -395,7 +390,7 @@ int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
         return RET_ERR;
     }
     MMI_HILOGI("Client pid:%{public}d", pid);
-    InputMgrImpl->OnAnr(pid);
+    InputMgrImpl.OnAnr(pid);
     return RET_OK;
 }
 
@@ -403,14 +398,15 @@ int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
 int32_t ClientMsgHandler::OnCooperationListiner(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
+    int32_t userData;
     std::string deviceId;
-    CooperationMessage msg;
-    pkt >> deviceId >> msg;
+    int32_t nType;
+    pkt >> userData >> deviceId >> nType;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read type failed");
         return RET_ERR;
     }
-    InputDevCooperateImpl.OnDevCooperateListener(deviceId, msg);
+    InputDevCooperateImpl.OnDevCooperateListener(deviceId, CooperationMessage(nType));
     return RET_OK;
 }
 
@@ -419,13 +415,13 @@ int32_t ClientMsgHandler::OnCooperationMessage(const UDSClient& client, NetPacke
     CALL_DEBUG_ENTER;
     int32_t userData;
     std::string deviceId;
-    CooperationMessage msg;
-    pkt >> userData >> deviceId >> msg;
+    int32_t nType;
+    pkt >> userData >> deviceId >> nType;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read device data failed");
+        MMI_HILOGE("Packet read cooperate msg failed");
         return RET_ERR;
     }
-    InputDevCooperateImpl.OnCooprationMessage(userData, deviceId, msg);
+    InputDevCooperateImpl.OnCooprationMessage(userData, deviceId, CooperationMessage(nType));
     return RET_OK;
 }
 
@@ -436,7 +432,7 @@ int32_t ClientMsgHandler::OnCooperationState(const UDSClient& client, NetPacket&
     bool state;
     pkt >> userData >> state;
     if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read device Data failed");
+        MMI_HILOGE("Packet read cooperate msg failed");
         return RET_ERR;
     }
     InputDevCooperateImpl.OnCooperationState(userData, state);

@@ -24,8 +24,8 @@ namespace MMI {
 class JsInputDeviceManager : public JsEventTarget {
 public:
     JsInputDeviceManager() = default;
-    ~JsInputDeviceManager() = default;
     DISALLOW_COPY_AND_MOVE(JsInputDeviceManager);
+    ~JsInputDeviceManager() = default;
 
     void ResetEnv();
     napi_value GetDeviceIds(napi_env env, napi_value handle = nullptr);

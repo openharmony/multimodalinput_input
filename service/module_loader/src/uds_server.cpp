@@ -56,7 +56,7 @@ int32_t UDSServer::GetClientFd(int32_t pid) const
 {
     auto it = idxPidMap_.find(pid);
     if (it == idxPidMap_.end()) {
-        return RET_ERR;
+        return INVALID_FD;
     }
     return it->second;
 }
@@ -65,7 +65,7 @@ int32_t UDSServer::GetClientPid(int32_t fd) const
 {
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
-        return RET_ERR;
+        return INVALID_PID;
     }
     return it->second->GetPid();
 }

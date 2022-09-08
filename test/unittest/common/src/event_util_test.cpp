@@ -45,7 +45,11 @@ void InputEventConsumer::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent
     if (flag == RECV_FLAG::RECV_FOCUS || flag == RECV_FLAG::RECV_MARK_CONSUMED) {
         pointerEvent->MarkProcessed();
         ASSERT_TRUE(pointerEvent != nullptr);
-        TestUtil->AddEventDump(TestUtil->DumpInputEvent(pointerEvent));
+        auto pointerAction = pointerEvent->GetPointerAction();
+        if (pointerAction != PointerEvent::POINTER_ACTION_ENTER_WINDOW &&
+            pointerAction != PointerEvent::POINTER_ACTION_LEAVE_WINDOW) {
+            TestUtil->AddEventDump(TestUtil->DumpInputEvent(pointerEvent));
+        }
     }
 }
 
@@ -56,6 +60,7 @@ void InputEventCallback::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent
         TestUtil->SetRecvFlag(RECV_FLAG::RECV_MONITOR);
         ASSERT_TRUE(pointerEvent != nullptr);
         TestUtil->AddEventDump(TestUtil->DumpInputEvent(pointerEvent));
+        lastPointerEventId_ = pointerEvent->GetId();
     }
 }
 
@@ -85,6 +90,9 @@ uint64_t WindowEventConsumer::GetConsumerThreadId()
 {
     return threadId_;
 }
+
+EventUtilTest::EventUtilTest() {}
+EventUtilTest::~EventUtilTest() {}
 
 void EventUtilTest::AddEventDump(std::string eventDump)
 {

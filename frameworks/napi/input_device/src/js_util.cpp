@@ -15,32 +15,16 @@
 
 #include "js_util.h"
 
+#include <linux/input.h>
+
 #include "mmi_log.h"
+#include "napi_constants.h"
 #include "util_napi.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsUtil" };
-const std::string GET_REFERENCE = "napi_get_reference_value";
-const std::string STRICT_EQUALS = "napi_strict_equals";
-const std::string DELETE_REFERENCE = "napi_delete_reference";
-const std::string CREATE_ARRAY = "napi_create_array";
-const std::string CREATE_INT32 = "napi_create_int32";
-const std::string SET_ELEMENT = "napi_set_element";
-const std::string SET_NAMED_PROPERTY = "napi_set_named_property";
-const std::string CREATE_STRING_UTF8 = "napi_create_string_utf8";
-const std::string CREATE_OBJECT = "napi_create_object";
-const std::string TYPEOF = "napi_typeof";
-
-constexpr int32_t ABS_MT_TOUCH_MAJOR = 0x30;
-constexpr int32_t ABS_MT_TOUCH_MINOR = 0x31;
-constexpr int32_t ABS_MT_ORIENTATION = 0x34;
-constexpr int32_t ABS_MT_POSITION_X  = 0x35;
-constexpr int32_t ABS_MT_POSITION_Y = 0x36;
-constexpr int32_t ABS_MT_PRESSURE = 0x3a;
-constexpr int32_t ABS_MT_WIDTH_MAJOR = 0x32;
-constexpr int32_t ABS_MT_WIDTH_MINOR = 0x33;
 
 std::map<int32_t, std::string> axisType = {
     {ABS_MT_TOUCH_MAJOR, "touchMajor"},
@@ -53,9 +37,6 @@ std::map<int32_t, std::string> axisType = {
     {ABS_MT_WIDTH_MINOR, "toolMinor"},
 };
 
-constexpr uint32_t EVDEV_UDEV_TAG_KEYBOARD = (1 << 1);
-constexpr uint32_t EVDEV_UDEV_TAG_MOUSE = (1 << 2);
-constexpr uint32_t EVDEV_UDEV_TAG_TOUCHPAD = (1 << 3);
 constexpr uint32_t EVDEV_UDEV_TAG_TOUCHSCREEN = (1 << 4);
 constexpr uint32_t EVDEV_UDEV_TAG_JOYSTICK = (1 << 6);
 constexpr uint32_t EVDEV_UDEV_TAG_TRACKBALL = (1 << 10);
@@ -209,14 +190,12 @@ bool JsUtil::TypeOf(napi_env env, napi_value value, napi_valuetype type)
     return true;
 }
 
-JsUtil::CallbackInfo::CallbackInfo() {}
-
-JsUtil::CallbackInfo::~CallbackInfo()
+void JsUtil::DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback)
 {
     CALL_DEBUG_ENTER;
-    if (ref != nullptr && env != nullptr) {
-        CHKRV(env, napi_delete_reference(env, ref), DELETE_REFERENCE);
-        env = nullptr;
+    if (callback->ref != nullptr && callback->env != nullptr) {
+        CHKRV(callback->env, napi_delete_reference(callback->env, callback->ref), DELETE_REFERENCE);
+        callback->env = nullptr;
     }
 }
 } // namespace MMI

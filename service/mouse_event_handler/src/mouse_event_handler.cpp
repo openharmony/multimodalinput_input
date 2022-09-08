@@ -20,6 +20,7 @@
 #include "input-event-codes.h"
 
 #include "define_multimodal.h"
+#include "event_log_helper.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
@@ -48,9 +49,9 @@ const std::vector<AccelerateCurve> ACCELERATE_CURVES {
     };
 constexpr double DOUBLE_ZERO = 1e-6;
 constexpr int32_t MIN_SPEED = 1;
-constexpr int32_t MAX_SPEED = 20;
+constexpr int32_t MAX_SPEED = 11;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-constexpr int32_t PERCENT_CONST = 100;
+constexpr double PERCENT_CONST = 100.0;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 int32_t PointerSpeedCheck(int32_t speed)
 {
@@ -71,6 +72,8 @@ MouseEventHandler::MouseEventHandler()
     pointerEvent_ = PointerEvent::Create();
     CHKPL(pointerEvent_);
 }
+
+MouseEventHandler::~MouseEventHandler() {}
 
 std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
 {
@@ -412,7 +415,7 @@ bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
 
 void MouseEventHandler::DumpInner()
 {
-    PrintEventData(pointerEvent_);
+    EventLogHelper::PrintEventData(pointerEvent_);
 }
 
 void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
@@ -484,30 +487,34 @@ void MouseEventHandler::SetDxDyForDInput(PointerEvent::PointerItem& pointerItem,
 {
     double dx = libinput_event_pointer_get_dx(data);
     double dy = libinput_event_pointer_get_dy(data);
-    int32_t rawDataDx = static_cast<int32_t>(dx);
-    int32_t rawDataDy = static_cast<int32_t>(dy);
-    pointerItem.SetRawData(RawData(rawDataDx, rawDataDy));
-    MMI_HILOGD("MouseEventHandler SetDxDyForDInput : dx:%{public}d, dy:%{public}d", rawDataDx, rawDataDy);
+    int32_t rawDx = static_cast<int32_t>(dx);
+    int32_t rawDy = static_cast<int32_t>(dy);
+    pointerItem.SetRawDx(rawDx);
+    pointerItem.SetRawDy(rawDy);
+    MMI_HILOGD("MouseEventHandler SetDxDyForDInput : dx:%{public}d, dy:%{public}d", rawDx, rawDy);
 }
 
-void MouseEventHandler::SetAbsolutionLocation(int32_t xPercent, int32_t yPercent)
+void MouseEventHandler::SetAbsolutionLocation(double xPercent, double yPercent)
 {
     MMI_HILOGI("MouseEventHandler cross screen location : xPercent:%{public}d, yPercent:%{public}d",
         xPercent, yPercent);
+    auto displayGroupInfo = WinMgr->GetDisplayGroupInfo();
     if (currentDisplayId_ == -1) {
-        auto dispalyGroupInfo = WinMgr->GetDisplayGroupInfo();
-        if (dispalyGroupInfo.displaysInfo.empty()) {
+        if (displayGroupInfo.displaysInfo.empty()) {
             MMI_HILOGI("The displayInfo is empty");
             return;
         }
-        currentDisplayId_ = dispalyGroupInfo.displaysInfo[0].id;
+        currentDisplayId_ = displayGroupInfo.displaysInfo[0].id;
     }
-    auto display = WinMgr->GetPhysicalDisplay(currentDisplayId_);
-    CHKPV(display);
-    auto x = display->width * xPercent / PERCENT_CONST;
-    auto y = display->height * yPercent / PERCENT_CONST;
-    absolutionX_ = x;
-    absolutionY_ = y;
+    struct DisplayInfo display;
+    for (auto &it : displayGroupInfo.displaysInfo) {
+        if (it.id == currentDisplayId_) {
+            display = it;
+            break;
+        }
+    }
+    absolutionX_ = display.width * xPercent / PERCENT_CONST;
+    absolutionY_ = display.height * yPercent / PERCENT_CONST;
     WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
     int32_t physicalX = WinMgr->GetMouseInfo().physicalX;
     int32_t physicalY = WinMgr->GetMouseInfo().physicalY;
