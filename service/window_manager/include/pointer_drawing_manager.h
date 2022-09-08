@@ -37,13 +37,18 @@ class PointerDrawingManager : public IPointerDrawingManager,
                               public IDeviceObserver,
                               public std::enable_shared_from_this<PointerDrawingManager> {
 public:
+    static const int32_t IMAGE_WIDTH = 64;
+    static const int32_t IMAGE_HEIGHT = 64;
+
+public:
     PointerDrawingManager();
-    ~PointerDrawingManager() = default;
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
+    ~PointerDrawingManager() = default;
     void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
         const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT);
-    void UpdateDisplayInfo(const DisplayInfo& displayInfo, const WinInfo &info);
-    void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo, const WinInfo &info);
+    void UpdateDisplayInfo(const DisplayInfo& displayInfo);
+    void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo);
+    void OnWindowInfo(const WinInfo &info);
     void UpdatePointerDevice(bool hasPointerDevicee, bool isPointerVisible);
     bool Init();
     void DeletePointerVisible(int32_t pid);
@@ -54,10 +59,6 @@ public:
     bool IsPointerVisible();
     void SetPointerLocation(int32_t pid, int32_t x, int32_t y);
     void AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
-
-public:
-    static const int32_t IMAGE_WIDTH = 64;
-    static const int32_t IMAGE_HEIGHT = 64;
 
 private:
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY);
@@ -75,7 +76,11 @@ private:
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
 
 private:
-    sptr<OHOS::Rosen::Window> pointerWindow_ = nullptr;
+    struct PidInfo {
+        int32_t pid { 0 };
+        bool visible { false };
+    };
+    sptr<OHOS::Rosen::Window> pointerWindow_ { nullptr };
     bool hasDisplay_ { false };
     DisplayInfo displayInfo_ {};
     bool hasPointerDevice_ { false };
@@ -87,10 +92,6 @@ private:
     int32_t imageWidth_ { 0 };
     int32_t imageHeight_ { 0 };
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
-    struct PidInfo {
-        int32_t pid { 0 };
-        bool visible { false };
-    };
     std::list<PidInfo> pidInfos_;
 };
 } // namespace MMI

@@ -17,6 +17,8 @@
 
 #include <cinttypes>
 
+#include <uv.h>
+
 #include "error_multimodal.h"
 
 namespace OHOS {
@@ -320,43 +322,81 @@ static void AsyncWorkFn(const napi_env &env, KeyEventMonitorInfo *event, napi_va
     MMI::SetNamedProperty(env, result, "finalKeyDownDuration", event->keyOption->GetFinalKeyDownDuration());
 }
 
+struct KeyEventMonitorInfoWorker {
+    napi_env env { nullptr };
+    KeyEventMonitorInfo *reportEvent { nullptr };
+};
+
+void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(work);
+    CHKPV(work->data);
+    (void)status;
+    KeyEventMonitorInfoWorker *dataWorker = static_cast<KeyEventMonitorInfoWorker *>(work->data);
+    if (dataWorker == nullptr) {
+        delete work;
+        work = nullptr;
+        MMI_HILOGE("Data worker is empty");
+        napi_throw_error(dataWorker->env, nullptr, "Data worker is empty");
+        return;
+    }
+    KeyEventMonitorInfo *event = dataWorker->reportEvent;
+
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(dataWorker->env, &scope);
+    if (scope == nullptr) {
+        MMI_HILOGE("Scope is nullptr");
+        return;
+    }
+    napi_value callback = nullptr;
+    if (napi_get_reference_value(dataWorker->env, event->callback[0], &callback) != napi_ok) {
+        MMI_HILOGE("Event get reference value failed");
+        napi_close_handle_scope(dataWorker->env, scope);
+        napi_throw_error(dataWorker->env, nullptr, "Event get reference value failed");
+        return;
+    }
+
+    napi_value result = nullptr;
+    AsyncWorkFn(dataWorker->env, event, result);
+    napi_value callResult = nullptr;
+    napi_status ret = napi_call_function(dataWorker->env, nullptr, callback, 1, &result, &callResult);
+    if (ret != napi_ok) {
+        napi_close_handle_scope(dataWorker->env, scope);
+        MMI_HILOGE("Call function failed, ret:%{public}d", static_cast<int32_t>(ret));
+        napi_throw_error(dataWorker->env, nullptr, "Call function failed");
+        return;
+    }
+    napi_close_handle_scope(dataWorker->env, scope);
+}
+
 void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(reportEvent);
-    napi_value resourceName;
-    napi_status status = napi_create_string_utf8(reportEvent->env, "AsyncCallback", NAPI_AUTO_LENGTH, &resourceName);
+    napi_status status;
+    uv_loop_s *loop = nullptr;
+    status = napi_get_uv_event_loop(reportEvent->env, &loop);
     if (status != napi_ok) {
-        MMI_HILOGE("Create string about resourceName failed");
-        napi_throw_error(reportEvent->env, nullptr, "Create string about resourceName failed");
+        MMI_HILOGE("Call napi_get_uv_event_loop failed");
+        napi_throw_error(reportEvent->env, nullptr, "Call napi_get_uv_event_loop failed");
         return;
     }
-    napi_create_async_work(
-        reportEvent->env, nullptr, resourceName, [](napi_env env, void *data) {},
-        [](napi_env env, napi_status status, void *data) {
-            MMI_HILOGD("Napi async work enter");
-            KeyEventMonitorInfo *event = (KeyEventMonitorInfo *)data;
-            CHKPV(event);
-            napi_value callback = nullptr;
-            if (napi_get_reference_value(env, event->callback[0], &callback) != napi_ok) {
-                MMI_HILOGE("Event get reference value failed");
-                napi_throw_error(env, nullptr, "Event get reference value failed");
-                return;
-            }
-            napi_value result = nullptr;
-            AsyncWorkFn(env, event, result);
-            napi_value callResult = nullptr;
-            status = napi_call_function(env, nullptr, callback, 1, &result, &callResult);
-            MMI_HILOGD("CallFunResult:%{public}d", static_cast<int32_t>(status));
-            if (status != napi_ok) {
-                MMI_HILOGE("Call function failed, status:%{public}d", status);
-                napi_throw_error(env, nullptr, "Call function failed");
-                return;
-            }
-            MMI_HILOGD("Napi async work left");
-        }, reportEvent, &reportEvent->asyncWork);
-    napi_queue_async_work(reportEvent->env, reportEvent->asyncWork);
-    MMI_HILOGD("EmitAsyncCallbackWork left");
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    KeyEventMonitorInfoWorker *dataWorker = new (std::nothrow) KeyEventMonitorInfoWorker();
+    CHKPV(dataWorker);
+
+    dataWorker->env = reportEvent->env;
+    dataWorker->reportEvent = reportEvent;
+    work->data = static_cast<void *>(dataWorker);
+
+    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, UvQueueWorkAsyncCallback);
+    if (ret != 0) {
+        delete dataWorker;
+        delete work;
+    }
 }
 } // namespace MMI
 } // namespace OHOS

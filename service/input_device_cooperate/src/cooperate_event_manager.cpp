@@ -23,7 +23,10 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "CooperateEventManager"};
 } // namespace
 
-void CooperateEventManager::RemoveCooperationEvent(sptr<EventInfo> event)
+CooperateEventManager::CooperateEventManager() {}
+CooperateEventManager::~CooperateEventManager() {}
+
+void CooperateEventManager::AddCooperationEvent(sptr<EventInfo> event)
 {
     CALL_DEBUG_ENTER;
     if (event->type == EventType::LISTENER) {
@@ -34,10 +37,10 @@ void CooperateEventManager::RemoveCooperationEvent(sptr<EventInfo> event)
     }
 }
 
-void CooperateEventManager::RemoveCooperationListenerEvent(sptr<EventInfo> event)
+void CooperateEventManager::RemoveCooperationEvent(sptr<EventInfo> event)
 {
     CALL_DEBUG_ENTER;
-    if (remoteCooperateCallbacks_.empty() || event != nullptr) {
+    if (remoteCooperateCallbacks_.empty() || event == nullptr) {
         MMI_HILOGE("Remove listener failed");
         return;
     }
@@ -118,7 +121,7 @@ void CooperateEventManager::NotifyCooperateMessage(
     CALL_DEBUG_ENTER;
     CHKPV(sess);
     NetPacket pkt(msgId);
-    pkt << userData << deviceId << msg;
+    pkt << userData << deviceId << static_cast<int32_t>(msg);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write data failed");
         return;

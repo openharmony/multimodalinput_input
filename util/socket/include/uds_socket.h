@@ -58,8 +58,8 @@ public:
     }
 
 protected:
-    int32_t fd_ = -1;
-    int32_t epollFd_ = -1;
+    int32_t fd_ { -1 };
+    int32_t epollFd_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS

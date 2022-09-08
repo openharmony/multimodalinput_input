@@ -19,12 +19,14 @@
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
+#include "event_log_helper.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "key_auto_repeat.h"
+#include "key_event_handler.h"
 #include "key_event_value_transformation.h"
 #include "libinput_adapter.h"
 #include "mmi_log.h"
@@ -119,6 +121,7 @@ int32_t InputEventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
     InputDevMgr->OnInputDeviceAdded(device);
     KeyMapMgr->ParseDeviceConfigFile(device);
     KeyRepeat->AddDeviceConfig(device);
+    KeyEventHdr->ResetKeyEvent(device);
     configManagement_.OnDeviceAdd(device);
     return RET_OK;
 }
@@ -143,7 +146,7 @@ void InputEventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> 
     }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
-    PrintEventData(keyEvent);
+    EventLogHelper::PrintEventData(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (!CheckKeyboardWhiteList(keyEvent)) {
         MMI_HILOGI("Check white list return false, keyboard event dropped");
@@ -206,18 +209,16 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    if (keyEvent_ == nullptr) {
-        keyEvent_ = KeyEvent::Create();
-    }
-    CHKPR(keyEvent_, ERROR_NULL_POINTER);
+    auto keyEvent = KeyEventHdr->GetKeyEvent();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
     CHKPR(event, ERROR_NULL_POINTER);
-    std::vector<int32_t> pressedKeys = keyEvent_->GetPressedKeys();
+    std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     int32_t lastPressedKey = -1;
     if (!pressedKeys.empty()) {
         lastPressedKey = pressedKeys.back();
         MMI_HILOGD("The last repeat button, keyCode:%{public}d", lastPressedKey);
     }
-    auto packageResult = keyEventHandler_.Normalize(event, keyEvent_);
+    auto packageResult = KeyEventHdr->Normalize(event, keyEvent);
     if (packageResult == MULTIDEVICE_SAME_EVENT_MARK) {
         MMI_HILOGD("The same event reported by multi_device should be discarded");
         return RET_OK;
@@ -227,17 +228,17 @@ int32_t InputEventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
         return KEY_EVENT_PKG_FAIL;
     }
 
-    BytraceAdapter::StartBytrace(keyEvent_);
-    PrintEventData(keyEvent_);
+    BytraceAdapter::StartBytrace(keyEvent);
+    EventLogHelper::PrintEventData(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    if (!CheckKeyboardWhiteList(keyEvent_)) {
+    if (!CheckKeyboardWhiteList(keyEvent)) {
         MMI_HILOGI("Check white list return false, keyboard event dropped");
         return RET_OK;
     }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-    nextHandler_->HandleKeyEvent(keyEvent_);
-    KeyRepeat->SelectAutoRepeat(keyEvent_);
-    MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent_->GetKeyCode(), keyEvent_->GetKeyAction());
+    nextHandler_->HandleKeyEvent(keyEvent);
+    KeyRepeat->SelectAutoRepeat(keyEvent);
+    MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
 #else
     MMI_HILOGW("Keyboard device does not support");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -250,12 +251,17 @@ bool InputEventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     InputHandler->SetJumpInterceptState(false);
+    int32_t keyCode = keyEvent->GetKeyCode();
+    if(keyCode == KeyEvent::KEYCODE_BACK || keyCode == KeyEvent::KEYCODE_VOLUME_UP
+        || keyCode == KeyEvent::KEYCODE_VOLUME_DOWN || keyCode == KeyEvent::KEYCODE_POWER) {
+        return true;
+    }
     CooperateState state = InputDevCooSM->GetCurrentCooperateState();
     MMI_HILOGI("Get current cooperate state:%{public}d", state);
     if (state == CooperateState::STATE_IN) {
         int32_t deviceId = keyEvent->GetDeviceId();
         if (InputDevMgr->IsRemote(deviceId)) {
-            auto networkId = InputDevMgr->GetOrginNetworkId(deviceId);
+            auto networkId = InputDevMgr->GetOriginNetworkId(deviceId);
             return !IsNeedFilterOut(networkId, keyEvent);
         }
     } else if (state == CooperateState::STATE_OUT) {
@@ -280,7 +286,6 @@ bool InputEventNormalizeHandler::IsNeedFilterOut(const std::string& deviceId, co
 {
     CALL_DEBUG_ENTER;
     std::vector<OHOS::MMI::KeyEvent::KeyItem> KeyItems = keyEvent->GetKeyItems();
-    MMI_HILOGI("KeyItems size :%{public}lu", KeyItems.size());
     std::vector<int32_t> KeyItemsForDInput;
     KeyItemsForDInput.reserve(KeyItems.size());
     for (const auto& item : KeyItems) {
@@ -306,14 +311,12 @@ int32_t InputEventNormalizeHandler::HandleMouseEvent(libinput_event* event)
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    if (keyEvent_ == nullptr) {
-        keyEvent_ = KeyEvent::Create();
-    }
-    CHKPR(keyEvent_, ERROR_NULL_POINTER);
+    const auto &keyEvent = KeyEventHdr->GetKeyEvent();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
     MouseEventHdr->Normalize(event);
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    std::vector<int32_t> pressedKeys = keyEvent_->GetPressedKeys();
+    std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     for (const int32_t& keyCode : pressedKeys) {
         MMI_HILOGI("Pressed keyCode:%{public}d", keyCode);
     }
@@ -398,7 +401,7 @@ int32_t InputEventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    if (DInputMgr->CheckTouchEvent(event)) {
+    if (InputDevCooSM->CheckTouchEvent(event)) {
         MMI_HILOGW("Touch event filter out");
         ResetTouchUpEvent(pointerEvent, event);
         return RET_OK;
@@ -454,10 +457,11 @@ int32_t InputEventNormalizeHandler::AddHandleTimer(int32_t timeout)
 {
     CALL_DEBUG_ENTER;
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
-        CHKPV(keyEvent_);
+        auto keyEvent = KeyEventHdr->GetKeyEvent();
+        CHKPV(keyEvent);
         CHKPV(nextHandler_);
-        nextHandler_->HandleKeyEvent(keyEvent_);
-        int32_t triggerTime = KeyRepeat->GetIntervalTime(keyEvent_->GetDeviceId());
+        nextHandler_->HandleKeyEvent(keyEvent);
+        int32_t triggerTime = KeyRepeat->GetIntervalTime(keyEvent->GetDeviceId());
         this->AddHandleTimer(triggerTime);
     });
     return timerId_;

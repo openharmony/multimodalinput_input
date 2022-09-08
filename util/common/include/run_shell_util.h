@@ -35,8 +35,8 @@ public:
     static int32_t StringToVectorByRegex(const std::string &log, std::vector<std::string> &vLog, const std::regex &r);
 
 private:
-    FILE *fp_ {nullptr};
-    int32_t logMaxSize_ {0};
+    FILE *fp_ { nullptr };
+    int32_t logMaxSize_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

@@ -20,8 +20,6 @@
 #include <map>
 #include <mutex>
 
-#include "singleton.h"
-
 #include "input_handler_type.h"
 #include "i_input_event_consumer.h"
 #include "mmi_event_handler.h"
@@ -85,11 +83,11 @@ private:
     void OnDispatchEventProcessed(int32_t eventId);
 
 private:
-    std::mutex mtxHandlers_;
     std::map<int32_t, Handler> inputHandlers_;
     std::map<int32_t, int32_t> processedEvents_;
     std::function<void(int32_t)> monitorCallback_ { nullptr };
     int32_t nextId_ { 1 };
+    std::mutex mtxHandlers_;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -17,7 +17,10 @@
 
 #include <sstream>
 
+#include <linux/input.h>
+
 #include "mmi_log.h"
+#include "event_log_helper.h"
 
 namespace OHOS {
 namespace MMI {
@@ -25,16 +28,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN,
     "TouchPadTransformPointProcessor"};
 constexpr int32_t MT_TOOL_NONE      = -1;
-constexpr int32_t MT_TOOL_FINGER    = 0;
-constexpr int32_t MT_TOOL_PEN       = 1;
-constexpr int32_t BTN_TOOL_PEN      = 0x140;
-constexpr int32_t BTN_TOOL_RUBBER   = 0x141;
-constexpr int32_t BTN_TOOL_BRUSH    = 0x142;
-constexpr int32_t BTN_TOOL_PENCIL   = 0x143;
-constexpr int32_t BTN_TOOL_AIRBRUSH = 0x144;
-constexpr int32_t BTN_TOOL_FINGER   = 0x145;
-constexpr int32_t BTN_TOOL_MOUSE    = 0x146;
-constexpr int32_t BTN_TOOL_LENS     = 0x147;
 constexpr int32_t BTN_DOWN          = 1;
 } // namespace
 
@@ -185,7 +178,8 @@ std::shared_ptr<PointerEvent> TouchPadTransformPointProcessor::OnLibinputTouchPa
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent_->UpdateId();
     MMI_HILOGD("Pointer event dispatcher of server:");
-    PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(), pointerEvent_->GetPointerIds().size());
+    EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
+        pointerEvent_->GetPointerIds().size());
     return pointerEvent_;
 }
 

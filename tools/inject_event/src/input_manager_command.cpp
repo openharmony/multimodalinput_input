@@ -60,6 +60,14 @@ constexpr int32_t ACTION_TIME = 3000;
 constexpr int32_t BLOCK_TIME_MS = 16;
 } // namespace
 
+void InputManagerCommand::SleepAndUpdateTime(int64_t &currentTimeMs)
+{
+    int64_t nowEndSysTimeMs = GetSysClockTime() / 1000;
+    int64_t sleepTimeMs = BLOCK_TIME_MS - (nowEndSysTimeMs - currentTimeMs) % BLOCK_TIME_MS;
+    std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMs));
+    currentTimeMs = nowEndSysTimeMs + sleepTimeMs;
+}
+
 int32_t InputManagerCommand::NextPos(int64_t begTimeMs, int64_t curtTimeMs, int32_t totalTimeMs,
     int32_t begPos, int32_t endPos)
 {
@@ -140,27 +148,156 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 while ((c = getopt_long(argc, argv, "m:d:u:c:b:s:i:", mouseSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
-                            if (optind >= argc) {
+                            if (argc - optind < 1) {
                                 std::cout << "too few arguments to function" << std::endl;
-                                return EVENT_REG_FAIL;
+                                return RET_ERR;
                             }
-                            if (!StrToInt(optarg, px) || !StrToInt(argv[optind], py)) {
-                                std::cout << "invalid parameter to move mouse" << std::endl;
-                                return EVENT_REG_FAIL;
+                            auto isTraceOption = [](const std::string &opt1) {
+                                return opt1 == std::string("--trace");
+                            };
+                            auto traceMode = [isTraceOption](int32_t argCount, char *argvOffset[]) -> bool {
+                                if (argCount <= 3) {
+                                    return false;
+                                }
+                                std::string arg3 = argvOffset[2];
+                                if (!arg3.empty() && arg3.at(0) == '-') {
+                                    return false;
+                                }
+                                if ((argCount >= 5) && isTraceOption(std::string(argvOffset[4]))) {
+                                    return true;
+                                }
+                                if ((argCount >= 6) && isTraceOption(std::string(argvOffset[5]))) {
+                                    return true;
+                                }
+                                return false;
+                            }(argc - optind + 1, &argv[optind - 1]);
+                            if (!traceMode) {
+                                if (!StrToInt(optarg, px) || !StrToInt(argv[optind], py)) {
+                                    std::cout << "invalid parameter to move mouse" << std::endl;
+                                    return RET_ERR;
+                                }
+                                if ((px < 0) || (py < 0)) {
+                                    std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                    return RET_ERR;
+                                }
+                                std::cout << "move to " << px << " " << py << std::endl;
+                                auto pointerEvent = PointerEvent::Create();
+                                CHKPR(pointerEvent, ERROR_NULL_POINTER);
+                                PointerEvent::PointerItem item;
+                                item.SetPointerId(0);
+                                item.SetDisplayX(px);
+                                item.SetDisplayY(py);
+                                pointerEvent->AddPointerItem(item);
+                                pointerEvent->SetPointerId(0);
+                                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                                pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                                optind++;
+                            } else {
+                                int32_t px1 = 0;
+                                int32_t py1 = 0;
+                                int32_t px2 = 0;
+                                int32_t py2 = 0;
+                                int32_t totalTimeMs = 1000;
+                                bool foundTraceOption = false;
+                                if (argc - optind >= 3) {
+                                    if ((!StrToInt(optarg, px1)) ||
+                                        (!StrToInt(argv[optind], py1)) ||
+                                        (!StrToInt(argv[optind + 1], px2)) ||
+                                        (!StrToInt(argv[optind + 2], py2))) {
+                                            std::cout << "invalid coordinate value" << std::endl;
+                                            return RET_ERR;
+                                    }
+                                    optind += 3;
+                                }
+                                if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
+                                    std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                    return RET_ERR;
+                                }
+                                if (argc - optind >= 1) {
+                                    std::string arg5 = argv[optind];
+                                    if (!arg5.empty() && arg5.at(0) == '-') {
+                                        if (isTraceOption(arg5)) {
+                                            foundTraceOption = true;
+                                        } else {
+                                            std::cout << "invalid option, the 5th position parameter must be --trace"
+                                                << std::endl;
+                                            return RET_ERR;
+                                        }
+                                    } else if (!StrToInt(arg5, totalTimeMs)) {
+                                        std::cout << "invalid total times" << std::endl;
+                                        return RET_ERR;
+                                    }
+                                    optind++;
+                                }
+                                if (!foundTraceOption) {
+                                    if (argc - optind < 1) {
+                                        std::cout << "missing 6th position parameter --trace" << std::endl;
+                                        return RET_ERR;
+                                    }
+                                    std::string arg6 = argv[optind];
+                                    if (!isTraceOption(arg6)) {
+                                        std::cout << "invalid option, the 6th position parameter must be --trace"
+                                            << std::endl;
+                                        return RET_ERR;
+                                    }
+                                    optind++;
+                                    foundTraceOption = true;
+                                }
+                                static const int64_t minTotalTimeMs = 1;
+                                static const int64_t maxTotalTimeMs = 15000;
+                                if ((totalTimeMs < minTotalTimeMs) || (totalTimeMs > maxTotalTimeMs)) {
+                                    std::cout << "total time is out of range:"
+                                        << minTotalTimeMs << " <= " << totalTimeMs << " <= " << maxTotalTimeMs
+                                        << std::endl;
+                                    return RET_ERR;
+                                }
+                                std::cout << "start coordinate: (" << px1 << ", "  << py1 << ")" << std::endl;
+                                std::cout << "  end coordinate: (" << px2 << ", "  << py2 << ")" << std::endl;
+                                std::cout << "     total times: "  << totalTimeMs  << " ms"      << std::endl;
+                                std::cout << "      trace mode: " << std::boolalpha << foundTraceOption << std::endl;
+                                auto pointerEvent = PointerEvent::Create();
+                                CHKPR(pointerEvent, ERROR_NULL_POINTER);
+                                px = px1;
+                                py = py1;
+                                PointerEvent::PointerItem item;
+                                item.SetPointerId(0);
+                                item.SetDisplayX(px);
+                                item.SetDisplayY(py);
+                                pointerEvent->SetPointerId(0);
+                                pointerEvent->AddPointerItem(item);
+                                pointerEvent->SetButtonPressed(-1);
+                                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                                pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+                                int64_t startTimeUs = GetSysClockTime();
+                                int64_t startTimeMs = startTimeUs / 1000;
+                                int64_t endTimeMs = 0;
+                                if (!AddInt64(startTimeMs, totalTimeMs, endTimeMs)) {
+                                    std::cout << "system time error" << std::endl;
+                                    return RET_ERR;
+                                }
+                                int64_t currentTimeMs = startTimeMs;
+                                while (currentTimeMs < endTimeMs) {
+                                    item.SetDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs, px1, px2));
+                                    item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs, py1, py2));
+                                    pointerEvent->SetActionTime(currentTimeMs);
+                                    pointerEvent->UpdatePointerItem(0, item);
+                                    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                                    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                                    SleepAndUpdateTime(currentTimeMs);
+                                }
+
+                                px = px2;
+                                py = py2;
+                                item.SetDisplayX(px);
+                                item.SetDisplayY(py);
+                                pointerEvent->SetActionTime(endTimeMs);
+                                pointerEvent->UpdatePointerItem(0, item);
+                                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             }
-                            std::cout << "move to " << px << " " << py << std::endl;
-                            auto pointerEvent = PointerEvent::Create();
-                            CHKPR(pointerEvent, ERROR_NULL_POINTER);
-                            PointerEvent::PointerItem item;
-                            item.SetPointerId(0);
-                            item.SetDisplayX(px);
-                            item.SetDisplayY(py);
-                            pointerEvent->AddPointerItem(item);
-                            pointerEvent->SetPointerId(0);
-                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            optind++;
                             break;
                         }
                         case 'd': {
@@ -316,6 +453,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             if (!StrToInt(optarg, px) ||
                                 !StrToInt(argv[optind], py)) {
                                 std::cout << "invalid coordinate value" << std::endl;
+                                return RET_ERR;
+                            }
+                            if ((px < 0) || (py < 0)) {
+                                std::cout << "Coordinate value must be greater than 0" << std::endl;
                                 return RET_ERR;
                             }
                             if (!StrToInt(argv[optind + 1], buttonId)) {
@@ -612,6 +753,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         return EVENT_REG_FAIL;
                                 }
                             }
+                            if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
+                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                return RET_ERR;
+                            }
                             const int64_t minTotalTimeMs = 1;
                             const int64_t maxTotalTimeMs = 15000;
                             if ((totalTimeMs < minTotalTimeMs) || (totalTimeMs > maxTotalTimeMs)) {
@@ -686,6 +831,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "invalid coordinate value" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
+                            if ((px1 < 0) || (py1 < 0)) {
+                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                return RET_ERR;
+                            }
                             std::cout << "touch down " << px1 << " " << py1 << std::endl;
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -709,6 +858,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             if (!StrToInt(optarg, px1) || !StrToInt(argv[optind], py1)) {
                                 std::cout << "invalid coordinate value" << std::endl;
                                 return EVENT_REG_FAIL;
+                            }
+                            if ((px1 < 0) || (py1 < 0)) {
+                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                return RET_ERR;
                             }
                             std::cout << "touch up " << px1 << " " << py1 << std::endl;
                             auto pointerEvent = PointerEvent::Create();
@@ -750,6 +903,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                             } else {
                                 std::cout << "parameter error, unable to run" << std::endl;
+                                return RET_ERR;
+                            }
+                            if ((px1 < 0) || (py1 < 0)) {
+                                std::cout << "Coordinate value must be greater than 0" << std::endl;
                                 return RET_ERR;
                             }
                             std::cout << "   click coordinate: ("<< px1 << ", "  << py1 << ")" << std::endl;
@@ -821,6 +978,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         std::cout << "invalid input coordinate or time" << std::endl;
                                         return RET_ERR;
                                 }
+                            }
+                            if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
+                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                return RET_ERR;
                             }
                             const int32_t minTotalTimeMs = 1000;
                             const int32_t maxTotalTimeMs = 15000;
@@ -918,7 +1079,8 @@ void InputManagerCommand::ShowUsage()
     std::cout << "The option are:                                " << std::endl;
     std::cout << "-M  --mouse                                    " << std::endl;
     std::cout << "commands for mouse:                            " << std::endl;
-    std::cout << "-m <dx> <dy>              --move   <dx> <dy>  -move to relative position (dx,dy) "    << std::endl;
+    std::cout << "-m <dx> <dy>              --move   <dx> <dy>  -move to relative position (dx,dy),"    << std::endl;
+    std::cout << "   <dx1> <dy1> <dx2> <dy2> [soomth time] --trace -dx1 dy1 to dx2 dy2 smooth movement" << std::endl;
     std::cout << "-d <key>                  --down   key        -press down a button, "                 << std::endl;
     std::cout << "                                               0 is the left button, 1 is the right," << std::endl;
     std::cout << "                                               2 is the middle"   << std::endl;
@@ -940,8 +1102,8 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-s <key>                  --scroll <key>      -positive values are sliding backwards" << std::endl;
     std::cout << "-i <time>                 --interval <time>   -the program interval for the (time) milliseconds";
     std::cout << std::endl;
-    std::cout << std::endl;
     std::cout << "                                               negative values are sliding forwards"  << std::endl;
+    std::cout << std::endl;
     std::cout << "-K  --keyboard                                                " << std::endl;
     std::cout << "commands for keyboard:                                        " << std::endl;
     std::cout << "-d <key>                   --down   <key>     -press down a key" << std::endl;

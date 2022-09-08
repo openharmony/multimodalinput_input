@@ -40,8 +40,8 @@ private:
     int32_t GetTouchToolType(struct libinput_device *device);
     void InitToolTypes();
 private:
-    int32_t deviceId_ {0};
-    std::shared_ptr<PointerEvent> pointerEvent_ = nullptr;
+    int32_t deviceId_ { 0 };
+    std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
 };
 } // namespace MMI

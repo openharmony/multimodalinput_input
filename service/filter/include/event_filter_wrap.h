@@ -18,7 +18,6 @@
 
 #include <mutex>
 #include "nocopyable.h"
-#include "singleton.h"
 
 #include "i_event_filter.h"
 #include "i_input_event_handler.h"

@@ -50,8 +50,8 @@ private:
         std::string &first, std::vector<uint32_t> &second, napi_ref &third);
     static bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
     std::shared_ptr<JsInputDinputManager> GetJsInputDinputMgr() const;
-    napi_ref contextRef_ { nullptr };
     std::shared_ptr<JsInputDinputManager> mgr_ { std::make_shared<JsInputDinputManager>() };
+    napi_ref contextRef_ { nullptr };
     std::mutex mtx_;
 };
 } // namespace MMI

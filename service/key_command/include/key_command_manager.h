@@ -55,6 +55,24 @@ struct ShortcutKey {
     void Print() const;
 };
 
+struct SequenceKey {
+    int32_t keyCode { -1 };
+    int32_t keyAction { 0 };
+    int64_t actionTime { 0 };
+    int64_t delay { 0 };
+    bool operator!=(const SequenceKey &sequenceKey)
+    {
+        return (keyCode != sequenceKey.keyCode) || (keyAction != sequenceKey.keyAction);
+    }
+};
+
+struct Sequence {
+    std::vector<SequenceKey> sequenceKeys;
+    int64_t abilityStartDelay { 0 };
+    int32_t timerId { -1 };
+    Ability ability;
+};
+
 class KeyCommandManager : public IInputEventHandler {
 public:
     KeyCommandManager() = default;
@@ -71,15 +89,21 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
 private:
-    bool ParseJson(const std::string configFile);
-    void LaunchAbility(ShortcutKey key);
-    std::string GenerateKey(const ShortcutKey& key);
     void Print();
+    void PrintSeq();
     bool ParseConfig();
+    bool ParseJson(const std::string &configFile);
+    void LaunchAbility(const ShortcutKey &key);
+    void LaunchAbility(const Sequence &sequence);
     bool IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key);
+    bool IsRepeatKeyEvent(const SequenceKey &sequenceKey);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey);
     bool HandleKeyDown(ShortcutKey &shortcutKey);
     bool HandleKeyCancel(ShortcutKey &shortcutKey);
+    bool HandleSequence(Sequence& sequence, bool &isLaunchAbility);
+    bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
+    bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
+    bool AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent);
     void ResetLastMatchedKey()
     {
         lastMatchedKey_.preKeys.clear();
@@ -87,9 +111,20 @@ private:
         lastMatchedKey_.timerId = -1;
         lastMatchedKey_.keyDownDuration = 0;
     }
+    void ResetSequenceKeys()
+    {
+        keys_.clear();
+        filterSequences_.clear();
+    }
     bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
+
+private:
     ShortcutKey lastMatchedKey_;
     std::map<std::string, ShortcutKey> shortcutKeys_;
+    std::vector<Sequence> sequences_;
+    std::vector<Sequence> filterSequences_;
+    std::vector<SequenceKey> keys_;
+    bool isParseConfig_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

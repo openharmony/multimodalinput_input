@@ -38,13 +38,11 @@
 
 namespace OHOS {
 namespace MMI {
-class DistributedInputAdapter : public DelayedSingleton<DistributedInputAdapter> {
+class DistributedInputAdapter final {
+    DECLARE_DELAYED_SINGLETON(DistributedInputAdapter);
 public:
     using DInputCallback = std::function<void(bool)>;
     using MouseStateChangeCallback = std::function<void(uint32_t type, uint32_t code, int32_t value)>;
-
-    DistributedInputAdapter();
-    ~DistributedInputAdapter();
     DISALLOW_COPY_AND_MOVE(DistributedInputAdapter);
 
     bool IsNeedFilterOut(const std::string &deviceId,
@@ -73,6 +71,8 @@ public:
 
     int32_t RegisterEventCallback(MouseStateChangeCallback callback);
     int32_t UnregisterEventCallback(MouseStateChangeCallback callback);
+
+    bool IsTouchEventNeedFilterOut(uint32_t absX, uint32_t absY);
 
 private:
     enum class CallbackType {
@@ -105,25 +105,21 @@ private:
 
     class StartDInputCallbackDHIds : public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
-        void OnResultFds(const std::string &srcId, const std::string &sinkId, const int32_t &status) override;
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
     };
 
     class StopDInputCallbackDHIds : public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
-        void OnResultFds(const std::string &srcId, const std::string &sinkId, const int32_t &status) override;
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
     };
 
     class StartDInputCallbackFds : public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
-        void OnResultFds(const std::string &srcId, const std::string &sinkId, const int32_t &status) override;
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
     };
 
     class StopDInputCallbackFds : public DistributedHardware::DistributedInput::StartStopDInputsCallbackStub {
     public:
-        void OnResultFds(const std::string &srcId, const std::string &sinkId, const int32_t &status) override;
         void OnResultDhids(const std::string &devId, const int32_t &status) override;
     };
 
@@ -149,21 +145,22 @@ private:
 
     class MouseStateChangeCallbackImpl : public DistributedHardware::DistributedInput::SimulationEventListenerStub {
     public:
-        int32_t OnMouseDownEvent(uint32_t type, uint32_t code, int32_t value) override;
+        int32_t OnSimulationEvent(uint32_t type, uint32_t code, int32_t value) override;
     };
     
     void SaveCallback(CallbackType type, DInputCallback callback);
     void AddTimer(const CallbackType &type);
-    int32_t RemoveTimer(const CallbackType &type);
+    void RemoveTimer(const CallbackType &type);
     void ProcessDInputCallback(CallbackType type, int32_t status);
+    void OnSimulationEvent(uint32_t type, uint32_t code, int32_t value);
     std::map<CallbackType, TimerInfo> watchingMap_;
     std::map<CallbackType, DInputCallback> callbackMap_;
     MouseStateChangeCallback mouseStateChangeCallback_ = { nullptr };
-    sptr<DistributedHardware::DistributedInput::SimulationEventListener> mouseListener_ { nullptr };
+    sptr<MouseStateChangeCallbackImpl> mouseListener_ { nullptr };
     std::mutex adapterLock_;
 };
 
-#define DistributedAdapter DistributedInputAdapter::GetInstance()
+#define DistributedAdapter ::OHOS::DelayedSingleton<DistributedInputAdapter>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 

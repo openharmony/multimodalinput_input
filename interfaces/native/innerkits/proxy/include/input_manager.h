@@ -420,6 +420,29 @@ public:
      * @since 9
      */
     int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
+
+    /**
+     * @brief 获取键盘设备指定功能按键的使能状态。
+     * @param funcKey 指定的功能按键，当前支持的功能按键有：
+     * NUM_LOCK_FUNCTION_KEY
+     * CAPS_LOCK_FUNCTION_KEY
+     * SCROLL_LOCK_FUNCTION_KEY。
+     * @return 返回功能按键的使能状态，true表示功能按键使能，
+     * false表示功能按键未使能。
+     */
+    bool GetFunctionKeyState(int32_t funcKey);
+
+    /**
+     * @brief 设置键盘设备指定功能按键的使能状态。
+     * @param funcKey 指定的功能按键，当前支持的功能按键有：
+     * NUM_LOCK_FUNCTION_KEY
+     * CAPS_LOCK_FUNCTION_KEY
+     * SCROLL_LOCK_FUNCTION_KEY。
+     * @param isEnable 待设置的使能状态。
+     * @return 0 表示设置成功，其他值表示设置失败。
+     */
+    int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

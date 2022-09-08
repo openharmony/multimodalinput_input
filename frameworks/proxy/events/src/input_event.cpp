@@ -264,20 +264,5 @@ bool InputEvent::ReadFromParcel(Parcel &in)
 
     return true;
 }
-
-std::ostream& operator<<(std::ostream& ostream, InputEvent& inputEvent)
-{
-    ostream << "DeviceNumber:" << inputEvent.GetDeviceId()
-        << ",EventNumber:" << inputEvent.GetId()
-        << ",EventType:" << InputEvent::EventTypeToString(inputEvent.GetEventType())
-        << ",ActionTime:" << inputEvent.GetActionTime()
-        << ",Action:" << inputEvent.GetAction()
-        << ",ActionStartTime:" << inputEvent.GetActionStartTime()
-        << ",TargetDisplayNumber:" << inputEvent.GetTargetDisplayId()
-        << ",AgentWindowNumber:" << inputEvent.GetAgentWindowId()
-        << ",TargetWindowNumber:" << inputEvent.GetTargetWindowId()
-        << ",Flag:" << inputEvent.GetFlag() << std::endl;
-    return ostream;
-}
 } // namespace MMI
 } // namespace OHOS

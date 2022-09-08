@@ -23,7 +23,7 @@
 #include <string>
 
 #include "cooperate_event_handler.h"
-#include "event_package.h"
+#include "define_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
@@ -35,7 +35,7 @@ public:
     {
         return RET_ERR;
     }
-    virtual int32_t StopInputDeviceCooperate()
+    virtual int32_t StopInputDeviceCooperate(const std::string &networkId)
     {
         return RET_ERR;
     }
@@ -46,8 +46,7 @@ protected:
     int32_t PrepareAndStart(const std::string &srcNetworkId, int32_t startInputDeviceId);
     bool NeedPrepare(const std::string &srcNetworkId, const std::string &sinkNetworkId);
     void OnPrepareDistributedInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId);
-    int32_t StartDistributedInput(int32_t startInputDeviceId);
-    int32_t StopInputDeviceCooperate(const std::string &remoteNetworkId);
+    int32_t StartRemoteInput(int32_t startInputDeviceId);
     virtual void OnStartRemoteInput(bool isSuccess, const std::string &srcNetworkId, int32_t startInputDeviceId);
 
 protected:

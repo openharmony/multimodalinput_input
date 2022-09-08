@@ -21,7 +21,6 @@
 #include <thread>
 
 #include "iremote_object.h"
-#include "nocopyable.h"
 #include "singleton.h"
 #include "system_ability.h"
 
@@ -40,7 +39,7 @@ namespace OHOS {
 namespace MMI {
 
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
-class MMIService : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
+class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MMIService);
     DECLEAR_SYSTEM_ABILITY(MMIService);
     DISALLOW_COPY_AND_MOVE(MMIService);
@@ -82,10 +81,13 @@ public:
     virtual int32_t GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId) override;
     virtual int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) override;
     virtual int32_t StartRemoteCooperate(const std::string& localDeviceId) override;
-    virtual int32_t StartRemoteCooperateResult(bool isSuccess, int32_t xPercent, int32_t yPercent) override;
+    virtual int32_t StartRemoteCooperateResult(bool isSuccess, const std::string& startDhid,
+        int32_t xPercent, int32_t yPercent) override;
     virtual int32_t StopRemoteCooperate() override;
     virtual int32_t StopRemoteCooperateResult(bool isSuccess) override;
     virtual int32_t StartCooperateOtherResult(const std::string& srcNetworkId) override;
+    virtual int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
+    virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
 
 #ifdef OHOS_RSS_CLIENT
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
@@ -103,7 +105,6 @@ protected:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ReadPointerSpeed(int32_t &speed);
 #endif // OHOS_BUILD_ENABLE_POINTER
-    int32_t CheckEventProcessed(int32_t pid, int32_t eventId);
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);
     int32_t OnGetDeviceIds(int32_t pid, int32_t userData);
@@ -129,6 +130,12 @@ protected:
         int32_t srcInputDeviceId);
     int32_t OnStopDeviceCooperate(int32_t pid, int32_t userData);
     int32_t OnGetInputDeviceCooperateState(int32_t pid, int32_t userData, const std::string &deviceId);
+    int32_t OnStartRemoteCooperate(const std::string& remoteDeviceId);
+    int32_t OnStartRemoteCooperateResult(bool isSuccess,
+        const std::string& startDhid, int32_t xPercent, int32_t yPercent);
+    int32_t OnStopRemoteCooperate();
+    int32_t OnStopRemoteCooperateResult(bool isSuccess);
+    int32_t OnStartCooperateOtherResult(const std::string& srcNetworkId);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     bool InitLibinputService();
     bool InitService();
@@ -144,7 +151,7 @@ protected:
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
-    int32_t mmiFd_ = -1;
+    int32_t mmiFd_ { -1 };
     std::mutex mu_;
     std::thread t_;
 #ifdef OHOS_RSS_CLIENT

@@ -35,6 +35,9 @@ constexpr size_t PRE_KEYS_NUM = 4;
 } // namespace
 int32_t KeyEventInputSubscribeManager::subscribeIdManager_ = 0;
 
+KeyEventInputSubscribeManager::KeyEventInputSubscribeManager() {}
+KeyEventInputSubscribeManager::~KeyEventInputSubscribeManager() {}
+
 KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(
     std::shared_ptr<KeyOption> keyOption,
     std::function<void(std::shared_ptr<KeyEvent>)> callback,
@@ -50,7 +53,7 @@ KeyEventInputSubscribeManager::SubscribeKeyEventInfo::SubscribeKeyEventInfo(
     ++KeyEventInputSubscribeManager::subscribeIdManager_;
 }
 
-bool operator<(const KeyOption &first, const KeyOption &second)
+static bool operator<(const KeyOption &first, const KeyOption &second)
 {
     if (first.GetFinalKey() != second.GetFinalKey()) {
         return (first.GetFinalKey() < second.GetFinalKey());
@@ -67,8 +70,14 @@ bool operator<(const KeyOption &first, const KeyOption &second)
     if (sIter != sPrekeys.cend() || tIter != tPrekeys.cend()) {
         return (tIter != tPrekeys.cend());
     }
-    if (first.IsFinalKeyDown() ^ second.IsFinalKeyDown()) {
-        return second.IsFinalKeyDown();
+    if (first.IsFinalKeyDown()) {
+        if (!second.IsFinalKeyDown()) {
+            return false;
+        }
+    } else {
+        if (second.IsFinalKeyDown()) {
+            return true;
+        }
     }
     return (first.GetFinalKeyDownDuration() < second.GetFinalKeyDownDuration());
 }
@@ -101,7 +110,7 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         return INVALID_SUBSCRIBE_ID;
     }
 
-    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    auto eventHandler = InputMgrImpl.GetCurrentEventHandler();
     CHKPR(eventHandler, INVALID_SUBSCRIBE_ID);
     auto [tIter, isOk] = subscribeInfos_.emplace(keyOption, callback, eventHandler);
     if (!isOk) {

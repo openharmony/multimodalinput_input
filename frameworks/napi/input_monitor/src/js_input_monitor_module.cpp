@@ -20,16 +20,13 @@
 #include <uv.h>
 
 #include "define_multimodal.h"
+#include "napi_constants.h"
 #include "js_input_monitor_manager.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule" };
-constexpr size_t MAX_STRING_LEN = 1024;
-const std::string GET_CB_INFO = "napi_get_cb_info";
-const std::string TYPEOF = "napi_typeof";
-const std::string GET_STRING_UTF8 = "napi_get_value_string_utf8";
 } // namespace
 
 static napi_value JsOn(napi_env env, napi_callback_info info)

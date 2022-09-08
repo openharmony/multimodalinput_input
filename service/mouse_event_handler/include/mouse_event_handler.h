@@ -19,7 +19,6 @@
 #include <memory>
 
 #include "libinput.h"
-#include "nocopyable.h"
 #include "singleton.h"
 
 #include "pointer_event.h"
@@ -37,17 +36,15 @@ struct AccelerateCurve {
     std::vector<double> diffNums;
 };
 
-class MouseEventHandler : public DelayedSingleton<MouseEventHandler>,
-    public std::enable_shared_from_this<MouseEventHandler> {
+class MouseEventHandler final : public std::enable_shared_from_this<MouseEventHandler> {
+    DECLARE_DELAYED_SINGLETON(MouseEventHandler);
 public:
-    MouseEventHandler();
-    ~MouseEventHandler() = default;
     DISALLOW_COPY_AND_MOVE(MouseEventHandler);
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
     int32_t Normalize(struct libinput_event *event);
     void Dump(int32_t fd, const std::vector<std::string> &args);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    void SetAbsolutionLocation(int32_t xPercent, int32_t yPercent);
+    void SetAbsolutionLocation(double xPercent, double yPercent);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
@@ -91,7 +88,7 @@ private:
     bool isSpeedSetByUser_ { false };
 };
 
-#define MouseEventHdr MouseEventHandler::GetInstance()
+#define MouseEventHdr ::OHOS::DelayedSingleton<MouseEventHandler>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // MOUSE_EVENT_HANDLER_H

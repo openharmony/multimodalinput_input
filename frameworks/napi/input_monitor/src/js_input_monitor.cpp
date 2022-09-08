@@ -85,6 +85,7 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
         && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
         static int32_t count = MOUSE_FLOW;
         if (++count < MOUSE_FLOW) {
+            pointerEvent->MarkProcessed();
             return;
         } else {
             count = 0;
@@ -353,8 +354,8 @@ MapFun JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent,
     mapFun["screenX"] = std::bind(&PointerEvent::PointerItem::GetWindowX, item);
     mapFun["screenY"] = std::bind(&PointerEvent::PointerItem::GetWindowY, item);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    mapFun["rawDeltaX"] = std::bind(&PointerEvent::PointerItem::GetRawDataDx, item);
-    mapFun["rawDeltaY"] = std::bind(&PointerEvent::PointerItem::GetRawDataDy, item);
+    mapFun["rawDeltaX"] = std::bind(&PointerEvent::PointerItem::GetRawDx, item);
+    mapFun["rawDeltaY"] = std::bind(&PointerEvent::PointerItem::GetRawDy, item);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     return mapFun;
 }
@@ -698,17 +699,21 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
     }
     CHKPV(monitor_);
     CHKPV(pointerEvent);
+    int32_t num = 0;
     {
         std::lock_guard<std::mutex> guard(mutex_);
         std::queue<std::shared_ptr<PointerEvent>> tmp;
+        if (!evQueue_.empty()) {
+            auto markProcessedEvent = evQueue_.front();
+            CHKPV(markProcessedEvent);
+            markProcessedEvent->MarkProcessed();
+        }
         std::swap(evQueue_, tmp);
         evQueue_.push(pointerEvent);
-    }
-    int32_t num = 0;
-    {
         num = jsTaskNum_;
         jsTaskNum_ = 1;
     }
+
     if (num < 1) {
         int32_t *id = &monitorId_;
         uv_work_t *work = new (std::nothrow) uv_work_t;

@@ -33,10 +33,10 @@ class StreamBuffer {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "StreamBuffer"};
 public:
     StreamBuffer() = default;
+    DISALLOW_MOVE(StreamBuffer);
     virtual ~StreamBuffer() = default;
     explicit StreamBuffer(const StreamBuffer &buf);
     virtual StreamBuffer &operator=(const StreamBuffer &other);
-    DISALLOW_MOVE(StreamBuffer);
     
     void Reset();
     void Clean();

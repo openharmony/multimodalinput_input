@@ -22,8 +22,8 @@ namespace MMI {
 class VirtualJoystick : public VirtualDevice {
 public:
     VirtualJoystick();
-    ~VirtualJoystick() = default;
     DISALLOW_COPY_AND_MOVE(VirtualJoystick);
+    ~VirtualJoystick() = default;
 };
 } // namespace MMI
 } // namespace OHOS

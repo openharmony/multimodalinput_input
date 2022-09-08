@@ -34,7 +34,9 @@ struct DMouseLocation {
     int32_t dy = 0;
     int32_t displayId = 0;
 };
-class DInputManager : public DelayedSingleton<DInputManager> {
+
+class DInputManager final {
+    DECLARE_DELAYED_SINGLETON(DInputManager);
 public:
     static const uint32_t DEFAULT_ABILITY;
     static const uint32_t MOUSE_ABILITY;
@@ -42,15 +44,13 @@ public:
     static const uint32_t TOUCH_ABILITY;
     static const uint32_t FULL_ABILITY;
 public:
-    DInputManager() = default;
-    ~DInputManager() = default;
+    DISALLOW_COPY_AND_MOVE(DInputManager);
     void SetMouseLocation(const DMouseLocation& info);
     DMouseLocation& GetMouseLocation();
     bool IsControllerSide(uint32_t inputAbility);
     bool IsDistributedInput(uint32_t inputAbility);
     bool IsNeedFilterOut(const std::string& deviceId, const std::shared_ptr<KeyEvent>& key);
     bool CheckWhiteList(const std::shared_ptr<KeyEvent>& key, bool &jumpIntercept);
-    bool CheckTouchEvent(struct libinput_event* event);
     OHOS::DistributedHardware::DistributedInput::DInputServerType GetDInputServerType(uint32_t inputAbility);
 
     int32_t PrepareRemoteInput(const std::string& deviceId, sptr<ICallDinput> prepareDinput);
@@ -65,8 +65,9 @@ private:
     DMouseLocation mouseLocation_;
     int32_t inputTypes_ = 0;
 };
-}
-}
-#define DInputMgr OHOS::MMI::DInputManager::GetInstance()
+
+#define DInputMgr ::OHOS::DelayedSingleton<DInputManager>::GetInstance()
+} // namespace MMI
+} // namespace OHOS
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL
 #endif // OHOS_DINPUT_MANAGER_H
