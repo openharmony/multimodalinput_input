@@ -47,7 +47,7 @@ void InputWindowsManager::Init(UDSServer& udsServer)
 int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEvent) const
 {
     CALL_DEBUG_ENTER;
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent, INVALID_FD);
     const WindowInfo* windowInfo = nullptr;
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         if (item.id == pointerEvent->GetTargetWindowId()) {
@@ -55,25 +55,25 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
             break;
         }
     }
-    CHKPR(windowInfo, RET_ERR);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
+    CHKPR(windowInfo, INVALID_FD);
+    CHKPR(udsServer_, INVALID_FD);
     return udsServer_->GetClientFd(windowInfo->pid);
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent> inputEvent)
 {
-    CHKPR(inputEvent, ERROR_NULL_POINTER);
+    CHKPR(inputEvent, INVALID_FD);
     CALL_DEBUG_ENTER;
     int32_t pid = GetPidAndUpdateTarget(inputEvent);
     if (pid <= 0) {
         MMI_HILOGE("Invalid pid");
-        return RET_ERR;
+        return INVALID_FD;
     }
     int32_t fd = udsServer_->GetClientFd(pid);
     if (fd < 0) {
         MMI_HILOGE("Invalid fd");
-        return RET_ERR;
+        return INVALID_FD;
     }
     return fd;
 }
@@ -97,8 +97,7 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
 int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent)
 {
     CALL_DEBUG_ENTER;
-    static constexpr int32_t invalid_pid = -1;
-    CHKPR(inputEvent, invalid_pid);
+    CHKPR(inputEvent, INVALID_PID);
     const int32_t focusWindowId = displayGroupInfo_.focusWindowId;
     WindowInfo* windowInfo = nullptr;
     for (auto &item : displayGroupInfo_.windowsInfo) {
@@ -107,7 +106,7 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> i
             break;
         }
     }
-    CHKPR(windowInfo, invalid_pid);
+    CHKPR(windowInfo, INVALID_PID);
     inputEvent->SetTargetWindowId(windowInfo->id);
     inputEvent->SetAgentWindowId(windowInfo->agentWindowId);
     MMI_HILOGD("focusWindowId:%{public}d, pid:%{public}d", focusWindowId, windowInfo->pid);
@@ -185,6 +184,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
 
     if (!displayGroupInfo.displaysInfo.empty()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
+        IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
         const MouseLocation &mouseLocation = GetMouseInfo();
         int32_t logicX = mouseLocation.physicalX;
         int32_t logicY = mouseLocation.physicalY;
@@ -195,7 +195,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
         }
         int32_t windowPid = GetWindowPid(windowInfo->id);
         WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
-        IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo, info);
+        IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
         if (InputDevMgr->HasPointerDevice()) {
             IPointerDrawingManager::GetInstance()->DrawPointerStyle();
         }
@@ -222,14 +222,17 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     const MouseLocation &mouseLocation = GetMouseInfo();
     lastLogicX_ = mouseLocation.physicalX;
     lastLogicY_ = mouseLocation.physicalY;
-    auto touchWindow = SelectWindowInfo(lastLogicX_, lastLogicY_, pointerEvent);
-    if (!touchWindow) {
-        MMI_HILOGE("TouchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
-        return;
+    if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW) {
+        auto touchWindow = GetWindowInfo(lastLogicX_, lastLogicY_);
+        if (!touchWindow) {
+            MMI_HILOGE("TouchWindow is nullptr");
+            return;
+        }
+        lastWindowInfo_ = *touchWindow;
     }
     PointerEvent::PointerItem pointerItem;
-    pointerItem.SetWindowX(lastLogicX_ - touchWindow->area.x);
-    pointerItem.SetWindowY(lastLogicY_ - touchWindow->area.y);
+    pointerItem.SetWindowX(lastLogicX_ - lastWindowInfo_.area.x);
+    pointerItem.SetWindowY(lastLogicY_ - lastWindowInfo_.area.y);
     pointerItem.SetDisplayX(lastLogicX_);
     pointerItem.SetDisplayY(lastLogicY_);
     pointerItem.SetPointerId(0);
@@ -241,8 +244,8 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
         return;
     }
     pointerEvent->SetTargetDisplayId(displayId);
-    pointerEvent->SetTargetWindowId(touchWindow->id);
-    pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
+    pointerEvent->SetTargetWindowId(lastWindowInfo_.id);
+    pointerEvent->SetAgentWindowId(lastWindowInfo_.agentWindowId);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(pointerItem);
     pointerEvent->SetPointerAction(pointerAction);
@@ -251,13 +254,7 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     pointerEvent->SetActionTime(time);
     pointerEvent->SetActionStartTime(time);
 
-    lastWindowInfo_ = *touchWindow;
-
-    auto fd = udsServer_->GetClientFd(touchWindow->pid);
-    if (fd == RET_ERR) {
-        auto windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
-        fd = udsServer_->GetClientFd(windowInfo->pid);
-    }
+    auto fd = udsServer_->GetClientFd(lastWindowInfo_.pid);
     auto sess = udsServer_->GetSession(fd);
     CHKPV(sess);
 
@@ -286,6 +283,16 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
     if (!lastPointerEvent_->GetPointerItem(lastPointerId, lastPointerItem)) {
         MMI_HILOGE("GetPointerItem:%{public}d fail", lastPointerId);
         return;
+    }
+    if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW) {
+        auto windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
+        if (!windowInfo) {
+            MMI_HILOGE("windowInfo is nullptr");
+            return;
+        }
+        if (windowInfo->id != lastWindowInfo_.id) {
+            lastWindowInfo_ = *windowInfo;
+        }
     }
     PointerEvent::PointerItem currentPointerItem;
     currentPointerItem.SetWindowX(lastLogicX_ - lastWindowInfo_.area.x);
@@ -799,9 +806,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
         return RET_ERR;
     }
+    IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicalDisplayInfo);
     int32_t mouseStyle = pointerStyleInfo.value();
     WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
-    IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicalDisplayInfo, info);
+    IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
         pointerItem.GetDisplayY(), MOUSE_ICON(mouseStyle));
 
@@ -816,17 +824,16 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     pointerItem.SetWindowY(windowY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     CHKPR(udsServer_, ERROR_NULL_POINTER);
-    auto fd = udsServer_->GetClientFd(touchWindow->pid);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
-    MMI_HILOGD("fd:%{public}d,pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
+    MMI_HILOGD("pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
                "logicalX:%{public}d,logicalY:%{public}d,"
                "displayX:%{public}d,displayY:%{public}d,windowX:%{public}d,windowY:%{public}d",
-               fd, touchWindow->pid, touchWindow->id, touchWindow->agentWindowId,
+               touchWindow->pid, touchWindow->id, touchWindow->agentWindowId,
                logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), windowX, windowY);
-    return fd;
+    return ERR_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -920,13 +927,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetToolWindowY(pointerItem.GetToolDisplayY() + physicDisplayInfo->y - touchWindow->area.y);
     pointerItem.SetTargetWindowId(touchWindow->id);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-    auto fd = udsServer_->GetClientFd(touchWindow->pid);
-    MMI_HILOGD("pid:%{public}d,fd:%{public}d,logicalX:%{public}d,logicalY:%{public}d,"
+    MMI_HILOGD("pid:%{public}d,logicalX:%{public}d,logicalY:%{public}d,"
                "physicalX:%{public}d,physicalY:%{public}d,windowX:%{public}d,windowY:%{public}d,"
                "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",
-               touchWindow->pid, fd, logicalX, logicalY, physicalX, physicalY,
+               touchWindow->pid, logicalX, logicalY, physicalX, physicalY,
                windowX, windowY, displayId, pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
-    return fd;
+    return ERR_OK;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 

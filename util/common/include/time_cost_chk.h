@@ -22,10 +22,8 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr int64_t MAX_INPUT_EVENT_TIME = 1000;
-constexpr int64_t MAX_OVER_TIME = 300;
-} // namespace
+inline constexpr int64_t MAX_INPUT_EVENT_TIME = 1000;
+inline constexpr int64_t MAX_OVER_TIME = 300;
 template<class T>
 class TimeCostChk {
     static inline constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TimeCostChk" };

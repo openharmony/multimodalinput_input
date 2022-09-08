@@ -20,6 +20,7 @@
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "napi_constants.h"
 #include "util_napi.h"
 #include "utils/log.h"
 #include "refbase.h"
@@ -31,35 +32,6 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-const std::string GET_BOOL = "napi_get_boolean";
-const std::string DELETE_REFERENCE = "napi_delete_reference";
-const std::string DELETE_ASYNC_WORK = "napi_delete_async_work";
-const std::string TYPEOF = "napi_typeof";
-const std::string GET_GLOBAL = "napi_get_global";
-const std::string DEFINE_CLASS = "napi_define_class";
-const std::string WRAP = "napi_wrap";
-const std::string UNWRAP = "napi_unwrap";
-const std::string NEW_INSTANCE = "napi_new_instance";
-const std::string SET_NAMED_PROPERTY = "napi_set_named_property";
-const std::string CREATE_REFERENCE = "napi_create_reference";
-const std::string REFERENCE_REF = "napi_create_reference";
-const std::string GET_CB_INFO = "napi_get_cb_info";
-const std::string HAS_NAMED_PROPERTY = "napi_has_named_property";
-const std::string DEFINE_PROPERTIES = "napi_define_properties";
-const std::string CREATE_PROMISE = "napi_create_promise";
-const std::string CREATE_STRING_UTF8 = "napi_create_string_utf8";
-const std::string GET_UNDEFINED = "napi_get_undefined";
-const std::string RESOLVE_DEFERRED = "napi_resolve_deferred";
-const std::string REJECT_DEFERRED = "napi_reject_deferred";
-const std::string GET_REFERENCE = "napi_get_reference_value";
-const std::string CALL_FUNCTION = "napi_call_function";
-const std::string CREATE_BOOL = "napi_get_boolean";
-const std::string CREATE_INT32 = "napi_create_int32";
-const std::string CREATE_OBJECT = "napi_create_object";
-const std::string GET_INT32 = "napi_get_value_int32";
-} // namespace
-
 class JsCommon {
 public:
     static bool TypeOf(napi_env env, napi_value value, napi_valuetype type);

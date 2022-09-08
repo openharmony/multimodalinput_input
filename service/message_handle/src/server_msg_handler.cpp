@@ -241,9 +241,9 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
         displayGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
+            MMI_HILOGE("Packet read display info failed");
+            return RET_ERR;
+        }
     }
     pkt >> num;
     for (uint32_t i = 0; i < num; i++) {

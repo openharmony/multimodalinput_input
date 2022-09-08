@@ -584,9 +584,8 @@ bool KeyCommandManager::ParseJson(const std::string &configFile)
         return false;
     }
 
-    bool ret = ParseShortcutKeys(parser, shortcutKeys_);
-    ret |= ParseSequences(parser, sequences_);
-    if (!ret) {
+    if (!ParseShortcutKeys(parser, shortcutKeys_) &&
+        !ParseSequences(parser, sequences_)) {
         MMI_HILOGE("Parse configFile failed");
         return false;
     }
@@ -639,9 +638,8 @@ bool KeyCommandManager::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         }
         isParseConfig_ = true;
     }
-    bool ret = HandleShortKeys(key);
-    ret &= HandleSequences(key);
-    if (!ret) {
+    if (!HandleShortKeys(key) ||
+        !HandleSequences(key)) {
         MMI_HILOGE("Handle key event failed");
         return false;
     }
