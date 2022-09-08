@@ -176,6 +176,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     std::cout << "invalid parameter to move mouse" << std::endl;
                                     return RET_ERR;
                                 }
+                                if ((px < 0) || (py < 0)) {
+                                    std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                    return RET_ERR;
+                                }
                                 std::cout << "move to " << px << " " << py << std::endl;
                                 auto pointerEvent = PointerEvent::Create();
                                 CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -205,6 +209,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                             return RET_ERR;
                                     }
                                     optind += 3;
+                                }
+                                if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
+                                    std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                    return RET_ERR;
                                 }
                                 if (argc - optind >= 1) {
                                     std::string arg5 = argv[optind];
@@ -445,6 +453,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             if (!StrToInt(optarg, px) ||
                                 !StrToInt(argv[optind], py)) {
                                 std::cout << "invalid coordinate value" << std::endl;
+                                return RET_ERR;
+                            }
+                            if ((px < 0) || (py < 0)) {
+                                std::cout << "Coordinate value must be greater than 0" << std::endl;
                                 return RET_ERR;
                             }
                             if (!StrToInt(argv[optind + 1], buttonId)) {
@@ -741,6 +753,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         return EVENT_REG_FAIL;
                                 }
                             }
+                            if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
+                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                return RET_ERR;
+                            }
                             const int64_t minTotalTimeMs = 1;
                             const int64_t maxTotalTimeMs = 15000;
                             if ((totalTimeMs < minTotalTimeMs) || (totalTimeMs > maxTotalTimeMs)) {
@@ -815,6 +831,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 std::cout << "invalid coordinate value" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
+                            if ((px1 < 0) || (py1 < 0)) {
+                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                return RET_ERR;
+                            }
                             std::cout << "touch down " << px1 << " " << py1 << std::endl;
                             auto pointerEvent = PointerEvent::Create();
                             CHKPR(pointerEvent, ERROR_NULL_POINTER);
@@ -838,6 +858,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             if (!StrToInt(optarg, px1) || !StrToInt(argv[optind], py1)) {
                                 std::cout << "invalid coordinate value" << std::endl;
                                 return EVENT_REG_FAIL;
+                            }
+                            if ((px1 < 0) || (py1 < 0)) {
+                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                return RET_ERR;
                             }
                             std::cout << "touch up " << px1 << " " << py1 << std::endl;
                             auto pointerEvent = PointerEvent::Create();
@@ -879,6 +903,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 }
                             } else {
                                 std::cout << "parameter error, unable to run" << std::endl;
+                                return RET_ERR;
+                            }
+                            if ((px1 < 0) || (py1 < 0)) {
+                                std::cout << "Coordinate value must be greater than 0" << std::endl;
                                 return RET_ERR;
                             }
                             std::cout << "   click coordinate: ("<< px1 << ", "  << py1 << ")" << std::endl;
@@ -950,6 +978,10 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                         std::cout << "invalid input coordinate or time" << std::endl;
                                         return RET_ERR;
                                 }
+                            }
+                            if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
+                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                return RET_ERR;
                             }
                             const int32_t minTotalTimeMs = 1000;
                             const int32_t maxTotalTimeMs = 15000;
