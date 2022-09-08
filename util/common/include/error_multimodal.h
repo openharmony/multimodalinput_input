@@ -20,10 +20,8 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr int32_t ERROR_UNSUPPORT = -2;
-constexpr int32_t ARGV_VALID = 2;
-}
+inline constexpr int32_t ERROR_UNSUPPORT = -2;
+inline constexpr int32_t ARGV_VALID = 2;
 
 enum MmiModuleType {
     MODULE_CLIENT = 0x00,
