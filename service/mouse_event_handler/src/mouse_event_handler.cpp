@@ -341,6 +341,11 @@ void MouseEventHandler::OnDisplayLost(int32_t displayId)
     }
 }
 
+int32_t MouseEventHandler::GetDisplayId() const
+{
+    return currentDisplayId_;
+}
+
 void MouseEventHandler::HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem)
 {
     CALL_DEBUG_ENTER;
