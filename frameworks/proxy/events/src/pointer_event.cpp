@@ -288,26 +288,6 @@ void PointerEvent::PointerItem::SetRawDy(int32_t rawDy)
     rawDy_ = rawDy;
 }
 
-int32_t PointerEvent::PointerItem::GetRawDeltaX() const
-{
-    return rawDeltaX_;
-}
-
-void PointerEvent::PointerItem::SetRawDeltaX(int32_t rawDeltaX)
-{
-    rawDeltaX_ = rawDeltaX;
-}
-
-int32_t PointerEvent::PointerItem::GetRawDeltaY() const
-{
-    return rawDeltaY_;
-}
-
-void PointerEvent::PointerItem::SetRawDeltaY(int32_t rawDeltaY)
-{
-    rawDeltaY_ = rawDeltaY;
-}
-
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     return (
@@ -334,9 +314,7 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(toolType_) &&
         out.WriteInt32(deviceId_) &&
         out.WriteInt32(rawDx_) &&
-        out.WriteInt32(rawDy_) &&
-        out.WriteInt32(rawDeltaX_) &&
-        out.WriteInt32(rawDeltaY_)
+        out.WriteInt32(rawDy_)
     );
 }
 
@@ -366,9 +344,7 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(toolType_) &&
         in.ReadInt32(deviceId_) &&
         in.ReadInt32(rawDx_) &&
-        in.ReadInt32(rawDy_) &&
-        in.ReadInt32(rawDeltaX_) &&
-        in.ReadInt32(rawDeltaY_)
+        in.ReadInt32(rawDy_)
     );
 }
 
