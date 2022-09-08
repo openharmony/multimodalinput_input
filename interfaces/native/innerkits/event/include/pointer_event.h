@@ -717,37 +717,6 @@ public:
          * @since 9
          */
         void SetRawDy(int32_t rawDy);
-
-        /**
-         * @brief 获取 x 坐标的偏移量。
-         * 对于指针输入事件，该值为目标屏幕上的 x 坐标相对偏移量。
-         * @return x 坐标相对偏移量。
-         * @since 9
-         */
-        int32_t GetRawDeltaX() const;
-
-        /**
-         * @brief 设置 x 坐标相对偏移量。
-         * @param rawDeltaX 表示要设置的 x 坐标相对偏移量。
-         * @return 无
-         * @since 9
-         */
-        void SetRawDeltaX(int32_t rawDeltaX);
-        /**
-         * @brief 获取 y 坐标的偏移量。
-         * 对于指针输入事件，该值为目标屏幕上的 y 坐标相对偏移量。
-         * @return y 坐标相对偏移量。
-         * @since 9
-         */
-        int32_t GetRawDeltaY() const;
-
-        /**
-         * @brief 设置 y 坐标相对偏移量。
-         * @param rawDeltaY 表示要设置的 y 坐标相对偏移量。
-         * @return 无效
-         * @since 9
-         */
-        void SetRawDeltaY(int32_t rawDeltaY);
     private:
         int32_t pointerId_ {};
         bool pressed_ { false };
@@ -774,8 +743,6 @@ public:
         int32_t targetWindowId_ { -1 };
         int32_t rawDx_ {};
         int32_t rawDy_ {};
-        int32_t rawDeltaX_ {};
-        int32_t rawDeltaY_ {};
     };
 
 public:

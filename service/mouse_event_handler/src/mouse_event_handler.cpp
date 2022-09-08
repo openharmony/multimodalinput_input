@@ -256,8 +256,8 @@ void MouseEventHandler::HandlePostInner(struct libinput_event_pointer* data, int
     auto mouseInfo = WinMgr->GetMouseInfo();
     MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
     if (WinMgr->GetMouseIsCaptureMode()) {
-        pointerItem.SetRawDeltaX(static_cast<int32_t>(libinput_event_pointer_get_dx(data)));
-        pointerItem.SetRawDeltaY(static_cast<int32_t>(libinput_event_pointer_get_dy(data)));
+        pointerItem.SetRawDx(static_cast<int32_t>(libinput_event_pointer_get_dx(data)));
+        pointerItem.SetRawDy(static_cast<int32_t>(libinput_event_pointer_get_dy(data)));
     }
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
