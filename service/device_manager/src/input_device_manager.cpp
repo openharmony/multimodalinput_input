@@ -672,12 +672,12 @@ std::string InputDeviceManager::Sha256(const std::string &in) const
 
 std::string InputDeviceManager::GenerateDescriptor(struct libinput_device *inputDevice, bool isRemote) const
 {
-    const char* location = libinput_device_get_phys(inputDevice);
+    const char* physicalPath = libinput_device_get_phys(inputDevice);
     std::string descriptor;
-    if (isRemote && location != nullptr) {
-        MMI_HILOGI("location:%{public}s", location);
+    if (isRemote && physicalPath != nullptr) {
+        MMI_HILOGI("physicalPath:%{public}s", physicalPath);
         std::vector<std::string> strList;
-        StringSplit(location, SPLIT_SYMBOL, strList);
+        StringSplit(physicalPath, SPLIT_SYMBOL, strList);
         if (strList.size() == 3) {
             descriptor = strList[2];
         }
@@ -693,8 +693,9 @@ std::string InputDeviceManager::GenerateDescriptor(struct libinput_device *input
     // add handling for USB devices to not uniqueify kbs that show up twice
     if (uniqueId != nullptr && uniqueId[0] != '\0') {
         rawDescriptor += "uniqueId:" + std::string(uniqueId);
-    } else if (location != nullptr) {
-        rawDescriptor += "location:" + std::string(location);
+    }
+    if (physicalPath != nullptr) {
+        rawDescriptor += "physicalPath:" + std::string(physicalPath);
     }
     if (name != nullptr && name[0] != '\0') {
         rawDescriptor += "name:" + regex_replace(name, std::regex(" "), "");
