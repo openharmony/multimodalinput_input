@@ -60,4 +60,5 @@ ohos_shared_library("inputmonitor") {
   relative_install_dir = "module/multimodalinput"
 
   part_name = "input"
+  subsystem_name = "multimodalinput"
 }
