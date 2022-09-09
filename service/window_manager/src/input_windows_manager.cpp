@@ -327,19 +327,23 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
 void InputWindowsManager::NotifyPointerToWindow()
 {
     CALL_INFO_TRACE;
+    auto windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
+    if (!windowInfo) {
+        MMI_HILOGE("windowInfo is nullptr");
+        return;
+    }
+    if (windowInfo->id == lastWindowInfo_.id) {
+        MMI_HILOGI("The mouse pointer does not leave the window");
+        lastWindowInfo_ = *windowInfo;
+        return;
+    }
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         if (item.id == lastWindowInfo_.id) {
             DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
             break;
         }
     }
-    for (const auto &item : displayGroupInfo_.windowsInfo) {
-        if ((IsInHotArea(lastLogicX_, lastLogicY_, item.pointerHotAreas)) && (lastWindowInfo_.id != item.id)) {
-            lastWindowInfo_ = item;
-            MMI_HILOGI("Pointer select new window:%{public}d", item.id);
-            break;
-        }
-    }
+    lastWindowInfo_ = *windowInfo;
     DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
