@@ -226,7 +226,7 @@ ohos_shared_library("libmmi-server") {
     "ability_base:want",
     "ability_runtime:ability_manager",
     "access_token:libaccesstoken_sdk",
-    "drivers_interface_input:hdi_input",
+    "drivers_interface_input:libinput_proxy_1.0",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
@@ -348,7 +348,7 @@ ohos_unittest("ut-mmi-service-out") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_input:hdi_input",
+    "drivers_interface_input:libinput_proxy_1.0",
     "hiviewdfx_hilog_native:libhilog",
   ]
 }
