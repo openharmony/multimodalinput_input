@@ -609,6 +609,7 @@ ohos_shared_library("libmmi-server") {
   }
 
   part_name = "input"
+  subsystem_name = "multimodalinput"
 }
 
 ohos_prebuilt_etc("mmi_device_config.ini") {
