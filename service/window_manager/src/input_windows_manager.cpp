@@ -180,7 +180,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
 
     if (!displayGroupInfo.displaysInfo.empty()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
-        const MouseLocation &mouseLocation = GetMouseInfo();
+        const MouseLocation mouseLocation = GetMouseInfo();
         int32_t logicX = mouseLocation.physicalX;
         int32_t logicY = mouseLocation.physicalY;
         std::optional<WindowInfo> windowInfo = GetWindowInfo(logicX, logicY);
@@ -214,7 +214,7 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     auto pointerEvent = PointerEvent::Create();
     CHKPV(pointerEvent);
     pointerEvent->UpdateId();
-    const MouseLocation &mouseLocation = GetMouseInfo();
+    const MouseLocation mouseLocation = GetMouseInfo();
     lastLogicX_ = mouseLocation.physicalX;
     lastLogicY_ = mouseLocation.physicalY;
     auto touchWindow = SelectWindowInfo(lastLogicX_, lastLogicY_, pointerEvent);
@@ -505,7 +505,7 @@ const DisplayGroupInfo& InputWindowsManager::GetDisplayGroupInfo()
 bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
 {
     CALL_DEBUG_ENTER;
-    const MouseLocation &mouseLocation = GetMouseInfo();
+    const MouseLocation mouseLocation = GetMouseInfo();
     int32_t logicX = mouseLocation.physicalX;
     int32_t logicY = mouseLocation.physicalY;
     std::optional<WindowInfo> touchWindow = GetWindowInfo(logicX, logicY);

@@ -145,15 +145,14 @@ bool TimerManager::IsExistInternal(int32_t timerId)
     return false;
 }
 
-std::unique_ptr<TimerManager::TimerItem>& TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem>& timer)
+void TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem>& timer)
 {
     for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->nextCallTime > timer->nextCallTime) {
-            return *(timers_.insert(it, std::move(timer)));
+            timers_.insert(it, std::move(timer));
         }
     }
     timers_.push_back(std::move(timer));
-    return *timers_.rbegin();
 }
 
 int32_t TimerManager::CalcNextDelayInternal()
@@ -196,8 +195,9 @@ void TimerManager::ProcessTimersInternal()
             MMI_HILOGE("The addition of nextCallTime in TimerItem overflows");
             return;
         }
-        const auto& timer = InsertTimerInternal(curTimer);
-        timer->callback();
+        auto callback = curTimer->callback;
+        InsertTimerInternal(curTimer);
+        callback();
     }
 }
 } // namespace MMI

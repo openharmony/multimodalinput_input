@@ -55,7 +55,7 @@ private:
     int32_t RemoveTimerInternal(int32_t timerId);
     int32_t ResetTimerInternal(int32_t timerId);
     bool IsExistInternal(int32_t timerId);
-    std::unique_ptr<TimerItem>& InsertTimerInternal(std::unique_ptr<TimerItem>& timer);
+    void InsertTimerInternal(std::unique_ptr<TimerItem>& timer);
     int32_t CalcNextDelayInternal();
     void ProcessTimersInternal();
 
