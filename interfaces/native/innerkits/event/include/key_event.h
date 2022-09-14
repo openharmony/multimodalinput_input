@@ -1369,6 +1369,13 @@ public:
     static const int32_t KEYCODE_BUTTON_DEAD;
 
     /**
+     * Keyboard menu key
+     *
+     * @since 9
+     */
+    static const int32_t KEYCODE_COMPOSE;
+
+    /**
      * Sleep key
      *
      * @since 9
