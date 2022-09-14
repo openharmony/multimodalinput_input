@@ -211,6 +211,7 @@ const int32_t KeyEvent::KEYCODE_BUTTON_BASE7 = 2413;
 const int32_t KeyEvent::KEYCODE_BUTTON_BASE8 = 2414;
 const int32_t KeyEvent::KEYCODE_BUTTON_BASE9 = 2415;
 const int32_t KeyEvent::KEYCODE_BUTTON_DEAD = 2416;
+const int32_t KeyEvent::KEYCODE_COMPOSE = 2466;
 const int32_t KeyEvent::KEYCODE_SLEEP = 2600;
 const int32_t KeyEvent::KEYCODE_ZENKAKU_HANKAKU = 2601;
 const int32_t KeyEvent::KEYCODE_102ND = 2602;

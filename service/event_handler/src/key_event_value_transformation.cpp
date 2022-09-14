@@ -473,7 +473,7 @@ std::map<int64_t, int32_t> KeyIntentionMap = {
     {((int64_t)KeyEvent::KEYCODE_ALT_RIGHT<<16) + KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::INTENTION_FORWARD},
     {((int64_t)KeyEvent::KEYCODE_SHIFT_LEFT<<16) + KeyEvent::KEYCODE_F10, KeyEvent::INTENTION_MENU},
     {((int64_t)KeyEvent::KEYCODE_SHIFT_RIGHT<<16) + KeyEvent::KEYCODE_F10, KeyEvent::INTENTION_MENU},
-    {(int64_t)KeyEvent::KEYCODE_MENU, KeyEvent::INTENTION_MENU},
+    {(int64_t)KeyEvent::KEYCODE_COMPOSE, KeyEvent::INTENTION_MENU},
     {(int64_t)KeyEvent::KEYCODE_PAGE_UP, KeyEvent::INTENTION_PAGE_UP},
     {(int64_t)KeyEvent::KEYCODE_PAGE_DOWN, KeyEvent::INTENTION_PAGE_DOWN},
     {((int64_t)KeyEvent::KEYCODE_CTRL_LEFT<<16) + KeyEvent::KEYCODE_PLUS, KeyEvent::INTENTION_ZOOM_OUT},
