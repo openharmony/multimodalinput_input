@@ -90,42 +90,42 @@ int32_t InputEventHandler::BuildInputHandlerChain()
     return RET_OK;
 #endif // !OHOS_BUILD_ENABLE_KEYBOARD && !OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_TOUCH
 
-    std::shared_ptr<IInputEventHandler> tmp = inputEventNormalizeHandler_;
+    std::shared_ptr<IInputEventHandler> handler = inputEventNormalizeHandler_;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     eventfilterHandler_ = std::make_shared<EventFilterWrap>();
     CHKPR(eventfilterHandler_, ERROR_NULL_POINTER);
-    tmp->SetNext(eventfilterHandler_);
-    tmp = eventfilterHandler_;
+    handler->SetNext(eventfilterHandler_);
+    handler = eventfilterHandler_;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     interceptorHandler_  = std::make_shared<EventInterceptorHandler>();
     CHKPR(interceptorHandler_, ERROR_NULL_POINTER);
-    tmp->SetNext(interceptorHandler_);
-    tmp = interceptorHandler_;
+    handler->SetNext(interceptorHandler_);
+    handler = interceptorHandler_;
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
     auto keyCommandHandler = std::make_shared<KeyCommandManager>();
     CHKPR(keyCommandHandler, ERROR_NULL_POINTER);
-    tmp->SetNext(keyCommandHandler);
-    tmp = keyCommandHandler;
+    handler->SetNext(keyCommandHandler);
+    handler = keyCommandHandler;
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
     subscriberHandler_ = std::make_shared<KeyEventSubscriber>();
     CHKPR(subscriberHandler_, ERROR_NULL_POINTER);
-    tmp->SetNext(subscriberHandler_);
-    tmp = subscriberHandler_;
+    handler->SetNext(subscriberHandler_);
+    handler = subscriberHandler_;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     monitorHandler_ = std::make_shared<EventMonitorHandler>();
     CHKPR(monitorHandler_, ERROR_NULL_POINTER);
-    tmp->SetNext(monitorHandler_);
-    tmp = monitorHandler_;
+    handler->SetNext(monitorHandler_);
+    handler = monitorHandler_;
 #endif // OHOS_BUILD_ENABLE_MONITOR
     auto dispatchHandler = std::make_shared<EventDispatch>();
     CHKPR(dispatchHandler, ERROR_NULL_POINTER);
-    tmp->SetNext(dispatchHandler);
+    handler->SetNext(dispatchHandler);
     return RET_OK;
 }
 
