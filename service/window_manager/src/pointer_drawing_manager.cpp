@@ -489,8 +489,9 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, in
         int32_t physicalX = lastPhysicalX_;
         int32_t physicalY = lastPhysicalY_;
         AdjustMouseFocus(ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle)].alignmentWay), physicalX, physicalY);
-        pointerWindow_->MoveTo(physicalX, physicalY);
+        pointerWindow_->MoveTo(physicalX + displayInfo_.x, physicalY + displayInfo_.y);
 
+        lastMouseStyle_ = pointerStyle;
         int32_t ret = InitLayer(MOUSE_ICON(pointerStyle));
         if (ret != RET_OK) {
             MMI_HILOGE("Init layer failed");
