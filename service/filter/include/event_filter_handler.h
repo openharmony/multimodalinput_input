@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef EVENT_FILTER_WRAP_H
-#define EVENT_FILTER_WRAP_H
+#ifndef EVENT_FILTER_HANDLER_H
+#define EVENT_FILTER_HANDLER_H
 
 #include <mutex>
 #include "nocopyable.h"
@@ -24,11 +24,11 @@
 
 namespace OHOS {
 namespace MMI {
-class EventFilterWrap : public IInputEventHandler {
+class EventFilterHandler : public IInputEventHandler {
 public:
-    EventFilterWrap();
-    DISALLOW_COPY_AND_MOVE(EventFilterWrap);
-    ~EventFilterWrap();
+    EventFilterHandler();
+    DISALLOW_COPY_AND_MOVE(EventFilterHandler);
+    ~EventFilterHandler();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -46,4 +46,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // EVENT_FILTER_WRAP_H
+#endif // EVENT_FILTER_HANDLER_H

@@ -13,17 +13,19 @@
  * limitations under the License.
  */
 
-#include "event_dispatch.h"
+#include "event_dispatch_handler.h"
+
 #include <cinttypes>
+
+#include "dfx_hisysevent.h"
+#include "hitrace_meter.h"
 
 #include "anr_manager.h"
 #include "bytrace_adapter.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "distributed_input_adapter.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-#include "dfx_hisysevent.h"
 #include "error_multimodal.h"
-#include "hitrace_meter.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
@@ -36,22 +38,22 @@ namespace OHOS {
 namespace MMI {
 namespace {
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) || defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatchHandler" };
 #endif // OHOS_BUILD_ENABLE_KEYBOARD ||  OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace
 
-EventDispatch::EventDispatch()
+EventDispatchHandler::EventDispatchHandler()
 {
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    DistributedAdapter->RegisterEventCallback(std::bind(&EventDispatch::OnMouseStateChange, this,
+    DistributedAdapter->RegisterEventCallback(std::bind(&EventDispatchHandler::OnMouseStateChange, this,
         std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 }
 
-EventDispatch::~EventDispatch() {}
+EventDispatchHandler::~EventDispatchHandler() {}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void EventDispatch::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
+void EventDispatchHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
     auto udsServer = InputHandler->GetUDSServer();
@@ -61,7 +63,7 @@ void EventDispatch::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-void EventDispatch::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+void EventDispatchHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     HandlePointerEventInner(pointerEvent);
@@ -69,7 +71,7 @@ void EventDispatch::HandlePointerEvent(const std::shared_ptr<PointerEvent> point
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-void EventDispatch::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+void EventDispatchHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     HandlePointerEventInner(pointerEvent);
@@ -77,7 +79,7 @@ void EventDispatch::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointer
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-void EventDispatch::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point)
+void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point)
 {
     CALL_DEBUG_ENTER;
     CHKPV(point);
@@ -130,7 +132,7 @@ void EventDispatch::HandlePointerEventInner(const std::shared_ptr<PointerEvent> 
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
+int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
@@ -168,7 +170,7 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
-bool EventDispatch::CheckPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
+bool EventDispatchHandler::CheckPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
@@ -188,7 +190,7 @@ bool EventDispatch::CheckPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
 }
 
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-void EventDispatch::OnMouseStateChange(uint32_t type, uint32_t code, int32_t value)
+void EventDispatchHandler::OnMouseStateChange(uint32_t type, uint32_t code, int32_t value)
 {
     std::lock_guard<std::mutex> guard(lock_);
     mouseState_.clear();

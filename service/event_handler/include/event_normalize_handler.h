@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef INPUT_EVENT_NORMALIZE_H
-#define INPUT_EVENT_NORMALIZE_H
+#ifndef EVENT_NORMALIZE_HANDLER_H
+#define EVENT_NORMALIZE_HANDLER_H
 
 #include <memory>
 
@@ -22,10 +22,10 @@
 
 namespace OHOS {
 namespace MMI {
-class InputEventNormalizeHandler : public IInputEventHandler {
+class EventNormalizeHandler : public IInputEventHandler {
 public:
-    InputEventNormalizeHandler() = default;
-    ~InputEventNormalizeHandler() = default;
+    EventNormalizeHandler() = default;
+    ~EventNormalizeHandler() = default;
     void HandleEvent(libinput_event* event) override;
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
     void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
@@ -54,4 +54,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // INPUT_EVENT_NORMALIZE_H
+#endif // EVENT_NORMALIZE_HANDLER_H
