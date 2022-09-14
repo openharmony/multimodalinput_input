@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef EVENT_DISPATCH_H
-#define EVENT_DISPATCH_H
+#ifndef EVENT_DISPATCH_HANDLER_H
+#define EVENT_DISPATCH_HANDLER_H
 
 #include <mutex>
 
@@ -27,16 +27,16 @@
 
 namespace OHOS {
 namespace MMI {
-class EventDispatch : public IInputEventHandler {
+class EventDispatchHandler : public IInputEventHandler {
     struct MouseState {
         uint32_t type { PointerEvent::SOURCE_TYPE_UNKNOWN };
         uint32_t code { PointerEvent::BUTTON_NONE };
         int32_t value { PointerEvent::POINTER_ACTION_UNKNOWN };
     };
 public:
-    EventDispatch();
-    DISALLOW_COPY_AND_MOVE(EventDispatch);
-    virtual ~EventDispatch();
+    EventDispatchHandler();
+    DISALLOW_COPY_AND_MOVE(EventDispatchHandler);
+    virtual ~EventDispatchHandler();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -65,4 +65,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // EVENT_DISPATCH_H
+#endif // EVENT_DISPATCH_HANDLER_H

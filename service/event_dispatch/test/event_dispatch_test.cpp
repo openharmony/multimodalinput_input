@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "event_dispatch.h"
+#include "event_dispatch_handler.h"
 #include "define_multimodal.h"
 
 namespace OHOS {

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "event_filter_wrap.h"
+#include "event_filter_handler.h"
 
 #include "error_multimodal.h"
 #include "mmi_log.h"
@@ -21,20 +21,20 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventFilterWrap" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventFilterHandler" };
 } // namespace
 
-EventFilterWrap::EventFilterWrap()
+EventFilterHandler::EventFilterHandler()
 {
     CALL_DEBUG_ENTER;
 }
 
-EventFilterWrap::~EventFilterWrap()
+EventFilterHandler::~EventFilterHandler()
 {
     CALL_DEBUG_ENTER;
 }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void EventFilterWrap::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
+void EventFilterHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
@@ -44,7 +44,7 @@ void EventFilterWrap::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-void EventFilterWrap::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+void EventFilterHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     if (HandlePointerEventFilter(pointerEvent)) {
@@ -57,7 +57,7 @@ void EventFilterWrap::HandlePointerEvent(const std::shared_ptr<PointerEvent> poi
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-void EventFilterWrap::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+void EventFilterHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     if (HandlePointerEventFilter(pointerEvent)) {
@@ -69,7 +69,7 @@ void EventFilterWrap::HandleTouchEvent(const std::shared_ptr<PointerEvent> point
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-int32_t EventFilterWrap::AddInputEventFilter(sptr<IEventFilter> filter)
+int32_t EventFilterHandler::AddInputEventFilter(sptr<IEventFilter> filter)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(lockFilter_);
@@ -77,7 +77,7 @@ int32_t EventFilterWrap::AddInputEventFilter(sptr<IEventFilter> filter)
     return RET_OK;
 }
 
-bool EventFilterWrap::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point)
+bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> point)
 {
     CALL_DEBUG_ENTER;
     CHKPF(point);

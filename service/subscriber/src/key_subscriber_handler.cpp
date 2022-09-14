@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "key_event_subscriber.h"
+#include "key_subscriber_handler.h"
 
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
@@ -28,12 +28,12 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "KeyEventSubscriber"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "KeySubscriberHandler"};
 constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void KeyEventSubscriber::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
+void KeySubscriberHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
     if (SubscribeKeyEvent(keyEvent)) {
@@ -47,7 +47,7 @@ void KeyEventSubscriber::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-void KeyEventSubscriber::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+void KeySubscriberHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
@@ -56,7 +56,7 @@ void KeyEventSubscriber::HandlePointerEvent(const std::shared_ptr<PointerEvent> 
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-void KeyEventSubscriber::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+void KeySubscriberHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
@@ -64,7 +64,7 @@ void KeyEventSubscriber::HandleTouchEvent(const std::shared_ptr<PointerEvent> po
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-int32_t KeyEventSubscriber::SubscribeKeyEvent(
+int32_t KeySubscriberHandler::SubscribeKeyEvent(
     SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)
 {
     CALL_INFO_TRACE;
@@ -93,7 +93,7 @@ int32_t KeyEventSubscriber::SubscribeKeyEvent(
     return RET_OK;
 }
 
-int32_t KeyEventSubscriber::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
+int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
 {
     CALL_INFO_TRACE;
     MMI_HILOGD("subscribeId:%{public}d", subscribeId);
@@ -107,7 +107,7 @@ int32_t KeyEventSubscriber::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscri
     return RET_ERR;
 }
 
-bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+bool KeySubscriberHandler::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
     if (IsRepeatedKeyEvent(keyEvent)) {
@@ -136,7 +136,7 @@ bool KeyEventSubscriber::SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     return handled;
 }
 
-void KeyEventSubscriber::InsertSubScriber(std::shared_ptr<Subscriber> subs)
+void KeySubscriberHandler::InsertSubScriber(std::shared_ptr<Subscriber> subs)
 {
     CALL_DEBUG_ENTER;
     CHKPV(subs);
@@ -150,7 +150,7 @@ void KeyEventSubscriber::InsertSubScriber(std::shared_ptr<Subscriber> subs)
     subscribers_.push_back(subs);
 }
 
-void KeyEventSubscriber::OnSessionDelete(SessionPtr sess)
+void KeySubscriberHandler::OnSessionDelete(SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
     CHKPV(sess);
@@ -164,7 +164,7 @@ void KeyEventSubscriber::OnSessionDelete(SessionPtr sess)
     }
 }
 
-bool KeyEventSubscriber::IsPreKeysMatch(
+bool KeySubscriberHandler::IsPreKeysMatch(
     const std::set<int32_t> &preKeys, const std::vector<int32_t> &pressedKeys) const
 {
     if (preKeys.size() != pressedKeys.size()) {
@@ -181,7 +181,7 @@ bool KeyEventSubscriber::IsPreKeysMatch(
     return true;
 }
 
-void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
+void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     const std::shared_ptr<Subscriber> &subscriber)
 {
     CALL_DEBUG_ENTER;
@@ -203,7 +203,7 @@ void KeyEventSubscriber::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     }
 }
 
-bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber> &subscriber,
+bool KeySubscriberHandler::AddTimer(const std::shared_ptr<Subscriber> &subscriber,
     const std::shared_ptr<KeyEvent> &keyEvent)
 {
     CALL_DEBUG_ENTER;
@@ -246,7 +246,7 @@ bool KeyEventSubscriber::AddTimer(const std::shared_ptr<Subscriber> &subscriber,
     return true;
 }
 
-void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber> &subscriber)
+void KeySubscriberHandler::ClearTimer(const std::shared_ptr<Subscriber> &subscriber)
 {
     CALL_DEBUG_ENTER;
     CHKPV(subscriber);
@@ -264,7 +264,7 @@ void KeyEventSubscriber::ClearTimer(const std::shared_ptr<Subscriber> &subscribe
     MMI_HILOGD("subscribeId:%{public}d,timerId:%{public}d", subscriber->id_, timerId);
 }
 
-void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
+void KeySubscriberHandler::OnTimer(const std::shared_ptr<Subscriber> subscriber)
 {
     CALL_DEBUG_ENTER;
     CHKPV(subscriber);
@@ -279,7 +279,7 @@ void KeyEventSubscriber::OnTimer(const std::shared_ptr<Subscriber> subscriber)
     MMI_HILOGD("subscribeId:%{public}d", subscriber->id_);
 }
 
-bool KeyEventSubscriber::InitSessionDeleteCallback()
+bool KeySubscriberHandler::InitSessionDeleteCallback()
 {
     CALL_DEBUG_ENTER;
     if (callbackInitialized_) {
@@ -289,13 +289,13 @@ bool KeyEventSubscriber::InitSessionDeleteCallback()
     auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPF(udsServerPtr);
     std::function<void(SessionPtr)> callback =
-        std::bind(&KeyEventSubscriber::OnSessionDelete, this, std::placeholders::_1);
+        std::bind(&KeySubscriberHandler::OnSessionDelete, this, std::placeholders::_1);
     udsServerPtr->AddSessionDeletedCallback(callback);
     callbackInitialized_ = true;
     return true;
 }
 
-bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent)
+bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
@@ -345,7 +345,7 @@ bool KeyEventSubscriber::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent
     return handled;
 }
 
-bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent)
+bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
@@ -403,7 +403,7 @@ bool KeyEventSubscriber::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent)
     return handled;
 }
 
-bool KeyEventSubscriber::HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyEvent)
+bool KeySubscriberHandler::HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
@@ -413,7 +413,7 @@ bool KeyEventSubscriber::HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyEve
     return false;
 }
 
-bool KeyEventSubscriber::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+bool KeySubscriberHandler::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
     if (keyEvent_ == nullptr) {
@@ -424,7 +424,7 @@ bool KeyEventSubscriber::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     return true;
 }
 
-void KeyEventSubscriber::RemoveKeyCode(int32_t keyCode, std::vector<int32_t> &keyCodes)
+void KeySubscriberHandler::RemoveKeyCode(int32_t keyCode, std::vector<int32_t> &keyCodes)
 {
     for (auto it = keyCodes.begin(); it != keyCodes.end(); ++it) {
         if (*it == keyCode) {
@@ -434,7 +434,7 @@ void KeyEventSubscriber::RemoveKeyCode(int32_t keyCode, std::vector<int32_t> &ke
     }
 }
 
-bool KeyEventSubscriber::IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent) {
+bool KeySubscriberHandler::IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent) {
     CHKPF(keyEvent);
     if (!hasEventExecuting) {
         return false;
@@ -468,7 +468,7 @@ bool KeyEventSubscriber::IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent) 
     return true;
 }
 
-void KeyEventSubscriber::Dump(int32_t fd, const std::vector<std::string> &args)
+void KeySubscriberHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
     mprintf(fd, "Subscriber information:\t");
