@@ -15,6 +15,8 @@
 
 #include "js_pointer_manager.h"
 
+#include "napi_constants.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {

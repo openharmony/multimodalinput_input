@@ -24,6 +24,7 @@ config("libmmi_client_config") {
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
     "event_handler/include",
+    "events/include",
     "module_loader/include",
   ]
 }

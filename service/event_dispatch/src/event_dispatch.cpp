@@ -28,6 +28,7 @@
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
 #include "input-event-codes.h"
+#include "napi_constants.h"
 #include "proto.h"
 #include "util.h"
 
@@ -36,7 +37,6 @@ namespace MMI {
 namespace {
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) || defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatch" };
-constexpr int32_t ANR_DISPATCH = 0;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD ||  OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace
 

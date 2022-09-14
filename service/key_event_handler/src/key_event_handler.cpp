@@ -30,8 +30,11 @@ KeyEventHandler::KeyEventHandler() {}
 
 KeyEventHandler::~KeyEventHandler() {}
 
-std::shared_ptr<KeyEvent> KeyEventHandler::GetKeyEvent() const
+std::shared_ptr<KeyEvent> KeyEventHandler::GetKeyEvent()
 {
+    if (keyEvent_ == nullptr) {
+        keyEvent_ = KeyEvent::Create();
+    }
     return keyEvent_;
 }
 
@@ -109,14 +112,16 @@ void KeyEventHandler::ResetKeyEvent(struct libinput_device* device)
         if (keyEvent_ == nullptr) {
             keyEvent_ = KeyEvent::Create();
         }
-        CHKPV(keyEvent_);
-        const std::vector<int32_t> funcKeys = {
-            KeyEvent::NUM_LOCK_FUNCTION_KEY,
-            KeyEvent::CAPS_LOCK_FUNCTION_KEY,
-            KeyEvent::SCROLL_LOCK_FUNCTION_KEY
-        };
-        for (const auto &funcKey : funcKeys) {
-            keyEvent_->SetFunctionKey(funcKey, libinput_get_funckey_state(device, funcKey));
+        if (libinput_has_event_led_type(device)) {
+            CHKPV(keyEvent_);
+            const std::vector<int32_t> funcKeys = {
+                KeyEvent::NUM_LOCK_FUNCTION_KEY,
+                KeyEvent::CAPS_LOCK_FUNCTION_KEY,
+                KeyEvent::SCROLL_LOCK_FUNCTION_KEY
+            };
+            for (const auto &funcKey : funcKeys) {
+                keyEvent_->SetFunctionKey(funcKey, libinput_get_funckey_state(device, funcKey));
+            }
         }
     }
 }

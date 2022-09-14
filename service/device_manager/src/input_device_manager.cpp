@@ -15,12 +15,14 @@
 
 #include "input_device_manager.h"
 
+#include <linux/input.h>
 #include <parameters.h>
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include <openssl/sha.h>
 #include <regex>
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include <unordered_map>
+
 #include "dfx_hisysevent.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
@@ -40,15 +42,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputD
 constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t SUPPORT_KEY = 1;
 
-constexpr int32_t ABS_MT_TOUCH_MAJOR = 0x30;
-constexpr int32_t ABS_MT_TOUCH_MINOR = 0x31;
-constexpr int32_t ABS_MT_ORIENTATION = 0x34;
-constexpr int32_t ABS_MT_POSITION_X  = 0x35;
-constexpr int32_t ABS_MT_POSITION_Y = 0x36;
-constexpr int32_t ABS_MT_PRESSURE = 0x3a;
-constexpr int32_t ABS_MT_WIDTH_MAJOR = 0x32;
-constexpr int32_t ABS_MT_WIDTH_MINOR = 0x33;
-constexpr int32_t BUS_BLUETOOTH = 0X5;
 const std::string UNKNOWN_SCREEN_ID = "";
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 const char *SPLIT_SYMBOL = "|";
@@ -679,12 +672,12 @@ std::string InputDeviceManager::Sha256(const std::string &in) const
 
 std::string InputDeviceManager::GenerateDescriptor(struct libinput_device *inputDevice, bool isRemote) const
 {
-    const char* location = libinput_device_get_phys(inputDevice);
+    const char* physicalPath = libinput_device_get_phys(inputDevice);
     std::string descriptor;
-    if (isRemote && location != nullptr) {
-        MMI_HILOGI("location:%{public}s", location);
+    if (isRemote && physicalPath != nullptr) {
+        MMI_HILOGI("physicalPath:%{public}s", physicalPath);
         std::vector<std::string> strList;
-        StringSplit(location, SPLIT_SYMBOL, strList);
+        StringSplit(physicalPath, SPLIT_SYMBOL, strList);
         if (strList.size() == 3) {
             descriptor = strList[2];
         }
@@ -700,8 +693,9 @@ std::string InputDeviceManager::GenerateDescriptor(struct libinput_device *input
     // add handling for USB devices to not uniqueify kbs that show up twice
     if (uniqueId != nullptr && uniqueId[0] != '\0') {
         rawDescriptor += "uniqueId:" + std::string(uniqueId);
-    } else if (location != nullptr) {
-        rawDescriptor += "location:" + std::string(location);
+    }
+    if (physicalPath != nullptr) {
+        rawDescriptor += "physicalPath:" + std::string(physicalPath);
     }
     if (name != nullptr && name[0] != '\0') {
         rawDescriptor += "name:" + regex_replace(name, std::regex(" "), "");

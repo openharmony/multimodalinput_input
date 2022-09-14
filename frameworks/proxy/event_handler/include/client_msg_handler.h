@@ -65,7 +65,6 @@ protected:
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
-    static void OnEventProcessed(int32_t eventId, int32_t eventType);
     static void OnDispatchEventProcessed(int32_t eventId);
 
 private:

@@ -21,6 +21,7 @@
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "mmi_log.h"
+#include "napi_constants.h"
 #include "net_packet.h"
 #include "proto.h"
 #include "util_ex.h"
@@ -29,7 +30,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventMonitorHandler" };
-constexpr int32_t ANR_MONITOR = 1;
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

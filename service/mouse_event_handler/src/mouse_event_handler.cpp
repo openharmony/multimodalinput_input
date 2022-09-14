@@ -20,6 +20,7 @@
 #include "input-event-codes.h"
 
 #include "define_multimodal.h"
+#include "event_log_helper.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
@@ -50,7 +51,7 @@ constexpr double DOUBLE_ZERO = 1e-6;
 constexpr int32_t MIN_SPEED = 1;
 constexpr int32_t MAX_SPEED = 11;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-constexpr int32_t PERCENT_CONST = 100;
+constexpr double PERCENT_CONST = 100.0;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace
 MouseEventHandler::MouseEventHandler()
@@ -340,6 +341,11 @@ void MouseEventHandler::OnDisplayLost(int32_t displayId)
     }
 }
 
+int32_t MouseEventHandler::GetDisplayId() const
+{
+    return currentDisplayId_;
+}
+
 void MouseEventHandler::HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem)
 {
     CALL_DEBUG_ENTER;
@@ -391,7 +397,7 @@ bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
 
 void MouseEventHandler::DumpInner()
 {
-    PrintEventData(pointerEvent_);
+    EventLogHelper::PrintEventData(pointerEvent_);
 }
 
 void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
@@ -442,7 +448,7 @@ void MouseEventHandler::SetDxDyForDInput(PointerEvent::PointerItem& pointerItem,
     MMI_HILOGD("MouseEventHandler SetDxDyForDInput : dx:%{public}d, dy:%{public}d", rawDx, rawDy);
 }
 
-void MouseEventHandler::SetAbsolutionLocation(int32_t xPercent, int32_t yPercent)
+void MouseEventHandler::SetAbsolutionLocation(double xPercent, double yPercent)
 {
     MMI_HILOGI("MouseEventHandler cross screen location : xPercent:%{public}d, yPercent:%{public}d",
         xPercent, yPercent);

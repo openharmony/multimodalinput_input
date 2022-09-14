@@ -20,6 +20,7 @@
 #include <sstream>
 
 #include "bytrace_adapter.h"
+#include "event_log_helper.h"
 #include "input_device.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_impl.h"
@@ -35,6 +36,7 @@
 #include "mmi_func_callback.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "napi_constants.h"
 #include "proto.h"
 #include "time_cost_chk.h"
 #include "util.h"
@@ -43,7 +45,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ClientMsgHandler"};
-constexpr int32_t ANR_DISPATCH = 0;
 } // namespace
 
 ClientMsgHandler::~ClientMsgHandler()
@@ -137,7 +138,7 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
         return PACKET_READ_FAIL;
     }
     MMI_HILOGI("Key event dispatcher of client, Fd:%{public}d", fd);
-    PrintEventData(key);
+    EventLogHelper::PrintEventData(key);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::TRACE_START, BytraceAdapter::KEY_DISPATCH_EVENT);
     key->SetProcessedCallback(dispatchCallback_);
     InputMgrImpl.OnKeyEvent(key);
@@ -157,7 +158,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         return RET_ERR;
     }
     MMI_HILOGD("Pointer event dispatcher of client:");
-    PrintEventData(pointerEvent);
+    EventLogHelper::PrintEventData(pointerEvent);
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOGI("Operation canceled.");
     }
@@ -362,13 +363,13 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-void ClientMsgHandler::OnEventProcessed(int32_t eventId, int32_t eventType)
+void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId)
 {
     CALL_DEBUG_ENTER;
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     NetPacket pkt(MmiMessageId::MARK_PROCESS);
-    pkt << eventId << eventType;
+    pkt << eventId << ANR_DISPATCH;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write event failed");
         return;
@@ -377,12 +378,6 @@ void ClientMsgHandler::OnEventProcessed(int32_t eventId, int32_t eventType)
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
-}
-
-void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId)
-{
-    CALL_DEBUG_ENTER;
-    OnEventProcessed(eventId, ANR_DISPATCH);
 }
 
 int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
