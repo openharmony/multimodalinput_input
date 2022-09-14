@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "key_command_manager.h"
+#include "key_command_handler.h"
 
 #include "dfx_hisysevent.h"
 #include "ability_manager_client.h"
@@ -32,7 +32,7 @@ constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr int32_t MAX_SEQUENCEKEYS_NUM = 10;
 constexpr int64_t MAX_DELAY_TIME = 3000000;
 constexpr int64_t SECONDS_SYSTEM = 1000;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
 struct JsonParser {
     JsonParser() = default;
     ~JsonParser()
@@ -523,7 +523,7 @@ bool ParseSequences(const JsonParser& parser, std::vector<Sequence>& sequenceVec
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void KeyCommandManager::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
+void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
     if (OnHandleEvent(keyEvent)) {
@@ -537,7 +537,7 @@ void KeyCommandManager::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-void KeyCommandManager::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+void KeyCommandHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
@@ -546,7 +546,7 @@ void KeyCommandManager::HandlePointerEvent(const std::shared_ptr<PointerEvent> p
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-void KeyCommandManager::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
+void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
@@ -554,7 +554,7 @@ void KeyCommandManager::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
-bool KeyCommandManager::ParseConfig()
+bool KeyCommandHandler::ParseConfig()
 {
     const char *testPathSuffix = "/etc/multimodalinput/ability_launch_config.json";
     char buf[MAX_PATH_LEN] = { 0 };
@@ -569,7 +569,7 @@ bool KeyCommandManager::ParseConfig()
     return ParseJson(customConfig) || ParseJson(defaultConfig);
 }
 
-bool KeyCommandManager::ParseJson(const std::string &configFile)
+bool KeyCommandHandler::ParseJson(const std::string &configFile)
 {
     CALL_DEBUG_ENTER;
     std::string jsonStr = ReadJsonFile(configFile);
@@ -595,7 +595,7 @@ bool KeyCommandManager::ParseJson(const std::string &configFile)
     return true;
 }
 
-void KeyCommandManager::Print()
+void KeyCommandHandler::Print()
 {
     MMI_HILOGD("shortcutKey count:%{public}zu", shortcutKeys_.size());
     int32_t row = 0;
@@ -612,7 +612,7 @@ void KeyCommandManager::Print()
     }
 }
 
-void KeyCommandManager::PrintSeq()
+void KeyCommandHandler::PrintSeq()
 {
     MMI_HILOGD("sequences count:%{public}zu", sequences_.size());
     int32_t row = 0;
@@ -627,7 +627,7 @@ void KeyCommandManager::PrintSeq()
     }
 }
 
-bool KeyCommandManager::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
+bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
     CHKPF(key);
@@ -646,7 +646,7 @@ bool KeyCommandManager::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
     return true;
 }
 
-bool KeyCommandManager::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent)
+bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
@@ -682,7 +682,7 @@ bool KeyCommandManager::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
     return false;
 }
 
-bool KeyCommandManager::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
+bool KeyCommandHandler::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
 {
     for (size_t i = keys_.size(); i > 0; --i) {
         if (keys_[i-1].keyCode == sequenceKey.keyCode) {
@@ -697,7 +697,7 @@ bool KeyCommandManager::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
     return false;
 }
 
-bool KeyCommandManager::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent)
+bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
@@ -731,7 +731,7 @@ bool KeyCommandManager::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
     return isLaunchAbility;
 }
 
-bool KeyCommandManager::AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent)
+bool KeyCommandHandler::AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
@@ -773,7 +773,7 @@ bool KeyCommandManager::AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent)
     return true;
 }
 
-bool KeyCommandManager::HandleSequence(Sequence &sequence, bool &isLaunchAbility)
+bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility)
 {
     CALL_DEBUG_ENTER;
     size_t keysSize = keys_.size();
@@ -816,7 +816,7 @@ bool KeyCommandManager::HandleSequence(Sequence &sequence, bool &isLaunchAbility
     return true;
 }
 
-bool KeyCommandManager::IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key)
+bool KeyCommandHandler::IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key)
 {
     CALL_DEBUG_ENTER;
     CHKPF(key);
@@ -839,13 +839,13 @@ bool KeyCommandManager::IsKeyMatch(const ShortcutKey &shortcutKey, const std::sh
     return true;
 }
 
-bool KeyCommandManager::SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key)
+bool KeyCommandHandler::SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key)
 {
     CHKPF(key);
     return keyCode == key->GetKeyCode();
 }
 
-bool KeyCommandManager::HandleKeyDown(ShortcutKey &shortcutKey)
+bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
 {
     CALL_DEBUG_ENTER;
     if (shortcutKey.keyDownDuration == 0) {
@@ -866,7 +866,7 @@ bool KeyCommandManager::HandleKeyDown(ShortcutKey &shortcutKey)
     return true;
 }
 
-bool KeyCommandManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey)
+bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
@@ -890,7 +890,7 @@ bool KeyCommandManager::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     return true;
 }
 
-bool KeyCommandManager::HandleKeyCancel(ShortcutKey &shortcutKey)
+bool KeyCommandHandler::HandleKeyCancel(ShortcutKey &shortcutKey)
 {
     CALL_DEBUG_ENTER;
     if (shortcutKey.timerId < 0) {
@@ -903,7 +903,7 @@ bool KeyCommandManager::HandleKeyCancel(ShortcutKey &shortcutKey)
     return false;
 }
 
-void KeyCommandManager::LaunchAbility(const ShortcutKey &key)
+void KeyCommandHandler::LaunchAbility(const ShortcutKey &key)
 {
     AAFwk::Want want;
     want.SetElementName(key.ability.deviceId, key.ability.bundleName, key.ability.abilityName);
@@ -927,7 +927,7 @@ void KeyCommandManager::LaunchAbility(const ShortcutKey &key)
     MMI_HILOGD("End launch ability, bundleName:%{public}s", key.ability.bundleName.c_str());
 }
 
-void KeyCommandManager::LaunchAbility(const Sequence &sequence)
+void KeyCommandHandler::LaunchAbility(const Sequence &sequence)
 {
     AAFwk::Want want;
     want.SetElementName(sequence.ability.deviceId, sequence.ability.bundleName, sequence.ability.abilityName);
