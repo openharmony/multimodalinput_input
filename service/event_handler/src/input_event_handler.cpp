@@ -92,10 +92,10 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 
     std::shared_ptr<IInputEventHandler> handler = eventNormalizeHandler_;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    eventfilterHandler_ = std::make_shared<EventFilterHandler>();
-    CHKPR(eventfilterHandler_, ERROR_NULL_POINTER);
-    handler->SetNext(eventfilterHandler_);
-    handler = eventfilterHandler_;
+    eventFilterHandler_ = std::make_shared<EventFilterHandler>();
+    CHKPR(eventFilterHandler_, ERROR_NULL_POINTER);
+    handler->SetNext(eventFilterHandler_);
+    handler = eventFilterHandler_;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -156,7 +156,7 @@ std::shared_ptr<EventMonitorHandler> InputEventHandler::GetMonitorHandler() cons
 
 std::shared_ptr<EventFilterHandler> InputEventHandler::GetFilterHandler() const
 {
-    return eventfilterHandler_;
+    return eventFilterHandler_;
 }
 
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
