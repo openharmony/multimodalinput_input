@@ -510,10 +510,10 @@ int32_t GetKeyIntentionByItems(std::shared_ptr<KeyEvent> keyEvent)
 
     int64_t keyCodes = 0;
     for (const auto &item : items) {
-        MMI_HILOGE("****************keyCode:%{public}d", item.GetKeyCode());
+        MMI_HILOGE("songliy keyCode:%{public}d", item.GetKeyCode());
         keyCodes = (keyCodes<<16) + item.GetKeyCode();
     }
-    MMI_HILOGE("****************KeyCodes Sum:%{public}lld", keyCodes);
+    MMI_HILOGE("songliy KeyCodes Sum:%{public}lld", keyCodes);
     return GetKeyIntentionByKeyCode(keyCodes);
 }
 } // namespace MMI
