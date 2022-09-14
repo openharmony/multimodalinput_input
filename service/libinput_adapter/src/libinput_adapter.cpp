@@ -136,7 +136,7 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_
     return true;
 }
 
-void LibinputAdapter::EventDispatchHandler(struct epoll_event& ev)
+void LibinputAdapter::EventDispatch(struct epoll_event& ev)
 {
     CALL_DEBUG_ENTER;
     CHKPV(ev.data.ptr);
