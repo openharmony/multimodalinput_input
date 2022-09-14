@@ -35,7 +35,7 @@ public:
     DISALLOW_COPY_AND_MOVE(LibinputAdapter);
     virtual ~LibinputAdapter();
     bool Init(FunInputEvent funInputEvent, const std::string& seat_id = "seat0");
-    void EventDispatch(struct epoll_event& ev);
+    void EventDispatchHandler(struct epoll_event& ev);
     void Stop();
     void ProcessPendingEvents();
     void ReloadDevice();

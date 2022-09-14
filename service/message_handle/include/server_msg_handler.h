@@ -18,7 +18,7 @@
 
 #include "nocopyable.h"
 
-#include "event_dispatch.h"
+#include "event_dispatch_handler.h"
 #include "i_event_filter.h"
 #include "input_handler_type.h"
 #include "key_option.h"

@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef KEY_EVENT_SUBSCRIBER_H
-#define KEY_EVENT_SUBSCRIBER_H
+#ifndef KEY_SUBSCRIBER_HANDLER_H
+#define KEY_SUBSCRIBER_HANDLER_H
 
 #include <algorithm>
 #include <list>
@@ -30,11 +30,11 @@
 
 namespace OHOS {
 namespace MMI {
-class KeyEventSubscriber :  public IInputEventHandler {
+class KeySubscriberHandler :  public IInputEventHandler {
 public:
-    KeyEventSubscriber() = default;
-    DISALLOW_COPY_AND_MOVE(KeyEventSubscriber);
-    ~KeyEventSubscriber() = default;
+    KeySubscriberHandler() = default;
+    DISALLOW_COPY_AND_MOVE(KeySubscriberHandler);
+    ~KeySubscriberHandler() = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -88,4 +88,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif  // KEY_EVENT_SUBSCRIBER_H
+#endif  // KEY_SUBSCRIBER_HANDLER_H

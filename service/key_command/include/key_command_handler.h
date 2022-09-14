@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef KEY_COMMAND_MANAGER_H
-#define KEY_COMMAND_MANAGER_H
+#ifndef KEY_COMMAND_HANDLER_H
+#define KEY_COMMAND_HANDLER_H
 
 #include <chrono>
 #include <condition_variable>
@@ -73,11 +73,11 @@ struct Sequence {
     Ability ability;
 };
 
-class KeyCommandManager : public IInputEventHandler {
+class KeyCommandHandler : public IInputEventHandler {
 public:
-    KeyCommandManager() = default;
-    DISALLOW_COPY_AND_MOVE(KeyCommandManager);
-    ~KeyCommandManager() = default;
+    KeyCommandHandler() = default;
+    DISALLOW_COPY_AND_MOVE(KeyCommandHandler);
+    ~KeyCommandHandler() = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -128,4 +128,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // KEY_COMMAND_MANAGER_H
+#endif // KEY_COMMAND_HANDLER_H
