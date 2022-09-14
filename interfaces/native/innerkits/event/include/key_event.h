@@ -2858,6 +2858,38 @@ public:
      */
     static const int32_t KEY_ACTION_UP;
 
+    static const int32_t INTENTION_UNKNOWN;
+    static const int32_t INTENTION_UP;
+    static const int32_t INTENTION_DOWN;
+    static const int32_t INTENTION_LEFT;
+    static const int32_t INTENTION_RIGHT;
+    static const int32_t INTENTION_SELECT;
+    static const int32_t INTENTION_ESCAPE;
+    static const int32_t INTENTION_BACK;
+    static const int32_t INTENTION_FORWARD;
+    static const int32_t INTENTION_MENU;
+    static const int32_t INTENTION_HOME;
+    static const int32_t INTENTION_PAGE_UP;
+    static const int32_t INTENTION_PAGE_DOWN;
+    static const int32_t INTENTION_ZOOM_OUT;
+    static const int32_t INTENTION_ZOOM_IN;
+
+    static const int32_t INTENTION_MEDIA_PLAY_PAUSE;
+    static const int32_t INTENTION_MEDIA_FAST_FORWARD;
+    static const int32_t INTENTION_MEDIA_FAST_REWIND;
+    static const int32_t INTENTION_MEDIA_FAST_PLAYBACK;
+    static const int32_t INTENTION_MEDIA_NEXT;
+    static const int32_t INTENTION_MEDIA_PREVIOUS;
+    static const int32_t INTENTION_MEDIA_MUTE;
+    static const int32_t INTENTION_VOLUTE_UP;
+    static const int32_t INTENTION_VOLUTE_DOWN;
+
+    static const int32_t INTENTION_CALL;
+    static const int32_t INTENTION_ENDCALL;
+    static const int32_t INTENTION_REJECTCALL;
+
+    static const int32_t INTENTION_CAMERA;
+
 public:
     class KeyItem {
     public:
@@ -3124,6 +3156,9 @@ public:
      */
     bool GetFunctionKey(int32_t funcKey) const;
 
+    int32_t GetKeyIntention();
+    void SetKeyIntention(int32_t keyIntention);
+
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.
@@ -3159,6 +3194,7 @@ private:
     bool numLock_ { false };
     bool capsLock_ { false };
     bool scrollLock_ { false };
+    int32_t keyIntention_ = -1;
 };
 
 std::ostream& operator<<(std::ostream&, KeyEvent&);
