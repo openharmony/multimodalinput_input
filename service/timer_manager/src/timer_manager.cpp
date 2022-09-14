@@ -150,6 +150,7 @@ void TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem>& timer)
     for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->nextCallTime > timer->nextCallTime) {
             timers_.insert(it, std::move(timer));
+            return;
         }
     }
     timers_.push_back(std::move(timer));
