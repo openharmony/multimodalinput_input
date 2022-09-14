@@ -28,7 +28,7 @@ class KeyEventHandler final {
     DECLARE_DELAYED_SINGLETON(KeyEventHandler);
 public:
     DISALLOW_COPY_AND_MOVE(KeyEventHandler);
-    std::shared_ptr<KeyEvent> GetKeyEvent() const;
+    std::shared_ptr<KeyEvent> GetKeyEvent();
     int32_t Normalize(libinput_event *event, std::shared_ptr<KeyEvent> keyEvent);
     void ResetKeyEvent(struct libinput_device* device);
 

@@ -17,11 +17,11 @@
 
 #include <functional>
 
-#include "constants.h"
 #include "define_multimodal.h"
 #include "input_device_cooperate_impl.h"
 #include "input_manager.h"
 #include "mmi_log.h"
+#include "napi_constants.h"
 #include "util_napi.h"
 
 namespace OHOS {

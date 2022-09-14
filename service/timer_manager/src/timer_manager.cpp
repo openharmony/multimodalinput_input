@@ -21,7 +21,7 @@ namespace {
 constexpr int32_t MIN_DELAY = -1;
 constexpr int32_t MIN_INTERVAL = 50;
 constexpr int32_t MAX_INTERVAL = 4096;
-constexpr int32_t MAX_TIMER_COUNT = 32;
+constexpr int32_t MAX_TIMER_COUNT = 64;
 constexpr int32_t NONEXISTENT_ID = -1;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TimerManager" };
 } // namespace
