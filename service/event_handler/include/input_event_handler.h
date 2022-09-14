@@ -57,7 +57,7 @@ private:
 
     UDSServer *udsServer_ = nullptr;
     std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler_ = nullptr;
-    std::shared_ptr<EventFilterHandler> eventfilterHandler_ = nullptr;
+    std::shared_ptr<EventFilterHandler> eventFilterHandler_ = nullptr;
     std::shared_ptr<EventInterceptorHandler> eventInterceptorHandler_ = nullptr;
     std::shared_ptr<KeySubscriberHandler> eventSubscriberHandler_ = nullptr;
     std::shared_ptr<EventMonitorHandler> eventMonitorHandler_ = nullptr;
