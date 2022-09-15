@@ -104,13 +104,13 @@ int32_t HdiInject::ManageHdfInject(const SessionPtr sess, NetPacket &pkt)
 int32_t HdiInject::OnSetEventInject(const RawInputEvent& allEvent, int32_t devIndex)
 {
     CALL_DEBUG_ENTER;
-    KeyEventHandler* pack[EVENT_PACKAGE_ARROW_SIZE];
-    pack[0] = (KeyEventHandler*)malloc(sizeof(KeyEventHandler));
+    KeyEventNormalize* pack[EVENT_PACKAGE_ARROW_SIZE];
+    pack[0] = (KeyEventNormalize*)malloc(sizeof(KeyEventNormalize));
     pack[0]->type = static_cast<int32_t>(allEvent.ev_type);
     pack[0]->code = static_cast<uint32_t>allEvent.ev_code;
     pack[0]->value = static_cast<int32_t>(allEvent.ev_value);
     pack[0]->timestamp = static_cast<uint64_t>(GetSysClockTime());
-    MMIHdiInject->eventcallback_.EventPkgCallback((const KeyEventHandler**)pack, 1, devIndex);
+    MMIHdiInject->eventcallback_.EventPkgCallback((const KeyEventNormalize**)pack, 1, devIndex);
     free(pack[0]);
     return RET_OK;
 }

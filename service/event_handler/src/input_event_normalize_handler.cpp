@@ -26,13 +26,13 @@
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "key_auto_repeat.h"
-#include "key_event_handler.h"
+#include "key_event_normalize.h"
 #include "key_event_value_transformation.h"
 #include "libinput_adapter.h"
 #include "mmi_log.h"
 #include "time_cost_chk.h"
 #include "timer_manager.h"
-#include "touch_transform_point_manager.h"
+#include "touch_event_normalize.h"
 
 namespace OHOS {
 namespace MMI {
@@ -333,7 +333,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH_PAD);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     nextHandler_->HandlePointerEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
@@ -359,7 +359,7 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_GESTURE);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_GESTURE);
     CHKPR(pointerEvent, GESTURE_EVENT_PKG_FAIL);
     MMI_HILOGD("GestureEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
                "action:%{public}d,actionStartTime:%{public}" PRId64 ","
@@ -394,7 +394,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     if (InputDevCooSM->CheckTouchEvent(event)) {
@@ -436,7 +436,7 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchTransformPointManger->OnLibInput(event, INPUT_DEVICE_CAP_TABLET_TOOL);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_TABLET_TOOL);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);

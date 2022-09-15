@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "key_event_handler.h"
+#include "key_event_normalize.h"
 
 #include "input_device_manager.h"
 #include "key_map_manager.h"
@@ -22,15 +22,15 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventHandler" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventNormalize" };
 constexpr uint32_t KEYSTATUS = 0;
 } // namespace
 
-KeyEventHandler::KeyEventHandler() {}
+KeyEventNormalize::KeyEventNormalize() {}
 
-KeyEventHandler::~KeyEventHandler() {}
+KeyEventNormalize::~KeyEventNormalize() {}
 
-std::shared_ptr<KeyEvent> KeyEventHandler::GetKeyEvent()
+std::shared_ptr<KeyEvent> KeyEventNormalize::GetKeyEvent()
 {
     if (keyEvent_ == nullptr) {
         keyEvent_ = KeyEvent::Create();
@@ -38,7 +38,7 @@ std::shared_ptr<KeyEvent> KeyEventHandler::GetKeyEvent()
     return keyEvent_;
 }
 
-int32_t KeyEventHandler::Normalize(struct libinput_event *event, std::shared_ptr<KeyEvent> keyEvent)
+int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, PARAM_INPUT_INVALID);
@@ -106,7 +106,7 @@ int32_t KeyEventHandler::Normalize(struct libinput_event *event, std::shared_ptr
     return RET_OK;
 }
 
-void KeyEventHandler::ResetKeyEvent(struct libinput_device* device)
+void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
 {
     if (InputDevMgr->IsKeyboardDevice(device) || InputDevMgr->IsPointerDevice(device)) {
         if (keyEvent_ == nullptr) {

@@ -12,21 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "tablet_tool_processor.h"
+#include "tablet_tool_tranform_processor.h"
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TabletToolProcessor" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TabletToolTransformProcessor" };
 constexpr int32_t DEFAULT_POINTER_ID { 0 };
 } // namespace
 
-TabletToolProcessor::TabletToolProcessor(int32_t deviceId)
+TabletToolTransformProcessor::TabletToolTransformProcessor(int32_t deviceId)
     : deviceId_(deviceId) {}
 
-std::shared_ptr<PointerEvent> TabletToolProcessor::OnEvent(struct libinput_event* event)
+std::shared_ptr<PointerEvent> TabletToolTransformProcessor::OnEvent(struct libinput_event* event)
 {
     CHKPP(event);
     if (pointerEvent_ == nullptr) {
@@ -64,7 +64,7 @@ std::shared_ptr<PointerEvent> TabletToolProcessor::OnEvent(struct libinput_event
     return pointerEvent_;
 }
 
-int32_t TabletToolProcessor::GetToolType(struct libinput_event_tablet_tool* tabletEvent)
+int32_t TabletToolTransformProcessor::GetToolType(struct libinput_event_tablet_tool* tabletEvent)
 {
     int32_t toolType = libinput_event_tablet_tool_get_tool_type(tabletEvent);
     if (toolType != 0) {
@@ -102,7 +102,7 @@ int32_t TabletToolProcessor::GetToolType(struct libinput_event_tablet_tool* tabl
     }
 }
 
-bool TabletToolProcessor::OnTip(struct libinput_event* event)
+bool TabletToolTransformProcessor::OnTip(struct libinput_event* event)
 {
     CHKPF(event);
     auto tabletEvent = libinput_event_get_tablet_tool_event(event);
@@ -132,7 +132,7 @@ bool TabletToolProcessor::OnTip(struct libinput_event* event)
     return ret;
 }
 
-bool TabletToolProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
+bool TabletToolTransformProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
 {
     CALL_DEBUG_ENTER;
     CHKPF(event);
@@ -174,7 +174,7 @@ bool TabletToolProcessor::OnTipDown(struct libinput_event_tablet_tool* event)
     return true;
 }
 
-bool TabletToolProcessor::OnTipMotion(struct libinput_event* event)
+bool TabletToolTransformProcessor::OnTipMotion(struct libinput_event* event)
 {
     CALL_DEBUG_ENTER;
     CHKPF(event);
@@ -218,7 +218,7 @@ bool TabletToolProcessor::OnTipMotion(struct libinput_event* event)
     return true;
 }
 
-bool TabletToolProcessor::OnTipUp(struct libinput_event_tablet_tool* event)
+bool TabletToolTransformProcessor::OnTipUp(struct libinput_event_tablet_tool* event)
 {
     CALL_DEBUG_ENTER;
     CHKPF(event);

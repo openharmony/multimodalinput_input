@@ -13,18 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef TABLET_TOOL_TRANSFORM_POINT_PROCESSOR_H
-#define TABLET_TOOL_TRANSFORM_POINT_PROCESSOR_H
+#ifndef TABLET_TOOL_TRANSFORM_PROCESSOR_H
+#define TABLET_TOOL_TRANSFORM_PROCESSOR_H
 #include "nocopyable.h"
-#include "transform_point_processor.h"
+#include "transform_processor.h"
 
 namespace OHOS {
 namespace MMI {
-class TabletToolProcessor : public TransformPointProcessor {
+class TabletToolTransformProcessor : public TransformProcessor {
 public:
-    explicit TabletToolProcessor(int32_t deviceId);
-    DISALLOW_COPY_AND_MOVE(TabletToolProcessor);
-    virtual ~TabletToolProcessor() = default;
+    explicit TabletToolTransformProcessor(int32_t deviceId);
+    DISALLOW_COPY_AND_MOVE(TabletToolTransformProcessor);
+    virtual ~TabletToolTransformProcessor() = default;
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
 
 private:
@@ -40,4 +40,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // TABLET_TOOL_TRANSFORM_POINT_PROCESSOR_H
+#endif // TABLET_TOOL_TRANSFORM_PROCESSOR_H

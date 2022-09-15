@@ -19,12 +19,12 @@
 #include <cstdio>
 
 #include "dfx_hisysevent.h"
-#include "input_device_manager.h"
 #include "i_pointer_drawing_manager.h"
-#include "mouse_event_handler.h"
+#include "input_device_manager.h"
+#include "mouse_event_normalize.h"
 #include "pointer_drawing_manager.h"
-#include "util.h"
 #include "util_ex.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
