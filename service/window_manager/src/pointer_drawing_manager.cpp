@@ -314,6 +314,7 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupIn
     for (const auto& item : displayGroupInfo.displaysInfo) {
         if (item.id == displayInfo_.id) {
             UpdateDisplayInfo(item);
+            DrawManager();
             return;
         }
     }
@@ -334,7 +335,6 @@ void PointerDrawingManager::OnWindowInfo(const WinInfo &info)
     CALL_DEBUG_ENTER;
     windowId_ = info.windowId;
     pid_ = info.windowPid;
-    DrawManager();
 }
 
 void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible)

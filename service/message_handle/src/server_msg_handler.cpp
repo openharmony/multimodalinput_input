@@ -27,6 +27,7 @@
 #include "input_event_handler.h"
 #include "input_event.h"
 #include "input_windows_manager.h"
+#include "i_pointer_drawing_manager.h"
 #include "key_event_handler.h"
 #include "key_subscriber_handler.h"
 #include "libinput_adapter.h"
@@ -208,6 +209,9 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
         case PointerEvent::SOURCE_TYPE_TOUCHPAD : {
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+            if (!IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
+                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true);
+            }
             inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
             break;
         }
