@@ -17,7 +17,7 @@
 
 #include "input_device_cooperate_sm.h"
 #include "input_device_manager.h"
-#include "mouse_event_handler.h"
+#include "mouse_event_normalize.h"
 #include "multimodal_input_connect_remoter.h"
 
 namespace OHOS {

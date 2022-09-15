@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef TOUCHPAD_TRANSFORM_POINT_PROCESSOR_H
-#define TOUCHPAD_TRANSFORM_POINT_PROCESSOR_H
+#ifndef TOUCH_TRANSFORM_PROCESSOR_H
+#define TOUCH_TRANSFORM_PROCESSOR_H
 
 #include <memory>
 
@@ -25,20 +25,20 @@
 
 namespace OHOS {
 namespace MMI {
-class TouchPadTransformPointProcessor {
+class TouchTransformProcessor {
 public:
-    explicit TouchPadTransformPointProcessor(int32_t deviceId);
-    DISALLOW_COPY_AND_MOVE(TouchPadTransformPointProcessor);
-    ~TouchPadTransformPointProcessor();
-    std::shared_ptr<PointerEvent> OnLibinputTouchPadEvent(struct libinput_event *event);
+    explicit TouchTransformProcessor(int32_t deviceId);
+    DISALLOW_COPY_AND_MOVE(TouchTransformProcessor);
+    ~TouchTransformProcessor();
+    std::shared_ptr<PointerEvent> OnLibinputTouchEvent(struct libinput_event *event);
 
 private:
-    void OnEventTouchPadDown(struct libinput_event *event);
-    void OnEventTouchPadMotion(struct libinput_event *event);
-    void OnEventTouchPadUp(struct libinput_event *event);
-    int32_t GetTouchPadToolType(struct libinput_event_touch *data, struct libinput_device *device);
-    int32_t GetTouchPadToolType(struct libinput_device *device);
-    void InitToolType();
+    bool OnEventTouchDown(struct libinput_event *event);
+    bool OnEventTouchMotion(struct libinput_event *event);
+    bool OnEventTouchUp(struct libinput_event *event);
+    int32_t GetTouchToolType(struct libinput_event_touch *data, struct libinput_device *device);
+    int32_t GetTouchToolType(struct libinput_device *device);
+    void InitToolTypes();
 private:
     int32_t deviceId_ { 0 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
@@ -46,4 +46,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // TOUCHPAD_TRANSFORM_POINT_PROCESSOR_H
+#endif // TOUCH_TRANSFORM_PROCESSOR_H
