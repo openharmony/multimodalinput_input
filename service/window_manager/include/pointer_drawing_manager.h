@@ -28,7 +28,7 @@
 
 #include "device_observer.h"
 #include "i_pointer_drawing_manager.h"
-#include "mouse_event_handler.h"
+#include "mouse_event_normalize.h"
 #include "struct_multimodal.h"
 
 namespace OHOS {

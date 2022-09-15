@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef KEY_EVENT_HANDLER_H
-#define KEY_EVENT_HANDLER_H
+#ifndef KEY_EVENT_NORMALIZE_H
+#define KEY_EVENT_NORMALIZE_H
 
 #include "singleton.h"
 
@@ -24,10 +24,10 @@
 
 namespace OHOS {
 namespace MMI {
-class KeyEventHandler final {
-    DECLARE_DELAYED_SINGLETON(KeyEventHandler);
+class KeyEventNormalize final {
+    DECLARE_DELAYED_SINGLETON(KeyEventNormalize);
 public:
-    DISALLOW_COPY_AND_MOVE(KeyEventHandler);
+    DISALLOW_COPY_AND_MOVE(KeyEventNormalize);
     std::shared_ptr<KeyEvent> GetKeyEvent();
     int32_t Normalize(libinput_event *event, std::shared_ptr<KeyEvent> keyEvent);
     void ResetKeyEvent(struct libinput_device* device);
@@ -35,7 +35,7 @@ public:
 private:
     std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
 };
-#define KeyEventHdr ::OHOS::DelayedSingleton<KeyEventHandler>::GetInstance()
+#define KeyEventHdr ::OHOS::DelayedSingleton<KeyEventNormalize>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#endif // KEY_EVENT_HANDLER_H
+#endif // KEY_EVENT_NORMALIZE_H

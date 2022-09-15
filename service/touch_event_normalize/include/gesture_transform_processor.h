@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef GESTURE_TRANSFORM_POINT_PROCESSOR_H
-#define GESTURE_TRANSFORM_POINT_PROCESSOR_H
+#ifndef GESTURE_TRANSFORM_PROCESSOR_H
+#define GESTURE_TRANSFORM_PROCESSOR_H
 
 #include <memory>
 
@@ -25,11 +25,11 @@
 
 namespace OHOS {
 namespace MMI {
-class GestureTransformPointProcessor {
+class GestureTransformProcessor {
 public:
-    explicit GestureTransformPointProcessor(int32_t deviceId);
-    DISALLOW_COPY_AND_MOVE(GestureTransformPointProcessor);
-    ~GestureTransformPointProcessor();
+    explicit GestureTransformProcessor(int32_t deviceId);
+    DISALLOW_COPY_AND_MOVE(GestureTransformProcessor);
+    ~GestureTransformProcessor();
     std::shared_ptr<PointerEvent> OnTouchPadGestureEvent(struct libinput_event *event);
 
 private:
@@ -43,4 +43,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // GESTURE_TRANSFORM_POINT_PROCESSOR_H
+#endif // GESTURE_TRANSFORM_PROCESSOR_H

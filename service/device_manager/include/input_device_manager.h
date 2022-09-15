@@ -21,7 +21,7 @@
 
 #include "device_observer.h"
 #include "event_dispatch_handler.h"
-#include "key_event_handler.h"
+#include "key_event_normalize.h"
 #include "input_device.h"
 #include "key_auto_repeat.h"
 #include "key_map_manager.h"

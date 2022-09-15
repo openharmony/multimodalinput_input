@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "touch_transform_point_processor.h"
+#include "touch_transform_processor.h"
 
 #include <linux/input.h>
 
@@ -23,21 +23,21 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformPointProcessor"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformProcessor"};
 constexpr int32_t MT_TOOL_NONE      = -1;
 constexpr int32_t BTN_DOWN          = 1;
 } // namespace
 
-TouchTransformPointProcessor::TouchTransformPointProcessor(int32_t deviceId) : deviceId_(deviceId)
+TouchTransformProcessor::TouchTransformProcessor(int32_t deviceId) : deviceId_(deviceId)
 {
     pointerEvent_ = PointerEvent::Create();
     CHKPL(pointerEvent_);
     InitToolTypes();
 }
 
-TouchTransformPointProcessor::~TouchTransformPointProcessor() {}
+TouchTransformProcessor::~TouchTransformProcessor() {}
 
-bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event)
+bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPF(event);
@@ -88,7 +88,7 @@ bool TouchTransformPointProcessor::OnEventTouchDown(struct libinput_event *event
     return true;
 }
 
-bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *event)
+bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPF(event);
@@ -128,7 +128,7 @@ bool TouchTransformPointProcessor::OnEventTouchMotion(struct libinput_event *eve
     return true;
 }
 
-bool TouchTransformPointProcessor::OnEventTouchUp(struct libinput_event *event)
+bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPF(event);
@@ -150,7 +150,7 @@ bool TouchTransformPointProcessor::OnEventTouchUp(struct libinput_event *event)
     return true;
 }
 
-std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent(struct libinput_event *event)
+std::shared_ptr<PointerEvent> TouchTransformProcessor::OnLibinputTouchEvent(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPP(event);
@@ -189,7 +189,7 @@ std::shared_ptr<PointerEvent> TouchTransformPointProcessor::OnLibinputTouchEvent
     return pointerEvent_;
 }
 
-int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_event_touch *data,
+int32_t TouchTransformProcessor::GetTouchToolType(struct libinput_event_touch *data,
     struct libinput_device *device)
 {
     int32_t toolType = libinput_event_touch_get_tool_type(data);
@@ -210,7 +210,7 @@ int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_event_tou
     }
 }
 
-int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_device *device)
+int32_t TouchTransformProcessor::GetTouchToolType(struct libinput_device *device)
 {
     for (const auto &item : vecToolType_) {
         if (libinput_device_touch_btn_tool_type_down(device, item.first) == BTN_DOWN) {
@@ -221,7 +221,7 @@ int32_t TouchTransformPointProcessor::GetTouchToolType(struct libinput_device *d
     return PointerEvent::TOOL_TYPE_FINGER;
 }
 
-void TouchTransformPointProcessor::InitToolTypes()
+void TouchTransformProcessor::InitToolTypes()
 {
     vecToolType_.emplace_back(std::make_pair(BTN_TOOL_PEN, PointerEvent::TOOL_TYPE_PEN));
     vecToolType_.emplace_back(std::make_pair(BTN_TOOL_RUBBER, PointerEvent::TOOL_TYPE_RUBBER));
