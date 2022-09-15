@@ -314,6 +314,7 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupIn
     for (const auto& item : displayGroupInfo.displaysInfo) {
         if (item.id == displayInfo_.id) {
             UpdateDisplayInfo(item);
+            DrawManager();
             return;
         }
     }
@@ -334,7 +335,6 @@ void PointerDrawingManager::OnWindowInfo(const WinInfo &info)
     CALL_DEBUG_ENTER;
     windowId_ = info.windowId;
     pid_ = info.windowPid;
-    DrawManager();
 }
 
 void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible)
@@ -489,8 +489,9 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, in
         int32_t physicalX = lastPhysicalX_;
         int32_t physicalY = lastPhysicalY_;
         AdjustMouseFocus(ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle)].alignmentWay), physicalX, physicalY);
-        pointerWindow_->MoveTo(physicalX, physicalY);
+        pointerWindow_->MoveTo(physicalX + displayInfo_.x, physicalY + displayInfo_.y);
 
+        lastMouseStyle_ = pointerStyle;
         int32_t ret = InitLayer(MOUSE_ICON(pointerStyle));
         if (ret != RET_OK) {
             MMI_HILOGE("Init layer failed");
@@ -546,45 +547,46 @@ void PointerDrawingManager::InitStyle()
 {
     CALL_DEBUG_ENTER;
     mouseIcons_ = {
-        {DEFAULT, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default_NW.png"}},
-        {EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "East_Center.png"}},
-        {WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "West_Center.png"}},
-        {SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "South_Center.png"}},
-        {NORTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North_Center.png"}},
-        {WEST_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "WestEast_Center.png"}},
-        {NORTH_SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "NorthSouth_Center.png"}},
-        {NORTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "NorthEast_Center.png"}},
-        {NORTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "NorthWest_Center.png"}},
-        {SOUTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "SouthEast_Center.png"}},
-        {SOUTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "SouthWest_Center.png"}},
-        {NORTH_EAST_SOUTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "NESW_Center.png"}},
-        {NORTH_WEST_SOUTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "NWSE_Center.png"}},
-        {CROSS, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Cross_Center.png"}},
-        {CURSOR_COPY, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Copy_NW.png"}},
-        {CURSOR_FORBID, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Forbid_NW.png"}},
-        {COLOR_SUCKER, {ANGLE_SW, IMAGE_POINTER_DEFAULT_PATH + "Colorsucker_SW.png"}},
-        {HAND_GRABBING, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "HandGrabbing_Center.png"}},
-        {HAND_OPEN, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "HandOpen_Center.png"}},
-        {HAND_POINTING, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "HandPointing_NW.png"}},
-        {HELP, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Help_NW.png"}},
-        {CURSOR_MOVE, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Move_Center.png"}},
-        {RESIZE_LEFT_RIGHT, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ResizeLeftRight_Center.png"}},
-        {RESIZE_UP_DOWN, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ResizeUpDown_Center.png"}},
-        {SCREENSHOT_CHOOSE, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ScreenshotCross_Center.png"}},
-        {SCREENSHOT_CURSOR, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ScreenshotCursor_Center.png"}},
-        {TEXT_CURSOR, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "TextCursor_Center.png"}},
-        {ZOOM_IN, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ZoomIn_Center.png"}},
-        {ZOOM_OUT, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "ZoomOut_Center.png"}},
-        {MIDDLE_BTN_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_East_Center.png"}},
-        {MIDDLE_BTN_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_West_Center.png"}},
-        {MIDDLE_BTN_SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_South_Center.png"}},
-        {MIDDLE_BTN_NORTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_North_Center.png"}},
-        {MIDDLE_BTN_NORTH_SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_NS_Center.png"}},
-        {MIDDLE_BTN_NORTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_NE_Center.png"}},
-        {MIDDLE_BTN_NORTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_NW_Center.png"}},
-        {MIDDLE_BTN_SOUTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_SE_Center.png"}},
-        {MIDDLE_BTN_SOUTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_SW_Center.png"}},
-        {MIDDLE_BTN_NORTH_SOUTH_WEST_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MiddleBtn_NSWE_Center.png"}},
+        {DEFAULT, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.png"}},
+        {EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "East.png"}},
+        {WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "West.png"}},
+        {SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "South.png"}},
+        {NORTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North.png"}},
+        {WEST_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "West_East.png"}},
+        {NORTH_SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North_South.png"}},
+        {NORTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North_East.png"}},
+        {NORTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North_West.png"}},
+        {SOUTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "South_East.png"}},
+        {SOUTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "South_West.png"}},
+        {NORTH_EAST_SOUTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North_East_South_West.png"}},
+        {NORTH_WEST_SOUTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "North_West_South_East.png"}},
+        {CROSS, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Cross.png"}},
+        {CURSOR_COPY, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Copy.png"}},
+        {CURSOR_FORBID, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Forbid.png"}},
+        {COLOR_SUCKER, {ANGLE_SW, IMAGE_POINTER_DEFAULT_PATH + "Colorsucker.png"}},
+        {HAND_GRABBING, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Hand_Grabbing.png"}},
+        {HAND_OPEN, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Hand_Open.png"}},
+        {HAND_POINTING, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Hand_Pointing.png"}},
+        {HELP, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Help.png"}},
+        {CURSOR_MOVE, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Move.png"}},
+        {RESIZE_LEFT_RIGHT, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Resize_Left_Right.png"}},
+        {RESIZE_UP_DOWN, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Resize_Up_Down.png"}},
+        {SCREENSHOT_CHOOSE, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Screenshot_Cross.png"}},
+        {SCREENSHOT_CURSOR, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Screenshot_Cursor.png"}},
+        {TEXT_CURSOR, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Text_Cursor.png"}},
+        {ZOOM_IN, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Zoom_In.png"}},
+        {ZOOM_OUT, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Zoom_Out.png"}},
+        {MIDDLE_BTN_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_East.png"}},
+        {MIDDLE_BTN_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_West.png"}},
+        {MIDDLE_BTN_SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_South.png"}},
+        {MIDDLE_BTN_NORTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_North.png"}},
+        {MIDDLE_BTN_NORTH_SOUTH, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_North_South.png"}},
+        {MIDDLE_BTN_NORTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_North_East.png"}},
+        {MIDDLE_BTN_NORTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_North_West.png"}},
+        {MIDDLE_BTN_SOUTH_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_South_East.png"}},
+        {MIDDLE_BTN_SOUTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_South_West.png"}},
+        {MIDDLE_BTN_NORTH_SOUTH_WEST_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH +
+            "MID_Btn_North_South_West_East.png"}},
     };
     for (auto iter = mouseIcons_.begin(); iter != mouseIcons_.end();) {
         if ((ReadCursorStyleFile(iter->second.iconPath)) != RET_OK) {

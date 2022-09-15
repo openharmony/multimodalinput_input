@@ -73,6 +73,7 @@ ohos_shared_library("libmmi-util") {
   ]
 
   part_name = "input"
+  subsystem_name = "multimodalinput"
 }
 
 ohos_unittest("ut-mmi-util-out") {

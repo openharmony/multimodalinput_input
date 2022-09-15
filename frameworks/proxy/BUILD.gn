@@ -81,6 +81,7 @@ ohos_source_set("libmmi-common") {
   ]
 
   part_name = "input"
+  subsystem_name = "multimodalinput"
 }
 
 ohos_shared_library("libmmi-client") {
@@ -160,6 +161,7 @@ ohos_shared_library("libmmi-client") {
   ]
 
   part_name = "input"
+  subsystem_name = "multimodalinput"
   external_deps = [
     "c_utils:utils",
     "eventhandler:libeventhandler",
