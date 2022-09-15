@@ -153,7 +153,7 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
 int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_NORMAL)) {
         MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
     }
