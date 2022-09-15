@@ -42,9 +42,9 @@ public:
     std::shared_ptr<JsInputDeviceCooperateManager> GetJsInputDeviceCooperateMgr();
 
 private:
-    std::shared_ptr<JsInputDeviceCooperateManager> mgr_ = nullptr;
+    std::shared_ptr<JsInputDeviceCooperateManager> mgr_ { nullptr };
     std::mutex mutex_;
-    napi_ref contextRef_ = nullptr;
+    napi_ref contextRef_ { nullptr };
 
     static napi_value CreateInstance(napi_env env);
     static napi_value JsConstructor(napi_env env, napi_callback_info info);

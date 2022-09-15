@@ -70,7 +70,7 @@ public:
     int32_t HdfdevtypeMapLibinputType(uint32_t devIndex, uint32_t devType);
 private:
     static HdfEventManager *globleThis_;
-    libinput *hdiinput_ = nullptr;
+    libinput *hdiinput_ { nullptr };
     std::list<uhdf *> hdflist_;
     bool devStatus[TOTAL_INPUT_DEVICE_STATUS_COUNT] { false };
     DevDesc mountDevIndex_[TOTAL_INPUT_DEVICE_COUNT];

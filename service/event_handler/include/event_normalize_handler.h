@@ -49,7 +49,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
-    int32_t timerId_ = -1;
+    int32_t timerId_ { -1 };
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
 };
 } // namespace MMI

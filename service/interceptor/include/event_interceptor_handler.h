@@ -66,7 +66,7 @@ private:
         }
         InputHandlerType handlerType_;
         HandleEventType eventType_;
-        SessionPtr session_ = nullptr;
+        SessionPtr session_ { nullptr };
     };
 
     class InterceptorCollection : public IInputEventCollectionHandler, protected NoCopyable {

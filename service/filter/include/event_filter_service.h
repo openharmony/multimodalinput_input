@@ -34,7 +34,7 @@ public:
     void SetPointerEventPtr(std::function<bool(std::shared_ptr<PointerEvent>)> pointerFilter);
 
 private:
-    std::function<bool(std::shared_ptr<PointerEvent>)> pointerFilter_ {nullptr};
+    std::function<bool(std::shared_ptr<PointerEvent>)> pointerFilter_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

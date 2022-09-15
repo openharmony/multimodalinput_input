@@ -33,13 +33,13 @@ public:
     std::shared_ptr<PointerEvent> OnTouchPadGestureEvent(struct libinput_event *event);
 
 private:
-    const int32_t defaultPointerId = 0;
+    const int32_t defaultPointerId { 0 };
     void OnEventTouchPadPinchBegin(libinput_event_gesture *data);
     void OnEventTouchPadPinchUpdate(libinput_event_gesture *data);
     void OnEventTouchPadPinchEnd(libinput_event_gesture *data);
 private:
     int32_t deviceId_ { 0 };
-    std::shared_ptr<PointerEvent> pointerEvent_ = nullptr;
+    std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
