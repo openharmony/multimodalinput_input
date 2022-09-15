@@ -466,6 +466,7 @@ std::map<int64_t, int32_t> KeyIntentionMap = {
     {(int64_t)KeyEvent::KEYCODE_DPAD_LEFT, KeyEvent::INTENTION_LEFT},
     {(int64_t)KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::INTENTION_RIGHT},
     {(int64_t)KeyEvent::KEYCODE_SPACE, KeyEvent::INTENTION_SELECT},
+    {(int64_t)KeyEvent::KEYCODE_NUMPAD_ENTER, KeyEvent::INTENTION_SELECT},
     {(int64_t)KeyEvent::KEYCODE_ESCAPE, KeyEvent::INTENTION_ESCAPE},
     {((int64_t)KeyEvent::KEYCODE_ALT_LEFT<<16) + KeyEvent::KEYCODE_DPAD_LEFT, KeyEvent::INTENTION_BACK},
     {((int64_t)KeyEvent::KEYCODE_ALT_LEFT<<16) + KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::INTENTION_FORWARD},
@@ -490,6 +491,7 @@ std::map<int64_t, int32_t> KeyIntentionMap = {
     {(int64_t)KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::INTENTION_VOLUTE_DOWN},
     {(int64_t)KeyEvent::KEYCODE_APPSELECT, KeyEvent::INTENTION_SELECT},
     {(int64_t)KeyEvent::KEYCODE_BACK, KeyEvent::INTENTION_BACK},
+    {(int64_t)KeyEvent::KEYCODE_MOVE_HOME, KeyEvent::INTENTION_HOME},
 };
 
 int32_t GetKeyIntentionByKeyCode(int64_t keyCodes)
@@ -513,7 +515,6 @@ int32_t GetKeyIntentionByItems(std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGE("songliy keyCode:%{public}d", item.GetKeyCode());
         keyCodes = (keyCodes<<16) + item.GetKeyCode();
     }
-    MMI_HILOGE("songliy KeyCodes Sum:%{public}lld", keyCodes);
     return GetKeyIntentionByKeyCode(keyCodes);
 }
 } // namespace MMI
