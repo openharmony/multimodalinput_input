@@ -33,7 +33,7 @@ public:
     void ResetKeyEvent(struct libinput_device* device);
 
 private:
-    std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
+    std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
 };
 #define KeyEventHdr ::OHOS::DelayedSingleton<KeyEventHandler>::GetInstance()
 } // namespace MMI

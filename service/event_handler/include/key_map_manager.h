@@ -40,7 +40,7 @@ public:
     std::vector<int32_t> InputTransferKeyValue(int32_t deviceId, int32_t keyCode);
 private:
     std::map<int32_t, std::map<int32_t, int32_t>> configKeyValue_;
-    int32_t defaultKeyId_ = -1;
+    int32_t defaultKeyId_ { -1 };
 };
 
 #define KeyMapMgr ::OHOS::DelayedSingleton<KeyMapManager>::GetInstance()

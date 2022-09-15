@@ -38,7 +38,7 @@ protected:
     virtual const std::vector<uint32_t>& GetProperties() const;
     virtual const std::vector<uint32_t>& GetAbs() const;
     virtual const std::vector<uint32_t>& GetRelBits() const;
-    int32_t fd_ = -1;
+    int32_t fd_ { -1 };
     const char * const deviceName_;
     const uint16_t busType_;
     const uint16_t vendorId_;
