@@ -91,7 +91,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;
     std::map<std::string, std::string> inputDeviceScreens_;
-    int32_t nextId_ {0};
+    int32_t nextId_ { 0 };
     std::list<std::shared_ptr<IDeviceObserver>> observers_;
     std::map<SessionPtr, std::function<void(int32_t, const std::string&)>> devListener_;
 };
