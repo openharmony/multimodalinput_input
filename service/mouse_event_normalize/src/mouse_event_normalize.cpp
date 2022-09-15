@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "mouse_event_handler.h"
+#include "mouse_event_normalize.h"
 
 #include <cinttypes>
 
@@ -21,19 +21,19 @@
 
 #include "define_multimodal.h"
 #include "event_log_helper.h"
+#include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
-#include "i_pointer_drawing_manager.h"
 #include "mouse_device_state.h"
 #include "timer_manager.h"
-#include "util.h"
 #include "util_ex.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MouseEventHandler" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MouseEventNormalize" };
 const std::vector<AccelerateCurve> ACCELERATE_CURVES {
     { { 8, 32, 128 }, { 0.16, 0.30, 0.56 }, { 0.0, -1.12, -9.44 } },
     { { 8, 32, 128 }, { 0.32, 0.60, 1.12 }, { 0.0, -2.24, -18.88 } },
@@ -54,20 +54,20 @@ constexpr int32_t MAX_SPEED = 11;
 constexpr double PERCENT_CONST = 100.0;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace
-MouseEventHandler::MouseEventHandler()
+MouseEventNormalize::MouseEventNormalize()
 {
     pointerEvent_ = PointerEvent::Create();
     CHKPL(pointerEvent_);
 }
 
-MouseEventHandler::~MouseEventHandler() {}
+MouseEventNormalize::~MouseEventNormalize() {}
 
-std::shared_ptr<PointerEvent> MouseEventHandler::GetPointerEvent() const
+std::shared_ptr<PointerEvent> MouseEventNormalize::GetPointerEvent() const
 {
     return pointerEvent_;
 }
 
-bool MouseEventHandler::GetSpeedGain(double vin, double &gain) const
+bool MouseEventNormalize::GetSpeedGain(double vin, double &gain) const
 {
     if (fabs(vin) < DOUBLE_ZERO) {
         MMI_HILOGE("The value of the parameter passed in is 0");
@@ -89,7 +89,7 @@ bool MouseEventHandler::GetSpeedGain(double vin, double &gain) const
     return true;
 }
 
-int32_t MouseEventHandler::HandleMotionInner(struct libinput_event_pointer* data)
+int32_t MouseEventNormalize::HandleMotionInner(struct libinput_event_pointer* data)
 {
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
@@ -117,7 +117,7 @@ int32_t MouseEventHandler::HandleMotionInner(struct libinput_event_pointer* data
     return RET_OK;
 }
 
-int32_t MouseEventHandler::HandleMotionAccelerate(struct libinput_event_pointer* data)
+int32_t MouseEventNormalize::HandleMotionAccelerate(struct libinput_event_pointer* data)
 {
     CHKPR(data, ERROR_NULL_POINTER);
     double dx = libinput_event_pointer_get_dx(data);
@@ -138,7 +138,7 @@ int32_t MouseEventHandler::HandleMotionAccelerate(struct libinput_event_pointer*
     return RET_OK;
 }
 
-void MouseEventHandler::InitAbsolution()
+void MouseEventNormalize::InitAbsolution()
 {
     if (absolutionX_ != -1 || absolutionY_ != -1 || currentDisplayId_ != -1) {
         return;
@@ -154,7 +154,7 @@ void MouseEventHandler::InitAbsolution()
     absolutionY_ = dispalyGroupInfo.displaysInfo[0].height * 1.0 / 2;
 }
 
-int32_t MouseEventHandler::HandleButtonInner(struct libinput_event_pointer* data)
+int32_t MouseEventNormalize::HandleButtonInner(struct libinput_event_pointer* data)
 {
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
@@ -188,7 +188,7 @@ int32_t MouseEventHandler::HandleButtonInner(struct libinput_event_pointer* data
     return RET_OK;
 }
 
-int32_t MouseEventHandler::HandleButtonValueInner(struct libinput_event_pointer* data)
+int32_t MouseEventNormalize::HandleButtonValueInner(struct libinput_event_pointer* data)
 {
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
@@ -203,7 +203,7 @@ int32_t MouseEventHandler::HandleButtonValueInner(struct libinput_event_pointer*
     return RET_OK;
 }
 
-int32_t MouseEventHandler::HandleAxisInner(struct libinput_event_pointer* data)
+int32_t MouseEventNormalize::HandleAxisInner(struct libinput_event_pointer* data)
 {
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
@@ -216,7 +216,7 @@ int32_t MouseEventHandler::HandleAxisInner(struct libinput_event_pointer* data)
         MMI_HILOGD("Axis update");
     } else {
         static constexpr int32_t timeout = 100;
-        std::weak_ptr<MouseEventHandler> weakPtr = shared_from_this();
+        std::weak_ptr<MouseEventNormalize> weakPtr = shared_from_this();
         timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
             CALL_DEBUG_ENTER;
             auto sharedPtr = weakPtr.lock();
@@ -246,7 +246,7 @@ int32_t MouseEventHandler::HandleAxisInner(struct libinput_event_pointer* data)
     return RET_OK;
 }
 
-void MouseEventHandler::HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId,
+void MouseEventNormalize::HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId,
                                         PointerEvent::PointerItem &pointerItem)
 {
     CALL_DEBUG_ENTER;
@@ -282,7 +282,7 @@ void MouseEventHandler::HandlePostInner(struct libinput_event_pointer* data, int
     pointerEvent_->SetAgentWindowId(-1);
 }
 
-int32_t MouseEventHandler::Normalize(struct libinput_event *event)
+int32_t MouseEventNormalize::Normalize(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
@@ -319,7 +319,7 @@ int32_t MouseEventHandler::Normalize(struct libinput_event *event)
     return result;
 }
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-void MouseEventHandler::HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY)
+void MouseEventNormalize::HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY)
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent_);
@@ -330,7 +330,7 @@ void MouseEventHandler::HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY)
     WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
 }
 
-void MouseEventHandler::OnDisplayLost(int32_t displayId)
+void MouseEventNormalize::OnDisplayLost(int32_t displayId)
 {
     if (currentDisplayId_ != displayId) {
         currentDisplayId_ = -1;
@@ -341,12 +341,12 @@ void MouseEventHandler::OnDisplayLost(int32_t displayId)
     }
 }
 
-int32_t MouseEventHandler::GetDisplayId() const
+int32_t MouseEventNormalize::GetDisplayId() const
 {
     return currentDisplayId_;
 }
 
-void MouseEventHandler::HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem)
+void MouseEventNormalize::HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem)
 {
     CALL_DEBUG_ENTER;
     auto mouseInfo = WinMgr->GetMouseInfo();
@@ -377,7 +377,7 @@ void MouseEventHandler::HandlePostMoveMouse(PointerEvent::PointerItem& pointerIt
     pointerEvent_->SetAgentWindowId(-1);
 }
 
-bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
+bool MouseEventNormalize::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
 {
     CALL_DEBUG_ENTER;
     CHKPF(pointerEvent_);
@@ -395,12 +395,12 @@ bool MouseEventHandler::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
 }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
-void MouseEventHandler::DumpInner()
+void MouseEventNormalize::DumpInner()
 {
     EventLogHelper::PrintEventData(pointerEvent_);
 }
 
-void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
+void MouseEventNormalize::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
     PointerEvent::PointerItem item;
@@ -415,7 +415,7 @@ void MouseEventHandler::Dump(int32_t fd, const std::vector<std::string> &args)
             pointerEvent_->GetTargetWindowId(), item.GetDownTime(), item.IsPressed() ? "true" : "false");
 }
 
-int32_t MouseEventHandler::SetPointerSpeed(int32_t speed)
+int32_t MouseEventNormalize::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;
     if (speed < MIN_SPEED) {
@@ -429,7 +429,7 @@ int32_t MouseEventHandler::SetPointerSpeed(int32_t speed)
     return RET_OK;
 }
 
-int32_t MouseEventHandler::GetPointerSpeed() const
+int32_t MouseEventNormalize::GetPointerSpeed() const
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Get pointer speed:%{public}d", speed_);
@@ -437,7 +437,7 @@ int32_t MouseEventHandler::GetPointerSpeed() const
 }
 
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-void MouseEventHandler::SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, libinput_event_pointer* data)
+void MouseEventNormalize::SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, libinput_event_pointer* data)
 {
     double dx = libinput_event_pointer_get_dx(data);
     double dy = libinput_event_pointer_get_dy(data);
@@ -445,12 +445,12 @@ void MouseEventHandler::SetDxDyForDInput(PointerEvent::PointerItem& pointerItem,
     int32_t rawDy = static_cast<int32_t>(dy);
     pointerItem.SetRawDx(rawDx);
     pointerItem.SetRawDy(rawDy);
-    MMI_HILOGD("MouseEventHandler SetDxDyForDInput : dx:%{public}d, dy:%{public}d", rawDx, rawDy);
+    MMI_HILOGD("MouseEventNormalize SetDxDyForDInput : dx:%{public}d, dy:%{public}d", rawDx, rawDy);
 }
 
-void MouseEventHandler::SetAbsolutionLocation(double xPercent, double yPercent)
+void MouseEventNormalize::SetAbsolutionLocation(double xPercent, double yPercent)
 {
-    MMI_HILOGI("MouseEventHandler cross screen location : xPercent:%{public}d, yPercent:%{public}d",
+    MMI_HILOGI("MouseEventNormalize cross screen location : xPercent:%{public}d, yPercent:%{public}d",
         xPercent, yPercent);
     auto displayGroupInfo = WinMgr->GetDisplayGroupInfo();
     if (currentDisplayId_ == -1) {
