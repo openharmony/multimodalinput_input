@@ -165,8 +165,7 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& p
         }
         ostream << ",pointerId:" << pointerId << ",DownTime:" << item.GetDownTime()
             << ",IsPressed:" << std::boolalpha << item.IsPressed()
-            << ",DisplayX:-\\{0,1\\}[[:digit:]]\\{1,\\},DisplayY:-\\{0,1\\}[[:digit:]]\\{1,\\}"
-            << ",WindowX:-\\{0,1\\}[[:digit:]]\\{1,\\},WindowY:-\\{0,1\\}[[:digit:]]\\{1,\\}"
+            << ",DisplayX:" << item.GetDisplayX() << ",DisplayY:" << item.GetDisplayY()
             << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
             << ",TiltX:" << std::fixed << std::setprecision(precision) << item.GetTiltX()
             << ",TiltY:" << std::fixed << std::setprecision(precision) << item.GetTiltY()
@@ -174,7 +173,8 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& p
             << ",ToolWindowX:" << item.GetToolWindowX() << ",ToolWindowY:" << item.GetToolWindowY()
             << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
             << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
-            << ",LongAxis:" << item.GetLongAxis() << ",ShortAxis:" << item.GetShortAxis();
+            << ",LongAxis:" << item.GetLongAxis() << ",ShortAxis:" << item.GetShortAxis()
+            << ",DeviceId:" << item.GetDeviceId();
     }
     return ostream.str();
 }
@@ -189,6 +189,12 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<KeyEvent>& keyEv
          << ", ActionStartTime:" << keyEvent->GetActionStartTime()
          << ", EventType:" << keyEvent->GetEventType()
          << ", KeyAction:" << keyEvent->GetKeyAction();
+    std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+    for (const int32_t &key : pressedKeys) {
+        auto keyItem = keyEvent->GetKeyItem(key);
+        CHKPS(keyItem);
+        keyItem->GetDeviceId();
+    }
     return strm.str();
 }
 
@@ -219,6 +225,18 @@ int64_t GetNanoTime()
     struct timespec time = { 0 };
     clock_gettime(CLOCK_MONOTONIC, &time);
     return static_cast<int64_t>(time.tv_sec) * SEC_TO_NANOSEC + time.tv_nsec;
+}
+
+void DumpWindowData(const std::shared_ptr<PointerEvent>& pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    pointerEvent->GetAxes();
+    pointerEvent->GetPressedKeys();
+    pointerEvent->GetPressedButtons();
+    PointerEvent::PointerItem item;
+    item.GetDisplayX();
+    item.GetDisplayY();
+    item.GetTargetWindowId();
 }
 } // namespace MMI
 } // namespace OHOS
