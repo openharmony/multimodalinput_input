@@ -19,7 +19,7 @@
 #include <map>
 #include <string>
 
-#include "event_dispatch.h"
+#include "event_dispatch_handler.h"
 #include "key_map_manager.h"
 #include "key_event.h"
 #include "libinput.h"

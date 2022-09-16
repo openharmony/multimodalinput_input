@@ -15,8 +15,8 @@
 
 #include "js_util.h"
 
-#include "constants.h"
 #include "mmi_log.h"
+#include "napi_constants.h"
 #include "util_napi.h"
 
 namespace OHOS {
@@ -55,7 +55,7 @@ napi_value JsUtil::GetStopInfo(const std::unique_ptr<CallbackInfo> &cb)
     return GetResult(cb->env, cb->data.stopResult);
 }
 
-napi_value JsUtil::GetGetStateInfo(const std::unique_ptr<CallbackInfo> &cb)
+napi_value JsUtil::GetStateInfo(const std::unique_ptr<CallbackInfo> &cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);

@@ -38,6 +38,7 @@ public:
 private:
     int32_t anrNoticedPid_ { -1 };
     UDSServer *udsServer_ { nullptr };
+    int32_t anrTimerCount_ { 0 };
 };
 
 #define ANRMgr ::OHOS::DelayedSingleton<ANRManager>::GetInstance()

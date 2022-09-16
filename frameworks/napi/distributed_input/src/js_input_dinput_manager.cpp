@@ -19,29 +19,18 @@
 #include <map>
 
 #include "input_manager.h"
+#include "napi_constants.h"
 #include "util_napi.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDinputManager" };
-const std::string CREATE_ARRAY = "napi_create_array";
-const std::string CREATE_INT32 = "napi_create_int32";
-const std::string CREATE_STRING = "napi_create_string";
-const std::string CREATE_OBJECT = "napi_create_object";
-const std::string SET_NAMED_PROPERTY = "napi_set_named_property";
-const std::string SET_ELEMENT = "napi_set_element";
-const std::string GET_REFERENCE = "napi_get_reference_value";
-const std::string CALL_FUNCTION = "napi_call_function";
-const std::string RESOLVE_DEFERRED = "napi_resolve_deferred";
-const std::string REFERENCE_UNREF = "reference_unref";
-const std::string DELETE_REFERENCE = "napi_delete_reference";
 const std::string DELETE_ASYNC_WORK = "napi_delete_async_work";
 const std::string CREATE_STRING_LATIN = "napi_create_string_latin1";
+
 std::mutex mutex_;
-constexpr uint32_t EVDEV_UDEV_TAG_KEYBOARD = (1 << 1);
-constexpr uint32_t EVDEV_UDEV_TAG_MOUSE = (1 << 2);
-constexpr uint32_t EVDEV_UDEV_TAG_TOUCHPAD = (1 << 3);
+
 std::map<int32_t, int32_t> deviceTypeMap = {
     {InputAbilityType::KEYBOARD, EVDEV_UDEV_TAG_KEYBOARD},
     {InputAbilityType::MOUSE, EVDEV_UDEV_TAG_MOUSE},

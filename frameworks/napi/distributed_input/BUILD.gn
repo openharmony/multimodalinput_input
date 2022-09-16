@@ -47,7 +47,7 @@ if (input_feature_distributed) {
       "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
       "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
       "//foundation/multimodalinput/input/util:libmmi-util",
-      "//third_party/libuv:uv_static",
+      "//third_party/libuv:uv",
     ]
 
     external_deps = [
@@ -61,5 +61,6 @@ if (input_feature_distributed) {
     relative_install_dir = "module/multimodalinput"
 
     part_name = "input"
+    subsystem_name = "multimodalinput"
   }
 }

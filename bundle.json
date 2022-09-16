@@ -15,7 +15,8 @@
       "SystemCapability.MultimodalInput.Input.Core",
       "SystemCapability.MultimodalInput.Input.InputSimulator",
       "SystemCapability.MultimodalInput.Input.InputMonitor",
-      "SystemCapability.MultimodalInput.Input.Pointer"
+      "SystemCapability.MultimodalInput.Input.Pointer",
+      "SystemCapability.MultimodalInput.Input.Cooperator"
     ],
     "features": [
       "input_feature_combination_key",

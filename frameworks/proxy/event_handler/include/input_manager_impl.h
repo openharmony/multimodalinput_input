@@ -150,7 +150,7 @@ private:
     std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
 
-    DisplayGroupInfo displayGroupInfo_;
+    DisplayGroupInfo displayGroupInfo_ {};
     std::mutex mtx_;
     std::mutex handleMtx_;
     std::condition_variable cv_;

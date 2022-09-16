@@ -418,7 +418,7 @@ int32_t MMIService::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventHandler::SetPointerSpeed,
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetPointerSpeed,
         MouseEventHdr, speed));
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer speed failed,return %{public}d", ret);
