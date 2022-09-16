@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef MOUSE_EVENT_HANDLER_H
-#define MOUSE_EVENT_HANDLER_H
+#ifndef MOUSE_EVENT_NORMALIZE_H
+#define MOUSE_EVENT_NORMALIZE_H
 
 #include <memory>
 
@@ -35,10 +35,10 @@ struct AccelerateCurve {
     std::vector<double> diffNums;
 };
 
-class MouseEventHandler final : public std::enable_shared_from_this<MouseEventHandler> {
-    DECLARE_DELAYED_SINGLETON(MouseEventHandler);
+class MouseEventNormalize final : public std::enable_shared_from_this<MouseEventNormalize> {
+    DECLARE_DELAYED_SINGLETON(MouseEventNormalize);
 public:
-    DISALLOW_COPY_AND_MOVE(MouseEventHandler);
+    DISALLOW_COPY_AND_MOVE(MouseEventNormalize);
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
     int32_t Normalize(struct libinput_event *event);
     void Dump(int32_t fd, const std::vector<std::string> &args);
@@ -82,7 +82,7 @@ private:
     int32_t speed_ { DEFAULT_SPEED };
 };
 
-#define MouseEventHdr ::OHOS::DelayedSingleton<MouseEventHandler>::GetInstance()
+#define MouseEventHdr ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#endif // MOUSE_EVENT_HANDLER_H
+#endif // MOUSE_EVENT_NORMALIZE_H

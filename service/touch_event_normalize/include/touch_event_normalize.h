@@ -13,25 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef TOUCH_TRANSFORM_POINT_MANAGER_H
-#define TOUCH_TRANSFORM_POINT_MANAGER_H
+#ifndef TOUCH_EVENT_NORMALIZE_H
+#define TOUCH_EVENT_NORMALIZE_H
 
 #include <map>
 #include <memory>
 
 #include "singleton.h"
 #include "libinput.h"
-#include "transform_point_processor.h"
-#include "gesture_transform_point_processor.h"
-#include "touch_transform_point_processor.h"
-#include "touchpad_transform_point_processor.h"
+#include "transform_processor.h"
+#include "gesture_transform_processor.h"
+#include "touch_transform_processor.h"
+#include "touchpad_transform_processor.h"
 
 namespace OHOS {
 namespace MMI {
-class TouchTransformPointManager final {
-    DECLARE_DELAYED_SINGLETON(TouchTransformPointManager);
+class TouchEventNormalize final {
+    DECLARE_DELAYED_SINGLETON(TouchEventNormalize);
 public:
-    DISALLOW_COPY_AND_MOVE(TouchTransformPointManager);
+    DISALLOW_COPY_AND_MOVE(TouchEventNormalize);
     std::shared_ptr<PointerEvent> OnLibInput(struct libinput_event *event, INPUT_DEVICE_TYPE deviceType);
 
 private:
@@ -45,13 +45,13 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 private:
-    std::map<int32_t, std::shared_ptr<TransformPointProcessor>> processors_;
-    std::map<int32_t, std::shared_ptr<TouchTransformPointProcessor>> touchPro_;
-    std::map<int32_t, std::shared_ptr<TouchPadTransformPointProcessor>> touchpadPro_;
-    std::map<int32_t, std::shared_ptr<GestureTransformPointProcessor>> gesturePro_;
+    std::map<int32_t, std::shared_ptr<TransformProcessor>> processors_;
+    std::map<int32_t, std::shared_ptr<TouchTransformProcessor>> touchPro_;
+    std::map<int32_t, std::shared_ptr<TouchPadTransformProcessor>> touchpadPro_;
+    std::map<int32_t, std::shared_ptr<GestureTransformProcessor>> gesturePro_;
 };
 
-#define TouchTransformPointManger ::OHOS::DelayedSingleton<TouchTransformPointManager>::GetInstance()
+#define TouchEventHdr ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
-#endif // TOUCH_TRANSFORM_POINT_MANAGER_H
+#endif // TOUCH_EVENT_NORMALIZE_H

@@ -22,7 +22,7 @@ config("libmmi_server_config") {
     "device_scalability/include",
     "delegate_task/include",
     "event_dispatch/include",
-    "key_event_handler/include",
+    "key_event_normalize/include",
     "event_handler/include",
     "event_dump/include",
     "monitor/include",
@@ -32,7 +32,7 @@ config("libmmi_server_config") {
     "message_handle/include",
     "module_loader/include",
     "window_manager/include",
-    "touch_transform_point/include",
+    "touch_event_normalize/include",
     "key_command/include",
     "subscriber/include",
     "timer_manager/include",
@@ -42,7 +42,7 @@ config("libmmi_server_config") {
     "${mmi_service_path}/module_loader/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
-    "mouse_event_handler/include",
+    "mouse_event_normalize/include",
     "//foundation/multimodalinput/interfaces/native/innerkits/event/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
@@ -467,8 +467,8 @@ ohos_shared_library("libmmi-server") {
 
   if (input_feature_keyboard) {
     sources += [
-      "key_event_handler/src/key_event_handler.cpp",
-      "key_event_handler/src/key_unicode_transformation.cpp",
+      "key_event_normalize/src/key_event_normalize.cpp",
+      "key_event_normalize/src/key_unicode_transformation.cpp",
       "subscriber/src/key_subscriber_handler.cpp",
     ]
     if (input_feature_combination_key) {
@@ -477,13 +477,13 @@ ohos_shared_library("libmmi-server") {
   }
 
   if (input_feature_mouse || input_feature_touchscreen) {
-    sources += [ "touch_transform_point/src/touch_transform_point_manager.cpp" ]
+    sources += [ "touch_event_normalize/src/touch_event_normalize.cpp" ]
     if (input_feature_mouse) {
       sources += [
-        "mouse_event_handler/src/mouse_device_state.cpp",
-        "mouse_event_handler/src/mouse_event_handler.cpp",
-        "touch_transform_point/src/gesture_transform_point_processor.cpp",
-        "touch_transform_point/src/touchpad_transform_point_processor.cpp",
+        "mouse_event_normalize/src/mouse_device_state.cpp",
+        "mouse_event_normalize/src/mouse_event_normalize.cpp",
+        "touch_event_normalize/src/gesture_transform_processor.cpp",
+        "touch_event_normalize/src/touchpad_transform_processor.cpp",
       ]
       if (input_feature_pointer_drawing) {
         sources += [ "window_manager/src/pointer_drawing_manager.cpp" ]
@@ -493,8 +493,8 @@ ohos_shared_library("libmmi-server") {
     }
     if (input_feature_touchscreen) {
       sources += [
-        "touch_transform_point/src/tablet_tool_processor.cpp",
-        "touch_transform_point/src/touch_transform_point_processor.cpp",
+        "touch_event_normalize/src/tablet_tool_tranform_processor.cpp",
+        "touch_event_normalize/src/touch_transform_processor.cpp",
       ]
     }
   }
@@ -641,7 +641,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_scalability/include",
     "${mmi_path}/service/event_dispatch/include",
-    "${mmi_path}/service/key_event_handler/include",
+    "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/hdi_inject/include",
     "${mmi_path}/service/event_dump/include",
@@ -724,7 +724,7 @@ ohos_unittest("TransformPointTest") {
     "${mmi_path}/tools/vuinput/include",
   ]
 
-  sources = [ "touch_transform_point/test/transform_point_test.cpp" ]
+  sources = [ "touch_event_normalize/test/transform_point_test.cpp" ]
 
   defines = []
 

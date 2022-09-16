@@ -28,7 +28,7 @@
 #include "i_event_filter.h"
 #include "i_input_event_handler.h"
 #include "key_subscriber_handler.h"
-#include "mouse_event_handler.h"
+#include "mouse_event_normalize.h"
 
 namespace OHOS {
 namespace MMI {
