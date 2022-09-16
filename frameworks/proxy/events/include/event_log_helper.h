@@ -38,10 +38,10 @@ private:
     static void Print(const std::shared_ptr<KeyEvent> event)
     {
         std::vector<KeyEvent::KeyItem> eventItems { event->GetKeyItems() };
-        MMI_HILOGD("KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64
+        MMI_HILOGD("KeyCode:%{public}d,KeyIntention:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64
             ",EventType:%{public}s,Flag:%{public}d,KeyAction:%{public}s,NumLock:%{public}d,"
             "CapsLock:%{public}d,ScrollLock:%{public}d,EventNumber:%{public}d,keyItemsCount:%{public}zu",
-            event->GetKeyCode(), event->GetActionTime(), event->GetActionStartTime(),
+            event->GetKeyCode(), event->GetKeyIntention(), event->GetActionTime(), event->GetActionStartTime(),
             InputEvent::EventTypeToString(event->GetEventType()), event->GetFlag(),
             KeyEvent::ActionToString(event->GetKeyAction()), event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
             event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),

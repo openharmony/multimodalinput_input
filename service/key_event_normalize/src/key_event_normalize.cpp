@@ -104,7 +104,6 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
         keyEvent->AddPressedKeyItems(item);
     }
     int32_t keyIntention = GetKeyIntentionByItems(keyEvent);
-    MMI_HILOGE("songliy KeyEventHandler:: Normalize, keyIntention:%{public}d", keyIntention);
     keyEvent->SetKeyIntention(keyIntention);
     return RET_OK;
 }
