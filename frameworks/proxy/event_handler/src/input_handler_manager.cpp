@@ -233,13 +233,18 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
         CHKPV(consumer);
         auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
         CHKPV(tempEvent);
+        tempEvent->SetProcessedCallback(monitorCallback_);
         if (!PostTask(handlerId,
             std::bind(&InputHandlerManager::OnPointerEventTask, this, consumer, handlerId, tempEvent))) {
             MMI_HILOGE("Post task failed");
+        } else {
+            consumerCount++;
         }
-        consumerCount++;
-        tempEvent->SetProcessedCallback(monitorCallback_);
         MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
+    }
+    if (consumerCount == 0) {
+        MMI_HILOGE("All task post failed");
+        return;
     }
     int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
     if (tokenType == TokenType::TOKEN_HAP &&

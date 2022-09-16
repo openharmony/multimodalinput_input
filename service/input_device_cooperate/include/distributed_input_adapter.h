@@ -89,8 +89,8 @@ private:
     };
 
     struct TimerInfo {
-        int32_t times = 0;
-        int32_t timerId = 0;
+        int32_t times { 0 };
+        int32_t timerId { 0 };
     };
 
     class StartDInputCallback : public DistributedHardware::DistributedInput::StartDInputCallbackStub {

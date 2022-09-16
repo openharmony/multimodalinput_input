@@ -55,16 +55,16 @@ public:
 private:
     int32_t BuildInputHandlerChain();
 
-    UDSServer *udsServer_ = nullptr;
-    std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler_ = nullptr;
-    std::shared_ptr<EventFilterHandler> eventFilterHandler_ = nullptr;
-    std::shared_ptr<EventInterceptorHandler> eventInterceptorHandler_ = nullptr;
-    std::shared_ptr<KeySubscriberHandler> eventSubscriberHandler_ = nullptr;
-    std::shared_ptr<EventMonitorHandler> eventMonitorHandler_ = nullptr;
+    UDSServer *udsServer_ { nullptr };
+    std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler_ { nullptr };
+    std::shared_ptr<EventFilterHandler> eventFilterHandler_ { nullptr };
+    std::shared_ptr<EventInterceptorHandler> eventInterceptorHandler_ { nullptr };
+    std::shared_ptr<KeySubscriberHandler> eventSubscriberHandler_ { nullptr };
+    std::shared_ptr<EventMonitorHandler> eventMonitorHandler_ { nullptr };
 
-    uint64_t idSeed_ = 0;
+    uint64_t idSeed_ { 0 };
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    bool isJumpIntercept_ = false;
+    bool isJumpIntercept_ { false };
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 };
 #define InputHandler ::OHOS::DelayedSingleton<InputEventHandler>::GetInstance()
