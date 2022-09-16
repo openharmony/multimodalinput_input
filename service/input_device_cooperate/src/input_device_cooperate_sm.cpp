@@ -460,7 +460,6 @@ void InputDeviceCooperateSM::HandleEvent(libinput_event *event)
             break;
         }
         default: {
-            MMI_HILOGI("This device does not support");
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPV(inputEventNormalizeHandler);
             inputEventNormalizeHandler->HandleEvent(event);
