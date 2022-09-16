@@ -27,11 +27,12 @@
 #include "input_event_handler.h"
 #include "input_event.h"
 #include "input_windows_manager.h"
-#include "key_event_handler.h"
-#include "key_event_subscriber.h"
+#include "key_event_normalize.h"
+#include "i_pointer_drawing_manager.h"
+#include "key_subscriber_handler.h"
 #include "libinput_adapter.h"
 #include "mmi_func_callback.h"
-#include "mouse_event_handler.h"
+#include "mouse_event_normalize.h"
 #include "time_cost_chk.h"
 #ifdef OHOS_BUILD_HDF
 #include "hdi_inject.h"
@@ -118,7 +119,7 @@ int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
     int32_t eventId = 0;
     int32_t eventType = 0;
     pkt >> eventId >> eventType;
-    MMI_HILOGD("Event is:%{public}d", eventId);
+    MMI_HILOGD("Event type:%{public}d, id:%{public}d", eventType, eventId);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read data failed");
         return PACKET_READ_FAIL;
@@ -132,7 +133,7 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
 {
     CALL_INFO_TRACE;
     CHKPR(keyEvent, ERROR_NULL_POINTER);
-    auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
     MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
@@ -199,15 +200,18 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
     auto source = pointerEvent->GetSourceType();
     switch (source) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
-            auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+            auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
             break;
         }
         case PointerEvent::SOURCE_TYPE_MOUSE:
         case PointerEvent::SOURCE_TYPE_TOUCHPAD : {
-            auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+            auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+            if (!IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
+                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true);
+            }
             inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
             break;
         }
@@ -241,9 +245,9 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
         displayGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
+            MMI_HILOGE("Packet read display info failed");
+            return RET_ERR;
+        }
     }
     pkt >> num;
     for (uint32_t i = 0; i < num; i++) {
@@ -328,7 +332,7 @@ int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
     if (MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
         auto pointerEvent = MouseEventHdr->GetPointerEvent();
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
-        auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+        auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
         inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
         MMI_HILOGD("Mouse movement message processed successfully");

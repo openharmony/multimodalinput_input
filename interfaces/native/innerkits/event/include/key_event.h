@@ -3203,8 +3203,6 @@ private:
     bool scrollLock_ { false };
     int32_t keyIntention_ = -1;
 };
-
-std::ostream& operator<<(std::ostream&, KeyEvent&);
 } // namespace MMI
 } // namespace OHOS
 #endif // KEY_EVENT_H

@@ -1046,8 +1046,6 @@ inline uint32_t PointerEvent::GetAxes() const
 {
     return axes_;
 }
-
-std::ostream& operator<<(std::ostream&, PointerEvent&);
 } // namespace MMI
 } // namespace OHOS
 #endif // POINTER_EVENT_H

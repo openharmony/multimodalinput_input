@@ -25,25 +25,25 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "input_device_manager.h"
-#include "input_event_handler.h"
-#include "event_monitor_handler.h"
-#include "input_windows_manager.h"
 #include "event_interceptor_handler.h"
-#include "key_event_subscriber.h"
-#include "mouse_event_handler.h"
-#include "securec.h"
-#include "util.h"
-#include "util_ex.h"
+#include "event_monitor_handler.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+#include "input_device_manager.h"
+#include "input_event_handler.h"
+#include "input_windows_manager.h"
+#include "key_subscriber_handler.h"
+#include "mouse_event_normalize.h"
+#include "securec.h"
+#include "util_ex.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
-constexpr int32_t MAX_COMMAND_COUNT = 32;
+constexpr size_t MAX_COMMAND_COUNT { 32 };
 } // namespace
 
 EventDump::EventDump() {}
@@ -70,7 +70,7 @@ void ChkConfig(int32_t fd)
 void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
-    int32_t count = 0;
+    size_t count = 0;
     for (const auto &str : args) {
         if (str.find("--") == 0) {
             ++count;

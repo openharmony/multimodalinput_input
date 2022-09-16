@@ -15,19 +15,15 @@
 
 #include "js_key_code.h"
 
-#include "mmi_log.h"
-#include "util_napi.h"
-
 #include "key_event.h"
+#include "mmi_log.h"
+#include "napi_constants.h"
+#include "util_napi.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsKeyCode" };
-const std::string DEFINE_CLASS = "napi_define_class";
-const std::string SET_NAMED_PROPERTY = "napi_set_named_property";
-const std::string CREATE_INT32 = "napi_create_int32";
-const std::string GET_CB_INFO = "napi_get_cb_info";
 } // namespace
 
 napi_value JsKeyCode::GetNapiInt32(napi_env env, int32_t code)

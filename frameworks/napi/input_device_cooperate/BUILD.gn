@@ -33,15 +33,16 @@ ohos_shared_library("inputdevicecooperate") {
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
     "//foundation/multimodalinput/input/util:libmmi-util",
-    "//third_party/libuv:uv_static",
+    "//third_party/libuv:uv",
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
-    "utils_base:utils",
   ]
 
   relative_install_dir = "module/multimodalinput"
   part_name = "input"
+  subsystem_name = "multimodalinput"
 }
