@@ -158,7 +158,7 @@ void TestSimulateInputEvent(EventType& event, const TestScene& testScene = TestS
 {
     EXPECT_TRUE((static_cast<int32_t>(testScene) ^ TestUtil->CompareDump(event)));
 }
-
+void DumpWindowData(const std::shared_ptr<PointerEvent>& pointerEvent);
 class AccessMonitor {
 public:
     AccessMonitor()

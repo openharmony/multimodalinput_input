@@ -23,8 +23,9 @@
 #include "distributed_input_adapter.h"
 #include "dm_device_info.h"
 #include "i_input_device_cooperate_state.h"
-#include "i_input_event_handler.h"
+#include "input_event_handler.h"
 
+struct libinput_event;
 namespace OHOS {
 namespace MMI {
 enum class CooperateState {
@@ -47,7 +48,7 @@ enum class CooperateMsg {
     COOPERATE_NULL = 10,
 };
 
-class InputDeviceCooperateSM final : public IInputEventHandler {
+class InputDeviceCooperateSM final {
     DECLARE_DELAYED_SINGLETON(InputDeviceCooperateSM);
     class DeviceInitCallBack : public DistributedHardware::DmInitCallback {
         void OnRemoteDied() override;
@@ -71,7 +72,7 @@ public:
     void StopRemoteCooperate();
     void StopRemoteCooperateResult(bool isSuccess);
     void StartCooperateOtherResult(const std::string &srcNetworkId);
-    void HandleEvent(struct libinput_event *event) override;
+    void HandleEvent(struct libinput_event *event);
     void UpdateState(CooperateState state);
     void UpdatePreparedDevices(const std::string &srcNetworkId, const std::string &sinkNetworkId);
     std::pair<std::string, std::string> GetPreparedDevices() const;

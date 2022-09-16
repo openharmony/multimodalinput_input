@@ -57,10 +57,10 @@ public:
         }
 
     private:
-        std::atomic_bool hasWaited_ = false;
-        int32_t id_ = 0;
+        std::atomic_bool hasWaited_ { false };
+        int32_t id_ { 0 };
         DTaskCallback fun_;
-        Promise* promise_ = nullptr;
+        Promise* promise_ { nullptr };
     };
     using TaskPtr = Task::TaskPtr;
     using Promise = Task::Promise;
@@ -93,7 +93,7 @@ private:
     TaskPtr PostTask(DTaskCallback callback, Promise *promise = nullptr);
 
 private:
-    uint64_t workerThreadId_ = 0;
+    uint64_t workerThreadId_ { 0 };
     int32_t fds_[2] = {};
     std::mutex mux_;
     std::queue<TaskPtr> tasks_;
