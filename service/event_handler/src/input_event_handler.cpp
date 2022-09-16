@@ -83,9 +83,6 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 {
     eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
     CHKPR(eventNormalizeHandler_, ERROR_NULL_POINTER);
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    InputDevCooSM->SetNext(eventNormalizeHandler_);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 #if !defined(OHOS_BUILD_ENABLE_KEYBOARD) && !defined(OHOS_BUILD_ENABLE_POINTER) && !defined(OHOS_BUILD_ENABLE_TOUCH)
     return RET_OK;
 #endif // !OHOS_BUILD_ENABLE_KEYBOARD && !OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_TOUCH
