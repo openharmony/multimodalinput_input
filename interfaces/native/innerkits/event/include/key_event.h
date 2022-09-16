@@ -3211,10 +3211,10 @@ private:
     int32_t keyCode_ { -1 };
     std::vector<KeyItem> keys_;
     int32_t keyAction_ { 0 };
+    int32_t keyIntention_ { -1 };
     bool numLock_ { false };
     bool capsLock_ { false };
     bool scrollLock_ { false };
-    int32_t keyIntention_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS
