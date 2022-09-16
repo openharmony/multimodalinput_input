@@ -44,8 +44,8 @@ public:
     napi_async_work asyncWork { nullptr };
     napi_deferred deferred { nullptr };
     napi_value promise { nullptr };
-    int32_t mouseX = 0;
-    int32_t mouseY = 0;
+    int32_t mouseX { 0 };
+    int32_t mouseY { 0 };
     T returnResult;
 };
 
