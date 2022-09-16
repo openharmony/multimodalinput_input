@@ -125,7 +125,7 @@ private:
     void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo);
 private:
-    UDSServer* udsServer_ = nullptr;
+    UDSServer* udsServer_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t firstBtnDownWindowId_ { -1 };
     int32_t lastLogicX_ { -1 };
@@ -135,7 +135,7 @@ private:
     std::map<int32_t, std::map<int32_t, int32_t>> pointerStyle_;
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
-    MouseLocation mouseLocation_ = {-1, -1}; // physical coord
+    MouseLocation mouseLocation_ = { -1, -1 }; // physical coord
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
