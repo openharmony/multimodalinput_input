@@ -87,11 +87,11 @@ protected:
         ERROR_STATUS_WRITE,
     };
     ErrorStatus rwErrorStatus_ = ErrorStatus::ERROR_STATUS_OK;
-    int32_t rCount_ = 0;
-    int32_t wCount_ = 0;
+    int32_t rCount_ { 0 };
+    int32_t wCount_ { 0 };
 
-    int32_t rPos_ = 0;
-    int32_t wPos_ = 0;
+    int32_t rPos_ { 0 };
+    int32_t wPos_ { 0 };
     char szBuff_[MAX_STREAM_BUF_SIZE+1] = {};
 };
 

@@ -40,7 +40,7 @@ public:
     };
 
 protected:
-    std::shared_ptr<IInputEventHandler> nextHandler_ = nullptr;
+    std::shared_ptr<IInputEventHandler> nextHandler_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
