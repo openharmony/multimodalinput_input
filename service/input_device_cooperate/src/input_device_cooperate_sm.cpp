@@ -461,8 +461,9 @@ void InputDeviceCooperateSM::HandleEvent(libinput_event *event)
         }
         default: {
             MMI_HILOGI("This device does not support");
-            CHKPV(nextHandler_);
-            nextHandler_->HandleEvent(event);
+            auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+            CHKPV(inputEventNormalizeHandler);
+            inputEventNormalizeHandler->HandleEvent(event);
             break;
         }
     }
@@ -507,8 +508,9 @@ void InputDeviceCooperateSM::CheckPointerEvent(struct libinput_event *event)
             return;
         }
     }
-    CHKPV(nextHandler_);
-    nextHandler_->HandleEvent(event);
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPV(inputEventNormalizeHandler);
+    inputEventNormalizeHandler->HandleEvent(event);
 }
 
 bool InputDeviceCooperateSM::CheckTouchEvent(struct libinput_event* event)
