@@ -461,7 +461,7 @@ int32_t InputTransformationKeyValue(int32_t keyCode)
 }
 
 namespace {
-constexpr  std::map<int64_t, int32_t> KeyIntentionMap = {
+const std::map<int64_t, int32_t> MAP_KEY_INTENTION = {
     {(int64_t)KeyEvent::KEYCODE_DPAD_UP, KeyEvent::INTENTION_UP},
     {(int64_t)KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::INTENTION_DOWN},
     {(int64_t)KeyEvent::KEYCODE_DPAD_LEFT, KeyEvent::INTENTION_LEFT},
@@ -506,8 +506,8 @@ int32_t keyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items)
     for (const auto &item : items) {
         keyCodes = (keyCodes << 16) + item.GetKeyCode();
     }
-    auto iter = KeyIntentionMap.find(keyCodes);
-    if (iter == KeyIntentionMap.end()) {
+    auto iter = MAP_KEY_INTENTION.find(keyCodes);
+    if (iter == MAP_KEY_INTENTION.end()) {
         return KeyEvent::INTENTION_UNKNOWN;
     }
     return iter->second;
