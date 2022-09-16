@@ -31,7 +31,7 @@ public:
 
     bool Marshalling(Parcel& out) const override;
     static PointerEventParcel *Unmarshalling(Parcel& in);
-    mutable std::shared_ptr<PointerEvent> data_ {nullptr};
+    mutable std::shared_ptr<PointerEvent> data_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

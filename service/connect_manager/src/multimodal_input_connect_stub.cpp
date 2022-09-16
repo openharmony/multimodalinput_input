@@ -226,7 +226,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_NORMAL)) {
         MMI_HILOGE("Permission check fail");
         return RET_ERR;
     }
@@ -247,7 +247,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_NORMAL)) {
         MMI_HILOGE("Permission check fail");
         return RET_ERR;
     }

@@ -40,8 +40,8 @@ private:
     static napi_value CreateJsObject(napi_env env, napi_callback_info info);
     static napi_value EnumConstructor(napi_env env, napi_callback_info info);
     static napi_value CreatePointerStyle(napi_env env, napi_value exports);
-    std::shared_ptr<JsPointerManager> mgr_ {nullptr};
-    napi_ref contextRef_ {nullptr};
+    std::shared_ptr<JsPointerManager> mgr_ { nullptr };
+    napi_ref contextRef_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

@@ -28,11 +28,11 @@
 namespace OHOS {
 namespace MMI {
 struct DMouseLocation {
-    int32_t globalX = 0;
-    int32_t globalY = 0;
-    int32_t dx = 0;
-    int32_t dy = 0;
-    int32_t displayId = 0;
+    int32_t globalX { 0 };
+    int32_t globalY { 0 };
+    int32_t dx { 0 };
+    int32_t dy { 0 };
+    int32_t displayId { 0 };
 };
 
 class DInputManager final {
@@ -63,7 +63,7 @@ public:
     void OnStopRemoteInput(const std::string& deviceId, uint32_t inputTypes);
 private:
     DMouseLocation mouseLocation_;
-    int32_t inputTypes_ = 0;
+    int32_t inputTypes_ { 0 };
 };
 
 #define DInputMgr ::OHOS::DelayedSingleton<DInputManager>::GetInstance()

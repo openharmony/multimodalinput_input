@@ -44,10 +44,10 @@ enum HdiDeviceStatus {
 };
 
 struct DeviceInformation {
-    bool status = false;
-    int32_t devIndex = 0;
-    int32_t devType = 0;
-    int16_t fd = 0;
+    bool status { false };
+    int32_t devIndex { 0 };
+    int32_t devType { 0 };
+    int16_t fd { 0 };
     char chipName[32];
 };
 public:
@@ -72,9 +72,9 @@ public:
     InputHostCb hotPlugcallback_;
     InputEventCb eventcallback_;
 private:
-    bool initStatus_ = false;
-    HotPlugEvent** event_ = nullptr;
-    MMI::UDSServer* udsServerPtr_ = nullptr;
+    bool initStatus_ { false };
+    HotPlugEvent** event_ { nullptr };
+    MMI::UDSServer* udsServerPtr_ { nullptr };
     std::vector<DeviceInformation> deviceArray_ = {};
 };
 

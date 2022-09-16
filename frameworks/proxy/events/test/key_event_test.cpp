@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "define_multimodal.h"
+#include "event_util_test.h"
 #include "input_manager.h"
 #include "key_event.h"
 #include "proto.h"
@@ -187,6 +188,39 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_005, TestSize.Level1)
     item1.SetPressed(true);
     KeyEvent2->AddKeyItem(item1);
     ASSERT_TRUE(KeyEvent2->IsValid());
+}
+
+/**
+ * @tc.name:KeyEventTest_OnCheckKeyEvent_006
+ * @tc.desc:Verify key event
+ * @tc.type: FUNC
+ * @tc.require: I5QSN3
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_006, TestSize.Level1)
+{
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    auto event1 = KeyEvent::from(inputEvent);
+    ASSERT_EQ(event1, nullptr);
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    auto event2 = KeyEvent::Clone(keyEvent);
+    ASSERT_NE(event2, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    keyEvent->SetActionTime(100);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    keyEvent->ActionToString(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->KeyCodeToString(KeyEvent::KEYCODE_BACK);
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_BACK);
+    item.SetDownTime(100);
+    item.SetPressed(true);
+    keyEvent->AddKeyItem(item);
+    ASSERT_TRUE(keyEvent->IsValid());
+    std::vector<KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
+    TestUtil->DumpInputEvent(keyEvent);
 }
 
 /**

@@ -68,9 +68,9 @@ private:
     const std::chrono::time_point<std::chrono::high_resolution_clock> beginTime_;
     const std::string strOutput_ = "";
     const std::string strReason_ = "";
-    const int64_t uiTime_ = 0;
-    const int64_t llParam1_ = 0;
-    const int64_t llParam2_ = 0;
+    const int64_t uiTime_ { 0 };
+    const int64_t llParam1_ { 0 };
+    const int64_t llParam2_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
