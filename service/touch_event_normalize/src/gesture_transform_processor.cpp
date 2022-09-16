@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "gesture_transform_point_processor.h"
+#include "gesture_transform_processor.h"
 
 #include "mmi_log.h"
 #include "mouse_device_state.h"
@@ -22,18 +22,18 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN,
-    "GestureTransformPointProcessor"};
+    "GestureTransformProcessor"};
 } // namespace
 
-GestureTransformPointProcessor::GestureTransformPointProcessor(int32_t deviceId) : deviceId_(deviceId)
+GestureTransformProcessor::GestureTransformProcessor(int32_t deviceId) : deviceId_(deviceId)
 {
     pointerEvent_ = PointerEvent::Create();
     CHKPL(pointerEvent_);
 }
 
-GestureTransformPointProcessor::~GestureTransformPointProcessor() {}
+GestureTransformProcessor::~GestureTransformProcessor() {}
 
-void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_gesture *data)
+void GestureTransformProcessor::OnEventTouchPadPinchBegin(libinput_event_gesture *data)
 {
     CALL_DEBUG_ENTER;
     CHKPV(data);
@@ -66,7 +66,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchBegin(libinput_event_ge
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
 }
 
-void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_gesture *data)
+void GestureTransformProcessor::OnEventTouchPadPinchUpdate(libinput_event_gesture *data)
 {
     MMI_HILOGD("Touchpad update event");
     CHKPV(data);
@@ -91,7 +91,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchUpdate(libinput_event_g
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
 }
 
-void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gesture *data)
+void GestureTransformProcessor::OnEventTouchPadPinchEnd(libinput_event_gesture *data)
 {
     MMI_HILOGD("Touchpad end event");
     CHKPV(data);
@@ -116,7 +116,7 @@ void GestureTransformPointProcessor::OnEventTouchPadPinchEnd(libinput_event_gest
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
 }
 
-std::shared_ptr<PointerEvent> GestureTransformPointProcessor::OnTouchPadGestureEvent(
+std::shared_ptr<PointerEvent> GestureTransformProcessor::OnTouchPadGestureEvent(
     struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;

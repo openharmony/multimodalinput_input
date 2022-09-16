@@ -12,18 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef TRANSFORM_POINT_PROCESSOR_H
-#define TRANSFORM_POINT_PROCESSOR_H
+#ifndef TRANSFORM_PROCESSOR_H
+#define TRANSFORM_PROCESSOR_H
 #include <libinput.h>
 #include <memory>
 #include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
-class TransformPointProcessor {
+class TransformProcessor {
 public:
     virtual std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif
+#endif // TRANSFORM_PROCESSOR_H
