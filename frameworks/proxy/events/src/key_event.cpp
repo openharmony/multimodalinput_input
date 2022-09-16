@@ -1245,7 +1245,7 @@ int32_t KeyEvent::SetFunctionKey(int32_t funcKey, int32_t value)
     }
 }
 
-int32_t KeyEvent::GetKeyIntention()
+int32_t KeyEvent::GetKeyIntention() const
 {
     return keyIntention_;
 }

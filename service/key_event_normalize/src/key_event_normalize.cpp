@@ -103,7 +103,8 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
         keyEvent->RemoveReleasedKeyItems(item);
         keyEvent->AddPressedKeyItems(item);
     }
-    int32_t keyIntention = GetKeyIntentionByItems(keyEvent);
+    std::vector<KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
+    int32_t keyIntention = keyItemsTransKeyIntention(items);
     keyEvent->SetKeyIntention(keyIntention);
     return RET_OK;
 }

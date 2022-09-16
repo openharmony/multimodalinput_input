@@ -1369,7 +1369,7 @@ public:
     static const int32_t KEYCODE_BUTTON_DEAD;
 
     /**
-     * Keyboard menu key
+     * 键盘list菜单键
      *
      * @since 9
      */
@@ -3163,7 +3163,20 @@ public:
      */
     bool GetFunctionKey(int32_t funcKey) const;
 
-    int32_t GetKeyIntention();
+    /**
+     * @brief 获取当前事件的按键意图。
+     * @param void
+     * @return 返回当前事件的按键意图。
+     * @since 9
+     */
+    int32_t GetKeyIntention() const;
+
+    /**
+     * @brief 给当前按键事件设置按键意图。
+     * @param keyIntention 指定的按键意图。
+     * @return void
+     * @since 9
+     */
     void SetKeyIntention(int32_t keyIntention);
 
 public:
@@ -3195,13 +3208,13 @@ private:
     bool IsValidKeyItem() const;
 
 private:
-    int32_t keyCode_ = -1;
+    int32_t keyCode_ { -1 };
     std::vector<KeyItem> keys_;
-    int32_t keyAction_ = 0;
+    int32_t keyAction_ { 0 };
     bool numLock_ { false };
     bool capsLock_ { false };
     bool scrollLock_ { false };
-    int32_t keyIntention_ = -1;
+    int32_t keyIntention_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS
