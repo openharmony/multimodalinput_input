@@ -226,9 +226,6 @@ void UDSClient::OnThread()
             }
             isConnected_ = true;
         }
-
-        OnThreadLoop();
-
         if (isToExit_) {
             isRunning_ = false;
             MMI_LOGW("Client thread exit");
