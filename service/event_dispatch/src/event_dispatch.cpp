@@ -87,7 +87,6 @@ void EventDispatch::HandlePointerEventInner(const std::shared_ptr<PointerEvent> 
         DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
     }
-    DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     if (CheckPointerEvent(point)) {
         MMI_HILOGE("Check pointer event return true,filter out this pointer event");
         return;
@@ -140,7 +139,6 @@ int32_t EventDispatch::DispatchKeyEventPid(UDSServer& udsServer, std::shared_ptr
         DfxHisysevent::OnUpdateTargetKey(key, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return RET_ERR;
     }
-    DfxHisysevent::OnUpdateTargetKey(key, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
     MMI_HILOGD("Event dispatcher of server:KeyEvent:KeyCode:%{public}d,Action:%{public}d,EventType:%{public}d,"
         "Fd:%{public}d", key->GetKeyCode(), key->GetAction(), key->GetEventType(), fd);
     auto session = udsServer.GetSession(fd);
