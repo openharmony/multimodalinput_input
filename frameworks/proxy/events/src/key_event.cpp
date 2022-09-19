@@ -542,7 +542,8 @@ KeyEvent::KeyEvent(const KeyEvent& other)
     : InputEvent(other),
       keyCode_(other.keyCode_),
       keys_(other.keys_),
-      keyAction_(other.keyAction_) {}
+      keyAction_(other.keyAction_),
+      keyIntention_(other.keyIntention_) {}
 
 KeyEvent::~KeyEvent() {}
 
