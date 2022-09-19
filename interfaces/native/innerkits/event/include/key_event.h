@@ -2865,36 +2865,200 @@ public:
      */
     static const int32_t KEY_ACTION_UP;
 
+    /**
+     * 未知意图
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_UNKNOWN;
+
+    /**
+     * D-pad 上
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_UP;
+
+    /**
+     * D-pad 下
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_DOWN;
+
+    /**
+     * D-pad 左
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_LEFT;
+
+    /**
+     * D-pad 右
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_RIGHT;
+
+    /**
+     * 选中
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_SELECT;
+
+    /**
+     * 逃逸
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_ESCAPE;
+
+    /**
+     * 返回
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_BACK;
+
+    /**
+     * 前进
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_FORWARD;
+
+    /**
+     * 菜单
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_MENU;
+    
+    /**
+     * 回到桌面
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_HOME;
+    
+    /**
+     * 上一页
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_PAGE_UP;
+    
+    /**
+     * 下一页
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_PAGE_DOWN;
+    
+    /**
+     * 放大键
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_ZOOM_OUT;
+    
+    /**
+     * 缩小键
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_ZOOM_IN;
 
+    /**
+     * 播放/暂停
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_MEDIA_PLAY_PAUSE;
+    
+    /**
+     * 快进
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_MEDIA_FAST_FORWARD;
+    
+    /**
+     * 快退
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_MEDIA_FAST_REWIND;
+    
+    /**
+     * 倍速播放
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_MEDIA_FAST_PLAYBACK;
+    
+    /**
+     * 下一首/下一集
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_MEDIA_NEXT;
+    
+    /**
+     * 上一首/上一集
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_MEDIA_PREVIOUS;
+    
+    /**
+     * 扬声器静音键
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_MEDIA_MUTE;
+
+    /**
+     * 音量增加键
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_VOLUTE_UP;
+    
+    /**
+     * 音量减小键
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_VOLUTE_DOWN;
 
+    /**
+     * 接听/挂断/拨号
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_CALL;
+    
+    /**
+     * 挂断
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_ENDCALL;
+    
+    /**
+     * 拒绝
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_REJECTCALL;
 
+    /**
+     * 拍照键
+     *
+     * @since 9
+     */
     static const int32_t INTENTION_CAMERA;
 
 public:
