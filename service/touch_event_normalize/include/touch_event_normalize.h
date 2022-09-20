@@ -19,12 +19,9 @@
 #include <map>
 #include <memory>
 
+#include "proto.h"
 #include "singleton.h"
-#include "libinput.h"
 #include "transform_processor.h"
-#include "gesture_transform_processor.h"
-#include "touch_transform_processor.h"
-#include "touchpad_transform_processor.h"
 
 namespace OHOS {
 namespace MMI {
@@ -35,20 +32,11 @@ public:
     std::shared_ptr<PointerEvent> OnLibInput(struct libinput_event *event, INPUT_DEVICE_TYPE deviceType);
 
 private:
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-    std::shared_ptr<PointerEvent> OnLibinputTouchEvent(struct libinput_event *event);
-    std::shared_ptr<PointerEvent> OnLibinputTabletToolEvent(struct libinput_event *event);
-#endif // OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_POINTER
-    std::shared_ptr<PointerEvent> OnLibinputTouchPadEvent(struct libinput_event *event);
-    std::shared_ptr<PointerEvent> OnTouchPadGestureEvent(struct libinput_event *event);
-#endif // OHOS_BUILD_ENABLE_POINTER
+    std::shared_ptr<TransformProcessor> MakeTransformProcessor(
+        int32_t deviceId, INPUT_DEVICE_TYPE deviceType) const;
 
 private:
     std::map<int32_t, std::shared_ptr<TransformProcessor>> processors_;
-    std::map<int32_t, std::shared_ptr<TouchTransformProcessor>> touchPro_;
-    std::map<int32_t, std::shared_ptr<TouchPadTransformProcessor>> touchpadPro_;
-    std::map<int32_t, std::shared_ptr<GestureTransformProcessor>> gesturePro_;
 };
 
 #define TouchEventHdr ::OHOS::DelayedSingleton<TouchEventNormalize>::GetInstance()
