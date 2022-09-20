@@ -27,8 +27,8 @@ namespace MMI {
 class VirtualDevice {
 public:
     VirtualDevice(const char *deviceName, uint16_t productId);
-    virtual ~VirtualDevice();
     DISALLOW_COPY_AND_MOVE(VirtualDevice);
+    virtual ~VirtualDevice();
     bool EmitEvent(uint16_t type, uint16_t code, uint32_t value) const;
     bool SetUp();
 
@@ -38,7 +38,7 @@ protected:
     virtual const std::vector<uint32_t>& GetProperties() const;
     virtual const std::vector<uint32_t>& GetAbs() const;
     virtual const std::vector<uint32_t>& GetRelBits() const;
-    int32_t fd_ = -1;
+    int32_t fd_ { -1 };
     const char * const deviceName_;
     const uint16_t busType_;
     const uint16_t vendorId_;

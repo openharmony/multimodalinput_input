@@ -1,6 +1,6 @@
  [
-    { 
-     "deviceName": "joystick", 
+    {
+     "deviceName": "joystick",
      "events":[
                 {"eventType": "THROTTLE"}
             ]

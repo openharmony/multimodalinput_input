@@ -59,7 +59,7 @@ bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> ev
     const uint32_t code = static_cast<uint32_t>(OPERATOR_TYPE::HANDLE_POINTER_EVENT);
     int32_t ret = remote->SendRequest(code, data, reply, option);
     if (ret != NO_ERROR) {
-        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return false;
     }
 

@@ -84,8 +84,8 @@ bool MMIClient::StartEventRunner()
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    if (!InputMgrImpl->InitEventHandler()) {
-        MMI_HILOGE("Init event handler error");
+    if (!InputMgrImpl.InitEventHandler()) {
+        MMI_HILOGE("Init event handler failed");
         Stop();
         return false;
     }
@@ -115,12 +115,12 @@ void MMIClient::OnRecvThread()
         CHKPV(recvEventHandler_);
         if (isConnected_ && fd_ >= 0) {
             if (!AddFdListener(fd_)) {
-                MMI_HILOGE("Add fd listener return false");
+                MMI_HILOGE("Add fd listener failed");
                 return;
             }
         } else {
             if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME)) {
-                MMI_HILOGE("Send reconnect event return false");
+                MMI_HILOGE("Send reconnect event failed");
                 return;
             }
         }
@@ -141,7 +141,7 @@ bool MMIClient::AddFdListener(int32_t fd)
     CHKPF(fdListener);
     auto errCode = recvEventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener);
     if (errCode != ERR_OK) {
-        MMI_HILOGE("Add fd listener error,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
+        MMI_HILOGE("Add fd listener failed,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
             recvEventHandler_->GetErrorStr(errCode).c_str());
         return false;
     }
@@ -227,6 +227,7 @@ void MMIClient::OnConnected()
     CALL_DEBUG_ENTER;
     MMI_HILOGI("Connection to server succeeded, fd:%{public}d", GetFd());
     isConnected_ = true;
+    msgHandler_.InitProcessedCallback();
     if (funConnected_) {
         funConnected_(*this);
     }
@@ -261,7 +262,7 @@ void MMIClient::Stop()
     if (recvEventHandler_ != nullptr) {
         recvEventHandler_->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);
     }
-    auto eventHandler = InputMgrImpl->GetEventHandler();
+    auto eventHandler = InputMgrImpl.GetEventHandler();
     CHKPV(eventHandler);
     eventHandler->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);
 }

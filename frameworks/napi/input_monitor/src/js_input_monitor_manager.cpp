@@ -18,13 +18,13 @@
 #include <uv.h>
 
 #include "define_multimodal.h"
+#include "napi_constants.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorManager" };
 
-const std::string GET_CB_INFO = "napi_get_cb_info";
 const std::string REFERENCE_UNREF = "napi_reference_unref";
 } // namespace
 
@@ -38,7 +38,7 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    for (const auto& item : monitors_) {
+    for (const auto &item : monitors_) {
         if ((item != nullptr) && (item->IsMatch(jsEnv, callback) != RET_ERR)) {
             MMI_HILOGD("Add js monitor failed");
             return;

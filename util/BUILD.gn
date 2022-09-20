@@ -25,7 +25,7 @@ config("libmmi_util_public_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
   ]
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -38,6 +38,10 @@ config("libmmi_util_public_config") {
   if (input_feature_hdf) {
     defines += [ "OHOS_BUILD_HDF" ]
   }
+
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+  }
 }
 
 ohos_shared_library("libmmi-util") {
@@ -46,6 +50,7 @@ ohos_shared_library("libmmi-util") {
     "common/src/klog.cpp",
     "common/src/run_shell_util.cpp",
     "common/src/util.cpp",
+    "common/src/util_napi.cpp",
     "common/src/uuid.cpp",
     "network/src/circle_stream_buffer.cpp",
     "network/src/net_packet.cpp",
@@ -62,19 +67,21 @@ ohos_shared_library("libmmi-util") {
 
   public_deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//commonlibrary/c_utils/base:utils",
+    "//foundation/arkui/napi:ace_napi",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
-    "//utils/native/base:utils",
   ]
 
   part_name = "input"
+  subsystem_name = "multimodalinput"
 }
 
 ohos_unittest("ut-mmi-util-out") {
   module_out_path = module_output_path
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//third_party/googletest/googletest/include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "${mmi_path}/frameworks/proxy/event_handler",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader",
@@ -98,7 +105,7 @@ ohos_unittest("ut-mmi-util-out") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -110,6 +117,10 @@ ohos_unittest("ut-mmi-util-out") {
 
   if (input_feature_hdf) {
     defines += [ "OHOS_BUILD_HDF" ]
+  }
+
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
 
   sources = [
@@ -133,9 +144,9 @@ ohos_unittest("ut-mmi-util-out") {
 ohos_unittest("RunShellUtilTest") {
   module_out_path = module_output_path
   include_dirs = [
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "//third_party/googletest/googletest/include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
     "${mmi_path}/frameworks/proxy/event_handler",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader",
@@ -160,7 +171,7 @@ ohos_unittest("RunShellUtilTest") {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
@@ -172,6 +183,10 @@ ohos_unittest("RunShellUtilTest") {
 
   if (input_feature_hdf) {
     defines += [ "OHOS_BUILD_HDF" ]
+  }
+
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
 
   sources = [ "common/test/run_shell_util_test.cpp" ]

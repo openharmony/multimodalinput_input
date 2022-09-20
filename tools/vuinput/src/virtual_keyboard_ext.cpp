@@ -17,8 +17,7 @@
 
 namespace OHOS {
 namespace MMI {
-VirtualKeyboardExt::VirtualKeyboardExt() : VirtualDevice("Virtual keyboardExt",
-    BUS_USB, 0x24ae, 0x4035)
+VirtualKeyboardExt::VirtualKeyboardExt() : VirtualDevice("Virtual keyboardExt", BUS_USB, 0x24ae, 0x4035)
 {
     eventTypes_ = { EV_KEY, EV_MSC, EV_REP };
     relBits_ = { REP_DELAY, REP_PERIOD };

@@ -27,14 +27,11 @@ namespace MMI {
     #define RET_ERR (-1)
 #endif
 
+inline constexpr int32_t INVALID_FD { -1 };
+inline constexpr int32_t INVALID_PID { -1 };
+
 #ifndef LINEINFO
 #define LINEINFO __FILE__, __LINE__
-#endif
-
-#if defined(__GNUC__) && __GNUC__ >= 4
-    #define WL_EXPORT __attribute__ ((visibility("default")))
-#else
-    #define WL_EXPORT
 #endif
 
 #ifdef DEBUG_CODE_TEST
@@ -67,7 +64,7 @@ namespace MMI {
 #define CHKPS(cond) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_HILOGE("%{public}s, (%{public}d), CHKPF(%{public}s) is null", \
+            MMI_HILOGE("%{public}s, (%{public}d), CHKPS(%{public}s) is null", \
                 __FILE__, __LINE__, #cond); \
             return ""; \
         } \
@@ -85,7 +82,7 @@ namespace MMI {
 #define CHKPB(cond) \
     { \
         if ((cond) == nullptr) { \
-            MMI_HILOGW("%{public}s, (%{public}d), CHKPC(%{public}s) is null, skip then break", \
+            MMI_HILOGW("%{public}s, (%{public}d), CHKPB(%{public}s) is null, skip then break", \
                 __FILE__, __LINE__, #cond); \
             break; \
         } \
@@ -159,7 +156,7 @@ namespace MMI {
 #define CHKPS(cond) \
     do { \
         if ((cond) == nullptr) { \
-            MMI_HILOGE("CHKPF(%{public}s) is null", #cond); \
+            MMI_HILOGE("CHKPS(%{public}s) is null", #cond); \
             return ""; \
         } \
     } while (0)

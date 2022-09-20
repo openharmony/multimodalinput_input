@@ -14,6 +14,8 @@
  */
 
 #include "js_input_dinput_context.h"
+
+#include "napi_constants.h"
 #include "util_napi.h"
 
 namespace OHOS {
@@ -27,25 +29,7 @@ constexpr uint32_t ARGC_NUM_1 = 1;
 constexpr uint32_t ARGC_NUM_2 = 2;
 constexpr uint32_t ARGC_NUM_3 = 3;
 constexpr uint32_t INIT_REF_COUNT = 1;
-constexpr size_t MAX_STRING_LEN = 1024;
 const std::string GET_GLOBLE = "napi_get_global";
-const std::string DEFINE_CLASS = "napi_define_class";
-const std::string WRAP = "napi_wrap";
-const std::string UNWRAP = "napi_unwrap";
-const std::string NEW_INSTANCE = "napi_new_instance";
-const std::string SET_NAMED_PROPERTY = "napi_set_named_property";
-const std::string CREATE_REFERENCE = "napi_create_reference";
-const std::string REFERENCE_REF = "napi_create_reference";
-const std::string GET_CB_INFO = "napi_get_cb_info";
-const std::string HAS_NAMED_PROPERTY = "napi_has_named_property";
-const std::string GET_INT32 = "napi_get_value_int32";
-const std::string DEFINE_PROPERTIES = "napi_define_properties";
-const std::string GET_STRING_UTF8 = "napi_get_value_string_utf8";
-const std::string GET_ARRAY_LENGTH = "napi_get_array_length";
-const std::string GET_ELEMENT = "napi_get_element";
-const std::string GET_BOOL = "napi_get_boolean";
-const std::string CREATE_INT32 = "napi_create_int32";
-const std::string TYPEOF = "napi_typeof";
 
 napi_ref inputAbilityTypeEnumConstructor_ = nullptr;
 } // namespace
@@ -91,7 +75,11 @@ napi_value JsInputDinputContext::JsConstructor(napi_env env, napi_callback_info 
         auto context = static_cast<JsInputDinputContext*>(data);
         delete context;
     }, nullptr, nullptr);
-    CHKRP(env, status, WRAP);
+    if (status != napi_ok) {
+        delete jsContext;
+        THROWERR(env, "Failed to wrap native instance");
+        return nullptr;
+    }
     return thisVar;
 }
 
@@ -199,7 +187,7 @@ napi_value JsInputDinputContext::GetRemoteInputAbility(napi_env env, napi_callba
     return nullptr;
 }
 
-napi_value JsInputDinputContext::GetParameter(napi_env env, napi_callback_info info, napi_ref& first)
+napi_value JsInputDinputContext::GetParameter(napi_env env, napi_callback_info info, napi_ref &first)
 {
     CALL_LOG_ENTER;
     size_t argc = ARGC_NUM_1;
@@ -224,7 +212,7 @@ napi_value JsInputDinputContext::GetParameter(napi_env env, napi_callback_info i
 }
 
 napi_value JsInputDinputContext::GetParameter(napi_env env, napi_callback_info info,
-    std::string& first, napi_ref& second)
+    std::string &first, napi_ref &second)
 {
     CALL_LOG_ENTER;
     size_t argc = ARGC_NUM_2;
@@ -258,7 +246,7 @@ napi_value JsInputDinputContext::GetParameter(napi_env env, napi_callback_info i
 }
 
 napi_value JsInputDinputContext::GetParameter(napi_env env, napi_callback_info info,
-    int32_t& first, int32_t& second, napi_ref& third)
+    int32_t &first, int32_t &second, napi_ref &third)
 {
     CALL_LOG_ENTER;
     size_t argc = ARGC_NUM_3;
@@ -293,7 +281,7 @@ napi_value JsInputDinputContext::GetParameter(napi_env env, napi_callback_info i
 }
 
 napi_value JsInputDinputContext::GetParameter(napi_env env, napi_callback_info info,
-    std::string& first, std::vector<uint32_t>& second, napi_ref& third)
+    std::string &first, std::vector<uint32_t> &second, napi_ref &third)
 {
     CALL_LOG_ENTER;
     size_t argc = ARGC_NUM_3;

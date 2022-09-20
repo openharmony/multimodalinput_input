@@ -40,6 +40,7 @@ constexpr int32_t AXIS_UPDATE = 5;
 constexpr int32_t AXIS_END = 6;
 constexpr int32_t MIDDLE = 1;
 constexpr int32_t RIGHT = 2;
+constexpr int32_t MOUSE_FLOW = 25;
 } // namespace
 
 bool InputMonitor::Start()
@@ -80,11 +81,22 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
         MMI_HILOGE("Failed to process pointer event, id:%{public}d", id_);
         return;
     }
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE
+        && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
+        static int32_t count = MOUSE_FLOW;
+        if (++count < MOUSE_FLOW) {
+            pointerEvent->MarkProcessed();
+            return;
+        } else {
+            count = 0;
+        }
+    }
     std::function<void(std::shared_ptr<PointerEvent>)> callback;
     {
         std::lock_guard<std::mutex> guard(mutex_);
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
             if (JsInputMonMgr.GetMonitor(id_)->GetTypeName() != "touch") {
+                pointerEvent->MarkProcessed();
                 return;
             }
             if (pointerEvent->GetPointerIds().size() == 1) {
@@ -330,13 +342,21 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
     return RET_OK;
 }
 
-MapFun JsInputMonitor::GetFuns(const PointerEvent::PointerItem& item)
+MapFun JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item)
 {
     MapFun mapFun;
+    mapFun["actionTime"] = std::bind(&PointerEvent::GetActionTime, pointerEvent);
+    mapFun["screenId"] = std::bind(&PointerEvent::GetTargetDisplayId, pointerEvent);
+    mapFun["windowId"] = std::bind(&PointerEvent::GetTargetWindowId, pointerEvent);
+    mapFun["deviceId"] = std::bind(&PointerEvent::PointerItem::GetDeviceId, item);
     mapFun["windowX"] = std::bind(&PointerEvent::PointerItem::GetDisplayX, item);
     mapFun["windowY"] = std::bind(&PointerEvent::PointerItem::GetDisplayY, item);
     mapFun["screenX"] = std::bind(&PointerEvent::PointerItem::GetWindowX, item);
     mapFun["screenY"] = std::bind(&PointerEvent::PointerItem::GetWindowY, item);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    mapFun["rawDeltaX"] = std::bind(&PointerEvent::PointerItem::GetRawDx, item);
+    mapFun["rawDeltaY"] = std::bind(&PointerEvent::PointerItem::GetRawDy, item);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     return mapFun;
 }
 
@@ -354,8 +374,8 @@ bool JsInputMonitor::SetMouseProperty(const std::shared_ptr<PointerEvent> pointe
         return false;
     }
 
-    auto mapFun = GetFuns(item);
-    for (const auto& it : mapFun) {
+    auto mapFun = GetFuns(pointerEvent, item);
+    for (const auto &it : mapFun) {
         if (SetNameProperty(jsEnv_, result, it.first, it.second()) != napi_ok) {
             THROWERR(jsEnv_, "Set property failed");
             return false;
@@ -410,8 +430,12 @@ int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> 
         if (pointerId == currentPointerId) {
             PointerEvent::PointerItem item;
             if (!pointerEvent->GetPointerItem(pointerId, item)) {
-                MMI_HILOGE("Invalid pointer: %{public}d", pointerId);
+                MMI_HILOGE("Invalid pointer:%{public}d", pointerId);
                 return RET_ERR;
+            }
+            if (SetNameProperty(jsEnv_, result, "id", currentPointerId) != napi_ok) {
+                THROWERR(jsEnv_, "Set property of id failed");
+                return false;
             }
             if (!SetMouseProperty(pointerEvent, item, result)) {
                 MMI_HILOGE("Set property of mouse failed");
@@ -678,9 +702,18 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
     int32_t num = 0;
     {
         std::lock_guard<std::mutex> guard(mutex_);
+        std::queue<std::shared_ptr<PointerEvent>> tmp;
+        if (!evQueue_.empty()) {
+            auto markProcessedEvent = evQueue_.front();
+            CHKPV(markProcessedEvent);
+            markProcessedEvent->MarkProcessed();
+        }
+        std::swap(evQueue_, tmp);
         evQueue_.push(pointerEvent);
         num = jsTaskNum_;
+        jsTaskNum_ = 1;
     }
+
     if (num < 1) {
         int32_t *id = &monitorId_;
         uv_work_t *work = new (std::nothrow) uv_work_t;
@@ -691,11 +724,13 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
         if (status != napi_ok) {
             THROWERR(jsEnv_, "napi_get_uv_event_loop is failed");
             delete work;
+            {
+                std::lock_guard<std::mutex> guard(mutex_);
+                jsTaskNum_ = 0;
+            }
             return;
         }
         uv_queue_work(loop, work, [](uv_work_t *work){}, &JsInputMonitor::JsCallback);
-        std::lock_guard<std::mutex> guard(mutex_);
-        ++jsTaskNum_;
     }
 }
 
@@ -715,17 +750,24 @@ void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status)
 void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    jsTaskNum_ = 0;
     if (!isMonitoring_) {
         MMI_HILOGE("Js monitor stop");
         return;
     }
     CHKPV(jsEnv_);
     CHKPV(receiver_);
-    std::lock_guard<std::mutex> guard(mutex_);
     while (!evQueue_.empty()) {
         if (!isMonitoring_) {
             MMI_HILOGE("Js monitor stop handle callback");
             break;
+        }
+        napi_handle_scope scope = nullptr;
+        napi_open_handle_scope(jsEnv_, &scope);
+        if (scope == nullptr) {
+            MMI_HILOGE("scope is nullptr");
+            return;
         }
         auto pointerEvent = evQueue_.front();
         CHKPC(pointerEvent);
@@ -733,6 +775,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
         napi_value napiPointer = nullptr;
         auto status = napi_create_object(jsEnv_, &napiPointer);
         if (status != napi_ok) {
+            pointerEvent->MarkProcessed();
             break;
         }
         auto ret = RET_ERR;
@@ -742,23 +785,26 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
             ret = TransformMousePointerEvent(pointerEvent, napiPointer);
         }
         if (ret != RET_OK || napiPointer == nullptr) {
+            pointerEvent->MarkProcessed();
             break;
         }
         napi_value callback = nullptr;
         status = napi_get_reference_value(jsEnv_, receiver_, &callback);
         if (status != napi_ok) {
+            pointerEvent->MarkProcessed();
             break;
         }
         napi_value result = nullptr;
         status = napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result);
         if (status != napi_ok) {
+            pointerEvent->MarkProcessed();
             break;
         }
         if (typeName == "touch") {
+            pointerEvent->MarkProcessed();
             bool retValue = false;
             status = napi_get_value_bool(jsEnv_, result, &retValue);
             if (status != napi_ok) {
-                --jsTaskNum_;
                 return;
             }
             if (retValue) {
@@ -766,8 +812,8 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
                 MarkConsumed(eventId);
             }
         }
+        napi_close_handle_scope(jsEnv_, scope);
     }
-    --jsTaskNum_;
 }
 } // namespace MMI
 } // namespace OHOS

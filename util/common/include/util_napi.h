@@ -31,6 +31,17 @@ namespace MMI {
         } \
     } while (0)
 
+#define CHKRV_SCOPE(env, state, desc, scope) \
+    do { \
+        if ((state) != napi_ok) { \
+            MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
+            auto infoTemp = std::string(__FUNCTION__)+ ":" + std::string(desc) + " failed"; \
+            napi_throw_error(env, nullptr, infoTemp.c_str()); \
+            napi_close_handle_scope(env, scope); \
+            return; \
+        } \
+    } while (0)
+
 #define CHKRP(env, state, desc) \
     do { \
         if ((state) != napi_ok) { \
@@ -57,6 +68,10 @@ namespace MMI {
         auto infoTemp = std::string(__FUNCTION__)+ ": " + #desc; \
         napi_throw_error(env, nullptr, infoTemp.c_str()); \
     } while (0)
+
+namespace UtilNapi {
+bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
+} // namespace UtilNapi
 } // namespace MMI
 } // namespace OHOS
 

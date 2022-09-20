@@ -22,16 +22,6 @@ namespace OHOS {
 namespace MMI {
 class VirtualDevice {
 public:
-    VirtualDevice(const std::string& deviceName, uint16_t busType, uint16_t vendorId, uint16_t productId);
-    virtual ~VirtualDevice();
-    DISALLOW_COPY_AND_MOVE(VirtualDevice);
-    bool SetUp();
-    void Close();
-    bool CreateKey();
-    bool SetAbsResolution();
-    bool SetPhys(const std::string& deviceName);
-    bool DoIoctl(int32_t fd, int32_t request, const uint32_t value);
-    void SetDeviceId();
     static std::vector<std::string> BrowseDirectory(const std::string& filePath);
     static std::string ReadFile(const std::string& filePath);
     static int32_t GetFileSize(const std::string& filePath);
@@ -41,6 +31,16 @@ public:
     static bool AddDevice(const std::string& startDeviceName);
     static bool CloseDevice(const std::string& closeDeviceName, const std::vector<std::string>& deviceList);
     static bool CommandBranch(std::vector<std::string>& argvList);
+    VirtualDevice(const std::string& deviceName, uint16_t busType, uint16_t vendorId, uint16_t productId);
+    DISALLOW_COPY_AND_MOVE(VirtualDevice);
+    virtual ~VirtualDevice();
+    bool SetUp();
+    void Close();
+    bool CreateKey();
+    bool SetAbsResolution();
+    bool SetPhys(const std::string& deviceName);
+    bool DoIoctl(int32_t fd, int32_t request, const uint32_t value);
+    void SetDeviceId();
 
 protected:
     void SetResolution(const ResolutionInfo& resolutionInfo);
@@ -56,7 +56,7 @@ protected:
     virtual const std::vector<uint32_t>& GetSwitches() const;
 
 protected:
-    int32_t fd_ = -1;
+    int32_t fd_ { -1 };
     std::string deviceName_;
     const uint16_t busTtype_ { 0 };
     const uint16_t vendorId_ { 0 };

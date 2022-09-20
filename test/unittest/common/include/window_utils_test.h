@@ -49,8 +49,8 @@ private:
     void CreateSmoothWindow();
     sptr<Rosen::Window> CreateWindow(const TestWindowInfo& info);
 private:
-    sptr<Rosen::Window> testWindow_ = nullptr;
-    static inline std::shared_ptr<WindowUtilsTest> windowUtils_ = nullptr;
+    sptr<Rosen::Window> testWindow_ { nullptr };
+    static inline std::shared_ptr<WindowUtilsTest> windowUtils_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

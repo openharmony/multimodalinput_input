@@ -21,7 +21,8 @@
 
 namespace OHOS {
 namespace MMI {
-class PermissionHelper : public DelayedSingleton<PermissionHelper> {
+class PermissionHelper final {
+    DECLARE_DELAYED_SINGLETON(PermissionHelper);
 public:
     static const uint32_t APL_NORMAL = 1 << OHOS::Security::AccessToken::APL_NORMAL;
     static const uint32_t APL_SYSTEM_BASIC = 1 << OHOS::Security::AccessToken::APL_SYSTEM_BASIC;
@@ -29,6 +30,7 @@ public:
     static const uint32_t APL_SYSTEM_BASIC_CORE = APL_SYSTEM_BASIC + APL_SYSTEM_CORE;
 
 public:
+    DISALLOW_COPY_AND_MOVE(PermissionHelper);
     bool CheckPermission(uint32_t required);
     bool CheckMonitor();
     int32_t GetTokenType();
@@ -38,7 +40,8 @@ private:
     bool CheckNativePermission(uint32_t tokenId, uint32_t required);
     bool CheckMonitorPermission(uint32_t tokenId);
 };
-#define PerHelper PermissionHelper::GetInstance()
+
+#define PerHelper ::OHOS::DelayedSingleton<PermissionHelper>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif  // PERMISSION_HELPER_H

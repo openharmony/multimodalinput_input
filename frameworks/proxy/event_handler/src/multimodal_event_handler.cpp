@@ -31,17 +31,20 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Multim
 void OnConnected(const IfMMIClient& client)
 {
     CALL_DEBUG_ENTER;
-    InputMgrImpl->OnConnected();
+    InputMgrImpl.OnConnected();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventInputSubscribeMgr.OnConnected();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
+#ifdef OHOS_BUILD_ENABLE_MONITOR
     IMonitorMgr->OnConnected();
+#endif // OHOS_BUILD_ENABLE_MONITOR
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     InputInterMgr->OnConnected();
-#endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 }
 
 MultimodalEventHandler::MultimodalEventHandler() {}
+MultimodalEventHandler::~MultimodalEventHandler() {}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyEventPtr)

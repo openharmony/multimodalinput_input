@@ -21,7 +21,6 @@
 #include <thread>
 
 #include "iremote_object.h"
-#include "nocopyable.h"
 #include "singleton.h"
 #include "system_ability.h"
 
@@ -40,7 +39,7 @@ namespace OHOS {
 namespace MMI {
 
 enum class ServiceRunningState {STATE_NOT_START, STATE_RUNNING, STATE_EXIT};
-class MMIService : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
+class MMIService final : public UDSServer, public SystemAbility, public MultimodalInputConnectStub {
     DECLARE_DELAYED_SINGLETON(MMIService);
     DECLEAR_SYSTEM_ABILITY(MMIService);
     DISALLOW_COPY_AND_MOVE(MMIService);
@@ -50,10 +49,14 @@ public:
     virtual void OnStop() override;
     int32_t Dump(int32_t fd, const std::vector<std::u16string> &args) override;
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
-        int32_t &toReturnClientFd) override;
+        int32_t &toReturnClientFd, int32_t &tokenType) override;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
     virtual int32_t SetPointerVisible(bool visible) override;
     virtual int32_t IsPointerVisible(bool &visible) override;
+    virtual int32_t SetPointerSpeed(int32_t speed) override;
+    virtual int32_t GetPointerSpeed(int32_t &speed) override;
+    virtual int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle) override;
+    virtual int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle) override;
     virtual int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys) override;
     virtual int32_t GetDeviceIds(int32_t userData) override;
     virtual int32_t GetDevice(int32_t userData, int32_t deviceId) override;
@@ -69,6 +72,22 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     virtual int32_t SetAnrObserver() override;
+    virtual int32_t RegisterCooperateListener() override;
+    virtual int32_t UnregisterCooperateListener() override;
+    virtual int32_t EnableInputDeviceCooperate(int32_t userData, bool enabled) override;
+    virtual int32_t StartInputDeviceCooperate(int32_t userData, const std::string &sinkDeviceId,
+        int32_t srcInputDeviceId) override;
+    virtual int32_t StopDeviceCooperate(int32_t userData) override;
+    virtual int32_t GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId) override;
+    virtual int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) override;
+    virtual int32_t StartRemoteCooperate(const std::string& localDeviceId) override;
+    virtual int32_t StartRemoteCooperateResult(bool isSuccess, const std::string& startDhid,
+        int32_t xPercent, int32_t yPercent) override;
+    virtual int32_t StopRemoteCooperate() override;
+    virtual int32_t StopRemoteCooperateResult(bool isSuccess) override;
+    virtual int32_t StartCooperateOtherResult(const std::string& srcNetworkId) override;
+    virtual int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
+    virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
 
 #ifdef OHOS_RSS_CLIENT
     virtual void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
@@ -83,7 +102,9 @@ protected:
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t CheckPointerVisible(bool &visible);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
-    int32_t CheckEventProcessed(int32_t pid, int32_t eventId);
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ReadPointerSpeed(int32_t &speed);
+#endif // OHOS_BUILD_ENABLE_POINTER
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);
     int32_t OnGetDeviceIds(int32_t pid, int32_t userData);
@@ -101,6 +122,21 @@ protected:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t OnRegisterCooperateListener(int32_t pid);
+    int32_t OnUnregisterCooperateListener(int32_t pid);
+    int32_t OnEnableInputDeviceCooperate(int32_t pid, int32_t userData, bool enabled);
+    int32_t OnStartInputDeviceCooperate(int32_t pid, int32_t userData, const std::string &sinkDeviceId,
+        int32_t srcInputDeviceId);
+    int32_t OnStopDeviceCooperate(int32_t pid, int32_t userData);
+    int32_t OnGetInputDeviceCooperateState(int32_t pid, int32_t userData, const std::string &deviceId);
+    int32_t OnStartRemoteCooperate(const std::string& remoteDeviceId);
+    int32_t OnStartRemoteCooperateResult(bool isSuccess,
+        const std::string& startDhid, int32_t xPercent, int32_t yPercent);
+    int32_t OnStopRemoteCooperate();
+    int32_t OnStopRemoteCooperateResult(bool isSuccess);
+    int32_t OnStartCooperateOtherResult(const std::string& srcNetworkId);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     bool InitLibinputService();
     bool InitService();
     bool InitSignalHandler();
@@ -115,7 +151,7 @@ protected:
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
-    int32_t mmiFd_ = -1;
+    int32_t mmiFd_ { -1 };
     std::mutex mu_;
     std::thread t_;
 #ifdef OHOS_RSS_CLIENT

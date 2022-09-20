@@ -33,26 +33,30 @@ config("mmi_connect_manager_config") {
 
 ohos_source_set("mmi_connect_manager_service") {
   part_name = "input"
-  sources = [
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_stub.cpp",
-  ]
+  subsystem_name = "multimodalinput"
+  sources =
+      [ "${mmi_connect_manager_path}/src/multimodal_input_connect_stub.cpp" ]
+
+  if (!input_feature_input_cooperation) {
+    sources += [
+      "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
+    ]
+  }
 
   configs = [ ":mmi_connect_manager_config" ]
-
-  defines = [ "OHOS_BUILD" ]
 
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 }
 
 ohos_source_set("mmi_connect_manager_proxy") {
   part_name = "input"
+  subsystem_name = "multimodalinput"
   sources = [
     "${mmi_connect_manager_path}/src/multimodal_input_connect_death_recipient.cpp",
     "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
@@ -60,14 +64,18 @@ ohos_source_set("mmi_connect_manager_proxy") {
     "${mmi_connect_manager_path}/src/multimodal_input_connect_proxy.cpp",
   ]
 
-  configs = [ ":mmi_connect_manager_config" ]
+  if (input_feature_input_cooperation) {
+    sources += [
+      "${mmi_connect_manager_path}/src/multimodal_input_connect_remoter.cpp",
+    ]
+  }
 
-  defines = [ "OHOS_BUILD" ]
+  configs = [ ":mmi_connect_manager_config" ]
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 }

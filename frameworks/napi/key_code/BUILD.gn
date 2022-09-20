@@ -13,16 +13,17 @@
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-config("libkeyCode_config") {
+config("keyCode_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
     "//foundation/multimodalinput/input/frameworks/napi/key_code/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/util/network/include",
+    "//commonlibrary/c_utils/base/include",
   ]
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
   if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
@@ -38,13 +39,9 @@ ohos_shared_library("keycode") {
     "src/native_register_module.cpp",
   ]
 
-  configs = [ ":libkeyCode_config" ]
+  configs = [ ":keyCode_config" ]
 
-  deps = [
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
-    "//foundation/multimodalinput/input/util:libmmi-util",
-    "//third_party/libuv:uv_static",
-  ]
+  deps = [ "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client" ]
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
@@ -54,4 +51,5 @@ ohos_shared_library("keycode") {
   relative_install_dir = "module/multimodalinput"
 
   part_name = "input"
+  subsystem_name = "multimodalinput"
 }

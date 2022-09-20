@@ -40,6 +40,8 @@ protected:
     int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply);
     int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetPointerStyle(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetPointerStyle(MessageParcel& data, MessageParcel& reply);
     int32_t StubIsPointerVisible(MessageParcel& data, MessageParcel& reply);
     int32_t StubSupportKeys(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetDeviceIds(MessageParcel& data, MessageParcel& reply);
@@ -56,6 +58,22 @@ protected:
     int32_t StubUnsubscribeKeyEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubInjectPointerEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetAnrListener(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply);
+    int32_t StubRegisterCooperateMonitor(MessageParcel& data, MessageParcel& reply);
+    int32_t StubUnregisterCooperateMonitor(MessageParcel& data, MessageParcel& reply);
+    int32_t StubEnableInputDeviceCooperate(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStartInputDeviceCooperate(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStopDeviceCooperate(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetInputDeviceCooperateState(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetInputDevice(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStartRemoteCooperate(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStartRemoteCooperateRes(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStopRemoteCooperate(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStopRemoteCooperateRes(MessageParcel& data, MessageParcel& reply);
+    int32_t StubStartCooperateOtherRes(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetFunctionKeyState(MessageParcel &data, MessageParcel &reply);
+    int32_t StubSetFunctionKeyState(MessageParcel &data, MessageParcel &reply);
 };
 } // namespace MMI
 } // namespace OHOS

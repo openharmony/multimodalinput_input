@@ -25,29 +25,33 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include "event_interceptor_handler.h"
+#include "event_monitor_handler.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+#include "input_device_cooperate_sm.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_manager.h"
 #include "input_event_handler.h"
-#include "input_handler_manager_global.h"
 #include "input_windows_manager.h"
-#include "interceptor_handler_global.h"
-#include "key_event_subscriber.h"
-#include "mouse_event_handler.h"
+#include "key_subscriber_handler.h"
+#include "mouse_event_normalize.h"
 #include "securec.h"
-#include "util.h"
 #include "util_ex.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDump" };
+constexpr size_t MAX_COMMAND_COUNT { 32 };
 } // namespace
+
+EventDump::EventDump() {}
+EventDump::~EventDump() {}
 
 void ChkConfig(int32_t fd)
 {
     mprintf(fd, "ChkMMIConfig: ");
-#ifdef OHOS_BUILD
-    mprintf(fd, "OHOS_BUILD");
-#endif
 #ifdef OHOS_BUILD_LIBINPUT
     mprintf(fd, "OHOS_BUILD_LIBINPUT");
 #endif
@@ -66,6 +70,22 @@ void ChkConfig(int32_t fd)
 void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 {
     CALL_DEBUG_ENTER;
+    size_t count = 0;
+    for (const auto &str : args) {
+        if (str.find("--") == 0) {
+            ++count;
+            continue;
+        }
+        if (str.find("-") == 0) {
+            count += str.size() - 1;
+            continue;
+        }
+    }
+    if (count > MAX_COMMAND_COUNT) {
+        MMI_HILOGE("cmd param number not more than 32");
+        mprintf(fd, "cmd param number not more than 32\n");
+        return;
+    }
     int32_t optionIndex = 0;
     struct option dumpOptions[] = {
         {"help", no_argument, 0, 'h'},
@@ -77,20 +97,32 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         {"monitor", no_argument, 0, 'o'},
         {"interceptor", no_argument, 0, 'i'},
         {"mouse", no_argument, 0, 'm'},
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+        {"inputdevcoosm", no_argument, 0, 'k'},
+#endif // OHOS_BUILD_ENABLE_COOPERATE
         {NULL, 0, 0, 0}
     };
-    char **argv = new char *[args.size()];
+    char **argv = new (std::nothrow) char *[args.size()];
+    CHKPV(argv);
+    if (memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*)) != EOK) {
+        MMI_HILOGE("Call memset_s failed");
+        delete[] argv;
+        return;
+    }
     for (size_t i = 0; i < args.size(); ++i) {
-        argv[i] = new char[args[i].size() + 1];
+        argv[i] = new (std::nothrow) char[args[i].size() + 1];
+        if (argv[i] == nullptr) {
+            MMI_HILOGE("Failed to allocate memory");
+            goto RELEASE_RES;
+        }
         if (strcpy_s(argv[i], args[i].size() + 1, args[i].c_str()) != EOK) {
             MMI_HILOGE("strcpy_s error");
             goto RELEASE_RES;
-            return;
         }
     }
     optind = 1;
     int32_t c;
-    while ((c = getopt_long (args.size(), argv, "hdlwusoim", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long (args.size(), argv, "hdlwusoimc", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
@@ -112,6 +144,14 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 auto udsServer = InputHandler->GetUDSServer();
                 CHKPV(udsServer);
                 udsServer->Dump(fd, args);
+                break;
+            }
+            case 'c': {
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+                InputDevCooSM->Dump(fd, args);
+#else
+                mprintf(fd, "Input device cooperate does not support");
+#endif // OHOS_BUILD_ENABLE_COOPERATE
                 break;
             }
             case 's': {
@@ -177,12 +217,13 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -h, --help: dump help\t");
     mprintf(fd, "      -d, --device: dump the device information\t");
     mprintf(fd, "      -l, --devicelist: dump the device list information\t");
-    mprintf(fd, "      -w, --windows,: dump the windows information\t");
+    mprintf(fd, "      -w, --windows: dump the windows information\t");
     mprintf(fd, "      -u, --udsserver: dump the uds_server information\t");
     mprintf(fd, "      -o, --monitor: dump the monitor information\t");
     mprintf(fd, "      -s, --subscriber: dump the subscriber information\t");
     mprintf(fd, "      -i, --interceptor: dump the interceptor information\t");
     mprintf(fd, "      -m, --mouse: dump the mouse information\t");
+    mprintf(fd, "      -c, --dump Keyboard and mouse crossing information\t");
 }
 } // namespace MMI
 } // namespace OHOS
