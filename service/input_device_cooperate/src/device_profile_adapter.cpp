@@ -22,8 +22,6 @@
 
 #include "distributed_device_profile_client.h"
 #include "service_characteristic_profile.h"
-#include "softbus_bus_center.h"
-#include "softbus_common.h"
 #include "sync_options.h"
 
 namespace OHOS {
@@ -56,7 +54,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
 
     int32_t ret = DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
     if (ret != 0) {
-        MMI_HILOGE("Put device profile failed");
+        MMI_HILOGE("Put device profile failed, ret:%{public}d", ret);
         return ret;
     }
     SyncOptions syncOptions;

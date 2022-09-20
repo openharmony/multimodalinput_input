@@ -59,7 +59,7 @@ napi_value JsUtil::GetStateInfo(const std::unique_ptr<CallbackInfo> &cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.cooperateOpened);
+    return GetStateResult(cb->env, cb->data.cooperateOpened);
 }
 
 napi_value JsUtil::GetResult(napi_env env, bool result)
@@ -74,6 +74,17 @@ napi_value JsUtil::GetResult(napi_env env, bool result)
         CHKRP(env, napi_create_object(env, &object), CREATE_OBJECT);
         CHKRP(env, napi_set_named_property(env, object, "code", resultNapi), SET_NAMED_PROPERTY);
     }
+    return object;
+}
+
+napi_value JsUtil::GetStateResult(napi_env env, bool result)
+{
+    CHKPP(env);
+    napi_value object = nullptr;
+    napi_value state = nullptr;
+    CHKRP(env, napi_get_boolean(env, result, &state), GET_BOOLEAN);
+    CHKRP(env, napi_create_object(env, &object), CREATE_OBJECT);
+    CHKRP(env, napi_set_named_property(env,  object, "state", state), SET_NAMED_PROPERTY);
     return object;
 }
 

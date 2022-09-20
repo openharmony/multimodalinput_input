@@ -22,6 +22,7 @@
 #include "event_log_helper.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
+#include "input_device_cooperate_util.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_manager.h"
 #include "input_event_handler.h"
@@ -262,7 +263,7 @@ bool EventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> key
         }
     } else if (state == CooperateState::STATE_OUT) {
         std::string networkId;
-        InputDevMgr->GetLocalDeviceId(networkId);
+        GetLocalDeviceId(networkId);
         if (!IsNeedFilterOut(networkId, keyEvent)) {
             if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
                 KeyRepeat->SelectAutoRepeat(keyEvent);
@@ -396,13 +397,6 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    if (InputDevCooSM->CheckTouchEvent(event)) {
-        MMI_HILOGW("Touch event filter out");
-        ResetTouchUpEvent(pointerEvent, event);
-        return RET_OK;
-    }
-#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
     ResetTouchUpEvent(pointerEvent, event);

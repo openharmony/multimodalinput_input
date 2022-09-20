@@ -83,12 +83,6 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::GET_INPUT_DEVICE_COOPERATE_STATE,
             &MultimodalInputConnectStub::StubGetInputDeviceCooperateState},
         {IMultimodalInputConnect::SET_INPUT_DEVICE_TO_SCREEN, &MultimodalInputConnectStub::StubSetInputDevice},
-        {IMultimodalInputConnect::REMOTE_COOPERATE_START, &MultimodalInputConnectStub::StubStartRemoteCooperate},
-        {IMultimodalInputConnect::REMOTE_COOPERATE_START_RES, &MultimodalInputConnectStub::StubStartRemoteCooperateRes},
-        {IMultimodalInputConnect::REMOTE_COOPERATE_STOP, &MultimodalInputConnectStub::StubStopRemoteCooperate},
-        {IMultimodalInputConnect::REMOTE_COOPERATE_STOP_RES, &MultimodalInputConnectStub::StubStopRemoteCooperateRes},
-        {IMultimodalInputConnect::REMOTE_COOPERATE_STOP_OTHER_RES,
-            &MultimodalInputConnectStub::StubStartCooperateOtherRes},
         {IMultimodalInputConnect::GET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubGetFunctionKeyState},
         {IMultimodalInputConnect::SET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubSetFunctionKeyState}
     };
@@ -682,90 +676,6 @@ int32_t MultimodalInputConnectStub::StubGetInputDeviceCooperateState(MessageParc
     int32_t ret = GetInputDeviceCooperateState(userData, deviceId);
     if (ret != RET_OK) {
         MMI_HILOGE("Call RegisterCooperateEvent failed ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t MultimodalInputConnectStub::StubStartRemoteCooperate(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!IsRunning()) {
-        MMI_HILOGE("Service is not running");
-        return MMISERVICE_NOT_RUNNING;
-    }
-    std::string remoteDeviceId;
-    READSTRING(data, remoteDeviceId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = StartRemoteCooperate(remoteDeviceId);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call StartRemoteCooperate failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t MultimodalInputConnectStub::StubStartRemoteCooperateRes(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!IsRunning()) {
-        MMI_HILOGE("Service is not running");
-        return MMISERVICE_NOT_RUNNING;
-    }
-    bool isSuccess;
-    READBOOL(data, isSuccess, IPC_PROXY_DEAD_OBJECT_ERR);
-    std::string startDhid;
-    READSTRING(data, startDhid, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t xPercent;
-    READINT32(data, xPercent, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t yPercent;
-    READINT32(data, yPercent, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = StartRemoteCooperateResult(isSuccess, startDhid, xPercent, yPercent);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call StartRemoteCooperateResult failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t MultimodalInputConnectStub::StubStopRemoteCooperate(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!IsRunning()) {
-        MMI_HILOGE("Service is not running");
-        return MMISERVICE_NOT_RUNNING;
-    }
-    int32_t ret = StopRemoteCooperate();
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call StopRemoteCooperate failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t MultimodalInputConnectStub::StubStopRemoteCooperateRes(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!IsRunning()) {
-        MMI_HILOGE("Service is not running");
-        return MMISERVICE_NOT_RUNNING;
-    }
-    bool isSuccess;
-    READBOOL(data, isSuccess, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = StopRemoteCooperateResult(isSuccess);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call StopRemoteCooperateResult failed, ret:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t MultimodalInputConnectStub::StubStartCooperateOtherRes(MessageParcel& data, MessageParcel& reply)
-{
-    CALL_DEBUG_ENTER;
-    if (!IsRunning()) {
-        MMI_HILOGE("Service is not running");
-        return MMISERVICE_NOT_RUNNING;
-    }
-    std::string peerNetworkId;
-    READSTRING(data, peerNetworkId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = StartCooperateOtherResult(peerNetworkId);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Call StartCooperateOtherRes failed, ret:%{public}d", ret);
     }
     return ret;
 }

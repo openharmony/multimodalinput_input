@@ -29,10 +29,10 @@ CooperateEventManager::~CooperateEventManager() {}
 void CooperateEventManager::AddCooperationEvent(sptr<EventInfo> event)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(lock_);
     if (event->type == EventType::LISTENER) {
         remoteCooperateCallbacks_.emplace_back(event);
     } else {
-        std::lock_guard<std::mutex> guard(lock_);
         cooperateCallbacks_[event->type] = event;
     }
 }
@@ -55,6 +55,7 @@ void CooperateEventManager::RemoveCooperationEvent(sptr<EventInfo> event)
 void CooperateEventManager::OnCooperateMessage(CooperationMessage msg, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(lock_);
     if (remoteCooperateCallbacks_.empty()) {
         MMI_HILOGE("No listener, send cooperate message failed");
         return;
