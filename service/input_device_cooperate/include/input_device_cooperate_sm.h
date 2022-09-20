@@ -93,7 +93,6 @@ public:
 private:
     void Reset(bool adjustAbsolutionLocation = false);
     void CheckPointerEvent(struct libinput_event *event);
-    bool CheckTouchEvent(struct libinput_event* event);
     void OnCloseCooperation(const std::string &networkId, bool isLocal);
     void NotifyRemoteStartFail(const std::string &remoteNetworkId);
     void NotifyRemoteStartSucess(const std::string &remoteNetworkId, const std::string &startDhid);

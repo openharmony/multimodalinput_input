@@ -26,11 +26,11 @@
 #include "dfx_hisysevent.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
+#include "input_device_cooperate_util.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_windows_manager.h"
 #include "key_event_value_transformation.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-#include "softbus_bus_center.h"
 #include "util.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "util_ex.h"
@@ -45,7 +45,6 @@ constexpr int32_t SUPPORT_KEY = 1;
 const std::string UNKNOWN_SCREEN_ID = "";
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 const char *SPLIT_SYMBOL = "|";
-const std::string BUNDLE_NAME = "DBinderBus_" + std::to_string(getpid());
 const std::string DH_ID_PREFIX = "Input_";
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 
@@ -531,14 +530,14 @@ std::vector<std::string> InputDeviceManager::GetCooperateDhids(int32_t deviceId)
 
 std::vector<std::string> InputDeviceManager::GetCooperateDhids(const std::string &dhid)
 {
-    int32_t pointerId = -1;
+    int32_t inputDeviceId = INVALID_DEVICE_ID;
     for (const auto &iter : inputDevice_) {
         if (iter.second.dhid_ == dhid) {
-            pointerId = iter.first;
+            inputDeviceId = iter.first;
             break;
         }
     }
-    return GetCooperateDhids(pointerId);
+    return GetCooperateDhids(inputDeviceId);
 }
 
 std::string InputDeviceManager::GetOriginNetworkId(int32_t id)
@@ -562,28 +561,12 @@ std::string InputDeviceManager::GetOriginNetworkId(const std::string &dhid)
     }
     std::string networkId;
     for (const auto &iter : inputDevice_) {
-        if (iter.second.dhid_ == dhid) {
+        if (iter.second.isRemote_ && iter.second.dhid_ == dhid) {
             networkId = iter.second.networkIdOrigin_;
-            if (networkId.empty()) {
-                GetLocalDeviceId(networkId);
-                break;
-            }
+            break;
         }
     }
     return networkId;
-}
-
-void InputDeviceManager::GetLocalDeviceId(std::string &local)
-{
-    local = "";
-    auto localNode = std::make_unique<NodeBasicInfo>();
-    CHKPV(localNode);
-    int32_t errCode = GetLocalNodeDeviceInfo(BUNDLE_NAME.c_str(), localNode.get());
-    if (errCode != RET_OK) {
-        MMI_HILOGE("GetLocalNodeDeviceInfo errCode: %{public}d", errCode);
-        return;
-    }
-    local = localNode->networkId;
 }
 
 std::string InputDeviceManager::GetDhid(int32_t deviceId) const
@@ -695,7 +678,7 @@ std::string InputDeviceManager::GenerateDescriptor(struct libinput_device *input
         rawDescriptor += "uniqueId:" + std::string(uniqueId);
     }
     if (physicalPath != nullptr) {
-        rawDescriptor += "physicalPath:" + std::string(physicalPath);
+        rawDescriptor += "location:" + std::string(physicalPath);
     }
     if (name != nullptr && name[0] != '\0') {
         rawDescriptor += "name:" + regex_replace(name, std::regex(" "), "");

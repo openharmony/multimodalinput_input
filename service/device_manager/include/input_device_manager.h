@@ -63,7 +63,6 @@ public:
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     std::string GetOriginNetworkId(int32_t id);
     std::string GetOriginNetworkId(const std::string &dhid);
-    void GetLocalDeviceId(std::string &local);
     std::string GetDhid(int32_t deviceId) const;
     std::vector<std::string> GetCooperateDhids(int32_t deviceId);
     std::vector<std::string> GetCooperateDhids(const std::string &dhid);
