@@ -24,7 +24,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerEvent" };
-constexpr double MAX_PRESSURE = 1.0;
+constexpr double MAX_PRESSURE { 1.0 };
+constexpr size_t MAX_N_PRESSED_BUTTONS { 10 };
+constexpr size_t MAX_N_POINTER_ITEMS { 5 };
 } // namespace
 
 std::shared_ptr<PointerEvent> PointerEvent::from(std::shared_ptr<InputEvent> inputEvent)
@@ -266,6 +268,26 @@ void PointerEvent::PointerItem::SetTargetWindowId(int32_t windowId)
     targetWindowId_ = windowId;
 }
 
+int32_t PointerEvent::PointerItem::GetRawDx() const
+{
+    return rawDx_;
+}
+
+void PointerEvent::PointerItem::SetRawDx(int32_t rawDx)
+{
+    rawDx_ = rawDx;
+}
+
+int32_t PointerEvent::PointerItem::GetRawDy() const
+{
+    return rawDy_;
+}
+
+void PointerEvent::PointerItem::SetRawDy(int32_t rawDy)
+{
+    rawDy_ = rawDy;
+}
+
 bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
 {
     return (
@@ -290,7 +312,9 @@ bool PointerEvent::PointerItem::WriteToParcel(Parcel &out) const
         out.WriteInt32(longAxis_) &&
         out.WriteInt32(shortAxis_) &&
         out.WriteInt32(toolType_) &&
-        out.WriteInt32(deviceId_)
+        out.WriteInt32(deviceId_) &&
+        out.WriteInt32(rawDx_) &&
+        out.WriteInt32(rawDy_)
     );
 }
 
@@ -318,7 +342,9 @@ bool PointerEvent::PointerItem::ReadFromParcel(Parcel &in)
         in.ReadInt32(longAxis_) &&
         in.ReadInt32(shortAxis_) &&
         in.ReadInt32(toolType_) &&
-        in.ReadInt32(deviceId_)
+        in.ReadInt32(deviceId_) &&
+        in.ReadInt32(rawDx_) &&
+        in.ReadInt32(rawDy_)
     );
 }
 
@@ -326,10 +352,10 @@ PointerEvent::PointerEvent(int32_t eventType) : InputEvent(eventType) {}
 
 PointerEvent::PointerEvent(const PointerEvent& other)
     : InputEvent(other), pointerId_(other.pointerId_), pointers_(other.pointers_),
-    pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
-    pointerAction_(other.pointerAction_), buttonId_(other.buttonId_),
-    axes_(other.axes_), axisValues_(other.axisValues_),
-    pressedKeys_(other.pressedKeys_) {}
+      pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
+      pointerAction_(other.pointerAction_), buttonId_(other.buttonId_),
+      axes_(other.axes_), axisValues_(other.axisValues_),
+      pressedKeys_(other.pressedKeys_) {}
 
 PointerEvent::~PointerEvent() {}
 
@@ -440,6 +466,10 @@ void PointerEvent::RemovePointerItem(int32_t pointerId)
 
 void PointerEvent::AddPointerItem(PointerItem &pointerItem)
 {
+    if (pointers_.size() >= MAX_N_POINTER_ITEMS) {
+        MMI_HILOGE("Exceed maximum allowed number of pointer items");
+        return;
+    }
     pointers_.push_back(pointerItem);
 }
 
@@ -451,7 +481,7 @@ void PointerEvent::UpdatePointerItem(int32_t pointerId, PointerItem &pointerItem
             return;
         }
     }
-    pointers_.push_back(pointerItem);
+    AddPointerItem(pointerItem);
 }
 
 std::set<int32_t> PointerEvent::GetPressedButtons() const
@@ -466,6 +496,10 @@ bool PointerEvent::IsButtonPressed(int32_t buttonId) const
 
 void PointerEvent::SetButtonPressed(int32_t buttonId)
 {
+    if (pressedButtons_.size() >= MAX_N_PRESSED_BUTTONS) {
+        MMI_HILOGE("Exceed maximum allowed number of pressed buttons");
+        return;
+    }
     auto iter = pressedButtons_.insert(buttonId);
     if (!iter.second) {
         MMI_HILOGE("Insert value failed, button:%{public}d", buttonId);
@@ -487,7 +521,7 @@ void PointerEvent::ClearButtonPressed()
 std::vector<int32_t> PointerEvent::GetPointerIds() const
 {
     std::vector<int32_t> pointerIdList;
-    for (auto &item : pointers_) {
+    for (const auto &item : pointers_) {
         pointerIdList.push_back(item.GetPointerId());
     }
     return pointerIdList;
@@ -582,20 +616,12 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
 
     WRITEINT32(out, pointerId_);
 
-    if (pointers_.size() > INT_MAX) {
-        return false;
-    }
-
     WRITEINT32(out, static_cast<int32_t>(pointers_.size()));
 
     for (const auto &item : pointers_) {
         if (!item.WriteToParcel(out)) {
             return false;
         }
-    }
-
-    if (pressedButtons_.size() > INT_MAX) {
-        return false;
     }
 
     WRITEINT32(out, static_cast<int32_t>(pressedButtons_.size()));
@@ -610,21 +636,14 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
 
     WRITEINT32(out, buttonId_);
 
-    WRITEUINT32(out, axes_);
+    const uint32_t axes { GetAxes() };
+    WRITEUINT32(out, axes);
 
-    const size_t axisValuesSize = axisValues_.size();
-    if (axisValuesSize > INT_MAX) {
-        return false;
-    }
-
-    if (axisValuesSize > AXIS_TYPE_MAX) {
-        return false;
-    }
-
-    WRITEINT32(out, static_cast<int32_t>(axisValuesSize));
-
-    for (const auto &item : axisValues_) {
-        WRITEDOUBLE(out, item);
+    for (int32_t i = AXIS_TYPE_UNKNOWN; i < AXIS_TYPE_MAX; ++i) {
+        const AxisType axis { static_cast<AxisType>(i) };
+        if (HasAxis(axes, axis)) {
+            WRITEDOUBLE(out, GetAxisValue(axis));
+        }
     }
 
     return true;
@@ -638,31 +657,30 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
     READINT32(in, pointerId_);
 
-    const int32_t pointersSize = in.ReadInt32();
-    if (pointersSize < 0) {
+    int32_t nPointers;
+    READINT32(in, nPointers);
+    if (nPointers > static_cast<int32_t>(MAX_N_POINTER_ITEMS)) {
         return false;
     }
 
-    for (int32_t i = 0; i < pointersSize; i++) {
-        PointerItem val = {};
-        if (!val.ReadFromParcel(in)) {
+    for (int32_t i = 0; i < nPointers; ++i) {
+        PointerItem item;
+        if (!item.ReadFromParcel(in)) {
             return false;
         }
-        pointers_.push_back(val);
+        AddPointerItem(item);
     }
 
-    const int32_t pressedButtonsSize = in.ReadInt32();
-    if (pressedButtonsSize < 0) {
+    int32_t nPressedButtons;
+    READINT32(in, nPressedButtons);
+    if (nPressedButtons > static_cast<int32_t>(MAX_N_PRESSED_BUTTONS)) {
         return false;
     }
 
-    for (int32_t i = 0; i < pressedButtonsSize; i++) {
-        int32_t val = 0;
-        READINT32(in, val);
-        auto iter = pressedButtons_.insert(val);
-        if (!iter.second) {
-            MMI_HILOGE("Insert value failed, button:%{public}d", val);
-        }
+    for (int32_t i = 0; i < nPressedButtons; ++i) {
+        int32_t buttonId;
+        READINT32(in, buttonId);
+        SetButtonPressed(buttonId);
     }
 
     READINT32(in, sourceType_);
@@ -671,21 +689,16 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
     READINT32(in, buttonId_);
 
-    READUINT32(in, axes_);
+    uint32_t axes;
+    READUINT32(in, axes);
 
-    const int32_t axisValueSize = in.ReadInt32();
-    if (axisValueSize < 0) {
-        return false;
-    }
-
-    if (axisValueSize > AXIS_TYPE_MAX) {
-        return false;
-    }
-
-    for (int32_t i = 0; i < axisValueSize; i++) {
-        double val {};
-        READDOUBLE(in, val);
-        axisValues_[i] = val;
+    for (int32_t i = AXIS_TYPE_UNKNOWN; i < AXIS_TYPE_MAX; ++i) {
+        const AxisType axis { static_cast<AxisType>(i) };
+        if (HasAxis(axes, axis)) {
+            double val;
+            READDOUBLE(in, val);
+            SetAxisValue(axis, val);
+        }
     }
 
     return true;
@@ -878,58 +891,6 @@ bool PointerEvent::IsValid() const
         }
     }
     return true;
-}
-
-std::ostream& operator<<(std::ostream& ostream, PointerEvent& pointerEvent)
-{
-    const int precision = 2;
-    std::vector<int32_t> pointerIds { pointerEvent.GetPointerIds() };
-    ostream << "EventType:" << InputEvent::EventTypeToString(pointerEvent.GetEventType())
-         << ",ActionTime:" << pointerEvent.GetActionTime()
-         << ",Action:" << pointerEvent.GetAction()
-         << ",ActionStartTime:" << pointerEvent.GetActionStartTime()
-         << ",Flag:" << pointerEvent.GetFlag()
-         << ",PointerAction:" << pointerEvent.DumpPointerAction()
-         << ",SourceType:" << pointerEvent.DumpSourceType()
-         << ",ButtonId:" << pointerEvent.GetButtonId()
-         << ",VerticalAxisValue:" << std::fixed << std::setprecision(precision)
-         << pointerEvent.GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
-         << ",HorizontalAxisValue:" << std::fixed << std::setprecision(precision)
-         << pointerEvent.GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)
-         << ",PinchAxisValue:" << std::fixed << std::setprecision(precision)
-         << pointerEvent.GetAxisValue(PointerEvent::AXIS_TYPE_PINCH)
-         << ",PointerCount:" << pointerIds.size()
-         << ",EventNumber:" << pointerEvent.GetId() << std::endl;
-
-    for (const auto& pointerId : pointerIds) {
-        PointerEvent::PointerItem item;
-        if (!pointerEvent.GetPointerItem(pointerId, item)) {
-            MMI_HILOGE("Invalid pointer: %{public}d.", pointerId);
-            return ostream;
-        }
-        ostream << "DownTime:" << item.GetDownTime()
-            << ",IsPressed:" << std::boolalpha << item.IsPressed()
-            << ",DisplayX:" << item.GetDisplayX() << ",DisplayY:" << item.GetDisplayY()
-            << ",WindowX:" << item.GetWindowX() << ",WindowY:" << item.GetWindowY()
-            << ",Width:" << item.GetWidth() << ",Height:" << item.GetHeight()
-            << ",TiltX:" << item.GetTiltX() << ",TiltY:" << item.GetTiltY()
-            << ",ToolDisplayX:" << item.GetToolDisplayX() << ",ToolDisplayY:" << item.GetToolDisplayY()
-            << ",ToolWindowX:" << item.GetToolWindowX() << ",ToolWindowY:" << item.GetToolWindowY()
-            << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
-            << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
-            << ",LongAxis:" << item.GetLongAxis() << ",ShortAxis:" << item.GetShortAxis()
-            << std::endl;
-    }
-    std::vector<int32_t> pressedKeys = pointerEvent.GetPressedKeys();
-    std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
-    if (cItr != pressedKeys.cend()) {
-        ostream << "Pressed keyCode: [" << *cItr++;
-        for (; cItr != pressedKeys.cend(); ++cItr) {
-            ostream << "," << *cItr;
-        }
-        ostream << "]" << std::endl;
-    }
-    return ostream;
 }
 } // namespace MMI
 } // namespace OHOS

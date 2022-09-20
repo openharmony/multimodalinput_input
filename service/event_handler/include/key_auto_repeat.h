@@ -19,7 +19,7 @@
 #include <map>
 #include <string>
 
-#include "event_dispatch.h"
+#include "event_dispatch_handler.h"
 #include "key_map_manager.h"
 #include "key_event.h"
 #include "libinput.h"
@@ -28,10 +28,10 @@
 
 namespace OHOS {
 namespace MMI {
-class KeyAutoRepeat : public DelayedSingleton<KeyAutoRepeat> {
+class KeyAutoRepeat final {
+    DECLARE_DELAYED_SINGLETON(KeyAutoRepeat);
 public:
-    KeyAutoRepeat() = default;
-    ~KeyAutoRepeat() = default;
+    DISALLOW_COPY_AND_MOVE(KeyAutoRepeat);
     int32_t AddDeviceConfig(struct libinput_device *device);
     void SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent);
     void AddHandleTimer(int32_t timeout);
@@ -43,12 +43,12 @@ private:
     DeviceConfig GetAutoSwitch(int32_t deviceId);
 private:
     std::map<int32_t, DeviceConfig> deviceConfig_;
-    int32_t timerId_ = -1;
-    int32_t repeatKeyCode_ = -1;
-    std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
+    int32_t timerId_ { -1 };
+    int32_t repeatKeyCode_ { -1 };
+    std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
 };
 
-#define KeyRepeat KeyAutoRepeat::GetInstance()
+#define KeyRepeat ::OHOS::DelayedSingleton<KeyAutoRepeat>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // KEY_AUTO_REPEAT_H

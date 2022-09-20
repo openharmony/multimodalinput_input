@@ -20,8 +20,6 @@
 #include <map>
 #include <mutex>
 
-#include "singleton.h"
-
 #include "input_handler_type.h"
 #include "i_input_event_consumer.h"
 #include "mmi_event_handler.h"
@@ -31,7 +29,7 @@ namespace OHOS {
 namespace MMI {
 class InputHandlerManager {
 public:
-    InputHandlerManager() = default;
+    InputHandlerManager();
     virtual ~InputHandlerManager() = default;
     DISALLOW_COPY_AND_MOVE(InputHandlerManager);
 
@@ -82,11 +80,14 @@ private:
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+    void OnDispatchEventProcessed(int32_t eventId);
 
 private:
-    std::mutex mtxHandlers_;
     std::map<int32_t, Handler> inputHandlers_;
+    std::map<int32_t, int32_t> processedEvents_;
+    std::function<void(int32_t)> monitorCallback_ { nullptr };
     int32_t nextId_ { 1 };
+    std::mutex mtxHandlers_;
 };
 } // namespace MMI
 } // namespace OHOS

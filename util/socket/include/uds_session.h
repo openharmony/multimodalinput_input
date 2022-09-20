@@ -15,6 +15,7 @@
 #ifndef UDS_SESSION_H
 #define UDS_SESSION_H
 
+#include <list>
 #include <memory>
 
 #include <sys/socket.h>
@@ -31,13 +32,13 @@ class UDSSession;
 using SessionPtr = std::shared_ptr<UDSSession>;
 class UDSSession : public std::enable_shared_from_this<UDSSession> {
 public:
-    UDSSession(const std::string& programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
+    UDSSession(const std::string &programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
                const int32_t pid);
     DISALLOW_COPY_AND_MOVE(UDSSession);
     virtual ~UDSSession() = default;
 
     bool SendMsg(const char *buf, size_t size) const;
-    bool SendMsg(NetPacket& pkt) const;
+    bool SendMsg(NetPacket &pkt) const;
     void Close();
 
     int32_t GetUid() const
@@ -75,6 +76,16 @@ public:
         return programName_;
     }
 
+    void SetAnrStatus(int32_t type, bool status)
+    {
+        isAnrProcess_[type] = status;
+    }
+
+    bool CheckAnrStatus(int32_t type)
+    {
+        return isAnrProcess_[type];
+    }
+
     void SetTokenType(int32_t type)
     {
         tokenType_ = type;
@@ -86,11 +97,11 @@ public:
     }
 
     void UpdateDescript();
-    void SaveANREvent(int32_t id, int64_t time);
-    void DelEvents(int32_t id);
-    int64_t GetEarliestEventTime() const;
-    bool IsEventQueueEmpty();
-    bool isANRProcess_ {false};
+    void SaveANREvent(int32_t type, int32_t id, int64_t time, int32_t timerId);
+    std::vector<int32_t> GetTimerIds(int32_t type);
+    std::list<int32_t> DelEvents(int32_t type, int32_t id);
+    int64_t GetEarliestEventTime(int32_t type = 0) const;
+    bool IsEventQueueEmpty(int32_t type = 0);
 
 #ifdef OHOS_BUILD_MMI_DEBUG
     void SetClientFd(const int32_t clientFd)
@@ -104,8 +115,10 @@ protected:
     struct EventTime {
         int32_t id { 0 };
         int64_t eventTime { 0 };
+        int32_t timerId { -1 };
     };
-    std::vector<EventTime> events_;
+    std::map<int32_t, std::vector<EventTime>> events_;
+    std::map<int32_t, bool> isAnrProcess_;
     std::string descript_;
     const std::string programName_;
     const int32_t moduleType_ { -1 };

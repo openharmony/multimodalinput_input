@@ -28,7 +28,11 @@ static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN,
 const uint32_t DInputManager::DEFAULT_ABILITY = 0;
 const uint32_t DInputManager::MOUSE_ABILITY = 1;
 const uint32_t DInputManager::KEYBOARD_ABILITY = 2;
-const uint32_t DInputManager::FULL_ABILITY = 3;
+const uint32_t DInputManager::TOUCH_ABILITY = 4;
+const uint32_t DInputManager::FULL_ABILITY = 7;
+
+DInputManager::DInputManager() {}
+DInputManager::~DInputManager() {}
 
 void DInputManager::SetMouseLocation(const DMouseLocation& info)
 {
@@ -152,7 +156,7 @@ int32_t DInputManager::StopRemoteInput(const std::string& deviceId, uint32_t inp
 
 void DInputManager::OnStartRemoteInput(const std::string& deviceId, uint32_t inputTypes)
 {
-    MMI_HILOGI("enter: inputTypes:%{public}d", inputTypes);
+    MMI_HILOGI("Enter: inputTypes:%{public}d", inputTypes);
     int32_t diffBit = (inputTypes_ & DInputManager::FULL_ABILITY) ^ (inputTypes & DInputManager::FULL_ABILITY);
     MMI_HILOGI("diffBit:%{public}d", diffBit);
     if (diffBit == 0) {
@@ -169,7 +173,7 @@ void DInputManager::OnStartRemoteInput(const std::string& deviceId, uint32_t inp
 
 void DInputManager::OnStopRemoteInput(const std::string& deviceId, uint32_t inputTypes)
 {
-    MMI_HILOGI("enter: inputTypes:%{public}d", inputTypes);
+    MMI_HILOGI("Enter: inputTypes:%{public}d", inputTypes);
     int32_t removeTypes = (inputTypes_ & DInputManager::FULL_ABILITY) & (inputTypes & DInputManager::FULL_ABILITY);
     MMI_HILOGI("removeTypes:%{public}d", removeTypes);
     if (removeTypes == 0) {

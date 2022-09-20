@@ -14,23 +14,29 @@
  */
 
 #include "input_handler_manager.h"
-#include <cinttypes>
 
-#include "mmi_log.h"
-#include "net_packet.h"
-#include "proto.h"
+#include <cinttypes>
 
 #include "bytrace_adapter.h"
 #include "input_handler_type.h"
 #include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "mmi_log.h"
+#include "napi_constants.h"
+#include "net_packet.h"
+#include "proto.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputHandlerManager" };
 } // namespace
+
+InputHandlerManager::InputHandlerManager()
+{
+    monitorCallback_ = std::bind(&InputHandlerManager::OnDispatchEventProcessed, this, std::placeholders::_1);
+}
 
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
     std::shared_ptr<IInputEventConsumer> consumer, HandleEventType eventType)
@@ -84,7 +90,7 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType,
     HandleEventType eventType, std::shared_ptr<IInputEventConsumer> monitor)
 {
-    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
+    auto eventHandler = InputMgrImpl.GetCurrentEventHandler();
     CHKPR(eventHandler, RET_ERR);
     InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
@@ -217,6 +223,7 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
     CHKPV(pointerEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
+    int32_t consumerCount = 0;
     for (const auto &iter : inputHandlers_) {
         if ((iter.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
             continue;
@@ -224,11 +231,25 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
         int32_t handlerId = iter.first;
         auto consumer = iter.second.consumer_;
         CHKPV(consumer);
+        auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
+        CHKPV(tempEvent);
+        tempEvent->SetProcessedCallback(monitorCallback_);
         if (!PostTask(handlerId,
-            std::bind(&InputHandlerManager::OnPointerEventTask, this, consumer, handlerId, pointerEvent))) {
+            std::bind(&InputHandlerManager::OnPointerEventTask, this, consumer, handlerId, tempEvent))) {
             MMI_HILOGE("Post task failed");
+        } else {
+            consumerCount++;
         }
         MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
+    }
+    if (consumerCount == 0) {
+        MMI_HILOGE("All task post failed");
+        return;
+    }
+    int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
+    if (tokenType == TokenType::TOKEN_HAP &&
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        processedEvents_.emplace(pointerEvent->GetId(), consumerCount);
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -262,6 +283,36 @@ HandleEventType InputHandlerManager::GetEventType() const
         eventType |= inputHandler.second.eventType_;
     }
     return eventType;
+}
+
+void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtxHandlers_);
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
+    CHKPV(client);
+    auto iter = processedEvents_.find(eventId);
+    if (iter == processedEvents_.end()) {
+        MMI_HILOGE("EventId not in processedEvents_");
+        return;
+    }
+    int32_t count = iter->second;
+    processedEvents_.erase(iter);
+    count--;
+    if (count > 0) {
+        processedEvents_.emplace(eventId, count);
+        return;
+    }
+    NetPacket pkt(MmiMessageId::MARK_PROCESS);
+    pkt << eventId << ANR_MONITOR;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write event failed");
+        return;
+    }
+    if (!client->SendMessage(pkt)) {
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return;
+    }
 }
 } // namespace MMI
 } // namespace OHOS

@@ -34,11 +34,10 @@ InputEvent::InputEvent(int32_t eventType) : eventType_(eventType)
 
 InputEvent::InputEvent(const InputEvent& other)
     : eventType_(other.eventType_), id_(other.id_), actionTime_(other.actionTime_),
-    action_(other.action_), actionStartTime_(other.actionStartTime_),
-    deviceId_(other.deviceId_), targetDisplayId_(other.targetDisplayId_),
-    targetWindowId_(other.targetWindowId_), agentWindowId_(other.agentWindowId_),
-    bitwise_(other.bitwise_), processedCallback_(other.processedCallback_)
-{}
+      action_(other.action_), actionStartTime_(other.actionStartTime_),
+      deviceId_(other.deviceId_), targetDisplayId_(other.targetDisplayId_),
+      targetWindowId_(other.targetWindowId_), agentWindowId_(other.agentWindowId_),
+      bitwise_(other.bitwise_), processedCallback_(other.processedCallback_) {}
 
 InputEvent::~InputEvent() {}
 
@@ -264,21 +263,6 @@ bool InputEvent::ReadFromParcel(Parcel &in)
     READUINT32(in, bitwise_);
 
     return true;
-}
-
-std::ostream& operator<<(std::ostream& ostream, InputEvent& inputEvent)
-{
-    ostream << "DeviceNumber:" << inputEvent.GetDeviceId()
-        << ",EventNumber:" << inputEvent.GetId()
-        << ",EventType:" << InputEvent::EventTypeToString(inputEvent.GetEventType())
-        << ",ActionTime:" << inputEvent.GetActionTime()
-        << ",Action:" << inputEvent.GetAction()
-        << ",ActionStartTime:" << inputEvent.GetActionStartTime()
-        << ",TargetDisplayNumber:" << inputEvent.GetTargetDisplayId()
-        << ",AgentWindowNumber:" << inputEvent.GetAgentWindowId()
-        << ",TargetWindowNumber:" << inputEvent.GetTargetWindowId()
-        << ",Flag:" << inputEvent.GetFlag() << std::endl;
-    return ostream;
 }
 } // namespace MMI
 } // namespace OHOS

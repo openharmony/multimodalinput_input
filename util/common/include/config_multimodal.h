@@ -20,27 +20,17 @@ namespace OHOS {
 namespace MMI {
 #define DEF_SEAT_ID "seat0"         // Default libinput seat
 
-#ifndef OHOS_BUILD
-    #define DEF_MMI_EVENT_INJECTION "/root/projects/build/bin/mmi-event-injection"
-    #define DEF_MMI_VIRTUAL_DEVICE_MANAGER "/root/projects/build/bin/mmi-virtual-device-manager"
-    #define DEF_MMI_DATA_ROOT       "/root/projects/run_root/"
-    #define DEF_EXP_CONFIG          "/root/projects/run_root/etc/mmi_device_config.ini" // Default device config file
-    #define DEF_EXP_SOPATH          "/root/projects/run_root/lib"                 // Default device so path
-    #define DEF_SCREEN_MAX_WIDTH    65535          // Default screen max width
-    #define DEF_SCREEN_MAX_HEIGHT   65535          // Default screen max height
-#else
-    #define DEF_MMI_EVENT_INJECTION "/system/bin/mmi-event-injection"
-    #define DEF_MMI_VIRTUAL_DEVICE_MANAGER "/system/bin/mmi-virtual-device-manager"
-    #define DEF_MMI_DATA_ROOT "/data/mmi/"
-    #define DEF_EXP_CONFIG "/system/etc/mmi_device_config.ini"
+#define DEF_MMI_EVENT_INJECTION "/system/bin/mmi-event-injection"
+#define DEF_MMI_VIRTUAL_DEVICE_MANAGER "/system/bin/mmi-virtual-device-manager"
+#define DEF_MMI_DATA_ROOT "/data/mmi/"
+#define DEF_EXP_CONFIG "/system/etc/mmi_device_config.ini"
 #ifdef __aarch64__
     #define DEF_EXP_SOPATH "/system/lib64/"
 #else
     #define DEF_EXP_SOPATH "/system/lib/"
 #endif
-    #define DEF_SCREEN_MAX_WIDTH 480
-    #define DEF_SCREEN_MAX_HEIGHT 960
-#endif
+#define DEF_SCREEN_MAX_WIDTH 480
+#define DEF_SCREEN_MAX_HEIGHT 960
 
 #define MAX_PACKET_BUF_SIZE (1024*8)                // Maximum buffer size of network packets
 #define MAX_STREAM_BUF_SIZE (MAX_PACKET_BUF_SIZE*2) // Maximum buffer size of socket stream
@@ -58,7 +48,11 @@ namespace MMI {
 #define MAX_THREAD_DEATH_TIME (6*1000)      // Thread death threshold time
 #define MMISEVER_WMS_DEVICE_ADDED 1         // notifyDeviceChange@Device added
 #define MMISEVER_WMS_DEVICE_REMOVE 2        // notifyDeviceChange@Device removed
-#define SEND_RETRY_LIMIT 32
+#ifndef OHOS_BUILD_ENABLE_COOPERATE
+    #define SEND_RETRY_LIMIT 32
+#else
+    #define SEND_RETRY_LIMIT 2
+#endif
 #define SEND_RETRY_SLEEP_TIME 10000
 #define ONCE_PROCESS_NETPACKET_LIMIT 100
 #define MAX_RECV_LIMIT 32

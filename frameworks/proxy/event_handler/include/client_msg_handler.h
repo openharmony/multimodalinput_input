@@ -25,11 +25,12 @@ namespace MMI {
 typedef std::function<int32_t(const UDSClient&, NetPacket&)> ClientMsgFun;
 class ClientMsgHandler : public MsgHandler<MmiMessageId, ClientMsgFun> {
 public:
-    ClientMsgHandler();
-    virtual ~ClientMsgHandler();
+    ClientMsgHandler() = default;
     DISALLOW_COPY_AND_MOVE(ClientMsgHandler);
+    virtual ~ClientMsgHandler();
 
     void Init();
+    void InitProcessedCallback();
     void OnMsgHandler(const UDSClient& client, NetPacket& pkt);
 
 protected:
@@ -43,10 +44,12 @@ protected:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnSubscribeKeyEventCallback(const UDSClient& client, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || \
+    defined(OHOS_BUILD_ENABLE_MONITOR))
     int32_t ReportKeyEvent(const UDSClient& client, NetPacket& pkt);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
+    (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR))
     int32_t ReportPointerEvent(const UDSClient& client, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     int32_t OnInputDevice(const UDSClient& client, NetPacket& pkt);
@@ -55,12 +58,17 @@ protected:
     int32_t OnInputKeyboardType(const UDSClient& client, NetPacket& pkt);
     int32_t OnDevListener(const UDSClient& client, NetPacket& pkt);
     int32_t OnAnr(const UDSClient& client, NetPacket& pkt);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t OnCooperationListiner(const UDSClient& client, NetPacket& pkt);
+    int32_t OnCooperationMessage(const UDSClient& client, NetPacket& pkt);
+    int32_t OnCooperationState(const UDSClient& client, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
-    static void OnEventProcessed(int32_t eventId);
+    static void OnDispatchEventProcessed(int32_t eventId);
 
 private:
-    std::function<void(int32_t)> eventProcessedCallback_;
+    std::function<void(int32_t)> dispatchCallback_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

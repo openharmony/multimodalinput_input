@@ -29,10 +29,11 @@ namespace MMI {
 typedef std::function<void(void *event)> FunInputEvent;
 class LibinputAdapter {
 public:
+    static void LoginfoPackagingTool(struct libinput_event *event);
+    static int32_t DeviceLedUpdate(struct libinput_device *device, int32_t funcKey, bool isEnable);
     LibinputAdapter();
     DISALLOW_COPY_AND_MOVE(LibinputAdapter);
     virtual ~LibinputAdapter();
-    static void LoginfoPackagingTool(struct libinput_event *event);
     bool Init(FunInputEvent funInputEvent, const std::string& seat_id = "seat0");
     void EventDispatch(struct epoll_event& ev);
     void Stop();
@@ -49,9 +50,9 @@ protected:
     void OnEventHandler();
 
 protected:
-    int32_t fd_ = -1;
-    udev *udev_ = nullptr;
-    libinput *input_ = nullptr;
+    int32_t fd_ { -1 };
+    udev *udev_ { nullptr };
+    libinput *input_ { nullptr };
 
     FunInputEvent funInputEvent_;
     std::string seat_id_;

@@ -39,7 +39,7 @@ static void HiLogFunc(struct libinput* input, libinput_log_priority priority, co
     CHKPV(input);
     char buffer[256];
     if (vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args) == -1) {
-        MMI_HILOGE("Call vsnprintf_s fail");
+        MMI_HILOGE("Call vsnprintf_s failed");
         va_end(args);
         return;
     }
@@ -66,6 +66,12 @@ void LibinputAdapter::LoginfoPackagingTool(struct libinput_event *event)
     InitHiLogFunc(context);
 }
 
+int32_t LibinputAdapter::DeviceLedUpdate(struct libinput_device *device, int32_t funcKey, bool enable)
+{
+    CHKPR(device, RET_ERR);
+    return libinput_set_led_state(device, funcKey, enable);
+}
+
 constexpr static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
         if (path == nullptr) {
@@ -75,7 +81,7 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
         char realPath[PATH_MAX] = {};
         int32_t count = 0;
         while ((realpath(path, realPath) == nullptr) && (count < MAX_RETRY_COUNT)) {
-            MMI_HILOGWK("Path is error, count: %{public}d, path:%{public}s", count, path);
+            MMI_HILOGWK("Path is error, count:%{public}d, path:%{public}s", count, path);
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
             ++count;
         }
@@ -203,14 +209,14 @@ void LibinputAdapter::RetriggerHotplugEvents()
             continue;
         }
         if (fputs("add", fs) < 0) {
-            MMI_HILOGW("fputs error: %{public}s", strerror(errno));
+            MMI_HILOGW("fputs error:%{public}s", strerror(errno));
         }
         if (fclose(fs) != 0) {
-            MMI_HILOGW("fclose error: %{public}s", strerror(errno));
+            MMI_HILOGW("fclose error:%{public}s", strerror(errno));
         }
     }
     if (closedir(pdir) != 0) {
-        MMI_HILOGW("closedir error: %{public}s", strerror(errno));
+        MMI_HILOGW("closedir error:%{public}s", strerror(errno));
     }
 }
 } // namespace MMI

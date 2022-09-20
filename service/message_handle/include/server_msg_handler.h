@@ -18,7 +18,8 @@
 
 #include "nocopyable.h"
 
-#include "event_dispatch.h"
+#include "event_dispatch_handler.h"
+#include "i_event_filter.h"
 #include "input_handler_type.h"
 #include "key_option.h"
 #include "msg_handler.h"
@@ -51,9 +52,14 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t OnGetFunctionKeyState(int32_t funcKey, bool &state);
+    int32_t OnSetFunctionKeyState(int32_t funcKey, bool enable);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 protected:
     int32_t MarkProcessed(SessionPtr sess, NetPacket& pkt);
@@ -66,8 +72,8 @@ protected:
     int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_MMI_DEBUG
 private:
-    UDSServer *udsServer_ = nullptr;
-    int32_t targetWindowId_ = -1;
+    UDSServer *udsServer_ { nullptr };
+    int32_t targetWindowId_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS

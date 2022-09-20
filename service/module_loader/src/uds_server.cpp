@@ -56,7 +56,7 @@ int32_t UDSServer::GetClientFd(int32_t pid) const
 {
     auto it = idxPidMap_.find(pid);
     if (it == idxPidMap_.end()) {
-        return RET_ERR;
+        return INVALID_FD;
     }
     return it->second;
 }
@@ -65,7 +65,7 @@ int32_t UDSServer::GetClientPid(int32_t fd) const
 {
     auto it = sessionsMap_.find(fd);
     if (it == sessionsMap_.end()) {
-        return RET_ERR;
+        return INVALID_PID;
     }
     return it->second->GetPid();
 }
@@ -116,7 +116,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
-    MMI_HILOGD("alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
+    MMI_HILOGD("Alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
                serverFd, toReturnClientFd, sockFds[1]);
     auto closeSocketFdWhenError = [&serverFd, &toReturnClientFd] {
         close(serverFd);
@@ -172,9 +172,9 @@ void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
         std::shared_ptr<UDSSession> udsSession = item.second;
         CHKPV(udsSession);
         mprintf(fd,
-                "Uid:%d | Pid:%d | Fd:%d | Descript:%s\t",
+                "Uid:%d | Pid:%d | Fd:%d | TokenType:%d | Descript:%s\t",
                 udsSession->GetUid(), udsSession->GetPid(), udsSession->GetFd(),
-                udsSession->GetDescript().c_str());
+                udsSession->GetTokenType(), udsSession->GetDescript().c_str());
     }
 }
 
@@ -286,7 +286,7 @@ void UDSServer::DumpSession(const std::string &title)
 {
     MMI_HILOGD("in %s: %s", __func__, title.c_str());
     int32_t i = 0;
-    for (auto& [key, value] : sessionsMap_) {
+    for (auto &[key, value] : sessionsMap_) {
         CHKPV(value);
         MMI_HILOGD("%d, %s", i, value->GetDescript().c_str());
         i++;
@@ -368,7 +368,7 @@ void UDSServer::AddSessionDeletedCallback(std::function<void(SessionPtr)> callba
 void UDSServer::NotifySessionDeleted(SessionPtr ses)
 {
     CALL_DEBUG_ENTER;
-    for (const auto& callback : callbacks_) {
+    for (const auto &callback : callbacks_) {
         callback(ses);
     }
 }

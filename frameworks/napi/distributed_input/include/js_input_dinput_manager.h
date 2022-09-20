@@ -31,6 +31,11 @@
 #define PARAMERTER_NUM 1
 namespace OHOS {
 namespace MMI {
+enum InputAbilityType {
+    MOUSE = 1,
+    KEYBOARD = 2,
+    TOUCHPAD = 4,
+};
 template <class T>
 class CallbackInfo {
 public:
@@ -39,14 +44,9 @@ public:
     napi_async_work asyncWork { nullptr };
     napi_deferred deferred { nullptr };
     napi_value promise { nullptr };
-    int32_t mouseX = 0;
-    int32_t mouseY = 0;
+    int32_t mouseX { 0 };
+    int32_t mouseY { 0 };
     T returnResult;
-};
-enum InputAbilityType {
-    MOUSE = 1,
-    KEYBOARD = 2,
-    TOUCHPAD = 4,
 };
 
 class JsInputDinputManager {
@@ -71,7 +71,7 @@ public:
             if (napi_create_promise(env, &cb->deferred, &cb->promise) != napi_ok) {
                 delete cb;
                 cb = nullptr;
-                napi_throw_error(env, nullptr, "failed to create promise");
+                napi_throw_error(env, nullptr, "Failed to create promise");
             }
         } else {
             cb->ref = handle;

@@ -21,10 +21,13 @@ namespace {
 constexpr int32_t MIN_DELAY = -1;
 constexpr int32_t MIN_INTERVAL = 50;
 constexpr int32_t MAX_INTERVAL = 4096;
-constexpr int32_t MAX_TIMER_COUNT = 32;
+constexpr int32_t MAX_TIMER_COUNT = 64;
 constexpr int32_t NONEXISTENT_ID = -1;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TimerManager" };
 } // namespace
+
+TimerManager::TimerManager() {}
+TimerManager::~TimerManager() {}
 
 int32_t TimerManager::AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback)
 {
@@ -60,11 +63,11 @@ int32_t TimerManager::TakeNextTimerId()
 {
     uint64_t timerSlot = 0;
     uint64_t one = 1;
-    
+
     for (const auto &timer : timers_) {
         timerSlot |= (one << timer->id);
     }
-    
+
     for (int32_t i = 0; i < MAX_TIMER_COUNT; i++) {
         if ((timerSlot & (one << i)) == 0) {
             return i;
@@ -142,15 +145,15 @@ bool TimerManager::IsExistInternal(int32_t timerId)
     return false;
 }
 
-std::unique_ptr<TimerManager::TimerItem>& TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem>& timer)
+void TimerManager::InsertTimerInternal(std::unique_ptr<TimerItem>& timer)
 {
     for (auto it = timers_.begin(); it != timers_.end(); ++it) {
         if ((*it)->nextCallTime > timer->nextCallTime) {
-            return *(timers_.insert(it, std::move(timer)));
+            timers_.insert(it, std::move(timer));
+            return;
         }
     }
     timers_.push_back(std::move(timer));
-    return *timers_.rbegin();
 }
 
 int32_t TimerManager::CalcNextDelayInternal()
@@ -193,8 +196,9 @@ void TimerManager::ProcessTimersInternal()
             MMI_HILOGE("The addition of nextCallTime in TimerItem overflows");
             return;
         }
-        const auto& timer = InsertTimerInternal(curTimer);
-        timer->callback();
+        auto callback = curTimer->callback;
+        InsertTimerInternal(curTimer);
+        callback();
     }
 }
 } // namespace MMI

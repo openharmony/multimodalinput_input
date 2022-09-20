@@ -26,7 +26,9 @@
 
 namespace OHOS {
 namespace MMI {
-class HdiInject {
+class HdiInject final {
+    DECLARE_DELAYED_SINGLETON(HdiInject);
+
 enum HdiInfoType {
     GET_STATUS_INFO = 1001,
     SET_HOT_PLUGS = 1002,
@@ -42,13 +44,14 @@ enum HdiDeviceStatus {
 };
 
 struct DeviceInformation {
-    bool status = false;
-    int32_t devIndex = 0;
-    int32_t devType = 0;
-    int16_t fd = 0;
+    bool status { false };
+    int32_t devIndex { 0 };
+    int32_t devType { 0 };
+    int16_t fd { 0 };
     char chipName[32];
 };
 public:
+    DISALLOW_COPY_AND_MOVE(HdiInject);
     bool Init(UDSServer &sess);
     void StartHdiserver();
     void ShowAllDeviceInfo();
@@ -69,13 +72,13 @@ public:
     InputHostCb hotPlugcallback_;
     InputEventCb eventcallback_;
 private:
-    bool initStatus_ = false;
-    HotPlugEvent** event_ = nullptr;
-    MMI::UDSServer* udsServerPtr_ = nullptr;
+    bool initStatus_ { false };
+    HotPlugEvent** event_ { nullptr };
+    MMI::UDSServer* udsServerPtr_ { nullptr };
     std::vector<DeviceInformation> deviceArray_ = {};
 };
 
-#define MMIHdiInject DelayedSingleton<HdiInject>::GetInstance()
+#define MMIHdiInject ::OHOS::DelayedSingleton<HdiInject>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // OHOS_BUILD_HDF

@@ -32,6 +32,9 @@ constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t OPEN_AUTO_REPEAT = 1;
 } // namespace
 
+KeyAutoRepeat::KeyAutoRepeat() {}
+KeyAutoRepeat::~KeyAutoRepeat() {}
+
 std::map<int32_t, DeviceConfig> KeyAutoRepeat::GetDeviceConfig() const
 {
     return deviceConfig_;
@@ -101,9 +104,9 @@ void KeyAutoRepeat::AddHandleTimer(int32_t timeout)
 {
     CALL_DEBUG_ENTER;
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
-        auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+        auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPV(inputEventNormalizeHandler);
-        inputEventNormalizeHandler->HandleKeyEvent(this->keyEvent_);   
+        inputEventNormalizeHandler->HandleKeyEvent(this->keyEvent_);
         int32_t triggertime = KeyRepeat->GetIntervalTime(keyEvent_->GetDeviceId());
         this->AddHandleTimer(triggertime);
     });

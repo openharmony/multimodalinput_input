@@ -22,8 +22,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Proce
 constexpr int64_t FINGER_BLOCK_TIME = 6;
 } // namespace
 
-int32_t ProcessingFingerDevice::TransformJsonDataToInputData(const DeviceItem& fingerEventArrays,
-    InputEventArray& inputEventArray)
+int32_t ProcessingFingerDevice::TransformJsonDataToInputData(const DeviceItem &fingerEventArrays,
+    InputEventArray &inputEventArray)
 {
     CALL_DEBUG_ENTER;
     std::vector<DeviceEvent> inputData = fingerEventArrays.events;
@@ -44,14 +44,14 @@ int32_t ProcessingFingerDevice::TransformJsonDataToInputData(const DeviceItem& f
     return RET_OK;
 }
 
-void ProcessingFingerDevice::AnalysisTouchPadFingerDate(const std::vector<DeviceEvent>& inputData,
-    TouchPadInputEvents& touchPadInputEvents)
+void ProcessingFingerDevice::AnalysisTouchPadFingerDate(const std::vector<DeviceEvent> &inputData,
+    TouchPadInputEvents &touchPadInputEvents)
 {
     TouchPadCoordinates touchPadCoordinates = {};
     TouchPadInputEvent touchPadInputEvent = {};
     for (const auto &item : inputData) {
         touchPadInputEvent.groupNumber = 0;
-        for (auto &posXYItem : item.posXY) {
+        for (const auto &posXYItem : item.posXY) {
             touchPadCoordinates.xPos = posXYItem.xPos;
             touchPadCoordinates.yPos = posXYItem.yPos;
             touchPadInputEvent.events.push_back(touchPadCoordinates);
@@ -63,8 +63,8 @@ void ProcessingFingerDevice::AnalysisTouchPadFingerDate(const std::vector<Device
     }
 }
 
-void ProcessingFingerDevice::AnalysisTouchPadFingerPressData(InputEventArray& inputEventArray,
-                                                             const TouchPadInputEvent& touchPadInputEvent)
+void ProcessingFingerDevice::AnalysisTouchPadFingerPressData(InputEventArray &inputEventArray,
+                                                             const TouchPadInputEvent &touchPadInputEvent)
 {
     int32_t xPos = 0;
     int32_t yPos = 0;
@@ -88,8 +88,8 @@ void ProcessingFingerDevice::AnalysisTouchPadFingerPressData(InputEventArray& in
     SetSynReport(inputEventArray);
 }
 
-void ProcessingFingerDevice::AnalysisTouchPadFingerMoveData(InputEventArray& inputEventArray,
-                                                            const TouchPadInputEvent& touchPadInputEvent)
+void ProcessingFingerDevice::AnalysisTouchPadFingerMoveData(InputEventArray &inputEventArray,
+                                                            const TouchPadInputEvent &touchPadInputEvent)
 {
     int32_t xPos = 0;
     int32_t yPos = 0;
@@ -109,8 +109,8 @@ void ProcessingFingerDevice::AnalysisTouchPadFingerMoveData(InputEventArray& inp
     SetSynReport(inputEventArray);
 }
 
-void ProcessingFingerDevice::AnalysisTouchPadFingerReleaseData(InputEventArray& inputEventArray,
-                                                               const TouchPadInputEvent& touchPadInputEvent)
+void ProcessingFingerDevice::AnalysisTouchPadFingerReleaseData(InputEventArray &inputEventArray,
+                                                               const TouchPadInputEvent &touchPadInputEvent)
 {
     for (uint64_t i = 0; i < static_cast<uint64_t>(touchPadInputEvent.groupNumber); i++) {
         if (touchPadInputEvent.groupNumber > 1) {

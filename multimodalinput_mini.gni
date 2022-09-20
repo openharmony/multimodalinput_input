@@ -31,6 +31,7 @@ declare_args() {
   input_feature_mouse = true
   input_feature_touchscreen = true
   input_feature_input_device = true
+  input_feature_input_cooperation = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -50,3 +51,4 @@ print("input_feature_keyboard = ${input_feature_keyboard}")
 print("input_feature_mouse = ${input_feature_mouse}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
+print("input_feature_input_cooperation = ${input_feature_input_cooperation}")

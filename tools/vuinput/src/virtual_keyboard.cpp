@@ -17,8 +17,7 @@
 
 namespace OHOS {
 namespace MMI {
-VirtualKeyboard::VirtualKeyboard() : VirtualDevice("Virtual keyboard",
-    BUS_USB, 0x24ae, 0x4035)
+VirtualKeyboard::VirtualKeyboard() : VirtualDevice("Virtual keyboard", BUS_USB, 0x24ae, 0x4035)
 {
     eventTypes_ = { EV_KEY, EV_MSC, EV_LED, EV_REP };
     miscellaneous_ = { MSC_SCAN };

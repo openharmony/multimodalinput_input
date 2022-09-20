@@ -13,7 +13,7 @@
 
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-config("libinputeventclient_config") {
+config("inputeventclient_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
@@ -21,9 +21,10 @@ config("libinputeventclient_config") {
     "//foundation/multimodalinput/input/frameworks/napi/input_consumer/include",
     "//foundation/multimodalinput/input/tools/event_inject/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
+    "//commonlibrary/c_utils/base/include",
   ]
 
-  defines = [ "OHOS_BUILD" ]
+  defines = []
   if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
@@ -39,23 +40,17 @@ ohos_shared_library("inputeventclient") {
     "src/js_register_util.cpp",
   ]
 
-  configs = [ ":libinputeventclient_config" ]
+  configs = [ ":inputeventclient_config" ]
 
-  deps = [
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
-    "//foundation/multimodalinput/input/util:libmmi-util",
-    "//third_party/libuv:uv_static",
-  ]
+  deps = [ "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client" ]
 
   external_deps = [
-    "drivers_interface_input:hdi_input",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
     "napi:ace_napi",
-    "utils_base:utils",
   ]
 
   relative_install_dir = "module/multimodalinput"
 
   part_name = "input"
+  subsystem_name = "multimodalinput"
 }

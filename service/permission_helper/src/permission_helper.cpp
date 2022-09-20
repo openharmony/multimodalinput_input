@@ -24,6 +24,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "PermissionHelper"};
 } // namespace
 
+PermissionHelper::PermissionHelper() {}
+PermissionHelper::~PermissionHelper() {}
+
 bool PermissionHelper::CheckPermission(uint32_t required)
 {
     CALL_DEBUG_ENTER;
@@ -34,7 +37,7 @@ bool PermissionHelper::CheckPermission(uint32_t required)
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
         return CheckNativePermission(tokenId, required);
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
-        MMI_HILOGI("token type is shell");
+        MMI_HILOGI("Token type is shell");
         return true;
     } else {
         MMI_HILOGE("Unsupported token type:%{public}d", tokenType);
@@ -51,7 +54,7 @@ bool PermissionHelper::CheckMonitor()
         (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE)) {
         return CheckMonitorPermission(tokenId);
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
-        MMI_HILOGI("token type is shell");
+        MMI_HILOGI("Token type is shell");
         return true;
     } else {
         MMI_HILOGE("Unsupported token type:%{public}d", tokenType);
@@ -67,7 +70,8 @@ bool PermissionHelper::CheckHapPermission(uint32_t tokenId, uint32_t required)
         return false;
     }
     if (!((1 << findInfo.apl) & required)) {
-        MMI_HILOGE("Check hap permission failed");
+        MMI_HILOGE("Check hap permission failed, name:%{public}s, apl:%{public}d, required:%{public}d",
+            findInfo.bundleName.c_str(), findInfo.apl, required);
         return false;
     }
     MMI_HILOGI("Check hap permission success");
@@ -78,7 +82,8 @@ bool PermissionHelper::CheckNativePermission(uint32_t tokenId, uint32_t required
 {
     OHOS::Security::AccessToken::NativeTokenInfo findInfo;
     if (OHOS::Security::AccessToken::AccessTokenKit::GetNativeTokenInfo(tokenId, findInfo) != 0) {
-        MMI_HILOGE("GetNativeTokenInfo failed");
+        MMI_HILOGE("GetNativeTokenInfo failed, name:%{public}s, apl:%{public}d, required:%{public}d",
+            findInfo.processName.c_str(), findInfo.apl, required);
         return false;
     }
     if (!((1 << findInfo.apl) & required)) {

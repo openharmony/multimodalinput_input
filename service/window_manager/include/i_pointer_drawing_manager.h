@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "display_info.h"
+#include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
@@ -28,8 +29,11 @@ public:
     virtual ~IPointerDrawingManager() = default;
 
     static std::shared_ptr<IPointerDrawingManager> GetInstance();
-    virtual void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY) {}
-    virtual void OnDisplayInfo(int32_t displayId, int32_t width, int32_t height, Direction direction) {}
+    virtual void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+        const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT) {}
+    virtual void UpdateDisplayInfo(const DisplayInfo& displayInfo) {}
+    virtual void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo) {}
+    virtual void OnWindowInfo(const WinInfo &info) {}
     virtual bool Init()
     {
         return true;
@@ -39,13 +43,22 @@ public:
     {
         return 0;
     }
+    virtual int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle)
+    {
+        return 0;
+    }
+    virtual int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle)
+    {
+        return 0;
+    }
+    virtual void DrawPointerStyle() {}
     virtual bool IsPointerVisible()
     {
         return false;
     }
-
+    virtual void SetPointerLocation(int32_t pid, int32_t x, int32_t y) {}
 public:
-    static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ = nullptr;
+    static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

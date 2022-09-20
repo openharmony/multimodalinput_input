@@ -33,9 +33,17 @@ public:
     static std::shared_ptr<MultimodalInputConnectManager> GetInstance();
     int32_t AllocSocketPair(const int32_t moduleType);
     int32_t GetClientSocketFdOfAllocedSocketPair() const;
+    int32_t GetTokenType() const
+    {
+        return tokenType_;
+    }
     int32_t AddInputEventFilter(sptr<IEventFilter> filter);
     int32_t SetPointerVisible(bool visible);
     int32_t IsPointerVisible(bool &visible);
+    int32_t SetPointerSpeed(int32_t speed);
+    int32_t GetPointerSpeed(int32_t &speed);
+    int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle);
+    int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle);
     int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys);
     int32_t GetDeviceIds(int32_t userData);
     int32_t GetDevice(int32_t userData, int32_t id);
@@ -51,6 +59,16 @@ public:
     int32_t UnsubscribeKeyEvent(int32_t subscribeId);
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
     int32_t SetAnrObserver();
+    int32_t RegisterCooperateListener();
+    int32_t UnregisterCooperateListener();
+    int32_t EnableInputDeviceCooperate(int32_t userData, bool enabled);
+    int32_t StartInputDeviceCooperate(int32_t userData, const std::string &sinkDeviceId, int32_t srcInputDeviceId);
+    int32_t StopDeviceCooperate(int32_t userData);
+    int32_t GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId);
+    int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
+    int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
+    int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
+
 private:
     MultimodalInputConnectManager() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);
@@ -59,10 +77,11 @@ private:
     void OnDeath();
     void Clean();
     void NotifyDeath();
-    sptr<IMultimodalInputConnect> multimodalInputConnectService_ = nullptr;
-    sptr<IRemoteObject::DeathRecipient> multimodalInputConnectRecipient_ = nullptr;
+    sptr<IMultimodalInputConnect> multimodalInputConnectService_ { nullptr };
+    sptr<IRemoteObject::DeathRecipient> multimodalInputConnectRecipient_ { nullptr };
+    int32_t socketFd_ { IMultimodalInputConnect::INVALID_SOCKET_FD };
+    int32_t tokenType_ { -1 };
     std::mutex lock_;
-    int32_t socketFd_ = IMultimodalInputConnect::INVALID_SOCKET_FD;
 };
 } // namespace MMI
 } // namespace OHOS

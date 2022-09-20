@@ -23,10 +23,12 @@
 #include "event_handler.h"
 #include "nocopyable.h"
 
+#include "cooperation_message.h"
 #include "i_anr_observer.h"
 #include "display_info.h"
 #include "error_multimodal.h"
 #include "i_input_device_listener.h"
+#include "i_input_device_cooperate_listener.h"
 #include "i_input_event_consumer.h"
 #include "input_device.h"
 #include "key_option.h"
@@ -205,45 +207,45 @@ public:
 
     /**
      * @brief Starts listening for an input device event.
-     * @param type Type of the input device event, which is **change**.
-     * @param listener Listener for the input device event.
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @param type Indicates the type of the input device event, which is <b>change</b>.
+     * @param listener Indicates the listener for the input device event.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener);
 
     /**
      * @brief Stops listening for an input device event.
-     * @param type Type of the input device event, which is **change**.
-     * @param listener Listener for the input device event.
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @param type Indicates the type of the input device event, which is <b>change</b>.
+     * @param listener Indicates the listener for the input device event.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t UnregisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener = nullptr);
 
     /**
-     * @brief Obtain the information about an input device.
-     * @param callback Callback function, receive reported data.
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Obtains the information about an input device.
+     * @param callback Indicates the callback used to receive the reported data.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t GetDeviceIds(std::function<void(std::vector<int32_t>&)> callback);
 
     /**
-     * @brief Obtain the information about an input device.
-     * @param deviceId ID of the input device whose information is to be obtained.
-     * @param callback Callback function, receive reported data.
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Obtains the information about an input device.
+     * @param deviceId Indicates the ID of the input device whose information is to be obtained.
+     * @param callback Indicates the callback used to receive the reported data.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t GetDevice(int32_t deviceId, std::function<void(std::shared_ptr<InputDevice>)> callback);
 
     /**
      * @brief Checks whether the specified key codes of an input device are supported.
-     * @param deviceId ID of the input device.
-     * @param keyCodes Key codes of the input device.
+     * @param deviceId Indicates the ID of the input device.
+     * @param keyCodes Indicates the key codes of the input device.
      * @param callback Callback function, receive reported data.
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes,
@@ -253,7 +255,7 @@ public:
      * @brief Sets whether the pointer icon is visible.
      * @param visible Whether the pointer icon is visible. The value <b>true</b> indicates that
      * the pointer icon is visible, and the value <b>false</b> indicates the opposite.
-     * @return void
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t SetPointerVisible(bool visible);
@@ -265,16 +267,181 @@ public:
      */
     bool IsPointerVisible();
 
+    int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle);
+    int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle);
+
+    /**
+     * @brief Sets the mouse pointer speed, which ranges from 1 to 11.
+     * @param speed Indicates the mouse pointer speed to set.
+     * @return Returns <b>RET_OK</b> if success; returns <b>RET_ERR</b> otherwise.
+     * @since 9
+     */
+    int32_t SetPointerSpeed(int32_t speed);
+
+    /**
+     * @brief Obtains the mouse pointer speed.
+     * @param speed Indicates the mouse pointer speed to get.
+     * @return Returns the mouse pointer speed if the operation is successful; returns <b>RET_ERR</b> otherwise.
+     * @since 9
+     */
+    int32_t GetPointerSpeed(int32_t &speed);
+
     /**
      * @brief Queries the keyboard type.
      * @param deviceId Indicates the keyboard device ID.
-     * @param callback 键盘类型结果的回调函数。
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @param callback Callback used to return the keyboard type.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
 
+    /**
+     * @brief Sets the observer for events indicating that the application does not respond.
+     * @param observer Indicates the observer for events indicating that the application does not respond.
+     * @return void
+     * @since 9
+     */
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
+
+    /**
+     * @brief 设置鼠标光标的位置.
+     * @param x x 坐标
+     * @param y y 坐标
+     * @return 0表示返回成功，否则表示返回失败
+     */
+    int32_t SetPointerLocation(int32_t x, int32_t y);
+
+    /**
+     * @brief 获取远端输入能力.
+     * @param deviceId 远端的deviceId
+     * @param remoteTypes 返回远端输入能力
+     * @return 0表示返回成功，否则表示返回失败
+     * @since 9
+     */
+    int32_t GetRemoteInputAbility(std::string deviceId, std::function<void(std::set<int32_t>)> remoteTypes);
+
+    /**
+     * @brief 准备分布式.
+     * @param deviceId 准备分布式的那台设备的ID
+     * @param callback 准备分布式的回调，如果准备分布式执行完了，此回调被调用
+     * 如果准备分布式成功，则返回大于或等于 <b>0</b> 的值
+     * 否则返回小于 <b>0</b> 的值.
+     * @return 0表示返回成功，否则表示返回失败
+     */
+    int32_t PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+
+    /**
+     * @brief 取消准备分布式.
+     * @param deviceId 取消准备分布式的那台设备的ID
+     * @param callback 取消准备分布式的回调，如果取消准备分布式执行完了，此回调被调用
+     * 如果取消准备分布式成功，则返回大于或等于 <b>0</b> 的值
+     * 否则返回小于 <b>0</b> 的值.
+     * @return 0表示返回成功，否则表示返回失败
+     */
+    int32_t UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
+
+    /**
+     * @brief 开始分布式.
+     * @param deviceId 开始分布式的那台设备的ID
+     * @param callback 开始分布式的回调，如果开始分布式执行完了，此回调被调用
+     * 如果开始分布式成功，则返回大于或等于 <b>0</b> 的值
+     * 否则返回小于 <b>0</b> 的值.
+     * @return 0表示返回成功，否则表示返回失败
+     */
+    int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
+
+    /**
+     * @brief 取消分布式.
+     * @param deviceId 取消分布式的那台设备的ID
+     * @param callback 取消分布式的回调，如果取消分布式执行完了，此回调被调用
+     * 如果取消分布式成功，则返回大于或等于 <b>0</b> 的值
+     * 否则返回小于 <b>0</b> 的值.
+     * @return 0表示返回成功，否则表示返回失败
+     */
+    int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
+
+    /**
+     * @brief 设置指定输入设备对应的屏幕ID
+     * @param dhid 输入设备唯一ID
+     * @param screenId 输入设备对应的屏幕ID
+     * @return 0表示返回成功，否则表示返回失败
+     */
+    int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
+
+    /**
+     * @brief 注册键鼠穿越管理事件监听。
+     * @param listener 穿越管理事件监听回调。
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener);
+
+    /**
+     * @brief 注销键鼠穿越管理事件监听。
+     * @param listener 事件监听回调.
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener = nullptr);
+
+    /**
+     * @brief 开启/关闭键鼠穿越管理接口。
+     * @param enabled 开启/关闭。
+     * @param callback 开启/关闭键鼠穿越，此回调被调用
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t EnableInputDeviceCooperate(bool enabled, std::function<void(std::string, CooperationMessage)> callback);
+
+    /**
+     * @brief 启动跨设备键鼠穿越。
+     * @param sinkDeviceId 键鼠穿越目标设备描述符（networkID）
+     * @param srcInputDeviceId 键鼠穿越待穿越输入外设标识符（设备ID句柄）
+     * @param callback 启动跨设备键鼠穿越，此回调被调用
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
+        std::function<void(std::string, CooperationMessage)> callback);
+
+    /**
+     * @brief 停止跨设备键鼠穿越。
+     * @param callback 停止跨设备键鼠穿越，此回调被调用
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback);
+
+    /**
+     * @brief 获取指定设备键鼠穿越状态。
+     * @param deviceId 指定设备描述符。
+     * @param callback 获取穿越管理设备状态，此回调被调用
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @since 9
+     */
+    int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
+
+    /**
+     * @brief 获取键盘设备指定功能按键的使能状态。
+     * @param funcKey 指定的功能按键，当前支持的功能按键有：
+     * NUM_LOCK_FUNCTION_KEY
+     * CAPS_LOCK_FUNCTION_KEY
+     * SCROLL_LOCK_FUNCTION_KEY。
+     * @return 返回功能按键的使能状态，true表示功能按键使能，
+     * false表示功能按键未使能。
+     */
+    bool GetFunctionKeyState(int32_t funcKey);
+
+    /**
+     * @brief 设置键盘设备指定功能按键的使能状态。
+     * @param funcKey 指定的功能按键，当前支持的功能按键有：
+     * NUM_LOCK_FUNCTION_KEY
+     * CAPS_LOCK_FUNCTION_KEY
+     * SCROLL_LOCK_FUNCTION_KEY。
+     * @param isEnable 待设置的使能状态。
+     * @return 0 表示设置成功，其他值表示设置失败。
+     */
+    int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
 
 private:
     InputManager() = default;

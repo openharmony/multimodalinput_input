@@ -21,8 +21,8 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingTouchScreenDevice" };
 } // namespace
 
-int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const DeviceItem& touchScreenEventArrays,
-                                                                  InputEventArray& inputEventArray)
+int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const DeviceItem &touchScreenEventArrays,
+                                                                  InputEventArray &inputEventArray)
 {
     CALL_DEBUG_ENTER;
     if (!touchScreenEventArrays.events.empty()) {
@@ -46,8 +46,8 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataToInputData(const DeviceIt
     return RET_OK;
 }
 
-int32_t ProcessingTouchScreenDevice::TransformJsonDataSingleTouchScreen(const DeviceItem& touchScreenEventArrays,
-    InputEventArray& inputEventArray)
+int32_t ProcessingTouchScreenDevice::TransformJsonDataSingleTouchScreen(const DeviceItem &touchScreenEventArrays,
+    InputEventArray &inputEventArray)
 {
     CALL_DEBUG_ENTER;
     std::vector<DeviceEvent> inputData = touchScreenEventArrays.events;
@@ -64,8 +64,8 @@ int32_t ProcessingTouchScreenDevice::TransformJsonDataSingleTouchScreen(const De
     return RET_OK;
 }
 
-void ProcessingTouchScreenDevice::AnalysisTouchScreenDate(const std::vector<DeviceEvent>& inputData,
-                                                          TouchScreenInputEvents& touchScreenInputEvents)
+void ProcessingTouchScreenDevice::AnalysisTouchScreenDate(const std::vector<DeviceEvent> &inputData,
+                                                          TouchScreenInputEvents &touchScreenInputEvents)
 {
     TouchScreenCoordinates touchScreenCoordinates = {};
     TouchScreenInputEvent touchScreenInputEvent = {};
@@ -83,11 +83,11 @@ void ProcessingTouchScreenDevice::AnalysisTouchScreenDate(const std::vector<Devi
     }
 }
 
-void ProcessingTouchScreenDevice::AnalysisSingleTouchScreenDate(const std::vector<DeviceEvent>& inputData,
-    std::vector<TouchSingleEventData>& touchSingleEventDatas)
+void ProcessingTouchScreenDevice::AnalysisSingleTouchScreenDate(const std::vector<DeviceEvent> &inputData,
+    std::vector<TouchSingleEventData> &touchSingleEventDatas)
 {
     TouchSingleEventData touchSingleEventData = {};
-    for (auto item : inputData) {
+    for (auto &item : inputData) {
         touchSingleEventData = {};
         touchSingleEventData.eventType = item.eventType;
         touchSingleEventData.trackingId = item.trackingId;
@@ -101,8 +101,8 @@ void ProcessingTouchScreenDevice::AnalysisSingleTouchScreenDate(const std::vecto
     }
 }
 
-void ProcessingTouchScreenDevice::AnalysisTouchScreenPressData(InputEventArray& inputEventArray,
-                                                               const TouchScreenInputEvent& touchScreenInputEvent)
+void ProcessingTouchScreenDevice::AnalysisTouchScreenPressData(InputEventArray &inputEventArray,
+                                                               const TouchScreenInputEvent &touchScreenInputEvent)
 {
     int32_t xPos = 0;
     int32_t yPos = 0;
@@ -118,8 +118,8 @@ void ProcessingTouchScreenDevice::AnalysisTouchScreenPressData(InputEventArray& 
     SetSynReport(inputEventArray);
 }
 
-void ProcessingTouchScreenDevice::AnalysisTouchScreenMoveData(InputEventArray& inputEventArray,
-                                                              const TouchScreenInputEvent& touchScreenInputEvent)
+void ProcessingTouchScreenDevice::AnalysisTouchScreenMoveData(InputEventArray &inputEventArray,
+                                                              const TouchScreenInputEvent &touchScreenInputEvent)
 {
     int32_t xPos = 0;
     int32_t yPos = 0;
@@ -134,8 +134,8 @@ void ProcessingTouchScreenDevice::AnalysisTouchScreenMoveData(InputEventArray& i
     SetSynReport(inputEventArray);
 }
 
-void ProcessingTouchScreenDevice::AnalysisTouchScreenReleaseData(InputEventArray& inputEventArray,
-                                                                 const TouchScreenInputEvent& touchScreenInputEvent)
+void ProcessingTouchScreenDevice::AnalysisTouchScreenReleaseData(InputEventArray &inputEventArray,
+                                                                 const TouchScreenInputEvent &touchScreenInputEvent)
 {
     for (uint32_t i = 0; i < touchScreenInputEvent.groupNumber; i++) {
         SetTrackingId(inputEventArray, 0, static_cast<int32_t>(i + 1));
@@ -147,8 +147,8 @@ void ProcessingTouchScreenDevice::AnalysisTouchScreenReleaseData(InputEventArray
     SetSynReport(inputEventArray);
 }
 
-void ProcessingTouchScreenDevice::AnalysisTouchScreenToInputData(InputEventArray& inputEventArray,
-                                                                 const TouchSingleEventData& touchSingleEventData)
+void ProcessingTouchScreenDevice::AnalysisTouchScreenToInputData(InputEventArray &inputEventArray,
+                                                                 const TouchSingleEventData &touchSingleEventData)
 {
     if (touchSingleEventData.eventType == "press") {
         AnalysisTouchScreenPressData(inputEventArray, touchSingleEventData);
@@ -159,8 +159,8 @@ void ProcessingTouchScreenDevice::AnalysisTouchScreenToInputData(InputEventArray
     }
 }
 
-void ProcessingTouchScreenDevice::AnalysisTouchScreenPressData(InputEventArray& inputEventArray,
-                                                               const TouchSingleEventData& touchSingleEventData)
+void ProcessingTouchScreenDevice::AnalysisTouchScreenPressData(InputEventArray &inputEventArray,
+                                                               const TouchSingleEventData &touchSingleEventData)
 {
     SetPositionX(inputEventArray, 0, touchSingleEventData.xPos);
     SetPositionY(inputEventArray, 0, touchSingleEventData.yPos);
@@ -174,8 +174,8 @@ void ProcessingTouchScreenDevice::AnalysisTouchScreenPressData(InputEventArray& 
     }
 }
 
-void ProcessingTouchScreenDevice::AnalysisTouchScreenMoveData(InputEventArray& inputEventArray,
-                                                              const TouchSingleEventData& touchSingleEventData)
+void ProcessingTouchScreenDevice::AnalysisTouchScreenMoveData(InputEventArray &inputEventArray,
+                                                              const TouchSingleEventData &touchSingleEventData)
 {
     SetPositionX(inputEventArray, 0, touchSingleEventData.xPos);
     SetPositionY(inputEventArray, 0, touchSingleEventData.yPos);
@@ -188,8 +188,8 @@ void ProcessingTouchScreenDevice::AnalysisTouchScreenMoveData(InputEventArray& i
     }
 }
 
-void ProcessingTouchScreenDevice::AnalysisTouchScreenReleaseData(InputEventArray& inputEventArray,
-                                                                 const TouchSingleEventData& touchSingleEventData)
+void ProcessingTouchScreenDevice::AnalysisTouchScreenReleaseData(InputEventArray &inputEventArray,
+                                                                 const TouchSingleEventData &touchSingleEventData)
 {
     SetTrackingId(inputEventArray, 0, touchSingleEventData.trackingId);
     SetBtnTouch(inputEventArray, 0, 0);

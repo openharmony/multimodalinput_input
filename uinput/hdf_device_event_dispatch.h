@@ -26,10 +26,10 @@ namespace OHOS {
 namespace MMI {
 class HdfDeviceEventDispatch {
 public:
+    static void GetEventCallbackDispatch(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex);
     HdfDeviceEventDispatch(const uint32_t maxX, const uint32_t maxY);
     DISALLOW_COPY_AND_MOVE(HdfDeviceEventDispatch);
     virtual ~HdfDeviceEventDispatch();
-    static void GetEventCallbackDispatch(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex);
 
 private:
     static InjectThread injectThread_;

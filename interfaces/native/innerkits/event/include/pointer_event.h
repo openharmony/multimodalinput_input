@@ -688,7 +688,35 @@ public:
          * @since 9
          */
         bool ReadFromParcel(Parcel &in);
-
+		
+        /**
+         * @brief 获取原始X坐标数值.
+         * @return  返回原始X坐标值.
+         * @since 9
+         */
+        int32_t GetRawDx() const;
+		
+        /**
+         * @brief 设置原始X坐标值.
+         * @param rawDx 待设置的原始X坐标值.
+         * @return void
+         * @since 9
+         */
+        void SetRawDx(int32_t rawDx);
+        /**
+         * @brief 获取原始Y坐标数值.
+         * @return  返回原始Y坐标值.
+         * @since 9
+         */
+        int32_t GetRawDy() const;
+		
+        /**
+         * @brief 设置原始Y坐标值.
+         * @param rawDy 待设置的原始Y坐标值.
+         * @return void
+         * @since 9
+         */
+        void SetRawDy(int32_t rawDy);
     private:
         int32_t pointerId_ {};
         bool pressed_ { false };
@@ -713,6 +741,8 @@ public:
         int64_t downTime_ {};
         int32_t toolType_ {};
         int32_t targetWindowId_ { -1 };
+        int32_t rawDx_ {};
+        int32_t rawDy_ {};
     };
 
 public:
@@ -1016,8 +1046,6 @@ inline uint32_t PointerEvent::GetAxes() const
 {
     return axes_;
 }
-
-std::ostream& operator<<(std::ostream&, PointerEvent&);
 } // namespace MMI
 } // namespace OHOS
 #endif // POINTER_EVENT_H

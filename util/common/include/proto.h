@@ -136,6 +136,11 @@ enum class MmiMessageId : int32_t {
     BIGPACKET_TEST = 91000,
 #endif // OHOS_BUILD_MMI_DEBUG
 
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    COOPERATION_ADD_LISTENER = 15000,
+    COOPERATION_MESSAGE,
+    COOPERATION_GET_STATE,
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     END,
 };
 
@@ -205,5 +210,10 @@ enum TokenType : int32_t {
     TOKEN_HAP = 0,
     TOKEN_NATIVE = 1,
     TOKEN_SHELL = 2
+};
+
+enum ANREventType {
+    ANR_DISPATCH = 0,
+    ANR_MONITOR = 1
 };
 #endif // PROTO_H

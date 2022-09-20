@@ -1,0 +1,48 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+
+config("inputdevicecooperate_config") {
+  visibility = [ ":inputdevicecooperate" ]
+
+  include_dirs = [ "include" ]
+}
+
+ohos_shared_library("inputdevicecooperate") {
+  sources = [
+    "src/js_event_target.cpp",
+    "src/js_input_device_cooperate_context.cpp",
+    "src/js_input_device_cooperate_manager.cpp",
+    "src/js_util.cpp",
+    "src/native_register_module.cpp",
+  ]
+
+  configs = [ ":inputdevicecooperate_config" ]
+
+  deps = [
+    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
+    "//foundation/multimodalinput/input/util:libmmi-util",
+    "//third_party/libuv:uv",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "napi:ace_napi",
+  ]
+
+  relative_install_dir = "module/multimodalinput"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+}

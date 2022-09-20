@@ -19,12 +19,10 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr int32_t MAX_DEVICENAME = 64;
-constexpr int32_t MAX_UUIDSIZE = 64;
-constexpr int32_t SYSTEMUID = 1000;
-constexpr int32_t MAX_SOLTED_COORDS_NUMS = 10;
-} // namespace
+inline constexpr int32_t MAX_DEVICENAME = 64;
+inline constexpr int32_t MAX_UUIDSIZE = 64;
+inline constexpr int32_t SYSTEMUID = 1000;
+inline constexpr int32_t MAX_SOLTED_COORDS_NUMS = 10;
 
 enum SENIOR_DEVICE_TYPE {
     INPUT_DEVICE_AISENSOR = 31,
@@ -108,6 +106,65 @@ enum TABLET_PAD_STRIP_AXIS_SOURCE {
     TABLET_PAD_STRIP_SOURCE_FINGER,
 };
 
+enum MOUSE_ICON {
+    DEFAULT = 0,
+    EAST = 1,
+    WEST = 2,
+    SOUTH = 3,
+    NORTH = 4,
+    WEST_EAST = 5,
+    NORTH_SOUTH = 6,
+    NORTH_EAST = 7,
+    NORTH_WEST = 8,
+    SOUTH_EAST = 9,
+    SOUTH_WEST = 10,
+    NORTH_EAST_SOUTH_WEST = 11,
+    NORTH_WEST_SOUTH_EAST = 12,
+    CROSS = 13,
+    CURSOR_COPY = 14,
+    CURSOR_FORBID = 15,
+    COLOR_SUCKER = 16,
+    HAND_GRABBING = 17,
+    HAND_OPEN = 18,
+    HAND_POINTING = 19,
+    HELP = 20,
+    CURSOR_MOVE = 21,
+    RESIZE_LEFT_RIGHT = 22,
+    RESIZE_UP_DOWN = 23,
+    SCREENSHOT_CHOOSE = 24,
+    SCREENSHOT_CURSOR = 25,
+    TEXT_CURSOR = 26,
+    ZOOM_IN = 27,
+    ZOOM_OUT = 28,
+    MIDDLE_BTN_EAST = 29,
+    MIDDLE_BTN_WEST = 30,
+    MIDDLE_BTN_SOUTH = 31,
+    MIDDLE_BTN_NORTH = 32,
+    MIDDLE_BTN_NORTH_SOUTH = 33,
+    MIDDLE_BTN_NORTH_EAST = 34,
+    MIDDLE_BTN_NORTH_WEST = 35,
+    MIDDLE_BTN_SOUTH_EAST = 36,
+    MIDDLE_BTN_SOUTH_WEST = 37,
+    MIDDLE_BTN_NORTH_SOUTH_WEST_EAST = 38,
+};
+
+enum ICON_TYPE {
+    ANGLE_E = 0,
+    ANGLE_S = 1,
+    ANGLE_W = 2,
+    ANGLE_N = 3,
+    ANGLE_SE = 4,
+    ANGLE_NE = 5,
+    ANGLE_SW = 6,
+    ANGLE_NW = 7,
+    ANGLE_CENTER = 8,
+};
+
+struct IconStyle {
+    int32_t alignmentWay { 0 };
+    std::string iconPath;
+};
+
 #pragma pack(1)
 struct TagPackHead {
     MmiMessageId idMsg;
@@ -186,6 +243,11 @@ struct PhysEllipsis {
 struct Threshold {
     int32_t upper {};
     int32_t lower {};
+};
+
+struct WinInfo {
+    int32_t windowPid {};
+    int32_t windowId {};
 };
 
 struct RegisteredEvent {
