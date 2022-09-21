@@ -22,6 +22,8 @@
 #include <fstream>
 #include <string>
 
+#include "securec.h"
+
 #include "error_multimodal.h"
 #include "mmi_log.h"
 
@@ -74,7 +76,9 @@ int32_t CpuInfo::GetTaskPidFile(const std::string &process_name)
         }
         while (std::getline(filePath, strLine)) {
             if ((strLine.find("Pid")) != std::string::npos) {
-                (void)::sscanf(strLine.c_str(), "%*s%d", &pid);
+                if (::sscanf_s(strLine.c_str(), "%*s%d", &pid, sizeof(pid)) != 1) {
+                    MMI_HILOGE("Failed to cut out the pid");
+                }
                 break;
             }
         }

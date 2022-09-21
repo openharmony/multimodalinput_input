@@ -450,7 +450,7 @@ void MouseEventHandler::SetDxDyForDInput(PointerEvent::PointerItem& pointerItem,
 
 void MouseEventHandler::SetAbsolutionLocation(double xPercent, double yPercent)
 {
-    MMI_HILOGI("MouseEventHandler cross screen location : xPercent:%{public}d, yPercent:%{public}d",
+    MMI_HILOGI("MouseEventNormalize cross screen location : xPercent:%{public}lf, yPercent:%{public}lf",
         xPercent, yPercent);
     auto displayGroupInfo = WinMgr->GetDisplayGroupInfo();
     if (currentDisplayId_ == -1) {
