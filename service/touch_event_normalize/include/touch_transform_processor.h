@@ -15,22 +15,17 @@
 
 #ifndef TOUCH_TRANSFORM_PROCESSOR_H
 #define TOUCH_TRANSFORM_PROCESSOR_H
-
-#include <memory>
-
 #include "nocopyable.h"
-
-#include "input_windows_manager.h"
-#include "pointer_event.h"
+#include "transform_processor.h"
 
 namespace OHOS {
 namespace MMI {
-class TouchTransformProcessor {
+class TouchTransformProcessor : public TransformProcessor {
 public:
     explicit TouchTransformProcessor(int32_t deviceId);
     DISALLOW_COPY_AND_MOVE(TouchTransformProcessor);
-    ~TouchTransformProcessor();
-    std::shared_ptr<PointerEvent> OnLibinputTouchEvent(struct libinput_event *event);
+    virtual ~TouchTransformProcessor() = default;
+    std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
 
 private:
     bool OnEventTouchDown(struct libinput_event *event);
@@ -40,7 +35,7 @@ private:
     int32_t GetTouchToolType(struct libinput_device *device);
     void InitToolTypes();
 private:
-    int32_t deviceId_ { 0 };
+    const int32_t deviceId_ { -1 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
 };

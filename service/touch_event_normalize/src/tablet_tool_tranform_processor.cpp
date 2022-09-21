@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "tablet_tool_tranform_processor.h"
 #include "input_windows_manager.h"
 #include "mmi_log.h"
@@ -19,7 +20,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TabletToolTransformProcessor" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "TabletToolTransformProcessor" };
 constexpr int32_t DEFAULT_POINTER_ID { 0 };
 } // namespace
 

@@ -14,14 +14,16 @@
  */
 
 #include "touch_event_normalize.h"
-
-#include "tablet_tool_tranform_processor.h"
+#include "gesture_transform_processor.h"
 #include "input_device_manager.h"
+#include "tablet_tool_tranform_processor.h"
+#include "touch_transform_processor.h"
+#include "touchpad_transform_processor.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TouchEventNormalize" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "TouchEventNormalize" };
 } // namespace
 
 TouchEventNormalize::TouchEventNormalize() {}
@@ -31,127 +33,55 @@ std::shared_ptr<PointerEvent> TouchEventNormalize::OnLibInput(
     struct libinput_event *event, INPUT_DEVICE_TYPE deviceType)
 {
     CHKPP(event);
-    switch (deviceType) {
-        case INPUT_DEVICE_CAP_TOUCH: {
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-            return OnLibinputTouchEvent(event);
-#endif // OHOS_BUILD_ENABLE_TOUCH
-        }
-        case INPUT_DEVICE_CAP_TABLET_TOOL: {
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-            return OnLibinputTabletToolEvent(event);
-#endif // OHOS_BUILD_ENABLE_TOUCH
-        }
-        case INPUT_DEVICE_CAP_TOUCH_PAD: {
-#ifdef OHOS_BUILD_ENABLE_POINTER
-            return OnLibinputTouchPadEvent(event);
-#endif // OHOS_BUILD_ENABLE_POINTER
-        }
-        case INPUT_DEVICE_CAP_GESTURE: {
-#ifdef OHOS_BUILD_ENABLE_POINTER
-            return OnTouchPadGestureEvent(event);
-#endif // OHOS_BUILD_ENABLE_POINTER
-        }
-        default: {
-            MMI_HILOGE("The in parameter deviceType is error, deviceType:%{public}d", deviceType);
-            break;
-        }
-    }
-    return nullptr;
-}
-
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-std::shared_ptr<PointerEvent> TouchEventNormalize::OnLibinputTouchEvent(struct libinput_event *event)
-{
-    CHKPP(event);
     auto device = libinput_event_get_device(event);
     CHKPP(device);
-    std::shared_ptr<TouchTransformProcessor> processor = nullptr;
-    auto deviceId = InputDevMgr->FindInputDeviceId(device);
-    if (auto it = touchPro_.find(deviceId); it != touchPro_.end()) {
-        processor = it->second;
-    } else {
-        processor = std::make_shared<TouchTransformProcessor>(deviceId);
-        CHKPP(processor);
-        auto iter = touchPro_.insert(
-            std::pair<int32_t, std::shared_ptr<TouchTransformProcessor>>(deviceId, processor));
-        if (!iter.second) {
-            MMI_HILOGE("Insert value failed, touch device:%{public}d", deviceId);
-        }
-    }
-    return processor->OnLibinputTouchEvent(event);
-}
-#endif // OHOS_BUILD_ENABLE_TOUCH
-
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-std::shared_ptr<PointerEvent> TouchEventNormalize::OnLibinputTabletToolEvent(struct libinput_event *event)
-{
-    CHKPP(event);
-    auto device = libinput_event_get_device(event);
-    CHKPP(device);
-    std::shared_ptr<TransformProcessor> processor = nullptr;
+    std::shared_ptr<TransformProcessor> processor { nullptr };
     auto deviceId = InputDevMgr->FindInputDeviceId(device);
 
     if (auto it = processors_.find(deviceId); it != processors_.end()) {
         processor = it->second;
     } else {
-        processor.reset(new (std::nothrow) TabletToolTransformProcessor(deviceId));
+        processor = MakeTransformProcessor(deviceId, deviceType);
         CHKPP(processor);
-        auto ret = processors_.emplace(deviceId, processor);
-        if (!ret.second) {
+        auto [tIter, isOk] = processors_.emplace(deviceId, processor);
+        if (!isOk) {
             MMI_HILOGE("Duplicate device record:%{public}d", deviceId);
         }
     }
     return processor->OnEvent(event);
 }
+
+std::shared_ptr<TransformProcessor> TouchEventNormalize::MakeTransformProcessor(
+    int32_t deviceId, INPUT_DEVICE_TYPE deviceType) const
+{
+    std::shared_ptr<TransformProcessor> processor { nullptr };
+    switch (deviceType) {
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+        case INPUT_DEVICE_CAP_TOUCH: {
+            processor = std::make_shared<TouchTransformProcessor>(deviceId);
+            break;
+        }
+        case INPUT_DEVICE_CAP_TABLET_TOOL: {
+            processor = std::make_shared<TabletToolTransformProcessor>(deviceId);
+            break;
+        }
 #endif // OHOS_BUILD_ENABLE_TOUCH
-
 #ifdef OHOS_BUILD_ENABLE_POINTER
-std::shared_ptr<PointerEvent> TouchEventNormalize::OnLibinputTouchPadEvent(struct libinput_event *event)
-{
-    CHKPP(event);
-    auto device = libinput_event_get_device(event);
-    CHKPP(device);
-    std::shared_ptr<TouchPadTransformProcessor> processor = nullptr;
-    auto deviceId = InputDevMgr->FindInputDeviceId(device);
-    auto it = touchpadPro_.find(deviceId);
-    if (it != touchpadPro_.end()) {
-        processor = it->second;
-    } else {
-        processor = std::make_shared<TouchPadTransformProcessor>(deviceId);
-        CHKPP(processor);
-        auto iter = touchpadPro_.insert(
-            std::pair<int32_t, std::shared_ptr<TouchPadTransformProcessor>>(deviceId, processor));
-        if (!iter.second) {
-            MMI_HILOGE("Insert value failed, touchpad device:%{public}d", deviceId);
+        case INPUT_DEVICE_CAP_TOUCH_PAD: {
+            processor = std::make_shared<TouchPadTransformProcessor>(deviceId);
+            break;
+        }
+        case INPUT_DEVICE_CAP_GESTURE: {
+            processor = std::make_shared<GestureTransformProcessor>(deviceId);
+            break;
+        }
+#endif // OHOS_BUILD_ENABLE_POINTER
+        default: {
+            MMI_HILOGE("Unsupported device type: %{public}d", deviceType);
+            break;
         }
     }
-    return processor->OnLibinputTouchPadEvent(event);
+    return processor;
 }
-#endif // OHOS_BUILD_ENABLE_POINTER
-
-#ifdef OHOS_BUILD_ENABLE_POINTER
-std::shared_ptr<PointerEvent> TouchEventNormalize::OnTouchPadGestureEvent(struct libinput_event *event)
-{
-    CHKPP(event);
-    auto device = libinput_event_get_device(event);
-    CHKPP(device);
-    std::shared_ptr<GestureTransformProcessor> processor = nullptr;
-    auto deviceId = InputDevMgr->FindInputDeviceId(device);
-    auto it = gesturePro_.find(deviceId);
-    if (it != gesturePro_.end()) {
-        processor = it->second;
-    } else {
-        processor = std::make_shared<GestureTransformProcessor>(deviceId);
-        CHKPP(processor);
-        auto iter = gesturePro_.insert(
-            std::pair<int32_t, std::shared_ptr<GestureTransformProcessor>>(deviceId, processor));
-        if (!iter.second) {
-            MMI_HILOGE("Insert value failed, gesture device:%{public}d", deviceId);
-        }
-    }
-    return processor->OnTouchPadGestureEvent(event);
-}
-#endif // OHOS_BUILD_ENABLE_POINTER
 } // namespace MMI
 } // namespace OHOS

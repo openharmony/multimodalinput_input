@@ -12,25 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #ifndef TOUCHPAD_TRANSFORM_PROCESSOR_H
 #define TOUCHPAD_TRANSFORM_PROCESSOR_H
-
-#include <memory>
-
 #include "nocopyable.h"
-
-#include "input_windows_manager.h"
-#include "pointer_event.h"
+#include "transform_processor.h"
 
 namespace OHOS {
 namespace MMI {
-class TouchPadTransformProcessor {
+class TouchPadTransformProcessor : public TransformProcessor {
 public:
     explicit TouchPadTransformProcessor(int32_t deviceId);
     DISALLOW_COPY_AND_MOVE(TouchPadTransformProcessor);
-    ~TouchPadTransformProcessor();
-    std::shared_ptr<PointerEvent> OnLibinputTouchPadEvent(struct libinput_event *event);
+    virtual ~TouchPadTransformProcessor() = default;
+    std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
 
 private:
     void OnEventTouchPadDown(struct libinput_event *event);
@@ -40,7 +34,7 @@ private:
     int32_t GetTouchPadToolType(struct libinput_device *device);
     void InitToolType();
 private:
-    int32_t deviceId_ { 0 };
+    const int32_t deviceId_ { -1 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
 };
