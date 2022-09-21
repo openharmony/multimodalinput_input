@@ -266,7 +266,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 item.SetDisplayY(py);
                                 pointerEvent->SetPointerId(0);
                                 pointerEvent->AddPointerItem(item);
-                                pointerEvent->SetButtonPressed(-1);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
