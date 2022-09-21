@@ -786,8 +786,8 @@ int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> 
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     return sMsgHandler_.OnInjectPointerEvent(pointerEvent);
 }
-
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
 int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_INFO_TRACE;

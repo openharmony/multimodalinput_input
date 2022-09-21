@@ -95,6 +95,9 @@ private:
     void OnSessionLost(SessionPtr session);
     void UpdatePointerStyle();
 #endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+    int32_t UpdateJoystickTarget(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH

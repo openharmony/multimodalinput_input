@@ -29,6 +29,7 @@ declare_args() {
   input_feature_monitor = true
   input_feature_keyboard = true
   input_feature_mouse = true
+  input_feature_joystick = true
   input_feature_touchscreen = true
   input_feature_input_device = true
   input_feature_input_cooperation = false
@@ -37,6 +38,10 @@ declare_args() {
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
     resource_schedule_service_enabled = true
   }
+}
+
+if (input_feature_joystick) {
+  input_feature_mouse = true
 }
 
 print("input_feature_libinput = ${input_feature_libinput}")
@@ -49,6 +54,7 @@ print("input_feature_interceptor = ${input_feature_interceptor}")
 print("input_feature_distributed = ${input_feature_distributed}")
 print("input_feature_keyboard = ${input_feature_keyboard}")
 print("input_feature_mouse = ${input_feature_mouse}")
+print("input_feature_joystick = ${input_feature_joystick}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_input_cooperation = ${input_feature_input_cooperation}")
