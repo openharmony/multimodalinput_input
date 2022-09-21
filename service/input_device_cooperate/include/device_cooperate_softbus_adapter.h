@@ -20,7 +20,6 @@
 #include <memory>
 #include <string>
 
-#include "nlohmann/json.hpp"
 #include "nocopyable.h"
 #include "session.h"
 
@@ -51,21 +50,14 @@ public:
 private:
     DeviceCooperateSoftbusAdapter() = default;
     DISALLOW_COPY_AND_MOVE(DeviceCooperateSoftbusAdapter);
-    std::string FindDeviceBySession(int32_t sessionId);
+    std::string FindDevice(int32_t sessionId);
     int32_t SendMsg(int32_t sessionId, std::string &message);
     int32_t CheckDeviceSessionState(const std::string &remoteDevId);
     void HandleSessionData(int32_t sessionId, const std::string& messageData);
-
-    void NotifyResponseStartRemoteCooperate(int32_t sessionId, const nlohmann::json &recMsg);
-    void NotifyResponseStartRemoteCooperateResult(int32_t sessionId, const nlohmann::json &recMsg);
-    void NotifyResponseStopRemoteCooperate(int32_t sessionId, const nlohmann::json &recMsg);
-    void NotifyResponseStopRemoteCooperateResult(int32_t sessionId, const nlohmann::json &recMsg);
-    void NotifyResponseStartCooperateOtherResult(int32_t sessionId, const nlohmann::json &recMsg);
-
     std::map<std::string, int32_t> sessionDevMap_;
     std::map<std::string, bool> channelStatusMap_;
     std::mutex operationMutex_;
-    std::string mySessionName_ = "";
+    std::string mySessionName_;
     std::condition_variable openSessionWaitCond_;
     ISessionListener sessListener_;
 };
