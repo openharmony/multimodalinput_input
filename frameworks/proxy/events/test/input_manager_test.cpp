@@ -53,6 +53,9 @@ public:
     std::shared_ptr<PointerEvent> SetupPointerEvent013();
     std::shared_ptr<PointerEvent> SetupPointerEvent014();
     std::shared_ptr<PointerEvent> SetupPointerEvent015();
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+    std::shared_ptr<PointerEvent> SetupPointerEvent016();
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
     std::shared_ptr<PointerEvent> SetupmouseEvent001();
     std::shared_ptr<PointerEvent> SetupmouseEvent002();
     std::shared_ptr<PointerEvent> SetupTouchScreenEvent001();
@@ -465,6 +468,16 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent015()
     pointerEvent->AddPointerItem(item);
     return pointerEvent;
 }
+
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent016()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK );
+    return pointerEvent;
+}
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
 
 std::shared_ptr<KeyEvent> InputManagerTest::SetupKeyEvent001()
 {
@@ -1177,6 +1190,22 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_013, Test
     TestSimulateInputEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
+
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+/**
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_014
+ * @tc.desc: Dispatch joystick event dispatch to focus window
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_014, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent016() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
 
 /**
  * @tc.name: InputManagerTest_MouseEventEnterAndLeave_001

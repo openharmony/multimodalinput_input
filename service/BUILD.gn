@@ -124,6 +124,10 @@ config("libmmi_server_config") {
   if (input_feature_input_cooperation) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
+
+  if (input_feature_joystick) {
+    defines += [ "OHOS_BUILD_ENABLE_JOYSTICK" ]
+  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
