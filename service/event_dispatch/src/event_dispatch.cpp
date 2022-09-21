@@ -173,8 +173,8 @@ bool EventDispatch::CheckPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         std::lock_guard<std::mutex> guard(lock_);
         if (!mouseState_.empty()) {
-            if (pointerEvent->GetSourceType() == mouseState_[0].type &&
-                pointerEvent->GetButtonId() == mouseState_[0].code &&
+            if (pointerEvent->GetSourceType() == static_cast<int32_t>(mouseState_[0].type) &&
+                pointerEvent->GetButtonId() == static_cast<int32_t>(mouseState_[0].code) &&
                 pointerEvent->GetPointerAction() == mouseState_[0].value) {
                 mouseState_.clear();
                 return true;
