@@ -27,8 +27,11 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceImpl"};
 } // namespace
 
-InputDeviceImpl::InputDeviceImpl() {}
-InputDeviceImpl::~InputDeviceImpl() {}
+InputDeviceImpl& InputDeviceImpl::GetInstance()
+{
+    static InputDeviceImpl instance;
+    return instance;
+}
 
 int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevListenerPtr listener)
 {
