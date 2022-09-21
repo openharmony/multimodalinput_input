@@ -15,22 +15,17 @@
 
 #ifndef GESTURE_TRANSFORM_PROCESSOR_H
 #define GESTURE_TRANSFORM_PROCESSOR_H
-
-#include <memory>
-
 #include "nocopyable.h"
-
-#include "input_windows_manager.h"
-#include "pointer_event.h"
+#include "transform_processor.h"
 
 namespace OHOS {
 namespace MMI {
-class GestureTransformProcessor {
+class GestureTransformProcessor : public TransformProcessor {
 public:
     explicit GestureTransformProcessor(int32_t deviceId);
     DISALLOW_COPY_AND_MOVE(GestureTransformProcessor);
-    ~GestureTransformProcessor();
-    std::shared_ptr<PointerEvent> OnTouchPadGestureEvent(struct libinput_event *event);
+    virtual ~GestureTransformProcessor() = default;
+    std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
 
 private:
     const int32_t defaultPointerId { 0 };
@@ -38,7 +33,7 @@ private:
     void OnEventTouchPadPinchUpdate(libinput_event_gesture *data);
     void OnEventTouchPadPinchEnd(libinput_event_gesture *data);
 private:
-    int32_t deviceId_ { 0 };
+    const int32_t deviceId_ { -1 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
 };
 } // namespace MMI

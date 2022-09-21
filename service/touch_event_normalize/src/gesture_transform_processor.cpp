@@ -21,24 +21,18 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN,
-    "GestureTransformProcessor"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "GestureTransformProcessor" };
 } // namespace
 
-GestureTransformProcessor::GestureTransformProcessor(int32_t deviceId) : deviceId_(deviceId)
-{
-    pointerEvent_ = PointerEvent::Create();
-    CHKPL(pointerEvent_);
-}
+GestureTransformProcessor::GestureTransformProcessor(int32_t deviceId)
+    : deviceId_(deviceId) {}
 
-GestureTransformProcessor::~GestureTransformProcessor() {}
-
-void GestureTransformProcessor::OnEventTouchPadPinchBegin(libinput_event_gesture *data)
+void GestureTransformProcessor::OnEventTouchPadPinchBegin(libinput_event_gesture *gesture)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(data);
-    int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
-    double scale = libinput_event_gesture_get_scale(data);
+    CHKPV(gesture);
+    int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(gesture));
+    double scale = libinput_event_gesture_get_scale(gesture);
     pointerEvent_->SetActionTime(GetSysClockTime());
     pointerEvent_->SetActionStartTime(time);
 
@@ -66,12 +60,12 @@ void GestureTransformProcessor::OnEventTouchPadPinchBegin(libinput_event_gesture
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
 }
 
-void GestureTransformProcessor::OnEventTouchPadPinchUpdate(libinput_event_gesture *data)
+void GestureTransformProcessor::OnEventTouchPadPinchUpdate(libinput_event_gesture *gesture)
 {
-    MMI_HILOGD("Touchpad update event");
-    CHKPV(data);
-    int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
-    double scale = libinput_event_gesture_get_scale(data);
+    CALL_DEBUG_ENTER;
+    CHKPV(gesture);
+    int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(gesture));
+    double scale = libinput_event_gesture_get_scale(gesture);
     pointerEvent_->SetActionTime(GetSysClockTime());
     pointerEvent_->SetActionStartTime(time);
 
@@ -91,12 +85,12 @@ void GestureTransformProcessor::OnEventTouchPadPinchUpdate(libinput_event_gestur
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
 }
 
-void GestureTransformProcessor::OnEventTouchPadPinchEnd(libinput_event_gesture *data)
+void GestureTransformProcessor::OnEventTouchPadPinchEnd(libinput_event_gesture *gesture)
 {
-    MMI_HILOGD("Touchpad end event");
-    CHKPV(data);
-    int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(data));
-    double scale = libinput_event_gesture_get_scale(data);
+    CALL_DEBUG_ENTER;
+    CHKPV(gesture);
+    int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(gesture));
+    double scale = libinput_event_gesture_get_scale(gesture);
     pointerEvent_->SetActionTime(GetSysClockTime());
     pointerEvent_->SetActionStartTime(time);
 
@@ -116,28 +110,31 @@ void GestureTransformProcessor::OnEventTouchPadPinchEnd(libinput_event_gesture *
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
 }
 
-std::shared_ptr<PointerEvent> GestureTransformProcessor::OnTouchPadGestureEvent(
-    struct libinput_event *event)
+std::shared_ptr<PointerEvent> GestureTransformProcessor::OnEvent(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPP(event);
-    auto data = libinput_event_get_gesture_event(event);
-    CHKPP(data);
+    auto gesture = libinput_event_get_gesture_event(event);
+    CHKPP(gesture);
+    if (pointerEvent_ == nullptr) {
+        pointerEvent_ = PointerEvent::Create();
+        CHKPP(pointerEvent_);
+    }
     auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
             pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
-            OnEventTouchPadPinchBegin(data);
+            OnEventTouchPadPinchBegin(gesture);
             break;
         }
         case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE: {
             pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
-            OnEventTouchPadPinchUpdate(data);
+            OnEventTouchPadPinchUpdate(gesture);
             break;
         }
         case LIBINPUT_EVENT_GESTURE_PINCH_END: {
             pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
-            OnEventTouchPadPinchEnd(data);
+            OnEventTouchPadPinchEnd(gesture);
             break;
         }
         case LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN:
