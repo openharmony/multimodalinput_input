@@ -560,7 +560,6 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/cJSON:cjson_static",
-    "//third_party/json:nlohmann_json_static",
   ]
 
   if (input_feature_libinput || input_feature_hdf) {

@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace MMI {
-
 constexpr int32_t ENCRYPT_TAG_LEN = 32;
 constexpr int32_t MSG_MAX_SIZE = 45 * 1024;
 
