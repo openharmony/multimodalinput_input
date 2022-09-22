@@ -141,6 +141,7 @@ void InputEventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> 
         return;
     }
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    DfxHisysevent::GetDispStartTime();
     CHKPV(keyEvent);
     EventLogHelper::PrintEventData(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
@@ -150,6 +151,8 @@ void InputEventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> 
     }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     nextHandler_->HandleKeyEvent(keyEvent);
+    DfxHisysevent::CalcKeyDispTimes();
+    DfxHisysevent::ReportDispTimes();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
@@ -160,6 +163,7 @@ void InputEventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<Pointe
         return;
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    DfxHisysevent::GetDispStartTime();
     CHKPV(pointerEvent);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) {
         MMI_HILOGI("MouseEvent Normalization Results, PointerAction:%{public}d,PointerId:%{public}d,"
@@ -182,6 +186,8 @@ void InputEventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<Pointe
     }
     WinMgr->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
+    DfxHisysevent::CalcPointerDispTimes();
+    DfxHisysevent::ReportDispTimes();
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -192,9 +198,12 @@ void InputEventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerE
         return;
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
+    DfxHisysevent::GetDispStartTime();
     CHKPV(pointerEvent);
     WinMgr->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandleTouchEvent(pointerEvent);
+    DfxHisysevent::CalcPointerDispTimes();
+    DfxHisysevent::ReportDispTimes();
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
