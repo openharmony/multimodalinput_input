@@ -1036,8 +1036,8 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     if (integerY >= height) {
         integerY = height - 1;
     }
-    x = static_cast<double>(integerX);
-    y = static_cast<double>(integerY);
+    x = static_cast<double>(integerX) + (x - floor(x));
+    y = static_cast<double>(integerY) + (y - floor(y));
     mouseLocation_.physicalX = integerX;
     mouseLocation_.physicalY = integerY;
     MMI_HILOGD("Mouse Data: physicalX:%{public}d,physicalY:%{public}d, displayId:%{public}d",
