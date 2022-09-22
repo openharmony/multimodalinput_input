@@ -72,7 +72,9 @@ public:
     const DisplayGroupInfo& GetDisplayGroupInfo();
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle);
     std::optional<int> GetPointerStyle(int32_t pid, int32_t windowId) const;
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool IsNeedRefreshLayer(int32_t windowId);
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #endif // OHOS_BUILD_ENABLE_POINTER
     void Dump(int32_t fd, const std::vector<std::string> &args);
     int32_t GetWindowPid(int32_t windowId, const DisplayGroupInfo& displayGroupInfo) const;
