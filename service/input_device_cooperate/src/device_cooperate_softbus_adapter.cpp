@@ -172,6 +172,11 @@ int32_t DeviceCooperateSoftbusAdapter::Init()
     return RET_OK;
 }
 
+DeviceCooperateSoftbusAdapter::~DeviceCooperateSoftbusAdapter()
+{
+    Release();
+}
+
 void DeviceCooperateSoftbusAdapter::Release()
 {
     std::unique_lock<std::mutex> sessionLock(operationMutex_);

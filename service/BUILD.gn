@@ -448,6 +448,7 @@ ohos_shared_library("libmmi-server") {
     sources += [
       "input_device_cooperate/src/cooperate_event_handler.cpp",
       "input_device_cooperate/src/cooperate_event_manager.cpp",
+      "input_device_cooperate/src/device_cooperate_softbus_adapter.cpp",
       "input_device_cooperate/src/device_profile_adapter.cpp",
       "input_device_cooperate/src/distributed_input_adapter.cpp",
       "input_device_cooperate/src/i_input_device_cooperate_state.cpp",
@@ -455,7 +456,6 @@ ohos_shared_library("libmmi-server") {
       "input_device_cooperate/src/input_device_cooperate_state_free.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_in.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_out.cpp",
-      "input_device_cooperate/src/device_cooperate_softbus_adapter.cpp",
       "input_device_cooperate/src/input_device_cooperate_util.cpp",
     ]
   }

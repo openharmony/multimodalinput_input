@@ -29,7 +29,7 @@ namespace OHOS {
 namespace MMI {
 class DeviceCooperateSoftbusAdapter {
 public:
-    virtual ~DeviceCooperateSoftbusAdapter() = default;
+    virtual ~DeviceCooperateSoftbusAdapter();
     static std::shared_ptr<DeviceCooperateSoftbusAdapter> GetInstance();
     int32_t StartRemoteCooperate(const std::string &localDeviceId, const std::string &remoteDeviceId);
     int32_t StartRemoteCooperateResult(const std::string &remoteDeviceId, bool isSuccess,
