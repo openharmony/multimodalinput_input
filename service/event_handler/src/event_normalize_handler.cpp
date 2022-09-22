@@ -140,6 +140,7 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
         MMI_HILOGW("Keyboard device does not support");
         return;
     }
+    DfxHisysevent::GetDispStartTime();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CHKPV(keyEvent);
     EventLogHelper::PrintEventData(keyEvent);
@@ -150,6 +151,8 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     nextHandler_->HandleKeyEvent(keyEvent);
+    DfxHisysevent::CalcKeyDispTimes();
+    DfxHisysevent::ReportDispTimes();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
@@ -159,6 +162,7 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
         MMI_HILOGW("Pointer device does not support");
         return;
     }
+    DfxHisysevent::GetDispStartTime();
 #ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPV(pointerEvent);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) {
@@ -182,6 +186,8 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
     }
     WinMgr->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
+    DfxHisysevent::CalcPointerDispTimes();
+    DfxHisysevent::ReportDispTimes();
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -191,10 +197,13 @@ void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent>
         MMI_HILOGW("Touchscreen device does not support");
         return;
     }
+    DfxHisysevent::GetDispStartTime();
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPV(pointerEvent);
     WinMgr->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandleTouchEvent(pointerEvent);
+    DfxHisysevent::CalcPointerDispTimes();
+    DfxHisysevent::ReportDispTimes();
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
