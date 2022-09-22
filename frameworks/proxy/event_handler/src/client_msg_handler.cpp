@@ -96,12 +96,12 @@ void ClientMsgHandler::InitProcessedCallback()
     CALL_DEBUG_ENTER;
     int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
     if (tokenType == TokenType::TOKEN_HAP) {
-        MMI_HILOGI("Current session is hap");
+        MMI_HILOGD("Current session is hap");
         dispatchCallback_ = std::bind(&ClientMsgHandler::OnDispatchEventProcessed, std::placeholders::_1);
     } else if (tokenType == static_cast<int32_t>(TokenType::TOKEN_NATIVE)) {
-        MMI_HILOGI("Current session is native");
+        MMI_HILOGD("Current session is native");
     } else {
-        MMI_HILOGW("Current session is unknown tokenType:%{public}d", tokenType);
+        MMI_HILOGE("Current session is unknown tokenType:%{public}d", tokenType);
     }
 }
 
