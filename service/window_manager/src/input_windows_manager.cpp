@@ -30,8 +30,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManager"};
+#ifdef OHOS_BUILD_ENABLE_POINTER
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 constexpr size_t MAX_WINDOW_COUNT = 20;
+#endif // OHOS_BUILD_ENABLE_POINTER
 } // namespace
 
 InputWindowsManager::InputWindowsManager() {}
@@ -41,7 +43,9 @@ void InputWindowsManager::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
     CHKPV(udsServer_);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     udsServer_->AddSessionDeletedCallback(std::bind(&InputWindowsManager::OnSessionLost, this, std::placeholders::_1));
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEvent) const
@@ -175,7 +179,9 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
     CheckFocusWindowChange(displayGroupInfo);
     CheckZorderWindowChange(displayGroupInfo);
     displayGroupInfo_ = displayGroupInfo;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     UpdatePointerStyle();
+#endif // OHOS_BUILD_ENABLE_POINTER
 
     if (!displayGroupInfo.displaysInfo.empty()) {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
