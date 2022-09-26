@@ -1468,6 +1468,70 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
 }
 
 /**
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_03
+ * @tc.desc: Verify subscribe volume up key event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_03, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    ASSERT_TRUE(MMIEventHdl.InitClient());
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption1 = std::make_shared<KeyOption>();
+    keyOption1->SetPreKeys(preKeys);
+    keyOption1->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
+    keyOption1->SetFinalKeyDown(true);
+    keyOption1->SetFinalKeyDownDuration(10);
+    int32_t subscribeId1 = -1;
+    subscribeId1 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption1,
+        [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent);
+        MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP down trigger callback");
+    });
+    std::shared_ptr<KeyOption> keyOption2 = std::make_shared<KeyOption>();
+    keyOption2->SetPreKeys(preKeys);
+    keyOption2->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
+    keyOption2->SetFinalKeyDown(false);
+    keyOption2->SetFinalKeyDownDuration(0);
+    int32_t subscribeId2 = -1;
+    subscribeId2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2,
+        [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent);
+        MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP up trigger callback");
+    });
+    std::shared_ptr<KeyOption> keyOption3 = std::make_shared<KeyOption>();
+    keyOption3->SetPreKeys(preKeys);
+    keyOption3->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
+    keyOption3->SetFinalKeyDown(true);
+    keyOption3->SetFinalKeyDownDuration(0);
+    int32_t subscribeId3 = -1;
+    subscribeId3 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption3,
+        [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent);
+        MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP down trigger callback");
+    });
+    std::shared_ptr<KeyOption> keyOption4 = std::make_shared<KeyOption>();
+    keyOption4->SetPreKeys(preKeys);
+    keyOption4->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
+    keyOption4->SetFinalKeyDown(false);
+    keyOption4->SetFinalKeyDownDuration(0);
+    int32_t subscribeId4 = -1;
+    subscribeId4 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption4,
+        [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent);
+        MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP up trigger callback");
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId1);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId2);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId3);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId4);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+}
+
+/**
  * @tc.name: TestGetKeystrokeAbility_001
  * @tc.desc: Verify SupportKeys
  * @tc.type: FUNC
