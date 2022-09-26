@@ -47,8 +47,8 @@ ohos_shared_library("inputdevice") {
   configs = [ ":inputdevice_config" ]
 
   deps = [
-      "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
-      "//foundation/multimodalinput/input/util:libmmi-util",
+    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
+    "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 
   external_deps = [
