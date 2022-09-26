@@ -143,6 +143,7 @@ std::vector<bool> InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<
 
 bool InputDeviceManager::IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const
 {
+    CHKPF(device);
     for (const auto &key : keyCodes) {
         int32_t value = InputTransformationKeyValue(key);
         if (libinput_device_keyboard_has_key(device, value) == SUPPORT_KEY) {

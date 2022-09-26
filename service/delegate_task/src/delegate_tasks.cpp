@@ -74,6 +74,7 @@ void DelegateTasks::ProcessTasks()
 int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(callback, ERROR_NULL_POINTER);
     if (IsCallFromWorkerThread()) {
         return callback();
     }
@@ -101,6 +102,7 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
 
 int32_t DelegateTasks::PostAsyncTask(DTaskCallback callback)
 {
+    CHKPR(callback, ERROR_NULL_POINTER);
     if (IsCallFromWorkerThread()) {
         return callback();
     }
