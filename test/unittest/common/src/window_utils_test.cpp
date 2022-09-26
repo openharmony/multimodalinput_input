@@ -17,6 +17,7 @@
 
 #include "define_multimodal.h"
 #include "mmi_log.h"
+#include "wm_common.h"
 
 namespace OHOS {
 namespace MMI {
@@ -85,7 +86,7 @@ void WindowUtilsTest::CreateSmoothWindow()
         .mode = Rosen::WindowMode::WINDOW_MODE_FULLSCREEN,
         .needAvoid = false,
         .parentLimit = false,
-        .parentName = "",
+        .parentId = Rosen::INVALID_WINDOW_ID,
     };
     testWindow_ = CreateWindow(info);
 }
@@ -101,8 +102,8 @@ sptr<Rosen::Window> WindowUtilsTest::CreateWindow(const TestWindowInfo& info)
     option->SetTurnScreenOn(true);
     option->SetDisplayId(0);
     option->SetRequestedOrientation(info.orientation_);
-    if (info.parentName != "") {
-        option->SetParentName(info.parentName);
+    if (info.parentId != Rosen::INVALID_WINDOW_ID) {
+        option->SetParentId(info.parentId);
     }
     if (info.needAvoid) {
         option->AddWindowFlag(Rosen::WindowFlag::WINDOW_FLAG_NEED_AVOID);
