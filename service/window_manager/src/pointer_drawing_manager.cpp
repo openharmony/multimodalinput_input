@@ -518,11 +518,6 @@ void PointerDrawingManager::DrawPointerStyle()
 {
     CALL_DEBUG_ENTER;
     if (hasDisplay_ && hasPointerDevice_) {
-        if (pointerWindow_ == nullptr) {
-            MMI_HILOGE("Draw pointer style failed, pointerWindow_ is null");
-            return;
-        }
-
         std::optional<int32_t> pointerStyleInfo = WinMgr->GetPointerStyle(pid_, windowId_);
         if (!pointerStyleInfo) {
             MMI_HILOGE("Draw pointer style failed, pointerStyleInfo is nullptr");
