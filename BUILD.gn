@@ -83,8 +83,6 @@ group("input_jsapi_group") {
       "frameworks/napi/key_event:keyevent",
       "frameworks/napi/mouse_event:mouseevent",
       "frameworks/napi/touch_event:touchevent",
-      "frameworks/napi/input_consumer:inputconsumer",
-      "frameworks/napi/input_event_client:inputeventclient",
     ]
     if (input_feature_distributed) {
       deps += [ "frameworks/napi/distributed_input:distributedinput" ]
@@ -94,6 +92,12 @@ group("input_jsapi_group") {
     }
     if (input_feature_mouse) {
       deps += [ "frameworks/napi/pointer:pointer" ]
+    }
+    if (input_feature_keyboard) {
+      deps += [
+        "frameworks/napi/input_consumer:inputconsumer",
+        "frameworks/napi/input_event_client:inputeventclient",
+      ]
     }
     if (input_feature_input_device) {
       deps += [ "frameworks/napi/input_device:inputdevice" ]
