@@ -144,6 +144,19 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_001, TestSize.L
     pointerEvent->AddPointerItem(item2);
     ASSERT_TRUE(!pointerEvent->IsValid());
 
+    PointerEvent::PointerItem item3;
+    item3.SetPointerId(0);
+    pointerEvent->AddPointerItem(item3);
+    PointerEvent::PointerItem item4;
+    item4.SetPointerId(0);
+    pointerEvent->AddPointerItem(item4);
+    PointerEvent::PointerItem item5;
+    item5.SetPointerId(0);
+    pointerEvent->AddPointerItem(item5);
+    PointerEvent::PointerItem item6;
+    item6.SetPointerId(0);
+    pointerEvent->AddPointerItem(item6);
+
     auto pointerEvent1 = PointerEvent::Create();
     ASSERT_NE(pointerEvent1, nullptr);
     pointerEvent1->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
