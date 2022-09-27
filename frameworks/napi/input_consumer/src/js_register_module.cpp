@@ -77,7 +77,7 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
         napi_throw_error(env, nullptr, "Get value of first param failed");
         return ERROR_CODE;
     }
-    event->name = eventName;
+    event->name = std::string(eventName);
     napi_value receiveValue = nullptr;
     if (napi_get_named_property(env, argv[1], "preKeys", &receiveValue) != napi_ok) {
         MMI_HILOGE("Get preKeys failed");
