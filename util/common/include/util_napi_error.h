@@ -22,6 +22,7 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
+#include "secure.h"
 #include "utils/log.h"
 
 namespace OHOS {
@@ -44,8 +45,8 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
     {COMMON_PERMISSION_CHECK_ERROR,  {"201", "Permission denied. An attempt was made to %s forbidden by permission:%s."}},
     {COMMON_PARAMETER_ERROR,  {"401", "Parameter error. The type of %s must be %s."}},
     {COOPERATOR_TARGET_DEV_DESCRIPTOR_ERROR, {"4400001", "Incorrect descriptor for the target device"}},
-    {COOPERATOR_DEVICE_ID_ERROE, {"401", " Incorrect ID of the input device for screen hop"}},
-    {COOPERATOR_FAIL, {"4400002", "Screen hop failed"}},
+    {COOPERATOR_DEVICE_ID_ERROE, {"401", " Incorrect ID of the input device"}},
+    {COOPERATOR_FAIL, {"4400002", "Input device operation failed"}},
 };
 
 #define THROWERR_API9(env, code, ...) \
@@ -59,7 +60,6 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
             } \
         } \
     } while (0)
-
 
 #define THROWERR_CUSTOM(env, code, msg) \
     do { \
