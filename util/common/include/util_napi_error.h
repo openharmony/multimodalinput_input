@@ -22,7 +22,7 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
-#include "secure.h"
+#include "securec.h"
 #include "utils/log.h"
 
 namespace OHOS {
