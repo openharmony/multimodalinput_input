@@ -331,43 +331,44 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
 {
     CALL_DEBUG_ENTER;
     CHKPV(work);
-    CHKPV(work->data);
-    (void)status;
-    KeyEventMonitorInfoWorker *dataWorker = static_cast<KeyEventMonitorInfoWorker *>(work->data);
-    if (dataWorker == nullptr) {
+    if (work->data == nullptr) {
+        MMI_HILOGE("Check data is null");
         delete work;
         work = nullptr;
-        MMI_HILOGE("Data worker is empty");
-        napi_throw_error(dataWorker->env, nullptr, "Data worker is empty");
         return;
     }
-    KeyEventMonitorInfo *event = dataWorker->reportEvent;
-
+    (void)status;
+    KeyEventMonitorInfoWorker* dataWorker = static_cast<KeyEventMonitorInfoWorker*>(work->data);
+    delete work;
+    work = nullptr;
+    KeyEventMonitorInfo* event = dataWorker->reportEvent;
+    napi_env env = dataWorker->env;
+    delete dataWorker;
+    CHKPV(event);
     napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(dataWorker->env, &scope);
-    if (scope == nullptr) {
-        MMI_HILOGE("Scope is nullptr");
+    if (napi_open_handle_scope(env, &scope) != napi_ok) {
+        MMI_HILOGE("napi open handle scope failed");
         return;
     }
     napi_value callback = nullptr;
-    if (napi_get_reference_value(dataWorker->env, event->callback[0], &callback) != napi_ok) {
+    if (napi_get_reference_value(env, event->callback[0], &callback) != napi_ok) {
         MMI_HILOGE("Event get reference value failed");
-        napi_close_handle_scope(dataWorker->env, scope);
-        napi_throw_error(dataWorker->env, nullptr, "Event get reference value failed");
+        napi_close_handle_scope(env, scope);
+        napi_throw_error(env, nullptr, "Event get reference value failed");
         return;
     }
 
     napi_value result = nullptr;
-    AsyncWorkFn(dataWorker->env, event, result);
+    AsyncWorkFn(env, event, result);
     napi_value callResult = nullptr;
-    napi_status ret = napi_call_function(dataWorker->env, nullptr, callback, 1, &result, &callResult);
+    napi_status ret = napi_call_function(env, nullptr, callback, 1, &result, &callResult);
     if (ret != napi_ok) {
-        napi_close_handle_scope(dataWorker->env, scope);
+        napi_close_handle_scope(env, scope);
         MMI_HILOGE("Call function failed, ret:%{public}d", static_cast<int32_t>(ret));
-        napi_throw_error(dataWorker->env, nullptr, "Call function failed");
+        napi_throw_error(env, nullptr, "Call function failed");
         return;
     }
-    napi_close_handle_scope(dataWorker->env, scope);
+    napi_close_handle_scope(env, scope);
 }
 
 void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
