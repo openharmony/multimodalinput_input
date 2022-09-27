@@ -200,9 +200,11 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
     auto source = pointerEvent->GetSourceType();
     switch (source) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
+#ifdef OHOS_BUILD_ENABLE_TOUCH
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_TOUCH
             break;
         }
         case PointerEvent::SOURCE_TYPE_MOUSE:
@@ -210,12 +212,14 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
         case PointerEvent::SOURCE_TYPE_JOYSTICK:
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
         case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
+#ifdef OHOS_BUILD_ENABLE_POINTER
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
             if (!IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
                 IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true);
             }
             inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER
             break;
         }
         default: {
