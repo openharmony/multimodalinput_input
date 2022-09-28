@@ -16,6 +16,7 @@
 #include "js_input_device_manager.h"
 
 #include "input_device_impl.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace MMI {
@@ -65,7 +66,13 @@ napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vect
     int32_t userData = InputDevImpl.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
     auto callback = std::bind(EmitSupportKeys, userData, std::placeholders::_1);
-    InputMgr->SupportKeys(id, keyCodes, callback);
+    int32_t napiCode = InputMgr->SupportKeys(id, keyCodes, callback);
+    if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device ID");
+    }
+    if (napiCode != RET_OK) {
+        JsEventTarget::RemoveCallbackInfo(env, handle, userData);
+    }
     return ret;
 }
 
@@ -76,7 +83,44 @@ napi_value JsInputDeviceManager::GetKeyboardType(napi_env env, int32_t id, napi_
     int32_t userData = InputDevImpl.GetUserData();
     napi_value ret = CreateCallbackInfo(env, handle, userData);
     auto callback = std::bind(EmitJsKeyboardType, userData, std::placeholders::_1);
-    InputMgr->GetKeyboardType(id, callback);
+    int32_t napiCode = InputMgr->GetKeyboardType(id, callback);
+    if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device ID");
+    }
+    if (napiCode != RET_OK) {
+        JsEventTarget::RemoveCallbackInfo(env, handle, userData);
+    }
+    return ret;
+}
+
+napi_value JsInputDeviceManager::GetDeviceList(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    int32_t userData = InputDevImpl.GetUserData();
+    napi_value ret = CreateCallbackInfo(env, handle, userData, true);
+    auto callback = std::bind(EmitJsIds, userData, std::placeholders::_1);
+    int32_t napiCode = InputMgr->GetDeviceIds(callback);
+    if (napiCode != RET_OK) {
+        JsEventTarget::RemoveCallbackInfo(env, handle, userData);
+    }
+    return ret;
+}
+
+napi_value JsInputDeviceManager::GetDeviceInfo(napi_env env, int32_t id, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    int32_t userData = InputDevImpl.GetUserData();
+    napi_value ret = CreateCallbackInfo(env, handle, userData, true);
+    auto callback = std::bind(EmitJsDev, userData, std::placeholders::_1);
+    int32_t napiCode = InputMgr->GetDevice(id, callback);
+    if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device ID");
+    }
+    if (napiCode != RET_OK) {
+        JsEventTarget::RemoveCallbackInfo(env, handle, userData);
+    }
     return ret;
 }
 

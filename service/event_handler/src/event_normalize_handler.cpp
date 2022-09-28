@@ -261,10 +261,6 @@ bool EventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> key
     int32_t keyCode = keyEvent->GetKeyCode();
     if(keyCode == KeyEvent::KEYCODE_BACK || keyCode == KeyEvent::KEYCODE_VOLUME_UP
         || keyCode == KeyEvent::KEYCODE_VOLUME_DOWN || keyCode == KeyEvent::KEYCODE_POWER) {
-        int32_t deviceId = keyEvent->GetDeviceId();
-        if (InputDevMgr->IsRemote(deviceId)) {
-           return false; 
-        }
         return true;
     }
     CooperateState state = InputDevCooSM->GetCurrentCooperateState();
@@ -296,16 +292,15 @@ bool EventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> key
 bool EventNormalizeHandler::IsNeedFilterOut(const std::string& deviceId, const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
+    std::vector<OHOS::MMI::KeyEvent::KeyItem> KeyItems = keyEvent->GetKeyItems();
+    std::vector<int32_t> KeyItemsForDInput;
+    KeyItemsForDInput.reserve(KeyItems.size());
+    for (const auto& item : KeyItems) {
+        KeyItemsForDInput.push_back(item.GetKeyCode());
+    }
     OHOS::DistributedHardware::DistributedInput::BusinessEvent businessEvent;
     businessEvent.keyCode = keyEvent->GetKeyCode();
     businessEvent.keyAction = keyEvent->GetKeyAction();
-    std::vector<OHOS::MMI::KeyEvent::KeyItem> KeyItems = keyEvent->GetKeyItems();
-    std::vector<int32_t> KeyItemsForDInput;
-    for (const auto& item : KeyItems) {
-        if (item.GetKeyCode() != businessEvent.keyCode) {
-            KeyItemsForDInput.push_back(item.GetKeyCode());
-        }
-    }
     businessEvent.pressedKeys = KeyItemsForDInput;
     MMI_HILOGI("businessEvent.keyCode :%{public}d, keyAction :%{public}d",
         businessEvent.keyCode, businessEvent.keyAction);

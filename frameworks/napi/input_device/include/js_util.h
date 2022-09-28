@@ -43,9 +43,10 @@ public:
         napi_env env { nullptr };
         napi_ref ref { nullptr };
         napi_deferred deferred { nullptr };
-        int32_t errCode { -1 };
+        int32_t errCode { 0 };
         CallbackData data;
         UserData uData;
+        bool isApi9 { false };
     };
     struct DeviceType {
         std::string sourceTypeName;
