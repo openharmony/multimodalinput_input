@@ -17,8 +17,8 @@
 
 #include "mmi_log.h"
 
-namespace OHOS{
-namespace MMI{
+namespace OHOS {
+namespace MMI {
 namespace UtilNapiError {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilNapiError" };
