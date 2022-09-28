@@ -40,7 +40,8 @@ public:
     static void EmitJsKeyboardType(int32_t userData, int32_t keyboardType);
     void AddListener(napi_env env, const std::string &type, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);
-    napi_value CreateCallbackInfo(napi_env env, napi_value handle, const int32_t userData);
+    void RemoveCallbackInfo(napi_env env, napi_value handle, int32_t userData);
+    napi_value CreateCallbackInfo(napi_env env, napi_value handle, const int32_t userData, bool isApi9 = false);
     void ResetEnv();
     virtual void OnDeviceAdded(int32_t deviceId, const std::string &type) override;
     virtual void OnDeviceRemoved(int32_t deviceId, const std::string &type) override;
@@ -54,10 +55,14 @@ private:
     static void CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status);
     static void CallKeyboardTypeAsync(uv_work_t *work, int32_t status);
     static void CallKeyboardTypePromise(uv_work_t *work, int32_t status);
+    static void CallDevListPromiseWork(uv_work_t *work, int32_t status);
+    static void CallDevListAsyncWork(uv_work_t *work, int32_t status);
+    static void CallDevInfoAsyncWork(uv_work_t *work, int32_t status);
+    static void CallDevInfoPromiseWork(uv_work_t *work, int32_t status);
     static void EmitAddedDeviceEvent(uv_work_t *work, int32_t status);
     static void EmitRemoveDeviceEvent(uv_work_t *work, int32_t status);
     static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfo(uv_work_t *work);
-
+    static napi_value GreateBusinessError(napi_env env, std::string errCode, std::string errMessage);
 private:
     inline static std::map<int32_t, std::unique_ptr<JsUtil::CallbackInfo>> callback_ {};
     inline static std::map<std::string, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>> devListener_ {};
