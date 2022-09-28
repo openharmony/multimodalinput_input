@@ -44,7 +44,7 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate(const std::string
     int32_t ret = RemoteMgr->StopRemoteCooperate(networkId);
     if (ret != RET_OK) {
         MMI_HILOGE("Stop input device cooperate fail");
-        return ret;
+        return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
     }
     std::string taskName = "process_stop_task";
     std::function<void()> handleProcessStopFunc =
@@ -60,6 +60,9 @@ void InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkId)
     CALL_DEBUG_ENTER;
     std::string sink = InputDevMgr->GetOriginNetworkId(startDhid_);
     std::vector<std::string>  dhids = InputDevMgr->GetCooperateDhids(startDhid_);
+    if (dhids.empty()) {
+        InputDevCooSM->OnStopFinish(false, srcNetworkId);
+    }
     int32_t ret = DistributedAdapter->StopRemoteInput(srcNetworkId, sink, dhids, [this, srcNetworkId](bool isSuccess) {
         this->OnStopRemoteInput(isSuccess, srcNetworkId);
         });
