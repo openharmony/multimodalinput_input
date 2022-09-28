@@ -42,10 +42,11 @@ enum NapiErrorCode : int32_t {
 };
 
 const std::map<int32_t, NapiError> NAPI_ERRORS = {
-    {COMMON_PERMISSION_CHECK_ERROR,  {"201", "Permission denied. An attempt was made to %s forbidden by permission:%s."}},
-    {COMMON_PARAMETER_ERROR,  {"401", "Parameter error. The type of %s must be %s."}},
+    {COMMON_PERMISSION_CHECK_ERROR,
+        {"201", "Permission denied. An attempt was made to %s forbidden by permission:%s."}},
+    {COMMON_PARAMETER_ERROR, {"401", "Parameter error. The type of %s must be %s."}},
     {COOPERATOR_TARGET_DEV_DESCRIPTOR_ERROR, {"4400001", "Incorrect descriptor for the target device"}},
-    {COOPERATOR_DEVICE_ID_ERROE, {"401", " Incorrect ID of the input device"}},
+    {COOPERATOR_DEVICE_ID_ERROE, {"401", "Incorrect ID of the input device"}},
     {COOPERATOR_FAIL, {"4400002", "Input device operation failed"}},
 };
 
@@ -53,10 +54,10 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
     do { \
         MMI_HILOGE("ErrorCode:%{public}s", (#code)); \
         NapiError codeMsg; \
-        if(UtilNapiError::GetApiError(code, codeMsg)) { \
-           char buf[100]; \
-           if (sprintf_s(buf, sizeof(buf), codeMsg.msg.c_str(), ##__VA_ARGS__) > 0) { \
-               napi_throw_error(env, codeMsg.errorCode.c_str(), buf); \
+        if (UtilNapiError::GetApiError(code, codeMsg)) { \
+            char buf[100]; \
+            if (sprintf_s(buf, sizeof(buf), codeMsg.msg.c_str(), ##__VA_ARGS__) > 0) { \
+                napi_throw_error(env, codeMsg.errorCode.c_str(), buf); \
             } \
         } \
     } while (0)
