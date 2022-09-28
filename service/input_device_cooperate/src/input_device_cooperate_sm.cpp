@@ -48,8 +48,10 @@ constexpr int32_t MOUSE_ABS_LOCATION_Y = 50;
 InputDeviceCooperateSM::InputDeviceCooperateSM() {}
 InputDeviceCooperateSM::~InputDeviceCooperateSM() {}
 
-void InputDeviceCooperateSM::Init()
+void InputDeviceCooperateSM::Init(DelegateTasksCallback delegateTasksCallback)
 {
+    CHKPL(delegateTasksCallback);
+    delegateTasksCallback_ = delegateTasksCallback;
     preparedNetworkId_ = std::make_pair("", "");
     currentStateSM_ = std::make_shared<InputDeviceCooperateStateFree>();
     TimerMgr->AddTimer(INTERVAL_MS, 1, [this]() {
@@ -78,7 +80,8 @@ void InputDeviceCooperateSM::OnCooperateChanged(const std::string &networkId, bo
 {
     CALL_DEBUG_ENTER;
     CooperationMessage msg = isOpen ? CooperationMessage::STATE_ON : CooperationMessage::STATE_OFF;
-    CooperateEventMgr->OnCooperateMessage(msg, networkId);
+    delegateTasksCallback_(std::bind(&CooperateEventManager::OnCooperateMessage, CooperateEventMgr, msg, networkId));
+    // CooperateEventMgr->OnCooperateMessage(msg, networkId);
     if (!isOpen) {
         OnCloseCooperation(networkId, false);
     }
@@ -189,7 +192,9 @@ int32_t InputDeviceCooperateSM::StopInputDeviceCooperate()
 void InputDeviceCooperateSM::StartRemoteCooperate(const std::string &remoteNetworkId)
 {
     CALL_INFO_TRACE;
-    CooperateEventMgr->OnCooperateMessage(CooperationMessage::INFO_START, remoteNetworkId);
+    CHKPV(delegateTasksCallback_);
+    delegateTasksCallback_(std::bind(&CooperateEventManager::OnCooperateMessage, CooperateEventMgr, CooperationMessage::INFO_START, remoteNetworkId));
+    // CooperateEventMgr->OnCooperateMessage(CooperationMessage::INFO_START, remoteNetworkId);
     std::lock_guard<std::mutex> guard(mutex_);
     isStarting_ = true;
 }
@@ -206,7 +211,9 @@ void InputDeviceCooperateSM::StartRemoteCooperateResult(bool isSuccess,
     startDhid_ = startDhid;
     CooperationMessage msg =
             isSuccess ? CooperationMessage::INFO_SUCCESS : CooperationMessage::INFO_FAIL;
-        CooperateEventMgr->OnCooperateMessage(msg);
+    delegateTasksCallback_(std::bind(&CooperateEventManager::OnCooperateMessage, CooperateEventMgr, msg));
+
+    // CooperateEventMgr->OnCooperateMessage(msg);
     if (!isSuccess || cooperateState_ == CooperateState::STATE_IN) {
         isStarting_ = false;
         return;
