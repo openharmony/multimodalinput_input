@@ -61,6 +61,7 @@ class InputDeviceCooperateSM final {
         void OnDeviceOffline(const DistributedHardware::DmDeviceInfo &deviceInfo) override;
     };
 public:
+    using DelegateTasksCallback = std::function<int32_t(std::function<int32_t()>)>;
     DISALLOW_COPY_AND_MOVE(InputDeviceCooperateSM);
     void Init();
     void EnableInputDeviceCooperate(bool enabled);
@@ -110,6 +111,7 @@ private:
     std::atomic<bool> isStarting_ { false };
     std::atomic<bool> isStopping_ { false };
     std::pair<int32_t, int32_t> mouseLocation_ { std::make_pair(0, 0) };
+    DelegateTasksCallback delegateTasksCallback_ { nullptr };
 };
 
 #define InputDevCooSM ::OHOS::DelayedSingleton<InputDeviceCooperateSM>::GetInstance()
