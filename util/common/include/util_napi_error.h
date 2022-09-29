@@ -60,7 +60,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
         napi_value errorCode = nullptr; \
         napi_value errorMsg = nullptr; \
         napi_create_int32(env, code, &errorCode); \
-        napi_create_string_utf8(env, msg.c_str(), NAPI_AUTO_LENGTH, &errorMsg); \
+        napi_create_string_utf8(env, std::string(msg).c_str(), NAPI_AUTO_LENGTH, &errorMsg); \
         napi_create_error(env, nullptr, errorMsg, &businessError); \
         napi_set_named_property(env, businessError, ERR_CODE.c_str(), errorCode); \
         napi_throw(env, businessError); \
@@ -73,7 +73,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
         if (UtilNapiError::GetApiError(code, codeMsg)) { \
             char buf[100]; \
             if (sprintf_s(buf, sizeof(buf), codeMsg.msg.c_str(), ##__VA_ARGS__) > 0) { \
-                THROWERR_CUSTOM(env, code, std::string(buf)) \
+                THROWERR_CUSTOM(env, code, buf) \
             } \
         } \
     } while (0)
