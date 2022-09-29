@@ -48,7 +48,7 @@ void JsEventTarget::EmitJsEnable(int32_t userData, std::string deviceId, Coopera
     std::lock_guard<std::mutex> guard(mutex_);
     auto iter = callback_.find(userData);
     if (iter == callback_.end()) {
-        MMI_HILOGE("failed to search for userData");
+        MMI_HILOGE("Failed to search for userData");
         return;
     }
     CHKPV(iter->second);
