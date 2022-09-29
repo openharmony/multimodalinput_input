@@ -65,15 +65,15 @@ bool getResult(sptr<AsyncContext> asyncContext, napi_value * results)
             MMI_HILOGE("ErrorCode not found, errCode:%{public}d", asyncContext->errorCode);
             return false;
         }
-        CHKRF(env, napi_create_object(env, &results[0]), CREATE_OBJECT);
         napi_value errCode = nullptr;
         napi_value errMsg = nullptr;
-        CHKRF(env, napi_create_string_utf8(env, codeMsg.errorCode.c_str(),
-            NAPI_AUTO_LENGTH, &errCode), CREATE_STRING_UTF8);
-        CHKRF(env, napi_set_named_property(env, results[0], "code", errCode), SET_NAMED_PROPERTY);
+        napi_value businessError = nullptr;
+        CHKRP(env, napi_create_int32(env, codeMsg.errorCode, &errCode), CREATE_INT32);
         CHKRF(env, napi_create_string_utf8(env, codeMsg.msg.c_str(),
             NAPI_AUTO_LENGTH, &errMsg), CREATE_STRING_UTF8);
-        CHKRF(env, napi_set_named_property(env, results[0], "message", errMsg), SET_NAMED_PROPERTY);
+        CHKRF(env, napi_create_error(env, nullptr, errMsg, &businessError), CREATE_ERROR);
+        CHKRF(env, napi_set_named_property(env, businessError, ERR_CODE.c_str(), errCode), SET_NAMED_PROPERTY);
+        results[0] = businessError;
     } else {
         CHKRF(env, napi_get_undefined(env, &results[0]), GET_UNDEFINED);
     }
