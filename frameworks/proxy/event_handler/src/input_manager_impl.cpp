@@ -613,7 +613,7 @@ int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, int32_t pointerStyle
     int32_t ret = MultimodalInputConnMgr->SetPointerStyle(windowId, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer style failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -628,7 +628,7 @@ int32_t InputManagerImpl::GetPointerStyle(int32_t windowId, int32_t &pointerStyl
     int32_t ret = MultimodalInputConnMgr->GetPointerStyle(windowId, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer style failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }

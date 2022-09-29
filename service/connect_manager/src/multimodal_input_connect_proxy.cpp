@@ -203,7 +203,7 @@ int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, int32_t p
     int32_t ret = remote->SendRequest(SET_POINTER_STYLE, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -224,7 +224,7 @@ int32_t MultimodalInputConnectProxy::GetPointerStyle(int32_t windowId, int32_t &
     int32_t ret = remote->SendRequest(GET_POINTER_STYLE, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     pointerStyle = reply.ReadInt32();
     return RET_OK;

@@ -21,6 +21,7 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "napi_constants.h"
+#include "util_napi_error.h"
 #include "util_napi.h"
 #include "utils/log.h"
 #include "refbase.h"
