@@ -73,7 +73,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
         if (UtilNapiError::GetApiError(code, codeMsg)) { \
             char buf[100]; \
             if (sprintf_s(buf, sizeof(buf), codeMsg.msg.c_str(), ##__VA_ARGS__) > 0) { \
-                THROWERR_CUSTOM(env, code, buf) \
+                THROWERR_CUSTOM(env, code, buf); \
             } \
         } \
     } while (0)
