@@ -347,12 +347,12 @@ void PointerDrawingManager::DrawManager()
 {
     if (hasDisplay_ && hasPointerDevice_ && pointerWindow_ == nullptr) {
         MMI_HILOGD("Draw pointer begin");
-        std::optional<int32_t> pointerStyleInfo = WinMgr->GetPointerStyle(pid_, windowId_);
-        if (!pointerStyleInfo) {
+        int32_t mouseStyle = -1;
+        int32_t ret = WinMgr->GetPointerStyle(pid_, windowId_, mouseStyle);
+        if (ret != RET_OK) {
             MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
             return;
         }
-        int32_t mouseStyle = pointerStyleInfo.value();
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayInfo_.id, displayInfo_.width / 2, displayInfo_.height / 2, MOUSE_ICON(mouseStyle));
             MMI_HILOGD("Draw manager, mouseStyle:%{public}d, last physical is initial value", mouseStyle);
@@ -468,9 +468,10 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, in
         return RET_ERR;
     }
 
-    if (WinMgr->SetPointerStyle(pid, windowId, pointerStyle)) {
+    int32_t ret = WinMgr->SetPointerStyle(pid, windowId, pointerStyle);
+    if (ret != RET_OK) {
         MMI_HILOGE("Set pointer style failed");
-        return RET_ERR;
+        return ret;
     }
 
     if (!InputDevMgr->HasPointerDevice()) {
@@ -503,13 +504,11 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, in
 int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle)
 {
     CALL_DEBUG_ENTER;
-    std::optional<int32_t> pointerStyleInfo = WinMgr->GetPointerStyle(pid, windowId);
-    if (!pointerStyleInfo) {
+    int32_t ret = WinMgr->GetPointerStyle(pid, windowId, pointerStyle);
+    if (ret != RET_OK) {
         MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
-        return RET_ERR;
+        return ret;
     }
-
-    pointerStyle = pointerStyleInfo.value();
     MMI_HILOGD("Window id:%{public}d get pointer style:%{public}d success", windowId, pointerStyle);
     return RET_OK;
 }
@@ -518,13 +517,12 @@ void PointerDrawingManager::DrawPointerStyle()
 {
     CALL_DEBUG_ENTER;
     if (hasDisplay_ && hasPointerDevice_) {
-        std::optional<int32_t> pointerStyleInfo = WinMgr->GetPointerStyle(pid_, windowId_);
-        if (!pointerStyleInfo) {
+        int32_t mouseStyle = -1;
+        int32_t ret = WinMgr->GetPointerStyle(pid_, windowId_, mouseStyle);
+        if (ret != RET_OK) {
             MMI_HILOGE("Draw pointer style failed, pointerStyleInfo is nullptr");
             return;
         }
-        int32_t mouseStyle = pointerStyleInfo.value();
-
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayInfo_.id, displayInfo_.width / 2, displayInfo_.height / 2, MOUSE_ICON(mouseStyle));
             MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", mouseStyle);
