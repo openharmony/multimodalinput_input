@@ -53,11 +53,6 @@ int32_t GetEventInfoAPI8(napi_env env, napi_callback_info info, KeyEventMonitorI
         napi_throw_error(env, nullptr, "Get param failed");
         return ERROR_CODE;
     }
-    if (argc != 2 && argc != 3) {
-        MMI_HILOGE("Requires 3 parameter");
-        napi_throw_error(env, nullptr, "Requires 3 parameter");
-        return ERROR_CODE;
-    }
     napi_valuetype valueType = napi_undefined;
     if (napi_typeof(env, argv[0], &valueType) != napi_ok) {
         MMI_HILOGE("Get type of first param failed");
@@ -158,11 +153,6 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     size_t argc = 3;
     napi_value argv[3] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 2) {
-        MMI_HILOGE("Requires at least 2 parameter");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
-        return nullptr;
-    }
     napi_valuetype valueType = napi_undefined;
     if (!UtilNapi::TypeOf(env, argv[0], napi_number)) {
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "number");
@@ -309,7 +299,14 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    size_t argc = 3;
     napi_value argv[3] = { 0 };
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 3) {
+        MMI_HILOGE("Requires 3 parameter");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        return nullptr;
+    }
     KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
@@ -373,7 +370,14 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    size_t argc = 3;
     napi_value argv[3] = { 0 };
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 2) {
+        MMI_HILOGE("Requires at least 2 parameter");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        return nullptr;
+    }
     KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
