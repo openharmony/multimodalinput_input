@@ -68,7 +68,7 @@ bool getResult(sptr<AsyncContext> asyncContext, napi_value * results)
         napi_value errCode = nullptr;
         napi_value errMsg = nullptr;
         napi_value businessError = nullptr;
-        CHKRP(env, napi_create_int32(env, codeMsg.errorCode, &errCode), CREATE_INT32);
+        CHKRP(env, napi_create_int32(env, asyncContext->errorCode, &errCode), CREATE_INT32);
         CHKRF(env, napi_create_string_utf8(env, codeMsg.msg.c_str(),
             NAPI_AUTO_LENGTH, &errMsg), CREATE_STRING_UTF8);
         CHKRF(env, napi_create_error(env, nullptr, errMsg, &businessError), CREATE_ERROR);
