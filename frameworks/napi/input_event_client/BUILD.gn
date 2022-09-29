@@ -18,7 +18,9 @@ config("inputeventclient_config") {
 
   include_dirs = [
     "//foundation/multimodalinput/input/util/common/include",
-    "//foundation/multimodalinput/input/frameworks/napi/input_consumer/include",
+    "//foundation/multimodalinput/input/util/socket/include",
+    "//foundation/multimodalinput/input/util/network/include",
+    "//foundation/multimodalinput/input/frameworks/napi/input_event_client/include",
     "//foundation/multimodalinput/input/tools/event_inject/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
     "//commonlibrary/c_utils/base/include",

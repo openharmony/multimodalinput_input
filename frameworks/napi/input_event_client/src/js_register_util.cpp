@@ -18,6 +18,8 @@
 #include <cinttypes>
 
 #include "napi_constants.h"
+#include "util_napi.h"
+#include "util_napi_error.h"
 #include "js_register_module.h"
 
 namespace OHOS {
@@ -127,99 +129,142 @@ void SetNamedProperty(const napi_env& env, napi_value object, const std::string&
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), value));
 }
 
-bool GetNamedPropertyBool(const napi_env& env, const napi_value& object, const std::string& name)
+int32_t GetNamedPropertyBool(const napi_env& env, const napi_value& object, const std::string& name, bool& ret)
 {
     napi_value napiValue = {};
-    napi_get_named_property(env, object, name.c_str(), &napiValue);
+    CHKRF(env, napi_get_named_property(env, object, name.c_str(), &napiValue), GET_NAMED_PROPERTY);
+    if (napiValue == nullptr) {
+        MMI_HILOGE("The value is null");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "The value is null");
+        return RET_ERR;
+    }
     napi_valuetype tmpType = napi_undefined;
-    if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGE("Call napi_typeof failed");
-        return false;
-    }
+    CHKRF(env, napi_typeof(env, napiValue, &tmpType), TYPEOF);
     if (tmpType != napi_boolean) {
-        MMI_HILOGE("The value is not bool");
-        return false;
+        MMI_HILOGE("The name is not bool");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "name", "bool");
+        return RET_ERR;
     }
-
-    bool value = false;
-    napi_get_value_bool(env, napiValue, &value);
-    return value;
+    CHKRF(env, napi_get_value_bool(env, napiValue, &ret), GET_BOOL);
+    return RET_OK;
 }
 
-std::string GetNamedPropertyString(const napi_env& env, const napi_value& object, const std::string& name)
+int32_t GetNamedPropertyString(const napi_env& env, const napi_value& object, const std::string& name, std::string& ret)
 {
-    std::string value = "";
     napi_value napiValue = {};
-    napi_get_named_property(env, object, name.c_str(), &napiValue);
+    if (napi_get_named_property(env, object, name.c_str(), &napiValue) != napi_ok) {
+        MMI_HILOGE("Call napi_get_named_property failed");
+        return RET_ERR;
+    }
+    if (napiValue == nullptr) {
+        MMI_HILOGE("The value is null");
+        return RET_ERR;
+    }
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_HILOGE("Call napi_typeof failed");
-        return value;
+        return RET_ERR;
     }
     if (tmpType != napi_string) {
         MMI_HILOGE("The value is not string");
-        return value;
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "name", "string");
+        return RET_ERR;
     }
-
     char tmpValue[MAX_STRING_LEN] = { 0 };
     size_t typeLen = 0;
-    napi_get_value_string_utf8(env, napiValue, tmpValue, MAX_STRING_LEN - 1, &typeLen);
-    value = tmpValue;
-    return value;
+    if (napi_get_value_string_utf8(env, napiValue, tmpValue, MAX_STRING_LEN - 1, &typeLen) != napi_ok) {
+        MMI_HILOGE("Call napi_get_value_string_utf8 failed");
+        return RET_ERR;
+    }
+    ret = tmpValue;
+    return RET_OK;
 }
 
-int32_t GetNamedPropertyInt32(const napi_env& env, const napi_value& object, const std::string& name)
+int32_t GetNamedPropertyInt32(const napi_env& env, const napi_value& object, const std::string& name, int32_t& ret)
 {
-    int32_t value = 0;
     napi_value napiValue = {};
-    napi_get_named_property(env, object, name.c_str(), &napiValue);
+    if (napi_get_named_property(env, object, name.c_str(), &napiValue) != napi_ok) {
+        MMI_HILOGE("Call napi_get_named_property failed");
+        return RET_ERR;
+    }
+    if (napiValue == nullptr) {
+        MMI_HILOGE("The value is null");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "The value is null");
+        return RET_ERR;
+    }
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_HILOGE("Call napi_typeof failed");
-        return value;
+        return RET_ERR;
     }
     if (tmpType != napi_number) {
-        MMI_HILOGE("The value is not number");
-        return value;
+        MMI_HILOGE("The value is not int32_t");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "name", "int32_t");
+        return RET_ERR;
     }
-    napi_get_value_int32(env, napiValue, &value);
-    return value;
+    if (napi_get_value_int32(env, napiValue, &ret) != napi_ok) {
+        MMI_HILOGE("NapiElement get int32 value failed");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
-int64_t GetNamedPropertyInt64(const napi_env& env, const napi_value& object, const std::string& name)
+int32_t GetNamedPropertyInt64(const napi_env& env, const napi_value& object, const std::string& name, int64_t& ret)
 {
-    int64_t value = 0;
     napi_value napiValue = {};
-    napi_get_named_property(env, object, name.c_str(), &napiValue);
+    if (napi_get_named_property(env, object, name.c_str(), &napiValue) != napi_ok) {
+        MMI_HILOGE("Call napi_get_named_property failed");
+        return RET_ERR;
+    }
+    if (napiValue == nullptr) {
+        MMI_HILOGE("The value is null");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "The value is null");
+        return RET_ERR;
+    }
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_HILOGE("Call napi_typeof failed");
-        return value;
+        return RET_ERR;
     }
     if (tmpType != napi_number) {
-        MMI_HILOGE("The value is not number");
-        return value;
+        MMI_HILOGE("The value is not int64_t");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "name", "int64_t");
+        return RET_ERR;
     }
-    napi_get_value_int64(env, napiValue, &value);
-    return value;
+    if (napi_get_value_int64(env, napiValue, &ret) != napi_ok) {
+        MMI_HILOGE("NapiElement get int64 value failed");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 
-uint32_t GetNamedPropertyUint32(const napi_env& env, const napi_value& object, const std::string& name)
+int32_t GetNamedPropertyUint32(const napi_env& env, const napi_value& object, const std::string& name, uint32_t& ret)
 {
-    uint32_t value = 0;
     napi_value napiValue = {};
-    napi_get_named_property(env, object, name.c_str(), &napiValue);
+    if (napi_get_named_property(env, object, name.c_str(), &napiValue) != napi_ok) {
+        MMI_HILOGE("Call napi_get_named_property failed");
+        return RET_ERR;
+    }
+    if (napiValue == nullptr) {
+        MMI_HILOGE("The value is null");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "The value is null");
+        return RET_ERR;
+    }
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_HILOGE("Call napi_typeof failed");
-        return value;
+        return RET_ERR;
     }
     if (tmpType != napi_number) {
-        MMI_HILOGE("The value is not number");
-        return value;
+        MMI_HILOGE("The value is not uint32_t");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "name", "uint32_t");
+        return RET_ERR;
     }
-    napi_get_value_uint32(env, napiValue, &value);
-    return value;
+    if (napi_get_value_uint32(env, napiValue, &ret) != napi_ok) {
+        MMI_HILOGE("NapiElement get uint32 value failed");
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
