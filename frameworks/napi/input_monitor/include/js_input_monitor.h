@@ -41,7 +41,7 @@ public:
     DISALLOW_COPY_AND_MOVE(InputMonitor);
     virtual ~InputMonitor() = default;
 
-    bool Start();
+    int32_t Start();
     void Stop();
     void MarkConsumed(int32_t eventId);
     void SetCallback(std::function<void(std::shared_ptr<PointerEvent>)> callback);
@@ -65,7 +65,7 @@ public:
     JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, int32_t id);
     ~JsInputMonitor();
 
-    bool Start();
+    int32_t Start();
     void Stop();
     void MarkConsumed(const int32_t eventId);
     int32_t IsMatch(const napi_env jsEnv, napi_value callback);
