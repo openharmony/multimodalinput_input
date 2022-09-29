@@ -284,6 +284,7 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> &ids)
     }
 
     iter->second->data.ids = ids;
+    iter->second->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
     CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
@@ -398,6 +399,7 @@ void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDevice> dev
     }
 
     iter->second->data.device = device;
+    iter->second->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
     CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
@@ -517,10 +519,10 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
     }
     napi_value handler = nullptr;
     CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler),
-          GET_REFERENCE, scope);
+        GET_REFERENCE, scope);
     napi_value result = nullptr;
     CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, callResult, &result),
-          CALL_FUNCTION, scope);
+        CALL_FUNCTION, scope);
     napi_close_handle_scope(cb->env, scope);
     JsUtil::DeleteCallbackInfo(std::move(cb));
 }
@@ -542,6 +544,7 @@ void JsEventTarget::EmitSupportKeys(int32_t userData, std::vector<bool> &keystro
     }
 
     iter->second->data.keystrokeAbility = keystrokeAbility;
+    iter->second->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
     CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
@@ -579,7 +582,7 @@ void JsEventTarget::EmitJsKeyboardType(int32_t userData, int32_t keyboardType)
         return;
     }
     iter->second->data.keyboardType = keyboardType;
-
+    iter->second->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
     CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
 
@@ -727,7 +730,7 @@ void JsEventTarget::CallDevListAsyncWork(uv_work_t *work, int32_t status)
     CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE, scope);
     napi_value result = nullptr;
     CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, callResult, &result),
-         CALL_FUNCTION, scope);
+        CALL_FUNCTION, scope);
     napi_close_handle_scope(cb->env, scope);
     JsUtil::DeleteCallbackInfo(std::move(cb));
 }

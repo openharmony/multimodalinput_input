@@ -37,7 +37,6 @@ public:
     void UnregisterDevListener(napi_env env, const std::string &type, napi_value handle = nullptr);
     napi_value GetDeviceList(napi_env env, napi_value handle = nullptr);
     napi_value GetDeviceInfo(napi_env env, int32_t id, napi_value handle = nullptr);
-
 };
 } // namespace MMI
 } // namespace OHOS
