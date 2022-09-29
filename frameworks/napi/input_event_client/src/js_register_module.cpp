@@ -121,8 +121,7 @@ static napi_value InjectKeyEvent(napi_env env, napi_callback_info info)
     auto keyEvent = KeyEvent::Create();
     if (keyEvent == nullptr) {
         MMI_HILOGE("The keyEvent is null");
-        CHKRP(env, napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAM, &result), CREATE_INT32);
-        return result;
+        return nullptr;
     }
     bool isPressed = false;
     int32_t ret = GetNamedPropertyBool(env, keyHandle, "isPressed", isPressed);
