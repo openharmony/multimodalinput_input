@@ -143,7 +143,7 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("Requires 2 parameter");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
         return nullptr;
     }
     if (!JsUtil::TypeOf(env, argv[0], napi_string)) {
@@ -158,7 +158,7 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
     std::string type = eventType;
     if (type != CHANGED_TYPE) {
         MMI_HILOGE("Type is not change");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type must be change");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "type must be change");
         return nullptr;
     }
     if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
@@ -181,7 +181,7 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("Requires 2 parameter");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
         return nullptr;
     }
     if (!JsUtil::TypeOf(env, argv[0], napi_string)) {
@@ -196,7 +196,7 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
     std::string type = eventType;
     if (type != CHANGED_TYPE) {
         MMI_HILOGE("Type is not change");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type must be change");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "type must be change");
         return nullptr;
     }
 
@@ -275,7 +275,7 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 2) {
         MMI_HILOGE("Requires 3 parameter");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
         return nullptr;
     }
 
@@ -296,7 +296,7 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
     CHKRP(env, napi_get_array_length(env, argv[1], &size), GET_ARRAY_LENGTH);
     if (size < 1 || size > 5) {
         MMI_HILOGE("Size range error");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "size range error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "size range error");
         return nullptr;
     }
 
@@ -335,7 +335,7 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("Requires 2 parameter");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
         return nullptr;
     }
 
@@ -388,7 +388,7 @@ napi_value JsInputDeviceContext::GetDeviceInfo(napi_env env, napi_callback_info 
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("Requires 2 parameter");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
         return nullptr;
     }
     if (!JsUtil::TypeOf(env, argv[0], napi_number)) {

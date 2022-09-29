@@ -456,7 +456,7 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
-        callResult = GreateBusinessError(cb->env, codeMsg.errorCode, codeMsg.msg);
+        callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &callResult), CREATE_ARRAY, scope);
@@ -502,7 +502,7 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
-        callResult[0] = GreateBusinessError(cb->env, codeMsg.errorCode, codeMsg.msg);
+        callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[1]), GET_UNDEFINED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &callResult[1]), CREATE_ARRAY, scope);
@@ -633,7 +633,7 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
-        callResult[0] = GreateBusinessError(cb->env, codeMsg.errorCode, codeMsg.msg);
+        callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[1]), GET_UNDEFINED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &callResult[1]), CREATE_INT32, scope);
@@ -676,7 +676,7 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
-        callResult = GreateBusinessError(cb->env, codeMsg.errorCode, codeMsg.msg);
+        callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &callResult), CREATE_INT32, scope);
@@ -713,7 +713,7 @@ void JsEventTarget::CallDevListAsyncWork(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
-        callResult[0] = GreateBusinessError(cb->env, codeMsg.errorCode, codeMsg.msg);
+        callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[1]), GET_UNDEFINED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &callResult[1]), CREATE_ARRAY, scope);
@@ -761,7 +761,7 @@ void JsEventTarget::CallDevListPromiseWork(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
-        callResult = GreateBusinessError(cb->env, codeMsg.errorCode, codeMsg.msg);
+        callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &callResult), CREATE_ARRAY, scope);
@@ -804,7 +804,7 @@ void JsEventTarget::CallDevInfoPromiseWork(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
-        callResult = GreateBusinessError(cb->env, codeMsg.errorCode, codeMsg.msg);
+        callResult = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
     } else {
         callResult = JsUtil::GetDeviceInfo(cb);
@@ -845,7 +845,7 @@ void JsEventTarget::CallDevInfoAsyncWork(uv_work_t *work, int32_t status)
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
-        callResult[0] = GreateBusinessError(cb->env, codeMsg.errorCode, codeMsg.msg);
+        callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[1]), GET_UNDEFINED, scope);
     } else {
         callResult[1] = JsUtil::GetDeviceInfo(cb);
@@ -943,18 +943,16 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, co
     return promise;
 }
 
-napi_value JsEventTarget::GreateBusinessError(napi_env env, std::string errCode, std::string errMessage)
+napi_value JsEventTarget::GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage)
 {
     CALL_DEBUG_ENTER;
     napi_value result = nullptr;
-    CHKRP(env, napi_create_object(env, &result), CREATE_OBJECT);
-    napi_value value = nullptr;
-    CHKRP(env, napi_create_string_utf8(env, errCode.data(), NAPI_AUTO_LENGTH, &value), CREATE_STRING_UTF8);
-    CHKRP(env, napi_set_named_property(env, result, "code", value), SET_NAMED_PROPERTY);
-
-    value = nullptr;
-    CHKRP(env, napi_create_string_utf8(env, errMessage.data(), NAPI_AUTO_LENGTH, &value), CREATE_STRING_UTF8);
-    CHKRP(env, napi_set_named_property(env, result, "message", value), SET_NAMED_PROPERTY);
+    napi_value resultCode = nullptr;
+    napi_value resultMessage = nullptr;
+    CHKRP(env, napi_create_int32(env, errCode, &resultCode), CREATE_INT32);
+    CHKRP(env, napi_create_string_utf8(env, errMessage.data(), NAPI_AUTO_LENGTH, &resultMessage), CREATE_STRING_UTF8);
+    CHKRP(env, napi_create_error(env, nullptr, resultMessage, &result), CREATE_ERROR);
+    CHKRP(env, napi_set_named_property(env, result, ERR_CODE.c_str(), resultCode), SET_NAMED_PROPERTY);
     return result;
 }
 
