@@ -530,6 +530,11 @@ void JsEventTarget::CallGetStatePromiseWork(uv_work_t *work, int32_t status)
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
     napi_value object = JsUtil::GetStateInfo(cb);
+    if (object == nullptr) {
+        MMI_HILOGE("object is nullptr");
+        napi_close_handle_scope(cb->env, scope);
+        return;
+    }
     CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, object), RESOLVE_DEFERRED, scope);
     napi_close_handle_scope(cb->env, scope);
 }
