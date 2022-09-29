@@ -53,6 +53,7 @@ struct KeyEventMonitorInfo {
     napi_ref callback[1] {};
     int32_t subscribeId { 0 };
     std::shared_ptr<KeyOption> keyOption { nullptr };
+    int32_t errCode { -1 };
 };
 
 typedef std::map<std::string, std::list<KeyEventMonitorInfo *>> Callbacks;
