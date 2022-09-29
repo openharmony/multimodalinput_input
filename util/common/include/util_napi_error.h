@@ -25,10 +25,13 @@
 #include "securec.h"
 #include "utils/log.h"
 
+#include "util_napi.h"
+
 namespace OHOS {
 namespace MMI {
+const std::string ERR_CODE = "code";
 struct NapiError {
-    std::string errorCode;
+    int32_t errorCode;
     std::string msg;
 };
 
@@ -43,12 +46,25 @@ enum NapiErrorCode : int32_t {
 
 const std::map<int32_t, NapiError> NAPI_ERRORS = {
     {COMMON_PERMISSION_CHECK_ERROR,
-        {"201", "Permission denied. An attempt was made to %s forbidden by permission:%s."}},
-    {COMMON_PARAMETER_ERROR, {"401", "Parameter error. The type of %s must be %s."}},
-    {COOPERATOR_TARGET_DEV_DESCRIPTOR_ERROR, {"4400001", "Incorrect descriptor for the target device"}},
-    {COOPERATOR_DEVICE_ID_ERROE, {"401", "Incorrect ID of the input device"}},
-    {COOPERATOR_FAIL, {"4400002", "Input device operation failed"}},
+        {COMMON_PERMISSION_CHECK_ERROR, "Permission denied. An attempt was made to %s forbidden by permission:%s."}},
+    {COMMON_PARAMETER_ERROR, {COMMON_PARAMETER_ERROR, "Parameter error. The type of %s must be %s."}},
+    {COOPERATOR_TARGET_DEV_DESCRIPTOR_ERROR,
+        {COOPERATOR_TARGET_DEV_DESCRIPTOR_ERROR,"Incorrect descriptor for the target device"}},
+    {COOPERATOR_DEVICE_ID_ERROE, {COMMON_PARAMETER_ERROR, "Incorrect ID of the input device"}},
+    {COOPERATOR_FAIL, {COOPERATOR_FAIL, "Input device operation failed"}},
 };
+
+#define THROWERR_CUSTOM(env, code, msg) \
+    do { \
+        napi_value businessError = nullptr; \
+        napi_value errorCode = nullptr; \
+        napi_value errorMsg = nullptr; \
+        napi_create_int32(env, code, &errorCode); \
+        napi_create_string_utf8(env, msg.c_str(), NAPI_AUTO_LENGTH, &errorMsg); \
+        napi_create_error(env, nullptr, errorMsg, &businessError); \
+        napi_set_named_property(env, businessError, ERR_CODE.c_str(), errorCode); \
+        napi_throw(env, businessError); \
+    } while (0)
 
 #define THROWERR_API9(env, code, ...) \
     do { \
@@ -57,14 +73,9 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
         if (UtilNapiError::GetApiError(code, codeMsg)) { \
             char buf[100]; \
             if (sprintf_s(buf, sizeof(buf), codeMsg.msg.c_str(), ##__VA_ARGS__) > 0) { \
-                napi_throw_error(env, codeMsg.errorCode.c_str(), buf); \
+                THROWERR_CUSTOM(env, code, std::string(buf)) \
             } \
         } \
-    } while (0)
-
-#define THROWERR_CUSTOM(env, code, msg) \
-    do { \
-        napi_throw_error(env, std::to_string(code).c_str(), msg); \
     } while (0)
 namespace UtilNapiError {
 bool GetApiError(int32_t code, NapiError& codeMsg);
