@@ -621,6 +621,11 @@ int32_t ReadTomlFile(const std::string &filePath, DeviceConfig &devConf)
         MMI_HILOGE("Unable to parse files other than json format");
         return RET_ERR;
     }
+    int32_t fileSize = GetFileSize(realPath);
+    if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
+        MMI_HILOGE("File size out of read range");
+        return RET_ERR;
+    }
     if (ReadConfigFile(realPath, devConf) == RET_ERR) {
         MMI_HILOGE("Read device config file failed");
         return RET_ERR;
