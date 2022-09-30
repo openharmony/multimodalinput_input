@@ -55,7 +55,7 @@ bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const s
     CHKRF(env, napi_typeof(env, napiValue, &tmpType), TYPEOF);
     if (tmpType != napi_boolean) {
         MMI_HILOGE("The value is not bool");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "name", "number");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "bool");
         return value;
     }
 
@@ -76,7 +76,7 @@ int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, con
     }
     if (tmpType != napi_number) {
         MMI_HILOGE("The value is not number");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "name", "number");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "number");
         return value;
     }
     napi_get_value_int32(env, napiValue, &value);
@@ -95,8 +95,8 @@ napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int
         napi_valuetype valuetype;
         CHKRP(env, napi_typeof(env, napiElement, &valuetype), TYPEOF);
         if (valuetype != napi_number) {
-            MMI_HILOGE("Wrong argument type, Numbers expected");
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong argument type, Numbers expected");
+            MMI_HILOGE("Wrong argument type, Number expected");
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong argument type, Number expected");
             return nullptr;
         }
         int32_t value = 0;

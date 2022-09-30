@@ -183,7 +183,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     }
     if (preKeys.size() > PRE_KEYS_SIZE) {
         MMI_HILOGE("PreKeys size invalid");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "PreKeys size invalid");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "preKeys size invalid");
         return nullptr;
     }
     MMI_HILOGD("PreKeys size:%{public}d", static_cast<int32_t>(preKeys.size()));
@@ -303,8 +303,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     napi_value argv[3] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 3) {
-        MMI_HILOGE("Requires 3 parameter");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "paramter number error");
         return nullptr;
     }
     KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
@@ -324,7 +323,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         case napi_string: {
             if (GetEventInfoAPI8(env, info, event, keyOption) < 0) {
                 delete event;
-                MMI_HILOGE("GetEventInfo failed");
+                MMI_HILOGE("GetEventInfoAPI8 failed");
                 return nullptr;
             }
             break;
@@ -332,7 +331,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         case napi_number: {
             if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
                 delete event;
-                MMI_HILOGE("GetEventInfo failed");
+                MMI_HILOGE("GetEventInfoAPI9 failed");
                 return nullptr;
             }
             break;
@@ -374,8 +373,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     napi_value argv[3] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 2) {
-        MMI_HILOGE("Requires at least 2 parameter");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "paramter number error");
         return nullptr;
     }
     KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
