@@ -186,6 +186,13 @@ public:
     static constexpr int32_t SOURCE_TYPE_TOUCHPAD = 3;
 
     /**
+     * 表明输入源产生类似于操纵杆的事件，包含按钮按下、按钮抬起、滚轮滚动。
+     *
+     * @since 9
+     */
+    static constexpr int32_t SOURCE_TYPE_JOYSTICK = 4;
+
+    /**
      * Indicates an invalid button ID.
      *
      * @since 9

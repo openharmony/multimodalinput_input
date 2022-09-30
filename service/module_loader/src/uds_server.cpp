@@ -143,13 +143,13 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     }
 
     SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
-    sess->SetTokenType(tokenType);
     if (sess == nullptr) {
         cleanTaskWhenError();
         MMI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
             programName.c_str(), pid, MAKE_SHARED_FAIL);
         return RET_ERR;
     }
+    sess->SetTokenType(tokenType);
 #ifdef OHOS_BUILD_MMI_DEBUG
     sess->SetClientFd(toReturnClientFd);
 #endif // OHOS__BUILD_MMI_DEBUG
@@ -178,14 +178,16 @@ void UDSServer::Dump(int32_t fd, const std::vector<std::string> &args)
     }
 }
 
-void UDSServer::OnConnected(SessionPtr s)
+void UDSServer::OnConnected(SessionPtr sess)
 {
-    MMI_HILOGI("Session desc:%{public}s", s->GetDescript().c_str());
+    CHKPV(sess);
+    MMI_HILOGI("Session desc:%{public}s", sess->GetDescript().c_str());
 }
 
-void UDSServer::OnDisconnected(SessionPtr s)
+void UDSServer::OnDisconnected(SessionPtr sess)
 {
-    MMI_HILOGI("Session desc:%{public}s", s->GetDescript().c_str());
+    CHKPV(sess);
+    MMI_HILOGI("Session desc:%{public}s", sess->GetDescript().c_str());
 }
 
 int32_t UDSServer::AddEpoll(EpollEventType type, int32_t fd)

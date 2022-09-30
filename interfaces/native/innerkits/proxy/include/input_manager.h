@@ -267,7 +267,22 @@ public:
      */
     bool IsPointerVisible();
 
+    /**
+     * @brief 设置鼠标指针样式
+     * @param windowId 指定要更改鼠标指针样式的窗口ID
+     * @param pointerStyle 指定要更改的鼠标指针样式ID
+     * @return 成功返回0，否则返回失败
+     * @since 9
+     */
     int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle);
+
+    /**
+     * @brief 获取鼠标指针样式
+     * @param windowId 指定要获取鼠标指针样式的窗口ID
+     * @param pointerStyle 返回获取的鼠标指针样式ID
+     * @return 成功返回0，否则返回失败
+     * @since 9
+     */
     int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle);
 
     /**
