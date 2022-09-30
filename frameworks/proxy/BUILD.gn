@@ -144,6 +144,10 @@ ohos_shared_library("libmmi-client") {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
 
+  if (input_feature_joystick) {
+    defines += [ "OHOS_BUILD_ENABLE_JOYSTICK" ]
+  }
+
   configs = [
     ":libmmi_client_config",
     "//foundation/multimodalinput/input/util:libmmi_util_public_config",
@@ -297,6 +301,9 @@ ohos_unittest("InputManagerTest") {
   }
   if (input_feature_monitor) {
     defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
+  }
+  if (input_feature_joystick) {
+    defines += [ "OHOS_BUILD_ENABLE_JOYSTICK" ]
   }
   sources = [
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",

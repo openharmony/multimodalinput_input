@@ -57,7 +57,7 @@ constexpr int32_t TWO_MORE_COMMAND = 2;
 constexpr int32_t THREE_MORE_COMMAND = 3;
 constexpr int32_t MAX_PRESSED_COUNT = 30;
 constexpr int32_t ACTION_TIME = 3000;
-constexpr int32_t BLOCK_TIME_MS = 16;
+constexpr int32_t BLOCK_TIME_MS = 10;
 } // namespace
 
 void InputManagerCommand::SleepAndUpdateTime(int64_t &currentTimeMs)

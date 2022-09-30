@@ -142,6 +142,7 @@ std::vector<bool> InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<
 
 bool InputDeviceManager::IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const
 {
+    CHKPF(device);
     for (const auto &key : keyCodes) {
         int32_t value = InputTransformationKeyValue(key);
         if (libinput_device_keyboard_has_key(device, value) == SUPPORT_KEY) {
@@ -509,8 +510,8 @@ std::vector<std::string> InputDeviceManager::GetCooperateDhids(int32_t deviceId)
         MMI_HILOGI("Not pointer device");
         return dhids;
     }
-    dhids.push_back(iter->second.dhid_);
-    MMI_HILOGE("wuwu:size: %{public}d, unq: %{public}s, type:%{public}s", inputDevice_.size(), dhids.back().c_str(), "pointer");
+    dhids.emplace_back(iter->second.dhid_);
+    MMI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "pointer");
     auto pointerNetworkId = iter->second.networkIdOrigin_;
     std::string localNetworkId = GetLocalDeviceId();
     pointerNetworkId = iter->second.isRemote_ ? iter->second.networkIdOrigin_ : localNetworkId;
@@ -522,9 +523,9 @@ std::vector<std::string> InputDeviceManager::GetCooperateDhids(int32_t deviceId)
         if (networkId != pointerNetworkId) {
             continue;
         }
-        if (GetDeviceSupportKey(item.first) == KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
-            dhids.push_back(item.second.dhid_);
-            MMI_HILOGE("wuwu: unq: %{public}s, type:%{public}s", dhids.back().c_str(), "supportkey");
+        if (IsKeyboardDevice(item.second.inputDeviceOrigin_)) {
+            dhids.emplace_back(item.second.dhid_);
+            MMI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "supportkey");
         }
     }
     return dhids;

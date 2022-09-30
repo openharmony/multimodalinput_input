@@ -56,7 +56,7 @@ const std::string CONFIG_ITEM_INTERVAL = "Key.autorepeat.intervaltime";
 const std::string CONFIG_ITEM_TYPE = "Key.keyboard.type";
 const std::string CURSORSTYLE_PATH = "/system/etc/multimodalinput/mouse_icon/";
 const std::string DATA_PATH = "/data";
-const std::string INPUT_PATH = "/system/etc/multimodalinput/";
+const std::string INPUT_PATH = "/system/";
 const std::string KEY_PATH = "/vendor/etc/keymap/";
 constexpr size_t BUF_TID_SIZE = 10;
 constexpr size_t BUF_CMD_SIZE = 512;
@@ -619,6 +619,11 @@ int32_t ReadTomlFile(const std::string &filePath, DeviceConfig &devConf)
     }
     if (!CheckFileExtendName(realPath, "TOML")) {
         MMI_HILOGE("Unable to parse files other than json format");
+        return RET_ERR;
+    }
+    int32_t fileSize = GetFileSize(realPath);
+    if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
+        MMI_HILOGE("File size out of read range");
         return RET_ERR;
     }
     if (ReadConfigFile(realPath, devConf) == RET_ERR) {
