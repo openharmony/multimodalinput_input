@@ -262,8 +262,7 @@ bool EventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> key
             return !IsNeedFilterOut(networkId, keyEvent);
         }
     } else if (state == CooperateState::STATE_OUT) {
-        std::string networkId;
-        GetLocalDeviceId(networkId);
+        std::string networkId = GetLocalDeviceId();
         if (!IsNeedFilterOut(networkId, keyEvent)) {
             if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
                 KeyRepeat->SelectAutoRepeat(keyEvent);

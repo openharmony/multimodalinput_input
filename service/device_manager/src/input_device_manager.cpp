@@ -510,19 +510,21 @@ std::vector<std::string> InputDeviceManager::GetCooperateDhids(int32_t deviceId)
         return dhids;
     }
     dhids.push_back(iter->second.dhid_);
-    MMI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "pointer");
+    MMI_HILOGE("wuwu:size: %{public}d, unq: %{public}s, type:%{public}s", inputDevice_.size(), dhids.back().c_str(), "pointer");
     auto pointerNetworkId = iter->second.networkIdOrigin_;
-    std::string localNetworkId;
-    GetLocalDeviceId(localNetworkId);
+    std::string localNetworkId = GetLocalDeviceId();
     pointerNetworkId = iter->second.isRemote_ ? iter->second.networkIdOrigin_ : localNetworkId;
     for (const auto &item : inputDevice_) {
         auto networkId = item.second.isRemote_ ? item.second.networkIdOrigin_ : localNetworkId;
+        MMI_HILOGE("wuwu:devtargs: %{public}d, isRemote_: %{public}d, Supportkey:%{public}d, networkId: %{public}s", 
+        libinput_device_get_tags(item.second.inputDeviceOrigin_), item.second.isRemote_
+        , GetDeviceSupportKey(item.first), networkId.c_str());
         if (networkId != pointerNetworkId) {
             continue;
         }
         if (GetDeviceSupportKey(item.first) == KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
             dhids.push_back(item.second.dhid_);
-            MMI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "supportkey");
+            MMI_HILOGE("wuwu: unq: %{public}s, type:%{public}s", dhids.back().c_str(), "supportkey");
         }
     }
     return dhids;
@@ -549,7 +551,7 @@ std::string InputDeviceManager::GetOriginNetworkId(int32_t id)
     }
     auto networkId = iter->second.networkIdOrigin_;
     if (networkId.empty()) {
-        GetLocalDeviceId(networkId);
+        networkId = GetLocalDeviceId();
     }
     return networkId;
 }

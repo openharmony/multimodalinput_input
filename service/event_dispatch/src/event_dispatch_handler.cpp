@@ -186,8 +186,8 @@ bool EventDispatchHandler::CheckPointerEvent(std::shared_ptr<PointerEvent> point
         pointerAction = PointerEvent::POINTER_ACTION_BUTTON_UP;
     }
     if ((EV_KEY == dinputSimulateEvent_[0].type == EV_KEY) &&
-        (MouseState->LibinputChangeToPointer(dinputSimulateEvent_[0].code) == pointerEvent->GetButtonId()) &&
-        (pointerAction == pointerEvent->GetPointerAction())) {
+        (pointerAction == pointerEvent->GetPointerAction()) &&
+        (MouseState->LibinputChangeToPointer(dinputSimulateEvent_[0].code) == pointerEvent->GetButtonId())) {
         dinputSimulateEvent_.clear();
         return true;
     }

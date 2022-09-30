@@ -57,7 +57,7 @@ namespace MMI {
 #define ONCE_PROCESS_NETPACKET_LIMIT 100
 #define MAX_RECV_LIMIT 32
 #define INPUT_POINTER_DEVICE "input.pointer.device"
-#define MMI_DSOFTBUS_PKG_NAME "ohos.mmi"
+#define MMI_DINPUT_PKG_NAME "ohos.mmi"
 } // namespace MMI
 } // namespace OHOS
 #endif // CONFIG_MULTIMODAL_H

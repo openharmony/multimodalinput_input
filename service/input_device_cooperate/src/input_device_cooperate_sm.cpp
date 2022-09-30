@@ -93,7 +93,6 @@ void InputDeviceCooperateSM::OnCloseCooperation(const std::string &networkId, bo
     std::lock_guard<std::mutex> guard(mutex_);
     if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty()) {
         if (networkId == preparedNetworkId_.first || networkId == preparedNetworkId_.second) {
-            DevCooperateSoftbusAdapter->CloseInputSoftbus(networkId);
             DistributedAdapter->UnPrepareRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
                 [](bool isSuccess) {});
         }
@@ -129,8 +128,7 @@ void InputDeviceCooperateSM::EnableInputDeviceCooperate(bool enabled)
         BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_STOP, BytraceAdapter::START_EVENT);
     } else {
         DProfileAdapter->UpdateCrossingSwitchState(enabled, onlineDevice_);
-        std::string localNetworkId;
-        GetLocalDeviceId(localNetworkId);
+        std::string localNetworkId = GetLocalDeviceId();
         OnCloseCooperation(localNetworkId, true);
     }
 }
@@ -194,7 +192,6 @@ void InputDeviceCooperateSM::StartRemoteCooperate(const std::string &remoteNetwo
     CALL_INFO_TRACE;
     CHKPV(delegateTasksCallback_);
     delegateTasksCallback_(std::bind(&CooperateEventManager::OnCooperateMessage, CooperateEventMgr, CooperationMessage::INFO_START, remoteNetworkId));
-    // CooperateEventMgr->OnCooperateMessage(CooperationMessage::INFO_START, remoteNetworkId);
     std::lock_guard<std::mutex> guard(mutex_);
     isStarting_ = true;
 }
@@ -211,9 +208,8 @@ void InputDeviceCooperateSM::StartRemoteCooperateResult(bool isSuccess,
     startDhid_ = startDhid;
     CooperationMessage msg =
             isSuccess ? CooperationMessage::INFO_SUCCESS : CooperationMessage::INFO_FAIL;
-    delegateTasksCallback_(std::bind(&CooperateEventManager::OnCooperateMessage, CooperateEventMgr, msg));
+    delegateTasksCallback_(std::bind(&CooperateEventManager::OnCooperateMessage, CooperateEventMgr, msg, ""));
 
-    // CooperateEventMgr->OnCooperateMessage(msg);
     if (!isSuccess || cooperateState_ == CooperateState::STATE_IN) {
         isStarting_ = false;
         return;
@@ -302,6 +298,7 @@ void InputDeviceCooperateSM::OnStopFinish(bool isSuccess, const std::string &rem
     if (isSuccess) {
         if (InputDevMgr->HasLocalPointerDevice()) {
             MouseEventHdr->SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
+            DevCooperateSoftbusAdapter->CloseInputSoftbus(remoteNetworkId);
         }
         if (cooperateState_ == CooperateState::STATE_IN || cooperateState_ == CooperateState::STATE_OUT) {
             UpdateState(CooperateState::STATE_FREE);
@@ -526,14 +523,14 @@ bool InputDeviceCooperateSM::InitDeviceManager()
     initCallback_ = std::make_shared<DeviceInitCallBack>();
     CHKPR(initCallback_, false);
     int32_t ret =
-        DistributedHardware::DeviceManager::GetInstance().InitDeviceManager(MMI_DSOFTBUS_PKG_NAME, initCallback_);
+        DistributedHardware::DeviceManager::GetInstance().InitDeviceManager(MMI_DINPUT_PKG_NAME, initCallback_);
     if (ret != 0) {
         MMI_HILOGE("Init device manager failed, ret:%{public}d", ret);
         return false;
     }
     stateCallback_ = std::make_shared<MmiDeviceStateCallback>();
     ret =
-        DistributedHardware::DeviceManager::GetInstance().RegisterDevStateCallback(MMI_DSOFTBUS_PKG_NAME, "", stateCallback_);
+        DistributedHardware::DeviceManager::GetInstance().RegisterDevStateCallback(MMI_DINPUT_PKG_NAME, "", stateCallback_);
     if (ret != 0) {
         MMI_HILOGE("Register devStateCallback failed, ret:%{public}d", ret);
         return false;
@@ -610,8 +607,7 @@ void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceOnline(
 void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceOffline(
     const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
-    CALL_DEBUG_ENTER;
-    InputDevCooSM->OnDeviceOffline(deviceInfo.deviceId);
+    CALL_INFO_TRACE;
 }
 
 void InputDeviceCooperateSM::MmiDeviceStateCallback::OnDeviceChanged(

@@ -39,8 +39,7 @@ int32_t InputDeviceCooperateStateIn::StartInputDeviceCooperate(const std::string
         MMI_HILOGE("RemoteNetworkId is empty");
         return RET_ERR;
     }
-    std::string localNetworkId;
-    GetLocalDeviceId(localNetworkId);
+    std::string localNetworkId = GetLocalDeviceId();
     if (localNetworkId.empty() || remoteNetworkId == localNetworkId) {
         MMI_HILOGE("Input Parameters error");
         return RET_ERR;

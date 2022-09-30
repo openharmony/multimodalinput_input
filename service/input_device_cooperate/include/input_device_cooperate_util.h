@@ -17,9 +17,25 @@
 
 #include <string>
 
+#include "cJSON.h"
+
 namespace OHOS {
 namespace MMI {
-void GetLocalDeviceId(std::string &local);
+struct JsonParser {
+    JsonParser() = default;
+    ~JsonParser()
+    {
+        if (json_ != nullptr) {
+            cJSON_Delete(json_);
+        }
+    }
+    operator cJSON *()
+    {
+        return json_;
+    }
+    cJSON *json_ { nullptr };
+};
+std::string GetLocalDeviceId();
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_DEVICE_COOPERATE_UTIL_H
