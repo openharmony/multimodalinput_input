@@ -18,9 +18,8 @@
 #include <algorithm>
 #include <mutex>
 
-#include "cJSON.h"
-
 #include "distributed_device_profile_client.h"
+#include "input_device_cooperate_util.h"
 #include "service_characteristic_profile.h"
 #include "sync_options.h"
 
@@ -32,20 +31,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Devic
 const std::string SERVICE_ID = "InputDeviceCooperation";
 const std::string SERVICE_TYPE = "InputDeviceCooperation";
 const std::string CHARACTERISTICS_NAME = "CurrentState";
-struct JsonParser {
-    JsonParser() = default;
-    ~JsonParser()
-    {
-        if (json_ != nullptr) {
-            cJSON_Delete(json_);
-        }
-    }
-    operator cJSON *()
-    {
-        return json_;
-    }
-    cJSON *json_ { nullptr };
-};
 } // namespace
 
 DeviceProfileAdapter::DeviceProfileAdapter() {}
@@ -64,7 +49,10 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     profile.SetServiceType(SERVICE_TYPE);
     cJSON *data = cJSON_CreateObject();
     cJSON_AddItemToObject(data, CHARACTERISTICS_NAME.c_str(), cJSON_CreateBool(state));
-    profile.SetCharacteristicProfileJson(cJSON_Print(data));
+    char *smsg = cJSON_Print(data);
+    cJSON_Delete(data);
+    profile.SetCharacteristicProfileJson(smsg);
+    cJSON_free(smsg);
 
     int32_t ret = DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
     if (ret != 0) {
@@ -90,7 +78,10 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
     profile.SetServiceType(SERVICE_TYPE);
     cJSON *data = cJSON_CreateObject();
     cJSON_AddItemToObject(data, CHARACTERISTICS_NAME.c_str(), cJSON_CreateBool(state));
-    profile.SetCharacteristicProfileJson(cJSON_Print(data));
+    char *smsg = cJSON_Print(data);
+    cJSON_Delete(data);
+    profile.SetCharacteristicProfileJson(smsg);
+    cJSON_free(smsg);
 
     return DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
 }

@@ -24,17 +24,16 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceCooperateUtil"};
 } // namespace
-void GetLocalDeviceId(std::string &local)
+std::string GetLocalDeviceId()
 {
-    local = "";
     auto localNode = std::make_unique<NodeBasicInfo>();
-    CHKPV(localNode);
-    int32_t errCode = GetLocalNodeDeviceInfo(MMI_DSOFTBUS_PKG_NAME, localNode.get());
+    CHKPS(localNode);
+    int32_t errCode = GetLocalNodeDeviceInfo(MMI_DINPUT_PKG_NAME, localNode.get());
     if (errCode != RET_OK) {
         MMI_HILOGE("GetLocalNodeDeviceInfo errCode: %{public}d", errCode);
-        return;
+        return "";
     }
-    local = localNode->networkId;
+    return localNode->networkId;
 }
 } // namespace MMI
 } // namespace OHOS
