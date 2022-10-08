@@ -48,7 +48,7 @@
         "hitrace_native",
         "resource_schedule_service",
         "eventhandler",
-        "multimedia_image_standard",
+        "multimedia_image_framework",
         "graphic_standard",
         "drivers_interface_input",
         "multimodalinput",

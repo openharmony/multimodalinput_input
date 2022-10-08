@@ -99,6 +99,7 @@ const std::map<int32_t, KeyUnicode> KEY_UNICODE_TRANSFORMATION = {
 
 bool IsShiftPressed(std::shared_ptr<KeyEvent> keyEvent)
 {
+    CHKPF(keyEvent);
     auto pressedKeys = keyEvent->GetPressedKeys();
     for (auto iter = pressedKeys.cbegin(); iter != pressedKeys.cend(); ++iter) {
         if ((*iter == HOS_KEY_SHIFT_LEFT) || (*iter == HOS_KEY_SHIFT_RIGHT)) {
