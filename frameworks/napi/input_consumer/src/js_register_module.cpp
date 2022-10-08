@@ -20,9 +20,9 @@
 
 #include "input_manager.h"
 #include "js_register_util.h"
+#include "napi_constants.h"
 #include "util_napi_error.h"
 #include "util_napi.h"
-#include "napi_constants.h"
 
 namespace OHOS {
 namespace MMI {
@@ -30,12 +30,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterModule" };
 constexpr size_t EVENT_NAME_LEN = 64;
 constexpr size_t PRE_KEYS_SIZE = 4;
-enum SubscribeType {
-    /**
-     * @since 9
-     */
-    KEY = 0,
-};
 } // namespace
 
 static Callbacks callbacks = {};
@@ -98,7 +92,7 @@ int32_t GetEventInfoAPI8(napi_env env, napi_callback_info info, KeyEventMonitorI
         napi_throw_error(env, nullptr, "PreKeys size invalid");
         return ERROR_CODE;
     }
-    MMI_HILOGD("PreKeys size:%{public}d", static_cast<int32_t>(preKeys.size()));
+    MMI_HILOGD("PreKeys size:%{public}zu", preKeys.size());
     keyOption->SetPreKeys(preKeys);
     std::string subKeyNames = "";
     for (const auto &item : preKeys) {
@@ -144,7 +138,7 @@ int32_t GetEventInfoAPI8(napi_env env, napi_callback_info info, KeyEventMonitorI
     return SUCCESS_CODE;
 }
 
-napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
+napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, const KeyEventMonitorInfo* event,
     std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
@@ -156,7 +150,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     napi_valuetype valueType = napi_undefined;
     if (!UtilNapi::TypeOf(env, argv[0], napi_number)) {
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "number");
-        MMI_HILOGE("Thr first parameter is not number");
+        MMI_HILOGE("The first parameter is not number");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_object)) {
@@ -186,7 +180,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "preKeys size invalid");
         return nullptr;
     }
-    MMI_HILOGD("PreKeys size:%{public}d", static_cast<int32_t>(preKeys.size()));
+    MMI_HILOGD("PreKeys size:%{public}zu", preKeys.size());
     keyOption->SetPreKeys(preKeys);
     std::string subKeyNames = "";
     for (const auto &item : preKeys) {
@@ -338,6 +332,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         }
         default: {
             THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "number");
+            delete event;
             return nullptr;
         }
     }
@@ -373,7 +368,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     napi_value argv[3] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 2) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "paramter number error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
     }
     KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
@@ -408,6 +403,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         }
         default: {
             THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "number");
+            delete event;
             return nullptr;
         }
     }
