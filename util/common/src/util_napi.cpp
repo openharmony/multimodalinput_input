@@ -17,7 +17,9 @@
 
 #include "mmi_log.h"
 
-namespace OHOS::MMI::UtilNapi {
+namespace OHOS {
+namespace MMI {
+namespace UtilNapi {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilNapi" };
 } // namespace
@@ -28,4 +30,6 @@ bool TypeOf(napi_env env, napi_value value, napi_valuetype type)
     CHKRF(env, napi_typeof(env, value, &valueType), "napi_typeof");
     return (valueType == type);
 }
-} // namespace OHOS::MMI::UtilNapi
+} // namespace UtilNapi
+} // namespace MMI
+} // namespace OHO
