@@ -113,7 +113,7 @@ napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int
         }
     }
     napi_value ret;
-    napi_create_int32(env, RET_OK, &ret);
+    CHKRP(env, napi_create_int32(env, RET_OK, &ret), CREATE_INT32);
     return ret;
 }
 

@@ -64,8 +64,8 @@ int32_t GetEventInfoAPI8(napi_env env, napi_callback_info info, KeyEventMonitorI
         return ERROR_CODE;
     }
     if (valueType != napi_object) {
-        MMI_HILOGE("Parameter2 is not napi_object");
-        napi_throw_error(env, nullptr, "Parameter2 is not napi_object");
+        MMI_HILOGE("The second parameter is not napi_object");
+        napi_throw_error(env, nullptr, "The second parameter is not napi_object");
         return ERROR_CODE;
     }
     char eventName[EVENT_NAME_LEN] = { 0 };
@@ -176,7 +176,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, const KeyEven
         return nullptr;
     }
     if (preKeys.size() > PRE_KEYS_SIZE) {
-        MMI_HILOGE("PreKeys size invalid");
+        MMI_HILOGE("preKeys size invalid");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "preKeys size invalid");
         return nullptr;
     }
@@ -207,7 +207,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, const KeyEven
     if (argc == 3) {
         CHKRP(env, napi_typeof(env, argv[2], &valueType), TYPEOF);
         if (valueType != napi_function) {
-            MMI_HILOGE("Parameter3 is not napi_function");
+            MMI_HILOGE("the third parameter is not napi_function");
             THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
             return nullptr;
         }
@@ -216,7 +216,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, const KeyEven
         event->callback[0] = nullptr;
     }
     napi_value ret;
-    napi_create_int32(env, RET_OK, &ret);
+    CHKRP(env, napi_create_int32(env, RET_OK, &ret), CREATE_INT32);
     return ret;
 }
 
