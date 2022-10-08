@@ -66,14 +66,16 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
         napi_throw(env, businessError); \
     } while (0)
 
-#define THROWERR_API9(env, code, ...) \
+#define THROWERR_API9(env, code, param1, param2) \
     do { \
         MMI_HILOGE("ErrorCode:%{public}s", (#code)); \
         NapiError codeMsg; \
         if (UtilNapiError::GetApiError(code, codeMsg)) { \
             char buf[100]; \
-            if (sprintf_s(buf, sizeof(buf), codeMsg.msg.c_str(), ##__VA_ARGS__) > 0) { \
+            if (sprintf_s(buf, sizeof(buf), codeMsg.msg.c_str(), param1, param2) > 0) { \
                 THROWERR_CUSTOM(env, code, buf); \
+            } else { \
+                MMI_HILOGE("Failed to convert string type to char type"); \
             } \
         } \
     } while (0)
