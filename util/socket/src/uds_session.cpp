@@ -147,11 +147,13 @@ std::vector<int32_t> UDSSession::GetTimerIds(int32_t type)
         MMI_HILOGE("Current events have no event type:%{public}d", type);
         return {};
     }
-    std::vector<int32_t> Timers;
+    std::vector<int32_t> timers;
     for (auto &item : iter->second) {
-        Timers.push_back(item.timerId);
+        timers.push_back(item.timerId);
+        item.timerId = -1;
     }
-    return Timers;
+    events_[iter->first] = iter->second;
+    return timers;
 }
 
 std::list<int32_t> UDSSession::DelEvents(int32_t type, int32_t id)
