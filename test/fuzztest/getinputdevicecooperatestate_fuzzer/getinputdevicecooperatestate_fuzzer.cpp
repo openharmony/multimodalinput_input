@@ -26,25 +26,12 @@ namespace {
     constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetInputDeviceCooperateStateFuzzTest" };
 } // namespace
 
-template<class T>
-size_t GetObject(const uint8_t* data, size_t size, T& object)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
 void GetInputDeviceCooperateStateFuzzTest(const uint8_t* data, size_t size)
 {
-    std::string deviceId;
-    size_t startPos = 0;
-    startPos += GetObject<std::string>(data + startPos, size - startPos, deviceId);
+    if (data == nullptr) {
+        return;
+    }
+    const std::string deviceId(reinterpret_cast<const char*>(data), size);
     auto fun = [](bool inputdevice) {
         MMI_HILOGD("Get inputdevice state success");
     };
