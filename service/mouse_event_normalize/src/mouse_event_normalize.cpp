@@ -226,6 +226,7 @@ int32_t MouseEventNormalize::HandleAxisInner(struct libinput_event_pointer* data
             auto pointerEvent = sharedPtr->GetPointerEvent();
             CHKPV(pointerEvent);
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+            pointerEvent->UpdateId();
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPV(inputEventNormalizeHandler);
             inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
