@@ -298,7 +298,6 @@ void InputDeviceCooperateSM::OnStopFinish(bool isSuccess, const std::string &rem
     if (isSuccess) {
         if (InputDevMgr->HasLocalPointerDevice()) {
             MouseEventHdr->SetAbsolutionLocation(MOUSE_ABS_LOCATION_X, MOUSE_ABS_LOCATION_Y);
-            DevCooperateSoftbusAdapter->CloseInputSoftbus(remoteNetworkId);
         }
         if (cooperateState_ == CooperateState::STATE_IN || cooperateState_ == CooperateState::STATE_OUT) {
             UpdateState(CooperateState::STATE_FREE);
@@ -306,6 +305,7 @@ void InputDeviceCooperateSM::OnStopFinish(bool isSuccess, const std::string &rem
             MMI_HILOGI("Current state is free");
         }
     }
+    DevCooperateSoftbusAdapter->CloseInputSoftbus(remoteNetworkId);
     isStopping_ = false;
 }
 
