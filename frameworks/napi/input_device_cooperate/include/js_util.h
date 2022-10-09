@@ -30,17 +30,17 @@ namespace MMI {
 class JsUtil {
 public:
     struct UserData {
-        int32_t userData = 0;
-        int32_t deviceId = 0;
-        napi_value handle = nullptr;
+        int32_t userData { 0 };
+        int32_t deviceId { 0 };
+        napi_value handle { nullptr };
         std::vector<int32_t> keys;
     };
 
     struct CallbackData {
-        bool enableResult = false;
-        bool startResult = false;
-        bool stopResult = false;
-        bool cooperateOpened = false;
+        bool enableResult { false };
+        bool startResult { false };
+        bool stopResult { false };
+        bool cooperateOpened { false };
         std::string deviceDescriptor;
         CooperationMessage msg = CooperationMessage::OPEN_SUCCESS;
     };
@@ -48,10 +48,10 @@ public:
     struct CallbackInfo {
         CallbackInfo() = default;
         ~CallbackInfo();
-        napi_env env = nullptr;
-        napi_ref ref = nullptr;
-        napi_deferred deferred = nullptr;
-        int32_t errCode = 0;
+        napi_env env { nullptr };
+        napi_ref ref { nullptr };
+        napi_deferred deferred { nullptr };
+        int32_t errCode { 0 };
         CallbackData data;
         UserData uData;
     };

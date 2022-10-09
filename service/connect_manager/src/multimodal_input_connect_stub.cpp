@@ -226,11 +226,6 @@ int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check fail");
-        return RET_ERR;
-    }
-
     int32_t windowId;
     READINT32(data, windowId, RET_ERR);
     int32_t pointerStyle;
@@ -247,11 +242,6 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check fail");
-        return RET_ERR;
-    }
-
     int32_t windowId;
     READINT32(data, windowId, RET_ERR);
     int32_t pointerStyle;
@@ -280,8 +270,11 @@ int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, Message
         READINT32(data, key, IPC_PROXY_DEAD_OBJECT_ERR);
         keys.push_back(key);
     }
-    SupportKeys(userData, deviceId, keys);
-    return RET_OK;
+    int32_t ret = SupportKeys(userData, deviceId, keys);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SupportKeys failed ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubGetDeviceIds(MessageParcel& data, MessageParcel& reply)
@@ -289,8 +282,11 @@ int32_t MultimodalInputConnectStub::StubGetDeviceIds(MessageParcel& data, Messag
     CALL_DEBUG_ENTER;
     int32_t userData = 0;
     READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
-    GetDeviceIds(userData);
-    return RET_OK;
+    int32_t ret = GetDeviceIds(userData);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetDeviceIds failed ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubGetDevice(MessageParcel& data, MessageParcel& reply)
@@ -300,22 +296,31 @@ int32_t MultimodalInputConnectStub::StubGetDevice(MessageParcel& data, MessagePa
     READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t deviceId = -1;
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
-    GetDevice(userData, deviceId);
-    return RET_OK;
+    int32_t ret = GetDevice(userData, deviceId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetDevice failed ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubRegisterInputDeviceMonitor(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    RegisterDevListener();
-    return RET_OK;
+    int32_t ret = RegisterDevListener();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call RegisterInputDeviceMonitor failed ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubUnregisterInputDeviceMonitor(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    UnregisterDevListener();
-    return RET_OK;
+    int32_t ret = UnregisterDevListener();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call UnregisterInputDeviceMonitor failed ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubGetKeyboardType(MessageParcel& data, MessageParcel& reply)
@@ -325,8 +330,11 @@ int32_t MultimodalInputConnectStub::StubGetKeyboardType(MessageParcel& data, Mes
     READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t deviceId = -1;
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
-    GetKeyboardType(userData, deviceId);
-    return RET_OK;
+    int32_t ret = GetKeyboardType(userData, deviceId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetKeyboardType failed ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, MessageParcel& reply)

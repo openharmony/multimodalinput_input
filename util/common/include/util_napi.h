@@ -26,7 +26,6 @@ namespace MMI {
         if ((state) != napi_ok) { \
             MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
             auto infoTemp = std::string(__FUNCTION__)+ ": " + std::string(desc) + " failed"; \
-            napi_throw_error(env, nullptr, infoTemp.c_str()); \
             return; \
         } \
     } while (0)
@@ -36,7 +35,6 @@ namespace MMI {
         if ((state) != napi_ok) { \
             MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
             auto infoTemp = std::string(__FUNCTION__)+ ":" + std::string(desc) + " failed"; \
-            napi_throw_error(env, nullptr, infoTemp.c_str()); \
             napi_close_handle_scope(env, scope); \
             return; \
         } \
@@ -47,7 +45,6 @@ namespace MMI {
         if ((state) != napi_ok) { \
             MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
             auto infoTemp = std::string(__FUNCTION__)+ ": " + std::string(desc) + " failed"; \
-            napi_throw_error(env, nullptr, infoTemp.c_str()); \
             return nullptr; \
         } \
     } while (0)
@@ -57,7 +54,6 @@ namespace MMI {
         if ((state) != napi_ok) { \
             MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
             auto infoTemp = std::string(__FUNCTION__)+ ": " + std::string(desc) + " failed"; \
-            napi_throw_error(env, nullptr, infoTemp.c_str()); \
             return false; \
         } \
     } while (0)

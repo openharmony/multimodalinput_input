@@ -131,6 +131,7 @@ void DfxHisysevent::OnClientConnect(const ClientConnectData &data, OHOS::HiviewD
 void DfxHisysevent::OnClientDisconnect(const SessionPtr& secPtr, int32_t fd,
     OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
+    CHKPV(secPtr);
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
         int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
             OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
@@ -171,6 +172,7 @@ void DfxHisysevent::OnClientDisconnect(const SessionPtr& secPtr, int32_t fd,
 void DfxHisysevent::OnUpdateTargetPointer(std::shared_ptr<PointerEvent> pointer, int32_t fd,
     OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
+    CHKPV(pointer);
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
         int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
             OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
@@ -201,6 +203,7 @@ void DfxHisysevent::OnUpdateTargetPointer(std::shared_ptr<PointerEvent> pointer,
 void DfxHisysevent::OnUpdateTargetKey(std::shared_ptr<KeyEvent> key, int32_t fd,
     OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
+    CHKPV(key);
     if (type == OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR) {
         int32_t ret = OHOS::HiviewDFX::HiSysEvent::Write(
             OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
