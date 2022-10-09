@@ -260,6 +260,7 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     int64_t time = GetSysClockTime();
     pointerEvent->SetActionTime(time);
     pointerEvent->SetActionStartTime(time);
+    pointerEvent->UpdateId();
 
     auto fd = udsServer_->GetClientFd(lastWindowInfo_.pid);
     auto sess = udsServer_->GetSession(fd);
