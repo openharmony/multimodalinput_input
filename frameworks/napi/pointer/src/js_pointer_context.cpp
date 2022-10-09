@@ -119,12 +119,12 @@ napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info 
     napi_value argv[2];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
-        MMI_HILOGE("At least 1 parameter is required");
+        MMI_HILOGE("At least one parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible" , "boolean");
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
-        MMI_HILOGE("The parameter is the wrong type of visible");
+        MMI_HILOGE("visible parameter type is wrong");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible" , "boolean");
         return nullptr;
     }
@@ -137,7 +137,7 @@ napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info 
         return jsPointerMgr->SetPointerVisible(env, visible);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        MMI_HILOGE("The parameter is the wrong type of callback");
+        MMI_HILOGE("callback parameter type is wrong ");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -157,7 +157,7 @@ napi_value JsPointerContext::IsPointerVisible(napi_env env, napi_callback_info i
         return jsPointerMgr->IsPointerVisible(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
-        MMI_HILOGE("The parameter is the wrong type of callback");
+        MMI_HILOGE("callback parameter type is wrong");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -177,7 +177,7 @@ napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info in
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        MMI_HILOGE("The parameter is the wrong type of speed");
+        MMI_HILOGE("speed parameter type is wrong");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "speed", "number");
         return nullptr;
     }
@@ -194,7 +194,7 @@ napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info in
         return jsPointerMgr->SetPointerSpeed(env, pointerSpeed);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        MMI_HILOGE("The parameter is the wrong type of callback");
+        MMI_HILOGE("callback parameter type is wrong");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -213,7 +213,7 @@ napi_value JsPointerContext::GetPointerSpeed(napi_env env, napi_callback_info in
         return jsPointerMgr->GetPointerSpeed(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
-        MMI_HILOGE("The parameter is the wrong type of callback");
+        MMI_HILOGE("callback parameter type is wrong");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -233,7 +233,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        MMI_HILOGE("The parameter is the wrong type of windowId");
+        MMI_HILOGE("windowId parameter type is wrong");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
         return nullptr;
     }
@@ -245,7 +245,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_number)) {
-        MMI_HILOGE("The parameter is the wrong type of pointerStyle");
+        MMI_HILOGE("pointerStyle parameter type is wrong");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "pointerStyle", "number");
         return nullptr;
     }
@@ -262,7 +262,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
         return jsPointerMgr->SetPointerStyle(env, windowid, pointerStyle);
     }
     if (!JsCommon::TypeOf(env, argv[2], napi_function)) {
-        MMI_HILOGE("The parameter is the wrong type of callback");
+        MMI_HILOGE("callback parameter type is wrong");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -281,7 +281,7 @@ napi_value JsPointerContext::GetPointerStyle(napi_env env, napi_callback_info in
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        MMI_HILOGE("The parameter is the wrong type of windowId");
+        MMI_HILOGE("windowId parameter type is wrong");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
         return nullptr;
     }
@@ -298,7 +298,7 @@ napi_value JsPointerContext::GetPointerStyle(napi_env env, napi_callback_info in
         return jsPointerMgr->GetPointerStyle(env, windowid);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        MMI_HILOGE("The parameter is the wrong type of callback");
+        MMI_HILOGE("callback parameter type is wrong");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
