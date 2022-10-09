@@ -30,12 +30,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Multi
 MultimodalInputConnectProxy::MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<IMultimodalInputConnect>(impl)
 {
-    MMI_HILOGI("Enter MultimodalInputConnectProxy");
+    MMI_HILOGD("Enter MultimodalInputConnectProxy");
 }
 
 MultimodalInputConnectProxy::~MultimodalInputConnectProxy()
 {
-    MMI_HILOGI("Enter ~MultimodalInputConnectProxy");
+    MMI_HILOGD("Enter ~MultimodalInputConnectProxy");
 }
 
 int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programName,

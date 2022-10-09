@@ -64,7 +64,7 @@ void DumpData(const char* dataPtr, const size_t dataSize, const char* fileName, 
     constexpr size_t outBufSize = 1024;
     char outBuf[outBufSize] = {};
     int32_t writeLen = 0;
-    int32_t ret;
+    int32_t ret = 0;
     auto funcAdvanceWriteLen = [&writeLen, ret]() {
         if (ret > 0) {
             writeLen += ret;

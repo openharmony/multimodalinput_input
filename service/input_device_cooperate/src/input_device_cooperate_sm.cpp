@@ -19,17 +19,17 @@
 #include "hitrace_meter.h"
 
 #include "bytrace_adapter.h"
-#include "cooperation_message.h"
 #include "cooperate_event_manager.h"
+#include "cooperation_message.h"
 #include "define_multimodal.h"
 #include "device_manager.h"
 #include "device_profile_adapter.h"
+#include "i_pointer_drawing_manager.h"
 #include "input_device_cooperate_state_free.h"
 #include "input_device_cooperate_state_in.h"
 #include "input_device_cooperate_state_out.h"
 #include "input_device_manager.h"
-#include "i_pointer_drawing_manager.h"
-#include "mouse_event_handler.h"
+#include "mouse_event_normalize.h"
 #include "multimodal_input_connect_remoter.h"
 #include "timer_manager.h"
 #include "util_ex.h"
@@ -460,9 +460,9 @@ void InputDeviceCooperateSM::HandleEvent(libinput_event *event)
             break;
         }
         default: {
-            MMI_HILOGI("This device does not support");
-            CHKPV(nextHandler_);
-            nextHandler_->HandleEvent(event);
+            auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+            CHKPV(inputEventNormalizeHandler);
+            inputEventNormalizeHandler->HandleEvent(event);
             break;
         }
     }
@@ -507,8 +507,9 @@ void InputDeviceCooperateSM::CheckPointerEvent(struct libinput_event *event)
             return;
         }
     }
-    CHKPV(nextHandler_);
-    nextHandler_->HandleEvent(event);
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+    CHKPV(inputEventNormalizeHandler);
+    inputEventNormalizeHandler->HandleEvent(event);
 }
 
 bool InputDeviceCooperateSM::CheckTouchEvent(struct libinput_event* event)

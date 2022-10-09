@@ -76,7 +76,7 @@ bool MMIClient::Start()
         Stop();
         return false;
     }
-    MMI_HILOGI("Client started successfully");
+    MMI_HILOGD("Client started successfully");
     return true;
 }
 
@@ -106,7 +106,7 @@ void MMIClient::OnRecvThread()
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    SetThreadName("mmi_client_RecvEventHdr");
+    SetThreadName("MmiClientRecvEventHdr");
     auto runner = EventRunner::Create(false);
     CHKPV(runner);
     {
@@ -250,7 +250,7 @@ int32_t MMIClient::Socket()
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
         MMI_HILOGE("Call GetClientSocketFdOfAllocedSocketPair return invalid fd");
     } else {
-        MMI_HILOGI("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
+        MMI_HILOGD("Call GetClientSocketFdOfAllocedSocketPair return fd:%{public}d", fd_);
     }
     return fd_;
 }

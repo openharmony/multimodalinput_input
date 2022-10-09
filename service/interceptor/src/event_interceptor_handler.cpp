@@ -17,7 +17,7 @@
 
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
-#include "event_dispatch.h"
+#include "event_dispatch_handler.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "mmi_log.h"

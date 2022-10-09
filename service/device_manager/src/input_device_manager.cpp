@@ -143,6 +143,7 @@ std::vector<bool> InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<
 
 bool InputDeviceManager::IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const
 {
+    CHKPF(device);
     for (const auto &key : keyCodes) {
         int32_t value = InputTransformationKeyValue(key);
         if (libinput_device_keyboard_has_key(device, value) == SUPPORT_KEY) {
@@ -510,7 +511,7 @@ std::vector<std::string> InputDeviceManager::GetCooperateDhids(int32_t deviceId)
         MMI_HILOGI("Not pointer device");
         return dhids;
     }
-    dhids.push_back(iter->second.dhid_);
+    dhids.emplace_back(iter->second.dhid_);
     MMI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "pointer");
     auto pointerNetworkId = iter->second.networkIdOrigin_;
     std::string localNetworkId;
@@ -521,8 +522,8 @@ std::vector<std::string> InputDeviceManager::GetCooperateDhids(int32_t deviceId)
         if (networkId != pointerNetworkId) {
             continue;
         }
-        if (GetDeviceSupportKey(item.first) == KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
-            dhids.push_back(item.second.dhid_);
+        if (IsKeyboardDevice(item.second.inputDeviceOrigin_)) {
+            dhids.emplace_back(item.second.dhid_);
             MMI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "supportkey");
         }
     }
@@ -672,12 +673,12 @@ std::string InputDeviceManager::Sha256(const std::string &in) const
 
 std::string InputDeviceManager::GenerateDescriptor(struct libinput_device *inputDevice, bool isRemote) const
 {
-    const char* location = libinput_device_get_phys(inputDevice);
+    const char* physicalPath = libinput_device_get_phys(inputDevice);
     std::string descriptor;
-    if (isRemote && location != nullptr) {
-        MMI_HILOGI("location:%{public}s", location);
+    if (isRemote && physicalPath != nullptr) {
+        MMI_HILOGI("physicalPath:%{public}s", physicalPath);
         std::vector<std::string> strList;
-        StringSplit(location, SPLIT_SYMBOL, strList);
+        StringSplit(physicalPath, SPLIT_SYMBOL, strList);
         if (strList.size() == 3) {
             descriptor = strList[2];
         }
@@ -693,8 +694,9 @@ std::string InputDeviceManager::GenerateDescriptor(struct libinput_device *input
     // add handling for USB devices to not uniqueify kbs that show up twice
     if (uniqueId != nullptr && uniqueId[0] != '\0') {
         rawDescriptor += "uniqueId:" + std::string(uniqueId);
-    } else if (location != nullptr) {
-        rawDescriptor += "location:" + std::string(location);
+    }
+    if (physicalPath != nullptr) {
+        rawDescriptor += "physicalPath:" + std::string(physicalPath);
     }
     if (name != nullptr && name[0] != '\0') {
         rawDescriptor += "name:" + regex_replace(name, std::regex(" "), "");

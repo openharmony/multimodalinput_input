@@ -28,7 +28,7 @@
 
 #include "device_observer.h"
 #include "i_pointer_drawing_manager.h"
-#include "mouse_event_handler.h"
+#include "mouse_event_normalize.h"
 #include "struct_multimodal.h"
 
 namespace OHOS {
@@ -86,7 +86,7 @@ private:
     bool hasPointerDevice_ { false };
     int32_t lastPhysicalX_ { -1 };
     int32_t lastPhysicalY_ { -1 };
-    int32_t lastMouseStyle_ { 0 };
+    int32_t lastMouseStyle_ { -1 };
     int32_t pid_ { 0 };
     int32_t windowId_ { 0 };
     int32_t imageWidth_ { 0 };

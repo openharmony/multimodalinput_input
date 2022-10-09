@@ -127,6 +127,7 @@ bool JsUtil::GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_val
         auto iter = axisType.find(item.GetAxisType());
         if (iter == axisType.end()) {
             MMI_HILOGD("Find axisType failed");
+            continue;
         }
         CHKRF(cb->env, napi_create_object(cb->env, &axisRange), CREATE_OBJECT);
         CHKRF(cb->env, napi_set_named_property(cb->env, axisRange, "source", sourceType), SET_NAMED_PROPERTY);
