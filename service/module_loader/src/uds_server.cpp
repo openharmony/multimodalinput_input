@@ -20,10 +20,8 @@
 
 #include <sys/socket.h>
 
-#include "accesstoken_kit.h"
 #include "dfx_hisysevent.h"
 #include "i_multimodal_input_connect.h"
-#include "ipc_skeleton.h"
 #include "mmi_log.h"
 #include "util.h"
 #include "util_ex.h"
@@ -116,7 +114,6 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     static constexpr size_t bufferSize = 32 * 1024;
     setsockopt(sockFds[0], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
-    
     if (tokenType == TokenType::TOKEN_NATIVE) {
         static constexpr size_t nativeBufferSize = 64 * 1024;
         setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &nativeBufferSize, sizeof(nativeBufferSize));
