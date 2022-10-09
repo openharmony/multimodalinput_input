@@ -49,11 +49,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, tmpType == napi_object, "parameter1 is not napi_object");
 
     auto keyEvent = KeyEvent::Create();
-    if (keyEvent == nullptr) {
-        MMI_HILOGE("The keyEvent is null");
-        napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAM, &result);
-        return result;
-    }
+    CHKPP(keyEvent);
     bool isPressed = false;
     int32_t ret = GetNamedPropertyBool(env, keyHandle, "isPressed", isPressed);
     if (ret != RET_OK) {
@@ -100,7 +96,7 @@ static napi_value InjectKeyEvent(napi_env env, napi_callback_info info)
     napi_value argv[1] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
-        MMI_HILOGE("Paramater num error");
+        MMI_HILOGE("Paramater number error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "KeyEvent", "string");
         return nullptr;
     }
@@ -119,10 +115,7 @@ static napi_value InjectKeyEvent(napi_env env, napi_callback_info info)
         return nullptr;
     }
     auto keyEvent = KeyEvent::Create();
-    if (keyEvent == nullptr) {
-        MMI_HILOGE("The keyEvent is null");
-        return nullptr;
-    }
+    CHKPP(keyEvent);
     bool isPressed = false;
     int32_t ret = GetNamedPropertyBool(env, keyHandle, "isPressed", isPressed);
     if (ret != RET_OK) {

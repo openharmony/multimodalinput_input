@@ -50,7 +50,7 @@ static napi_value JsOnOld(napi_env env, napi_callback_info info)
         THROWERR(env, "Register js monitor failed, value type is not napi_string");
         return nullptr;
     }
-    char typeName[MAX_STRING_LEN] = {0};
+    char typeName[MAX_STRING_LEN] = { 0 };
     size_t len = 0;
     CHKRP(env, napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_STRING_UTF8);
     if (std::strcmp(typeName, "touch") != 0 && std::strcmp(typeName, "mouse") != 0) {
@@ -101,8 +101,8 @@ static napi_value JsOnApi9(napi_env env, napi_callback_info info)
     int32_t value = INVALID_VALUE;
     CHKRP(env, napi_get_value_int32(env, argv[0], &value), GET_INT32);
     if (value != TOUCH && value != MOUSE) {
-        MMI_HILOGE("Into the parameter error");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Into the parameter error");
+        MMI_HILOGE("Get the parameter error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Get the parameter error");
         return nullptr;
     }
 
@@ -124,7 +124,7 @@ static napi_value JsOnApi9(napi_env env, napi_callback_info info)
     } else if (value == MOUSE) {
         typeName = "mouse";
     } else {
-        MMI_HILOGE("Into the parameter error");
+        MMI_HILOGE("Get the parameter error");
         return nullptr;
     }
 
@@ -157,7 +157,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         }
         default: {
             THROWERR(env, "Failed to register JS monitor, value type mismatch");
-            return nullptr;
+            break;
         }
     }
     return nullptr;
@@ -183,7 +183,7 @@ static napi_value JsOffOld(napi_env env, napi_callback_info info)
         THROWERR(env, "Unregister js monitor failed, value type is not napi_string");
         return nullptr;
     }
-    char typeName[MAX_STRING_LEN] = {0};
+    char typeName[MAX_STRING_LEN] = { 0 };
     size_t len = 0;
     CHKRP(env, napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_STRING_UTF8);
     if (std::strcmp(typeName, "touch") != 0 && std::strcmp(typeName, "mouse") != 0) {
@@ -308,7 +308,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         }
         default: {
             THROWERR(env, "Failed to register JS monitor, value type mismatch");
-            return nullptr;
+            break;
         }
     }
     return nullptr;
@@ -319,7 +319,7 @@ napi_value EnumConstructor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 0;
-    napi_value args[1] = {0};
+    napi_value args[1] = { 0 };
     napi_value ret = nullptr;
     void *data = nullptr;
     CHKRP(env, napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);
@@ -330,7 +330,7 @@ napi_value EnumClassConstructor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 0;
-    napi_value args[1] = {0};
+    napi_value args[1] = { 0 };
     napi_value ret = nullptr;
     void *data = nullptr;
     CHKRP(env, napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);
