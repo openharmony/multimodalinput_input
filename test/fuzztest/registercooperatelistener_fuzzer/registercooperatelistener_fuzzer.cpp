@@ -30,7 +30,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Regis
 class InputDeviceCooperateListenerTest : public IInputDeviceCooperateListener {
 public:
     InputDeviceCooperateListenerTest() : IInputDeviceCooperateListener() {}
-    virtual void OnCooperateMessage(const std::string &deviceId, CooperationMessage msg) override
+    void OnCooperateMessage(const std::string &deviceId, CooperationMessage msg) override
     {
         MMI_HILOGD("RegisterCooperateListenerFuzzTest");
     };

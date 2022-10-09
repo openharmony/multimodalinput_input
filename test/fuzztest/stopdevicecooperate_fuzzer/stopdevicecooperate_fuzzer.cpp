@@ -34,7 +34,7 @@ void StopDeviceCooperateFuzzTest(const uint8_t* data, size_t  size)
         MMI_HILOGD("StopDeviceCooperateFuzzTest");
     };
 
-    InputManager::GetInstance()->StopDeviceCooperate(userData,fun);
+    InputManager::GetInstance()->StopDeviceCooperate(userData, fun);
 }
 } // MMI
 } // OHOS
