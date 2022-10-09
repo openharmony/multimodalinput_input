@@ -24,8 +24,8 @@
 #include "input_manager.h"
 #include "mmi_log.h"
 #include "napi_constants.h"
-#include "util_napi_error.h"
 #include "util_napi.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace MMI {
@@ -293,7 +293,7 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, in
     return promise;
 }
 
-void JsEventTarget::RemoveCallbackInfo(napi_env env, napi_value handle, int32_t userData)
+void JsEventTarget::RemoveCallbackInfo(int32_t userData)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -362,7 +362,11 @@ void JsEventTarget::CallEnablePromsieWork(uv_work_t *work, int32_t status)
         return;
     }
     napi_valuetype valueType = napi_undefined;
-    CHKRV(cb->env, napi_typeof(cb->env, object, &valueType), TYPEOF);
+    if (napi_typeof(cb->env, object, &valueType) != napi_ok) {
+        MMI_HILOGE("napi typeof failed");
+        napi_close_handle_scope(cb->env, scope);
+        return;
+    }
     if (valueType != napi_undefined) {
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, object), REJECT_DEFERRED, scope);
     } else {
@@ -420,7 +424,11 @@ void JsEventTarget::CallStartPromiseWork(uv_work_t *work, int32_t status)
         return;
     }
     napi_valuetype valueType = napi_undefined;
-    CHKRV(cb->env, napi_typeof(cb->env, object, &valueType), TYPEOF);
+    if (napi_typeof(cb->env, object, &valueType) != napi_ok) {
+        MMI_HILOGE("napi typeof failed");
+        napi_close_handle_scope(cb->env, scope);
+        return;
+    }
     if (valueType != napi_undefined) {
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, object), REJECT_DEFERRED, scope);
     } else {
@@ -479,7 +487,11 @@ void JsEventTarget::CallStopPromiseWork(uv_work_t *work, int32_t status)
     }
 
     napi_valuetype valueType = napi_undefined;
-    CHKRV(cb->env, napi_typeof(cb->env, object, &valueType), TYPEOF);
+    if (napi_typeof(cb->env, object, &valueType) != napi_ok) {
+        MMI_HILOGE("napi typeof failed");
+        napi_close_handle_scope(cb->env, scope);
+        return;
+    }
     if (valueType != napi_undefined) {
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, object), REJECT_DEFERRED, scope);
     } else {

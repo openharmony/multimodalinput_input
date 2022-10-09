@@ -40,7 +40,7 @@ napi_value JsInputDeviceCooperateManager::Enable(napi_env env, bool enable, napi
     int32_t errCode = InputMgr->EnableInputDeviceCooperate(enable, callback);
     HandleExecuteResult(env, errCode);
     if (errCode != RET_OK) {
-        RemoveCallbackInfo(env, handle, userData);
+        RemoveCallbackInfo(userData);
     }
     return result;
 }
@@ -56,7 +56,7 @@ napi_value JsInputDeviceCooperateManager::Start(napi_env env, const std::string 
     int32_t errCode = InputMgr->StartInputDeviceCooperate(sinkDeviceDescriptor, srcInputDeviceId, callback);
     HandleExecuteResult(env, errCode);
     if (errCode != RET_OK) {
-        RemoveCallbackInfo(env, handle, userData);
+        RemoveCallbackInfo(userData);
     }
     return result;
 }
@@ -71,7 +71,7 @@ napi_value JsInputDeviceCooperateManager::Stop(napi_env env, napi_value handle)
     int32_t errCode = InputMgr->StopDeviceCooperate(callback);
     HandleExecuteResult(env, errCode);
     if (errCode != RET_OK) {
-        RemoveCallbackInfo(env, handle, userData);
+        RemoveCallbackInfo(userData);
     }
     return result;
 }
@@ -86,7 +86,7 @@ napi_value JsInputDeviceCooperateManager::GetState(napi_env env, const std::stri
     int32_t errCode = InputMgr->GetInputDeviceCooperateState(deviceDescriptor, callback);
     HandleExecuteResult(env, errCode);
     if (errCode != RET_OK) {
-        RemoveCallbackInfo(env, handle, userData);
+        RemoveCallbackInfo(userData);
     }
     return result;
 }
