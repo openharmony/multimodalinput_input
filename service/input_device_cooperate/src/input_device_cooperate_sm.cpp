@@ -135,7 +135,7 @@ int32_t InputDeviceCooperateSM::StartInputDeviceCooperate(
     std::lock_guard<std::mutex> guard(mutex_);
     if (isStarting_) {
         MMI_HILOGE("In transition state, not process");
-        return RET_ERR;
+        return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
     }
     CHKPR(currentStateSM_, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::LAUNCH_EVENT);
@@ -145,7 +145,7 @@ int32_t InputDeviceCooperateSM::StartInputDeviceCooperate(
         MMI_HILOGE("Start remote input fail");
         BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_STOP, BytraceAdapter::LAUNCH_EVENT);
         isStarting_ = false;
-        return RET_ERR;
+        return ret;
     }
     UpdateMouseLocation();
     if (cooperateState_ == CooperateState::STATE_FREE) {
@@ -200,7 +200,7 @@ void InputDeviceCooperateSM::StartRemoteCooperateResult(bool isSuccess,
     }
     startDhid_ = startDhid;
     CooperationMessage msg =
-            isSuccess ? CooperationMessage::INFO_SUCCESS : CooperationMessage::INFO_FAIL;
+            isSuccess ? CooperationMessage::INFO_SUCCESS : CooperationMessage::COOPERATE_FAIL;
         CooperateEventMgr->OnCooperateMessage(msg);
     if (!isSuccess || cooperateState_ == CooperateState::STATE_IN) {
         isStarting_ = false;
@@ -234,7 +234,7 @@ void InputDeviceCooperateSM::StopRemoteCooperateResult(bool isSuccess)
         return;
     }
     CooperationMessage msg =
-        isSuccess ? CooperationMessage::STOP_SUCCESS : CooperationMessage::STOP_FAIL;
+        isSuccess ? CooperationMessage::STOP_SUCCESS : CooperationMessage::COOPERATE_FAIL;
     CooperateEventMgr->OnCooperateMessage(msg);
     if (isSuccess) {
         Reset(true);
@@ -308,7 +308,7 @@ void InputDeviceCooperateSM::NotifyRemoteStartFail(const std::string &remoteNetw
 {
     CALL_DEBUG_ENTER;
     RemoteMgr->StartRemoteCooperateResult(remoteNetworkId, false, "",  0, 0);
-    CooperateEventMgr->OnStart(CooperationMessage::INFO_FAIL);
+    CooperateEventMgr->OnStart(CooperationMessage::COOPERATE_FAIL);
 }
 
 void InputDeviceCooperateSM::NotifyRemoteStartSucess(const std::string &remoteNetworkId, const std::string& startDhid)
@@ -324,7 +324,7 @@ void InputDeviceCooperateSM::NotifyRemoteStopFinish(bool isSuccess, const std::s
     CALL_DEBUG_ENTER;
     RemoteMgr->StopRemoteCooperateResult(remoteNetworkId, isSuccess);
     if (!isSuccess) {
-        CooperateEventMgr->OnStop(CooperationMessage::STOP_FAIL);
+        CooperateEventMgr->OnStop(CooperationMessage::COOPERATE_FAIL);
     } else {
         CooperateEventMgr->OnStop(CooperationMessage::STOP_SUCCESS);
     }

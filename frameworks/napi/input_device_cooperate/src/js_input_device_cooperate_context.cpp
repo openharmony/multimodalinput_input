@@ -22,6 +22,7 @@
 #include "mmi_log.h"
 #include "napi_constants.h"
 #include "util_napi.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace MMI {
@@ -49,7 +50,6 @@ napi_value JsInputDeviceCooperateContext::Export(napi_env env, napi_value export
     CALL_INFO_TRACE;
     auto instance = CreateInstance(env);
     if (instance == nullptr) {
-        THROWERR(env, "Failed to create instance");
         MMI_HILOGE("instance is nullptr");
         return nullptr;
     }
@@ -65,14 +65,14 @@ napi_value JsInputDeviceCooperateContext::Enable(napi_env env, napi_callback_inf
     napi_value argv[2] = {};
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
-    if (argc != 1 && argc != 2) {
-        THROWERR(env, "Wrong number of parameters");
+    if (argc == 0) {
         MMI_HILOGE("Wrong number of parameters");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "enable", "boolean");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_boolean)) {
-        THROWERR(env, "The first parameter is not boolean");
         MMI_HILOGE("Thr first parameter is not boolean");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "enable", "boolean");
         return nullptr;
     }
     bool enable = false;
@@ -84,8 +84,8 @@ napi_value JsInputDeviceCooperateContext::Enable(napi_env env, napi_callback_inf
         return jsInputDeviceMgr->Enable(env, enable);
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
-        THROWERR(env, "The second paramter is not function");
         MMI_HILOGE("The second parameter is not function");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
     return jsInputDeviceMgr->Enable(env, enable, argv[1]);
@@ -98,19 +98,19 @@ napi_value JsInputDeviceCooperateContext::Start(napi_env env, napi_callback_info
     napi_value argv[3] = {};
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
-    if (argc != 2 && argc != 3) {
-        THROWERR(env, "Wrong number of parameters");
+    if (argc < 2) {
         MMI_HILOGE("Wrong number of parameters");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "sinkDeviceDescriptor", "string");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
-        THROWERR(env, "The first parameter is not string");
         MMI_HILOGE("Thr first parameter is not boolean");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "sinkDeviceDescriptor", "string");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_number)) {
-        THROWERR(env, "The second parameter is not number");
         MMI_HILOGE("The second parameter is not number");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "srcInputDeviceId", "number");
         return nullptr;
     }
     char sinkDeviceDescriptor[MAX_STRING_LEN] = {};
@@ -127,8 +127,8 @@ napi_value JsInputDeviceCooperateContext::Start(napi_env env, napi_callback_info
         return jsInputDeviceMgr->Start(env, sinkDeviceDescriptor, srcInputDeviceId);
     }
     if (!UtilNapi::TypeOf(env, argv[2], napi_function)) {
-        THROWERR(env, "The third paramter is not function");
         MMI_HILOGE("Thr third parameter is not function");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
     return jsInputDeviceMgr->Start(env, std::string(sinkDeviceDescriptor), srcInputDeviceId, argv[2]);
@@ -141,20 +141,14 @@ napi_value JsInputDeviceCooperateContext::Stop(napi_env env, napi_callback_info 
     napi_value argv[1] = {};
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
-    if (argc != 0 && argc != 1) {
-        THROWERR(env, "Wrong number of parameters");
-        MMI_HILOGE("Wrong number of parameters");
-        return nullptr;
-    }
-
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCooperateMgr();
     if (argc == 0) {
         return jsInputDeviceMgr->Stop(env);
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_function)) {
-        THROWERR(env, "The first paramter is not function");
         MMI_HILOGE("The first parameter is not function");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
     return jsInputDeviceMgr->Stop(env, argv[0]);
@@ -167,14 +161,14 @@ napi_value JsInputDeviceCooperateContext::GetState(napi_env env, napi_callback_i
     napi_value argv[2] = {};
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
-    if (argc != 1 && argc != 2) {
-        THROWERR(env, "Wrong number of parameters");
+    if (argc == 0) {
         MMI_HILOGE("Wrong number of parameters");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceDescriptor", "string");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
-        THROWERR(env, "The first parameter is not string");
         MMI_HILOGE("The first paramter is not string");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceDescriptor", "string");
         return nullptr;
     }
     char deviceDescriptor[MAX_STRING_LEN] = { 0 };
@@ -189,8 +183,8 @@ napi_value JsInputDeviceCooperateContext::GetState(napi_env env, napi_callback_i
         return jsInputDeviceMgr->GetState(env, deviceDescriptor_);
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
-        THROWERR(env, "The second paramter is not function");
         MMI_HILOGE("The second parameter is not function");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
     return jsInputDeviceMgr->GetState(env, deviceDescriptor_, argv[1]);
@@ -203,14 +197,14 @@ napi_value JsInputDeviceCooperateContext::On(napi_env env, napi_callback_info in
     napi_value argv[2] = {};
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
-    if (argc != 1 && argc != 2) {
-        THROWERR(env, "Wrong number of parameters");
+    if (argc == 0) {
         MMI_HILOGE("Wrong number of parameters");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "string");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
-        THROWERR(env, "The first parameter is not string");
         MMI_HILOGE("The first parameter is not string");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "string");
         return nullptr;
     }
     char type[MAX_STRING_LEN] = {};
@@ -221,8 +215,8 @@ napi_value JsInputDeviceCooperateContext::On(napi_env env, napi_callback_info in
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCooperateMgr();
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
-        THROWERR(env, "The second paramter is not function");
         MMI_HILOGE("The seocond parameter is not function");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
     jsInputDeviceMgr->RegisterListener(env, type_, argv[1]);
@@ -236,14 +230,14 @@ napi_value JsInputDeviceCooperateContext::Off(napi_env env, napi_callback_info i
     napi_value argv[2] = {};
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
-    if (argc != 1 && argc != 2) {
-        THROWERR(env, "Wrong number of parameters");
+    if (argc == 0) {
         MMI_HILOGE("Wrong number of parameters");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "string");
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
-        THROWERR(env, "The first parameter is not string");
         MMI_HILOGE("The first parameter is not string");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "string");
         return nullptr;
     }
     char type[MAX_STRING_LEN] = {};
@@ -258,8 +252,8 @@ napi_value JsInputDeviceCooperateContext::Off(napi_env env, napi_callback_info i
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
-        THROWERR(env, "The second paramter is not function");
         MMI_HILOGE("The second parameter is not function");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
     jsInputDeviceMgr->UnregisterListener(env, type_, argv[1]);
@@ -341,7 +335,6 @@ JsInputDeviceCooperateContext *JsInputDeviceCooperateContext::GetInstance(napi_e
     bool result = false;
     CHKRP(env, napi_has_named_property(env, global, INPUT_DEVICE_COOPERATE, &result), HAS_NAMED_PROPERTY);
     if (!result) {
-        THROWERR(env, "multimodal_input_device_cooperate was not found");
         MMI_HILOGE("multimodal_input_device_cooperate was not found");
         return nullptr;
     }
@@ -349,7 +342,6 @@ JsInputDeviceCooperateContext *JsInputDeviceCooperateContext::GetInstance(napi_e
     napi_value object = nullptr;
     CHKRP(env, napi_get_named_property(env, global, INPUT_DEVICE_COOPERATE, &object), GET_NAMED_PROPERTY);
     if (object == nullptr) {
-        THROWERR(env, "object is nullptr");
         MMI_HILOGE("object is nullptr");
         return nullptr;
     }
@@ -357,7 +349,6 @@ JsInputDeviceCooperateContext *JsInputDeviceCooperateContext::GetInstance(napi_e
     JsInputDeviceCooperateContext *instance = nullptr;
     CHKRP(env, napi_unwrap(env, object, (void**)&instance), UNWRAP);
     if (instance == nullptr) {
-        THROWERR(env, "instance is nullptr");
         MMI_HILOGE("instance is nullptr");
         return nullptr;
     }
