@@ -20,10 +20,8 @@
 
 #include <sys/socket.h>
 
-#include "accesstoken_kit.h"
 #include "dfx_hisysevent.h"
 #include "i_multimodal_input_connect.h"
-#include "ipc_skeleton.h"
 #include "mmi_log.h"
 #include "util.h"
 #include "util_ex.h"
