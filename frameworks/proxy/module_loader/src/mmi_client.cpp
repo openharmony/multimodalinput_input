@@ -51,7 +51,7 @@ void MMIClient::SetEventHandler(EventHandlerPtr eventHandler)
     eventHandler_ = eventHandler;
 }
 
-void MMIClient::CheckIsEventHandlerChanged(EventHandlerPtr eventHandler)
+void MMIClient::MarkIsEventHandlerChanged(EventHandlerPtr eventHandler)
 {
     CHKPV(eventHandler);
     CHKPV(eventHandler_);
@@ -59,12 +59,13 @@ void MMIClient::CheckIsEventHandlerChanged(EventHandlerPtr eventHandler)
     CHKPV(currentRunner);
     auto newRunner = eventHandler->GetEventRunner();
     CHKPV(newRunner);
-    MMI_HILOGD("Current handler name:%{public}s", currentRunner->GetRunnerThreadName().c_str());
     isEventHandlerChanged_ = false;
     if (currentRunner->GetRunnerThreadName() != newRunner->GetRunnerThreadName()) {
         isEventHandlerChanged_ = true;
-        MMI_HILOGD("New handler name:%{public}s", newRunner->GetRunnerThreadName().c_str());
+        MMI_HILOGD("Event handler changed");
     }
+    MMI_HILOGD("Current handler name:%{public}s, New handler name:%{public}s",
+        currentRunner->GetRunnerThreadName().c_str(), newRunner->GetRunnerThreadName().c_str());
 }
 
 bool MMIClient::SendMessage(const NetPacket &pkt) const
@@ -110,6 +111,7 @@ bool MMIClient::StartEventRunner()
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
         CHKPF(eventHandler_);
+        MMI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
     }
 
     if (isConnected_ && fd_ >= 0) {
@@ -196,6 +198,7 @@ int32_t MMIClient::Reconnect()
 void MMIClient::OnReconnect()
 {
     if (Reconnect() == RET_OK) {
+        MMI_HILOGI("Reconnect ok");
         return;
     }
     CHKPV(eventHandler_);

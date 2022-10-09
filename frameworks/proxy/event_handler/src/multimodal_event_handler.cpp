@@ -86,7 +86,7 @@ bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
     CALL_DEBUG_ENTER;
     if (client_ != nullptr) {
         if (eventHandler != nullptr) {
-            client_->CheckIsEventHandlerChanged(eventHandler);
+            client_->MarkIsEventHandlerChanged(eventHandler);
         }
         return true;
     }
@@ -114,7 +114,6 @@ int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent>
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    MMI_HILOGD("Inject pointer event:");
     EventLogHelper::PrintEventData(pointerEvent);
     int32_t ret = MultimodalInputConnMgr->InjectPointerEvent(pointerEvent);
     if (ret != 0) {

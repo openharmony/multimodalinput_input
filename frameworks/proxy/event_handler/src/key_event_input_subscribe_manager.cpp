@@ -171,7 +171,12 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
     BytraceAdapter::StartBytrace(event, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_SUBSCRIBE_EVENT);
     auto info = GetSubscribeKeyEvent(subscribeId);
     CHKPR(info, ERROR_NULL_POINTER);
-    info->GetCallback()(event);
+    auto callback = info->GetCallback();
+    if (!callback) {
+        MMI_HILOGE("Callback is null");
+        return RET_ERR;
+    }
+    callback(event);
     MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", subscribeId, event->GetKeyCode());
     return RET_OK;
 }
