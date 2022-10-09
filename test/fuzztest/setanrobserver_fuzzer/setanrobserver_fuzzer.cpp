@@ -27,9 +27,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SetAn
 
 class IAnrObserverTest : public IAnrObserver {
 public:
-    IAnrObserverTest () : IAnrObserver() {}
+    IAnrObserverTest() : IAnrObserver() {}
     virtual ~IAnrObserverTest() {}
-    virtual void OnAnr(int32_t pid) const override
+    void OnAnr(int32_t pid) const override
     {
         MMI_HILOGD("Set anr success");
     };

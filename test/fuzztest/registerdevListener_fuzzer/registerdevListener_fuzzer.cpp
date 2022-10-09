@@ -27,12 +27,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Regis
 
 class InputDeviceListenerTest : public IInputDeviceListener {
 public:
-    InputDeviceListenerTest () : IInputDeviceListener() {}
-    virtual void OnDeviceAdded(int32_t deviceId, const std::string &type) override
+    InputDeviceListenerTest() : IInputDeviceListener() {}
+    void OnDeviceAdded(int32_t deviceId, const std::string &type) override
     {
         MMI_HILOGD("Add device success");
     };
-    virtual void OnDeviceRemoved(int32_t deviceId, const std::string &type) override
+    void OnDeviceRemoved(int32_t deviceId, const std::string &type) override
     {
         MMI_HILOGD("Remove device success");
     };
