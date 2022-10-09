@@ -474,7 +474,7 @@ int32_t MMIService::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
         IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, std::ref(pointerStyle)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer style failed,return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
