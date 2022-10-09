@@ -549,6 +549,9 @@ const char* PointerEvent::DumpSourceType() const
         case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
             return "touch-pad";
         }
+        case PointerEvent::SOURCE_TYPE_JOYSTICK: {
+            return "joystick";
+        }
         default: {
             break;
         }

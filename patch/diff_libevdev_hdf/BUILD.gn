@@ -85,4 +85,5 @@ ohos_shared_library("libevdev-hdf") {
   public_deps = []
 
   part_name = "input"
+  subsystem_name = "multimodalinput"
 }

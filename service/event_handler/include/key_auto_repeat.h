@@ -19,7 +19,7 @@
 #include <map>
 #include <string>
 
-#include "event_dispatch.h"
+#include "event_dispatch_handler.h"
 #include "key_map_manager.h"
 #include "key_event.h"
 #include "libinput.h"
@@ -43,9 +43,9 @@ private:
     DeviceConfig GetAutoSwitch(int32_t deviceId);
 private:
     std::map<int32_t, DeviceConfig> deviceConfig_;
-    int32_t timerId_ = -1;
-    int32_t repeatKeyCode_ = -1;
-    std::shared_ptr<KeyEvent> keyEvent_ = nullptr;
+    int32_t timerId_ { -1 };
+    int32_t repeatKeyCode_ { -1 };
+    std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
 };
 
 #define KeyRepeat ::OHOS::DelayedSingleton<KeyAutoRepeat>::GetInstance()

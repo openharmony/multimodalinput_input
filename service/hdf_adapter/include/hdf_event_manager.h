@@ -53,7 +53,7 @@ public:
     static int32_t EvdevSimIoctl(int32_t hdindex, int32_t pcmd, void *iobuff);
     static int32_t EvdevIoctl(int32_t hdiindex, int32_t pcmd, void *iobuff);
     static void HotPlugCallback(const HotPlugEvent *event);
-    static void GetEventCallback(const KeyEventHandler **pkgs, uint32_t count, uint32_t devIndex);
+    static void GetEventCallback(const KeyEventNormalize **pkgs, uint32_t count, uint32_t devIndex);
     static int32_t DeviceAddHandle(uint32_t devIndex, uint32_t devType);
     static int32_t DeviceRemoveHandle(uint32_t devIndex, uint32_t devType);
     static libinput *HdfLibinputInit();
@@ -70,7 +70,7 @@ public:
     int32_t HdfdevtypeMapLibinputType(uint32_t devIndex, uint32_t devType);
 private:
     static HdfEventManager *globleThis_;
-    libinput *hdiinput_ = nullptr;
+    libinput *hdiinput_ { nullptr };
     std::list<uhdf *> hdflist_;
     bool devStatus[TOTAL_INPUT_DEVICE_STATUS_COUNT] { false };
     DevDesc mountDevIndex_[TOTAL_INPUT_DEVICE_COUNT];

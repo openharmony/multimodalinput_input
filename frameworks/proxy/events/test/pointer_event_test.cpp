@@ -143,6 +143,18 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_001, TestSize.L
     item2.SetPointerId(0);
     pointerEvent->AddPointerItem(item2);
     ASSERT_TRUE(!pointerEvent->IsValid());
+    PointerEvent::PointerItem item3;
+    item3.SetPointerId(0);
+    pointerEvent->AddPointerItem(item3);
+    PointerEvent::PointerItem item4;
+    item4.SetPointerId(0);
+    pointerEvent->AddPointerItem(item4);
+    PointerEvent::PointerItem item5;
+    item5.SetPointerId(0);
+    pointerEvent->AddPointerItem(item5);
+    PointerEvent::PointerItem item6;
+    item6.SetPointerId(0);
+    pointerEvent->AddPointerItem(item6);
 
     auto pointerEvent1 = PointerEvent::Create();
     ASSERT_NE(pointerEvent1, nullptr);
@@ -457,6 +469,61 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_005, TestSize.L
     item2.SetPressed(false);
     pointerEvent->AddPointerItem(item2);
     ASSERT_TRUE(pointerEvent->IsValid());
+}
+
+/**
+ * @tc.name:PointerEventTest_CheckTouchPointEvent_006
+ * @tc.desc:Verify touch screen event
+ * @tc.type: FUNC
+ * @tc.require: I5QSN3
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_006, TestSize.Level1)
+{
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetButtonId(PointerEvent::BUTTON_NONE);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDownTime(100);
+    item.SetToolDisplayX(90);
+    item.SetToolDisplayY(90);
+    item.SetToolWindowX(50);
+    item.SetToolWindowY(50);
+    item.SetToolWidth(30);
+    item.SetToolHeight(30);
+    item.SetLongAxis(100);
+    item.SetShortAxis(20);
+    item.SetToolType(2);
+    item.SetTargetWindowId(0);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_TRUE(pointerEvent->IsValid());
+    DumpWindowData(pointerEvent); 
+    pointerEvent->RemovePointerItem(0);
+    pointerEvent->IsButtonPressed(0);
+    pointerEvent->ClearButtonPressed();
+    pointerEvent->ClearAxisValue();
+    pointerEvent->DeleteReleaseButton(PointerEvent::BUTTON_NONE);
+    ASSERT_FALSE(pointerEvent->IsValid());
+}
+
+/**
+ * @tc.name:PointerEventTest_CheckTouchInputEvent_001
+ * @tc.desc:Verify touch screen event
+ * @tc.type: FUNC
+ * @tc.require: I5QSN3
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchInputEvent_001, TestSize.Level1)
+{
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    inputEvent->SetTargetDisplayId(0);
+    inputEvent->SetDeviceId(0);
+    inputEvent->EventTypeToString(InputEvent::EVENT_TYPE_POINTER);
+    inputEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    inputEvent->ClearFlag();
 }
 } // namespace MMI
 } // namespace OHOS

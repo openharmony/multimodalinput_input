@@ -72,7 +72,9 @@ public:
     const DisplayGroupInfo& GetDisplayGroupInfo();
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle);
     std::optional<int> GetPointerStyle(int32_t pid, int32_t windowId) const;
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool IsNeedRefreshLayer(int32_t windowId);
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #endif // OHOS_BUILD_ENABLE_POINTER
     void Dump(int32_t fd, const std::vector<std::string> &args);
     int32_t GetWindowPid(int32_t windowId, const DisplayGroupInfo& displayGroupInfo) const;
@@ -95,6 +97,9 @@ private:
     void OnSessionLost(SessionPtr session);
     void UpdatePointerStyle();
 #endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+    int32_t UpdateJoystickTarget(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
@@ -125,7 +130,7 @@ private:
     void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo);
 private:
-    UDSServer* udsServer_ = nullptr;
+    UDSServer* udsServer_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t firstBtnDownWindowId_ { -1 };
     int32_t lastLogicX_ { -1 };
@@ -135,7 +140,7 @@ private:
     std::map<int32_t, std::map<int32_t, int32_t>> pointerStyle_;
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
-    MouseLocation mouseLocation_ = {-1, -1}; // physical coord
+    MouseLocation mouseLocation_ = { -1, -1 }; // physical coord
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()

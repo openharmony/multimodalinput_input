@@ -20,8 +20,8 @@
 #include <string>
 
 #include "device_observer.h"
-#include "event_dispatch.h"
-#include "key_event_handler.h"
+#include "event_dispatch_handler.h"
+#include "key_event_normalize.h"
 #include "input_device.h"
 #include "key_auto_repeat.h"
 #include "key_map_manager.h"
@@ -91,7 +91,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;
     std::map<std::string, std::string> inputDeviceScreens_;
-    int32_t nextId_ {0};
+    int32_t nextId_ { 0 };
     std::list<std::shared_ptr<IDeviceObserver>> observers_;
     std::map<SessionPtr, std::function<void(int32_t, const std::string&)>> devListener_;
 };
