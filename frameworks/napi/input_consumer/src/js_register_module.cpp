@@ -138,7 +138,7 @@ int32_t GetEventInfoAPI8(napi_env env, napi_callback_info info, KeyEventMonitorI
     return SUCCESS_CODE;
 }
 
-napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, const KeyEventMonitorInfo* event,
+napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
     std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
@@ -381,7 +381,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     };
     CHKPP(event);
     auto keyOption = std::make_shared<KeyOption>();
-    if ((keyOption) == nullptr) {
+    if (keyOption == nullptr) {
         delete event;
         MMI_HILOGE("Check keyOption is null");
         return nullptr;
