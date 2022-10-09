@@ -20,7 +20,6 @@
 
 #include "circle_stream_buffer.h"
 #include "client_msg_handler.h"
-#include "mmi_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -31,6 +30,8 @@ public:
     virtual ~MMIClient() override;
 
     int32_t Socket() override;
+    virtual void SetEventHandler(EventHandlerPtr eventHandler) override;
+    virtual void CheckIsEventHandlerChanged(EventHandlerPtr eventHandler) override;
     bool Start() override;
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
@@ -41,13 +42,15 @@ public:
     virtual int32_t Reconnect() override;
     virtual void OnDisconnect() override;
     virtual MMIClientPtr GetSharedPtr() override;
+    bool IsEventHandlerChanged() override { return isEventHandlerChanged_; }
 
 protected:
     bool StartEventRunner();
-    void OnRecvThread();
+    void OnReconnect();
     bool AddFdListener(int32_t fd);
     bool DelFdListener(int32_t fd);
     void OnPacket(NetPacket& pkt);
+    const std::string& GetErrorStr(ErrCode code) const;
     virtual void OnConnected() override;
     virtual void OnDisconnected() override;
 
@@ -57,9 +60,9 @@ protected:
     ConnectCallback funDisconnected_;
     CircleStreamBuffer circBuf_;
     std::mutex mtx_;
-    std::condition_variable cv_;
-    std::thread recvThread_;
-    std::shared_ptr<MMIEventHandler> recvEventHandler_ { nullptr };
+    EventHandlerPtr eventHandler_ { nullptr };
+    bool isEventHandlerChanged_ = false;
+    bool isListening_ = false;
 };
 } // namespace MMI
 } // namespace OHOS

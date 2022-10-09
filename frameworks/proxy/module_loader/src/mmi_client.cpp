@@ -30,6 +30,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClient" };
+const std::string THREAD_NAME = "mmi_EventHdr";
 } // namespace
 
 using namespace AppExecFwk;
@@ -42,6 +43,28 @@ MMIClient::~MMIClient()
 {
     CALL_DEBUG_ENTER;
     Stop();
+}
+
+void MMIClient::SetEventHandler(EventHandlerPtr eventHandler)
+{
+    CHKPV(eventHandler);
+    eventHandler_ = eventHandler;
+}
+
+void MMIClient::CheckIsEventHandlerChanged(EventHandlerPtr eventHandler)
+{
+    CHKPV(eventHandler);
+    CHKPV(eventHandler_);
+    auto currentRunner = eventHandler_->GetEventRunner();
+    CHKPV(currentRunner);
+    auto newRunner = eventHandler->GetEventRunner();
+    CHKPV(newRunner);
+    MMI_HILOGD("Current handler name:%{public}s", currentRunner->GetRunnerThreadName().c_str());
+    isEventHandlerChanged_ = false;
+    if (currentRunner->GetRunnerThreadName() != newRunner->GetRunnerThreadName()) {
+        isEventHandlerChanged_ = true;
+        MMI_HILOGD("New handler name:%{public}s", newRunner->GetRunnerThreadName().c_str());
+    }
 }
 
 bool MMIClient::SendMessage(const NetPacket &pkt) const
@@ -63,7 +86,6 @@ bool MMIClient::Start()
 {
     CALL_DEBUG_ENTER;
     msgHandler_.Init();
-    EventManager.SetClientHandle(GetSharedPtr());
     auto callback = std::bind(&ClientMsgHandler::OnMsgHandler, &msgHandler_,
         std::placeholders::_1, std::placeholders::_2);
     if (!StartClient(callback)) {
@@ -84,49 +106,28 @@ bool MMIClient::StartEventRunner()
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    if (!InputMgrImpl.InitEventHandler()) {
-        MMI_HILOGE("Init event handler failed");
-        Stop();
-        return false;
+    if (eventHandler_ == nullptr) {
+        auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
+        eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
+        CHKPF(eventHandler_);
     }
 
-    static constexpr int32_t outTime = 3;
-    std::unique_lock <std::mutex> lck(mtx_);
-    recvThread_ = std::thread(std::bind(&MMIClient::OnRecvThread, this));
-    recvThread_.detach();
-    if (cv_.wait_for(lck, std::chrono::seconds(outTime)) == std::cv_status::timeout) {
-        MMI_HILOGE("Recv thread start timeout");
-        Stop();
-        return false;
+    if (isConnected_ && fd_ >= 0) {
+        if (isListening_) {
+            MMI_HILOGI("File fd is in listening");
+            return true;
+        }
+        if (!AddFdListener(fd_)) {
+            MMI_HILOGE("Add fd listener failed");
+            return false;
+        }
+    } else {
+        if (!eventHandler_->PostTask(std::bind(&MMIClient::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
+            MMI_HILOGE("Send reconnect event failed");
+            return false;
+        }
     }
     return true;
-}
-
-void MMIClient::OnRecvThread()
-{
-    CALL_DEBUG_ENTER;
-    CHK_PID_AND_TID();
-    SetThreadName("MmiClientRecvEventHdr");
-    auto runner = EventRunner::Create(false);
-    CHKPV(runner);
-    {
-        std::lock_guard<std::mutex> lck(mtx_);
-        recvEventHandler_ = std::make_shared<MMIEventHandler>(runner, GetSharedPtr());
-        CHKPV(recvEventHandler_);
-        if (isConnected_ && fd_ >= 0) {
-            if (!AddFdListener(fd_)) {
-                MMI_HILOGE("Add fd listener failed");
-                return;
-            }
-        } else {
-            if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME)) {
-                MMI_HILOGE("Send reconnect event failed");
-                return;
-            }
-        }
-        cv_.notify_one();
-    }
-    runner->Run();
 }
 
 bool MMIClient::AddFdListener(int32_t fd)
@@ -136,13 +137,13 @@ bool MMIClient::AddFdListener(int32_t fd)
         MMI_HILOGE("Invalid fd:%{public}d", fd);
         return false;
     }
-    CHKPF(recvEventHandler_);
+    CHKPF(eventHandler_);
     auto fdListener = std::make_shared<MMIFdListener>(GetSharedPtr());
     CHKPF(fdListener);
-    auto errCode = recvEventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener);
+    auto errCode = eventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener);
     if (errCode != ERR_OK) {
         MMI_HILOGE("Add fd listener failed,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
-            recvEventHandler_->GetErrorStr(errCode).c_str());
+            GetErrorStr(errCode).c_str());
         return false;
     }
     isRunning_ = true;
@@ -154,13 +155,17 @@ bool MMIClient::AddFdListener(int32_t fd)
 bool MMIClient::DelFdListener(int32_t fd)
 {
     CALL_DEBUG_ENTER;
-    if (fd < 0) {
+    CHKPF(eventHandler_);
+    if (fd >= 0) {
+        eventHandler_->RemoveFileDescriptorListener(fd);
+    } else {
         MMI_HILOGE("Invalid fd:%{public}d", fd);
-        return false;
     }
-    CHKPF(recvEventHandler_);
-    recvEventHandler_->RemoveAllEvents();
-    recvEventHandler_->RemoveFileDescriptorListener(fd);
+    auto runner = eventHandler_->GetEventRunner();
+    CHKPF(runner);
+    if (runner->GetRunnerThreadName() == THREAD_NAME) {
+        eventHandler_->RemoveAllEvents();
+    }
     isRunning_ = false;
     return true;
 }
@@ -188,6 +193,17 @@ int32_t MMIClient::Reconnect()
     return ConnectTo();
 }
 
+void MMIClient::OnReconnect()
+{
+    if (Reconnect() == RET_OK) {
+        return;
+    }
+    CHKPV(eventHandler_);
+    if (!eventHandler_->PostTask(std::bind(&MMIClient::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
+        MMI_HILOGE("Post reconnect event failed");
+    }
+}
+
 void MMIClient::OnDisconnect()
 {
     OnDisconnected();
@@ -208,6 +224,7 @@ void MMIClient::OnDisconnected()
     CALL_DEBUG_ENTER;
     MMI_HILOGI("Disconnected from server, fd:%{public}d", fd_);
     isConnected_ = false;
+    isListening_ = false;
     if (funDisconnected_) {
         funDisconnected_(*this);
     }
@@ -215,9 +232,9 @@ void MMIClient::OnDisconnected()
         MMI_HILOGE("Delete fd listener failed");
     }
     Close();
-    if (!isExit && recvEventHandler_ != nullptr) {
-        if (!recvEventHandler_->SendEvent(MMI_EVENT_HANDLER_ID_RECONNECT, 0, CLIENT_RECONNECT_COOLING_TIME)) {
-            MMI_HILOGE("Send reconnect event return false");
+    if (!isExit && eventHandler_ != nullptr) {
+        if (!eventHandler_->PostTask(std::bind(&MMIClient::OnReconnect, this), CLIENT_RECONNECT_COOLING_TIME)) {
+            MMI_HILOGE("Send reconnect event task failed");
         }
     }
 }
@@ -231,10 +248,12 @@ void MMIClient::OnConnected()
     if (funConnected_) {
         funConnected_(*this);
     }
-    if (!isExit && !isRunning_ && fd_ >= 0 && recvEventHandler_ != nullptr) {
+    if (!isExit && !isRunning_ && fd_ >= 0 && eventHandler_ != nullptr) {
         if (!AddFdListener(fd_)) {
             MMI_HILOGE("Add fd listener failed");
+            return;
         }
+        isListening_ = true;
     }
 }
 
@@ -259,12 +278,35 @@ void MMIClient::Stop()
 {
     CALL_DEBUG_ENTER;
     UDSClient::Stop();
-    if (recvEventHandler_ != nullptr) {
-        recvEventHandler_->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);
+    if (eventHandler_ != nullptr) {
+        auto runner = eventHandler_->GetEventRunner();
+        CHKPV(runner);
+        if (runner->GetRunnerThreadName() == THREAD_NAME) {
+            runner->Stop();
+            eventHandler_->RemoveAllEvents();
+            eventHandler_->RemoveAllFileDescriptorListeners();
+        }
     }
-    auto eventHandler = InputMgrImpl.GetEventHandler();
-    CHKPV(eventHandler);
-    eventHandler->SendSyncEvent(MMI_EVENT_HANDLER_ID_STOP, 0, EventHandler::Priority::IMMEDIATE);
+}
+
+const std::string& MMIClient::GetErrorStr(ErrCode code) const
+{
+    const static std::string defErrString = "Unknown event handler error!";
+    const static std::map<ErrCode, std::string> mapStrings = {
+        {ERR_OK, "ERR_OK."},
+        {EVENT_HANDLER_ERR_INVALID_PARAM, "Invalid parameters"},
+        {EVENT_HANDLER_ERR_NO_EVENT_RUNNER, "Have not set event runner yet"},
+        {EVENT_HANDLER_ERR_FD_NOT_SUPPORT, "Not support to listen file descriptors"},
+        {EVENT_HANDLER_ERR_FD_ALREADY, "File descriptor is already in listening"},
+        {EVENT_HANDLER_ERR_FD_FAILED, "Failed to listen file descriptor"},
+        {EVENT_HANDLER_ERR_RUNNER_NO_PERMIT, "No permit to start or stop deposited event runner"},
+        {EVENT_HANDLER_ERR_RUNNER_ALREADY, "Event runner is already running"}
+    };
+    auto it = mapStrings.find(code);
+    if (it != mapStrings.end()) {
+        return it->second;
+    }
+    return defErrString;
 }
 } // namespace MMI
 } // namespace OHOS

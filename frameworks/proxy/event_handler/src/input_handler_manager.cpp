@@ -19,7 +19,6 @@
 
 #include "bytrace_adapter.h"
 #include "input_handler_type.h"
-#include "input_manager_impl.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 #include "mmi_log.h"
@@ -90,14 +89,11 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType,
     HandleEventType eventType, std::shared_ptr<IInputEventConsumer> monitor)
 {
-    auto eventHandler = InputMgrImpl.GetCurrentEventHandler();
-    CHKPR(eventHandler, RET_ERR);
     InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
         .handlerType_ = handlerType,
         .eventType_ = eventType,
         .consumer_ = monitor,
-        .eventHandler_ = eventHandler,
     };
     auto ret = inputHandlers_.emplace(handler.handlerId_, handler);
     if (!ret.second) {
@@ -157,33 +153,7 @@ std::shared_ptr<IInputEventConsumer> InputHandlerManager::FindHandler(int32_t ha
     return nullptr;
 }
 
-EventHandlerPtr InputHandlerManager::GetEventHandler(int32_t handlerId)
-{
-    auto tItr = inputHandlers_.find(handlerId);
-    if (tItr != inputHandlers_.end()) {
-        return tItr->second.eventHandler_;
-    }
-    return nullptr;
-}
-
-bool InputHandlerManager::PostTask(int32_t handlerId, const AppExecFwk::EventHandler::Callback &callback)
-{
-    auto eventHandler = GetEventHandler(handlerId);
-    CHKPF(eventHandler);
-    return MMIEventHandler::PostTask(eventHandler, callback);
-}
-
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void InputHandlerManager::OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
-    std::shared_ptr<KeyEvent> keyEvent)
-{
-    CHK_PID_AND_TID();
-    CHKPV(consumer);
-    CHKPV(keyEvent);
-    consumer->OnInputEvent(keyEvent);
-    MMI_HILOGD("Key event callback id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
-}
-
 void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHK_PID_AND_TID();
@@ -197,32 +167,17 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent)
         int32_t handlerId = handler.first;
         auto consumer = handler.second.consumer_;
         CHKPV(consumer);
-        if (!PostTask(handlerId,
-            std::bind(&InputHandlerManager::OnKeyEventTask, this, consumer, handlerId, keyEvent))) {
-            MMI_HILOGE("Post task failed");
-        }
+        consumer->OnInputEvent(keyEvent);
         MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
     }
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-void InputHandlerManager::OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer, int32_t handlerId,
-    std::shared_ptr<PointerEvent> pointerEvent)
+void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent,
+    std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos)
 {
-    CHK_PID_AND_TID();
-    CHKPV(consumer);
-    CHKPV(pointerEvent);
-    consumer->OnInputEvent(pointerEvent);
-    MMI_HILOGD("Pointer event callback id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
-}
-
-void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CHK_PID_AND_TID();
-    CHKPV(pointerEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
-    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
     int32_t consumerCount = 0;
     for (const auto &iter : inputHandlers_) {
         if ((iter.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
@@ -231,16 +186,8 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
         int32_t handlerId = iter.first;
         auto consumer = iter.second.consumer_;
         CHKPV(consumer);
-        auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
-        CHKPV(tempEvent);
-        tempEvent->SetProcessedCallback(monitorCallback_);
-        if (!PostTask(handlerId,
-            std::bind(&InputHandlerManager::OnPointerEventTask, this, consumer, handlerId, tempEvent))) {
-            MMI_HILOGE("Post task failed");
-        } else {
-            consumerCount++;
-        }
-        MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", handlerId, pointerEvent->GetPointerId());
+        consumerInfos.emplace(handlerId, consumer);
+        consumerCount++;
     }
     if (consumerCount == 0) {
         MMI_HILOGE("All task post failed");
@@ -250,6 +197,24 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
     if (tokenType == TokenType::TOKEN_HAP &&
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         processedEvents_.emplace(pointerEvent->GetId(), consumerCount);
+    }
+}
+
+void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHK_PID_AND_TID();
+    CHKPV(pointerEvent);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
+    std::map<int32_t, std::shared_ptr<IInputEventConsumer>> consumerInfos;
+    GetConsumerInfos(pointerEvent, consumerInfos);
+    for (const auto &iter : consumerInfos) {
+        auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
+        CHKPV(tempEvent);
+        tempEvent->SetProcessedCallback(monitorCallback_);
+        auto consumer = iter.second;
+        CHKPV(consumer);
+        consumer->OnInputEvent(tempEvent);
+        MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", iter.first, pointerEvent->GetPointerId());
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
