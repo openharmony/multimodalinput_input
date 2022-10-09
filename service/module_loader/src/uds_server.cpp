@@ -116,8 +116,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     static constexpr size_t bufferSize = 32 * 1024;
     setsockopt(sockFds[0], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
-    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(IPCSkeleton::GetCallingTokenID());
-    if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
+    if (tokenType == TokenType::TOKEN_NATIVE) {
         static constexpr size_t nativeBufferSize = 64 * 1024;
         setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &nativeBufferSize, sizeof(nativeBufferSize));
         setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &nativeBufferSize, sizeof(nativeBufferSize));
