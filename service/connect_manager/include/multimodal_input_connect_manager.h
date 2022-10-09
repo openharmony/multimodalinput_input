@@ -78,8 +78,8 @@ private:
     void OnDeath();
     void Clean();
     void NotifyDeath();
-    sptr<IMultimodalInputConnect> multimodalInputConnectService_ = nullptr;
-    sptr<IRemoteObject::DeathRecipient> multimodalInputConnectRecipient_ = nullptr;
+    sptr<IMultimodalInputConnect> multimodalInputConnectService_ { nullptr };
+    sptr<IRemoteObject::DeathRecipient> multimodalInputConnectRecipient_ { nullptr };
     int32_t socketFd_ { IMultimodalInputConnect::INVALID_SOCKET_FD };
     int32_t tokenType_ { -1 };
     std::mutex lock_;

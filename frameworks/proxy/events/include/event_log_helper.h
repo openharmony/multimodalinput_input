@@ -48,8 +48,9 @@ private:
             event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY),
             event->GetId(), eventItems.size());
         for (const auto &item : eventItems) {
-            MMI_HILOGD("DeviceNumber:%{public}d,KeyCode:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d",
-                item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed());
+            MMI_HILOGD("DeviceNumber:%{public}d,KeyCode:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
+                "GetUnicode:%{public}d", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed(),
+                item.GetUnicode());
         }
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
         std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();

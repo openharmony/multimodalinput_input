@@ -19,19 +19,21 @@
 #include <cstdio>
 
 #include "dfx_hisysevent.h"
-#include "input_device_manager.h"
 #include "i_pointer_drawing_manager.h"
-#include "mouse_event_handler.h"
+#include "input_device_manager.h"
+#include "mouse_event_normalize.h"
 #include "pointer_drawing_manager.h"
-#include "util.h"
 #include "util_ex.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManager"};
+#ifdef OHOS_BUILD_ENABLE_POINTER
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 constexpr size_t MAX_WINDOW_COUNT = 20;
+#endif // OHOS_BUILD_ENABLE_POINTER
 } // namespace
 
 InputWindowsManager::InputWindowsManager() {}
@@ -41,7 +43,9 @@ void InputWindowsManager::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
     CHKPV(udsServer_);
+#ifdef OHOS_BUILD_ENABLE_POINTER
     udsServer_->AddSessionDeletedCallback(std::bind(&InputWindowsManager::OnSessionLost, this, std::placeholders::_1));
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEvent) const
@@ -180,26 +184,34 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
         captureModeInfo_.isCaptureMode = false;
     }
     displayGroupInfo_ = displayGroupInfo;
+#ifdef OHOS_BUILD_ENABLE_POINTER
     UpdatePointerStyle();
+#endif // OHOS_BUILD_ENABLE_POINTER
 
     if (!displayGroupInfo.displaysInfo.empty()) {
-#ifdef OHOS_BUILD_ENABLE_POINTER
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
-        const MouseLocation &mouseLocation = GetMouseInfo();
-        int32_t logicX = mouseLocation.physicalX;
-        int32_t logicY = mouseLocation.physicalY;
-        std::optional<WindowInfo> windowInfo = GetWindowInfo(logicX, logicY);
-        if (!windowInfo) {
-            MMI_HILOGE("The windowInfo is nullptr");
-            return;
-        }
-        int32_t windowPid = GetWindowPid(windowInfo->id);
-        WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
-        IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
         if (InputDevMgr->HasPointerDevice()) {
+            MouseLocation mouseLocation = GetMouseInfo();
+            int32_t displayId = MouseEventHdr->GetDisplayId();
+            if (displayId < 0) {
+                displayId = displayGroupInfo_.displaysInfo[0].id;
+            }
+            auto displayInfo = GetPhysicalDisplay(displayId);
+            CHKPV(displayInfo);
+            int32_t logicX = mouseLocation.physicalX + displayInfo->x;
+            int32_t logicY = mouseLocation.physicalY + displayInfo->y;
+            std::optional<WindowInfo> windowInfo = GetWindowInfo(logicX, logicY);
+            if (!windowInfo) {
+                MMI_HILOGE("The windowInfo is nullptr");
+                return;
+            }
+            int32_t windowPid = GetWindowPid(windowInfo->id);
+            WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
+            IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
             IPointerDrawingManager::GetInstance()->DrawPointerStyle();
         }
-#endif // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (InputDevMgr->HasPointerDevice()) {
@@ -219,7 +231,7 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     auto pointerEvent = PointerEvent::Create();
     CHKPV(pointerEvent);
     pointerEvent->UpdateId();
-    const MouseLocation &mouseLocation = GetMouseInfo();
+    MouseLocation mouseLocation = GetMouseInfo();
     lastLogicX_ = mouseLocation.physicalX;
     lastLogicY_ = mouseLocation.physicalY;
     if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW) {
@@ -253,6 +265,7 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     int64_t time = GetSysClockTime();
     pointerEvent->SetActionTime(time);
     pointerEvent->SetActionStartTime(time);
+    pointerEvent->UpdateId();
 
     auto fd = udsServer_->GetClientFd(lastWindowInfo_.pid);
     auto sess = udsServer_->GetSession(fd);
@@ -316,6 +329,10 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
     auto fd = udsServer_->GetClientFd(lastWindowInfo_.pid);
     if (fd == RET_ERR) {
         auto windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
+        if (!windowInfo) {
+            MMI_HILOGE("The windowInfo is nullptr");
+            return;
+        }
         fd = udsServer_->GetClientFd(windowInfo->pid);
     }
     auto sess = udsServer_->GetSession(fd);
@@ -332,19 +349,23 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
 void InputWindowsManager::NotifyPointerToWindow()
 {
     CALL_INFO_TRACE;
+    auto windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
+    if (!windowInfo) {
+        MMI_HILOGE("windowInfo is nullptr");
+        return;
+    }
+    if (windowInfo->id == lastWindowInfo_.id) {
+        MMI_HILOGI("The mouse pointer does not leave the window");
+        lastWindowInfo_ = *windowInfo;
+        return;
+    }
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         if (item.id == lastWindowInfo_.id) {
             DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
             break;
         }
     }
-    for (const auto &item : displayGroupInfo_.windowsInfo) {
-        if ((IsInHotArea(lastLogicX_, lastLogicY_, item.pointerHotAreas)) && (lastWindowInfo_.id != item.id)) {
-            lastWindowInfo_ = item;
-            MMI_HILOGI("Pointer select new window:%{public}d", item.id);
-            break;
-        }
-    }
+    lastWindowInfo_ = *windowInfo;
     DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -514,12 +535,19 @@ const DisplayGroupInfo& InputWindowsManager::GetDisplayGroupInfo()
     return displayGroupInfo_;
 }
 
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
 {
     CALL_DEBUG_ENTER;
-    const MouseLocation &mouseLocation = GetMouseInfo();
-    int32_t logicX = mouseLocation.physicalX;
-    int32_t logicY = mouseLocation.physicalY;
+    MouseLocation mouseLocation = GetMouseInfo();
+    int32_t displayId = MouseEventHdr->GetDisplayId();
+    if (displayId < 0) {
+        displayId = displayGroupInfo_.displaysInfo[0].id;
+    }
+    auto displayInfo = GetPhysicalDisplay(displayId);
+    CHKPR(displayInfo, false);
+    int32_t logicX = mouseLocation.physicalX + displayInfo->x;
+    int32_t logicY = mouseLocation.physicalY + displayInfo->y;
     std::optional<WindowInfo> touchWindow = GetWindowInfo(logicX, logicY);
     if (!touchWindow) {
         MMI_HILOGE("TouchWindow is nullptr");
@@ -535,6 +563,7 @@ bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
         touchWindow->id, windowId);
     return false;
 }
+#endif
 
 void InputWindowsManager::OnSessionLost(SessionPtr session)
 {
@@ -722,6 +751,7 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             }
         }
     }
+    MMI_HILOGD("firstBtnDownWindowId_:%{public}d", firstBtnDownWindowId_);
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         if (item.id == firstBtnDownWindowId_) {
             return std::make_optional(item);
@@ -944,6 +974,28 @@ int32_t InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> 
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+int32_t InputWindowsManager::UpdateJoystickTarget(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t focusWindowId = displayGroupInfo_.focusWindowId;
+    const WindowInfo* windowInfo = nullptr;
+    for (const auto &item : displayGroupInfo_.windowsInfo) {
+        if (item.id == focusWindowId) {
+            windowInfo = &item;
+            break;
+        }
+    }
+    CHKPR(windowInfo, ERROR_NULL_POINTER);
+    pointerEvent->SetTargetWindowId(windowInfo->id);
+    pointerEvent->SetAgentWindowId(windowInfo->agentWindowId);
+    MMI_HILOGD("focusWindow:%{public}d, pid:%{public}d", focusWindowId, windowInfo->pid);
+
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
+
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent)
 {
@@ -964,6 +1016,11 @@ int32_t InputWindowsManager::UpdateTargetPointer(std::shared_ptr<PointerEvent> p
             return UpdateTouchPadTarget(pointerEvent);
         }
 #endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+        case PointerEvent::SOURCE_TYPE_JOYSTICK: {
+            return UpdateJoystickTarget(pointerEvent);
+        }
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
         default: {
             MMI_HILOGE("Source type is unknown, source:%{public}d", source);
             break;
@@ -1048,8 +1105,8 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     if (integerY >= height) {
         integerY = height - 1;
     }
-    x = static_cast<double>(integerX);
-    y = static_cast<double>(integerY);
+    x = static_cast<double>(integerX) + (x - floor(x));
+    y = static_cast<double>(integerY) + (y - floor(y));
     mouseLocation_.physicalX = integerX;
     mouseLocation_.physicalY = integerY;
     MMI_HILOGD("Mouse Data: physicalX:%{public}d,physicalY:%{public}d, displayId:%{public}d",

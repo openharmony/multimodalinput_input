@@ -53,6 +53,9 @@ public:
     std::shared_ptr<PointerEvent> SetupPointerEvent013();
     std::shared_ptr<PointerEvent> SetupPointerEvent014();
     std::shared_ptr<PointerEvent> SetupPointerEvent015();
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+    std::shared_ptr<PointerEvent> SetupPointerEvent016();
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
     std::shared_ptr<PointerEvent> SetupmouseEvent001();
     std::shared_ptr<PointerEvent> SetupmouseEvent002();
     std::shared_ptr<PointerEvent> SetupTouchScreenEvent001();
@@ -69,6 +72,7 @@ public:
     int32_t TestAddMonitor(std::shared_ptr<IInputEventConsumer> consumer);
     void TestRemoveMonitor(int32_t monitorId);
     void TestMarkConsumed(int32_t monitorId, int32_t eventId);
+    std::shared_ptr<PointerEvent> SetupTabletToolEvent001();
 };
 
 void InputManagerTest::SetUpTestCase()
@@ -464,6 +468,16 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent015()
     pointerEvent->AddPointerItem(item);
     return pointerEvent;
 }
+
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent016()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK );
+    return pointerEvent;
+}
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
 
 std::shared_ptr<KeyEvent> InputManagerTest::SetupKeyEvent001()
 {
@@ -1177,6 +1191,22 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_013, Test
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+/**
+ * @tc.name: MultimodalEventHandler_SimulatePointerEvent_014
+ * @tc.desc: Dispatch joystick event dispatch to focus window
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_014, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent016() };
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
+
 /**
  * @tc.name: InputManagerTest_MouseEventEnterAndLeave_001
  * @tc.desc: Verify that the mouse moves away from the window
@@ -1434,6 +1464,70 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId1);
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId2);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+}
+
+/**
+ * @tc.name: InputManagerTest_SubscribeKeyEvent_03
+ * @tc.desc: Verify subscribe volume up key event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_03, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    ASSERT_TRUE(MMIEventHdl.InitClient());
+    std::set<int32_t> preKeys;
+    std::shared_ptr<KeyOption> keyOption1 = std::make_shared<KeyOption>();
+    keyOption1->SetPreKeys(preKeys);
+    keyOption1->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
+    keyOption1->SetFinalKeyDown(true);
+    keyOption1->SetFinalKeyDownDuration(10);
+    int32_t subscribeId1 = -1;
+    subscribeId1 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption1,
+        [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent);
+        MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP down trigger callback");
+    });
+    std::shared_ptr<KeyOption> keyOption2 = std::make_shared<KeyOption>();
+    keyOption2->SetPreKeys(preKeys);
+    keyOption2->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
+    keyOption2->SetFinalKeyDown(false);
+    keyOption2->SetFinalKeyDownDuration(0);
+    int32_t subscribeId2 = -1;
+    subscribeId2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2,
+        [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent);
+        MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP up trigger callback");
+    });
+    std::shared_ptr<KeyOption> keyOption3 = std::make_shared<KeyOption>();
+    keyOption3->SetPreKeys(preKeys);
+    keyOption3->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
+    keyOption3->SetFinalKeyDown(true);
+    keyOption3->SetFinalKeyDownDuration(0);
+    int32_t subscribeId3 = -1;
+    subscribeId3 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption3,
+        [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent);
+        MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP down trigger callback");
+    });
+    std::shared_ptr<KeyOption> keyOption4 = std::make_shared<KeyOption>();
+    keyOption4->SetPreKeys(preKeys);
+    keyOption4->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
+    keyOption4->SetFinalKeyDown(false);
+    keyOption4->SetFinalKeyDownDuration(0);
+    int32_t subscribeId4 = -1;
+    subscribeId4 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption4,
+        [](std::shared_ptr<KeyEvent> keyEvent) {
+        EventLogHelper::PrintEventData(keyEvent);
+        MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP up trigger callback");
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId1);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId2);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId3);
+    InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId4);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
 
@@ -3314,5 +3408,89 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseHotArea_002, TestSize.Level1)
     ASSERT_TRUE(pointerEvent != nullptr);
     ASSERT_EQ(pointerEvent->GetSourceType(), PointerEvent::SOURCE_TYPE_MOUSE);
 }
+
+std::shared_ptr<PointerEvent> InputManagerTest::SetupTabletToolEvent001()
+{
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(DEFAULT_POINTER_ID);   // test code，set the PointerId = 0
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
+    item.SetPressure(0.7);    // test code，set the Pressure = 0.7
+    item.SetTiltX(10.0);     // test code，set the TiltX = 10.0
+    item.SetTiltY(-9.0);     // test code，set the TiltX = -9.0
+    item.SetDeviceId(DEFAULT_DEVICE_ID);    // test code，set the DeviceId = 0
+    item.SetToolType(PointerEvent::TOOL_TYPE_PEN);
+    pointerEvent->AddPointerItem(item);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(DEFAULT_POINTER_ID);  // test code，set the PointerId = 0
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    return pointerEvent;
+}
+
+#ifdef OHOS_BUILD_ENABLE_MONITOR
+/**
+ * @tc.name: InputManagerTest_MonitorTabletToolEvent_001
+ * @tc.desc: Verify monitoring tablet tool down event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_MonitorTabletToolEvent_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto callbackPtr = GetPtr<InputEventCallback>();
+    ASSERT_TRUE(callbackPtr != nullptr);
+    int32_t monitorId = TestAddMonitor(callbackPtr);
+    EXPECT_TRUE(IsValidHandlerId(monitorId));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    auto pointerEvent = SetupTabletToolEvent001();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    TestSimulateInputEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_TOUCH
+
+    if (IsValidHandlerId(monitorId)) {
+        TestRemoveMonitor(monitorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+#endif // OHOS_BUILD_ENABLE_MONITOR
+
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+/**
+ * @tc.name: InputManagerTest_InterceptTabletToolEvent_001
+ * @tc.desc: Verify intercepting tablet tool event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_InterceptTabletToolEvent_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto interceptor = GetPtr<InputEventCallback>();
+    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor) };
+    EXPECT_TRUE(IsValidHandlerId(interceptorId));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    auto pointerEvent = SetupTabletToolEvent001();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    TestSimulateInputEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_TOUCH
+
+    if (IsValidHandlerId(interceptorId)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 } // namespace MMI
 } // namespace OHOS

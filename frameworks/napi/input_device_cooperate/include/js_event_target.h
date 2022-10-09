@@ -55,7 +55,7 @@ private:
     inline static std::map<std::string_view, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>>
         cooperateListener_ = {};
     inline static std::map<int32_t, std::unique_ptr<JsUtil::CallbackInfo>> callback_ = {};
-    bool isListeningProcess_ = false;
+    bool isListeningProcess_ { false };
 
     static void CallEnablePromsieWork(uv_work_t *work, int32_t status);
     static void CallEnableAsyncWork(uv_work_t *work, int32_t status);

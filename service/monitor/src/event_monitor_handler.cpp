@@ -294,8 +294,9 @@ void EventMonitorHandler::MonitorCollection::MarkConsumed(int32_t eventId, Sessi
     CHKPV(pointerEvent);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetActionTime(GetSysClockTime());
+    pointerEvent->UpdateId();
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
-    auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPV(inputEventNormalizeHandler);
     inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH

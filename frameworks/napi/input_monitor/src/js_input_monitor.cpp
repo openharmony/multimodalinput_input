@@ -40,7 +40,7 @@ constexpr int32_t AXIS_UPDATE = 5;
 constexpr int32_t AXIS_END = 6;
 constexpr int32_t MIDDLE = 1;
 constexpr int32_t RIGHT = 2;
-constexpr int32_t MOUSE_FLOW = 25;
+constexpr int32_t MOUSE_FLOW = 15;
 } // namespace
 
 bool InputMonitor::Start()
