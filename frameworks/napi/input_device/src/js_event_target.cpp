@@ -15,8 +15,8 @@
 
 #include "js_event_target.h"
 
-#include "util_napi_error.h"
 #include "napi_constants.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace MMI {
@@ -314,7 +314,6 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> &ids)
         MMI_HILOGE("uv_queue_work failed");
         JsUtil::DeletePtr<uv_work_t*>(work);
         JsUtil::DeletePtr<int32_t*>(uData);
-        return;
     }
 }
 
@@ -330,7 +329,6 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
     CHKPV(cb);
     CHKPV(cb->env);
-
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
     if (scope == nullptr) {
@@ -448,11 +446,13 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
     napi_value callResult = nullptr;
     if (cb->errCode != RET_OK) {
         if (cb->errCode == RET_ERR) {
+            napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Other errors");
             return;
         }
         NapiError codeMsg;
         if (!UtilNapiError::GetApiError(cb->errCode, codeMsg)) {
+            napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
@@ -494,11 +494,13 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
     napi_value callResult[2] = { 0 };
     if (cb->errCode != RET_OK) {
         if (cb->errCode == RET_ERR) {
+            napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Other errors");
             return;
         }
         NapiError codeMsg;
         if (!UtilNapiError::GetApiError(cb->errCode, codeMsg)) {
+            napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
@@ -625,11 +627,13 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
     napi_value callResult[2] = { 0 };
     if (cb->errCode != RET_OK) {
         if (cb->errCode == RET_ERR) {
+            napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Other errors");
             return;
         }
         NapiError codeMsg;
         if (!UtilNapiError::GetApiError(cb->errCode, codeMsg)) {
+            napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
@@ -668,11 +672,13 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
     napi_value callResult;
     if (cb->errCode != RET_OK) {
         if (cb->errCode == RET_ERR) {
+            napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Other errors");
             return;
         }
         NapiError codeMsg;
         if (!UtilNapiError::GetApiError(cb->errCode, codeMsg)) {
+            napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
@@ -705,11 +711,13 @@ void JsEventTarget::CallDevListAsyncWork(uv_work_t *work, int32_t status)
     napi_value callResult[2] = { 0 };
     if (cb->errCode != RET_OK) {
         if (cb->errCode == RET_ERR) {
+            napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Other errors");
             return;
         }
         NapiError codeMsg;
         if (!UtilNapiError::GetApiError(cb->errCode, codeMsg)) {
+            napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
@@ -753,11 +761,13 @@ void JsEventTarget::CallDevListPromiseWork(uv_work_t *work, int32_t status)
     napi_value callResult = nullptr;
     if (cb->errCode != RET_OK) {
         if (cb->errCode == RET_ERR) {
+            napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Other errors");
             return;
         }
         NapiError codeMsg;
         if (!UtilNapiError::GetApiError(cb->errCode, codeMsg)) {
+            napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
@@ -796,11 +806,13 @@ void JsEventTarget::CallDevInfoPromiseWork(uv_work_t *work, int32_t status)
     napi_value callResult = nullptr;
     if (cb->errCode != RET_OK) {
         if (cb->errCode == RET_ERR) {
+            napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Other errors");
             return;
         }
         NapiError codeMsg;
         if (!UtilNapiError::GetApiError(cb->errCode, codeMsg)) {
+            napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
@@ -837,11 +849,13 @@ void JsEventTarget::CallDevInfoAsyncWork(uv_work_t *work, int32_t status)
     napi_value callResult[2] = { 0 };
     if (cb->errCode != RET_OK) {
         if (cb->errCode == RET_ERR) {
+            napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Other errors");
             return;
         }
         NapiError codeMsg;
         if (!UtilNapiError::GetApiError(cb->errCode, codeMsg)) {
+            napi_close_handle_scope(cb->env, scope);
             MMI_HILOGE("Error code %{public}d not found", cb->errCode);
             return;
         }
