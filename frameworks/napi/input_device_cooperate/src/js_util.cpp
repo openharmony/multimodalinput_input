@@ -17,6 +17,7 @@
 
 #include "mmi_log.h"
 #include "napi_constants.h"
+#include "util_napi_error.h"
 #include "util_napi.h"
 
 namespace OHOS {
@@ -38,41 +39,53 @@ napi_value JsUtil::GetEnableInfo(const std::unique_ptr<CallbackInfo> &cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.enableResult);
+    return GetResult(cb->env, cb->data.enableResult, cb->data.errCode);
 }
 
 napi_value JsUtil::GetStartInfo(const std::unique_ptr<CallbackInfo> &cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.startResult);
+    return GetResult(cb->env, cb->data.startResult, cb->data.errCode);
 }
 
 napi_value JsUtil::GetStopInfo(const std::unique_ptr<CallbackInfo> &cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.stopResult);
+    return GetResult(cb->env, cb->data.stopResult, cb->data.errCode);
 }
 
 napi_value JsUtil::GetStateInfo(const std::unique_ptr<CallbackInfo> &cb)
 {
     CHKPP(cb);
     CHKPP(cb->env);
-    return GetResult(cb->env, cb->data.cooperateOpened);
+    napi_value ret = nullptr;
+    napi_value state = nullptr;
+    CHKRP(cb->env, napi_create_int32(cb->env, cb->data.cooperateOpened ? 1 : 0, &ret),
+        CREATE_INT32);
+    CHKRP(cb->env, napi_coerce_to_bool(cb->env, ret, &state), COERCE_TO_BOOL);
+    return state;
 }
 
-napi_value JsUtil::GetResult(napi_env env, bool result)
+napi_value JsUtil::GetResult(napi_env env, bool result, int32_t errCode)
 {
     CHKPP(env);
     napi_value object = nullptr;
     if (result) {
         napi_get_undefined(env, &object);
     } else {
-        napi_value resultNapi = nullptr;
-        CHKRP(env, napi_create_int32(env, RET_ERR, &resultNapi), CREATE_INT32);
-        CHKRP(env, napi_create_object(env, &object), CREATE_OBJECT);
-        CHKRP(env, napi_set_named_property(env, object, "code", resultNapi), SET_NAMED_PROPERTY);
+        NapiError napiError;
+        if (!UtilNapiError::GetApiError(errCode, napiError)) {
+            MMI_HILOGE("This error code could not be found");
+            return nullptr;
+        }
+        napi_value resultCode = nullptr;
+        napi_value resultMessage = nullptr;
+        CHKRP(env, napi_create_int32(env, errCode, &resultCode), CREATE_INT32);
+        CHKRP(env, napi_create_string_utf8(env, napiError.msg.data(), NAPI_AUTO_LENGTH, &resultMessage), CREATE_INT32);
+        CHKRP(env, napi_create_error(env, nullptr, resultMessage, &object), CREATE_ERROR);
+        CHKRP(env, napi_set_named_property(env, object, ERR_CODE.c_str(), resultCode), SET_NAMED_PROPERTY);
     }
     return object;
 }

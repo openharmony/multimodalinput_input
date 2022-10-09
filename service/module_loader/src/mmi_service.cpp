@@ -1086,7 +1086,7 @@ int32_t MMIService::EnableInputDeviceCooperate(int32_t userData, bool enabled)
         std::bind(&MMIService::OnEnableInputDeviceCooperate, this, pid, userData, enabled));
     if (ret != RET_OK) {
         MMI_HILOGE("OnEnableInputDeviceCooperate failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #else
     (void)(userData);
@@ -1105,7 +1105,7 @@ int32_t MMIService::StartInputDeviceCooperate(int32_t userData, const std::strin
         std::bind(&MMIService::OnStartInputDeviceCooperate, this, pid, userData, sinkDeviceId, srcInputDeviceId));
     if (ret != RET_OK) {
         MMI_HILOGE("OnStartInputDeviceCooperate failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #else
     (void)(userData);
@@ -1123,7 +1123,7 @@ int32_t MMIService::StopDeviceCooperate(int32_t userData)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnStopDeviceCooperate, this, pid, userData));
     if (ret != RET_OK) {
         MMI_HILOGE("OnStopDeviceCooperate failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #else
     (void)(userData);
@@ -1233,8 +1233,8 @@ int32_t MMIService::OnStartInputDeviceCooperate(int32_t pid, int32_t userData, c
     int32_t ret = InputDevCooSM->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId);
     if (ret != RET_OK) {
         MMI_HILOGE("OnStartInputDeviceCooperate failed, ret:%{public}d", ret);
-        CooperateEventMgr->OnErrorMessage(event->type, CooperationMessage::INFO_FAIL);
-        return RET_ERR;
+        CooperateEventMgr->OnErrorMessage(event->type, CooperationMessage(ret));
+        return ret;
     }
     return RET_OK;
 }
@@ -1254,8 +1254,8 @@ int32_t MMIService::OnStopDeviceCooperate(int32_t pid, int32_t userData)
     int32_t ret = InputDevCooSM->StopInputDeviceCooperate();
     if (ret != RET_OK) {
         MMI_HILOGE("OnStopDeviceCooperate failed, ret:%{public}d", ret);
-        CooperateEventMgr->OnErrorMessage(event->type, CooperationMessage::STOP_FAIL);
-        return RET_ERR;
+        CooperateEventMgr->OnErrorMessage(event->type, CooperationMessage(ret));
+        return ret;
     }
     return RET_OK;
 }

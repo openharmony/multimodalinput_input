@@ -37,7 +37,11 @@ napi_value JsInputDeviceCooperateManager::Enable(napi_env env, bool enable, napi
     int32_t userData = InputDevCooperateImpl.GetUserData();
     napi_value result = CreateCallbackInfo(env, handle, userData);
     auto callback = std::bind(EmitJsEnable, userData, std::placeholders::_1, std::placeholders::_2);
-    InputMgr->EnableInputDeviceCooperate(enable, callback);
+    int32_t errCode = InputMgr->EnableInputDeviceCooperate(enable, callback);
+    HandleExecuteResult(env, errCode);
+    if (errCode != RET_OK) {
+        RemoveCallbackInfo(userData);
+    }
     return result;
 }
 
@@ -49,7 +53,11 @@ napi_value JsInputDeviceCooperateManager::Start(napi_env env, const std::string 
     int32_t userData = InputDevCooperateImpl.GetUserData();
     napi_value result = CreateCallbackInfo(env, handle, userData);
     auto callback = std::bind(EmitJsStart, userData, std::placeholders::_1, std::placeholders::_2);
-    InputMgr->StartInputDeviceCooperate(sinkDeviceDescriptor, srcInputDeviceId, callback);
+    int32_t errCode = InputMgr->StartInputDeviceCooperate(sinkDeviceDescriptor, srcInputDeviceId, callback);
+    HandleExecuteResult(env, errCode);
+    if (errCode != RET_OK) {
+        RemoveCallbackInfo(userData);
+    }
     return result;
 }
 
@@ -60,7 +68,11 @@ napi_value JsInputDeviceCooperateManager::Stop(napi_env env, napi_value handle)
     int32_t userData = InputDevCooperateImpl.GetUserData();
     napi_value result = CreateCallbackInfo(env, handle, userData);
     auto callback = std::bind(EmitJsStop, userData, std::placeholders::_1, std::placeholders::_2);
-    InputMgr->StopDeviceCooperate(callback);
+    int32_t errCode = InputMgr->StopDeviceCooperate(callback);
+    HandleExecuteResult(env, errCode);
+    if (errCode != RET_OK) {
+        RemoveCallbackInfo(userData);
+    }
     return result;
 }
 
@@ -71,7 +83,11 @@ napi_value JsInputDeviceCooperateManager::GetState(napi_env env, const std::stri
     int32_t userData = InputDevCooperateImpl.GetUserData();
     napi_value result = CreateCallbackInfo(env, handle, userData);
     auto callback = std::bind(EmitJsGetState, userData, std::placeholders::_1);
-    InputMgr->GetInputDeviceCooperateState(deviceDescriptor, callback);
+    int32_t errCode = InputMgr->GetInputDeviceCooperateState(deviceDescriptor, callback);
+    HandleExecuteResult(env, errCode);
+    if (errCode != RET_OK) {
+        RemoveCallbackInfo(userData);
+    }
     return result;
 }
 
