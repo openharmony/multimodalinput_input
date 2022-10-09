@@ -387,7 +387,11 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_valuetype valueType = napi_undefined;
-    CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
+    if (napi_typeof(env, argv[0], &valueType) != napi_ok) {
+        delete event;
+        MMI_HILOGE("Napi typeof failed");
+        return nullptr;
+    }
     switch (valueType) {
         case napi_string: {
             if (GetEventInfoAPI8(env, info, event, keyOption) < 0) {
