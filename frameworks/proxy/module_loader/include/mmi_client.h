@@ -30,8 +30,8 @@ public:
     virtual ~MMIClient() override;
 
     int32_t Socket() override;
-    virtual void SetEventHandler(EventHandlerPtr eventHandler) override;
-    virtual void CheckIsEventHandlerChanged(EventHandlerPtr eventHandler) override;
+    void SetEventHandler(EventHandlerPtr eventHandler) override;
+    void MarkIsEventHandlerChanged(EventHandlerPtr eventHandler) override;
     bool Start() override;
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
@@ -42,7 +42,10 @@ public:
     virtual int32_t Reconnect() override;
     virtual void OnDisconnect() override;
     virtual MMIClientPtr GetSharedPtr() override;
-    bool IsEventHandlerChanged() override { return isEventHandlerChanged_; }
+    bool IsEventHandlerChanged() override
+    {
+        return isEventHandlerChanged_;
+    }
 
 protected:
     bool StartEventRunner();
@@ -61,8 +64,8 @@ protected:
     CircleStreamBuffer circBuf_;
     std::mutex mtx_;
     EventHandlerPtr eventHandler_ { nullptr };
-    bool isEventHandlerChanged_ = false;
-    bool isListening_ = false;
+    bool isEventHandlerChanged_ { false };
+    bool isListening_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

@@ -186,7 +186,11 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
         int32_t handlerId = iter.first;
         auto consumer = iter.second.consumer_;
         CHKPV(consumer);
-        consumerInfos.emplace(handlerId, consumer);
+        auto ret = consumerInfos.emplace(handlerId, consumer);
+        if (!ret.second) {
+            MMI_HILOGI("Duplicate handler:%{public}d", handlerId);
+            continue;
+        }
         consumerCount++;
     }
     if (consumerCount == 0) {
@@ -211,8 +215,8 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
         auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
         CHKPV(tempEvent);
         tempEvent->SetProcessedCallback(monitorCallback_);
+        CHKPV(iter.second);
         auto consumer = iter.second;
-        CHKPV(consumer);
         consumer->OnInputEvent(tempEvent);
         MMI_HILOGD("Pointer event id:%{public}d pointerId:%{public}d", iter.first, pointerEvent->GetPointerId());
     }

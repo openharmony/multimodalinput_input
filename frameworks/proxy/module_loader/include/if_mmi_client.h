@@ -38,7 +38,7 @@ public:
     virtual int32_t Reconnect() = 0;
     virtual void OnDisconnect() = 0;
     virtual void SetEventHandler(EventHandlerPtr eventHandler) = 0;
-    virtual void CheckIsEventHandlerChanged(EventHandlerPtr eventHandler) = 0;
+    virtual void MarkIsEventHandlerChanged(EventHandlerPtr eventHandler) = 0;
     virtual bool IsEventHandlerChanged() = 0;
 };
 } // namespace MMI
