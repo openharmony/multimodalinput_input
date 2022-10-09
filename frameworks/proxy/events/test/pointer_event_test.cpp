@@ -16,7 +16,6 @@
 #include "define_multimodal.h"
 #include "event_util_test.h"
 #include "proto.h"
-#include "standardized_event_manager.h"
 #include "util.h"
 
 namespace OHOS {
