@@ -51,17 +51,31 @@ AsyncContext::~AsyncContext()
     }
 }
 
-void getResult(sptr<AsyncContext> asyncContext, napi_value * results)
+bool getResult(sptr<AsyncContext> asyncContext, napi_value * results)
 {
     CALL_DEBUG_ENTER;
     napi_env env = asyncContext->env;
-    if (asyncContext->errorCode == RET_OK) {
-        CHKRV(env, napi_get_undefined(env, &results[0]), GET_UNDEFINED);
-    } else {
-        CHKRV(env, napi_create_object(env, &results[0]), CREATE_OBJECT);
+    if (asyncContext->errorCode != RET_OK) {
+        if (asyncContext->errorCode == RET_ERR) {
+            MMI_HILOGE("Other errors");
+            return false;
+        }
+        NapiError codeMsg;
+        if (!UtilNapiError::GetApiError(asyncContext->errorCode, codeMsg)) {
+            MMI_HILOGE("ErrorCode not found, errCode:%{public}d", asyncContext->errorCode);
+            return false;
+        }
         napi_value errCode = nullptr;
-        CHKRV(env, napi_create_int32(env, asyncContext->errorCode, &errCode), CREATE_INT32);
-        CHKRV(env, napi_set_named_property(env, results[0], "code", errCode), SET_NAMED_PROPERTY);
+        napi_value errMsg = nullptr;
+        napi_value businessError = nullptr;
+        CHKRF(env, napi_create_int32(env, asyncContext->errorCode, &errCode), CREATE_INT32);
+        CHKRF(env, napi_create_string_utf8(env, codeMsg.msg.c_str(),
+            NAPI_AUTO_LENGTH, &errMsg), CREATE_STRING_UTF8);
+        CHKRF(env, napi_create_error(env, nullptr, errMsg, &businessError), CREATE_ERROR);
+        CHKRF(env, napi_set_named_property(env, businessError, ERR_CODE.c_str(), errCode), SET_NAMED_PROPERTY);
+        results[0] = businessError;
+    } else {
+        CHKRF(env, napi_get_undefined(env, &results[0]), GET_UNDEFINED);
     }
 
     ReturnType resultType;
@@ -69,14 +83,15 @@ void getResult(sptr<AsyncContext> asyncContext, napi_value * results)
     if (resultType == ReturnType::BOOL) {
         bool temp;
         asyncContext->reserve >> temp;
-        CHKRV(env, napi_get_boolean(env, temp, &results[1]), CREATE_BOOL);
+        CHKRF(env, napi_get_boolean(env, temp, &results[1]), CREATE_BOOL);
     } else if (resultType == ReturnType::NUMBER) {
         int32_t temp;
         asyncContext->reserve >> temp;
-        CHKRV(env, napi_create_int32(env, temp, &results[1]), CREATE_INT32);
+        CHKRF(env, napi_create_int32(env, temp, &results[1]), CREATE_INT32);
     } else {
-        CHKRV(env, napi_get_undefined(env, &results[1]), GET_UNDEFINED);
+        CHKRF(env, napi_get_undefined(env, &results[1]), GET_UNDEFINED);
     }
+    return true;
 }
 
 void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
@@ -100,7 +115,10 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
              */
             asyncContext->DecStrongRef(nullptr);
             napi_value results[2] = { 0 };
-            getResult(asyncContext, results);
+            if (!getResult(asyncContext, results)) {
+                MMI_HILOGE("Failed to create napi data");
+                return;
+            }
             if (asyncContext->deferred) {
                 if (asyncContext->errorCode == RET_OK) {
                     CHKRV(env, napi_resolve_deferred(env, asyncContext->deferred, results[1]), RESOLVE_DEFERRED);
@@ -125,10 +143,7 @@ napi_value JsPointerManager::SetPointerVisible(napi_env env, bool visible, napi_
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    if (asyncContext == nullptr) {
-        THROWERR(env, "create AsyncContext failed");
-        return nullptr;
-    }
+    CHKPP(asyncContext);
 
     asyncContext->errorCode = InputManager::GetInstance()->SetPointerVisible(visible);
     asyncContext->reserve << ReturnType::VOID;
@@ -148,10 +163,7 @@ napi_value JsPointerManager::IsPointerVisible(napi_env env, napi_value handle)
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    if (asyncContext == nullptr) {
-        THROWERR(env, "create AsyncContext failed");
-        return nullptr;
-    }
+    CHKPP(asyncContext);
 
     bool visible = InputManager::GetInstance()->IsPointerVisible();
     asyncContext->errorCode = ERR_OK;
@@ -172,10 +184,7 @@ napi_value JsPointerManager::SetPointerSpeed(napi_env env, int32_t pointerSpeed,
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    if (asyncContext == nullptr) {
-        THROWERR(env, "Create AsyncContext failed");
-        return nullptr;
-    }
+    CHKPP(asyncContext);
     asyncContext->errorCode = InputManager::GetInstance()->SetPointerSpeed(pointerSpeed);
     asyncContext->reserve << ReturnType::VOID;
     napi_value promise = nullptr;
@@ -193,10 +202,7 @@ napi_value JsPointerManager::GetPointerSpeed(napi_env env, napi_value handle)
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    if (asyncContext == nullptr) {
-        THROWERR(env, "Create AsyncContext failed");
-        return nullptr;
-    }
+    CHKPP(asyncContext);
     int32_t pointerSpeed = 0;
     asyncContext->errorCode = InputManager::GetInstance()->GetPointerSpeed(pointerSpeed);
     asyncContext->reserve << ReturnType::NUMBER << pointerSpeed;
@@ -239,10 +245,7 @@ napi_value JsPointerManager::SetPointerStyle(napi_env env, int32_t windowid, int
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    if (asyncContext == nullptr) {
-        THROWERR(env, "Create AsyncContext failed");
-        return nullptr;
-    }
+    CHKPP(asyncContext);
     asyncContext->errorCode = InputManager::GetInstance()->SetPointerStyle(windowid, pointerStyle);
     asyncContext->reserve << ReturnType::VOID;
 
@@ -261,10 +264,7 @@ napi_value JsPointerManager::GetPointerStyle(napi_env env, int32_t windowid, nap
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    if (asyncContext == nullptr) {
-        THROWERR(env, "Create AsyncContext failed");
-        return nullptr;
-    }
+    CHKPP(asyncContext);
     int32_t pointerStyle = 0;
     asyncContext->errorCode = InputManager::GetInstance()->GetPointerStyle(windowid, pointerStyle);
     asyncContext->reserve << ReturnType::NUMBER << pointerStyle;

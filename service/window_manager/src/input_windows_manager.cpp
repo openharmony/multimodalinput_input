@@ -24,6 +24,7 @@
 #include "mouse_event_normalize.h"
 #include "pointer_drawing_manager.h"
 #include "util_ex.h"
+#include "util_napi_error.h"
 #include "util.h"
 
 namespace OHOS {
@@ -579,13 +580,13 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, int3
     auto it = pointerStyle_.find(pid);
     if (it == pointerStyle_.end()) {
         MMI_HILOGE("The pointer style map is not include param pd:%{public}d", pid);
-        return RET_ERR;
+        return COMMON_PARAMETER_ERROR ;
     }
     
     auto iter = it->second.find(windowId);
     if (iter == it->second.end()) {
         MMI_HILOGE("The window id is invalid");
-        return RET_ERR;
+        return COMMON_PARAMETER_ERROR ;
     }
     
     iter->second = pointerStyle;
@@ -593,23 +594,24 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, int3
     return RET_OK;
 }
 
-std::optional<int> InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId) const
+int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle) const
 {
     CALL_DEBUG_ENTER;
     auto it = pointerStyle_.find(pid);
     if (it == pointerStyle_.end()) {
         MMI_HILOGE("The pointer style map is not include param pd, %{public}d", pid);
-        return std::nullopt;
+        return RET_ERR;
     }
     
     auto iter = it->second.find(windowId);
     if (iter == it->second.end()) {
         MMI_HILOGE("The window id is Invalid");
-        return std::nullopt;
+        return COMMON_PARAMETER_ERROR ;
     }
     
     MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, iter->second);
-    return iter->second;
+    pointerStyle = iter->second;
+    return RET_OK;
 }
 
 void InputWindowsManager::UpdatePointerStyle()
@@ -825,14 +827,13 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
         return RET_ERR;
     }
-
-    std::optional<int32_t> pointerStyleInfo = GetPointerStyle(touchWindow->pid, touchWindow->id);
-    if (!pointerStyleInfo) {
+    int32_t mouseStyle = -1;
+    int32_t ret = GetPointerStyle(touchWindow->pid, touchWindow->id, mouseStyle);
+    if (ret != RET_OK) {
         MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
-        return RET_ERR;
+        return ret;
     }
     IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicalDisplayInfo);
-    int32_t mouseStyle = pointerStyleInfo.value();
     WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
     IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
