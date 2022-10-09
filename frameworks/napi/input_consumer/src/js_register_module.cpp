@@ -20,6 +20,9 @@
 
 #include "input_manager.h"
 #include "js_register_util.h"
+#include "napi_constants.h"
+#include "util_napi_error.h"
+#include "util_napi.h"
 
 namespace OHOS {
 namespace MMI {
@@ -31,7 +34,7 @@ constexpr size_t PRE_KEYS_SIZE = 4;
 
 static Callbacks callbacks = {};
 
-int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
+int32_t GetEventInfoAPI8(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
     std::shared_ptr<KeyOption> keyOption)
 {
     CALL_DEBUG_ENTER;
@@ -44,11 +47,6 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
         napi_throw_error(env, nullptr, "Get param failed");
         return ERROR_CODE;
     }
-    if (argc != 2 && argc != 3) {
-        MMI_HILOGE("Requires 3 parameter");
-        napi_throw_error(env, nullptr, "Requires 3 parameter");
-        return ERROR_CODE;
-    }
     napi_valuetype valueType = napi_undefined;
     if (napi_typeof(env, argv[0], &valueType) != napi_ok) {
         MMI_HILOGE("Get type of first param failed");
@@ -56,8 +54,8 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
         return ERROR_CODE;
     }
     if (valueType != napi_string) {
-        MMI_HILOGE("Parameter1 is not napi_string");
-        napi_throw_error(env, nullptr, "Parameter1 is not napi_string");
+        MMI_HILOGE("The first parameter is not napi_string");
+        napi_throw_error(env, nullptr, "The first parameter is not napi_string");
         return ERROR_CODE;
     }
     if (napi_typeof(env, argv[1], &valueType) != napi_ok) {
@@ -66,8 +64,8 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
         return ERROR_CODE;
     }
     if (valueType != napi_object) {
-        MMI_HILOGE("Parameter2 is not napi_object");
-        napi_throw_error(env, nullptr, "Parameter2 is not napi_object");
+        MMI_HILOGE("The second parameter is not napi_object");
+        napi_throw_error(env, nullptr, "The second parameter is not napi_object");
         return ERROR_CODE;
     }
     char eventName[EVENT_NAME_LEN] = { 0 };
@@ -85,7 +83,7 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
         return ERROR_CODE;
     }
     std::set<int32_t> preKeys;
-    if (!GetPreKeys(env, receiveValue, preKeys)) {
+    if (GetPreKeys(env, receiveValue, preKeys) == nullptr) {
         MMI_HILOGE("Get preKeys failed");
         return ERROR_CODE;
     }
@@ -94,7 +92,7 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
         napi_throw_error(env, nullptr, "PreKeys size invalid");
         return ERROR_CODE;
     }
-    MMI_HILOGD("PreKeys size:%{public}d", static_cast<int32_t>(preKeys.size()));
+    MMI_HILOGD("PreKeys size:%{public}zu", preKeys.size());
     keyOption->SetPreKeys(preKeys);
     std::string subKeyNames = "";
     for (const auto &item : preKeys) {
@@ -125,8 +123,8 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
             return ERROR_CODE;
         }
         if (valueType != napi_function) {
-            MMI_HILOGE("Parameter3 is not napi_function");
-            napi_throw_error(env, nullptr, "Parameter3 is not napi_function");
+            MMI_HILOGE("The third parameter is not napi_function");
+            napi_throw_error(env, nullptr, "The third parameter is not napi_function");
             return ERROR_CODE;
         }
         if (napi_create_reference(env, argv[2], 1, &event->callback[0]) != napi_ok) {
@@ -138,6 +136,88 @@ int32_t GetEventInfo(napi_env env, napi_callback_info info, KeyEventMonitorInfo*
         event->callback[0] = nullptr;
     }
     return SUCCESS_CODE;
+}
+
+napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
+    std::shared_ptr<KeyOption> keyOption)
+{
+    CALL_DEBUG_ENTER;
+    CHKPP(event);
+    CHKPP(keyOption);
+    size_t argc = 3;
+    napi_value argv[3] = { 0 };
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    napi_valuetype valueType = napi_undefined;
+    if (!UtilNapi::TypeOf(env, argv[0], napi_number)) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "number");
+        MMI_HILOGE("The first parameter is not number");
+        return nullptr;
+    }
+    if (!UtilNapi::TypeOf(env, argv[1], napi_object)) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyOptions", "object");
+        MMI_HILOGE("The second parameter is not napi_object");
+        return nullptr;
+    }
+    int32_t type = 0;
+    CHKRP(env, napi_get_value_int32(env, argv[0], &type), GET_INT32);
+    if (type != 0) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "type not in range");
+        return nullptr;
+    }
+    napi_value receiveValue = nullptr;
+    CHKRP(env, napi_get_named_property(env, argv[1], "preKeys", &receiveValue), GET_NAMED_PROPERTY);
+    if (receiveValue == nullptr) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "preKeys not found");
+        return nullptr;
+    }
+    std::set<int32_t> preKeys;
+    if (GetPreKeys(env, receiveValue, preKeys) == nullptr) {
+        MMI_HILOGE("Get preKeys failed");
+        return nullptr;
+    }
+    if (preKeys.size() > PRE_KEYS_SIZE) {
+        MMI_HILOGE("preKeys size invalid");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "preKeys size invalid");
+        return nullptr;
+    }
+    MMI_HILOGD("PreKeys size:%{public}zu", preKeys.size());
+    keyOption->SetPreKeys(preKeys);
+    std::string subKeyNames = "";
+    for (const auto &item : preKeys) {
+        subKeyNames += std::to_string(item);
+        subKeyNames += ",";
+        MMI_HILOGD("preKeys:%{public}d", item);
+    }
+    int32_t finalKey = GetNamedPropertyInt32(env, argv[1], "finalKey");
+    subKeyNames += std::to_string(finalKey);
+    subKeyNames += ",";
+    keyOption->SetFinalKey(finalKey);
+    MMI_HILOGD("FinalKey:%{public}d", finalKey);
+    bool isFinalKeyDown = GetNamedPropertyBool(env, argv[1], "isFinalKeyDown");
+    subKeyNames += std::to_string(isFinalKeyDown);
+    subKeyNames += ",";
+    keyOption->SetFinalKeyDown(isFinalKeyDown);
+    MMI_HILOGD("IsFinalKeyDown:%{public}d,map_key:%{public}s",
+        (isFinalKeyDown == true?1:0), subKeyNames.c_str());
+    int32_t finalKeyDownDuration = GetNamedPropertyInt32(env, argv[1], "finalKeyDownDuration");
+    subKeyNames += std::to_string(finalKeyDownDuration);
+    keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
+    event->eventType = subKeyNames;
+    MMI_HILOGD("FinalKeyDownDuration:%{public}d", finalKeyDownDuration);
+    if (argc == 3) {
+        CHKRP(env, napi_typeof(env, argv[2], &valueType), TYPEOF);
+        if (valueType != napi_function) {
+            MMI_HILOGE("the third parameter is not napi_function");
+            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+            return nullptr;
+        }
+        CHKRP(env, napi_create_reference(env, argv[2], 1, &event->callback[0]), REFERENCE_REF);
+    } else {
+        event->callback[0] = nullptr;
+    }
+    napi_value ret;
+    CHKRP(env, napi_create_int32(env, RET_OK, &ret), CREATE_INT32);
+    return ret;
 }
 
 static bool MatchCombinationKeys(KeyEventMonitorInfo* monitorInfo, std::shared_ptr<KeyEvent> keyEvent)
@@ -213,6 +293,13 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    size_t argc = 3;
+    napi_value argv[3] = { 0 };
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 3) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "paramter number error");
+        return nullptr;
+    }
     KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
@@ -224,15 +311,39 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         MMI_HILOGE("Check keyOption is null");
         return nullptr;
     }
-    if (GetEventInfo(env, info, event, keyOption) < 0) {
+    napi_valuetype valueType = napi_undefined;
+    if (napi_typeof(env, argv[0], &valueType) != napi_ok) {
         delete event;
-        MMI_HILOGE("GetEventInfo failed");
+        MMI_HILOGE("Napi typeof failed");
         return nullptr;
+    }
+    switch (valueType) {
+        case napi_string: {
+            if (GetEventInfoAPI8(env, info, event, keyOption) < 0) {
+                delete event;
+                MMI_HILOGE("GetEventInfoAPI8 failed");
+                return nullptr;
+            }
+            break;
+        }
+        case napi_number: {
+            if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
+                delete event;
+                MMI_HILOGE("GetEventInfoAPI9 failed");
+                return nullptr;
+            }
+            break;
+        }
+        default: {
+            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "number");
+            delete event;
+            return nullptr;
+        }
     }
     event->keyOption = keyOption;
     int32_t preSubscribeId = GetPreSubscribeId(callbacks, event);
     if (preSubscribeId < 0) {
-        MMI_HILOGD("eventType:%{public}s,eventName:%{public}s", event->eventType.c_str(),  event->name.c_str());
+        MMI_HILOGD("eventType:%{public}s,eventName:%{public}s", event->eventType.c_str(), event->name.c_str());
         int32_t subscribeId = -1;
         subscribeId = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, SubKeyEventCallback);
         if (subscribeId < 0) {
@@ -257,21 +368,52 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    size_t argc = 3;
+    napi_value argv[3] = { 0 };
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 2) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
+        return nullptr;
+    }
     KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
         .env = env,
         .asyncWork = nullptr,
     };
     CHKPP(event);
     auto keyOption = std::make_shared<KeyOption>();
-    if ((keyOption) == nullptr) {
+    if (keyOption == nullptr) {
         delete event;
         MMI_HILOGE("Check keyOption is null");
         return nullptr;
     }
-    if (GetEventInfo(env, info, event, keyOption) < 0) {
+    napi_valuetype valueType = napi_undefined;
+    if (napi_typeof(env, argv[0], &valueType) != napi_ok) {
         delete event;
-        MMI_HILOGE("GetEventInfo failed");
+        MMI_HILOGE("Napi typeof failed");
         return nullptr;
+    }
+    switch (valueType) {
+        case napi_string: {
+            if (GetEventInfoAPI8(env, info, event, keyOption) < 0) {
+                delete event;
+                MMI_HILOGE("GetEventInfo failed");
+                return nullptr;
+            }
+            break;
+        }
+        case napi_number: {
+            if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
+                delete event;
+                MMI_HILOGE("GetEventInfo failed");
+                return nullptr;
+            }
+            break;
+        }
+        default: {
+            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "number");
+            delete event;
+            return nullptr;
+        }
     }
     int32_t subscribeId = -1;
     if (DelEventCallback(env, callbacks, event, subscribeId) < 0) {
@@ -290,6 +432,17 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
+napi_value EnumClassConstructor(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 0;
+    napi_value args[1] = { 0 };
+    napi_value ret = nullptr;
+    void *data = nullptr;
+    CHKRP(env, napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);
+    return ret;
+}
+
 EXTERN_C_START
 static napi_value MmiInit(napi_env env, napi_value exports)
 {
@@ -299,6 +452,15 @@ static napi_value MmiInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("off", JsOff),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    napi_value key = nullptr;
+    CHKRP(env, napi_create_int32(env, 0, &key), CREATE_INT32);
+    napi_property_descriptor keyDesc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("KEY", key),
+    };
+    napi_value result = nullptr;
+    CHKRP(env, napi_define_class(env, "SubscribeType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(keyDesc) / sizeof(*keyDesc), keyDesc, &result), DEFINE_CLASS);
+    CHKRP(env, napi_set_named_property(env, exports, "SubscribeType", result), SET_NAMED_PROPERTY);
     return exports;
 }
 EXTERN_C_END
