@@ -54,8 +54,8 @@ int32_t GetEventInfoAPI8(napi_env env, napi_callback_info info, KeyEventMonitorI
         return ERROR_CODE;
     }
     if (valueType != napi_string) {
-        MMI_HILOGE("Parameter1 is not napi_string");
-        napi_throw_error(env, nullptr, "Parameter1 is not napi_string");
+        MMI_HILOGE("The first parameter is not napi_string");
+        napi_throw_error(env, nullptr, "The first parameter is not napi_string");
         return ERROR_CODE;
     }
     if (napi_typeof(env, argv[1], &valueType) != napi_ok) {
@@ -123,8 +123,8 @@ int32_t GetEventInfoAPI8(napi_env env, napi_callback_info info, KeyEventMonitorI
             return ERROR_CODE;
         }
         if (valueType != napi_function) {
-            MMI_HILOGE("Parameter3 is not napi_function");
-            napi_throw_error(env, nullptr, "Parameter3 is not napi_function");
+            MMI_HILOGE("The third parameter is not napi_function");
+            napi_throw_error(env, nullptr, "The third parameter is not napi_function");
             return ERROR_CODE;
         }
         if (napi_create_reference(env, argv[2], 1, &event->callback[0]) != napi_ok) {
@@ -155,7 +155,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, const KeyEven
     }
     if (!UtilNapi::TypeOf(env, argv[1], napi_object)) {
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyOptions", "object");
-        MMI_HILOGE("Parameter2 is not napi_object");
+        MMI_HILOGE("The second parameter is not napi_object");
         return nullptr;
     }
     int32_t type = 0;
@@ -312,7 +312,11 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_valuetype valueType = napi_undefined;
-    CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
+    if (napi_typeof(env, argv[0], &valueType) != napi_ok) {
+        delete event;
+        MMI_HILOGE("Napi typeof failed");
+        return nullptr;
+    }
     switch (valueType) {
         case napi_string: {
             if (GetEventInfoAPI8(env, info, event, keyOption) < 0) {
