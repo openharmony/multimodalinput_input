@@ -297,12 +297,12 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
         return;
     }
     napi_value callback = nullptr;
-    CHKRV_SCOPE(dataWorker->env, napi_get_reference_value(dataWorker->env, event->callback[0], &callback), GET_REFERENCE_VALUE, scope);
+    CHKRV_SCOPE(env, napi_get_reference_value(env, event->callback[0], &callback), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
     AsyncWorkFn(env, event, result);
     napi_value callResult = nullptr;
-    CHKRV_SCOPE(dataWorker->env, napi_call_function(dataWorker->env, nullptr, callback, 1, &result, &callResult), CALL_FUNCTION, scope);
-    napi_close_handle_scope(dataWorker->env, scope);
+    CHKRV_SCOPE(env, napi_call_function(env, nullptr, callback, 1, &result, &callResult), CALL_FUNCTION, scope);
+    napi_close_handle_scope(env, scope);
 }
 
 void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
