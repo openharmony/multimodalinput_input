@@ -48,6 +48,8 @@ public:
     bool AddEnv(napi_env env, napi_callback_info cbInfo);
 
     void RemoveEnv(napi_env env);
+
+    void ThrowError(napi_env env, int32_t code);
 private:
     JsInputMonitorManager() = default;
 

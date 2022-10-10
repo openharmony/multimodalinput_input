@@ -216,4 +216,9 @@ enum ANREventType {
     ANR_DISPATCH = 0,
     ANR_MONITOR = 1
 };
+
+enum EventType {
+    TOUCH = 0,
+    MOUSE = 1,
+};
 #endif // PROTO_H
