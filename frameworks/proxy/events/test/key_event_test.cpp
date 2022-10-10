@@ -21,7 +21,6 @@
 #include "key_event.h"
 #include "proto.h"
 #include "run_shell_util.h"
-#include "standardized_event_manager.h"
 
 namespace OHOS {
 namespace MMI {
