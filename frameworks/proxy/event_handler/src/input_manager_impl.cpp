@@ -134,7 +134,7 @@ void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInf
         MMI_HILOGE("The windows info or display info is empty!");
         return;
     }
-    for (const auto &item : displayGroupInfo_.windowsInfo) {
+    for (const auto &item : displayGroupInfo.windowsInfo) {
         if ((item.defaultHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
             (item.pointerHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
             item.defaultHotAreas.empty() || item.pointerHotAreas.empty()) {
