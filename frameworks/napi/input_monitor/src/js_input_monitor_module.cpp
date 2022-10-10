@@ -29,7 +29,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule" };
-constexpr int32_t INVALID_VALUE = -1;
 } // namespace
 
 static napi_value JsOnApi9(napi_env env, napi_callback_info info)
@@ -50,32 +49,19 @@ static napi_value JsOnApi9(napi_env env, napi_callback_info info)
     size_t len = 0;
     CHKRP(env, napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_STRING_UTF8);
     if (std::strcmp(typeName, "touch") != 0 && std::strcmp(typeName, "mouse") != 0) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType", "EventType must be mouse or touch");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType must be mouse or touch");
         return nullptr;
     }
-
     CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
     if (valueType != napi_function) {
         MMI_HILOGE("Second Parameter type error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
         return nullptr;
     }
-
     if (!JsInputMonMgr.AddEnv(env, info)) {
         MMI_HILOGE("AddEnv failed");
         return nullptr;
     }
-
-    std::string typeName;
-    if (value == TOUCH) {
-        typeName = "touch";
-    } else if (value == MOUSE) {
-        typeName = "mouse";
-    } else {
-        MMI_HILOGE("Get the parameter error");
-        return nullptr;
-    }
-
     JsInputMonMgr.AddMonitor(env, typeName, argv[1]);
     return nullptr;
 }
@@ -116,7 +102,7 @@ static napi_value JsOffApi9(napi_env env, napi_callback_info info)
     size_t len = 0;
     CHKRP(env, napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_STRING_UTF8);
     if (std::strcmp(typeName, "touch") != 0 && std::strcmp(typeName, "mouse") != 0) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType", "EventType must be mouse or touch");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType must be mouse or touch");
         return nullptr;
     }
     if (argv[1] == nullptr) {
@@ -158,6 +144,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
+EXTERN_C_START
 static napi_value MmiInputMonitorInit(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -168,8 +155,8 @@ static napi_value MmiInputMonitorInit(napi_env env, napi_value exports)
     CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     return exports;
 }
-
 EXTERN_C_END
+
 static napi_module mmiInputMonitorModule = {
     .nm_version = 1,
     .nm_flags = 0,
