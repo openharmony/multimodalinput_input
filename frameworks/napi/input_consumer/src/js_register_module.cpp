@@ -295,17 +295,6 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
-napi_value EnumClassConstructor(napi_env env, napi_callback_info info)
-{
-    CALL_DEBUG_ENTER;
-    size_t argc = 0;
-    napi_value args[1] = { 0 };
-    napi_value ret = nullptr;
-    void *data = nullptr;
-    CHKRP(env, napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);
-    return ret;
-}
-
 EXTERN_C_START
 static napi_value MmiInit(napi_env env, napi_value exports)
 {
@@ -315,15 +304,6 @@ static napi_value MmiInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("off", JsOff),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
-    napi_value key = nullptr;
-    CHKRP(env, napi_create_int32(env, 0, &key), CREATE_INT32);
-    napi_property_descriptor keyDesc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("KEY", key),
-    };
-    napi_value result = nullptr;
-    CHKRP(env, napi_define_class(env, "SubscribeType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
-        sizeof(keyDesc) / sizeof(*keyDesc), keyDesc, &result), DEFINE_CLASS);
-    CHKRP(env, napi_set_named_property(env, exports, "SubscribeType", result), SET_NAMED_PROPERTY);
     return exports;
 }
 EXTERN_C_END
