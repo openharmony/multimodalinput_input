@@ -102,7 +102,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     keyOption->SetFinalKey(finalKey);
     MMI_HILOGD("FinalKey:%{public}d", finalKey);
     bool isFinalKeyDown;
-    if (GetNamedPropertyBool(env, argv[1], "isFinalKeyDown", isFinalKeyDown)) {
+    if (!GetNamedPropertyBool(env, argv[1], "isFinalKeyDown", isFinalKeyDown)) {
         MMI_HILOGE("GetNamedPropertyBool failed");
         return nullptr;
     }
