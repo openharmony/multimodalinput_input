@@ -93,7 +93,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
         return nullptr;
     }
     if (finalKey < 0) {
-        MMI_HILOGE("finalKey:%{public}d is less 0, can not process", value);
+        MMI_HILOGE("finalKey:%{public}d is less 0, can not process", finalKey);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKey must be greater than or equal to zero");
         return nullptr;
     }
@@ -117,7 +117,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
         return nullptr;
     }
     if (finalKeyDownDuration < 0) {
-        MMI_HILOGE("finalKey:%{public}d is less 0, can not process", value);
+        MMI_HILOGE("finalKeyDownDuration:%{public}d is less 0, can not process", finalKeyDownDuration);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKeyDownDuration must be greater than or equal to zero");
         return nullptr;
     }
