@@ -88,7 +88,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
         MMI_HILOGD("preKeys:%{public}d", item);
     }
     int32_t finalKey;
-    if (GetNamedPropertyInt32(env, argv[1], "finalKey", finalKey)) {
+    if (!GetNamedPropertyInt32(env, argv[1], "finalKey", finalKey)) {
         MMI_HILOGE("GetNamedPropertyInt32 failed");
         return nullptr;
     }
@@ -112,7 +112,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     MMI_HILOGD("IsFinalKeyDown:%{public}d,map_key:%{public}s",
         (isFinalKeyDown == true?1:0), subKeyNames.c_str());
     int32_t finalKeyDownDuration;
-    if (GetNamedPropertyInt32(env, argv[1], "finalKeyDownDuration", finalKeyDownDuration)) {
+    if (!GetNamedPropertyInt32(env, argv[1], "finalKeyDownDuration", finalKeyDownDuration)) {
         MMI_HILOGE("GetNamedPropertyInt32 failed");
         return nullptr;
     }
