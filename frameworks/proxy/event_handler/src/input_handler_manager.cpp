@@ -46,7 +46,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     if (inputHandlers_.size() >= MAX_N_INPUT_HANDLERS) {
         MMI_HILOGE("The number of handlers exceeds the maximum");
-        return INVALID_HANDLER_ID;
+        return ERROR_EXCEED_MAX_COUNT;
     }
     int32_t handlerId = GetNextId();
     if (handlerId == INVALID_HANDLER_ID) {
@@ -64,7 +64,10 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
         MMI_HILOGD("New handler successfully registered, report to server");
         const HandleEventType newType = GetEventType();
         if (currentType != newType) {
-            AddToServer(handlerType, newType);
+            int32_t ret = AddToServer(handlerType, newType);
+            if (ret < 0) {
+                return ret;
+            }
         }
     } else {
         handlerId = INVALID_HANDLER_ID;
@@ -107,12 +110,13 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
     return RET_OK;
 }
 
-void InputHandlerManager::AddToServer(InputHandlerType handlerType, HandleEventType eventType)
+int32_t InputHandlerManager::AddToServer(InputHandlerType handlerType, HandleEventType eventType)
 {
     int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerType, eventType);
-    if (ret != 0) {
+    if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
+    return ret;
 }
 
 int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType handlerType)
