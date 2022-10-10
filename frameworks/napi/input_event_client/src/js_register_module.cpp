@@ -68,10 +68,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
         return result;
     }
     keyEvent->SetKeyCode(keyCode);
-    bool isIntercepted = false;
-    if (!isIntercepted) {
-        keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
-    }
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
     int32_t keyDownDuration;
     ret = GetNamedPropertyInt32(env, keyHandle, "keyDownDuration", keyDownDuration);
     if (ret != RET_OK) {
@@ -134,10 +131,7 @@ static napi_value InjectKeyEvent(napi_env env, napi_callback_info info)
         return result;
     }
     keyEvent->SetKeyCode(keyCode);
-    bool isIntercepted = false;
-    if (!isIntercepted) {
-        keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
-    }
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
     int32_t keyDownDuration;
     ret = GetNamedPropertyInt32(env, keyHandle, "keyDownDuration", keyDownDuration);
     if (ret != RET_OK) {
