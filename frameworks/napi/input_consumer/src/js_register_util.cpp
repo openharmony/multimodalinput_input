@@ -46,9 +46,8 @@ void SetNamedProperty(const napi_env &env, napi_value &object, const std::string
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
 }
 
-bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const std::string &name)
+bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const std::string &name, bool &ret)
 {
-    bool value = false;
     napi_value napiValue = {};
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
@@ -56,32 +55,31 @@ bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const s
     if (tmpType != napi_boolean) {
         MMI_HILOGE("The value is not bool");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "bool");
-        return value;
+        return false;
     }
 
-    napi_get_value_bool(env, napiValue, &value);
-    MMI_HILOGD("%{public}s=%{public}d", name.c_str(), value);
-    return value;
+    napi_get_value_bool(env, napiValue, &ret);
+    MMI_HILOGD("%{public}s=%{public}d", name.c_str(), ret);
+    return true;
 }
 
-int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name)
+bool GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name, int32_t &ret)
 {
-    int32_t value = 0;
     napi_value napiValue = {};
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_HILOGE("Call napi_typeof failed");
-        return value;
+        return false;
     }
     if (tmpType != napi_number) {
         MMI_HILOGE("The value is not number");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "number");
-        return value;
+        return false;
     }
-    napi_get_value_int32(env, napiValue, &value);
-    MMI_HILOGD("%{public}s=%{public}d", name.c_str(), value);
-    return value;
+    napi_get_value_int32(env, napiValue, &ret);
+    MMI_HILOGD("%{public}s=%{public}d", name.c_str(), ret);
+    return true;
 }
 
 napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> &params)
@@ -95,15 +93,15 @@ napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int
         napi_valuetype valuetype;
         CHKRP(env, napi_typeof(env, napiElement, &valuetype), TYPEOF);
         if (valuetype != napi_number) {
-            MMI_HILOGE("Wrong argument type, Number expected");
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong argument type, Number expected");
+            MMI_HILOGE("PreKeysWrong argument type, Number expected");
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "element of preKeys must be number");
             return nullptr;
         }
         int32_t value = 0;
         CHKRP(env, napi_get_value_int32(env, napiElement, &value), GET_INT32);
         if (value < 0) {
             MMI_HILOGE("preKey:%{public}d is less 0, can not process", value);
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "preKey is less 0, can not process");
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "element of preKeys must be greater than or equal to zero");
             return nullptr;
         }
         MMI_HILOGD("Get int array number:%{public}d", value);
