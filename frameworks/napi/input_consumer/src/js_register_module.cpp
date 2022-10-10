@@ -92,6 +92,11 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
         MMI_HILOGE("GetNamedPropertyInt32 failed");
         return nullptr;
     }
+    if (finalKey < 0) {
+        MMI_HILOGE("finalKey:%{public}d is less 0, can not process", value);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKey must be greater than or equal to zero");
+        return nullptr;
+    }
     subKeyNames += std::to_string(finalKey);
     subKeyNames += ",";
     keyOption->SetFinalKey(finalKey);
@@ -109,6 +114,11 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     int32_t finalKeyDownDuration;
     if (GetNamedPropertyInt32(env, argv[1], "finalKeyDownDuration", finalKeyDownDuration)) {
         MMI_HILOGE("GetNamedPropertyInt32 failed");
+        return nullptr;
+    }
+    if (finalKeyDownDuration < 0) {
+        MMI_HILOGE("finalKey:%{public}d is less 0, can not process", value);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKeyDownDuration must be greater than or equal to zero");
         return nullptr;
     }
     subKeyNames += std::to_string(finalKeyDownDuration);
