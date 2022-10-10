@@ -70,58 +70,6 @@ private:
 InputManagerImpl::InputManagerImpl() {}
 InputManagerImpl::~InputManagerImpl() {}
 
-bool InputManagerImpl::InitEventHandler()
-{
-    CALL_DEBUG_ENTER;
-    if (mmiEventHandler_ != nullptr) {
-        MMI_HILOGE("Repeated initialization operations");
-        return false;
-    }
-
-    static constexpr int32_t timeout = 3;
-    std::unique_lock<std::mutex> lck(handleMtx_);
-    ehThread_ = std::thread(std::bind(&InputManagerImpl::OnThread, this));
-    ehThread_.detach();
-    if (cv_.wait_for(lck, std::chrono::seconds(timeout)) == std::cv_status::timeout) {
-        MMI_HILOGE("EventHandler thread start timeout");
-        return false;
-    }
-    return true;
-}
-
-MMIEventHandlerPtr InputManagerImpl::GetEventHandler() const
-{
-    CHKPP(mmiEventHandler_);
-    return mmiEventHandler_->GetSharedPtr();
-}
-
-EventHandlerPtr InputManagerImpl::GetCurrentEventHandler() const
-{
-    auto eventHandler = AppExecFwk::EventHandler::Current();
-    if (eventHandler == nullptr) {
-        eventHandler = GetEventHandler();
-    }
-    return eventHandler;
-}
-
-void InputManagerImpl::OnThread()
-{
-    CALL_DEBUG_ENTER;
-    CHK_PID_AND_TID();
-    std::shared_ptr<AppExecFwk::EventRunner> eventRunner = nullptr;
-    {
-        std::lock_guard<std::mutex> lck(handleMtx_);
-        SetThreadName("MmiClientEventHdr");
-        mmiEventHandler_ = std::make_shared<MMIEventHandler>();
-        CHKPV(mmiEventHandler_);
-        eventRunner = mmiEventHandler_->GetEventRunner();
-        CHKPV(eventRunner);
-        cv_.notify_one();
-    }
-    CHKPV(eventRunner);
-    eventRunner->Run();
-}
-
 void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
@@ -181,18 +129,17 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
     CHKPV(inputEventConsumer);
+    CHKPV(eventHandler);
     std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHdl.InitClient()) {
+    if (!MMIEventHdl.InitClient(eventHandler)) {
         MMI_HILOGE("Client init failed");
         return;
     }
     consumer_ = inputEventConsumer;
     eventHandler_ = eventHandler;
-    if (eventHandler_ == nullptr) {
-        eventHandler_ = InputMgrImpl.GetCurrentEventHandler();
-    }
 }
 
 int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
@@ -239,11 +186,25 @@ void InputManagerImpl::OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
     CHKPV(keyEvent);
     CHKPV(eventHandler_);
     CHKPV(consumer_);
-    std::lock_guard<std::mutex> guard(mtx_);
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
+    std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        eventHandler = eventHandler_;
+        inputConsumer = consumer_;
+    }
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_DISPATCH_EVENT);
-    if (!MMIEventHandler::PostTask(eventHandler_,
-        std::bind(&InputManagerImpl::OnKeyEventTask, this, consumer_, keyEvent))) {
-        MMI_HILOGE("Post task failed");
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
+    CHKPV(client);
+    if (client->IsEventHandlerChanged()) {
+        if (!eventHandler->PostHighPriorityTask(std::bind(&InputManagerImpl::OnKeyEventTask,
+            this, inputConsumer, keyEvent))) {
+            MMI_HILOGE("Post task failed");
+            return;
+        }
+    } else {
+        inputConsumer->OnInputEvent(keyEvent);
+        MMI_HILOGD("Key event report keyCode:%{public}d", keyEvent->GetKeyCode());
     }
     MMI_HILOGD("Key event keyCode:%{public}d", keyEvent->GetKeyCode());
 }
@@ -267,11 +228,25 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
     CHKPV(pointerEvent);
     CHKPV(eventHandler_);
     CHKPV(consumer_);
-    std::lock_guard<std::mutex> guard(mtx_);
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler = nullptr;
+    std::shared_ptr<IInputEventConsumer> inputConsumer = nullptr;
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        eventHandler = eventHandler_;
+        inputConsumer = consumer_;
+    }
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
-    if (!MMIEventHandler::PostTask(eventHandler_,
-        std::bind(&InputManagerImpl::OnPointerEventTask, this, consumer_, pointerEvent))) {
-        MMI_HILOGE("Post task failed");
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
+    CHKPV(client);
+    if (client->IsEventHandlerChanged()) {
+        if (!eventHandler->PostHighPriorityTask(std::bind(&InputManagerImpl::OnPointerEventTask,
+            this, inputConsumer, pointerEvent))) {
+            MMI_HILOGE("Post task failed");
+            return;
+        }
+    } else {
+        inputConsumer->OnInputEvent(pointerEvent);
+        MMI_HILOGD("Pointer event report pointerId:%{public}d", pointerEvent->GetPointerId());
     }
     MMI_HILOGD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
 }
@@ -755,24 +730,14 @@ void InputManagerImpl::OnAnr(int32_t pid)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
-    auto eventHandler = GetCurrentEventHandler();
-    CHKPV(eventHandler);
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (!MMIEventHandler::PostTask(eventHandler,
-        std::bind(&InputManagerImpl::OnAnrTask, this, anrObservers_, pid))) {
-        MMI_HILOGE("Post task failed");
+    {
+        std::lock_guard<std::mutex> guard(mtx_);
+        for (const auto &observer : anrObservers_) {
+            CHKPC(observer);
+            observer->OnAnr(pid);
+        }
     }
     MMI_HILOGI("ANR noticed pid:%{public}d", pid);
-}
-
-void InputManagerImpl::OnAnrTask(std::vector<std::shared_ptr<IAnrObserver>> observers, int32_t pid)
-{
-    CALL_DEBUG_ENTER;
-    CHK_PID_AND_TID();
-    for (const auto &observer : observers) {
-        CHKPV(observer);
-        observer->OnAnr(pid);
-    }
 }
 
 int32_t InputManagerImpl::SetInputDevice(const std::string &dhid, const std::string &screenId)
