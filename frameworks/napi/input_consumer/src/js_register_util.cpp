@@ -63,23 +63,24 @@ bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const s
     return true;
 }
 
-bool GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name, int32_t &ret)
+std::optional<int32_t> GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name)
 {
     napi_value napiValue = {};
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_HILOGE("Call napi_typeof failed");
-        return false;
+        return std::nullopt;
     }
     if (tmpType != napi_number) {
         MMI_HILOGE("The value is not number");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "number");
-        return false;
+        return std::nullopt;
     }
+    int32_t ret;
     napi_get_value_int32(env, napiValue, &ret);
     MMI_HILOGD("%{public}s=%{public}d", name.c_str(), ret);
-    return true;
+    return std::make_optional(ret);
 }
 
 napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> &params)
@@ -93,7 +94,7 @@ napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int
         napi_valuetype valuetype;
         CHKRP(env, napi_typeof(env, napiElement, &valuetype), TYPEOF);
         if (valuetype != napi_number) {
-            MMI_HILOGE("PreKeysWrong argument type, Number expected");
+            MMI_HILOGE("PreKeys Wrong argument type, Number expected");
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "element of preKeys must be number");
             return nullptr;
         }
@@ -101,7 +102,7 @@ napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int
         CHKRP(env, napi_get_value_int32(env, napiElement, &value), GET_INT32);
         if (value < 0) {
             MMI_HILOGE("preKey:%{public}d is less 0, can not process", value);
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "element of preKeys must be greater than or equal to zero");
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "element of preKeys must be greater than or equal to 0");
             return nullptr;
         }
         MMI_HILOGD("Get int array number:%{public}d", value);

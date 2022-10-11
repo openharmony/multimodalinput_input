@@ -87,14 +87,15 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
         subKeyNames += ",";
         MMI_HILOGD("preKeys:%{public}d", item);
     }
-    int32_t finalKey;
-    if (!GetNamedPropertyInt32(env, argv[1], "finalKey", finalKey)) {
+    std::optional<int32_t> optionalFinalKey = GetNamedPropertyInt32(env, argv[1], "finalKey");
+    if (!optionalFinalKey) {
         MMI_HILOGE("GetNamedPropertyInt32 failed");
         return nullptr;
     }
+    int32_t finalKey = optionalFinalKey.value();
     if (finalKey < 0) {
         MMI_HILOGE("finalKey:%{public}d is less 0, can not process", finalKey);
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKey must be greater than or equal to zero");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKey must be greater than or equal to 0");
         return nullptr;
     }
     subKeyNames += std::to_string(finalKey);
@@ -111,14 +112,15 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     keyOption->SetFinalKeyDown(isFinalKeyDown);
     MMI_HILOGD("IsFinalKeyDown:%{public}d,map_key:%{public}s",
         (isFinalKeyDown == true?1:0), subKeyNames.c_str());
-    int32_t finalKeyDownDuration;
-    if (!GetNamedPropertyInt32(env, argv[1], "finalKeyDownDuration", finalKeyDownDuration)) {
+    std::optional<int32_t> optionalkeyDownDuration = GetNamedPropertyInt32(env, argv[1], "finalKeyDownDuration");
+    if (!optionalkeyDownDuration) {
         MMI_HILOGE("GetNamedPropertyInt32 failed");
         return nullptr;
     }
+    int32_t finalKeyDownDuration = optionalkeyDownDuration.value();
     if (finalKeyDownDuration < 0) {
         MMI_HILOGE("finalKeyDownDuration:%{public}d is less 0, can not process", finalKeyDownDuration);
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKeyDownDuration must be greater than or equal to zero");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "finalKeyDownDuration must be greater than or equal to 0");
         return nullptr;
     }
     subKeyNames += std::to_string(finalKeyDownDuration);
