@@ -58,7 +58,7 @@ bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const s
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "bool");
         return false;
     }
-    CHKRP(env, napi_get_value_bool(env, napiValue, &ret), GET_BOOL);
+    CHKRF(env, napi_get_value_bool(env, napiValue, &ret), GET_BOOL);
     MMI_HILOGD("%{public}s=%{public}d", name.c_str(), ret);
     return true;
 }
