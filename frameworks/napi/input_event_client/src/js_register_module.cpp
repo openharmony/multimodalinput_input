@@ -41,14 +41,20 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "KeyEvent", "string");
         return nullptr;
     }
+    napi_valuetype tmpType = napi_undefined;
+    CHKRP(env, napi_typeof(env, argv[0], &tmpType), TYPEOF);
+    if (tmpType != napi_object) {
+        MMI_HILOGE("KeyEvent is not napi_object");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "KeyEvent", "object");
+        return nullptr;
+    }
     napi_value keyHandle = nullptr;
     CHKRP(env, napi_get_named_property(env, argv[0], "KeyEvent", &keyHandle), GET_NAMED_PROPERTY);
     if (keyHandle == nullptr) {
         MMI_HILOGE("KeyEvent is nullptr");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "KeyEvent not exist");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "KeyEvent not found");
         return nullptr;
     }
-    napi_valuetype tmpType = napi_undefined;
     CHKRP(env, napi_typeof(env, keyHandle, &tmpType), TYPEOF);
     if (tmpType != napi_object) {
         MMI_HILOGE("KeyEvent is not napi_object");
@@ -74,12 +80,29 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
         MMI_HILOGE("Get keyCode failed");
         return result;
     }
+    if (keyCode < 0) {
+        MMI_HILOGE("keyCode:%{public}d is less 0, can not process", keyCode);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyCode must be greater than or equal to zero");
+        return result;
+    }
     keyEvent->SetKeyCode(keyCode);
+    bool isIntercepted = false;
+    ret = GetNamedPropertyBool(env, keyHandle, "isIntercepted", isIntercepted);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get isIntercepted failed");
+        return result;
+    }
+    MMI_HILOGD("isIntercepted:%{public}d", isIntercepted);
     keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
     int32_t keyDownDuration;
     ret = GetNamedPropertyInt32(env, keyHandle, "keyDownDuration", keyDownDuration);
     if (ret != RET_OK) {
         MMI_HILOGE("Get keyDownDuration failed");
+        return result;
+    }
+    if (keyDownDuration < 0) {
+        MMI_HILOGE("keyDownDuration:%{public}d is less 0, can not process", keyDownDuration);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyDownDuration must be greater than or equal to zero");
         return result;
     }
     KeyEvent::KeyItem item;
