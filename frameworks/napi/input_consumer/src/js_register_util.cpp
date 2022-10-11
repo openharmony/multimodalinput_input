@@ -51,14 +51,14 @@ bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const s
     napi_value napiValue = {};
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
+
     CHKRF(env, napi_typeof(env, napiValue, &tmpType), TYPEOF);
     if (tmpType != napi_boolean) {
         MMI_HILOGE("The value is not bool");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "bool");
         return false;
     }
-
-    napi_get_value_bool(env, napiValue, &ret);
+    CHKRP(env, napi_get_value_bool(env, napiValue, &ret), GET_BOOL);
     MMI_HILOGD("%{public}s=%{public}d", name.c_str(), ret);
     return true;
 }
@@ -68,17 +68,14 @@ std::optional<int32_t> GetNamedPropertyInt32(const napi_env &env, const napi_val
     napi_value napiValue = {};
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
-    if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGE("Call napi_typeof failed");
-        return std::nullopt;
-    }
+    CHKRP(env, napi_typeof(env, napiValue, &tmpType), TYPEOF);
     if (tmpType != napi_number) {
         MMI_HILOGE("The value is not number");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "number");
         return std::nullopt;
     }
     int32_t ret;
-    napi_get_value_int32(env, napiValue, &ret);
+    CHKRP(env, napi_get_value_int32(env, napiValue, &ret), GET_INT32);
     MMI_HILOGD("%{public}s=%{public}d", name.c_str(), ret);
     return std::make_optional(ret);
 }
