@@ -43,15 +43,14 @@ constexpr int32_t RIGHT = 2;
 constexpr int32_t MOUSE_FLOW = 15;
 } // namespace
 
-bool InputMonitor::Start()
+int32_t InputMonitor::Start()
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
         monitorId_ = InputMgr->AddMonitor(shared_from_this());
-        return monitorId_ >= 0;
     }
-    return true;
+    return monitorId_;
 }
 
 void InputMonitor::Stop()
@@ -636,19 +635,19 @@ int32_t JsInputMonitor::TransformMousePointerEvent(const std::shared_ptr<Pointer
     return RET_OK;
 }
 
-bool JsInputMonitor::Start()
+int32_t JsInputMonitor::Start()
 {
     CALL_DEBUG_ENTER;
     CHKPF(monitor_);
     if (isMonitoring_) {
         MMI_HILOGW("Js is monitoring");
-        return true;
+        return RET_OK;
     }
-    if (monitor_->Start()) {
+    int32_t ret = monitor_->Start();
+    if (ret >= 0) {
         isMonitoring_ = true;
-        return true;
     }
-    return false;
+    return ret;
 }
 
 JsInputMonitor::~JsInputMonitor()

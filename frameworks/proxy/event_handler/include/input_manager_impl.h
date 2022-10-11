@@ -24,7 +24,7 @@
 
 #include "display_info.h"
 #include "event_filter_service.h"
-
+#include "event_handler.h"
 #include "if_mmi_client.h"
 #include "input_device_impl.h"
 #include "input_device_cooperate_impl.h"
@@ -37,7 +37,6 @@
 #include "i_anr_observer.h"
 #include "i_input_event_consumer.h"
 #include "key_option.h"
-#include "mmi_event_handler.h"
 #include "pointer_event.h"
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
 #include "call_dinput_service.h"
@@ -50,10 +49,6 @@ class InputManagerImpl final {
 
 public:
     DISALLOW_MOVE(InputManagerImpl);
-
-    bool InitEventHandler();
-    MMIEventHandlerPtr GetEventHandler() const;
-    EventHandlerPtr GetCurrentEventHandler() const;
 
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     int32_t SubscribeKeyEvent(
@@ -142,9 +137,6 @@ private:
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-    void OnAnrTask(std::vector<std::shared_ptr<IAnrObserver>> observers, int32_t pid);
-    void OnThread();
-
 private:
     sptr<EventFilterService> eventFilterService_ { nullptr };
     std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
@@ -155,8 +147,7 @@ private:
     std::mutex handleMtx_;
     std::condition_variable cv_;
     std::thread ehThread_;
-    EventHandlerPtr eventHandler_  { nullptr };
-    MMIEventHandlerPtr mmiEventHandler_ { nullptr };
+    std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
 #ifdef OHOS_DISTRIBUTED_INPUT_MODEL
     sptr<CallDinputService> callDinputService_ { nullptr };
 #endif // OHOS_DISTRIBUTED_INPUT_MODEL

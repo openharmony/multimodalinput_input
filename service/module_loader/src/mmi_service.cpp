@@ -39,6 +39,7 @@
 #include "mmi_log.h"
 #include "string_ex.h"
 #include "util_ex.h"
+#include "util_napi_error.h"
 #include "multimodal_input_connect_def_parcel.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
@@ -474,7 +475,7 @@ int32_t MMIService::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
         IPointerDrawingManager::GetInstance(), GetCallingPid(), windowId, std::ref(pointerStyle)));
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer style failed,return %{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
@@ -485,10 +486,15 @@ int32_t MMIService::OnSupportKeys(int32_t pid, int32_t userData, int32_t deviceI
     CALL_DEBUG_ENTER;
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
-    std::vector<bool> keystroke = InputDevMgr->SupportKeys(deviceId, keys);
+    std::vector<bool> keystroke;
+    int32_t ret = InputDevMgr->SupportKeys(deviceId, keys, keystroke);
     if (keystroke.size() > MAX_SUPPORT_KEY) {
         MMI_HILOGE("Device exceeds the max range");
         return RET_ERR;
+    }
+    if (ret != RET_OK) {
+        MMI_HILOGE("Device id not support");
+        return ret;
     }
 
     NetPacket pkt(MmiMessageId::INPUT_DEVICE_SUPPORT_KEYS);
@@ -516,7 +522,7 @@ int32_t MMIService::SupportKeys(int32_t userData, int32_t deviceId, std::vector<
         pid, userData, deviceId, keys));
     if (ret != RET_OK) {
         MMI_HILOGE("Support keys info process failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -563,10 +569,10 @@ int32_t MMIService::OnGetDevice(int32_t pid, int32_t userData, int32_t deviceId)
     CHKPR(sess, RET_ERR);
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
     if (InputDevMgr->GetInputDevice(deviceId) == nullptr) {
-        MMI_HILOGI("Input device not found");
-    } else {
-        inputDevice = InputDevMgr->GetInputDevice(deviceId);
+        MMI_HILOGE("Input device not found");
+        return COMMON_PARAMETER_ERROR;
     }
+    inputDevice = InputDevMgr->GetInputDevice(deviceId);
     NetPacket pkt(MmiMessageId::INPUT_DEVICE);
     pkt << userData << inputDevice->GetId() << inputDevice->GetName() << inputDevice->GetType()
         << inputDevice->GetBus() << inputDevice->GetProduct() << inputDevice->GetVendor()
@@ -590,7 +596,7 @@ int32_t MMIService::GetDevice(int32_t userData, int32_t deviceId)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetDevice, this, pid, userData, deviceId));
     if (ret != RET_OK) {
         MMI_HILOGE("Get input device info failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
@@ -651,7 +657,12 @@ int32_t MMIService::OnGetKeyboardType(int32_t pid, int32_t userData, int32_t dev
 {
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
-    int32_t keyboardType = InputDevMgr->GetKeyboardType(deviceId);
+    int32_t keyboardType = 0;
+    int32_t ret = InputDevMgr->GetKeyboardType(deviceId, keyboardType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetKeyboardType call failed");
+        return ret;
+    }
     NetPacket pkt(MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE);
     pkt << userData << keyboardType;
     if (pkt.ChkRWError()) {
@@ -1086,7 +1097,7 @@ int32_t MMIService::EnableInputDeviceCooperate(int32_t userData, bool enabled)
         std::bind(&MMIService::OnEnableInputDeviceCooperate, this, pid, userData, enabled));
     if (ret != RET_OK) {
         MMI_HILOGE("OnEnableInputDeviceCooperate failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #else
     (void)(userData);
@@ -1105,7 +1116,7 @@ int32_t MMIService::StartInputDeviceCooperate(int32_t userData, const std::strin
         std::bind(&MMIService::OnStartInputDeviceCooperate, this, pid, userData, sinkDeviceId, srcInputDeviceId));
     if (ret != RET_OK) {
         MMI_HILOGE("OnStartInputDeviceCooperate failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #else
     (void)(userData);
@@ -1123,7 +1134,7 @@ int32_t MMIService::StopDeviceCooperate(int32_t userData)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnStopDeviceCooperate, this, pid, userData));
     if (ret != RET_OK) {
         MMI_HILOGE("OnStopDeviceCooperate failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
 #else
     (void)(userData);
@@ -1233,8 +1244,8 @@ int32_t MMIService::OnStartInputDeviceCooperate(int32_t pid, int32_t userData, c
     int32_t ret = InputDevCooSM->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId);
     if (ret != RET_OK) {
         MMI_HILOGE("OnStartInputDeviceCooperate failed, ret:%{public}d", ret);
-        CooperateEventMgr->OnErrorMessage(event->type, CooperationMessage::INFO_FAIL);
-        return RET_ERR;
+        CooperateEventMgr->OnErrorMessage(event->type, CooperationMessage(ret));
+        return ret;
     }
     return RET_OK;
 }
@@ -1254,8 +1265,8 @@ int32_t MMIService::OnStopDeviceCooperate(int32_t pid, int32_t userData)
     int32_t ret = InputDevCooSM->StopInputDeviceCooperate();
     if (ret != RET_OK) {
         MMI_HILOGE("OnStopDeviceCooperate failed, ret:%{public}d", ret);
-        CooperateEventMgr->OnErrorMessage(event->type, CooperationMessage::STOP_FAIL);
-        return RET_ERR;
+        CooperateEventMgr->OnErrorMessage(event->type, CooperationMessage(ret));
+        return ret;
     }
     return RET_OK;
 }
