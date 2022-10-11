@@ -87,7 +87,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
         subKeyNames += ",";
         MMI_HILOGD("preKeys:%{public}d", item);
     }
-    std::optional<int32_t> optionalFinalKey = GetNamedPropertyInt32(env, argv[1], "finalKey");
+    auto optionalFinalKey = GetNamedPropertyInt32(env, argv[1], "finalKey");
     if (!optionalFinalKey) {
         MMI_HILOGE("GetNamedPropertyInt32 failed");
         return nullptr;
@@ -112,7 +112,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     keyOption->SetFinalKeyDown(isFinalKeyDown);
     MMI_HILOGD("IsFinalKeyDown:%{public}d,map_key:%{public}s",
         (isFinalKeyDown == true?1:0), subKeyNames.c_str());
-    std::optional<int32_t> optionalkeyDownDuration = GetNamedPropertyInt32(env, argv[1], "finalKeyDownDuration");
+    auto optionalkeyDownDuration = GetNamedPropertyInt32(env, argv[1], "finalKeyDownDuration");
     if (!optionalkeyDownDuration) {
         MMI_HILOGE("GetNamedPropertyInt32 failed");
         return nullptr;
