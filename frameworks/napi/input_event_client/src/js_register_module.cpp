@@ -82,7 +82,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     }
     if (keyCode < 0) {
         MMI_HILOGE("keyCode:%{public}d is less 0, can not process", keyCode);
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyCode must be greater than or equal to zero");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyCode must be greater than or equal to 0");
         return result;
     }
     keyEvent->SetKeyCode(keyCode);
@@ -102,7 +102,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     }
     if (keyDownDuration < 0) {
         MMI_HILOGE("keyDownDuration:%{public}d is less 0, can not process", keyDownDuration);
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyDownDuration must be greater than or equal to zero");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyDownDuration must be greater than or equal to 0");
         return result;
     }
     KeyEvent::KeyItem item;
