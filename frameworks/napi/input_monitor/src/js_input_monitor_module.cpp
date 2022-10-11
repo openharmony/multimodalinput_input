@@ -76,9 +76,6 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
     }
-
-    napi_valuetype valueType = napi_undefined;
-    CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
     JsOnApi9(env, info);
     return nullptr;
 }
