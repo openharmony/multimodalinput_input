@@ -46,42 +46,44 @@ void SetNamedProperty(const napi_env &env, napi_value &object, const std::string
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
 }
 
-bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const std::string &name)
+bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const std::string &name, bool &ret)
 {
-    bool value = false;
     napi_value napiValue = {};
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
+
     CHKRF(env, napi_typeof(env, napiValue, &tmpType), TYPEOF);
     if (tmpType != napi_boolean) {
         MMI_HILOGE("The value is not bool");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "bool");
-        return value;
+        return false;
     }
-
-    napi_get_value_bool(env, napiValue, &value);
-    MMI_HILOGD("%{public}s=%{public}d", name.c_str(), value);
-    return value;
+    CHKRF(env, napi_get_value_bool(env, napiValue, &ret), GET_BOOL);
+    MMI_HILOGD("%{public}s=%{public}d", name.c_str(), ret);
+    return true;
 }
 
-int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name)
+std::optional<int32_t> GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name)
 {
-    int32_t value = 0;
     napi_value napiValue = {};
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_HILOGE("Call napi_typeof failed");
-        return value;
+        return std::nullopt;
     }
     if (tmpType != napi_number) {
         MMI_HILOGE("The value is not number");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "number");
-        return value;
+        return std::nullopt;
     }
-    napi_get_value_int32(env, napiValue, &value);
-    MMI_HILOGD("%{public}s=%{public}d", name.c_str(), value);
-    return value;
+    int32_t ret;
+    if (napi_get_value_int32(env, napiValue, &ret) != napi_ok) {
+        MMI_HILOGE("Call napi_get_value_int32 failed");
+        return std::nullopt;
+    }
+    MMI_HILOGD("%{public}s=%{public}d", name.c_str(), ret);
+    return std::make_optional(ret);
 }
 
 napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> &params)
@@ -95,15 +97,15 @@ napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int
         napi_valuetype valuetype;
         CHKRP(env, napi_typeof(env, napiElement, &valuetype), TYPEOF);
         if (valuetype != napi_number) {
-            MMI_HILOGE("Wrong argument type, Number expected");
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Wrong argument type, Number expected");
+            MMI_HILOGE("PreKeys Wrong argument type, Number expected");
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "element of preKeys must be number");
             return nullptr;
         }
         int32_t value = 0;
         CHKRP(env, napi_get_value_int32(env, napiElement, &value), GET_INT32);
         if (value < 0) {
             MMI_HILOGE("preKey:%{public}d is less 0, can not process", value);
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "preKey is less 0, can not process");
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "element of preKeys must be greater than or equal to 0");
             return nullptr;
         }
         MMI_HILOGD("Get int array number:%{public}d", value);
@@ -297,12 +299,12 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
         return;
     }
     napi_value callback = nullptr;
-    CHKRV_SCOPE(dataWorker->env, napi_get_reference_value(dataWorker->env, event->callback[0], &callback), GET_REFERENCE_VALUE, scope);
+    CHKRV_SCOPE(env, napi_get_reference_value(env, event->callback[0], &callback), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
     AsyncWorkFn(env, event, result);
     napi_value callResult = nullptr;
-    CHKRV_SCOPE(dataWorker->env, napi_call_function(dataWorker->env, nullptr, callback, 1, &result, &callResult), CALL_FUNCTION, scope);
-    napi_close_handle_scope(dataWorker->env, scope);
+    CHKRV_SCOPE(env, napi_call_function(env, nullptr, callback, 1, &result, &callResult), CALL_FUNCTION, scope);
+    napi_close_handle_scope(env, scope);
 }
 
 void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
