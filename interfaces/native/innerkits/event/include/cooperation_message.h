@@ -31,6 +31,9 @@ enum class CooperationMessage {
     STOP_FAIL = 402,
     STATE_ON = 500,
     STATE_OFF = 501,
+    INPUT_DEVICE_ID_ERROR = 4400001,
+    COOPERATE_FAIL = 4400002,
+    COOPERATION_DEVICE_ERROR = 4400003,
 };
 } // namespace MMI
 } // namespace OHOS

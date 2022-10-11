@@ -102,6 +102,7 @@ sptr<Rosen::Window> WindowUtilsTest::CreateWindow(const TestWindowInfo& info)
     option->SetTurnScreenOn(true);
     option->SetDisplayId(0);
     option->SetRequestedOrientation(info.orientation_);
+    option->SetMainHandlerAvailable(false);
     if (info.parentId != Rosen::INVALID_WINDOW_ID) {
         option->SetParentId(info.parentId);
     }

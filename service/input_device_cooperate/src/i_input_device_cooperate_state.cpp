@@ -84,12 +84,17 @@ int32_t IInputDeviceCooperateState::StartRemoteInput(int32_t startInputDeviceId)
     std::vector<std::string> dhids = InputDevMgr->GetCooperateDhids(startInputDeviceId);
     if (dhids.empty()) {
         InputDevCooSM->OnStartFinish(false, networkIds.first, startInputDeviceId);
-        return RET_OK;
+        return static_cast<int32_t>(CooperationMessage::INPUT_DEVICE_ID_ERROR);
     }
-    return DistributedAdapter->StartRemoteInput(
+    int32_t ret = DistributedAdapter->StartRemoteInput(
         networkIds.first, networkIds.second, dhids, [this, src = networkIds.first, startInputDeviceId](bool isSuccess) {
             this->OnStartRemoteInput(isSuccess, src, startInputDeviceId);
         });
+    if (ret != RET_OK) {
+        InputDevCooSM->OnStartFinish(false, networkIds.first, startInputDeviceId);
+        return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
+    }
+    return RET_OK; 
 }
 
 void IInputDeviceCooperateState::OnStartRemoteInput(

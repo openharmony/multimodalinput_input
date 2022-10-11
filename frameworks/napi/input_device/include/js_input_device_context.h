@@ -30,6 +30,8 @@ public:
     static napi_value Off(napi_env env, napi_callback_info info);
     static napi_value GetDeviceIds(napi_env env, napi_callback_info info);
     static napi_value GetDevice(napi_env env, napi_callback_info info);
+    static napi_value GetDeviceList(napi_env env, napi_callback_info info);
+    static napi_value GetDeviceInfo(napi_env env, napi_callback_info info);
     static napi_value SupportKeys(napi_env env, napi_callback_info info);
     static napi_value GetKeyboardType(napi_env env, napi_callback_info info);
     std::shared_ptr<JsInputDeviceManager> GetJsInputDeviceMgr() const;
