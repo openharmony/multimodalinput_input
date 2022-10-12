@@ -32,8 +32,8 @@ ohos_fuzztest("RemoveInterceptorFuzzTest") {
   sources = [ "removeinterceptor_fuzzer.cpp" ]
   deps = [ "${mmi_path}/frameworks/proxy:libmmi-client" ]
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
-    "utils_base:utils",
   ]
 }
 
