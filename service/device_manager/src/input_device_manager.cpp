@@ -525,7 +525,12 @@ std::vector<std::string> InputDeviceManager::GetCooperateDhids(int32_t deviceId)
         if (networkId != pointerNetworkId) {
             continue;
         }
-        if (GetDeviceSupportKey(item.first) == KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
+        int32_t keyboardType = KEYBOARD_TYPE_NONE;
+        if (GetDeviceSupportKey(item.first, keyboardType) != RET_OK) {
+            MMI_HILOGI("Get device support key failed");
+            return dhids;
+        }
+        if (keyboardType == KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
             dhids.push_back(item.second.dhid_);
             MMI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "supportkey");
         }
