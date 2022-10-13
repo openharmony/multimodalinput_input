@@ -34,11 +34,6 @@ const std::string THREAD_NAME = "mmi_EventHdr";
 } // namespace
 
 using namespace AppExecFwk;
-MMIClient::MMIClient()
-{
-    CALL_DEBUG_ENTER;
-}
-
 MMIClient::~MMIClient()
 {
     CALL_DEBUG_ENTER;

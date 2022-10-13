@@ -43,16 +43,8 @@ public:
     static void TearDownTestCase(void) {}
 };
 
-class MMIClientUnitTest : public MMIClient {
+class MMIClientUnitTest {
 public:
-    void OnDisconnectedUnitTest()
-    {
-        OnDisconnected();
-    }
-    void OnConnectedUnitTest()
-    {
-        OnConnected();
-    }
 #ifdef OHOS_BUILD_MMI_DEBUG
 public:
     static bool Write(const WindowInfo& info, NetPacket& pkt)
@@ -139,6 +131,7 @@ public:
     }
 #endif // OHOS_BUILD_MMI_DEBUG
 };
+
 ConnectCallback connectFun;
 
 /**
@@ -154,7 +147,7 @@ HWTEST_F(MMIClientTest, RegisterConnectedFunction, TestSize.Level1)
 }
 
 /**
- * @tc.name:RegisterConnectedFunction
+ * @tc.name:RegisterDisconnectedFunction
  * @tc.desc:Verify register disconnected
  * @tc.type: FUNC
  * @tc.require:
@@ -163,76 +156,6 @@ HWTEST_F(MMIClientTest, RegisterDisconnectedFunction, TestSize.Level1)
 {
     MMIClient mmiClient;
     mmiClient.RegisterDisconnectedFunction(connectFun);
-}
-
-/**
- * @tc.name:Re_RegisterConnectedFunction
- * @tc.desc:Verify register connetct
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, Re_RegisterConnectedFunction, TestSize.Level1)
-{
-    MMIClientUnitTest mmiClientTest;
-    mmiClientTest.RegisterConnectedFunction(connectFun);
-}
-
-/**
- * @tc.name:Re_RegisterDisconnectedFunction
- * @tc.desc:Verify register disconnetct
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, Re_RegisterDisconnectedFunction, TestSize.Level1)
-{
-    MMIClientUnitTest mmiClientTest;
-    mmiClientTest.RegisterDisconnectedFunction(connectFun);
-}
-
-HWTEST_F(MMIClientTest, Re_OnConnected, TestSize.Level1)
-{
-    MMIClientUnitTest mmiClientTest;
-    mmiClientTest.OnConnectedUnitTest();
-}
-
-/**
- * @tc.name:Re_OnConnected_002
- * @tc.desc:Verify connnected unit
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, Re_OnConnected_002, TestSize.Level1)
-{
-    ConnectCallback funTmp;
-    MMIClientUnitTest mmiClientTest;
-    mmiClientTest.RegisterConnectedFunction(funTmp);
-    mmiClientTest.OnConnectedUnitTest();
-}
-
-/**
- * @tc.name:Re_OnDisconnected
- * @tc.desc:Verify disconnnected unit
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, Re_OnDisconnected, TestSize.Level1)
-{
-    MMIClientUnitTest mmiClientTest;
-    mmiClientTest.OnDisconnectedUnitTest();
-}
-
-/**
- * @tc.name:Re_OnDisconnected_002
- * @tc.desc:Verify disconnnected unit
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MMIClientTest, Re_OnDisconnected_002, TestSize.Level1)
-{
-    ConnectCallback funTmp;
-    MMIClientUnitTest mmiClientTest;
-    mmiClientTest.RegisterDisconnectedFunction(funTmp);
-    mmiClientTest.OnDisconnectedUnitTest();
 }
 
 #ifdef OHOS_BUILD_MMI_DEBUG
