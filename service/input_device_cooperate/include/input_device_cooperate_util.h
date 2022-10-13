@@ -27,6 +27,7 @@ struct JsonParser {
     {
         if (json_ != nullptr) {
             cJSON_Delete(json_);
+            json_ = nullptr;
         }
     }
     operator cJSON *()
