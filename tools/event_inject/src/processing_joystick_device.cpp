@@ -18,7 +18,7 @@
 using namespace OHOS::MMI;
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ProcessingJoystickDevice" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingJoystickDevice" };
 constexpr int32_t DEFAULT_ABSX_VALUE = 8188;
 constexpr int32_t DEFAULT_ABSY_VALUE = 8192;
 constexpr int32_t DEFAULT_ABSZ_VALUE = 125;
