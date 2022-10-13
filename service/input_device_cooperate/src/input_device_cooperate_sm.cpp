@@ -81,7 +81,6 @@ void InputDeviceCooperateSM::OnCooperateChanged(const std::string &networkId, bo
     CALL_DEBUG_ENTER;
     CooperationMessage msg = isOpen ? CooperationMessage::STATE_ON : CooperationMessage::STATE_OFF;
     delegateTasksCallback_(std::bind(&CooperateEventManager::OnCooperateMessage, CooperateEventMgr, msg, networkId));
-    // CooperateEventMgr->OnCooperateMessage(msg, networkId);
     if (!isOpen) {
         OnCloseCooperation(networkId, false);
     }
@@ -191,7 +190,8 @@ void InputDeviceCooperateSM::StartRemoteCooperate(const std::string &remoteNetwo
 {
     CALL_INFO_TRACE;
     CHKPV(delegateTasksCallback_);
-    delegateTasksCallback_(std::bind(&CooperateEventManager::OnCooperateMessage, CooperateEventMgr, CooperationMessage::INFO_START, remoteNetworkId));
+    delegateTasksCallback_(std::bind(&CooperateEventManager::OnCooperateMessage,
+        CooperateEventMgr, CooperationMessage::INFO_START, remoteNetworkId));
     std::lock_guard<std::mutex> guard(mutex_);
     isStarting_ = true;
 }
@@ -529,8 +529,8 @@ bool InputDeviceCooperateSM::InitDeviceManager()
         return false;
     }
     stateCallback_ = std::make_shared<MmiDeviceStateCallback>();
-    ret =
-        DistributedHardware::DeviceManager::GetInstance().RegisterDevStateCallback(MMI_DINPUT_PKG_NAME, "", stateCallback_);
+    ret = DistributedHardware::DeviceManager::GetInstance().RegisterDevStateCallback(MMI_DINPUT_PKG_NAME,
+        "", stateCallback_);
     if (ret != 0) {
         MMI_HILOGE("Register devStateCallback failed, ret:%{public}d", ret);
         return false;

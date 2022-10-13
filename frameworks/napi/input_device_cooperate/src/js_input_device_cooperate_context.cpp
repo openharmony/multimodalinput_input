@@ -210,7 +210,7 @@ napi_value JsInputDeviceCooperateContext::On(napi_env env, napi_callback_info in
     char type[MAX_STRING_LEN] = {};
     size_t length = 0;
     CHKRP(env, napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_STRING);
-    if (std::strcmp(type, "cooperation") != 0) {
+    if (type == "cooperation") {
         THROWERR(env, "Register listener failed, the first parameter is invalid");
         MMI_HILOGE("Register listener failed, the first parameter is invalid");
         return nullptr;

@@ -32,7 +32,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 std::shared_ptr<DeviceCooperateSoftbusAdapter> g_instance = nullptr;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "DeviceCooperateSoftbusAdapter"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DeviceCooperateSoftbusAdapter" };
 const int32_t DINPUT_LINK_TYPE_MAX = 4;
 const SessionAttribute g_sessionAttr = {
     .dataType = SessionType::TYPE_BYTES,
@@ -149,7 +149,7 @@ int32_t DeviceCooperateSoftbusAdapter::Init()
     localSessionName_ = SESSION_NAME + networkId.substr(0, INTERCEPT_STRING_LENGTH);
     int32_t ret = CreateSessionServer(MMI_DINPUT_PKG_NAME, localSessionName_.c_str(), &sessListener_);
     if (ret != RET_OK) {
-        MMI_HILOGE("Create session server failed, error code %{public}d", ret);
+        MMI_HILOGE("Create session server failed, error code: %{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -476,7 +476,7 @@ int32_t DeviceCooperateSoftbusAdapter::OnSessionOpened(int32_t sessionId, int32_
     int32_t sessionSide = GetSessionSide(sessionId);
     MMI_HILOGI("session open succeed, sessionId:%{public}d, sessionSide:%{public}d(1 is client side)",
         sessionId, sessionSide);
-    if (sessionSide == SESSION_SIDE_SERVER){
+    if (sessionSide == SESSION_SIDE_SERVER) {
         if (getPeerDeviceIdResult == RET_OK) {
             channelStatusMap_[peerDevId] = true;
         }
