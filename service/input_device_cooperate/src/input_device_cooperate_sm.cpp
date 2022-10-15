@@ -54,6 +54,7 @@ void InputDeviceCooperateSM::Init(DelegateTasksCallback delegateTasksCallback)
     delegateTasksCallback_ = delegateTasksCallback;
     preparedNetworkId_ = std::make_pair("", "");
     currentStateSM_ = std::make_shared<InputDeviceCooperateStateFree>();
+    DevCooperateSoftbusAdapter->Init();
     TimerMgr->AddTimer(INTERVAL_MS, 1, [this]() {
         this->InitDeviceManager();
     });
@@ -122,7 +123,6 @@ void InputDeviceCooperateSM::EnableInputDeviceCooperate(bool enabled)
     CALL_INFO_TRACE;
     if (enabled) {
         BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_START, BytraceAdapter::START_EVENT);
-        DevCooperateSoftbusAdapter->Init();
         DProfileAdapter->UpdateCrossingSwitchState(enabled, onlineDevice_);
         BytraceAdapter::StartBytrace(BytraceAdapter::TRACE_STOP, BytraceAdapter::START_EVENT);
     } else {

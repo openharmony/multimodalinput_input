@@ -318,8 +318,8 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info)
 {
     info.inputDeviceOrigin_ = inputDevice;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
     info.isRemote_ = IsRemote(inputDevice);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (info.isRemote_) {
         info.networkIdOrigin_ = MakeNetworkId(libinput_device_get_phys(inputDevice));
     }
@@ -500,6 +500,35 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
     }
 }
 
+bool InputDeviceManager::IsRemote(struct libinput_device *inputDevice) const
+{
+    CHKPR(inputDevice, false);
+    bool isRemote = false;
+    const char* name = libinput_device_get_name(inputDevice);
+    if (name == nullptr || name[0] == '\0') {
+        MMI_HILOGD("Device name is empty");
+        return false;
+    }
+    std::string strName = name;
+    std::string::size_type pos = strName.find(VIRTUAL_DEVICE_NAME);
+    if (pos != std::string::npos) {
+        isRemote = true;
+    }
+    MMI_HILOGD("isRemote: %{public}s", isRemote == true ? "true" : "false");
+    return isRemote;
+}
+
+bool InputDeviceManager::IsRemote(int32_t id) const
+{
+    bool isRemote = false;
+    auto device = inputDevice_.find(id);
+    if (device != inputDevice_.end()) {
+        isRemote = device->second.isRemote_;
+    }
+    MMI_HILOGD("isRemote: %{public}s", isRemote == true ? "true" : "false");
+    return isRemote;
+}
+
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 std::vector<std::string> InputDeviceManager::GetCooperateDhids(int32_t deviceId)
 {
@@ -520,9 +549,6 @@ std::vector<std::string> InputDeviceManager::GetCooperateDhids(int32_t deviceId)
     pointerNetworkId = iter->second.isRemote_ ? iter->second.networkIdOrigin_ : localNetworkId;
     for (const auto &item : inputDevice_) {
         auto networkId = item.second.isRemote_ ? item.second.networkIdOrigin_ : localNetworkId;
-        MMI_HILOGE("wuwu:devtargs: %{public}d, isRemote_:%{public}d, Supportkey:%{public}d, networkId: %{public}s",
-            libinput_device_get_tags(item.second.inputDeviceOrigin_), item.second.isRemote_,
-            GetDeviceSupportKey(item.first), networkId.c_str());
         if (networkId != pointerNetworkId) {
             continue;
         }
@@ -597,34 +623,6 @@ bool InputDeviceManager::HasLocalPointerDevice() const
         }
     }
     return false;
-}
-
-bool InputDeviceManager::IsRemote(struct libinput_device *inputDevice) const
-{
-    CHKPR(inputDevice, false);
-    bool isRemote = false;
-    const char* name = libinput_device_get_name(inputDevice);
-    if (name == nullptr || name[0] == '\0') {
-        return false;
-    }
-    std::string strName = name;
-    std::string::size_type pos = strName.find(VIRTUAL_DEVICE_NAME);
-    if (pos != std::string::npos) {
-        isRemote = true;
-    }
-    MMI_HILOGD("isRemote: %{public}s", isRemote == true ? "true" : "false");
-    return isRemote;
-}
-
-bool InputDeviceManager::IsRemote(int32_t id) const
-{
-    bool isRemote = false;
-    auto device = inputDevice_.find(id);
-    if (device != inputDevice_.end()) {
-        isRemote = device->second.isRemote_;
-    }
-    MMI_HILOGD("isRemote: %{public}s", isRemote == true ? "true" : "false");
-    return isRemote;
 }
 
 std::string InputDeviceManager::MakeNetworkId(const char *phys) const
