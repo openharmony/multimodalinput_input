@@ -23,7 +23,6 @@ namespace OHOS {
 namespace MMI {
 constexpr int32_t ENCRYPT_TAG_LEN = 32;
 constexpr int32_t MSG_MAX_SIZE = 45 * 1024;
-
 constexpr uint32_t SESSION_NAME_SIZE_MAX = 256;
 constexpr uint32_t DEVICE_ID_SIZE_MAX = 65;
 constexpr uint32_t INTERCEPT_STRING_LENGTH = 20;
@@ -43,11 +42,13 @@ const std::string GROUP_ID = "mmi_softbus_group_id";
 #define MMI_SOFTBUS_KEY_OTHER_DEVICE_ID "mmi_softbus_key_other_device_id"
 #define MMI_SOFTBUS_KEY_SESSION_ID "mmi_softbus_key_session_id"
 
-const uint32_t  REMOTE_COOPERATE_START = 1;
-const uint32_t  REMOTE_COOPERATE_START_RES = 2;
-const uint32_t  REMOTE_COOPERATE_STOP = 3;
-const uint32_t  REMOTE_COOPERATE_STOP_RES = 4;
-const uint32_t  REMOTE_COOPERATE_STOP_OTHER_RES = 5;
+enum {
+    REMOTE_COOPERATE_START = 1,
+    REMOTE_COOPERATE_START_RES = 2,
+    REMOTE_COOPERATE_STOP = 3,
+    REMOTE_COOPERATE_STOP_RES = 4,
+    REMOTE_COOPERATE_STOP_OTHER_RES = 5
+};
 }  // namespace MMI
 }  // namespace OHOS
 #endif  // MMI_SOFTBUS_DEFINE_H

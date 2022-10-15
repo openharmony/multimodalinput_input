@@ -60,6 +60,8 @@ public:
     void RemoveDevListener(SessionPtr sess);
     void Dump(int32_t fd, const std::vector<std::string> &args);
     void DumpDeviceList(int32_t fd, const std::vector<std::string> &args);
+    bool IsRemote(struct libinput_device *inputDevice) const;
+    bool IsRemote(int32_t id) const;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     std::string GetOriginNetworkId(int32_t id);
     std::string GetOriginNetworkId(const std::string &dhid);
@@ -67,8 +69,6 @@ public:
     std::vector<std::string> GetCooperateDhids(int32_t deviceId);
     std::vector<std::string> GetCooperateDhids(const std::string &dhid);
     bool HasLocalPointerDevice() const;
-    bool IsRemote(struct libinput_device *inputDevice) const;
-    bool IsRemote(int32_t id) const;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     bool IsKeyboardDevice(struct libinput_device* device) const;
     bool IsPointerDevice(struct libinput_device* device) const;
