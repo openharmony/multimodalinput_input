@@ -30,7 +30,7 @@ std::string GetLocalDeviceId()
     CHKPS(localNode);
     int32_t errCode = GetLocalNodeDeviceInfo(MMI_DINPUT_PKG_NAME, localNode.get());
     if (errCode != RET_OK) {
-        MMI_HILOGE("GetLocalNodeDeviceInfo errCode: %{public}d", errCode);
+        MMI_HILOGE("GetLocalNodeDeviceInfo errCode:%{public}d", errCode);
         return "";
     }
     return localNode->networkId;
