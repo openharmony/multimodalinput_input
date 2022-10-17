@@ -474,7 +474,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent016()
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK );
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     return pointerEvent;
 }
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
