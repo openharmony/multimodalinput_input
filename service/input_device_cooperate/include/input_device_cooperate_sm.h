@@ -114,6 +114,7 @@ private:
     DelegateTasksCallback delegateTasksCallback_ { nullptr };
 };
 
+#define DisHardware DistributedHardware::DeviceManager::GetInstance()
 #define InputDevCooSM ::OHOS::DelayedSingleton<InputDeviceCooperateSM>::GetInstance()
 } // namespace MMI
 } // namespace OHOS

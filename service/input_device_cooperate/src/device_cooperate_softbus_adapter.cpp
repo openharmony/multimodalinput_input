@@ -149,7 +149,7 @@ int32_t DeviceCooperateSoftbusAdapter::Init()
     localSessionName_ = SESSION_NAME + networkId.substr(0, INTERCEPT_STRING_LENGTH);
     int32_t ret = CreateSessionServer(MMI_DINPUT_PKG_NAME, localSessionName_.c_str(), &sessListener_);
     if (ret != RET_OK) {
-        MMI_HILOGE("Create session server failed, error code: %{public}d", ret);
+        MMI_HILOGE("Create session server failed, error code:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -184,13 +184,13 @@ int32_t DeviceCooperateSoftbusAdapter::OpenInputSoftbus(const std::string &remot
 {
     CALL_INFO_TRACE;
     if (CheckDeviceSessionState(remoteDevId)) {
-        MMI_HILOGD("Softbus session has already opened");
+        MMI_HILOGD("Softbus session has already  opened");
         return RET_OK;
     }
 
     int32_t ret = Init();
     if (ret != RET_OK) {
-        MMI_HILOGE("CreateSessionServer failed");
+        MMI_HILOGE("Init failed");
         return RET_ERR;
     }
 
@@ -263,7 +263,7 @@ int32_t DeviceCooperateSoftbusAdapter::StartRemoteCooperate(const std::string &l
     int32_t ret = SendMsg(sessionId, smsg);
     cJSON_free(smsg);
     if (ret != RET_OK) {
-        MMI_HILOGE("Start remote cooperate send session msg failed, ret: %{public}d", ret);
+        MMI_HILOGE("Start remote cooperate send session msg failed, ret:%{public}d", ret);
         return RET_ERR;
     }
     return RET_OK;
@@ -382,7 +382,7 @@ void DeviceCooperateSoftbusAdapter::HandleSessionData(int32_t sessionId, const s
         MMI_HILOGE("OnBytesReceived cmdType is not number type");
         return;
     }
-    MMI_HILOGI("valueint: %{public}d", comType->valueint);
+    MMI_HILOGD("valueint: %{public}d", comType->valueint);
     switch (comType->valueint) {
         case REMOTE_COOPERATE_START: {
             ResponseStartRemoteCooperate(sessionId, parser);
@@ -420,14 +420,13 @@ void DeviceCooperateSoftbusAdapter::OnBytesReceived(int32_t sessionId, const voi
     }
     std::string message = std::string(static_cast<const char *>(data), dataLen);
     HandleSessionData(sessionId, message);
-    return;
 }
 
 int32_t DeviceCooperateSoftbusAdapter::SendMsg(int32_t sessionId, const std::string &message)
 {
     CALL_DEBUG_ENTER;
     if (message.size() > MSG_MAX_SIZE) {
-        MMI_HILOGW("error: message.size() > MSG_MAX_SIZE msessage size: %{public}d", message.size());
+        MMI_HILOGW("error:message.size() > MSG_MAX_SIZE msessage size:%{public}d", message.size());
         return RET_ERR;
     }
     return SendBytes(sessionId, message.c_str(), strlen(message.c_str()));
@@ -440,10 +439,9 @@ std::string DeviceCooperateSoftbusAdapter::FindDevice(int32_t sessionId)
         [sessionId](const std::map<std::string, int>::value_type item) {
         return item.second == sessionId;
     });
-
     if (find_item == sessionDevMap_.end()) {
-        MMI_HILOGE("FindKeyByValue error");
-        return "";
+        MMI_HILOGE("FindDevice error");
+        return {};
     }
     return find_item->first;
 }
@@ -453,10 +451,10 @@ int32_t DeviceCooperateSoftbusAdapter::OnSessionOpened(int32_t sessionId, int32_
     CALL_INFO_TRACE;
     char peerDevId[DEVICE_ID_SIZE_MAX] = {};
     int32_t getPeerDeviceIdResult = GetPeerDeviceId(sessionId, peerDevId, sizeof(peerDevId));
-    MMI_HILOGD("Get peer device id ret: %{public}d", getPeerDeviceIdResult);
+    MMI_HILOGD("Get peer device id ret:%{public}d", getPeerDeviceIdResult);
     if (result != RET_OK) {
         std::string deviceId = FindDevice(sessionId);
-        MMI_HILOGE("Session open failed result: %{public}d", result);
+        MMI_HILOGE("Session open failed result:%{public}d", result);
         std::unique_lock<std::mutex> sessionLock(operationMutex_);
         if (sessionDevMap_.find(deviceId) != sessionDevMap_.end()) {
             sessionDevMap_.erase(deviceId);
@@ -471,13 +469,12 @@ int32_t DeviceCooperateSoftbusAdapter::OnSessionOpened(int32_t sessionId, int32_
     int32_t sessionSide = GetSessionSide(sessionId);
     MMI_HILOGI("session open succeed, sessionId:%{public}d, sessionSide:%{public}d(1 is client side)",
         sessionId, sessionSide);
+    std::lock_guard<std::mutex> notifyLock(operationMutex_);
     if (sessionSide == SESSION_SIDE_SERVER) {
-        std::lock_guard<std::mutex> notifyLock(operationMutex_);
         if (getPeerDeviceIdResult == RET_OK) {
             sessionDevMap_[peerDevId] = sessionId;
         }
     } else {
-        std::lock_guard<std::mutex> notifyLock(operationMutex_);
         if (getPeerDeviceIdResult == RET_OK) {
             channelStatusMap_[peerDevId] = true;
         }

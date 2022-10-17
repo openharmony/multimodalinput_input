@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef INPUT_DEVICE_COOPERATE_ADAPTER_H
-#define INPUT_DEVICE_COOPERATE_ADAPTER_H
+#ifndef DEVICE_COOPERATE_SOFTBUS_ADAPTER_H
+#define DEVICE_COOPERATE_SOFTBUS_ADAPTER_H
 
 #include <map>
 #include <memory>
@@ -65,4 +65,4 @@ private:
 } // namespace MMI
 } // namespace OHOS
 #define DevCooperateSoftbusAdapter DeviceCooperateSoftbusAdapter::GetInstance()
-#endif // INPUT_DEVICE_COOPERATE_ADAPTER_H
+#endif // DEVICE_COOPERATE_SOFTBUS_ADAPTER_H
