@@ -22,7 +22,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceContext" };
-constexpr size_t MIN_N_ARGS = 2;
 
 enum KeyboardType {
     NONE = 0,
@@ -277,7 +276,7 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
     size_t argc = 3;
     napi_value argv[3];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < MIN_N_ARGS) {
+    if (argc < 2) {
         MMI_HILOGE("Require three parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
         return nullptr;
