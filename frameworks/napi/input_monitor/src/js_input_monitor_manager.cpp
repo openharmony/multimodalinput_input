@@ -42,7 +42,7 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
     std::lock_guard<std::mutex> guard(mutex_);
     for (const auto &item : monitors_) {
         if ((item != nullptr) && (item->IsMatch(jsEnv, callback) != RET_ERR)) {
-            MMI_HILOGE("Add js monitor failed");
+            MMI_HILOGW("Add js monitor failed");
             return;
         }
     }
