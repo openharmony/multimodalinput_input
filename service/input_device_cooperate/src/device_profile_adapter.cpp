@@ -99,7 +99,7 @@ bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
     }
     cJSON* state = cJSON_GetObjectItemCaseSensitive(parser.json_, CHARACTERISTICS_NAME.c_str());
     if (!cJSON_IsBool(state)) {
-        MMI_HILOGE("state is not bool type.");
+        MMI_HILOGE("State is not bool type");
         return false;
     }
     return cJSON_IsTrue(state);

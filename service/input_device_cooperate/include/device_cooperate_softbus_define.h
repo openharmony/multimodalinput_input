@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef MMI_SOFTBUS_DEFINE_H
-#define MMI_SOFTBUS_DEFINE_H
+#ifndef DEVICE_COOPERATE_SOFTBUS_DEFINE_H
+#define DEVICE_COOPERATE_SOFTBUS_DEFINE_H
 
 #include <string>
 #include <unistd.h>
@@ -51,4 +51,4 @@ enum {
 };
 }  // namespace MMI
 }  // namespace OHOS
-#endif  // MMI_SOFTBUS_DEFINE_H
+#endif  // DEVICE_COOPERATE_SOFTBUS_DEFINE_H

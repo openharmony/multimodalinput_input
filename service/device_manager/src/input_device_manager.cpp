@@ -502,7 +502,7 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
 
 bool InputDeviceManager::IsRemote(struct libinput_device *inputDevice) const
 {
-    CHKPR(inputDevice, false);
+    CHKPF(inputDevice, false);
     bool isRemote = false;
     const char* name = libinput_device_get_name(inputDevice);
     if (name == nullptr || name[0] == '\0') {
@@ -514,7 +514,7 @@ bool InputDeviceManager::IsRemote(struct libinput_device *inputDevice) const
     if (pos != std::string::npos) {
         isRemote = true;
     }
-    MMI_HILOGD("isRemote: %{public}s", isRemote == true ? "true" : "false");
+    MMI_HILOGD("isRemote: %{public}s", isRemote ? "true" : "false");
     return isRemote;
 }
 
@@ -525,7 +525,7 @@ bool InputDeviceManager::IsRemote(int32_t id) const
     if (device != inputDevice_.end()) {
         isRemote = device->second.isRemote_;
     }
-    MMI_HILOGD("isRemote: %{public}s", isRemote == true ? "true" : "false");
+    MMI_HILOGD("isRemote: %{public}s", isRemote ? "true" : "false");
     return isRemote;
 }
 
