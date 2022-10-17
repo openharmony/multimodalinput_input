@@ -24,26 +24,21 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "StopDeviceCooperateFuzzTest" };
 } // namespace
 
-void StopDeviceCooperateFuzzTest(const uint8_t* data, size_t  size)
+void StopDeviceCooperateFuzzTest(size_t  size)
 {
-    if (data == nullptr) {
-        return;
-    }
-    int32_t userData = *(reinterpret_cast<const int32_t*>(data));
     auto fun = [](std::string listener, CooperationMessage cooperateMessages) {
         MMI_HILOGD("StopDeviceCooperateFuzzTest");
     };
 
-    InputManager::GetInstance()->StopDeviceCooperate(userData, fun);
+    InputManager::GetInstance()->StopDeviceCooperate(fun);
 }
 } // MMI
 } // OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(size_t size)
 {
     /* Run your code on data */
-    OHOS::MMI::StopDeviceCooperateFuzzTest(data, size);
+    OHOS::MMI::StopDeviceCooperateFuzzTest(size);
     return 0;
 }
-
