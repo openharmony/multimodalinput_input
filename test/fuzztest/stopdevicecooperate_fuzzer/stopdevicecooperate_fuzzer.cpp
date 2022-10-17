@@ -24,7 +24,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "StopDeviceCooperateFuzzTest" };
 } // namespace
 
-void StopDeviceCooperateFuzzTest(const uint8_t* /* data */, size_t  size)
+void StopDeviceCooperateFuzzTest(size_t  size)
 {
     auto fun = [](std::string listener, CooperationMessage cooperateMessages) {
         MMI_HILOGD("StopDeviceCooperateFuzzTest");
@@ -36,10 +36,9 @@ void StopDeviceCooperateFuzzTest(const uint8_t* /* data */, size_t  size)
 } // OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(size_t size)
 {
     /* Run your code on data */
-    OHOS::MMI::StopDeviceCooperateFuzzTest(data, size);
+    OHOS::MMI::StopDeviceCooperateFuzzTest(size);
     return 0;
 }
-
