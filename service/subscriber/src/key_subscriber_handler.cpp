@@ -434,7 +434,8 @@ void KeySubscriberHandler::RemoveKeyCode(int32_t keyCode, std::vector<int32_t> &
     }
 }
 
-bool KeySubscriberHandler::IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent) {
+bool KeySubscriberHandler::IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
+{
     CHKPF(keyEvent);
     if (!hasEventExecuting) {
         return false;
@@ -455,7 +456,7 @@ bool KeySubscriberHandler::IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent
     for (const auto &item : keyEvent->GetKeyItems()) {
         int32_t keyCode = item.GetKeyCode();
         bool findResult = false;
-        for (const auto &item1 : keyEvent_->GetKeyItems()){
+        for (const auto &item1 : keyEvent_->GetKeyItems()) {
             if (keyCode == item1.GetKeyCode()) {
                 findResult = true;
                 break;

@@ -37,7 +37,6 @@ std::shared_ptr<PointerEvent> TouchEventNormalize::OnLibInput(
     CHKPP(device);
     std::shared_ptr<TransformProcessor> processor { nullptr };
     auto deviceId = InputDevMgr->FindInputDeviceId(device);
-
     if (auto it = processors_.find(deviceId); it != processors_.end()) {
         processor = it->second;
     } else {
