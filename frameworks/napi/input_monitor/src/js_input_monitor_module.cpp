@@ -29,7 +29,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule" };
-constexpr size_t MIN_N_ARGS = 2;
 } // namespace
 
 static napi_value JsOnApi9(napi_env env, napi_callback_info info)
@@ -73,7 +72,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     size_t argc = 2;
     napi_value argv[2];
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < MIN_N_ARGS) {
+    if (argc < 2) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
     }

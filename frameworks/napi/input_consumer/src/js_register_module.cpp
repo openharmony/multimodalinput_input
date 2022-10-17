@@ -30,7 +30,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterModule" };
 constexpr size_t EVENT_NAME_LEN = 64;
 constexpr size_t PRE_KEYS_SIZE = 4;
-constexpr size_t VALID_N_ARGS = 3;
 } // namespace
 
 static Callbacks callbacks = {};
@@ -128,7 +127,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
     event->eventType = subKeyNames;
     MMI_HILOGD("FinalKeyDownDuration:%{public}d", finalKeyDownDuration);
-    if (argc == VALID_N_ARGS) {
+    if (argc == 3) {
         CHKRP(env, napi_typeof(env, argv[2], &valueType), TYPEOF);
         if (valueType != napi_function) {
             MMI_HILOGE("the third parameter is not napi_function");
