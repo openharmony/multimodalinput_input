@@ -64,7 +64,9 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
         const HandleEventType newType = GetEventType();
         if (currentType != newType) {
             int32_t ret = AddToServer(handlerType, newType);
-            if (ret < 0) {
+            if (ret != RET_OK) {
+                MMI_HILOGD("Handler:%{public}d permissions failed, remove the monitor", handlerId);
+                RemoveLocal(handlerId, handlerType);
                 return ret;
             }
         }
