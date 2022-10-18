@@ -248,7 +248,7 @@ int32_t MouseEventNormalize::HandleAxisInner(struct libinput_event_pointer* data
 }
 
 void MouseEventNormalize::HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId,
-                                        PointerEvent::PointerItem &pointerItem)
+    PointerEvent::PointerItem &pointerItem)
 {
     CALL_DEBUG_ENTER;
     CHKPV(data);

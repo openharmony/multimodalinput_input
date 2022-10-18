@@ -208,7 +208,7 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             break;
         }
         case PointerEvent::SOURCE_TYPE_MOUSE:
-#ifdef OHOS_BUILD_ENABLE_JOYSTICK 
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
         case PointerEvent::SOURCE_TYPE_JOYSTICK:
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
         case PointerEvent::SOURCE_TYPE_TOUCHPAD: {

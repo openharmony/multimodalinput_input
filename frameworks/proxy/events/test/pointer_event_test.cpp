@@ -499,7 +499,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_006, TestSize.L
     item.SetTargetWindowId(0);
     pointerEvent->AddPointerItem(item);
     ASSERT_TRUE(pointerEvent->IsValid());
-    DumpWindowData(pointerEvent); 
+    DumpWindowData(pointerEvent);
     pointerEvent->RemovePointerItem(0);
     pointerEvent->IsButtonPressed(0);
     pointerEvent->ClearButtonPressed();
