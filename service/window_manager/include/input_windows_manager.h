@@ -140,7 +140,8 @@ private:
     std::map<int32_t, std::map<int32_t, int32_t>> pointerStyle_;
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
-    MouseLocation mouseLocation_ = { -1, -1 }; // physical coord
+    // physical coord
+    MouseLocation mouseLocation_ = { -1, -1 };
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
