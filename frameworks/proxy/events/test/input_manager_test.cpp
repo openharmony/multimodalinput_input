@@ -2998,7 +2998,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, Tes
     ASSERT_TRUE(eventHandler != nullptr);
     uint64_t runnerThreadId = 0;
 
-    auto fun = [&]() {
+    auto fun = [&runnerThreadId]() {
         runnerThreadId = GetThisThreadId();
         MMI_HILOGD("Create eventHandler is threadId:%{public}" PRIu64, runnerThreadId);
         ASSERT_TRUE(runnerThreadId != 0);
@@ -3036,7 +3036,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_002, Tes
     ASSERT_TRUE(eventHandler != nullptr);
     uint64_t runnerThreadId = 0;
 
-    auto fun = [&]() {
+    auto fun = [&runnerThreadId]() {
         runnerThreadId = GetThisThreadId();
         MMI_HILOGD("Create eventHandler is threadId:%{public}" PRIu64, runnerThreadId);
         ASSERT_TRUE(runnerThreadId != 0);
