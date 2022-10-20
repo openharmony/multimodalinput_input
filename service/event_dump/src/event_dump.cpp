@@ -52,9 +52,6 @@ EventDump::~EventDump() {}
 void ChkConfig(int32_t fd)
 {
     mprintf(fd, "ChkMMIConfig: ");
-#ifdef OHOS_BUILD_LIBINPUT
-    mprintf(fd, "OHOS_BUILD_LIBINPUT");
-#endif
 #ifdef OHOS_BUILD_MMI_DEBUG
     mprintf(fd, "OHOS_BUILD_MMI_DEBUG");
 #endif // OHOS_BUILD_MMI_DEBUG
