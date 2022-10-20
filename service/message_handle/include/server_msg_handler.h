@@ -65,9 +65,6 @@ protected:
     int32_t MarkProcessed(SessionPtr sess, NetPacket& pkt);
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
-#ifdef OHOS_BUILD_MMI_DEBUG
-    int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
-#endif // OHOS_BUILD_MMI_DEBUG
 private:
     UDSServer *udsServer_ { nullptr };
     int32_t targetWindowId_ { -1 };

@@ -51,9 +51,6 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     MsgCallback funs[] = {
         {MmiMessageId::MARK_PROCESS, MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
-#ifdef OHOS_BUILD_MMI_DEBUG
-        {MmiMessageId::BIGPACKET_TEST, MsgCallbackBind2(&ServerMsgHandler::OnBigPacketTest, this)},
-#endif // OHOS_BUILD_MMI_DEBUG
     };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
@@ -349,56 +346,5 @@ int32_t ServerMsgHandler::AddInputEventFilter(sptr<IEventFilter> filter)
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
-#ifdef OHOS_BUILD_MMI_DEBUG
-int32_t ServerMsgHandler::OnBigPacketTest(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t width = 0;
-    int32_t height = 0;
-    int32_t focusWindowId = 0;
-    pkt >> width >> height >> focusWindowId;
-    MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
-        width, height, focusWindowId);
-    uint32_t num = 0;
-    pkt >> num;
-    for (uint32_t i = 0; i < num; i++) {
-        WindowInfo info;
-        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
-            >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
-        MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
-            "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
-            "defaultHotAreas:size:%{public}zu,pointerHotAreas:size:%{public}zu,"
-            "agentWindowId:%{public}d,flags:%{public}d",
-            info.id, info.pid, info.uid, info.area.x, info.area.y, info.area.width,
-            info.area.height, info.defaultHotAreas.size(), info.pointerHotAreas.size(),
-            info.agentWindowId, info.flags);
-        for (const auto &win : info.defaultHotAreas) {
-            MMI_HILOGD("defaultHotAreas,x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
-                win.x, win.y, win.width, win.height);
-        }
-        for (const auto &pointer : info.pointerHotAreas) {
-            MMI_HILOGD("pointerHotAreas,x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
-                pointer.x, pointer.y, pointer.width, pointer.height);
-        }
-    }
-    pkt >> num;
-    for (uint32_t i = 0; i < num; i++) {
-        DisplayInfo info;
-        pkt >> info.id >> info.x >> info.y >> info.width >> info.height
-            >> info.name >> info.uniq >> info.direction;
-        MMI_HILOGD("displaysInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
-            "width:%{public}d,height:%{public}d,name:%{public}s,"
-            "uniq:%{public}s,direction:%{public}d",
-            info.id, info.x, info.y, info.width, info.height, info.name.c_str(),
-            info.uniq.c_str(), info.direction);
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read data failed");
-        return PACKET_READ_FAIL;
-    }
-    return RET_OK;
-}
-#endif // OHOS_BUILD_MMI_DEBUG
 } // namespace MMI
 } // namespace OHOS
