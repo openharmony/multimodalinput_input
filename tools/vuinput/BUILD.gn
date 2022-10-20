@@ -33,10 +33,6 @@ config("libmmi_virtual_device_config") {
   if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
 }
 
 config("virtual_device_public_config") {
@@ -88,10 +84,6 @@ ohos_source_set("libmmi-virtual-device") {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
-
   part_name = "input"
   subsystem_name = "multimodalinput"
   external_deps = [ "c_utils:utils" ]
@@ -119,10 +111,6 @@ ohos_executable("vuinput") {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
-
   install_enable = true
   part_name = "input"
   subsystem_name = "multimodalinput"
@@ -142,7 +130,7 @@ ohos_unittest("ut-virtual-device-out") {
     "${mmi_path}/util/socket/include",
   ]
 
-  if (input_feature_libinput || input_feature_hdf) {
+  if (input_feature_libinput) {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
@@ -160,10 +148,6 @@ ohos_unittest("ut-virtual-device-out") {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
-
   deps = [
     "${mmi_path}/tools/vuinput:libmmi-virtual-device",
     "${mmi_path}/util:libmmi-util",
@@ -171,7 +155,7 @@ ohos_unittest("ut-virtual-device-out") {
     "//third_party/googletest:gtest_main",
   ]
 
-  if (input_feature_libinput || input_feature_hdf) {
+  if (input_feature_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
   external_deps = [

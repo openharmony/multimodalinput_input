@@ -62,17 +62,6 @@ config("libmmi_server_config") {
     ]
   }
 
-  if (input_feature_hdf) {
-    include_dirs += [
-      "hdf_adapter/include",
-      "hdi_inject/include",
-      "$root_out_dir/diff_libinput_mmi/export_include",
-      "//third_party/eudev/export_include/",
-      "$root_out_dir/diff_libevdev_hdf/export_include",
-      "$root_out_dir/diff_libinput_mmi/include/linux",
-    ]
-  }
-
   defines = []
 
   if (input_feature_debug) {
@@ -81,10 +70,6 @@ config("libmmi_server_config") {
 
   if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   if (input_feature_combination_key) {
@@ -462,13 +447,6 @@ ohos_shared_library("libmmi-server") {
     ]
   }
 
-  if (input_feature_hdf) {
-    sources += [
-      "hdf_adapter/src/hdf_event_manager.cpp",
-      "hdi_inject/src/hdi_inject.cpp",
-    ]
-  }
-
   if (input_feature_keyboard) {
     sources += [
       "key_event_normalize/src/key_event_normalize.cpp",
@@ -565,7 +543,7 @@ ohos_shared_library("libmmi-server") {
     "//third_party/json:nlohmann_json_static",
   ]
 
-  if (input_feature_libinput || input_feature_hdf) {
+  if (input_feature_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 
@@ -657,7 +635,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/uinput",
   ]
 
-  if (input_feature_libinput || input_feature_hdf) {
+  if (input_feature_libinput) {
     include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
   }
 
@@ -677,10 +655,6 @@ ohos_unittest("ut-mmi-service-out") {
 
   if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   if (input_feature_pointer_drawing) {
@@ -709,7 +683,7 @@ ohos_unittest("ut-mmi-service-out") {
     "//third_party/googletest:gtest_main",
   ]
 
-  if (input_feature_libinput || input_feature_hdf) {
+  if (input_feature_libinput) {
     deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
   }
 

@@ -18,9 +18,6 @@ gen_src_dir = "//third_party/libinput"
 gen_dst_dir = root_out_dir + "/diff_libinput_mmi"
 patches_root_dir = "//foundation/multimodalinput/input/patch"
 build_gn_dir = "$patches_root_dir/diff_libinput_mmi/libinput"
-if (input_feature_hdf) {
-  build_gn_dir = "$patches_root_dir/diff_libinput_mmi/hdf"
-}
 
 action("apply_patch") {
   visibility = [ ":*" ]
@@ -102,10 +99,6 @@ config("libinput-third_config") {
     include_dirs += [ "$gen_dst_dir/hm_src" ]
   }
 
-  if (input_feature_hdf) {
-    include_dirs += [ "$root_out_dir/diff_mtdev_hdf/include" ]
-  }
-
   cflags = [
     "-Wno-unused-parameter",
     "-Wno-implicit-int",
@@ -129,10 +122,6 @@ config("libinput-third_public_config") {
     "//third_party/FreeBSD/sys/dev/evdev",
     "$gen_dst_dir/src",
   ]
-
-  if (input_feature_hdf) {
-    include_dirs += [ "$root_out_dir/diff_mtdev_hdf/include" ]
-  }
 
   cflags = []
 }
@@ -191,13 +180,6 @@ ohos_source_set("patch_gen_libinput-third-mmi") {
       "//third_party/mtdev:libmtdev",
     ]
   }
-
-  if (input_feature_hdf) {
-    public_deps += [
-      "//foundation/multimodalinput/input/patch/diff_libevdev_hdf:libevdev-hdf",
-      "//foundation/multimodalinput/input/patch/diff_mtdev_hdf:libmtdev-hdf",
-    ]
-  }
 }
 
 ohos_shared_library("libinput-third-mmi") {
@@ -215,13 +197,6 @@ ohos_shared_library("libinput-third-mmi") {
     public_deps += [
       "//third_party/libevdev:libevdev",
       "//third_party/mtdev:libmtdev",
-    ]
-  }
-
-  if (input_feature_hdf) {
-    public_deps += [
-      "//foundation/multimodalinput/input/patch/diff_libevdev_hdf:libevdev-hdf",
-      "//foundation/multimodalinput/input/patch/diff_mtdev_hdf:libmtdev-hdf",
     ]
   }
 
