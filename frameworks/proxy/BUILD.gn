@@ -191,10 +191,6 @@ ohos_unittest("ut-mmi-proxy-out") {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
-
   sources = [ "module_loader/test/mmi_client_test.cpp" ]
 
   configs = [ ":libmmi_test_util" ]
@@ -228,10 +224,6 @@ ohos_unittest("KeyEventTest") {
 
   if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   sources = [
@@ -279,10 +271,6 @@ ohos_unittest("InputManagerTest") {
 
   if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   if (input_feature_keyboard) {
@@ -348,10 +336,6 @@ ohos_unittest("InputManagerManualTest") {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
-
   if (input_feature_mouse) {
     defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
   }
@@ -392,10 +376,6 @@ ohos_unittest("PointerEventTest") {
 
   if (input_feature_libinput) {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
   }
 
   if (input_feature_mouse) {

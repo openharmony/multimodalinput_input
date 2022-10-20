@@ -17,7 +17,6 @@ mmi_path = "//foundation/multimodalinput/input"
 ability_runtime_path = "//foundation/ability/ability_runtime"
 ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
 input_feature_libinput = true
-input_feature_hdf = false
 input_feature_debug = false
 input_feature_distributed = false
 
@@ -45,7 +44,6 @@ if (input_feature_joystick) {
 }
 
 print("input_feature_libinput = ${input_feature_libinput}")
-print("input_feature_hdf = ${input_feature_hdf}")
 print("input_feature_debug = ${input_feature_debug}")
 print("input_feature_combination_key = ${input_feature_combination_key}")
 print("input_feature_pointer_drawing = ${input_feature_pointer_drawing}")

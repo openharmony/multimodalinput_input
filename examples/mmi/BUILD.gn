@@ -43,10 +43,6 @@ ohos_executable("mmi-server") {
     defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
-
   install_enable = true
   part_name = "input"
   subsystem_name = "multimodalinput"
