@@ -614,7 +614,6 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/event_handler/include",
-    "${mmi_path}/service/hdi_inject/include",
     "${mmi_path}/service/event_dump/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
@@ -626,7 +625,6 @@ ohos_unittest("ut-mmi-service-out") {
 
   sources = [
     "event_dispatch/test/event_dispatch_test.cpp",
-    "hdi_inject/test/hdi_inject_test.cpp",
     "message_handle/test/server_msg_handler_test.cpp",
     "module_loader/test/uds_server_test.cpp",
     "window_manager/test/input_windows_manager_test.cpp",
@@ -663,7 +661,6 @@ ohos_unittest("ut-mmi-service-out") {
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_input:hdi_input",
     "hiviewdfx_hilog_native:libhilog",
   ]
 }
