@@ -627,7 +627,6 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/hdi_inject/include",
     "${mmi_path}/service/event_dump/include",
-    "${mmi_path}/service/hdf_adapter/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/module_loader/include",
