@@ -528,12 +528,12 @@ ohos_shared_library("libmmi-server") {
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
     "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/cJSON:cjson_static",
     "//third_party/json:nlohmann_json_static",
-    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
   ]
 
   if (resource_schedule_service_enabled) {
@@ -654,9 +654,9 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
   ]
 
   external_deps = [

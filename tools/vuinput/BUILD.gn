@@ -75,8 +75,8 @@ ohos_executable("vuinput") {
   configs = [ ":virtual_device_public_config" ]
 
   deps = [
-    "//foundation/multimodalinput/input/tools/vuinput:libmmi-virtual-device",
     "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
+    "//foundation/multimodalinput/input/tools/vuinput:libmmi-virtual-device",
   ]
 
   install_enable = true
@@ -106,9 +106,9 @@ ohos_unittest("ut-virtual-device-out") {
   deps = [
     "${mmi_path}/tools/vuinput:libmmi-virtual-device",
     "${mmi_path}/util:libmmi-util",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
   ]
 
   external_deps = [
