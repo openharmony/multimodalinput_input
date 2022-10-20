@@ -68,10 +68,6 @@ config("libmmi_server_config") {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
   if (input_feature_combination_key) {
     defines += [ "OHOS_BUILD_ENABLE_COMBINATION_KEY" ]
   }
@@ -541,11 +537,8 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/cJSON:cjson_static",
     "//third_party/json:nlohmann_json_static",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
   ]
-
-  if (input_feature_libinput) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
 
   if (resource_schedule_service_enabled) {
     deps += [ "//foundation/resourceschedule/resource_schedule_service/ressched/interfaces/innerkits/ressched_client:ressched_client" ]
@@ -632,11 +625,8 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/uinput",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  if (input_feature_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
 
   sources = [
     "event_dispatch/test/event_dispatch_test.cpp",
@@ -650,10 +640,6 @@ ohos_unittest("ut-mmi-service-out") {
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
   if (input_feature_pointer_drawing) {
@@ -680,11 +666,8 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
   ]
-
-  if (input_feature_libinput) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
 
   external_deps = [
     "c_utils:utils",

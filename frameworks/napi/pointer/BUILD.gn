@@ -21,11 +21,6 @@ config("pointer_config") {
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/util/network/include",
   ]
-
-  defines = []
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
 }
 
 ohos_shared_library("pointer") {

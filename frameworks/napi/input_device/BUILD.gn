@@ -24,11 +24,6 @@ config("inputdevice_config") {
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
     "//foundation/multimodalinput/input/frameworks/proxy/module_loader/include",
   ]
-
-  defines = []
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
 }
 
 ohos_shared_library("inputdevice") {
