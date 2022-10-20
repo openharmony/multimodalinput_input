@@ -34,9 +34,6 @@
 #include "mmi_func_callback.h"
 #include "mouse_event_normalize.h"
 #include "time_cost_chk.h"
-#ifdef OHOS_BUILD_HDF
-#include "hdi_inject.h"
-#endif
 
 namespace OHOS {
 namespace MMI {
@@ -51,21 +48,12 @@ ServerMsgHandler::~ServerMsgHandler() {}
 void ServerMsgHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
-#ifdef OHOS_BUILD_HDF
-    if (!(MMIHdiInject->Init(udsServer))) {
-        MMI_HILOGE("Input device initialization failed");
-        return;
-    }
-#endif
     MsgCallback funs[] = {
         {MmiMessageId::MARK_PROCESS, MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
 #ifdef OHOS_BUILD_MMI_DEBUG
         {MmiMessageId::BIGPACKET_TEST, MsgCallbackBind2(&ServerMsgHandler::OnBigPacketTest, this)},
 #endif // OHOS_BUILD_MMI_DEBUG
-#ifdef OHOS_BUILD_HDF
-        {MmiMessageId::HDI_INJECT, MsgCallbackBind2(&ServerMsgHandler::OnHdiInject, this)},
-#endif // OHOS_BUILD_HDF
     };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
@@ -90,27 +78,6 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
         MMI_HILOGE("Msg handling failed. id:%{public}d,errCode:%{public}d", id, ret);
     }
 }
-
-#ifdef OHOS_BUILD_HDF
-int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
-{
-    MMI_HILOGI("Hdfinject server access hditools info");
-    CHKPR(sess, ERROR_NULL_POINTER);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    const int32_t processingCode = MMIHdiInject->ManageHdfInject(sess, pkt);
-    NetPacket pkt(MmiMessageId::HDI_INJECT);
-    pkt << processingCode;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write reply message failed");
-        return RET_ERR;
-    }
-    if (!sess->SendMsg(pkt)) {
-        MMI_HILOGE("OnHdiInject reply message error");
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-#endif // OHOS_BUILD_HDF
 
 int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
 {

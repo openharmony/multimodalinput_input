@@ -31,10 +31,6 @@
 #include "server_msg_handler.h"
 #include "uds_server.h"
 
-#ifdef OHOS_BUILD_HDF
-    #include "hdf_event_manager.h"
-#endif
-
 namespace OHOS {
 namespace MMI {
 
