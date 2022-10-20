@@ -25,12 +25,6 @@ config("event_injection_config") {
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
   ]
-
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
 }
 
 config("event_injection_public_config") {
@@ -136,12 +130,6 @@ ohos_unittest("ut-event-injection-out") {
     "test/send_message_test.cpp",
   ]
 
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
@@ -170,11 +158,6 @@ ohos_executable("mmi-event-injection") {
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
   ]
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
 
   install_enable = true
   part_name = "input"
