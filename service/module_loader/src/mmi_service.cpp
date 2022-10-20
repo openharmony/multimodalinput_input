@@ -84,9 +84,6 @@ void CheckDefineOutput(const char* fmt, Ts... args)
 static void CheckDefine()
 {
     CheckDefineOutput("ChkDefs:");
-#ifdef OHOS_BUILD_LIBINPUT
-    CheckDefineOutput("%-40s", "OHOS_BUILD_LIBINPUT");
-#endif
 #ifdef OHOS_BUILD_MMI_DEBUG
     CheckDefineOutput("%-40s", "OHOS_BUILD_MMI_DEBUG");
 #endif
