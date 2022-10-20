@@ -50,12 +50,15 @@
 #include "timer_manager.h"
 #include "input_device_manager.h"
 #include "util.h"
+#include "xcollie/watchdog.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIService" };
 const std::string DEF_INPUT_SEAT = "seat0";
+constexpr int32_t WATCHDOG_INTERVAL_TIME = 15000;
+constexpr int32_t WATCHDOG_DELAY_TIME = 20000;
 } // namespace
 
 const bool REGISTER_RESULT =
@@ -310,6 +313,23 @@ void MMIService::OnStart()
 #ifdef OHOS_RSS_CLIENT
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
 #endif
+
+    TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
+        MMI_HILOGD("Set watchdog flag to true");
+        watchdogFlg_ = true;
+    });
+    auto taskFunc = [this]() {
+        if (watchdogFlg_) {
+            MMI_HILOGD("Set watchdog flag to false");
+            watchdogFlg_ = false;
+        } else {
+            MMI_HILOGD("kill MMIService");
+            abort();
+        }
+    };
+    HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc,
+        WATCHDOG_INTERVAL_TIME, WATCHDOG_DELAY_TIME);
+
     t_.join();
 }
 

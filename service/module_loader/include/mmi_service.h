@@ -161,6 +161,8 @@ private:
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
+
+    std::atomic_bool watchdogFlg_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
