@@ -23,12 +23,6 @@ config("libmmi_virtual_device_config") {
     "//commonlibrary/c_utils/base/include",
     "//util/common/include",
   ]
-
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
 }
 
 config("virtual_device_public_config") {
@@ -70,12 +64,6 @@ ohos_source_set("libmmi-virtual-device") {
 
   configs = [ ":libmmi_virtual_device_config" ]
 
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
   part_name = "input"
   subsystem_name = "multimodalinput"
   external_deps = [ "c_utils:utils" ]
@@ -90,11 +78,6 @@ ohos_executable("vuinput") {
     "//foundation/multimodalinput/input/tools/vuinput:libmmi-virtual-device",
     "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
   ]
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
 
   install_enable = true
   part_name = "input"
@@ -119,12 +102,6 @@ ohos_unittest("ut-virtual-device-out") {
   sources = [ "test/virtual_device_test.cpp" ]
 
   configs = [ ":virtual_device_public_config" ]
-
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
 
   deps = [
     "${mmi_path}/tools/vuinput:libmmi-virtual-device",

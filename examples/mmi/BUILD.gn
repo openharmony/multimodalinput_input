@@ -30,12 +30,6 @@ ohos_executable("mmi-server") {
     "samgr:samgr_proxy",
   ]
 
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
   install_enable = true
   part_name = "input"
   subsystem_name = "multimodalinput"

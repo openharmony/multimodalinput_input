@@ -66,10 +66,6 @@ ohos_source_set("libmmi-common") {
 
   defines = []
 
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
   if (input_feature_input_cooperation) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
@@ -102,10 +98,6 @@ ohos_shared_library("libmmi-client") {
   }
 
   defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
 
   if (input_feature_pointer_drawing) {
     defines += [ "OHOS_BUILD_ENABLE_POINTER_DRAWING" ]
@@ -182,10 +174,6 @@ ohos_unittest("ut-mmi-proxy-out") {
 
   defines = []
 
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
   sources = [ "module_loader/test/mmi_client_test.cpp" ]
 
   configs = [ ":libmmi_test_util" ]
@@ -211,10 +199,6 @@ ohos_unittest("KeyEventTest") {
   ]
 
   defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
 
   sources = [
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
@@ -249,10 +233,6 @@ ohos_unittest("InputManagerTest") {
   ]
 
   defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
 
   if (input_feature_pointer_drawing) {
     defines += [ "OHOS_BUILD_ENABLE_POINTER_DRAWING" ]
@@ -312,10 +292,6 @@ ohos_unittest("InputManagerManualTest") {
 
   defines = []
 
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
   if (input_feature_mouse) {
     defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
   }
@@ -346,10 +322,6 @@ ohos_unittest("PointerEventTest") {
   include_dirs = [ "$root_out_dir/diff_libinput_mmi/export_include" ]
 
   defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
 
   if (input_feature_mouse) {
     defines += [ "OHOS_BUILD_ENABLE_POINTER" ]

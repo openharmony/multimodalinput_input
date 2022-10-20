@@ -64,10 +64,6 @@ config("libmmi_server_config") {
 
   defines = []
 
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
   if (input_feature_combination_key) {
     defines += [ "OHOS_BUILD_ENABLE_COMBINATION_KEY" ]
   }
@@ -638,10 +634,6 @@ ohos_unittest("ut-mmi-service-out") {
 
   defines = []
 
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
   if (input_feature_pointer_drawing) {
     defines += [ "OHOS_BUILD_ENABLE_POINTER_DRAWING" ]
   }
@@ -687,10 +679,6 @@ ohos_unittest("TransformPointTest") {
   sources = [ "touch_event_normalize/test/transform_point_test.cpp" ]
 
   defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
 
   deps = [
     "${mmi_path}/tools/vuinput:libmmi-virtual-device",
