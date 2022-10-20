@@ -22,11 +22,6 @@ config("inputconsumer_config") {
     "//foundation/multimodalinput/input/tools/event_inject/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
   ]
-
-  defines = []
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
 }
 
 ohos_shared_library("inputconsumer") {

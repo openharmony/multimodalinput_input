@@ -29,10 +29,6 @@ config("libmmi_virtual_device_config") {
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
 }
 
 config("virtual_device_public_config") {
@@ -80,10 +76,6 @@ ohos_source_set("libmmi-virtual-device") {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
   part_name = "input"
   subsystem_name = "multimodalinput"
   external_deps = [ "c_utils:utils" ]
@@ -96,19 +88,12 @@ ohos_executable("vuinput") {
 
   deps = [
     "//foundation/multimodalinput/input/tools/vuinput:libmmi-virtual-device",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
   ]
-
-  if (input_feature_libinput) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
   defines = []
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
   install_enable = true
@@ -128,11 +113,8 @@ ohos_unittest("ut-virtual-device-out") {
     "${mmi_path}/util/network/include",
     "${mmi_path}/util/socket",
     "${mmi_path}/util/socket/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  if (input_feature_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
 
   sources = [ "test/virtual_device_test.cpp" ]
 
@@ -144,20 +126,14 @@ ohos_unittest("ut-virtual-device-out") {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
   }
 
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
   deps = [
     "${mmi_path}/tools/vuinput:libmmi-virtual-device",
     "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
   ]
 
-  if (input_feature_libinput) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",

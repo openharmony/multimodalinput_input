@@ -20,11 +20,8 @@ ohos_executable("mmi-server") {
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/service:libmmi-server",
     "//foundation/multimodalinput/input/util:libmmi-util",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
   ]
-
-  if (input_feature_libinput) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
@@ -37,10 +34,6 @@ ohos_executable("mmi-server") {
 
   if (input_feature_debug) {
     defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
   }
 
   install_enable = true
