@@ -276,10 +276,13 @@ int32_t GetPid()
 std::string GetFileName(const std::string &strPath)
 {
     size_t nPos = strPath.find_last_of('/');
-    if (strPath.npos == nPos)
+    if (strPath.npos == nPos) {
         nPos = strPath.find_last_of('\\');
-    if (strPath.npos == nPos)
+    }
+    if (strPath.npos == nPos) {
         return strPath;
+    }
+
     return strPath.substr(nPos + 1, strPath.npos);
 }
 
@@ -738,7 +741,7 @@ std::string StringPrintf(const char *format, ...)
         result = space;
     } else {
         MMI_HILOGE("The buffer is overflow");
-    } 
+    }
     va_end(ap);
     return result;
 }

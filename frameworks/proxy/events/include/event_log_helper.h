@@ -92,9 +92,9 @@ private:
                 "Pressure:%{public}.2f,ToolType:%{public}d,LongAxis:%{public}d,ShortAxis:%{public}d",
                 pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(),
                 item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(),
-                item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(), item.GetToolWindowX(),
-                item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(), item.GetPressure(), item.GetToolType(),
-                item.GetLongAxis(), item.GetShortAxis());
+                item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(),
+                item.GetToolWindowX(), item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(),
+                item.GetPressure(), item.GetToolType(), item.GetLongAxis(), item.GetShortAxis());
         }
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
         std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
