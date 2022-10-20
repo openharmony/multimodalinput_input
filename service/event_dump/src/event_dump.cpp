@@ -55,9 +55,6 @@ void ChkConfig(int32_t fd)
 #ifdef OHOS_BUILD_LIBINPUT
     mprintf(fd, "OHOS_BUILD_LIBINPUT");
 #endif
-#ifdef OHOS_BUILD_HDF
-    mprintf(fd, "OHOS_BUILD_HDF");
-#endif
 #ifdef OHOS_BUILD_MMI_DEBUG
     mprintf(fd, "OHOS_BUILD_MMI_DEBUG");
 #endif // OHOS_BUILD_MMI_DEBUG
