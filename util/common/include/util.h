@@ -96,8 +96,7 @@ bool AddInt(T op1, T op2, T minVal, T maxVal, T &res)
         if (op2 > maxVal - op1) {
             return false;
         }
-    }
-    else {
+    } else {
         if (op2 < minVal - op1) {
             return false;
         }
