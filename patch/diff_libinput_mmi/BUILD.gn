@@ -18,9 +18,6 @@ gen_src_dir = "//third_party/libinput"
 gen_dst_dir = root_out_dir + "/diff_libinput_mmi"
 patches_root_dir = "//foundation/multimodalinput/input/patch"
 build_gn_dir = "$patches_root_dir/diff_libinput_mmi/libinput"
-if (input_feature_hdf) {
-  build_gn_dir = "$patches_root_dir/diff_libinput_mmi/hdf"
-}
 
 action("apply_patch") {
   visibility = [ ":*" ]
@@ -66,22 +63,13 @@ action("apply_patch") {
     "$gen_dst_dir/tools/libinput-debug-events.c",
     "$gen_dst_dir/tools/libinput-list-devices.c",
     "$gen_dst_dir/tools/libinput-debug-tablet.c",
+    "$gen_dst_dir/hm_src/hm_missing.h",
+    "$gen_dst_dir/hm_src/hm_missing.c",
+    "$gen_dst_dir/tools/libinput-record.c",
+    "$gen_dst_dir/tools/libinput-analyze.c",
+    "$gen_dst_dir/tools/libinput-measure.c",
+    "$gen_dst_dir/tools/libinput-quirks.c",
   ]
-
-  if (input_feature_libinput) {
-    outputs += [
-      "$gen_dst_dir/hm_src/hm_missing.h",
-      "$gen_dst_dir/hm_src/hm_missing.c",
-
-      "$gen_dst_dir/tools/libinput-record.c",
-
-      "$gen_dst_dir/tools/libinput-analyze.c",
-
-      "$gen_dst_dir/tools/libinput-measure.c",
-
-      "$gen_dst_dir/tools/libinput-quirks.c",
-    ]
-  }
 
   args = [
     rebase_path(gen_src_dir, root_build_dir),
@@ -96,15 +84,8 @@ config("libinput-third_config") {
   include_dirs = [
     "$gen_dst_dir/src",
     "$gen_dst_dir/include",
+    "$gen_dst_dir/hm_src",
   ]
-
-  if (input_feature_libinput) {
-    include_dirs += [ "$gen_dst_dir/hm_src" ]
-  }
-
-  if (input_feature_hdf) {
-    include_dirs += [ "$root_out_dir/diff_mtdev_hdf/include" ]
-  }
 
   cflags = [
     "-Wno-unused-parameter",
@@ -112,14 +93,9 @@ config("libinput-third_config") {
     "-Wno-return-type",
     "-Wno-unused-function",
     "-Wno-string-conversion",
+    "-DHAVE_LIBINPUT_LOG_CONSOLE_ENABLE",
+    "-DHAVE_LIBINPUT_LOG_ENABLE",
   ]
-
-  if (input_feature_libinput) {
-    cflags += [
-      "-DHAVE_LIBINPUT_LOG_CONSOLE_ENABLE",
-      "-DHAVE_LIBINPUT_LOG_ENABLE",
-    ]
-  }
 }
 
 config("libinput-third_public_config") {
@@ -129,10 +105,6 @@ config("libinput-third_public_config") {
     "//third_party/FreeBSD/sys/dev/evdev",
     "$gen_dst_dir/src",
   ]
-
-  if (input_feature_hdf) {
-    include_dirs += [ "$root_out_dir/diff_mtdev_hdf/include" ]
-  }
 
   cflags = []
 }
@@ -183,21 +155,11 @@ ohos_source_set("patch_gen_libinput-third-mmi") {
 
   deps = [ ":apply_patch" ]
 
-  public_deps = [ "//third_party/eudev:libudev" ]
-
-  if (input_feature_libinput) {
-    public_deps += [
-      "//third_party/libevdev:libevdev",
-      "//third_party/mtdev:libmtdev",
-    ]
-  }
-
-  if (input_feature_hdf) {
-    public_deps += [
-      "//foundation/multimodalinput/input/patch/diff_libevdev_hdf:libevdev-hdf",
-      "//foundation/multimodalinput/input/patch/diff_mtdev_hdf:libmtdev-hdf",
-    ]
-  }
+  public_deps = [
+    "//third_party/eudev:libudev",
+    "//third_party/libevdev:libevdev",
+    "//third_party/mtdev:libmtdev",
+  ]
 }
 
 ohos_shared_library("libinput-third-mmi") {
@@ -209,347 +171,335 @@ ohos_shared_library("libinput-third-mmi") {
 
   deps = [ ":patch_gen_libinput-third-mmi" ]
 
-  public_deps = [ "//third_party/eudev:libudev" ]
-
-  if (input_feature_libinput) {
-    public_deps += [
-      "//third_party/libevdev:libevdev",
-      "//third_party/mtdev:libmtdev",
-    ]
-  }
-
-  if (input_feature_hdf) {
-    public_deps += [
-      "//foundation/multimodalinput/input/patch/diff_libevdev_hdf:libevdev-hdf",
-      "//foundation/multimodalinput/input/patch/diff_mtdev_hdf:libmtdev-hdf",
-    ]
-  }
+  public_deps = [
+    "//third_party/eudev:libudev",
+    "//third_party/libevdev:libevdev",
+    "//third_party/mtdev:libmtdev",
+  ]
 
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
 
-if (input_feature_libinput) {
-  ohos_source_set("patch_gen_libinput-debug") {
-    part_name = "input"
-    subsystem_name = "multimodalinput"
-    sources = [
-      "$gen_dst_dir/tools/libinput-debug-events.c",
-      "$gen_dst_dir/tools/shared.c",
-      "$gen_dst_dir/tools/shared.h",
-    ]
+ohos_source_set("patch_gen_libinput-debug") {
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  sources = [
+    "$gen_dst_dir/tools/libinput-debug-events.c",
+    "$gen_dst_dir/tools/shared.c",
+    "$gen_dst_dir/tools/shared.h",
+  ]
 
-    configs = [ ":libinput-third_config" ]
+  configs = [ ":libinput-third_config" ]
 
-    public_configs = [ ":libinput-third_public_config" ]
-
-    deps = [ ":apply_patch" ]
+  public_configs = [ ":libinput-third_public_config" ]
 
-    public_deps = [
-      "//third_party/eudev:libudev",
-      "//third_party/libevdev:libevdev",
-      "//third_party/mtdev:libmtdev",
-    ]
-  }
+  deps = [ ":apply_patch" ]
 
-  ohos_executable("libinput-debug-mmi") {
-    install_enable = true
+  public_deps = [
+    "//third_party/eudev:libudev",
+    "//third_party/libevdev:libevdev",
+    "//third_party/mtdev:libmtdev",
+  ]
+}
 
-    sources = []
+ohos_executable("libinput-debug-mmi") {
+  install_enable = true
 
-    configs = [ ":libinput-third_config" ]
+  sources = []
 
-    public_configs = [ ":libinput-third_public_config" ]
+  configs = [ ":libinput-third_config" ]
 
-    deps = [
-      ":libinput-third-mmi",
-      ":patch_gen_libinput-debug",
-    ]
+  public_configs = [ ":libinput-third_public_config" ]
 
-    public_deps = [
-      "//third_party/eudev:libudev",
-      "//third_party/libevdev:libevdev",
-      "//third_party/mtdev:libmtdev",
-    ]
+  deps = [
+    ":libinput-third-mmi",
+    ":patch_gen_libinput-debug",
+  ]
 
-    part_name = "input"
-    subsystem_name = "multimodalinput"
-  }
-
-  ohos_source_set("patch_gen_libinput-list") {
-    part_name = "input"
-    subsystem_name = "multimodalinput"
-    sources = [
-      "$gen_dst_dir/tools/libinput-list-devices.c",
-      "$gen_dst_dir/tools/shared.c",
-      "$gen_dst_dir/tools/shared.h",
-    ]
+  public_deps = [
+    "//third_party/eudev:libudev",
+    "//third_party/libevdev:libevdev",
+    "//third_party/mtdev:libmtdev",
+  ]
 
-    configs = [ ":libinput-third_config" ]
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+}
+
+ohos_source_set("patch_gen_libinput-list") {
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  sources = [
+    "$gen_dst_dir/tools/libinput-list-devices.c",
+    "$gen_dst_dir/tools/shared.c",
+    "$gen_dst_dir/tools/shared.h",
+  ]
 
-    public_configs = [ ":libinput-third_public_config" ]
+  configs = [ ":libinput-third_config" ]
 
-    deps = [ ":apply_patch" ]
-
-    public_deps = [
-      "//third_party/eudev:libudev",
-      "//third_party/libevdev:libevdev",
-      "//third_party/mtdev:libmtdev",
-    ]
-  }
+  public_configs = [ ":libinput-third_public_config" ]
 
-  ohos_executable("libinput-list-mmi") {
-    install_enable = true
+  deps = [ ":apply_patch" ]
 
-    sources = []
+  public_deps = [
+    "//third_party/eudev:libudev",
+    "//third_party/libevdev:libevdev",
+    "//third_party/mtdev:libmtdev",
+  ]
+}
 
-    configs = [ ":libinput-third_config" ]
+ohos_executable("libinput-list-mmi") {
+  install_enable = true
 
-    public_configs = [ ":libinput-third_public_config" ]
+  sources = []
 
-    deps = [
-      ":libinput-third-mmi",
-      ":patch_gen_libinput-list",
-    ]
+  configs = [ ":libinput-third_config" ]
 
-    public_deps = [
-      "//third_party/eudev:libudev",
-      "//third_party/libevdev:libevdev",
-      "//third_party/mtdev:libmtdev",
-    ]
+  public_configs = [ ":libinput-third_public_config" ]
 
-    part_name = "input"
-    subsystem_name = "multimodalinput"
-  }
+  deps = [
+    ":libinput-third-mmi",
+    ":patch_gen_libinput-list",
+  ]
 
-  ohos_source_set("patch_gen_libinput-tablet") {
-    part_name = "input"
-    subsystem_name = "multimodalinput"
-    sources = [
-      "$gen_dst_dir/tools/libinput-debug-tablet.c",
-      "$gen_dst_dir/tools/shared.c",
-      "$gen_dst_dir/tools/shared.h",
-    ]
+  public_deps = [
+    "//third_party/eudev:libudev",
+    "//third_party/libevdev:libevdev",
+    "//third_party/mtdev:libmtdev",
+  ]
 
-    configs = [ ":libinput-third_config" ]
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+}
 
-    public_configs = [ ":libinput-third_public_config" ]
+ohos_source_set("patch_gen_libinput-tablet") {
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  sources = [
+    "$gen_dst_dir/tools/libinput-debug-tablet.c",
+    "$gen_dst_dir/tools/shared.c",
+    "$gen_dst_dir/tools/shared.h",
+  ]
 
-    deps = [ ":apply_patch" ]
+  configs = [ ":libinput-third_config" ]
 
-    public_deps = [
-      "//third_party/eudev:libudev",
-      "//third_party/libevdev:libevdev",
-      "//third_party/mtdev:libmtdev",
-    ]
-  }
+  public_configs = [ ":libinput-third_public_config" ]
 
-  ohos_executable("libinput-tablet-mmi") {
-    install_enable = true
+  deps = [ ":apply_patch" ]
 
-    sources = []
+  public_deps = [
+    "//third_party/eudev:libudev",
+    "//third_party/libevdev:libevdev",
+    "//third_party/mtdev:libmtdev",
+  ]
+}
 
-    configs = [ ":libinput-third_config" ]
+ohos_executable("libinput-tablet-mmi") {
+  install_enable = true
 
-    public_configs = [ ":libinput-third_public_config" ]
+  sources = []
 
-    deps = [
-      ":libinput-third-mmi",
-      ":patch_gen_libinput-tablet",
-    ]
+  configs = [ ":libinput-third_config" ]
 
-    public_deps = [
-      "//third_party/eudev:libudev",
-      "//third_party/libevdev:libevdev",
-      "//third_party/mtdev:libmtdev",
-    ]
+  public_configs = [ ":libinput-third_public_config" ]
 
-    part_name = "input"
-    subsystem_name = "multimodalinput"
-  }
+  deps = [
+    ":libinput-third-mmi",
+    ":patch_gen_libinput-tablet",
+  ]
 
-  ohos_source_set("patch_gen_libinput-record") {
-    part_name = "input"
-    subsystem_name = "multimodalinput"
-    sources = [
-      "$gen_dst_dir/hm_src/hm_missing.c",
-      "$gen_dst_dir/tools/libinput-record.c",
-      "$gen_dst_dir/tools/shared.c",
-      "$gen_dst_dir/tools/shared.h",
-    ]
+  public_deps = [
+    "//third_party/eudev:libudev",
+    "//third_party/libevdev:libevdev",
+    "//third_party/mtdev:libmtdev",
+  ]
 
-    configs = [ ":libinput-third_config" ]
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+}
 
-    public_configs = [ ":libinput-third_public_config" ]
+ohos_source_set("patch_gen_libinput-record") {
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  sources = [
+    "$gen_dst_dir/hm_src/hm_missing.c",
+    "$gen_dst_dir/tools/libinput-record.c",
+    "$gen_dst_dir/tools/shared.c",
+    "$gen_dst_dir/tools/shared.h",
+  ]
 
-    deps = [ ":apply_patch" ]
+  configs = [ ":libinput-third_config" ]
 
-    public_deps = [
-      "//third_party/eudev:libudev",
-      "//third_party/libevdev:libevdev",
-      "//third_party/mtdev:libmtdev",
-    ]
-  }
+  public_configs = [ ":libinput-third_public_config" ]
 
-  ohos_executable("libinput-record-mmi") {
-    install_enable = true
+  deps = [ ":apply_patch" ]
 
-    sources = []
+  public_deps = [
+    "//third_party/eudev:libudev",
+    "//third_party/libevdev:libevdev",
+    "//third_party/mtdev:libmtdev",
+  ]
+}
 
-    configs = [ ":libinput-third_config" ]
+ohos_executable("libinput-record-mmi") {
+  install_enable = true
 
-    public_configs = [ ":libinput-third_public_config" ]
+  sources = []
 
-    deps = [
-      ":libinput-third-mmi",
-      ":patch_gen_libinput-record",
-    ]
+  configs = [ ":libinput-third_config" ]
 
-    public_deps = [
-      "//third_party/eudev:libudev",
-      "//third_party/libevdev:libevdev",
-      "//third_party/mtdev:libmtdev",
-    ]
+  public_configs = [ ":libinput-third_public_config" ]
 
-    part_name = "input"
-    subsystem_name = "multimodalinput"
-  }
+  deps = [
+    ":libinput-third-mmi",
+    ":patch_gen_libinput-record",
+  ]
 
-  ohos_source_set("patch_gen_libinput-analyze") {
-    part_name = "input"
-    subsystem_name = "multimodalinput"
-    sources = [
-      "$gen_dst_dir/tools/libinput-analyze.c",
-      "$gen_dst_dir/tools/shared.c",
-      "$gen_dst_dir/tools/shared.h",
-    ]
+  public_deps = [
+    "//third_party/eudev:libudev",
+    "//third_party/libevdev:libevdev",
+    "//third_party/mtdev:libmtdev",
+  ]
 
-    configs = [ ":libinput-third_config" ]
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+}
 
-    public_configs = [ ":libinput-third_public_config" ]
+ohos_source_set("patch_gen_libinput-analyze") {
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  sources = [
+    "$gen_dst_dir/tools/libinput-analyze.c",
+    "$gen_dst_dir/tools/shared.c",
+    "$gen_dst_dir/tools/shared.h",
+  ]
 
-    deps = [ ":apply_patch" ]
+  configs = [ ":libinput-third_config" ]
 
-    public_deps = [
-      "//third_party/eudev:libudev",
-      "//third_party/libevdev:libevdev",
-      "//third_party/mtdev:libmtdev",
-    ]
-  }
+  public_configs = [ ":libinput-third_public_config" ]
 
-  ohos_executable("libinput-analyze-mmi") {
-    install_enable = true
+  deps = [ ":apply_patch" ]
 
-    sources = []
+  public_deps = [
+    "//third_party/eudev:libudev",
+    "//third_party/libevdev:libevdev",
+    "//third_party/mtdev:libmtdev",
+  ]
+}
 
-    configs = [ ":libinput-third_config" ]
+ohos_executable("libinput-analyze-mmi") {
+  install_enable = true
 
-    public_configs = [ ":libinput-third_public_config" ]
+  sources = []
 
-    deps = [
-      ":libinput-third-mmi",
-      ":patch_gen_libinput-analyze",
-    ]
+  configs = [ ":libinput-third_config" ]
 
-    public_deps = [
-      "//third_party/eudev:libudev",
-      "//third_party/libevdev:libevdev",
-      "//third_party/mtdev:libmtdev",
-    ]
+  public_configs = [ ":libinput-third_public_config" ]
 
-    part_name = "input"
-    subsystem_name = "multimodalinput"
-  }
+  deps = [
+    ":libinput-third-mmi",
+    ":patch_gen_libinput-analyze",
+  ]
 
-  ohos_source_set("patch_gen_libinput-measure") {
-    part_name = "input"
-    subsystem_name = "multimodalinput"
-    sources = [
-      "$gen_dst_dir/tools/libinput-measure.c",
-      "$gen_dst_dir/tools/shared.c",
-      "$gen_dst_dir/tools/shared.h",
-    ]
+  public_deps = [
+    "//third_party/eudev:libudev",
+    "//third_party/libevdev:libevdev",
+    "//third_party/mtdev:libmtdev",
+  ]
 
-    configs = [ ":libinput-third_config" ]
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+}
 
-    public_configs = [ ":libinput-third_public_config" ]
+ohos_source_set("patch_gen_libinput-measure") {
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  sources = [
+    "$gen_dst_dir/tools/libinput-measure.c",
+    "$gen_dst_dir/tools/shared.c",
+    "$gen_dst_dir/tools/shared.h",
+  ]
 
-    deps = [ ":apply_patch" ]
+  configs = [ ":libinput-third_config" ]
 
-    public_deps = [
-      "//third_party/eudev:libudev",
-      "//third_party/libevdev:libevdev",
-      "//third_party/mtdev:libmtdev",
-    ]
-  }
+  public_configs = [ ":libinput-third_public_config" ]
 
-  ohos_executable("libinput-measure-mmi") {
-    install_enable = true
+  deps = [ ":apply_patch" ]
 
-    sources = []
+  public_deps = [
+    "//third_party/eudev:libudev",
+    "//third_party/libevdev:libevdev",
+    "//third_party/mtdev:libmtdev",
+  ]
+}
 
-    configs = [ ":libinput-third_config" ]
+ohos_executable("libinput-measure-mmi") {
+  install_enable = true
 
-    public_configs = [ ":libinput-third_public_config" ]
+  sources = []
 
-    deps = [
-      ":libinput-third-mmi",
-      ":patch_gen_libinput-measure",
-    ]
+  configs = [ ":libinput-third_config" ]
 
-    public_deps = [
-      "//third_party/eudev:libudev",
-      "//third_party/libevdev:libevdev",
-      "//third_party/mtdev:libmtdev",
-    ]
+  public_configs = [ ":libinput-third_public_config" ]
 
-    part_name = "input"
-    subsystem_name = "multimodalinput"
-  }
+  deps = [
+    ":libinput-third-mmi",
+    ":patch_gen_libinput-measure",
+  ]
 
-  ohos_source_set("patch_gen_libinput-quirks") {
-    part_name = "input"
-    subsystem_name = "multimodalinput"
-    sources = [
-      "$gen_dst_dir/tools/libinput-quirks.c",
-      "$gen_dst_dir/tools/shared.c",
-      "$gen_dst_dir/tools/shared.h",
-    ]
+  public_deps = [
+    "//third_party/eudev:libudev",
+    "//third_party/libevdev:libevdev",
+    "//third_party/mtdev:libmtdev",
+  ]
 
-    configs = [ ":libinput-third_config" ]
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+}
 
-    public_configs = [ ":libinput-third_public_config" ]
+ohos_source_set("patch_gen_libinput-quirks") {
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  sources = [
+    "$gen_dst_dir/tools/libinput-quirks.c",
+    "$gen_dst_dir/tools/shared.c",
+    "$gen_dst_dir/tools/shared.h",
+  ]
 
-    deps = [ ":apply_patch" ]
+  configs = [ ":libinput-third_config" ]
 
-    public_deps = [
-      "//third_party/eudev:libudev",
-      "//third_party/libevdev:libevdev",
-      "//third_party/mtdev:libmtdev",
-    ]
-  }
+  public_configs = [ ":libinput-third_public_config" ]
 
-  ohos_executable("libinput-quirks-mmi") {
-    install_enable = true
+  deps = [ ":apply_patch" ]
 
-    sources = []
+  public_deps = [
+    "//third_party/eudev:libudev",
+    "//third_party/libevdev:libevdev",
+    "//third_party/mtdev:libmtdev",
+  ]
+}
 
-    configs = [ ":libinput-third_config" ]
+ohos_executable("libinput-quirks-mmi") {
+  install_enable = true
 
-    public_configs = [ ":libinput-third_public_config" ]
+  sources = []
 
-    deps = [
-      ":libinput-third-mmi",
-      ":patch_gen_libinput-quirks",
-    ]
+  configs = [ ":libinput-third_config" ]
 
-    public_deps = [
-      "//third_party/eudev:libudev",
-      "//third_party/libevdev:libevdev",
-      "//third_party/mtdev:libmtdev",
-    ]
+  public_configs = [ ":libinput-third_public_config" ]
 
-    part_name = "input"
-    subsystem_name = "multimodalinput"
-  }
+  deps = [
+    ":libinput-third-mmi",
+    ":patch_gen_libinput-quirks",
+  ]
+
+  public_deps = [
+    "//third_party/eudev:libudev",
+    "//third_party/libevdev:libevdev",
+    "//third_party/mtdev:libmtdev",
+  ]
+
+  part_name = "input"
+  subsystem_name = "multimodalinput"
 }
