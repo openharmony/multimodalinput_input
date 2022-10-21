@@ -470,39 +470,5 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
     }
     return exports;
 }
-
-napi_value JsPointerContext::SetPointerLocation(napi_env env, napi_callback_info info)
-{
-    CALL_INFO_TRACE;
-    size_t argc = 3;
-    napi_value argv[3];
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc > 3 || argc < 2) {
-        THROWERR(env, "the number of parameters is not as expected");
-        return nullptr;
-    }
-    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        THROWERR(env, "The first parameter type is wrong");
-        return nullptr;
-    }
-    if (!JsCommon::TypeOf(env, argv[1], napi_number)) {
-        THROWERR(env, "The second parameter type is wrong");
-        return nullptr;
-    }
-    int32_t x = 0;
-    int32_t y = 0;
-    CHKRP(env, napi_get_value_int32(env, argv[0], &x), GET_INT32);
-    CHKRP(env, napi_get_value_int32(env, argv[1], &y), GET_INT32);
-    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
-    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
-    if (argc == 2) {
-        return jsPointerMgr->SetPointerLocation(env, nullptr, x, y);
-    }
-    if (!JsCommon::TypeOf(env, argv[2], napi_function)) {
-        THROWERR(env, "The third parameter type is wrong");
-        return nullptr;
-    }
-    return jsPointerMgr->SetPointerLocation(env, argv[2], x, y);
-}
 } // namespace MMI
 } // namespace OHOS
