@@ -84,9 +84,6 @@ group("input_jsapi_group") {
       "frameworks/napi/mouse_event:mouseevent",
       "frameworks/napi/touch_event:touchevent",
     ]
-    if (input_feature_distributed) {
-      deps += [ "frameworks/napi/distributed_input:distributedinput" ]
-    }
     if (input_feature_monitor) {
       deps += [ "frameworks/napi/input_monitor:inputmonitor" ]
     }
