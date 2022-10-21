@@ -69,13 +69,13 @@ private:
         SessionPtr session_ { nullptr };
     };
 
-    class InterceptorCollection : public IInputEventCollectionHandler, protected NoCopyable {
+    class InterceptorCollection final : public IInputEventCollectionHandler, protected NoCopyable {
     public:
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-        virtual bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent) override;
+        bool HandleEvent(std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-        virtual bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
+        bool HandleEvent(std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
         int32_t AddInterceptor(const SessionHandler& interceptor);
         void RemoveInterceptor(const SessionHandler& interceptor);

@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace MMI {
-class JsKeyEvent {
+class JsKeyEvent final {
 public:
     JsKeyEvent() = default;
     ~JsKeyEvent() = default;

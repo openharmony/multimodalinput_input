@@ -26,14 +26,14 @@
 
 namespace OHOS {
 namespace MMI {
-class InputMonitorManager : public InputHandlerManager {
+class InputMonitorManager final : public InputHandlerManager {
     DECLARE_DELAYED_SINGLETON(InputMonitorManager);
 public:
     DISALLOW_COPY_AND_MOVE(InputMonitorManager);
     int32_t AddMonitor(std::shared_ptr<IInputEventConsumer> monitor);
     void RemoveMonitor(int32_t monitorId);
     void MarkConsumed(int32_t monitorId, int32_t eventId);
-    virtual InputHandlerType GetHandlerType() const override;
+    InputHandlerType GetHandlerType() const override;
 
 public:
     static bool IsValidMonitorId(int32_t monitorId);

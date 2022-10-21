@@ -26,8 +26,8 @@ namespace OHOS {
 namespace MMI {
 class CallDinputProxy final : public IRemoteProxy<ICallDinput> {
 public:
-    explicit CallDinputProxy(const sptr<IRemoteObject> &impl) {}
-    ~CallDinputProxy() = default;
+    explicit CallDinputProxy(const sptr<IRemoteObject> &impl) = default;
+    ~CallDinputProxy() override = default;
     int32_t HandlePrepareDinput(const std::string &deviceId, int32_t status) override;
     int32_t HandleUnprepareDinput(const std::string &deviceId, int32_t status) override;
     int32_t HandleStartDinput(const std::string &deviceId, uint32_t inputTypes, int32_t status) override;

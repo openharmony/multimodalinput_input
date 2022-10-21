@@ -41,7 +41,7 @@ enum EpollEventType {
 using MsgServerFunCallback = std::function<void(SessionPtr, NetPacket&)>;
 class UDSServer : public UDSSocket, public IUdsServer {
 public:
-    UDSServer();
+    UDSServer() = default;
     DISALLOW_COPY_AND_MOVE(UDSServer);
     virtual ~UDSServer();
     void UdsStop();
