@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace MMI {
-class InputDeviceCooperateImpl {
+class InputDeviceCooperateImpl final {
 public:
     static InputDeviceCooperateImpl &GetInstance();
     DISALLOW_COPY_AND_MOVE(InputDeviceCooperateImpl);

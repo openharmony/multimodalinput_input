@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace MMI {
-class JsInputDinputContext {
+class JsInputDinputContext final {
 public:
     JsInputDinputContext() = default;
     ~JsInputDinputContext() = default;

@@ -27,11 +27,11 @@
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(SessionPtr sess, NetPacket& pkt)> ServerMsgFun;
-class ServerMsgHandler : public MsgHandler<MmiMessageId, ServerMsgFun> {
+class ServerMsgHandler final : public MsgHandler<MmiMessageId, ServerMsgFun> {
 public:
-    ServerMsgHandler();
+    ServerMsgHandler() = default;
     DISALLOW_COPY_AND_MOVE(ServerMsgHandler);
-    virtual ~ServerMsgHandler() override;
+    ~ServerMsgHandler() override = default;
 
     void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);

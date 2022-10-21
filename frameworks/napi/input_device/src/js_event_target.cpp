@@ -35,8 +35,6 @@ JsEventTarget::JsEventTarget()
     CK(ret.second, VAL_NOT_EXP);
 }
 
-JsEventTarget::~JsEventTarget() {}
-
 void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
 {
     CALL_DEBUG_ENTER;
@@ -290,7 +288,7 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> &ids)
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
-    if ((uData) == nullptr) {
+    if (uData == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
         MMI_HILOGE("Check uData is null");
         return;

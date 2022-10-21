@@ -30,7 +30,7 @@ class MultimodalInputConnectStub : public IRemoteStub<IMultimodalInputConnect> {
 public:
     MultimodalInputConnectStub() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectStub);
-    ~MultimodalInputConnectStub() = default;
+    virtual ~MultimodalInputConnectStub() = default;
 
     virtual bool IsRunning() const = 0;
     virtual int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,

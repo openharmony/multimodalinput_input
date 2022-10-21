@@ -30,8 +30,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputD
 
 InputDeviceCooperateStateOut::InputDeviceCooperateStateOut(const std::string& startDhid)
     : startDhid_(startDhid)
-{
-}
+{}
 
 int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate(const std::string &networkId)
 {

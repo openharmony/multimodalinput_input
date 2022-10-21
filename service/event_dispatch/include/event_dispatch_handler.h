@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace MMI {
-class EventDispatchHandler : public IInputEventHandler {
+class EventDispatchHandler final : public IInputEventHandler {
     struct MouseState {
         uint32_t type { PointerEvent::SOURCE_TYPE_UNKNOWN };
         uint32_t code { PointerEvent::BUTTON_NONE };
@@ -36,7 +36,7 @@ class EventDispatchHandler : public IInputEventHandler {
 public:
     EventDispatchHandler();
     DISALLOW_COPY_AND_MOVE(EventDispatchHandler);
-    virtual ~EventDispatchHandler();
+    ~EventDispatchHandler() override = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
