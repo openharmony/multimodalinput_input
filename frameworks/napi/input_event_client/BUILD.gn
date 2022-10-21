@@ -23,15 +23,6 @@ config("inputeventclient_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
     "//commonlibrary/c_utils/base/include",
   ]
-
-  defines = []
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
 }
 
 ohos_shared_library("inputeventclient") {
