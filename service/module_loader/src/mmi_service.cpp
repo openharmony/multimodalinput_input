@@ -84,15 +84,6 @@ void CheckDefineOutput(const char* fmt, Ts... args)
 static void CheckDefine()
 {
     CheckDefineOutput("ChkDefs:");
-#ifdef OHOS_BUILD_LIBINPUT
-    CheckDefineOutput("%-40s", "OHOS_BUILD_LIBINPUT");
-#endif
-#ifdef OHOS_BUILD_HDF
-    CheckDefineOutput("%-40s", "OHOS_BUILD_HDF");
-#endif
-#ifdef OHOS_BUILD_MMI_DEBUG
-    CheckDefineOutput("%-40s", "OHOS_BUILD_MMI_DEBUG");
-#endif
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_POINTER_DRAWING");
 #endif
@@ -186,10 +177,6 @@ bool MMIService::IsRunning() const
 
 bool MMIService::InitLibinputService()
 {
-#ifdef OHOS_BUILD_HDF
-    MMI_HILOGD("HDF Init");
-    hdfEventManager.SetupCallback();
-#endif
     if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
         DEF_INPUT_SEAT))) {
         MMI_HILOGE("Libinput init, bind failed");
