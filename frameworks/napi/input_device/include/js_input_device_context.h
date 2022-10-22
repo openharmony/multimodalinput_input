@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace MMI {
-class JsInputDeviceContext {
+class JsInputDeviceContext final {
 public:
     JsInputDeviceContext();
     DISALLOW_COPY_AND_MOVE(JsInputDeviceContext);

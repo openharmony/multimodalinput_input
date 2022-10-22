@@ -29,7 +29,7 @@
 namespace OHOS {
 namespace MMI {
 class NetPacket;
-class InputDeviceImpl {
+class InputDeviceImpl final {
 public:
     static InputDeviceImpl& GetInstance();
     DISALLOW_COPY_AND_MOVE(InputDeviceImpl);

@@ -27,7 +27,7 @@ namespace MMI {
 class CallDinputStub : public IRemoteStub<ICallDinput> {
 public:
     CallDinputStub() = default;
-    ~CallDinputStub() = default;
+    virtual ~CallDinputStub() = default;
     int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;
 protected:
     int32_t StubHandlePrepareDinput(MessageParcel& data, MessageParcel& reply);

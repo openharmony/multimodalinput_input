@@ -50,8 +50,6 @@ EventDispatchHandler::EventDispatchHandler()
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 }
 
-EventDispatchHandler::~EventDispatchHandler() {}
-
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventDispatchHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {

@@ -47,11 +47,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ClientMsgHandler"};
 } // namespace
 
-ClientMsgHandler::~ClientMsgHandler()
-{
-    dispatchCallback_ = nullptr;
-}
-
 void ClientMsgHandler::Init()
 {
     MsgCallback funs[] = {

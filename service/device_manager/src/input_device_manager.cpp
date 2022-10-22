@@ -616,7 +616,7 @@ bool InputDeviceManager::HasLocalPointerDevice() const
 
 bool InputDeviceManager::IsRemote(struct libinput_device *inputDevice) const
 {
-    CHKPR(inputDevice, false);
+    CHKPF(inputDevice);
     bool isRemote = false;
     const char* name = libinput_device_get_name(inputDevice);
     if (name == nullptr || name[0] == '\0') {

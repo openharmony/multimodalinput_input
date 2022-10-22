@@ -30,7 +30,7 @@
 
 namespace OHOS {
 namespace MMI {
-class KeySubscriberHandler :  public IInputEventHandler {
+class KeySubscriberHandler final :  public IInputEventHandler {
 public:
     KeySubscriberHandler() = default;
     DISALLOW_COPY_AND_MOVE(KeySubscriberHandler);

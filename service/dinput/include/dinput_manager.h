@@ -38,11 +38,12 @@ struct DMouseLocation {
 class DInputManager final {
     DECLARE_DELAYED_SINGLETON(DInputManager);
 public:
-    static const uint32_t DEFAULT_ABILITY;
-    static const uint32_t MOUSE_ABILITY;
-    static const uint32_t KEYBOARD_ABILITY;
-    static const uint32_t TOUCH_ABILITY;
-    static const uint32_t FULL_ABILITY;
+    static constexpr uint32_t DEFAULT_ABILITY { 0 };
+    static constexpr uint32_t MOUSE_ABILITY { 1 };
+    static constexpr uint32_t KEYBOARD_ABILITY { 2 };
+    static constexpr uint32_t TOUCH_ABILITY { 4 };
+    static constexpr uint32_t FULL_ABILITY { 7 };
+
 public:
     DISALLOW_COPY_AND_MOVE(DInputManager);
     void SetMouseLocation(const DMouseLocation& info);

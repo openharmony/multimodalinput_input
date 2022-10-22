@@ -26,9 +26,9 @@
 
 namespace OHOS {
 namespace MMI {
-class MultimodalInputConnectRemoter : public std::enable_shared_from_this<MultimodalInputConnectRemoter> {
+class MultimodalInputConnectRemoter final : public std::enable_shared_from_this<MultimodalInputConnectRemoter> {
 public:
-    virtual ~MultimodalInputConnectRemoter() = default;
+    ~MultimodalInputConnectRemoter() = default;
     static std::shared_ptr<MultimodalInputConnectRemoter> GetInstance();
     int32_t StartRemoteCooperate(const std::string &localDeviceId, const std::string &remoteDeviceId);
     int32_t StartRemoteCooperateResult(const std::string &remoteDeviceId, bool isSuccess,

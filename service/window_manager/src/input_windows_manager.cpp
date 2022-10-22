@@ -541,7 +541,7 @@ bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
         displayId = displayGroupInfo_.displaysInfo[0].id;
     }
     auto displayInfo = GetPhysicalDisplay(displayId);
-    CHKPR(displayInfo, false);
+    CHKPF(displayInfo);
     int32_t logicX = mouseLocation.physicalX + displayInfo->x;
     int32_t logicY = mouseLocation.physicalY + displayInfo->y;
     std::optional<WindowInfo> touchWindow = GetWindowInfo(logicX, logicY);

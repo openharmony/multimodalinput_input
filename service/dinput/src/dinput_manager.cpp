@@ -25,11 +25,6 @@ namespace MMI {
 namespace {
 static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DInputManager" };
 }
-const uint32_t DInputManager::DEFAULT_ABILITY = 0;
-const uint32_t DInputManager::MOUSE_ABILITY = 1;
-const uint32_t DInputManager::KEYBOARD_ABILITY = 2;
-const uint32_t DInputManager::TOUCH_ABILITY = 4;
-const uint32_t DInputManager::FULL_ABILITY = 7;
 
 DInputManager::DInputManager() {}
 DInputManager::~DInputManager() {}
