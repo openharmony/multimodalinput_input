@@ -31,8 +31,6 @@ enum KeyboardType {
     HANDWRITING_PEN = 4,
     REMOTE_CONTROL = 5,
 };
-constexpr uint32_t MIN_N_SIZE = 1;
-constexpr uint32_t MAX_N_SIZE = 5;
 } // namespace
 
 JsInputDeviceContext::JsInputDeviceContext()
@@ -299,7 +297,9 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
     }
     uint32_t size = 0;
     CHKRP(env, napi_get_array_length(env, argv[1], &size), GET_ARRAY_LENGTH);
-    if (size < MIN_N_SIZE || size > MAX_N_SIZE) {
+    static constexpr uint32_t minSupportKeys = 1;
+    static constexpr uint32_t maxSupportKeys = 5;
+    if (size < minSupportKeys || size > maxSupportKeys) {
         MMI_HILOGE("Size range error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "size range error");
         return nullptr;
