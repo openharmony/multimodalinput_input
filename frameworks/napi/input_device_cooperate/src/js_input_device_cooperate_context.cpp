@@ -210,8 +210,11 @@ napi_value JsInputDeviceCooperateContext::On(napi_env env, napi_callback_info in
     char type[MAX_STRING_LEN] = {};
     size_t length = 0;
     CHKRP(env, napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_STRING);
-    std::string type_ = type;
-
+    if (std::strcmp(type, "cooperation") != 0) {
+        THROWERR(env, "Register listener failed, the first parameter is invalid");
+        MMI_HILOGE("Register listener failed, the first parameter is invalid");
+        return nullptr;
+    }
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCooperateMgr();
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
@@ -219,7 +222,7 @@ napi_value JsInputDeviceCooperateContext::On(napi_env env, napi_callback_info in
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    jsInputDeviceMgr->RegisterListener(env, type_, argv[1]);
+    jsInputDeviceMgr->RegisterListener(env, type, argv[1]);
     return nullptr;
 }
 
@@ -357,12 +360,6 @@ JsInputDeviceCooperateContext *JsInputDeviceCooperateContext::GetInstance(napi_e
 
 void JsInputDeviceCooperateContext::DeclareDeviceCooperateInterface(napi_env env, napi_value exports)
 {
-    napi_value openSuccess = nullptr;
-    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::OPEN_SUCCESS), &openSuccess),
-        CREATE_INT32);
-    napi_value openFail = nullptr;
-    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::OPEN_FAIL), &openFail),
-        CREATE_INT32);
     napi_value infoStart = nullptr;
     CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::INFO_START), &infoStart),
         CREATE_INT32);
@@ -372,21 +369,6 @@ void JsInputDeviceCooperateContext::DeclareDeviceCooperateInterface(napi_env env
     napi_value infoFail = nullptr;
     CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::INFO_FAIL), &infoFail),
         CREATE_INT32);
-    napi_value close = nullptr;
-    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::CLOSE), &close),
-        CREATE_INT32);
-    napi_value closeSuccess = nullptr;
-    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::CLOSE_SUCCESS), &closeSuccess),
-        CREATE_INT32);
-    napi_value stop = nullptr;
-    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::STOP), &stop),
-        CREATE_INT32);
-    napi_value stopSuccess = nullptr;
-    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::STOP_SUCCESS), &stopSuccess),
-        CREATE_INT32);
-    napi_value stopFail = nullptr;
-    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::STOP_FAIL), &stopFail),
-        CREATE_INT32);
     napi_value stateOn = nullptr;
     CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::STATE_ON), &stateOn),
         CREATE_INT32);
@@ -395,16 +377,9 @@ void JsInputDeviceCooperateContext::DeclareDeviceCooperateInterface(napi_env env
         CREATE_INT32);
 
     napi_property_descriptor msg[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_OPEN_SUCCESS", openSuccess),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_OPEN_FAIL", openFail),
         DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_INFO_START", infoStart),
         DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_INFO_SUCCESS", infoSuccess),
         DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_INFO_FAIL", infoFail),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_CLOSE", close),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_CLOSE_SUCCESS", closeSuccess),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STOP", stop),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STOP_SUCCESS", stopSuccess),
-        DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STOP_FAIL", stopFail),
         DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STATE_ON", stateOn),
         DECLARE_NAPI_STATIC_PROPERTY("MSG_COOPERATE_STATE_OFF", stateOff),
     };
