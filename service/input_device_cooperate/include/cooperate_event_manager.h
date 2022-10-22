@@ -48,7 +48,7 @@ public:
 
     void AddCooperationEvent(sptr<EventInfo> event);
     void RemoveCooperationEvent(sptr<EventInfo> event);
-    void OnCooperateMessage(CooperationMessage msg, const std::string &deviceId = "");
+    int32_t OnCooperateMessage(CooperationMessage msg, const std::string &deviceId = "");
     void OnEnable(CooperationMessage msg, const std::string &deviceId = "");
     void OnStart(CooperationMessage msg, const std::string &deviceId = "");
     void OnStop(CooperationMessage msg, const std::string &deviceId = "");

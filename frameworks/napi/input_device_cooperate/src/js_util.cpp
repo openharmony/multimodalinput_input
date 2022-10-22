@@ -81,12 +81,23 @@ napi_value JsUtil::GetResult(napi_env env, bool result, int32_t errCode)
             return nullptr;
         }
         napi_value resultCode = nullptr;
-        napi_value resultMessage = nullptr;
         CHKRP(env, napi_create_int32(env, errCode, &resultCode), CREATE_INT32);
+        napi_value resultMessage = nullptr;
         CHKRP(env, napi_create_string_utf8(env, napiError.msg.data(), NAPI_AUTO_LENGTH, &resultMessage), CREATE_INT32);
         CHKRP(env, napi_create_error(env, nullptr, resultMessage, &object), CREATE_ERROR);
         CHKRP(env, napi_set_named_property(env, object, ERR_CODE.c_str(), resultCode), SET_NAMED_PROPERTY);
     }
+    return object;
+}
+
+napi_value JsUtil::GetStateResult(napi_env env, bool result)
+{
+    CHKPP(env);
+    napi_value state = nullptr;
+    CHKRP(env, napi_get_boolean(env, result, &state), GET_BOOLEAN);
+    napi_value object = nullptr;
+    CHKRP(env, napi_create_object(env, &object), CREATE_OBJECT);
+    CHKRP(env, napi_set_named_property(env,  object, "state", state), SET_NAMED_PROPERTY);
     return object;
 }
 

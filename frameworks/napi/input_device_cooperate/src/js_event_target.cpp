@@ -564,14 +564,17 @@ void JsEventTarget::CallGetStateAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(cb);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
-
-    napi_value object[2] = { 0 };
-    CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &object[0]), GET_UNDEFINED, scope);
-    object[1] = JsUtil::GetStateInfo(cb);
+    napi_value resultObj[2];
+    CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &resultObj[0]), GET_UNDEFINED, scope);
+    resultObj[1] = JsUtil::GetStateInfo(cb);
+    if (resultObj[1] == nullptr) {
+        MMI_HILOGE("Object is nullptr");
+        napi_close_handle_scope(cb->env, scope);
+    }
     napi_value handler = nullptr;
     CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
-    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, object, &result), CALL_FUNCTION, scope);
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, resultObj, &result), CALL_FUNCTION, scope);
     napi_close_handle_scope(cb->env, scope);
 }
 
