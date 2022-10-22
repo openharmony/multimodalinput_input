@@ -24,19 +24,19 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "BytraceAdapter" };
-const std::string onKeyEvent{ "OnKeyEvent" };
-const std::string onTouchEvent{ "OnTouchEvent" };
-const std::string onPointerEvent{ "OnPointerEvent" };
-const std::string keyEventDispatch{ "KeyEventDispatch" };
-const std::string touchEventDispatch{ "touchEventDispatch" };
-const std::string pointerEventDispatch{ "PointerEventDispatch" };
-const std::string keyEventSubscribe{ "KeyEventSubscribe" };
-const std::string pointerEventIntercept{ "PointerEventIntercept" };
-const std::string touchEventIntercept{ "TouchEventIntercept" };
-const std::string keyEventIntercept{ "KeyEventIntercept" };
-const std::string startEvent{ "StartEvent" };
-const std::string launchEvent{ "LaunchEvent" };
-const std::string stopEvent{ "StopEvent" };
+const std::string onKeyEvent { "OnKeyEvent" };
+const std::string onTouchEvent { "OnTouchEvent" };
+const std::string onPointerEvent { "OnPointerEvent" };
+const std::string keyEventDispatch { "KeyEventDispatch" };
+const std::string touchEventDispatch { "TouchEventDispatch" };
+const std::string pointerEventDispatch { "PointerEventDispatch" };
+const std::string keyEventSubscribe { "KeyEventSubscribe" };
+const std::string pointerEventIntercept { "PointerEventIntercept" };
+const std::string touchEventIntercept { "TouchEventIntercept" };
+const std::string keyEventIntercept { "KeyEventIntercept" };
+const std::string startEvent { "StartEvent" };
+const std::string launchEvent { "LaunchEvent" };
+const std::string stopEvent { "StopEvent" };
 constexpr int32_t START_ID = 1;
 constexpr int32_t LAUNCH_ID = 2;
 constexpr int32_t STOP_ID = 3;
