@@ -315,15 +315,15 @@ void MMIService::OnStart()
 #endif
 
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
-        MMI_HILOGD("Set watchdog flag to true");
-        watchdogFlg_ = true;
+        MMI_HILOGD("Set thread status flag to true");
+        threadStatusFlag_ = true;
     });
     auto taskFunc = [this]() {
-        if (watchdogFlg_) {
-            MMI_HILOGD("Set watchdog flag to false");
-            watchdogFlg_ = false;
+        if (threadStatusFlag_) {
+            MMI_HILOGD("Set thread status flag to false");
+            threadStatusFlag_ = false;
         } else {
-            MMI_HILOGD("kill MMIService");
+            MMI_HILOGE("Watchdog happened, process exit");
             abort();
         }
     };

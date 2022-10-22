@@ -162,7 +162,7 @@ private:
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
 
-    std::atomic_bool watchdogFlg_ { false };
+    std::atomic_bool threadStatusFlag_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
