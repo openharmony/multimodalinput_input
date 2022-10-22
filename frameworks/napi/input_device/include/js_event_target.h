@@ -32,7 +32,7 @@ namespace MMI {
 class JsEventTarget : public IInputDeviceListener, public std::enable_shared_from_this<JsEventTarget> {
 public:
     JsEventTarget();
-    ~JsEventTarget();
+    virtual ~JsEventTarget() = default;
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
     static void EmitJsIds(int32_t userData, std::vector<int32_t> &ids);
     static void EmitJsDev(int32_t userData, std::shared_ptr<InputDevice> device);
@@ -43,8 +43,8 @@ public:
     void RemoveCallbackInfo(napi_env env, napi_value handle, int32_t userData);
     napi_value CreateCallbackInfo(napi_env env, napi_value handle, const int32_t userData, bool isApi9 = false);
     void ResetEnv();
-    virtual void OnDeviceAdded(int32_t deviceId, const std::string &type) override;
-    virtual void OnDeviceRemoved(int32_t deviceId, const std::string &type) override;
+    void OnDeviceAdded(int32_t deviceId, const std::string &type) override;
+    void OnDeviceRemoved(int32_t deviceId, const std::string &type) override;
 
 private:
     static void CallIdsPromiseWork(uv_work_t *work, int32_t status);

@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace MMI {
-class EventLogHelper {
+class EventLogHelper final {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventLogHelper" };
 
 public:

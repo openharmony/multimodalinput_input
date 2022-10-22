@@ -29,7 +29,7 @@
 
 namespace OHOS {
 namespace MMI {
-class JsInputMonitorManager {
+class JsInputMonitorManager final {
 public:
     static JsInputMonitorManager& GetInstance();
     DISALLOW_COPY_AND_MOVE(JsInputMonitorManager);

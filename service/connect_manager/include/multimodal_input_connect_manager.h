@@ -27,9 +27,9 @@
 
 namespace OHOS {
 namespace MMI {
-class MultimodalInputConnectManager : public std::enable_shared_from_this<MultimodalInputConnectManager> {
+class MultimodalInputConnectManager final : public std::enable_shared_from_this<MultimodalInputConnectManager> {
 public:
-    virtual ~MultimodalInputConnectManager() = default;
+    ~MultimodalInputConnectManager() = default;
     static std::shared_ptr<MultimodalInputConnectManager> GetInstance();
     int32_t AllocSocketPair(const int32_t moduleType);
     int32_t GetClientSocketFdOfAllocedSocketPair() const;

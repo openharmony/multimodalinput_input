@@ -41,10 +41,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerMsgHandler" };
 } // namespace
 
-ServerMsgHandler::ServerMsgHandler() {}
-
-ServerMsgHandler::~ServerMsgHandler() {}
-
 void ServerMsgHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;

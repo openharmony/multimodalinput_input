@@ -49,7 +49,7 @@ struct AsyncContext : RefBase {
     ~AsyncContext();
 };
 
-class JsPointerManager {
+class JsPointerManager final {
 public:
     JsPointerManager() = default;
     ~JsPointerManager() = default;

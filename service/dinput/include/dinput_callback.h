@@ -29,37 +29,37 @@
 
 namespace OHOS {
 namespace MMI {
-class PrepareDInputCallback : public OHOS::DistributedHardware::DistributedInput::PrepareDInputCallbackStub {
+class PrepareDInputCallback final : public OHOS::DistributedHardware::DistributedInput::PrepareDInputCallbackStub {
 public:
     explicit PrepareDInputCallback(sptr<ICallDinput> prepareDinput) : callback_(prepareDinput) {}
-    ~PrepareDInputCallback() = default;
+    ~PrepareDInputCallback() override = default;
     void OnResult(const std::string& deviceId, const int32_t& status) override;
 private:
     sptr<ICallDinput> callback_ { nullptr };
 };
 
-class StartDInputCallback : public OHOS::DistributedHardware::DistributedInput::StartDInputCallbackStub {
+class StartDInputCallback final : public OHOS::DistributedHardware::DistributedInput::StartDInputCallbackStub {
 public:
     explicit StartDInputCallback(sptr<ICallDinput> prepareDinput) : callback_(prepareDinput) {}
-    ~StartDInputCallback() = default;
+    ~StartDInputCallback() override = default;
     void OnResult(const std::string& deviceId, const uint32_t& inputTypes, const int32_t& status) override;
 private:
     sptr<ICallDinput> callback_ { nullptr };
 };
 
-class StopDInputCallback : public OHOS::DistributedHardware::DistributedInput::StopDInputCallbackStub {
+class StopDInputCallback final : public OHOS::DistributedHardware::DistributedInput::StopDInputCallbackStub {
 public:
     explicit StopDInputCallback(sptr<ICallDinput> prepareDinput) : callback_(prepareDinput) {}
-    ~StopDInputCallback() = default;
+    ~StopDInputCallback() override = default;
     void OnResult(const std::string& deviceId, const uint32_t& inputTypes, const int32_t& status) override;
 private:
     sptr<ICallDinput> callback_ { nullptr };
 };
 
-class UnprepareDInputCallback : public OHOS::DistributedHardware::DistributedInput::UnprepareDInputCallbackStub {
+class UnprepareDInputCallback final : public OHOS::DistributedHardware::DistributedInput::UnprepareDInputCallbackStub {
 public:
     explicit UnprepareDInputCallback(sptr<ICallDinput> prepareDinput) : callback_(prepareDinput) {}
-    ~UnprepareDInputCallback() = default;
+    ~UnprepareDInputCallback() override = default;
     void OnResult(const std::string& deviceId, const int32_t& status) override;
 private:
     sptr<ICallDinput> callback_ { nullptr };

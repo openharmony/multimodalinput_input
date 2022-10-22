@@ -29,47 +29,47 @@ class MultimodalInputConnectProxy final : public IRemoteProxy<IMultimodalInputCo
 public:
     explicit MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl);
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectProxy);
-    virtual ~MultimodalInputConnectProxy() override;
-    virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
+    ~MultimodalInputConnectProxy() override = default;
+    int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) override;
-    virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
-    virtual int32_t SetPointerVisible(bool visible) override;
-    virtual int32_t IsPointerVisible(bool &visible) override;
-    virtual int32_t SetPointerSpeed(int32_t speed) override;
-    virtual int32_t GetPointerSpeed(int32_t &speed) override;
-    virtual int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle) override;
-    virtual int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle) override;
-    virtual int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys) override;
-    virtual int32_t GetDeviceIds(int32_t userData) override;
-    virtual int32_t GetDevice(int32_t userData, int32_t deviceId) override;
-    virtual int32_t RegisterDevListener() override;
-    virtual int32_t UnregisterDevListener() override;
-    virtual int32_t GetKeyboardType(int32_t userData, int32_t deviceId) override;
-    virtual int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType) override;
-    virtual int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType) override;
-    virtual int32_t MarkEventConsumed(int32_t eventId) override;
-    virtual int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
-    virtual int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
-    virtual int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
-    virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
-    virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
-    virtual int32_t SetAnrObserver() override;
-    virtual int32_t RegisterCooperateListener() override;
-    virtual int32_t UnregisterCooperateListener() override;
-    virtual int32_t EnableInputDeviceCooperate(int32_t userData, bool enabled) override;
-    virtual int32_t StartInputDeviceCooperate(int32_t userData, const std::string &sinkDeviceId,
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
+    int32_t SetPointerVisible(bool visible) override;
+    int32_t IsPointerVisible(bool &visible) override;
+    int32_t SetPointerSpeed(int32_t speed) override;
+    int32_t GetPointerSpeed(int32_t &speed) override;
+    int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle) override;
+    int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle) override;
+    int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys) override;
+    int32_t GetDeviceIds(int32_t userData) override;
+    int32_t GetDevice(int32_t userData, int32_t deviceId) override;
+    int32_t RegisterDevListener() override;
+    int32_t UnregisterDevListener() override;
+    int32_t GetKeyboardType(int32_t userData, int32_t deviceId) override;
+    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType) override;
+    int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType) override;
+    int32_t MarkEventConsumed(int32_t eventId) override;
+    int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
+    int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
+    int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) override;
+    int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
+    int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
+    int32_t SetAnrObserver() override;
+    int32_t RegisterCooperateListener() override;
+    int32_t UnregisterCooperateListener() override;
+    int32_t EnableInputDeviceCooperate(int32_t userData, bool enabled) override;
+    int32_t StartInputDeviceCooperate(int32_t userData, const std::string &sinkDeviceId,
         int32_t srcInputDeviceId) override;
-    virtual int32_t StopDeviceCooperate(int32_t userData) override;
-    virtual int32_t GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId) override;
-    virtual int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) override;
-    virtual int32_t StartRemoteCooperate(const std::string &localDeviceId) override;
-    virtual int32_t StartRemoteCooperateResult(bool isSuccess, const std::string& startDhid,
+    int32_t StopDeviceCooperate(int32_t userData) override;
+    int32_t GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId) override;
+    int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) override;
+    int32_t StartRemoteCooperate(const std::string &localDeviceId) override;
+    int32_t StartRemoteCooperateResult(bool isSuccess, const std::string& startDhid,
         int32_t xPercent, int32_t yPercent) override;
-    virtual int32_t StopRemoteCooperate() override;
-    virtual int32_t StopRemoteCooperateResult(bool isSuccess) override;
-    virtual int32_t StartCooperateOtherResult(const std::string &srcNetworkId) override;
-    virtual int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
-    virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
+    int32_t StopRemoteCooperate() override;
+    int32_t StopRemoteCooperateResult(bool isSuccess) override;
+    int32_t StartCooperateOtherResult(const std::string &srcNetworkId) override;
+    int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
+    int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

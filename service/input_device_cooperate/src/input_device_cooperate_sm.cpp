@@ -334,7 +334,7 @@ bool InputDeviceCooperateSM::UpdateMouseLocation()
 {
     CALL_DEBUG_ENTER;
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
-    CHKPR(pointerEvent, false);
+    CHKPF(pointerEvent);
     int32_t displayId = pointerEvent->GetTargetDisplayId();
     auto displayGroupInfo =  WinMgr->GetDisplayGroupInfo();
     struct DisplayInfo physicalDisplayInfo;

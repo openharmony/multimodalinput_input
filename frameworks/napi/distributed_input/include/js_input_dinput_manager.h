@@ -49,7 +49,7 @@ public:
     T returnResult;
 };
 
-class JsInputDinputManager {
+class JsInputDinputManager final {
 public:
     napi_value PrepareRemoteInput(napi_env env, const std::string& deviceId, napi_ref handle);
     napi_value UnprepareRemoteInput(napi_env env, const std::string& deviceId, napi_ref handle);
