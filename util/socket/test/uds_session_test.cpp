@@ -32,7 +32,7 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
     static constexpr char PROGRAM_NAME[] = "uds_sesion_test";
-    const int32_t moduleType_ = 3; // 3 CONNECT_MODULE_TYPE_ST_TEST
+    const int32_t moduleType_ = 3;
     static inline int32_t pid_ = 0;
     int32_t writeFd_ = -1;
     int32_t readFd_ = -1;
