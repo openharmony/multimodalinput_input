@@ -18,7 +18,6 @@
 
 #include "get_device_object.h"
 #include "get_device_node.h"
-#include "send_message.h"
 
 namespace OHOS {
 namespace MMI {
