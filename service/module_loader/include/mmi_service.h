@@ -28,10 +28,6 @@
 #include "input_event_handler.h"
 #include "server_msg_handler.h"
 
-#ifdef OHOS_BUILD_HDF
-    #include "hdf_event_manager.h"
-#endif
-
 namespace OHOS {
 namespace MMI {
 

@@ -31,15 +31,9 @@ public:
 
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
-#ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformTouchScreenJsonDataToInputData.json";
     string startDeviceCmd = "mmi-virtual-device-manager start touchscreen & ";
     string closeDeviceCmd = "mmi-virtual-device-manager close all";
-#else
-    const string path = "temp/Test_TransformTouchScreenJsonDataToInputData.json";
-    string startDeviceCmd = "./mmi-virtual-deviced.out start touchscreen &";
-    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
-#endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
     std::ifstream reader(path);
@@ -60,15 +54,9 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, Tes
 
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
-#ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformJsonDataToInputDataEventsIsEmpty.json";
     string startDeviceCmd = "mmi-virtual-device-manager start touchscreen & ";
     string closeDeviceCmd = "mmi-virtual-device-manager close all";
-#else
-    const string path = "temp/Test_TransformJsonDataToInputDataEventsIsEmpty.json";
-    string startDeviceCmd = "./mmi-virtual-deviced.out start touchscreen &";
-    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
-#endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
     std::ifstream reader(path);
@@ -89,15 +77,9 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEvent
 
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataSingleEventsIsEmpty, TestSize.Level1)
 {
-#ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformJsonDataToInputDataSingleEventsIsEmpty.json";
     string startDeviceCmd = "mmi-virtual-device-manager start touchscreen & ";
     string closeDeviceCmd = "mmi-virtual-device-manager close all";
-#else
-    const string path = "temp/Test_TransformJsonDataToInputDataSingleEventsIsEmpty.json";
-    string startDeviceCmd = "./mmi-virtual-deviced.out start touchscreen &";
-    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
-#endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
     std::ifstream reader(path);

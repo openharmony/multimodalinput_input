@@ -20,12 +20,9 @@ ohos_executable("mmi-server") {
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//foundation/multimodalinput/input/service:libmmi-server",
   ]
-
-  if (is_mmi_have_libinput) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
@@ -33,20 +30,6 @@ ohos_executable("mmi-server") {
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
-
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
 
   install_enable = true
   part_name = "multimodalinput_base"

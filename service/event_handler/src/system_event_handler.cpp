@@ -15,47 +15,8 @@
 
 #include "system_event_handler.h"
 #include <cstring>
-#include "libmmi_util.h"
-
-#ifdef OHOS_BUILD
 #include "ability_manager.h"
-#else
-namespace OHOS::AAFwk {
-class Want {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "Want" };
-public:
-    static constexpr char const *FLAG_HOME_INTENT_FROM_SYSTEM = "AddEntityTest";
-
-    Want() = default;
-    ~Want() = default;
-    Want& AddEntity(const std::string& entity)
-    {
-        MMI_LOGW("Want::AddEntity:%{public}s", entity.c_str());
-        return *this;
-    }
-};
-}
-
-namespace OHOS::AppExecFwk {
-class AbilityManager {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "AbilityManager" };
-public:
-    AbilityManager() = default;
-    virtual ~AbilityManager() = default;
-
-    static AbilityManager& GetInstance()
-    {
-        static AbilityManager ttt;
-        return ttt;
-    }
-    void StartAbility(const AAFwk::Want& want, int32_t requestCode = 0) const
-    {
-        MMI_LOGW("AbilityManager::StartAbility");
-    }
-};
-}
-
-#endif
+#include "libmmi_util.h"
 
 namespace OHOS {
 namespace MMI {

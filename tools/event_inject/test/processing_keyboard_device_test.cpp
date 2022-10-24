@@ -31,15 +31,9 @@ public:
 
 HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputData, TestSize.Level1)
 {
-#ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformKeyBoardJsonDataToInputData.json";
     string startDeviceCmd = "mmi-virtual-device-manager start keyboard & ";
     string closeDeviceCmd = "mmi-virtual-device-manager close all";
-#else
-    const string path = "temp/Test_TransformKeyBoardJsonDataToInputData.json";
-    string startDeviceCmd = "./mmi-virtual-deviced.out start keyboard &";
-    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
-#endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
     std::ifstream reader(path);
@@ -60,15 +54,9 @@ HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputData
 
 HWTEST_F(ProcessingKeyboardDeviceTest, Test_TransformKeyBoardJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
-#ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformKeyBoardJsonDataToInputDataEventsIsEmpty.json";
     string startDeviceCmd = "mmi-virtual-device-manager start keyboard & ";
     string closeDeviceCmd = "mmi-virtual-device-manager close all";
-#else
-    const string path = "temp/Test_TransformKeyBoardJsonDataToInputDataEventsIsEmpty.json";
-    string startDeviceCmd = "./mmi-virtual-deviced.out start keyboard &";
-    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
-#endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
     std::ifstream reader(path);

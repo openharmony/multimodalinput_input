@@ -18,23 +18,11 @@ group("patch_packages") {
   deps = [
     "diff_libinput_mmi:libinput-third-mmi",
     "prebuild_eudev:prebuild_eudev",
+    "prebuild_libinput:prebuild_libinput",
     "prebuild_x_keyboard_config:prebuild_x_keyboard_config",
+    "//third_party/eudev:libudev",
+    "//third_party/eudev:udev_conf",
+    "//third_party/eudev:udevd",
+    "//third_party/eudev:udevd.rc",
   ]
-
-  if (is_mmi_have_hdf) {
-    deps += [
-      "diff_libevdev_hdf:libevdev-hdf",
-      "diff_mtdev_hdf:libmtdev-hdf",
-    ]
-  }
-
-  if (is_mmi_have_libinput) {
-    deps += [
-      "prebuild_libinput:prebuild_libinput",
-      "//third_party/eudev:libudev",
-      "//third_party/eudev:udev_conf",
-      "//third_party/eudev:udevd",
-      "//third_party/eudev:udevd.rc",
-    ]
-  }
 }

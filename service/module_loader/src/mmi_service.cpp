@@ -41,40 +41,6 @@ struct mmi_epoll_event {
     EpollEventType event_type;
 };
 
-template<class ...Ts>
-void CheckDefineOutput(const char* fmt, Ts... args)
-{
-    using namespace OHOS::MMI;
-    CHKPV(fmt);
-    int32_t ret = 0;
-    char buf[MAX_STREAM_BUF_SIZE] = {};
-    ret = snprintf_s(buf, MAX_STREAM_BUF_SIZE, MAX_STREAM_BUF_SIZE - 1, fmt, args...);
-    if (ret < 0) {
-        KMSG_LOGI("call snprintf_s fail.ret = %d", ret);
-        return;
-    }
-
-    KMSG_LOGI("%s", buf);
-    MMI_LOGI("%{public}s", buf);
-}
-
-static void CheckDefine()
-{
-    CheckDefineOutput("ChkDefs:");
-#ifdef OHOS_BUILD
-    CheckDefineOutput("%-40s", "OHOS_BUILD");
-#endif
-#ifdef OHOS_BUILD_LIBINPUT
-    CheckDefineOutput("%-40s", "OHOS_BUILD_LIBINPUT");
-#endif
-#ifdef OHOS_BUILD_HDF
-    CheckDefineOutput("%-40s", "OHOS_BUILD_HDF");
-#endif
-#ifdef OHOS_BUILD_MMI_DEBUG
-    CheckDefineOutput("%-40s", "OHOS_BUILD_MMI_DEBUG");
-#endif
-}
-
 MMIService::MMIService() : SystemAbility(MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true) {}
 
 MMIService::~MMIService() {}
@@ -105,10 +71,6 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
 
 bool MMIService::InitLibinputService()
 {
-#ifdef OHOS_BUILD_HDF
-    MMI_LOGD("HDF Init");
-    hdfEventManager.SetupCallback();
-#endif
     CHKF(input_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
          DEF_INPUT_SEAT), LIBINPUT_INIT_FAIL);
     auto inputFd = input_.GetInputFd();
@@ -139,8 +101,6 @@ bool MMIService::InitService()
 
 int32_t MMIService::Init()
 {
-    CheckDefine();
-
     MMI_LOGD("InputEventHandler Init");
     InputHandler->Init(*this);
 

@@ -26,20 +26,6 @@ config("libmmi_util_public_config") {
     "//drivers/peripheral/input/interfaces/include",
     "//utils/native/base/include",
   ]
-
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
 }
 
 ohos_shared_library("libmmi-util") {
@@ -58,10 +44,6 @@ ohos_shared_library("libmmi-util") {
     "socket/src/uds_session.cpp",
     "socket/src/uds_socket.cpp",
   ]
-
-  if (is_mmi_have_debug) {
-    sources += [ "common/src/uds_command_queue.cpp" ]
-  }
 
   public_configs = [
     "//foundation/multimodalinput/input:multimodalinput_mmi_public_config",
@@ -103,25 +85,8 @@ ohos_unittest("ut-mmi-util-out") {
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
-
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
 
   sources = [
     "common/test/safe_keeper_test.cpp",
@@ -167,25 +132,8 @@ ohos_unittest("RunShellUtilTest") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
-
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
 
   sources = [ "common/test/run_shell_util_test.cpp" ]
 
