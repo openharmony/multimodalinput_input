@@ -15,7 +15,6 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 module_output_path = "multimodalinput/unit_out"
-HDF_FWKS = "//drivers/framework"
 
 config("event_injection_config") {
   visibility = [ ":*" ]
@@ -25,16 +24,6 @@ config("event_injection_config") {
     "//foundation/multimodalinput/input/common/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
-
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
 }
 
 config("event_injection_public_config") {
@@ -73,13 +62,10 @@ ohos_shared_library("event-injection") {
   deps = [
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
   ]
-
-  if (is_mmi_have_libinput) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
 
   part_name = "multimodalinput_base"
 }
@@ -87,8 +73,6 @@ ohos_shared_library("event-injection") {
 ohos_unittest("ut-event-injection-out") {
   module_out_path = module_output_path
   include_dirs = [
-    "//drivers/peripheral/input/interfaces/include",
-    "//drivers/adapter/uhdf2/adapter/osal/include",
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
     "//third_party/wayland-ivi-extension/include",
@@ -123,19 +107,8 @@ ohos_unittest("ut-event-injection-out") {
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/tools/event_inject/include",
     "${mmi_path}/uinput",
-    "$HDF_FWKS/include/utils",
-    "$HDF_FWKS/include/osal",
-    "$HDF_FWKS/core/adapter/syscall/include",
-    "$HDF_FWKS/include/core",
-    "$HDF_FWKS/ability/sbuf/include",
-    "$HDF_FWKS/core/shared/include",
-    "$HDF_FWKS/utils/include",
-    "$HDF_FWKS/inclue",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
 
   sources = [
     "test/device_base_test.cpp",
@@ -152,21 +125,12 @@ ohos_unittest("ut-event-injection-out") {
     "test/send_message_test.cpp",
   ]
 
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/tools/event_inject:event-injection",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//third_party/libxkbcommon:libxkbcommon",
@@ -175,9 +139,6 @@ ohos_unittest("ut-event-injection-out") {
     "//utils/native/base:utils",
   ]
 
-  if (is_mmi_have_libinput) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }
 
@@ -188,21 +149,9 @@ ohos_executable("mmi-event-injection") {
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//foundation/multimodalinput/input/tools/event_inject:event-injection",
   ]
-
-  if (is_mmi_have_libinput) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
 
   install_enable = true
   part_name = "multimodalinput_base"

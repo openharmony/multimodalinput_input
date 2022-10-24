@@ -33,13 +33,6 @@ public:
         return OnVirtualKeyEvent(sess, pkt);
     }
 
-#ifdef OHOS_BUILD_HDF
-    int32_t OnHdiInjectTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
-    {
-        return OnHdiInject(sess, pkt);
-    }
-#endif
-
     int32_t OnDumpTest(SessionPtr sess, OHOS::MMI::NetPacket& pkt)
     {
         return OnDump(sess, pkt);

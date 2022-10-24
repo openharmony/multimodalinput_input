@@ -27,8 +27,6 @@ ohos_shared_library("input-manager") {
     "$SUBSYSTEM_DIR/interfaces/native/innerkits/multimodalinput_proxy/include",
   ]
 
-  cflags = [ "-DOHOS_BUILD" ]
-
   deps = [
     "$SUBSYSTEM_FRAMEWORKS_DIR/proxy:libmmi-client",
     "$SUBSYSTEM_FRAMEWORKS_DIR/util:libmmi-util",
@@ -52,8 +50,6 @@ ohos_executable("input") {
     "$SUBSYSTEM_DIR/interfaces/native/innerkits/multimodalinput_proxy/include",
   ]
 
-  cflags = [ "-DOHOS_BUILD" ]
-
   deps = [ "$SUBSYSTEM_DIR/input/tools/inject_event:input-manager" ]
 
   external_deps = [
@@ -70,8 +66,6 @@ ohos_unittest("InjectEventTest") {
   include_dirs = [ "include" ]
 
   sources = [ "test/inject_event_test.cpp" ]
-
-  cflags = [ "-DOHOS_BUILD" ]
 
   deps = [
     "$SUBSYSTEM_DIR/input/tools/inject_event:input-manager",

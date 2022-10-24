@@ -22,7 +22,5 @@ config("module_test_config") {
 
 group("moduletest") {
   testonly = true
-  deps = [
-    "sdk_test:sdk-test",
-  ]
+  deps = [ "sdk_test:sdk-test" ]
 }

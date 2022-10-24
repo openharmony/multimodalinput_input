@@ -31,15 +31,9 @@ public:
 
 HWTEST_F(ProcessingPadDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
-#ifdef OHOS_BUILD
     const string path = "/data/json/Test_TransformPadJsonDataToInputData.json";
     string startDeviceCmd = "mmi-virtual-device-manager start touchpad & ";
     string closeDeviceCmd = "mmi-virtual-device-manager close all";
-#else
-    const string path = "temp/Test_TransformPadJsonDataToInputData.json";
-    string startDeviceCmd = "./mmi-virtual-deviced.out start touchpad &";
-    string closeDeviceCmd = "./mmi-virtual-deviced.out close all";
-#endif
     system(startDeviceCmd.c_str());
     std::this_thread::sleep_for(std::chrono::seconds(1));
     std::ifstream reader(path);

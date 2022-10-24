@@ -45,7 +45,6 @@ namespace MMI {
     std::string GetFileName(const std::string& strPath);
     const char* GetProgramName();
     char* MmiBasename(char* path);
-    std::string GetStackInfo();
     void SetThreadName(const std::string& name);
     const std::string& GetThreadName();
     void AddId(std::vector<int32_t> &list, int32_t id);

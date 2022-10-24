@@ -37,11 +37,7 @@ HWTEST_F(InjectionEventDispatchTest, Test_Init, TestSize.Level1)
 
 HWTEST_F(InjectionEventDispatchTest, Test_OnJson, TestSize.Level1)
 {
-#ifdef OHOS_BUILD
     const std::string path = "/data/json/Test_InjectionEventDispatchTestOnJson.json";
-#else
-    const std::string path = "temp/Test_InjectionEventDispatchTestOnJson.json";
-#endif
     InjectionEventDispatch injectionEventDispatch;
     injectionEventDispatch.injectArgvs_.push_back("json");
     injectionEventDispatch.injectArgvs_.push_back(path);

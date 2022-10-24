@@ -28,10 +28,6 @@
 #include "mmi_func_callback.h"
 #include "time_cost_chk.h"
 
-#ifdef OHOS_BUILD_HDF
-#include "hdi_inject.h"
-#endif
-
 namespace OHOS {
 namespace MMI {
     namespace {
@@ -47,9 +43,6 @@ OHOS::MMI::ServerMsgHandler::~ServerMsgHandler() {}
 bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
-#ifdef OHOS_BUILD_HDF
-    CHKF(MMIHdiInject->Init(udsServer), SENIOR_INPUT_DEV_INIT_FAIL);
-#endif
     MsgCallback funs[] = {
         {MmiMessageId::ON_VIRTUAL_KEY, MsgCallbackBind2(&ServerMsgHandler::OnVirtualKeyEvent, this)},
         {MmiMessageId::NEW_CHECK_REPLY_MESSAGE,
@@ -76,12 +69,6 @@ bool OHOS::MMI::ServerMsgHandler::Init(UDSServer& udsServer)
             MsgCallbackBind2(&ServerMsgHandler::OnAddTouchpadEventFilter, this)},
         {MmiMessageId::REMOVE_EVENT_INTERCEPTOR,
             MsgCallbackBind2(&ServerMsgHandler::OnRemoveTouchpadEventFilter, this)},
-#ifdef OHOS_BUILD_HDF
-        {MmiMessageId::HDI_INJECT, MsgCallbackBind2(&ServerMsgHandler::OnHdiInject, this)},
-#endif // OHOS_BUILD_HDF
-#ifdef OHOS_BUILD_MMI_DEBUG
-        {MmiMessageId::BIGPACKET_TEST, MsgCallbackBind2(&ServerMsgHandler::OnBigPacketTest, this)},
-#endif // OHOS_BUILD_MMI_DEBUG
     };
     for (auto& it : funs) {
         CHKC(RegistrationEvent(it), EVENT_REG_FAIL);
@@ -104,23 +91,6 @@ void OHOS::MMI::ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
         MMI_LOGE("ServerMsgHandler::OnMsgHandler Msg handling failed. id:%{public}d,errCode:%{public}d", id, ret);
     }
 }
-
-#ifdef OHOS_BUILD_HDF
-int32_t OHOS::MMI::ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
-{
-    MMI_LOGI("hdfinject server access hditools info");
-    CHKPR(sess, ERROR_NULL_POINTER);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    const int32_t processingCode = MMIHdiInject->ManageHdfInject(sess, pkt);
-    NetPacket pkt(MmiMessageId::HDI_INJECT);
-    pkt << processingCode;
-    if (!sess->SendMsg(pkt)) {
-        MMI_LOGE("OnHdiInject reply messaage error");
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-#endif
 
 int32_t OHOS::MMI::ServerMsgHandler::OnVirtualKeyEvent(SessionPtr sess, NetPacket& pkt)
 {
@@ -471,48 +441,4 @@ int32_t OHOS::MMI::ServerMsgHandler::OnRemoveTouchpadEventFilter(SessionPtr sess
     InterceptorMgrGbl.OnRemoveInterceptor(id);
     return RET_OK;
 }
-
-#ifdef OHOS_BUILD_MMI_DEBUG
-int32_t OHOS::MMI::ServerMsgHandler::OnBigPacketTest(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t pid = 0;
-    int32_t id = 0;
-    pkt >> pid >> id;
-    int32_t phyNum = 0;
-    pkt >> phyNum;
-    MMI_LOGD("BigPacketsTest pid:%{public}d id:%{public}d phyNum:%{public}d size:%{public}zu",
-        pid, id, phyNum, pkt.Size());
-    for (auto i = 0; i < phyNum; i++) {
-        PhysicalDisplayInfo info = {};
-        pkt >> info.id >> info.leftDisplayId >> info.upDisplayId >> info.topLeftX >> info.topLeftY;
-        pkt >> info.width >> info.height >> info.name >> info.seatId >> info.seatName >> info.logicWidth;
-        pkt >> info.logicHeight >> info.direction;
-        MMI_LOGD("\tPhysical: idx:%{public}d id:%{public}d seatId:%{public}s", i, info.id, info.seatId.c_str());
-    }
-    int32_t logcNum = 0;
-    pkt >> logcNum;
-    MMI_LOGD("\tlogcNum:%{public}d", logcNum);
-    for (auto i = 0; i < logcNum; i++) {
-        LogicalDisplayInfo info = {};
-        pkt >> info.id >> info.topLeftX >> info.topLeftY;
-        pkt >> info.width >> info.height >> info.name >> info.seatId >> info.seatName >> info.focusWindowId;
-        MMI_LOGD("\t\tLogical: idx:%{public}d id:%{public}d seatId:%{public}s", i, info.id, info.seatId.c_str());
-        int32_t winNum = 0;
-        pkt >> winNum;
-        MMI_LOGD("\t\twinNum:%{public}d", winNum);
-        for (auto j = 0; j < winNum; j++) {
-            WindowInfo winInfo;
-            pkt >> winInfo;
-            MMI_LOGD("\t\t\tWindows: idx:%{public}d id:%{public}d displayId:%{public}d",
-                j, winInfo.id, winInfo.displayId);
-        }
-    }
-    if (pkt.ChkRWError()) {
-        MMI_LOGE("Packet read data failed");
-        return PACKET_READ_FAIL;
-    }
-    return RET_OK;
-}
-#endif // OHOS_BUILD_MMI_DEBUG
 // LCOV_EXCL_STOP

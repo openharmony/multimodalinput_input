@@ -22,20 +22,6 @@ config("virtual_device_config") {
     "include",
     "//utils/native/base/include",
   ]
-
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
 }
 
 config("virtual_device_public_config") {
@@ -72,20 +58,6 @@ ohos_shared_library("libmmi-virtual-device") {
 
   configs = [ ":virtual_device_config" ]
 
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
-
   deps = [ "//utils/native/base:utils" ]
 
   install_enable = true
@@ -97,24 +69,10 @@ ohos_executable("mmi-virtual-device-manager") {
 
   configs = [ ":virtual_device_public_config" ]
 
-  deps = [ "//foundation/multimodalinput/input/tools/virtual_device_manager:libmmi-virtual-device" ]
-
-  if (is_mmi_have_libinput) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
+  deps = [
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
+    "//foundation/multimodalinput/input/tools/virtual_device_manager:libmmi-virtual-device",
+  ]
 
   install_enable = true
   part_name = "multimodalinput_base"

@@ -36,8 +36,6 @@ ohos_source_set("mmi_event_filter_service") {
 
   configs = [ ":mmi_event_filter_config" ]
 
-  cflags = [ "-DOHOS_BUILD" ]
-
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
@@ -56,8 +54,6 @@ ohos_source_set("mmi_event_filter_proxy") {
   public_configs = [ ":mmi_event_filter_config" ]
 
   configs = [ ":mmi_event_filter_config" ]
-
-  cflags = [ "-DOHOS_BUILD" ]
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",

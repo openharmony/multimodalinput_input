@@ -36,8 +36,6 @@ ohos_source_set("mmi_connect_manager_service") {
 
   configs = [ ":mmi_connect_manager_config" ]
 
-  cflags = [ "-DOHOS_BUILD" ]
-
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
@@ -57,8 +55,6 @@ ohos_source_set("mmi_connect_manager_proxy") {
   public_configs = [ ":mmi_connect_manager_config" ]
 
   configs = [ ":mmi_connect_manager_config" ]
-
-  cflags = [ "-DOHOS_BUILD" ]
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",

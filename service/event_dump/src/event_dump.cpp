@@ -32,19 +32,6 @@ namespace MMI {
 void ChkConfig(int32_t fd)
 {
     mprintf(fd, "ChkMMIConfig: ");
-#ifdef OHOS_BUILD
-    mprintf(fd, "\tOHOS_BUILD");
-#endif
-#ifdef OHOS_BUILD_LIBINPUT
-    mprintf(fd, "\tOHOS_BUILD_LIBINPUT");
-#endif
-#ifdef OHOS_BUILD_HDF
-    mprintf(fd, "\tOHOS_BUILD_HDF");
-#endif
-#ifdef OHOS_BUILD_MMI_DEBUG
-    mprintf(fd, "\tOHOS_BUILD_MMI_DEBUG");
-#endif // OHOS_BUILD_MMI_DEBUG
-
     mprintf(fd, "\tDEF_MMI_DATA_ROOT: %s\n", DEF_MMI_DATA_ROOT);
     mprintf(fd, "\tEXP_CONFIG: %s\n", DEF_EXP_CONFIG);
     mprintf(fd, "\tEXP_SOPATH: %s\n", DEF_EXP_SOPATH);
