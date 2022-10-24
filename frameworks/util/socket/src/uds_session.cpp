@@ -100,9 +100,6 @@ void UDSSession::UpdateDescript()
         << ", programName = " << programName_
         << ", moduleType = " << moduleType_
         << (bHasClosed_ ? ", closed" : ", opened")
-#ifdef OHOS_BUILD_MMI_DEBUG
-        << ", clientFd = " << clientFd_
-#endif // OHOS_BUILD_MMI_DEBUG
         << std::endl;
     descript_ = oss.str().c_str();
 }
