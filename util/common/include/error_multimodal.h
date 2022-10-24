@@ -24,25 +24,21 @@ inline constexpr int32_t ERROR_UNSUPPORT = -2;
 inline constexpr int32_t ARGV_VALID = 2;
 inline constexpr int32_t ERROR_NO_PERMISSION = -201;
 
-enum MmiModuleType {
+enum {
     MODULE_CLIENT = 0x00,
     MODULE_EVENT_SIMULATE = 0x01,
     MODULE_SERVER = 0x02,
     MODULE_UTIL = 0x03
 };
-// Error code for client
-constexpr ErrCode CLIENT_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_CLIENT);
 
 enum {
     // APL鉴权失败
-    CHECK_PERMISSION_FAIL = CLIENT_ERR_OFFSET,
+    CHECK_PERMISSION_FAIL = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_CLIENT),
 };
-// Error code for event simulate
-constexpr ErrCode EVENT_SIMULATE_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_EVENT_SIMULATE);
 
 enum {
     // 文件打开失败
-    FILE_OPEN_FAIL = EVENT_SIMULATE_ERR_OFFSET,
+    FILE_OPEN_FAIL = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_EVENT_SIMULATE),
     // 流缓冲读取失败
     STREAM_BUF_READ_FAIL,
     // 事件注册失败
@@ -50,12 +46,10 @@ enum {
     // 参数注入失败
     PARAM_INPUT_FAIL
 };
-// Error code for server
-constexpr ErrCode SERVER_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_SERVER);
 
 enum {
     // 发送消息失败
-    MSG_SEND_FAIL = SERVER_ERR_OFFSET,
+    MSG_SEND_FAIL = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_SERVER),
     // 未知的事件
     UNKNOWN_EVENT,
     // 空指针
@@ -101,28 +95,14 @@ enum {
     // DUMP参数错误
     DUMP_PARAM_ERR
 };
-// Error code for util
-constexpr ErrCode UTIL_ERR_OFFSET = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_UTIL);
 
 enum {
     // 非标准化事件
-    NON_STD_EVENT = UTIL_ERR_OFFSET,
+    NON_STD_EVENT = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_UTIL),
     // 未处理的消息
     UNPROC_MSG,
     // 未知消息ID
     UNKNOWN_MSG_ID,
-    // 未知设备
-    UNKNOWN_DEV,
-    // 文件读取失败
-    FILE_READ_FAIL,
-    // 文件写入失败
-    FILE_WRITE_FAIL,
-    // api参数类型错误
-    API_PARAM_TYPE_FAIL,
-    // api返回值超出定义范围
-    API_OUT_OF_RANGE,
-    // 获取focus_id失败
-    FOCUS_ID_OBTAIN_FAIL,
     // EPOLL创建失败
     EPOLL_CREATE_FAIL,
     // 修改EPOLL失败
