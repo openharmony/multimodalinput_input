@@ -691,7 +691,7 @@ int32_t MMIService::GetKeyboardType(int32_t userData, int32_t deviceId)
         pid, userData, deviceId));
     if (ret != RET_OK) {
         MMI_HILOGE("Get keyboard type failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
