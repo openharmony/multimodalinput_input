@@ -41,12 +41,6 @@ ohos_source_set("libmmi-common") {
     "events/src/pointer_event.cpp",
   ]
 
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
   configs = [ ":libmmi_client_config" ]
 
   public_configs = [ ":libmmi_client_config" ]
@@ -77,12 +71,6 @@ ohos_shared_library("libmmi-client") {
     "events/src/key_option.cpp",
     "module_loader/src/mmi_client.cpp",
   ]
-
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
 
   configs = [ ":libmmi_client_config" ]
 
@@ -129,25 +117,8 @@ ohos_unittest("ut-mmi-proxy-out") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
-
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
 
   sources = [ "module_loader/test/mmi_client_test.cpp" ]
 
@@ -187,25 +158,8 @@ ohos_unittest("KeyEventTest") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
-
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
 
   sources = [ "events/test/key_event_test.cpp" ]
 
@@ -245,25 +199,8 @@ ohos_unittest("InputManagerTest") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
-
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
 
   sources = [ "events/test/input_manager_test.cpp" ]
 
@@ -303,25 +240,8 @@ ohos_unittest("InputManagerManualTest") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
-
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
 
   sources = [ "events/test/input_manager_manual_test.cpp" ]
 
@@ -344,25 +264,8 @@ ohos_unittest("PointerEventTest") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "//third_party/googletest/googletest/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  if (is_mmi_have_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
-
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
 
   sources = [ "events/test/pointer_event_test.cpp" ]
 

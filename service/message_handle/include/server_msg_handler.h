@@ -33,9 +33,6 @@ public:
 protected:
     int32_t OnVirtualKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
-#ifdef OHOS_BUILD_HDF
-    int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
-#endif
     int32_t OnDump(SessionPtr sess, NetPacket& pkt);
     int32_t NewCheckReplyMessageFormClient(SessionPtr sess, NetPacket& pkt);
     int32_t GetMultimodeInputInfo(SessionPtr sess, NetPacket& pkt);
@@ -55,9 +52,6 @@ protected:
     int32_t OnUnSubscribeKeyEvent(SessionPtr sess, NetPacket& pkt);
     int32_t OnAddTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
     int32_t OnRemoveTouchpadEventFilter(SessionPtr sess, NetPacket& pkt);
-#ifdef OHOS_BUILD_MMI_DEBUG
-    int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
-#endif // OHOS_BUILD_MMI_DEBUG
 
 private:
     UDSServer *udsServer_ = nullptr; // External references, do not delete

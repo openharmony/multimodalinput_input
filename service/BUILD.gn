@@ -59,31 +59,6 @@ config("libmmi_server_public_config") {
     "//foundation/graphic/standard/rosen/modules/2d_graphics/src",
     "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
   ]
-
-  if (is_mmi_have_hdf) {
-    include_dirs += [
-      "hdf_adapter/include",
-      "hdi_inject/include",
-      "$root_out_dir/diff_libinput_mmi/export_include",
-      "//third_party/eudev/export_include/",
-      "$root_out_dir/diff_libevdev_hdf/export_include",
-      "$root_out_dir/diff_libinput_mmi/include/linux",
-    ]
-  }
-
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
 }
 
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
@@ -128,13 +103,6 @@ ohos_shared_library("libmmi-server") {
     "window_manager/src/input_windows_manager.cpp",
   ]
 
-  if (is_mmi_have_hdf) {
-    sources += [
-      "hdf_adapter/src/hdf_event_manager.cpp",
-      "hdi_inject/src/hdi_inject.cpp",
-    ]
-  }
-
   if (mmi_enable_combinationkey) {
     sources += [ "key_command/src/key_command_manager.cpp" ]
   } else {
@@ -154,7 +122,6 @@ ohos_shared_library("libmmi-server") {
     ":drawing_pointer_image",
     ":mmi_device_config.ini",
     ":multimodalinput_config_ability.json",
-    "//drivers/peripheral/input/hal:hdi_input",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
@@ -169,6 +136,7 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimedia/image_standard/interfaces/innerkits:image_native",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
     "//third_party/json:nlohmann_json_static",
@@ -177,10 +145,6 @@ ohos_shared_library("libmmi-server") {
     "//third_party/weston:libweston",
     "//utils/native/base:utils",
   ]
-
-  if (is_mmi_have_libinput || is_mmi_have_hdf) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
 
   external_deps = [
     "ability_runtime:ability_manager",
@@ -209,13 +173,10 @@ ohos_prebuilt_etc("mmi_device_config.ini") {
 import("//build/ohos.gni")
 import("//build/test.gni")
 module_output_path = "multimodalinput/unit_out"
-HDF_FWKS = "//drivers/framework"
 
 ohos_unittest("ut-mmi-service-out") {
   module_out_path = module_output_path
   include_dirs = [
-    "//drivers/peripheral/input/interfaces/include",
-    "//drivers/adapter/uhdf2/adapter/osal/include",
     "//utils/native/base/include",
     "//third_party/googletest/googletest/include",
     "//third_party/wayland-ivi-extension/include",
@@ -245,66 +206,34 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/event_package/include",
     "${mmi_path}/service/event_handler/include",
-    "${mmi_path}/service/hdi_inject/include",
     "${mmi_path}/service/event_dump/include",
-    "${mmi_path}/service/hdf_adapter/include",
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/module_loader/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/uinput",
-    "$HDF_FWKS/include/utils",
-    "$HDF_FWKS/include/osal",
-    "$HDF_FWKS/core/adapter/syscall/include",
-    "$HDF_FWKS/include/core",
-    "$HDF_FWKS/ability/sbuf/include",
-    "$HDF_FWKS/core/shared/include",
-    "$HDF_FWKS/utils/include",
-    "$HDF_FWKS/inclue",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  if (is_mmi_have_libinput || is_mmi_have_hdf) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
 
   sources = [
     "event_dispatch/test/event_dispatch_test.cpp",
-    "hdi_inject/test/hdi_inject_test.cpp",
     "message_handle/test/server_msg_handler_test.cpp",
     "module_loader/test/uds_server_test.cpp",
     "window_manager/test/input_windows_manager_test.cpp",
   ]
 
-  cflags = [ "-DOHOS_BUILD" ]
-
-  if (is_mmi_have_debug) {
-    cflags += [ "-DOHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
-
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/frameworks/util:libmmi-util",
     "${mmi_path}/service:libmmi-server",
-    "//drivers/peripheral/input/hal:hdi_input",
     "//foundation/aafwk/standard/frameworks/kits/appkit:appkit_native",
     "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//third_party/libxkbcommon:libxkbcommon",
     "//utils/native/base:utils",
   ]
-
-  if (is_mmi_have_libinput || is_mmi_have_hdf) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
 }

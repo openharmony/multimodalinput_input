@@ -68,14 +68,6 @@ public:
     bool EventsIsEmpty();
     bool isANRProcess_ {false};
 
-#ifdef OHOS_BUILD_MMI_DEBUG
-    void SetClientFd(const int32_t clientFd)
-    {
-        clientFd_ = clientFd;
-        UpdateDescript();
-    }
-#endif
-
 protected:
     struct EventTime {
         int32_t id;
@@ -90,9 +82,6 @@ protected:
     const int32_t uid_;
     const int32_t pid_;
     bool hasPermission_ = true;
-#ifdef OHOS_BUILD_MMI_DEBUG
-    int32_t clientFd_ = -1;
-#endif // OHOS_BUILD_MMI_DEBUG
 };
 } // namespace MMI
 } // namespace OHOS

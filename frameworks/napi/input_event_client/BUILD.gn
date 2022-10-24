@@ -30,15 +30,6 @@ config("libinputeventclient_config") {
     "//third_party/libuv/include/",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
   ]
-
-  cflags = [ "-DOHOS_BUILD" ]
-  if (is_mmi_have_libinput) {
-    cflags += [ "-DOHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (is_mmi_have_hdf) {
-    cflags += [ "-DOHOS_BUILD_HDF" ]
-  }
 }
 
 ohos_shared_library("inputeventclient") {
@@ -50,11 +41,11 @@ ohos_shared_library("inputeventclient") {
   configs = [ ":libinputeventclient_config" ]
 
   deps = [
-    "//drivers/peripheral/input/hal:hdi_input",
     "//foundation/ace/napi:ace_napi",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core:ipc_core",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
     "//foundation/multimodalinput/input/frameworks/util:libmmi-util",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//foundation/multimodalinput/input/tools/event_inject:event-injection",
     "//third_party/libuv:uv_static",
     "//third_party/libxkbcommon:libxkbcommon",
@@ -62,10 +53,6 @@ ohos_shared_library("inputeventclient") {
     "//third_party/wayland-ivi-extension:libscreen-info-module",
     "//utils/native/base:utils",
   ]
-
-  if (is_mmi_have_libinput || is_mmi_have_hdf) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
 
   relative_install_dir = "module/multimodalinput"
 
