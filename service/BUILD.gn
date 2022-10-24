@@ -554,6 +554,7 @@ ohos_shared_library("libmmi-server") {
     "ability_runtime:ability_manager",
     "access_token:libaccesstoken_sdk",
     "config_policy:configpolicy_util",
+    "hicollie_native:libhicollie",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
