@@ -173,7 +173,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type2_001, TestSize.Level1)
  */
 HWTEST_F(UDSSessionTest, SendMsg_type2_002, TestSize.Level1)
 {
-    NetPacket pkt(MmiMessageId::BEGIN);
+    NetPacket pkt(MmiMessageId::INVALID);
 
     UDSSession sesObj(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
     bool retResult = sesObj.SendMsg(pkt);
@@ -189,7 +189,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type2_002, TestSize.Level1)
 HWTEST_F(UDSSessionTest, SendMsg_type2_003, TestSize.Level1)
 {
     int32_t fd = -65535;
-    NetPacket pkt(MmiMessageId::BEGIN);
+    NetPacket pkt(MmiMessageId::INVALID);
 
     UDSSession sesObj(PROGRAM_NAME, moduleType_, fd, UID_ROOT, pid_);
     bool retResult = sesObj.SendMsg(pkt);

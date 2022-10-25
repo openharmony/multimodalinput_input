@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,22 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef SEND_MESSAGE_H
-#define SEND_MESSAGE_H
+#ifndef POINTERSPEED_FUZZER_H
+#define POINTERSPEED_FUZZER_H
 
-#include "nocopyable.h"
+#define FUZZ_PROJECT_NAME "pointerspeed_fuzzer"
 
-#include "msg_head.h"
-
-namespace OHOS {
-namespace MMI {
-class SendMessage {
-public:
-    SendMessage() = default;
-    DISALLOW_COPY_AND_MOVE(SendMessage);
-    ~SendMessage() = default;
-    int32_t GetDevIndexName(const std::string& deviceName);
-};
-} // namespace MMI
-} // namespace OHOS
-#endif // SEND_MESSAGE_H
+#endif // POINTERSPEED_FUZZER_H
