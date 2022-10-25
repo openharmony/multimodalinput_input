@@ -60,11 +60,6 @@ public:
         START_INPUT_DEVICE_COOPERATE = 33,
         STOP_DEVICE_COOPERATE = 34,
         GET_INPUT_DEVICE_COOPERATE_STATE = 35,
-        REMOTE_COOPERATE_START = 40,
-        REMOTE_COOPERATE_START_RES = 41,
-        REMOTE_COOPERATE_STOP = 42,
-        REMOTE_COOPERATE_STOP_RES = 43,
-        REMOTE_COOPERATE_STOP_OTHER_RES = 44,
         SET_INPUT_DEVICE_TO_SCREEN = 50,
     };
 
@@ -107,12 +102,6 @@ public:
     virtual int32_t StopDeviceCooperate(int32_t userData) = 0;
     virtual int32_t GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId) = 0;
     virtual int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) = 0;
-    virtual int32_t StartRemoteCooperate(const std::string& localDeviceId) = 0;
-    virtual int32_t StartRemoteCooperateResult(bool isSuccess, const std::string& startDhid,
-        int32_t xPercent, int32_t yPercent) = 0;
-    virtual int32_t StopRemoteCooperate() = 0;
-    virtual int32_t StopRemoteCooperateResult(bool isSuccess) = 0;
-    virtual int32_t StartCooperateOtherResult(const std::string &srcNetworkId) = 0;
     virtual int32_t GetFunctionKeyState(int32_t funckey, bool &state) = 0;
     virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) = 0;
 };

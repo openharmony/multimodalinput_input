@@ -16,11 +16,11 @@
 #include "input_device_cooperate_state_out.h"
 
 #include "cooperation_message.h"
+#include "device_cooperate_softbus_adapter.h"
 #include "distributed_input_adapter.h"
 #include "input_device_cooperate_sm.h"
+#include "input_device_cooperate_util.h"
 #include "input_device_manager.h"
-#include "mouse_event_normalize.h"
-#include "multimodal_input_connect_remoter.h"
 
 namespace OHOS {
 namespace MMI {
@@ -40,7 +40,7 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate(const std::string
         std::pair<std::string, std::string> prepared = InputDevCooSM->GetPreparedDevices();
         srcNetworkId = prepared.first;
     }
-    int32_t ret = RemoteMgr->StopRemoteCooperate(networkId);
+    int32_t ret = DevCooperateSoftbusAdapter->StopRemoteCooperate(networkId);
     if (ret != RET_OK) {
         MMI_HILOGE("Stop input device cooperate fail");
         return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
@@ -57,7 +57,7 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate(const std::string
 void InputDeviceCooperateStateOut::ProcessStop(const std::string& srcNetworkId)
 {
     CALL_DEBUG_ENTER;
-    std::string sink = InputDevMgr->GetOriginNetworkId(startDhid_);
+    std::string sink = GetLocalDeviceId();
     std::vector<std::string>  dhids = InputDevMgr->GetCooperateDhids(startDhid_);
     if (dhids.empty()) {
         InputDevCooSM->OnStopFinish(false, srcNetworkId);

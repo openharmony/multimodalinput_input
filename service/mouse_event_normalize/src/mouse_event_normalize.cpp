@@ -446,12 +446,12 @@ void MouseEventNormalize::SetDxDyForDInput(PointerEvent::PointerItem& pointerIte
     int32_t rawDy = static_cast<int32_t>(dy);
     pointerItem.SetRawDx(rawDx);
     pointerItem.SetRawDy(rawDy);
-    MMI_HILOGD("MouseEventNormalize SetDxDyForDInput : dx:%{public}d, dy:%{public}d", rawDx, rawDy);
+    MMI_HILOGD("MouseEventNormalize SetDxDyForDInput, dx:%{public}d, dy:%{public}d", rawDx, rawDy);
 }
 
 void MouseEventNormalize::SetAbsolutionLocation(double xPercent, double yPercent)
 {
-    MMI_HILOGI("MouseEventNormalize cross screen location : xPercent:%{public}lf, yPercent:%{public}lf",
+    MMI_HILOGI("Cross screen location, xPercent:%{public}lf, yPercent:%{public}lf",
         xPercent, yPercent);
     auto displayGroupInfo = WinMgr->GetDisplayGroupInfo();
     if (currentDisplayId_ == -1) {
