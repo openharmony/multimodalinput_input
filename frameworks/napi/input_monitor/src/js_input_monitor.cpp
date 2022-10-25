@@ -120,7 +120,8 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
     callback(pointerEvent);
 }
 
-void InputMonitor::SetId(int32_t id) {
+void InputMonitor::SetId(int32_t id)
+{
     id_ = id;
 }
 
@@ -154,7 +155,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi
         MMI_HILOGE("The monitor is null");
         return;
     }
-    monitor_->SetCallback([jsId=id](std::shared_ptr<PointerEvent> pointerEvent) {
+    monitor_->SetCallback([jsId = id](std::shared_ptr<PointerEvent> pointerEvent) {
         auto& jsMonitor {JsInputMonMgr.GetMonitor(jsId)};
         CHKPV(jsMonitor);
         jsMonitor->OnPointerEvent(pointerEvent);
@@ -729,7 +730,7 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
             }
             return;
         }
-        uv_queue_work(loop, work, [](uv_work_t *work){}, &JsInputMonitor::JsCallback);
+        uv_queue_work(loop, work, [](uv_work_t *work) {}, &JsInputMonitor::JsCallback);
     }
 }
 
