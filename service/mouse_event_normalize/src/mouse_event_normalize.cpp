@@ -46,7 +46,7 @@ const std::vector<AccelerateCurve> ACCELERATE_CURVES {
     { { 8, 32, 128 }, { 1.04, 3.30, 6.16 }, { 0.0, -18.08, -109.60 } },
     { { 8, 32, 128 }, { 1.10, 3.75, 7.00 }, { 0.0, -21.20, -125.20 } },
     { { 8, 32, 128 }, { 1.16, 4.20, 7.84 }, { 0.0, -24.32, -140.80 } }
-    };
+};
 constexpr double DOUBLE_ZERO = 1e-6;
 constexpr int32_t MIN_SPEED = 1;
 constexpr int32_t MAX_SPEED = 11;

@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorManager" };
 
 const std::string REFERENCE_UNREF = "napi_reference_unref";
 constexpr int32_t MONITOR_REGISTER_EXCEED_MAX { 4100001 };
