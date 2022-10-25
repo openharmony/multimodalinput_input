@@ -61,8 +61,9 @@ class InputDeviceCooperateSM final {
         void OnDeviceOffline(const DistributedHardware::DmDeviceInfo &deviceInfo) override;
     };
 public:
+    using DelegateTasksCallback = std::function<int32_t(std::function<int32_t()>)>;
     DISALLOW_COPY_AND_MOVE(InputDeviceCooperateSM);
-    void Init();
+    void Init(DelegateTasksCallback delegateTasksCallback);
     void EnableInputDeviceCooperate(bool enabled);
     int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId);
     int32_t StopInputDeviceCooperate();
@@ -93,7 +94,6 @@ public:
 private:
     void Reset(bool adjustAbsolutionLocation = false);
     void CheckPointerEvent(struct libinput_event *event);
-    bool CheckTouchEvent(struct libinput_event* event);
     void OnCloseCooperation(const std::string &networkId, bool isLocal);
     void NotifyRemoteStartFail(const std::string &remoteNetworkId);
     void NotifyRemoteStartSucess(const std::string &remoteNetworkId, const std::string &startDhid);
@@ -111,8 +111,10 @@ private:
     std::atomic<bool> isStarting_ { false };
     std::atomic<bool> isStopping_ { false };
     std::pair<int32_t, int32_t> mouseLocation_ { std::make_pair(0, 0) };
+    DelegateTasksCallback delegateTasksCallback_ { nullptr };
 };
 
+#define DisHardware DistributedHardware::DeviceManager::GetInstance()
 #define InputDevCooSM ::OHOS::DelayedSingleton<InputDeviceCooperateSM>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
