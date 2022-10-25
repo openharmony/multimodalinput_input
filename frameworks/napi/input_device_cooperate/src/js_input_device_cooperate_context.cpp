@@ -79,6 +79,7 @@ napi_value JsInputDeviceCooperateContext::Enable(napi_env env, napi_callback_inf
     CHKRP(env, napi_get_value_bool(env, argv[0], &enable), GET_BOOL);
 
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
+    CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCooperateMgr();
     if (argc == 1) {
         return jsInputDeviceMgr->Enable(env, enable);
@@ -122,6 +123,7 @@ napi_value JsInputDeviceCooperateContext::Start(napi_env env, napi_callback_info
     CHKRP(env, napi_get_value_int32(env, argv[1], &srcInputDeviceId), GET_INT32);
 
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
+    CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCooperateMgr();
     if (argc == 2) {
         return jsInputDeviceMgr->Start(env, sinkDeviceDescriptor, srcInputDeviceId);
@@ -142,6 +144,7 @@ napi_value JsInputDeviceCooperateContext::Stop(napi_env env, napi_callback_info 
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
+    CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCooperateMgr();
     if (argc == 0) {
         return jsInputDeviceMgr->Stop(env);
@@ -178,6 +181,7 @@ napi_value JsInputDeviceCooperateContext::GetState(napi_env env, napi_callback_i
     std::string deviceDescriptor_ = deviceDescriptor;
 
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
+    CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCooperateMgr();
     if (argc == 1) {
         return jsInputDeviceMgr->GetState(env, deviceDescriptor_);
@@ -213,6 +217,7 @@ napi_value JsInputDeviceCooperateContext::On(napi_env env, napi_callback_info in
     std::string type_ = type;
 
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
+    CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCooperateMgr();
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
         MMI_HILOGE("The seocond parameter is not function");
@@ -246,6 +251,7 @@ napi_value JsInputDeviceCooperateContext::Off(napi_env env, napi_callback_info i
     std::string type_ = type;
 
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
+    CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCooperateMgr();
     if (argc == 1) {
         jsInputDeviceMgr->UnregisterListener(env, type_);

@@ -37,7 +37,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "Util"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Util" };
 constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int32_t MAX_PRO_FILE_SIZE = 128000;
 constexpr int32_t KEY_ELEMENT_COUNT = 4;
