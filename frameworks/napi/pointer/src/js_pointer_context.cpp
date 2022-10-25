@@ -120,12 +120,12 @@ napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info 
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("At least one parameter is required");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible" , "boolean");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible", "boolean");
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
         MMI_HILOGE("visible parameter type is wrong");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible" , "boolean");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible", "boolean");
         return nullptr;
     }
     bool visible = true;

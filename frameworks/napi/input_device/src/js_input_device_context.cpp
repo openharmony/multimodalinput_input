@@ -297,7 +297,9 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
     }
     uint32_t size = 0;
     CHKRP(env, napi_get_array_length(env, argv[1], &size), GET_ARRAY_LENGTH);
-    if (size < 1 || size > 5) {
+    static constexpr uint32_t minSupportKeys = 1;
+    static constexpr uint32_t maxSupportKeys = 5;
+    if (size < minSupportKeys || size > maxSupportKeys) {
         MMI_HILOGE("Size range error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "size range error");
         return nullptr;
@@ -353,6 +355,7 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
     if (argc == 1) {
         return jsInputDeviceMgr->GetKeyboardType(env, id);
     }
