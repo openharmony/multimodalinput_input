@@ -160,6 +160,9 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     pointerEvent->SetProcessedCallback(dispatchCallback_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
     InputMgrImpl.OnPointerEvent(pointerEvent);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK) {
+        pointerEvent->MarkProcessed();
+    }
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
