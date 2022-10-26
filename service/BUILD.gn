@@ -474,6 +474,9 @@ ohos_shared_library("libmmi-server") {
       ]
     }
   }
+  if (input_feature_joystick) {
+    sources += [ "touch_event_normalize/src/joystick_transform_processor.cpp" ]
+  }
   if (input_feature_monitor) {
     sources += [ "monitor/src/event_monitor_handler.cpp" ]
   }

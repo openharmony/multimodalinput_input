@@ -104,6 +104,12 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
             HandleTableToolEvent(event);
             break;
         }
+        case LIBINPUT_EVENT_JOYSTICK_BUTTON:
+        case LIBINPUT_EVENT_JOYSTICK_AXIS: {
+            HandleJoystickEvent(event);
+            DfxHisysevent::CalcPointerDispTimes();
+            break;
+        }
         default: {
             MMI_HILOGW("This device does not support");
             break;
@@ -439,7 +445,7 @@ void EventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> poin
 int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
 {
     if (nextHandler_ == nullptr) {
-        MMI_HILOGW("Touchscreen device does not support");
+        MMI_HILOGW("TableTool device does not support");
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -452,8 +458,27 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
         pointerEvent->Reset();
     }
 #else
-    MMI_HILOGW("Touchscreen device does not support");
+    MMI_HILOGW("TableTool device does not support");
 #endif // OHOS_BUILD_ENABLE_TOUCH
+    return RET_OK;
+}
+
+int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
+{
+    CALL_DEBUG_ENTER;
+    if (nextHandler_ == nullptr) {
+        MMI_HILOGW("Joystick device does not support");
+        return ERROR_UNSUPPORT;
+    }
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+    CHKPR(event, ERROR_NULL_POINTER);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::JOYSTICK);
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+    nextHandler_->HandlePointerEvent(pointerEvent);
+#else
+    MMI_HILOGW("Joystick device does not support");
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
     return RET_OK;
 }
 

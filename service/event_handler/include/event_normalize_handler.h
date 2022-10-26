@@ -50,6 +50,7 @@ private:
     int32_t HandleMouseEvent(libinput_event* event);
     int32_t HandleTouchEvent(libinput_event* event);
     int32_t HandleTableToolEvent(libinput_event* event);
+    int32_t HandleJoystickEvent(libinput_event* event);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     bool IsNeedFilterOut(const std::string& deviceId, const std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
