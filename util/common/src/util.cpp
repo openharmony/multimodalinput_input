@@ -72,7 +72,7 @@ int64_t GetSysClockTime()
 
 int64_t GetMillisTime()
 {
-    auto timeNow = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
+    auto timeNow = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
     auto tmp = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow.time_since_epoch());
     return tmp.count();
 }
