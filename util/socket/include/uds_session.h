@@ -103,14 +103,6 @@ public:
     int64_t GetEarliestEventTime(int32_t type = 0) const;
     bool IsEventQueueEmpty(int32_t type = 0);
 
-#ifdef OHOS_BUILD_MMI_DEBUG
-    void SetClientFd(const int32_t clientFd)
-    {
-        clientFd_ = clientFd;
-        UpdateDescript();
-    }
-#endif
-
 protected:
     struct EventTime {
         int32_t id { 0 };
@@ -126,9 +118,6 @@ protected:
     const int32_t uid_ { -1 };
     const int32_t pid_ { -1 };
     int32_t tokenType_ { TokenType::TOKEN_INVALID };
-#ifdef OHOS_BUILD_MMI_DEBUG
-    int32_t clientFd_ { -1 };
-#endif // OHOS_BUILD_MMI_DEBUG
 };
 } // namespace MMI
 } // namespace OHOS
