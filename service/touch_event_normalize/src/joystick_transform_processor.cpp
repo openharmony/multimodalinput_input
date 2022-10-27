@@ -57,14 +57,12 @@ bool JoystickTransformProcessor::OnEventJoystickButton(struct libinput_event* ev
     pointerEvent_->SetDeviceId(deviceId_);   
     uint32_t button = libinput_event_joystick_button_get_key(data);
     int32_t buttonId = LibinputButtonToPointer(button);
-    
     if (buttonId == PointerEvent::BUTTON_NONE) {
         MMI_HILOGE("Unknown btn, btn:%{public}u", button);
         return false;
     }
     pointerEvent_->SetButtonId(buttonId);
     auto state = libinput_event_joystick_button_get_key_state(data);
-    
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
         pointerEvent_->DeleteReleaseButton(buttonId);
@@ -75,7 +73,7 @@ bool JoystickTransformProcessor::OnEventJoystickButton(struct libinput_event* ev
         MMI_HILOGE("Unknown state, state:%{public}u", state);
         return false;
     }
-    MMI_HILOGD("button:%{public}u, buttonId:%{public}d, state:%{public}d", button, buttonId ,state);
+    MMI_HILOGD("button:%{public}u, buttonId:%{public}d, state:%{public}d", button, buttonId, state);
     return true;
 }
 
@@ -121,7 +119,7 @@ std::shared_ptr<PointerEvent> JoystickTransformProcessor::OnEvent(struct libinpu
     auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_JOYSTICK_BUTTON: {
-            if(!OnEventJoystickButton(event)) {
+            if (!OnEventJoystickButton(event)) {
                 MMI_HILOGE("Get OnEventJoystickButton failed");
                 return nullptr;
             }
