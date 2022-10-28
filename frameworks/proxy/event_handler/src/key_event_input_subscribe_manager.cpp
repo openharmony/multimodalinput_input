@@ -28,7 +28,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventInputSubscribeManager" };
 constexpr int32_t INVALID_SUBSCRIBE_ID = -1;
-constexpr size_t PRE_KEYS_NUM = 3;
+constexpr size_t PRE_KEYS_NUM = 4;
 } // namespace
 int32_t KeyEventInputSubscribeManager::subscribeIdManager_ = 0;
 

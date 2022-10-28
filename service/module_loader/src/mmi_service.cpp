@@ -310,8 +310,7 @@ void MMIService::OnStart()
             MMI_HILOGD("Set thread status flag to false");
             threadStatusFlag_ = false;
         } else {
-            MMI_HILOGE("Watchdog happened, process exit");
-            abort();
+            MMI_HILOGE("Watchdog happened");
         }
     };
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc,
