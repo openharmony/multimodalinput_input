@@ -18,10 +18,10 @@ import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 module_output_path = "multimodalinput/fuzz"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("GetPointerStyleFuzzTest") {
+ohos_fuzztest("PointerStyleFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file =
-      "//foundation/multimodalinput/input/test/fuzztest/getpointerstyle_fuzzer"
+      "//foundation/multimodalinput/input/test/fuzztest/pointerstyle_fuzzer"
   include_dirs =
       [ "//foundation/multimodalinput/input/interfaces/util/common/include" ]
   cflags = [
@@ -30,11 +30,12 @@ ohos_fuzztest("GetPointerStyleFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "getpointerstyle_fuzzer.cpp" ]
+  sources = [ "pointerstyle_fuzzer.cpp" ]
   deps = [ "${mmi_path}/frameworks/proxy:libmmi-client" ]
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
   ]
 }
 
@@ -44,7 +45,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":GetPointerStyleFuzzTest",
+    ":PointerStyleFuzzTest",
   ]
 }
 ###############################################################################

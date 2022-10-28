@@ -50,7 +50,7 @@ void PointerSpeedFuzzTest(const uint8_t* data, size_t size)
         MMI_HILOGD("Set pointer speed success");
     }
 
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, speed);
+    GetObject<int32_t>(data + startPos, size - startPos, speed);
     if (InputManager::GetInstance()->GetPointerSpeed(speed) == RET_OK) {
         MMI_HILOGD("Get pointer speed success");
     }

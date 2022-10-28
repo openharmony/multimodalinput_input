@@ -13,20 +13,18 @@
  * limitations under the License.
  */
 
-#include "updatedisplayinfo_fuzzer.h"
+#include "pointerstyle_fuzzer.h"
 
-#include <string>
-
+#include "ipc_skeleton.h"
 #include "securec.h"
 
-#include "define_multimodal.h"
 #include "input_manager.h"
 #include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UpdateDisplayInfoFuzzTest" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerStyleFuzzTest" };
 } // namespace
 template<class T>
 size_t GetObject(const uint8_t *data, size_t size, T &object)
@@ -77,7 +75,7 @@ void UpdateHotAreas(const uint8_t* data, size_t size, WindowInfo &windowInfo)
     windowInfo.pointerHotAreas = pointerHotAreasInfo;
 }
 
-void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
+void UpdateDisplayInfo(const uint8_t* data, size_t size, int32_t windowId)
 {
     DisplayGroupInfo displayGroupInfo;
     size_t startPos = 0;
@@ -86,54 +84,63 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.focusWindowId);
     std::vector<WindowInfo> windowsInfo;
     std::vector<DisplayInfo> displaysInfo;
-    for (size_t i = 0; i < WindowInfo::MAX_HOTAREA_COUNT + 1; ++i) {
-        WindowInfo windowInfo;
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.id);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.pid);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.uid);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.x);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.y);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.width);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.height);
-        UpdateHotAreas(data, size, windowInfo);
-        windowsInfo.push_back(windowInfo);
+    WindowInfo windowInfo;
+    windowInfo.id = windowId;
+    windowInfo.pid = IPCSkeleton::GetCallingPid();
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.uid);
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.x);
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.y);
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.width);
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.height);
+    UpdateHotAreas(data, size, windowInfo);
+    windowsInfo.push_back(windowInfo);
 
-        DisplayInfo displayInfo;
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.id);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.x);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.y);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.width);
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.height);
+    DisplayInfo displayInfo;
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.id);
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.x);
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.y);
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.width);
+    GetObject<int32_t>(data + startPos, size - startPos, displayInfo.height);
 
-        size_t objectSize = 0;
-        std::string name = "";
-        size_t ret = GetString(objectSize, data, size, name);
-        if (ret == 0) {
-            MMI_HILOGD("%{public}s:%{public}d The return value is 0", __func__, __LINE__);
-            return;
-        }
-        displayInfo.name = name;
-        std::string uniq = "";
-        ret = GetString(objectSize, data, size, uniq);
-        if (ret == 0) {
-            MMI_HILOGD("%{public}s:%{public}d The return value is 0", __func__, __LINE__);
-            return;
-        }
-        displayInfo.uniq = uniq;
-        displaysInfo.push_back(displayInfo);
+    size_t objectSize = 0;
+    std::string name = "";
+    size_t ret = GetString(objectSize, data, size, name);
+    if (ret == 0) {
+        MMI_HILOGD("%{public}s:%{public}d GetString return 0", __func__, __LINE__);
+        return;
     }
+    displayInfo.name = name;
+    std::string uniq = "";
+    ret = GetString(objectSize, data, size, uniq);
+    if (ret == 0) {
+        MMI_HILOGD("%{public}s:%{public}d GetString return 0", __func__, __LINE__);
+        return;
+    }
+    displayInfo.uniq = uniq;
+    displaysInfo.push_back(displayInfo);
     displayGroupInfo.windowsInfo = windowsInfo;
     displayGroupInfo.displaysInfo = displaysInfo;
     InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
-    MMI_HILOGD("Update display info success");
 }
-} // namespace MMI
-} // namespace OHOS
+
+void PointerStyleFuzzTest(const uint8_t* data, size_t size)
+{
+    int32_t windowId;
+    size_t startPos = 0;
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, windowId);
+    UpdateDisplayInfo(data, size, windowId);
+    int32_t pointerStyle;
+    GetObject<int32_t>(data + startPos, size - startPos, pointerStyle);
+    InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle);
+    InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle);
+}
+} // MMI
+} // OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::MMI::UpdateDisplayInfoFuzzTest(data, size);
+    OHOS::MMI::PointerStyleFuzzTest(data, size);
     return 0;
 }

@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef GETFUNCTIONKEYSTATE_FUZZER_H
-#define GETFUNCTIONKEYSTATE_FUZZER_H
+#ifndef POINTERSTYLE_FUZZER_H
+#define POINTERSTYLE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "getfunctionkeystate_fuzzer"
+#define FUZZ_PROJECT_NAME "pointerstyle_fuzzer"
 
-#endif // GETFUNCTIONKEYSTATE_FUZZER_H
+#endif // POINTERSTYLE_FUZZER_H
