@@ -24,7 +24,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SubscribeKeyEventFuzzTest" };
-constexpr int32_t DEFAULT_PREKEY_COUNT = 4;
+constexpr int32_t DEFAULT_PREKEY_COUNT = 3;
 } // namespace
 
 class InputEventConsumerTest : public IInputEventConsumer {

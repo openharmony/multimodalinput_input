@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "getfunctionkeystate_fuzzer.h"
+#include "functionkeystate_fuzzer.h"
 
 #include "securec.h"
 
@@ -36,18 +36,17 @@ size_t GetObject(T &object, const uint8_t *data, size_t size)
     return objectSize;
 }
 
-void GetFunctionkeyStateFuzzTest(const uint8_t* data, size_t  size)
+void FunctionkeyStateFuzzTest(const uint8_t* data, size_t size)
 {
     int32_t funcKey;
     size_t startPos = 0;
     startPos += GetObject<int32_t>(funcKey, data + startPos, size - startPos);
-    InputManager::GetInstance()->GetFunctionKeyState(funcKey);
-
-    int32_t random = 0;
-    startPos += GetObject<int32_t>(funcKey, data + startPos, size - startPos);
-    startPos += GetObject<int32_t>(random, data + startPos, size - startPos);
+    int32_t random;
+    GetObject<int32_t>(random, data + startPos, size - startPos);
     bool enable = (random % 2) ? false : true;
     InputManager::GetInstance()->SetFunctionKeyState(funcKey, enable);
+
+    InputManager::GetInstance()->GetFunctionKeyState(funcKey);
 }
 } // MMI
 } // OHOS
@@ -56,7 +55,6 @@ void GetFunctionkeyStateFuzzTest(const uint8_t* data, size_t  size)
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
-    OHOS::MMI::GetFunctionkeyStateFuzzTest(data, size);
+    OHOS::MMI::FunctionkeyStateFuzzTest(data, size);
     return 0;
 }
-
