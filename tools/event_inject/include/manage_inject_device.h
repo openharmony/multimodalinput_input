@@ -30,7 +30,6 @@ public:
     int32_t TransformJsonData(const DeviceItems &configData);
 private:
     int32_t SendEvent(const InputEventArray &inputEventArray);
-    int32_t SendEventToHdi(const InputEventArray &inputEventArray);
     int32_t SendEventToDeviceNode(const InputEventArray &inputEventArray);
 private:
     GetDeviceNode getDeviceNodeObject_;
