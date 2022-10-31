@@ -20,11 +20,11 @@
 
 namespace OHOS {
 namespace MMI {
-class GestureTransformProcessor : public TransformProcessor {
+class GestureTransformProcessor final : public TransformProcessor {
 public:
     explicit GestureTransformProcessor(int32_t deviceId);
     DISALLOW_COPY_AND_MOVE(GestureTransformProcessor);
-    virtual ~GestureTransformProcessor() = default;
+    ~GestureTransformProcessor() = default;
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
 
 private:

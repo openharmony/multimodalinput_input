@@ -182,8 +182,10 @@ HWTEST_F(InputManagerManualTest, HandlePointerEventFilter_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     AddInputEventFilter();
-    SimulateInputEventHelper(10, 10, 1); // set physical x and physical y are 10, will expect value is 1
-    SimulateInputEventHelper(0, 0, 2); // set physical x and physical y are not 10, will expect value is 2
+    // set physical x and physical y are 10, will expect value is 1
+    SimulateInputEventHelper(10, 10, 1);
+    // set physical x and physical y are not 10, will expect value is 2
+    SimulateInputEventHelper(0, 0, 2);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI

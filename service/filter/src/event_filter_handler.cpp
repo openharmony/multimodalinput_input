@@ -24,15 +24,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventFilterHandler" };
 } // namespace
 
-EventFilterHandler::EventFilterHandler()
-{
-    CALL_DEBUG_ENTER;
-}
-
-EventFilterHandler::~EventFilterHandler()
-{
-    CALL_DEBUG_ENTER;
-}
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventFilterHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {

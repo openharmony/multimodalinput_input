@@ -73,11 +73,11 @@ struct Sequence {
     Ability ability;
 };
 
-class KeyCommandHandler : public IInputEventHandler {
+class KeyCommandHandler final : public IInputEventHandler {
 public:
     KeyCommandHandler() = default;
     DISALLOW_COPY_AND_MOVE(KeyCommandHandler);
-    ~KeyCommandHandler() = default;
+    ~KeyCommandHandler() override = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

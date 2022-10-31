@@ -21,7 +21,6 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "napi_constants.h"
-#include "util_napi.h"
 #include "utils/log.h"
 #include "refbase.h"
 
@@ -29,6 +28,8 @@
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_manager.h"
+#include "util_napi.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace MMI {
@@ -48,7 +49,7 @@ struct AsyncContext : RefBase {
     ~AsyncContext();
 };
 
-class JsPointerManager {
+class JsPointerManager final {
 public:
     JsPointerManager() = default;
     ~JsPointerManager() = default;
@@ -61,7 +62,6 @@ public:
     napi_value GetPointerSpeed(napi_env env, napi_value handle = nullptr);
     napi_value SetPointerStyle(napi_env env, int32_t windowid, int32_t pointerStyle, napi_value handle = nullptr);
     napi_value GetPointerStyle(napi_env env, int32_t windowid, napi_value handle = nullptr);
-    napi_value SetPointerLocation(napi_env env, napi_value handle, int32_t x, int32_t y);
 };
 } // namespace MMI
 } // namespace OHOS

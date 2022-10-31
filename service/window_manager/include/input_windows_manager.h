@@ -71,7 +71,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     const DisplayGroupInfo& GetDisplayGroupInfo();
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle);
-    std::optional<int> GetPointerStyle(int32_t pid, int32_t windowId) const;
+    int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle) const;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool IsNeedRefreshLayer(int32_t windowId);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -141,7 +141,7 @@ private:
     std::map<int32_t, std::map<int32_t, int32_t>> pointerStyle_;
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
-    MouseLocation mouseLocation_ = { -1, -1 }; // physical coord
+    MouseLocation mouseLocation_ = { -1, -1 };
     struct CaptureModeInfo {
         int32_t windowId { -1 };
         bool isCaptureMode { false };
