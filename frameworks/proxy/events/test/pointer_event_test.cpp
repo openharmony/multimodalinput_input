@@ -16,14 +16,13 @@
 #include "define_multimodal.h"
 #include "event_util_test.h"
 #include "proto.h"
-#include "standardized_event_manager.h"
 #include "util.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 #ifdef OHOS_BUILD_ENABLE_POINTER
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "PointerEventTest"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerEventTest" };
 #endif // OHOS_BUILD_ENABLE_POINTER
 using namespace testing::ext;
 } // namespace
@@ -500,7 +499,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchPointEvent_006, TestSize.L
     item.SetTargetWindowId(0);
     pointerEvent->AddPointerItem(item);
     ASSERT_TRUE(pointerEvent->IsValid());
-    DumpWindowData(pointerEvent); 
+    DumpWindowData(pointerEvent);
     pointerEvent->RemovePointerItem(0);
     pointerEvent->IsButtonPressed(0);
     pointerEvent->ClearButtonPressed();

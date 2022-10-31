@@ -11,6 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+
 group("test") {
   testonly = true
 
@@ -18,14 +20,32 @@ group("test") {
     "addinputeventfilter_fuzzer:fuzztest",
     "addinterceptor_fuzzer:fuzztest",
     "addmonitor_fuzzer:fuzztest",
+    "functionkeystate_fuzzer:fuzztest",
     "getkeyboardtype_fuzzer:fuzztest",
     "markconsumed_fuzzer:fuzztest",
     "movemouse_fuzzer:fuzztest",
+    "pointerspeed_fuzzer:fuzztest",
+    "pointerstyle_fuzzer:fuzztest",
     "pointervisible_fuzzer:fuzztest",
-    "setwindowinputeventconsumer_fuzzer:fuzztest",
     "simulateinputevent_fuzzer:fuzztest",
     "subscribekeyevent_fuzzer:fuzztest",
     "supportkeys_fuzzer:fuzztest",
     "updatedisplayinfo_fuzzer:fuzztest",
   ]
+  if (input_feature_input_cooperation) {
+    deps += [
+      "enableinputdevicecooperate_fuzzer:fuzztest",
+      "getdeviceIds_fuzzer:fuzztest",
+      "getdevice_fuzzer:fuzztest",
+      "getinputdevicecooperatestate_fuzzer:fuzztest",
+      "registercooperatelistener_fuzzer:fuzztest",
+      "registerdevListener_fuzzer:fuzztest",
+      "removeinterceptor_fuzzer:fuzztest",
+      "setanrobserver_fuzzer:fuzztest",
+      "setwindowinputeventconsumer_fuzzer:fuzztest",
+      "startinputdevicecooperate_fuzzer:fuzztest",
+      "stopdevicecooperate_fuzzer:fuzztest",
+      "unregisterdevListener_fuzzer:fuzztest",
+    ]
+  }
 }

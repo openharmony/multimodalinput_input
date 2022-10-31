@@ -46,7 +46,7 @@ const std::vector<AccelerateCurve> ACCELERATE_CURVES {
     { { 8, 32, 128 }, { 1.04, 3.30, 6.16 }, { 0.0, -18.08, -109.60 } },
     { { 8, 32, 128 }, { 1.10, 3.75, 7.00 }, { 0.0, -21.20, -125.20 } },
     { { 8, 32, 128 }, { 1.16, 4.20, 7.84 }, { 0.0, -24.32, -140.80 } }
-    };
+};
 constexpr double DOUBLE_ZERO = 1e-6;
 constexpr int32_t MIN_SPEED = 1;
 constexpr int32_t MAX_SPEED = 11;
@@ -268,7 +268,7 @@ int32_t MouseEventNormalize::HandleAxisInner(struct libinput_event_pointer* data
 }
 
 void MouseEventNormalize::HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId,
-                                        PointerEvent::PointerItem &pointerItem)
+    PointerEvent::PointerItem &pointerItem)
 {
     CALL_DEBUG_ENTER;
     CHKPV(data);
@@ -494,12 +494,12 @@ void MouseEventNormalize::SetDxDyForDInput(PointerEvent::PointerItem& pointerIte
     int32_t rawDy = static_cast<int32_t>(dy);
     pointerItem.SetRawDx(rawDx);
     pointerItem.SetRawDy(rawDy);
-    MMI_HILOGD("MouseEventNormalize SetDxDyForDInput : dx:%{public}d, dy:%{public}d", rawDx, rawDy);
+    MMI_HILOGD("MouseEventNormalize SetDxDyForDInput, dx:%{public}d, dy:%{public}d", rawDx, rawDy);
 }
 
 void MouseEventNormalize::SetAbsolutionLocation(double xPercent, double yPercent)
 {
-    MMI_HILOGI("MouseEventNormalize cross screen location : xPercent:%{public}lf, yPercent:%{public}lf",
+    MMI_HILOGI("Cross screen location, xPercent:%{public}lf, yPercent:%{public}lf",
         xPercent, yPercent);
     auto displayGroupInfo = WinMgr->GetDisplayGroupInfo();
     if (currentDisplayId_ == -1) {

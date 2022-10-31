@@ -149,6 +149,69 @@ public:
         AXIS_TYPE_PINCH,
 
         /**
+         * 表示x轴，当你操作手柄上的操纵杆或摇杆上的操纵杆时，x轴状态改变。
+         *
+         * @since 9
+         */
+        AXIS_TYPE_ABS_X,
+
+        /**
+         * 表示y轴，当你操作手柄上的操纵杆或摇杆上的操纵杆时，y轴状态改变。
+         *
+         * @since 9
+         */
+        AXIS_TYPE_ABS_Y,
+
+        /**
+         * 表示z轴，当你操作手柄上的操纵杆或摇杆上的操纵杆时，z轴状态改变。
+         *
+         * @since 9
+         */
+        AXIS_TYPE_ABS_Z,
+
+        /**
+         * 表示rz轴，当你操作手柄上的操纵杆或摇杆上的操纵杆时，rz轴状态改变。
+         *
+         * @since 9
+         */
+        AXIS_TYPE_ABS_RZ,
+
+        /**
+         * 表示gas轴，当你操作手柄上的操纵杆或摇杆上的操纵杆时，gas轴状态改变。
+         *
+         * @since 9
+         */
+        AXIS_TYPE_ABS_GAS,
+
+        /**
+         * 表示brake轴，当你操作手柄上的操纵杆或摇杆上的操纵杆时，brake轴状态改变。
+         *
+         * @since 9
+         */
+        AXIS_TYPE_ABS_BRAKE,
+
+        /**
+         * 表示hat0x轴，当你操作手柄上的操纵杆或摇杆上的操纵杆时，hat0x轴状态改变。
+         *
+         * @since 9
+         */
+        AXIS_TYPE_ABS_HAT0X,
+
+        /**
+         * 表示hat0y轴，当你操作手柄上的操纵杆或摇杆上的操纵杆时，hat0y轴状态改变。
+         *
+         * @since 9
+         */
+        AXIS_TYPE_ABS_HAT0Y,
+
+        /**
+         * 表示throttle轴，当你操作手柄上的操纵杆或摇杆上的操纵杆时，throttle轴状态改变。
+         *
+         * @since 9
+         */
+        AXIS_TYPE_ABS_THROTTLE,
+
+        /**
          * Indicates the maximum number of defined axis types.
          *
          * @since 9
@@ -310,6 +373,188 @@ public:
      * @since 9
      */
     static constexpr int32_t TOOL_TYPE_LENS = 7;
+
+    /**
+     * 表示手柄的TL2按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_TL2 = 0;
+
+    /**
+     * 表示手柄的TR2按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_TR2 = 1;
+
+    /**
+     * 表示手柄的TL按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_TL = 2;
+
+    /**
+     * 表示手柄的TR按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_TR = 3;
+
+    /**
+     * 表示手柄的WEST按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_WEST = 4;
+
+    /**
+     * 表示手柄的SOUTH按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_SOUTH = 5;
+
+    /**
+     * 表示手柄的NORTH按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_NORTH = 6;
+
+    /**
+     * 表示手柄的EAST按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_EAST = 7;
+
+    /**
+     * 表示手柄的START按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_START = 8;
+
+    /**
+     * 表示手柄的SELECT按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_SELECT = 9;
+
+    /**
+     * 表示手柄的HOMEPAGE按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_HOMEPAGE = 10;
+
+    /**
+     * 表示手柄的THUMBL按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_THUMBL = 11;
+
+    /**
+     * 表示手柄的THUMBR按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_THUMBR = 12;
+
+    /**
+     * 表示操纵杆的TRIGGER按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_TRIGGER = 13;
+
+    /**
+     * 表示操纵杆的THUMB按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_THUMB = 14;
+
+    /**
+     * 表示操纵杆的THUMB2按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_THUMB2 = 15;
+
+    /**
+     * 表示操纵杆的TOP按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_TOP = 16;
+
+    /**
+     * 表示操纵杆的TOP2按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_TOP2 = 17;
+
+    /**
+     * 表示操纵杆的PINKIE按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_PINKIE = 18;
+
+    /**
+     * 表示操纵杆的BASE按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_BASE = 19;
+
+    /**
+     * 表示操纵杆的BASE2按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_BASE2 = 20;
+
+    /**
+     * 表示操纵杆的BASE3按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_BASE3 = 21;
+
+    /**
+     * 表示操纵杆的BASE4按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_BASE4 = 22;
+
+    /**
+     * 表示操纵杆的BASE5按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_BASE5 = 23;
+
+    /**
+     * 表示操纵杆的BASE6按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_BASE6 = 24;
+
+    /**
+     * 表示操纵杆的DEAD按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_DEAD = 25;
 
 public:
     static std::shared_ptr<PointerEvent> from(std::shared_ptr<InputEvent> inputEvent);

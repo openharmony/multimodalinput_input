@@ -76,21 +76,21 @@ bool SimulateInputEventFuzzTest(const uint8_t* data, size_t size)
     auto pointerDownEvent = PointerEvent::Create();
     CHKPF(pointerDownEvent);
     PointerEvent::PointerItem downitem;
-    downitem.SetPointerId(0);   // test code，set the PointerId = 0
+    downitem.SetPointerId(0);
     int32_t physicalX;
     startPos += GetObject<int32_t>(physicalX, data + startPos, size - startPos);
-    downitem.SetDisplayX(physicalX);   // test code，set the DisplayX = 823
+    downitem.SetDisplayX(physicalX);
     int32_t physicalY;
     startPos += GetObject<int32_t>(physicalY, data + startPos, size - startPos);
-    downitem.SetDisplayY(physicalY);   // test code，set the DisplayY = 723
+    downitem.SetDisplayY(physicalY);
     int32_t pressure;
     startPos += GetObject<int32_t>(pressure, data + startPos, size - startPos);
-    downitem.SetPressure(pressure);    // test code，set the Pressure = 5
-    downitem.SetDeviceId(1);    // test code，set the DeviceId = 1
+    downitem.SetPressure(pressure);
+    downitem.SetDeviceId(1);
     pointerDownEvent->AddPointerItem(downitem);
     pointerDownEvent->SetId(std::numeric_limits<int32_t>::max());
     pointerDownEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerDownEvent->SetPointerId(0);  // test code，set the PointerId = 1
+    pointerDownEvent->SetPointerId(0);
     pointerDownEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     MMI_HILOGD("Call InputManager::SimulatePointerEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerDownEvent);
@@ -98,15 +98,15 @@ bool SimulateInputEventFuzzTest(const uint8_t* data, size_t size)
     auto pointerUpEvent = PointerEvent::Create();
     CHKPF(pointerUpEvent);
     PointerEvent::PointerItem upitem;
-    upitem.SetPointerId(0);   // test code，set the PointerId = 0
-    upitem.SetDisplayX(physicalX);   // test code，set the DisplayX = 823
-    upitem.SetDisplayY(physicalY);   // test code，set the DisplayY = 723
-    upitem.SetPressure(pressure);    // test code，set the Pressure = 5
-    upitem.SetDeviceId(1);    // test code，set the DeviceId = 1
+    upitem.SetPointerId(0);
+    upitem.SetDisplayX(physicalX);
+    upitem.SetDisplayY(physicalY);
+    upitem.SetPressure(pressure);
+    upitem.SetDeviceId(1);
     pointerUpEvent->AddPointerItem(upitem);
     pointerUpEvent->SetId(std::numeric_limits<int32_t>::max());
     pointerUpEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    pointerUpEvent->SetPointerId(0);  // test code，set the PointerId = 1
+    pointerUpEvent->SetPointerId(0);
     pointerUpEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     MMI_HILOGD("Call InputManager::SimulatePointerEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerUpEvent);

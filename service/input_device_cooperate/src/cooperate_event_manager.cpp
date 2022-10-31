@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "CooperateEventManager"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "CooperateEventManager" };
 } // namespace
 
 CooperateEventManager::CooperateEventManager() {}
@@ -29,10 +29,10 @@ CooperateEventManager::~CooperateEventManager() {}
 void CooperateEventManager::AddCooperationEvent(sptr<EventInfo> event)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(lock_);
     if (event->type == EventType::LISTENER) {
         remoteCooperateCallbacks_.emplace_back(event);
     } else {
-        std::lock_guard<std::mutex> guard(lock_);
         cooperateCallbacks_[event->type] = event;
     }
 }
@@ -52,18 +52,20 @@ void CooperateEventManager::RemoveCooperationEvent(sptr<EventInfo> event)
     }
 }
 
-void CooperateEventManager::OnCooperateMessage(CooperationMessage msg, const std::string &deviceId)
+int32_t CooperateEventManager::OnCooperateMessage(CooperationMessage msg, const std::string &deviceId)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(lock_);
     if (remoteCooperateCallbacks_.empty()) {
         MMI_HILOGE("No listener, send cooperate message failed");
-        return;
+        return RET_ERR;
     }
     for (auto it = remoteCooperateCallbacks_.begin(); it != remoteCooperateCallbacks_.end(); ++it) {
         sptr<EventInfo> info = *it;
         CHKPC(info);
         NotifyCooperateMessage(info->sess, info->msgId, info->userData, deviceId, msg);
     }
+    return RET_OK;
 }
 
 void CooperateEventManager::OnEnable(CooperationMessage msg, const std::string &deviceId)

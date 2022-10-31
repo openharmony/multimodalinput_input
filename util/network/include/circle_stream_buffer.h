@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace MMI {
 class CircleStreamBuffer : public StreamBuffer {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "CircleStreamBuffer"};
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "CircleStreamBuffer" };
 public:
     CircleStreamBuffer() = default;
     virtual ~CircleStreamBuffer() = default;

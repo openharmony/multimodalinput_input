@@ -52,8 +52,8 @@ void ANRManager::MarkProcessed(int32_t eventType, int32_t eventId, SessionPtr se
         if (item != -1) {
             TimerMgr->RemoveTimer(item);
             anrTimerCount_--;
-            MMI_HILOGD("Remove anr timer, anr type:%{public}d, eventId:%{public}d, timer id:%{public}d, count:%{public}d",
-                eventType, eventId, item, anrTimerCount_);
+            MMI_HILOGD("Remove anr timer, anr type:%{public}d, eventId:%{public}d, timer id:%{public}d,"
+                "count:%{public}d", eventType, eventId, item, anrTimerCount_);
         }
     }
 }

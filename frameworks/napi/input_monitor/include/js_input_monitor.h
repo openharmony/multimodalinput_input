@@ -34,21 +34,21 @@ namespace MMI {
 using MapFun = std::map<std::string, std::function<int64_t()>>;
 
 
-class InputMonitor : public IInputEventConsumer,
-                     public std::enable_shared_from_this<InputMonitor> {
+class InputMonitor final : public IInputEventConsumer,
+                           public std::enable_shared_from_this<InputMonitor> {
 public:
     InputMonitor() = default;
     DISALLOW_COPY_AND_MOVE(InputMonitor);
-    virtual ~InputMonitor() = default;
+    ~InputMonitor() override = default;
 
-    bool Start();
+    int32_t Start();
     void Stop();
     void MarkConsumed(int32_t eventId);
     void SetCallback(std::function<void(std::shared_ptr<PointerEvent>)> callback);
     void SetId(int32_t id);
-    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override;
-    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override;
-    virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override;
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override;
+    void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override;
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override;
 
 private:
     std::function<void(std::shared_ptr<PointerEvent>)> callback_;
@@ -58,14 +58,13 @@ private:
     mutable std::mutex mutex_;
 };
 
-
-class JsInputMonitor {
+class JsInputMonitor final {
 public:
     static void JsCallback(uv_work_t *work, int32_t status);
     JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, int32_t id);
     ~JsInputMonitor();
 
-    bool Start();
+    int32_t Start();
     void Stop();
     void MarkConsumed(const int32_t eventId);
     int32_t IsMatch(const napi_env jsEnv, napi_value callback);

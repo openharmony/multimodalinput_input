@@ -23,14 +23,6 @@ config("inputmonitor_config") {
   ]
 
   defines = []
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
-
   if (input_feature_input_cooperation) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
@@ -49,6 +41,7 @@ ohos_shared_library("inputmonitor") {
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
+    "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 
   external_deps = [

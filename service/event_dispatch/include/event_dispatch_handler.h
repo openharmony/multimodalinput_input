@@ -27,8 +27,8 @@
 
 namespace OHOS {
 namespace MMI {
-class EventDispatchHandler : public IInputEventHandler {
-    struct MouseState {
+class EventDispatchHandler final : public IInputEventHandler {
+    struct DinputSimulateEvent {
         uint32_t type { PointerEvent::SOURCE_TYPE_UNKNOWN };
         uint32_t code { PointerEvent::BUTTON_NONE };
         int32_t value { PointerEvent::POINTER_ACTION_UNKNOWN };
@@ -36,7 +36,7 @@ class EventDispatchHandler : public IInputEventHandler {
 public:
     EventDispatchHandler();
     DISALLOW_COPY_AND_MOVE(EventDispatchHandler);
-    virtual ~EventDispatchHandler();
+    ~EventDispatchHandler() override = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -53,14 +53,14 @@ public:
     void HandlePointerEventInner(const std::shared_ptr<PointerEvent> point);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    void OnMouseStateChange(uint32_t type, uint32_t code, int32_t value);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
+    void OnDinputSimulateEvent(uint32_t type, uint32_t code, int32_t value);
     bool CheckPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     std::mutex lock_;
-    std::vector<MouseState> mouseState_;
+    std::vector<DinputSimulateEvent> dinputSimulateEvent_;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 };
 } // namespace MMI

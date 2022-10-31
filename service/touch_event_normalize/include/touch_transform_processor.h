@@ -20,11 +20,11 @@
 
 namespace OHOS {
 namespace MMI {
-class TouchTransformProcessor : public TransformProcessor {
+class TouchTransformProcessor final : public TransformProcessor {
 public:
     explicit TouchTransformProcessor(int32_t deviceId);
     DISALLOW_COPY_AND_MOVE(TouchTransformProcessor);
-    virtual ~TouchTransformProcessor() = default;
+    ~TouchTransformProcessor() = default;
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
 
 private:

@@ -26,34 +26,28 @@ namespace OHOS {
 namespace MMI {
 using namespace DistributedHardware::DistributedInput;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "DistributedInputAdapter"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DistributedInputAdapter" };
 constexpr int32_t DEFAULT_DELAY_TIME = 4000;
 constexpr int32_t RETRY_TIME = 2;
 } // namespace
 DistributedInputAdapter::DistributedInputAdapter()
 {
-    mouseListener_ = new (std::nothrow) MouseStateChangeCallbackImpl();
-    CHKPL(mouseListener_);
-    DistributedInputKit::RegisterSimulationEventListener(mouseListener_);
+    simulationEventListener_ = new (std::nothrow) SimulateEventCallbackImpl();
+    CHKPL(simulationEventListener_);
+    DistributedInputKit::RegisterSimulationEventListener(simulationEventListener_);
 }
 
 DistributedInputAdapter::~DistributedInputAdapter()
 {
     std::lock_guard<std::mutex> guard(adapterLock_);
-    DistributedInputKit::UnregisterSimulationEventListener(mouseListener_);
-    mouseListener_ = nullptr;
+    DistributedInputKit::UnregisterSimulationEventListener(simulationEventListener_);
+    simulationEventListener_ = nullptr;
     callbackMap_.clear();
 }
 
 bool DistributedInputAdapter::IsNeedFilterOut(const std::string &deviceId, const BusinessEvent &event)
 {
     return DistributedInputKit::IsNeedFilterOut(deviceId, event);
-}
-
-bool DistributedInputAdapter::IsTouchEventNeedFilterOut(uint32_t absX, uint32_t absY)
-{
-    TouchScreenEvent touchScreenEvent{ absX, absY };
-    return DistributedInputKit::IsTouchEventNeedFilterOut(touchScreenEvent);
 }
 
 int32_t DistributedInputAdapter::StartRemoteInput(const std::string &deviceId, const std::vector<std::string> &dhIds,
@@ -77,9 +71,9 @@ int32_t DistributedInputAdapter::StartRemoteInput(const std::string &srcId, cons
 int32_t DistributedInputAdapter::StartRemoteInput(const std::string &srcId, const std::string &sinkId,
                                                   const std::vector<std::string> &dhIds, DInputCallback callback)
 {
-    sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StartDInputCallbackFds();
+    sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StartDInputCallbackSink();
     CHKPR(cb, ERROR_NULL_POINTER);
-    SaveCallback(CallbackType::StartDInputCallbackFds, callback);
+    SaveCallback(CallbackType::StartDInputCallbackSink, callback);
     return DistributedInputKit::StartRemoteInput(srcId, sinkId, dhIds, cb);
 }
 
@@ -104,9 +98,9 @@ int32_t DistributedInputAdapter::StopRemoteInput(const std::string &srcId, const
 int32_t DistributedInputAdapter::StopRemoteInput(const std::string &srcId, const std::string &sinkId,
                                                  const std::vector<std::string> &dhIds, DInputCallback callback)
 {
-    sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StopDInputCallbackFds();
+    sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StopDInputCallbackSink();
     CHKPR(cb, ERROR_NULL_POINTER);
-    SaveCallback(CallbackType::StopDInputCallbackFds, callback);
+    SaveCallback(CallbackType::StopDInputCallbackSink, callback);
     return DistributedInputKit::StopRemoteInput(srcId, sinkId, dhIds, cb);
 }
 
@@ -144,18 +138,18 @@ int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &deviceI
     return DistributedInputKit::UnprepareRemoteInput(deviceId, cb);
 }
 
-int32_t DistributedInputAdapter::RegisterEventCallback(MouseStateChangeCallback callback)
+int32_t DistributedInputAdapter::RegisterEventCallback(SimulateEventCallback callback)
 {
     std::lock_guard<std::mutex> guard(adapterLock_);
     CHKPR(callback, RET_ERR);
-    mouseStateChangeCallback_ = callback;
+    SimulateEventCallback_ = callback;
     return RET_OK;
 }
-int32_t DistributedInputAdapter::UnregisterEventCallback(MouseStateChangeCallback callback)
+int32_t DistributedInputAdapter::UnregisterEventCallback(SimulateEventCallback callback)
 {
     std::lock_guard<std::mutex> guard(adapterLock_);
     CHKPR(callback, RET_ERR);
-    mouseStateChangeCallback_ = nullptr;
+    SimulateEventCallback_ = nullptr;
     return RET_OK;
 }
 
@@ -217,8 +211,8 @@ void DistributedInputAdapter::ProcessDInputCallback(CallbackType type, int32_t s
 void DistributedInputAdapter::OnSimulationEvent(uint32_t type, uint32_t code, int32_t value)
 {
     std::lock_guard<std::mutex> guard(adapterLock_);
-    CHKPV(mouseStateChangeCallback_);
-    mouseStateChangeCallback_(type, code, value);
+    CHKPV(SimulateEventCallback_);
+    SimulateEventCallback_(type, code, value);
 }
 
 void DistributedInputAdapter::StartDInputCallback::OnResult(const std::string &devId, const uint32_t &inputTypes,
@@ -243,14 +237,14 @@ void DistributedInputAdapter::StopDInputCallbackDHIds::OnResultDhids(const std::
     DistributedAdapter->ProcessDInputCallback(CallbackType::StopDInputCallbackDHIds, status);
 }
 
-void DistributedInputAdapter::StartDInputCallbackFds::OnResultDhids(const std::string &devId, const int32_t &status)
+void DistributedInputAdapter::StartDInputCallbackSink::OnResultDhids(const std::string &devId, const int32_t &status)
 {
-    DistributedAdapter->ProcessDInputCallback(CallbackType::StartDInputCallbackFds, status);
+    DistributedAdapter->ProcessDInputCallback(CallbackType::StartDInputCallbackSink, status);
 }
 
-void DistributedInputAdapter::StopDInputCallbackFds::OnResultDhids(const std::string &devId, const int32_t &status)
+void DistributedInputAdapter::StopDInputCallbackSink::OnResultDhids(const std::string &devId, const int32_t &status)
 {
-    DistributedAdapter->ProcessDInputCallback(CallbackType::StopDInputCallbackFds, status);
+    DistributedAdapter->ProcessDInputCallback(CallbackType::StopDInputCallbackSink, status);
 }
 
 void DistributedInputAdapter::PrepareStartDInputCallback::OnResult(const std::string &devId, const int32_t &status)
@@ -273,7 +267,7 @@ void DistributedInputAdapter::UnPrepareStopDInputCallbackSink::OnResult(const st
     DistributedAdapter->ProcessDInputCallback(CallbackType::UnPrepareStopDInputCallbackSink, status);
 }
 
-int32_t DistributedInputAdapter::MouseStateChangeCallbackImpl::OnSimulationEvent(uint32_t type, uint32_t code,
+int32_t DistributedInputAdapter::SimulateEventCallbackImpl::OnSimulationEvent(uint32_t type, uint32_t code,
     int32_t value)
 {
     DistributedAdapter->OnSimulationEvent(type, code, value);

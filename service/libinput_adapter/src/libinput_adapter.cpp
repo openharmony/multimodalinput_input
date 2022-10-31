@@ -101,10 +101,6 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
     },
 };
 
-LibinputAdapter::LibinputAdapter() {}
-
-LibinputAdapter::~LibinputAdapter() {}
-
 bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_id)
 {
     CALL_DEBUG_ENTER;

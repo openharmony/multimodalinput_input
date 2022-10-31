@@ -20,46 +20,52 @@
 
 #include "circle_stream_buffer.h"
 #include "client_msg_handler.h"
-#include "mmi_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
-class MMIClient : public UDSClient, public IfMMIClient, public std::enable_shared_from_this<IfMMIClient> {
+class MMIClient final : public UDSClient, public IfMMIClient, public std::enable_shared_from_this<IfMMIClient> {
 public:
-    MMIClient();
+    MMIClient() = default;
     DISALLOW_COPY_AND_MOVE(MMIClient);
-    virtual ~MMIClient() override;
+    ~MMIClient() override;
 
     int32_t Socket() override;
+    void SetEventHandler(EventHandlerPtr eventHandler) override;
+    void MarkIsEventHandlerChanged(EventHandlerPtr eventHandler) override;
     bool Start() override;
     void RegisterConnectedFunction(ConnectCallback fun) override;
     void RegisterDisconnectedFunction(ConnectCallback fun) override;
-    virtual void Stop() override;
-    virtual bool SendMessage(const NetPacket& pkt) const override;
-    virtual bool GetCurrentConnectedStatus() const override;
-    virtual void OnRecvMsg(const char *buf, size_t size) override;
-    virtual int32_t Reconnect() override;
-    virtual void OnDisconnect() override;
-    virtual MMIClientPtr GetSharedPtr() override;
+    void Stop() override;
+    bool SendMessage(const NetPacket& pkt) const override;
+    bool GetCurrentConnectedStatus() const override;
+    void OnRecvMsg(const char *buf, size_t size) override;
+    int32_t Reconnect() override;
+    void OnDisconnect() override;
+    MMIClientPtr GetSharedPtr() override;
+    bool IsEventHandlerChanged() override
+    {
+        return isEventHandlerChanged_;
+    }
 
-protected:
+private:
     bool StartEventRunner();
-    void OnRecvThread();
+    void OnReconnect();
     bool AddFdListener(int32_t fd);
     bool DelFdListener(int32_t fd);
     void OnPacket(NetPacket& pkt);
-    virtual void OnConnected() override;
-    virtual void OnDisconnected() override;
+    const std::string& GetErrorStr(ErrCode code) const;
+    void OnConnected() override;
+    void OnDisconnected() override;
 
-protected:
+private:
     ClientMsgHandler msgHandler_;
     ConnectCallback funConnected_;
     ConnectCallback funDisconnected_;
     CircleStreamBuffer circBuf_;
     std::mutex mtx_;
-    std::condition_variable cv_;
-    std::thread recvThread_;
-    std::shared_ptr<MMIEventHandler> recvEventHandler_ { nullptr };
+    EventHandlerPtr eventHandler_ { nullptr };
+    bool isEventHandlerChanged_ { false };
+    bool isListening_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

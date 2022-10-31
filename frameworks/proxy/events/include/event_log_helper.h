@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace MMI {
-class EventLogHelper {
+class EventLogHelper final {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventLogHelper" };
 
 public:
@@ -69,14 +69,26 @@ private:
         MMI_HILOGD("EventType:%{public}s,ActionTime:%{public}" PRId64 ",Action:%{public}d,"
             "ActionStartTime:%{public}" PRId64 ",Flag:%{public}d,PointerAction:%{public}s,"
             "SourceType:%{public}s,ButtonId:%{public}d,VerticalAxisValue:%{public}.2f,"
-            "HorizontalAxisValue:%{public}.2f,PinchAxisValue:%{public}.2f,PointerId:%{public}d,"
-            "PointerCount:%{public}zu,EventNumber:%{public}d",
+            "HorizontalAxisValue:%{public}.2f,PinchAxisValue:%{public}.2f,"
+            "XAbsValue:%{public}.2f,YAbsValue:%{public}.2f,ZAbsValue:%{public}.2f,"
+            "RzAbsValue:%{public}.2f,GasAbsValue:%{public}.2f,BrakeAbsValue:%{public}.2f,"
+            "Hat0xAbsValue:%{public}.2f,Hat0yAbsValue:%{public}.2f,ThrottleAbsValue:%{public}.2f,"
+            "PointerId:%{public}d,PointerCount:%{public}zu,EventNumber:%{public}d",
             InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
             event->GetAction(), event->GetActionStartTime(), event->GetFlag(),
             event->DumpPointerAction(), event->DumpSourceType(), event->GetButtonId(),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_X),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Y),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Z),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_RZ),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_GAS),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_BRAKE),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0X),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0Y),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_THROTTLE),
             event->GetPointerId(), pointerIds.size(), event->GetId());
 
         for (const auto& pointerId : pointerIds) {
@@ -92,9 +104,9 @@ private:
                 "Pressure:%{public}.2f,ToolType:%{public}d,LongAxis:%{public}d,ShortAxis:%{public}d",
                 pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(),
                 item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(),
-                item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(), item.GetToolWindowX(),
-                item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(), item.GetPressure(), item.GetToolType(),
-                item.GetLongAxis(), item.GetShortAxis());
+                item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(),
+                item.GetToolWindowX(), item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(),
+                item.GetPressure(), item.GetToolType(), item.GetLongAxis(), item.GetShortAxis());
         }
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
         std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
