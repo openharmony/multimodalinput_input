@@ -214,15 +214,7 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
     event->SetSourceType(tField);
     pkt >> tField;
     event->SetButtonId(tField);
-    uint32_t tAxes;
-    pkt >> tAxes;
-    double axisValue;
-    for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
-        if (PointerEvent::HasAxis(tAxes, static_cast<PointerEvent::AxisType>(i))) {
-            pkt >> axisValue;
-            event->SetAxisValue(static_cast<PointerEvent::AxisType>(i), axisValue);
-        }
-    }
+    SetAxisInfo(pkt, event);
 
     std::set<int32_t>::size_type nPressed;
     pkt >> nPressed;
@@ -255,6 +247,19 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
     }
     event->SetPressedKeys(pressedKeys);
     return RET_OK;
+}
+
+void InputEventDataTransformation::SetAxisInfo(NetPacket &pkt, std::shared_ptr<PointerEvent> event)
+{
+    uint32_t tAxes;
+    pkt >> tAxes;
+    double axisValue;
+    for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
+        if (PointerEvent::HasAxis(tAxes, static_cast<PointerEvent::AxisType>(i))) {
+            pkt >> axisValue;
+            event->SetAxisValue(static_cast<PointerEvent::AxisType>(i), axisValue);
+        }
+    }
 }
 
 int32_t InputEventDataTransformation::SerializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item)
