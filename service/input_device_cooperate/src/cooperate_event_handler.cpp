@@ -22,7 +22,6 @@ CooperateEventHandler::CooperateEventHandler(
     : AppExecFwk::EventHandler(runner)
 {
 }
-CooperateEventHandler::~CooperateEventHandler() = default;
 
 bool CooperateEventHandler::ProxyPostTask(const Callback &callback, int64_t delayTime)
 {

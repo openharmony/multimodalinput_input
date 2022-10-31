@@ -30,7 +30,7 @@ namespace OHOS {
 namespace MMI {
 class DeviceProfileAdapter final {
     DECLARE_DELAYED_SINGLETON(DeviceProfileAdapter);
-    class ProfileEventCallbackImpl : public DeviceProfile::IProfileEventCallback {
+    class ProfileEventCallbackImpl final : public DeviceProfile::IProfileEventCallback {
     public:
         void OnSyncCompleted(const DeviceProfile::SyncResult &syncResults) override;
         void OnProfileChanged(const DeviceProfile::ProfileChangeNotification &changeNotification) override;

@@ -27,13 +27,13 @@
 namespace OHOS {
 namespace MMI {
 typedef std::function<void(void *event)> FunInputEvent;
-class LibinputAdapter {
+class LibinputAdapter final {
 public:
     static void LoginfoPackagingTool(struct libinput_event *event);
     static int32_t DeviceLedUpdate(struct libinput_device *device, int32_t funcKey, bool isEnable);
-    LibinputAdapter();
+    LibinputAdapter() = default;
     DISALLOW_COPY_AND_MOVE(LibinputAdapter);
-    virtual ~LibinputAdapter();
+    ~LibinputAdapter() = default;
     bool Init(FunInputEvent funInputEvent, const std::string& seat_id = "seat0");
     void EventDispatch(struct epoll_event& ev);
     void Stop();

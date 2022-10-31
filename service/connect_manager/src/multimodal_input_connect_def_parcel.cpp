@@ -25,10 +25,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Multi
 bool ConnectReqParcel::Marshalling(Parcel& out) const
 {
     WRITEINT32(out, data.moduleId);
-    if (!out.WriteString(data.clientName)) {
-        return false;
-    }
-    return true;
+    return out.WriteString(data.clientName);
 }
 
 ConnectReqParcel *ConnectReqParcel::Unmarshalling(Parcel& in)

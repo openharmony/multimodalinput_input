@@ -21,12 +21,12 @@
 
 namespace OHOS {
 namespace MMI {
-class MultimodalInputConnectDeathRecipient : public IRemoteObject::DeathRecipient {
+class MultimodalInputConnectDeathRecipient final : public IRemoteObject::DeathRecipient {
 public:
     explicit MultimodalInputConnectDeathRecipient(const std::function<void(const wptr<IRemoteObject> &object)>
                                                   &deathCallback);
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectDeathRecipient);
-    virtual ~MultimodalInputConnectDeathRecipient() = default;
+    ~MultimodalInputConnectDeathRecipient() override = default;
     void OnRemoteDied(const wptr<IRemoteObject> &object) override;
 
 private:

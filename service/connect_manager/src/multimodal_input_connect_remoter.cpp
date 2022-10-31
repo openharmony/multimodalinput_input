@@ -30,7 +30,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 std::shared_ptr<MultimodalInputConnectRemoter> g_instance = nullptr;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectRemoter"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectRemoter" };
 } // namespace
 
 std::shared_ptr<MultimodalInputConnectRemoter> MultimodalInputConnectRemoter::GetInstance()

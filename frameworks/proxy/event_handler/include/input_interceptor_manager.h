@@ -26,13 +26,13 @@
 
 namespace OHOS {
 namespace MMI {
-class InputInterceptorManager : public InputHandlerManager {
+class InputInterceptorManager final : public InputHandlerManager {
     DECLARE_DELAYED_SINGLETON(InputInterceptorManager);
 public:
     DISALLOW_COPY_AND_MOVE(InputInterceptorManager);
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor, HandleEventType eventType);
     void RemoveInterceptor(int32_t interceptorId);
-    virtual InputHandlerType GetHandlerType() const override;
+    InputHandlerType GetHandlerType() const override;
 };
 
 inline InputHandlerType InputInterceptorManager::GetHandlerType() const

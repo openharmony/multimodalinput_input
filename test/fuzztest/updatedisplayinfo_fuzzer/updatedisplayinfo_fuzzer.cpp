@@ -54,6 +54,29 @@ size_t GetString(size_t objectSize, const uint8_t *data, size_t size, std::strin
     return objectSize;
 }
 
+void UpdateHotAreas(const uint8_t* data, size_t size, WindowInfo &windowInfo)
+{
+    size_t startPos = 0;
+    std::vector<Rect> defaultHotAreasInfo;
+    std::vector<Rect> pointerHotAreasInfo;
+    for (size_t j = 0; j < WindowInfo::MAX_HOTAREA_COUNT; ++j) {
+        Rect defaultRect;
+        startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.height);
+        startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.width);
+        startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.x);
+        startPos += GetObject<int32_t>(data + startPos, size - startPos, defaultRect.y);
+        defaultHotAreasInfo.push_back(defaultRect);
+        Rect pointerRect;
+        startPos += GetObject<int32_t>(data + startPos, size - startPos, pointerRect.height);
+        startPos += GetObject<int32_t>(data + startPos, size - startPos, pointerRect.width);
+        startPos += GetObject<int32_t>(data + startPos, size - startPos, pointerRect.x);
+        startPos += GetObject<int32_t>(data + startPos, size - startPos, pointerRect.y);
+        pointerHotAreasInfo.push_back(pointerRect);
+    }
+    windowInfo.defaultHotAreas = defaultHotAreasInfo;
+    windowInfo.pointerHotAreas = pointerHotAreasInfo;
+}
+
 void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
 {
     DisplayGroupInfo displayGroupInfo;
@@ -61,8 +84,8 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.width);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.height);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.focusWindowId);
-    std::vector<WindowInfo> windowsInfos;
-    std::vector<DisplayInfo> displaysInfos;
+    std::vector<WindowInfo> windowsInfo;
+    std::vector<DisplayInfo> displaysInfo;
     for (size_t i = 0; i < WindowInfo::MAX_HOTAREA_COUNT + 1; ++i) {
         WindowInfo windowInfo;
         startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.id);
@@ -72,7 +95,8 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
         startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.y);
         startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.width);
         startPos += GetObject<int32_t>(data + startPos, size - startPos, windowInfo.area.height);
-        windowsInfos.push_back(windowInfo);
+        UpdateHotAreas(data, size, windowInfo);
+        windowsInfo.push_back(windowInfo);
 
         DisplayInfo displayInfo;
         startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.id);
@@ -83,8 +107,7 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
 
         size_t objectSize = 0;
         std::string name = "";
-        size_t ret = 0;
-        ret = GetString(objectSize, data, size, name);
+        size_t ret = GetString(objectSize, data, size, name);
         if (ret == 0) {
             MMI_HILOGD("%{public}s:%{public}d The return value is 0", __func__, __LINE__);
             return;
@@ -97,10 +120,10 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
             return;
         }
         displayInfo.uniq = uniq;
-        displaysInfos.push_back(displayInfo);
+        displaysInfo.push_back(displayInfo);
     }
-    displayGroupInfo.windowsInfo = windowsInfos;
-    displayGroupInfo.displaysInfo = displaysInfos;
+    displayGroupInfo.windowsInfo = windowsInfo;
+    displayGroupInfo.displaysInfo = displaysInfo;
     InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
     MMI_HILOGD("Update display info success");
 }

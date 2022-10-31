@@ -26,29 +26,29 @@
 #include "dfx_hisysevent.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
+#include "input_device_cooperate_util.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_windows_manager.h"
 #include "key_event_value_transformation.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-#include "softbus_bus_center.h"
 #include "util.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "util_ex.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceManager"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceManager" };
 constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t SUPPORT_KEY = 1;
 
 const std::string UNKNOWN_SCREEN_ID = "";
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 const char *SPLIT_SYMBOL = "|";
-const std::string BUNDLE_NAME = "DBinderBus_" + std::to_string(getpid());
 const std::string DH_ID_PREFIX = "Input_";
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-
+const std::string INPUT_VIRTUAL_DEVICE_NAME = "Hos Distributed Virtual Device ";
 std::unordered_map<int32_t, std::string> axisType = {
     {ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR"},
     {ABS_MT_TOUCH_MINOR, "TOUCH_MINOR"},
@@ -122,23 +122,21 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
     return ids;
 }
 
-std::vector<bool> InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes)
+int32_t InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes, std::vector<bool> &keystroke)
 {
     CALL_DEBUG_ENTER;
-    std::vector<bool> keystrokeAbility;
     auto iter = inputDevice_.find(deviceId);
     if (iter == inputDevice_.end()) {
-        keystrokeAbility.insert(keystrokeAbility.end(), keyCodes.size(), false);
-        return keystrokeAbility;
+        return COMMON_PARAMETER_ERROR;
     }
     for (const auto &item : keyCodes) {
         bool ret = false;
         for (const auto &it : KeyMapMgr->InputTransferKeyValue(deviceId, item)) {
             ret |= libinput_device_has_key(iter->second.inputDeviceOrigin_, it) == SUPPORT_KEY;
         }
-        keystrokeAbility.push_back(ret);
+        keystroke.push_back(ret);
     }
-    return keystrokeAbility;
+    return RET_OK;
 }
 
 bool InputDeviceManager::IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const
@@ -179,7 +177,7 @@ int32_t InputDeviceManager::GetKeyboardBusMode(int32_t deviceId)
     return dev->GetBus();
 }
 
-int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId)
+int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId, int32_t &keyboardType)
 {
     CALL_DEBUG_ENTER;
     std::vector <int32_t> keyCodes;
@@ -189,12 +187,16 @@ int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId)
     keyCodes.push_back(KeyEvent::KEYCODE_CTRL_LEFT);
     keyCodes.push_back(KeyEvent::KEYCODE_SHIFT_RIGHT);
     keyCodes.push_back(KeyEvent::KEYCODE_F20);
-    std::vector<bool> supportKey = SupportKeys(deviceId, keyCodes);
+    std::vector<bool> supportKey;
+    int32_t ret = SupportKeys(deviceId, keyCodes, supportKey);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SupportKey call failed");
+        return ret;
+    }
     std::map<int32_t, bool> determineKbType;
     for (size_t i = 0; i < keyCodes.size(); i++) {
         determineKbType[keyCodes[i]] = supportKey[i];
     }
-    int32_t keyboardType = 0;
     if (determineKbType[KeyEvent::KEYCODE_HOME] && GetKeyboardBusMode(deviceId) == BUS_BLUETOOTH) {
         keyboardType = KEYBOARD_TYPE_REMOTECONTROL;
         MMI_HILOGD("The keyboard type is remote control:%{public}d", keyboardType);
@@ -213,22 +215,22 @@ int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId)
         MMI_HILOGW("Undefined keyboard type");
     }
     MMI_HILOGD("Get keyboard type results by supporting keys:%{public}d", keyboardType);
-    return keyboardType;
+    return RET_OK;
 }
 
-int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId)
+int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
     CALL_DEBUG_ENTER;
-    int32_t keyboardType = KEYBOARD_TYPE_NONE;
+    int32_t tempKeyboardType = KEYBOARD_TYPE_NONE;
     if (auto iter = inputDevice_.find(deviceId); iter == inputDevice_.end()) {
         MMI_HILOGE("Failed to search for the deviceID");
-        return keyboardType;
+        return COMMON_PARAMETER_ERROR;
     }
-    if (GetDeviceConfig(deviceId, keyboardType)) {
-        return keyboardType;
+    if (GetDeviceConfig(deviceId, tempKeyboardType)) {
+        keyboardType = tempKeyboardType;
+        return RET_OK;
     }
-    keyboardType = GetDeviceSupportKey(deviceId);
-    return keyboardType;
+    return GetDeviceSupportKey(deviceId, keyboardType);
 }
 
 void InputDeviceManager::AddDevListener(SessionPtr sess, std::function<void(int32_t, const std::string&)> callback)
@@ -316,8 +318,8 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info)
 {
     info.inputDeviceOrigin_ = inputDevice;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
     info.isRemote_ = IsRemote(inputDevice);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (info.isRemote_) {
         info.networkIdOrigin_ = MakeNetworkId(libinput_device_get_phys(inputDevice));
     }
@@ -498,6 +500,35 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
     }
 }
 
+bool InputDeviceManager::IsRemote(struct libinput_device *inputDevice) const
+{
+    CHKPF(inputDevice);
+    bool isRemote = false;
+    const char* name = libinput_device_get_name(inputDevice);
+    if (name == nullptr || name[0] == '\0') {
+        MMI_HILOGD("Device name is empty");
+        return false;
+    }
+    std::string strName = name;
+    std::string::size_type pos = strName.find(INPUT_VIRTUAL_DEVICE_NAME);
+    if (pos != std::string::npos) {
+        isRemote = true;
+    }
+    MMI_HILOGD("isRemote:%{public}s", isRemote ? "true" : "false");
+    return isRemote;
+}
+
+bool InputDeviceManager::IsRemote(int32_t id) const
+{
+    bool isRemote = false;
+    auto device = inputDevice_.find(id);
+    if (device != inputDevice_.end()) {
+        isRemote = device->second.isRemote_;
+    }
+    MMI_HILOGD("isRemote:%{public}s", isRemote ? "true" : "false");
+    return isRemote;
+}
+
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 std::vector<std::string> InputDeviceManager::GetCooperateDhids(int32_t deviceId)
 {
@@ -511,19 +542,23 @@ std::vector<std::string> InputDeviceManager::GetCooperateDhids(int32_t deviceId)
         MMI_HILOGI("Not pointer device");
         return dhids;
     }
-    dhids.emplace_back(iter->second.dhid_);
+    dhids.push_back(iter->second.dhid_);
     MMI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "pointer");
     auto pointerNetworkId = iter->second.networkIdOrigin_;
-    std::string localNetworkId;
-    GetLocalDeviceId(localNetworkId);
+    std::string localNetworkId = GetLocalDeviceId();
     pointerNetworkId = iter->second.isRemote_ ? iter->second.networkIdOrigin_ : localNetworkId;
     for (const auto &item : inputDevice_) {
         auto networkId = item.second.isRemote_ ? item.second.networkIdOrigin_ : localNetworkId;
         if (networkId != pointerNetworkId) {
             continue;
         }
-        if (IsKeyboardDevice(item.second.inputDeviceOrigin_)) {
-            dhids.emplace_back(item.second.dhid_);
+        int32_t keyboardType = KEYBOARD_TYPE_NONE;
+        if (GetDeviceSupportKey(item.first, keyboardType) != RET_OK) {
+            MMI_HILOGI("Get device support key failed");
+            return dhids;
+        }
+        if (keyboardType == KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
+            dhids.push_back(item.second.dhid_);
             MMI_HILOGI("unq: %{public}s, type:%{public}s", dhids.back().c_str(), "supportkey");
         }
     }
@@ -532,14 +567,14 @@ std::vector<std::string> InputDeviceManager::GetCooperateDhids(int32_t deviceId)
 
 std::vector<std::string> InputDeviceManager::GetCooperateDhids(const std::string &dhid)
 {
-    int32_t pointerId = -1;
+    int32_t inputDeviceId = INVALID_DEVICE_ID;
     for (const auto &iter : inputDevice_) {
         if (iter.second.dhid_ == dhid) {
-            pointerId = iter.first;
+            inputDeviceId = iter.first;
             break;
         }
     }
-    return GetCooperateDhids(pointerId);
+    return GetCooperateDhids(inputDeviceId);
 }
 
 std::string InputDeviceManager::GetOriginNetworkId(int32_t id)
@@ -551,7 +586,7 @@ std::string InputDeviceManager::GetOriginNetworkId(int32_t id)
     }
     auto networkId = iter->second.networkIdOrigin_;
     if (networkId.empty()) {
-        GetLocalDeviceId(networkId);
+        networkId = GetLocalDeviceId();
     }
     return networkId;
 }
@@ -563,28 +598,12 @@ std::string InputDeviceManager::GetOriginNetworkId(const std::string &dhid)
     }
     std::string networkId;
     for (const auto &iter : inputDevice_) {
-        if (iter.second.dhid_ == dhid) {
+        if (iter.second.isRemote_ && iter.second.dhid_ == dhid) {
             networkId = iter.second.networkIdOrigin_;
-            if (networkId.empty()) {
-                GetLocalDeviceId(networkId);
-                break;
-            }
+            break;
         }
     }
     return networkId;
-}
-
-void InputDeviceManager::GetLocalDeviceId(std::string &local)
-{
-    local = "";
-    auto localNode = std::make_unique<NodeBasicInfo>();
-    CHKPV(localNode);
-    int32_t errCode = GetLocalNodeDeviceInfo(BUNDLE_NAME.c_str(), localNode.get());
-    if (errCode != RET_OK) {
-        MMI_HILOGE("GetLocalNodeDeviceInfo errCode: %{public}d", errCode);
-        return;
-    }
-    local = localNode->networkId;
 }
 
 std::string InputDeviceManager::GetDhid(int32_t deviceId) const
@@ -604,34 +623,6 @@ bool InputDeviceManager::HasLocalPointerDevice() const
         }
     }
     return false;
-}
-
-bool InputDeviceManager::IsRemote(struct libinput_device *inputDevice) const
-{
-    CHKPR(inputDevice, false);
-    bool isRemote = false;
-    const char* name = libinput_device_get_name(inputDevice);
-    if (name == nullptr || name[0] == '\0') {
-        return false;
-    }
-    std::string strName = name;
-    std::string::size_type pos = strName.find(VIRTUAL_DEVICE_NAME);
-    if (pos != std::string::npos) {
-        isRemote = true;
-    }
-    MMI_HILOGD("isRemote: %{public}s", isRemote == true ? "true" : "false");
-    return isRemote;
-}
-
-bool InputDeviceManager::IsRemote(int32_t id) const
-{
-    bool isRemote = false;
-    auto device = inputDevice_.find(id);
-    if (device != inputDevice_.end()) {
-        isRemote = device->second.isRemote_;
-    }
-    MMI_HILOGD("isRemote: %{public}s", isRemote == true ? "true" : "false");
-    return isRemote;
 }
 
 std::string InputDeviceManager::MakeNetworkId(const char *phys) const

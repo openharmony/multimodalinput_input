@@ -29,9 +29,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "UDSServer"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UDSServer" };
 } // namespace
-UDSServer::UDSServer() {}
 
 UDSServer::~UDSServer()
 {
@@ -114,8 +113,14 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     static constexpr size_t bufferSize = 32 * 1024;
     setsockopt(sockFds[0], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
     setsockopt(sockFds[0], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
-    setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
-    setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
+    if (tokenType == TokenType::TOKEN_NATIVE) {
+        static constexpr size_t nativeBufferSize = 64 * 1024;
+        setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &nativeBufferSize, sizeof(nativeBufferSize));
+        setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &nativeBufferSize, sizeof(nativeBufferSize));
+    } else {
+        setsockopt(sockFds[1], SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize));
+        setsockopt(sockFds[1], SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize));
+    }
     MMI_HILOGD("Alloc socketpair, serverFd:%{public}d,clientFd:%{public}d(%{public}d)",
                serverFd, toReturnClientFd, sockFds[1]);
     auto closeSocketFdWhenError = [&serverFd, &toReturnClientFd] {
@@ -150,9 +155,6 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
         return RET_ERR;
     }
     sess->SetTokenType(tokenType);
-#ifdef OHOS_BUILD_MMI_DEBUG
-    sess->SetClientFd(toReturnClientFd);
-#endif // OHOS__BUILD_MMI_DEBUG
 
     if (!AddSession(sess)) {
         cleanTaskWhenError();

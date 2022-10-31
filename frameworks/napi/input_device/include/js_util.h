@@ -46,6 +46,7 @@ public:
         int32_t errCode { -1 };
         CallbackData data;
         UserData uData;
+        bool isApi9 { false };
     };
     struct DeviceType {
         std::string sourceTypeName;
