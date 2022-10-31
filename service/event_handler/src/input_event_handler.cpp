@@ -104,10 +104,10 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
-    auto keyCommandHandler = std::make_shared<KeyCommandHandler>();
-    CHKPR(keyCommandHandler, ERROR_NULL_POINTER);
-    handler->SetNext(keyCommandHandler);
-    handler = keyCommandHandler;
+    eventKeyCommandHandler_ = std::make_shared<KeyCommandHandler>();
+    CHKPR(eventKeyCommandHandler_, ERROR_NULL_POINTER);
+    handler->SetNext(eventKeyCommandHandler_);
+    handler = eventKeyCommandHandler_;
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
     eventSubscriberHandler_ = std::make_shared<KeySubscriberHandler>();
     CHKPR(eventSubscriberHandler_, ERROR_NULL_POINTER);
@@ -144,6 +144,11 @@ std::shared_ptr<EventInterceptorHandler> InputEventHandler::GetInterceptorHandle
 std::shared_ptr<KeySubscriberHandler> InputEventHandler::GetSubscriberHandler() const
 {
     return eventSubscriberHandler_;
+}
+
+std::shared_ptr<KeyCommandHandler> InputEventHandler::GetKeyCommandHandler() const
+{
+    return eventKeyCommandHandler_;
 }
 
 std::shared_ptr<EventMonitorHandler> InputEventHandler::GetMonitorHandler() const
