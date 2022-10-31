@@ -34,6 +34,7 @@ public:
 private:
     static int32_t SerializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item);
     static int32_t DeserializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item);
+    static void SetAxisInfo(NetPacket &pkt, std::shared_ptr<PointerEvent> event);
 };
 } // namespace MMI
 } // namespace OHOS
