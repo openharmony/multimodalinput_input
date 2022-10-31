@@ -66,7 +66,8 @@ int32_t PointerSpeedCheck(int32_t speed)
     }
 }
 } // namespace
-MouseEventNormalize::MouseEventNormalize(){
+MouseEventNormalize::MouseEventNormalize()
+{
     pointerEvent_ = PointerEvent::Create();
     CHKPL(pointerEvent_);
 }
@@ -479,7 +480,8 @@ int32_t MouseEventNormalize::GetPointerSpeedByDeviceId(int32_t deviceId) const
     return pointerDeviceSpeeds.at(deviceId);
 }
 
-int32_t MouseEventNormalize::GetPointerSpeed() const{
+int32_t MouseEventNormalize::GetPointerSpeed() const
+{
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Get pointer speed:%{public}d", speed_);
     return speed_;
