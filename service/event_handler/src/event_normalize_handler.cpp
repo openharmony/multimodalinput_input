@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,7 @@
 #include "event_log_helper.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
+#include "input_device_cooperate_util.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_manager.h"
 #include "input_event_handler.h"
@@ -259,12 +260,8 @@ bool EventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> key
     CHKPF(keyEvent);
     InputHandler->SetJumpInterceptState(false);
     int32_t keyCode = keyEvent->GetKeyCode();
-    if(keyCode == KeyEvent::KEYCODE_BACK || keyCode == KeyEvent::KEYCODE_VOLUME_UP
+    if (keyCode == KeyEvent::KEYCODE_BACK || keyCode == KeyEvent::KEYCODE_VOLUME_UP
         || keyCode == KeyEvent::KEYCODE_VOLUME_DOWN || keyCode == KeyEvent::KEYCODE_POWER) {
-        int32_t deviceId = keyEvent->GetDeviceId();
-        if (InputDevMgr->IsRemote(deviceId)) {
-           return false; 
-        }
         return true;
     }
     CooperateState state = InputDevCooSM->GetCurrentCooperateState();
@@ -276,8 +273,7 @@ bool EventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> key
             return !IsNeedFilterOut(networkId, keyEvent);
         }
     } else if (state == CooperateState::STATE_OUT) {
-        std::string networkId;
-        InputDevMgr->GetLocalDeviceId(networkId);
+        std::string networkId = GetLocalDeviceId();
         if (!IsNeedFilterOut(networkId, keyEvent)) {
             if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
                 KeyRepeat->SelectAutoRepeat(keyEvent);
@@ -296,16 +292,15 @@ bool EventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> key
 bool EventNormalizeHandler::IsNeedFilterOut(const std::string& deviceId, const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
+    std::vector<OHOS::MMI::KeyEvent::KeyItem> KeyItems = keyEvent->GetKeyItems();
+    std::vector<int32_t> KeyItemsForDInput;
+    KeyItemsForDInput.reserve(KeyItems.size());
+    for (const auto& item : KeyItems) {
+        KeyItemsForDInput.push_back(item.GetKeyCode());
+    }
     OHOS::DistributedHardware::DistributedInput::BusinessEvent businessEvent;
     businessEvent.keyCode = keyEvent->GetKeyCode();
     businessEvent.keyAction = keyEvent->GetKeyAction();
-    std::vector<OHOS::MMI::KeyEvent::KeyItem> KeyItems = keyEvent->GetKeyItems();
-    std::vector<int32_t> KeyItemsForDInput;
-    for (const auto& item : KeyItems) {
-        if (item.GetKeyCode() != businessEvent.keyCode) {
-            KeyItemsForDInput.push_back(item.GetKeyCode());
-        }
-    }
     businessEvent.pressedKeys = KeyItemsForDInput;
     MMI_HILOGI("businessEvent.keyCode :%{public}d, keyAction :%{public}d",
         businessEvent.keyCode, businessEvent.keyAction);
@@ -353,7 +348,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH_PAD);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     nextHandler_->HandlePointerEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
@@ -379,7 +374,7 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_GESTURE);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::GESTURE);
     CHKPR(pointerEvent, GESTURE_EVENT_PKG_FAIL);
     MMI_HILOGD("GestureEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
                "action:%{public}d,actionStartTime:%{public}" PRId64 ","
@@ -414,15 +409,8 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    if (InputDevCooSM->CheckTouchEvent(event)) {
-        MMI_HILOGW("Touch event filter out");
-        ResetTouchUpEvent(pointerEvent, event);
-        return RET_OK;
-    }
-#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
     ResetTouchUpEvent(pointerEvent, event);
@@ -456,7 +444,7 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_TABLET_TOOL);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TABLET_TOOL);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);

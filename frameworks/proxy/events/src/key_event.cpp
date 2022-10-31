@@ -22,7 +22,7 @@ using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "KeyEvent"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEvent" };
 } // namespace
 const int32_t KeyEvent::UNKOWN_FUNCTION_KEY = -1;
 const int32_t KeyEvent::NUM_LOCK_FUNCTION_KEY = 0;

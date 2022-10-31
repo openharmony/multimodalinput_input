@@ -27,13 +27,33 @@ namespace OHOS {
 namespace MMI {
 class TouchEventNormalize final {
     DECLARE_DELAYED_SINGLETON(TouchEventNormalize);
+
+public:
+    enum class DeviceType : int32_t {
+        KEYBOARD,
+        POINTER,
+        TOUCH,
+        TABLET_TOOL,
+        TABLET_PAD,
+        GESTURE,
+        SWITCH,
+        JOYSTICK,
+        AISENSOR,
+        TOUCH_PAD,
+        REMOTE_CONTROL,
+        TRACK_BALL,
+        KNUCKLE,
+        TRACKPAD5,
+        GAMEPAD,
+    };
+
 public:
     DISALLOW_COPY_AND_MOVE(TouchEventNormalize);
-    std::shared_ptr<PointerEvent> OnLibInput(struct libinput_event *event, INPUT_DEVICE_TYPE deviceType);
+    std::shared_ptr<PointerEvent> OnLibInput(struct libinput_event *event, DeviceType deviceType);
 
 private:
     std::shared_ptr<TransformProcessor> MakeTransformProcessor(
-        int32_t deviceId, INPUT_DEVICE_TYPE deviceType) const;
+        int32_t deviceId, DeviceType deviceType) const;
 
 private:
     std::map<int32_t, std::shared_ptr<TransformProcessor>> processors_;

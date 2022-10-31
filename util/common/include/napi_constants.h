@@ -60,6 +60,7 @@ inline constexpr std::string_view SET_ELEMENT = "napi_set_element";
 inline constexpr std::string_view GET_REFERENCE = "napi_get_reference_value";
 inline constexpr std::string_view CREATE_STRING_UTF8 = "napi_create_string_utf8";
 inline const std::string CHANGED_TYPE = "change";
+inline const std::string SUBSCRIBE_TYPE = "key";
 inline constexpr std::string_view DELETE_ASYNC_WORK = "napi_delete_async_work";
 inline constexpr std::string_view CREATE_BOOL = "napi_get_boolean";
 inline constexpr std::string_view COERCE_TO_BOOL = "napi_coerce_to_bool";

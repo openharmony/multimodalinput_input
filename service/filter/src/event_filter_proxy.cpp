@@ -32,11 +32,6 @@ EventFilterProxy::EventFilterProxy(const sptr<IRemoteObject> &impl) : IRemotePro
     MMI_HILOGI("EventFilterProxy()");
 }
 
-EventFilterProxy::~EventFilterProxy()
-{
-    MMI_HILOGI("~EventFilterProxy()");
-}
-
 bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> event)
 {
     CALL_DEBUG_ENTER;

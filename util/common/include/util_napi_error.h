@@ -71,7 +71,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
         MMI_HILOGE("ErrorCode:%{public}s", (#code)); \
         NapiError codeMsg; \
         if (UtilNapiError::GetApiError(code, codeMsg)) { \
-            char buf[100]; \
+            char buf[300]; \
             if (sprintf_s(buf, sizeof(buf), codeMsg.msg.c_str(), param1, param2) > 0) { \
                 THROWERR_CUSTOM(env, code, buf); \
             } else { \

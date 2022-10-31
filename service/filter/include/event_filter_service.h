@@ -27,10 +27,10 @@ namespace MMI {
 enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING };
 class EventFilterService final : public EventFilterStub {
 public:
-    EventFilterService();
+    EventFilterService() = default;
     DISALLOW_COPY_AND_MOVE(EventFilterService);
-    ~EventFilterService();
-    virtual bool HandlePointerEvent(const std::shared_ptr<PointerEvent> event) override;
+    ~EventFilterService() override = default;
+    bool HandlePointerEvent(const std::shared_ptr<PointerEvent> event) override;
     void SetPointerEventPtr(std::function<bool(std::shared_ptr<PointerEvent>)> pointerFilter);
 
 private:

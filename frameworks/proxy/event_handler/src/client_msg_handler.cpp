@@ -44,19 +44,14 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ClientMsgHandler"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ClientMsgHandler" };
 } // namespace
-
-ClientMsgHandler::~ClientMsgHandler()
-{
-    dispatchCallback_ = nullptr;
-}
 
 void ClientMsgHandler::Init()
 {
     MsgCallback funs[] = {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-        {MmiMessageId::ON_KEYEVENT, MsgCallbackBind2(&ClientMsgHandler::OnKeyEvent, this)},
+        {MmiMessageId::ON_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnKeyEvent, this)},
         {MmiMessageId::ON_SUBSCRIBE_KEY, std::bind(&ClientMsgHandler::OnSubscribeKeyEventCallback,
                                                    this, std::placeholders::_1, std::placeholders::_2)},
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -165,6 +160,9 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
     pointerEvent->SetProcessedCallback(dispatchCallback_);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_DISPATCH_EVENT);
     InputMgrImpl.OnPointerEvent(pointerEvent);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK) {
+        pointerEvent->MarkProcessed();
+    }
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

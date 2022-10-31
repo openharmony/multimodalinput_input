@@ -24,21 +24,7 @@ config("libmmi_util_public_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
   ]
-
   defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
-
   if (input_feature_input_cooperation) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
@@ -100,32 +86,15 @@ ohos_unittest("ut-mmi-util-out") {
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
-  if (input_feature_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
-
   defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
-
   if (input_feature_input_cooperation) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }
 
   sources = [
-    "common/test/util_test.cpp",
     "network/test/net_packet_test.cpp",
     "socket/test/stream_buffer_test.cpp",
     "socket/test/uds_client_test.cpp",
@@ -166,26 +135,10 @@ ohos_unittest("RunShellUtilTest") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
-  if (input_feature_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
-
   defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
-
   if (input_feature_input_cooperation) {
     defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
   }

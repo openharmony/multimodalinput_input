@@ -32,7 +32,7 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
     static constexpr char PROGRAM_NAME[] = "uds_sesion_test";
-    const int32_t moduleType_ = 3; // 3 CONNECT_MODULE_TYPE_ST_TEST
+    const int32_t moduleType_ = 3;
     static inline int32_t pid_ = 0;
     int32_t writeFd_ = -1;
     int32_t readFd_ = -1;
@@ -173,7 +173,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type2_001, TestSize.Level1)
  */
 HWTEST_F(UDSSessionTest, SendMsg_type2_002, TestSize.Level1)
 {
-    NetPacket pkt(MmiMessageId::BEGIN);
+    NetPacket pkt(MmiMessageId::INVALID);
 
     UDSSession sesObj(PROGRAM_NAME, moduleType_, writeFd_, UID_ROOT, pid_);
     bool retResult = sesObj.SendMsg(pkt);
@@ -189,7 +189,7 @@ HWTEST_F(UDSSessionTest, SendMsg_type2_002, TestSize.Level1)
 HWTEST_F(UDSSessionTest, SendMsg_type2_003, TestSize.Level1)
 {
     int32_t fd = -65535;
-    NetPacket pkt(MmiMessageId::BEGIN);
+    NetPacket pkt(MmiMessageId::INVALID);
 
     UDSSession sesObj(PROGRAM_NAME, moduleType_, fd, UID_ROOT, pid_);
     bool retResult = sesObj.SendMsg(pkt);

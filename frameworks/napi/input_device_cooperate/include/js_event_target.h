@@ -36,7 +36,7 @@ namespace MMI {
 class JsEventTarget : public IInputDeviceCooperateListener, public std::enable_shared_from_this<JsEventTarget> {
 public:
     JsEventTarget();
-    ~JsEventTarget() = default;
+    virtual ~JsEventTarget() = default;
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
 
     static void EmitJsEnable(int32_t userData, std::string deviceId, CooperationMessage msg);
@@ -47,14 +47,16 @@ public:
     void AddListener(napi_env env, const std::string &type, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);
     napi_value CreateCallbackInfo(napi_env, napi_value handle, int32_t userData);
+    void RemoveCallbackInfo(int32_t userData);
+    void HandleExecuteResult(napi_env env, int32_t errCode);
     void ResetEnv();
 
     void OnCooperateMessage(const std::string &deviceId, CooperationMessage msg) override;
 
 private:
     inline static std::map<std::string_view, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>>
-        cooperateListener_ = {};
-    inline static std::map<int32_t, std::unique_ptr<JsUtil::CallbackInfo>> callback_ = {};
+        cooperateListener_ {};
+    inline static std::map<int32_t, std::unique_ptr<JsUtil::CallbackInfo>> callback_ {};
     bool isListeningProcess_ { false };
 
     static void CallEnablePromsieWork(uv_work_t *work, int32_t status);

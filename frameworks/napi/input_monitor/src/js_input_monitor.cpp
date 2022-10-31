@@ -43,15 +43,14 @@ constexpr int32_t RIGHT = 2;
 constexpr int32_t MOUSE_FLOW = 15;
 } // namespace
 
-bool InputMonitor::Start()
+int32_t InputMonitor::Start()
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
         monitorId_ = InputMgr->AddMonitor(shared_from_this());
-        return monitorId_ >= 0;
     }
-    return true;
+    return monitorId_;
 }
 
 void InputMonitor::Stop()
@@ -121,7 +120,8 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
     callback(pointerEvent);
 }
 
-void InputMonitor::SetId(int32_t id) {
+void InputMonitor::SetId(int32_t id)
+{
     id_ = id;
 }
 
@@ -155,7 +155,7 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi
         MMI_HILOGE("The monitor is null");
         return;
     }
-    monitor_->SetCallback([jsId=id](std::shared_ptr<PointerEvent> pointerEvent) {
+    monitor_->SetCallback([jsId = id](std::shared_ptr<PointerEvent> pointerEvent) {
         auto& jsMonitor {JsInputMonMgr.GetMonitor(jsId)};
         CHKPV(jsMonitor);
         jsMonitor->OnPointerEvent(pointerEvent);
@@ -636,19 +636,19 @@ int32_t JsInputMonitor::TransformMousePointerEvent(const std::shared_ptr<Pointer
     return RET_OK;
 }
 
-bool JsInputMonitor::Start()
+int32_t JsInputMonitor::Start()
 {
     CALL_DEBUG_ENTER;
     CHKPF(monitor_);
     if (isMonitoring_) {
         MMI_HILOGW("Js is monitoring");
-        return true;
+        return RET_OK;
     }
-    if (monitor_->Start()) {
+    int32_t ret = monitor_->Start();
+    if (ret >= 0) {
         isMonitoring_ = true;
-        return true;
     }
-    return false;
+    return ret;
 }
 
 JsInputMonitor::~JsInputMonitor()
@@ -730,7 +730,7 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
             }
             return;
         }
-        uv_queue_work(loop, work, [](uv_work_t *work){}, &JsInputMonitor::JsCallback);
+        uv_queue_work(loop, work, [](uv_work_t *work) {}, &JsInputMonitor::JsCallback);
     }
 }
 

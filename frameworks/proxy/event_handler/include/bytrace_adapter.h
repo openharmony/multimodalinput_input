@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace MMI {
-class BytraceAdapter {
+class BytraceAdapter final {
 public:
     enum TraceBtn {
         TRACE_STOP = 0,

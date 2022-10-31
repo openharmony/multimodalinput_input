@@ -30,11 +30,11 @@
 
 namespace OHOS {
 namespace MMI {
-class EventMonitorHandler : public IInputEventHandler {
+class EventMonitorHandler final : public IInputEventHandler {
 public:
     EventMonitorHandler() = default;
     DISALLOW_COPY_AND_MOVE(EventMonitorHandler);
-    ~EventMonitorHandler() = default;
+    ~EventMonitorHandler() override = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
