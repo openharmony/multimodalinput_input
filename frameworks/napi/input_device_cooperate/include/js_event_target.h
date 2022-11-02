@@ -69,7 +69,7 @@ private:
     static void CallGetStateAsyncWork(uv_work_t *work, int32_t status);
     static void EmitCooperateMessageEvent(uv_work_t *work, int32_t status);
 
-    static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfo(uv_work_t *work);
+    static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfoAndFreeWork(uv_work_t *work);
 };
 } // namespace MMI
 } // namespace OHOS

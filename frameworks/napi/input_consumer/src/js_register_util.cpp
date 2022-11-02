@@ -316,7 +316,11 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     KeyEventMonitorInfoWorker *dataWorker = new (std::nothrow) KeyEventMonitorInfoWorker();
-    CHKPV(dataWorker);
+    if (dataWorker == nullptr) {
+        MMI_HILOGE("dataWorker is nullptr");
+        delete work;
+        return;
+    }
 
     dataWorker->env = reportEvent->env;
     dataWorker->reportEvent = reportEvent;
