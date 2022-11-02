@@ -67,6 +67,15 @@ public:
             ptr = nullptr;
         }
     }
+
+    template <typename T>
+    static void ChkAndDeletePtr(T &ptr)
+    {
+        if (ptr != nullptr && ptr->data == nullptr) {
+            JsUtil::DeletePtr<uv_work_t*>(ptr);
+            return;
+        }
+    }
 };
 } // namespace MMI
 } // namespace OHOS

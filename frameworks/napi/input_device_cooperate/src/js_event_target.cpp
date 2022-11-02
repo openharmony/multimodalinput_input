@@ -349,7 +349,7 @@ void JsEventTarget::CallEnablePromsieWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is null");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfoAndFreeWork(work);
     CHKPV(cb);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
@@ -384,7 +384,7 @@ void JsEventTarget::CallEnableAsyncWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is null");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfoAndFreeWork(work);
     CHKPV(cb);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
@@ -411,7 +411,7 @@ void JsEventTarget::CallStartPromiseWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is null");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfoAndFreeWork(work);
     CHKPV(cb);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
@@ -446,7 +446,7 @@ void JsEventTarget::CallStartAsyncWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is null");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfoAndFreeWork(work);
     CHKPV(cb);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
@@ -473,7 +473,7 @@ void JsEventTarget::CallStopPromiseWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is null");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfoAndFreeWork(work);
     CHKPV(cb);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
@@ -509,7 +509,7 @@ void JsEventTarget::CallStopAsyncWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is null");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfoAndFreeWork(work);
     CHKPV(cb);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
@@ -536,7 +536,7 @@ void JsEventTarget::CallGetStatePromiseWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is null");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfoAndFreeWork(work);
     CHKPV(cb);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
@@ -560,7 +560,7 @@ void JsEventTarget::CallGetStateAsyncWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is null");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
+    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfoAndFreeWork(work);
     CHKPV(cb);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
@@ -626,7 +626,7 @@ void JsEventTarget::EmitCooperateMessageEvent(uv_work_t *work, int32_t status)
     }
 }
 
-std::unique_ptr<JsUtil::CallbackInfo> JsEventTarget::GetCallbackInfo(uv_work_t *work)
+std::unique_ptr<JsUtil::CallbackInfo> JsEventTarget::GetCallbackInfoAndFreeWork(uv_work_t *work)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);

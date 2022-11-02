@@ -61,7 +61,7 @@ private:
     static void CallDevInfoPromiseWork(uv_work_t *work, int32_t status);
     static void EmitAddedDeviceEvent(uv_work_t *work, int32_t status);
     static void EmitRemoveDeviceEvent(uv_work_t *work, int32_t status);
-    static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfo(uv_work_t *work);
+    static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfoAndFreeWork(uv_work_t *work);
     static napi_value GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage);
 private:
     inline static std::map<int32_t, std::unique_ptr<JsUtil::CallbackInfo>> callback_ {};
