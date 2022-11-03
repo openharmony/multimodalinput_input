@@ -48,7 +48,7 @@ const std::string UNKNOWN_SCREEN_ID = "";
 const char *SPLIT_SYMBOL = "|";
 const std::string DH_ID_PREFIX = "Input_";
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-const std::string INPUT_VIRTUAL_DEVICE_NAME = "Hos Distributed Virtual Device ";
+const std::string INPUT_VIRTUAL_DEVICE_NAME = "DistributedInput ";
 std::unordered_map<int32_t, std::string> axisType = {
     {ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR"},
     {ABS_MT_TOUCH_MINOR, "TOUCH_MINOR"},
