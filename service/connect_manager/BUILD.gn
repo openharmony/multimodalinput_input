@@ -35,8 +35,8 @@ ohos_source_set("mmi_connect_manager_service") {
   part_name = "input"
   subsystem_name = "multimodalinput"
   sources = [
-    "${mmi_connect_manager_path}/src/multimodal_input_connect_stub.cpp",
     "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
+    "${mmi_connect_manager_path}/src/multimodal_input_connect_stub.cpp",
   ]
 
   configs = [ ":mmi_connect_manager_config" ]
