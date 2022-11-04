@@ -34,7 +34,7 @@ UDSSocket::~UDSSocket()
     EpollClose();
 }
 
-int32_t UDSSocket::EpollCreat(int32_t size)
+int32_t UDSSocket::EpollCreate(int32_t size)
 {
     epollFd_ = epoll_create(size);
     if (epollFd_ < 0) {
