@@ -299,8 +299,8 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
 {
     DIR *dir = nullptr;
     const std::string::size_type pos = fileName.find("_");
-    const std::string procressPath = "/proc/" + fileName.substr(0, pos) + "/";
-    const std::string filePath = procressPath + "cmdline";
+    const std::string processPath = "/proc/" + fileName.substr(0, pos) + "/";
+    const std::string filePath = processPath + "cmdline";
     std::string temp;
     std::string processName;
     if (!CheckFileName(fileName)) {
@@ -311,9 +311,9 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
         std::cout << "Failed to create file" << std::endl;
         goto RELEASE_RES;
     }
-    dir = opendir(procressPath.c_str());
+    dir = opendir(processPath.c_str());
     if (dir == nullptr) {
-        std::cout << "Useless flag file:" << procressPath << std::endl;
+        std::cout << "Useless flag file:" << processPath << std::endl;
         goto RELEASE_RES;
     }
     temp = ReadUinputToolFile(filePath);
@@ -324,7 +324,7 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
     processName.append(temp);
     if (processName.find(VIRTUAL_DEVICE_NAME.c_str()) != std::string::npos) {
         if (closedir(dir) != 0) {
-            std::cout << "Close dir:" << procressPath <<"failed" << std::endl;
+            std::cout << "Close dir:" << processPath <<"failed" << std::endl;
         }
         return true;
     }
