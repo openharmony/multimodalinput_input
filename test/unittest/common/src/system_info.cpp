@@ -60,21 +60,25 @@ int32_t CpuInfo::GetTaskPidFile(const std::string &process_name)
             continue;
         }
         const std::string path = procPath + "/" + pidFile->d_name + "/status";
-        std::ifstream filePath(path);
-        if (!filePath.is_open()) {
+        std::ifstream file(path);
+        if (!file.is_open()) {
             continue;
         }
         std::string strLine;
-        std::getline(filePath, strLine);
+        if (!std::getline(file, strLine)) {
+            MMI_HILOGE("getline failed");
+            file.close();
+            return DEFAULT_PID;
+        }
         if (strLine.empty()) {
-            filePath.close();
+            file.close();
             continue;
         }
         if ((strLine.find(process_name)) == std::string::npos) {
-            filePath.close();
+            file.close();
             continue;
         }
-        while (std::getline(filePath, strLine)) {
+        while (std::getline(file, strLine)) {
             if ((strLine.find("Pid")) != std::string::npos) {
                 if (::sscanf_s(strLine.c_str(), "%*s%d", &pid, sizeof(pid)) != 1) {
                     MMI_HILOGE("Failed to cut out the pid");
@@ -82,7 +86,7 @@ int32_t CpuInfo::GetTaskPidFile(const std::string &process_name)
                 break;
             }
         }
-        filePath.close();
+        file.close();
         break;
     }
     ::closedir(dir);
