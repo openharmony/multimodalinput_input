@@ -19,13 +19,9 @@
 #include "securec.h"
 
 #include "input_manager.h"
-#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerStyleFuzzTest" };
-} // namespace
 template<class T>
 size_t GetObject(const uint8_t *data, size_t size, T &object)
 {
@@ -40,7 +36,7 @@ size_t GetObject(const uint8_t *data, size_t size, T &object)
     return objectSize;
 }
 
-size_t GetString(size_t objectSize, const uint8_t *data, size_t size, std::string &object)
+size_t GetString(const uint8_t *data, size_t size, char *object, size_t objectSize)
 {
     if (objectSize > size) {
         return 0;
@@ -79,6 +75,7 @@ void UpdateDisplayInfo(const uint8_t* data, size_t size, int32_t windowId)
 {
     DisplayGroupInfo displayGroupInfo;
     size_t startPos = 0;
+    size_t stringSize = 4;
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.width);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.height);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.focusWindowId);
@@ -100,22 +97,13 @@ void UpdateDisplayInfo(const uint8_t* data, size_t size, int32_t windowId)
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.x);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.y);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.width);
-    GetObject<int32_t>(data + startPos, size - startPos, displayInfo.height);
-
-    size_t objectSize = 0;
-    std::string name = "";
-    size_t ret = GetString(objectSize, data, size, name);
-    if (ret == 0) {
-        MMI_HILOGD("%{public}s:%{public}d GetString return 0", __func__, __LINE__);
-        return;
-    }
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.height);
+    startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.dpi);
+    char name[] = "name";
+    startPos += GetString(data + startPos, size - startPos, name, stringSize);
     displayInfo.name = name;
-    std::string uniq = "";
-    ret = GetString(objectSize, data, size, uniq);
-    if (ret == 0) {
-        MMI_HILOGD("%{public}s:%{public}d GetString return 0", __func__, __LINE__);
-        return;
-    }
+    char uniq[] = "uniq";
+    GetString(data + startPos, size - startPos, uniq, stringSize);
     displayInfo.uniq = uniq;
     displaysInfo.push_back(displayInfo);
     displayGroupInfo.windowsInfo = windowsInfo;

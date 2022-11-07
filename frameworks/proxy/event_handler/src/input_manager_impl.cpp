@@ -288,7 +288,7 @@ int32_t InputManagerImpl::PackDisplayInfo(NetPacket &pkt)
     pkt << num;
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         pkt << item.id << item.x << item.y << item.width
-            << item.height << item.name << item.uniq << item.direction;
+            << item.height << item.dpi << item.name << item.uniq << item.direction;
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write display data failed");
@@ -323,9 +323,9 @@ void InputManagerImpl::PrintDisplayInfo()
     MMI_HILOGI("displayInfos,num:%{public}zu", displayGroupInfo_.displaysInfo.size());
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         MMI_HILOGI("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
-            "width:%{public}d,height:%{public}d,name:%{public}s,"
+            "width:%{public}d,height:%{public}d,dpi:%{public}d,name:%{public}s,"
             "uniq:%{public}s,direction:%{public}d",
-            item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
+            item.id, item.x, item.y, item.width, item.height, item.dpi, item.name.c_str(),
             item.uniq.c_str(), item.direction);
     }
 }
