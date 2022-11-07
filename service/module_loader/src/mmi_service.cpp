@@ -298,7 +298,9 @@ void MMIService::OnStart()
     AddReloadDeviceTimer();
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
 #ifdef OHOS_RSS_CLIENT
+    MMI_HILOGI("Add system ability listener start");
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
+    MMI_HILOGI("Add system ability listener success");
 #endif
 
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
@@ -313,9 +315,10 @@ void MMIService::OnStart()
             MMI_HILOGE("Watchdog happened");
         }
     };
+    MMI_HILOGI("Run periodical task start");
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc,
         WATCHDOG_INTERVAL_TIME, WATCHDOG_DELAY_TIME);
-
+    MMI_HILOGI("Run periodical task success");
     t_.join();
 }
 
@@ -326,7 +329,9 @@ void MMIService::OnStop()
     libinputAdapter_.Stop();
     state_ = ServiceRunningState::STATE_NOT_START;
 #ifdef OHOS_RSS_CLIENT
+    MMI_HILOGI("Remove system ability listener start");
     RemoveSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
+    MMI_HILOGI("Remove system ability listener success");
 #endif
 }
 
@@ -829,6 +834,7 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
 #ifdef OHOS_RSS_CLIENT
 void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
 {
+    CALL_INFO_TRACE;
     if (systemAbilityId == RES_SCHED_SYS_ABILITY_ID) {
         int sleepSeconds = 1;
         sleep(sleepSeconds);
