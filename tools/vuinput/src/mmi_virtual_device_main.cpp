@@ -24,7 +24,7 @@ int32_t main(int32_t argc, const char *argv[])
     if (access(OHOS::MMI::g_folderPath.c_str(), F_OK) != 0) {
         MMI_HILOGW("Directory %{public}s did not exist, errno: %{public}d", g_folderPath.c_str(), errno);
         mkdir(OHOS::MMI::g_folderPath.c_str(), SYMBOL_FOLDER_PERMISSIONS);
-    } 
+    }
     std::vector<std::string> argvList;
     for (uint16_t i = 0; i < argc; i++) {
         argvList.push_back(argv[i]);
