@@ -843,8 +843,7 @@ void JsEventTarget::CallDevInfoPromiseWork(uv_work_t *work, int32_t status)
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
     if (scope == nullptr) {
-        JsUtil::DeletePtr<uv_work_t*>(work);
-        JsUtil::DeleteCallbackInfo(std::move(cb));
+        MMI_HILOGE("scope is nullptr");
         return;
     }
     napi_value callResult = nullptr;
