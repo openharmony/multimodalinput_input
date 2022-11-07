@@ -85,7 +85,7 @@ int32_t CpuInfo::GetTaskPidFile(const std::string &process_name)
         filePath.close();
         break;
     }
-     if (::closedir(dir) != 0) {
+    if (::closedir(dir) != 0) {
         MMI_HILOGE("Failed to closedir");
     }
 
