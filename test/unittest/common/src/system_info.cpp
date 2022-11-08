@@ -85,7 +85,9 @@ int32_t CpuInfo::GetTaskPidFile(const std::string &process_name)
         filePath.close();
         break;
     }
-    ::closedir(dir);
+    if (::closedir(dir) != 0) {
+        MMI_HILOGE("Failed to closedir");
+    }
 
     return pid;
 }
@@ -115,7 +117,7 @@ int32_t CpuInfo::GetTaskPidCmd(const std::string &process_name, int32_t flag, st
         return DEFAULT_PID;
     }
     ::pclose(fp);
-    return ::atoi(buf);
+    return std::stoi(buf);
 }
 
 int32_t CpuInfo::GetProcOccupy(int32_t pid)
