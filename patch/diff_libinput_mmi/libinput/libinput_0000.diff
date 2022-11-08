@@ -3426,6 +3426,20 @@ diff -Naur old/src/evdev-tablet.c new/src/evdev-tablet.c
  		};
 
  		tool_set_pressure_thresholds(tablet, tool);
+@@ -2117,11 +2118,11 @@
+ {
+ 	struct tablet_dispatch *tablet = tablet_dispatch(device->dispatch);
+ 	bool is_touchscreen, is_ext_touchpad;
+-
++/*
+ 	if (libinput_device_get_device_group(&device->base) !=
+ 	    libinput_device_get_device_group(&added_device->base))
+ 		return;
+-
++*/
+ 	is_touchscreen = evdev_device_has_capability(added_device,
+ 						     LIBINPUT_DEVICE_CAP_TOUCH);
+ 	is_ext_touchpad = evdev_device_has_capability(added_device,
 @@ -2368,6 +2369,34 @@
  	return true;
  }
@@ -3693,7 +3707,7 @@ diff -Naur old/src/evdev.c new/src/evdev.c
  	default:
  		return false;
  	}
-@@ -2917,3 +2969,45 @@
+@@ -2917,3 +2969,59 @@
  #endif
  	return has_left_handed;
  }
@@ -3723,6 +3737,17 @@ diff -Naur old/src/evdev.c new/src/evdev.c
 +			!libevdev_has_event_type(evdev, EV_REL));
 +}
 +
++static inline bool
++is_tablet_tool(const struct libevdev *evdev)
++{
++	return (libevdev_has_event_type(evdev, EV_KEY) &&
++			(libevdev_has_event_code(evdev, EV_KEY, BTN_TOOL_PEN) ||
++			 libevdev_has_event_code(evdev, EV_KEY, BTN_STYLUS)) &&
++			libevdev_has_event_type(evdev, EV_ABS) &&
++			libevdev_has_event_code(evdev, EV_ABS, ABS_X) &&
++			libevdev_has_event_code(evdev, EV_ABS, ABS_Y));
++}
++
 +static enum evdev_device_udev_tags
 +update_device_capability(struct evdev_device *device)
 +{
@@ -3735,6 +3760,9 @@ diff -Naur old/src/evdev.c new/src/evdev.c
 +	}
 +	if (is_keyboard(device->evdev)) {
 +		return (EVDEV_UDEV_TAG_INPUT | EVDEV_UDEV_TAG_KEYBOARD);
++	}
++	if (is_tablet_tool(device->evdev)) {
++		return (EVDEV_UDEV_TAG_INPUT | EVDEV_UDEV_TAG_TABLET);
 +	}
 +	evdev_log_info(device, "update_device_capability() leave\n");
 +    return 0;
