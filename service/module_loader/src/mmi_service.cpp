@@ -259,7 +259,7 @@ int32_t MMIService::Init()
         return EPOLL_CREATE_FAIL;
     }
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    /* 
+    /*
      * PostAsyncTask is used here to prevent InputDeviceCooperateSM:: StartRemoteCooperate() and
      * CheckPointerEvent() from holding locks, resulting in deadlocks
      */
