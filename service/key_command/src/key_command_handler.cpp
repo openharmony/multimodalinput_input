@@ -905,6 +905,7 @@ bool KeyCommandHandler::HandleKeyCancel(ShortcutKey &shortcutKey)
 
 void KeyCommandHandler::LaunchAbility(const ShortcutKey &key)
 {
+    CALL_INFO_TRACE;
     AAFwk::Want want;
     want.SetElementName(key.ability.deviceId, key.ability.bundleName, key.ability.abilityName);
     want.SetAction(key.ability.action);
@@ -929,6 +930,7 @@ void KeyCommandHandler::LaunchAbility(const ShortcutKey &key)
 
 void KeyCommandHandler::LaunchAbility(const Sequence &sequence)
 {
+    CALL_INFO_TRACE;
     AAFwk::Want want;
     want.SetElementName(sequence.ability.deviceId, sequence.ability.bundleName, sequence.ability.abilityName);
     want.SetAction(sequence.ability.action);
