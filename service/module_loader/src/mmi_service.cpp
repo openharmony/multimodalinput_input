@@ -259,7 +259,11 @@ int32_t MMIService::Init()
         return EPOLL_CREATE_FAIL;
     }
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    InputDevCooSM->Init(std::bind(&DelegateTasks::PostSyncTask, &delegateTasks_, std::placeholders::_1));
+    /*
+     * PostAsyncTask is used here to prevent InputDeviceCooperateSM:: StartRemoteCooperate() and
+     * CheckPointerEvent() from holding locks, resulting in deadlocks
+     */
+    InputDevCooSM->Init(std::bind(&DelegateTasks::PostAsyncTask, &delegateTasks_, std::placeholders::_1));
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     MMI_HILOGD("Input msg handler init");
     InputHandler->Init(*this);
