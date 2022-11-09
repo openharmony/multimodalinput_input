@@ -15,6 +15,7 @@
 
 #include "util.h"
 
+#include <array>
 #include <chrono>
 #include <cinttypes>
 #include <cstdarg>
@@ -32,7 +33,6 @@
 #include "error_multimodal.h"
 #include "mmi_log.h"
 #include "securec.h"
-#include "uuid.h"
 
 namespace OHOS {
 namespace MMI {
@@ -75,14 +75,6 @@ int64_t GetMillisTime()
     auto timeNow = std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now());
     auto tmp = std::chrono::duration_cast<std::chrono::milliseconds>(timeNow.time_since_epoch());
     return tmp.count();
-}
-
-std::string GetUUid()
-{
-    Uuid uid;
-    std::string strUuid;
-    uid.ConvertToStdString(strUuid);
-    return strUuid;
 }
 
 static std::string GetThisThreadIdOfString()

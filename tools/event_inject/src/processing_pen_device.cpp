@@ -15,8 +15,8 @@
 
 #include "processing_pen_device.h"
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingPenDevice" };
 constexpr int32_t EV_ABS_Z_DEFAULT_VALUE = 450;
@@ -216,3 +216,5 @@ int32_t ProcessingPenDevice::AnalysisPenLeavePadEvent(const DeviceEvent& event, 
 
     return RET_OK;
 }
+} // namespace MMI
+} // namespace OHOS
