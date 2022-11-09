@@ -327,10 +327,8 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
         return true;
     }
     RELEASE_RES:
-    if (dir != nullptr) {
-        if (closedir(dir) != 0) {
-            std::cout << "Close dir failed" << std::endl;
-        }
+    if (closedir(dir) != 0) {
+        std::cout << "Close dir failed" << std::endl;
     }
     if (std::remove((g_folderPath + fileName).c_str()) != 0) {
         std::cout << "Remove file failed" << std::endl;
