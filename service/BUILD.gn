@@ -64,14 +64,12 @@ config("libmmi_server_config") {
 
   defines = input_default_defines
 
-  service_defines = []
-
   if (input_feature_combination_key) {
-    service_defines += [ "OHOS_BUILD_ENABLE_COMBINATION_KEY" ]
+    defines += [ "OHOS_BUILD_ENABLE_COMBINATION_KEY" ]
   }
 
   if (resource_schedule_service_enabled) {
-    service_defines += [ "OHOS_RSS_CLIENT" ]
+    defines += [ "OHOS_RSS_CLIENT" ]
   }
 
   if (input_feature_input_cooperation) {
