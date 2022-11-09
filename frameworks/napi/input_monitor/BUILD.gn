@@ -22,10 +22,7 @@ config("inputmonitor_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
   ]
 
-  defines = []
-  if (input_feature_input_cooperation) {
-    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
-  }
+  defines = input_default_defines
 }
 
 ohos_shared_library("inputmonitor") {
