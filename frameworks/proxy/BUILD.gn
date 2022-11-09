@@ -64,11 +64,8 @@ ohos_source_set("libmmi-common") {
     "events/src/pointer_event.cpp",
   ]
 
-  defines = []
+  defines = input_default_defines
 
-  if (input_feature_input_cooperation) {
-    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
-  }
   public_configs = [ ":libmmi_client_config" ]
 
   external_deps = [
@@ -97,26 +94,7 @@ ohos_shared_library("libmmi-client") {
     sources += [ "event_handler/src/input_device_cooperate_impl.cpp" ]
   }
 
-  defines = []
-
-  if (input_feature_pointer_drawing) {
-    defines += [ "OHOS_BUILD_ENABLE_POINTER_DRAWING" ]
-  }
-  if (input_feature_monitor) {
-    defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
-  }
-  if (input_feature_interceptor) {
-    defines += [ "OHOS_BUILD_ENABLE_INTERCEPTOR" ]
-  }
-  if (input_feature_keyboard) {
-    defines += [ "OHOS_BUILD_ENABLE_KEYBOARD" ]
-  }
-  if (input_feature_mouse) {
-    defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
-  }
-  if (input_feature_touchscreen) {
-    defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
-  }
+  defines = input_default_defines
 
   if (input_feature_interceptor) {
     sources += [ "event_handler/src/input_interceptor_manager.cpp" ]
@@ -128,14 +106,6 @@ ohos_shared_library("libmmi-client") {
 
   if (input_feature_keyboard) {
     sources += [ "event_handler/src/key_event_input_subscribe_manager.cpp" ]
-  }
-
-  if (input_feature_input_cooperation) {
-    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
-  }
-
-  if (input_feature_joystick) {
-    defines += [ "OHOS_BUILD_ENABLE_JOYSTICK" ]
   }
 
   configs = [
@@ -172,7 +142,7 @@ ohos_unittest("ut-mmi-proxy-out") {
     "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
-  defines = []
+  defines = input_default_defines
 
   sources = [ "module_loader/test/mmi_client_test.cpp" ]
 
@@ -198,7 +168,7 @@ ohos_unittest("KeyEventTest") {
     "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
-  defines = []
+  defines = input_default_defines
 
   sources = [
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
@@ -232,30 +202,8 @@ ohos_unittest("InputManagerTest") {
     "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
-  defines = []
+  defines = input_default_defines
 
-  if (input_feature_pointer_drawing) {
-    defines += [ "OHOS_BUILD_ENABLE_POINTER_DRAWING" ]
-  }
-
-  if (input_feature_keyboard) {
-    defines += [ "OHOS_BUILD_ENABLE_KEYBOARD" ]
-  }
-  if (input_feature_mouse) {
-    defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
-  }
-  if (input_feature_touchscreen) {
-    defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
-  }
-  if (input_feature_interceptor) {
-    defines += [ "OHOS_BUILD_ENABLE_INTERCEPTOR" ]
-  }
-  if (input_feature_monitor) {
-    defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
-  }
-  if (input_feature_joystick) {
-    defines += [ "OHOS_BUILD_ENABLE_JOYSTICK" ]
-  }
   sources = [
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
     "${mmi_path}/test/unittest/common/src/system_info.cpp",
@@ -290,14 +238,8 @@ ohos_unittest("InputManagerManualTest") {
     "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
-  defines = []
+  defines = input_default_defines
 
-  if (input_feature_mouse) {
-    defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
-  }
-  if (input_feature_touchscreen) {
-    defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
-  }
   sources = [ "events/test/input_manager_manual_test.cpp" ]
 
   configs = [ ":libmmi_test_util" ]
@@ -321,11 +263,8 @@ ohos_unittest("PointerEventTest") {
   module_out_path = module_output_path
   include_dirs = [ "$root_out_dir/diff_libinput_mmi/export_include" ]
 
-  defines = []
+  defines = input_default_defines
 
-  if (input_feature_mouse) {
-    defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
-  }
   sources = [
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
     "${mmi_path}/test/unittest/common/src/window_utils_test.cpp",
