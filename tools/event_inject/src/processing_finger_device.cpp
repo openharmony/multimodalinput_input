@@ -15,8 +15,8 @@
 
 #include "processing_finger_device.h"
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingFingerDevice" };
 constexpr int64_t FINGER_BLOCK_TIME = 6;
@@ -123,3 +123,5 @@ void ProcessingFingerDevice::AnalysisTouchPadFingerReleaseData(InputEventArray &
     }
     SetSynReport(inputEventArray);
 }
+} // namespace MMI
+} // namespace OHOS

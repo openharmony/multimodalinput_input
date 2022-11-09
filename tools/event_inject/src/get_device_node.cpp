@@ -15,8 +15,8 @@
 
 #include "get_device_node.h"
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetDeviceNode" };
 const std::string DEVICES_INFO_PATH = "/proc/bus/input/devices";
@@ -132,3 +132,5 @@ void GetDeviceNode::AnalyseDevices(const std::vector<std::string> &deviceStrs, D
         }
     }
 }
+} // namespace MMI
+} // namespace OHOS
