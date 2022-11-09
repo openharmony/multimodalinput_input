@@ -15,8 +15,13 @@
 
 #include "cooperate_event_handler.h"
 
+#include "mmi_log.h"
+
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "CooperateEventHandler" };
+} // namespace
 CooperateEventHandler::CooperateEventHandler(
     const std::shared_ptr<AppExecFwk::EventRunner> &runner)
     : AppExecFwk::EventHandler(runner)
