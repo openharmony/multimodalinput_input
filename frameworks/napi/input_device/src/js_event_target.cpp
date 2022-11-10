@@ -215,21 +215,21 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("scope is nullptr");
         return;
     }
-    napi_value arr = nullptr;
-    CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &arr), CREATE_ARRAY, scope);
+    napi_value arr[2];
+    CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &arr[0]), GET_UNDEFINED, scope);
+    CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &arr[1]), CREATE_ARRAY, scope);
     uint32_t index = 0;
     napi_value value = nullptr;
     for (const auto &item : cb->data.ids) {
         CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, item, &value), CREATE_INT32, scope);
-        CHKRV_SCOPE(cb->env, napi_set_element(cb->env, arr, index, value), SET_ELEMENT, scope);
+        CHKRV_SCOPE(cb->env, napi_set_element(cb->env, arr[1], index, value), SET_ELEMENT, scope);
         ++index;
     }
 
     napi_value handler = nullptr;
     CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE, scope);
     napi_value result = nullptr;
-    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &arr, &result),
-         CALL_FUNCTION, scope);
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, arr, &result), CALL_FUNCTION, scope);
     napi_close_handle_scope(cb->env, scope);
     JsUtil::DeleteCallbackInfo(std::move(cb));
 }
@@ -335,16 +335,13 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("scope is nullptr");
         return;
     }
-    napi_value object = JsUtil::GetDeviceInfo(cb);
-    if (object == nullptr) {
-        MMI_HILOGE("Check object is null");
-        napi_close_handle_scope(cb->env, scope);
-        return;
-    }
+    napi_value object[2];
+    CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &object[0]), GET_UNDEFINED, scope);
+    object[1] = JsUtil::GetDeviceInfo(cb);
     napi_value handler = nullptr;
     CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE, scope);
     napi_value result = nullptr;
-    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 1, &object, &result), CALL_FUNCTION,
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, object, &result), CALL_FUNCTION,
         scope);
     napi_close_handle_scope(cb->env, scope);
     JsUtil::DeleteCallbackInfo(std::move(cb));
