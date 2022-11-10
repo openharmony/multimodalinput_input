@@ -93,7 +93,10 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
 int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(pointerWindow_, RET_ERR);
+    if (pointerWindow_ == nullptr) {
+        MMI_HILOGD("pointerWindow_ is nullptr");
+        return RET_ERR;
+    }
     sptr<OHOS::Surface> layer = GetLayer();
     if (layer == nullptr) {
         pointerWindow_->Destroy();
