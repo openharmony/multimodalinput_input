@@ -154,7 +154,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
         }
         OnConnected(sess);
         return RET_OK;
-    } while(0);
+    } while (0);
     close(serverFd);
     serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     close(toReturnClientFd);
