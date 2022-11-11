@@ -149,6 +149,21 @@ void PointerDrawingManager::AdjustMouseFocus(ICON_TYPE iconType, int32_t &physic
     }
 }
 
+
+void PointerDrawingManager::SetMouseDisplayState(bool state)
+{
+    CALL_DEBUG_ENTER;
+    if (mouseDisplayState_ != state) {
+        mouseDisplayState_ = state;
+        InitLayer(MOUSE_ICON(lastMouseStyle_));
+    }
+}
+
+bool PointerDrawingManager::GetMouseDisplayState() const
+{
+    return mouseDisplayState_;
+}
+    
 void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physicalY)
 {
     if (physicalX < 0) {
@@ -409,7 +424,7 @@ void PointerDrawingManager::UpdatePointerVisible()
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerWindow_);
-    if (IsPointerVisible()) {
+    if (IsPointerVisible() && mouseDisplayState_) {
         pointerWindow_->Show();
         MMI_HILOGD("Pointer window show success");
     } else {
