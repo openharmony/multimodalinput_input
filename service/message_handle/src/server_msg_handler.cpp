@@ -144,28 +144,12 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     pointerEvent->UpdateId();
     int32_t action = pointerEvent->GetPointerAction();
-    if ((action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_UP)
-        && targetWindowId_ > 0) {
-        pointerEvent->SetTargetWindowId(targetWindowId_);
-        PointerEvent::PointerItem pointerItem;
-        auto pointerIds = pointerEvent->GetPointerIds();
-        if (pointerIds.empty()) {
-            MMI_HILOGE("GetPointerIds is empty");
-            return RET_ERR;
-        }
-        auto id = pointerIds.front();
-        if (!pointerEvent->GetPointerItem(id, pointerItem)) {
-            MMI_HILOGE("Can't find pointer item");
-            return RET_ERR;
-        }
-        pointerItem.SetTargetWindowId(targetWindowId_);
-        pointerEvent->UpdatePointerItem(id, pointerItem);
-    }
     auto source = pointerEvent->GetSourceType();
     switch (source) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
             auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+            FixTargetWindowId(pointerEvent, action);
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
             break;
         }
@@ -184,12 +168,35 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             break;
         }
     }
-    if (action == PointerEvent::POINTER_ACTION_DOWN) {
+    if (source == PointerEvent::SOURCE_TYPE_TOUCHSCREEN && action == PointerEvent::POINTER_ACTION_DOWN) {
         targetWindowId_ = pointerEvent->GetTargetWindowId();
     }
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+void ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action)
+{
+    if (action == PointerEvent::POINTER_ACTION_DOWN || targetWindowId_ < 0) {
+        return;
+    }
+    pointerEvent->SetTargetWindowId(targetWindowId_);
+    PointerEvent::PointerItem pointerItem;
+    auto pointerIds = pointerEvent->GetPointerIds();
+    if (pointerIds.empty()) {
+        MMI_HILOGE("GetPointerIds is empty");
+        return;
+    }
+    auto id = pointerIds.front();
+    if (!pointerEvent->GetPointerItem(id, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item");
+        return;
+    }
+    pointerItem.SetTargetWindowId(targetWindowId_);
+    pointerEvent->UpdatePointerItem(id, pointerItem);
+}
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
