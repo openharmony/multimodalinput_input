@@ -40,6 +40,8 @@ public:
     void TearDown();
     static void SetUpTestCase();
     std::string GetEventDump();
+    std::shared_ptr<KeyOption> InitOption(const std::set<int32_t> &preKeys,
+        int32_t finalKey, bool isFinalKeyDown, int32_t duration);
     std::shared_ptr<PointerEvent> SetupPointerEvent001();
     std::shared_ptr<PointerEvent> SetupPointerEvent002();
     std::shared_ptr<PointerEvent> SetupPointerEvent003();
@@ -1390,6 +1392,17 @@ HWTEST_F(InputManagerTest, InputManager_NotResponse_002, TestSize.Level1)
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 }
 
+std::shared_ptr<KeyOption> InputManagerTest::InitOption(const std::set<int32_t> &preKeys,
+    int32_t finalKey, bool isFinalKeyDown, int32_t duration)
+{
+    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
+    keyOption->SetPreKeys(preKeys);
+    keyOption->SetFinalKey(finalKey);
+    keyOption->SetFinalKeyDown(isFinalKeyDown);
+    keyOption->SetFinalKeyDownDuration(duration);
+    return keyOption;
+}
+
 /**
  * @tc.name: InputManagerTest_SubscribeKeyEvent_001
  * @tc.desc: Verify invalid parameter.
@@ -1401,11 +1414,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_001, TestSize.Leve
 {
     CALL_DEBUG_ENTER;
     std::set<int32_t> preKeys;
-    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
-    keyOption->SetPreKeys(preKeys);
-    keyOption->SetFinalKey(KeyEvent::KEYCODE_VOLUME_MUTE);
-    keyOption->SetFinalKeyDown(true);
-    keyOption->SetFinalKeyDownDuration(0);
+    std::shared_ptr<KeyOption> keyOption = InitOption(preKeys, KeyEvent::KEYCODE_VOLUME_MUTE, true, 0);
     int32_t response = -1;
     response = InputManager::GetInstance()->SubscribeKeyEvent(keyOption, nullptr);
     EXPECT_TRUE(response < 0);
@@ -1426,11 +1435,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
     ASSERT_TRUE(MMIEventHdl.InitClient());
     // 电源键长按按下订阅
     std::set<int32_t> preKeys;
-    std::shared_ptr<KeyOption> keyOption = std::make_shared<KeyOption>();
-    keyOption->SetPreKeys(preKeys);
-    keyOption->SetFinalKey(KeyEvent::KEYCODE_POWER);
-    keyOption->SetFinalKeyDown(true);
-    keyOption->SetFinalKeyDownDuration(2000);
+    std::shared_ptr<KeyOption> keyOption = InitOption(preKeys, KeyEvent::KEYCODE_POWER, true, 2000);
     int32_t subscribeId1 = -1;
     subscribeId1 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption,
         [](std::shared_ptr<KeyEvent> keyEvent) {
@@ -1444,11 +1449,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     // 电源键抬起订阅
-    std::shared_ptr<KeyOption> keyOption2 = std::make_shared<KeyOption>();
-    keyOption2->SetPreKeys(preKeys);
-    keyOption2->SetFinalKey(KeyEvent::KEYCODE_POWER);
-    keyOption2->SetFinalKeyDown(false);
-    keyOption2->SetFinalKeyDownDuration(0);
+    std::shared_ptr<KeyOption> keyOption2 = InitOption(preKeys, KeyEvent::KEYCODE_POWER, false, 0);
     int32_t subscribeId2 = -1;
     subscribeId2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2,
         [](std::shared_ptr<KeyEvent> keyEvent) {
@@ -1478,44 +1479,28 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_03, TestSize.Level
     CALL_DEBUG_ENTER;
     ASSERT_TRUE(MMIEventHdl.InitClient());
     std::set<int32_t> preKeys;
-    std::shared_ptr<KeyOption> keyOption1 = std::make_shared<KeyOption>();
-    keyOption1->SetPreKeys(preKeys);
-    keyOption1->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
-    keyOption1->SetFinalKeyDown(true);
-    keyOption1->SetFinalKeyDownDuration(10);
+    std::shared_ptr<KeyOption> keyOption1 = InitOption(preKeys, KeyEvent::KEYCODE_VOLUME_UP, true, 10);
     int32_t subscribeId1 = -1;
     subscribeId1 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption1,
         [](std::shared_ptr<KeyEvent> keyEvent) {
         EventLogHelper::PrintEventData(keyEvent);
         MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP down trigger callback");
     });
-    std::shared_ptr<KeyOption> keyOption2 = std::make_shared<KeyOption>();
-    keyOption2->SetPreKeys(preKeys);
-    keyOption2->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
-    keyOption2->SetFinalKeyDown(false);
-    keyOption2->SetFinalKeyDownDuration(0);
+    std::shared_ptr<KeyOption> keyOption2 = InitOption(preKeys, KeyEvent::KEYCODE_VOLUME_UP, false, 0);
     int32_t subscribeId2 = -1;
     subscribeId2 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption2,
         [](std::shared_ptr<KeyEvent> keyEvent) {
         EventLogHelper::PrintEventData(keyEvent);
         MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP up trigger callback");
     });
-    std::shared_ptr<KeyOption> keyOption3 = std::make_shared<KeyOption>();
-    keyOption3->SetPreKeys(preKeys);
-    keyOption3->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
-    keyOption3->SetFinalKeyDown(true);
-    keyOption3->SetFinalKeyDownDuration(0);
+    std::shared_ptr<KeyOption> keyOption3 = InitOption(preKeys, KeyEvent::KEYCODE_VOLUME_UP, true, 0);
     int32_t subscribeId3 = -1;
     subscribeId3 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption3,
         [](std::shared_ptr<KeyEvent> keyEvent) {
         EventLogHelper::PrintEventData(keyEvent);
         MMI_HILOGD("Subscribe key event KEYCODE_VOLUME_UP down trigger callback");
     });
-    std::shared_ptr<KeyOption> keyOption4 = std::make_shared<KeyOption>();
-    keyOption4->SetPreKeys(preKeys);
-    keyOption4->SetFinalKey(KeyEvent::KEYCODE_VOLUME_UP);
-    keyOption4->SetFinalKeyDown(false);
-    keyOption4->SetFinalKeyDownDuration(0);
+    std::shared_ptr<KeyOption> keyOption4 = InitOption(preKeys, KeyEvent::KEYCODE_VOLUME_UP, false, 0);
     int32_t subscribeId4 = -1;
     subscribeId4 = InputManager::GetInstance()->SubscribeKeyEvent(keyOption4,
         [](std::shared_ptr<KeyEvent> keyEvent) {

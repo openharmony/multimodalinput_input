@@ -200,6 +200,13 @@ struct DisplayInfo {
     int32_t height;
 
     /**
+     * 像素密度，表示一英寸包含的像素点数。
+     *
+     * @since 10
+     */
+    int32_t dpi;
+
+    /**
      * Name of the physical display, which is used for debugging
      *
      * @since 9

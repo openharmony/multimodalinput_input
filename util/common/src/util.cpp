@@ -308,7 +308,7 @@ void ReadProFile(const std::string &filePath, int32_t deviceId,
     }
     char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("Path is error");
+        MMI_HILOGI("The realpath return nullptr");
         return;
     }
     if (!IsValidProPath(realPath)) {
@@ -493,7 +493,7 @@ int32_t ReadTomlFile(const std::string &filePath, DeviceConfig &devConf)
     }
     char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
-        MMI_HILOGE("Path is error");
+        MMI_HILOGI("The realpath return nullptr");
         return RET_ERR;
     }
     if (!IsValidTomlPath(realPath)) {

@@ -59,7 +59,8 @@ public:
     bool IsPointerVisible() override;
     void SetPointerLocation(int32_t pid, int32_t x, int32_t y) override;
     void AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
-
+    void SetMouseDisplayState(bool state) override;
+    bool GetMouseDisplayState() const override;
 private:
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY);
     sptr<OHOS::Surface> GetLayer();
@@ -93,6 +94,7 @@ private:
     int32_t imageHeight_ { 0 };
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
+    bool mouseDisplayState_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
