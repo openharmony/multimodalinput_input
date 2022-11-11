@@ -92,6 +92,10 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 #endif // OHOS_BUILD_ENABLE_COOPERATE
         {NULL, 0, 0, 0}
     };
+    if (args.empty()) {
+        MMI_HILOGE("size of args can't be zero");
+        return;
+    }
     char **argv = new (std::nothrow) char *[args.size()];
     CHKPV(argv);
     if (memset_s(argv, args.size() * sizeof(char*), 0, args.size() * sizeof(char*)) != EOK) {
@@ -191,7 +195,9 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     RELEASE_RES:
     for (size_t i = 0; i < args.size(); ++i) {
-        delete[] argv[i];
+        if (argv[i] != nullptr) {
+            delete[] argv[i];
+        }
     }
     delete[] argv;
 }

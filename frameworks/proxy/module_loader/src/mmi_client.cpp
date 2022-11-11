@@ -155,6 +155,7 @@ bool MMIClient::DelFdListener(int32_t fd)
     CHKPF(eventHandler_);
     if (fd >= 0) {
         eventHandler_->RemoveFileDescriptorListener(fd);
+        MMI_HILOGI("Remove file descriptor listener success");
     } else {
         MMI_HILOGE("Invalid fd:%{public}d", fd);
     }
@@ -162,6 +163,7 @@ bool MMIClient::DelFdListener(int32_t fd)
     CHKPF(runner);
     if (runner->GetRunnerThreadName() == THREAD_NAME) {
         eventHandler_->RemoveAllEvents();
+        MMI_HILOGI("Remove all events success");
     }
     isRunning_ = false;
     return true;
@@ -283,6 +285,7 @@ void MMIClient::Stop()
             runner->Stop();
             eventHandler_->RemoveAllEvents();
             eventHandler_->RemoveAllFileDescriptorListeners();
+            MMI_HILOGI("Remove all file descriptor listeners success");
         }
     }
 }

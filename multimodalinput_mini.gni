@@ -50,3 +50,37 @@ print("input_feature_joystick = ${input_feature_joystick}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_input_cooperation = ${input_feature_input_cooperation}")
+
+input_default_defines = []
+
+if (input_feature_pointer_drawing) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+}
+
+if (input_feature_interceptor) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_INTERCEPTOR" ]
+}
+
+if (input_feature_keyboard) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_KEYBOARD" ]
+}
+
+if (input_feature_monitor) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
+}
+
+if (input_feature_input_cooperation) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+}
+
+if (input_feature_touchscreen) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
+}
+
+if (input_feature_mouse) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
+}
+
+if (input_feature_joystick) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_JOYSTICK" ]
+}

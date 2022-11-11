@@ -49,8 +49,7 @@ int32_t InputDeviceCooperateStateOut::StopInputDeviceCooperate(const std::string
     std::function<void()> handleProcessStopFunc =
         std::bind(&InputDeviceCooperateStateOut::ProcessStop, this, srcNetworkId);
     CHKPR(eventHandler_, RET_ERR);
-    eventHandler_->PostTask(handleProcessStopFunc, taskName, 0,
-        AppExecFwk::EventQueue::Priority::HIGH);
+    eventHandler_->ProxyPostTask(handleProcessStopFunc, taskName, 0);
     return RET_OK;
 }
 
@@ -77,8 +76,7 @@ void InputDeviceCooperateStateOut::OnStopRemoteInput(bool isSuccess, const std::
     std::function<void()> handleStopFinishFunc =
         std::bind(&InputDeviceCooperateSM::OnStopFinish, InputDevCooSM, isSuccess, srcNetworkId);
     CHKPV(eventHandler_);
-    eventHandler_->PostTask(handleStopFinishFunc, taskName, 0,
-        AppExecFwk::EventQueue::Priority::HIGH);
+    eventHandler_->ProxyPostTask(handleStopFinishFunc, taskName, 0);
 }
 
 void InputDeviceCooperateStateOut::OnKeyboardOnline(const std::string &dhid)

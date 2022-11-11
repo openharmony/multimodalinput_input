@@ -265,8 +265,10 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
 
     auto fd = udsServer_->GetClientFd(lastWindowInfo_.pid);
     auto sess = udsServer_->GetSession(fd);
-    CHKPV(sess);
-
+    if (sess == nullptr) {
+        MMI_HILOGI("The last window has disappeared");
+        return;
+    }
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
     if (!sess->SendMsg(pkt)) {
@@ -332,7 +334,10 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
         fd = udsServer_->GetClientFd(windowInfo->pid);
     }
     auto sess = udsServer_->GetSession(fd);
-    CHKPV(sess);
+    if (sess == nullptr) {
+        MMI_HILOGI("The last window has disappeared");
+        return;
+    }
 
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
@@ -833,12 +838,12 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
         return ret;
     }
+    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
     IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicalDisplayInfo);
     WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
     IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
         pointerItem.GetDisplayY(), MOUSE_ICON(mouseStyle));
-
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     int32_t windowX = logicalX - touchWindow->area.x;
@@ -934,6 +939,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",
                touchWindow->pid, logicalX, logicalY, physicalX, physicalY,
                windowX, windowY, displayId, pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
+    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
     return ERR_OK;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
