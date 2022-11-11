@@ -210,6 +210,20 @@ sptr<OHOS::Surface> PointerDrawingManager::GetLayer()
     return surfaceNode->GetSurface();
 }
 
+void PointerDrawingManager::SetMouseDisplayState(bool state)
+{
+    CALL_DEBUG_ENTER;
+    if (mouseDisplayState_ != state) {
+        mouseDisplayState_ = state;
+        InitLayer(MOUSE_ICON(lastMouseStyle_));
+    }
+}
+
+bool PointerDrawingManager::GetMouseDisplayState() const
+{
+    return mouseDisplayState_;
+}
+
 sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Surface> layer) const
 {
     sptr<OHOS::SurfaceBuffer> buffer;
@@ -415,7 +429,7 @@ void PointerDrawingManager::UpdatePointerVisible()
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerWindow_);
-    if (IsPointerVisible()) {
+    if (IsPointerVisible() && mouseDisplayState_) {
         pointerWindow_->Show();
     } else {
         pointerWindow_->Hide();
