@@ -70,9 +70,7 @@ private:
     void DrawManager();
     void FixCursorPosition(int32_t &physicalX, int32_t &physicalY);
     std::unique_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
-    void DeletePidInfo(int32_t pid);
     void UpdatePointerVisible();
-    void UpdatePidInfo(int32_t pid, bool visible);
     void InitStyle();
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
 
