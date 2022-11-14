@@ -71,6 +71,12 @@ protected:
 #ifdef OHOS_BUILD_MMI_DEBUG
     int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_MMI_DEBUG
+
+private:
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    void FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action);
+#endif // OHOS_BUILD_ENABLE_TOUCH
+
 private:
     UDSServer *udsServer_ { nullptr };
     int32_t targetWindowId_ { -1 };
