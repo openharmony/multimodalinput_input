@@ -68,7 +68,7 @@ protected:
 
 private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    void FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action);
+    bool FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 private:
