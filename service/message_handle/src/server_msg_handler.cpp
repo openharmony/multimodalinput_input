@@ -146,7 +146,9 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_TOUCH
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
-            FixTargetWindowId(pointerEvent, action);
+            if (!FixTargetWindowId(pointerEvent, action)) {
+                return RET_ERR;
+            }
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
             break;
@@ -179,25 +181,27 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-void ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action)
+bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action)
 {
     if (action == PointerEvent::POINTER_ACTION_DOWN || targetWindowId_ < 0) {
-        return;
+        MMI_HILOGD("Down event or targetWindowId_ less 0 is not need fix window id");
+        return true;
     }
     pointerEvent->SetTargetWindowId(targetWindowId_);
     PointerEvent::PointerItem pointerItem;
     auto pointerIds = pointerEvent->GetPointerIds();
     if (pointerIds.empty()) {
         MMI_HILOGE("GetPointerIds is empty");
-        return;
+        return false;
     }
     auto id = pointerIds.front();
     if (!pointerEvent->GetPointerItem(id, pointerItem)) {
         MMI_HILOGE("Can't find pointer item");
-        return;
+        return false;
     }
     pointerItem.SetTargetWindowId(targetWindowId_);
     pointerEvent->UpdatePointerItem(id, pointerItem);
+    return true;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
