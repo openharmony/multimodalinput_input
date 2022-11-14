@@ -398,7 +398,11 @@ void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDevice> dev
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
-    CHKPV(uData);
+    if (uData == nullptr) {
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        MMI_HILOGE("Check uData is nullptr");
+        return;
+    }
     work->data = static_cast<void*>(uData);
     int32_t ret;
     if (iter->second->isApi9) {
@@ -547,7 +551,11 @@ void JsEventTarget::EmitSupportKeys(int32_t userData, std::vector<bool> &keystro
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
-    CHKPV(uData);
+    if (uData == nullptr) {
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        MMI_HILOGE("Check data is null");
+        return;
+    }
     work->data = static_cast<void*>(uData);
     int32_t ret;
     if (iter->second->ref == nullptr) {
@@ -586,7 +594,11 @@ void JsEventTarget::EmitJsKeyboardType(int32_t userData, int32_t keyboardType)
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
-    CHKPV(uData);
+    if (uData == nullptr) {
+        JsUtil::DeletePtr<uv_work_t*>(work);
+        MMI_HILOGE("Check uDdata is nullptr");
+        return;
+    }
     work->data = static_cast<void*>(uData);
     int32_t ret = 0;
     if (iter->second->ref == nullptr) {

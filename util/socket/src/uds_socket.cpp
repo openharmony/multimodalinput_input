@@ -98,6 +98,7 @@ int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isNonBlock)
     if (flags < 0) {
         MMI_HILOGE("fcntl F_GETFL fail. fd:%{public}d,flags:%{public}d,errno:%{public}d,errCode:%{public}d",
             fd, flags, errno, FCNTL_FAIL);
+        close(fd);
         return flags;
     }
     MMI_HILOGI("F_GETFL fd:%{public}d,flags:%{public}d", fd, flags);
@@ -110,6 +111,7 @@ int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isNonBlock)
     if (flags < 0) {
         MMI_HILOGE("fcntl F_SETFL fail. fd:%{public}d,flags:%{public}d,errno:%{public}d,errCode:%{public}d",
             fd, flags, errno, FCNTL_FAIL);
+        close(fd);
         return flags;
     }
     MMI_HILOGI("F_SETFL fd:%{public}d,flags:%{public}d", fd, flags);
