@@ -188,7 +188,8 @@ void LibinputAdapter::RetriggerHotplugEvents()
         MMI_HILOGE("Failed to open directory: \'/sys/class/input\'");
         return;
     }
-    for (struct dirent *pdirent = readdir(pdir); pdirent != nullptr; pdirent = readdir(pdir)) {
+    struct dirent *pdirent = nullptr;
+    while ((pdirent = readdir(pdir)) != nullptr) {
         char path[PATH_MAX];
         if (sprintf_s(path, sizeof(path), "/sys/class/input/%s/uevent", pdirent->d_name) < 0) {
             continue;
