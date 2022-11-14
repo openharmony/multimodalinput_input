@@ -824,6 +824,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
         return RET_ERR;
     }
+    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
     IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicalDisplayInfo);
     int32_t mouseStyle = pointerStyleInfo.value();
     WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
@@ -926,6 +927,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",
                touchWindow->pid, logicalX, logicalY, physicalX, physicalY,
                windowX, windowY, displayId, pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
+    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
     return ERR_OK;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
