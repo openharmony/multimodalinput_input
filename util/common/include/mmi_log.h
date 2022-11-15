@@ -134,4 +134,8 @@ private:
 
 #define CALL_INFO_TRACE         ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___     \
     { std::bind(&::OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1, __FUNCTION__), LABEL.tag, LOG_INFO }
+
+#define CALL_TEST_DEBUG         ::OHOS::MMI::InnerFunctionTracer ___innerFuncTracer_Info___     \
+    { std::bind(&::OHOS::HiviewDFX::HiLog::Info, LABEL, std::placeholders::_1,     \
+    (test_info_ == nullptr ? "TestBody" : test_info_->name())), LABEL.tag, LOG_DEBUG }
 #endif // MMI_LOG_H
