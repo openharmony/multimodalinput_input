@@ -314,7 +314,7 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
     dir = opendir(processPath.c_str());
     if (dir == nullptr) {
         std::cout << "Useless flag file:" << processPath << std::endl;
-        goto RELEASE_RES;
+        return false;
     }
     temp = ReadUinputToolFile(filePath);
     if (temp.empty()) {
@@ -329,10 +329,8 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
         return true;
     }
     RELEASE_RES:
-    if (dir != nullptr) {
-        if (closedir(dir) != 0) {
-            std::cout << "Close dir failed" << std::endl;
-        }
+    if (closedir(dir) != 0) {
+        std::cout << "Close dir failed" << std::endl;
     }
     if (std::remove((g_folderPath + fileName).c_str()) != 0) {
         std::cout << "Remove file failed" << std::endl;
