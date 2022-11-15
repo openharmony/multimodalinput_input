@@ -18,12 +18,9 @@
 #include <algorithm>
 #include <mutex>
 
-#include "nlohmann/json.hpp"
-
 #include "distributed_device_profile_client.h"
+#include "input_device_cooperate_util.h"
 #include "service_characteristic_profile.h"
-#include "softbus_bus_center.h"
-#include "softbus_common.h"
 #include "sync_options.h"
 
 namespace OHOS {
@@ -50,13 +47,16 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     ServiceCharacteristicProfile profile;
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
-    nlohmann::json data;
-    data[CHARACTERISTICS_NAME] = state;
-    profile.SetCharacteristicProfileJson(data.dump());
+    cJSON *data = cJSON_CreateObject();
+    cJSON_AddItemToObject(data, CHARACTERISTICS_NAME.c_str(), cJSON_CreateBool(state));
+    char *smsg = cJSON_Print(data);
+    cJSON_Delete(data);
+    profile.SetCharacteristicProfileJson(smsg);
+    cJSON_free(smsg);
 
     int32_t ret = DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
     if (ret != 0) {
-        MMI_HILOGE("Put device profile failed");
+        MMI_HILOGE("Put device profile failed, ret:%{public}d", ret);
         return ret;
     }
     SyncOptions syncOptions;
@@ -76,9 +76,13 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
     ServiceCharacteristicProfile profile;
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
-    nlohmann::json data;
-    data[CHARACTERISTICS_NAME] = state;
-    profile.SetCharacteristicProfileJson(data.dump());
+    cJSON *data = cJSON_CreateObject();
+    cJSON_AddItemToObject(data, CHARACTERISTICS_NAME.c_str(), cJSON_CreateBool(state));
+    char *smsg = cJSON_Print(data);
+    cJSON_Delete(data);
+    profile.SetCharacteristicProfileJson(smsg);
+    cJSON_free(smsg);
+
     return DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
 }
 
@@ -87,12 +91,18 @@ bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
     ServiceCharacteristicProfile profile;
     DistributedDeviceProfileClient::GetInstance().GetDeviceProfile(deviceId, SERVICE_ID, profile);
     std::string jsonData = profile.GetCharacteristicProfileJson();
-    nlohmann::json jsonObject = nlohmann::json::parse(jsonData, nullptr, false);
-    if (jsonObject.is_discarded()) {
-        MMI_HILOGE("JsonData is discarded");
+    JsonParser parser;
+    parser.json_ = cJSON_Parse(jsonData.c_str());
+    if (!cJSON_IsObject(parser.json_)) {
+        MMI_HILOGE("Parser.json_ is not object");
         return false;
     }
-    return jsonObject[CHARACTERISTICS_NAME].get<bool>();
+    cJSON* state = cJSON_GetObjectItemCaseSensitive(parser.json_, CHARACTERISTICS_NAME.c_str());
+    if (!cJSON_IsBool(state)) {
+        MMI_HILOGE("State is not bool type");
+        return false;
+    }
+    return cJSON_IsTrue(state);
 }
 
 int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &deviceId, DPCallback callback)

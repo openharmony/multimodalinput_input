@@ -47,7 +47,7 @@ int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetwor
                 this->OnPrepareDistributedInput(isSuccess, srcNetworkId, startInputDeviceId);
             });
         if (ret != RET_OK) {
-            MMI_HILOGE("Prepare remoteNetworkId input fail");
+            MMI_HILOGE("Prepare remote input fail");
             InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
             InputDevCooSM->UpdatePreparedDevices("", "");
         }

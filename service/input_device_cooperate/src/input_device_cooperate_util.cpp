@@ -13,20 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef INPUT_DEVICE_COOPERATE_STATE_FREE_H
-#define INPUT_DEVICE_COOPERATE_STATE_FREE_H
+#include "input_device_cooperate_util.h"
 
-#include "i_input_device_cooperate_state.h"
+#include "softbus_bus_center.h"
 
+#include "config_multimodal.h"
+#include "define_multimodal.h"
 namespace OHOS {
 namespace MMI {
-class InputDeviceCooperateStateFree : public IInputDeviceCooperateState {
-public:
-    virtual int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId) override;
-
-private:
-    int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId);
-};
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceCooperateUtil" };
+} // namespace
+std::string GetLocalDeviceId()
+{
+    auto localNode = std::make_unique<NodeBasicInfo>();
+    CHKPS(localNode);
+    int32_t ret = GetLocalNodeDeviceInfo(MMI_DINPUT_PKG_NAME, localNode.get());
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetLocalNodeDeviceInfo ret:%{public}d", ret);
+        return {};
+    }
+    return localNode->networkId;
+}
 } // namespace MMI
 } // namespace OHOS
-#endif // INPUT_DEVICE_COOPERATE_STATE_FREE_H
