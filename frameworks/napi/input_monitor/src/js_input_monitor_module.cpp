@@ -37,9 +37,9 @@ static napi_value JsOnApi9(napi_env env, napi_callback_info info)
     size_t argc = 2;
     napi_value argv[2];
 
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     napi_valuetype valueType = napi_undefined;
-    CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
+    CHKRP(napi_typeof(env, argv[0], &valueType), TYPEOF);
     if (valueType != napi_string) {
         MMI_HILOGE("First Parameter type error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "EventType", "string");
@@ -47,12 +47,12 @@ static napi_value JsOnApi9(napi_env env, napi_callback_info info)
     }
     char typeName[MAX_STRING_LEN] = { 0 };
     size_t len = 0;
-    CHKRP(env, napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_STRING_UTF8);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_VALUE_STRING_UTF8);
     if (std::strcmp(typeName, "touch") != 0 && std::strcmp(typeName, "mouse") != 0) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType must be mouse or touch");
         return nullptr;
     }
-    CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
+    CHKRP(napi_typeof(env, argv[1], &valueType), TYPEOF);
     if (valueType != napi_function) {
         MMI_HILOGE("Second Parameter type error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
@@ -71,7 +71,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     CALL_DEBUG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 2) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
@@ -85,9 +85,9 @@ static napi_value JsOffApi9(napi_env env, napi_callback_info info)
     CALL_DEBUG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     napi_valuetype valueType = napi_undefined;
-    CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
+    CHKRP(napi_typeof(env, argv[0], &valueType), TYPEOF);
     if (valueType != napi_string) {
         MMI_HILOGE("First Parameter type error");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "EventType", "string");
@@ -95,7 +95,7 @@ static napi_value JsOffApi9(napi_env env, napi_callback_info info)
     }
     char typeName[MAX_STRING_LEN] = { 0 };
     size_t len = 0;
-    CHKRP(env, napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_STRING_UTF8);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_VALUE_STRING_UTF8);
     if (std::strcmp(typeName, "touch") != 0 && std::strcmp(typeName, "mouse") != 0) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType must be mouse or touch");
         return nullptr;
@@ -106,7 +106,7 @@ static napi_value JsOffApi9(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
+    CHKRP(napi_typeof(env, argv[1], &valueType), TYPEOF);
     if (valueType != napi_function) {
         MMI_HILOGE("Second Parameter type error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
@@ -128,7 +128,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     size_t argc = 2;
     napi_value argv[2];
 
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
@@ -145,7 +145,7 @@ static napi_value MmiInputMonitorInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
     };
-    CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
+    CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     return exports;
 }
 EXTERN_C_END
