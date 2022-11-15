@@ -21,13 +21,9 @@ int32_t main(int32_t argc, const char *argv[])
         std::cout << "Invalid Input Para, Please Check the validity of the para" << std::endl;
         return 0;
     }
-    DIR* dir = opendir(OHOS::MMI::g_folderPath.c_str());
-    if (dir == nullptr) {
+    if (access(OHOS::MMI::g_folderPath.c_str(), F_OK) != 0) {
+        MMI_HILOGW("Directory %{public}s did not exist, errno: %{public}d", g_folderPath.c_str(), errno);
         mkdir(OHOS::MMI::g_folderPath.c_str(), SYMBOL_FOLDER_PERMISSIONS);
-    } else {
-        if (closedir(dir) != 0) {
-            std::cout << "Close dir:" << OHOS::MMI::g_folderPath << "failed" << std::endl;
-        }
     }
     std::vector<std::string> argvList;
     for (uint16_t i = 0; i < argc; i++) {
