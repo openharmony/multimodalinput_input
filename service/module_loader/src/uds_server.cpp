@@ -107,54 +107,54 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
         MMI_HILOGE("Call fcntl failed, errno:%{public}d", errno);
         return RET_ERR;
     }
-    do {
-        static constexpr size_t bufferSize = 32 * 1024;
-        if (setsockopt(serverFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-            MMI_HILOGE("setsockopt serverFd failed, errno: %{public}d", errno);
-            break;
+    static constexpr size_t bufferSize = 32 * 1024;
+    static constexpr size_t nativeBufferSize = 64 * 1024;
+    SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
+    if (setsockopt(serverFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
+        MMI_HILOGE("setsockopt serverFd failed, errno: %{public}d", errno);
+        goto CLOSE_SOCK;
+    }
+    if (setsockopt(serverFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize)) != 0) {
+        MMI_HILOGE("setsockopt serverFd failed, errno: %{public}d", errno);
+        goto CLOSE_SOCK;
+    }
+    if (tokenType == TokenType::TOKEN_NATIVE) {
+        if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &nativeBufferSize, sizeof(nativeBufferSize)) != 0) {
+            MMI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
+            goto CLOSE_SOCK;
         }
-        if (setsockopt(serverFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-            MMI_HILOGE("setsockopt serverFd failed, errno: %{public}d", errno);
-            break;
+        if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &nativeBufferSize, sizeof(nativeBufferSize)) != 0) {
+            MMI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
+            goto CLOSE_SOCK;
         }
-        if (tokenType == TokenType::TOKEN_NATIVE) {
-            static constexpr size_t nativeBufferSize = 64 * 1024;
-            if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &nativeBufferSize, sizeof(nativeBufferSize)) != 0) {
-                MMI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
-                break;
-            }
-            if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &nativeBufferSize, sizeof(nativeBufferSize)) != 0) {
-                MMI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
-                break;
-            }
-        } else {
-            if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-                MMI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
-                break;
-            }
-            if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize)) != 0) {
-                MMI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
-                break;
-            }
+    } else {
+        if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
+            MMI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
+            goto CLOSE_SOCK;
         }
-        if (AddEpoll(EPOLL_EVENT_SOCKET, serverFd) != RET_OK) {
-            MMI_HILOGE("epoll_ctl EPOLL_CTL_ADD failed, errCode:%{public}d", EPOLL_MODIFY_FAIL);
-            break;
+        if (setsockopt(toReturnClientFd, SOL_SOCKET, SO_RCVBUF, &bufferSize, sizeof(bufferSize)) != 0) {
+            MMI_HILOGE("setsockopt toReturnClientFd failed, errno: %{public}d", errno);
+            goto CLOSE_SOCK;
         }
-        SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
-        if (sess == nullptr) {
-            MMI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
-                programName.c_str(), pid, MAKE_SHARED_FAIL);
-            break;
-        }
-        sess->SetTokenType(tokenType);
-        if (!AddSession(sess)) {
-            MMI_HILOGE("AddSession fail errCode:%{public}d", ADD_SESSION_FAIL);
-            break;
-        }
-        OnConnected(sess);
-        return RET_OK;
-    } while (0);
+    }
+    if (AddEpoll(EPOLL_EVENT_SOCKET, serverFd) != RET_OK) {
+        MMI_HILOGE("epoll_ctl EPOLL_CTL_ADD failed, errCode:%{public}d", EPOLL_MODIFY_FAIL);
+        goto CLOSE_SOCK;
+    }
+    if (sess == nullptr) {
+        MMI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
+            programName.c_str(), pid, MAKE_SHARED_FAIL);
+        goto CLOSE_SOCK;
+    }
+    sess->SetTokenType(tokenType);
+    if (!AddSession(sess)) {
+        MMI_HILOGE("AddSession fail errCode:%{public}d", ADD_SESSION_FAIL);
+        goto CLOSE_SOCK;
+    }
+    OnConnected(sess);
+    return RET_OK;
+    
+    CLOSE_SOCK:
     close(serverFd);
     serverFd = IMultimodalInputConnect::INVALID_SOCKET_FD;
     close(toReturnClientFd);
