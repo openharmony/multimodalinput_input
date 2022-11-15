@@ -498,7 +498,7 @@ void DeviceCooperateSoftbusAdapter::OnSessionClosed(int32_t sessionId)
     if (GetSessionSide(sessionId) != 0) {
         channelStatusMap_.erase(deviceId);
     }
-    InputDevCooSM->OnDeviceOffline(deviceId);
+    InputDevCooSM->Reset(deviceId);
 }
 } // namespace MMI
 } // namespace OHOS

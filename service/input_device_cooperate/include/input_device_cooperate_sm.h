@@ -89,6 +89,7 @@ public:
     void OnStopFinish(bool isSuccess, const std::string &remoteNetworkId);
     bool IsStarting() const;
     bool IsStopping() const;
+    void Reset(const std::string &networkId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
 
 private:
