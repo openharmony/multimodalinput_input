@@ -53,7 +53,7 @@ int32_t InputDeviceCooperateStateIn::StartInputDeviceCooperate(const std::string
     std::function<void()> handleProcessStartFunc =
         std::bind(&InputDeviceCooperateStateIn::ProcessStart, this, remoteNetworkId, startInputDeviceId);
     CHKPR(eventHandler_, RET_ERR);
-    eventHandler_->PostTask(handleProcessStartFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
+    eventHandler_->ProxyPostTask(handleProcessStartFunc, taskName, 0);
     return RET_OK;
 }
 
@@ -80,7 +80,7 @@ int32_t InputDeviceCooperateStateIn::StopInputDeviceCooperate(const std::string 
     std::string taskName = "process_stop_task";
     std::function<void()> handleProcessStopFunc = std::bind(&InputDeviceCooperateStateIn::ProcessStop, this);
     CHKPR(eventHandler_, RET_ERR);
-    eventHandler_->PostTask(handleProcessStopFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
+    eventHandler_->ProxyPostTask(handleProcessStopFunc, taskName, 0);
     return RET_OK;
 }
 
@@ -112,7 +112,7 @@ void InputDeviceCooperateStateIn::OnStartRemoteInput(
     std::function<void()> handleRelayStopFunc = std::bind(&InputDeviceCooperateStateIn::StopRemoteInput,
         this, sinkNetworkId, srcNetworkId, dhid, startInputDeviceId);
     CHKPV(eventHandler_);
-    eventHandler_->PostTask(handleRelayStopFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
+    eventHandler_->ProxyPostTask(handleRelayStopFunc, taskName, 0);
 }
 
 void InputDeviceCooperateStateIn::StopRemoteInput(const std::string &sinkNetworkId,
@@ -136,13 +136,13 @@ void InputDeviceCooperateStateIn::OnStopRemoteInput(bool isSuccess,
         std::function<void()> handleStartFinishFunc = std::bind(&InputDeviceCooperateSM::OnStartFinish,
             InputDevCooSM, isSuccess, remoteNetworkId, startInputDeviceId);
         CHKPV(eventHandler_);
-        eventHandler_->PostTask(handleStartFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
+        eventHandler_->ProxyPostTask(handleStartFinishFunc, taskName, 0);
     } else if (InputDevCooSM->IsStopping()) {
         std::string taskName = "stop_finish_task";
         std::function<void()> handleStopFinishFunc =
             std::bind(&InputDeviceCooperateSM::OnStopFinish, InputDevCooSM, isSuccess, remoteNetworkId);
         CHKPV(eventHandler_);
-        eventHandler_->PostTask(handleStopFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
+        eventHandler_->ProxyPostTask(handleStopFinishFunc, taskName, 0);
     }
 }
 
