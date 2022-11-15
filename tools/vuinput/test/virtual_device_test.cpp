@@ -343,6 +343,7 @@ HWTEST_F(VirtualDeviceTest, Test_FindDevice_closeTrue01, TestSize.Level1)
     symbolFileTest.append(g_folderPath).append("1111111").append("_").append("testDevice");
     std::ofstream flagFile;
     flagFile.open(symbolFileTest.c_str());
+    flagFile.close(symbolFileTest.c_str());
     std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("close ");

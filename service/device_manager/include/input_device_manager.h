@@ -27,6 +27,7 @@
 #include "key_map_manager.h"
 #include "msg_handler.h"
 #include "nocopyable.h"
+#include "pointer_drawing_manager.h"
 #include "singleton.h"
 #include "util.h"
 
@@ -36,11 +37,12 @@ class InputDeviceManager final : public IDeviceObject {
     DECLARE_DELAYED_SINGLETON(InputDeviceManager);
 
     struct InputDeviceInfo {
-        struct libinput_device *inputDeviceOrigin_ { nullptr };
-        std::string networkIdOrigin_;
-        bool isRemote_ { false };
-        bool isPointerDevice_ { false };
-        std::string dhid_;
+        struct libinput_device *inputDeviceOrigin { nullptr };
+        std::string networkIdOrigin;
+        bool isRemote { false };
+        bool isPointerDevice { false };
+        bool isTouchableDevice { false };
+        std::string dhid;
     };
 public:
     DISALLOW_COPY_AND_MOVE(InputDeviceManager);
@@ -73,10 +75,12 @@ public:
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     bool IsKeyboardDevice(struct libinput_device* device) const;
     bool IsPointerDevice(struct libinput_device* device) const;
+    bool IsTouchDevice(struct libinput_device* device) const;
     struct libinput_device* GetKeyboardDevice() const;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasPointerDevice();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    bool HasTouchDevice();
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
     const std::string& GetScreenId(int32_t deviceId) const;
 

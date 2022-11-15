@@ -61,6 +61,10 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
         return RET_ERR;
     }
     socketFd = reply.ReadFileDescriptor();
+    if (socketFd < RET_OK) {
+        MMI_HILOGE("Read file fescriptor failed, fd: %{public}d", socketFd);
+        return IPC_PROXY_DEAD_OBJECT_ERR;
+    }
     READINT32(reply, tokenType, IPC_PROXY_DEAD_OBJECT_ERR);
     MMI_HILOGD("socketFd:%{public}d tokenType:%{public}d", socketFd, tokenType);
     return RET_OK;
@@ -86,7 +90,7 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(ADD_INPUT_EVENT_FILTER, data, reply, option);
     if (ret != RET_OK) {
-        MMI_HILOGE("Reply readint32 error:%{public}d", ret);
+        MMI_HILOGE("Send request message failed, ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
@@ -133,7 +137,7 @@ int32_t MultimodalInputConnectProxy::IsPointerVisible(bool &visible)
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
-    visible = reply.ReadBool();
+    READBOOL(reply, visible, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
 }
 
@@ -175,7 +179,7 @@ int32_t MultimodalInputConnectProxy::GetPointerSpeed(int32_t &speed)
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    speed = reply.ReadInt32();
+    READINT32(reply, speed, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
 }
 
@@ -221,7 +225,7 @@ int32_t MultimodalInputConnectProxy::GetPointerStyle(int32_t windowId, int32_t &
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
         return ret;
     }
-    pointerStyle = reply.ReadInt32();
+    READINT32(reply, pointerStyle, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
 }
 

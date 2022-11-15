@@ -162,8 +162,12 @@ DeviceCooperateSoftbusAdapter::~DeviceCooperateSoftbusAdapter()
 
 void DeviceCooperateSoftbusAdapter::Release()
 {
+    CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
-    std::for_each(sessionDevMap_.begin(), sessionDevMap_.end(), [](auto item) { CloseSession(item.second); });
+    std::for_each(sessionDevMap_.begin(), sessionDevMap_.end(), [](auto item) {
+        CloseSession(item.second);
+        MMI_HILOGD("Close session success");
+    });
     int32_t ret = RemoveSessionServer(MMI_DINPUT_PKG_NAME, localSessionName_.c_str());
     MMI_HILOGD("RemoveSessionServer ret:%{public}d", ret);
     sessionDevMap_.clear();
