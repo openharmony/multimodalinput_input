@@ -34,7 +34,7 @@ void SetNamedProperty(const napi_env &env, napi_value &object, const std::string
 {
     MMI_HILOGD("%{public}s=%{public}d", name.c_str(), value);
     napi_value napiValue;
-    CHKRV(env, napi_create_int32(env, value, &napiValue), CREATE_INT32);
+    CHKRV(napi_create_int32(env, value, &napiValue), CREATE_INT32);
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
 }
 
@@ -42,7 +42,7 @@ void SetNamedProperty(const napi_env &env, napi_value &object, const std::string
 {
     MMI_HILOGD("%{public}s=%{public}s", name.c_str(), value.c_str());
     napi_value napiValue;
-    CHKRV(env, napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &napiValue), CREATE_STRING_UTF8);
+    CHKRV(napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &napiValue), CREATE_STRING_UTF8);
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
 }
 
@@ -52,13 +52,13 @@ bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const s
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
 
-    CHKRF(env, napi_typeof(env, napiValue, &tmpType), TYPEOF);
+    CHKRF(napi_typeof(env, napiValue, &tmpType), TYPEOF);
     if (tmpType != napi_boolean) {
         MMI_HILOGE("The value is not bool");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "bool");
         return false;
     }
-    CHKRF(env, napi_get_value_bool(env, napiValue, &ret), GET_BOOL);
+    CHKRF(napi_get_value_bool(env, napiValue, &ret), GET_VALUE_BOOL);
     MMI_HILOGD("%{public}s=%{public}d", name.c_str(), ret);
     return true;
 }
@@ -90,19 +90,19 @@ napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int
 {
     CALL_DEBUG_ENTER;
     uint32_t arrayLength = 0;
-    CHKRP(env, napi_get_array_length(env, value, &arrayLength), GET_ARRAY_LENGTH);
+    CHKRP(napi_get_array_length(env, value, &arrayLength), GET_ARRAY_LENGTH);
     for (uint32_t i = 0; i < arrayLength; i++) {
         napi_value napiElement;
-        CHKRP(env, napi_get_element(env, value, i, &napiElement), GET_ELEMENT);
+        CHKRP(napi_get_element(env, value, i, &napiElement), GET_ELEMENT);
         napi_valuetype valuetype;
-        CHKRP(env, napi_typeof(env, napiElement, &valuetype), TYPEOF);
+        CHKRP(napi_typeof(env, napiElement, &valuetype), TYPEOF);
         if (valuetype != napi_number) {
             MMI_HILOGE("PreKeys Wrong argument type, Number expected");
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "element of preKeys must be number");
             return nullptr;
         }
         int32_t value = 0;
-        CHKRP(env, napi_get_value_int32(env, napiElement, &value), GET_INT32);
+        CHKRP(napi_get_value_int32(env, napiElement, &value), GET_VALUE_INT32);
         if (value < 0) {
             MMI_HILOGE("preKey:%{public}d is less 0, can not process", value);
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "element of preKeys must be greater than or equal to 0");
@@ -115,7 +115,7 @@ napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int
         }
     }
     napi_value ret;
-    CHKRP(env, napi_create_int32(env, RET_OK, &ret), CREATE_INT32);
+    CHKRP(napi_create_int32(env, RET_OK, &ret), CREATE_INT32);
     return ret;
 }
 
@@ -250,15 +250,15 @@ static void AsyncWorkFn(const napi_env &env, KeyEventMonitorInfo *event, napi_va
     CHKPV(event);
     CHKPV(event->keyOption);
     MMI_HILOGD("Status > 0 enter");
-    CHKRV(env, napi_create_object(env, &result), CREATE_OBJECT);
+    CHKRV(napi_create_object(env, &result), CREATE_OBJECT);
     napi_value arr;
-    CHKRV(env, napi_create_array(env, &arr), CREATE_ARRAY);
+    CHKRV(napi_create_array(env, &arr), CREATE_ARRAY);
     std::set<int32_t> preKeys = event->keyOption->GetPreKeys();
     int32_t i = 0;
     napi_value value;
     for (const auto &preKey : preKeys) {
-        CHKRV(env, napi_create_int32(env, preKey, &value), CREATE_INT32);
-        CHKRV(env, napi_set_element(env, arr, i, value), SET_ELEMENT);
+        CHKRV(napi_create_int32(env, preKey, &value), CREATE_INT32);
+        CHKRV(napi_set_element(env, arr, i, value), SET_ELEMENT);
         ++i;
     }
     std::string preKeysStr = "preKeys";
@@ -312,7 +312,7 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
     CALL_DEBUG_ENTER;
     CHKPV(reportEvent);
     uv_loop_s *loop = nullptr;
-    CHKRV(reportEvent->env, napi_get_uv_event_loop(reportEvent->env, &loop), GET_UV_LOOP);
+    CHKRV(napi_get_uv_event_loop(reportEvent->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     KeyEventMonitorInfoWorker *dataWorker = new (std::nothrow) KeyEventMonitorInfoWorker();

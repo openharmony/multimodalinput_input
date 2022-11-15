@@ -42,7 +42,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     CHKPP(keyOption);
     size_t argc = 3;
     napi_value argv[3] = { 0 };
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     napi_valuetype valueType = napi_undefined;
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "type", "string");
@@ -56,7 +56,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     }
     char eventType[EVENT_NAME_LEN] = { 0 };
     size_t typeLen = 0;
-    CHKRP(env, napi_get_value_string_utf8(env, argv[0], eventType, EVENT_NAME_LEN - 1, &typeLen), GET_STRING_UTF8);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], eventType, EVENT_NAME_LEN - 1, &typeLen), GET_VALUE_STRING_UTF8);
     std::string type = eventType;
     if (type != SUBSCRIBE_TYPE) {
         MMI_HILOGE("Type is not key");
@@ -64,7 +64,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
         return nullptr;
     }
     napi_value receiveValue = nullptr;
-    CHKRP(env, napi_get_named_property(env, argv[1], "preKeys", &receiveValue), GET_NAMED_PROPERTY);
+    CHKRP(napi_get_named_property(env, argv[1], "preKeys", &receiveValue), GET_NAMED_PROPERTY);
     if (receiveValue == nullptr) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "preKeys not found");
         return nullptr;
@@ -128,18 +128,18 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     event->eventType = subKeyNames;
     MMI_HILOGD("FinalKeyDownDuration:%{public}d", finalKeyDownDuration);
     if (argc == 3) {
-        CHKRP(env, napi_typeof(env, argv[2], &valueType), TYPEOF);
+        CHKRP(napi_typeof(env, argv[2], &valueType), TYPEOF);
         if (valueType != napi_function) {
             MMI_HILOGE("the third parameter is not napi_function");
             THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
             return nullptr;
         }
-        CHKRP(env, napi_create_reference(env, argv[2], 1, &event->callback[0]), REFERENCE_REF);
+        CHKRP(napi_create_reference(env, argv[2], 1, &event->callback[0]), REFERENCE_REF);
     } else {
         event->callback[0] = nullptr;
     }
     napi_value ret;
-    CHKRP(env, napi_create_int32(env, RET_OK, &ret), CREATE_INT32);
+    CHKRP(napi_create_int32(env, RET_OK, &ret), CREATE_INT32);
     return ret;
 }
 
@@ -235,7 +235,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     CALL_DEBUG_ENTER;
     size_t argc = 3;
     napi_value argv[3] = { 0 };
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 3) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
@@ -292,7 +292,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     CALL_DEBUG_ENTER;
     size_t argc = 3;
     napi_value argv[3] = { 0 };
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 2) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
