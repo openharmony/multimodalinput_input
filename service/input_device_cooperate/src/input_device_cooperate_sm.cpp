@@ -568,7 +568,7 @@ void InputDeviceCooperateSM::OnDeviceOnline(const std::string &networkId)
         InputDevCooSM, std::placeholders::_1, std::placeholders::_2));
 }
 
-void InputDeviceCooperateSM::OnDeviceOffline(const std::string& networkId)
+void InputDeviceCooperateSM::OnDeviceOffline(const std::string &networkId)
 {
     CALL_INFO_TRACE;
     DProfileAdapter->UnregisterCrossingStateListener(networkId);
