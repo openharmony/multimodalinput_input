@@ -60,7 +60,7 @@ struct JsonParser {
     cJSON *json_ { nullptr };
 };
 
-bool IsSpeialType(int32_t keyCode, SpecialType type)
+bool IsSpecialType(int32_t keyCode, SpecialType type)
 {
     auto it = SPECIAL_KEYS.find(keyCode);
     if (it == SPECIAL_KEYS.end()) {
@@ -608,9 +608,9 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
         return false;
     }
 
-    bool ret = ParseShortcutKeys(parser, shortcutKeys_);
-    ret = ParseSequences(parser, sequences_) && ret;
-    if (!ret) {
+    bool isParseShortKeys = ParseShortcutKeys(parser, shortcutKeys_);
+    bool isParseSequences = ParseSequences(parser, sequences_);
+    if (!isParseShortKeys && !isParseSequences) {
         MMI_HILOGE("Parse configFile failed");
         return false;
     }
@@ -664,9 +664,9 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         isParseConfig_ = true;
     }
 
-    bool ret = HandleShortKeys(key);
-    ret = HandleSequences(key) || ret;
-    if (ret) {
+    bool isHandleShortKey = HandleShortKeys(key);
+    bool isHandleSequences = HandleSequences(key);
+    if (isHandleShortKey || isHandleSequences) {
         return true;
     }
 
@@ -675,7 +675,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         return true;
     }
 
-    if (IsSpeialType(key->GetKeyCode(), SpecialType::SUBSCRIBER_BEFORE_DELAY)) {
+    if (IsSpecialType(key->GetKeyCode(), SpecialType::SUBSCRIBER_BEFORE_DELAY)) {
         int32_t timerId = TimerMgr->AddTimer(SPECIAL_KEY_DOWN_DELAY, 1, [this, key] () {
             MMI_HILOGD("Timer callback");
             auto it = specialTimers_.find(key->GetKeyCode());
@@ -787,7 +787,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
 
     if (isLaunchAbility) {
         for (const auto& item : keys_) {
-            if (IsSpeialType(item.keyCode, SpecialType::KEY_DOWN_ACTION)) {
+            if (IsSpecialType(item.keyCode, SpecialType::KEY_DOWN_ACTION)) {
                 HandleSpecialKeys(item.keyCode, item.keyAction);
             }
             InputHandler->GetSubscriberHandler()->RemoveSubscriberKeyUpTimer(item.keyCode);
