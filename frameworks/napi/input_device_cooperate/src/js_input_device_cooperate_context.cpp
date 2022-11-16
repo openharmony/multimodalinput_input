@@ -63,7 +63,7 @@ napi_value JsInputDeviceCooperateContext::Enable(napi_env env, napi_callback_inf
     CALL_INFO_TRACE;
     size_t argc = 2;
     napi_value argv[2] = {};
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
         MMI_HILOGE("Wrong number of parameters");
@@ -76,7 +76,7 @@ napi_value JsInputDeviceCooperateContext::Enable(napi_env env, napi_callback_inf
         return nullptr;
     }
     bool enable = false;
-    CHKRP(env, napi_get_value_bool(env, argv[0], &enable), GET_BOOL);
+    CHKRP(napi_get_value_bool(env, argv[0], &enable), GET_VALUE_BOOL);
 
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
     CHKPP(jsDev);
@@ -97,7 +97,7 @@ napi_value JsInputDeviceCooperateContext::Start(napi_env env, napi_callback_info
     CALL_INFO_TRACE;
     size_t argc = 3;
     napi_value argv[3] = {};
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc < 2) {
         MMI_HILOGE("Wrong number of parameters");
@@ -117,10 +117,10 @@ napi_value JsInputDeviceCooperateContext::Start(napi_env env, napi_callback_info
     char sinkDeviceDescriptor[MAX_STRING_LEN] = {};
     int32_t srcInputDeviceId = 0;
     size_t length = 0;
-    CHKRP(env, napi_get_value_string_utf8(env, argv[0], sinkDeviceDescriptor,
-        sizeof(sinkDeviceDescriptor), &length), GET_STRING);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], sinkDeviceDescriptor,
+        sizeof(sinkDeviceDescriptor), &length), GET_VALUE_STRING_UTF8);
     std::string sinkDeviceDescriptor_ = sinkDeviceDescriptor;
-    CHKRP(env, napi_get_value_int32(env, argv[1], &srcInputDeviceId), GET_INT32);
+    CHKRP(napi_get_value_int32(env, argv[1], &srcInputDeviceId), GET_VALUE_INT32);
 
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
     CHKPP(jsDev);
@@ -141,7 +141,7 @@ napi_value JsInputDeviceCooperateContext::Stop(napi_env env, napi_callback_info 
     CALL_INFO_TRACE;
     size_t argc = 1;
     napi_value argv[1] = {};
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
     CHKPP(jsDev);
@@ -162,7 +162,7 @@ napi_value JsInputDeviceCooperateContext::GetState(napi_env env, napi_callback_i
     CALL_INFO_TRACE;
     size_t argc = 2;
     napi_value argv[2] = {};
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
         MMI_HILOGE("Wrong number of parameters");
@@ -176,8 +176,8 @@ napi_value JsInputDeviceCooperateContext::GetState(napi_env env, napi_callback_i
     }
     char deviceDescriptor[MAX_STRING_LEN] = { 0 };
     size_t length = 0;
-    CHKRP(env, napi_get_value_string_utf8(env, argv[0], deviceDescriptor,
-        sizeof(deviceDescriptor), &length), GET_STRING);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], deviceDescriptor,
+        sizeof(deviceDescriptor), &length), GET_VALUE_STRING_UTF8);
     std::string deviceDescriptor_ = deviceDescriptor;
 
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
@@ -199,7 +199,7 @@ napi_value JsInputDeviceCooperateContext::On(napi_env env, napi_callback_info in
     CALL_INFO_TRACE;
     size_t argc = 2;
     napi_value argv[2] = {};
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
         MMI_HILOGE("Wrong number of parameters");
@@ -213,7 +213,7 @@ napi_value JsInputDeviceCooperateContext::On(napi_env env, napi_callback_info in
     }
     char type[MAX_STRING_LEN] = {};
     size_t length = 0;
-    CHKRP(env, napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_STRING);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
     if (std::strcmp(type, "cooperation") != 0) {
         THROWERR(env, "Register listener failed, the first parameter is invalid");
         MMI_HILOGE("Register listener failed, the first parameter is invalid");
@@ -236,7 +236,7 @@ napi_value JsInputDeviceCooperateContext::Off(napi_env env, napi_callback_info i
     CALL_INFO_TRACE;
     size_t argc = 2;
     napi_value argv[2] = {};
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     if (argc == 0) {
         MMI_HILOGE("Wrong number of parameters");
@@ -250,7 +250,7 @@ napi_value JsInputDeviceCooperateContext::Off(napi_env env, napi_callback_info i
     }
     char type[MAX_STRING_LEN] = {};
     size_t length = 0;
-    CHKRP(env, napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_STRING);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], type, sizeof(type), &length), GET_VALUE_STRING_UTF8);
     std::string type_ = type;
 
     JsInputDeviceCooperateContext *jsDev = JsInputDeviceCooperateContext::GetInstance(env);
@@ -279,27 +279,27 @@ napi_value JsInputDeviceCooperateContext::CreateInstance(napi_env env)
 {
     CALL_INFO_TRACE;
     napi_value global = nullptr;
-    CHKRP(env, napi_get_global(env, &global), GET_GLOBAL);
+    CHKRP(napi_get_global(env, &global), GET_GLOBAL);
 
     constexpr char className[] = "JsInputDeviceCooperateContext";
     napi_value jsClass = nullptr;
     napi_property_descriptor desc[] = {};
     napi_status status = napi_define_class(env, className, sizeof(className),
         JsInputDeviceCooperateContext::JsConstructor, nullptr, sizeof(desc) / sizeof(desc[0]), nullptr, &jsClass);
-    CHKRP(env, status, DEFINE_CLASS);
+    CHKRP(status, DEFINE_CLASS);
 
     status = napi_set_named_property(env, global, INPUT_DEVICE_CLASS, jsClass);
-    CHKRP(env, status, SET_NAMED_PROPERTY);
+    CHKRP(status, SET_NAMED_PROPERTY);
 
     napi_value jsInstance = nullptr;
-    CHKRP(env, napi_new_instance(env, jsClass, 0, nullptr, &jsInstance), NEW_INSTANCE);
-    CHKRP(env, napi_set_named_property(env, global, INPUT_DEVICE_COOPERATE, jsInstance),
+    CHKRP(napi_new_instance(env, jsClass, 0, nullptr, &jsInstance), NEW_INSTANCE);
+    CHKRP(napi_set_named_property(env, global, INPUT_DEVICE_COOPERATE, jsInstance),
         SET_NAMED_PROPERTY);
 
     JsInputDeviceCooperateContext *jsContext = nullptr;
-    CHKRP(env, napi_unwrap(env, jsInstance, (void**)&jsContext), UNWRAP);
+    CHKRP(napi_unwrap(env, jsInstance, (void**)&jsContext), UNWRAP);
     CHKPP(jsContext);
-    CHKRP(env, napi_create_reference(env, jsInstance, 1, &(jsContext->contextRef_)), CREATE_REFERENCE);
+    CHKRP(napi_create_reference(env, jsInstance, 1, &(jsContext->contextRef_)), CREATE_REFERENCE);
 
     uint32_t refCount = 0;
     status = napi_reference_ref(env, jsContext->contextRef_, &refCount);
@@ -316,7 +316,7 @@ napi_value JsInputDeviceCooperateContext::JsConstructor(napi_env env, napi_callb
     CALL_INFO_TRACE;
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    CHKRP(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data), GET_CB_INFO);
 
     JsInputDeviceCooperateContext *jsContext = new (std::nothrow) JsInputDeviceCooperateContext();
     CHKPP(jsContext);
@@ -339,24 +339,24 @@ JsInputDeviceCooperateContext *JsInputDeviceCooperateContext::GetInstance(napi_e
 {
     CALL_INFO_TRACE;
     napi_value global = nullptr;
-    CHKRP(env, napi_get_global(env, &global), GET_GLOBAL);
+    CHKRP(napi_get_global(env, &global), GET_GLOBAL);
 
     bool result = false;
-    CHKRP(env, napi_has_named_property(env, global, INPUT_DEVICE_COOPERATE, &result), HAS_NAMED_PROPERTY);
+    CHKRP(napi_has_named_property(env, global, INPUT_DEVICE_COOPERATE, &result), HAS_NAMED_PROPERTY);
     if (!result) {
         MMI_HILOGE("multimodal_input_device_cooperate was not found");
         return nullptr;
     }
 
     napi_value object = nullptr;
-    CHKRP(env, napi_get_named_property(env, global, INPUT_DEVICE_COOPERATE, &object), GET_NAMED_PROPERTY);
+    CHKRP(napi_get_named_property(env, global, INPUT_DEVICE_COOPERATE, &object), GET_NAMED_PROPERTY);
     if (object == nullptr) {
         MMI_HILOGE("object is nullptr");
         return nullptr;
     }
 
     JsInputDeviceCooperateContext *instance = nullptr;
-    CHKRP(env, napi_unwrap(env, object, (void**)&instance), UNWRAP);
+    CHKRP(napi_unwrap(env, object, (void**)&instance), UNWRAP);
     if (instance == nullptr) {
         MMI_HILOGE("instance is nullptr");
         return nullptr;
@@ -367,19 +367,19 @@ JsInputDeviceCooperateContext *JsInputDeviceCooperateContext::GetInstance(napi_e
 void JsInputDeviceCooperateContext::DeclareDeviceCooperateInterface(napi_env env, napi_value exports)
 {
     napi_value infoStart = nullptr;
-    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::INFO_START), &infoStart),
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(CooperationMessage::INFO_START), &infoStart),
         CREATE_INT32);
     napi_value infoSuccess = nullptr;
-    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::INFO_SUCCESS), &infoSuccess),
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(CooperationMessage::INFO_SUCCESS), &infoSuccess),
         CREATE_INT32);
     napi_value infoFail = nullptr;
-    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::INFO_FAIL), &infoFail),
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(CooperationMessage::INFO_FAIL), &infoFail),
         CREATE_INT32);
     napi_value stateOn = nullptr;
-    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::STATE_ON), &stateOn),
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(CooperationMessage::STATE_ON), &stateOn),
         CREATE_INT32);
     napi_value stateOff = nullptr;
-    CHKRV(env, napi_create_int32(env, static_cast<int32_t>(CooperationMessage::STATE_OFF), &stateOff),
+    CHKRV(napi_create_int32(env, static_cast<int32_t>(CooperationMessage::STATE_OFF), &stateOff),
         CREATE_INT32);
 
     napi_property_descriptor msg[] = {
@@ -391,9 +391,9 @@ void JsInputDeviceCooperateContext::DeclareDeviceCooperateInterface(napi_env env
     };
 
     napi_value eventMsg = nullptr;
-    CHKRV(env, napi_define_class(env, "EventMsg", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    CHKRV(napi_define_class(env, "EventMsg", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(msg) / sizeof(*msg), msg, &eventMsg), DEFINE_CLASS);
-    CHKRV(env, napi_set_named_property(env, exports, "EventMsg", eventMsg), SET_NAMED_PROPERTY);
+    CHKRV(napi_set_named_property(env, exports, "EventMsg", eventMsg), SET_NAMED_PROPERTY);
 }
 
 void JsInputDeviceCooperateContext::DeclareDeviceCooperateData(napi_env env, napi_value exports)
@@ -406,7 +406,7 @@ void JsInputDeviceCooperateContext::DeclareDeviceCooperateData(napi_env env, nap
         DECLARE_NAPI_STATIC_FUNCTION("on", On),
         DECLARE_NAPI_STATIC_FUNCTION("off", Off),
     };
-    CHKRV(env, napi_define_properties(env, exports,
+    CHKRV(napi_define_properties(env, exports,
         sizeof(functions) / sizeof(*functions), functions), DEFINE_PROPERTIES);
 }
 
@@ -416,7 +416,7 @@ napi_value JsInputDeviceCooperateContext::EnumClassConstructor(napi_env env, nap
     napi_value args[1] = {};
     napi_value result = nullptr;
     void *data = nullptr;
-    CHKRP(env, napi_get_cb_info(env, info, &argc, args, &result, &data), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, args, &result, &data), GET_CB_INFO);
     return result;
 }
 } // namespace MMI
