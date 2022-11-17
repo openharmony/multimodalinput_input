@@ -42,7 +42,8 @@ void DelegateTasks::Task::ProcessTask()
     }
 }
 
-DelegateTasks::~DelegateTasks() {
+DelegateTasks::~DelegateTasks()
+{
     if (fds_[0] >= 0) {
         close(fds_[0]);
         fds_[0] = -1;
