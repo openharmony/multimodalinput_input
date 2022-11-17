@@ -81,8 +81,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
         MMI_HILOGE("Init layer failed");
         return;
     }
-    pointerWindow_->Show();
-    MMI_HILOGD("Pointer window show success");
+    UpdatePointerVisible();
     MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
         displayId, physicalX, physicalY);
 }
