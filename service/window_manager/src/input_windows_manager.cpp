@@ -745,12 +745,12 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             } else if ((targetWindowId < 0) && (IsInHotArea(logicalX, logicalY, item.pointerHotAreas))) {
                 firstBtnDownWindowId_ = item.id;
                 MMI_HILOGW("Find out the dispatch window of this pointer event when the targetWindowId "
-                           "hasn't been setted up yet, window:%{public}d", firstBtnDownWindowId_);
+                           "hasn't been set up yet, window:%{public}d", firstBtnDownWindowId_);
                 break;
             } else if ((targetWindowId >= 0) && (targetWindowId == item.id)) {
                 firstBtnDownWindowId_ = targetWindowId;
                 MMI_HILOGW("Find out the dispatch window of this pointer event when the targetWindowId "
-                           "has been setted up already, window:%{public}d", firstBtnDownWindowId_);
+                           "has been set up already, window:%{public}d", firstBtnDownWindowId_);
                 break;
             } else {
                 MMI_HILOGW("Continue searching for the dispatch window of this pointer event");

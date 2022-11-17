@@ -83,7 +83,7 @@ void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
     if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
         TimerMgr->RemoveTimer(timerId_);
         timerId_ = -1;
-        MMI_HILOGI("Stop kayboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
+        MMI_HILOGI("Stop keyboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
         if (repeatKeyCode_ != keyEvent_->GetKeyCode()) {
             auto pressedKeyItem = keyEvent_->GetKeyItem(keyEvent_->GetKeyCode());
             if (pressedKeyItem != nullptr) {

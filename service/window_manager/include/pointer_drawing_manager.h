@@ -49,7 +49,7 @@ public:
     void UpdateDisplayInfo(const DisplayInfo& displayInfo) override;
     void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo) override;
     void OnWindowInfo(const WinInfo &info) override;
-    void UpdatePointerDevice(bool hasPointerDevicee, bool isPointerVisible) override;
+    void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible) override;
     bool Init() override;
     void DeletePointerVisible(int32_t pid) override;
     int32_t SetPointerVisible(int32_t pid, bool visible) override;
