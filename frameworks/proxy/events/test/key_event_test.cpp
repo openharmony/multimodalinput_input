@@ -365,7 +365,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_TransitionFunctionKey_004, TestSize.Level1)
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     int32_t lockCode = keyEvent->TransitionFunctionKey(KeyEvent::KEYCODE_A);
-    ASSERT_EQ(lockCode, KeyEvent::UNKOWN_FUNCTION_KEY);
+    ASSERT_EQ(lockCode, KeyEvent::UNKNOWN_FUNCTION_KEY);
 }
 } // namespace MMI
 } // namespace OHOS

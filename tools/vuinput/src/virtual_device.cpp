@@ -322,7 +322,7 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
     processName.append(temp);
     if (processName.find(VIRTUAL_DEVICE_NAME.c_str()) != std::string::npos) {
         if (closedir(dir) != 0) {
-            std::cout << "Close dir:" << processPath <<" failed" << std::endl;
+            std::cout << "Close dir:" << processPath << "failed" << std::endl;
         }
         return true;
     }
@@ -584,14 +584,14 @@ bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::v
     }
     if (closeDeviceName == "all") {
         for (const auto &it : deviceList) {
-            kill(atoi(it.c_str()), SIGKILL);
+            kill(std::stoi(it), SIGKILL);
         }
         RemoveDir(g_folderPath);
         return true;
     }
     for (const auto &it : deviceList) {
         if (it.find(closeDeviceName) == 0) {
-            kill(atoi(it.c_str()), SIGKILL);
+            kill(std::stoi(it), SIGKILL);
             if (BrowseDirectory(g_folderPath).size() == 0) {
                 RemoveDir(g_folderPath);
             }

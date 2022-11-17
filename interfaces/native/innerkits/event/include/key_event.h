@@ -32,7 +32,7 @@ public:
      *
      * @since 9
      */
-    static const int32_t UNKOWN_FUNCTION_KEY;
+    static const int32_t UNKNOWN_FUNCTION_KEY;
 
     /**
      * Num Lock功能按键

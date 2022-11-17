@@ -44,6 +44,7 @@ DeviceProfileAdapter::~DeviceProfileAdapter()
 
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::vector<std::string> &deviceIds)
 {
+    CALL_INFO_TRACE;
     ServiceCharacteristicProfile profile;
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
@@ -61,7 +62,10 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
     }
     SyncOptions syncOptions;
     std::for_each(deviceIds.begin(), deviceIds.end(),
-                  [&syncOptions](auto &deviceId) { syncOptions.AddDevice(deviceId); });
+                  [&syncOptions](auto &deviceId) {
+                      syncOptions.AddDevice(deviceId);
+                      MMI_HILOGD("Add device success");
+                  });
     auto syncCallback = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
     ret =
         DistributedDeviceProfileClient::GetInstance().SyncDeviceProfile(syncOptions, syncCallback);
@@ -73,6 +77,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
 
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
 {
+    CALL_INFO_TRACE;
     ServiceCharacteristicProfile profile;
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
@@ -88,6 +93,7 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
 
 bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
 {
+    CALL_INFO_TRACE;
     ServiceCharacteristicProfile profile;
     DistributedDeviceProfileClient::GetInstance().GetDeviceProfile(deviceId, SERVICE_ID, profile);
     std::string jsonData = profile.GetCharacteristicProfileJson();
@@ -130,6 +136,7 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &d
 
 int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string &deviceId)
 {
+    CALL_INFO_TRACE;
     if (deviceId.empty()) {
         MMI_HILOGE("DeviceId is empty");
         return RET_ERR;
@@ -155,6 +162,7 @@ int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string 
 
 int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &deviceId)
 {
+    CALL_INFO_TRACE;
     std::list<std::string> serviceIdList;
     serviceIdList.emplace_back(SERVICE_ID);
     ExtraInfo extraInfo;

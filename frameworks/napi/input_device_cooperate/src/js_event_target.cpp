@@ -61,7 +61,7 @@ void JsEventTarget::EmitJsEnable(int32_t userData, std::string deviceId, Coopera
         (msg == CooperationMessage::OPEN_SUCCESS || msg == CooperationMessage::CLOSE_SUCCESS) ? true : false;
     iter->second->data.errCode = static_cast<int32_t>(msg);
     uv_loop_s *loop = nullptr;
-    CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
+    CHKRV(napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_s *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
@@ -74,7 +74,7 @@ void JsEventTarget::EmitJsEnable(int32_t userData, std::string deviceId, Coopera
     work->data = static_cast<void*>(uData);
     int32_t result;
     if (iter->second->ref == nullptr) {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallEnablePromsieWork);
+        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallEnablePromiseWork);
     } else {
         result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallEnableAsyncWork);
     }
@@ -104,7 +104,7 @@ void JsEventTarget::EmitJsStart(int32_t userData, std::string deviceId, Cooperat
     iter->second->data.startResult = (msg == CooperationMessage::INFO_SUCCESS ? true : false);
     iter->second->data.errCode = static_cast<int32_t>(msg);
     uv_loop_s *loop = nullptr;
-    CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
+    CHKRV(napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_s *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
@@ -147,7 +147,7 @@ void JsEventTarget::EmitJsStop(int32_t userData, std::string deviceId, Cooperati
     iter->second->data.stopResult = (msg == CooperationMessage::STOP_SUCCESS ? true : false);
     iter->second->data.errCode = static_cast<int32_t>(msg);
     uv_loop_s *loop = nullptr;
-    CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
+    CHKRV(napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_s *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
@@ -189,7 +189,7 @@ void JsEventTarget::EmitJsGetState(int32_t userData, bool state)
     }
     iter->second->data.cooperateOpened = state;
     uv_loop_s *loop = nullptr;
-    CHKRV(iter->second->env, napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_LOOP);
+    CHKRV(napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_s *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     int32_t *uData = new (std::nothrow) int32_t(userData);
@@ -232,7 +232,7 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
         }
     }
     napi_ref ref = nullptr;
-    CHKRV(env, napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
+    CHKRV(napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
     auto monitor = std::make_unique<JsUtil::CallbackInfo>();
     if (monitor == nullptr) {
         napi_delete_reference(env, ref);
@@ -285,9 +285,9 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, in
     cb->env = env;
     napi_value promise = nullptr;
     if (handle == nullptr) {
-        CHKRP(env, napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
+        CHKRP(napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
     } else {
-        CHKRP(env, napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
+        CHKRP(napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
     }
     callback_.emplace(userData, std::move(cb));
     return promise;
@@ -326,7 +326,7 @@ void JsEventTarget::OnCooperateMessage(const std::string &deviceId, CooperationM
         CHKPC(item);
         CHKPC(item->env);
         uv_loop_s *loop = nullptr;
-        CHKRV(item->env, napi_get_uv_event_loop(item->env, &loop), GET_UV_LOOP);
+        CHKRV(napi_get_uv_event_loop(item->env, &loop), GET_UV_EVENT_LOOP);
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
         item->data.msg = msg;
@@ -334,13 +334,13 @@ void JsEventTarget::OnCooperateMessage(const std::string &deviceId, CooperationM
         work->data = static_cast<void*>(&item);
         int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, EmitCooperateMessageEvent);
         if (result != 0) {
-            MMI_HILOGE("uv_queue_work faild");
+            MMI_HILOGE("uv_queue_work failed");
             JsUtil::DeletePtr<uv_work_t*>(work);
         }
     }
 }
 
-void JsEventTarget::CallEnablePromsieWork(uv_work_t *work, int32_t status)
+void JsEventTarget::CallEnablePromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);
@@ -607,7 +607,7 @@ void JsEventTarget::EmitCooperateMessageEvent(uv_work_t *work, int32_t status)
         }
         napi_value deviceDescriptor = nullptr;
         CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, item->data.deviceDescriptor.c_str(),
-            NAPI_AUTO_LENGTH, &deviceDescriptor), CREATE_STRING, scope);
+            NAPI_AUTO_LENGTH, &deviceDescriptor), CREATE_STRING_UTF8, scope);
         napi_value eventMsg = nullptr;
         CHKRV_SCOPE(item->env, napi_create_int32(item->env, static_cast<int32_t>(item->data.msg), &eventMsg),
             CREATE_INT32, scope);

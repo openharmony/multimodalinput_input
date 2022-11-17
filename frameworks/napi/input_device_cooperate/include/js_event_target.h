@@ -59,7 +59,7 @@ private:
     inline static std::map<int32_t, std::unique_ptr<JsUtil::CallbackInfo>> callback_ {};
     bool isListeningProcess_ { false };
 
-    static void CallEnablePromsieWork(uv_work_t *work, int32_t status);
+    static void CallEnablePromiseWork(uv_work_t *work, int32_t status);
     static void CallEnableAsyncWork(uv_work_t *work, int32_t status);
     static void CallStartPromiseWork(uv_work_t *work, int32_t status);
     static void CallStartAsyncWork(uv_work_t *work, int32_t status);

@@ -30,7 +30,7 @@ napi_value JsKeyCode::GetNapiInt32(napi_env env, int32_t code)
 {
     CALL_DEBUG_ENTER;
     napi_value keyCode = nullptr;
-    CHKRP(env, napi_create_int32(env, code, &keyCode), CREATE_INT32);
+    CHKRP(napi_create_int32(env, code, &keyCode), CREATE_INT32);
     return keyCode;
 }
 
@@ -41,7 +41,7 @@ napi_value JsKeyCode::EnumClassConstructor(napi_env env, napi_callback_info info
     napi_value args[1] = {0};
     napi_value ret = nullptr;
     void *data = nullptr;
-    CHKRP(env, napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);
     return ret;
 }
 
@@ -397,9 +397,9 @@ napi_value JsKeyCode::Export(napi_env env, napi_value exports)
     };
 
     napi_value result = nullptr;
-    CHKRP(env, napi_define_class(env, "KeyCode", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    CHKRP(napi_define_class(env, "KeyCode", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
-    CHKRP(env, napi_set_named_property(env, exports, "KeyCode", result), SET_NAMED_PROPERTY);
+    CHKRP(napi_set_named_property(env, exports, "KeyCode", result), SET_NAMED_PROPERTY);
     return exports;
 }
 } // namespace MMI
