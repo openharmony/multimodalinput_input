@@ -109,7 +109,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     }
     static constexpr size_t bufferSize = 32 * 1024;
     static constexpr size_t nativeBufferSize = 64 * 1024;
-    SessionPtr sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
+    SessionPtr sess = nullptr;
     if (setsockopt(serverFd, SOL_SOCKET, SO_SNDBUF, &bufferSize, sizeof(bufferSize)) != 0) {
         MMI_HILOGE("setsockopt serverFd failed, errno: %{public}d", errno);
         goto CLOSE_SOCK;
@@ -141,6 +141,7 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
         MMI_HILOGE("epoll_ctl EPOLL_CTL_ADD failed, errCode:%{public}d", EPOLL_MODIFY_FAIL);
         goto CLOSE_SOCK;
     }
+    sess = std::make_shared<UDSSession>(programName, moduleType, serverFd, uid, pid);
     if (sess == nullptr) {
         MMI_HILOGE("make_shared fail. progName:%{public}s,pid:%{public}d,errCode:%{public}d",
             programName.c_str(), pid, MAKE_SHARED_FAIL);
