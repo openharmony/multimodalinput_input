@@ -118,7 +118,7 @@ int32_t InputDeviceCooperateImpl::StopDeviceCooperate(FuncCooperationMessage cal
 }
 
 int32_t InputDeviceCooperateImpl::GetInputDeviceCooperateState(
-    const std::string &deviceId, FuncCooperateionState callback)
+    const std::string &deviceId, FuncCooperationState callback)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -141,12 +141,12 @@ void InputDeviceCooperateImpl::OnDevCooperateListener(const std::string deviceId
     }
 }
 
-void InputDeviceCooperateImpl::OnCooprationMessage(int32_t userData, const std::string deviceId, CooperationMessage msg)
+void InputDeviceCooperateImpl::OnCooperationMessage(int32_t userData, const std::string deviceId, CooperationMessage msg)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
-    auto event = GetCooprateMessageEvent(userData);
+    auto event = GetCooperateMessageEvent(userData);
     CHKPV(event);
     (*event)(deviceId, msg);
 }
@@ -156,10 +156,10 @@ void InputDeviceCooperateImpl::OnCooperationState(int32_t userData, bool state)
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
-    auto event = GetCooprateStateEvent(userData);
+    auto event = GetCooperateStateEvent(userData);
     CHKPV(event);
     (*event)(state);
-    MMI_HILOGD("Cooperatinon state event callback userData:%{public}d state:(%{public}d)", userData, state);
+    MMI_HILOGD("Cooperation state event callback userData:%{public}d state:(%{public}d)", userData, state);
 }
 
 int32_t InputDeviceCooperateImpl::GetUserData()
@@ -168,14 +168,14 @@ int32_t InputDeviceCooperateImpl::GetUserData()
     return userData_;
 }
 
-const InputDeviceCooperateImpl::DevCooperationMsg *InputDeviceCooperateImpl::GetCooprateMessageEvent(
+const InputDeviceCooperateImpl::DevCooperationMsg *InputDeviceCooperateImpl::GetCooperateMessageEvent(
     int32_t userData) const
 {
     auto iter = devCooperateEvent_.find(userData);
     return iter == devCooperateEvent_.end() ? nullptr : &iter->second.msg;
 }
 
-const InputDeviceCooperateImpl::DevCooperateionState *InputDeviceCooperateImpl::GetCooprateStateEvent(
+const InputDeviceCooperateImpl::DevCooperationState *InputDeviceCooperateImpl::GetCooperateStateEvent(
     int32_t userData) const
 {
     auto iter = devCooperateEvent_.find(userData);

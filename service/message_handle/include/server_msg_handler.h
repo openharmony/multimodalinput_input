@@ -65,6 +65,12 @@ protected:
     int32_t MarkProcessed(SessionPtr sess, NetPacket& pkt);
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
+
+private:
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    bool FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action);
+#endif // OHOS_BUILD_ENABLE_TOUCH
+
 private:
     UDSServer *udsServer_ { nullptr };
     int32_t targetWindowId_ { -1 };
