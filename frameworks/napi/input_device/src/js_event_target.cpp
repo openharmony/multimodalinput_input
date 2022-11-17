@@ -42,7 +42,7 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
@@ -91,7 +91,7 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     auto temp = static_cast<std::unique_ptr<JsUtil::CallbackInfo>*>(work->data);
@@ -200,7 +200,7 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
@@ -237,7 +237,7 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
@@ -288,7 +288,7 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> &ids)
     int32_t *uData = new (std::nothrow) int32_t(userData);
     if (uData == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check uData is null");
+        MMI_HILOGE("Check uData is nullptr");
         return;
     }
     work->data = static_cast<void*>(uData);
@@ -319,7 +319,7 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
@@ -348,7 +348,7 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
@@ -362,7 +362,7 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     }
     napi_value object = JsUtil::GetDeviceInfo(cb);
     if (object == nullptr) {
-        MMI_HILOGE("Check object is null");
+        MMI_HILOGE("Check object is nullptr");
         napi_close_handle_scope(cb->env, scope);
         return;
     }
@@ -428,7 +428,7 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
@@ -555,7 +555,7 @@ void JsEventTarget::EmitSupportKeys(int32_t userData, std::vector<bool> &keystro
     int32_t *uData = new (std::nothrow) int32_t(userData);
     if (uData == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     work->data = static_cast<void*>(uData);
@@ -671,7 +671,7 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
@@ -769,7 +769,7 @@ void JsEventTarget::CallDevListPromiseWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
@@ -868,7 +868,7 @@ void JsEventTarget::CallDevInfoAsyncWork(uv_work_t *work, int32_t status)
     CHKPV(work);
     if (work->data == nullptr) {
         JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         return;
     }
     std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
