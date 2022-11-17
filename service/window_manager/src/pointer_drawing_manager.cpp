@@ -73,6 +73,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
             MMI_HILOGE("Init layer failed");
             return;
         }
+        UpdatePointerVisible();
         MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
             displayId, physicalX, physicalY);
         return;
@@ -85,7 +86,8 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
         MMI_HILOGE("Init layer failed");
         return;
     }
-
+    pointerWindow_->Show();
+    MMI_HILOGD("Pointer window show success");
     MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
         displayId, physicalX, physicalY);
 }
@@ -124,7 +126,6 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
         return RET_ERR;
     }
     MMI_HILOGD("Init layer success");
-    UpdatePointerVisible();
     return RET_OK;
 }
 
@@ -213,7 +214,10 @@ void PointerDrawingManager::SetMouseDisplayState(bool state)
     CALL_DEBUG_ENTER;
     if (mouseDisplayState_ != state) {
         mouseDisplayState_ = state;
-        InitLayer(MOUSE_ICON(lastMouseStyle_));
+        if (mouseDisplayState_) {
+            InitLayer(MOUSE_ICON(lastMouseStyle_));
+        }
+        UpdatePointerVisible();
     }
 }
 
@@ -353,7 +357,11 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
 {
     CALL_DEBUG_ENTER;
     hasPointerDevice_ = hasPointerDevice;
-    SetPointerVisible(getpid(), isPointerVisible);
+    if (hasPointerDevice_) {
+        SetPointerVisible(getpid(), isPointerVisible);
+    } else {
+        DeletePointerVisible(getpid());
+    }
     DrawManager();
 }
 
@@ -399,30 +407,6 @@ std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
     return iPointDrawMgr_;
 }
 
-void PointerDrawingManager::DeletePidInfo(int32_t pid)
-{
-    CALL_DEBUG_ENTER;
-    for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
-        if (it->pid == pid) {
-            pidInfos_.erase(it);
-            return;
-        }
-    }
-}
-
-void PointerDrawingManager::UpdatePidInfo(int32_t pid, bool visible)
-{
-    CALL_DEBUG_ENTER;
-    for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
-        if (it->pid == pid) {
-            pidInfos_.erase(it);
-            break;
-        }
-    }
-    PidInfo info = { .pid = pid, .visible = visible };
-    pidInfos_.push_back(info);
-}
-
 void PointerDrawingManager::UpdatePointerVisible()
 {
     CALL_DEBUG_ENTER;
@@ -449,15 +433,36 @@ bool PointerDrawingManager::IsPointerVisible()
 void PointerDrawingManager::DeletePointerVisible(int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    DeletePidInfo(pid);
-    UpdatePointerVisible();
+    auto it = pidInfos_.begin();
+    for (; it != pidInfos_.end(); ++it) {
+        if (it->pid == pid) {
+            pidInfos_.erase(it);
+            break;
+        }
+    }
+    if (it != pidInfos_.end()) {
+        if (IsPointerVisible()) {
+            InitLayer(MOUSE_ICON(lastMouseStyle_));
+        }
+        UpdatePointerVisible();
+    }
 }
 
 int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
 {
     CALL_DEBUG_ENTER;
-    UpdatePidInfo(pid, visible);
-    InitLayer(MOUSE_ICON(lastMouseStyle_));
+    for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
+        if (it->pid == pid) {
+            pidInfos_.erase(it);
+            break;
+        }
+    }
+    PidInfo info = { .pid = pid, .visible = visible };
+    pidInfos_.push_back(info);
+    if (visible) {
+        InitLayer(MOUSE_ICON(lastMouseStyle_));
+    }
+    UpdatePointerVisible();
     return RET_OK;
 }
 
@@ -511,6 +516,7 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, in
             return RET_ERR;
         }
     }
+    UpdatePointerVisible();
     MMI_HILOGD("Window id:%{public}d set pointer style:%{public}d success", windowId, pointerStyle);
     return RET_OK;
 }
