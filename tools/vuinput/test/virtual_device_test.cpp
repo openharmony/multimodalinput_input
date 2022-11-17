@@ -230,12 +230,12 @@ HWTEST_F(VirtualDeviceTest, Test_AddDevice_false02, TestSize.Level1)
 }
 
 /**
- * @tc.name:Test_CloseDevice_flase02
+ * @tc.name:Test_CloseDevice_false02
  * @tc.desc:Verify VirtualDevice function CloseDevice
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(VirtualDeviceTest, Test_CloseDevice_flase02, TestSize.Level1)
+HWTEST_F(VirtualDeviceTest, Test_CloseDevice_false02, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
     std::vector<std::string> fileList;

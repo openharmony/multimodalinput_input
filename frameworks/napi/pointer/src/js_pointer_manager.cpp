@@ -108,7 +108,7 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
             sptr<AsyncContext> asyncContext(static_cast<AsyncContext *>(data));
             /**
              * After the asynchronous task is created, the asyncCallbackInfo reference count is reduced
-             * to 0 destructions, so you need to add 1 to the asyncCallbackInfo reference count when the
+             * to 0 destruction, so you need to add 1 to the asyncCallbackInfo reference count when the
              * asynchronous task is created, and subtract 1 from the reference count after the naked
              * pointer is converted to a pointer when the asynchronous task is executed, the reference
              * count of the smart pointer is guaranteed to be 1.

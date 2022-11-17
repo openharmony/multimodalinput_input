@@ -37,7 +37,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     napi_value argv[1] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
-        MMI_HILOGE("Paramater number error");
+        MMI_HILOGE("Parameter number error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
     }

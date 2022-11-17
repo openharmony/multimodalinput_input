@@ -706,7 +706,7 @@ std::string InputDeviceManager::GenerateDescriptor(struct libinput_device *input
     uint16_t product = libinput_device_get_id_product(inputDevice);
     std::string rawDescriptor;
     rawDescriptor += StringPrintf(":%04x:%04x:", vendor, product);
-    // add handling for USB devices to not uniqueify kbs that show up twice
+    // add handling for USB devices to not unique kbs that show up twice
     if (uniqueId != nullptr && uniqueId[0] != '\0') {
         rawDescriptor += "uniqueId:" + std::string(uniqueId);
     }
