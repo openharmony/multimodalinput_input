@@ -35,16 +35,16 @@ enum class CooperateState {
 };
 
 enum class CooperateMsg {
-    COOPERATE_ON_SUCESS = 0,
+    COOPERATE_ON_SUCCESS = 0,
     COOPERATE_ON_FAIL = 1,
-    COOPERATE_OFF_SUCESS = 2,
+    COOPERATE_OFF_SUCCESS = 2,
     COOPERATE_OFF_FAIL = 3,
     COOPERATE_START = 4,
-    COOPERATE_START_SUCESS = 5,
+    COOPERATE_START_SUCCESS = 5,
     COOPERATE_START_FAIL = 6,
     COOPERATE_STOP = 7,
-    COOPERATE_STOP_SUCESS = 8,
-    COOPERATE_STOP_FIAL = 9,
+    COOPERATE_STOP_SUCCESS = 8,
+    COOPERATE_STOP_FAIL = 9,
     COOPERATE_NULL = 10,
 };
 
@@ -96,7 +96,7 @@ private:
     void CheckPointerEvent(struct libinput_event *event);
     void OnCloseCooperation(const std::string &networkId, bool isLocal);
     void NotifyRemoteStartFail(const std::string &remoteNetworkId);
-    void NotifyRemoteStartSucess(const std::string &remoteNetworkId, const std::string &startDhid);
+    void NotifyRemoteStartSuccess(const std::string &remoteNetworkId, const std::string &startDhid);
     void NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId);
     bool UpdateMouseLocation();
     std::shared_ptr<IInputDeviceCooperateState> currentStateSM_ { nullptr };

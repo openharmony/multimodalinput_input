@@ -74,7 +74,7 @@ void JsEventTarget::EmitJsEnable(int32_t userData, std::string deviceId, Coopera
     work->data = static_cast<void*>(uData);
     int32_t result;
     if (iter->second->ref == nullptr) {
-        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallEnablePromsieWork);
+        result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallEnablePromiseWork);
     } else {
         result = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallEnableAsyncWork);
     }
@@ -334,13 +334,13 @@ void JsEventTarget::OnCooperateMessage(const std::string &deviceId, CooperationM
         work->data = static_cast<void*>(&item);
         int32_t result = uv_queue_work(loop, work, [](uv_work_t *work) {}, EmitCooperateMessageEvent);
         if (result != 0) {
-            MMI_HILOGE("uv_queue_work faild");
+            MMI_HILOGE("uv_queue_work failed");
             JsUtil::DeletePtr<uv_work_t*>(work);
         }
     }
 }
 
-void JsEventTarget::CallEnablePromsieWork(uv_work_t *work, int32_t status)
+void JsEventTarget::CallEnablePromiseWork(uv_work_t *work, int32_t status)
 {
     CALL_INFO_TRACE;
     CHKPV(work);

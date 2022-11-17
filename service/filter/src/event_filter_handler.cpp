@@ -74,7 +74,7 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> 
     CHKPF(point);
     std::lock_guard<std::mutex> guard(lockFilter_);
     if (filter_ == nullptr) {
-        MMI_HILOGD("The filter is not setted");
+        MMI_HILOGD("The filter is not set");
         return false;
     }
     if (filter_->HandlePointerEvent(point)) {

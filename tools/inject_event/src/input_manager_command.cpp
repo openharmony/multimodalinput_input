@@ -1126,7 +1126,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
                             if (joyInfo.buttonId > JOYSTICK_BUTTON_ID) {
-                                std::cout << "Pressd button value is greater than the max value" << std::endl;
+                                std::cout << "Pressed button value is greater than the max value" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
                             state.push_back(std::pair<int32_t, JoystickInfo>(JOYSTICK_BUTTON_PRESS, joyInfo));
@@ -1253,7 +1253,7 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-M  --mouse                                    " << std::endl;
     std::cout << "commands for mouse:                            " << std::endl;
     std::cout << "-m <dx> <dy>              --move   <dx> <dy>  -move to relative position (dx,dy),"    << std::endl;
-    std::cout << "   <dx1> <dy1> <dx2> <dy2> [soomth time] --trace -dx1 dy1 to dx2 dy2 smooth movement" << std::endl;
+    std::cout << "   <dx1> <dy1> <dx2> <dy2> [smooth time] --trace -dx1 dy1 to dx2 dy2 smooth movement" << std::endl;
     std::cout << "-d <key>                  --down   key        -press down a button, "                 << std::endl;
     std::cout << "                                               0 is the left button, 1 is the right," << std::endl;
     std::cout << "                                               2 is the middle"   << std::endl;
