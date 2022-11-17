@@ -279,6 +279,10 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
 {
     CALL_INFO_TRACE;
     CHKPV(udsServer_);
+    if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        MMI_HILOGD("The mouse is hide");
+        return;
+    }
     if (lastPointerEvent_ == nullptr) {
         SendPointerEvent(pointerAction);
         return;
@@ -833,7 +837,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
         return ret;
     }
-    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+    if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+        DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+    }
     IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicalDisplayInfo);
     WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
     IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
@@ -935,7 +942,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",
                touchWindow->pid, logicalX, logicalY, physicalX, physicalY,
                windowX, windowY, displayId, pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
-    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+    if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+    }
     return ERR_OK;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
