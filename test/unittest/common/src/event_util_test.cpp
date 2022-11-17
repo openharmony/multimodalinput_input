@@ -196,8 +196,11 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<KeyEvent>& keyEv
          << ", KeyAction:" << keyEvent->GetKeyAction();
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     for (const int32_t &key : pressedKeys) {
-        auto keyItem = keyEvent->GetKeyItem(key);
-        CHKPS(keyItem);
+        std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem(key);
+        if (!keyItem) {
+            MMI_HILOGE("keyItem is nullopt");
+            return "";
+        }
         keyItem->GetDeviceId();
     }
     return strm.str();
