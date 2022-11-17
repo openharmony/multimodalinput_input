@@ -223,7 +223,7 @@ napi_value JsInputDeviceCooperateContext::On(napi_env env, napi_callback_info in
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceCooperateMgr();
     if (!UtilNapi::TypeOf(env, argv[1], napi_function)) {
-        MMI_HILOGE("The seocond parameter is not function");
+        MMI_HILOGE("The second parameter is not function");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }

@@ -25,7 +25,7 @@
 #  // __BASE is used for defining the basic info of the event.
 #  // "type" optional values are: FAULT, STATISTICS, SECURITY, BEHAVIOR.
 #  // "level" optional values are: CRITICAL, MINOR.
-#  // "tag" set tags with may used by subscriber of this event, multiple tags devided by space.
+#  // "tag" set tags with may be used by subscriber of this event, multiple tags divided by space.
 #  // "desc" full description of this event.
 #  @PARAMETER: {type: parameter type, arrsize: array length(optional), desc: parameter description}.
 #  // follow the __BASE block, each line defines a parameter of this event.
@@ -146,7 +146,7 @@ TARGET_KEY_EVENT_FAILURE:
   MSG: {type: STRING, desc: message}
 
 FOCUS_WINDOW_CHANGE:
-  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: foucs window change}
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: focus window change}
   OLD_FOCUS_WINDOWID: {type: INT32, desc: old focus windowid}
   NEW_FOCUS_WINDOWID: {type: INT32, desc: new focus windowid}
   OLD_FOCUS_WINDOWPID: {type: INT32, desc: old focus windowpid}

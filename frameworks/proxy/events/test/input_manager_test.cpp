@@ -2965,7 +2965,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetProcCpuUsage, TestSize.Level1)
     const std::string process_name = "multimodalinput";
     auto usage = cpuInfo.GetProcCpuUsage(process_name);
     MMI_HILOGD("The CPU usage of the %{public}s process is %{public}.2f", process_name.c_str(), usage);
-    ASSERT_TRUE(usage < SYSTEM_INFO::CPU_USAGE_LOAD && usage != SYSTEM_INFO::CPU_USAGE_UNKONW);
+    ASSERT_TRUE(usage < SYSTEM_INFO::CPU_USAGE_LOAD && usage != SYSTEM_INFO::CPU_USAGE_UNKNOWN);
 }
 
 /**
@@ -3325,12 +3325,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_006, TestSize.Level
 HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_007, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::UNKOWN_FUNCTION_KEY, true);
-    bool result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::UNKOWN_FUNCTION_KEY);
+    InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::UNKNOWN_FUNCTION_KEY, true);
+    bool result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::UNKNOWN_FUNCTION_KEY);
     ASSERT_FALSE(result);
     
-    InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::UNKOWN_FUNCTION_KEY, false);
-    result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::UNKOWN_FUNCTION_KEY);
+    InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::UNKNOWN_FUNCTION_KEY, false);
+    result = InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::UNKNOWN_FUNCTION_KEY);
     ASSERT_FALSE(result);
 }
 

@@ -37,14 +37,14 @@ void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> key
     CHKPV(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (!InputHandler->GetJumpInterceptState() && OnHandleEvent(keyEvent)) {
-        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{puiblic}d",
+        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{public}d",
             keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
         return;
     }
 #else
     if (OnHandleEvent(keyEvent)) {
-        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{puiblic}d",
+        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{public}d",
             keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
         return;
