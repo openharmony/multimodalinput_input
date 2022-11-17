@@ -452,6 +452,7 @@ ohos_shared_library("libmmi-server") {
     sources += [
       "input_device_cooperate/src/cooperate_event_handler.cpp",
       "input_device_cooperate/src/cooperate_event_manager.cpp",
+      "input_device_cooperate/src/device_cooperate_softbus_adapter.cpp",
       "input_device_cooperate/src/device_profile_adapter.cpp",
       "input_device_cooperate/src/distributed_input_adapter.cpp",
       "input_device_cooperate/src/i_input_device_cooperate_state.cpp",
@@ -459,6 +460,7 @@ ohos_shared_library("libmmi-server") {
       "input_device_cooperate/src/input_device_cooperate_state_free.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_in.cpp",
       "input_device_cooperate/src/input_device_cooperate_state_out.cpp",
+      "input_device_cooperate/src/input_device_cooperate_util.cpp",
     ]
   }
 
@@ -562,7 +564,6 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/cJSON:cjson_static",
-    "//third_party/json:nlohmann_json_static",
   ]
 
   if (input_feature_libinput || input_feature_hdf) {

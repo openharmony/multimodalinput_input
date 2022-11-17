@@ -47,7 +47,7 @@ int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetwor
                 this->OnPrepareDistributedInput(isSuccess, srcNetworkId, startInputDeviceId);
             });
         if (ret != RET_OK) {
-            MMI_HILOGE("Prepare remoteNetworkId input fail");
+            MMI_HILOGE("Prepare remote input fail");
             InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
             InputDevCooSM->UpdatePreparedDevices("", "");
         }
@@ -73,7 +73,7 @@ void IInputDeviceCooperateState::OnPrepareDistributedInput(
         std::function<void()> handleStartDinputFunc =
             std::bind(&IInputDeviceCooperateState::StartRemoteInput, this, startInputDeviceId);
         CHKPV(eventHandler_);
-        eventHandler_->PostTask(handleStartDinputFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
+        eventHandler_->ProxyPostTask(handleStartDinputFunc, taskName, 0);
     }
 }
 
@@ -105,7 +105,7 @@ void IInputDeviceCooperateState::OnStartRemoteInput(
     std::function<void()> handleStartFinishFunc =
         std::bind(&InputDeviceCooperateSM::OnStartFinish, InputDevCooSM, isSuccess, srcNetworkId, startInputDeviceId);
     CHKPV(eventHandler_);
-    eventHandler_->PostTask(handleStartFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
+    eventHandler_->ProxyPostTask(handleStartFinishFunc, taskName, 0);
 }
 
 bool IInputDeviceCooperateState::NeedPrepare(const std::string &srcNetworkId, const std::string &sinkNetworkId)

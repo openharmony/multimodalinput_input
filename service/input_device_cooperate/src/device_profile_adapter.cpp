@@ -18,12 +18,9 @@
 #include <algorithm>
 #include <mutex>
 
-#include "nlohmann/json.hpp"
-
 #include "distributed_device_profile_client.h"
+#include "input_device_cooperate_util.h"
 #include "service_characteristic_profile.h"
-#include "softbus_bus_center.h"
-#include "softbus_common.h"
 #include "sync_options.h"
 
 namespace OHOS {
@@ -47,21 +44,28 @@ DeviceProfileAdapter::~DeviceProfileAdapter()
 
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::vector<std::string> &deviceIds)
 {
+    CALL_INFO_TRACE;
     ServiceCharacteristicProfile profile;
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
-    nlohmann::json data;
-    data[CHARACTERISTICS_NAME] = state;
-    profile.SetCharacteristicProfileJson(data.dump());
+    cJSON *data = cJSON_CreateObject();
+    cJSON_AddItemToObject(data, CHARACTERISTICS_NAME.c_str(), cJSON_CreateBool(state));
+    char *smsg = cJSON_Print(data);
+    cJSON_Delete(data);
+    profile.SetCharacteristicProfileJson(smsg);
+    cJSON_free(smsg);
 
     int32_t ret = DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
     if (ret != 0) {
-        MMI_HILOGE("Put device profile failed");
+        MMI_HILOGE("Put device profile failed, ret:%{public}d", ret);
         return ret;
     }
     SyncOptions syncOptions;
     std::for_each(deviceIds.begin(), deviceIds.end(),
-                  [&syncOptions](auto &deviceId) { syncOptions.AddDevice(deviceId); });
+                  [&syncOptions](auto &deviceId) {
+                      syncOptions.AddDevice(deviceId);
+                      MMI_HILOGD("Add device success");
+                  });
     auto syncCallback = std::make_shared<DeviceProfileAdapter::ProfileEventCallbackImpl>();
     ret =
         DistributedDeviceProfileClient::GetInstance().SyncDeviceProfile(syncOptions, syncCallback);
@@ -73,26 +77,38 @@ int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state, const std::v
 
 int32_t DeviceProfileAdapter::UpdateCrossingSwitchState(bool state)
 {
+    CALL_INFO_TRACE;
     ServiceCharacteristicProfile profile;
     profile.SetServiceId(SERVICE_ID);
     profile.SetServiceType(SERVICE_TYPE);
-    nlohmann::json data;
-    data[CHARACTERISTICS_NAME] = state;
-    profile.SetCharacteristicProfileJson(data.dump());
+    cJSON *data = cJSON_CreateObject();
+    cJSON_AddItemToObject(data, CHARACTERISTICS_NAME.c_str(), cJSON_CreateBool(state));
+    char *smsg = cJSON_Print(data);
+    cJSON_Delete(data);
+    profile.SetCharacteristicProfileJson(smsg);
+    cJSON_free(smsg);
+
     return DistributedDeviceProfileClient::GetInstance().PutDeviceProfile(profile);
 }
 
 bool DeviceProfileAdapter::GetCrossingSwitchState(const std::string &deviceId)
 {
+    CALL_INFO_TRACE;
     ServiceCharacteristicProfile profile;
     DistributedDeviceProfileClient::GetInstance().GetDeviceProfile(deviceId, SERVICE_ID, profile);
     std::string jsonData = profile.GetCharacteristicProfileJson();
-    nlohmann::json jsonObject = nlohmann::json::parse(jsonData, nullptr, false);
-    if (jsonObject.is_discarded()) {
-        MMI_HILOGE("JsonData is discarded");
+    JsonParser parser;
+    parser.json_ = cJSON_Parse(jsonData.c_str());
+    if (!cJSON_IsObject(parser.json_)) {
+        MMI_HILOGE("Parser.json_ is not object");
         return false;
     }
-    return jsonObject[CHARACTERISTICS_NAME].get<bool>();
+    cJSON* state = cJSON_GetObjectItemCaseSensitive(parser.json_, CHARACTERISTICS_NAME.c_str());
+    if (!cJSON_IsBool(state)) {
+        MMI_HILOGE("State is not bool type");
+        return false;
+    }
+    return cJSON_IsTrue(state);
 }
 
 int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &deviceId, DPCallback callback)
@@ -120,6 +136,7 @@ int32_t DeviceProfileAdapter::RegisterCrossingStateListener(const std::string &d
 
 int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string &deviceId)
 {
+    CALL_INFO_TRACE;
     if (deviceId.empty()) {
         MMI_HILOGE("DeviceId is empty");
         return RET_ERR;
@@ -145,6 +162,7 @@ int32_t DeviceProfileAdapter::UnregisterCrossingStateListener(const std::string 
 
 int32_t DeviceProfileAdapter::RegisterProfileListener(const std::string &deviceId)
 {
+    CALL_INFO_TRACE;
     std::list<std::string> serviceIdList;
     serviceIdList.emplace_back(SERVICE_ID);
     ExtraInfo extraInfo;
