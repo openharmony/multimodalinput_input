@@ -12,21 +12,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef INPUT_DEVICE_COOPERATE_UTIL_H
+#define INPUT_DEVICE_COOPERATE_UTIL_H
 
-#ifndef INPUT_DEVICE_COOPERATE_STATE_FREE_H
-#define INPUT_DEVICE_COOPERATE_STATE_FREE_H
+#include <string>
 
-#include "i_input_device_cooperate_state.h"
+#include "cJSON.h"
 
 namespace OHOS {
 namespace MMI {
-class InputDeviceCooperateStateFree : public IInputDeviceCooperateState {
-public:
-    virtual int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId) override;
-
-private:
-    int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId);
+struct JsonParser {
+    JsonParser() = default;
+    ~JsonParser()
+    {
+        if (json_ != nullptr) {
+            cJSON_Delete(json_);
+            json_ = nullptr;
+        }
+    }
+    operator cJSON *()
+    {
+        return json_;
+    }
+    cJSON *json_ { nullptr };
 };
+std::string GetLocalDeviceId();
 } // namespace MMI
 } // namespace OHOS
-#endif // INPUT_DEVICE_COOPERATE_STATE_FREE_H
+#endif // INPUT_DEVICE_COOPERATE_UTIL_H

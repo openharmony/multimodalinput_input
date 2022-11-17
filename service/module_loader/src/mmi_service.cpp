@@ -273,7 +273,7 @@ int32_t MMIService::Init()
         return SASERVICE_INIT_FAIL;
     }
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    InputDevCooSM->Init();
+    InputDevCooSM->Init(std::bind(&DelegateTasks::PostAsyncTask, &delegateTasks_, std::placeholders::_1));
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     MMI_HILOGD("Input msg handler init");
     InputHandler->Init(*this);
@@ -1284,120 +1284,6 @@ int32_t MMIService::OnGetInputDeviceCooperateState(int32_t pid, int32_t userData
     event->userData = userData;
     CooperateEventMgr->AddCooperationEvent(event);
     InputDevCooSM->GetCooperateState(deviceId);
-    return RET_OK;
-}
-#endif // OHOS_BUILD_ENABLE_COOPERATE
-
-int32_t MMIService::StartRemoteCooperate(const std::string& remoteDeviceId)
-{
-    CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnStartRemoteCooperate,
-        this, remoteDeviceId));
-    if (ret != RET_OK) {
-        MMI_HILOGE("Start remote cooperate failed,return %{public}d", ret);
-        return ret;
-    }
-#endif // OHOS_BUILD_ENABLE_COOPERATE
-    return RET_OK;
-}
-
-int32_t MMIService::StartRemoteCooperateResult(bool isSuccess,
-    const std::string& startDhid, int32_t xPercent, int32_t yPercent)
-{
-    CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    MMI_HILOGI("StartRemoteCooperateResult:[%{public}d]", isSuccess);
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnStartRemoteCooperateResult,
-        this, isSuccess, startDhid, xPercent, yPercent));
-    if (ret != RET_OK) {
-        MMI_HILOGE("Start remote cooperate res failed,return %{public}d", ret);
-        return ret;
-    }
-#else
-    (void)(isSuccess);
-    (void)(xPercent);
-    (void)(yPercent);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
-    return RET_OK;
-}
-
-int32_t MMIService::StopRemoteCooperate()
-{
-    CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnStopRemoteCooperate, this));
-    if (ret != RET_OK) {
-        MMI_HILOGE("Stop remote cooperate failed,return %{public}d", ret);
-        return ret;
-    }
-#endif // OHOS_BUILD_ENABLE_COOPERATE
-    return RET_OK;
-}
-
-int32_t MMIService::StopRemoteCooperateResult(bool isSuccess)
-{
-    CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    MMI_HILOGI("Enter MMI StopRemoteCooperateResult [%{public}d]", isSuccess);
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnStopRemoteCooperateResult,
-        this, isSuccess));
-    if (ret != RET_OK) {
-        MMI_HILOGE("Stop remote cooperate res failed,return %{public}d", ret);
-        return ret;
-    }
-#else
-    (void)(isSuccess);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
-    return RET_OK;
-}
-
-int32_t MMIService::StartCooperateOtherResult(const std::string& srcNetworkId)
-{
-    CALL_DEBUG_ENTER;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    MMI_HILOGI("Enter MMI StartCooperateOtherResult [%{public}s]", srcNetworkId.c_str());
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnStartCooperateOtherResult,
-        this, srcNetworkId));
-    if (ret != RET_OK) {
-        MMI_HILOGE("Start remote other res failed,return %{public}d", ret);
-        return ret;
-    }
-#else
-    (void)(srcNetworkId);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
-    return RET_OK;
-}
-
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-int32_t MMIService::OnStartRemoteCooperate(const std::string& remoteDeviceId)
-{
-    InputDevCooSM->StartRemoteCooperate(remoteDeviceId);
-    return RET_OK;
-}
-
-int32_t MMIService::OnStartRemoteCooperateResult(bool isSuccess,
-    const std::string& startDhid, int32_t xPercent, int32_t yPercent)
-{
-    InputDevCooSM->StartRemoteCooperateResult(isSuccess, startDhid, xPercent, yPercent);
-    return RET_OK;
-}
-
-int32_t MMIService::OnStopRemoteCooperate()
-{
-    InputDevCooSM->StopRemoteCooperate();
-    return RET_OK;
-}
-
-int32_t MMIService::OnStopRemoteCooperateResult(bool isSuccess)
-{
-    InputDevCooSM->StopRemoteCooperateResult(isSuccess);
-    return RET_OK;
-}
-
-int32_t MMIService::OnStartCooperateOtherResult(const std::string& srcNetworkId)
-{
-    InputDevCooSM->StartCooperateOtherResult(srcNetworkId);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
