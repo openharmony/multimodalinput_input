@@ -24,10 +24,8 @@ config("libmmi_util_public_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
   ]
-  defines = []
-  if (input_feature_input_cooperation) {
-    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
-  }
+
+  defines = input_default_defines
 }
 
 ohos_shared_library("libmmi-util") {
@@ -89,10 +87,7 @@ ohos_unittest("ut-mmi-util-out") {
     "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
-  defines = []
-  if (input_feature_input_cooperation) {
-    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
-  }
+  defines = input_default_defines
 
   sources = [
     "network/test/net_packet_test.cpp",
@@ -138,10 +133,7 @@ ohos_unittest("RunShellUtilTest") {
     "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
-  defines = []
-  if (input_feature_input_cooperation) {
-    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
-  }
+  defines = input_default_defines
 
   sources = [ "common/test/run_shell_util_test.cpp" ]
 

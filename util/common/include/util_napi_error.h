@@ -41,7 +41,7 @@ enum NapiErrorCode : int32_t {
     COMMON_PARAMETER_ERROR = 401,
     COOPERATOR_TARGET_DEV_DESCRIPTOR_ERROR = 4400001,
     COOPERATOR_FAIL = 4400002,
-    COOPERATOR_DEVICE_ID_ERROE = 4400003,
+    COOPERATOR_DEVICE_ID_ERROR = 4400003,
 };
 
 const std::map<int32_t, NapiError> NAPI_ERRORS = {
@@ -50,7 +50,7 @@ const std::map<int32_t, NapiError> NAPI_ERRORS = {
     {COMMON_PARAMETER_ERROR, {COMMON_PARAMETER_ERROR, "Parameter error. The type of %s must be %s."}},
     {COOPERATOR_TARGET_DEV_DESCRIPTOR_ERROR,
         {COOPERATOR_TARGET_DEV_DESCRIPTOR_ERROR, "Incorrect descriptor for the target device"}},
-    {COOPERATOR_DEVICE_ID_ERROE, {COMMON_PARAMETER_ERROR, "Incorrect ID of the input device"}},
+    {COOPERATOR_DEVICE_ID_ERROR, {COMMON_PARAMETER_ERROR, "Incorrect ID of the input device"}},
     {COOPERATOR_FAIL, {COOPERATOR_FAIL, "Input device operation failed"}},
 };
 

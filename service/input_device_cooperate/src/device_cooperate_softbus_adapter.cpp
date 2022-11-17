@@ -162,8 +162,12 @@ DeviceCooperateSoftbusAdapter::~DeviceCooperateSoftbusAdapter()
 
 void DeviceCooperateSoftbusAdapter::Release()
 {
+    CALL_INFO_TRACE;
     std::unique_lock<std::mutex> sessionLock(operationMutex_);
-    std::for_each(sessionDevMap_.begin(), sessionDevMap_.end(), [](auto item) { CloseSession(item.second); });
+    std::for_each(sessionDevMap_.begin(), sessionDevMap_.end(), [](auto item) {
+        CloseSession(item.second);
+        MMI_HILOGD("Close session success");
+    });
     int32_t ret = RemoveSessionServer(MMI_DINPUT_PKG_NAME, localSessionName_.c_str());
     MMI_HILOGD("RemoveSessionServer ret:%{public}d", ret);
     sessionDevMap_.clear();
@@ -426,7 +430,7 @@ int32_t DeviceCooperateSoftbusAdapter::SendMsg(int32_t sessionId, const std::str
 {
     CALL_DEBUG_ENTER;
     if (message.size() > MSG_MAX_SIZE) {
-        MMI_HILOGW("error:message.size() > MSG_MAX_SIZE msessage size:%{public}zu", message.size());
+        MMI_HILOGW("error:message.size() > MSG_MAX_SIZE message size:%{public}zu", message.size());
         return RET_ERR;
     }
     return SendBytes(sessionId, message.c_str(), strlen(message.c_str()));

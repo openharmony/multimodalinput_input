@@ -265,8 +265,10 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
 
     auto fd = udsServer_->GetClientFd(lastWindowInfo_.pid);
     auto sess = udsServer_->GetSession(fd);
-    CHKPV(sess);
-
+    if (sess == nullptr) {
+        MMI_HILOGI("The last window has disappeared");
+        return;
+    }
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
     if (!sess->SendMsg(pkt)) {
@@ -279,6 +281,10 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
 {
     CALL_INFO_TRACE;
     CHKPV(udsServer_);
+    if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        MMI_HILOGI("the mouse is hide");
+        return;
+    }
     if (lastPointerEvent_ == nullptr) {
         SendPointerEvent(pointerAction);
         return;
@@ -332,7 +338,10 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
         fd = udsServer_->GetClientFd(windowInfo->pid);
     }
     auto sess = udsServer_->GetSession(fd);
-    CHKPV(sess);
+    if (sess == nullptr) {
+        MMI_HILOGI("The last window has disappeared");
+        return;
+    }
 
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
@@ -736,12 +745,12 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             } else if ((targetWindowId < 0) && (IsInHotArea(logicalX, logicalY, item.pointerHotAreas))) {
                 firstBtnDownWindowId_ = item.id;
                 MMI_HILOGW("Find out the dispatch window of this pointer event when the targetWindowId "
-                           "hasn't been setted up yet, window:%{public}d", firstBtnDownWindowId_);
+                           "hasn't been set up yet, window:%{public}d", firstBtnDownWindowId_);
                 break;
             } else if ((targetWindowId >= 0) && (targetWindowId == item.id)) {
                 firstBtnDownWindowId_ = targetWindowId;
                 MMI_HILOGW("Find out the dispatch window of this pointer event when the targetWindowId "
-                           "has been setted up already, window:%{public}d", firstBtnDownWindowId_);
+                           "has been set up already, window:%{public}d", firstBtnDownWindowId_);
                 break;
             } else {
                 MMI_HILOGW("Continue searching for the dispatch window of this pointer event");
@@ -833,12 +842,15 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
         return ret;
     }
+    if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+        DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+    }
     IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicalDisplayInfo);
     WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
     IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
         pointerItem.GetDisplayY(), MOUSE_ICON(mouseStyle));
-
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     int32_t windowX = logicalX - touchWindow->area.x;
@@ -934,6 +946,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",
                touchWindow->pid, logicalX, logicalY, physicalX, physicalY,
                windowX, windowY, displayId, pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
+    if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+    }
     return ERR_OK;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
