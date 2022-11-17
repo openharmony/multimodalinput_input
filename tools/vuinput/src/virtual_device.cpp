@@ -322,7 +322,7 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
     processName.append(temp);
     if (processName.find(VIRTUAL_DEVICE_NAME.c_str()) != std::string::npos) {
         if (closedir(dir) != 0) {
-            std::cout << "Close dir:" << processPath << "failed" << std::endl;
+            std::cout << "Close dir:" << processPath << " failed" << std::endl;
         }
         return true;
     }
