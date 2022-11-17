@@ -35,27 +35,27 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     size_t argc = 1;
     napi_value argv[1] = { 0 };
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1) {
-        MMI_HILOGE("Paramater number error");
+        MMI_HILOGE("Parameter number error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
     }
     napi_valuetype tmpType = napi_undefined;
-    CHKRP(env, napi_typeof(env, argv[0], &tmpType), TYPEOF);
+    CHKRP(napi_typeof(env, argv[0], &tmpType), TYPEOF);
     if (tmpType != napi_object) {
         MMI_HILOGE("KeyEvent is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "KeyEvent", "object");
         return nullptr;
     }
     napi_value keyHandle = nullptr;
-    CHKRP(env, napi_get_named_property(env, argv[0], "KeyEvent", &keyHandle), GET_NAMED_PROPERTY);
+    CHKRP(napi_get_named_property(env, argv[0], "KeyEvent", &keyHandle), GET_NAMED_PROPERTY);
     if (keyHandle == nullptr) {
         MMI_HILOGE("KeyEvent is nullptr");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "KeyEvent not found");
         return nullptr;
     }
-    CHKRP(env, napi_typeof(env, keyHandle, &tmpType), TYPEOF);
+    CHKRP(napi_typeof(env, keyHandle, &tmpType), TYPEOF);
     if (tmpType != napi_object) {
         MMI_HILOGE("KeyEvent is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "KeyEvent", "object");
@@ -111,7 +111,7 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     item.SetDownTime(static_cast<int64_t>(keyDownDuration));
     keyEvent->AddKeyItem(item);
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
-    CHKRP(env, napi_create_int32(env, 0, &result), CREATE_INT32);
+    CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
 }
 

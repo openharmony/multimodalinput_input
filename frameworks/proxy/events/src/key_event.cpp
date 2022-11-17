@@ -415,7 +415,7 @@ const std::map <int32_t, std::string> KEYCODE_TO_STRING = {
     {KeyEvent::KEYCODE_LAUNCHER_MENU, "KEYCODE_LAUNCHER_MENU"},
 };
 } // namespace
-const int32_t KeyEvent::UNKOWN_FUNCTION_KEY = -1;
+const int32_t KeyEvent::UNKNOWN_FUNCTION_KEY = -1;
 const int32_t KeyEvent::NUM_LOCK_FUNCTION_KEY = 0;
 const int32_t KeyEvent::CAPS_LOCK_FUNCTION_KEY = 1;
 const int32_t KeyEvent::SCROLL_LOCK_FUNCTION_KEY = 2;
@@ -1165,7 +1165,7 @@ int32_t KeyEvent::TransitionFunctionKey(int32_t keyCode)
         }
         default: {
             MMI_HILOGW("Unknown key code");
-            return UNKOWN_FUNCTION_KEY;
+            return UNKNOWN_FUNCTION_KEY;
         }
     }
 }
@@ -1207,7 +1207,7 @@ int32_t KeyEvent::SetFunctionKey(int32_t funcKey, int32_t value)
         }
         default: {
             MMI_HILOGW("Unknown function key");
-            return UNKOWN_FUNCTION_KEY;
+            return UNKNOWN_FUNCTION_KEY;
         }
     }
 }
