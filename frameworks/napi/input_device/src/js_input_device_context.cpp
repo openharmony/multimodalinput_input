@@ -93,10 +93,8 @@ napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info 
     napi_status status = napi_wrap(env, thisVar, jsContext, [](napi_env env, void* data, void* hin) {
         MMI_HILOGI("jsvm ends");
         JsInputDeviceContext *context = static_cast<JsInputDeviceContext*>(data);
-        if (context != nullptr) {
-            delete context;
-            context = nullptr;
-        }
+        delete context;
+        context = nullptr;
     }, nullptr, nullptr);
     if (status != napi_ok) {
         delete jsContext;
