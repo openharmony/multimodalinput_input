@@ -15,8 +15,8 @@
 
 #include "processing_game_pad_device.h"
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingGamePadDevice" };
 } // namespace
@@ -218,3 +218,5 @@ void ProcessingGamePadDevice::TransformDirectionKeyEvent(const DeviceEvent& padE
         MMI_HILOGW("Unknown direction type");
     }
 }
+} // namespace MMI
+} // namespace OHOS

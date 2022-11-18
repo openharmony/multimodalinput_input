@@ -15,8 +15,8 @@
 
 #include "processing_pad_device.h"
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingPadDevice" };
 } // namespace
@@ -110,3 +110,5 @@ void ProcessingPadDevice::TransformRingEvent(const PadEvent& padEvent, InputEven
         SetSynReport(inputEventArray);
     }
 }
+} // namespace MMI
+} // namespace OHOS

@@ -36,7 +36,8 @@ constexpr int32_t WAIT_TIME_FOR_INPUT { 10 };
 static void HiLogFunc(struct libinput* input, libinput_log_priority priority, const char* fmt, va_list args)
 {
     CHKPV(input);
-    char buffer[256];
+    CHKPV(fmt);
+    char buffer[256] = {};
     if (vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args) == -1) {
         MMI_HILOGE("Call vsnprintf_s failed");
         va_end(args);
