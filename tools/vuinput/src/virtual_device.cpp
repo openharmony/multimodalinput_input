@@ -53,29 +53,29 @@ const std::string PROC_PATH = "/proc";
 const std::string VIRTUAL_DEVICE_NAME = "vuinput";
 const std::string g_pid = std::to_string(getpid());
 
-inline bool IsNum(const std::string& str)
+static inline bool IsNum(const std::string& str)
 {
     std::istringstream sin(str);
     double num;
     return (sin >> num) && sin.eof();
 }
 
-inline bool IsValidPath(const std::string& rootDir, const std::string& filePath)
+static inline bool IsValidPath(const std::string& rootDir, const std::string& filePath)
 {
     return (filePath.compare(0, rootDir.size(), rootDir) == 0);
 }
 
-inline bool IsValidUinputPath(const std::string& filePath)
+static inline bool IsValidUinputPath(const std::string& filePath)
 {
     return IsValidPath(PROC_PATH, filePath);
 }
 
-inline bool IsFileExists(const std::string& fileName)
+static inline bool IsFileExists(const std::string& fileName)
 {
     return (access(fileName.c_str(), F_OK) == 0);
 }
 
-bool CheckFileName(const std::string& fileName)
+static bool CheckFileName(const std::string& fileName)
 {
     std::string::size_type pos = fileName.find("_");
     if (pos == std::string::npos) {
@@ -101,7 +101,7 @@ bool CheckFileName(const std::string& fileName)
     return result;
 }
 
-void RemoveDir(const std::string& filePath)
+static void RemoveDir(const std::string& filePath)
 {
     if (filePath.empty()) {
         std::cout << "File path is empty" << std::endl;
@@ -121,30 +121,29 @@ void RemoveDir(const std::string& filePath)
         if (ptr->d_type == DT_REG) {
             std::string rmFile = filePath + ptr->d_name;
             if (std::remove(rmFile.c_str()) != 0) {
-                std::cout << "Remove file:" << rmFile << "failed" << std::endl;
+                std::cout << "Remove file:" << rmFile << " failed" << std::endl;
             }
         } else if (ptr->d_type == DT_DIR) {
             RemoveDir((filePath + ptr->d_name + "/"));
         } else {
-            std::cout << "File name:" << ptr << "type is error" << std::endl;
+            std::cout << "File name:" << ptr << " type is error" << std::endl;
         }
     }
     if (closedir(dir) != 0) {
-        std::cout << "Close dir:" << filePath << "failed" << std::endl;
+        std::cout << "Close dir:" << filePath << " failed" << std::endl;
     }
     if (std::remove(filePath.c_str()) != 0) {
-        std::cout << "Remove dir:" << filePath <<"failed" << std::endl;
+        std::cout << "Remove dir:" << filePath <<" failed" << std::endl;
     }
-    return;
 }
 
-void StartMouse()
+static void StartMouse()
 {
     static VirtualMouse virtualMouse;
     virtualMouse.SetUp();
 }
 
-void StartKeyboard()
+static void StartKeyboard()
 {
     static VirtualKeyboard virtualKey;
     virtualKey.SetUp();
@@ -156,25 +155,25 @@ void StartKeyboard()
     virtualKeyext.SetUp();
 }
 
-void StartJoystick()
+static void StartJoystick()
 {
     static VirtualJoystick virtualJoystick;
     virtualJoystick.SetUp();
 }
 
-void StartTrackball()
+static void StartTrackball()
 {
     static VirtualTrackball virtualTrackball;
     virtualTrackball.SetUp();
 }
 
-void StartRemoteControl()
+static void StartRemoteControl()
 {
     static VirtualRemoteControl virtualRemoteControl;
     virtualRemoteControl.SetUp();
 }
 
-void StartTrackpad()
+static void StartTrackpad()
 {
     static VirtualTrackpad virtualTrackpad;
     virtualTrackpad.SetUp();
@@ -184,7 +183,7 @@ void StartTrackpad()
     virtualTrackpadSysCtrl.SetUp();
 }
 
-void StartKnob()
+static void StartKnob()
 {
     static VirtualKnob virtualKnob;
     virtualKnob.SetUp();
@@ -196,13 +195,13 @@ void StartKnob()
     virtualKnobSysCtrl.SetUp();
 }
 
-void StartGamePad()
+static void StartGamePad()
 {
     static VirtualGamePad virtualGamePad;
     virtualGamePad.SetUp();
 }
 
-void StartTouchPad()
+static void StartTouchPad()
 {
     static VirtualStylus virtualStylus;
     virtualStylus.SetUp();
@@ -214,7 +213,7 @@ void StartTouchPad()
     virtualSingleFinger.SetUp();
 }
 
-void StartTouchScreen()
+static void StartTouchScreen()
 {
     static VirtualTouchScreen virtualTouchScreen;
     virtualTouchScreen.SetUp();
@@ -222,7 +221,7 @@ void StartTouchScreen()
     virtualSingleTouchScreen.SetUp();
 }
 
-void StartPen()
+static void StartPen()
 {
     static VirtualPen virtualPen;
     virtualPen.SetUp();
@@ -247,7 +246,7 @@ std::map<std::string, virtualFun> mapFun = {
     {"pen", &StartPen}
 };
 
-void StartAllDevices()
+static void StartAllDevices()
 {
     if (mapFun.empty()) {
         std::cout << "mapFun is empty" << std::endl;
@@ -275,7 +274,6 @@ VirtualDevice::~VirtualDevice()
 std::vector<std::string> VirtualDevice::BrowseDirectory(const std::string& filePath)
 {
     std::vector<std::string> fileList;
-    fileList.clear();
     DIR* dir = opendir(filePath.c_str());
     if (dir == nullptr) {
         std::cout << "Failed to open folder" << std::endl;
@@ -290,17 +288,16 @@ std::vector<std::string> VirtualDevice::BrowseDirectory(const std::string& fileP
         }
     }
     if (closedir(dir) != 0) {
-        std::cout << "Close dir:" << filePath << "failed" << std::endl;
+        std::cout << "Close dir:" << filePath << " failed" << std::endl;
     }
     return fileList;
 }
 
 bool VirtualDevice::ClearFileResidues(const std::string& fileName)
 {
-    DIR *dir = nullptr;
     const std::string::size_type pos = fileName.find("_");
-    const std::string procressPath = "/proc/" + fileName.substr(0, pos) + "/";
-    const std::string filePath = procressPath + "cmdline";
+    const std::string processPath = "/proc/" + fileName.substr(0, pos) + "/";
+    const std::string filePath = processPath + "cmdline";
     std::string temp;
     std::string processName;
     if (!CheckFileName(fileName)) {
@@ -311,10 +308,11 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
         std::cout << "Failed to create file" << std::endl;
         goto RELEASE_RES;
     }
-    dir = opendir(procressPath.c_str());
+    DIR *dir = nullptr;
+    dir = opendir(processPath.c_str());
     if (dir == nullptr) {
-        std::cout << "Useless flag file:" << procressPath << std::endl;
-        goto RELEASE_RES;
+        std::cout << "Useless flag file:" << processPath << std::endl;
+        return false;
     }
     temp = ReadUinputToolFile(filePath);
     if (temp.empty()) {
@@ -324,15 +322,13 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
     processName.append(temp);
     if (processName.find(VIRTUAL_DEVICE_NAME.c_str()) != std::string::npos) {
         if (closedir(dir) != 0) {
-            std::cout << "Close dir:" << procressPath <<"failed" << std::endl;
+            std::cout << "Close dir:" << processPath << " failed" << std::endl;
         }
         return true;
     }
     RELEASE_RES:
-    if (dir != nullptr) {
-        if (closedir(dir) != 0) {
-            std::cout << "Close dir failed" << std::endl;
-        }
+    if (closedir(dir) != 0) {
+        std::cout << "Close dir failed" << std::endl;
     }
     if (std::remove((g_folderPath + fileName).c_str()) != 0) {
         std::cout << "Remove file failed" << std::endl;
@@ -588,14 +584,14 @@ bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::v
     }
     if (closeDeviceName == "all") {
         for (const auto &it : deviceList) {
-            kill(atoi(it.c_str()), SIGKILL);
+            kill(std::stoi(it), SIGKILL);
         }
         RemoveDir(g_folderPath);
         return true;
     }
     for (const auto &it : deviceList) {
         if (it.find(closeDeviceName) == 0) {
-            kill(atoi(it.c_str()), SIGKILL);
+            kill(std::stoi(it), SIGKILL);
             if (BrowseDirectory(g_folderPath).size() == 0) {
                 RemoveDir(g_folderPath);
             }

@@ -73,7 +73,7 @@ void ClientMsgHandler::Init()
         {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-        {MmiMessageId::COOPERATION_ADD_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnCooperationListiner, this)},
+        {MmiMessageId::COOPERATION_ADD_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnCooperationListener, this)},
         {MmiMessageId::COOPERATION_MESSAGE, MsgCallbackBind2(&ClientMsgHandler::OnCooperationMessage, this)},
         {MmiMessageId::COOPERATION_GET_STATE, MsgCallbackBind2(&ClientMsgHandler::OnCooperationState, this)},
 #endif // OHOS_BUILD_ENABLE_COOPERATE
@@ -393,7 +393,7 @@ int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)
 }
 
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-int32_t ClientMsgHandler::OnCooperationListiner(const UDSClient& client, NetPacket& pkt)
+int32_t ClientMsgHandler::OnCooperationListener(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
     int32_t userData;
@@ -419,7 +419,7 @@ int32_t ClientMsgHandler::OnCooperationMessage(const UDSClient& client, NetPacke
         MMI_HILOGE("Packet read cooperate msg failed");
         return RET_ERR;
     }
-    InputDevCooperateImpl.OnCooprationMessage(userData, deviceId, CooperationMessage(nType));
+    InputDevCooperateImpl.OnCooperationMessage(userData, deviceId, CooperationMessage(nType));
     return RET_OK;
 }
 

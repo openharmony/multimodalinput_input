@@ -216,7 +216,7 @@ void JsInputMonitorManager::RemoveEnv(std::map<napi_env, napi_ref>::iterator it)
 {
     CALL_DEBUG_ENTER;
     uint32_t refCount;
-    CHKRV(it->first, napi_reference_unref(it->first, it->second, &refCount), REFERENCE_UNREF);
+    CHKRV(napi_reference_unref(it->first, it->second, &refCount), REFERENCE_UNREF);
     envManager_.erase(it);
 }
 
