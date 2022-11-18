@@ -216,7 +216,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
 {
     CHKPF(pointerEvent);
     if (interceptors_.empty()) {
-        MMI_HILOGE("Pointer interceptors is empty");
+        MMI_HILOGI("Interceptors is empty");
         return false;
     }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());

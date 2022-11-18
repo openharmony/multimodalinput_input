@@ -612,7 +612,7 @@ void InputManagerImpl::OnConnected()
 {
     CALL_DEBUG_ENTER;
     if (displayGroupInfo_.windowsInfo.empty() || displayGroupInfo_.displaysInfo.empty()) {
-        MMI_HILOGE("The windows info or display info is empty");
+        MMI_HILOGI("The windows info or display info is empty");
         return;
     }
     SendDisplayInfo();

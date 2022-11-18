@@ -640,7 +640,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
     }
     if (!HandleShortKeys(key) ||
         !HandleSequences(key)) {
-        MMI_HILOGE("Handle key event failed");
+        MMI_HILOGD("Shortkeys and Sequences is empty");
         return false;
     }
     return true;
@@ -655,12 +655,12 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         return false;
     }
     if (IsKeyMatch(lastMatchedKey_, keyEvent)) {
-        MMI_HILOGE("The same key is waiting timeout, skip");
+        MMI_HILOGD("The same key is waiting timeout, skip");
         return true;
     }
     DfxHisysevent::GetComboStartTime();
     if (lastMatchedKey_.timerId >= 0) {
-        MMI_HILOGE("Remove timer:%{public}d", lastMatchedKey_.timerId);
+        MMI_HILOGD("Remove timer:%{public}d", lastMatchedKey_.timerId);
         TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
     }
     ResetLastMatchedKey();

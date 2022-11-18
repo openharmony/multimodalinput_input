@@ -336,7 +336,10 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
         fd = udsServer_->GetClientFd(windowInfo->pid);
     }
     auto sess = udsServer_->GetSession(fd);
-    CHKPV(sess);
+    if (sess == nullptr) {
+        MMI_HILOGI("The last window has disappeared");
+        return;
+    }
 
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
