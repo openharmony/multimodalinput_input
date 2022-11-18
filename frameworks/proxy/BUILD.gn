@@ -79,6 +79,7 @@ ohos_source_set("libmmi-common") {
 
 ohos_shared_library("libmmi-client") {
   sources = [
+    "event_handler/src/anr_handler.cpp",
     "event_handler/src/bytrace_adapter.cpp",
     "event_handler/src/client_msg_handler.cpp",
     "event_handler/src/input_device_impl.cpp",

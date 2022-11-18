@@ -45,7 +45,6 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
     MsgCallback funs[] = {
-        {MmiMessageId::MARK_PROCESS, MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
     };
     for (auto &it : funs) {
@@ -70,22 +69,6 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
     if (ret < 0) {
         MMI_HILOGE("Msg handling failed. id:%{public}d,errCode:%{public}d", id, ret);
     }
-}
-
-int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t eventId = 0;
-    int32_t eventType = 0;
-    pkt >> eventId >> eventType;
-    MMI_HILOGD("Event type:%{public}d, id:%{public}d", eventType, eventId);
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read data failed");
-        return PACKET_READ_FAIL;
-    }
-    ANRMgr->MarkProcessed(eventType, eventId, sess);
-    return RET_OK;
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
