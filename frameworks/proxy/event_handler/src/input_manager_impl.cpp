@@ -126,6 +126,12 @@ int32_t InputManagerImpl::AddInputEventFilter(std::function<bool(std::shared_ptr
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 }
 
+EventHandlerPtr InputManagerImpl::GetEventHandler() const
+{
+    CHKPP(eventHandler_);
+    return eventHandler_;
+}
+
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {

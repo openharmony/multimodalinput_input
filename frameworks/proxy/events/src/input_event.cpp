@@ -200,7 +200,7 @@ void InputEvent::ClearFlag()
     bitwise_ = EVENT_FLAG_NONE;
 }
 
-void InputEvent::SetProcessedCallback(std::function<void(int32_t)> callback)
+void InputEvent::SetProcessedCallback(std::function<void(int32_t, int64_t)> callback)
 {
     processedCallback_ = callback;
 }
@@ -211,8 +211,8 @@ void InputEvent::MarkProcessed()
         return;
     }
     auto func = processedCallback_;
-    processedCallback_ = std::function<void(int32_t)>();
-    func(id_);
+    processedCallback_ = std::function<void(int32_t, int64_t)>();
+    func(id_, actionTime_);
 }
 
 bool InputEvent::WriteToParcel(Parcel &out) const

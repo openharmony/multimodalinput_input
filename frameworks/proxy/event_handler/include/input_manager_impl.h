@@ -112,6 +112,7 @@ public:
     bool GetFunctionKeyState(int32_t funcKey);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
 
+    EventHandlerPtr GetEventHandler() const;
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt);

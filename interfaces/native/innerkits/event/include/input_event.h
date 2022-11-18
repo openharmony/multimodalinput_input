@@ -315,7 +315,7 @@ public:
      * @return void
      * @since 9
      */
-    void SetProcessedCallback(std::function<void(int32_t)> callback);
+    void SetProcessedCallback(std::function<void(int32_t, int64_t)> callback);
 
 public:
     /**
@@ -353,7 +353,7 @@ private:
     int32_t targetWindowId_;
     int32_t agentWindowId_;
     uint32_t bitwise_;
-    std::function<void(int32_t)> processedCallback_;
+    std::function<void(int32_t, int64_t)> processedCallback_;
 };
 } // namespace MMI
 } // namespace OHOS
