@@ -96,7 +96,8 @@ int32_t UDSServer::AddSocketPairInfo(const std::string& programName,
     int32_t& serverFd, int32_t& toReturnClientFd, int32_t& tokenType)
 {
     CALL_DEBUG_ENTER;
-    int32_t sockFds[2] = {};
+    int32_t sockFds[2] = { -1 };
+
     if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockFds) != 0) {
         MMI_HILOGE("Call socketpair failed, errno:%{public}d", errno);
         return RET_ERR;
