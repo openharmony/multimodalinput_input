@@ -749,8 +749,8 @@ const std::string& InputDeviceManager::GetScreenId(int32_t deviceId) const
             return iter->second;
         }
     }
-#endif // OHOS_BUILD_ENABLE_COOPERATE
     MMI_HILOGE("Find input device screen id failed");
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     return UNKNOWN_SCREEN_ID;
 }
 } // namespace MMI
