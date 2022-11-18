@@ -300,6 +300,7 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
     const std::string filePath = processPath + "cmdline";
     std::string temp;
     std::string processName;
+    DIR *dir = nullptr;
     if (!CheckFileName(fileName)) {
         std::cout << "File name check error" << std::endl;
         goto RELEASE_RES;
@@ -308,7 +309,6 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
         std::cout << "Failed to create file" << std::endl;
         goto RELEASE_RES;
     }
-    DIR *dir = nullptr;
     dir = opendir(processPath.c_str());
     if (dir == nullptr) {
         std::cout << "Useless flag file:" << processPath << std::endl;
