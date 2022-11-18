@@ -640,7 +640,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
     }
     if (!HandleShortKeys(key) ||
         !HandleSequences(key)) {
-        MMI_HILOGE("Handle key event failed");
+        MMI_HILOGD("Shortkeys and Sequences is empty");
         return false;
     }
     return true;
@@ -655,12 +655,12 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         return false;
     }
     if (IsKeyMatch(lastMatchedKey_, keyEvent)) {
-        MMI_HILOGE("The same key is waiting timeout, skip");
+        MMI_HILOGD("The same key is waiting timeout, skip");
         return true;
     }
     DfxHisysevent::GetComboStartTime();
     if (lastMatchedKey_.timerId >= 0) {
-        MMI_HILOGE("Remove timer:%{public}d", lastMatchedKey_.timerId);
+        MMI_HILOGD("Remove timer:%{public}d", lastMatchedKey_.timerId);
         TimerMgr->RemoveTimer(lastMatchedKey_.timerId);
     }
     ResetLastMatchedKey();
@@ -905,6 +905,7 @@ bool KeyCommandHandler::HandleKeyCancel(ShortcutKey &shortcutKey)
 
 void KeyCommandHandler::LaunchAbility(const ShortcutKey &key)
 {
+    CALL_INFO_TRACE;
     AAFwk::Want want;
     want.SetElementName(key.ability.deviceId, key.ability.bundleName, key.ability.abilityName);
     want.SetAction(key.ability.action);
@@ -929,6 +930,7 @@ void KeyCommandHandler::LaunchAbility(const ShortcutKey &key)
 
 void KeyCommandHandler::LaunchAbility(const Sequence &sequence)
 {
+    CALL_INFO_TRACE;
     AAFwk::Want want;
     want.SetElementName(sequence.ability.deviceId, sequence.ability.bundleName, sequence.ability.abilityName);
     want.SetAction(sequence.ability.action);

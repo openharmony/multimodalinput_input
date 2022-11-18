@@ -144,14 +144,14 @@ void MouseEventNormalize::InitAbsolution()
         return;
     }
     MMI_HILOGD("Init absolution");
-    auto dispalyGroupInfo = WinMgr->GetDisplayGroupInfo();
-    if (dispalyGroupInfo.displaysInfo.empty()) {
+    auto displayGroupInfo = WinMgr->GetDisplayGroupInfo();
+    if (displayGroupInfo.displaysInfo.empty()) {
         MMI_HILOGI("The displayInfo is empty");
         return;
     }
-    currentDisplayId_ = dispalyGroupInfo.displaysInfo[0].id;
-    absolutionX_ = dispalyGroupInfo.displaysInfo[0].width * 1.0 / 2;
-    absolutionY_ = dispalyGroupInfo.displaysInfo[0].height * 1.0 / 2;
+    currentDisplayId_ = displayGroupInfo.displaysInfo[0].id;
+    absolutionX_ = displayGroupInfo.displaysInfo[0].width * 1.0 / 2;
+    absolutionY_ = displayGroupInfo.displaysInfo[0].height * 1.0 / 2;
 }
 
 int32_t MouseEventNormalize::HandleButtonInner(struct libinput_event_pointer* data)
@@ -308,7 +308,7 @@ int32_t MouseEventNormalize::Normalize(struct libinput_event *event)
             break;
         }
         default: {
-            MMI_HILOGE("Unknow type:%{public}d", type);
+            MMI_HILOGE("Unknown type:%{public}d", type);
             return RET_ERR;
         }
     }
@@ -382,8 +382,8 @@ bool MouseEventNormalize::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
 {
     CALL_DEBUG_ENTER;
     CHKPF(pointerEvent_);
-    bool bHasPoinerDevice = InputDevMgr->HasPointerDevice();
-    if (!bHasPoinerDevice) {
+    bool bHasPointerDevice = InputDevMgr->HasPointerDevice();
+    if (!bHasPointerDevice) {
         MMI_HILOGE("There hasn't any pointer device");
         return false;
     }
@@ -392,7 +392,7 @@ bool MouseEventNormalize::NormalizeMoveMouse(int32_t offsetX, int32_t offsetY)
     HandleMotionMoveMouse(offsetX, offsetY);
     HandlePostMoveMouse(pointerItem);
     DumpInner();
-    return bHasPoinerDevice;
+    return bHasPointerDevice;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 

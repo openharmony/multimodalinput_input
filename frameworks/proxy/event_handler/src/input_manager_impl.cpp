@@ -612,7 +612,7 @@ void InputManagerImpl::OnConnected()
 {
     CALL_DEBUG_ENTER;
     if (displayGroupInfo_.windowsInfo.empty() || displayGroupInfo_.displaysInfo.empty()) {
-        MMI_HILOGE("The windows info or display info is empty");
+        MMI_HILOGI("The windows info or display info is empty");
         return;
     }
     SendDisplayInfo();
@@ -622,7 +622,7 @@ void InputManagerImpl::OnConnected()
     }
     int32_t ret = MultimodalInputConnMgr->SetAnrObserver();
     if (ret != RET_OK) {
-        MMI_HILOGE("Set anr observerfailed, ret:%{public}d", ret);
+        MMI_HILOGE("Set anr observer failed, ret:%{public}d", ret);
     }
 }
 
