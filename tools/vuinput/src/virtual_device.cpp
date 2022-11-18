@@ -568,6 +568,7 @@ bool VirtualDevice::AddDevice(const std::string& startDeviceName)
         std::cout << "Failed to create file" <<std::endl;
         return false;
     }
+    flagFile.close();
     return true;
 }
 
