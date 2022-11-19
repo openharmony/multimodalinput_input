@@ -38,9 +38,6 @@
 #include "i_input_event_consumer.h"
 #include "key_option.h"
 #include "pointer_event.h"
-#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-#include "call_dinput_service.h"
-#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 
 namespace OHOS {
 namespace MMI {
@@ -104,14 +101,6 @@ public:
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid);
 
-    int32_t SetPointerLocation(int32_t x, int32_t y);
-
-    int32_t GetRemoteInputAbility(std::string deviceId, std::function<void(std::set<int32_t>)> remoteTypes);
-    int32_t PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
-    int32_t UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
-    int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
-    int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
-
     int32_t RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener);
     int32_t UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener = nullptr);
     int32_t EnableInputDeviceCooperate(bool enabled, std::function<void(std::string, CooperationMessage)> callback);
@@ -148,9 +137,6 @@ private:
     std::condition_variable cv_;
     std::thread ehThread_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
-#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    sptr<CallDinputService> callDinputService_ { nullptr };
-#endif // OHOS_DISTRIBUTED_INPUT_MODEL
 };
 
 #define InputMgrImpl ::OHOS::Singleton<InputManagerImpl>::GetInstance()
