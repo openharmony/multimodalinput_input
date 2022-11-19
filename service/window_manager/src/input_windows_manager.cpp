@@ -46,8 +46,19 @@ void InputWindowsManager::Init(UDSServer& udsServer)
     CHKPV(udsServer_);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     udsServer_->AddSessionDeletedCallback(std::bind(&InputWindowsManager::OnSessionLost, this, std::placeholders::_1));
+    InitMouseDownInfo();
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+void InputWindowsManager::InitMouseDownInfo()
+{
+    mouseDownInfo_.id = -1;
+    mouseDownInfo_.pid = -1;
+    mouseDownInfo_.defaultHotAreas.clear();
+    mouseDownInfo_.pointerHotAreas.clear();
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEvent)
 {
@@ -68,11 +79,20 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
         return udsServer_->GetClientFd(-1);
     }
     int32_t pid = -1;
-    auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
-    if (iter != touchItemDownInfos_.end()) {
-        pid = iter->second.pid;
-        touchItemDownInfos_.erase(iter);
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
+        if (iter != touchItemDownInfos_.end()) {
+            pid = iter->second.pid;
+            touchItemDownInfos_.erase(iter);
+        }
     }
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
+        if (mouseDownInfo_.pid != -1) {
+            pid = mouseDownInfo_.pid;
+            InitMouseDownInfo();
+        }
+    }
+    
     return udsServer_->GetClientFd(pid);
 }
 
@@ -373,10 +393,17 @@ void InputWindowsManager::NotifyPointerToWindow()
         lastWindowInfo_ = *windowInfo;
         return;
     }
+    bool isFindLastWindow = false;
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         if (item.id == lastWindowInfo_.id) {
             DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+            isFindLastWindow = true;
             break;
+        }
+    }
+    if (!isFindLastWindow) {
+        if (udsServer_ != nullptr && udsServer_->GetClientFd(lastWindowInfo_.pid) != INVALID_FD) {
+            DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
         }
     }
     lastWindowInfo_ = *windowInfo;
@@ -842,8 +869,13 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     auto touchWindow = SelectWindowInfo(logicalX, logicalY, pointerEvent);
     if (!touchWindow) {
-        MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
-        return RET_ERR;
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN || mouseDownInfo_.id == -1) {
+            MMI_HILOGE("touchWindow is nullptr, targetWindow:%{public}d", pointerEvent->GetTargetWindowId());
+            return RET_ERR;
+        }
+        touchWindow = std::make_optional(mouseDownInfo_);
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+        MMI_HILOGD("mouse event send cancel, window:%{public}d", touchWindow->id);
     }
     int32_t mouseStyle = -1;
     int32_t ret = GetPointerStyle(touchWindow->pid, touchWindow->id, mouseStyle);
@@ -872,7 +904,14 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-
+    int32_t action = pointerEvent->GetPointerAction();
+    if (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
+        mouseDownInfo_ = *touchWindow;
+    }
+    if (action == PointerEvent::POINTER_ACTION_BUTTON_UP) {
+        InitMouseDownInfo();
+        MMI_HILOGD("Mouse up, clear mouse down info");
+    }
     MMI_HILOGD("pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
                "logicalX:%{public}d,logicalY:%{public}d,"
                "displayX:%{public}d,displayY:%{public}d,windowX:%{public}d,windowY:%{public}d",
