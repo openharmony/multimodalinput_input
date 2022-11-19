@@ -81,7 +81,7 @@ private:
     void RemoveKeyCode(int32_t keyCode, std::vector<int32_t> &keyCodes);
     bool IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     bool IsNotifyPowerKeySubsciber(int32_t keyCode, const std::vector<int32_t> &keyCodes);
-    void StartKeyUpNotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
+    void HandleKeyUpWithDelay(std::shared_ptr<KeyEvent> keyEvent,
                                     const std::shared_ptr<Subscriber> &subscriber);
     void PrintKeyUpLog(const std::shared_ptr<Subscriber> &subscriber);
 

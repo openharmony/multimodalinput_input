@@ -387,7 +387,7 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
         auto duration = keyOption->GetFinalKeyDownDuration();
         if (duration <= 0) {
             MMI_HILOGD("duration <= 0");
-            StartKeyUpNotifySubscriber(keyEvent, subscriber);
+            HandleKeyUpWithDelay(keyEvent, subscriber);
             handled = true;
             continue;
         }
@@ -401,7 +401,7 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
             continue;
         }
         MMI_HILOGD("upTime - downTime < duration");
-        StartKeyUpNotifySubscriber(keyEvent, subscriber);
+        HandleKeyUpWithDelay(keyEvent, subscriber);
         handled = true;
     }
     MMI_HILOGD("%{public}s", handled ? "true" : "false");
@@ -489,17 +489,15 @@ bool KeySubscriberHandler::IsNotifyPowerKeySubsciber(int32_t keyCode, const std:
         return true;
     }
 
-    bool isVolumePress = true;
     for (const auto& pressedKey: keyCodes) {
         if (pressedKey == KeyEvent::KEYCODE_VOLUME_DOWN || pressedKey == KeyEvent::KEYCODE_VOLUME_UP) {
-            isVolumePress = false;
-            break;
+            return false;
         }
     }
-    return isVolumePress;
+    return true;
 }
 
-void KeySubscriberHandler::StartKeyUpNotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
+void KeySubscriberHandler::HandleKeyUpWithDelay(std::shared_ptr<KeyEvent> keyEvent,
                                                       const std::shared_ptr<Subscriber> &subscriber)
 {
     auto keyUpDelay = subscriber->keyOption_->GetFinalKeyUpDelay();
@@ -514,6 +512,7 @@ void KeySubscriberHandler::StartKeyUpNotifySubscriber(std::shared_ptr<KeyEvent> 
 
 void KeySubscriberHandler::PrintKeyUpLog(const std::shared_ptr<Subscriber> &subscriber)
 {
+    CHKPV(subscriber);
     auto &keyOption = subscriber->keyOption_;
     MMI_HILOGD("subscribeId:%{public}d, keyOption->finalKey:%{public}d,"
         "keyOption->isFinalKeyDown:%{public}s, keyOption->finalKeyDownDuration:%{public}d,"

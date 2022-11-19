@@ -34,12 +34,6 @@
 
 namespace OHOS {
 namespace MMI {
-enum SpecialType {
-    SPECIAL_ALL = 0,
-    SUBSCRIBER_BEFORE_DELAY = 1,
-    KEY_DOWN_ACTION = 2
-};
-
 struct Ability {
     std::string bundleName;
     std::string abilityName;
@@ -110,7 +104,7 @@ private:
     bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
     bool AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent);
-    void RemoveSubscriberFrontTimer(int32_t keyCode);
+    void RemoveSubscribedTimer(int32_t keyCode);
     void HandleSpecialKeys(int32_t keyCode, int32_t keyAction);
     void InterruptTimers();
     void ResetLastMatchedKey()

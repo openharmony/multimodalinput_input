@@ -45,6 +45,11 @@ const std::map<int32_t, SpecialType> SPECIAL_KEYS = {
     { KeyEvent::KEYCODE_VOLUME_DOWN, SpecialType::SPECIAL_ALL },
     { KeyEvent::KEYCODE_VOLUME_UP, SpecialType::SUBSCRIBER_BEFORE_DELAY }
 };
+enum SpecialType {
+    SPECIAL_ALL = 0,
+    SUBSCRIBER_BEFORE_DELAY = 1,
+    KEY_DOWN_ACTION = 2
+};
 struct JsonParser {
     JsonParser() = default;
     ~JsonParser()
@@ -66,10 +71,7 @@ bool IsSpecialType(int32_t keyCode, SpecialType type)
     if (it == SPECIAL_KEYS.end()) {
         return false;
     }
-    if (it->second != SpecialType::SPECIAL_ALL && it->second != type) {
-        return false;
-    }
-    return true;
+    return (it->second == SpecialType::SPECIAL_ALL || it->second == type);
 }
 
 bool GetPreKeys(const cJSON* jsonData, ShortcutKey &shortcutKey)
@@ -664,9 +666,9 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         isParseConfig_ = true;
     }
 
-    bool isHandleShortKey = HandleShortKeys(key);
-    bool isHandleSequences = HandleSequences(key);
-    if (isHandleShortKey || isHandleSequences) {
+    bool isHandled = HandleShortKeys(key);
+    bool isHandled = HandleSequences(key) || isHandled;
+    if (isHandled) {
         return true;
     }
 
@@ -695,7 +697,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
             timerIds.push_back(timerId);
             auto it = specialTimers_.emplace(key->GetKeyCode(), timerIds);
             if (!it.second) {
-                MMI_HILOGE("Emplace duplicated");
+                MMI_HILOGE("Keycode duplicated");
                 return false;
             }
         } else {
@@ -791,7 +793,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
                 HandleSpecialKeys(item.keyCode, item.keyAction);
             }
             InputHandler->GetSubscriberHandler()->RemoveSubscriberKeyUpTimer(item.keyCode);
-            RemoveSubscriberFrontTimer(item.keyCode);
+            RemoveSubscribedTimer(item.keyCode);
         }
     }
 
@@ -1027,7 +1029,7 @@ void ShortcutKey::Print() const
         finalKey, ability.bundleName.c_str());
 }
 
-void KeyCommandHandler::RemoveSubscriberFrontTimer(int32_t keyCode)
+void KeyCommandHandler::RemoveSubscribedTimer(int32_t keyCode)
 {
     CALL_DEBUG_ENTER;
     auto iter = specialTimers_.find(keyCode);
@@ -1055,7 +1057,7 @@ void KeyCommandHandler::HandleSpecialKeys(int32_t keyCode, int32_t keyAction)
         if (iter == specialKeys_.end()) {
             auto it = specialKeys_.emplace(keyCode, keyAction);
             if (!it.second) {
-                MMI_HILOGD("Add keyCode failed");
+                MMI_HILOGD("KeyCode duplicated");
                 return;
             }
         }
