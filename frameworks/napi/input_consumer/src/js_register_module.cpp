@@ -237,7 +237,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     napi_value argv[3] = { 0 };
     CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 3) {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "paramter number error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
     }
     KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {

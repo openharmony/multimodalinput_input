@@ -341,7 +341,7 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
     if (info.isRemote) {
         info.networkIdOrigin = MakeNetworkId(libinput_device_get_phys(inputDevice));
     }
-    info.dhid = GenerateDescriptor(inputDevice, info.isRemote);  
+    info.dhid = GenerateDescriptor(inputDevice, info.isRemote);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 }
 
