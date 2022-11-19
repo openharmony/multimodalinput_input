@@ -167,7 +167,7 @@ napi_value JsInputDeviceCooperateContext::GetState(napi_env env, napi_callback_i
         return nullptr;
     }
     if (!UtilNapi::TypeOf(env, argv[0], napi_string)) {
-        MMI_HILOGE("The first paramter is not string");
+        MMI_HILOGE("The first parameter is not string");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceDescriptor", "string");
         return nullptr;
     }
