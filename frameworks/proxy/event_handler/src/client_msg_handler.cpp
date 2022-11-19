@@ -56,7 +56,7 @@ void ClientMsgHandler::Init()
 {
     MsgCallback funs[] = {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-        {MmiMessageId::ON_KEYEVENT, MsgCallbackBind2(&ClientMsgHandler::OnKeyEvent, this)},
+        {MmiMessageId::ON_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnKeyEvent, this)},
         {MmiMessageId::ON_SUBSCRIBE_KEY, std::bind(&ClientMsgHandler::OnSubscribeKeyEventCallback,
                                                    this, std::placeholders::_1, std::placeholders::_2)},
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

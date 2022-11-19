@@ -25,16 +25,6 @@ config("event_injection_config") {
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
   ]
-
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
 }
 
 config("event_injection_public_config") {
@@ -64,7 +54,6 @@ ohos_source_set("event-injection") {
     "src/processing_pad_device.cpp",
     "src/processing_pen_device.cpp",
     "src/processing_touch_screen_device.cpp",
-    "src/send_message.cpp",
   ]
 
   configs = [
@@ -73,15 +62,12 @@ ohos_source_set("event-injection") {
   ]
 
   deps = [
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
     "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/cJSON:cjson_static",
   ]
-
-  if (input_feature_libinput) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
 
   external_deps = [ "ipc:ipc_core" ]
 
@@ -92,7 +78,6 @@ ohos_source_set("event-injection") {
 ohos_unittest("ut-event-injection-out") {
   module_out_path = module_output_path
   include_dirs = [
-    "//drivers/peripheral/input/interfaces/include",
     "//commonlibrary/c_utils/base/include",
     "//third_party/googletest/googletest/include",
     "//third_party/cJSON",
@@ -124,11 +109,8 @@ ohos_unittest("ut-event-injection-out") {
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/tools/event_inject/include",
     "${mmi_path}/uinput",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  if (input_feature_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
 
   sources = [
     "test/device_base_test.cpp",
@@ -143,32 +125,18 @@ ohos_unittest("ut-event-injection-out") {
     "test/processing_pad_device_test.cpp",
     "test/processing_pen_device_test.cpp",
     "test/processing_touch_screen_device_test.cpp",
-    "test/send_message_test.cpp",
   ]
-
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/tools/event_inject:event-injection",
     "${mmi_path}/util:libmmi-util",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//third_party/cJSON:cjson_static",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
-
-  if (input_feature_libinput) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
 
   external_deps = [
     "c_utils:utils",
@@ -183,22 +151,10 @@ ohos_executable("mmi-event-injection") {
   configs = [ ":event_injection_public_config" ]
 
   deps = [
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//foundation/multimodalinput/input/tools/event_inject:event-injection",
     "//foundation/multimodalinput/input/util:libmmi-util",
   ]
-
-  if (input_feature_libinput) {
-    deps += [ "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi" ]
-  }
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
 
   install_enable = true
   part_name = "input"

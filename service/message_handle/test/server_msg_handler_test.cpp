@@ -32,14 +32,6 @@ public:
 
 class ServerMsgHandlerUnitTest : public ServerMsgHandler {
 public:
-
-#ifdef OHOS_BUILD_HDF
-    int32_t OnHdiInjectTest(SessionPtr sess, NetPacket& pkt)
-    {
-        return OnHdiInject(sess, pkt);
-    }
-#endif // OHOS_BUILD_HDF
-
     int32_t OnInjectKeyEventTest(SessionPtr sess, std::shared_ptr<KeyEvent> keyEvent)
     {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

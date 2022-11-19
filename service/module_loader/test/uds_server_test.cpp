@@ -83,7 +83,7 @@ HWTEST_F(UDSServerTest, SendMsg_002, TestSize.Level1)
 
 HWTEST_F(UDSServerTest, SendMsg_003, TestSize.Level1)
 {
-    MmiMessageId msgId = MmiMessageId::BEGIN;
+    MmiMessageId msgId = MmiMessageId::INVALID;
     NetPacket pkt(msgId);
 
     int32_t fd = 3333;
