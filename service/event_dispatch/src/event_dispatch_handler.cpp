@@ -153,7 +153,7 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
         return RET_OK;
     }
 
-    NetPacket pkt(MmiMessageId::ON_KEYEVENT);
+    NetPacket pkt(MmiMessageId::ON_KEY_EVENT);
     InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_DISPATCH_EVENT);
     pkt << fd;

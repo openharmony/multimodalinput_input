@@ -963,10 +963,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",
                touchWindow->pid, logicalX, logicalY, physicalX, physicalY,
                windowX, windowY, displayId, pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
+#ifdef OHOS_BUILD_ENABLE_POINTER
     if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
         DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
         IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
     }
+#endif // OHOS_BUILD_ENABLE_POINTER
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if (pointerAction == PointerEvent::POINTER_ACTION_DOWN) {
         touchItemDownInfos_.insert(std::make_pair(pointerId, *touchWindow));
