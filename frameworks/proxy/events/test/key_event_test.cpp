@@ -216,6 +216,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_006, TestSize.Level1)
     item.SetKeyCode(KeyEvent::KEYCODE_BACK);
     item.SetDownTime(100);
     item.SetPressed(true);
+    item.SetUnicode(0);
     keyEvent->AddKeyItem(item);
     ASSERT_TRUE(keyEvent->IsValid());
     std::vector<KeyEvent::KeyItem> items = keyEvent->GetKeyItems();

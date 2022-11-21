@@ -138,7 +138,7 @@ void InputManagerManualTest::AddInputEventFilter()
         if (x == 10 && y == 10) {
             MMI_HILOGI("The values of X and y are both 10, which meets the expectation and callbackRet is set to 1");
             callbackRet = 1;
-            return true;
+            return false;
         }
 
         MMI_HILOGI("The values of X and y are not 10, which meets the expectation and callbackRet is set to 2");
