@@ -30,20 +30,20 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSReg
 int32_t GetNamedPropertyBool(const napi_env& env, const napi_value& object, const std::string& name, bool& ret)
 {
     napi_value napiValue = {};
-    CHKRF(env, napi_get_named_property(env, object, name.c_str(), &napiValue), GET_NAMED_PROPERTY);
+    CHKRF(napi_get_named_property(env, object, name.c_str(), &napiValue), GET_NAMED_PROPERTY);
     if (napiValue == nullptr) {
         MMI_HILOGE("The value is null");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid KeyEvent");
         return RET_ERR;
     }
     napi_valuetype tmpType = napi_undefined;
-    CHKRF(env, napi_typeof(env, napiValue, &tmpType), TYPEOF);
+    CHKRF(napi_typeof(env, napiValue, &tmpType), TYPEOF);
     if (tmpType != napi_boolean) {
         MMI_HILOGE("The name is not bool");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "bool");
         return RET_ERR;
     }
-    CHKRF(env, napi_get_value_bool(env, napiValue, &ret), GET_BOOL);
+    CHKRF(napi_get_value_bool(env, napiValue, &ret), GET_VALUE_BOOL);
     return RET_OK;
 }
 

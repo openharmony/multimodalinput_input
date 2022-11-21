@@ -291,7 +291,7 @@ void InputDeviceCooperateSM::OnStartFinish(bool isSuccess,
         NotifyRemoteStartFail(remoteNetworkId);
     } else {
         startDhid_ = InputDevMgr->GetDhid(startInputDeviceId);
-        NotifyRemoteStartSucess(remoteNetworkId, startDhid_);
+        NotifyRemoteStartSuccess(remoteNetworkId, startDhid_);
         if (cooperateState_ == CooperateState::STATE_FREE) {
             UpdateState(CooperateState::STATE_OUT);
         } else if (cooperateState_ == CooperateState::STATE_IN) {
@@ -338,7 +338,7 @@ void InputDeviceCooperateSM::NotifyRemoteStartFail(const std::string &remoteNetw
     CooperateEventMgr->OnStart(CooperationMessage::INFO_FAIL);
 }
 
-void InputDeviceCooperateSM::NotifyRemoteStartSucess(const std::string &remoteNetworkId, const std::string& startDhid)
+void InputDeviceCooperateSM::NotifyRemoteStartSuccess(const std::string &remoteNetworkId, const std::string& startDhid)
 {
     CALL_DEBUG_ENTER;
     DevCooperateSoftbusAdapter->StartRemoteCooperateResult(remoteNetworkId,
@@ -374,7 +374,7 @@ bool InputDeviceCooperateSM::UpdateMouseLocation()
     int32_t displayWidth = physicalDisplayInfo.width;
     int32_t displayHeight = physicalDisplayInfo.height;
     if (displayWidth == 0 || displayHeight == 0) {
-        MMI_HILOGE("diaplay width or height is 0");
+        MMI_HILOGE("display width or height is 0");
         return false;
     }
     auto mouseInfo = WinMgr->GetMouseInfo();

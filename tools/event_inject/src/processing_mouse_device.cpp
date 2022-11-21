@@ -15,8 +15,8 @@
 
 #include "processing_mouse_device.h"
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingMouseDevice" };
 } // namespace
@@ -134,3 +134,5 @@ void ProcessingMouseDevice::TransformMouseHwheelEvent(const MouseEvent& mouseEve
     SetRelWheel(inputEventArray, mouseEvent.blockTime, static_cast<int32_t>(distance));
     SetSynReport(inputEventArray);
 }
+} // namespace MMI
+} // namespace OHOS

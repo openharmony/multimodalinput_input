@@ -18,8 +18,8 @@
 #include <chrono>
 #include <thread>
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ManageInjectDevice" };
 constexpr int64_t INJECT_SLEEP_TIMES = 10;
@@ -97,3 +97,5 @@ int32_t ManageInjectDevice::SendEventToDeviceNode(const InputEventArray &inputEv
     }
     return RET_OK;
 }
+} // namespace MMI
+} // namespace OHOS

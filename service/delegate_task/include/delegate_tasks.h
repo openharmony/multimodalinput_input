@@ -68,7 +68,7 @@ public:
 
 public:
     DelegateTasks() = default;
-    ~DelegateTasks() override = default;
+    ~DelegateTasks();
 
     bool Init();
     void ProcessTasks();

@@ -62,7 +62,7 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
     }
     socketFd = reply.ReadFileDescriptor();
     if (socketFd < RET_OK) {
-        MMI_HILOGE("Read file fescriptor failed, fd: %{public}d", socketFd);
+        MMI_HILOGE("Read file descriptor failed, fd: %{public}d", socketFd);
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
     READINT32(reply, tokenType, IPC_PROXY_DEAD_OBJECT_ERR);

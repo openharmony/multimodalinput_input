@@ -42,6 +42,18 @@ void DelegateTasks::Task::ProcessTask()
     }
 }
 
+DelegateTasks::~DelegateTasks()
+{
+    if (fds_[0] >= 0) {
+        close(fds_[0]);
+        fds_[0] = -1;
+    }
+    if (fds_[1] >= 0) {
+        close(fds_[1]);
+        fds_[1] = -1;
+    }
+}
+
 bool DelegateTasks::Init()
 {
     CALL_DEBUG_ENTER;
@@ -52,10 +64,12 @@ bool DelegateTasks::Init()
     }
     if (fcntl(fds_[0], F_SETFL, O_NONBLOCK) == -1) {
         MMI_HILOGE("The fcntl read failed,errno:%{public}d", errno);
+        close(fds_[0]);
         return false;
     }
     if (fcntl(fds_[1], F_SETFL, O_NONBLOCK) == -1) {
         MMI_HILOGE("The fcntl write failed,errno:%{public}d", errno);
+        close(fds_[1]);
         return false;
     }
     return true;

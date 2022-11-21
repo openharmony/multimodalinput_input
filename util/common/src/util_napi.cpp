@@ -27,7 +27,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilN
 bool TypeOf(napi_env env, napi_value value, napi_valuetype type)
 {
     napi_valuetype valueType = napi_undefined;
-    CHKRF(env, napi_typeof(env, value, &valueType), "napi_typeof");
+    CHKRF(napi_typeof(env, value, &valueType), "napi_typeof");
     return (valueType == type);
 }
 } // namespace UtilNapi
