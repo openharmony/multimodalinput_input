@@ -208,7 +208,7 @@ HWTEST_F(NetPacketTest, ReadAndWrite, TestSize.Level1)
 {
     int32_t p1 = 112;
     std::string p2 = "test111";
-    NetPacket pkt(MmiMessageId::REGISTER_APP_INFO);
+    NetPacket pkt(MmiMessageId::INVALID);
     pkt << p1 << p2;
 
     int32_t r1 = 0;
@@ -228,7 +228,7 @@ HWTEST_F(NetPacketTest, WriteError, TestSize.Level1)
 {
     int32_t p1 = 112;
     std::string p2 = "test111";
-    NetPacket pkt(MmiMessageId::REGISTER_APP_INFO);
+    NetPacket pkt(MmiMessageId::INVALID);
     pkt << p1 << p2;
     EXPECT_FALSE(pkt.ChkRWError());
     struct TestData {
@@ -250,7 +250,7 @@ HWTEST_F(NetPacketTest, ReadError, TestSize.Level1)
 {
     int32_t p1 = 112;
     std::string p2 = "test111";
-    NetPacket pkt(MmiMessageId::REGISTER_APP_INFO);
+    NetPacket pkt(MmiMessageId::INVALID);
     pkt << p1 << p2;
     EXPECT_FALSE(pkt.ChkRWError());
 

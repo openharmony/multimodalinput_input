@@ -164,21 +164,6 @@ int32_t InjectionEventDispatch::OnHelp()
     return RET_OK;
 }
 
-int32_t InjectionEventDispatch::GetDeviceIndex(const std::string &deviceNameText) const
-{
-    if (deviceNameText.empty()) {
-        MMI_HILOGE("The deviceNameText is empty");
-        return RET_ERR;
-    }
-    for (const auto &item : allDevices_) {
-        if (deviceNameText == item.chipName) {
-            return item.devIndex;
-        }
-    }
-    MMI_HILOGW("Get device index failed");
-    return RET_ERR;
-}
-
 bool InjectionEventDispatch::CheckValue(const std::string &inputValue)
 {
     if ((inputValue.length()) > INPUT_VALUE_LENGTH) {
@@ -287,26 +272,6 @@ int32_t InjectionEventDispatch::OnSendEvent()
         close(fd);
     }
     return RET_OK;
-}
-
-int32_t InjectionEventDispatch::GetDevTypeIndex(int32_t devIndex) const
-{
-    for (const auto &item : allDevices_) {
-        if (devIndex == item.devIndex) {
-            return item.devType;
-        }
-    }
-    return RET_ERR;
-}
-
-int32_t InjectionEventDispatch::GetDevIndexType(int32_t devType) const
-{
-    for (const auto &item : allDevices_) {
-        if (item.devType == devType) {
-            return item.devIndex;
-        }
-    }
-    return RET_ERR;
 }
 } // namespace MMI
 } // namespace OHOS

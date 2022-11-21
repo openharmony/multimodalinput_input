@@ -62,7 +62,6 @@ public:
     napi_value GetPointerSpeed(napi_env env, napi_value handle = nullptr);
     napi_value SetPointerStyle(napi_env env, int32_t windowid, int32_t pointerStyle, napi_value handle = nullptr);
     napi_value GetPointerStyle(napi_env env, int32_t windowid, napi_value handle = nullptr);
-    napi_value SetPointerLocation(napi_env env, napi_value handle, int32_t x, int32_t y);
 };
 } // namespace MMI
 } // namespace OHOS

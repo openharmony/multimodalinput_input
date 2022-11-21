@@ -218,29 +218,6 @@ napi_value JsPointerManager::GetPointerSpeed(napi_env env, napi_value handle)
     return promise;
 }
 
-napi_value JsPointerManager::SetPointerLocation(napi_env env, napi_value handle, int32_t x, int32_t y)
-{
-    CALL_DEBUG_ENTER;
-    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    if (asyncContext == nullptr) {
-        THROWERR(env, "create AsyncContext failed");
-        return nullptr;
-    }
-    asyncContext->errorCode = InputManager::GetInstance()->SetPointerLocation(x, y);
-    asyncContext->reserve << ReturnType::VOID;
-    napi_value promise = nullptr;
-    uint32_t initial_refcount = 1;
-    if (handle != nullptr) {
-        CHKRP(env, napi_create_reference(env, handle, initial_refcount, &asyncContext->callback), CREATE_REFERENCE);
-        CHKRP(env, napi_get_undefined(env, &promise), GET_UNDEFINED);
-        napi_delete_reference(env, asyncContext->callback);
-    } else {
-        CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
-    }
-    AsyncCallbackWork(asyncContext);
-    return promise;
-}
-
 napi_value JsPointerManager::SetPointerStyle(napi_env env, int32_t windowid, int32_t pointerStyle, napi_value handle)
 {
     CALL_DEBUG_ENTER;
