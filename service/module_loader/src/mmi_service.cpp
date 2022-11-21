@@ -593,6 +593,10 @@ int32_t MMIService::OnGetDevice(int32_t pid, int32_t userData, int32_t deviceId)
         << inputDevice->GetBus() << inputDevice->GetProduct() << inputDevice->GetVendor()
         << inputDevice->GetVersion() << inputDevice->GetPhys() << inputDevice->GetUniq()
         << inputDevice->GetAxisInfo().size();
+    for (auto &axis : inputDevice->GetAxisInfo()) {
+        pkt << axis.GetAxisType() << axis.GetMinimum() << axis.GetMaximum()
+            << axis.GetFuzz() << axis.GetFlat() << axis.GetResolution();
+    }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write input device info failed");
         return RET_ERR;
