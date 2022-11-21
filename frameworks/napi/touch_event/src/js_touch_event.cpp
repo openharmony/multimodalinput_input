@@ -53,7 +53,7 @@ napi_value JsTouchEvent::GetNapiInt32(napi_env env, int32_t code)
 {
     CALL_DEBUG_ENTER;
     napi_value ret = nullptr;
-    CHKRP(env, napi_create_int32(env, code, &ret), CREATE_INT32);
+    CHKRP(napi_create_int32(env, code, &ret), CREATE_INT32);
     return ret;
 }
 
@@ -64,7 +64,7 @@ napi_value JsTouchEvent::EnumClassConstructor(napi_env env, napi_callback_info i
     napi_value args[1] = {0};
     napi_value ret = nullptr;
     void *data = nullptr;
-    CHKRP(env, napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);
     return ret;
 }
 
@@ -78,9 +78,9 @@ napi_value JsTouchEvent::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("UP", GetNapiInt32(env, static_cast<int32_t>(Action::UP))),
     };
     napi_value action = nullptr;
-    CHKRP(env, napi_define_class(env, "Action", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    CHKRP(napi_define_class(env, "Action", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(actionArr) / sizeof(*actionArr), actionArr, &action), DEFINE_CLASS);
-    CHKRP(env, napi_set_named_property(env, exports, "Action", action), SET_NAMED_PROPERTY);
+    CHKRP(napi_set_named_property(env, exports, "Action", action), SET_NAMED_PROPERTY);
 
     napi_property_descriptor toolTypeArr[] = {
         DECLARE_NAPI_STATIC_PROPERTY("FINGER", GetNapiInt32(env, static_cast<int32_t>(ToolType::FINGER))),
@@ -93,9 +93,9 @@ napi_value JsTouchEvent::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("LENS", GetNapiInt32(env, static_cast<int32_t>(ToolType::LENS))),
     };
     napi_value toolType = nullptr;
-    CHKRP(env, napi_define_class(env, "ToolType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    CHKRP(napi_define_class(env, "ToolType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(toolTypeArr) / sizeof(*toolTypeArr), toolTypeArr, &toolType), DEFINE_CLASS);
-    CHKRP(env, napi_set_named_property(env, exports, "ToolType", toolType), SET_NAMED_PROPERTY);
+    CHKRP(napi_set_named_property(env, exports, "ToolType", toolType), SET_NAMED_PROPERTY);
 
     napi_property_descriptor sourceTypeArr[] = {
         DECLARE_NAPI_STATIC_PROPERTY("TOUCH_SCREEN", GetNapiInt32(env, static_cast<int32_t>(SourceType::TOUCH_SCREEN))),
@@ -103,9 +103,9 @@ napi_value JsTouchEvent::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("TOUCH_PAD", GetNapiInt32(env, static_cast<int32_t>(SourceType::TOUCH_PAD))),
     };
     napi_value sourceType = nullptr;
-    CHKRP(env, napi_define_class(env, "SourceType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    CHKRP(napi_define_class(env, "SourceType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(sourceTypeArr) / sizeof(*sourceTypeArr), sourceTypeArr, &sourceType), DEFINE_CLASS);
-    CHKRP(env, napi_set_named_property(env, exports, "SourceType", sourceType), SET_NAMED_PROPERTY);
+    CHKRP(napi_set_named_property(env, exports, "SourceType", sourceType), SET_NAMED_PROPERTY);
     return exports;
 }
 } // namespace MMI

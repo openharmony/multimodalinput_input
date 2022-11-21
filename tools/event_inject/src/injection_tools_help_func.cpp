@@ -17,10 +17,13 @@
 
 #include <string>
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
+    
 std::string InjectionToolsHelpFunc::GetHelpText()
 {
     std::string ret = "\n                           Harmony device event injection ...\n\n";
     return ret;
 }
+} // namespace MMI
+} // namespace OHOS

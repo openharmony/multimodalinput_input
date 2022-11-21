@@ -15,8 +15,8 @@
 
 #include "processing_touch_screen_device.h"
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingTouchScreenDevice" };
 } // namespace
@@ -202,3 +202,5 @@ void ProcessingTouchScreenDevice::AnalysisTouchScreenReleaseData(InputEventArray
         SetSynReport(inputEventArray, touchSingleEventData.blockTime);
     }
 }
+} // namespace MMI
+} // namespace OHOS

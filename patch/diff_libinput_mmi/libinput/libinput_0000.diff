@@ -114,7 +114,7 @@ diff -Naur old/export_include/libinput.h new/export_include/libinput.h
 + * @since 1.16.4
 + */
 +enum libinput_joystick_axis_source {
-+	LIBINPUT_JOYSTICK_AXIS_SOURCE_UNKNOW = 0,
++	LIBINPUT_JOYSTICK_AXIS_SOURCE_UNKNOWN = 0,
 +	LIBINPUT_JOYSTICK_AXIS_SOURCE_ABS_X = 1 << 0,
 +	LIBINPUT_JOYSTICK_AXIS_SOURCE_ABS_Y = 1 << 1,
 +	LIBINPUT_JOYSTICK_AXIS_SOURCE_ABS_Z = 1 << 2,
@@ -2421,7 +2421,7 @@ diff -Naur old/src/evdev-joystick.c new/src/evdev-joystick.c
 +    }
 +
 +    if (absinfo == NULL) {
-+        libinput_log_printf("unsupported joystick abs event: divice_name:%s code:%d value:%d.\n",
++        libinput_log_printf("unsupported joystick abs event: device_name:%s code:%d value:%d.\n",
 +            device->devname, code, event->value);
 +        return;
 +    }
@@ -5624,7 +5624,7 @@ diff -Naur old/src/libinput.h new/src/libinput.h
 + * @since 1.16.4
 + */
 +enum libinput_joystick_axis_source {
-+	LIBINPUT_JOYSTICK_AXIS_SOURCE_UNKNOW = 0,
++	LIBINPUT_JOYSTICK_AXIS_SOURCE_UNKNOWN = 0,
 +	LIBINPUT_JOYSTICK_AXIS_SOURCE_ABS_X = 1 << 0,
 +	LIBINPUT_JOYSTICK_AXIS_SOURCE_ABS_Y = 1 << 1,
 +	LIBINPUT_JOYSTICK_AXIS_SOURCE_ABS_Z = 1 << 2,

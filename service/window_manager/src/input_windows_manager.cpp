@@ -49,7 +49,7 @@ void InputWindowsManager::Init(UDSServer& udsServer)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEvent) const
+int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, INVALID_FD);
@@ -60,9 +60,21 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
             break;
         }
     }
-    CHKPR(windowInfo, INVALID_FD);
+    
     CHKPR(udsServer_, INVALID_FD);
-    return udsServer_->GetClientFd(windowInfo->pid);
+    if (windowInfo != nullptr) {
+        return udsServer_->GetClientFd(windowInfo->pid);
+    }
+    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL) {
+        return udsServer_->GetClientFd(-1);
+    }
+    int32_t pid = -1;
+    auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
+    if (iter != touchItemDownInfos_.end()) {
+        pid = iter->second.pid;
+        touchItemDownInfos_.erase(iter);
+    }
+    return udsServer_->GetClientFd(pid);
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -281,6 +293,10 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
 {
     CALL_INFO_TRACE;
     CHKPV(udsServer_);
+    if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        MMI_HILOGI("the mouse is hide");
+        return;
+    }
     if (lastPointerEvent_ == nullptr) {
         SendPointerEvent(pointerAction);
         return;
@@ -741,12 +757,12 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
             } else if ((targetWindowId < 0) && (IsInHotArea(logicalX, logicalY, item.pointerHotAreas))) {
                 firstBtnDownWindowId_ = item.id;
                 MMI_HILOGW("Find out the dispatch window of this pointer event when the targetWindowId "
-                           "hasn't been setted up yet, window:%{public}d", firstBtnDownWindowId_);
+                           "hasn't been set up yet, window:%{public}d", firstBtnDownWindowId_);
                 break;
             } else if ((targetWindowId >= 0) && (targetWindowId == item.id)) {
                 firstBtnDownWindowId_ = targetWindowId;
                 MMI_HILOGW("Find out the dispatch window of this pointer event when the targetWindowId "
-                           "has been setted up already, window:%{public}d", firstBtnDownWindowId_);
+                           "has been set up already, window:%{public}d", firstBtnDownWindowId_);
                 break;
             } else {
                 MMI_HILOGW("Continue searching for the dispatch window of this pointer event");
@@ -838,7 +854,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
         return ret;
     }
-    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+    if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+        DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+    }
     IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicalDisplayInfo);
     WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
     IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
@@ -918,9 +937,16 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
     if (touchWindow == nullptr) {
-        MMI_HILOGE("The touchWindow is nullptr, logicalX:%{public}d, logicalY:%{public}d",
-            logicalX, logicalY);
-        return RET_ERR;
+        auto it = touchItemDownInfos_.find(pointerId);
+        if (it == touchItemDownInfos_.end() ||
+            pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+            MMI_HILOGE("The touchWindow is nullptr, logicalX:%{public}d, logicalY:%{public}d",
+                logicalX, logicalY);
+            return RET_ERR;
+        }
+        touchWindow = &it->second;
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+        MMI_HILOGD("touch event send cancel, window:%{public}d", touchWindow->id);
     }
     auto windowX = logicalX - touchWindow->area.x;
     auto windowY = logicalY - touchWindow->area.y;
@@ -939,7 +965,22 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",
                touchWindow->pid, logicalX, logicalY, physicalX, physicalY,
                windowX, windowY, displayId, pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
-    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+    if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+        DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+    }
+
+    int32_t pointerAction = pointerEvent->GetPointerAction();
+    if (pointerAction == PointerEvent::POINTER_ACTION_DOWN) {
+        touchItemDownInfos_.insert(std::make_pair(pointerId, *touchWindow));
+    }
+    if (pointerAction == PointerEvent::POINTER_ACTION_UP) {
+        auto iter = touchItemDownInfos_.find(pointerId);
+        if (iter != touchItemDownInfos_.end()) {
+            touchItemDownInfos_.erase(iter);
+            MMI_HILOGD("Clear the touch info, action is up, pointerid:%{public}d", pointerId);
+        }
+    }
     return ERR_OK;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
