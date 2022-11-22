@@ -40,15 +40,15 @@ constexpr int64_t MAX_DELAY_TIME = 1000000;
 constexpr int64_t SECONDS_SYSTEM = 1000;
 constexpr int32_t SPECIAL_KEY_DOWN_DELAY = 150;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
-const std::map<int32_t, SpecialType> SPECIAL_KEYS = {
-    { KeyEvent::KEYCODE_POWER, SpecialType::KEY_DOWN_ACTION },
-    { KeyEvent::KEYCODE_VOLUME_DOWN, SpecialType::SPECIAL_ALL },
-    { KeyEvent::KEYCODE_VOLUME_UP, SpecialType::SUBSCRIBER_BEFORE_DELAY }
-};
 enum SpecialType {
     SPECIAL_ALL = 0,
     SUBSCRIBER_BEFORE_DELAY = 1,
     KEY_DOWN_ACTION = 2
+};
+const std::map<int32_t, SpecialType> SPECIAL_KEYS = {
+    { KeyEvent::KEYCODE_POWER, SpecialType::KEY_DOWN_ACTION },
+    { KeyEvent::KEYCODE_VOLUME_DOWN, SpecialType::SPECIAL_ALL },
+    { KeyEvent::KEYCODE_VOLUME_UP, SpecialType::SUBSCRIBER_BEFORE_DELAY }
 };
 struct JsonParser {
     JsonParser() = default;

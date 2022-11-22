@@ -498,7 +498,7 @@ bool KeySubscriberHandler::IsNotifyPowerKeySubsciber(int32_t keyCode, const std:
 }
 
 void KeySubscriberHandler::HandleKeyUpWithDelay(std::shared_ptr<KeyEvent> keyEvent,
-                                                      const std::shared_ptr<Subscriber> &subscriber)
+    const std::shared_ptr<Subscriber> &subscriber)
 {
     auto keyUpDelay = subscriber->keyOption_->GetFinalKeyUpDelay();
     if (keyUpDelay <= 0) {
