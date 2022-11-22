@@ -144,7 +144,6 @@ group("mmi_tests") {
     "service:ut-mmi-service-out",
     "test/fuzztest:test",
     "tools/inject_event:InjectEventTest",
-    "util:RunShellUtilTest",
     "util:ut-mmi-util-out",
   ]
 }
