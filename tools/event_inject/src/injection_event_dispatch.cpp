@@ -36,7 +36,7 @@ constexpr uint32_t SEND_EVENT_DEV_NODE_INDEX = 1;
 constexpr uint32_t SEND_EVENT_TYPE_INDEX = 2;
 constexpr uint32_t SEND_EVENT_CODE_INDEX = 3;
 constexpr uint32_t SEND_EVENT_VALUE_INDEX = 4;
-constexpr int32_t ARGVS_TARGET_INDEX = 1;
+constexpr int32_t ARGVS_TARGET_INDEX = 0;
 constexpr int32_t ARGVS_CODE_INDEX = 2;
 constexpr int32_t JSON_FILE_PATH_INDEX = 1;
 constexpr uint32_t INPUT_TYPE_LENGTH = 3;
@@ -52,6 +52,7 @@ void InjectionEventDispatch::Init()
 
 void InjectionEventDispatch::InitManageFunction()
 {
+    CALL_DEBUG_ENTER;
     InjectFunctionMap funs[] = {
         {"help", std::bind(&InjectionEventDispatch::OnHelp, this)},
         {"sendevent", std::bind(&InjectionEventDispatch::OnSendEvent, this)},
@@ -87,37 +88,31 @@ int32_t InjectionEventDispatch::OnJson()
     return manageInjectDevice_.TransformJsonData(DataInit(jsonBuf, logStatus));
 }
 
+void InjectionEventDispatch::SetArgvs(const std::vector<std::string> &injectArgvs)
+{
+    injectArgvs_ = injectArgvs;
+}
+
 std::string InjectionEventDispatch::GetFunId() const
 {
     return funId_;
 }
 
-bool InjectionEventDispatch::VerifyArgvs(const int32_t &argc, const std::vector<std::string> &argv)
+bool InjectionEventDispatch::VerifyArgvs()
 {
     CALL_DEBUG_ENTER;
-    if (argc < ARGV_VALID || argv.at(ARGVS_TARGET_INDEX).empty()) {
-        MMI_HILOGE("Invalid Input Para, Please Check the validity of the para. errCode:%{public}d", PARAM_INPUT_FAIL);
+    std::string temp = injectArgvs_.at(ARGVS_TARGET_INDEX);
+    if (temp.empty()) {
+        MMI_HILOGE("Invalid Input parameter");
         return false;
     }
-
-    bool result = false;
-    for (const auto &item : injectFuns_) {
-        std::string temp(argv.at(ARGVS_TARGET_INDEX));
-        if (temp == item.first) {
-            funId_ = temp;
-            result = true;
-            break;
-        }
+    auto it = injectFuns_.find(temp);
+    if (it == injectFuns_.end()) {
+        MMI_HILOGE("Parameter bound function not found");
+        return false;
     }
-    if (result) {
-        injectArgvs_.clear();
-        for (uint64_t i = 1; i < static_cast<uint64_t>(argc); i++) {
-            injectArgvs_.push_back(argv[i]);
-        }
-        argvNum_ = argc - 1;
-    }
-
-    return result;
+    funId_ = temp;
+    return true;
 }
 
 void InjectionEventDispatch::Run()
@@ -159,8 +154,7 @@ int32_t InjectionEventDispatch::ExecuteFunction(std::string funId)
 int32_t InjectionEventDispatch::OnHelp()
 {
     InjectionToolsHelpFunc helpFunc;
-    std::string ret = helpFunc.GetHelpText();
-    MMI_HILOGI("%{public}s", ret.c_str());
+    helpFunc.ShowUsage();
     return RET_OK;
 }
 

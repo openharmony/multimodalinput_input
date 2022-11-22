@@ -18,7 +18,9 @@
 
 #include <cstdint>
 #include <functional>
+#include <getopt.h>
 #include <iostream>
+#include <string>
 #include <vector>
 #include <map>
 #include <unistd.h>
