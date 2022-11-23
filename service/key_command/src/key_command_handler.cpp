@@ -667,7 +667,7 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
     }
 
     bool isHandled = HandleShortKeys(key);
-    bool isHandled = HandleSequences(key) || isHandled;
+    isHandled = HandleSequences(key) || isHandled;
     if (isHandled) {
         return true;
     }
