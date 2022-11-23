@@ -126,6 +126,7 @@ private:
     bool IsInsideDisplay(const DisplayInfo& displayInfo, int32_t physicalX, int32_t physicalY);
     void FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& physicalX,
         int32_t& physicalY, int32_t& displayId);
+    void InitMouseDownInfo();
 #endif // OHOS_BUILD_ENABLE_POINTER
     void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo);
@@ -138,6 +139,7 @@ private:
     WindowInfo lastWindowInfo_;
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
     std::map<int32_t, std::map<int32_t, int32_t>> pointerStyle_;
+    WindowInfo mouseDownInfo_;
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
     MouseLocation mouseLocation_ = { -1, -1 }; // physical coord
