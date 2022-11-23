@@ -158,6 +158,7 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& p
          << ",PointerAction:" << pointerEvent->DumpPointerAction()
          << ",SourceType:" << pointerEvent->DumpSourceType()
          << ",ButtonId:" << pointerEvent->GetButtonId()
+         << ",DeviceId:" << pointerEvent->GetDeviceId()
          << ",VerticalAxisValue:" << std::fixed << std::setprecision(precision)
          << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
          << ",HorizontalAxisValue:" << std::fixed << std::setprecision(precision)
@@ -179,7 +180,8 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& p
             << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
             << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
             << ",LongAxis:" << item.GetLongAxis() << ",ShortAxis:" << item.GetShortAxis()
-            << ",DeviceId:" << item.GetDeviceId();
+            << ",DeviceId:" << item.GetDeviceId() << ",RawDx:" << item.GetRawDx()
+            << ",RawDy:" << item.GetRawDy();
     }
     return ostream.str();
 }
@@ -198,7 +200,9 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<KeyEvent>& keyEv
     for (const int32_t &key : pressedKeys) {
         auto keyItem = keyEvent->GetKeyItem(key);
         CHKPS(keyItem);
-        keyItem->GetDeviceId();
+        strm << ", KeyCode:" << keyItem->GetKeyCode()
+            << ", DeviceId:" << keyItem->GetDeviceId()
+            << ", Unicode:" << keyItem->GetUnicode();
     }
     return strm.str();
 }
@@ -207,6 +211,7 @@ bool EventUtilTest::CompareDump(const std::shared_ptr<PointerEvent>& pointerEven
 {
     CALL_DEBUG_ENTER;
     std::string before = DumpInputEvent(pointerEvent);
+    MMI_HILOGD("before:%{public}s", before.c_str());
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::string after = GetEventDump();
     MMI_HILOGD("after:%{public}s", after.c_str());
@@ -218,6 +223,7 @@ bool EventUtilTest::CompareDump(const std::shared_ptr<KeyEvent>& keyEvent)
 {
     CALL_DEBUG_ENTER;
     std::string before = DumpInputEvent(keyEvent);
+    MMI_HILOGD("before:%{public}s", before.c_str());
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     std::string after = GetEventDump();
     MMI_HILOGD("after:%{public}s", after.c_str());
