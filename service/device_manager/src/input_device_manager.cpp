@@ -410,18 +410,13 @@ void InputDeviceManager::ScanPointerDevice()
 bool InputDeviceManager::IsPointerDevice(struct libinput_device* device) const
 {
     CHKPF(device);
-    enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
-    MMI_HILOGD("The current device udev tag:%{public}d", static_cast<int32_t>(udevTags));
-    return (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK |
-    EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;
+    return libinput_device_has_capability(device, LIBINPUT_DEVICE_CAP_POINTER);
 }
 
 bool InputDeviceManager::IsKeyboardDevice(struct libinput_device* device) const
 {
     CHKPF(device);
-    enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
-    MMI_HILOGD("The current device udev tag:%{public}d", static_cast<int32_t>(udevTags));
-    return udevTags & EVDEV_UDEV_TAG_KEYBOARD;
+    return libinput_device_has_capability(device, LIBINPUT_DEVICE_CAP_KEYBOARD);
 }
 
 bool InputDeviceManager::IsTouchDevice(struct libinput_device* device) const
