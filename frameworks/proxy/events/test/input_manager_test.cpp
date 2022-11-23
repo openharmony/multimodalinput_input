@@ -3432,7 +3432,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RegisterCooperateListener, TestSize.
  * @tc.name: InputManagerTest_UnregisterCooperateListener
  * @tc.desc: Unregister cooperate listener
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(InputManagerTest, InputManagerTest_UnregisterCooperateListener, TestSize.Level1)
 {
