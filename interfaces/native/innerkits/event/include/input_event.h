@@ -295,13 +295,6 @@ public:
     void ClearFlag();
 
     /**
-     * @brief Assigns a new ID for an input event.
-     * @return void
-     * @since 9
-     */
-    void AssignNewId();
-
-    /**
      * @brief Marks an input event as completed.
      * This method can only be called once.
      * @return void
