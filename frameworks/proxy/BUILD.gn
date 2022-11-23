@@ -204,6 +204,10 @@ ohos_unittest("InputManagerTest") {
 
   defines = input_default_defines
 
+  if (input_feature_input_cooperation) {
+    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+  }
+
   sources = [
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
     "${mmi_path}/test/unittest/common/src/system_info.cpp",
