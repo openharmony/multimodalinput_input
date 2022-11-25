@@ -30,7 +30,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventMonitorHandler" };
-size_t MAX_EVENTIDS_SIZE = 1000;
+constexpr size_t MAX_EVENTIDS_SIZE = 1000;
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
