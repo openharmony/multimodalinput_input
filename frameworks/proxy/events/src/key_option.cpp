@@ -57,19 +57,9 @@ int32_t KeyOption::GetFinalKeyDownDuration() const
     return finalKeyDownDuration_;
 }
 
-int32_t KeyOption::GetFinalKeyUpDelay() const
-{
-    return finalKeyUpDelay_;
-}
-
 void KeyOption::SetFinalKeyDownDuration(int32_t duration)
 {
     finalKeyDownDuration_ = duration;
-}
-
-void KeyOption::SetFinalKeyUpDelay(int32_t delay)
-{
-    finalKeyUpDelay_ = delay;
 }
 
 bool KeyOption::ReadFromParcel(Parcel &in)
@@ -92,8 +82,7 @@ bool KeyOption::ReadFromParcel(Parcel &in)
     return (
         in.ReadInt32(finalKey_) &&
         in.ReadBool(isFinalKeyDown_) &&
-        in.ReadInt32(finalKeyDownDuration_) &&
-        in.ReadInt32(finalKeyUpDelay_)
+        in.ReadInt32(finalKeyDownDuration_)
     );
 }
 
@@ -112,8 +101,7 @@ bool KeyOption::WriteToParcel(Parcel &out) const
     return (
         out.WriteInt32(finalKey_) &&
         out.WriteBool(isFinalKeyDown_) &&
-        out.WriteInt32(finalKeyDownDuration_) &&
-        out.WriteInt32(finalKeyUpDelay_)
+        out.WriteInt32(finalKeyDownDuration_)
     );
 }
 } // namespace MMI
