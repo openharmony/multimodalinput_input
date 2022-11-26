@@ -678,13 +678,14 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
     }
 
     if (IsSpecialType(key->GetKeyCode(), SpecialType::SUBSCRIBER_BEFORE_DELAY)) {
-        int32_t timerId = TimerMgr->AddTimer(SPECIAL_KEY_DOWN_DELAY, 1, [this, key] () {
+        auto tmpKey = KeyEvent::Clone(key);
+        int32_t timerId = TimerMgr->AddTimer(SPECIAL_KEY_DOWN_DELAY, 1, [this, tmpKey] () {
             MMI_HILOGD("Timer callback");
-            auto it = specialTimers_.find(key->GetKeyCode());
+            auto it = specialTimers_.find(tmpKey->GetKeyCode());
             if (it != specialTimers_.end() && !it->second.empty()) {
                 it->second.pop_front();
             }
-            InputHandler->GetSubscriberHandler()->HandleKeyEvent(key);
+            InputHandler->GetSubscriberHandler()->HandleKeyEvent(tmpKey);
         });
         if (timerId < 0) {
             MMI_HILOGE("Add timer failed");
