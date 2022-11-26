@@ -28,7 +28,6 @@
 #include "i_event_filter.h"
 #include "i_input_event_handler.h"
 #include "key_subscriber_handler.h"
-#include "key_command_handler.h"
 #include "mouse_event_normalize.h"
 
 namespace OHOS {
@@ -46,7 +45,6 @@ public:
     std::shared_ptr<EventNormalizeHandler> GetEventNormalizeHandler() const;
     std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const;
     std::shared_ptr<KeySubscriberHandler> GetSubscriberHandler() const;
-    std::shared_ptr<KeyCommandHandler> GetKeyCommandHandler() const;
     std::shared_ptr<EventMonitorHandler> GetMonitorHandler() const;
     std::shared_ptr<EventFilterHandler> GetFilterHandler() const;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
@@ -62,7 +60,6 @@ private:
     std::shared_ptr<EventFilterHandler> eventFilterHandler_ { nullptr };
     std::shared_ptr<EventInterceptorHandler> eventInterceptorHandler_ { nullptr };
     std::shared_ptr<KeySubscriberHandler> eventSubscriberHandler_ { nullptr };
-    std::shared_ptr<KeyCommandHandler> eventKeyCommandHandler_ { nullptr };
     std::shared_ptr<EventMonitorHandler> eventMonitorHandler_ { nullptr };
 
     uint64_t idSeed_ { 0 };
