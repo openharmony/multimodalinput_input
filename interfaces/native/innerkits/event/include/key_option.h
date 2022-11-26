@@ -88,12 +88,6 @@ public:
     int32_t GetFinalKeyDownDuration() const;
 
     /**
-     * @brief 获取最后一个按键抬起的延时时间，当最后一个按键抬起时，会延时触发订阅
-     * @return
-     */
-    int32_t GetFinalKeyUpDelay() const;
-
-    /**
      * @brief Sets the duration when the final key is held down or the maximum duration between when
      * the key is pressed and when the key is released.
      * If the final key is pressed, this parameter indicates the duration when the final key is held down.
@@ -105,12 +99,6 @@ public:
      * @since 9
      */
     void SetFinalKeyDownDuration(int32_t duration);
-
-    /**
-     * @brief 设置最后一个按键抬起后的延时时间
-     * @param delay
-     */
-    void SetFinalKeyUpDelay(int32_t delay);
 
 public:
     /**
@@ -134,7 +122,6 @@ private:
     int32_t finalKey_ { -1 };
     bool isFinalKeyDown_ { false };
     int32_t finalKeyDownDuration_ { 0 };
-    int32_t finalKeyUpDelay_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
