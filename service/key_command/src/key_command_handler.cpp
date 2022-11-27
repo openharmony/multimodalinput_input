@@ -17,22 +17,39 @@
 
 #include "dfx_hisysevent.h"
 #include "ability_manager_client.h"
+#include "bytrace_adapter.h"
 #include "cJSON.h"
 #include "config_policy_utils.h"
-#include "file_ex.h"
-#include "bytrace_adapter.h"
+#include "define_multimodal.h"
 #include "error_multimodal.h"
+#include "file_ex.h"
+#include "input_event_data_transformation.h"
+#include "input_event_handler.h"
 #include "mmi_log.h"
+#include "net_packet.h"
+#include "proto.h"
 #include "timer_manager.h"
+#include "util_ex.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr int32_t MAX_SEQUENCEKEYS_NUM = 10;
-constexpr int64_t MAX_DELAY_TIME = 3000000;
+constexpr int64_t MAX_DELAY_TIME = 1000000;
 constexpr int64_t SECONDS_SYSTEM = 1000;
+constexpr int32_t SPECIAL_KEY_DOWN_DELAY = 150;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
+enum SpecialType {
+    SPECIAL_ALL = 0,
+    SUBSCRIBER_BEFORE_DELAY = 1,
+    KEY_DOWN_ACTION = 2
+};
+const std::map<int32_t, SpecialType> SPECIAL_KEYS = {
+    { KeyEvent::KEYCODE_POWER, SpecialType::KEY_DOWN_ACTION },
+    { KeyEvent::KEYCODE_VOLUME_DOWN, SpecialType::SPECIAL_ALL },
+    { KeyEvent::KEYCODE_VOLUME_UP, SpecialType::SUBSCRIBER_BEFORE_DELAY }
+};
 struct JsonParser {
     JsonParser() = default;
     ~JsonParser()
@@ -47,6 +64,15 @@ struct JsonParser {
     }
     cJSON *json_ { nullptr };
 };
+
+bool IsSpecialType(int32_t keyCode, SpecialType type)
+{
+    auto it = SPECIAL_KEYS.find(keyCode);
+    if (it == SPECIAL_KEYS.end()) {
+        return false;
+    }
+    return (it->second == SpecialType::SPECIAL_ALL || it->second == type);
+}
 
 bool GetPreKeys(const cJSON* jsonData, ShortcutKey &shortcutKey)
 {
@@ -584,8 +610,9 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
         return false;
     }
 
-    if (!ParseShortcutKeys(parser, shortcutKeys_) &&
-        !ParseSequences(parser, sequences_)) {
+    bool isParseShortKeys = ParseShortcutKeys(parser, shortcutKeys_);
+    bool isParseSequences = ParseSequences(parser, sequences_);
+    if (!isParseShortKeys && !isParseSequences) {
         MMI_HILOGE("Parse configFile failed");
         return false;
     }
@@ -638,12 +665,50 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         }
         isParseConfig_ = true;
     }
-    if (!HandleShortKeys(key) ||
-        !HandleSequences(key)) {
-        MMI_HILOGD("Shortkeys and Sequences is empty");
-        return false;
+
+    bool isHandled = HandleShortKeys(key);
+    isHandled = HandleSequences(key) || isHandled;
+    if (isHandled) {
+        return true;
     }
-    return true;
+
+    if (!specialKeys_.empty() && specialKeys_.find(key->GetKeyCode()) != specialKeys_.end()) {
+        HandleSpecialKeys(key->GetKeyCode(), key->GetAction());
+        return true;
+    }
+
+    if (IsSpecialType(key->GetKeyCode(), SpecialType::SUBSCRIBER_BEFORE_DELAY)) {
+        auto tmpKey = KeyEvent::Clone(key);
+        int32_t timerId = TimerMgr->AddTimer(SPECIAL_KEY_DOWN_DELAY, 1, [this, tmpKey] () {
+            MMI_HILOGD("Timer callback");
+            auto it = specialTimers_.find(tmpKey->GetKeyCode());
+            if (it != specialTimers_.end() && !it->second.empty()) {
+                it->second.pop_front();
+            }
+            InputHandler->GetSubscriberHandler()->HandleKeyEvent(tmpKey);
+        });
+        if (timerId < 0) {
+            MMI_HILOGE("Add timer failed");
+            return false;
+        }
+
+        auto it = specialTimers_.find(key->GetKeyCode());
+        if (it == specialTimers_.end()) {
+            std::list<int32_t> timerIds;
+            timerIds.push_back(timerId);
+            auto it = specialTimers_.emplace(key->GetKeyCode(), timerIds);
+            if (!it.second) {
+                MMI_HILOGE("Keycode duplicated");
+                return false;
+            }
+        } else {
+            it->second.push_back(timerId);
+        }
+        MMI_HILOGD("Add timer success");
+        return true;
+    }
+    
+    return false;
 }
 
 bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent)
@@ -723,6 +788,16 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
         }
     }
 
+    if (isLaunchAbility) {
+        for (const auto& item : keys_) {
+            if (IsSpecialType(item.keyCode, SpecialType::KEY_DOWN_ACTION)) {
+                HandleSpecialKeys(item.keyCode, item.keyAction);
+            }
+            InputHandler->GetSubscriberHandler()->RemoveSubscriberKeyUpTimer(item.keyCode);
+            RemoveSubscribedTimer(item.keyCode);
+        }
+    }
+
     if (tempSeqs.empty()) {
         MMI_HILOGD("No matching sequence found");
     } else {
@@ -740,6 +815,10 @@ bool KeyCommandHandler::AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent)
     sequenceKey.keyAction = keyEvent->GetKeyAction();
     sequenceKey.actionTime = keyEvent->GetActionTime();
     size_t size = keys_.size();
+    if (size > MAX_SEQUENCEKEYS_NUM) {
+        MMI_HILOGD("The save key size more than the max size");
+        return false;
+    }
     if (size > 0) {
         if (keys_[size - 1].actionTime > sequenceKey.actionTime) {
             MMI_HILOGE("The current event time is greater than the last event time");
@@ -755,19 +834,8 @@ bool KeyCommandHandler::AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent)
                 return false;
             }
             keys_[size - 1].delay = sequenceKey.actionTime - keys_[size - 1].actionTime;
-            for (Sequence& item : filterSequences_) {
-                if (item.timerId >= 0) {
-                    MMI_HILOGD("The key sequence change, close the timer");
-                    TimerMgr->RemoveTimer(item.timerId);
-                    item.timerId = -1;
-                }
-            }
+            InterruptTimers();
         }
-    }
-
-    if (size > MAX_SEQUENCEKEYS_NUM) {
-        MMI_HILOGD("The save key size more than the max size");
-        return false;
     }
     keys_.push_back(sequenceKey);
     return true;
@@ -960,6 +1028,52 @@ void ShortcutKey::Print() const
     }
     MMI_HILOGD("Eventkey matched, finalKey:%{public}d, bundleName:%{public}s",
         finalKey, ability.bundleName.c_str());
+}
+
+void KeyCommandHandler::RemoveSubscribedTimer(int32_t keyCode)
+{
+    CALL_DEBUG_ENTER;
+    auto iter = specialTimers_.find(keyCode);
+    if (iter != specialTimers_.end()) {
+        for (auto& item : iter->second) {
+            TimerMgr->RemoveTimer(item);
+        }
+        specialTimers_.erase(keyCode);
+        MMI_HILOGD("Remove timer success");
+    }
+}
+
+void KeyCommandHandler::HandleSpecialKeys(int32_t keyCode, int32_t keyAction)
+{
+    CALL_DEBUG_ENTER;
+    auto iter = specialKeys_.find(keyCode);
+    if (keyAction == KeyEvent::KEY_ACTION_UP) {
+        if (iter != specialKeys_.end()) {
+            specialKeys_.erase(iter);
+            return;
+        }
+    }
+
+    if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
+        if (iter == specialKeys_.end()) {
+            auto it = specialKeys_.emplace(keyCode, keyAction);
+            if (!it.second) {
+                MMI_HILOGD("KeyCode duplicated");
+                return;
+            }
+        }
+    }
+}
+
+void KeyCommandHandler::InterruptTimers()
+{
+    for (Sequence& item : filterSequences_) {
+        if (item.timerId >= 0) {
+            MMI_HILOGD("The key sequence change, close the timer");
+            TimerMgr->RemoveTimer(item.timerId);
+            item.timerId = -1;
+        }
+    }
 }
 } // namespace MMI
 } // namespace OHOS
