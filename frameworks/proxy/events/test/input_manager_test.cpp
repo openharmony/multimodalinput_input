@@ -757,6 +757,46 @@ void InputManagerTest::TestMarkConsumed(int32_t monitorId, int32_t eventId)
 }
 
 /**
+ * @tc.name: InputManagerTest_AddMonitor_001
+ * @tc.desc: Verify pointerevent monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto PointerEventFun = [](std::shared_ptr<PointerEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(PointerEventFun);
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
+    ASSERT_NE(monitorId, INVALID_HANDLER_ID);
+#else
+    ASSERT_EQ(monitorId, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR ||  OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+}
+
+/**
+ * @tc.name: InputManagerTest_AddMonitor_002
+ * @tc.desc: Verify keyevent monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
+    ASSERT_NE(monitorId, INVALID_HANDLER_ID);
+#else
+    ASSERT_EQ(monitorId, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD || OHOS_BUILD_ENABLE_MONITOR
+}
+
+/**
  * @tc.name: MultimodalEventHandler_SimulateKeyEvent_001
  * @tc.desc: Verify simulate the back key is long pressed and lifted
  * @tc.type: FUNC
@@ -2040,6 +2080,29 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_011, TestSize.Level1)
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+
+/**
+ * @tc.name: TestInputEventInterceptor_012
+ * @tc.desc: Verify keyevent interceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_012, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto fun = [](std::shared_ptr<KeyEvent> keyEvent) {
+        MMI_HILOGD("Add interceptor success");
+    };
+    int32_t interceptorId = InputManager::GetInstance()->AddInterceptor(fun);
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+    ASSERT_NE(interceptorId, INVALID_HANDLER_ID);
+#else
+    ASSERT_EQ(interceptorId, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
+    if (IsValidHandlerId(interceptorId)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
     }
 }
 
@@ -3426,18 +3489,69 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo, TestSize.Level1)
 }
 
 /**
- * @tc.name: InputManagerTest_RegisterCooperateListener
+ * @tc.name: InputManagerTest_SetInputDevice
+ * @tc.desc: Set input device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetInputDevice, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::string dhid("");
+    std::string screenId("");
+    int32_t ret = InputManager::GetInstance()->SetInputDevice(dhid, screenId);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    ASSERT_EQ(ret, RET_ERR);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+}
+
+/**
+ * @tc.name: InputManagerTest_RegisterCooperateListener_001
  * @tc.desc: Register cooperate listener
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(InputManagerTest, InputManagerTest_RegisterCooperateListener, TestSize.Level1)
+HWTEST_F(InputManagerTest, InputManagerTest_RegisterCooperateListener_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<IInputDeviceCooperateListener> consumer = nullptr;
     int32_t ret = InputManager::GetInstance()->RegisterCooperateListener(consumer);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     ASSERT_EQ(ret, RET_ERR);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+}
+
+/**
+ * @tc.name: InputManagerTest_RegisterCooperateListener_002
+ * @tc.desc: Register cooperate listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_RegisterCooperateListener_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    class InputDeviceCooperateListenerTest : public IInputDeviceCooperateListener {
+    public:
+        InputDeviceCooperateListenerTest() : IInputDeviceCooperateListener() {}
+        void OnCooperateMessage(const std::string &deviceId, CooperationMessage msg) override
+        {
+            MMI_HILOGD("RegisterCooperateListenerTest");
+        };
+    };
+    std::shared_ptr<InputDeviceCooperateListenerTest> consumer = std::make_shared<InputDeviceCooperateListenerTest>();
+    int32_t ret = InputManager::GetInstance()->RegisterCooperateListener(consumer);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    ret = InputManager::GetInstance()->UnregisterCooperateListener(consumer);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    ASSERT_EQ(ret, RET_OK);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
