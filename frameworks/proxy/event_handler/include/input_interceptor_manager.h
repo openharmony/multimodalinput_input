@@ -31,6 +31,8 @@ class InputInterceptorManager final : public InputHandlerManager {
 public:
     DISALLOW_COPY_AND_MOVE(InputInterceptorManager);
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor, HandleEventType eventType);
+    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor, HandleEventType eventType,
+        PriorityLevel priorityLevel);
     void RemoveInterceptor(int32_t interceptorId);
     InputHandlerType GetHandlerType() const override;
 };

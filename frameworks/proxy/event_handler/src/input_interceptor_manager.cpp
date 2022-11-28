@@ -37,6 +37,16 @@ int32_t InputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsu
     return AddHandler(InputHandlerType::INTERCEPTOR, interceptor, eventType);
 }
 
+int32_t InputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor,
+    HandleEventType eventType, PriorityLevel priorityLevel)
+{
+    if (interceptor == nullptr) {
+        MMI_HILOGE("No interceptor was specified.");
+        return INVALID_HANDLER_ID;
+    }
+    return AddHandler(InputHandlerType::INTERCEPTOR, interceptor, eventType, priorityLevel);
+}
+
 void InputInterceptorManager::RemoveInterceptor(int32_t interceptorId)
 {
     RemoveHandler(interceptorId, InputHandlerType::INTERCEPTOR);

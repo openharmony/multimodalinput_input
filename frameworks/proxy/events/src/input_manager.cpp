@@ -105,6 +105,17 @@ int32_t InputManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent
     return InputMgrImpl.AddInterceptor(interceptor);
 }
 
+int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor, PriorityLevel priorityLevel)
+{
+    return InputMgrImpl.AddInterceptor(interceptor, priorityLevel);
+}
+
+int32_t InputManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor,
+    PriorityLevel priorityLevel)
+{
+    return InputMgrImpl.AddInterceptor(interceptor, priorityLevel);
+}
+
 void InputManager::RemoveInterceptor(int32_t interceptorId)
 {
     InputMgrImpl.RemoveInterceptor(interceptorId);
