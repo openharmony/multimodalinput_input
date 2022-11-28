@@ -837,7 +837,6 @@ bool KeyCommandHandler::AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent)
         MMI_HILOGD("The save key size more than the max size");
         return false;
     }
-
     keys_.push_back(sequenceKey);
     return true;
 }
