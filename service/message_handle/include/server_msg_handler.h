@@ -20,6 +20,7 @@
 
 #include "event_dispatch_handler.h"
 #include "i_event_filter.h"
+#include "i_input_event_consumer.h"
 #include "input_handler_type.h"
 #include "key_option.h"
 #include "msg_handler.h"
@@ -36,8 +37,10 @@ public:
     void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-    int32_t OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType);
-    int32_t OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType);
+    int32_t OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType,
+        PriorityLevel priorityLevel);
+    int32_t OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType,
+        PriorityLevel priorityLevel);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t OnMarkConsumed(SessionPtr sess, int32_t eventId);

@@ -24,6 +24,12 @@
 
 namespace OHOS {
 namespace MMI {
+enum PriorityLevel : int32_t {
+    LOW_LEVEL,
+    MIDDLE_LEVEL,
+    HIGH_LEVEL
+};
+
 struct IInputEventConsumer {
 public:
     IInputEventConsumer() = default;
