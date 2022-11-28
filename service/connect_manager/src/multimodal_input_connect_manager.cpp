@@ -156,17 +156,17 @@ int32_t MultimodalInputConnectManager::GetKeyboardType(int32_t userData, int32_t
 }
 
 int32_t MultimodalInputConnectManager::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-    PriorityLevel priorityLevel)
+    int32_t priority)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->AddInputHandler(handlerType, eventType, priorityLevel);
+    return multimodalInputConnectService_->AddInputHandler(handlerType, eventType, priority);
 }
 
 int32_t MultimodalInputConnectManager::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-    PriorityLevel priorityLevel)
+    int32_t priority)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
-    return multimodalInputConnectService_->RemoveInputHandler(handlerType, eventType, priorityLevel);
+    return multimodalInputConnectService_->RemoveInputHandler(handlerType, eventType, priority);
 }
 
 int32_t MultimodalInputConnectManager::MarkEventConsumed(int32_t eventId)

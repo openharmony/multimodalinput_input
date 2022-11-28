@@ -42,9 +42,9 @@ public:
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        PriorityLevel priorityLevel, SessionPtr session);
+        int32_t priority, SessionPtr session);
     void RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        PriorityLevel priorityLevel, SessionPtr session);
+        int32_t priority, SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -58,14 +58,14 @@ private:
 private:
     class SessionHandler {
     public:
-        SessionHandler(InputHandlerType handlerType, HandleEventType eventType, PriorityLevel priorityLevel,
+        SessionHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
             SessionPtr session) : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
-            priorityLevel_(priorityLevel), session_(session) {}
+            priority_(priority), session_(session) {}
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
         InputHandlerType handlerType_;
         HandleEventType eventType_;
-        PriorityLevel priorityLevel_;
+        int32_t priority_;
         SessionPtr session_ { nullptr };
     };
 

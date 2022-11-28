@@ -362,7 +362,7 @@ int32_t MultimodalInputConnectProxy::GetKeyboardType(int32_t userData, int32_t d
 }
 
 int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType, PriorityLevel priorityLevel)
+    HandleEventType eventType, int32_t priority)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -372,7 +372,7 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerTyp
     }
     WRITEINT32(data, handlerType, ERR_INVALID_VALUE);
     WRITEUINT32(data, eventType, ERR_INVALID_VALUE);
-    WRITEINT32(data, priorityLevel, ERR_INVALID_VALUE);
+    WRITEINT32(data, priority, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -386,7 +386,7 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerTyp
 }
 
 int32_t MultimodalInputConnectProxy::RemoveInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType, PriorityLevel priorityLevel)
+    HandleEventType eventType, int32_t priority)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -396,7 +396,7 @@ int32_t MultimodalInputConnectProxy::RemoveInputHandler(InputHandlerType handler
     }
     WRITEINT32(data, handlerType, ERR_INVALID_VALUE);
     WRITEUINT32(data, eventType, ERR_INVALID_VALUE);
-    WRITEINT32(data, priorityLevel, ERR_INVALID_VALUE);
+    WRITEINT32(data, priority, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();

@@ -38,7 +38,7 @@ InputHandlerManager::InputHandlerManager()
 }
 
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
-    HandleEventType eventType, PriorityLevel priorityLevel)
+    HandleEventType eventType, int32_t priority)
 {
     CALL_INFO_TRACE;
     CHKPR(consumer, INVALID_HANDLER_ID);
@@ -59,11 +59,11 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
     }
     const HandleEventType currentType = GetEventType();
     MMI_HILOGD("Register new handler:%{public}d", handlerId);
-    if (RET_OK == AddLocal(handlerId, handlerType, eventType, priorityLevel, consumer)) {
+    if (RET_OK == AddLocal(handlerId, handlerType, eventType, priority, consumer)) {
         MMI_HILOGD("New handler successfully registered, report to server");
         const HandleEventType newType = GetEventType();
         if (currentType != newType) {
-            int32_t ret = AddToServer(handlerType, newType, priorityLevel);
+            int32_t ret = AddToServer(handlerType, newType, priority);
             if (ret != RET_OK) {
                 MMI_HILOGD("Handler:%{public}d permissions failed, remove the monitor", handlerId);
                 RemoveLocal(handlerId, handlerType);
@@ -85,7 +85,7 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
     if (RET_OK == RemoveLocal(handlerId, handlerType)) {
         MMI_HILOGD("Handler:%{public}d unregistered, report to server", handlerId);
         const HandleEventType newType = GetEventType();
-        const PriorityLevel newLevel = GetPriorityLevel();
+        const int32_t newLevel = GetPriority();
         if (currentType != newType) {
             RemoveFromServer(handlerType, newType, newLevel);
         }
@@ -93,13 +93,13 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
 }
 
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType,
-    HandleEventType eventType, PriorityLevel priorityLevel, std::shared_ptr<IInputEventConsumer> monitor)
+    HandleEventType eventType, int32_t priority, std::shared_ptr<IInputEventConsumer> monitor)
 {
     InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
         .handlerType_ = handlerType,
         .eventType_ = eventType,
-        .priorityLevel_ = priorityLevel,
+        .priority_ = priority,
         .consumer_ = monitor,
     };
     auto ret = inputHandlers_.emplace(handler.handlerId_, handler);
@@ -110,7 +110,7 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         auto iterIndex = interHandlers_.begin();
         for (; iterIndex != interHandlers_.end(); ++iterIndex) {
-            if (handler.priorityLevel_ > iterIndex->priorityLevel_) {
+            if (handler.priority_ < iterIndex->priority_) {
                 break;
             }
         }
@@ -124,9 +124,9 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
 }
 
 int32_t InputHandlerManager::AddToServer(InputHandlerType handlerType, HandleEventType eventType,
-    PriorityLevel priorityLevel)
+    int32_t priority)
 {
-    int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerType, eventType, priorityLevel);
+    int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerType, eventType, priority);
     if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
@@ -149,7 +149,7 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
 
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         for (auto it = interHandlers_.begin(); it != interHandlers_.end(); ++it) {
-            if (handlerId > it->handlerId_) {
+            if (handlerId < it->handlerId_) {
                 interHandlers_.erase(it);
                 break;
             }
@@ -159,9 +159,9 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
 }
 
 void InputHandlerManager::RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType,
-    PriorityLevel priorityLevel)
+    int32_t priority)
 {
-    int32_t ret = MultimodalInputConnMgr->RemoveInputHandler(handlerType, eventType, priorityLevel);
+    int32_t ret = MultimodalInputConnMgr->RemoveInputHandler(handlerType, eventType, priority);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
@@ -298,9 +298,9 @@ void InputHandlerManager::OnConnected()
 {
     CALL_DEBUG_ENTER;
     HandleEventType eventType = GetEventType();
-    PriorityLevel priorityLevel = GetPriorityLevel();
+    int32_t priority = GetPriority();
     if (eventType != HANDLE_EVENT_TYPE_NONE) {
-        AddToServer(GetHandlerType(), eventType, priorityLevel);
+        AddToServer(GetHandlerType(), eventType, priority);
     }
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
@@ -329,17 +329,17 @@ HandleEventType InputHandlerManager::GetEventType() const
     return eventType;
 }
 
-PriorityLevel InputHandlerManager::GetPriorityLevel() const
+int32_t InputHandlerManager::GetPriority() const
 {
     if (inputHandlers_.empty()) {
         MMI_HILOGD("InputHandlers is empty");
-        return PriorityLevel::LOW_LEVEL;
+        return DEFUALT_INTERCEPTOR_PRIORITY;
     }
-    PriorityLevel priorityLevel { PriorityLevel::LOW_LEVEL };
+    int32_t priority { DEFUALT_INTERCEPTOR_PRIORITY };
     if (!interHandlers_.empty()) {
-        priorityLevel = interHandlers_.front().priorityLevel_;
+        priority = interHandlers_.front().priority_;
     }
-    return priorityLevel;
+    return priority;
 }
 
 void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId)

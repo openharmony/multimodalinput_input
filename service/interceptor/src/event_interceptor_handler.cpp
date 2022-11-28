@@ -84,7 +84,7 @@ void EventInterceptorHandler::HandleTouchEvent(const std::shared_ptr<PointerEven
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t EventInterceptorHandler::AddInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType, PriorityLevel priorityLevel, SessionPtr session)
+    HandleEventType eventType, int32_t priority, SessionPtr session)
 {
     CALL_INFO_TRACE;
     CHKPR(session, RET_ERR);
@@ -93,17 +93,17 @@ int32_t EventInterceptorHandler::AddInputHandler(InputHandlerType handlerType,
         return RET_ERR;
     }
     InitSessionLostCallback();
-    SessionHandler interceptor { handlerType, eventType, priorityLevel, session };
+    SessionHandler interceptor { handlerType, eventType, priority, session };
     return interceptors_.AddInterceptor(interceptor);
 }
 
 void EventInterceptorHandler::RemoveInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType, PriorityLevel priorityLevel, SessionPtr session)
+    HandleEventType eventType, int32_t priority, SessionPtr session)
 {
     CALL_INFO_TRACE;
     CHKPV(session);
     if (handlerType == InputHandlerType::INTERCEPTOR) {
-        SessionHandler interceptor { handlerType, eventType, priorityLevel, session };
+        SessionHandler interceptor { handlerType, eventType, priority, session };
         interceptors_.RemoveInterceptor(interceptor);
     }
 }
@@ -250,7 +250,7 @@ int32_t EventInterceptorHandler::InterceptorCollection::AddInterceptor(const Ses
 
     auto iterIndex = interceptors_.cbegin();
     for (; iterIndex != interceptors_.cend(); ++iterIndex) {
-        if (interceptor.priorityLevel_ > iterIndex->priorityLevel_) {
+        if (interceptor.priority_ < iterIndex->priority_) {
             break;
         }
     }
@@ -277,7 +277,7 @@ void EventInterceptorHandler::InterceptorCollection::RemoveInterceptor(const Ses
 
     auto iterIndex = interceptors_.cbegin();
     for (; iterIndex != interceptors_.cend(); ++iterIndex) {
-        if (interceptor.priorityLevel_ > iterIndex->priorityLevel_) {
+        if (interceptor.priority_ < iterIndex->priority_) {
             break;
         }
     }
