@@ -229,7 +229,13 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
             CHKPV(displayInfo);
             int32_t logicX = mouseLocation.physicalX + displayInfo->x;
             int32_t logicY = mouseLocation.physicalY + displayInfo->y;
-            std::optional<WindowInfo> windowInfo = GetWindowInfo(logicX, logicY);
+            std::optional<WindowInfo> windowInfo;
+            if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE &&
+                lastPointerEvent_->GetPressedButtons().empty()) {
+                windowInfo = GetWindowInfo(logicX, logicY);
+            } else {
+                windowInfo = SelectWindowInfo(logicX, logicY, lastPointerEvent_);
+            }
             if (!windowInfo) {
                 MMI_HILOGE("The windowInfo is nullptr");
                 return;
@@ -332,7 +338,13 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
         return;
     }
     if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW) {
-        auto windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
+        std::optional<WindowInfo> windowInfo;
+        if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE &&
+            lastPointerEvent_->GetPressedButtons().empty()) {
+            windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
+        } else {
+            windowInfo = SelectWindowInfo(lastLogicX_, lastLogicY_, lastPointerEvent_);
+        }
         if (!windowInfo) {
             MMI_HILOGE("windowInfo is nullptr");
             return;
@@ -386,13 +398,19 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
 void InputWindowsManager::NotifyPointerToWindow()
 {
     CALL_INFO_TRACE;
-    auto windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
+    std::optional<WindowInfo> windowInfo;
+    if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE &&
+        lastPointerEvent_->GetPressedButtons().empty()) {
+        windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
+    } else {
+        windowInfo = SelectWindowInfo(lastLogicX_, lastLogicY_, lastPointerEvent_);
+    }
     if (!windowInfo) {
-        MMI_HILOGE("windowInfo is nullptr");
+        MMI_HILOGE("The windowInfo is nullptr");
         return;
     }
     if (windowInfo->id == lastWindowInfo_.id) {
-        MMI_HILOGI("The mouse pointer does not leave the window");
+        MMI_HILOGI("The mouse pointer does not leave the window:%{public}d", lastWindowInfo_.id);
         lastWindowInfo_ = *windowInfo;
         return;
     }
@@ -826,6 +844,7 @@ void InputWindowsManager::UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
     const std::shared_ptr<PointerEvent>& pointerEvent, const WindowInfo& touchWindow)
 {
     CHKPV(pointerEvent);
+    MMI_HILOGD("LastWindowInfo:%{public}d, touchWindow:%{public}d", lastWindowInfo_.id, touchWindow.id);
     if (lastWindowInfo_.id != touchWindow.id) {
         DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
         lastLogicX_ = logicalX;
