@@ -815,10 +815,6 @@ bool KeyCommandHandler::AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent)
     sequenceKey.keyAction = keyEvent->GetKeyAction();
     sequenceKey.actionTime = keyEvent->GetActionTime();
     size_t size = keys_.size();
-    if (size > MAX_SEQUENCEKEYS_NUM) {
-        MMI_HILOGD("The save key size more than the max size");
-        return false;
-    }
     if (size > 0) {
         if (keys_[size - 1].actionTime > sequenceKey.actionTime) {
             MMI_HILOGE("The current event time is greater than the last event time");
@@ -836,6 +832,10 @@ bool KeyCommandHandler::AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent)
             keys_[size - 1].delay = sequenceKey.actionTime - keys_[size - 1].actionTime;
             InterruptTimers();
         }
+    }
+    if (size > MAX_SEQUENCEKEYS_NUM) {
+        MMI_HILOGD("The save key size more than the max size");
+        return false;
     }
     keys_.push_back(sequenceKey);
     return true;
