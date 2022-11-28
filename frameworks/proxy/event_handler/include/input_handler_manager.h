@@ -45,11 +45,11 @@ public:
     bool HasHandler(int32_t handlerId);
     virtual InputHandlerType GetHandlerType() const = 0;
     HandleEventType GetEventType() const;
-    PriorityLevel GetPriorityLevel() const;
+    int32_t GetPriority() const;
 
 protected:
     int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
-        HandleEventType eventType = HANDLE_EVENT_TYPE_ALL, PriorityLevel priorityLevel = PriorityLevel::LOW_LEVEL);
+        HandleEventType eventType = HANDLE_EVENT_TYPE_ALL, int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY);
     void RemoveHandler(int32_t handlerId, InputHandlerType IsValidHandlerType);
 
 private:
@@ -57,17 +57,17 @@ private:
         int32_t handlerId_ { 0 };
         InputHandlerType handlerType_ { NONE };
         HandleEventType eventType_ { HANDLE_EVENT_TYPE_ALL };
-        PriorityLevel priorityLevel_ { PriorityLevel::LOW_LEVEL };
+        int32_t priority_ { DEFUALT_INTERCEPTOR_PRIORITY };
         std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     };
 
 private:
     int32_t GetNextId();
     int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType,
-        HandleEventType eventType, PriorityLevel priorityLevel, std::shared_ptr<IInputEventConsumer> monitor);
-    int32_t AddToServer(InputHandlerType handlerType, HandleEventType eventType, PriorityLevel priorityLevel);
+        HandleEventType eventType, int32_t priority, std::shared_ptr<IInputEventConsumer> monitor);
+    int32_t AddToServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority);
     int32_t RemoveLocal(int32_t handlerId, InputHandlerType handlerType);
-    void RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, PriorityLevel priorityLevel);
+    void RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority);
 
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
     void OnDispatchEventProcessed(int32_t eventId);
