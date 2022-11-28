@@ -47,6 +47,7 @@ public:
     int32_t SubscribeKeyEvent(SessionPtr sess, int32_t subscribeId,
             const std::shared_ptr<KeyOption> keyOption);
     int32_t UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
+    void RemoveSubscriberKeyUpTimer(int32_t keyCode);
     void Dump(int32_t fd, const std::vector<std::string> &args);
 private:
     struct Subscriber {
@@ -61,16 +62,13 @@ private:
     void InsertSubScriber(std::shared_ptr<Subscriber> subs);
 
 private:
-    bool SubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+    bool OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     bool HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent);
     bool HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent);
     bool HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyEvent);
-
     bool IsPreKeysMatch(const std::set<int32_t> &preKeys, const std::vector<int32_t> &pressedKeys) const;
-
     void NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
-            const std::shared_ptr<Subscriber> &subscriber);
-
+        const std::shared_ptr<Subscriber> &subscriber);
     bool AddTimer(const std::shared_ptr<Subscriber> &subscriber, const std::shared_ptr<KeyEvent> &keyEvent);
     void ClearTimer(const std::shared_ptr<Subscriber> &subscriber);
     void OnTimer(const std::shared_ptr<Subscriber> subscriber);
@@ -79,11 +77,14 @@ private:
     bool CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     void RemoveKeyCode(int32_t keyCode, std::vector<int32_t> &keyCodes);
     bool IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+    bool IsNotifyPowerKeySubsciber(int32_t keyCode, const std::vector<int32_t> &keyCodes);
+    void HandleKeyUpWithDelay(std::shared_ptr<KeyEvent> keyEvent, const std::shared_ptr<Subscriber> &subscriber);
+    void PrintKeyUpLog(const std::shared_ptr<Subscriber> &subscriber);
 
 private:
     std::list<std::shared_ptr<Subscriber>> subscribers_ {};
     bool callbackInitialized_ { false };
-    bool hasEventExecuting { false };
+    bool hasEventExecuting_ { false };
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
 };
 } // namespace MMI
