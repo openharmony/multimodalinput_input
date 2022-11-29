@@ -102,7 +102,6 @@ int32_t InputEventHandler::BuildInputHandlerChain()
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
     eventKeyCommandHandler_ = std::make_shared<KeyCommandHandler>();
-    CHKPR(eventKeyCommandHandler_, ERROR_NULL_POINTER);
     handler->SetNext(eventKeyCommandHandler_);
     handler = eventKeyCommandHandler_;
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
