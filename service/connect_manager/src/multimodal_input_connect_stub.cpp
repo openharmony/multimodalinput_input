@@ -431,7 +431,6 @@ int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, M
     READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
 
     auto keyOption = std::make_shared<KeyOption>();
-    CHKPR(keyOption, IPC_STUB_WRITE_PARCEL_ERR);
     if (!keyOption->ReadFromParcel(data)) {
         MMI_HILOGE("Read keyOption failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
