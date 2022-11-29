@@ -36,7 +36,6 @@ enum KeyboardType {
 JsInputDeviceContext::JsInputDeviceContext()
 {
     mgr_ = std::make_shared<JsInputDeviceManager>();
-    CHKPL(mgr_);
 }
 
 JsInputDeviceContext::~JsInputDeviceContext()

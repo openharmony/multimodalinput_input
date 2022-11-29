@@ -54,10 +54,6 @@ void HdfDeviceEventManager::ConnectHDFInit()
         }
         std::unique_ptr<HdfDeviceEventDispatch> hdf = std::make_unique<HdfDeviceEventDispatch>(\
             iDevInfo_->attrSet.axisInfo[ABS_MT_POSITION_X].max, iDevInfo_->attrSet.axisInfo[ABS_MT_POSITION_Y].max);
-        if (hdf == nullptr) {
-            MMI_HILOGE("The hdf is nullptr");
-            return;
-        }
         callback_.EventPkgCallback = hdf->GetEventCallbackDispatch;
         ret = inputInterface_->iInputReporter->RegisterReportCallback(TOUCH_DEV_ID, &callback_);
         MMI_HILOGD("RegisterReportCallback ret:%{public}d", ret);

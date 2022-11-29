@@ -234,11 +234,6 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     napi_ref ref = nullptr;
     CHKRV(env, napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
     auto monitor = std::make_unique<JsUtil::CallbackInfo>();
-    if (monitor == nullptr) {
-        napi_delete_reference(env, ref);
-        MMI_HILOGE("monitor is nullptr");
-        return;
-    }
     monitor->env = env;
     monitor->ref = ref;
     iter->second.push_back(std::move(monitor));
@@ -281,7 +276,6 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, in
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     auto cb = std::make_unique<JsUtil::CallbackInfo>();
-    CHKPP(cb);
     cb->env = env;
     napi_value promise = nullptr;
     if (handle == nullptr) {
