@@ -224,7 +224,6 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
     GetConsumerInfos(pointerEvent, consumerInfos);
     for (const auto &iter : consumerInfos) {
         auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
-        CHKPV(tempEvent);
         tempEvent->SetProcessedCallback(monitorCallback_);
         CHKPV(iter.second);
         auto consumer = iter.second;
