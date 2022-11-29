@@ -45,27 +45,29 @@ public:
     bool HasHandler(int32_t handlerId);
     virtual InputHandlerType GetHandlerType() const = 0;
     HandleEventType GetEventType() const;
+    int32_t GetPriority() const;
 
 protected:
     int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
-        HandleEventType eventType = HANDLE_EVENT_TYPE_ALL);
-    void RemoveHandler(int32_t handlerId, InputHandlerType handlerType);
+        HandleEventType eventType = HANDLE_EVENT_TYPE_ALL, int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY);
+    void RemoveHandler(int32_t handlerId, InputHandlerType IsValidHandlerType);
 
 private:
     struct Handler {
         int32_t handlerId_ { 0 };
         InputHandlerType handlerType_ { NONE };
         HandleEventType eventType_ { HANDLE_EVENT_TYPE_ALL };
+        int32_t priority_ { DEFUALT_INTERCEPTOR_PRIORITY };
         std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     };
 
 private:
     int32_t GetNextId();
     int32_t AddLocal(int32_t handlerId, InputHandlerType handlerType,
-        HandleEventType eventType, std::shared_ptr<IInputEventConsumer> monitor);
-    int32_t AddToServer(InputHandlerType handlerType, HandleEventType eventType);
+        HandleEventType eventType, int32_t priority, std::shared_ptr<IInputEventConsumer> monitor);
+    int32_t AddToServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority);
     int32_t RemoveLocal(int32_t handlerId, InputHandlerType handlerType);
-    void RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType);
+    void RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority);
 
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
     void OnDispatchEventProcessed(int32_t eventId);
@@ -75,6 +77,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 private:
+    std::list<Handler> interHandlers_;
     std::map<int32_t, Handler> inputHandlers_;
     std::map<int32_t, int32_t> processedEvents_;
     std::set<int32_t> mouseEventIds_;

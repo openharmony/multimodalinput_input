@@ -74,8 +74,10 @@ public:
     void MarkConsumed(int32_t monitorId, int32_t eventId);
     void MoveMouse(int32_t offsetX, int32_t offsetY);
 
-    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
-    int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
+    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor,
+        int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY);
+    int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor,
+        int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY);
     void RemoveInterceptor(int32_t interceptorId);
 
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);
