@@ -16,6 +16,7 @@
 #ifndef INPUT_DEVICE_H
 #define INPUT_DEVICE_H
 
+#include <bitset>
 #include <string>
 #include <vector>
 
@@ -23,6 +24,28 @@
 
 namespace OHOS {
 namespace MMI {
+enum InputDeviceCapability {
+    INPUT_DEV_CAP_KEYBOARD,
+    INPUT_DEV_CAP_POINTER,
+    INPUT_DEV_CAP_TOUCH,
+    INPUT_DEV_CAP_TABLET_TOOL,
+    INPUT_DEV_CAP_TABLET_PAD,
+    INPUT_DEV_CAP_GESTURE,
+    INPUT_DEV_CAP_SWITCH,
+    INPUT_DEV_CAP_JOYSTICK,
+    INPUT_DEV_CAP_MAX
+};
+
+enum KeyboardType {
+    KEYBOARD_TYPE_NONE,
+    KEYBOARD_TYPE_UNKNOWN,
+    KEYBOARD_TYPE_ALPHABETICKEYBOARD,
+    KEYBOARD_TYPE_DIGITALKEYBOARD,
+    KEYBOARD_TYPE_HANDWRITINGPEN,
+    KEYBOARD_TYPE_REMOTECONTROL,
+    KEYBOARD_TYPE_MAX
+};
+
 class InputDevice {
 public:
     InputDevice() = default;
@@ -47,6 +70,8 @@ public:
     std::string GetPhys() const;
     void SetUniq(std::string uniq);
     std::string GetUniq() const;
+    void AddCapability(InputDeviceCapability cap);
+    bool HasCapability(InputDeviceCapability cap) const;
 
     class AxisInfo {
     public:
@@ -90,6 +115,7 @@ private:
     std::string uniq_ { "null" };
     std::vector<AxisInfo> axis_;
     std::vector<int32_t> deviceIdList_;
+    std::bitset<INPUT_DEV_CAP_MAX> capabilities_;
 };
 } // namespace MMI
 } // namespace OHOS
