@@ -74,6 +74,66 @@ void InputEventCallback::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
     }
 }
 
+void PriorityLowCallback::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
+{
+    CALL_DEBUG_ENTER;
+    if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
+        TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+        ASSERT_TRUE(pointerEvent != nullptr);
+        TestUtil->AddEventDump("Call low interceptor");
+    }
+}
+
+void PriorityLowCallback::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    CALL_DEBUG_ENTER;
+    if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
+        TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+        ASSERT_TRUE(keyEvent != nullptr);
+        TestUtil->AddEventDump("Call low interceptor");
+    }
+}
+
+void PriorityMiddleCallback::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
+{
+    CALL_DEBUG_ENTER;
+    if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
+        TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+        ASSERT_TRUE(pointerEvent != nullptr);
+        TestUtil->AddEventDump("Call middle interceptor");
+    }
+}
+
+void PriorityMiddleCallback::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    CALL_DEBUG_ENTER;
+    if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
+        TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+        ASSERT_TRUE(keyEvent != nullptr);
+        TestUtil->AddEventDump("Call middle interceptor");
+    }
+}
+
+void PriorityHighCallback::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
+{
+    CALL_DEBUG_ENTER;
+    if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
+        TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+        ASSERT_TRUE(pointerEvent != nullptr);
+        TestUtil->AddEventDump("Call high interceptor");
+    }
+}
+
+void PriorityHighCallback::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    CALL_DEBUG_ENTER;
+    if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
+        TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+        ASSERT_TRUE(keyEvent != nullptr);
+        TestUtil->AddEventDump("Call high interceptor");
+    }
+}
+
 void WindowEventConsumer::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
 {
     threadId_ = GetThisThreadId();

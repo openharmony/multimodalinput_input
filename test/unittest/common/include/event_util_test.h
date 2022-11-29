@@ -89,6 +89,11 @@ class EventUtilTest final {
 public:
     DISALLOW_COPY_AND_MOVE(EventUtilTest);
     bool Init();
+    void Reset() 
+    {
+        recvFlag_ = RECV_FLAG::RECV_FOCUS;
+        strEventDump_.clear();
+    }
     std::string GetEventDump();
     void AddEventDump(std::string eventDump);
     std::string DumpInputEvent(const std::shared_ptr<PointerEvent>& pointerEvent);
@@ -114,6 +119,27 @@ private:
 #define TestUtil ::OHOS::DelayedSingleton<EventUtilTest>::GetInstance()
 
 class InputEventConsumer : public IInputEventConsumer {
+public:
+    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override;
+    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override;
+    virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
+};
+
+class PriorityLowCallback : public IInputEventConsumer {
+public:
+    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override;
+    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override;
+    virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
+};
+
+class PriorityMiddleCallback : public IInputEventConsumer {
+public:
+    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override;
+    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override;
+    virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
+};
+
+class PriorityHighCallback : public IInputEventConsumer {
 public:
     virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override;
     virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override;
