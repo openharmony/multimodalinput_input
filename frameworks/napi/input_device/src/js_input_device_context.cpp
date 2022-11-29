@@ -29,7 +29,6 @@ constexpr uint32_t MAX_N_SIZE = 5;
 JsInputDeviceContext::JsInputDeviceContext()
 {
     mgr_ = std::make_shared<JsInputDeviceManager>();
-    CHKPL(mgr_);
 }
 
 JsInputDeviceContext::~JsInputDeviceContext()
