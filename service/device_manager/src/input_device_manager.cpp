@@ -49,7 +49,7 @@ const char *SPLIT_SYMBOL = "|";
 const std::string DH_ID_PREFIX = "Input_";
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 const std::string INPUT_VIRTUAL_DEVICE_NAME = "DistributedInput ";
-std::unordered_map<int32_t, std::string> axisType = {
+std::unordered_map<int32_t, std::string> axisType {
     {ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR"},
     {ABS_MT_TOUCH_MINOR, "TOUCH_MINOR"},
     {ABS_MT_ORIENTATION, "ORIENTATION"},
@@ -58,6 +58,17 @@ std::unordered_map<int32_t, std::string> axisType = {
     {ABS_MT_PRESSURE, "PRESSURE"},
     {ABS_MT_WIDTH_MAJOR, "WIDTH_MAJOR"},
     {ABS_MT_WIDTH_MINOR, "WIDTH_MINOR"}
+};
+
+std::vector<std::pair<enum libinput_device_capability, InputDeviceCapability>> devCapEnumMaps {
+    { LIBINPUT_DEVICE_CAP_KEYBOARD, InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD },
+    { LIBINPUT_DEVICE_CAP_POINTER, InputDeviceCapability::INPUT_DEV_CAP_POINTER },
+    { LIBINPUT_DEVICE_CAP_TOUCH, InputDeviceCapability::INPUT_DEV_CAP_TOUCH },
+    { LIBINPUT_DEVICE_CAP_TABLET_TOOL, InputDeviceCapability::INPUT_DEV_CAP_TABLET_TOOL },
+    { LIBINPUT_DEVICE_CAP_TABLET_PAD, InputDeviceCapability::INPUT_DEV_CAP_TABLET_PAD },
+    { LIBINPUT_DEVICE_CAP_GESTURE, InputDeviceCapability::INPUT_DEV_CAP_GESTURE },
+    { LIBINPUT_DEVICE_CAP_SWITCH, InputDeviceCapability::INPUT_DEV_CAP_SWITCH },
+    { LIBINPUT_DEVICE_CAP_JOYSTICK, InputDeviceCapability::INPUT_DEV_CAP_JOYSTICK },
 };
 } // namespace
 
@@ -74,7 +85,6 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     }
 
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
-    CHKPP(inputDevice);
     inputDevice->SetId(iter->first);
     struct libinput_device *inputDeviceOrigin = iter->second.inputDeviceOrigin;
     inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(inputDeviceOrigin)));
@@ -88,6 +98,12 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
     inputDevice->SetPhys((phys == nullptr) ? ("null") : (phys));
     const char* uniq = libinput_device_get_uniq(inputDeviceOrigin);
     inputDevice->SetUniq((uniq == nullptr) ? ("null") : (uniq));
+
+    for (const auto &[first, second] : devCapEnumMaps) {
+        if (libinput_device_has_capability(inputDeviceOrigin, first)) {
+            inputDevice->AddCapability(second);
+        }
+    }
 
     InputDevice::AxisInfo axis;
     for (const auto &item : axisType) {
