@@ -88,8 +88,10 @@ public:
     int32_t GetFinalKeyDownDuration() const;
 
     /**
-     * @brief 获取最后一个按键抬起的延时时间，当最后一个按键抬起时，会延时触发订阅
-     * @return
+     * @brief Get the delay time of lifting the last key. When the last key is lifted, the subscription
+     * will be delayed and triggered.
+     * @return Return to the delay time of lifting the last key.
+     * @since 9
      */
     int32_t GetFinalKeyUpDelay() const;
 
@@ -107,8 +109,10 @@ public:
     void SetFinalKeyDownDuration(int32_t duration);
 
     /**
-     * @brief 设置最后一个按键抬起后的延时时间
-     * @param delay
+     * @brief Set the delay time for lifting the last key.
+     * @param delay Delay time for lifting the last key.
+     * @return void
+     * @since 9
      */
     void SetFinalKeyUpDelay(int32_t delay);
 
