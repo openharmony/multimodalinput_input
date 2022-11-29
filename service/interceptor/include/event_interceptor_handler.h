@@ -62,9 +62,9 @@ private:
             priority_(priority), session_(session) {}
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
-        InputHandlerType handlerType_;
-        HandleEventType eventType_;
-        int32_t priority_;
+        InputHandlerType handlerType_ { NONE };
+        HandleEventType eventType_ { HANDLE_EVENT_TYPE_ALL };
+        int32_t priority_ { DEFUALT_INTERCEPTOR_PRIORITY } ;
         SessionPtr session_ { nullptr };
     };
 
