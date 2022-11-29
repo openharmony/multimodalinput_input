@@ -149,7 +149,7 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
 
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         for (auto it = interHandlers_.begin(); it != interHandlers_.end(); ++it) {
-            if (handlerId < it->handlerId_) {
+            if (handlerId == it->handlerId_) {
                 interHandlers_.erase(it);
                 break;
             }
