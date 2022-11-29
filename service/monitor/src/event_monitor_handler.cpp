@@ -291,7 +291,6 @@ void EventMonitorHandler::MonitorCollection::MarkConsumed(int32_t eventId, Sessi
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     MMI_HILOGD("Cancel operation");
     auto pointerEvent = std::make_shared<PointerEvent>(*state.lastPointerEvent_);
-    CHKPV(pointerEvent);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetActionTime(GetSysClockTime());
     pointerEvent->UpdateId();

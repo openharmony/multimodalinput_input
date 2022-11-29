@@ -91,7 +91,6 @@ bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
         return true;
     }
     client_ = std::make_shared<MMIClient>();
-    CHKPF(client_);
     client_->SetEventHandler(eventHandler);
     client_->RegisterConnectedFunction(&OnConnected);
     if (!(client_->Start())) {
