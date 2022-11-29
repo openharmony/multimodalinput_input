@@ -2206,8 +2206,8 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_014, TestSize.Level1)
 
     auto interceptor1 = GetPtr<PriorityHighCallback>();
     auto interceptor2 = GetPtr<PriorityMiddleCallback>();
-    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500) };
-    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor3, 600) };
+    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400) };
+    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500) };
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     EXPECT_TRUE(IsValidHandlerId(interceptorId1));
     EXPECT_TRUE(IsValidHandlerId(interceptorId2));
