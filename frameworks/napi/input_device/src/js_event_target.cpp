@@ -897,7 +897,6 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     napi_ref ref = nullptr;
     CHKRV(env, napi_create_reference(env, handle, 1, &ref), CREATE_REFERENCE);
     auto monitor = std::make_unique<JsUtil::CallbackInfo>();
-    CHKPV(monitor);
     monitor->env = env;
     monitor->ref = ref;
     iter->second.push_back(std::move(monitor));
@@ -944,7 +943,6 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, co
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     auto cb = std::make_unique<JsUtil::CallbackInfo>();
-    CHKPP(cb);
     cb->env = env;
     cb->isApi9 = isApi9;
     napi_value promise = nullptr;

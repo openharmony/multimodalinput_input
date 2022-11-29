@@ -246,11 +246,6 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     };
     CHKPP(event);
     auto keyOption = std::make_shared<KeyOption>();
-    if ((keyOption) == nullptr) {
-        delete event;
-        MMI_HILOGE("Check keyOption is null");
-        return nullptr;
-    }
     napi_valuetype valueType = napi_undefined;
     if (napi_typeof(env, argv[0], &valueType) != napi_ok) {
         delete event;
@@ -303,11 +298,6 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     };
     CHKPP(event);
     auto keyOption = std::make_shared<KeyOption>();
-    if (keyOption == nullptr) {
-        delete event;
-        MMI_HILOGE("Check keyOption is null");
-        return nullptr;
-    }
     napi_valuetype valueType = napi_undefined;
     if (napi_typeof(env, argv[0], &valueType) != napi_ok) {
         delete event;
