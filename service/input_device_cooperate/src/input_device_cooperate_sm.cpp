@@ -114,10 +114,15 @@ void InputDeviceCooperateSM::OnCloseCooperation(const std::string &networkId, bo
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     if (!preparedNetworkId_.first.empty() && !preparedNetworkId_.second.empty()) {
-        if (networkId == preparedNetworkId_.first || networkId == preparedNetworkId_.second) {
-            DistributedAdapter->UnPrepareRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
-                [](bool isSuccess) {});
+        if (cooperateState_ != CooperateState::STATE_FREE) {
+            auto dhids = InputDevMgr->GetCooperateDhids(startDhid_);
+            DistributedAdapter->StopRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
+                dhids, [](bool isSuccess){
+            MMI_HILOGI("Failed to stop remote");
+            });
         }
+        DistributedAdapter->UnPrepareRemoteInput(preparedNetworkId_.first, preparedNetworkId_.second,
+            [](bool isSuccess) {});
     }
     preparedNetworkId_ = std::make_pair("", "");
     if (cooperateState_ == CooperateState::STATE_FREE) {
