@@ -105,7 +105,6 @@ bool MMIClient::StartEventRunner()
     if (eventHandler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-        CHKPF(eventHandler_);
         MMI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
     }
 
@@ -136,7 +135,6 @@ bool MMIClient::AddFdListener(int32_t fd)
     }
     CHKPF(eventHandler_);
     auto fdListener = std::make_shared<MMIFdListener>(GetSharedPtr());
-    CHKPF(fdListener);
     auto errCode = eventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener);
     if (errCode != ERR_OK) {
         MMI_HILOGE("Add fd listener failed,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,

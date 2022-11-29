@@ -276,7 +276,6 @@ int32_t InputDeviceImpl::GetUserData()
 std::shared_ptr<InputDevice> InputDeviceImpl::DevDataUnmarshalling(NetPacket &pkt)
 {
     auto devData = std::make_shared<InputDevice>();
-    CHKPP(devData);
     int32_t deviceId;
     std::string name;
     int32_t deviceType;
