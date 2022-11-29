@@ -37,8 +37,8 @@ InputHandlerManager::InputHandlerManager()
     monitorCallback_ = std::bind(&InputHandlerManager::OnDispatchEventProcessed, this, std::placeholders::_1);
 }
 
-int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
-    std::shared_ptr<IInputEventConsumer> consumer, HandleEventType eventType)
+int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
+    HandleEventType eventType, int32_t priority)
 {
     CALL_INFO_TRACE;
     CHKPR(consumer, INVALID_HANDLER_ID);
@@ -59,11 +59,11 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType,
     }
     const HandleEventType currentType = GetEventType();
     MMI_HILOGD("Register new handler:%{public}d", handlerId);
-    if (RET_OK == AddLocal(handlerId, handlerType, eventType, consumer)) {
+    if (RET_OK == AddLocal(handlerId, handlerType, eventType, priority, consumer)) {
         MMI_HILOGD("New handler successfully registered, report to server");
         const HandleEventType newType = GetEventType();
         if (currentType != newType) {
-            int32_t ret = AddToServer(handlerType, newType);
+            int32_t ret = AddToServer(handlerType, newType, priority);
             if (ret != RET_OK) {
                 MMI_HILOGD("Handler:%{public}d permissions failed, remove the monitor", handlerId);
                 RemoveLocal(handlerId, handlerType);
@@ -85,19 +85,21 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
     if (RET_OK == RemoveLocal(handlerId, handlerType)) {
         MMI_HILOGD("Handler:%{public}d unregistered, report to server", handlerId);
         const HandleEventType newType = GetEventType();
+        const int32_t newLevel = GetPriority();
         if (currentType != newType) {
-            RemoveFromServer(handlerType, newType);
+            RemoveFromServer(handlerType, newType, newLevel);
         }
     }
 }
 
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType,
-    HandleEventType eventType, std::shared_ptr<IInputEventConsumer> monitor)
+    HandleEventType eventType, int32_t priority, std::shared_ptr<IInputEventConsumer> monitor)
 {
     InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
         .handlerType_ = handlerType,
         .eventType_ = eventType,
+        .priority_ = priority,
         .consumer_ = monitor,
     };
     auto ret = inputHandlers_.emplace(handler.handlerId_, handler);
@@ -105,12 +107,26 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
         MMI_HILOGE("Duplicate handler:%{public}d", handler.handlerId_);
         return RET_ERR;
     }
+    if (handlerType == InputHandlerType::INTERCEPTOR) {
+        auto iterIndex = interHandlers_.begin();
+        for (; iterIndex != interHandlers_.end(); ++iterIndex) {
+            if (handler.priority_ < iterIndex->priority_) {
+                break;
+            }
+        }
+        auto iter = interHandlers_.emplace(iterIndex, handler);
+        if (iter == interHandlers_.end()) {
+            MMI_HILOGE("Add new handler failed");
+            return RET_ERR;
+        }
+    }
     return RET_OK;
 }
 
-int32_t InputHandlerManager::AddToServer(InputHandlerType handlerType, HandleEventType eventType)
+int32_t InputHandlerManager::AddToServer(InputHandlerType handlerType, HandleEventType eventType,
+    int32_t priority)
 {
-    int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerType, eventType);
+    int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerType, eventType, priority);
     if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
@@ -130,12 +146,22 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
         return RET_ERR;
     }
     inputHandlers_.erase(tItr);
+
+    if (handlerType == InputHandlerType::INTERCEPTOR) {
+        for (auto it = interHandlers_.begin(); it != interHandlers_.end(); ++it) {
+            if (handlerId == it->handlerId_) {
+                interHandlers_.erase(it);
+                break;
+            }
+        }
+    }
     return RET_OK;
 }
 
-void InputHandlerManager::RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType)
+void InputHandlerManager::RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType,
+    int32_t priority)
 {
-    int32_t ret = MultimodalInputConnMgr->RemoveInputHandler(handlerType, eventType);
+    int32_t ret = MultimodalInputConnMgr->RemoveInputHandler(handlerType, eventType, priority);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
@@ -166,15 +192,29 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent)
     CHKPV(keyEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_INTERCEPT_EVENT);
-    for (const auto &handler : inputHandlers_) {
-        if ((handler.second.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
-            continue;
+    if (!interHandlers_.empty()) {
+        for (const auto &item : interHandlers_) {
+            if ((item.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
+                continue;
+            }
+            int32_t handlerId = item.handlerId_;
+            auto consumer = item.consumer_;
+            CHKPV(consumer);
+            consumer->OnInputEvent(keyEvent);
+            MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
+            break;
         }
-        int32_t handlerId = handler.first;
-        auto consumer = handler.second.consumer_;
-        CHKPV(consumer);
-        consumer->OnInputEvent(keyEvent);
-        MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
+    } else {
+        for (const auto &item : inputHandlers_) {
+            if ((item.second.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
+                continue;
+            }
+            int32_t handlerId = item.first;
+            auto consumer = item.second.consumer_;
+            CHKPV(consumer);
+            consumer->OnInputEvent(keyEvent);
+            MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
+        }
     }
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -185,20 +225,39 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
 {
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     int32_t consumerCount = 0;
-    for (const auto &iter : inputHandlers_) {
-        if ((iter.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
-            continue;
+    if (!interHandlers_.empty()) {
+        for (const auto &item : interHandlers_) {
+            if ((item.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
+                continue;
+            }
+            int32_t handlerId = item.handlerId_;
+            auto consumer = item.consumer_;
+            CHKPV(consumer);
+            auto ret = consumerInfos.emplace(handlerId, consumer);
+            if (!ret.second) {
+                MMI_HILOGI("Duplicate handler:%{public}d", handlerId);
+                continue;
+            }
+            consumerCount++;
+            break;
         }
-        int32_t handlerId = iter.first;
-        auto consumer = iter.second.consumer_;
-        CHKPV(consumer);
-        auto ret = consumerInfos.emplace(handlerId, consumer);
-        if (!ret.second) {
-            MMI_HILOGI("Duplicate handler:%{public}d", handlerId);
-            continue;
+    } else {
+        for (const auto &item : inputHandlers_) {
+            if ((item.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
+                continue;
+            }
+            int32_t handlerId = item.first;
+            auto consumer = item.second.consumer_;
+            CHKPV(consumer);
+            auto ret = consumerInfos.emplace(handlerId, consumer);
+            if (!ret.second) {
+                MMI_HILOGI("Duplicate handler:%{public}d", handlerId);
+                continue;
+            }
+            consumerCount++;
         }
-        consumerCount++;
     }
+
     if (consumerCount == 0) {
         MMI_HILOGE("All task post failed");
         return;
@@ -238,8 +297,9 @@ void InputHandlerManager::OnConnected()
 {
     CALL_DEBUG_ENTER;
     HandleEventType eventType = GetEventType();
+    int32_t priority = GetPriority();
     if (eventType != HANDLE_EVENT_TYPE_NONE) {
-        AddToServer(GetHandlerType(), eventType);
+        AddToServer(GetHandlerType(), eventType, priority);
     }
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
@@ -258,10 +318,27 @@ HandleEventType InputHandlerManager::GetEventType() const
         return HANDLE_EVENT_TYPE_NONE;
     }
     HandleEventType eventType { HANDLE_EVENT_TYPE_NONE };
-    for (const auto &inputHandler : inputHandlers_) {
-        eventType |= inputHandler.second.eventType_;
+    if (!interHandlers_.empty()) {
+        eventType |= interHandlers_.front().eventType_;
+    } else {
+        for (const auto &inputHandler : inputHandlers_) {
+            eventType |= inputHandler.second.eventType_;
+        }
     }
     return eventType;
+}
+
+int32_t InputHandlerManager::GetPriority() const
+{
+    if (inputHandlers_.empty()) {
+        MMI_HILOGD("InputHandlers is empty");
+        return DEFUALT_INTERCEPTOR_PRIORITY;
+    }
+    int32_t priority { DEFUALT_INTERCEPTOR_PRIORITY };
+    if (!interHandlers_.empty()) {
+        priority = interHandlers_.front().priority_;
+    }
+    return priority;
 }
 
 void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId)

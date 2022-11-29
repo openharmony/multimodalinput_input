@@ -45,8 +45,10 @@ public:
     int32_t RegisterDevListener() override;
     int32_t UnregisterDevListener() override;
     int32_t GetKeyboardType(int32_t userData, int32_t deviceId) override;
-    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType) override;
-    int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType) override;
+    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+        int32_t priority) override;
+    int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+        int32_t priority) override;
     int32_t MarkEventConsumed(int32_t eventId) override;
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;

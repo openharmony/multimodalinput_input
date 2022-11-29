@@ -84,7 +84,7 @@ void EventInterceptorHandler::HandleTouchEvent(const std::shared_ptr<PointerEven
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t EventInterceptorHandler::AddInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType, SessionPtr session)
+    HandleEventType eventType, int32_t priority, SessionPtr session)
 {
     CALL_INFO_TRACE;
     CHKPR(session, RET_ERR);
@@ -93,17 +93,17 @@ int32_t EventInterceptorHandler::AddInputHandler(InputHandlerType handlerType,
         return RET_ERR;
     }
     InitSessionLostCallback();
-    SessionHandler interceptor { handlerType, eventType, session };
+    SessionHandler interceptor { handlerType, eventType, priority, session };
     return interceptors_.AddInterceptor(interceptor);
 }
 
 void EventInterceptorHandler::RemoveInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType, SessionPtr session)
+    HandleEventType eventType, int32_t priority, SessionPtr session)
 {
     CALL_INFO_TRACE;
     CHKPV(session);
     if (handlerType == InputHandlerType::INTERCEPTOR) {
-        SessionHandler interceptor { handlerType, eventType, session };
+        SessionHandler interceptor { handlerType, eventType, priority, session };
         interceptors_.RemoveInterceptor(interceptor);
     }
 }
@@ -205,6 +205,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
             interceptor.SendToClient(keyEvent);
             MMI_HILOGD("Key event was intercepted");
             isInterceptor = true;
+            break;
         }
     }
     return isInterceptor;
@@ -226,6 +227,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
             interceptor.SendToClient(pointerEvent);
             MMI_HILOGD("Pointer event was intercepted");
             isInterceptor = true;
+            break;
         }
     }
     return isInterceptor;
@@ -234,57 +236,55 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
 
 int32_t EventInterceptorHandler::InterceptorCollection::AddInterceptor(const SessionHandler& interceptor)
 {
+    for (auto iter = interceptors_.begin(); iter != interceptors_.end(); ++iter) {
+        if (iter->session_ == interceptor.session_) {
+            interceptors_.erase(iter);
+            break;
+        }
+    }
+
     if (interceptors_.size() >= MAX_N_INPUT_INTERCEPTORS) {
         MMI_HILOGE("The number of interceptors exceeds limit");
         return RET_ERR;
     }
-    bool isFound = false;
-    auto iter = interceptors_.find(interceptor);
-    if (iter != interceptors_.end()) {
-        if (iter->eventType_ == interceptor.eventType_) {
-            MMI_HILOGD("Interceptor with event type (%{public}u) already exists", interceptor.eventType_);
-            return RET_OK;
-        }
-        isFound = true;
-        interceptors_.erase(iter);
-    }
 
-    auto [sIter, isOk] = interceptors_.insert(interceptor);
-    if (!isOk) {
-        if (isFound) {
-            MMI_HILOGE("Internal error: interceptor has been removed");
-        } else {
-            MMI_HILOGE("Failed to add interceptor");
+    auto iterIndex = interceptors_.cbegin();
+    for (; iterIndex != interceptors_.cend(); ++iterIndex) {
+        if (interceptor.priority_ < iterIndex->priority_) {
+            break;
         }
-        return RET_ERR;
     }
-
-    if (isFound) {
-        MMI_HILOGD("Event type is updated:%{public}u", interceptor.eventType_);
-    } else {
-        MMI_HILOGD("Service AddInterceptor Success");
+    auto sIter = interceptors_.emplace(iterIndex, interceptor);
+    if (sIter == interceptors_.end()) {
+        MMI_HILOGE("Failed to add interceptor");
+        RET_ERR;
     }
     return RET_OK;
 }
 
 void EventInterceptorHandler::InterceptorCollection::RemoveInterceptor(const SessionHandler& interceptor)
 {
-    std::set<SessionHandler>::const_iterator iter = interceptors_.find(interceptor);
-    if (iter == interceptors_.cend()) {
-        MMI_HILOGE("Interceptor does not exist");
-        return;
+    for (auto iter = interceptors_.begin(); iter != interceptors_.end(); ++iter) {
+        if (iter->session_ == interceptor.session_) {
+            interceptors_.erase(iter);
+            break;
+        }
     }
-
-    interceptors_.erase(iter);
     if (interceptor.eventType_ == HANDLE_EVENT_TYPE_NONE) {
         MMI_HILOGD("Unregister interceptor successfully");
         return;
     }
 
-    auto [sIter, isOk] = interceptors_.insert(interceptor);
-    if (!isOk) {
+    auto iterIndex = interceptors_.cbegin();
+    for (; iterIndex != interceptors_.cend(); ++iterIndex) {
+        if (interceptor.priority_ < iterIndex->priority_) {
+            break;
+        }
+    }
+    auto sIter = interceptors_.emplace(iterIndex, interceptor);
+    if (sIter == interceptors_.end()) {
         MMI_HILOGE("Internal error, interceptor has been removed");
-        return;
+        RET_ERR;
     }
     MMI_HILOGD("Event type is updated:%{public}u", interceptor.eventType_);
 }
@@ -292,12 +292,9 @@ void EventInterceptorHandler::InterceptorCollection::RemoveInterceptor(const Ses
 void EventInterceptorHandler::InterceptorCollection::OnSessionLost(SessionPtr session)
 {
     CALL_INFO_TRACE;
-    std::set<SessionHandler>::const_iterator cItr = interceptors_.cbegin();
-    while (cItr != interceptors_.cend()) {
-        if (cItr->session_ != session) {
-            ++cItr;
-        } else {
-            cItr = interceptors_.erase(cItr);
+    for (auto iter = interceptors_.begin(); iter != interceptors_.end(); ++iter) {
+        if (iter->session_ == session) {
+            interceptors_.erase(iter);
         }
     }
 }

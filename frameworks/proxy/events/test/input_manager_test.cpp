@@ -1738,16 +1738,20 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
 
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    for (const auto &id : ids) {
+    for (size_t i = 0; i < ids.size(); ++i) {
         std::string sPointerEs = InputManagerTest::GetEventDump();
         MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-        ASSERT_TRUE(!sPointerEs.empty());
+        if (i == 0) {
+            ASSERT_TRUE(!sPointerEs.empty());
+        } else {
+            ASSERT_TRUE(sPointerEs.empty());
+        }
 #else
         ASSERT_TRUE(sPointerEs.empty());
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
-        if (IsValidHandlerId(id)) {
-            InputManager::GetInstance()->RemoveInterceptor(id);
+        if (IsValidHandlerId(ids[i])) {
+            InputManager::GetInstance()->RemoveInterceptor(ids[i]);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
@@ -2045,7 +2049,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_011, TestSize.Level1)
     injectDownEvent->AddPressedKeyItems(kitDown);
 
     auto interceptor = GetPtr<InputEventCallback>();
-    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor) };
+    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor, 400) };
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
 #else
@@ -2056,7 +2060,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_011, TestSize.Level1)
     InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
 
     std::string sPointerEs = InputManagerTest::GetEventDump();
-    MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
+    MMI_HILOGD("PriorityLevel Test:sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
     ASSERT_TRUE(!sPointerEs.empty());
 #else
@@ -2070,11 +2074,241 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_011, TestSize.Level1)
 
 /**
  * @tc.name: TestInputEventInterceptor_012
- * @tc.desc: Verify keyevent interceptor
+ * @tc.desc: Verify mouse interceptor
  * @tc.type: FUNC
  * @tc.require:
  */
 HWTEST_F(InputManagerTest, TestInputEventInterceptor_012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDownTime(10010);
+    item.SetPressed(true);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+
+    auto interceptor = GetPtr<InputEventCallback>();
+    int32_t interceptorId = InputManager::GetInstance()->AddInterceptor(interceptor, 400);
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    EXPECT_TRUE(IsValidHandlerId(interceptorId));
+#else
+    EXPECT_EQ(interceptorId, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+    std::string sPointerEs = InputManagerTest::GetEventDump();
+    MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+    ASSERT_TRUE(!sPointerEs.empty());
+#else
+    ASSERT_TRUE(sPointerEs.empty());
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
+    if (IsValidHandlerId(interceptorId)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+
+/**
+ * @tc.name: TestInputEventInterceptor_013
+ * @tc.desc: Verify mouse interceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_013, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDownTime(10010);
+    item.SetPressed(true);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+
+    auto interceptor1 = GetPtr<PriorityHighCallback>();
+    auto interceptor2 = GetPtr<PriorityMiddleCallback>();
+    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400) };
+    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500) };
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    EXPECT_TRUE(IsValidHandlerId(interceptorId1));
+    EXPECT_TRUE(IsValidHandlerId(interceptorId2));
+#else
+    EXPECT_EQ(interceptorId1, ERROR_UNSUPPORT);
+    EXPECT_EQ(interceptorId2, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+    for (size_t i = 0; i < 2; ++i) {
+        std::string sPointerEs = InputManagerTest::GetEventDump();
+        MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
+    #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+        if (i == 0) {
+            EXPECT_EQ(sPointerEs, "Call high interceptor");
+        } else {
+            ASSERT_TRUE(sPointerEs.empty());
+        }
+    #else
+        ASSERT_TRUE(sPointerEs.empty());
+    #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
+    }
+
+    if (IsValidHandlerId(interceptorId1)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+
+    if (IsValidHandlerId(interceptorId2)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId2);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+
+/**
+ * @tc.name: TestInputEventInterceptor_014
+ * @tc.desc: Verify space key interceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_014, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+
+    auto interceptor1 = GetPtr<PriorityHighCallback>();
+    auto interceptor2 = GetPtr<PriorityMiddleCallback>();
+    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400) };
+    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500) };
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    EXPECT_TRUE(IsValidHandlerId(interceptorId1));
+    EXPECT_TRUE(IsValidHandlerId(interceptorId2));
+#else
+    EXPECT_EQ(interceptorId1, ERROR_UNSUPPORT);
+    EXPECT_EQ(interceptorId2, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    for (size_t i = 0; i < 2; ++i) {
+        std::string sPointerEs = InputManagerTest::GetEventDump();
+        MMI_HILOGD("PriorityLevel Test:sPointerEs:%{public}s", sPointerEs.c_str());
+    #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+        if (i == 0) {
+            EXPECT_EQ(sPointerEs, "Call high interceptor");
+        } else {
+            ASSERT_TRUE(sPointerEs.empty());
+        }
+    #else
+        ASSERT_TRUE(sPointerEs.empty());
+    #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
+    }
+
+    if (IsValidHandlerId(interceptorId1)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+
+    if (IsValidHandlerId(interceptorId2)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId2);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+
+/**
+ * @tc.name: TestInputEventInterceptor_015
+ * @tc.desc: Verify space key interceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_015, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+
+    auto interceptor1 = GetPtr<PriorityHighCallback>();
+    auto interceptor2 = GetPtr<PriorityMiddleCallback>();
+    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400) };
+    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500) };
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    EXPECT_TRUE(IsValidHandlerId(interceptorId1));
+    EXPECT_TRUE(IsValidHandlerId(interceptorId2));
+#else
+    EXPECT_EQ(interceptorId1, ERROR_UNSUPPORT);
+    EXPECT_EQ(interceptorId2, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+    if (IsValidHandlerId(interceptorId1)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    for (size_t i = 0; i < 3; ++i) {
+        std::string sPointerEs = InputManagerTest::GetEventDump();
+        MMI_HILOGD("PriorityLevel Test:sPointerEs:%{public}s", sPointerEs.c_str());
+    #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+        if (i == 0) {
+            EXPECT_EQ(sPointerEs, "Call middle interceptor");
+        } else {
+            ASSERT_TRUE(sPointerEs.empty());
+        }
+    #else
+        ASSERT_TRUE(sPointerEs.empty());
+    #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
+    }
+
+    if (IsValidHandlerId(interceptorId2)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId2);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+
+/**
+ * @tc.name: TestInputEventInterceptor_016
+ * @tc.desc: Verify keyevent interceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_016, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     auto fun = [](std::shared_ptr<KeyEvent> keyEvent) {
