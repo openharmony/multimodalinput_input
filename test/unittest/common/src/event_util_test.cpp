@@ -139,7 +139,6 @@ bool EventUtilTest::Init()
     auto runner = AppExecFwk::EventRunner::Create(threadTest);
     CHKPF(runner);
     auto eventHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
-    CHKPF(eventHandler);
     MMI::InputManager::GetInstance()->SetWindowInputEventConsumer(listener_, eventHandler);
     return true;
 }
