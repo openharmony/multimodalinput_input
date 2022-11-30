@@ -211,6 +211,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
     CheckFocusWindowChange(displayGroupInfo);
     CheckZorderWindowChange(displayGroupInfo);
     displayGroupInfo_ = displayGroupInfo;
+    PrintDisplayInfo();
 #ifdef OHOS_BUILD_ENABLE_POINTER
     UpdatePointerStyle();
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -229,6 +230,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
             int32_t logicX = mouseLocation.physicalX + displayInfo->x;
             int32_t logicY = mouseLocation.physicalY + displayInfo->y;
             std::optional<WindowInfo> windowInfo;
+            CHKPV(lastPointerEvent_);
             if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE &&
                 lastPointerEvent_->GetPressedButtons().empty()) {
                 windowInfo = GetWindowInfo(logicX, logicY);
@@ -253,7 +255,6 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    PrintDisplayInfo();
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -396,6 +397,7 @@ void InputWindowsManager::NotifyPointerToWindow()
 {
     CALL_INFO_TRACE;
     std::optional<WindowInfo> windowInfo;
+    CHKPV(lastPointerEvent_);
     if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE &&
         lastPointerEvent_->GetPressedButtons().empty()) {
         windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
