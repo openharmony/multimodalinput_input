@@ -38,13 +38,13 @@ int32_t InputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsu
 }
 
 int32_t InputInterceptorManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor,
-    HandleEventType eventType, int32_t priority)
+    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     if (interceptor == nullptr) {
         MMI_HILOGE("No interceptor was specified.");
         return INVALID_HANDLER_ID;
     }
-    return AddHandler(InputHandlerType::INTERCEPTOR, interceptor, eventType, priority);
+    return AddHandler(InputHandlerType::INTERCEPTOR, interceptor, eventType, priority, deviceTags);
 }
 
 void InputInterceptorManager::RemoveInterceptor(int32_t interceptorId)

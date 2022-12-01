@@ -41,9 +41,9 @@ public:
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, SessionPtr session);
+        int32_t priority, uint32_t deviceTags, SessionPtr session);
     void RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority, SessionPtr session);
+        int32_t priority, uint32_t deviceTags, SessionPtr session);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     bool OnHandleEvent(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -58,13 +58,15 @@ private:
     class SessionHandler {
     public:
         SessionHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
-            SessionPtr session) : handlerType_(handlerType), eventType_(eventType & HANDLE_EVENT_TYPE_ALL),
-            priority_(priority), session_(session) {}
+            uint32_t deviceTags, SessionPtr session) : handlerType_(handlerType),
+            eventType_(eventType & HANDLE_EVENT_TYPE_ALL), priority_(priority), deviceTags_(deviceTags),
+            session_(session) {}
         void SendToClient(std::shared_ptr<KeyEvent> keyEvent) const;
         void SendToClient(std::shared_ptr<PointerEvent> pointerEvent) const;
         InputHandlerType handlerType_ { NONE };
         HandleEventType eventType_ { HANDLE_EVENT_TYPE_ALL };
-        int32_t priority_ { DEFUALT_INTERCEPTOR_PRIORITY } ;
+        int32_t priority_ { DEFUALT_INTERCEPTOR_PRIORITY };
+        uint32_t deviceTags_ { EVDEV_UDEV_TAG_INPUT };
         SessionPtr session_ { nullptr };
     };
 

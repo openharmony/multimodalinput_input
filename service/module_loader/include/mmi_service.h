@@ -60,9 +60,9 @@ public:
     int32_t UnregisterDevListener() override;
     int32_t GetKeyboardType(int32_t userData, int32_t deviceId) override;
     int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority) override;
+        int32_t priority, uint32_t deviceTags) override;
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority) override;
+        int32_t priority, uint32_t deviceTags) override;
     int32_t MarkEventConsumed(int32_t eventId) override;
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
@@ -105,9 +105,9 @@ protected:
     int32_t OnGetKeyboardType(int32_t pid, int32_t userData, int32_t deviceId);
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t CheckAddInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority);
+        int32_t priority, uint32_t deviceTags);
     int32_t CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
-        int32_t priority);
+        int32_t priority, uint32_t deviceTags);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     int32_t CheckMarkConsumed(int32_t pid, int32_t eventId);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
