@@ -286,7 +286,8 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
 {
     CALL_DEBUG_ENTER;
     InputHandlerType handlerType;
-    pkt >> handlerType;
+    uint32_t deviceTags;
+    pkt >> handlerType >> deviceTags;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read handler failed");
         return RET_ERR;
@@ -301,13 +302,13 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
     switch (handlerType) {
         case INTERCEPTOR: {
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-            InputInterMgr->OnInputEvent(keyEvent);
+            InputInterMgr->OnInputEvent(keyEvent, deviceTags);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
             break;
         }
         case MONITOR: {
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-            IMonitorMgr->OnInputEvent(keyEvent);
+            IMonitorMgr->OnInputEvent(keyEvent, deviceTags);
 #endif // OHOS_BUILD_ENABLE_MONITOR
             break;
         }
@@ -326,7 +327,8 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 {
     CALL_DEBUG_ENTER;
     InputHandlerType handlerType;
-    pkt >> handlerType;
+    uint32_t deviceTags;
+    pkt >> handlerType >> deviceTags;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read Pointer data failed");
         return RET_ERR;
@@ -342,13 +344,13 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
     switch (handlerType) {
         case INTERCEPTOR: {
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-            InputInterMgr->OnInputEvent(pointerEvent);
+            InputInterMgr->OnInputEvent(pointerEvent, deviceTags);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
             break;
         }
         case MONITOR: {
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-            IMonitorMgr->OnInputEvent(pointerEvent);
+            IMonitorMgr->OnInputEvent(pointerEvent, deviceTags);
 #endif // OHOS_BUILD_ENABLE_MONITOR
             break;
         }

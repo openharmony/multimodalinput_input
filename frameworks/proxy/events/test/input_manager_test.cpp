@@ -2049,7 +2049,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_011, TestSize.Level1)
     injectDownEvent->AddPressedKeyItems(kitDown);
 
     auto interceptor = GetPtr<InputEventCallback>();
-    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor, 400) };
+    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor, 400, 1) };
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
 #else
@@ -2097,7 +2097,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_012, TestSize.Level1)
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
     auto interceptor = GetPtr<InputEventCallback>();
-    int32_t interceptorId = InputManager::GetInstance()->AddInterceptor(interceptor, 400);
+    int32_t interceptorId = InputManager::GetInstance()->AddInterceptor(interceptor, 400, 1);
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
 #else
@@ -2146,8 +2146,8 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_013, TestSize.Level1)
 
     auto interceptor1 = GetPtr<PriorityHighCallback>();
     auto interceptor2 = GetPtr<PriorityMiddleCallback>();
-    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400) };
-    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500) };
+    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400, 1) };
+    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500, 1) };
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     EXPECT_TRUE(IsValidHandlerId(interceptorId1));
     EXPECT_TRUE(IsValidHandlerId(interceptorId2));
@@ -2206,8 +2206,8 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_014, TestSize.Level1)
 
     auto interceptor1 = GetPtr<PriorityHighCallback>();
     auto interceptor2 = GetPtr<PriorityMiddleCallback>();
-    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400) };
-    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500) };
+    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400, 1) };
+    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500, 1) };
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     EXPECT_TRUE(IsValidHandlerId(interceptorId1));
     EXPECT_TRUE(IsValidHandlerId(interceptorId2));
@@ -2266,8 +2266,8 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_015, TestSize.Level1)
 
     auto interceptor1 = GetPtr<PriorityHighCallback>();
     auto interceptor2 = GetPtr<PriorityMiddleCallback>();
-    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400) };
-    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500) };
+    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400, 1) };
+    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500, 1) };
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     EXPECT_TRUE(IsValidHandlerId(interceptorId1));
     EXPECT_TRUE(IsValidHandlerId(interceptorId2));
@@ -2322,6 +2322,55 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_016, TestSize.Level1)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
+    }
+}
+
+/**
+ * @tc.name: TestInputEventInterceptor_017
+ * @tc.desc: Verify mouse interceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_017, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDownTime(10010);
+    item.SetPressed(true);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+
+    auto interceptor = GetPtr<InputEventCallback>();
+    uint32_t touchTags = 1 << 2;
+    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor, 400, touchTags) };
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    EXPECT_TRUE(IsValidHandlerId(interceptorId));
+#else
+    EXPECT_EQ(interceptorId, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+    std::string sPointerEs = InputManagerTest::GetEventDump();
+    MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+    ASSERT_TRUE(sPointerEs.empty());
+#else
+    ASSERT_TRUE(sPointerEs.empty());
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
+
+    if (IsValidHandlerId(interceptorId)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
 

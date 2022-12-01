@@ -710,22 +710,22 @@ int32_t MMIService::GetKeyboardType(int32_t userData, int32_t deviceId)
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType,
-    HandleEventType eventType, int32_t priority)
+    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnAddInputHandler(sess, handlerType, eventType, priority);
+    return sMsgHandler_.OnAddInputHandler(sess, handlerType, eventType, priority, deviceTags);
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
 int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-    int32_t priority)
+    int32_t priority, uint32_t deviceTags)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckAddInput, this, pid, handlerType, eventType, priority));
+        std::bind(&MMIService::CheckAddInput, this, pid, handlerType, eventType, priority, deviceTags));
     if (ret != RET_OK) {
         MMI_HILOGE("Add input handler failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -736,22 +736,22 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 int32_t MMIService::CheckRemoveInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
-    int32_t priority)
+    int32_t priority, uint32_t deviceTags)
 {
     auto sess = GetSessionByPid(pid);
     CHKPR(sess, ERROR_NULL_POINTER);
-    return sMsgHandler_.OnRemoveInputHandler(sess, handlerType, eventType, priority);
+    return sMsgHandler_.OnRemoveInputHandler(sess, handlerType, eventType, priority, deviceTags);
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 
 int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-    int32_t priority)
+    int32_t priority, uint32_t deviceTags)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
-        std::bind(&MMIService::CheckRemoveInput, this, pid, handlerType, eventType, priority));
+        std::bind(&MMIService::CheckRemoveInput, this, pid, handlerType, eventType, priority, deviceTags));
     if (ret != RET_OK) {
         MMI_HILOGE("Remove input handler failed, ret:%{public}d", ret);
         return RET_ERR;
