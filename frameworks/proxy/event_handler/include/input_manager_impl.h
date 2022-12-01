@@ -75,10 +75,10 @@ public:
 
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor,
         int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
-        uint32_t deviceTags = EVDEV_UDEV_TAG_INPUT);
+        uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor,
         int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
-        uint32_t deviceTags = EVDEV_UDEV_TAG_INPUT);
+        uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
     void RemoveInterceptor(int32_t interceptorId);
 
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);

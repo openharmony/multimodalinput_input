@@ -203,8 +203,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
     bool isInterceptor = false;
     std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(keyEvent->GetDeviceId());
     for (const auto &interceptor : interceptors_) {
-        if ((interceptor.deviceTags_ != 1) &&
-            (interceptor.deviceTags_ & inputDevice->GetType()) == 0) {
+        if (!inputDevice->HasCapability(interceptor.deviceTags_)) {
             continue;
         }
         if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_KEY) == HANDLE_EVENT_TYPE_KEY) {
@@ -230,8 +229,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
     bool isInterceptor = false;
     std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(pointerEvent->GetDeviceId());
     for (const auto &interceptor : interceptors_) {
-        if ((interceptor.deviceTags_ != 1) &&
-            (interceptor.deviceTags_ & inputDevice->GetType()) == 0) {
+       if (!inputDevice->HasCapability(interceptor.deviceTags_)) {
             continue;
         }
         if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {

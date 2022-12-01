@@ -25,7 +25,6 @@ inline constexpr int32_t   MIN_HANDLER_ID { 1 };
 inline constexpr int32_t   INVALID_HANDLER_ID { -1 };
 inline constexpr int32_t   ERROR_EXCEED_MAX_COUNT { -4100001 };
 inline constexpr int32_t   DEFUALT_INTERCEPTOR_PRIORITY { 500 };
-inline constexpr uint32_t  EVDEV_UDEV_TAG_INPUT = 1 << 0;
 
 enum InputHandlerType : int32_t {
     NONE,

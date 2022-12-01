@@ -352,7 +352,7 @@ uint32_t InputHandlerManager::GetDeviceTags() const
         MMI_HILOGD("InputHandlers is empty");
         return DEFUALT_INTERCEPTOR_PRIORITY;
     }
-    uint32_t deviceTags { EVDEV_UDEV_TAG_INPUT };
+    uint32_t deviceTags { CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) };
     if (!interHandlers_.empty()) {
         deviceTags = interHandlers_.front().deviceTags_;
     }
