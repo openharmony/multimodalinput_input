@@ -20,6 +20,7 @@
 #include <map>
 #include <mutex>
 
+#include "input_device.h"
 #include "input_handler_type.h"
 #include "i_input_event_consumer.h"
 #include "pointer_event.h"
@@ -51,7 +52,7 @@ public:
 protected:
     int32_t AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
         HandleEventType eventType = HANDLE_EVENT_TYPE_ALL, int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
-        uint32_t deviceTags = EVDEV_UDEV_TAG_INPUT);
+        uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
     void RemoveHandler(int32_t handlerId, InputHandlerType IsValidHandlerType);
 
 private:
@@ -60,7 +61,7 @@ private:
         InputHandlerType handlerType_ { NONE };
         HandleEventType eventType_ { HANDLE_EVENT_TYPE_ALL };
         int32_t priority_ { DEFUALT_INTERCEPTOR_PRIORITY };
-        uint32_t deviceTags_ { EVDEV_UDEV_TAG_INPUT };
+        uint32_t deviceTags_ { CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) };
         std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     };
 

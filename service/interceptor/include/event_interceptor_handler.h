@@ -20,6 +20,7 @@
 
 #include "i_input_event_handler.h"
 #include "i_input_event_collection_handler.h"
+#include "input_device.h"
 #include "input_handler_type.h"
 #include "nocopyable.h"
 #include "uds_session.h"
@@ -66,7 +67,7 @@ private:
         InputHandlerType handlerType_ { NONE };
         HandleEventType eventType_ { HANDLE_EVENT_TYPE_ALL };
         int32_t priority_ { DEFUALT_INTERCEPTOR_PRIORITY };
-        uint32_t deviceTags_ { EVDEV_UDEV_TAG_INPUT };
+        uint32_t deviceTags_ { CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) };
         SessionPtr session_ { nullptr };
     };
 
