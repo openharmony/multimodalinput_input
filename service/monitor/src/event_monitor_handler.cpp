@@ -155,7 +155,7 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent>
 {
     CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
-    pkt << handlerType_ << evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT;
+    pkt << handlerType_ << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write key event failed");
         return;
@@ -184,7 +184,7 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
             return;
         }
     }
-    pkt << handlerType_ << evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT;
+    pkt << handlerType_ << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write pointer event failed");
         return;
@@ -291,7 +291,6 @@ void EventMonitorHandler::MonitorCollection::MarkConsumed(int32_t eventId, Sessi
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     MMI_HILOGD("Cancel operation");
     auto pointerEvent = std::make_shared<PointerEvent>(*state.lastPointerEvent_);
-    CHKPV(pointerEvent);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetActionTime(GetSysClockTime());
     pointerEvent->UpdateId();
