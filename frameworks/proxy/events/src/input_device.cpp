@@ -127,6 +127,22 @@ bool InputDevice::HasCapability(InputDeviceCapability cap) const
     return false;
 }
 
+bool InputDevice::HasCapability(uint32_t deviceTags) const
+{
+    int32_t min = static_cast<int32_t>(INPUT_DEV_CAP_KEYBOARD);
+    int32_t max = static_cast<int32_t>(INPUT_DEV_CAP_MAX);
+    for (int32_t cap = min; cap < max; ++cap) {
+        if (!capabilities_.test(static_cast<InputDeviceCapability>(cap))) {
+            continue;
+        }
+        uint32_t tags = CapabilityToTags(static_cast<InputDeviceCapability>(cap));
+        if ((tags & deviceTags) == tags) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void InputDevice::AddAxisInfo(AxisInfo axis)
 {
     axis_.push_back(axis);

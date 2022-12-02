@@ -36,6 +36,11 @@ enum InputDeviceCapability {
     INPUT_DEV_CAP_MAX
 };
 
+inline constexpr uint32_t CapabilityToTags(InputDeviceCapability capability)
+{
+    return static_cast<uint32_t>((1 << capability) - (capability / INPUT_DEV_CAP_MAX));
+}
+
 enum KeyboardType {
     KEYBOARD_TYPE_NONE,
     KEYBOARD_TYPE_UNKNOWN,
@@ -72,6 +77,8 @@ public:
     std::string GetUniq() const;
     void AddCapability(InputDeviceCapability cap);
     bool HasCapability(InputDeviceCapability cap) const;
+    bool HasCapability(uint32_t deviceTags) const;
+
 
     class AxisInfo {
     public:
@@ -114,7 +121,6 @@ private:
     std::string phys_ { "null" };
     std::string uniq_ { "null" };
     std::vector<AxisInfo> axis_;
-    std::vector<int32_t> deviceIdList_;
     std::bitset<INPUT_DEV_CAP_MAX> capabilities_;
 };
 } // namespace MMI

@@ -18,6 +18,7 @@
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "event_dispatch_handler.h"
+#include "input_device_manager.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
 #include "mmi_log.h"
@@ -84,7 +85,7 @@ void EventInterceptorHandler::HandleTouchEvent(const std::shared_ptr<PointerEven
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t EventInterceptorHandler::AddInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType, int32_t priority, SessionPtr session)
+    HandleEventType eventType, int32_t priority, uint32_t deviceTags, SessionPtr session)
 {
     CALL_INFO_TRACE;
     CHKPR(session, RET_ERR);
@@ -93,17 +94,17 @@ int32_t EventInterceptorHandler::AddInputHandler(InputHandlerType handlerType,
         return RET_ERR;
     }
     InitSessionLostCallback();
-    SessionHandler interceptor { handlerType, eventType, priority, session };
+    SessionHandler interceptor { handlerType, eventType, priority, deviceTags, session };
     return interceptors_.AddInterceptor(interceptor);
 }
 
 void EventInterceptorHandler::RemoveInputHandler(InputHandlerType handlerType,
-    HandleEventType eventType, int32_t priority, SessionPtr session)
+    HandleEventType eventType, int32_t priority, uint32_t deviceTags, SessionPtr session)
 {
     CALL_INFO_TRACE;
     CHKPV(session);
     if (handlerType == InputHandlerType::INTERCEPTOR) {
-        SessionHandler interceptor { handlerType, eventType, priority, session };
+        SessionHandler interceptor { handlerType, eventType, priority, deviceTags, session };
         interceptors_.RemoveInterceptor(interceptor);
     }
 }
@@ -155,7 +156,7 @@ void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEv
 {
     CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
-    pkt << handlerType_;
+    pkt << handlerType_ << deviceTags_;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write key event failed");
         return;
@@ -175,7 +176,7 @@ void EventInterceptorHandler::SessionHandler::SendToClient(std::shared_ptr<Point
     CHKPV(pointerEvent);
     NetPacket pkt(MmiMessageId::REPORT_POINTER_EVENT);
     MMI_HILOGD("Service send to client InputHandlerType:%{public}d", handlerType_);
-    pkt << handlerType_;
+    pkt << handlerType_ << deviceTags_;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write pointer event failed");
         return;
@@ -200,7 +201,17 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
     }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     bool isInterceptor = false;
+    std::vector<KeyEvent::KeyItem> keyItems = keyEvent->GetKeyItems();
+    if (keyItems.empty()) {
+        MMI_HILOGE("keyItems is empty");
+        return false;
+    }
+    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(keyItems.front().GetDeviceId());
+    CHKPF(inputDevice);
     for (const auto &interceptor : interceptors_) {
+        if (!inputDevice->HasCapability(interceptor.deviceTags_)) {
+            continue;
+        }
         if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_KEY) == HANDLE_EVENT_TYPE_KEY) {
             interceptor.SendToClient(keyEvent);
             MMI_HILOGD("Key event was intercepted");
@@ -222,7 +233,18 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
     }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     bool isInterceptor = false;
+    PointerEvent::PointerItem pointerItem;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("GetPointerItem:%{public}d fail", pointerId);
+        return false;
+    }
+    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(pointerItem.GetDeviceId());
+    CHKPF(inputDevice);
     for (const auto &interceptor : interceptors_) {
+        if (!inputDevice->HasCapability(interceptor.deviceTags_)) {
+            continue;
+        }
         if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
             interceptor.SendToClient(pointerEvent);
             MMI_HILOGD("Pointer event was intercepted");

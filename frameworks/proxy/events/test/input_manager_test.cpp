@@ -2049,7 +2049,8 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_011, TestSize.Level1)
     injectDownEvent->AddPressedKeyItems(kitDown);
 
     auto interceptor = GetPtr<InputEventCallback>();
-    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor, 400) };
+    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor, 400, touchTags) };
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
 #else
@@ -2097,7 +2098,8 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_012, TestSize.Level1)
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
     auto interceptor = GetPtr<InputEventCallback>();
-    int32_t interceptorId = InputManager::GetInstance()->AddInterceptor(interceptor, 400);
+    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+    int32_t interceptorId = InputManager::GetInstance()->AddInterceptor(interceptor, 400, touchTags);
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
 #else
@@ -2146,8 +2148,9 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_013, TestSize.Level1)
 
     auto interceptor1 = GetPtr<PriorityHighCallback>();
     auto interceptor2 = GetPtr<PriorityMiddleCallback>();
-    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400) };
-    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500) };
+    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400, touchTags) };
+    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500, touchTags) };
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     EXPECT_TRUE(IsValidHandlerId(interceptorId1));
     EXPECT_TRUE(IsValidHandlerId(interceptorId2));
@@ -2200,14 +2203,16 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_014, TestSize.Level1)
     kitDown.SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
     kitDown.SetPressed(true);
     kitDown.SetDownTime(downTime);
+    kitDown.SetDeviceId(1);
     injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
 
     auto interceptor1 = GetPtr<PriorityHighCallback>();
     auto interceptor2 = GetPtr<PriorityMiddleCallback>();
-    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400) };
-    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500) };
+    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400, touchTags) };
+    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500, touchTags) };
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     EXPECT_TRUE(IsValidHandlerId(interceptorId1));
     EXPECT_TRUE(IsValidHandlerId(interceptorId2));
@@ -2260,14 +2265,16 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_015, TestSize.Level1)
     kitDown.SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
     kitDown.SetPressed(true);
     kitDown.SetDownTime(downTime);
+    kitDown.SetDeviceId(1);
     injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
 
     auto interceptor1 = GetPtr<PriorityHighCallback>();
     auto interceptor2 = GetPtr<PriorityMiddleCallback>();
-    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400) };
-    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500) };
+    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400, touchTags) };
+    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500, touchTags) };
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     EXPECT_TRUE(IsValidHandlerId(interceptorId1));
     EXPECT_TRUE(IsValidHandlerId(interceptorId2));

@@ -416,7 +416,7 @@ void InputManagerImpl::MoveMouse(int32_t offsetX, int32_t offsetY)
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor,
-    int32_t priority)
+    int32_t priority, uint32_t deviceTags)
 {
     CALL_INFO_TRACE;
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -426,7 +426,7 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputInterMgr->AddInterceptor(interceptor, HANDLE_EVENT_TYPE_ALL, priority);
+    return InputInterMgr->AddInterceptor(interceptor, HANDLE_EVENT_TYPE_ALL, priority, deviceTags);
 #else
     MMI_HILOGW("Interceptor function does not support");
     return ERROR_UNSUPPORT;
@@ -434,7 +434,7 @@ int32_t InputManagerImpl::AddInterceptor(std::shared_ptr<IInputEventConsumer> in
 }
 
 int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor,
-    int32_t priority)
+    int32_t priority, uint32_t deviceTags)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
@@ -445,7 +445,7 @@ int32_t InputManagerImpl::AddInterceptor(std::function<void(std::shared_ptr<KeyE
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputInterMgr->AddInterceptor(consumer, HANDLE_EVENT_TYPE_KEY, priority);
+    return InputInterMgr->AddInterceptor(consumer, HANDLE_EVENT_TYPE_KEY, priority, deviceTags);
 #else
     MMI_HILOGW("Keyboard device or interceptor function does not support");
     return ERROR_UNSUPPORT;
