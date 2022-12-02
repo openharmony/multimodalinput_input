@@ -210,7 +210,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
         MMI_HILOGE("keyItems is empty");
         return false;
     }
-    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(items.front().GetDeviceId());
+    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(keyItems.front().GetDeviceId());
     CHKPF(inputDevice);
     for (const auto &interceptor : interceptors_) {
         if (!inputDevice->HasCapability(interceptor.deviceTags_)) {
