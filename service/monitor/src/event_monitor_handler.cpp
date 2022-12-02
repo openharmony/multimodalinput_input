@@ -155,7 +155,7 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent>
 {
     CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
-    pkt << handlerType_;
+    pkt << handlerType_ << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write key event failed");
         return;
@@ -184,7 +184,7 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
             return;
         }
     }
-    pkt << handlerType_;
+    pkt << handlerType_ << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write pointer event failed");
         return;

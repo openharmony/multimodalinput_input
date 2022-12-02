@@ -358,7 +358,10 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
     READUINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t priority;
     READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = AddInputHandler(static_cast<InputHandlerType>(handlerType), eventType, priority);
+    int32_t deviceTags;
+    READINT32(data, deviceTags, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = AddInputHandler(static_cast<InputHandlerType>(handlerType), eventType, priority,
+        deviceTags);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AddInputHandler failed ret:%{public}d", ret);
         return ret;
@@ -388,7 +391,10 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
     READUINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t priority;
     READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = RemoveInputHandler(static_cast<InputHandlerType>(handlerType), eventType, priority);
+    int32_t deviceTags;
+    READINT32(data, deviceTags, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = RemoveInputHandler(static_cast<InputHandlerType>(handlerType), eventType, priority,
+        deviceTags);
     if (ret != RET_OK) {
         MMI_HILOGE("Call RemoveInputHandler failed ret:%{public}d", ret);
         return ret;

@@ -38,7 +38,7 @@ InputHandlerManager::InputHandlerManager()
 }
 
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
-    HandleEventType eventType, int32_t priority)
+    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     CALL_INFO_TRACE;
     CHKPR(consumer, INVALID_HANDLER_ID);
@@ -59,11 +59,11 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
     }
     const HandleEventType currentType = GetEventType();
     MMI_HILOGD("Register new handler:%{public}d", handlerId);
-    if (RET_OK == AddLocal(handlerId, handlerType, eventType, priority, consumer)) {
+    if (RET_OK == AddLocal(handlerId, handlerType, eventType, priority, deviceTags, consumer)) {
         MMI_HILOGD("New handler successfully registered, report to server");
         const HandleEventType newType = GetEventType();
         if (currentType != newType) {
-            int32_t ret = AddToServer(handlerType, newType, priority);
+            int32_t ret = AddToServer(handlerType, newType, priority, deviceTags);
             if (ret != RET_OK) {
                 MMI_HILOGD("Handler:%{public}d permissions failed, remove the monitor", handlerId);
                 RemoveLocal(handlerId, handlerType);
@@ -86,20 +86,22 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
         MMI_HILOGD("Handler:%{public}d unregistered, report to server", handlerId);
         const HandleEventType newType = GetEventType();
         const int32_t newLevel = GetPriority();
+        const uint64_t newTags = GetDeviceTags();
         if (currentType != newType) {
-            RemoveFromServer(handlerType, newType, newLevel);
+            RemoveFromServer(handlerType, newType, newLevel, newTags);
         }
     }
 }
 
-int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType,
-    HandleEventType eventType, int32_t priority, std::shared_ptr<IInputEventConsumer> monitor)
+int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType, HandleEventType eventType,
+    int32_t priority, uint32_t deviceTags, std::shared_ptr<IInputEventConsumer> monitor)
 {
     InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
         .handlerType_ = handlerType,
         .eventType_ = eventType,
         .priority_ = priority,
+        .deviceTags_ = deviceTags,
         .consumer_ = monitor,
     };
     auto ret = inputHandlers_.emplace(handler.handlerId_, handler);
@@ -124,9 +126,9 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
 }
 
 int32_t InputHandlerManager::AddToServer(InputHandlerType handlerType, HandleEventType eventType,
-    int32_t priority)
+    int32_t priority, uint32_t deviceTags)
 {
-    int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerType, eventType, priority);
+    int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerType, eventType, priority, deviceTags);
     if (ret != RET_OK) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
@@ -159,9 +161,9 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
 }
 
 void InputHandlerManager::RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType,
-    int32_t priority)
+    int32_t priority, uint32_t deviceTags)
 {
-    int32_t ret = MultimodalInputConnMgr->RemoveInputHandler(handlerType, eventType, priority);
+    int32_t ret = MultimodalInputConnMgr->RemoveInputHandler(handlerType, eventType, priority, deviceTags);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
@@ -186,7 +188,7 @@ std::shared_ptr<IInputEventConsumer> InputHandlerManager::FindHandler(int32_t ha
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent)
+void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint32_t deviceTags)
 {
     CHK_PID_AND_TID();
     CHKPV(keyEvent);
@@ -194,7 +196,8 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent)
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_INTERCEPT_EVENT);
     if (!interHandlers_.empty()) {
         for (const auto &item : interHandlers_) {
-            if ((item.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
+            if ((item.deviceTags_ !=  deviceTags) &&
+                ((item.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY)) {
                 continue;
             }
             int32_t handlerId = item.handlerId_;
@@ -220,14 +223,15 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent,
+void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags,
     std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos)
 {
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     int32_t consumerCount = 0;
     if (!interHandlers_.empty()) {
         for (const auto &item : interHandlers_) {
-            if ((item.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
+            if ((item.deviceTags_ !=  deviceTags) &&
+                ((item.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER)) {
                 continue;
             }
             int32_t handlerId = item.handlerId_;
@@ -274,13 +278,13 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
     }
 }
 
-void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags)
 {
     CHK_PID_AND_TID();
     CHKPV(pointerEvent);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
     std::map<int32_t, std::shared_ptr<IInputEventConsumer>> consumerInfos;
-    GetConsumerInfos(pointerEvent, consumerInfos);
+    GetConsumerInfos(pointerEvent, deviceTags, consumerInfos);
     for (const auto &iter : consumerInfos) {
         auto tempEvent = std::make_shared<PointerEvent>(*pointerEvent);
         tempEvent->SetProcessedCallback(monitorCallback_);
@@ -298,8 +302,9 @@ void InputHandlerManager::OnConnected()
     CALL_DEBUG_ENTER;
     HandleEventType eventType = GetEventType();
     int32_t priority = GetPriority();
+    uint32_t deviceTags = GetDeviceTags();
     if (eventType != HANDLE_EVENT_TYPE_NONE) {
-        AddToServer(GetHandlerType(), eventType, priority);
+        AddToServer(GetHandlerType(), eventType, priority, deviceTags);
     }
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
@@ -339,6 +344,19 @@ int32_t InputHandlerManager::GetPriority() const
         priority = interHandlers_.front().priority_;
     }
     return priority;
+}
+
+uint32_t InputHandlerManager::GetDeviceTags() const
+{
+    if (inputHandlers_.empty()) {
+        MMI_HILOGD("InputHandlers is empty");
+        return DEFUALT_INTERCEPTOR_PRIORITY;
+    }
+    uint32_t deviceTags { CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) };
+    if (!interHandlers_.empty()) {
+        deviceTags = interHandlers_.front().deviceTags_;
+    }
+    return deviceTags;
 }
 
 void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId)
