@@ -201,10 +201,6 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
     }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     bool isInterceptor = false;
-    std::vector<int32_t> ids = InputDevMgr->GetInputDeviceIds();
-    for (const auto &id : ids) {
-        MMI_HILOGD("id:%{public}d", id);
-    }
     std::vector<KeyEvent::KeyItem> keyItems = keyEvent->GetKeyItems();
     if (keyItems.empty()) {
         MMI_HILOGE("keyItems is empty");
@@ -237,10 +233,6 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
     }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     bool isInterceptor = false;
-    std::vector<int32_t> ids = InputDevMgr->GetInputDeviceIds();
-    for (const auto &id : ids) {
-        MMI_HILOGD("id:%{public}d", id);
-    }
     PointerEvent::PointerItem pointerItem;
     int32_t pointerId = pointerEvent->GetPointerId();
     if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
