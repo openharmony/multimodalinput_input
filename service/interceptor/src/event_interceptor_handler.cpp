@@ -201,7 +201,17 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
     }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     bool isInterceptor = false;
-    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(keyEvent->GetDeviceId());
+    std::vector<int32_t> ids = InputDevMgr->GetInputDeviceIds();
+    for (const auto &id : ids) {
+        MMI_HILOGD("id:%{public}d", id);
+    }
+    std::vector<KeyEvent::KeyItem> keyItems = keyEvent->GetKeyItems();
+    if (keyItems.empty()) {
+        MMI_HILOGE("keyItems is empty");
+        return false;
+    }
+    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(items.front().GetDeviceId());
+    CHKPF(inputDevice);
     for (const auto &interceptor : interceptors_) {
         if (!inputDevice->HasCapability(interceptor.deviceTags_)) {
             continue;
@@ -227,9 +237,20 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
     }
     MMI_HILOGD("There are currently:%{public}zu interceptors", interceptors_.size());
     bool isInterceptor = false;
-    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(pointerEvent->GetDeviceId());
+    std::vector<int32_t> ids = InputDevMgr->GetInputDeviceIds();
+    for (const auto &id : ids) {
+        MMI_HILOGD("id:%{public}d", id);
+    }
+    PointerEvent::PointerItem pointerItem;
+    int32_t pointerId = pointerEvent->GetPointerId();
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("GetPointerItem:%{public}d fail", pointerId);
+        return false;
+    }
+    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(pointerItem.GetDeviceId());
+    CHKPF(inputDevice);
     for (const auto &interceptor : interceptors_) {
-       if (!inputDevice->HasCapability(interceptor.deviceTags_)) {
+        if (!inputDevice->HasCapability(interceptor.deviceTags_)) {
             continue;
         }
         if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
