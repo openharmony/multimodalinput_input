@@ -67,9 +67,7 @@ private:
     bool GetSpeedGain(double vin, double &gain) const;
     void DumpInner();
     void InitAbsolution();
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
     void SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, libinput_event_pointer* data);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
