@@ -673,7 +673,8 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, int3
     
     auto iter = it->second.find(windowId);
     if (iter == it->second.end()) {
-        MMI_HILOGE("The window id is Invalid");
+        MMI_HILOGW("The window id is invalid");
+        pointerStyle = DEFAULT_POINTER_STYLE;
         return COMMON_PARAMETER_ERROR ;
     }
     
