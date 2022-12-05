@@ -99,7 +99,7 @@ private:
         void Dump(int32_t fd, const std::vector<std::string> &args);
 
     struct ConsumptionState {
-        std::unordered_set<int32_t> eventIds_;
+        std::set<int32_t> eventIds_;
         bool isMonitorConsumed_ { false };
         std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
     };

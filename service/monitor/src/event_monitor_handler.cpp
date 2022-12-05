@@ -30,6 +30,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventMonitorHandler" };
+constexpr size_t MAX_EVENTIDS_SIZE = 1000;
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -356,6 +357,10 @@ void EventMonitorHandler::MonitorCollection::UpdateConsumptionState(std::shared_
         sIter = tIter;
     }
     ConsumptionState &state = sIter->second;
+    if (state.eventIds_.size() >= MAX_EVENTIDS_SIZE) {
+        auto iter = state.eventIds_.begin();
+        state.eventIds_.erase(iter);
+    }
     auto [tIter, isOk] = state.eventIds_.emplace(pointerEvent->GetId());
     if (!isOk) {
         MMI_HILOGW("Failed to stash event");
