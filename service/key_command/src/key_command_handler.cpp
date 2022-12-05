@@ -870,7 +870,7 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
             isLaunchAbility = true;
             return true;
         }
-        sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay, 1, [this, sequence] () {
+        sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay/SECONDS_SYSTEM, 1, [this, sequence] () {
             MMI_HILOGD("Timer callback");
             LaunchAbility(sequence);
         });
