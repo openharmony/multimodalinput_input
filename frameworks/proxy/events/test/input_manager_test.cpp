@@ -1999,6 +1999,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_010, TestSize.Level1)
     kitDown.SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
     kitDown.SetPressed(true);
     kitDown.SetDownTime(downTime);
+    kitDown.SetDeviceId(1);
     injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
@@ -2044,6 +2045,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_011, TestSize.Level1)
     kitDown.SetKeyCode(KeyEvent::KEYCODE_SPACE);
     kitDown.SetPressed(true);
     kitDown.SetDownTime(downTime);
+    kitDown.SetDeviceId(1);
     injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_SPACE);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
