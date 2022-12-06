@@ -152,11 +152,6 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
 int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
-
     bool visible = false;
     READBOOL(data, visible, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetPointerVisible(visible);
@@ -171,11 +166,6 @@ int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, M
 int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
-
     bool visible = false;
     int32_t ret = IsPointerVisible(visible);
     if (ret != RET_OK) {
