@@ -592,7 +592,7 @@ int32_t MMIService::OnGetDevice(int32_t pid, int32_t userData, int32_t deviceId)
     pkt << userData << inputDevice->GetId() << inputDevice->GetName() << inputDevice->GetType()
         << inputDevice->GetBus() << inputDevice->GetProduct() << inputDevice->GetVendor()
         << inputDevice->GetVersion() << inputDevice->GetPhys() << inputDevice->GetUniq()
-        << inputDevice->GetAxisInfo().size();
+        << inputDevice->GetCapabilities() << inputDevice->GetAxisInfo().size();
     for (auto &axis : inputDevice->GetAxisInfo()) {
         pkt << axis.GetAxisType() << axis.GetMinimum() << axis.GetMaximum()
             << axis.GetFuzz() << axis.GetFlat() << axis.GetResolution();

@@ -261,7 +261,7 @@ int32_t MMIClient::Socket()
     int32_t ret = MultimodalInputConnMgr->AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AllocSocketPair return %{public}d", ret);
-        return RET_ERR;
+        return IMultimodalInputConnect::INVALID_SOCKET_FD;
     }
     fd_ = MultimodalInputConnMgr->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {

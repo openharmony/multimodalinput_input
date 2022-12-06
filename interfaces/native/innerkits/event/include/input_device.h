@@ -79,6 +79,8 @@ public:
     bool HasCapability(InputDeviceCapability cap) const;
     bool HasCapability(uint32_t deviceTags) const;
 
+    unsigned long GetCapabilities() const;
+    void SetCapabilities(unsigned long caps);
 
     class AxisInfo {
     public:
@@ -106,10 +108,12 @@ public:
         int32_t flat_ { 0 };
         int32_t resolution_ { 0 };
     };
+
     void AddAxisInfo(AxisInfo axis);
     std::vector<AxisInfo> GetAxisInfo();
     InputDevice(int32_t id, std::string name, int32_t deviceType, int32_t bus, int32_t version, int32_t product,
                 int32_t vendor, std::string phys, std::string uniq, std::vector<AxisInfo> axis);
+
 private:
     int32_t id_ { -1 };
     std::string name_ { "null" };
@@ -123,6 +127,16 @@ private:
     std::vector<AxisInfo> axis_;
     std::bitset<INPUT_DEV_CAP_MAX> capabilities_;
 };
+
+inline unsigned long InputDevice::GetCapabilities() const
+{
+    return capabilities_.to_ulong();
+}
+
+inline void InputDevice::SetCapabilities(unsigned long caps)
+{
+    capabilities_ = std::bitset<INPUT_DEV_CAP_MAX>(caps % (1 << INPUT_DEV_CAP_MAX));
+}
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_DEVICE_H
