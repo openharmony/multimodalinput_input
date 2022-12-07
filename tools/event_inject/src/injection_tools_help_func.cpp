@@ -142,12 +142,7 @@ bool InjectionToolsHelpFunc::JsonOption(int32_t argc, char **argv)
         std::cout<< "Wrong number of input parameters" << std::endl;
         return false;
     }
-    std::string jsonFile = argv[optind];
-    char realPath[PATH_MAX] = {};
-    if (realpath(jsonFile.c_str(), realPath) == nullptr) {
-        std::cout << "Json file path is error, path: " << jsonFile.c_str() << std::endl;
-        return false;
-    }
+    const std::string jsonFile = argv[optind];
     std::string jsonBuf = ReadJsonFile(jsonFile);
     if (jsonBuf.empty()) {
         return false;
