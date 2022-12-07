@@ -580,10 +580,6 @@ bool VirtualDevice::AddDevice(const std::string& startDeviceName)
 
 bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::vector<std::string>& deviceList)
 {
-    if (BrowseDirectory(g_folderPath).size() == 0) {
-        std::cout << "No device to off" <<std::endl;
-        return false;
-    }
     if (deviceList.empty()) {
         RemoveDir(g_folderPath);
         std::cout << "No start device" <<std::endl;
@@ -696,10 +692,14 @@ bool VirtualDevice::SelectOptions(int32_t argc, char **argv, int32_t &opt)
 
 bool VirtualDevice::ListOption(int32_t argc, char **argv)
 {
-    std::vector<std::string> deviceList = BrowseDirectory(g_folderPath);
     if (argc != PARAMETERS_QUERY_NUMBER) {
-        std::cout << "Invalid Input Para, Please Check the validity of the para" << std::endl;
+        std::cout << "Invalid Input Param, Please Check the validity of the para" << std::endl;
         return false;
+    }
+    std::vector<std::string> deviceList = BrowseDirectory(g_folderPath);
+    if (deviceList.empty()) {
+        std::cout << "No device information to query" << std::endl;
+        return true;
     }
     std::string::size_type pos;
     std::cout << "PID\tDEVICE" << std::endl;
@@ -715,7 +715,7 @@ bool VirtualDevice::ListOption(int32_t argc, char **argv)
 bool VirtualDevice::StartOption(int32_t argc, char **argv)
 {
     if (argc != PARAMETERS_NUMBER) {
-        std::cout << "Invalid Input Para, Please Check the validity of the para" << std::endl;
+        std::cout << "Invalid Input Param, Please Check the validity of the para" << std::endl;
         return false;
     }
     if (!AddDevice(argv[optind])) {
@@ -732,7 +732,7 @@ bool VirtualDevice::CloseOption(int32_t argc, char **argv)
 {
     std::vector<std::string> deviceList = BrowseDirectory(g_folderPath);
     if (argc != PARAMETERS_NUMBER) {
-        std::cout << "Invalid Input Para, Please Check the validity of the para" << std::endl;
+        std::cout << "Invalid Input Param, Please Check the validity of the para" << std::endl;
         return false;
     }
     if (!CloseDevice(argv[optind], deviceList)) {
@@ -746,7 +746,7 @@ bool VirtualDevice::CloseOption(int32_t argc, char **argv)
 bool VirtualDevice::HelpOption(int32_t argc, char **argv)
 {
     if (argc != PARAMETERS_QUERY_NUMBER) {
-        std::cout << "Invalid Input Para, Please Check the validity of the para" << std::endl;
+        std::cout << "Invalid Input Param, Please Check the validity of the para" << std::endl;
         return false;
     }
     ShowUsage();
