@@ -15,27 +15,11 @@
 
 #include "virtual_device.h"
 
-int32_t main(int32_t argc, const char *argv[])
+int32_t main(int32_t argc, char *argv[])
 {
-    if (argc == 1 || argc > PARAMETERS_NUMBER) {
-        std::cout << "Invalid Input Para, Please Check the validity of the para" << std::endl;
-        return 0;
+    if (!OHOS::MMI::VirtualDevice::CheckCommand(argc, argv)) {
+        std::cout << "Try './vuinput --help' for more information" << std::endl;
+        return -1;
     }
-    if (access(OHOS::MMI::g_folderPath.c_str(), F_OK) != 0) {
-        std::cout << "Directory " << OHOS::MMI::g_folderPath.c_str() << " did not exist, errno: " << errno << std::endl;
-        mkdir(OHOS::MMI::g_folderPath.c_str(), SYMBOL_FOLDER_PERMISSIONS);
-    }
-    std::vector<std::string> argvList;
-    for (uint16_t i = 0; i < argc; i++) {
-        argvList.push_back(argv[i]);
-    }
-    if (!OHOS::MMI::VirtualDevice::CommandBranch(argvList)) {
-        return 0;
-    }
-    static constexpr std::int32_t usleepTime = 1500000;
-    while (true) {
-        usleep(usleepTime);
-    }
-
     return 0;
 }
