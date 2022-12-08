@@ -941,7 +941,7 @@ int32_t MMIService::SetPointerLocation(int32_t x, int32_t y)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetPointerLocation,
         MouseEventHdr, x, y));
     if (ret != RET_OK) {
-        MMI_HILOGE("Set pointer speed failed,return %{public}d", ret);
+        MMI_HILOGE("Set pointer location failed,ret %{public}d", ret);
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
