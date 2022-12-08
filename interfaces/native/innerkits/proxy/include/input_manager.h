@@ -30,6 +30,7 @@
 #include "i_input_device_listener.h"
 #include "i_input_device_cooperate_listener.h"
 #include "i_input_event_consumer.h"
+#include "i_input_event_filter.h"
 #include "input_device.h"
 #include "key_option.h"
 
@@ -52,17 +53,8 @@ public:
      */
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
 
-    /**
-     * @brief Sets a globally unique input event filter.
-     * @param filter Indicates the input event filter to set. When an input event occurs, this filter is
-     * called and returns a value indicating whether to continue processing the input event.If the filter
-     * returns <b>true</b>, the processing of the input event ends. If the filter returns <b>false</b>,
-     * the processing of the input event continues.
-     * @return return Returns a value greater than or equal to <b>0</b> if the input event filter is added
-     * successfully; returns a value less than <b>0</b> otherwise.
-     * @since 9
-     */
-    int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);
+    int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority);
+    int32_t RemoveInputEventFilter(int32_t filterId);
 
     /**
      * @brief Sets a consumer for the window input event of the current process.

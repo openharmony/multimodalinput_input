@@ -37,9 +37,14 @@ void InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
     InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
 }
 
-int32_t InputManager::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
+int32_t InputManager::AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority)
 {
-    return InputMgrImpl.AddInputEventFilter(filter);
+    return InputMgrImpl.AddInputEventFilter(filter, priority);
+}
+
+int32_t InputManager::RemoveInputEventFilter(int32_t filterId)
+{
+    return InputMgrImpl.RemoveInputEventFilter(filterId);
 }
 
 void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)

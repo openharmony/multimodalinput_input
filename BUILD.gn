@@ -130,7 +130,10 @@ group("ut_mmi_debug_tools") {
 
 group("mmi_tests_manual") {
   testonly = true
-  deps = [ "service:TransformPointTest" ]
+  deps = [
+    "frameworks/proxy:InputManagerFilterManualTest",
+    "service:TransformPointTest",
+  ]
 }
 
 group("mmi_tests") {
