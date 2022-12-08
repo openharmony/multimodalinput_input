@@ -22,15 +22,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceContext" };
-
-enum KeyboardType {
-    NONE = 0,
-    UNKNOWN = 1,
-    ALPHABETIC_KEYBOARD = 2,
-    DIGITAL_KEYBOARD = 3,
-    HANDWRITING_PEN = 4,
-    REMOTE_CONTROL = 5,
-};
 constexpr uint32_t MIN_N_SIZE = 1;
 constexpr uint32_t MAX_N_SIZE = 5;
 } // namespace
@@ -38,7 +29,6 @@ constexpr uint32_t MAX_N_SIZE = 5;
 JsInputDeviceContext::JsInputDeviceContext()
 {
     mgr_ = std::make_shared<JsInputDeviceManager>();
-    CHKPL(mgr_);
 }
 
 JsInputDeviceContext::~JsInputDeviceContext()
@@ -94,6 +84,7 @@ napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info 
         MMI_HILOGI("jsvm ends");
         JsInputDeviceContext *context = static_cast<JsInputDeviceContext*>(data);
         delete context;
+        context = nullptr;
     }, nullptr, nullptr);
     if (status != napi_ok) {
         delete jsContext;
@@ -436,17 +427,17 @@ napi_value JsInputDeviceContext::CreateEnumKeyboardType(napi_env env, napi_value
 {
     CALL_DEBUG_ENTER;
     napi_value none = nullptr;
-    CHKRP(napi_create_int32(env, KeyboardType::NONE, &none), CREATE_INT32);
+    CHKRP(napi_create_int32(env, KeyboardType::KEYBOARD_TYPE_NONE, &none), CREATE_INT32);
     napi_value unknown = nullptr;
-    CHKRP(napi_create_int32(env, KeyboardType::UNKNOWN, &unknown), CREATE_INT32);
+    CHKRP(napi_create_int32(env, KeyboardType::KEYBOARD_TYPE_UNKNOWN, &unknown), CREATE_INT32);
     napi_value alphabeticKeyboard = nullptr;
-    CHKRP(napi_create_int32(env, KeyboardType::ALPHABETIC_KEYBOARD, &alphabeticKeyboard), CREATE_INT32);
+    CHKRP(napi_create_int32(env, KeyboardType::KEYBOARD_TYPE_ALPHABETICKEYBOARD, &alphabeticKeyboard), CREATE_INT32);
     napi_value digitalKeyboard = nullptr;
-    CHKRP(napi_create_int32(env, KeyboardType::DIGITAL_KEYBOARD, &digitalKeyboard), CREATE_INT32);
+    CHKRP(napi_create_int32(env, KeyboardType::KEYBOARD_TYPE_DIGITALKEYBOARD, &digitalKeyboard), CREATE_INT32);
     napi_value handwritingPen = nullptr;
-    CHKRP(napi_create_int32(env, KeyboardType::HANDWRITING_PEN, &handwritingPen), CREATE_INT32);
+    CHKRP(napi_create_int32(env, KeyboardType::KEYBOARD_TYPE_HANDWRITINGPEN, &handwritingPen), CREATE_INT32);
     napi_value remoteControl = nullptr;
-    CHKRP(napi_create_int32(env, KeyboardType::REMOTE_CONTROL, &remoteControl), CREATE_INT32);
+    CHKRP(napi_create_int32(env, KeyboardType::KEYBOARD_TYPE_REMOTECONTROL, &remoteControl), CREATE_INT32);
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("NONE", none),
         DECLARE_NAPI_STATIC_PROPERTY("UNKNOWN", unknown),

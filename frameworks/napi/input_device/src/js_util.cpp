@@ -121,6 +121,11 @@ bool JsUtil::GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_val
     }
     napi_value axisRanges = nullptr;
     CHKRF(napi_create_array(cb->env, &axisRanges), CREATE_ARRAY);
+    if (sourceType == nullptr) {
+        CHKRF(napi_set_named_property(cb->env, object, "axisRanges", axisRanges), SET_NAMED_PROPERTY);
+        MMI_HILOGD("SourceType not found");
+        return true;
+    }
     napi_value axisRange = nullptr;
     uint32_t i = 0;
     for (const auto &item : cb->data.device->GetAxisInfo()) {

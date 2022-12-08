@@ -759,6 +759,46 @@ void InputManagerTest::TestMarkConsumed(int32_t monitorId, int32_t eventId)
 }
 
 /**
+ * @tc.name: InputManagerTest_AddMonitor_001
+ * @tc.desc: Verify pointerevent monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto PointerEventFun = [](std::shared_ptr<PointerEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(PointerEventFun);
+#if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && defined(OHOS_BUILD_ENABLE_MONITOR)
+    ASSERT_NE(monitorId, INVALID_HANDLER_ID);
+#else
+    ASSERT_EQ(monitorId, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_MONITOR ||  OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+}
+
+/**
+ * @tc.name: InputManagerTest_AddMonitor_002
+ * @tc.desc: Verify keyevent monitor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_AddMonitor_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto keyEventFun = [](std::shared_ptr<KeyEvent> event) {
+        MMI_HILOGD("Add monitor success");
+    };
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(keyEventFun);
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_MONITOR)
+    ASSERT_NE(monitorId, INVALID_HANDLER_ID);
+#else
+    ASSERT_EQ(monitorId, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD || OHOS_BUILD_ENABLE_MONITOR
+}
+
+/**
  * @tc.name: MultimodalEventHandler_SimulateKeyEvent_001
  * @tc.desc: Verify simulate the back key is long pressed and lifted
  * @tc.type: FUNC
@@ -1698,16 +1738,20 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_004, TestSize.Level1)
 
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-    for (const auto &id : ids) {
+    for (size_t i = 0; i < ids.size(); ++i) {
         std::string sPointerEs = InputManagerTest::GetEventDump();
         MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-        ASSERT_TRUE(!sPointerEs.empty());
+        if (i == 0) {
+            ASSERT_TRUE(!sPointerEs.empty());
+        } else {
+            ASSERT_TRUE(sPointerEs.empty());
+        }
 #else
         ASSERT_TRUE(sPointerEs.empty());
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
-        if (IsValidHandlerId(id)) {
-            InputManager::GetInstance()->RemoveInterceptor(id);
+        if (IsValidHandlerId(ids[i])) {
+            InputManager::GetInstance()->RemoveInterceptor(ids[i]);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
@@ -1955,6 +1999,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_010, TestSize.Level1)
     kitDown.SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
     kitDown.SetPressed(true);
     kitDown.SetDownTime(downTime);
+    kitDown.SetDeviceId(1);
     injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
@@ -2000,12 +2045,14 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_011, TestSize.Level1)
     kitDown.SetKeyCode(KeyEvent::KEYCODE_SPACE);
     kitDown.SetPressed(true);
     kitDown.SetDownTime(downTime);
+    kitDown.SetDeviceId(1);
     injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_SPACE);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
 
     auto interceptor = GetPtr<InputEventCallback>();
-    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor) };
+    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+    int32_t interceptorId { InputManager::GetInstance()->AddInterceptor(interceptor, 400, touchTags) };
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     EXPECT_TRUE(IsValidHandlerId(interceptorId));
 #else
@@ -2016,7 +2063,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_011, TestSize.Level1)
     InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
 
     std::string sPointerEs = InputManagerTest::GetEventDump();
-    MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
+    MMI_HILOGD("PriorityLevel Test:sPointerEs:%{public}s", sPointerEs.c_str());
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
     ASSERT_TRUE(!sPointerEs.empty());
 #else
@@ -2025,6 +2072,265 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_011, TestSize.Level1)
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+
+/**
+ * @tc.name: TestInputEventInterceptor_012
+ * @tc.desc: Verify mouse interceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_012, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDownTime(10010);
+    item.SetPressed(true);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+
+    auto interceptor = GetPtr<InputEventCallback>();
+    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+    int32_t interceptorId = InputManager::GetInstance()->AddInterceptor(interceptor, 400, touchTags);
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    EXPECT_TRUE(IsValidHandlerId(interceptorId));
+#else
+    EXPECT_EQ(interceptorId, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+    std::string sPointerEs = InputManagerTest::GetEventDump();
+    MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+    ASSERT_TRUE(!sPointerEs.empty());
+#else
+    ASSERT_TRUE(sPointerEs.empty());
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
+    if (IsValidHandlerId(interceptorId)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+
+/**
+ * @tc.name: TestInputEventInterceptor_013
+ * @tc.desc: Verify mouse interceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_013, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDownTime(10010);
+    item.SetPressed(true);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+
+    auto interceptor1 = GetPtr<PriorityHighCallback>();
+    auto interceptor2 = GetPtr<PriorityMiddleCallback>();
+    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400, touchTags) };
+    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500, touchTags) };
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    EXPECT_TRUE(IsValidHandlerId(interceptorId1));
+    EXPECT_TRUE(IsValidHandlerId(interceptorId2));
+#else
+    EXPECT_EQ(interceptorId1, ERROR_UNSUPPORT);
+    EXPECT_EQ(interceptorId2, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+    for (size_t i = 0; i < 2; ++i) {
+        std::string sPointerEs = InputManagerTest::GetEventDump();
+        MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
+    #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+        if (i == 0) {
+            EXPECT_EQ(sPointerEs, "Call high interceptor");
+        } else {
+            ASSERT_TRUE(sPointerEs.empty());
+        }
+    #else
+        ASSERT_TRUE(sPointerEs.empty());
+    #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
+    }
+
+    if (IsValidHandlerId(interceptorId1)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+
+    if (IsValidHandlerId(interceptorId2)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId2);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+
+/**
+ * @tc.name: TestInputEventInterceptor_014
+ * @tc.desc: Verify space key interceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_014, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    kitDown.SetDeviceId(1);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+
+    auto interceptor1 = GetPtr<PriorityHighCallback>();
+    auto interceptor2 = GetPtr<PriorityMiddleCallback>();
+    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400, touchTags) };
+    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500, touchTags) };
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    EXPECT_TRUE(IsValidHandlerId(interceptorId1));
+    EXPECT_TRUE(IsValidHandlerId(interceptorId2));
+#else
+    EXPECT_EQ(interceptorId1, ERROR_UNSUPPORT);
+    EXPECT_EQ(interceptorId2, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    for (size_t i = 0; i < 2; ++i) {
+        std::string sPointerEs = InputManagerTest::GetEventDump();
+        MMI_HILOGD("PriorityLevel Test:sPointerEs:%{public}s", sPointerEs.c_str());
+    #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+        if (i == 0) {
+            EXPECT_EQ(sPointerEs, "Call high interceptor");
+        } else {
+            ASSERT_TRUE(sPointerEs.empty());
+        }
+    #else
+        ASSERT_TRUE(sPointerEs.empty());
+    #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
+    }
+
+    if (IsValidHandlerId(interceptorId1)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+
+    if (IsValidHandlerId(interceptorId2)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId2);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+
+/**
+ * @tc.name: TestInputEventInterceptor_015
+ * @tc.desc: Verify space key interceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_015, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    kitDown.SetDeviceId(1);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+
+    auto interceptor1 = GetPtr<PriorityHighCallback>();
+    auto interceptor2 = GetPtr<PriorityMiddleCallback>();
+    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+    int32_t interceptorId1 { InputManager::GetInstance()->AddInterceptor(interceptor1, 400, touchTags) };
+    int32_t interceptorId2 { InputManager::GetInstance()->AddInterceptor(interceptor2, 500, touchTags) };
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+    EXPECT_TRUE(IsValidHandlerId(interceptorId1));
+    EXPECT_TRUE(IsValidHandlerId(interceptorId2));
+#else
+    EXPECT_EQ(interceptorId1, ERROR_UNSUPPORT);
+    EXPECT_EQ(interceptorId2, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+    if (IsValidHandlerId(interceptorId1)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
+    for (size_t i = 0; i < 3; ++i) {
+        std::string sPointerEs = InputManagerTest::GetEventDump();
+        MMI_HILOGD("PriorityLevel Test:sPointerEs:%{public}s", sPointerEs.c_str());
+    #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+        if (i == 0) {
+            EXPECT_EQ(sPointerEs, "Call middle interceptor");
+        } else {
+            ASSERT_TRUE(sPointerEs.empty());
+        }
+    #else
+        ASSERT_TRUE(sPointerEs.empty());
+    #endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
+    }
+
+    if (IsValidHandlerId(interceptorId2)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId2);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+
+/**
+ * @tc.name: TestInputEventInterceptor_016
+ * @tc.desc: Verify keyevent interceptor
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, TestInputEventInterceptor_016, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto fun = [](std::shared_ptr<KeyEvent> keyEvent) {
+        MMI_HILOGD("Add interceptor success");
+    };
+    int32_t interceptorId = InputManager::GetInstance()->AddInterceptor(fun);
+#if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
+    ASSERT_NE(interceptorId, INVALID_HANDLER_ID);
+#else
+    ASSERT_EQ(interceptorId, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
+    if (IsValidHandlerId(interceptorId)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
     }
 }
 
@@ -3366,7 +3672,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_TouchScreenHotArea_002, TestSize.Lev
 
 /**
  * @tc.name: InputManagerTest_MouseHotArea_001
- * @tc.desc: mouse event Search window by pointerHotAreas
+ * @tc.desc: Mouse event Search window by pointerHotAreas
  * @tc.type: FUNC
  * @tc.require: I5HMCB
  */
@@ -3381,7 +3687,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseHotArea_001, TestSize.Level1)
 
 /**
  * @tc.name: InputManagerTest_MouseHotArea_002
- * @tc.desc: mouse event Search window by pointerHotAreas
+ * @tc.desc: Mouse event Search window by pointerHotAreas
  * @tc.type: FUNC
  * @tc.require: I5HMCB
  */
@@ -3391,6 +3697,269 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseHotArea_002, TestSize.Level1)
     std::shared_ptr<PointerEvent> pointerEvent { SetupmouseEvent002() };
     ASSERT_TRUE(pointerEvent != nullptr);
     ASSERT_EQ(pointerEvent->GetSourceType(), PointerEvent::SOURCE_TYPE_MOUSE);
+}
+
+/**
+ * @tc.name: InputManagerTest_UpdateDisplayInfo
+ * @tc.desc: Update window information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = 0;
+    displayGroupInfo.width = 0;
+    displayGroupInfo.height = 0;
+    InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
+    ASSERT_TRUE(displayGroupInfo.displaysInfo.empty());
+}
+
+/**
+ * @tc.name: InputManagerTest_SetInputDevice
+ * @tc.desc: Set input device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetInputDevice, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    std::string dhid("");
+    std::string screenId("");
+    int32_t ret = InputManager::GetInstance()->SetInputDevice(dhid, screenId);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    ASSERT_EQ(ret, RET_ERR);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+}
+
+/**
+ * @tc.name: InputManagerTest_RegisterCooperateListener_001
+ * @tc.desc: Register cooperate listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_RegisterCooperateListener_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<IInputDeviceCooperateListener> consumer = nullptr;
+    int32_t ret = InputManager::GetInstance()->RegisterCooperateListener(consumer);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    ASSERT_EQ(ret, RET_ERR);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+}
+
+/**
+ * @tc.name: InputManagerTest_RegisterCooperateListener_002
+ * @tc.desc: Register cooperate listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_RegisterCooperateListener_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    class InputDeviceCooperateListenerTest : public IInputDeviceCooperateListener {
+    public:
+        InputDeviceCooperateListenerTest() : IInputDeviceCooperateListener() {}
+        void OnCooperateMessage(const std::string &deviceId, CooperationMessage msg) override
+        {
+            MMI_HILOGD("RegisterCooperateListenerTest");
+        };
+    };
+    std::shared_ptr<InputDeviceCooperateListenerTest> consumer = std::make_shared<InputDeviceCooperateListenerTest>();
+    int32_t ret = InputManager::GetInstance()->RegisterCooperateListener(consumer);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+    ret = InputManager::GetInstance()->UnregisterCooperateListener(consumer);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+}
+
+/**
+ * @tc.name: InputManagerTest_UnregisterCooperateListener
+ * @tc.desc: Unregister cooperate listener
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UnregisterCooperateListener, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<IInputDeviceCooperateListener> consumer = nullptr;
+    int32_t ret = InputManager::GetInstance()->UnregisterCooperateListener(consumer);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+}
+
+/**
+ * @tc.name: InputManagerTest_EnableInputDeviceCooperate
+ * @tc.desc: Enable input device cooperate
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_EnableInputDeviceCooperate, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool enabled = false;
+    auto fun = [](std::string listener, CooperationMessage cooperateMessages) {
+        MMI_HILOGD("Enable input device cooperate success");
+    };
+    int32_t ret = InputManager::GetInstance()->EnableInputDeviceCooperate(enabled, fun);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+}
+
+/**
+ * @tc.name: InputManagerTest_StartInputDeviceCooperate
+ * @tc.desc: Start input device cooperate
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_StartInputDeviceCooperate, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::string sinkDeviceId("");
+    int32_t srcInputDeviceId = -1;
+    auto fun = [](std::string listener, CooperationMessage cooperateMessages) {
+        MMI_HILOGD("Start input device cooperate success");
+    };
+    int32_t ret = InputManager::GetInstance()->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, fun);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    ASSERT_NE(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+}
+
+/**
+ * @tc.name: InputManagerTest_StopDeviceCooperate
+ * @tc.desc: Stop device cooperate
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_StopDeviceCooperate, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto fun = [](std::string listener, CooperationMessage cooperateMessages) {
+        MMI_HILOGD("Start input device cooperate success");
+    };
+    int32_t ret = InputManager::GetInstance()->StopDeviceCooperate(fun);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    ASSERT_NE(ret, ERROR_UNSUPPORT);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+}
+
+/**
+ * @tc.name: InputManagerTest_GetInputDeviceCooperateState
+ * @tc.desc: Get input device cooperate state
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetInputDeviceCooperateState, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    const std::string deviceId("");
+    auto fun = [](bool state) {
+        MMI_HILOGD("Get inputdevice state success");
+    };
+    int32_t ret = InputManager::GetInstance()->GetInputDeviceCooperateState(deviceId, fun);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    ASSERT_EQ(ret, RET_OK);
+#else
+    ASSERT_EQ(ret, ERROR_UNSUPPORT);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+}
+
+/**
+ * @tc.name: InputManagerTest_GetDevice_001
+ * @tc.desc: Verify the fetch device info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = 0;
+    auto callback = [](std::shared_ptr<InputDevice> inputDevice) {
+        MMI_HILOGD("Get device success");
+        ASSERT_TRUE(inputDevice != nullptr);
+    };
+    int32_t ret = InputManager::GetInstance()->GetDevice(deviceId, callback);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetDevice_002
+ * @tc.desc: Verify the fetch device info
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetDevice_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = -1;
+    auto callback = [](std::shared_ptr<InputDevice> inputDevice) {
+        MMI_HILOGD("Get device success");
+        ASSERT_TRUE(inputDevice != nullptr);
+    };
+    int32_t ret = InputManager::GetInstance()->GetDevice(deviceId, callback);
+    ASSERT_NE(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetDeviceIds
+ * @tc.desc: Verify the fetch device list
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetDeviceIds, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto callback = [](std::vector<int32_t> ids) {
+        MMI_HILOGD("Get device success");
+    };
+    int32_t ret = InputManager::GetInstance()->GetDeviceIds(callback);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetAnrObserver
+ * @tc.desc: Verify the observer for events
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetAnrObserver, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    class IAnrObserverTest : public IAnrObserver {
+    public:
+        IAnrObserverTest() : IAnrObserver() {}
+        virtual ~IAnrObserverTest() {}
+        void OnAnr(int32_t pid) const override
+        {
+            MMI_HILOGD("Set anr success");
+        };
+    };
+
+    std::shared_ptr<IAnrObserverTest> observer = std::make_shared<IAnrObserverTest>();
+    InputManager::GetInstance()->SetAnrObserver(observer);
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupTabletToolEvent001()

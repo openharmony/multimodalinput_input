@@ -15,8 +15,8 @@
 
 #include "device_base.h"
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 namespace {
 constexpr int32_t FIRST_FINGER = 1;
 constexpr int32_t SECOND_FINGER = 2;
@@ -481,3 +481,5 @@ void DeviceBase::SetThrottle(InputEventArray& inputEventArray, int64_t blockTime
     SetTimeToLibinputEvent(injectEvent);
     inputEventArray.events.push_back(injectEvent);
 }
+} // namespace MMI
+} // namespace OHOS

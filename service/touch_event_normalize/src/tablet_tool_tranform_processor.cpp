@@ -168,6 +168,7 @@ bool TabletToolTransformProcessor::OnTipDown(struct libinput_event_tablet_tool* 
     item.SetTiltY(tiltY);
     item.SetPressure(pressure);
     item.SetToolType(toolType);
+    item.SetTargetWindowId(-1);
 
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);

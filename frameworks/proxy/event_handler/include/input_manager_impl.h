@@ -35,7 +35,6 @@
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
 #include "i_anr_observer.h"
-#include "i_input_event_consumer.h"
 #include "key_option.h"
 #include "pointer_event.h"
 
@@ -74,8 +73,12 @@ public:
     void MarkConsumed(int32_t monitorId, int32_t eventId);
     void MoveMouse(int32_t offsetX, int32_t offsetY);
 
-    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
-    int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
+    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor,
+        int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
+        uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
+    int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor,
+        int32_t priority = DEFUALT_INTERCEPTOR_PRIORITY,
+        uint32_t deviceTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX));
     void RemoveInterceptor(int32_t interceptorId);
 
     void SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent);

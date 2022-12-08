@@ -35,13 +35,11 @@ public:
     virtual ~UDSSocketUnitTest() {}
 };
 
-#if BINDER_TODO
-
 HWTEST_F(UDSSocketTest, Close, TestSize.Level1)
 {
     UDSSocketUnitTest socObj;
-    int32_t retResult = socObj.Close();
-    EXPECT_EQ(RET_OK, retResult);
+    socObj.Close();
+    EXPECT_EQ(-1, socObj.GetFd());
 }
 
 HWTEST_F(UDSSocketTest, EpollCreate_001, TestSize.Level1)
@@ -50,7 +48,7 @@ HWTEST_F(UDSSocketTest, EpollCreate_001, TestSize.Level1)
 
     UDSSocketUnitTest socObj;
     int32_t retResult = socObj.EpollCreate(size);
-    ASSERT_EQ(-1, retResult);
+    ASSERT_LE(retResult, 0);
 }
 
 HWTEST_F(UDSSocketTest, EpollCreate_002, TestSize.Level1)
@@ -59,7 +57,7 @@ HWTEST_F(UDSSocketTest, EpollCreate_002, TestSize.Level1)
 
     UDSSocketUnitTest socObj;
     int32_t retResult = socObj.EpollCreate(size);
-    ASSERT_EQ(-1, retResult);
+    ASSERT_LE(retResult, 0);
 }
 
 HWTEST_F(UDSSocketTest, EpollCtl_001, TestSize.Level1)
@@ -134,6 +132,5 @@ HWTEST_F(UDSSocketTest, EpollWait_004, TestSize.Level1)
     int32_t retResult = socObj.EpollWait(*events, MAX_EVENT_SIZE, timeout);
     ASSERT_EQ(-1, retResult);
 }
-#endif
 } // namespace MMI
 } // namespace OHOS
