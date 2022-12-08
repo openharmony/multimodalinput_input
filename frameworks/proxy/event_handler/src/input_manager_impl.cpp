@@ -907,7 +907,7 @@ void InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
     }
 #else
     MMI_HILOGW("Pointer device or pointer drawing module does not support");
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 } // namespace MMI
 } // namespace OHOS

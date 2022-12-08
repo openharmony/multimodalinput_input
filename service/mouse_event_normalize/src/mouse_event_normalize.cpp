@@ -477,7 +477,7 @@ void MouseEventNormalize::SetAbsolutionLocation(double xPercent, double yPercent
 
 int32_t MouseEventNormalize::SetPointerLocation(int32_t x, int32_t y)
 {
-    MMI_HILOGI("Cross screen location, x:%{public}d, yPercent:%{public}d",x, y);
+    MMI_HILOGI("Location, x:%{public}d, y:%{public}d",x, y);
     auto displayGroupInfo = WinMgr->GetDisplayGroupInfo();
     if (currentDisplayId_ == -1) {
         if (displayGroupInfo.displaysInfo.empty()) {
