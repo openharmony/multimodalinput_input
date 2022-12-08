@@ -25,7 +25,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MmiSe
 
 int32_t main(int32_t argc, const char *argv[])
 {
-        auto service = OHOS::DelayedSingleton<MMIService>::GetInstance();
+    auto service = OHOS::DelayedSingleton<MMIService>::GetInstance();
     service->OnStart();
     constexpr int32_t sleepTime = 10 * 60;
     while (1) {
