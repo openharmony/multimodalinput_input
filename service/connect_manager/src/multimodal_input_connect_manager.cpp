@@ -266,6 +266,12 @@ int32_t MultimodalInputConnectManager::SetFunctionKeyState(int32_t funcKey, bool
     return multimodalInputConnectService_->SetFunctionKeyState(funcKey, enable);
 }
 
+int32_t MultimodalInputConnectManager::SetPointerLocation(int32_t x, int32_t y)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetPointerLocation(x, y);
+}
+
 bool MultimodalInputConnectManager::ConnectMultimodalInputService()
 {
     CALL_DEBUG_ENTER;

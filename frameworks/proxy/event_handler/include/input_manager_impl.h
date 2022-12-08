@@ -114,6 +114,7 @@ public:
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
     bool GetFunctionKeyState(int32_t funcKey);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
+    void SetPointerLocation(int32_t x, int32_t y);
 
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
