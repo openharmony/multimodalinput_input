@@ -15,6 +15,8 @@
 
 #include "input_device_impl.h"
 
+#include <algorithm>
+
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
@@ -46,14 +48,17 @@ int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevLi
         MMI_HILOGE("Find change failed");
         return RET_ERR;
     }
-    for (const auto &item : iter->second) {
-        if (item == listener) {
-            MMI_HILOGW("The listener already exists");
-            return RET_ERR;
-        }
+    auto &listeners = iter->second;
+
+    if (std::all_of(listeners.cbegin(), listeners.cend(),
+                    [listener](InputDevListenerPtr tListener) {
+                        return (tListener != listener);
+                    })) {
+        MMI_HILOGI("Add device listener");
+        listeners.push_back(listener);
+    } else {
+        MMI_HILOGW("The listener already exists");
     }
-    auto monitor = listener;
-    iter->second.push_back(monitor);
     if (!isListeningProcess_) {
         MMI_HILOGI("Start monitoring");
         isListeningProcess_ = true;
@@ -276,7 +281,6 @@ int32_t InputDeviceImpl::GetUserData()
 std::shared_ptr<InputDevice> InputDeviceImpl::DevDataUnmarshalling(NetPacket &pkt)
 {
     auto devData = std::make_shared<InputDevice>();
-    CHKPP(devData);
     int32_t deviceId;
     std::string name;
     int32_t deviceType;
@@ -286,7 +290,8 @@ std::shared_ptr<InputDevice> InputDeviceImpl::DevDataUnmarshalling(NetPacket &pk
     int32_t version;
     std::string phys;
     std::string uniq;
-    pkt >> deviceId >> name >> deviceType >> bus >> product >> vendor >> version >> phys >> uniq;
+    unsigned long caps;
+    pkt >> deviceId >> name >> deviceType >> bus >> product >> vendor >> version >> phys >> uniq >> caps;
     devData->SetId(deviceId);
     devData->SetName(name);
     devData->SetType(deviceType);
@@ -296,6 +301,7 @@ std::shared_ptr<InputDevice> InputDeviceImpl::DevDataUnmarshalling(NetPacket &pk
     devData->SetVersion(version);
     devData->SetPhys(phys);
     devData->SetUniq(uniq);
+    devData->SetCapabilities(caps);
 
     size_t size;
     pkt >> size;

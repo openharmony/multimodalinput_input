@@ -1125,7 +1125,6 @@ bool KeyEvent::WriteToParcel(Parcel &out) const
         }
     }
     WRITEINT32(out, keyAction_);
-
     return true;
 }
 
@@ -1147,7 +1146,6 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
         keys_.push_back(val);
     }
     READINT32(in, keyAction_);
-
     return true;
 }
 

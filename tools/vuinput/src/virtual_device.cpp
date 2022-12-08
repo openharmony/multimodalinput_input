@@ -49,6 +49,7 @@ namespace {
 constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int32_t INVALID_FILE_SIZE = -1;
 constexpr int32_t FILE_POWER = 0777;
+constexpr int32_t SLEEP_TIME = 1500000;
 const std::string PROC_PATH = "/proc";
 const std::string VIRTUAL_DEVICE_NAME = "vuinput";
 const std::string g_pid = std::to_string(getpid());
@@ -120,7 +121,7 @@ static void RemoveDir(const std::string& filePath)
         }
         if (ptr->d_type == DT_REG) {
             std::string rmFile = filePath + ptr->d_name;
-            if (std::remove(rmFile.c_str()) != 0) {
+            if (remove(rmFile.c_str()) != 0) {
                 std::cout << "Remove file:" << rmFile << " failed" << std::endl;
             }
         } else if (ptr->d_type == DT_DIR) {
@@ -300,37 +301,45 @@ bool VirtualDevice::ClearFileResidues(const std::string& fileName)
     const std::string filePath = processPath + "cmdline";
     std::string temp;
     std::string processName;
+    DIR *dir = nullptr;
     if (!CheckFileName(fileName)) {
         std::cout << "File name check error" << std::endl;
-        goto RELEASE_RES;
+        goto RELEASE_RES1;
     }
     if (pos == std::string::npos) {
         std::cout << "Failed to create file" << std::endl;
-        goto RELEASE_RES;
+        goto RELEASE_RES1;
     }
-    DIR *dir = nullptr;
+    if (!IsFileExists(processPath)) {
+        std::cout <<  processPath << " folder does not exist" << std::endl;
+        goto RELEASE_RES1;
+    }
     dir = opendir(processPath.c_str());
     if (dir == nullptr) {
         std::cout << "Useless flag file:" << processPath << std::endl;
-        return false;
+        goto RELEASE_RES1;
     }
     temp = ReadUinputToolFile(filePath);
     if (temp.empty()) {
         std::cout << "Temp is empty" << std::endl;
-        goto RELEASE_RES;
+        goto RELEASE_RES2;
     }
     processName.append(temp);
-    if (processName.find(VIRTUAL_DEVICE_NAME.c_str()) != std::string::npos) {
-        if (closedir(dir) != 0) {
-            std::cout << "Close dir:" << processPath << " failed" << std::endl;
-        }
-        return true;
+    if (processName.find(VIRTUAL_DEVICE_NAME.c_str()) == std::string::npos) {
+        std::cout << "Process name is wrong" << std::endl;
+        goto RELEASE_RES2;
     }
-    RELEASE_RES:
+    return true;
+    RELEASE_RES1:
+    if (remove((g_folderPath + fileName).c_str()) != 0) {
+        std::cout << "Remove file failed" << std::endl;
+    }
+    return false;
+    RELEASE_RES2:
     if (closedir(dir) != 0) {
         std::cout << "Close dir failed" << std::endl;
     }
-    if (std::remove((g_folderPath + fileName).c_str()) != 0) {
+    if (remove((g_folderPath + fileName).c_str()) != 0) {
         std::cout << "Remove file failed" << std::endl;
     }
     return false;
@@ -557,9 +566,6 @@ bool VirtualDevice::AddDevice(const std::string& startDeviceName)
         std::cout << "Failed to start device: " << startDeviceName <<std::endl;
         return false;
     }
-    if (!IsFileExists(g_folderPath)) {
-        mkdir(g_folderPath.c_str(), FILE_POWER);
-    }
     std::string symbolFile;
     symbolFile.append(g_folderPath).append(g_pid).append("_").append(startDeviceName);
     std::ofstream flagFile;
@@ -568,15 +574,12 @@ bool VirtualDevice::AddDevice(const std::string& startDeviceName)
         std::cout << "Failed to create file" <<std::endl;
         return false;
     }
+    flagFile.close();
     return true;
 }
 
 bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::vector<std::string>& deviceList)
 {
-    if (BrowseDirectory(g_folderPath).size() == 0) {
-        std::cout << "No device to off" <<std::endl;
-        return false;
-    }
     if (deviceList.empty()) {
         RemoveDir(g_folderPath);
         std::cout << "No start device" <<std::endl;
@@ -592,8 +595,9 @@ bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::v
     for (const auto &it : deviceList) {
         if (it.find(closeDeviceName) == 0) {
             kill(std::stoi(it), SIGKILL);
-            if (BrowseDirectory(g_folderPath).size() == 0) {
-                RemoveDir(g_folderPath);
+            remove((g_folderPath + it).c_str());
+            if (BrowseDirectory(g_folderPath).empty()) {
+                    RemoveDir(g_folderPath);
             }
             return true;
         }
@@ -602,46 +606,151 @@ bool VirtualDevice::CloseDevice(const std::string& closeDeviceName, const std::v
     return false;
 }
 
-bool VirtualDevice::CommandBranch(std::vector<std::string>& argvList)
+bool VirtualDevice::CheckCommand(int32_t argc, char **argv)
 {
-    std::vector<std::string> deviceList = BrowseDirectory(g_folderPath);
-    if (argvList[1] == "start") {
-        if (argvList.size() != PARAMETERS_NUMBER) {
-            std::cout << "Invalid Input Para, Please Check the validity of the para" << std::endl;
-            return false;
-        }
-        if (!AddDevice(argvList.back())) {
-            std::cout << "Failed to create device" << std::endl;
-            return false;
-        }
-        return true;
-    } else if (argvList[1] == "list") {
-        if (argvList.size() != PARAMETERS_QUERY_NUMBER) {
-            std::cout << "Invalid Input Para, Please Check the validity of the para" << std::endl;
-            return false;
-        }
-        std::string::size_type pos;
-        std::cout << "PID\tDEVICE" << std::endl;
-        for (const auto &item : deviceList) {
-            pos = item.find("_");
-            std::cout << item.substr(0, pos) << "\t" << item.substr(pos + 1, item.size() - pos - 1) << std::endl;
-        }
-        return false;
-    } else if (argvList[1] == "close") {
-        if (argvList.size() != PARAMETERS_NUMBER) {
-            std::cout << "Invalid Input Para, Please Check the validity of the para" << std::endl;
-            return false;
-        }
-        if (!CloseDevice(argvList.back(), deviceList)) {
-            return false;
-        } else {
-            std::cout << "device closed successfully" << std::endl;
-            return false;
-        }
-    } else {
-        std::cout << "The command line format is incorrect" << std::endl;
+    int32_t c = -1;
+    if (!SelectOptions(argc, argv, c)) {
+        std::cout << "Select option failed" << std::endl;
         return false;
     }
+    if (!IsFileExists(g_folderPath)) {
+        mkdir(g_folderPath.c_str(), FILE_POWER);
+    }
+    switch (c) {
+        case 'L': {
+            if (!ListOption(argc, argv)) {
+                std::cout << "Device query failed" << std::endl;
+                return false;
+            }
+            break;
+        }
+        case 'S': {
+            if (!StartOption(argc, argv)) {
+                std::cout << "Device start failed" << std::endl;
+                return false;
+            }
+            break;
+        }
+        case 'C': {
+            if (!CloseOption(argc, argv)) {
+                std::cout << "Device close failed" << std::endl;
+                return false;
+            }
+            break;
+        }
+        case '?': {
+            if (!HelpOption(argc, argv)) {
+                std::cout << "Failed to ask for help" << std::endl;
+                return false;
+            }
+            break;
+        }
+        default: {
+            std::cout << "The command line format is incorrect" << std::endl;
+            return false;
+        }
+    }
+    return true;
+}
+
+bool VirtualDevice::SelectOptions(int32_t argc, char **argv, int32_t &opt)
+{
+    if (argc < PARAMETERS_QUERY_NUMBER) {
+        std::cout << "Please enter options or parameters" << std::endl;
+        return false;
+    }
+    struct option longOptions[] = {
+        {"list", no_argument, NULL, 'L'},
+        {"start", no_argument, NULL, 'S'},
+        {"close", no_argument, NULL, 'C'},
+        {"help", no_argument, NULL, '?'},
+        {NULL, 0, NULL, 0}
+    };
+    std::string inputOptions = argv[optind];
+    if (inputOptions.find('-') == inputOptions.npos) {
+        for (uint32_t i = 0; i < sizeof(longOptions) / sizeof(struct option) - 1; ++i) {
+            if (longOptions[i].name == inputOptions) {
+                opt = longOptions[i].val;
+                optind++;
+                break;
+            }
+        }
+    } else if ((inputOptions.length() != PARAMETERS_QUERY_NUMBER) &&
+               (inputOptions[inputOptions.find('-') + 1] != '-')) {
+        std::cout << "More than one short option is not supported" << std::endl;
+        return false;
+    } else {
+        int32_t optionIndex = 0;
+        opt = getopt_long(argc, argv, "LSC?", longOptions, &optionIndex);
+    }
+    if (opt == -1) {
+        std::cout << "Nonstandard input parameters" << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool VirtualDevice::ListOption(int32_t argc, char **argv)
+{
+    if (argc != PARAMETERS_QUERY_NUMBER) {
+        std::cout << "Invalid Input Param, Please Check the validity of the para" << std::endl;
+        return false;
+    }
+    std::vector<std::string> deviceList = BrowseDirectory(g_folderPath);
+    if (deviceList.empty()) {
+        std::cout << "No device information to query" << std::endl;
+        return true;
+    }
+    std::string::size_type pos;
+    std::cout << "PID\tDEVICE" << std::endl;
+    for (const auto &item : deviceList) {
+        pos = item.find("_");
+        if (pos != std::string::npos) {
+            std::cout << item.substr(0, pos) << "\t" << item.substr(pos + 1, item.size() - pos - 1) << std::endl;
+        }
+    }
+    return true;
+}
+
+bool VirtualDevice::StartOption(int32_t argc, char **argv)
+{
+    if (argc != PARAMETERS_NUMBER) {
+        std::cout << "Invalid Input Param, Please Check the validity of the para" << std::endl;
+        return false;
+    }
+    if (!AddDevice(argv[optind])) {
+        std::cout << "Failed to create device" << std::endl;
+        return false;
+    }
+    while (true) {
+        usleep(SLEEP_TIME);
+    }
+    return true;
+}
+
+bool VirtualDevice::CloseOption(int32_t argc, char **argv)
+{
+    std::vector<std::string> deviceList = BrowseDirectory(g_folderPath);
+    if (argc != PARAMETERS_NUMBER) {
+        std::cout << "Invalid Input Param, Please Check the validity of the para" << std::endl;
+        return false;
+    }
+    if (!CloseDevice(argv[optind], deviceList)) {
+        std::cout << "Failed to closed device" << std::endl;
+        return false;
+    }
+    std::cout << "device closed successfully" << std::endl;
+    return true;
+}
+
+bool VirtualDevice::HelpOption(int32_t argc, char **argv)
+{
+    if (argc != PARAMETERS_QUERY_NUMBER) {
+        std::cout << "Invalid Input Param, Please Check the validity of the para" << std::endl;
+        return false;
+    }
+    ShowUsage();
+    return true;
 }
 
 void VirtualDevice::SetResolution(const ResolutionInfo& resolutionInfo)
@@ -702,6 +811,33 @@ const std::vector<uint32_t>& VirtualDevice::GetMiscellaneous() const
 const std::vector<uint32_t>& VirtualDevice::GetSwitches() const
 {
     return switches_;
+}
+
+void VirtualDevice::ShowUsage()
+{
+    std::cout << "Usage: vuinput <option> <command> <arg>..."      << std::endl;
+    std::cout << "The option are:                                " << std::endl;
+    std::cout << "commands for list:                             " << std::endl;
+    std::cout << "-L      --list        list    -display virtual devices and pid information" << std::endl;
+    std::cout << "commands for start:                            " << std::endl;
+    std::cout << "-S <device> &   --start <device> &    start <device> &     -start a device" << std::endl;
+    std::cout << " -start supported <device>-" << std::endl;
+    std::cout << "  mouse"         << std::endl;
+    std::cout << "  keyboard"      << std::endl;
+    std::cout << "  joystick"      << std::endl;
+    std::cout << "  trackball"     << std::endl;
+    std::cout << "  remotecontrol" << std::endl;
+    std::cout << "  trackpad"      << std::endl;
+    std::cout << "  knob"          << std::endl;
+    std::cout << "  gamepad"       << std::endl;
+    std::cout << "  touchpad"      << std::endl;
+    std::cout << "  touchscreen"   << std::endl;
+    std::cout << "  pen"           << std::endl;
+    std::cout << "-S all &        --start all &        start all &           -start devices " << std::endl;
+    std::cout << "commands for close:                                                       " << std::endl;
+    std::cout << "-C <pid>        --close <pid>        close <pid>           -close a pid   " << std::endl;
+    std::cout << "-C all          --close all          close all             -close pids    " << std::endl;
+    std::cout << "-?  --help   help                                                         " << std::endl;
 }
 } // namespace MMI
 } // namespace OHOS

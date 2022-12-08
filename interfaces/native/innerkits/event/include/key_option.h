@@ -88,6 +88,14 @@ public:
     int32_t GetFinalKeyDownDuration() const;
 
     /**
+     * @brief Get the delay time of lifting the last key. When the last key is lifted, the subscription
+     * will be delayed and triggered.
+     * @return Return to the delay time of lifting the last key.
+     * @since 9
+     */
+    int32_t GetFinalKeyUpDelay() const;
+
+    /**
      * @brief Sets the duration when the final key is held down or the maximum duration between when
      * the key is pressed and when the key is released.
      * If the final key is pressed, this parameter indicates the duration when the final key is held down.
@@ -99,6 +107,14 @@ public:
      * @since 9
      */
     void SetFinalKeyDownDuration(int32_t duration);
+
+    /**
+     * @brief Set the delay time for lifting the last key.
+     * @param delay Delay time for lifting the last key.
+     * @return void
+     * @since 9
+     */
+    void SetFinalKeyUpDelay(int32_t delay);
 
 public:
     /**
@@ -122,6 +138,7 @@ private:
     int32_t finalKey_ { -1 };
     bool isFinalKeyDown_ { false };
     int32_t finalKeyDownDuration_ { 0 };
+    int32_t finalKeyUpDelay_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

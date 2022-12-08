@@ -231,7 +231,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType,
-    HandleEventType eventType)
+    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGD("handlerType:%{public}d", handlerType);
@@ -239,7 +239,7 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType ha
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         auto interceptorHandler = InputHandler->GetInterceptorHandler();
         CHKPR(interceptorHandler, ERROR_NULL_POINTER);
-        return interceptorHandler->AddInputHandler(handlerType, eventType, sess);
+        return interceptorHandler->AddInputHandler(handlerType, eventType, priority, deviceTags, sess);
     }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
@@ -253,7 +253,7 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType ha
 }
 
 int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType,
-                                               HandleEventType eventType)
+    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGD("OnRemoveInputHandler handlerType:%{public}d eventType:%{public}u", handlerType, eventType);
@@ -261,7 +261,7 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         auto interceptorHandler = InputHandler->GetInterceptorHandler();
         CHKPR(interceptorHandler, ERROR_NULL_POINTER);
-        interceptorHandler->RemoveInputHandler(handlerType, eventType, sess);
+        interceptorHandler->RemoveInputHandler(handlerType, eventType, priority, deviceTags, sess);
     }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR

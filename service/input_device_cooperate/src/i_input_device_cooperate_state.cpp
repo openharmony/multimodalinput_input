@@ -32,7 +32,6 @@ IInputDeviceCooperateState::IInputDeviceCooperateState()
     runner_ = AppExecFwk::EventRunner::Create(true);
     CHKPL(runner_);
     eventHandler_ = std::make_shared<CooperateEventHandler>(runner_);
-    CHKPL(eventHandler_);
 }
 
 int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetworkId, int32_t startInputDeviceId)
