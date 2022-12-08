@@ -177,7 +177,7 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
         physicalY = 0;
     }
     const int32_t cursorUnit = 16;
-    if (displayInfo_.direction == Direction0 || displayInfo_.direction == Direction180) {
+    if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
         if (physicalX > (displayInfo_.width - imageWidth_ / cursorUnit)) {
             physicalX = displayInfo_.width - imageWidth_ / cursorUnit;
         }

@@ -21,7 +21,7 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
-#include "display_info.h"
+#include "window_info.h"
 #include "input_event.h"
 #include "input_event_data_transformation.h"
 #include "pointer_event.h"
