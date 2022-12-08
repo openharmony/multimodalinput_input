@@ -900,10 +900,14 @@ int32_t InputManagerImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
 void InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
 {
     CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t ret = MultimodalInputConnMgr->SetPointerLocation(x, y);
     if (ret != RET_OK) {
         MMI_HILOGE("Set Pointer Location failed, ret:%{public}d", ret);
     }
+#else
+    MMI_HILOGW("Pointer device or pointer drawing module does not support");
+#endif
 }
 } // namespace MMI
 } // namespace OHOS
