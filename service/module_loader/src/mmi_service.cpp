@@ -934,6 +934,19 @@ int32_t MMIService::SetFunctionKeyState(int32_t funcKey, bool enable)
     return RET_OK;
 }
 
+int32_t MMIService::SetPointerLocation(int32_t x, int32_t y)
+{
+        CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetPointerLocation,
+        MouseEventHdr, x, y));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer location failed,ret %{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    return RET_OK;
+}
 void MMIService::OnDelegateTask(epoll_event& ev)
 {
     if ((ev.events & EPOLLIN) == 0) {

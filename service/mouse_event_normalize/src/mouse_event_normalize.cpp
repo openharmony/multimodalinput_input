@@ -474,5 +474,32 @@ void MouseEventNormalize::SetAbsolutionLocation(double xPercent, double yPercent
     IPointerDrawingManager::GetInstance()->SetPointerLocation(getpid(), physicalX, physicalY);
 }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+
+int32_t MouseEventNormalize::SetPointerLocation(int32_t x, int32_t y)
+{
+    MMI_HILOGI("Location, x:%{public}d, y:%{public}d",x, y);
+    auto displayGroupInfo = WinMgr->GetDisplayGroupInfo();
+    if (currentDisplayId_ == -1) {
+        if (displayGroupInfo.displaysInfo.empty()) {
+            MMI_HILOGI("The displayInfo is empty");
+            return RET_ERR;
+        }
+        currentDisplayId_ = displayGroupInfo.displaysInfo[0].id;
+    }
+    struct DisplayInfo display;
+    for (auto &it : displayGroupInfo.displaysInfo) {
+        if (it.id == currentDisplayId_) {
+            display = it;
+            break;
+        }
+    }
+    absolutionX_ = static_cast<double>(x);
+    absolutionY_ = static_cast<double>(y);
+    WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
+    int32_t physicalX = WinMgr->GetMouseInfo().physicalX;
+    int32_t physicalY = WinMgr->GetMouseInfo().physicalY;
+    IPointerDrawingManager::GetInstance()->SetPointerLocation(getpid(), physicalX, physicalY);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

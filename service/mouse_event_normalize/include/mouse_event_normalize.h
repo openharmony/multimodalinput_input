@@ -52,7 +52,7 @@ public:
     int32_t GetPointerSpeed() const;
     void OnDisplayLost(int32_t displayId);
     int32_t GetDisplayId() const;
-
+    int32_t SetPointerLocation(int32_t x, int32_t y);
 private:
     int32_t HandleMotionInner(struct libinput_event_pointer* data);
     int32_t HandleButtonInner(struct libinput_event_pointer* data);

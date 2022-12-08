@@ -70,6 +70,7 @@ public:
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
+    int32_t SetPointerLocation(int32_t x, int32_t y);
 
 private:
     MultimodalInputConnectManager() = default;

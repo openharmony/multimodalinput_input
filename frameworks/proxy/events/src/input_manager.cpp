@@ -239,5 +239,10 @@ int32_t InputManager::SetFunctionKeyState(int32_t funcKey, bool enable)
 {
     return InputMgrImpl.SetFunctionKeyState(funcKey, enable);
 }
+
+void InputManager::SetPointerLocation(int32_t x, int32_t y)
+{
+    InputMgrImpl.SetPointerLocation(x, y);
+}
 } // namespace MMI
 } // namespace OHOS
