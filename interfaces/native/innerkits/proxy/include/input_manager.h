@@ -402,6 +402,14 @@ public:
      */
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
 
+    /**
+     * @brief 设置鼠标绝对坐标
+     * @param x 指定设置鼠标的x坐标
+     * @param y 指定设置鼠标的y坐标
+     * @return void
+     */
+    void SetPointerLocation(int32_t x, int32_t y);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
