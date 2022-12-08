@@ -233,14 +233,36 @@ ohos_unittest("InputManagerTest") {
 
 ohos_unittest("InputManagerManualTest") {
   module_out_path = module_output_path
-  include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "$root_out_dir/diff_libinput_mmi/export_include",
-  ]
+  include_dirs = [ "//commonlibrary/c_utils/base/include" ]
 
   defines = input_default_defines
 
   sources = [ "events/test/input_manager_manual_test.cpp" ]
+
+  configs = [ ":libmmi_test_util" ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/util:libmmi-util",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+  external_deps = [
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+  ]
+}
+
+ohos_unittest("InputManagerFilterManualTest") {
+  module_out_path = module_output_path
+  include_dirs = [ "//commonlibrary/c_utils/base/include" ]
+
+  defines = input_default_defines
+
+  sources = [ "events/test/input_manager_filter_manual_test.cpp" ]
 
   configs = [ ":libmmi_test_util" ]
 

@@ -37,7 +37,8 @@ public:
     {
         return tokenType_;
     }
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority);
+    int32_t RemoveInputEventFilter(int32_t filterId);
     int32_t SetPointerVisible(bool visible);
     int32_t IsPointerVisible(bool &visible);
     int32_t SetPointerSpeed(int32_t speed);

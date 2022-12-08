@@ -13,27 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef I_EVENT_FILTER_H
-#define I_EVENT_FILTER_H
+#ifndef I_INPUT_EVENT_FILTER_H
+#define I_INPUT_EVENT_FILTER_H
 
-#include "iremote_broker.h"
+#include <memory>
 
-#include "i_input_event_filter.h"
+#include "axis_event.h"
 #include "key_event.h"
 #include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
-class IEventFilter : public IRemoteBroker {
+struct IInputEventFilter {
 public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.multimodalinput.IEventFilter");
-    virtual bool HandleKeyEvent(const std::shared_ptr<KeyEvent> event) = 0;
-    virtual bool HandlePointerEvent(const std::shared_ptr<PointerEvent> event) = 0;
-    enum class OPERATOR_TYPE {
-        HANDLE_KEY_EVENT = 0,
-        HANDLE_POINTER_EVENT = 1,
-    };
+    IInputEventFilter() = default;
+    virtual ~IInputEventFilter() = default;
+    virtual bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const = 0;
+    virtual bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const = 0;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_EVENT_FILTER_H
+#endif // I_INPUT_EVENT_FILTER_H

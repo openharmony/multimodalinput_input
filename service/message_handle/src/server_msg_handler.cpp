@@ -345,12 +345,19 @@ int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid,
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-int32_t ServerMsgHandler::AddInputEventFilter(sptr<IEventFilter> filter)
+int32_t ServerMsgHandler::AddInputEventFilter(sptr<IEventFilter> filter,
+    int32_t filterId, int32_t priority, int32_t clientPid)
 {
     auto filterHandler = InputHandler->GetFilterHandler();
     CHKPR(filterHandler, ERROR_NULL_POINTER);
-    filterHandler->AddInputEventFilter(filter);
-    return RET_OK;
+    return filterHandler->AddInputEventFilter(filter, filterId, priority, clientPid);
+}
+
+int32_t ServerMsgHandler::RemoveInputEventFilter(int32_t clientPid, int32_t filterId)
+{
+    auto filterHandler = InputHandler->GetFilterHandler();
+    CHKPR(filterHandler, ERROR_NULL_POINTER);
+    return filterHandler->RemoveInputEventFilter(clientPid, filterId);   
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI

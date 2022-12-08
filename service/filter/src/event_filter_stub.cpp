@@ -42,6 +42,9 @@ int32_t EventFilterStub::OnRemoteRequest(
     }
 
     switch (code) {
+        case static_cast<uint32_t>(IEventFilter::OPERATOR_TYPE::HANDLE_KEY_EVENT): {
+            return StubHandleKeyEvent(data, reply);
+        }
         case static_cast<uint32_t>(IEventFilter::OPERATOR_TYPE::HANDLE_POINTER_EVENT): {
             return StubHandlePointerEvent(data, reply);
         }
@@ -50,6 +53,25 @@ int32_t EventFilterStub::OnRemoteRequest(
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
         }
     }
+}
+
+int32_t EventFilterStub::StubHandleKeyEvent(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<KeyEvent> event = KeyEvent::Create();
+    if (event == nullptr) {
+        MMI_HILOGE("The event is nullptr");
+        return RET_ERR;
+    }
+
+    if (!event->ReadFromParcel(data)) {
+        MMI_HILOGE("Read data error");
+        return RET_ERR;
+    }
+
+    bool ret = HandleKeyEvent(event);
+    WRITEBOOL(reply, ret, RET_ERR);
+    return RET_OK;
 }
 
 int32_t EventFilterStub::StubHandlePointerEvent(MessageParcel& data, MessageParcel& reply)
