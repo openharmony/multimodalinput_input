@@ -764,5 +764,26 @@ int32_t MultimodalInputConnectProxy::SetFunctionKeyState(int32_t funcKey, bool e
     }
     return ret;
 }
+
+int32_t MultimodalInputConnectProxy::SetPointerLocation(int32_t x, int32_t y)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    WRITEINT32(data, x, ERR_INVALID_VALUE);
+    WRITEINT32(data, y, ERR_INVALID_VALUE);
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(SET_POINTER_LOCATION, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS

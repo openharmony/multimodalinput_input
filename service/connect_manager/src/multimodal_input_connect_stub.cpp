@@ -84,7 +84,8 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             &MultimodalInputConnectStub::StubGetInputDeviceCooperateState},
         {IMultimodalInputConnect::SET_INPUT_DEVICE_TO_SCREEN, &MultimodalInputConnectStub::StubSetInputDevice},
         {IMultimodalInputConnect::GET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubGetFunctionKeyState},
-        {IMultimodalInputConnect::SET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubSetFunctionKeyState}
+        {IMultimodalInputConnect::SET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubSetFunctionKeyState},
+        {IMultimodalInputConnect::SET_POINTER_LOCATION, &MultimodalInputConnectStub::StubSetPointerLocation}
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -749,6 +750,29 @@ int32_t MultimodalInputConnectStub::StubSetFunctionKeyState(MessageParcel &data,
     READINT32(data, funcKey, IPC_PROXY_DEAD_OBJECT_ERR);
     READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetFunctionKeyState(funcKey, enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetFunctionKeyState failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t x = 0;
+    int32_t y = 0;
+    READINT32(data, x, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, y, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetPointerLocation(x, y);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetFunctionKeyState failed ret:%{public}d", ret);
     }

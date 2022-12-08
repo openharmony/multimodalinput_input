@@ -61,6 +61,7 @@ public:
         STOP_DEVICE_COOPERATE = 34,
         GET_INPUT_DEVICE_COOPERATE_STATE = 35,
         SET_INPUT_DEVICE_TO_SCREEN = 50,
+        SET_POINTER_LOCATION = 51,
     };
 
     enum {
@@ -106,6 +107,7 @@ public:
     virtual int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) = 0;
     virtual int32_t GetFunctionKeyState(int32_t funckey, bool &state) = 0;
     virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) = 0;
+    virtual int32_t SetPointerLocation(int32_t x, int32_t y) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

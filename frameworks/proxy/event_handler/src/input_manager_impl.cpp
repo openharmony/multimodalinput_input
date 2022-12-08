@@ -896,5 +896,14 @@ int32_t InputManagerImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
+
+void InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->SetPointerLocation(x, y);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set Pointer Location failed, ret:%{public}d", ret);
+    }
+}
 } // namespace MMI
 } // namespace OHOS
