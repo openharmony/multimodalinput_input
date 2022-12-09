@@ -19,6 +19,7 @@
 #include "iremote_broker.h"
 
 #include "i_event_filter.h"
+#include "i_input_event_filter.h"
 #include "input_handler_type.h"
 #include "key_event.h"
 #include "key_option.h"
@@ -54,6 +55,7 @@ public:
         GET_POINTER_STYLE = 24,
         SET_FUNCTION_KEY_STATE = 25,
         GET_FUNCTION_KEY_STATE = 26,
+        RMV_INPUT_EVENT_FILTER = 27,
         REGISTER_COOPERATE_MONITOR = 30,
         UNREGISTER_COOPERATE_MONITOR = 31,
         ENABLE_INPUT_DEVICE_COOPERATE = 32,
@@ -73,7 +75,8 @@ public:
 
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) = 0;
-    virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter) = 0;
+    virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority) = 0;
+    virtual int32_t RemoveInputEventFilter(int32_t filterId) = 0;
     virtual int32_t SetPointerVisible(bool visible) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
     virtual int32_t SetPointerSpeed(int32_t speed) = 0;
