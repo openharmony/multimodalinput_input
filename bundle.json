@@ -99,7 +99,7 @@
           "name": "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
           "header": {
             "header_files": [
-              "proxy/include/display_info.h",
+              "proxy/include/window_info.h",
               "proxy/include/input_manager.h",
               "event/include/key_event.h",
               "event/include/pointer_event.h",
