@@ -23,7 +23,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOM
 
 int32_t main(int32_t argc, char* argv[])
 {
-    using namespace OHOS::MMI;
     do {
         SetThreadName("main");
         InjectionToolsHelpFunc helpFunc;

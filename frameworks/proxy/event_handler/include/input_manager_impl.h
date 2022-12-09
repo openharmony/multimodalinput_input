@@ -23,7 +23,7 @@
 
 #include "net_packet.h"
 
-#include "display_info.h"
+#include "window_info.h"
 #include "event_filter_service.h"
 #include "event_handler.h"
 #include "if_mmi_client.h"

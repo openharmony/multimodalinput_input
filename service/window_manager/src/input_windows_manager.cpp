@@ -496,27 +496,27 @@ void InputWindowsManager::RotateTouchScreen(DisplayInfo info, LogicalCoordinate&
 {
     const Direction direction = info.direction;
 
-    if (direction == Direction0) {
-        MMI_HILOGD("direction is Direction0");
+    if (direction == DIRECTION0) {
+        MMI_HILOGD("direction is DIRECTION0");
         return;
     }
-    if (direction == Direction90) {
-        MMI_HILOGD("direction is Direction90");
+    if (direction == DIRECTION90) {
+        MMI_HILOGD("direction is DIRECTION90");
         int32_t temp = coord.x;
         coord.x = info.height - coord.y;
         coord.y = temp;
         MMI_HILOGD("physicalX:%{public}d, physicalY:%{public}d", coord.x, coord.y);
         return;
     }
-    if (direction == Direction180) {
-        MMI_HILOGD("direction is Direction180");
+    if (direction == DIRECTION180) {
+        MMI_HILOGD("direction is DIRECTION180");
         coord.x = info.width - coord.x;
         coord.y = info.height - coord.y;
         MMI_HILOGD("physicalX:%{public}d, physicalY:%{public}d", coord.x, coord.y);
         return;
     }
-    if (direction == Direction270) {
-        MMI_HILOGD("direction is Direction270");
+    if (direction == DIRECTION270) {
+        MMI_HILOGD("direction is DIRECTION270");
         int32_t temp = coord.y;
         coord.y = info.width - coord.x;
         coord.x = temp;
@@ -745,7 +745,7 @@ void InputWindowsManager::AdjustDisplayCoordinate(
 {
     int32_t width = 0;
     int32_t height = 0;
-    if (displayInfo.direction == Direction0 || displayInfo.direction == Direction180) {
+    if (displayInfo.direction == DIRECTION0 || displayInfo.direction == DIRECTION180) {
         width = displayInfo.width;
         height = displayInfo.height;
     } else {
@@ -1166,7 +1166,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     }
     int32_t width = 0;
     int32_t height = 0;
-    if (displayInfo->direction == Direction0 || displayInfo->direction == Direction180) {
+    if (displayInfo->direction == DIRECTION0 || displayInfo->direction == DIRECTION180) {
         width = displayInfo->width;
         height = displayInfo->height;
     } else {
