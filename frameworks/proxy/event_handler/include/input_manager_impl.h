@@ -16,6 +16,7 @@
 #ifndef INPUT_MANAGER_IMPL_H
 #define INPUT_MANAGER_IMPL_H
 
+#include <list>
 #include <vector>
 
 #include "singleton.h"
@@ -52,7 +53,8 @@ public:
         std::function<void(std::shared_ptr<KeyEvent>)> callback
     );
     void UnsubscribeKeyEvent(int32_t subscriberId);
-    int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);
+    int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority);
+    int32_t RemoveInputEventFilter(int32_t filterId);
 
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
@@ -121,6 +123,7 @@ private:
     int32_t PackDisplayInfo(NetPacket &pkt);
     void PrintDisplayInfo();
     void SendDisplayInfo();
+    void ReAddInputEventFilter();
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEventTask(std::shared_ptr<IInputEventConsumer> consumer,
@@ -131,7 +134,7 @@ private:
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 private:
-    sptr<EventFilterService> eventFilterService_ { nullptr };
+    std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t>> eventFilterServices_;
     std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
 

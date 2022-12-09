@@ -86,6 +86,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         {"subscriber", no_argument, 0, 's'},
         {"monitor", no_argument, 0, 'o'},
         {"interceptor", no_argument, 0, 'i'},
+        {"filter", no_argument, 0, 'f'},
         {"mouse", no_argument, 0, 'm'},
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
         {"inputdevcoosm", no_argument, 0, 'k'},
@@ -116,7 +117,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     optind = 1;
     int32_t c;
-    while ((c = getopt_long (args.size(), argv, "hdlwusoimc", dumpOptions, &optionIndex)) != -1) {
+    while ((c = getopt_long (args.size(), argv, "hdlwusoifmc", dumpOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'h': {
                 DumpEventHelp(fd, args);
@@ -178,6 +179,12 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
                 break;
             }
+            case 'f': {
+                auto filterHandler = InputHandler->GetFilterHandler();
+                CHKPV(filterHandler);
+                filterHandler->Dump(fd, args);
+                break;
+            }
             case 'm': {
 #ifdef OHOS_BUILD_ENABLE_POINTER
                 MouseEventHdr->Dump(fd, args);
@@ -218,6 +225,7 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -o, --monitor: dump the monitor information\t");
     mprintf(fd, "      -s, --subscriber: dump the subscriber information\t");
     mprintf(fd, "      -i, --interceptor: dump the interceptor information\t");
+    mprintf(fd, "      -f, --filter: dump the filter information\t");
     mprintf(fd, "      -m, --mouse: dump the mouse information\t");
     mprintf(fd, "      -c, --dump Keyboard and mouse crossing information\t");
 }

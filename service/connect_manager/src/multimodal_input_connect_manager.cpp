@@ -73,14 +73,24 @@ int32_t MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair() co
     return socketFd_;
 }
 
-int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> filter)
+int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority)
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
         MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
-    return multimodalInputConnectService_->AddInputEventFilter(filter);
+    return multimodalInputConnectService_->AddInputEventFilter(filter, filterId, priority);
+}
+
+int32_t MultimodalInputConnectManager::RemoveInputEventFilter(int32_t filterId)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    if (multimodalInputConnectService_ == nullptr) {
+        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        return RET_ERR;
+    }
+    return multimodalInputConnectService_->RemoveInputEventFilter(filterId);    
 }
 
 int32_t MultimodalInputConnectManager::SetPointerVisible(bool visible)

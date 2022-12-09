@@ -16,15 +16,19 @@
 #ifndef EVENT_FILTER_HANDLER_H
 #define EVENT_FILTER_HANDLER_H
 
+#include <memory>
 #include <mutex>
+#include <queue>
+
 #include "nocopyable.h"
 
+#include "event_filter_death_recipient.h"
 #include "i_event_filter.h"
 #include "i_input_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
-class EventFilterHandler final : public IInputEventHandler {
+class EventFilterHandler final : public IInputEventHandler, public std::enable_shared_from_this<EventFilterHandler> {
 public:
     EventFilterHandler() = default;
     DISALLOW_COPY_AND_MOVE(EventFilterHandler);
@@ -38,11 +42,23 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
-    bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> point);
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority, int32_t clientPid);
+    int32_t RemoveInputEventFilter(int32_t filterId, int32_t clientPid);
+    void Dump(int32_t fd, const std::vector<std::string> &args);
+    bool HandleKeyEventFilter(std::shared_ptr<KeyEvent> event);
+    bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> event);
 private:
     std::mutex lockFilter_;
-    sptr<IEventFilter> filter_ {nullptr};
+    struct FilterInfo
+    {
+        const sptr<IEventFilter> filter;
+        sptr<IRemoteObject::DeathRecipient> deathRecipient { nullptr };
+        const int32_t filterId;
+        const int32_t priority;
+        const int32_t clientPid;
+        bool IsSameClient(int32_t id, int32_t pid) const { return ((filterId == id) && (clientPid == pid)); }
+    };
+    std::list<FilterInfo> filters_;
 };
 } // namespace MMI
 } // namespace OHOS
