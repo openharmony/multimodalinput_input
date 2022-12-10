@@ -66,7 +66,7 @@ ohos_source_set("event-injection") {
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
     "//foundation/multimodalinput/input/util:libmmi-util",
-    "//third_party/cJSON:cjson_static",
+    "//third_party/cJSON:cjson",
   ]
 
   external_deps = [ "ipc:ipc_core" ]
@@ -133,7 +133,7 @@ ohos_unittest("ut-event-injection-out") {
     "${mmi_path}/tools/event_inject:event-injection",
     "${mmi_path}/util:libmmi-util",
     "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
-    "//third_party/cJSON:cjson_static",
+    "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
