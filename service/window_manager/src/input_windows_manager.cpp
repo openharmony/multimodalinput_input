@@ -87,13 +87,14 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
             touchItemDownInfos_.erase(iter);
         }
     }
+#ifdef OHOS_BUILD_ENABLE_POINTER
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         if (mouseDownInfo_.pid != -1) {
             pid = mouseDownInfo_.pid;
             InitMouseDownInfo();
         }
     }
-    
+#endif // OHOS_BUILD_ENABLE_POINTER
     return udsServer_->GetClientFd(pid);
 }
 
