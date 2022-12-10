@@ -328,9 +328,11 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     if (info.isPointerDevice) {
         bool visible = !info.isRemote || hasLocalPointer;
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
         if (HasTouchDevice()) {
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
         }
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
         NotifyPointerDevice(true, visible);
         OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "true");
         MMI_HILOGI("Set para input.pointer.device true");
