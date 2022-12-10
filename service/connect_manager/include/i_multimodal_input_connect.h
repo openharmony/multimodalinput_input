@@ -24,6 +24,7 @@
 #include "key_event.h"
 #include "key_option.h"
 #include "pointer_event.h"
+#include "system_ability_definition.h"
 
 namespace OHOS {
 namespace MMI {
@@ -70,7 +71,7 @@ public:
         CONNECT_MODULE_TYPE_MMI_CLIENT = 0,
     };
     static constexpr int32_t INVALID_SOCKET_FD = -1;
-    static constexpr int32_t MULTIMODAL_INPUT_CONNECT_SERVICE_ID = 3101;
+    static constexpr int32_t MULTIMODAL_INPUT_CONNECT_SERVICE_ID = MULTIMODAL_INPUT_SERVICE_ID;
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.multimodalinput.IConnectManager");
 
     virtual int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
