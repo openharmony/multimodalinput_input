@@ -104,7 +104,7 @@ int32_t InputManagerImpl::AddInputEventFilter(std::shared_ptr<IInputEventFilter>
     std::lock_guard<std::mutex> guard(mtx_);
     CHKPR(filter, RET_ERR);
     if (eventFilterServices_.size() >= MAX_FILTER_NUM) {
-        MMI_HILOGE("Too many filters, size:%{public}u", eventFilterServices_.size());
+        MMI_HILOGE("Too many filters, size:%{public}zu", eventFilterServices_.size());
         return RET_ERR;
     }
     sptr<IEventFilter> service = new (std::nothrow) EventFilterService(filter);
@@ -128,7 +128,7 @@ int32_t InputManagerImpl::RemoveInputEventFilter(int32_t filterId)
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mtx_);
     if (eventFilterServices_.empty()) {
-        MMI_HILOGE("Filters is empty, size:%{public}u", eventFilterServices_.size());
+        MMI_HILOGE("Filters is empty, size:%{public}zu", eventFilterServices_.size());
         return RET_OK;
     }
     std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t>>::iterator it;
@@ -671,7 +671,7 @@ void InputManagerImpl::ReAddInputEventFilter()
 {
     CALL_INFO_TRACE;
     if (eventFilterServices_.size() > MAX_FILTER_NUM) {
-        MMI_HILOGE("Too many filters, size:%{public}u", eventFilterServices_.size());
+        MMI_HILOGE("Too many filters, size:%{public}zu", eventFilterServices_.size());
         return;
     }
     for (const auto &[filterId, t] : eventFilterServices_) {
