@@ -70,7 +70,7 @@ int32_t EventFilterHandler::AddInputEventFilter(sptr<IEventFilter> filter,
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(lockFilter_);
     CHKPR(filter, ERROR_NULL_POINTER);
-    MMI_HILOGI("Add filter,filterId:%{public}d,priority:%{public}d,clientPid:%{public}d,filters_ size:%{public}u",
+    MMI_HILOGI("Add filter,filterId:%{public}d,priority:%{public}d,clientPid:%{public}d,filters_ size:%{public}zu",
         filterId, priority, clientPid, filters_.size());
     
     std::weak_ptr<EventFilterHandler> weakPtr = shared_from_this();
