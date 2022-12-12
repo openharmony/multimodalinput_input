@@ -25,6 +25,53 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectProxy" };
+
+int32_t ParseInputDevice(MessageParcel &reply, std::shared_ptr<InputDevice> &inputDevice)
+{
+    int32_t value;
+    READINT32(reply, value, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetId(value);
+    READINT32(reply, value, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetType(value);
+    std::string name;
+    READSTRING(reply, name, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetName(name);
+    READINT32(reply, value, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetBus(value);
+    READINT32(reply, value, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetVersion(value);
+    READINT32(reply, value, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetProduct(value);
+    READINT32(reply, value, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetVendor(value);
+    std::string phys;
+    READSTRING(reply, phys, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetPhys(phys);
+    std::string uniq;
+    READSTRING(reply, uniq, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetUniq(uniq);
+
+    uint32_t size;
+    READUINT32(reply, size, IPC_PROXY_DEAD_OBJECT_ERR);
+    InputDevice::AxisInfo axis;
+    for (uint32_t i = 0; i < size; ++i) {
+        int32_t val;
+        READINT32(reply, val, IPC_PROXY_DEAD_OBJECT_ERR);
+        axis.SetMinimum(val);
+        READINT32(reply, val, IPC_PROXY_DEAD_OBJECT_ERR);
+        axis.SetMaximum(val);
+        READINT32(reply, val, IPC_PROXY_DEAD_OBJECT_ERR);
+        axis.SetAxisType(val);
+        READINT32(reply, val, IPC_PROXY_DEAD_OBJECT_ERR);
+        axis.SetFuzz(val);
+        READINT32(reply, val, IPC_PROXY_DEAD_OBJECT_ERR);
+        axis.SetFlat(val);
+        READINT32(reply, val, IPC_PROXY_DEAD_OBJECT_ERR);
+        axis.SetResolution(val);
+        inputDevice->AddAxisInfo(axis);
+    }
+    return RET_OK;
+}
 } // namespace
 
 MultimodalInputConnectProxy::MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl)
@@ -290,7 +337,8 @@ int32_t MultimodalInputConnectProxy::UnregisterDevListener()
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys)
+int32_t MultimodalInputConnectProxy::SupportKeys(int32_t deviceId, std::vector<int32_t> &keys,
+    std::vector<bool> &keystroke)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -298,7 +346,6 @@ int32_t MultimodalInputConnectProxy::SupportKeys(int32_t userData, int32_t devic
         MMI_HILOGE("Failed to write descriptor");
         return RET_ERR;
     }
-    WRITEINT32(data, userData);
     WRITEINT32(data, deviceId);
     WRITEINT32(data, static_cast<int32_t>(keys.size()));
     for (const auto &item : keys) {
@@ -314,10 +361,15 @@ int32_t MultimodalInputConnectProxy::SupportKeys(int32_t userData, int32_t devic
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
+    if (!reply.ReadBoolVector(&keystroke)) {
+        MMI_HILOGE("Read ids failed");
+        return RET_ERR;
+    }
+    MMI_HILOGE("keystroke size:%{public}zu", keystroke.size());
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::GetDeviceIds(int32_t userData)
+int32_t MultimodalInputConnectProxy::GetDeviceIds(std::vector<int32_t> &ids)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -325,7 +377,6 @@ int32_t MultimodalInputConnectProxy::GetDeviceIds(int32_t userData)
         MMI_HILOGE("Failed to write descriptor");
         return RET_ERR;
     }
-    WRITEINT32(data, userData);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -335,10 +386,15 @@ int32_t MultimodalInputConnectProxy::GetDeviceIds(int32_t userData)
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
+    if (!reply.ReadInt32Vector(&ids)) {
+        MMI_HILOGE("Read vector failed");
+        return RET_ERR;
+    }
+    MMI_HILOGE("ids size:%{public}zu", ids.size());
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::GetDevice(int32_t userData, int32_t deviceId)
+int32_t MultimodalInputConnectProxy::GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -346,7 +402,6 @@ int32_t MultimodalInputConnectProxy::GetDevice(int32_t userData, int32_t deviceI
         MMI_HILOGE("Failed to write descriptor");
         return RET_ERR;
     }
-    WRITEINT32(data, userData);
     WRITEINT32(data, deviceId);
     MessageParcel reply;
     MessageOption option;
@@ -357,10 +412,15 @@ int32_t MultimodalInputConnectProxy::GetDevice(int32_t userData, int32_t deviceI
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
+    ret = ParseInputDevice(reply, inputDevice);
+    if (ret != RET_OK) {
+        MMI_HILOGE("ParseInputDevice failed");
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::GetKeyboardType(int32_t userData, int32_t deviceId)
+int32_t MultimodalInputConnectProxy::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -368,7 +428,6 @@ int32_t MultimodalInputConnectProxy::GetKeyboardType(int32_t userData, int32_t d
         MMI_HILOGE("Failed to write descriptor");
         return RET_ERR;
     }
-    WRITEINT32(data, userData);
     WRITEINT32(data, deviceId);
     MessageParcel reply;
     MessageOption option;
@@ -379,6 +438,7 @@ int32_t MultimodalInputConnectProxy::GetKeyboardType(int32_t userData, int32_t d
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
     }
+    READINT32(reply, keyboardType, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
 }
 

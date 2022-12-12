@@ -711,7 +711,7 @@ int32_t InputManagerImpl::GetDeviceIds(std::function<void(std::vector<int32_t>&)
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputDevImpl.GetInputDeviceIdsAsync(callback);
+    return InputDevImpl.GetInputDeviceIds(callback);
 }
 
 int32_t InputManagerImpl::GetDevice(int32_t deviceId,
@@ -722,7 +722,7 @@ int32_t InputManagerImpl::GetDevice(int32_t deviceId,
         MMI_HILOGE("Client init failed");
         return RET_ERR;
     }
-    return InputDevImpl.GetInputDeviceAsync(deviceId, callback);
+    return InputDevImpl.GetInputDevice(deviceId, callback);
 }
 
 int32_t InputManagerImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes,

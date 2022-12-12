@@ -53,8 +53,8 @@ public:
         FuncCooperationMessage callback);
     int32_t StopDeviceCooperate(FuncCooperationMessage callback);
     int32_t GetInputDeviceCooperateState(const std::string &deviceId, FuncCooperationState callback);
-    void OnDevCooperateListener(const std::string deviceId, CooperationMessage msg);
-    void OnCooperationMessage(int32_t userData, const std::string deviceId, CooperationMessage msg);
+    void OnDevCooperateListener(const std::string &deviceId, const CooperationMessage &msg);
+    void OnCooperationMessage(int32_t userData, const std::string &deviceId, const CooperationMessage &msg);
     void OnCooperationState(int32_t userData, bool state);
     int32_t GetUserData();
 

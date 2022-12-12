@@ -19,6 +19,7 @@
 #include "iremote_broker.h"
 
 #include "i_event_filter.h"
+#include "input_device.h"
 #include "i_input_event_filter.h"
 #include "input_handler_type.h"
 #include "key_event.h"
@@ -83,12 +84,12 @@ public:
     virtual int32_t GetPointerSpeed(int32_t &speed) = 0;
     virtual int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle) = 0;
     virtual int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle) = 0;
-    virtual int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys) = 0;
-    virtual int32_t GetDeviceIds(int32_t userData) = 0;
-    virtual int32_t GetDevice(int32_t userData, int32_t id) = 0;
+    virtual int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke) = 0;
+    virtual int32_t GetDeviceIds(std::vector<int32_t> &ids) = 0;
+    virtual int32_t GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice) = 0;
     virtual int32_t RegisterDevListener() = 0;
     virtual int32_t UnregisterDevListener() = 0;
-    virtual int32_t GetKeyboardType(int32_t userData, int32_t deviceId) = 0;
+    virtual int32_t GetKeyboardType(int32_t deviceId, int32_t &keyboardType) = 0;
     virtual int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags) = 0;
     virtual int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,

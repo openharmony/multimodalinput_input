@@ -54,12 +54,12 @@ public:
     int32_t GetPointerSpeed(int32_t &speed) override;
     int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle) override;
     int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle) override;
-    int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys) override;
-    int32_t GetDeviceIds(int32_t userData) override;
-    int32_t GetDevice(int32_t userData, int32_t deviceId) override;
+    int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke) override;
+    int32_t GetDeviceIds(std::vector<int32_t> &ids) override;
+    int32_t GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice) override;
     int32_t RegisterDevListener() override;
     int32_t UnregisterDevListener() override;
-    int32_t GetKeyboardType(int32_t userData, int32_t deviceId) override;
+    int32_t GetKeyboardType(int32_t deviceId, int32_t &keyboardType) override;
     int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags) override;
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
@@ -101,10 +101,10 @@ protected:
 #endif // OHOS_BUILD_ENABLE_POINTER
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);
-    int32_t OnGetDeviceIds(int32_t pid, int32_t userData);
-    int32_t OnGetDevice(int32_t pid, int32_t userData, int32_t deviceId);
-    int32_t OnSupportKeys(int32_t pid, int32_t userData, int32_t deviceId, std::vector<int32_t> &keys);
-    int32_t OnGetKeyboardType(int32_t pid, int32_t userData, int32_t deviceId);
+    int32_t OnGetDeviceIds(std::vector<int32_t> &ids);
+    int32_t OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice);
+    int32_t OnSupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke);
+    int32_t OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType);
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t CheckAddInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags);
