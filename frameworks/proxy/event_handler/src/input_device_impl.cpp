@@ -117,160 +117,60 @@ void InputDeviceImpl::OnDevListener(int32_t deviceId, const std::string &type)
     }
 }
 
-int32_t InputDeviceImpl::GetInputDeviceIdsAsync(FunInputDevIds callback)
+int32_t InputDeviceImpl::GetInputDeviceIds(FunInputDevIds callback)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    InputDeviceData data;
-    data.ids = callback;
-    if (userData_ == INT32_MAX) {
-        MMI_HILOGE("userData exceeds the maximum");
+    CHKPR(callback, RET_ERR);
+    std::vector<int32_t> ids;
+    int32_t ret = MultimodalInputConnMgr->GetDeviceIds(ids);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetInputDeviceIds failed");
         return RET_ERR;
     }
-    inputDevices_[userData_] = data;
-    return MultimodalInputConnMgr->GetDeviceIds(userData_++);
+    callback(ids);
+    return ret;
 }
 
-int32_t InputDeviceImpl::GetInputDeviceAsync(int32_t deviceId, FunInputDevInfo callback)
+int32_t InputDeviceImpl::GetInputDevice(int32_t deviceId, FunInputDevInfo callback)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    InputDeviceData data;
-    data.inputDevice = callback;
-    if (userData_ == INT32_MAX) {
-        MMI_HILOGE("UserData exceeds the maximum");
+    CHKPR(callback, RET_ERR);
+    std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
+    int32_t ret = MultimodalInputConnMgr->GetDevice(deviceId, inputDevice);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetDevice failed");
         return RET_ERR;
     }
-    inputDevices_[userData_] = data;
-    return MultimodalInputConnMgr->GetDevice(userData_++, deviceId);
+    callback(inputDevice);
+    return RET_OK;
 }
 
 int32_t InputDeviceImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes, FunInputDevKeys callback)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (keyCodes.size() > MAX_SUPPORT_KEY) {
-        MMI_HILOGE("Keys exceeds the max range");
+    CHKPR(callback, RET_ERR);
+    std::vector<bool> keystroke;
+    int32_t ret = MultimodalInputConnMgr->SupportKeys(deviceId, keyCodes, keystroke);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SupportKeys failed");
         return RET_ERR;
     }
-    InputDeviceData data;
-    data.keys = callback;
-    if (userData_ == INT32_MAX) {
-        MMI_HILOGE("UserData exceeds the maximum");
-        return RET_ERR;
-    }
-    inputDevices_[userData_] = data;
-    return MultimodalInputConnMgr->SupportKeys(userData_++, deviceId, keyCodes);
+    callback(keystroke);
+    return RET_OK;
 }
 
 int32_t InputDeviceImpl::GetKeyboardType(int32_t deviceId, FunKeyboardTypes callback)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    InputDeviceData data;
-    data.kbTypes = callback;
-    if (userData_ == INT32_MAX) {
-        MMI_HILOGE("UserData exceeds the maximum");
+    CHKPR(callback, RET_ERR);
+    int32_t keyboardType = 0;
+    int32_t ret = MultimodalInputConnMgr->GetKeyboardType(deviceId, keyboardType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetKeyboardType failed");
         return RET_ERR;
     }
-    inputDevices_[userData_] = data;
-    return MultimodalInputConnMgr->GetKeyboardType(userData_++, deviceId);
-}
-
-void InputDeviceImpl::OnInputDevice(int32_t userData, std::shared_ptr<InputDevice> devData)
-{
-    CALL_DEBUG_ENTER;
-    CHK_PID_AND_TID();
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto iter = inputDevices_.find(userData);
-    if (iter == inputDevices_.end()) {
-        MMI_HILOGI("Find userData failed");
-        return;
-    }
-    auto devInfo = GetDeviceInfo(userData);
-    CHKPV(devInfo);
-    CHKPV(devData);
-    (*devInfo)(devData);
-    MMI_HILOGD("Report device info, userData:%{public}d name:%{public}s type:%{public}d",
-        userData, devData->GetName().c_str(), devData->GetType());
-}
-
-void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> &ids)
-{
-    CHK_PID_AND_TID();
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto iter = inputDevices_.find(userData);
-    if (iter == inputDevices_.end()) {
-        MMI_HILOGI("Find userData failed");
-        return;
-    }
-    auto devIds = GetDeviceIds(userData);
-    CHKPV(devIds);
-    (*devIds)(ids);
-    MMI_HILOGD("Report all device, userData:%{public}d device:(%{public}s)",
-        userData, IdsListToString(ids).c_str());
-}
-
-void InputDeviceImpl::OnSupportKeys(int32_t userData, std::vector<bool> &keystrokeAbility)
-{
-    CHK_PID_AND_TID();
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto iter = inputDevices_.find(userData);
-    if (iter == inputDevices_.end()) {
-        MMI_HILOGI("Find userData failed");
-        return;
-    }
-    auto devKeys = GetDeviceKeys(userData);
-    CHKPV(devKeys);
-    (*devKeys)(keystrokeAbility);
-}
-
-void InputDeviceImpl::OnKeyboardType(int32_t userData, int32_t keyboardType)
-{
-    CHK_PID_AND_TID();
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (auto iter = inputDevices_.find(userData); iter == inputDevices_.end()) {
-        MMI_HILOGI("Find userData failed");
-        return;
-    }
-    auto devKbTypes = GetKeyboardTypes(userData);
-    CHKPV(devKbTypes);
-    (*devKbTypes)(keyboardType);
-    MMI_HILOGD("Keyboard type event userData:%{public}d keyboardType:%{public}d",
-        userData, keyboardType);
-}
-
-const InputDeviceImpl::FunInputDevInfo* InputDeviceImpl::GetDeviceInfo(int32_t userData) const
-{
-    auto iter = inputDevices_.find(userData);
-    if (iter == inputDevices_.end()) {
-        return nullptr;
-    }
-    return &iter->second.inputDevice;
-}
-
-const InputDeviceImpl::FunInputDevIds* InputDeviceImpl::GetDeviceIds(int32_t userData) const
-{
-    auto iter = inputDevices_.find(userData);
-    if (iter == inputDevices_.end()) {
-        return nullptr;
-    }
-    return &iter->second.ids;
-}
-
-const InputDeviceImpl::FunInputDevKeys* InputDeviceImpl::GetDeviceKeys(int32_t userData) const
-{
-    auto iter = inputDevices_.find(userData);
-    if (iter == inputDevices_.end()) {
-        return nullptr;
-    }
-    return &iter->second.keys;
-}
-
-const InputDeviceImpl::FunKeyboardTypes* InputDeviceImpl::GetKeyboardTypes(int32_t userData) const
-{
-    auto iter = inputDevices_.find(userData);
-    return iter == inputDevices_.end()? nullptr : &iter->second.kbTypes;
+    callback(keyboardType);
+    return RET_OK;
 }
 
 int32_t InputDeviceImpl::GetUserData()
