@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace MMI {
-class BytraceAdapter {
+class BytraceAdapter final {
 public:
     enum TraceBtn {
         TRACE_STOP = 0,
@@ -36,12 +36,18 @@ public:
         POINT_INTERCEPT_EVENT = 5,
         POINT_DISPATCH_EVENT = 6
     };
+    enum EventType {
+        START_EVENT = 1,
+        LAUNCH_EVENT = 2,
+        STOP_EVENT = 3
+    };
 
     static void StartBytrace(std::shared_ptr<KeyEvent> keyEvent);
     static void StartBytrace(std::shared_ptr<KeyEvent> key, HandlerType handlerType);
     static void StartBytrace(std::shared_ptr<PointerEvent> pointerEvent, TraceBtn traceBtn);
     static void StartBytrace(std::shared_ptr<KeyEvent> keyEvent, TraceBtn traceBtn, HandlerType handlerType);
     static void StartBytrace(std::shared_ptr<PointerEvent> pointerEvent, TraceBtn traceBtn, HandlerType handlerType);
+    static void StartBytrace(TraceBtn traceBtn, EventType eventType);
 };
 } // namespace MMI
 } // namespace OHOS

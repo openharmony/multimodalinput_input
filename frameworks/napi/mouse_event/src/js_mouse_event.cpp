@@ -16,16 +16,13 @@
 #include "js_mouse_event.h"
 
 #include "mmi_log.h"
+#include "napi_constants.h"
 #include "util_napi.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsMouseEvent" };
-const std::string DEFINE_CLASS = "napi_define_class";
-const std::string SET_NAMED_PROPERTY = "napi_set_named_property";
-const std::string CREATE_INT32 = "napi_create_int32";
-const std::string GET_CB_INFO = "napi_get_cb_info";
 
 enum class Action : int32_t {
     CANCEL = 0,
@@ -59,7 +56,7 @@ napi_value JsMouseEvent::GetNapiInt32(napi_env env, int32_t code)
 {
     CALL_DEBUG_ENTER;
     napi_value ret = nullptr;
-    CHKRP(env, napi_create_int32(env, code, &ret), CREATE_INT32);
+    CHKRP(napi_create_int32(env, code, &ret), CREATE_INT32);
     return ret;
 }
 
@@ -70,7 +67,7 @@ napi_value JsMouseEvent::EnumClassConstructor(napi_env env, napi_callback_info i
     napi_value args[1] = {0};
     napi_value ret = nullptr;
     void *data = nullptr;
-    CHKRP(env, napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);
     return ret;
 }
 
@@ -87,9 +84,9 @@ napi_value JsMouseEvent::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("AXIS_END", GetNapiInt32(env, static_cast<int32_t>(Action::AXIS_END))),
     };
     napi_value action = nullptr;
-    CHKRP(env, napi_define_class(env, "Action", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    CHKRP(napi_define_class(env, "Action", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(actionArr) / sizeof(*actionArr), actionArr, &action), DEFINE_CLASS);
-    CHKRP(env, napi_set_named_property(env, exports, "Action", action), SET_NAMED_PROPERTY);
+    CHKRP(napi_set_named_property(env, exports, "Action", action), SET_NAMED_PROPERTY);
 
     napi_property_descriptor buttonArr[] = {
         DECLARE_NAPI_STATIC_PROPERTY("LEFT", GetNapiInt32(env, static_cast<int32_t>(Button::LEFT))),
@@ -102,9 +99,9 @@ napi_value JsMouseEvent::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("TASK", GetNapiInt32(env, static_cast<int32_t>(Button::TASK))),
     };
     napi_value button = nullptr;
-    CHKRP(env, napi_define_class(env, "Button", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    CHKRP(napi_define_class(env, "Button", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(buttonArr) / sizeof(*buttonArr), buttonArr, &button), DEFINE_CLASS);
-    CHKRP(env, napi_set_named_property(env, exports, "Button", button), SET_NAMED_PROPERTY);
+    CHKRP(napi_set_named_property(env, exports, "Button", button), SET_NAMED_PROPERTY);
 
     napi_property_descriptor axisArr[] = {
         DECLARE_NAPI_STATIC_PROPERTY("SCROLL_VERTICAL", GetNapiInt32(env, static_cast<int32_t>(Axis::SCROLL_VERTICAL))),
@@ -113,9 +110,9 @@ napi_value JsMouseEvent::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("PINCH", GetNapiInt32(env, static_cast<int32_t>(Axis::PINCH))),
     };
     napi_value axis = nullptr;
-    CHKRP(env, napi_define_class(env, "Axis", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    CHKRP(napi_define_class(env, "Axis", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(axisArr) / sizeof(*axisArr), axisArr, &axis), DEFINE_CLASS);
-    CHKRP(env, napi_set_named_property(env, exports, "Axis", axis), SET_NAMED_PROPERTY);
+    CHKRP(napi_set_named_property(env, exports, "Axis", axis), SET_NAMED_PROPERTY);
     return exports;
 }
 } // namespace MMI

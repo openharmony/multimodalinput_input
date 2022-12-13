@@ -27,14 +27,11 @@ namespace MMI {
     #define RET_ERR (-1)
 #endif
 
+inline constexpr int32_t INVALID_FD { -1 };
+inline constexpr int32_t INVALID_PID { -1 };
+
 #ifndef LINEINFO
 #define LINEINFO __FILE__, __LINE__
-#endif
-
-#if defined(__GNUC__) && __GNUC__ >= 4
-    #define WL_EXPORT __attribute__ ((visibility("default")))
-#else
-    #define WL_EXPORT
 #endif
 
 #ifdef DEBUG_CODE_TEST

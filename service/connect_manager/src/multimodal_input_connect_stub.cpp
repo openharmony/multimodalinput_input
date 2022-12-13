@@ -33,8 +33,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Multi
 using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, MessageParcel& reply);
 } // namespace
 
-int32_t MultimodalInputConnectStub::OnRemoteRequest(
-    uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& option)
+int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
+    MessageParcel& reply, MessageOption& option)
 {
     int32_t pid = GetCallingPid();
     TimeCostChk chk("IPC-OnRemoteRequest", "overtime 300(us)", MAX_OVER_TIME, pid,
@@ -49,6 +49,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
     const static std::map<int32_t, ConnFunc> mapConnFunc = {
         {IMultimodalInputConnect::ALLOC_SOCKET_FD, &MultimodalInputConnectStub::StubHandleAllocSocketFd},
         {IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubAddInputEventFilter},
+        {IMultimodalInputConnect::RMV_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubRemoveInputEventFilter},
         {IMultimodalInputConnect::SET_POINTER_VISIBLE, &MultimodalInputConnectStub::StubSetPointerVisible},
         {IMultimodalInputConnect::SET_POINTER_STYLE, &MultimodalInputConnectStub::StubSetPointerStyle},
         {IMultimodalInputConnect::GET_POINTER_STYLE, &MultimodalInputConnectStub::StubGetPointerStyle},
@@ -71,12 +72,21 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(
         {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
         {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
         {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener},
-        {IMultimodalInputConnect::REMOTE_COOPERATE_START, &MultimodalInputConnectStub::StubStartRemoteCooperate},
-        {IMultimodalInputConnect::REMOTE_COOPERATE_START_RES, &MultimodalInputConnectStub::StubStartRemoteCooperateRes},
-        {IMultimodalInputConnect::REMOTE_COOPERATE_STOP, &MultimodalInputConnectStub::StubStopRemoteCooperate},
-        {IMultimodalInputConnect::REMOTE_COOPERATE_STOP_RES, &MultimodalInputConnectStub::StubStopRemoteCooperateRes},
-        {IMultimodalInputConnect::REMOTE_COOPERATE_STOP_OTHER_RES,
-            &MultimodalInputConnectStub::StubStartCooperateOtherRes}
+        {IMultimodalInputConnect::REGISTER_COOPERATE_MONITOR,
+            &MultimodalInputConnectStub::StubRegisterCooperateMonitor},
+        {IMultimodalInputConnect::UNREGISTER_COOPERATE_MONITOR,
+            &MultimodalInputConnectStub::StubUnregisterCooperateMonitor},
+        {IMultimodalInputConnect::ENABLE_INPUT_DEVICE_COOPERATE,
+            &MultimodalInputConnectStub::StubEnableInputDeviceCooperate},
+        {IMultimodalInputConnect::START_INPUT_DEVICE_COOPERATE,
+            &MultimodalInputConnectStub::StubStartInputDeviceCooperate},
+        {IMultimodalInputConnect::STOP_DEVICE_COOPERATE, &MultimodalInputConnectStub::StubStopDeviceCooperate},
+        {IMultimodalInputConnect::GET_INPUT_DEVICE_COOPERATE_STATE,
+            &MultimodalInputConnectStub::StubGetInputDeviceCooperateState},
+        {IMultimodalInputConnect::SET_INPUT_DEVICE_TO_SCREEN, &MultimodalInputConnectStub::StubSetInputDevice},
+        {IMultimodalInputConnect::GET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubGetFunctionKeyState},
+        {IMultimodalInputConnect::SET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubSetFunctionKeyState},
+        {IMultimodalInputConnect::SET_POINTER_LOCATION, &MultimodalInputConnectStub::StubSetPointerLocation}
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -107,9 +117,14 @@ int32_t MultimodalInputConnectStub::StubHandleAllocSocketFd(MessageParcel& data,
         }
         return ret;
     }
-    reply.WriteFileDescriptor(clientFd);
+
+    if (!reply.WriteFileDescriptor(clientFd)) {
+        MMI_HILOGE("Write file descriptor failed");
+        return IPC_STUB_WRITE_PARCEL_ERR;
+    }
+
     WRITEINT32(reply, tokenType, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGI("send clientFd to client, clientFd:%{public}d, tokenType:%{public}d", clientFd, tokenType);
+    MMI_HILOGI("Send clientFd to client, clientFd:%{public}d, tokenType:%{public}d", clientFd, tokenType);
     close(clientFd);
     return RET_OK;
 }
@@ -126,10 +141,31 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
     CHKPR(client, ERR_INVALID_VALUE);
     sptr<IEventFilter> filter = iface_cast<IEventFilter>(client);
     CHKPR(filter, ERROR_NULL_POINTER);
-
-    int32_t ret = AddInputEventFilter(filter);
+    int32_t filterId = -1;
+    READINT32(data, filterId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t priority = 0;
+    READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = AddInputEventFilter(filter, filterId, priority);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AddInputEventFilter failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubRemoveInputEventFilter(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    int32_t filterId = -1;
+    READINT32(data, filterId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = RemoveInputEventFilter(filterId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call RemoveInputEventFilter failed ret:%{public}d", ret);
         return ret;
     }
     MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
@@ -139,11 +175,6 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
 int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
-
     bool visible = false;
     READBOOL(data, visible, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetPointerVisible(visible);
@@ -158,11 +189,6 @@ int32_t MultimodalInputConnectStub::StubSetPointerVisible(MessageParcel& data, M
 int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
-
     bool visible = false;
     int32_t ret = IsPointerVisible(visible);
     if (ret != RET_OK) {
@@ -178,7 +204,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerSpeed(MessageParcel& data, Mes
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check fail");
+        MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
     }
     int32_t speed;
@@ -195,7 +221,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, Mes
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check fail");
+        MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
     }
     int32_t speed;
@@ -212,11 +238,6 @@ int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check fail");
-        return RET_ERR;
-    }
-
     int32_t windowId;
     READINT32(data, windowId, RET_ERR);
     int32_t pointerStyle;
@@ -224,7 +245,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
     int32_t ret = SetPointerStyle(windowId, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetPointerStyle failed ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     MMI_HILOGD("Successfully set window:%{public}d, icon:%{public}d", windowId, pointerStyle);
     return RET_OK;
@@ -233,18 +254,13 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check fail");
-        return RET_ERR;
-    }
-
     int32_t windowId;
     READINT32(data, windowId, RET_ERR);
     int32_t pointerStyle;
     int32_t ret = GetPointerStyle(windowId, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetPointerStyle failed ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     WRITEINT32(reply, pointerStyle, RET_ERR);
     MMI_HILOGD("Successfully get window:%{public}d, icon:%{public}d", windowId, pointerStyle);
@@ -254,8 +270,6 @@ int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData = 0;
-    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t deviceId = -1;
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t size = 0;
@@ -266,53 +280,100 @@ int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, Message
         READINT32(data, key, IPC_PROXY_DEAD_OBJECT_ERR);
         keys.push_back(key);
     }
-    SupportKeys(userData, deviceId, keys);
-    return RET_OK;
+    std::vector<bool> keystroke;
+    int32_t ret = SupportKeys(deviceId, keys, keystroke);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SupportKeys failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    if (!reply.WriteBoolVector(keystroke)) {
+        MMI_HILOGE("Write keyStroke failed");
+        return RET_ERR;
+    }
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubGetDeviceIds(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData = 0;
-    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
-    GetDeviceIds(userData);
-    return RET_OK;
+    std::vector<int32_t> ids;
+    int32_t ret = GetDeviceIds(ids);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetDeviceIds failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    if (!reply.WriteInt32Vector(ids)) {
+        MMI_HILOGE("Write ids failed");
+        return RET_ERR;
+    }
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubGetDevice(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData = 0;
-    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t deviceId = -1;
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
-    GetDevice(userData, deviceId);
+    std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
+    int32_t ret = GetDevice(deviceId, inputDevice);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetDevice failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    WRITEINT32(reply, inputDevice->GetId(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, inputDevice->GetType(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITESTRING(reply, inputDevice->GetName(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, inputDevice->GetBus(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, inputDevice->GetVersion(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, inputDevice->GetProduct(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, inputDevice->GetVendor(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITESTRING(reply, inputDevice->GetPhys(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITESTRING(reply, inputDevice->GetUniq(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEUINT32(reply, static_cast<uint32_t>(inputDevice->GetAxisInfo().size()), IPC_STUB_WRITE_PARCEL_ERR);
+    for (const auto &item : inputDevice->GetAxisInfo()) {
+        WRITEINT32(reply, item.GetMinimum(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(reply, item.GetMaximum(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(reply, item.GetAxisType(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(reply, item.GetFuzz(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(reply, item.GetFlat(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(reply, item.GetResolution(), IPC_STUB_WRITE_PARCEL_ERR);
+    }
     return RET_OK;
 }
 
 int32_t MultimodalInputConnectStub::StubRegisterInputDeviceMonitor(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    RegisterDevListener();
-    return RET_OK;
+    int32_t ret = RegisterDevListener();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call RegisterInputDeviceMonitor failed ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubUnregisterInputDeviceMonitor(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    UnregisterDevListener();
-    return RET_OK;
+    int32_t ret = UnregisterDevListener();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call UnregisterInputDeviceMonitor failed ret:%{public}d", ret);
+    }
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubGetKeyboardType(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData = 0;
-    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t deviceId = -1;
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
-    GetKeyboardType(userData, deviceId);
-    return RET_OK;
+    int32_t keyboardType = 0;
+    int32_t ret = GetKeyboardType(deviceId, keyboardType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetKeyboardType failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    WRITEINT32(reply, keyboardType, IPC_STUB_WRITE_PARCEL_ERR);
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, MessageParcel& reply)
@@ -331,11 +392,16 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
     }
     if ((handlerType == InputHandlerType::MONITOR) && (!PerHelper->CheckMonitor())) {
         MMI_HILOGE("Monitor permission check failed");
-        return CHECK_PERMISSION_FAIL;
+        return ERROR_NO_PERMISSION;
     }
     uint32_t eventType;
     READUINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = AddInputHandler(static_cast<InputHandlerType>(handlerType), eventType);
+    int32_t priority;
+    READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t deviceTags;
+    READINT32(data, deviceTags, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = AddInputHandler(static_cast<InputHandlerType>(handlerType), eventType, priority,
+        deviceTags);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AddInputHandler failed ret:%{public}d", ret);
         return ret;
@@ -363,7 +429,12 @@ int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, 
     }
     uint32_t eventType;
     READUINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = RemoveInputHandler(static_cast<InputHandlerType>(handlerType), eventType);
+    int32_t priority;
+    READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t deviceTags;
+    READINT32(data, deviceTags, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = RemoveInputHandler(static_cast<InputHandlerType>(handlerType), eventType, priority,
+        deviceTags);
     if (ret != RET_OK) {
         MMI_HILOGE("Call RemoveInputHandler failed ret:%{public}d", ret);
         return ret;
@@ -397,7 +468,7 @@ int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, M
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("permission check failed");
+        MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
     }
 
@@ -410,7 +481,6 @@ int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, M
     READINT32(data, subscribeId, IPC_PROXY_DEAD_OBJECT_ERR);
 
     auto keyOption = std::make_shared<KeyOption>();
-    CHKPR(keyOption, IPC_STUB_WRITE_PARCEL_ERR);
     if (!keyOption->ReadFromParcel(data)) {
         MMI_HILOGE("Read keyOption failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
@@ -427,7 +497,7 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data,
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("permission check failed");
+        MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
     }
 
@@ -476,7 +546,7 @@ int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, Mess
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("permission check failed");
+        MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
     }
     if (!IsRunning()) {
@@ -501,7 +571,7 @@ int32_t MultimodalInputConnectStub::StubInjectPointerEvent(MessageParcel& data, 
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("permission check failed");
+        MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
     }
     if (!IsRunning()) {
@@ -540,7 +610,7 @@ int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, Mess
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubStartRemoteCooperate(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubRegisterCooperateMonitor(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -551,16 +621,14 @@ int32_t MultimodalInputConnectStub::StubStartRemoteCooperate(MessageParcel& data
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    std::string remoteDeviceId;
-    READSTRING(data, remoteDeviceId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = StartRemoteCooperate(remoteDeviceId);
+    int32_t ret = RegisterCooperateListener();
     if (ret != RET_OK) {
-        MMI_HILOGE("Call StartRemoteCooperate failed, ret:%{public}d", ret);
+        MMI_HILOGE("Call RegisterCooperateEvent failed ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubStartRemoteCooperateRes(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubUnregisterCooperateMonitor(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -571,20 +639,14 @@ int32_t MultimodalInputConnectStub::StubStartRemoteCooperateRes(MessageParcel& d
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    bool isSucess;
-    READBOOL(data, isSucess, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t xPercent;
-    READINT32(data, xPercent, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t yPercent;
-    READINT32(data, yPercent, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = StartRemoteCooperateResult(isSucess, xPercent, yPercent);
+    int32_t ret = UnregisterCooperateListener();
     if (ret != RET_OK) {
-        MMI_HILOGE("Call StartRemoteCooperateResult failed, ret:%{public}d", ret);
+        MMI_HILOGE("Call RegisterCooperateEvent failed ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubStopRemoteCooperate(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubEnableInputDeviceCooperate(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -595,14 +657,18 @@ int32_t MultimodalInputConnectStub::StubStopRemoteCooperate(MessageParcel& data,
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t ret = StopRemoteCooperate();
+    int32_t userData;
+    bool enabled;
+    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, enabled, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = EnableInputDeviceCooperate(userData, enabled);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call StopRemoteCooperate failed, ret:%{public}d", ret);
+        MMI_HILOGE("Call RegisterCooperateEvent failed ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubStopRemoteCooperateRes(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubStartInputDeviceCooperate(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -613,16 +679,20 @@ int32_t MultimodalInputConnectStub::StubStopRemoteCooperateRes(MessageParcel& da
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    bool isSucess;
-    READBOOL(data, isSucess, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = StopRemoteCooperateResult(isSucess);
+    int32_t userData;
+    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
+    std::string sinkDeviceId;
+    READSTRING(data, sinkDeviceId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t srcInputDeviceId;
+    READINT32(data, srcInputDeviceId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = StartInputDeviceCooperate(userData, sinkDeviceId, srcInputDeviceId);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call StopRemoteCooperateResult failed, ret:%{public}d", ret);
+        MMI_HILOGE("Call StartInputDeviceCooperate failed ret:%{public}d", ret);
     }
     return ret;
 }
 
-int32_t MultimodalInputConnectStub::StubStartCooperateOtherRes(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubStopDeviceCooperate(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -633,11 +703,127 @@ int32_t MultimodalInputConnectStub::StubStartCooperateOtherRes(MessageParcel& da
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    std::string peerNetworkId;
-    READSTRING(data, peerNetworkId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = StartCooperateOtherResult(peerNetworkId);
+    int32_t userData;
+    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = StopDeviceCooperate(userData);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call StartCooperateOtherRes failed, ret:%{public}d", ret);
+        MMI_HILOGE("Call RegisterCooperateEvent failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubGetInputDeviceCooperateState(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t userData;
+    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
+    std::string deviceId;
+    READSTRING(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = GetInputDeviceCooperateState(userData, deviceId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call RegisterCooperateEvent failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetInputDevice(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    std::string dhid;
+    READSTRING(data, dhid, IPC_PROXY_DEAD_OBJECT_ERR);
+    std::string screenId;
+    READSTRING(data, screenId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetInputDevice(dhid, screenId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetInputDevice failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetFunctionKeyState(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t funcKey { 0 };
+    bool state  { false };
+    READINT32(data, funcKey, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = GetFunctionKeyState(funcKey, state);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetKeyboardEnableState failed ret:%{public}d", ret);
+        return ret;
+    }
+
+    WRITEBOOL(reply, state, IPC_PROXY_DEAD_OBJECT_ERR);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetFunctionKeyState(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t funcKey { 0 };
+    bool enable  { false };
+    READINT32(data, funcKey, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetFunctionKeyState(funcKey, enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetFunctionKeyState failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel &data, MessageParcel &reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t x = 0;
+    int32_t y = 0;
+    READINT32(data, x, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, y, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetPointerLocation(x, y);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetFunctionKeyState failed ret:%{public}d", ret);
     }
     return ret;
 }

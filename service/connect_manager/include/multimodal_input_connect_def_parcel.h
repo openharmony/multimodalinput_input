@@ -24,20 +24,11 @@ namespace OHOS {
 namespace MMI {
 class ConnectReqParcel final : public Parcelable {
 public:
+    static ConnectReqParcel *Unmarshalling(Parcel &in);
     ConnectReqParcel() = default;
     ~ConnectReqParcel() override = default;
-    bool Marshalling(Parcel& out) const override;
-    static ConnectReqParcel *Unmarshalling(Parcel& in);
-    ConnectDefReq data;
-};
-
-class ConnectRespParcel final : public Parcelable {
-public:
-    ConnectRespParcel() = default;
-    ~ConnectRespParcel() override = default;
     bool Marshalling(Parcel &out) const override;
-    static ConnectRespParcel *Unmarshalling(Parcel &in);
-    ConnectDefResp data;
+    ConnectDefReq data;
 };
 } // namespace MMI
 } // namespace OHOS

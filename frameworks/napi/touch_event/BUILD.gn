@@ -20,16 +20,8 @@ config("touchEvent_config") {
     "//foundation/multimodalinput/input/frameworks/napi/touch_event/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/util/network/include",
+    "//commonlibrary/c_utils/base/include",
   ]
-
-  defines = []
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
 }
 
 ohos_shared_library("touchevent") {
@@ -40,11 +32,7 @@ ohos_shared_library("touchevent") {
 
   configs = [ ":touchEvent_config" ]
 
-  deps = [
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
-    "//foundation/multimodalinput/input/util:libmmi-util",
-    "//third_party/libuv:uv_static",
-  ]
+  deps = []
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
@@ -54,4 +42,5 @@ ohos_shared_library("touchevent") {
   relative_install_dir = "module/multimodalinput"
 
   part_name = "input"
+  subsystem_name = "multimodalinput"
 }

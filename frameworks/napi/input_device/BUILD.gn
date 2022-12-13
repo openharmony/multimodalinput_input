@@ -20,16 +20,10 @@ config("inputdevice_config") {
     "//foundation/multimodalinput/input/frameworks/napi/input_device/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/util/network/include",
+    "//commonlibrary/c_utils/base/include",
+    "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
+    "//foundation/multimodalinput/input/frameworks/proxy/module_loader/include",
   ]
-
-  defines = []
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
 }
 
 ohos_shared_library("inputdevice") {
@@ -46,7 +40,6 @@ ohos_shared_library("inputdevice") {
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
     "//foundation/multimodalinput/input/util:libmmi-util",
-    "//third_party/libuv:uv_static",
   ]
 
   external_deps = [
@@ -57,4 +50,5 @@ ohos_shared_library("inputdevice") {
   relative_install_dir = "module/multimodalinput"
 
   part_name = "input"
+  subsystem_name = "multimodalinput"
 }

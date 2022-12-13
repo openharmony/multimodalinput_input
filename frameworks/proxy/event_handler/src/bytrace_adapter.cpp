@@ -24,19 +24,23 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "BytraceAdapter" };
+const std::string onKeyEvent { "OnKeyEvent" };
+const std::string onTouchEvent { "OnTouchEvent" };
+const std::string onPointerEvent { "OnPointerEvent" };
+const std::string keyEventDispatch { "KeyEventDispatch" };
+const std::string touchEventDispatch { "touchEventDispatch" };
+const std::string pointerEventDispatch { "PointerEventDispatch" };
+const std::string keyEventSubscribe { "KeyEventSubscribe" };
+const std::string pointerEventIntercept { "PointerEventIntercept" };
+const std::string touchEventIntercept { "TouchEventIntercept" };
+const std::string keyEventIntercept { "KeyEventIntercept" };
+const std::string startEvent { "StartEvent" };
+const std::string launchEvent { "LaunchEvent" };
+const std::string stopEvent { "StopEvent" };
+constexpr int32_t START_ID = 1;
+constexpr int32_t LAUNCH_ID = 2;
+constexpr int32_t STOP_ID = 3;
 } // namespace
-namespace {
-    std::string onKeyEvent = "OnKeyEvent";
-    std::string onTouchEvent = "OnTouchEvent";
-    std::string onPointerEvent = "OnPointerEvent";
-    std::string keyEventDispatch = "KeyEventDispatch";
-    std::string touchEventDispatch = "touchEventDispatch";
-    std::string pointerEventDispatch = "PointerEventDispatch";
-    std::string keyEventSubscribe = "KeyEventSubscribe";
-    std::string pointerEventIntercept = "PointerEventIntercept";
-    std::string touchEventIntercept = "TouchEventIntercept";
-    std::string keyEventIntercept = "KeyEventIntercept";
-}
 
 void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent)
 {
@@ -90,7 +94,7 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> key, HandlerType han
             break;
         }
         default: {
-            checkKeyCode = "Unknow keycode:" + std::to_string(keyCode);
+            checkKeyCode = "Unknown keycode:" + std::to_string(keyCode);
             break;
         }
     }
@@ -122,7 +126,7 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent, TraceBtn t
                 break;
             }
             default: {
-                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "Unknow keycode:" + std::to_string(keyCode));
+                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "Unknown keycode:" + std::to_string(keyCode));
                 break;
             }
         }
@@ -141,7 +145,7 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent, TraceBtn t
                 break;
             }
             default: {
-                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "Unknow keycode:" + std::to_string(keyCode));
+                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "Unknown keycode:" + std::to_string(keyCode));
                 break;
             }
         }
@@ -185,6 +189,48 @@ void BytraceAdapter::StartBytrace(
                 FinishAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, pointerEventIntercept, eventId);
             } else {
                 FinishAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, touchEventIntercept, eventId);
+            }
+        }
+    }
+}
+
+void BytraceAdapter::StartBytrace(TraceBtn traceBtn, EventType eventType)
+{
+    std::string checkKeyCode;
+    if (traceBtn == TRACE_START) {
+        switch (eventType) {
+            case START_EVENT: {
+                StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, startEvent, START_ID);
+                checkKeyCode = "crossing startId:" + std::to_string(START_ID);
+                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, checkKeyCode);
+                break;
+            }
+            case LAUNCH_EVENT: {
+                StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, launchEvent, LAUNCH_ID);
+                checkKeyCode = "crossing launchId:" + std::to_string(LAUNCH_ID);
+                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, checkKeyCode);
+                break;
+            }
+            case STOP_EVENT: {
+                StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, stopEvent, STOP_ID);
+                checkKeyCode = "crossing stopId:" + std::to_string(STOP_ID);
+                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, checkKeyCode);
+                break;
+            }
+        }
+    } else {
+        switch (eventType) {
+            case START_EVENT: {
+                FinishAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, keyEventIntercept, START_ID);
+                break;
+            }
+            case LAUNCH_EVENT: {
+                FinishAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, keyEventIntercept, LAUNCH_ID);
+                break;
+            }
+            case STOP_EVENT: {
+                FinishAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, keyEventIntercept, STOP_ID);
+                break;
             }
         }
     }

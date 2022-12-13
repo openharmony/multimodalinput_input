@@ -32,13 +32,13 @@ class UDSSession;
 using SessionPtr = std::shared_ptr<UDSSession>;
 class UDSSession : public std::enable_shared_from_this<UDSSession> {
 public:
-    UDSSession(const std::string& programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
+    UDSSession(const std::string &programName, const int32_t moduleType, const int32_t fd, const int32_t uid,
                const int32_t pid);
     DISALLOW_COPY_AND_MOVE(UDSSession);
     virtual ~UDSSession() = default;
 
     bool SendMsg(const char *buf, size_t size) const;
-    bool SendMsg(NetPacket& pkt) const;
+    bool SendMsg(NetPacket &pkt) const;
     void Close();
 
     int32_t GetUid() const
@@ -103,14 +103,6 @@ public:
     int64_t GetEarliestEventTime(int32_t type = 0) const;
     bool IsEventQueueEmpty(int32_t type = 0);
 
-#ifdef OHOS_BUILD_MMI_DEBUG
-    void SetClientFd(const int32_t clientFd)
-    {
-        clientFd_ = clientFd;
-        UpdateDescript();
-    }
-#endif
-
 protected:
     struct EventTime {
         int32_t id { 0 };
@@ -126,9 +118,6 @@ protected:
     const int32_t uid_ { -1 };
     const int32_t pid_ { -1 };
     int32_t tokenType_ { TokenType::TOKEN_INVALID };
-#ifdef OHOS_BUILD_MMI_DEBUG
-    int32_t clientFd_ { -1 };
-#endif // OHOS_BUILD_MMI_DEBUG
 };
 } // namespace MMI
 } // namespace OHOS

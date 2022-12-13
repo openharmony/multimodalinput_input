@@ -21,6 +21,7 @@
 #include "input_device.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "refbase.h"
 
 namespace OHOS {
 namespace MMI {
@@ -29,25 +30,24 @@ public:
     struct UserData {
         int32_t userData { 0 };
         int32_t deviceId { 0 };
-        napi_value handle = nullptr;
+        napi_value handle { nullptr };
         std::vector<int32_t> keys;
     };
     struct CallbackData {
         std::vector<int32_t> ids;
-        std::shared_ptr<InputDevice> device = nullptr;
+        std::shared_ptr<InputDevice> device { nullptr };
         std::vector<bool> keystrokeAbility;
         int32_t deviceId { 0 };
         int32_t keyboardType { 0 };
     };
-    struct CallbackInfo {
-        CallbackInfo();
-        ~CallbackInfo();
-        napi_env env = nullptr;
-        napi_ref ref = nullptr;
-        napi_deferred deferred = nullptr;
+    struct CallbackInfo : RefBase {
+        napi_env env { nullptr };
+        napi_ref ref { nullptr };
+        napi_deferred deferred { nullptr };
         int32_t errCode { -1 };
         CallbackData data;
         UserData uData;
+        bool isApi9 { false };
     };
     struct DeviceType {
         std::string sourceTypeName;
@@ -55,12 +55,13 @@ public:
     };
 
     static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
-    static napi_value GetDeviceInfo(const std::unique_ptr<CallbackInfo> &cb);
-    static bool GetDeviceAxisInfo(const std::unique_ptr<CallbackInfo> &cb, napi_value &object);
-    static bool GetDeviceSourceType(const std::unique_ptr<CallbackInfo> &cb, napi_value &object);
+    static napi_value GetDeviceInfo(sptr<CallbackInfo> cb);
+    static bool GetDeviceAxisInfo(sptr<CallbackInfo> cb, napi_value &object);
+    static bool GetDeviceSourceType(sptr<CallbackInfo> cb, napi_value &object);
     static bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
+    static void DeleteCallbackInfo(std::unique_ptr<CallbackInfo> callback);
     template <typename T>
-    static void DeletePtr(T ptr)
+    static void DeletePtr(T &ptr)
     {
         if (ptr != nullptr) {
             delete ptr;

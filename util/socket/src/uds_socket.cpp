@@ -34,7 +34,7 @@ UDSSocket::~UDSSocket()
     EpollClose();
 }
 
-int32_t UDSSocket::EpollCreat(int32_t size)
+int32_t UDSSocket::EpollCreate(int32_t size)
 {
     epollFd_ = epoll_create(size);
     if (epollFd_ < 0) {
@@ -45,7 +45,7 @@ int32_t UDSSocket::EpollCreat(int32_t size)
     return epollFd_;
 }
 
-int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, int32_t epollFd)
+int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event, int32_t epollFd)
 {
     if (fd < 0) {
         MMI_HILOGE("Invalid fd");
@@ -72,7 +72,7 @@ int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event& event, i
     return ret;
 }
 
-int32_t UDSSocket::EpollWait(struct epoll_event& events, int32_t maxevents, int32_t timeout, int32_t epollFd)
+int32_t UDSSocket::EpollWait(struct epoll_event &events, int32_t maxevents, int32_t timeout, int32_t epollFd)
 {
     if (epollFd < 0) {
         epollFd = epollFd_;
@@ -88,35 +88,7 @@ int32_t UDSSocket::EpollWait(struct epoll_event& events, int32_t maxevents, int3
     return ret;
 }
 
-int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isNonBlock)
-{
-    if (fd < 0) {
-        MMI_HILOGE("Invalid fd");
-        return RET_ERR;
-    }
-    int32_t flags = fcntl(fd, F_GETFL);
-    if (flags < 0) {
-        MMI_HILOGE("fcntl F_GETFL fail. fd:%{public}d,flags:%{public}d,errno:%{public}d,errCode:%{public}d",
-            fd, flags, errno, FCNTL_FAIL);
-        return flags;
-    }
-    MMI_HILOGI("F_GETFL fd:%{public}d,flags:%{public}d", fd, flags);
-    uint32_t mask = static_cast<uint32_t>(flags);
-    mask |= O_NONBLOCK;
-    if (!isNonBlock) {
-        mask &= ~O_NONBLOCK;
-    }
-    flags = fcntl(fd, F_SETFL, static_cast<int32_t>(mask));
-    if (flags < 0) {
-        MMI_HILOGE("fcntl F_SETFL fail. fd:%{public}d,flags:%{public}d,errno:%{public}d,errCode:%{public}d",
-            fd, flags, errno, FCNTL_FAIL);
-        return flags;
-    }
-    MMI_HILOGI("F_SETFL fd:%{public}d,flags:%{public}d", fd, flags);
-    return flags;
-}
-
-void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, UDSSocket::PacketCallBackFun callbackFun)
+void UDSSocket::OnReadPackets(CircleStreamBuffer &circBuf, UDSSocket::PacketCallBackFun callbackFun)
 {
     constexpr int32_t headSize = static_cast<int32_t>(sizeof(PackHead));
     for (int32_t i = 0; i < ONCE_PROCESS_NETPACKET_LIMIT; i++) {
@@ -140,7 +112,7 @@ void UDSSocket::OnReadPackets(CircleStreamBuffer& circBuf, UDSSocket::PacketCall
         }
         NetPacket pkt(head->idMsg);
         if ((head->size > 0) && (!pkt.Write(&buf[headSize], head->size))) {
-            MMI_HILOGW("Error writing data in the NetPacket. It will be retried next time. messageid: %{public}d,"
+            MMI_HILOGW("Error writing data in the NetPacket. It will be retried next time. messageid:%{public}d,"
                 "size:%{public}d", head->idMsg, head->size);
             break;
         }

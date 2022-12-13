@@ -15,16 +15,18 @@
 
 #include "input_device_impl.h"
 
-#include "input_manager_impl.h"
+#include <algorithm>
+
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "napi_constants.h"
+#include "net_packet.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceImpl"};
-const std::string CHANGED_TYPE = "change";
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceImpl" };
 } // namespace
 
 InputDeviceImpl& InputDeviceImpl::GetInstance()
@@ -46,16 +48,17 @@ int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevLi
         MMI_HILOGE("Find change failed");
         return RET_ERR;
     }
-    for (const auto &item : iter->second) {
-        if (item.second == listener) {
-            MMI_HILOGW("The listener already exists");
-            return RET_ERR;
-        }
+    auto &listeners = iter->second;
+
+    if (std::all_of(listeners.cbegin(), listeners.cend(),
+                    [listener](InputDevListenerPtr tListener) {
+                        return (tListener != listener);
+                    })) {
+        MMI_HILOGI("Add device listener");
+        listeners.push_back(listener);
+    } else {
+        MMI_HILOGW("The listener already exists");
     }
-    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
-    CHKPR(eventHandler, RET_ERR);
-    auto monitor = std::make_pair(eventHandler, listener);
-    iter->second.push_back(monitor);
     if (!isListeningProcess_) {
         MMI_HILOGI("Start monitoring");
         isListeningProcess_ = true;
@@ -81,7 +84,7 @@ int32_t InputDeviceImpl::UnregisterDevListener(const std::string &type, InputDev
         goto listenerLabel;
     }
     for (auto it = iter->second.begin(); it != iter->second.end(); ++it) {
-        if (it->second == listener) {
+        if (*it == listener) {
             iter->second.erase(it);
             goto listenerLabel;
         }
@@ -95,17 +98,6 @@ listenerLabel:
     return RET_OK;
 }
 
-void InputDeviceImpl::OnDevListenerTask(const DevListener &devMonitor, const std::string &type, int32_t deviceId)
-{
-    CALL_DEBUG_ENTER;
-    MMI_HILOGI("Report device change task, event type:%{public}s", type.c_str());
-    if (type == "add") {
-        devMonitor.second->OnDeviceAdded(deviceId, type);
-        return;
-    }
-    devMonitor.second->OnDeviceRemoved(deviceId, type);
-}
-
 void InputDeviceImpl::OnDevListener(int32_t deviceId, const std::string &type)
 {
     CALL_DEBUG_ENTER;
@@ -116,217 +108,69 @@ void InputDeviceImpl::OnDevListener(int32_t deviceId, const std::string &type)
         return;
     }
     for (const auto &item : iter->second) {
-        if (!MMIEventHandler::PostTask(item.first,
-            std::bind(&InputDeviceImpl::OnDevListenerTask, this, item, type, deviceId))) {
-            MMI_HILOGE("Post task failed");
+        MMI_HILOGI("Report device change task, event type:%{public}s", type.c_str());
+        if (type == "add") {
+            item->OnDeviceAdded(deviceId, type);
+            continue;
         }
+        item->OnDeviceRemoved(deviceId, type);
     }
 }
 
-int32_t InputDeviceImpl::GetInputDeviceIdsAsync(FunInputDevIds callback)
+int32_t InputDeviceImpl::GetInputDeviceIds(FunInputDevIds callback)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
-    CHKPR(eventHandler, RET_ERR);
-    InputDeviceData data;
-    data.ids = std::make_pair(eventHandler, callback);
-    if (userData_ == INT32_MAX) {
-        MMI_HILOGE("userData exceeds the maximum");
+    CHKPR(callback, RET_ERR);
+    std::vector<int32_t> ids;
+    int32_t ret = MultimodalInputConnMgr->GetDeviceIds(ids);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetInputDeviceIds failed");
         return RET_ERR;
     }
-    inputDevices_[userData_] = data;
-    return MultimodalInputConnMgr->GetDeviceIds(userData_++);
+    callback(ids);
+    return ret;
 }
 
-int32_t InputDeviceImpl::GetInputDeviceAsync(int32_t deviceId, FunInputDevInfo callback)
+int32_t InputDeviceImpl::GetInputDevice(int32_t deviceId, FunInputDevInfo callback)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
-    CHKPR(eventHandler, RET_ERR);
-    InputDeviceData data;
-    data.inputDevice = std::make_pair(eventHandler, callback);
-    if (userData_ == INT32_MAX) {
-        MMI_HILOGE("UserData exceeds the maximum");
+    CHKPR(callback, RET_ERR);
+    std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
+    int32_t ret = MultimodalInputConnMgr->GetDevice(deviceId, inputDevice);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetDevice failed");
         return RET_ERR;
     }
-    inputDevices_[userData_] = data;
-    return MultimodalInputConnMgr->GetDevice(userData_++, deviceId);
+    callback(inputDevice);
+    return RET_OK;
 }
 
 int32_t InputDeviceImpl::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCodes, FunInputDevKeys callback)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (keyCodes.size() > MAX_SUPPORT_KEY) {
-        MMI_HILOGE("Keys exceeds the max range");
+    CHKPR(callback, RET_ERR);
+    std::vector<bool> keystroke;
+    int32_t ret = MultimodalInputConnMgr->SupportKeys(deviceId, keyCodes, keystroke);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SupportKeys failed");
         return RET_ERR;
     }
-    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
-    CHKPR(eventHandler, RET_ERR);
-    InputDeviceData data;
-    data.keys = std::make_pair(eventHandler, callback);
-    if (userData_ == INT32_MAX) {
-        MMI_HILOGE("UserData exceeds the maximum");
-        return RET_ERR;
-    }
-    inputDevices_[userData_] = data;
-    return MultimodalInputConnMgr->SupportKeys(userData_++, deviceId, keyCodes);
+    callback(keystroke);
+    return RET_OK;
 }
 
 int32_t InputDeviceImpl::GetKeyboardType(int32_t deviceId, FunKeyboardTypes callback)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto eventHandler = InputMgrImpl->GetCurrentEventHandler();
-    CHKPR(eventHandler, RET_ERR);
-    InputDeviceData data;
-    data.kbTypes = std::make_pair(eventHandler, callback);
-    if (userData_ == INT32_MAX) {
-        MMI_HILOGE("UserData exceeds the maximum");
+    CHKPR(callback, RET_ERR);
+    int32_t keyboardType = 0;
+    int32_t ret = MultimodalInputConnMgr->GetKeyboardType(deviceId, keyboardType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetKeyboardType failed");
         return RET_ERR;
     }
-    inputDevices_[userData_] = data;
-    return MultimodalInputConnMgr->GetKeyboardType(userData_++, deviceId);
-}
-
-void InputDeviceImpl::OnInputDeviceTask(const DevInfo &devInfo, int32_t userData, std::shared_ptr<InputDevice> devData)
-{
-    CHK_PID_AND_TID();
-    CHKPV(devData);
-    devInfo.second(devData);
-    MMI_HILOGD("Report device info task, userData:%{public}d name:%{public}s",
-        userData, devData->GetName().c_str());
-}
-
-void InputDeviceImpl::OnInputDevice(int32_t userData, std::shared_ptr<InputDevice> devData)
-{
-    CALL_DEBUG_ENTER;
-    CHK_PID_AND_TID();
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto iter = inputDevices_.find(userData);
-    if (iter == inputDevices_.end()) {
-        MMI_HILOGI("Find userData failed");
-        return;
-    }
-    auto devInfo = GetDeviceInfo(userData);
-    CHKPV(devInfo);
-    if (!MMIEventHandler::PostTask(devInfo->first,
-        std::bind(&InputDeviceImpl::OnInputDeviceTask, this, *devInfo, userData, devData))) {
-        MMI_HILOGE("Post task failed");
-    }
-    MMI_HILOGD("Report device info, userData:%{public}d name:%{public}s type:%{public}d",
-        userData, devData->GetName().c_str(), devData->GetType());
-}
-
-void InputDeviceImpl::OnInputDeviceIdsTask(const DevIds &devIds, int32_t userData, std::vector<int32_t> &ids)
-{
-    CHK_PID_AND_TID();
-    devIds.second(ids);
-    MMI_HILOGD("Report all device, userData:%{public}d devices:(%{public}s)",
-        userData, IdsListToString(ids).c_str());
-}
-
-void InputDeviceImpl::OnInputDeviceIds(int32_t userData, std::vector<int32_t> &ids)
-{
-    CHK_PID_AND_TID();
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto iter = inputDevices_.find(userData);
-    if (iter == inputDevices_.end()) {
-        MMI_HILOGI("Find userData failed");
-        return;
-    }
-    auto devIds = GetDeviceIds(userData);
-    CHKPV(devIds);
-    if (!MMIEventHandler::PostTask(devIds->first,
-        std::bind(&InputDeviceImpl::OnInputDeviceIdsTask, this, *devIds, userData, ids))) {
-        MMI_HILOGE("Post task failed");
-    }
-    MMI_HILOGD("Report all device, userData:%{public}d device:(%{public}s)",
-        userData, IdsListToString(ids).c_str());
-}
-
-void InputDeviceImpl::OnSupportKeysTask(const DevKeys &devKeys, int32_t userData, std::vector<bool> &supportRet)
-{
-    CHK_PID_AND_TID();
-    devKeys.second(supportRet);
-}
-
-void InputDeviceImpl::OnSupportKeys(int32_t userData, const std::vector<bool> &keystrokeAbility)
-{
-    CHK_PID_AND_TID();
-    std::lock_guard<std::mutex> guard(mtx_);
-    auto iter = inputDevices_.find(userData);
-    if (iter == inputDevices_.end()) {
-        MMI_HILOGI("Find userData failed");
-        return;
-    }
-    auto devKeys = GetDeviceKeys(userData);
-    CHKPV(devKeys);
-    if (!MMIEventHandler::PostTask(devKeys->first,
-        std::bind(&InputDeviceImpl::OnSupportKeysTask, this, *devKeys, userData, keystrokeAbility))) {
-        MMI_HILOGE("Post task failed");
-    }
-}
-
-void InputDeviceImpl::OnKeyboardTypeTask(const DevKeyboardTypes &kbTypes, int32_t userData, int32_t keyboardType)
-{
-    CHK_PID_AND_TID();
-    kbTypes.second(keyboardType);
-    MMI_HILOGD("Keyboard type event callback userData:%{public}d keyboardType:(%{public}d)",
-        userData, keyboardType);
-}
-
-void InputDeviceImpl::OnKeyboardType(int32_t userData, int32_t keyboardType)
-{
-    CHK_PID_AND_TID();
-    std::lock_guard<std::mutex> guard(mtx_);
-    if (auto iter = inputDevices_.find(userData); iter == inputDevices_.end()) {
-        MMI_HILOGI("Find userData failed");
-        return;
-    }
-    auto devKbTypes = GetKeyboardTypes(userData);
-    CHKPV(devKbTypes);
-    if (!MMIEventHandler::PostTask(devKbTypes->first,
-        std::bind(&InputDeviceImpl::OnKeyboardTypeTask, this, *devKbTypes, userData, keyboardType))) {
-        MMI_HILOGE("Post task failed");
-    }
-    MMI_HILOGD("Keyboard type event userData:%{public}d keyboardType:%{public}d",
-        userData, keyboardType);
-}
-
-const InputDeviceImpl::DevInfo* InputDeviceImpl::GetDeviceInfo(int32_t userData) const
-{
-    auto iter = inputDevices_.find(userData);
-    if (iter == inputDevices_.end()) {
-        return nullptr;
-    }
-    return &iter->second.inputDevice;
-}
-
-const InputDeviceImpl::DevIds* InputDeviceImpl::GetDeviceIds(int32_t userData) const
-{
-    auto iter = inputDevices_.find(userData);
-    if (iter == inputDevices_.end()) {
-        return nullptr;
-    }
-    return &iter->second.ids;
-}
-
-const InputDeviceImpl::DevKeys* InputDeviceImpl::GetDeviceKeys(int32_t userData) const
-{
-    auto iter = inputDevices_.find(userData);
-    if (iter == inputDevices_.end()) {
-        return nullptr;
-    }
-    return &iter->second.keys;
-}
-
-const InputDeviceImpl::DevKeyboardTypes* InputDeviceImpl::GetKeyboardTypes(int32_t userData) const
-{
-    auto iter = inputDevices_.find(userData);
-    return iter == inputDevices_.end()? nullptr : &iter->second.kbTypes;
+    callback(keyboardType);
+    return RET_OK;
 }
 
 int32_t InputDeviceImpl::GetUserData()
@@ -337,70 +181,44 @@ int32_t InputDeviceImpl::GetUserData()
 std::shared_ptr<InputDevice> InputDeviceImpl::DevDataUnmarshalling(NetPacket &pkt)
 {
     auto devData = std::make_shared<InputDevice>();
-    CHKPP(devData);
     int32_t deviceId;
-    pkt >> deviceId;
-    devData->SetId(deviceId);
-
     std::string name;
-    pkt >> name;
-    devData->SetName(name);
-
     int32_t deviceType;
-    pkt >> deviceType;
-    devData->SetType(deviceType);
-
     int32_t bus;
-    pkt >> bus;
-    devData->SetBus(bus);
-
     int32_t product;
-    pkt >> product;
-    devData->SetProduct(product);
-
     int32_t vendor;
-    pkt >> vendor;
-    devData->SetVendor(vendor);
-
     int32_t version;
-    pkt >> version;
-    devData->SetVersion(version);
-
     std::string phys;
-    pkt >> phys;
-    devData->SetPhys(phys);
-
     std::string uniq;
-    pkt >> uniq;
+    unsigned long caps;
+    pkt >> deviceId >> name >> deviceType >> bus >> product >> vendor >> version >> phys >> uniq >> caps;
+    devData->SetId(deviceId);
+    devData->SetName(name);
+    devData->SetType(deviceType);
+    devData->SetBus(bus);
+    devData->SetProduct(product);
+    devData->SetVendor(vendor);
+    devData->SetVersion(version);
+    devData->SetPhys(phys);
     devData->SetUniq(uniq);
+    devData->SetCapabilities(caps);
 
     size_t size;
     pkt >> size;
-    std::vector<InputDevice::AxisInfo> axisInfo;
     for (size_t i = 0; i < size; ++i) {
         InputDevice::AxisInfo axis;
         int32_t type;
-        pkt >> type;
-        axis.SetAxisType(type);
-
         int32_t min;
-        pkt >> min;
-        axis.SetMinimum(min);
-
         int32_t max;
-        pkt >> max;
-        axis.SetMaximum(max);
-
         int32_t fuzz;
-        pkt >> fuzz;
-        axis.SetFuzz(fuzz);
-
         int32_t flat;
-        pkt >> flat;
-        axis.SetFlat(flat);
-
         int32_t resolution;
-        pkt >> resolution;
+        pkt >> type >> min >> max >> fuzz >> flat >> resolution;
+        axis.SetAxisType(type);
+        axis.SetMinimum(min);
+        axis.SetMaximum(max);
+        axis.SetFuzz(fuzz);
+        axis.SetFlat(flat);
         axis.SetResolution(resolution);
         devData->AddAxisInfo(axis);
     }

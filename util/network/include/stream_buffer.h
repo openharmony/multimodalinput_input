@@ -30,23 +30,23 @@
 namespace OHOS {
 namespace MMI {
 class StreamBuffer {
-    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "StreamBuffer"};
+    static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "StreamBuffer" };
 public:
     StreamBuffer() = default;
-    virtual ~StreamBuffer() = default;
-    explicit StreamBuffer(const StreamBuffer& buf);
-    virtual StreamBuffer& operator=(const StreamBuffer& other);
     DISALLOW_MOVE(StreamBuffer);
+    virtual ~StreamBuffer() = default;
+    explicit StreamBuffer(const StreamBuffer &buf);
+    virtual StreamBuffer &operator=(const StreamBuffer &other);
     
     void Reset();
     void Clean();
     bool SeekReadPos(int32_t n);
 
-    bool Read(std::string& buf);
-    bool Write(const std::string& buf);
+    bool Read(std::string &buf);
+    bool Write(const std::string &buf);
 
-    bool Read(StreamBuffer& buf);
-    bool Write(const StreamBuffer& buf);
+    bool Read(StreamBuffer &buf);
+    bool Write(const StreamBuffer &buf);
 
     bool Read(char *buf, size_t size);
     virtual bool Write(const char *buf, size_t size);
@@ -57,13 +57,13 @@ public:
     int32_t GetAvailableBufSize() const;
 
     bool ChkRWError() const;
-    const std::string& GetErrorStatusRemark() const;
+    const std::string &GetErrorStatusRemark() const;
     const char *Data() const;
 
     template<typename T>
-    bool Read(T& data);
+    bool Read(T &data);
     template<typename T>
-    bool Write(const T& data);
+    bool Write(const T &data);
     template<typename T>
     bool Read(std::vector<T> &data);
     template<typename T>
@@ -73,12 +73,12 @@ public:
     const char *WriteBuf() const;
 
     template<typename T>
-    StreamBuffer& operator >> (T& data);
+    StreamBuffer &operator >> (T &data);
     template<typename T>
-    StreamBuffer& operator << (const T& data);
+    StreamBuffer &operator << (const T &data);
 
 protected:
-    bool Clone(const StreamBuffer& buf);
+    bool Clone(const StreamBuffer &buf);
 
 protected:
     enum class ErrorStatus {
@@ -87,11 +87,11 @@ protected:
         ERROR_STATUS_WRITE,
     };
     ErrorStatus rwErrorStatus_ = ErrorStatus::ERROR_STATUS_OK;
-    int32_t rCount_ = 0;
-    int32_t wCount_ = 0;
+    int32_t rCount_ { 0 };
+    int32_t wCount_ { 0 };
 
-    int32_t rPos_ = 0;
-    int32_t wPos_ = 0;
+    int32_t rPos_ { 0 };
+    int32_t wPos_ { 0 };
     char szBuff_[MAX_STREAM_BUF_SIZE+1] = {};
 };
 

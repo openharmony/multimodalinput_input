@@ -16,6 +16,7 @@
 #ifndef INPUT_DEVICE_H
 #define INPUT_DEVICE_H
 
+#include <bitset>
 #include <string>
 #include <vector>
 
@@ -23,11 +24,38 @@
 
 namespace OHOS {
 namespace MMI {
+enum InputDeviceCapability {
+    INPUT_DEV_CAP_KEYBOARD,
+    INPUT_DEV_CAP_POINTER,
+    INPUT_DEV_CAP_TOUCH,
+    INPUT_DEV_CAP_TABLET_TOOL,
+    INPUT_DEV_CAP_TABLET_PAD,
+    INPUT_DEV_CAP_GESTURE,
+    INPUT_DEV_CAP_SWITCH,
+    INPUT_DEV_CAP_JOYSTICK,
+    INPUT_DEV_CAP_MAX
+};
+
+inline constexpr uint32_t CapabilityToTags(InputDeviceCapability capability)
+{
+    return static_cast<uint32_t>((1 << capability) - (capability / INPUT_DEV_CAP_MAX));
+}
+
+enum KeyboardType {
+    KEYBOARD_TYPE_NONE,
+    KEYBOARD_TYPE_UNKNOWN,
+    KEYBOARD_TYPE_ALPHABETICKEYBOARD,
+    KEYBOARD_TYPE_DIGITALKEYBOARD,
+    KEYBOARD_TYPE_HANDWRITINGPEN,
+    KEYBOARD_TYPE_REMOTECONTROL,
+    KEYBOARD_TYPE_MAX
+};
+
 class InputDevice {
 public:
     InputDevice() = default;
-    ~InputDevice() = default;
     DISALLOW_COPY_AND_MOVE(InputDevice);
+    ~InputDevice() = default;
 
     void SetId(int32_t deviceId);
     int32_t GetId() const;
@@ -47,6 +75,12 @@ public:
     std::string GetPhys() const;
     void SetUniq(std::string uniq);
     std::string GetUniq() const;
+    void AddCapability(InputDeviceCapability cap);
+    bool HasCapability(InputDeviceCapability cap) const;
+    bool HasCapability(uint32_t deviceTags) const;
+
+    unsigned long GetCapabilities() const;
+    void SetCapabilities(unsigned long caps);
 
     class AxisInfo {
     public:
@@ -67,30 +101,42 @@ public:
         int32_t GetResolution() const;
 
     private:
-        int32_t axisType_ {0};
-        int32_t minimum_ {0};
-        int32_t maximum_ {0};
-        int32_t fuzz_ {0};
-        int32_t flat_ {0};
-        int32_t resolution_ {0};
+        int32_t axisType_ { 0 };
+        int32_t minimum_ { 0 };
+        int32_t maximum_ { 0 };
+        int32_t fuzz_ { 0 };
+        int32_t flat_ { 0 };
+        int32_t resolution_ { 0 };
     };
+
     void AddAxisInfo(AxisInfo axis);
     std::vector<AxisInfo> GetAxisInfo();
     InputDevice(int32_t id, std::string name, int32_t deviceType, int32_t bus, int32_t version, int32_t product,
                 int32_t vendor, std::string phys, std::string uniq, std::vector<AxisInfo> axis);
+
 private:
-    int32_t id_ {-1};
-    std::string name_ {"null"};
-    int32_t type_ {0};
-    int32_t bus_ {-1};
-    int32_t version_ {-1};
-    int32_t product_ {-1};
-    int32_t vendor_ {-1};
-    std::string phys_ {"null"};
-    std::string uniq_ {"null"};
+    int32_t id_ { -1 };
+    std::string name_ { "null" };
+    int32_t type_ { 0 };
+    int32_t bus_ { -1 };
+    int32_t version_ { -1 };
+    int32_t product_ { -1 };
+    int32_t vendor_ { -1 };
+    std::string phys_ { "null" };
+    std::string uniq_ { "null" };
     std::vector<AxisInfo> axis_;
-    std::vector<int32_t> deviceIdList_;
+    std::bitset<INPUT_DEV_CAP_MAX> capabilities_;
 };
+
+inline unsigned long InputDevice::GetCapabilities() const
+{
+    return capabilities_.to_ulong();
+}
+
+inline void InputDevice::SetCapabilities(unsigned long caps)
+{
+    capabilities_ = std::bitset<INPUT_DEV_CAP_MAX>(caps % (1 << INPUT_DEV_CAP_MAX));
+}
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_DEVICE_H

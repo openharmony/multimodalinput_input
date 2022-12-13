@@ -21,27 +21,24 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "MmiEventSimulateDemoMain" };
 } // namespace
 
-int32_t main(int32_t argc, const char* argv[])
+int32_t main(int32_t argc, char* argv[])
 {
-    using namespace OHOS::MMI;
     do {
         SetThreadName("main");
-        if (argc < ARGV_VALID) {
-            MMI_HILOGI("Invalid Input Para, Please Check the validity of the para! errCode:%d", PARAM_INPUT_FAIL);
-            break;
-        }
-        std::vector<std::string> argvs;
-        for (int32_t i = 0; i < argc; i++) {
-            argvs.push_back(argv[i]);
+        InjectionToolsHelpFunc helpFunc;
+        if (!helpFunc.CheckInjectionCommand(argc, argv)) {
+            MMI_HILOGE("Invalid Input Para, Please Check the validity of the para! errCode:%d", PARAM_INPUT_FAIL);
+            std::cout << "Try './mmi-event-injection --help' for more information" << std::endl;
+            return RET_ERR;
         }
         InjectionEventDispatch injection;
+        injection.SetArgvs(helpFunc.GetArgvs());
         injection.Init();
-        if (!(injection.VerifyArgvs(argc, argvs))) {
-            MMI_HILOGI("Invalid Input Para, Please Check the validity of the para! errCode:%d", PARAM_INPUT_FAIL);
-            break;
+        if (!injection.VerifyArgvs()) {
+            MMI_HILOGE("Parameter and function validation failed");
+            return RET_ERR;
         }
         injection.Run();
     } while (0);
-
     return RET_OK;
 }

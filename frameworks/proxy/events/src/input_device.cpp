@@ -112,6 +112,37 @@ std::string InputDevice::GetUniq() const
     return uniq_;
 }
 
+void InputDevice::AddCapability(InputDeviceCapability cap)
+{
+    if (cap >= INPUT_DEV_CAP_KEYBOARD && cap < INPUT_DEV_CAP_MAX) {
+        capabilities_.set(cap);
+    }
+}
+
+bool InputDevice::HasCapability(InputDeviceCapability cap) const
+{
+    if (cap >= INPUT_DEV_CAP_KEYBOARD && cap < INPUT_DEV_CAP_MAX) {
+        return capabilities_.test(cap);
+    }
+    return false;
+}
+
+bool InputDevice::HasCapability(uint32_t deviceTags) const
+{
+    int32_t min = static_cast<int32_t>(INPUT_DEV_CAP_KEYBOARD);
+    int32_t max = static_cast<int32_t>(INPUT_DEV_CAP_MAX);
+    for (int32_t cap = min; cap < max; ++cap) {
+        if (!capabilities_.test(static_cast<InputDeviceCapability>(cap))) {
+            continue;
+        }
+        uint32_t tags = CapabilityToTags(static_cast<InputDeviceCapability>(cap));
+        if ((tags & deviceTags) == tags) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void InputDevice::AddAxisInfo(AxisInfo axis)
 {
     axis_.push_back(axis);

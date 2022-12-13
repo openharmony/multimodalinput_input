@@ -28,6 +28,34 @@ namespace MMI {
 class KeyEvent : public InputEvent {
 public:
     /**
+     * 未知的功能按键
+     *
+     * @since 9
+     */
+    static const int32_t UNKNOWN_FUNCTION_KEY;
+
+    /**
+     * Num Lock功能按键
+     *
+     * @since 9
+     */
+    static const int32_t NUM_LOCK_FUNCTION_KEY;
+
+    /**
+     * Caps Lock功能按键
+     *
+     * @since 9
+     */
+    static const int32_t CAPS_LOCK_FUNCTION_KEY;
+
+    /**
+     * Scroll Lock功能按键
+     *
+     * @since 9
+     */
+    static const int32_t SCROLL_LOCK_FUNCTION_KEY;
+
+    /**
      * Function (Fn) key
      *
      * @since 9
@@ -1339,6 +1367,13 @@ public:
      * @since 9
      */
     static const int32_t KEYCODE_BUTTON_DEAD;
+
+    /**
+     * 键盘list菜单键
+     *
+     * @since 9
+     */
+    static const int32_t KEYCODE_COMPOSE;
 
     /**
      * Sleep key
@@ -2830,6 +2865,202 @@ public:
      */
     static const int32_t KEY_ACTION_UP;
 
+    /**
+     * 未知意图
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_UNKNOWN;
+
+    /**
+     * D-pad 上
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_UP;
+
+    /**
+     * D-pad 下
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_DOWN;
+
+    /**
+     * D-pad 左
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_LEFT;
+
+    /**
+     * D-pad 右
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_RIGHT;
+
+    /**
+     * 选中
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_SELECT;
+
+    /**
+     * 逃逸
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_ESCAPE;
+
+    /**
+     * 返回
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_BACK;
+
+    /**
+     * 前进
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_FORWARD;
+
+    /**
+     * 菜单
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_MENU;
+    
+    /**
+     * 回到桌面
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_HOME;
+    
+    /**
+     * 上一页
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_PAGE_UP;
+    
+    /**
+     * 下一页
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_PAGE_DOWN;
+    
+    /**
+     * 放大键
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_ZOOM_OUT;
+    
+    /**
+     * 缩小键
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_ZOOM_IN;
+
+    /**
+     * 播放/暂停
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_MEDIA_PLAY_PAUSE;
+    
+    /**
+     * 快进
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_MEDIA_FAST_FORWARD;
+    
+    /**
+     * 快退
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_MEDIA_FAST_REWIND;
+    
+    /**
+     * 倍速播放
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_MEDIA_FAST_PLAYBACK;
+    
+    /**
+     * 下一首/下一集
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_MEDIA_NEXT;
+    
+    /**
+     * 上一首/上一集
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_MEDIA_PREVIOUS;
+    
+    /**
+     * 扬声器静音键
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_MEDIA_MUTE;
+
+    /**
+     * 音量增加键
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_VOLUTE_UP;
+    
+    /**
+     * 音量减小键
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_VOLUTE_DOWN;
+
+    /**
+     * 接听/挂断/拨号
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_CALL;
+    
+    /**
+     * 挂断
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_ENDCALL;
+    
+    /**
+     * 拒绝
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_REJECTCALL;
+
+    /**
+     * 拍照键
+     *
+     * @since 9
+     */
+    static const int32_t INTENTION_CAMERA;
+
 public:
     class KeyItem {
     public:
@@ -2898,6 +3129,21 @@ public:
          */
         void SetPressed(bool pressed);
 
+        /**
+         * @brief 设置当前按键对应的unicode值
+         * @param unicode 指定的unicode值
+         * @return 空
+         * @since 9
+         */
+        void SetUnicode(uint32_t unicode);
+
+        /**
+         * @brief 获取当前按键的unicode值
+         * @return 返回unicode值
+         * @since 9
+         */
+        uint32_t GetUnicode() const;
+
     public:
         /**
          * @brief Writes data to a <b>Parcel</b> object.
@@ -2920,6 +3166,7 @@ public:
         int32_t deviceId_ = -1;
         int32_t keyCode_ = -1;
         int64_t downTime_ = 0;
+        uint32_t unicode_ { 0 };
     };
 
 public:
@@ -3055,6 +3302,47 @@ public:
      */
     bool IsValid() const;
 
+    /**
+     * @brief 把指定的按键转换为功能按键。
+     * @param keyCode 待转换的键值。
+     * @return 返回转换后的功能按键。
+     * @since 9
+     */
+    int32_t TransitionFunctionKey(int32_t keyCode);
+
+    /**
+     * @brief 给指定的功能按键设置使能状态。
+     * @param funcKey 指定的功能按键。
+     * @param value 待设置的功能按键状态。
+     * @return 返回是否设置成功。
+     * @since 9
+     */
+    int32_t SetFunctionKey(int32_t funcKey, int32_t value);
+
+    /**
+     * @brief 获取指定功能按键的使能状态。
+     * @param funcKey 指定的功能按键。
+     * @return 返回指定功能按键的使能状态。
+     * @since 9
+     */
+    bool GetFunctionKey(int32_t funcKey) const;
+
+    /**
+     * @brief 获取当前事件的按键意图。
+     * @param void
+     * @return 返回当前事件的按键意图。
+     * @since 9
+     */
+    int32_t GetKeyIntention() const;
+
+    /**
+     * @brief 给当前按键事件设置按键意图。
+     * @param keyIntention 指定的按键意图。
+     * @return void
+     * @since 9
+     */
+    void SetKeyIntention(int32_t keyIntention);
+
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.
@@ -3084,12 +3372,14 @@ private:
     bool IsValidKeyItem() const;
 
 private:
-    int32_t keyCode_ = -1;
+    int32_t keyCode_ { -1 };
     std::vector<KeyItem> keys_;
-    int32_t keyAction_ = 0;
+    int32_t keyAction_ { 0 };
+    int32_t keyIntention_ { -1 };
+    bool numLock_ { false };
+    bool capsLock_ { false };
+    bool scrollLock_ { false };
 };
-
-std::ostream& operator<<(std::ostream&, KeyEvent&);
 } // namespace MMI
 } // namespace OHOS
 #endif // KEY_EVENT_H

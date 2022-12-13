@@ -18,9 +18,10 @@
 
 #include <mutex>
 #include <set>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "nocopyable.h"
-#include "singleton.h"
 
 #include "i_input_event_handler.h"
 #include "i_input_event_collection_handler.h"
@@ -29,11 +30,11 @@
 
 namespace OHOS {
 namespace MMI {
-class EventMonitorHandler : public IInputEventHandler {
+class EventMonitorHandler final : public IInputEventHandler {
 public:
     EventMonitorHandler() = default;
     DISALLOW_COPY_AND_MOVE(EventMonitorHandler);
-    ~EventMonitorHandler() = default;
+    ~EventMonitorHandler() override = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -72,7 +73,7 @@ private:
         }
         InputHandlerType handlerType_;
         HandleEventType eventType_;
-        SessionPtr session_ = nullptr;
+        SessionPtr session_ { nullptr };
     };
 
     class MonitorCollection : public IInputEventCollectionHandler, protected NoCopyable {
@@ -97,10 +98,15 @@ private:
         void OnSessionLost(SessionPtr session);
         void Dump(int32_t fd, const std::vector<std::string> &args);
 
-        std::set<SessionHandler> monitors_;
-        std::shared_ptr<PointerEvent> lastPointerEvent_ = nullptr;
-        int32_t downEventId_ { -1 };
+    struct ConsumptionState {
+        std::set<int32_t> eventIds_;
         bool isMonitorConsumed_ { false };
+        std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
+    };
+
+    private:
+        std::set<SessionHandler> monitors_;
+        std::unordered_map<int32_t, ConsumptionState> states_;
     };
 
 private:

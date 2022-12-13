@@ -20,7 +20,6 @@
 #include <list>
 #include <memory>
 
-#include "nocopyable.h"
 #include "singleton.h"
 
 #include "define_multimodal.h"
@@ -29,9 +28,10 @@
 
 namespace OHOS {
 namespace MMI {
-class TimerManager : public DelayedSingleton<TimerManager> {
+class TimerManager final {
+    DECLARE_DELAYED_SINGLETON(TimerManager);
+
 public:
-    TimerManager() = default;
     DISALLOW_COPY_AND_MOVE(TimerManager);
     int32_t AddTimer(int32_t intervalMs, int32_t repeatCount, std::function<void()> callback);
     int32_t RemoveTimer(int32_t timerId);
@@ -55,15 +55,15 @@ private:
     int32_t RemoveTimerInternal(int32_t timerId);
     int32_t ResetTimerInternal(int32_t timerId);
     bool IsExistInternal(int32_t timerId);
-    std::unique_ptr<TimerItem>& InsertTimerInternal(std::unique_ptr<TimerItem>& timer);
+    void InsertTimerInternal(std::unique_ptr<TimerItem>& timer);
     int32_t CalcNextDelayInternal();
     void ProcessTimersInternal();
 
 private:
-        std::list<std::unique_ptr<TimerItem>> timers_;
+    std::list<std::unique_ptr<TimerItem>> timers_;
 };
 
-#define TimerMgr TimerManager::GetInstance()
+#define TimerMgr ::OHOS::DelayedSingleton<TimerManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // TIMER_MANAGER_H

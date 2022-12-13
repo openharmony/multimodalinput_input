@@ -18,7 +18,7 @@
 
 #include "nocopyable.h"
 
-#include "event_dispatch.h"
+#include "event_dispatch_handler.h"
 #include "i_event_filter.h"
 #include "input_handler_type.h"
 #include "key_option.h"
@@ -27,17 +27,19 @@
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(SessionPtr sess, NetPacket& pkt)> ServerMsgFun;
-class ServerMsgHandler : public MsgHandler<MmiMessageId, ServerMsgFun> {
+class ServerMsgHandler final : public MsgHandler<MmiMessageId, ServerMsgFun> {
 public:
-    ServerMsgHandler();
+    ServerMsgHandler() = default;
     DISALLOW_COPY_AND_MOVE(ServerMsgHandler);
-    virtual ~ServerMsgHandler() override;
+    ~ServerMsgHandler() override = default;
 
     void Init(UDSServer& udsServer);
     void OnMsgHandler(SessionPtr sess, NetPacket& pkt);
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
-    int32_t OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType);
-    int32_t OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType);
+    int32_t OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType,
+        int32_t priority, uint32_t deviceTags);
+    int32_t OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType, HandleEventType eventType,
+        int32_t priority, uint32_t deviceTags);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t OnMarkConsumed(SessionPtr sess, int32_t eventId);
@@ -52,26 +54,29 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t OnGetFunctionKeyState(int32_t funcKey, bool &state);
+    int32_t OnSetFunctionKeyState(int32_t funcKey, bool enable);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t OnInjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority, int32_t clientPid);
+    int32_t RemoveInputEventFilter(int32_t clientPid, int32_t filterId);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 protected:
     int32_t MarkProcessed(SessionPtr sess, NetPacket& pkt);
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
-#ifdef OHOS_BUILD_HDF
-    int32_t OnHdiInject(SessionPtr sess, NetPacket& pkt);
-#endif
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
-#ifdef OHOS_BUILD_MMI_DEBUG
-    int32_t OnBigPacketTest(SessionPtr sess, NetPacket& pkt);
-#endif // OHOS_BUILD_MMI_DEBUG
+
 private:
-    UDSServer *udsServer_ = nullptr;
-    int32_t targetWindowId_ = -1;
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    bool FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action);
+#endif // OHOS_BUILD_ENABLE_TOUCH
+
+private:
+    UDSServer *udsServer_ { nullptr };
+    int32_t targetWindowId_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS

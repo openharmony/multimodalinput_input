@@ -29,7 +29,7 @@
 
 namespace OHOS {
 namespace MMI {
-class JsInputMonitorManager {
+class JsInputMonitorManager final {
 public:
     static JsInputMonitorManager& GetInstance();
     DISALLOW_COPY_AND_MOVE(JsInputMonitorManager);
@@ -48,20 +48,22 @@ public:
     bool AddEnv(napi_env env, napi_callback_info cbInfo);
 
     void RemoveEnv(napi_env env);
+
+    void ThrowError(napi_env env, int32_t code);
 private:
+    JsInputMonitorManager() = default;
+
     bool IsExisting(napi_env env);
 
     void RemoveEnv(std::map<napi_env, napi_ref>::iterator it);
 
     void RemoveAllEnv();
 
-    JsInputMonitorManager() = default;
-
 private:
-    int32_t nextId_ {0};
-    std::mutex mutex_;
     std::list<std::shared_ptr<JsInputMonitor>> monitors_;
     std::map<napi_env, napi_ref> envManager_;
+    int32_t nextId_ { 0 };
+    std::mutex mutex_;
 };
 
 #define JsInputMonMgr JsInputMonitorManager::GetInstance()

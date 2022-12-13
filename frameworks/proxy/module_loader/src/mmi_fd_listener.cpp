@@ -32,10 +32,6 @@ MMIFdListener::MMIFdListener(MMIClientPtr client) : mmiClient_(client)
 {
     CALL_DEBUG_ENTER;
 }
-MMIFdListener::~MMIFdListener()
-{
-    CALL_DEBUG_ENTER;
-}
 
 void MMIFdListener::OnReadable(int32_t fd)
 {

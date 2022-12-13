@@ -22,10 +22,8 @@
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr int64_t MAX_INPUT_EVENT_TIME = 1000;
-constexpr int64_t MAX_OVER_TIME = 300;
-} // namespace
+inline constexpr int64_t MAX_INPUT_EVENT_TIME = 1000;
+inline constexpr int64_t MAX_OVER_TIME = 300;
 template<class T>
 class TimeCostChk {
     static inline constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TimeCostChk" };
@@ -70,9 +68,9 @@ private:
     const std::chrono::time_point<std::chrono::high_resolution_clock> beginTime_;
     const std::string strOutput_ = "";
     const std::string strReason_ = "";
-    const int64_t uiTime_ = 0;
-    const int64_t llParam1_ = 0;
-    const int64_t llParam2_ = 0;
+    const int64_t uiTime_ { 0 };
+    const int64_t llParam1_ { 0 };
+    const int64_t llParam2_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
