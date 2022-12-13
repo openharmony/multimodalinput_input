@@ -818,7 +818,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             while (currentTimeMs < endTimeMs) {
                                 item.SetDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs, px1, px2));
                                 item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs, py1, py2));
-                                pointerEvent->SetActionTime(currentTimeMs);
+                                pointerEvent->SetActionTime(currentTimeMs * 1000);
                                 pointerEvent->UpdatePointerItem(0, item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -831,7 +831,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
-                            pointerEvent->SetActionTime(endTimeMs);
+                            pointerEvent->SetActionTime(endTimeMs * 1000);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -839,7 +839,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
-                            pointerEvent->SetActionTime(endTimeMs + BLOCK_TIME_MS);
+                            pointerEvent->SetActionTime((endTimeMs + BLOCK_TIME_MS) * 1000);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);

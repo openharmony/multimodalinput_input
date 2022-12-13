@@ -34,14 +34,13 @@ public:
     JsEventTarget();
     virtual ~JsEventTarget() = default;
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
-    static void EmitJsIds(int32_t userData, std::vector<int32_t> &ids);
-    static void EmitJsDev(int32_t userData, std::shared_ptr<InputDevice> device);
-    static void EmitSupportKeys(int32_t userData, std::vector<bool> &keystrokeAbility);
-    static void EmitJsKeyboardType(int32_t userData, int32_t keyboardType);
+    static void EmitJsIds(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t> &ids);
+    static void EmitJsDev(sptr<JsUtil::CallbackInfo> cb, std::shared_ptr<InputDevice> device);
+    static void EmitSupportKeys(sptr<JsUtil::CallbackInfo> cb, std::vector<bool> &keystrokeAbility);
+    static void EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t keyboardType);
     void AddListener(napi_env env, const std::string &type, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);
-    void RemoveCallbackInfo(napi_env env, napi_value handle, int32_t userData);
-    napi_value CreateCallbackInfo(napi_env env, napi_value handle, const int32_t userData, bool isApi9 = false);
+    napi_value CreateCallbackInfo(napi_env, napi_value handle, sptr<JsUtil::CallbackInfo> cb);
     void ResetEnv();
     void OnDeviceAdded(int32_t deviceId, const std::string &type) override;
     void OnDeviceRemoved(int32_t deviceId, const std::string &type) override;
@@ -61,10 +60,8 @@ private:
     static void CallDevInfoPromiseWork(uv_work_t *work, int32_t status);
     static void EmitAddedDeviceEvent(uv_work_t *work, int32_t status);
     static void EmitRemoveDeviceEvent(uv_work_t *work, int32_t status);
-    static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfo(uv_work_t *work);
     static napi_value GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage);
 private:
-    inline static std::map<int32_t, std::unique_ptr<JsUtil::CallbackInfo>> callback_ {};
     inline static std::map<std::string, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>> devListener_ {};
     bool isListeningProcess_ { false };
 };

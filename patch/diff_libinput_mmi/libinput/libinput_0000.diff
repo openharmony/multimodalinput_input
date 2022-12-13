@@ -2890,7 +2890,7 @@ diff -Naur old/src/evdev-mt-touchpad-gestures.c new/src/evdev-mt-touchpad-gestur
  	return GESTURE_STATE_SWIPE;
 diff -Naur old/src/evdev-mt-touchpad-tap.c new/src/evdev-mt-touchpad-tap.c
 --- old/src/evdev-mt-touchpad-tap.c	2021-01-01 00:00:00.000000000 +0800
-+++ new/src/evdev-mt-touchpad-tap.c	2021-01-01 00:00:00.000000000 +0800
++++ new/src/evdev-mt-touchpad-tap.c	2022-12-12 19:49:27.376953599 +0800
 @@ -72,6 +72,7 @@
  	CASE_RETURN_STRING(TAP_STATE_DRAGGING_OR_TAP);
  	CASE_RETURN_STRING(TAP_STATE_DRAGGING_2);
@@ -2993,6 +2993,15 @@ diff -Naur old/src/evdev-mt-touchpad-tap.c new/src/evdev-mt-touchpad-tap.c
  	}
  
  	if (tp->tap.state == TAP_STATE_IDLE || tp->tap.state == TAP_STATE_DEAD)
+@@ -1154,7 +1212,7 @@
+ static inline enum libinput_config_drag_state
+ tp_drag_default(struct evdev_device *device)
+ {
+-	return LIBINPUT_CONFIG_DRAG_ENABLED;
++	return LIBINPUT_CONFIG_DRAG_DISABLED;
+ }
+ 
+ static enum libinput_config_drag_state
 @@ -1295,3 +1353,63 @@
  		return false;
  	}
