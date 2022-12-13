@@ -118,6 +118,7 @@ public:
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
     void SetPointerLocation(int32_t x, int32_t y);
 
+    EventHandlerPtr GetEventHandler() const;
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt);

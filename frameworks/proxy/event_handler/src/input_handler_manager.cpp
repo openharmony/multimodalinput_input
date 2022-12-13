@@ -19,6 +19,7 @@
 
 #include "bytrace_adapter.h"
 #include "input_handler_type.h"
+#include "anr_handler.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
 #include "mmi_log.h"
@@ -34,7 +35,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 
 InputHandlerManager::InputHandlerManager()
 {
-    monitorCallback_ = std::bind(&InputHandlerManager::OnDispatchEventProcessed, this, std::placeholders::_1);
+    monitorCallback_ = std::bind(&InputHandlerManager::OnDispatchEventProcessed, this, std::placeholders::_1,
+        std::placeholders::_2);
 }
 
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
@@ -359,10 +361,9 @@ uint32_t InputHandlerManager::GetDeviceTags() const
     return deviceTags;
 }
 
-void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId)
+void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId, int64_t actionTime)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtxHandlers_);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
     CHKPV(client);
     if (mouseEventIds_.find(eventId) != mouseEventIds_.end()) {
@@ -381,16 +382,7 @@ void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId)
         processedEvents_.emplace(eventId, count);
         return;
     }
-    NetPacket pkt(MmiMessageId::MARK_PROCESS);
-    pkt << eventId << ANR_MONITOR;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write event failed");
-        return;
-    }
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
-    }
+    ANRHdl->SetLastProcessedEventId(ANR_MONITOR, eventId, actionTime);
 }
 } // namespace MMI
 } // namespace OHOS

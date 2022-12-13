@@ -28,7 +28,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ANRManager" };
-constexpr int64_t INPUT_UI_TIMEOUT_TIME = 5 * 1000000;
 const std::string FOUNDATION = "foundation";
 constexpr int32_t MAX_ANR_TIMER_COUNT = 50;
 } // namespace
@@ -44,9 +43,12 @@ void ANRManager::Init(UDSServer &udsServer)
     udsServer_->AddSessionDeletedCallback(std::bind(&ANRManager::OnSessionLost, this, std::placeholders::_1));
 }
 
-void ANRManager::MarkProcessed(int32_t eventType, int32_t eventId, SessionPtr sess)
+int32_t ANRManager::MarkProcessed(int32_t pid, int32_t eventType, int32_t eventId)
 {
-    CHKPV(sess);
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("pid:%{public}d, eventType:%{public}d, eventId:%{public}d", pid, eventType, eventId);
+    SessionPtr sess = udsServer_->GetSessionByPid(pid);
+    CHKPR(sess, RET_ERR);
     std::list<int32_t> timerIds = sess->DelEvents(eventType, eventId);
     for (int32_t item : timerIds) {
         if (item != -1) {
@@ -56,6 +58,7 @@ void ANRManager::MarkProcessed(int32_t eventType, int32_t eventId, SessionPtr se
                 "count:%{public}d", eventType, eventId, item, anrTimerCount_);
         }
     }
+    return RET_OK;
 }
 
 void ANRManager::RemoveTimers(SessionPtr sess)
