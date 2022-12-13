@@ -30,7 +30,7 @@ int32_t InputEventDataTransformation::KeyEventToNetPacket(
         MMI_HILOGE("Serialize input event failed");
         return RET_ERR;
     }
-    pkt << key->GetKeyCode() << key->GetKeyAction();
+    pkt << key->GetKeyCode() << key->GetKeyAction() << key->GetKeyIntention();
     auto keys = key->GetKeyItems();
     int32_t size = static_cast<int32_t>(keys.size());
     if (size > MAX_KEY_SIZE) {
@@ -63,6 +63,8 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
     key->SetKeyCode(data);
     pkt >> data;
     key->SetKeyAction(data);
+    pkt >> data;
+    key->SetKeyIntention(data);
     int32_t size = 0;
     pkt >> size;
     if (size > MAX_KEY_SIZE) {
