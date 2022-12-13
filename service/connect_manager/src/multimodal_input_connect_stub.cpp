@@ -270,8 +270,6 @@ int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData = 0;
-    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t deviceId = -1;
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t size = 0;
@@ -282,9 +280,15 @@ int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, Message
         READINT32(data, key, IPC_PROXY_DEAD_OBJECT_ERR);
         keys.push_back(key);
     }
-    int32_t ret = SupportKeys(userData, deviceId, keys);
+    std::vector<bool> keystroke;
+    int32_t ret = SupportKeys(deviceId, keys, keystroke);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SupportKeys failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    if (!reply.WriteBoolVector(keystroke)) {
+        MMI_HILOGE("Write keyStroke failed");
+        return RET_ERR;
     }
     return ret;
 }
@@ -292,11 +296,15 @@ int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, Message
 int32_t MultimodalInputConnectStub::StubGetDeviceIds(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData = 0;
-    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = GetDeviceIds(userData);
+    std::vector<int32_t> ids;
+    int32_t ret = GetDeviceIds(ids);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetDeviceIds failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    if (!reply.WriteInt32Vector(ids)) {
+        MMI_HILOGE("Write ids failed");
+        return RET_ERR;
     }
     return ret;
 }
@@ -304,15 +312,33 @@ int32_t MultimodalInputConnectStub::StubGetDeviceIds(MessageParcel& data, Messag
 int32_t MultimodalInputConnectStub::StubGetDevice(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData = 0;
-    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t deviceId = -1;
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = GetDevice(userData, deviceId);
+    std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
+    int32_t ret = GetDevice(deviceId, inputDevice);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetDevice failed ret:%{public}d", ret);
+        return RET_ERR;
     }
-    return ret;
+    WRITEINT32(reply, inputDevice->GetId(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, inputDevice->GetType(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITESTRING(reply, inputDevice->GetName(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, inputDevice->GetBus(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, inputDevice->GetVersion(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, inputDevice->GetProduct(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEINT32(reply, inputDevice->GetVendor(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITESTRING(reply, inputDevice->GetPhys(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITESTRING(reply, inputDevice->GetUniq(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEUINT32(reply, static_cast<uint32_t>(inputDevice->GetAxisInfo().size()), IPC_STUB_WRITE_PARCEL_ERR);
+    for (const auto &item : inputDevice->GetAxisInfo()) {
+        WRITEINT32(reply, item.GetMinimum(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(reply, item.GetMaximum(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(reply, item.GetAxisType(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(reply, item.GetFuzz(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(reply, item.GetFlat(), IPC_STUB_WRITE_PARCEL_ERR);
+        WRITEINT32(reply, item.GetResolution(), IPC_STUB_WRITE_PARCEL_ERR);
+    }
+    return RET_OK;
 }
 
 int32_t MultimodalInputConnectStub::StubRegisterInputDeviceMonitor(MessageParcel& data, MessageParcel& reply)
@@ -338,14 +364,15 @@ int32_t MultimodalInputConnectStub::StubUnregisterInputDeviceMonitor(MessageParc
 int32_t MultimodalInputConnectStub::StubGetKeyboardType(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    int32_t userData = 0;
-    READINT32(data, userData, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t deviceId = -1;
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = GetKeyboardType(userData, deviceId);
+    int32_t keyboardType = 0;
+    int32_t ret = GetKeyboardType(deviceId, keyboardType);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetKeyboardType failed ret:%{public}d", ret);
+        return RET_ERR;
     }
+    WRITEINT32(reply, keyboardType, IPC_STUB_WRITE_PARCEL_ERR);
     return ret;
 }
 

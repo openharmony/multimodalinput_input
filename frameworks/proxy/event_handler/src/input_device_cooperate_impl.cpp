@@ -132,7 +132,7 @@ int32_t InputDeviceCooperateImpl::GetInputDeviceCooperateState(
     return MultimodalInputConnMgr->GetInputDeviceCooperateState(userData_++, deviceId);
 }
 
-void InputDeviceCooperateImpl::OnDevCooperateListener(const std::string deviceId, CooperationMessage msg)
+void InputDeviceCooperateImpl::OnDevCooperateListener(const std::string &deviceId, const CooperationMessage &msg)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -141,7 +141,7 @@ void InputDeviceCooperateImpl::OnDevCooperateListener(const std::string deviceId
     }
 }
 
-void InputDeviceCooperateImpl::OnCooperationMessage(int32_t userData, const std::string deviceId, CooperationMessage msg)
+void InputDeviceCooperateImpl::OnCooperationMessage(int32_t userData, const std::string &deviceId, const CooperationMessage &msg)
 {
     CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
