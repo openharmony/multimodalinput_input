@@ -85,6 +85,7 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
     bool GetMouseIsCaptureMode() const;
+
 private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const;
@@ -149,7 +150,6 @@ private:
         int32_t windowId { -1 };
         bool isCaptureMode { false };
     } captureModeInfo_;
-};
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()

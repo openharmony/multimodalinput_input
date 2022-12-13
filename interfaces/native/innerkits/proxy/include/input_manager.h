@@ -408,8 +408,8 @@ public:
      * @return 进入捕获模式成功或失败.
      * @since 9
      */
-
     int32_t EnterCaptureMode(int32_t windowId);
+
     /**
      * @brief 退出捕获模式
      * @param windowId 窗口id.
