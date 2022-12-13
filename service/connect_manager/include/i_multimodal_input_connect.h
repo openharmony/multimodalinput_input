@@ -36,6 +36,7 @@ public:
         ADD_INPUT_EVENT_FILTER = 1,
         SET_POINTER_VISIBLE = 2,
         IS_POINTER_VISIBLE = 3,
+        MARK_PROCESSED = 4,
         SUBSCRIBE_KEY_EVENT = 6,
         UNSUBSCRIBE_KEY_EVENT = 7,
         ADD_INPUT_HANDLER = 8,
@@ -81,6 +82,7 @@ public:
     virtual int32_t RemoveInputEventFilter(int32_t filterId) = 0;
     virtual int32_t SetPointerVisible(bool visible) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
+    virtual int32_t MarkProcessed(int32_t eventType, int32_t eventId) = 0;
     virtual int32_t SetPointerSpeed(int32_t speed) = 0;
     virtual int32_t GetPointerSpeed(int32_t &speed) = 0;
     virtual int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle) = 0;
