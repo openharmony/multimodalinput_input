@@ -58,10 +58,6 @@ void ClientMsgHandler::Init()
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         {MmiMessageId::ON_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnPointerEvent, this)},
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-        {MmiMessageId::INPUT_DEVICE, MsgCallbackBind2(&ClientMsgHandler::OnInputDevice, this)},
-        {MmiMessageId::INPUT_DEVICE_IDS, MsgCallbackBind2(&ClientMsgHandler::OnInputDeviceIds, this)},
-        {MmiMessageId::INPUT_DEVICE_SUPPORT_KEYS, MsgCallbackBind2(&ClientMsgHandler::OnSupportKeys, this)},
-        {MmiMessageId::INPUT_DEVICE_KEYBOARD_TYPE, MsgCallbackBind2(&ClientMsgHandler::OnInputKeyboardType, this)},
         {MmiMessageId::ADD_INPUT_DEVICE_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnDevListener, this)},
         {MmiMessageId::NOTICE_ANR, MsgCallbackBind2(&ClientMsgHandler::OnAnr, this)},
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || \
@@ -194,77 +190,6 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
     return KeyEventInputSubscribeMgr.OnSubscribeKeyEventCallback(keyEvent, subscribeId);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-
-int32_t ClientMsgHandler::OnInputDeviceIds(const UDSClient& client, NetPacket& pkt)
-{
-    CALL_DEBUG_ENTER;
-    int32_t userData;
-    std::vector<int32_t> inputDeviceIds;
-    pkt >> userData >> inputDeviceIds;
-    if (inputDeviceIds.size() > MAX_INPUT_DEVICE) {
-        MMI_HILOGE("Device exceeds the max range");
-        return RET_ERR;
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read cooperate msg failed");
-        return RET_ERR;
-    }
-    InputDevImpl.OnInputDeviceIds(userData, inputDeviceIds);
-    return RET_OK;
-}
-
-int32_t ClientMsgHandler::OnInputDevice(const UDSClient& client, NetPacket& pkt)
-{
-    CALL_DEBUG_ENTER;
-    int32_t userData;
-    pkt >> userData;
-    std::shared_ptr<InputDevice> devData = InputDevImpl.DevDataUnmarshalling(pkt);
-    CHKPR(devData, RET_ERR);
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read cooperate msg failed");
-        return RET_ERR;
-    }
-    InputDevImpl.OnInputDevice(userData, devData);
-    return RET_OK;
-}
-
-int32_t ClientMsgHandler::OnSupportKeys(const UDSClient& client, NetPacket& pkt)
-{
-    CALL_DEBUG_ENTER;
-    int32_t userData;
-    size_t size;
-    pkt >> userData >> size;
-    if (size > MAX_SUPPORT_KEY) {
-        MMI_HILOGE("Keys exceeds the max range");
-        return RET_ERR;
-    }
-    std::vector<bool> abilityRet;
-    bool ret;
-    for (size_t i = 0; i < size; ++i) {
-        pkt >> ret;
-        abilityRet.push_back(ret);
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read key Data failed");
-        return RET_ERR;
-    }
-    InputDevImpl.OnSupportKeys(userData, abilityRet);
-    return RET_OK;
-}
-
-int32_t ClientMsgHandler::OnInputKeyboardType(const UDSClient& client, NetPacket& pkt)
-{
-    CALL_DEBUG_ENTER;
-    int32_t userData;
-    int32_t KeyboardType;
-    pkt >> userData >> KeyboardType;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read failed");
-        return PACKET_WRITE_FAIL;
-    }
-    InputDevImpl.OnKeyboardType(userData, KeyboardType);
-    return RET_OK;
-}
 
 int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
 {

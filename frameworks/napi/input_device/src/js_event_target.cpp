@@ -203,10 +203,10 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is nullptr");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
-    CHKPV(cb);
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t*>(work);
+    cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
-
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
     if (scope == nullptr) {
@@ -240,10 +240,10 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is nullptr");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
-    CHKPV(cb);
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t*>(work);
+    cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
-
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
     if (scope == nullptr) {
@@ -263,44 +263,28 @@ void JsEventTarget::CallIdsPromiseWork(uv_work_t *work, int32_t status)
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> &ids)
+void JsEventTarget::EmitJsIds(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t> &ids)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    auto iter = callback_.find(userData);
-    if (iter == callback_.end()) {
-        MMI_HILOGE("Failed to search for userData");
-        return;
-    }
-    CHKPV(iter->second);
-    if (iter->second->env == nullptr) {
-        callback_.erase(iter);
-        MMI_HILOGE("The env is nullptr");
-        return;
-    }
-
-    iter->second->data.ids = ids;
-    iter->second->errCode = RET_OK;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    cb->data.ids = ids;
+    cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
-    CHKRV(napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_EVENT_LOOP);
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
-    int32_t *uData = new (std::nothrow) int32_t(userData);
-    if (uData == nullptr) {
-        JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check uData is nullptr");
-        return;
-    }
-    work->data = static_cast<void*>(uData);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
     int32_t ret;
-    if (iter->second->isApi9) {
-        if (iter->second->ref == nullptr) {
+    if (cb->isApi9) {
+        if (cb->ref == nullptr) {
             ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDevListPromiseWork);
         } else {
             ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDevListAsyncWork);
         }
     } else {
-        if (iter->second->ref == nullptr) {
+        if (cb->ref == nullptr) {
             ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallIdsPromiseWork);
         } else {
             ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallIdsAsyncWork);
@@ -309,7 +293,6 @@ void JsEventTarget::EmitJsIds(int32_t userData, std::vector<int32_t> &ids)
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work failed");
         JsUtil::DeletePtr<uv_work_t*>(work);
-        JsUtil::DeletePtr<int32_t*>(uData);
     }
 }
 
@@ -322,8 +305,9 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is nullptr");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
-    CHKPV(cb);
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t*>(work);
+    cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
@@ -351,8 +335,9 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is nullptr");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
-    CHKPV(cb);
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t*>(work);
+    cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
@@ -370,45 +355,29 @@ void JsEventTarget::CallDevPromiseWork(uv_work_t *work, int32_t status)
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDevice> device)
+void JsEventTarget::EmitJsDev(sptr<JsUtil::CallbackInfo> cb, std::shared_ptr<InputDevice> device)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     CHKPV(device);
-    auto iter = callback_.find(userData);
-    if (iter == callback_.end()) {
-        MMI_HILOGE("Failed to search for userData");
-        return;
-    }
-    CHKPV(iter->second);
-    if (iter->second->env == nullptr) {
-        callback_.erase(iter);
-        MMI_HILOGE("The env is nullptr");
-        return;
-    }
-
-    iter->second->data.device = device;
-    iter->second->errCode = RET_OK;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    cb->data.device = device;
+    cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
-    CHKRV(napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_EVENT_LOOP);
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
-    int32_t *uData = new (std::nothrow) int32_t(userData);
-    if (uData == nullptr) {
-        JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check uData is nullptr");
-        return;
-    }
-    work->data = static_cast<void*>(uData);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
     int32_t ret;
-    if (iter->second->isApi9) {
-        if (iter->second->ref == nullptr) {
+    if (cb->isApi9) {
+        if (cb->ref == nullptr) {
             ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDevInfoPromiseWork);
         } else {
             ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDevInfoAsyncWork);
         }
     } else {
-        if (iter->second->ref == nullptr) {
+        if (cb->ref == nullptr) {
             ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDevPromiseWork);
         } else {
             ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallDevAsyncWork);
@@ -417,8 +386,6 @@ void JsEventTarget::EmitJsDev(int32_t userData, std::shared_ptr<InputDevice> dev
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work failed");
         JsUtil::DeletePtr<uv_work_t*>(work);
-        JsUtil::DeletePtr<int32_t*>(uData);
-        return;
     }
 }
 
@@ -431,10 +398,10 @@ void JsEventTarget::CallKeystrokeAbilityPromise(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is nullptr");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
-    CHKPV(cb);
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t*>(work);
+    cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
-
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
     CHKPV(scope);
@@ -483,10 +450,10 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is nullptr");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
-    CHKPV(cb);
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t*>(work);
+    cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
-
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
     CHKPV(scope);
@@ -531,37 +498,21 @@ void JsEventTarget::CallKeystrokeAbilityAsync(uv_work_t *work, int32_t status)
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::EmitSupportKeys(int32_t userData, std::vector<bool> &keystrokeAbility)
+void JsEventTarget::EmitSupportKeys(sptr<JsUtil::CallbackInfo> cb, std::vector<bool> &keystrokeAbility)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    auto iter = callback_.find(userData);
-    if (iter == callback_.end()) {
-        MMI_HILOGE("Failed to search for userData");
-        return;
-    }
-    CHKPV(iter->second);
-    if (iter->second->env == nullptr) {
-        callback_.erase(iter);
-        MMI_HILOGE("The env is nullptr");
-        return;
-    }
-
-    iter->second->data.keystrokeAbility = keystrokeAbility;
-    iter->second->errCode = RET_OK;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    cb->data.keystrokeAbility = keystrokeAbility;
+    cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
-    CHKRV(napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_EVENT_LOOP);
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
-    int32_t *uData = new (std::nothrow) int32_t(userData);
-    if (uData == nullptr) {
-        JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check data is nullptr");
-        return;
-    }
-    work->data = static_cast<void*>(uData);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
     int32_t ret;
-    if (iter->second->ref == nullptr) {
+    if (cb->ref == nullptr) {
         ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallKeystrokeAbilityPromise);
     } else {
         ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallKeystrokeAbilityAsync);
@@ -569,42 +520,25 @@ void JsEventTarget::EmitSupportKeys(int32_t userData, std::vector<bool> &keystro
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work failed");
         JsUtil::DeletePtr<uv_work_t*>(work);
-        JsUtil::DeletePtr<int32_t*>(uData);
-        return;
     }
 }
 
-void JsEventTarget::EmitJsKeyboardType(int32_t userData, int32_t keyboardType)
+void JsEventTarget::EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t keyboardType)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    auto iter = callback_.find(userData);
-    if (iter == callback_.end()) {
-        MMI_HILOGE("Failed to search for userData");
-        return;
-    }
-    CHKPV(iter->second);
-    if (iter->second->env == nullptr) {
-        callback_.erase(iter);
-        MMI_HILOGE("The env is nullptr");
-        return;
-    }
-    iter->second->data.keyboardType = keyboardType;
-    iter->second->errCode = RET_OK;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    cb->data.keyboardType = keyboardType;
+    cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
-    CHKRV(napi_get_uv_event_loop(iter->second->env, &loop), GET_UV_EVENT_LOOP);
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
 
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
-    int32_t *uData = new (std::nothrow) int32_t(userData);
-    if (uData == nullptr) {
-        JsUtil::DeletePtr<uv_work_t*>(work);
-        MMI_HILOGE("Check uDdata is nullptr");
-        return;
-    }
-    work->data = static_cast<void*>(uData);
-    int32_t ret = 0;
-    if (iter->second->ref == nullptr) {
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret;
+    if (cb->ref == nullptr) {
         ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallKeyboardTypePromise);
     } else {
         ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, CallKeyboardTypeAsync);
@@ -612,8 +546,6 @@ void JsEventTarget::EmitJsKeyboardType(int32_t userData, int32_t keyboardType)
     if (ret != 0) {
         MMI_HILOGE("uv_queue_work failed");
         JsUtil::DeletePtr<uv_work_t*>(work);
-        JsUtil::DeletePtr<int32_t*>(uData);
-        return;
     }
 }
 
@@ -626,8 +558,9 @@ void JsEventTarget::CallKeyboardTypeAsync(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is nullptr");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
-    CHKPV(cb);
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t*>(work);
+    cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
 
     napi_handle_scope scope = nullptr;
@@ -675,8 +608,9 @@ void JsEventTarget::CallKeyboardTypePromise(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is nullptr");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
-    CHKPV(cb);
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t*>(work);
+    cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
 
     napi_handle_scope scope = nullptr;
@@ -719,8 +653,9 @@ void JsEventTarget::CallDevListAsyncWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is nullptr");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
-    CHKPV(cb);
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t*>(work);
+    cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
@@ -773,8 +708,9 @@ void JsEventTarget::CallDevListPromiseWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is nullptr");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
-    CHKPV(cb);
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t*>(work);
+    cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
@@ -822,8 +758,9 @@ void JsEventTarget::CallDevInfoPromiseWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is nullptr");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
-    CHKPV(cb);
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t*>(work);
+    cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
@@ -872,8 +809,9 @@ void JsEventTarget::CallDevInfoAsyncWork(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is nullptr");
         return;
     }
-    std::unique_ptr<JsUtil::CallbackInfo> cb = GetCallbackInfo(work);
-    CHKPV(cb);
+    sptr<JsUtil::CallbackInfo> cb(static_cast<JsUtil::CallbackInfo *>(work->data));
+    JsUtil::DeletePtr<uv_work_t*>(work);
+    cb->DecStrongRef(nullptr);
     CHKPV(cb->env);
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(cb->env, &scope);
@@ -974,23 +912,6 @@ monitorLabel:
     }
 }
 
-napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, const int32_t userData, bool isApi9)
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    auto cb = std::make_unique<JsUtil::CallbackInfo>();
-    cb->env = env;
-    cb->isApi9 = isApi9;
-    napi_value promise = nullptr;
-    if (handle == nullptr) {
-        CHKRP(napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
-    } else {
-        CHKRP(napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
-    }
-    callback_.emplace(userData, std::move(cb));
-    return promise;
-}
-
 napi_value JsEventTarget::GreateBusinessError(napi_env env, int32_t errCode, std::string errMessage)
 {
     CALL_DEBUG_ENTER;
@@ -1004,40 +925,24 @@ napi_value JsEventTarget::GreateBusinessError(napi_env env, int32_t errCode, std
     return result;
 }
 
-std::unique_ptr<JsUtil::CallbackInfo> JsEventTarget::GetCallbackInfo(uv_work_t *work)
+napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, sptr<JsUtil::CallbackInfo> cb)
 {
-    std::lock_guard<std::mutex> guard(mutex_);
-    int32_t *uData = static_cast<int32_t*>(work->data);
-    int32_t userData = *uData;
-    JsUtil::DeletePtr<uv_work_t*>(work);
-    JsUtil::DeletePtr<int32_t*>(uData);
-
-    auto iter = callback_.find(userData);
-    if (iter == callback_.end()) {
-        MMI_HILOGE("Find userData failed");
-        return nullptr;
+    CALL_INFO_TRACE;
+    CHKPP(cb);
+    cb->env = env;
+    napi_value promise = nullptr;
+    if (handle == nullptr) {
+        CHKRP(napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
+    } else {
+        CHKRP(napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
     }
-    auto cb = std::move(iter->second);
-    callback_.erase(iter);
-    return cb;
-}
-
-void JsEventTarget::RemoveCallbackInfo(napi_env env, napi_value handle, int32_t userData)
-{
-    CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
-    auto iter = callback_.find(userData);
-    if (iter != callback_.end()) {
-        auto cb = std::move(iter->second);
-        callback_.erase(iter);
-    }
+    return promise;
 }
 
 void JsEventTarget::ResetEnv()
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
-    callback_.clear();
     devListener_.clear();
     InputMgr->UnregisterDevListener("change", shared_from_this());
 }
