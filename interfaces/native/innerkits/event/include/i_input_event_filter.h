@@ -13,31 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef RUN_SHELL_UTIL_H
-#define RUN_SHELL_UTIL_H
+#ifndef I_INPUT_EVENT_FILTER_H
+#define I_INPUT_EVENT_FILTER_H
 
-#include <regex>
-#include <string>
-#include <vector>
+#include <memory>
 
-#include "nocopyable.h"
+#include "axis_event.h"
+#include "key_event.h"
+#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
-class RunShellUtil {
+struct IInputEventFilter {
 public:
-    RunShellUtil();
-    DISALLOW_COPY_AND_MOVE(RunShellUtil);
-    ~RunShellUtil();
-    int32_t RunShellCommand(const std::string &command, std::vector<std::string> &vLog);
-    int32_t SetLogMaxSize(int32_t logSize);
-
-    static int32_t StringToVectorByRegex(const std::string &log, std::vector<std::string> &vLog, const std::regex &r);
-
-private:
-    FILE *fp_ { nullptr };
-    int32_t logMaxSize_ { 0 };
+    IInputEventFilter() = default;
+    virtual ~IInputEventFilter() = default;
+    virtual bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const = 0;
+    virtual bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const = 0;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // RUN_SHELL_UTIL_H
+#endif // I_INPUT_EVENT_FILTER_H

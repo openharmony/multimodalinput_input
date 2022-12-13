@@ -16,6 +16,7 @@
 #include "touch_event_normalize.h"
 #include "gesture_transform_processor.h"
 #include "input_device_manager.h"
+#include "joystick_transform_processor.h"
 #include "tablet_tool_tranform_processor.h"
 #include "touch_transform_processor.h"
 #include "touchpad_transform_processor.h"
@@ -75,6 +76,12 @@ std::shared_ptr<TransformProcessor> TouchEventNormalize::MakeTransformProcessor(
             break;
         }
 #endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+	    case DeviceType::JOYSTICK: {
+            processor = std::make_shared<JoystickTransformProcessor>(deviceId);
+            break;
+        }
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
         default: {
             MMI_HILOGE("Unsupported device type: %{public}d", deviceType);
             break;

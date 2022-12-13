@@ -34,7 +34,7 @@ UDSSocket::~UDSSocket()
     EpollClose();
 }
 
-int32_t UDSSocket::EpollCreat(int32_t size)
+int32_t UDSSocket::EpollCreate(int32_t size)
 {
     epollFd_ = epoll_create(size);
     if (epollFd_ < 0) {
@@ -86,34 +86,6 @@ int32_t UDSSocket::EpollWait(struct epoll_event &events, int32_t maxevents, int3
         MMI_HILOGE("epoll_wait ret:%{public}d,errno:%{public}d", ret, errno);
     }
     return ret;
-}
-
-int32_t UDSSocket::SetNonBlockMode(int32_t fd, bool isNonBlock)
-{
-    if (fd < 0) {
-        MMI_HILOGE("Invalid fd");
-        return RET_ERR;
-    }
-    int32_t flags = fcntl(fd, F_GETFL);
-    if (flags < 0) {
-        MMI_HILOGE("fcntl F_GETFL fail. fd:%{public}d,flags:%{public}d,errno:%{public}d,errCode:%{public}d",
-            fd, flags, errno, FCNTL_FAIL);
-        return flags;
-    }
-    MMI_HILOGI("F_GETFL fd:%{public}d,flags:%{public}d", fd, flags);
-    uint32_t mask = static_cast<uint32_t>(flags);
-    mask |= O_NONBLOCK;
-    if (!isNonBlock) {
-        mask &= ~O_NONBLOCK;
-    }
-    flags = fcntl(fd, F_SETFL, static_cast<int32_t>(mask));
-    if (flags < 0) {
-        MMI_HILOGE("fcntl F_SETFL fail. fd:%{public}d,flags:%{public}d,errno:%{public}d,errCode:%{public}d",
-            fd, flags, errno, FCNTL_FAIL);
-        return flags;
-    }
-    MMI_HILOGI("F_SETFL fd:%{public}d,flags:%{public}d", fd, flags);
-    return flags;
 }
 
 void UDSSocket::OnReadPackets(CircleStreamBuffer &circBuf, UDSSocket::PacketCallBackFun callbackFun)

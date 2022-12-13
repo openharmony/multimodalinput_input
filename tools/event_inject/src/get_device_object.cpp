@@ -19,8 +19,8 @@
 #include <thread>
 #include<regex>
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetDeviceObject" };
 bool IsKeyboardDevice(const std::string& deviceName)
@@ -75,3 +75,5 @@ DeviceBase* GetDeviceObject::CreateDeviceObject(const std::string deviceName)
 
     return deviceBasePtr;
 }
+} // namespace MMI
+} // namespace OHOS

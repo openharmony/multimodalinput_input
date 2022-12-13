@@ -24,7 +24,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-using namespace OHOS::MMI;
 } // namespace
 
 class UDSClientTest : public testing::Test {
@@ -39,46 +38,25 @@ public:
     {
         fd_ = fd;
     }
-
-    bool StartClientTestUnitTest(MsgClientFunCallback fun)
+    int32_t Socket()
     {
-        auto retResult = StartClient(fun);
-        return retResult;
+        return fd_;
     }
 };
 
-#if BINDER_TODO
+HWTEST_F(UDSClientTest, ConnectTo_01, TestSize.Level1)
+{
+    UDSClientUnitTest udsClient;
+    int32_t retResult = udsClient.ConnectTo();
+    ASSERT_EQ(RET_ERR, retResult);
+}
+
 HWTEST_F(UDSClientTest, ConnectTo_02, TestSize.Level1)
 {
-    int32_t retResult;
-    const char *path = "1234";
-    bool isBind = false;
-
-    UDSClient udsClient;
-    retResult = udsClient.ConnectTo(path, isBind);
-    ASSERT_EQ(-1, retResult);
-}
-
-HWTEST_F(UDSClientTest, ConnectTo_03, TestSize.Level1)
-{
-    int32_t retResult;
-    const char *path = "568*";
-    bool isBind = true;
-
-    UDSClient udsClient;
-    retResult = udsClient.ConnectTo(path, isBind);
-    ASSERT_EQ(-1, retResult);
-}
-
-HWTEST_F(UDSClientTest, ConnectTo_04, TestSize.Level1)
-{
-    int32_t retResult;
-    const char *path = "./";
-    bool isBind = true;
-
-    UDSClient udsClient;
-    retResult = udsClient.ConnectTo(path, isBind);
-    ASSERT_EQ(-1, retResult);
+    UDSClientUnitTest udsClient;
+    udsClient.SetFd(0);
+    int32_t retResult = udsClient.ConnectTo();
+    ASSERT_EQ(RET_OK, retResult);
 }
 
 HWTEST_F(UDSClientTest, SendMsg_001, TestSize.Level1)
@@ -87,11 +65,8 @@ HWTEST_F(UDSClientTest, SendMsg_001, TestSize.Level1)
     size_t size = 0;
 
     UDSClientUnitTest udsClientUt;
-    udsClientUt.SetFd(0);
-
-    UDSClient udsClient;
-    auto retResult = udsClient.SendMsg(buf, size);
-    ASSERT_EQ(0, retResult);
+    auto retResult = udsClientUt.SendMsg(buf, size);
+    ASSERT_FALSE(retResult);
 }
 
 HWTEST_F(UDSClientTest, SendMsg_002, TestSize.Level1)
@@ -100,88 +75,32 @@ HWTEST_F(UDSClientTest, SendMsg_002, TestSize.Level1)
     size_t size = 5;
 
     UDSClientUnitTest udsClientUt;
-    udsClientUt.SetFd(0);
-
-    UDSClient udsClient;
-    auto retResult = udsClient.SendMsg(buf, size);
-    ASSERT_EQ(0, retResult);
-}
-
-HWTEST_F(UDSClientTest, SendMsg_003, TestSize.Level1)
-{
-    const char *buf = "1234";
-    size_t size = 4;
-
-    UDSClientUnitTest udsClientUt;
-    udsClientUt.SetFd(0);
-
-    UDSClient udsClient;
-    auto retResult = udsClient.SendMsg(buf, size);
-    ASSERT_EQ(0, retResult);
-}
-
-HWTEST_F(UDSClientTest, SendMsg_004, TestSize.Level1)
-{
-    const char *buf = "1234&";
-    size_t size = 5;
-
-    UDSClientUnitTest udsClientUt;
-    udsClientUt.SetFd(0);
-
-    UDSClient udsClient;
-    auto retResult = udsClient.SendMsg(buf, size);
-    ASSERT_EQ(0, retResult);
-}
-
-HWTEST_F(UDSClientTest, SendMsg_005, TestSize.Level1)
-{
-    const char *buf = "Arg_012,@#$";
-    size_t size = 11;
-
-    UDSClientUnitTest udsClientUt;
-    udsClientUt.SetFd(0);
-
-    UDSClient udsClient;
-    auto retResult = udsClient.SendMsg(buf, size);
-    ASSERT_EQ(0, retResult);
-}
-
-HWTEST_F(UDSClientTest, SendMsg_006, TestSize.Level1)
-{
-    const char *buf = "Arg_012,@#$435";
-    size_t size = 14;
-
-    UDSClientUnitTest udsClientUt;
-    udsClientUt.SetFd(0);
-
-    UDSClient udsClient;
-    auto retResult = udsClient.SendMsg(buf, size);
-    ASSERT_EQ(0, retResult);
+    auto retResult = udsClientUt.SendMsg(buf, size);
+    ASSERT_FALSE(retResult);
 }
 
 HWTEST_F(UDSClientTest, SendMsg_type2_001, TestSize.Level1)
 {
     NetPacket pkt(MmiMessageId::INVALID);
 
-    UDSClient udsClient;
-    auto retResult = udsClient.SendMsg(pkt);
-    EXPECT_EQ(0, retResult);
+    UDSClientUnitTest udsClientUt;
+    auto retResult = udsClientUt.SendMsg(pkt);
+    ASSERT_FALSE(retResult);
 }
 
 HWTEST_F(UDSClientTest, SendMsg_type2_002, TestSize.Level1)
 {
     NetPacket pkt(static_cast<MmiMessageId>(222));
 
-    UDSClient udsClient;
-    auto retResult = udsClient.SendMsg(pkt);
-    EXPECT_EQ(0, retResult);
+    UDSClientUnitTest udsClientUt;
+    auto retResult = udsClientUt.SendMsg(pkt);
+    ASSERT_FALSE(retResult);
 }
 
 HWTEST_F(UDSClientTest, Stop_001, TestSize.Level1)
 {
-    UDSClient udsClient;
-    udsClient.Stop();
+    UDSClientUnitTest udsClientUt;
+    udsClientUt.Stop();
 }
-#endif
 } // namespace MMI
 } // namespace OHOS

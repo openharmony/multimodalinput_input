@@ -34,14 +34,10 @@ config("mmi_connect_manager_config") {
 ohos_source_set("mmi_connect_manager_service") {
   part_name = "input"
   subsystem_name = "multimodalinput"
-  sources =
-      [ "${mmi_connect_manager_path}/src/multimodal_input_connect_stub.cpp" ]
-
-  if (!input_feature_input_cooperation) {
-    sources += [
-      "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
-    ]
-  }
+  sources = [
+    "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
+    "${mmi_connect_manager_path}/src/multimodal_input_connect_stub.cpp",
+  ]
 
   configs = [ ":mmi_connect_manager_config" ]
 

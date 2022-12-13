@@ -192,7 +192,7 @@ void TimerManager::ProcessTimersInternal()
             curTimer->callback();
             continue;
         }
-        if (!AddInt64(nowTime, curTimer->intervalMs, curTimer->nextCallTime)) {
+        if (!AddInt64(curTimer->nextCallTime, curTimer->intervalMs, curTimer->nextCallTime)) {
             MMI_HILOGE("The addition of nextCallTime in TimerItem overflows");
             return;
         }

@@ -42,7 +42,7 @@ size_t GetObject(const uint8_t *data, size_t size, T &object)
     return objectSize;
 }
 
-size_t GetString(size_t objectSize, const uint8_t *data, size_t size, std::string &object)
+size_t GetString(const uint8_t *data, size_t size, char *object, size_t objectSize)
 {
     if (objectSize > size) {
         return 0;
@@ -81,6 +81,7 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
 {
     DisplayGroupInfo displayGroupInfo;
     size_t startPos = 0;
+    size_t stringSize = 4;
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.width);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.height);
     startPos += GetObject<int32_t>(data + startPos, size - startPos, displayGroupInfo.focusWindowId);
@@ -104,21 +105,12 @@ void UpdateDisplayInfoFuzzTest(const uint8_t* data, size_t size)
         startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.y);
         startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.width);
         startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.height);
-
-        size_t objectSize = 0;
-        std::string name = "";
-        size_t ret = GetString(objectSize, data, size, name);
-        if (ret == 0) {
-            MMI_HILOGD("%{public}s:%{public}d The return value is 0", __func__, __LINE__);
-            return;
-        }
+        startPos += GetObject<int32_t>(data + startPos, size - startPos, displayInfo.dpi);
+        char name[] = "name";
+        startPos += GetString(data + startPos, size - startPos, name, stringSize);
         displayInfo.name = name;
-        std::string uniq = "";
-        ret = GetString(objectSize, data, size, uniq);
-        if (ret == 0) {
-            MMI_HILOGD("%{public}s:%{public}d The return value is 0", __func__, __LINE__);
-            return;
-        }
+        char uniq[] = "uniq";
+        startPos += GetString(data + startPos, size - startPos, uniq, stringSize);
         displayInfo.uniq = uniq;
         displaysInfo.push_back(displayInfo);
     }

@@ -25,13 +25,37 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AddInputEventFilterFuzzTest" };
 } // namespace
 
-void AddInputEventFilterFuzzTest(const uint8_t* data, size_t /* size */)
+void AddInputEventFilterFuzzTest(const uint8_t* data, size_t size)
 {
-    auto fun = [](std::shared_ptr<PointerEvent> event) ->bool {
-        MMI_HILOGD("Add inputevent filter success");
-        return false;
+    struct TestFilter : public IInputEventFilter {
+        virtual bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {
+            CHKPR(keyEvent, false);
+            MMI_HILOGI("Fuzz test in TestFilter::OnInputEvent,key code:%{public}d", keyEvent->GetKeyCode());
+            return false;
+        }
+        bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+        {
+            CHKPR(pointerEvent, false);
+            MMI_HILOGI("Fuzz test in TestFilter::OnInputEvent,pointer id:%{public}d", pointerEvent->GetPointerId());
+            return false;
+        }
     };
-    InputManager::GetInstance()->AddInputEventFilter(fun);
+    auto filter = std::make_shared<TestFilter>();
+    const auto priority = 200 + (size % 100);
+    const auto filterId = InputManager::GetInstance()->AddInputEventFilter(filter, priority);
+    if (filterId == -1) {
+        MMI_HILOGE("Add filter,ret:%{public}d", filterId);
+        return;
+    } else {
+        MMI_HILOGE("Add filter success,filterId:%{public}d", filterId);
+    }
+    auto ret = InputManager::GetInstance()->RemoveInputEventFilter(filterId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Remove filter,ret:%{public}d", ret);
+        return;
+    } else {
+        MMI_HILOGE("Remove filter,success,filterId:%{public}d", filterId);
+    }
 }
 } // MMI
 } // OHOS

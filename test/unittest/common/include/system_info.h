@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace MMI {
 namespace SYSTEM_INFO {
-static constexpr double CPU_USAGE_UNKONW = -1.0;
+static constexpr double CPU_USAGE_UNKNOWN = -1.0;
 static constexpr double CPU_USAGE_LOAD = 20.0;
 static constexpr double CPU_USAGE_MAX = 100.0;
 class SystemInfo {
