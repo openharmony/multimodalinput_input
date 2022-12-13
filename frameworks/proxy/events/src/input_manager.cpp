@@ -37,9 +37,14 @@ void InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
     InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
 }
 
-int32_t InputManager::AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter)
+int32_t InputManager::AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority)
 {
-    return InputMgrImpl.AddInputEventFilter(filter);
+    return InputMgrImpl.AddInputEventFilter(filter, priority);
+}
+
+int32_t InputManager::RemoveInputEventFilter(int32_t filterId)
+{
+    return InputMgrImpl.RemoveInputEventFilter(filterId);
 }
 
 void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
@@ -103,6 +108,12 @@ int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interc
 int32_t InputManager::AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor)
 {
     return InputMgrImpl.AddInterceptor(interceptor);
+}
+
+int32_t InputManager::AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor, int32_t priority,
+    uint32_t deviceTags)
+{
+    return InputMgrImpl.AddInterceptor(interceptor, priority, deviceTags);
 }
 
 void InputManager::RemoveInterceptor(int32_t interceptorId)
@@ -192,39 +203,6 @@ int32_t InputManager::SetInputDevice(const std::string& dhid, const std::string&
     return InputMgrImpl.SetInputDevice(dhid, screenId);
 }
 
-int32_t InputManager::SetPointerLocation(int32_t x, int32_t y)
-{
-    return InputMgrImpl.SetPointerLocation(x, y);
-}
-
-int32_t InputManager::GetRemoteInputAbility(std::string deviceId,
-    std::function<void(std::set<int32_t>)> remoteTypes)
-{
-    return InputMgrImpl.GetRemoteInputAbility(deviceId, remoteTypes);
-}
-
-int32_t InputManager::PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
-{
-    return InputMgrImpl.PrepareRemoteInput(deviceId, callback);
-}
-
-int32_t InputManager::UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback)
-{
-    return InputMgrImpl.UnprepareRemoteInput(deviceId, callback);
-}
-
-int32_t InputManager::StartRemoteInput(const std::string& deviceId,
-    uint32_t inputAbility, std::function<void(int32_t)> callback)
-{
-    return InputMgrImpl.StartRemoteInput(deviceId, inputAbility, callback);
-}
-
-int32_t InputManager::StopRemoteInput(const std::string& deviceId, uint32_t inputAbility,
-    std::function<void(int32_t)> callback)
-{
-    return InputMgrImpl.StopRemoteInput(deviceId, inputAbility, callback);
-}
-
 int32_t InputManager::RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener)
 {
     return InputMgrImpl.RegisterCooperateListener(listener);
@@ -265,6 +243,11 @@ bool InputManager::GetFunctionKeyState(int32_t funcKey)
 int32_t InputManager::SetFunctionKeyState(int32_t funcKey, bool enable)
 {
     return InputMgrImpl.SetFunctionKeyState(funcKey, enable);
+}
+
+void InputManager::SetPointerLocation(int32_t x, int32_t y)
+{
+    InputMgrImpl.SetPointerLocation(x, y);
 }
 } // namespace MMI
 } // namespace OHOS

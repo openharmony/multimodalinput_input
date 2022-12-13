@@ -19,6 +19,9 @@
 
 #include "input_manager.h"
 #include "js_register_util.h"
+#include "napi_constants.h"
+#include "util_napi.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace MMI {
@@ -32,45 +35,83 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     napi_value result = nullptr;
     size_t argc = 1;
     napi_value argv[1] = { 0 };
-    if (napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr) != napi_ok) {
-        MMI_HILOGE("Call napi_get_cb_info failed");
-        napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAM, &result);
-        return result;
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 1) {
+        MMI_HILOGE("Parameter number error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
+        return nullptr;
     }
-    NAPI_ASSERT(env, argc == 1, "paramater num error");
-
-    napi_value keyHandle = nullptr;
-    napi_get_named_property(env, argv[0], "KeyEvent", &keyHandle);
     napi_valuetype tmpType = napi_undefined;
-    napi_typeof(env, keyHandle, &tmpType);
-    NAPI_ASSERT(env, tmpType == napi_object, "parameter1 is not napi_object");
-
-    auto keyEvent = KeyEvent::Create();
-    if (keyEvent == nullptr) {
-        MMI_HILOGE("The keyEvent is null");
-        napi_create_int32(env, MMI_STANDARD_EVENT_INVALID_PARAM, &result);
-        return result;
+    CHKRP(napi_typeof(env, argv[0], &tmpType), TYPEOF);
+    if (tmpType != napi_object) {
+        MMI_HILOGE("KeyEvent is not napi_object");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "KeyEvent", "object");
+        return nullptr;
     }
-    bool isPressed = GetNamedPropertyBool(env, keyHandle, "isPressed");
+    napi_value keyHandle = nullptr;
+    CHKRP(napi_get_named_property(env, argv[0], "KeyEvent", &keyHandle), GET_NAMED_PROPERTY);
+    if (keyHandle == nullptr) {
+        MMI_HILOGE("KeyEvent is nullptr");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "KeyEvent not found");
+        return nullptr;
+    }
+    CHKRP(napi_typeof(env, keyHandle, &tmpType), TYPEOF);
+    if (tmpType != napi_object) {
+        MMI_HILOGE("KeyEvent is not napi_object");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "KeyEvent", "object");
+        return nullptr;
+    }
+    auto keyEvent = KeyEvent::Create();
+    CHKPP(keyEvent);
+    bool isPressed = false;
+    int32_t ret = GetNamedPropertyBool(env, keyHandle, "isPressed", isPressed);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get isPressed failed");
+        return nullptr;
+    }
     if (isPressed) {
         keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     } else {
         keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     }
-    int32_t keyCode = GetNamedPropertyInt32(env, keyHandle, "keyCode");
+    int32_t keyCode;
+    ret = GetNamedPropertyInt32(env, keyHandle, "keyCode", keyCode);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get keyCode failed");
+        return nullptr;
+    }
+    if (keyCode < 0) {
+        MMI_HILOGE("keyCode:%{public}d is less 0, can not process", keyCode);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyCode must be greater than or equal to 0");
+        return nullptr;
+    }
     keyEvent->SetKeyCode(keyCode);
     bool isIntercepted = false;
-    if (!isIntercepted) {
-        keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    ret = GetNamedPropertyBool(env, keyHandle, "isIntercepted", isIntercepted);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get isIntercepted failed");
+        return nullptr;
     }
-    int32_t keyDownDuration = GetNamedPropertyInt32(env, keyHandle, "keyDownDuration");
+    MMI_HILOGD("isIntercepted:%{public}d", isIntercepted);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    int32_t keyDownDuration;
+    ret = GetNamedPropertyInt32(env, keyHandle, "keyDownDuration", keyDownDuration);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get keyDownDuration failed");
+        return nullptr;
+    }
+    if (keyDownDuration < 0) {
+        MMI_HILOGE("keyDownDuration:%{public}d is less 0, can not process", keyDownDuration);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyDownDuration must be greater than or equal to 0");
+        return nullptr;
+    }
     KeyEvent::KeyItem item;
     item.SetKeyCode(keyCode);
     item.SetPressed(isPressed);
     item.SetDownTime(static_cast<int64_t>(keyDownDuration));
     keyEvent->AddKeyItem(item);
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
-    napi_create_int32(env, 0, &result);
+    CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
 }
 

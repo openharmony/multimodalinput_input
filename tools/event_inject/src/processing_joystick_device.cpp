@@ -15,10 +15,10 @@
 
 #include "processing_joystick_device.h"
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "ProcessingJoystickDevice" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingJoystickDevice" };
 constexpr int32_t DEFAULT_ABSX_VALUE = 8188;
 constexpr int32_t DEFAULT_ABSY_VALUE = 8192;
 constexpr int32_t DEFAULT_ABSZ_VALUE = 125;
@@ -170,3 +170,5 @@ void ProcessingJoystickDevice::TransformThrottle1Event(const DeviceEvent& joysti
     SetThrottle(inputEventArray, joystickEvent.blockTime, joystickEvent.keyValue);
     SetSynReport(inputEventArray);
 }
+} // namespace MMI
+} // namespace OHOS

@@ -73,11 +73,11 @@ struct Sequence {
     Ability ability;
 };
 
-class KeyCommandHandler : public IInputEventHandler {
+class KeyCommandHandler final : public IInputEventHandler {
 public:
     KeyCommandHandler() = default;
     DISALLOW_COPY_AND_MOVE(KeyCommandHandler);
-    ~KeyCommandHandler() = default;
+    ~KeyCommandHandler() override = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -104,6 +104,9 @@ private:
     bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
     bool AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent);
+    void RemoveSubscribedTimer(int32_t keyCode);
+    void HandleSpecialKeys(int32_t keyCode, int32_t keyAction);
+    void InterruptTimers();
     void ResetLastMatchedKey()
     {
         lastMatchedKey_.preKeys.clear();
@@ -125,6 +128,8 @@ private:
     std::vector<Sequence> filterSequences_;
     std::vector<SequenceKey> keys_;
     bool isParseConfig_ { false };
+    std::map<int32_t, int32_t> specialKeys_;
+    std::map<int32_t, std::list<int32_t>> specialTimers_;
 };
 } // namespace MMI
 } // namespace OHOS

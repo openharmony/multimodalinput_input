@@ -28,8 +28,9 @@ class EventFilterProxy final : public IRemoteProxy<IEventFilter> {
 public:
     explicit EventFilterProxy(const sptr<IRemoteObject> &impl);
     DISALLOW_COPY_AND_MOVE(EventFilterProxy);
-    virtual ~EventFilterProxy() override;
-    virtual bool HandlePointerEvent(const std::shared_ptr<PointerEvent> event) override;
+    ~EventFilterProxy() override = default;
+    bool HandleKeyEvent(const std::shared_ptr<KeyEvent> event) override;
+    bool HandlePointerEvent(const std::shared_ptr<PointerEvent> event) override;
 private:
     static inline BrokerDelegator<EventFilterProxy> delegator_;
 };

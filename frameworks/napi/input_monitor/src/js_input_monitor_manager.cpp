@@ -19,13 +19,15 @@
 
 #include "define_multimodal.h"
 #include "napi_constants.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorManager" };
 
 const std::string REFERENCE_UNREF = "napi_reference_unref";
+constexpr int32_t MONITOR_REGISTER_EXCEED_MAX { 4100001 };
 } // namespace
 
 JsInputMonitorManager& JsInputMonitorManager::GetInstance()
@@ -40,14 +42,15 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
     std::lock_guard<std::mutex> guard(mutex_);
     for (const auto &item : monitors_) {
         if ((item != nullptr) && (item->IsMatch(jsEnv, callback) != RET_ERR)) {
-            MMI_HILOGD("Add js monitor failed");
+            MMI_HILOGW("Add js monitor failed");
             return;
         }
     }
     auto monitor = std::make_shared<JsInputMonitor>(jsEnv, typeName, callback, nextId_++);
-    CHKPV(monitor);
-    if (!monitor->Start()) {
-        THROWERR(jsEnv, "js monitor startup failed");
+    int32_t ret = monitor->Start();
+    if (ret < 0) {
+        MMI_HILOGE("js monitor startup failed");
+        ThrowError(jsEnv, ret);
         return;
     }
     monitors_.push_back(monitor);
@@ -212,7 +215,7 @@ void JsInputMonitorManager::RemoveEnv(std::map<napi_env, napi_ref>::iterator it)
 {
     CALL_DEBUG_ENTER;
     uint32_t refCount;
-    CHKRV(it->first, napi_reference_unref(it->first, it->second, &refCount), REFERENCE_UNREF);
+    CHKRV(napi_reference_unref(it->first, it->second, &refCount), REFERENCE_UNREF);
     envManager_.erase(it);
 }
 
@@ -234,6 +237,18 @@ bool JsInputMonitorManager::IsExisting(napi_env env)
     }
 
     return true;
+}
+
+void JsInputMonitorManager::ThrowError(napi_env env, int32_t code)
+{
+    int32_t errorCode = -code;
+    if (errorCode == MONITOR_REGISTER_EXCEED_MAX) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Maximum number of listeners exceeded for a single process");
+    } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
+        THROWERR_API9(env, COMMON_PERMISSION_CHECK_ERROR, "monitor", "ohos.permission.INPUT_MONITORING");
+    } else {
+        MMI_HILOGE("Add monitor failed");
+    }
 }
 } // namespace MMI
 } // namespace OHOS

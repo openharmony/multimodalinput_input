@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "IInputDeviceCooperateState"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInputDeviceCooperateState" };
 } // namespace
 
 IInputDeviceCooperateState::IInputDeviceCooperateState()
@@ -32,7 +32,6 @@ IInputDeviceCooperateState::IInputDeviceCooperateState()
     runner_ = AppExecFwk::EventRunner::Create(true);
     CHKPL(runner_);
     eventHandler_ = std::make_shared<CooperateEventHandler>(runner_);
-    CHKPL(eventHandler_);
 }
 
 int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetworkId, int32_t startInputDeviceId)
@@ -47,7 +46,7 @@ int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetwor
                 this->OnPrepareDistributedInput(isSuccess, srcNetworkId, startInputDeviceId);
             });
         if (ret != RET_OK) {
-            MMI_HILOGE("Prepare remoteNetworkId input fail");
+            MMI_HILOGE("Prepare remote input fail");
             InputDevCooSM->OnStartFinish(false, sinkNetworkId, startInputDeviceId);
             InputDevCooSM->UpdatePreparedDevices("", "");
         }
@@ -73,7 +72,7 @@ void IInputDeviceCooperateState::OnPrepareDistributedInput(
         std::function<void()> handleStartDinputFunc =
             std::bind(&IInputDeviceCooperateState::StartRemoteInput, this, startInputDeviceId);
         CHKPV(eventHandler_);
-        eventHandler_->PostTask(handleStartDinputFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
+        eventHandler_->ProxyPostTask(handleStartDinputFunc, taskName, 0);
     }
 }
 
@@ -84,12 +83,17 @@ int32_t IInputDeviceCooperateState::StartRemoteInput(int32_t startInputDeviceId)
     std::vector<std::string> dhids = InputDevMgr->GetCooperateDhids(startInputDeviceId);
     if (dhids.empty()) {
         InputDevCooSM->OnStartFinish(false, networkIds.first, startInputDeviceId);
-        return RET_OK;
+        return static_cast<int32_t>(CooperationMessage::INPUT_DEVICE_ID_ERROR);
     }
-    return DistributedAdapter->StartRemoteInput(
+    int32_t ret = DistributedAdapter->StartRemoteInput(
         networkIds.first, networkIds.second, dhids, [this, src = networkIds.first, startInputDeviceId](bool isSuccess) {
             this->OnStartRemoteInput(isSuccess, src, startInputDeviceId);
         });
+    if (ret != RET_OK) {
+        InputDevCooSM->OnStartFinish(false, networkIds.first, startInputDeviceId);
+        return static_cast<int32_t>(CooperationMessage::COOPERATE_FAIL);
+    }
+    return RET_OK; 
 }
 
 void IInputDeviceCooperateState::OnStartRemoteInput(
@@ -100,7 +104,7 @@ void IInputDeviceCooperateState::OnStartRemoteInput(
     std::function<void()> handleStartFinishFunc =
         std::bind(&InputDeviceCooperateSM::OnStartFinish, InputDevCooSM, isSuccess, srcNetworkId, startInputDeviceId);
     CHKPV(eventHandler_);
-    eventHandler_->PostTask(handleStartFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
+    eventHandler_->ProxyPostTask(handleStartFinishFunc, taskName, 0);
 }
 
 bool IInputDeviceCooperateState::NeedPrepare(const std::string &srcNetworkId, const std::string &sinkNetworkId)

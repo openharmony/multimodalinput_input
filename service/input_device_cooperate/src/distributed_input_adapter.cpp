@@ -26,39 +26,37 @@ namespace OHOS {
 namespace MMI {
 using namespace DistributedHardware::DistributedInput;
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "DistributedInputAdapter"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DistributedInputAdapter" };
 constexpr int32_t DEFAULT_DELAY_TIME = 4000;
 constexpr int32_t RETRY_TIME = 2;
 } // namespace
 DistributedInputAdapter::DistributedInputAdapter()
 {
-    mouseListener_ = new (std::nothrow) MouseStateChangeCallbackImpl();
-    CHKPL(mouseListener_);
-    DistributedInputKit::RegisterSimulationEventListener(mouseListener_);
+    CALL_INFO_TRACE;
+    simulationEventListener_ = new (std::nothrow) SimulateEventCallbackImpl();
+    CHKPL(simulationEventListener_);
+    DistributedInputKit::RegisterSimulationEventListener(simulationEventListener_);
 }
 
 DistributedInputAdapter::~DistributedInputAdapter()
 {
+    CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(adapterLock_);
-    DistributedInputKit::UnregisterSimulationEventListener(mouseListener_);
-    mouseListener_ = nullptr;
+    DistributedInputKit::UnregisterSimulationEventListener(simulationEventListener_);
+    simulationEventListener_ = nullptr;
     callbackMap_.clear();
 }
 
 bool DistributedInputAdapter::IsNeedFilterOut(const std::string &deviceId, const BusinessEvent &event)
 {
+    CALL_INFO_TRACE;
     return DistributedInputKit::IsNeedFilterOut(deviceId, event);
-}
-
-bool DistributedInputAdapter::IsTouchEventNeedFilterOut(uint32_t absX, uint32_t absY)
-{
-    TouchScreenEvent touchScreenEvent{ absX, absY };
-    return DistributedInputKit::IsTouchEventNeedFilterOut(touchScreenEvent);
 }
 
 int32_t DistributedInputAdapter::StartRemoteInput(const std::string &deviceId, const std::vector<std::string> &dhIds,
                                                   DInputCallback callback)
 {
+    CALL_INFO_TRACE;
     sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StartDInputCallbackDHIds();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::StartDInputCallbackDHIds, callback);
@@ -68,6 +66,7 @@ int32_t DistributedInputAdapter::StartRemoteInput(const std::string &deviceId, c
 int32_t DistributedInputAdapter::StartRemoteInput(const std::string &srcId, const std::string &sinkId,
                                                   const uint32_t &inputTypes, DInputCallback callback)
 {
+    CALL_INFO_TRACE;
     sptr<IStartDInputCallback> cb = new (std::nothrow) StartDInputCallback();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::StartDInputCallback, callback);
@@ -77,15 +76,17 @@ int32_t DistributedInputAdapter::StartRemoteInput(const std::string &srcId, cons
 int32_t DistributedInputAdapter::StartRemoteInput(const std::string &srcId, const std::string &sinkId,
                                                   const std::vector<std::string> &dhIds, DInputCallback callback)
 {
-    sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StartDInputCallbackFds();
+    CALL_INFO_TRACE;
+    sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StartDInputCallbackSink();
     CHKPR(cb, ERROR_NULL_POINTER);
-    SaveCallback(CallbackType::StartDInputCallbackFds, callback);
+    SaveCallback(CallbackType::StartDInputCallbackSink, callback);
     return DistributedInputKit::StartRemoteInput(srcId, sinkId, dhIds, cb);
 }
 
 int32_t DistributedInputAdapter::StopRemoteInput(const std::string &deviceId, const std::vector<std::string> &dhIds,
                                                  DInputCallback callback)
 {
+    CALL_INFO_TRACE;
     sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StopDInputCallbackDHIds();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::StopDInputCallbackDHIds, callback);
@@ -95,6 +96,7 @@ int32_t DistributedInputAdapter::StopRemoteInput(const std::string &deviceId, co
 int32_t DistributedInputAdapter::StopRemoteInput(const std::string &srcId, const std::string &sinkId,
                                                  const uint32_t &inputTypes, DInputCallback callback)
 {
+    CALL_INFO_TRACE;
     sptr<IStopDInputCallback> cb = new (std::nothrow) StopDInputCallback();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::StopDInputCallback, callback);
@@ -104,15 +106,17 @@ int32_t DistributedInputAdapter::StopRemoteInput(const std::string &srcId, const
 int32_t DistributedInputAdapter::StopRemoteInput(const std::string &srcId, const std::string &sinkId,
                                                  const std::vector<std::string> &dhIds, DInputCallback callback)
 {
-    sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StopDInputCallbackFds();
+    CALL_INFO_TRACE;
+    sptr<IStartStopDInputsCallback> cb = new (std::nothrow) StopDInputCallbackSink();
     CHKPR(cb, ERROR_NULL_POINTER);
-    SaveCallback(CallbackType::StopDInputCallbackFds, callback);
+    SaveCallback(CallbackType::StopDInputCallbackSink, callback);
     return DistributedInputKit::StopRemoteInput(srcId, sinkId, dhIds, cb);
 }
 
 int32_t DistributedInputAdapter::PrepareRemoteInput(const std::string &srcId, const std::string &sinkId,
                                                     DInputCallback callback)
 {
+    CALL_INFO_TRACE;
     sptr<IPrepareDInputCallback> cb = new (std::nothrow) PrepareStartDInputCallbackSink();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::PrepareStartDInputCallbackSink, callback);
@@ -122,6 +126,7 @@ int32_t DistributedInputAdapter::PrepareRemoteInput(const std::string &srcId, co
 int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &srcId, const std::string &sinkId,
                                                       DInputCallback callback)
 {
+    CALL_INFO_TRACE;
     sptr<IUnprepareDInputCallback> cb = new (std::nothrow) UnPrepareStopDInputCallbackSink();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::UnPrepareStopDInputCallbackSink, callback);
@@ -130,6 +135,7 @@ int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &srcId, 
 
 int32_t DistributedInputAdapter::PrepareRemoteInput(const std::string &deviceId, DInputCallback callback)
 {
+    CALL_INFO_TRACE;
     sptr<IPrepareDInputCallback> cb = new (std::nothrow) PrepareStartDInputCallback();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::PrepareStartDInputCallback, callback);
@@ -138,24 +144,25 @@ int32_t DistributedInputAdapter::PrepareRemoteInput(const std::string &deviceId,
 
 int32_t DistributedInputAdapter::UnPrepareRemoteInput(const std::string &deviceId, DInputCallback callback)
 {
+    CALL_INFO_TRACE;
     sptr<IUnprepareDInputCallback> cb = new (std::nothrow) UnPrepareStopDInputCallback();
     CHKPR(cb, ERROR_NULL_POINTER);
     SaveCallback(CallbackType::UnPrepareStopDInputCallback, callback);
     return DistributedInputKit::UnprepareRemoteInput(deviceId, cb);
 }
 
-int32_t DistributedInputAdapter::RegisterEventCallback(MouseStateChangeCallback callback)
+int32_t DistributedInputAdapter::RegisterEventCallback(SimulateEventCallback callback)
 {
     std::lock_guard<std::mutex> guard(adapterLock_);
     CHKPR(callback, RET_ERR);
-    mouseStateChangeCallback_ = callback;
+    SimulateEventCallback_ = callback;
     return RET_OK;
 }
-int32_t DistributedInputAdapter::UnregisterEventCallback(MouseStateChangeCallback callback)
+int32_t DistributedInputAdapter::UnregisterEventCallback(SimulateEventCallback callback)
 {
     std::lock_guard<std::mutex> guard(adapterLock_);
     CHKPR(callback, RET_ERR);
-    mouseStateChangeCallback_ = nullptr;
+    SimulateEventCallback_ = nullptr;
     return RET_OK;
 }
 
@@ -217,8 +224,8 @@ void DistributedInputAdapter::ProcessDInputCallback(CallbackType type, int32_t s
 void DistributedInputAdapter::OnSimulationEvent(uint32_t type, uint32_t code, int32_t value)
 {
     std::lock_guard<std::mutex> guard(adapterLock_);
-    CHKPV(mouseStateChangeCallback_);
-    mouseStateChangeCallback_(type, code, value);
+    CHKPV(SimulateEventCallback_);
+    SimulateEventCallback_(type, code, value);
 }
 
 void DistributedInputAdapter::StartDInputCallback::OnResult(const std::string &devId, const uint32_t &inputTypes,
@@ -243,14 +250,14 @@ void DistributedInputAdapter::StopDInputCallbackDHIds::OnResultDhids(const std::
     DistributedAdapter->ProcessDInputCallback(CallbackType::StopDInputCallbackDHIds, status);
 }
 
-void DistributedInputAdapter::StartDInputCallbackFds::OnResultDhids(const std::string &devId, const int32_t &status)
+void DistributedInputAdapter::StartDInputCallbackSink::OnResultDhids(const std::string &devId, const int32_t &status)
 {
-    DistributedAdapter->ProcessDInputCallback(CallbackType::StartDInputCallbackFds, status);
+    DistributedAdapter->ProcessDInputCallback(CallbackType::StartDInputCallbackSink, status);
 }
 
-void DistributedInputAdapter::StopDInputCallbackFds::OnResultDhids(const std::string &devId, const int32_t &status)
+void DistributedInputAdapter::StopDInputCallbackSink::OnResultDhids(const std::string &devId, const int32_t &status)
 {
-    DistributedAdapter->ProcessDInputCallback(CallbackType::StopDInputCallbackFds, status);
+    DistributedAdapter->ProcessDInputCallback(CallbackType::StopDInputCallbackSink, status);
 }
 
 void DistributedInputAdapter::PrepareStartDInputCallback::OnResult(const std::string &devId, const int32_t &status)
@@ -273,7 +280,7 @@ void DistributedInputAdapter::UnPrepareStopDInputCallbackSink::OnResult(const st
     DistributedAdapter->ProcessDInputCallback(CallbackType::UnPrepareStopDInputCallbackSink, status);
 }
 
-int32_t DistributedInputAdapter::MouseStateChangeCallbackImpl::OnSimulationEvent(uint32_t type, uint32_t code,
+int32_t DistributedInputAdapter::SimulateEventCallbackImpl::OnSimulationEvent(uint32_t type, uint32_t code,
     int32_t value)
 {
     DistributedAdapter->OnSimulationEvent(type, code, value);

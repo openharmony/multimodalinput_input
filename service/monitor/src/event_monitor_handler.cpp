@@ -30,6 +30,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventMonitorHandler" };
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+constexpr size_t MAX_EVENTIDS_SIZE = 1000;
+#endif // OHOS_BUILD_ENABLE_TOUCH
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -155,7 +158,7 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<KeyEvent>
 {
     CHKPV(keyEvent);
     NetPacket pkt(MmiMessageId::REPORT_KEY_EVENT);
-    pkt << handlerType_;
+    pkt << handlerType_ << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write key event failed");
         return;
@@ -184,7 +187,7 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
             return;
         }
     }
-    pkt << handlerType_;
+    pkt << handlerType_ << static_cast<uint32_t>(evdev_device_udev_tags::EVDEV_UDEV_TAG_INPUT);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write pointer event failed");
         return;
@@ -291,9 +294,9 @@ void EventMonitorHandler::MonitorCollection::MarkConsumed(int32_t eventId, Sessi
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     MMI_HILOGD("Cancel operation");
     auto pointerEvent = std::make_shared<PointerEvent>(*state.lastPointerEvent_);
-    CHKPV(pointerEvent);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     pointerEvent->SetActionTime(GetSysClockTime());
+    pointerEvent->UpdateId();
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT | InputEvent::EVENT_FLAG_NO_MONITOR);
     auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPV(inputEventNormalizeHandler);
@@ -356,6 +359,10 @@ void EventMonitorHandler::MonitorCollection::UpdateConsumptionState(std::shared_
         sIter = tIter;
     }
     ConsumptionState &state = sIter->second;
+    if (state.eventIds_.size() >= MAX_EVENTIDS_SIZE) {
+        auto iter = state.eventIds_.begin();
+        state.eventIds_.erase(iter);
+    }
     auto [tIter, isOk] = state.eventIds_.emplace(pointerEvent->GetId());
     if (!isOk) {
         MMI_HILOGW("Failed to stash event");

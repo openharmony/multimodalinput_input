@@ -22,6 +22,8 @@
 #include "define_multimodal.h"
 #include "napi_constants.h"
 #include "js_input_monitor_manager.h"
+#include "proto.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace MMI {
@@ -29,42 +31,94 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule" };
 } // namespace
 
-static napi_value JsOn(napi_env env, napi_callback_info info)
+static napi_value JsOnApi9(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
 
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc != 2) {
-        THROWERR(env, "Register js monitor failed, the number of parameter is error");
-        return nullptr;
-    }
-
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     napi_valuetype valueType = napi_undefined;
-    CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
+    CHKRP(napi_typeof(env, argv[0], &valueType), TYPEOF);
     if (valueType != napi_string) {
-        THROWERR(env, "Register js monitor failed, value type is not napi_string");
+        MMI_HILOGE("First Parameter type error");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "EventType", "string");
         return nullptr;
     }
-    char typeName[MAX_STRING_LEN] = {0};
+    char typeName[MAX_STRING_LEN] = { 0 };
     size_t len = 0;
-    CHKRP(env, napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_STRING_UTF8);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_VALUE_STRING_UTF8);
     if (std::strcmp(typeName, "touch") != 0 && std::strcmp(typeName, "mouse") != 0) {
-        THROWERR(env, "Register js monitor failed, the first parameter is invalid");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType must be mouse or touch");
         return nullptr;
     }
-
-    CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
+    CHKRP(napi_typeof(env, argv[1], &valueType), TYPEOF);
     if (valueType != napi_function) {
-        THROWERR(env, "The second param is not napi_function");
+        MMI_HILOGE("Second Parameter type error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
         return nullptr;
     }
     if (!JsInputMonMgr.AddEnv(env, info)) {
-        THROWERR(env, "AddEnv failed");
+        MMI_HILOGE("AddEnv failed");
         return nullptr;
     }
     JsInputMonMgr.AddMonitor(env, typeName, argv[1]);
+    return nullptr;
+}
+
+static napi_value JsOn(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 2) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
+        return nullptr;
+    }
+    JsOnApi9(env, info);
+    return nullptr;
+}
+
+static napi_value JsOffApi9(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    napi_valuetype valueType = napi_undefined;
+    CHKRP(napi_typeof(env, argv[0], &valueType), TYPEOF);
+    if (valueType != napi_string) {
+        MMI_HILOGE("First Parameter type error");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "EventType", "string");
+        return nullptr;
+    }
+    char typeName[MAX_STRING_LEN] = { 0 };
+    size_t len = 0;
+    CHKRP(napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_VALUE_STRING_UTF8);
+    if (std::strcmp(typeName, "touch") != 0 && std::strcmp(typeName, "mouse") != 0) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType must be mouse or touch");
+        return nullptr;
+    }
+    if (argv[1] == nullptr) {
+        JsInputMonMgr.RemoveMonitor(env, typeName);
+        MMI_HILOGD("Remove all monitor");
+        return nullptr;
+    }
+
+    CHKRP(napi_typeof(env, argv[1], &valueType), TYPEOF);
+    if (valueType != napi_function) {
+        MMI_HILOGE("Second Parameter type error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
+        return nullptr;
+    }
+
+    if (!JsInputMonMgr.AddEnv(env, info)) {
+        JsInputMonMgr.RemoveMonitor(env, typeName);
+        return nullptr;
+    }
+
+    JsInputMonMgr.RemoveMonitor(env, typeName, argv[1]);
     return nullptr;
 }
 
@@ -72,49 +126,14 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
     size_t argc = 2;
-    napi_value argv[argc];
-    argv[0] = nullptr;
-    argv[1] = nullptr;
+    napi_value argv[2];
 
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 1 || argc > 2) {
-        THROWERR(env, "Unregister js monitor failed, the number of parameter is error");
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 1) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
     }
-
-    napi_valuetype valueType = napi_undefined;
-    CHKRP(env, napi_typeof(env, argv[0], &valueType), TYPEOF);
-    if (valueType != napi_string) {
-        THROWERR(env, "Unregister js monitor failed, value type is not napi_string");
-        return nullptr;
-    }
-    char typeName[MAX_STRING_LEN] = {0};
-    size_t len = 0;
-    CHKRP(env, napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_STRING_UTF8);
-    if (std::strcmp(typeName, "touch") != 0 && std::strcmp(typeName, "mouse") != 0) {
-        THROWERR(env, "Unregister js monitor failed, The first parameter is invalid");
-        return nullptr;
-    }
-
-    if (argv[1] == nullptr) {
-        JsInputMonMgr.RemoveMonitor(env, typeName);
-        MMI_HILOGD("Remove all monitor");
-        return nullptr;
-    }
-
-    CHKRP(env, napi_typeof(env, argv[1], &valueType), TYPEOF);
-    if (valueType != napi_function) {
-        THROWERR(env, "Unregister js monitor failed, the second param is not napi_function");
-        return nullptr;
-    }
-
-    if (!JsInputMonMgr.AddEnv(env, info)) {
-        JsInputMonMgr.RemoveMonitor(env, typeName);
-        THROWERR(env, "Unregister js monitor failed, remove all monitor");
-        return nullptr;
-    }
-
-    JsInputMonMgr.RemoveMonitor(env, typeName, argv[1]);
+    JsOffApi9(env, info);
     return nullptr;
 }
 
@@ -126,7 +145,7 @@ static napi_value MmiInputMonitorInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
     };
-    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     return exports;
 }
 EXTERN_C_END

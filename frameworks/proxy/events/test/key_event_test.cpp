@@ -20,14 +20,11 @@
 #include "input_manager.h"
 #include "key_event.h"
 #include "proto.h"
-#include "run_shell_util.h"
-#include "standardized_event_manager.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-using namespace OHOS::MMI;
 } // namespace
 
 class KeyEventTest : public testing::Test {
@@ -37,8 +34,8 @@ public:
 };
 
 /**
- * @tc.name:KeyEventTest_OnCheckKeyEvent_001
- * @tc.desc:Verify key event
+ * @tc.name: KeyEventTest_OnCheckKeyEvent_001
+ * @tc.desc: Verify key event
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -60,8 +57,8 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_001, TestSize.Level1)
 }
 
 /**
- * @tc.name:KeyEventTest_OnCheckKeyEvent_002
- * @tc.desc:Verify key event
+ * @tc.name: KeyEventTest_OnCheckKeyEvent_002
+ * @tc.desc: Verify key event
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -89,8 +86,8 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_002, TestSize.Level1)
 }
 
 /**
- * @tc.name:KeyEventTest_OnCheckKeyEvent_003
- * @tc.desc:Verify key event
+ * @tc.name: KeyEventTest_OnCheckKeyEvent_003
+ * @tc.desc: Verify key event
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -121,8 +118,8 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_003, TestSize.Level1)
 }
 
 /**
- * @tc.name:KeyEventTest_OnCheckKeyEvent_004
- * @tc.desc:Verify key event
+ * @tc.name: KeyEventTest_OnCheckKeyEvent_004
+ * @tc.desc: Verify key event
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -154,8 +151,8 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_004, TestSize.Level1)
 }
 
 /**
- * @tc.name:KeyEventTest_OnCheckKeyEvent_005
- * @tc.desc:Verify key event
+ * @tc.name: KeyEventTest_OnCheckKeyEvent_005
+ * @tc.desc: Verify key event
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -191,8 +188,8 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_005, TestSize.Level1)
 }
 
 /**
- * @tc.name:KeyEventTest_OnCheckKeyEvent_006
- * @tc.desc:Verify key event
+ * @tc.name: KeyEventTest_OnCheckKeyEvent_006
+ * @tc.desc: Verify key event
  * @tc.type: FUNC
  * @tc.require: I5QSN3
  */
@@ -217,6 +214,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_006, TestSize.Level1)
     item.SetKeyCode(KeyEvent::KEYCODE_BACK);
     item.SetDownTime(100);
     item.SetPressed(true);
+    item.SetUnicode(0);
     keyEvent->AddKeyItem(item);
     ASSERT_TRUE(keyEvent->IsValid());
     std::vector<KeyEvent::KeyItem> items = keyEvent->GetKeyItems();
@@ -366,7 +364,72 @@ HWTEST_F(KeyEventTest, KeyEventTest_TransitionFunctionKey_004, TestSize.Level1)
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     ASSERT_NE(keyEvent, nullptr);
     int32_t lockCode = keyEvent->TransitionFunctionKey(KeyEvent::KEYCODE_A);
-    ASSERT_EQ(lockCode, KeyEvent::UNKOWN_FUNCTION_KEY);
+    ASSERT_EQ(lockCode, KeyEvent::UNKNOWN_FUNCTION_KEY);
+}
+
+/**
+ * @tc.name: KeyEventTest_ReadFromParcel_001
+ * @tc.desc: Read from parcel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_ReadFromParcel_001, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    keyEvent->SetActionTime(100);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->ActionToString(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->KeyCodeToString(KeyEvent::KEYCODE_HOME);
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_HOME);
+    item.SetDownTime(100);
+    item.SetPressed(true);
+    keyEvent->AddKeyItem(item);
+    MessageParcel data;
+    bool ret = keyEvent->WriteToParcel(data);
+    ASSERT_TRUE(ret);
+    ret = keyEvent->ReadFromParcel(data);
+    ASSERT_TRUE(ret);
+}
+
+/**
+ * @tc.name: KeyEventTest_ReadFromParcel_002
+ * @tc.desc: Read from parcel
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_ReadFromParcel_002, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    keyEvent->SetActionTime(100);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->ActionToString(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->KeyCodeToString(KeyEvent::KEYCODE_HOME);
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_HOME);
+    item.SetDownTime(100);
+    item.SetPressed(true);
+    keyEvent->AddKeyItem(item);
+    MessageParcel data;
+    bool ret = keyEvent->WriteToParcel(data);
+    ASSERT_TRUE(ret);
+    std::shared_ptr<InputEvent> inputEvent = InputEvent::Create();
+    ret = inputEvent->ReadFromParcel(data);
+    ASSERT_TRUE(ret);
+    int32_t keyCode;
+    ret = data.ReadInt32(keyCode);
+    ASSERT_TRUE(ret);
+    const int32_t keysSize = data.ReadInt32();
+    ASSERT_FALSE(keysSize < 0);
+    for (int32_t i = 0; i < keysSize; ++i) {
+        KeyEvent::KeyItem keyItem = {};
+        ret = keyItem.ReadFromParcel(data);
+        ASSERT_TRUE(ret);
+    }
 }
 } // namespace MMI
 } // namespace OHOS

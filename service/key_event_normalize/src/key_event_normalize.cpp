@@ -87,7 +87,7 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     }
     if (keyAction == KeyEvent::KEY_ACTION_UP) {
         int32_t funcKey = keyEvent->TransitionFunctionKey(keyCode);
-        if (funcKey != KeyEvent::UNKOWN_FUNCTION_KEY) {
+        if (funcKey != KeyEvent::UNKNOWN_FUNCTION_KEY) {
             int32_t ret = keyEvent->SetFunctionKey(funcKey, libinput_get_funckey_state(device, funcKey));
             if (ret == funcKey) {
                 MMI_HILOGD("Set function key:%{public}d to state:%{public}d succeed",

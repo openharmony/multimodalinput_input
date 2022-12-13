@@ -20,6 +20,9 @@
 #include <uv.h>
 
 #include "error_multimodal.h"
+#include "napi_constants.h"
+#include "util_napi_error.h"
+#include "util_napi.h"
 
 namespace OHOS {
 namespace MMI {
@@ -30,120 +33,90 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSReg
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, int32_t value)
 {
     MMI_HILOGD("%{public}s=%{public}d", name.c_str(), value);
-    napi_status status;
     napi_value napiValue;
-    status = napi_create_int32(env, value, &napiValue);
-    if (status != napi_ok) {
-        MMI_HILOGE("%{public}s=%{public}d failed", name.c_str(), value);
-        napi_throw_error(env, nullptr, "napi create int32 failed");
-        return;
-    }
+    CHKRV(napi_create_int32(env, value, &napiValue), CREATE_INT32);
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
 }
 
 void SetNamedProperty(const napi_env &env, napi_value &object, const std::string &name, std::string value)
 {
     MMI_HILOGD("%{public}s=%{public}s", name.c_str(), value.c_str());
-    napi_status status;
     napi_value napiValue;
-    status = napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &napiValue);
-    if (status != napi_ok) {
-        MMI_HILOGE("%{public}s=%{public}s failed", name.c_str(), value.c_str());
-        napi_throw_error(env, nullptr, "napi create string failed");
-        return;
-    }
+    CHKRV(napi_create_string_utf8(env, value.c_str(), NAPI_AUTO_LENGTH, &napiValue), CREATE_STRING_UTF8);
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, object, name.c_str(), napiValue));
 }
 
-bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const std::string &name)
+bool GetNamedPropertyBool(const napi_env &env, const napi_value &object, const std::string &name, bool &ret)
 {
-    bool value = false;
     napi_value napiValue = {};
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
-    if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGE("Call napi_typeof fail");
-        napi_throw_error(env, nullptr, "call napi_typeof failed");
-        return false;
-    }
+
+    CHKRF(napi_typeof(env, napiValue, &tmpType), TYPEOF);
     if (tmpType != napi_boolean) {
         MMI_HILOGE("The value is not bool");
-        return value;
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "bool");
+        return false;
     }
-
-    napi_get_value_bool(env, napiValue, &value);
-    MMI_HILOGD("%{public}s=%{public}d", name.c_str(), value);
-    return value;
+    CHKRF(napi_get_value_bool(env, napiValue, &ret), GET_VALUE_BOOL);
+    MMI_HILOGD("%{public}s=%{public}d", name.c_str(), ret);
+    return true;
 }
 
-int32_t GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name)
+std::optional<int32_t> GetNamedPropertyInt32(const napi_env &env, const napi_value &object, const std::string &name)
 {
-    int32_t value = 0;
     napi_value napiValue = {};
     napi_get_named_property(env, object, name.c_str(), &napiValue);
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
         MMI_HILOGE("Call napi_typeof failed");
-        napi_throw_error(env, nullptr, "call napi_typeof failed");
-        return value;
+        return std::nullopt;
     }
     if (tmpType != napi_number) {
         MMI_HILOGE("The value is not number");
-        napi_throw_error(env, nullptr, "value is not number");
-        return value;
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "number");
+        return std::nullopt;
     }
-    napi_get_value_int32(env, napiValue, &value);
-    MMI_HILOGD("%{public}s=%{public}d", name.c_str(), value);
-    return value;
+    int32_t ret;
+    if (napi_get_value_int32(env, napiValue, &ret) != napi_ok) {
+        MMI_HILOGE("Call napi_get_value_int32 failed");
+        return std::nullopt;
+    }
+    MMI_HILOGD("%{public}s=%{public}d", name.c_str(), ret);
+    return std::make_optional(ret);
 }
 
-bool GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> &params)
+napi_value GetPreKeys(const napi_env &env, const napi_value &value, std::set<int32_t> &params)
 {
     CALL_DEBUG_ENTER;
     uint32_t arrayLength = 0;
-    if (napi_get_array_length(env, value, &arrayLength) != napi_ok) {
-        MMI_HILOGE("Get array length failed");
-        napi_throw_error(env, nullptr, "Get array length failed");
-        return false;
-    }
+    CHKRP(napi_get_array_length(env, value, &arrayLength), GET_ARRAY_LENGTH);
     for (uint32_t i = 0; i < arrayLength; i++) {
         napi_value napiElement;
-        if (napi_get_element(env, value, i, &napiElement) != napi_ok) {
-            MMI_HILOGE("Get element failed");
-            napi_throw_error(env, nullptr, "Get element failed");
-            return false;
-        }
-
+        CHKRP(napi_get_element(env, value, i, &napiElement), GET_ELEMENT);
         napi_valuetype valuetype;
-        if (napi_typeof(env, napiElement, &valuetype) != napi_ok) {
-            MMI_HILOGE("Call typeof napiElement failed");
-            napi_throw_error(env, nullptr, "Call typeof napiElement failed");
-            return false;
-        }
+        CHKRP(napi_typeof(env, napiElement, &valuetype), TYPEOF);
         if (valuetype != napi_number) {
-            MMI_HILOGE("Wrong argument type, Numbers expected");
-            napi_throw_error(env, nullptr, "Wrong argument type, Numbers expected");
-            return false;
+            MMI_HILOGE("PreKeys Wrong argument type, Number expected");
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "element of preKeys must be number");
+            return nullptr;
         }
         int32_t value = 0;
-        if (napi_get_value_int32(env, napiElement, &value) != napi_ok) {
-            MMI_HILOGE("NapiElement get int32 value failed");
-            napi_throw_error(env, nullptr, "NapiElement get int32 value failed");
-            return false;
-        }
+        CHKRP(napi_get_value_int32(env, napiElement, &value), GET_VALUE_INT32);
         if (value < 0) {
             MMI_HILOGE("preKey:%{public}d is less 0, can not process", value);
-            napi_throw_error(env, nullptr, "preKey is less 0, can not process");
-            return false;
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "element of preKeys must be greater than or equal to 0");
+            return nullptr;
         }
         MMI_HILOGD("Get int array number:%{public}d", value);
         if (!params.insert(value).second) {
             MMI_HILOGE("Params insert value failed");
-            napi_throw_error(env, nullptr, "params insert value failed");
-            return false;
+            return nullptr;
         }
     }
-    return true;
+    napi_value ret;
+    CHKRP(napi_create_int32(env, RET_OK, &ret), CREATE_INT32);
+    return ret;
 }
 
 int32_t GetPreSubscribeId(Callbacks &callbacks, KeyEventMonitorInfo *event)
@@ -170,7 +143,6 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
     napi_status status = napi_get_reference_value(env, event->callback[0], &handler1);
     if (status != napi_ok) {
         MMI_HILOGE("Handler1 get reference value failed");
-        napi_throw_error(env, nullptr, "Handler1 get reference value failed");
         return JS_CALLBACK_EVENT_FAILED;
     }
     auto it = callbacks.find(event->eventType);
@@ -179,14 +151,12 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
         status = napi_get_reference_value(env, (*iter).callback[0], &handler2);
         if (status != napi_ok) {
             MMI_HILOGE("Handler2 get reference value failed");
-            napi_throw_error(env, nullptr, "Handler2 get reference value failed");
             return JS_CALLBACK_EVENT_FAILED;
         }
         bool isEqual = false;
         status = napi_strict_equals(env, handler1, handler2, &isEqual);
         if (status != napi_ok) {
             MMI_HILOGE("Compare two handler failed");
-            napi_throw_error(env, nullptr, "Compare two handler failed");
             return JS_CALLBACK_EVENT_FAILED;
         }
         if (isEqual) {
@@ -216,7 +186,6 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
         status = napi_get_reference_value(env, event->callback[0], &handler1);
         if (status != napi_ok) {
             MMI_HILOGE("Handler1 get reference value failed");
-            napi_throw_error(env, nullptr, "Handler1 get reference value failed");
             return JS_CALLBACK_EVENT_FAILED;
         }
     }
@@ -230,21 +199,18 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
             status = napi_get_reference_value(env, (*iter)->callback[0], &handler2);
             if (status != napi_ok) {
                 MMI_HILOGE("Handler2 get reference value failed");
-                napi_throw_error(env, nullptr, "Handler2 get reference value failed");
                 return JS_CALLBACK_EVENT_FAILED;
             }
             bool isEquals = false;
             status = napi_strict_equals(env, handler1, handler2, &isEquals);
             if (status != napi_ok) {
                 MMI_HILOGE("Compare two handler failed");
-                napi_throw_error(env, nullptr, "Compare two handler failed");
                 return JS_CALLBACK_EVENT_FAILED;
             }
             if (isEquals) {
                 status = napi_delete_reference(env, (*iter)->callback[0]);
                 if (status != napi_ok) {
                     MMI_HILOGE("Delete reference failed");
-                    napi_throw_error(env, nullptr, "Delete reference failed");
                     return JS_CALLBACK_EVENT_FAILED;
                 }
                 KeyEventMonitorInfo *monitorInfo = *iter;
@@ -284,35 +250,15 @@ static void AsyncWorkFn(const napi_env &env, KeyEventMonitorInfo *event, napi_va
     CHKPV(event);
     CHKPV(event->keyOption);
     MMI_HILOGD("Status > 0 enter");
-    napi_status status = napi_create_object(env, &result);
-    if (status != napi_ok) {
-        MMI_HILOGE("Create object failed");
-        napi_throw_error(env, nullptr, "create object failed");
-        return;
-    }
+    CHKRV(napi_create_object(env, &result), CREATE_OBJECT);
     napi_value arr;
-    status = napi_create_array(env, &arr);
-    if (status != napi_ok) {
-        MMI_HILOGE("Create array failed");
-        napi_throw_error(env, nullptr, "create array failed");
-        return;
-    }
+    CHKRV(napi_create_array(env, &arr), CREATE_ARRAY);
     std::set<int32_t> preKeys = event->keyOption->GetPreKeys();
     int32_t i = 0;
     napi_value value;
     for (const auto &preKey : preKeys) {
-        status = napi_create_int32(env, preKey, &value);
-        if (status != napi_ok) {
-            MMI_HILOGE("Create int32 failed");
-            napi_throw_error(env, nullptr, "create int32 failed");
-            return;
-        }
-        status = napi_set_element(env, arr, i, value);
-        if (status != napi_ok) {
-            MMI_HILOGE("Set element failed");
-            napi_throw_error(env, nullptr, "set element failed");
-            return;
-        }
+        CHKRV(napi_create_int32(env, preKey, &value), CREATE_INT32);
+        CHKRV(napi_set_element(env, arr, i, value), SET_ELEMENT);
         ++i;
     }
     std::string preKeysStr = "preKeys";
@@ -331,62 +277,50 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
 {
     CALL_DEBUG_ENTER;
     CHKPV(work);
-    CHKPV(work->data);
-    (void)status;
-    KeyEventMonitorInfoWorker *dataWorker = static_cast<KeyEventMonitorInfoWorker *>(work->data);
-    if (dataWorker == nullptr) {
+    if (work->data == nullptr) {
+        MMI_HILOGE("Check data is nullptr");
         delete work;
         work = nullptr;
-        MMI_HILOGE("Data worker is empty");
-        napi_throw_error(dataWorker->env, nullptr, "Data worker is empty");
         return;
     }
+    (void)status;
+    KeyEventMonitorInfoWorker *dataWorker = static_cast<KeyEventMonitorInfoWorker *>(work->data);
+    delete work;
+    work = nullptr;
     KeyEventMonitorInfo *event = dataWorker->reportEvent;
-
+    napi_env env = dataWorker->env;
+    delete dataWorker;
+    dataWorker = nullptr;
+    CHKPV(event);
     napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(dataWorker->env, &scope);
+    napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
         MMI_HILOGE("Scope is nullptr");
         return;
     }
     napi_value callback = nullptr;
-    if (napi_get_reference_value(dataWorker->env, event->callback[0], &callback) != napi_ok) {
-        MMI_HILOGE("Event get reference value failed");
-        napi_close_handle_scope(dataWorker->env, scope);
-        napi_throw_error(dataWorker->env, nullptr, "Event get reference value failed");
-        return;
-    }
-
+    CHKRV_SCOPE(env, napi_get_reference_value(env, event->callback[0], &callback), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
-    AsyncWorkFn(dataWorker->env, event, result);
+    AsyncWorkFn(env, event, result);
     napi_value callResult = nullptr;
-    napi_status ret = napi_call_function(dataWorker->env, nullptr, callback, 1, &result, &callResult);
-    if (ret != napi_ok) {
-        napi_close_handle_scope(dataWorker->env, scope);
-        MMI_HILOGE("Call function failed, ret:%{public}d", static_cast<int32_t>(ret));
-        napi_throw_error(dataWorker->env, nullptr, "Call function failed");
-        return;
-    }
-    napi_close_handle_scope(dataWorker->env, scope);
+    CHKRV_SCOPE(env, napi_call_function(env, nullptr, callback, 1, &result, &callResult), CALL_FUNCTION, scope);
+    napi_close_handle_scope(env, scope);
 }
 
 void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(reportEvent);
-    napi_status status;
     uv_loop_s *loop = nullptr;
-    status = napi_get_uv_event_loop(reportEvent->env, &loop);
-    if (status != napi_ok) {
-        MMI_HILOGE("Call napi_get_uv_event_loop failed");
-        napi_throw_error(reportEvent->env, nullptr, "Call napi_get_uv_event_loop failed");
-        return;
-    }
-
+    CHKRV(napi_get_uv_event_loop(reportEvent->env, &loop), GET_UV_EVENT_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
     CHKPV(work);
     KeyEventMonitorInfoWorker *dataWorker = new (std::nothrow) KeyEventMonitorInfoWorker();
-    CHKPV(dataWorker);
+    if (dataWorker == nullptr) {
+        MMI_HILOGE("dataWorker is nullptr");
+        delete work;
+        return;
+    }
 
     dataWorker->env = reportEvent->env;
     dataWorker->reportEvent = reportEvent;

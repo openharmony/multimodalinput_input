@@ -549,6 +549,9 @@ const char* PointerEvent::DumpSourceType() const
         case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
             return "touch-pad";
         }
+        case PointerEvent::SOURCE_TYPE_JOYSTICK: {
+            return "joystick";
+        }
         default: {
             break;
         }
@@ -863,13 +866,7 @@ bool PointerEvent::IsValidCheckTouch() const
 bool PointerEvent::IsValid() const
 {
     CALL_DEBUG_ENTER;
-    int32_t sourceType = GetSourceType();
-    if (sourceType != SOURCE_TYPE_MOUSE && sourceType != SOURCE_TYPE_TOUCHSCREEN &&
-        sourceType != SOURCE_TYPE_TOUCHPAD) {
-        MMI_HILOGE("SourceType is invalid");
-        return false;
-    }
-    switch (sourceType) {
+    switch (GetSourceType()) {
         case SOURCE_TYPE_MOUSE: {
             if (!IsValidCheckMouse()) {
                 MMI_HILOGE("IsValidCheckMouse is invalid");
@@ -885,6 +882,8 @@ bool PointerEvent::IsValid() const
             }
             break;
         }
+        case SOURCE_TYPE_JOYSTICK:
+            break;
         default: {
             MMI_HILOGE("SourceType is invalid");
             return false;

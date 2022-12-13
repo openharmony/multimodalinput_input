@@ -33,9 +33,9 @@
 
 namespace OHOS {
 namespace MMI {
-class PointerDrawingManager : public IPointerDrawingManager,
-                              public IDeviceObserver,
-                              public std::enable_shared_from_this<PointerDrawingManager> {
+class PointerDrawingManager final : public IPointerDrawingManager,
+                                    public IDeviceObserver,
+                                    public std::enable_shared_from_this<PointerDrawingManager> {
 public:
     static const int32_t IMAGE_WIDTH = 64;
     static const int32_t IMAGE_HEIGHT = 64;
@@ -43,23 +43,24 @@ public:
 public:
     PointerDrawingManager();
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
-    ~PointerDrawingManager() = default;
+    ~PointerDrawingManager() override = default;
     void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
-        const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT);
-    void UpdateDisplayInfo(const DisplayInfo& displayInfo);
-    void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo);
-    void OnWindowInfo(const WinInfo &info);
-    void UpdatePointerDevice(bool hasPointerDevicee, bool isPointerVisible);
-    bool Init();
-    void DeletePointerVisible(int32_t pid);
-    int32_t SetPointerVisible(int32_t pid, bool visible);
-    int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle);
-    int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle);
-    void DrawPointerStyle();
-    bool IsPointerVisible();
-    void SetPointerLocation(int32_t pid, int32_t x, int32_t y);
+        const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT) override;
+    void UpdateDisplayInfo(const DisplayInfo& displayInfo) override;
+    void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo) override;
+    void OnWindowInfo(const WinInfo &info) override;
+    void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible) override;
+    bool Init() override;
+    void DeletePointerVisible(int32_t pid) override;
+    int32_t SetPointerVisible(int32_t pid, bool visible) override;
+    int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle) override;
+    int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle) override;
+    void DrawPointerStyle() override;
+    bool IsPointerVisible() override;
+    void SetPointerLocation(int32_t pid, int32_t x, int32_t y) override;
     void AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
-
+    void SetMouseDisplayState(bool state) override;
+    bool GetMouseDisplayState() const override;
 private:
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY);
     sptr<OHOS::Surface> GetLayer();
@@ -69,9 +70,7 @@ private:
     void DrawManager();
     void FixCursorPosition(int32_t &physicalX, int32_t &physicalY);
     std::unique_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
-    void DeletePidInfo(int32_t pid);
     void UpdatePointerVisible();
-    void UpdatePidInfo(int32_t pid, bool visible);
     void InitStyle();
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
 
@@ -93,6 +92,7 @@ private:
     int32_t imageHeight_ { 0 };
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
+    bool mouseDisplayState_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

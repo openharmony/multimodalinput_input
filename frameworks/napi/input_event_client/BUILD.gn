@@ -18,20 +18,11 @@ config("inputeventclient_config") {
 
   include_dirs = [
     "//foundation/multimodalinput/input/util/common/include",
-    "//foundation/multimodalinput/input/frameworks/napi/input_consumer/include",
+    "//foundation/multimodalinput/input/frameworks/napi/input_event_client/include",
     "//foundation/multimodalinput/input/tools/event_inject/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
     "//commonlibrary/c_utils/base/include",
   ]
-
-  defines = []
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
 }
 
 ohos_shared_library("inputeventclient") {
@@ -42,7 +33,10 @@ ohos_shared_library("inputeventclient") {
 
   configs = [ ":inputeventclient_config" ]
 
-  deps = [ "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client" ]
+  deps = [
+    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
+    "//foundation/multimodalinput/input/util:libmmi-util",
+  ]
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",

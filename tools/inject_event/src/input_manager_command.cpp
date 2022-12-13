@@ -50,14 +50,30 @@ private:
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerCommand"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerCommand" };
 constexpr int32_t SLEEPTIME = 20;
 constexpr int32_t MOUSE_ID = 7;
+constexpr int32_t JOYSTICK_BUTTON_ID = 25;
 constexpr int32_t TWO_MORE_COMMAND = 2;
 constexpr int32_t THREE_MORE_COMMAND = 3;
 constexpr int32_t MAX_PRESSED_COUNT = 30;
 constexpr int32_t ACTION_TIME = 3000;
-constexpr int32_t BLOCK_TIME_MS = 16;
+constexpr int32_t BLOCK_TIME_MS = 10;
+constexpr int64_t MIN_TAKTTIME_MS = 1;
+constexpr int64_t MAX_TAKTTIME_MS = 15000;
+enum JoystickEvent {
+    JOYSTICK_BUTTON_UP,
+    JOYSTICK_BUTTON_PRESS,
+    JOYSTICK_MOVE,
+    JOYSTICK_CLICK,
+    JOYSTICK_INTERVAL
+};
+struct JoystickInfo {
+    int32_t buttonId { -1 };
+    int32_t absValue { -1 };
+    int32_t taktTime { 0 };
+    PointerEvent::AxisType absType;
+};
 } // namespace
 
 void InputManagerCommand::SleepAndUpdateTime(int64_t &currentTimeMs)
@@ -105,6 +121,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"mouse", no_argument, NULL, 'M'},
         {"keyboard", no_argument, NULL, 'K'},
         {"touch", no_argument, NULL, 'T'},
+        {"joystick", no_argument, NULL, 'J'},
         {"help", no_argument, NULL, '?'},
         {NULL, 0, NULL, 0}
     };
@@ -135,10 +152,18 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"drag", required_argument, NULL, 'g'},
         {NULL, 0, NULL, 0}
     };
+    struct option joystickSensorOptions[] = {
+        {"move", required_argument, NULL, 'm'},
+        {"down", required_argument, NULL, 'd'},
+        {"up", required_argument, NULL, 'u'},
+        {"click", required_argument, NULL, 'c'},
+        {"interval", required_argument, NULL, 'i'},
+        {NULL, 0, NULL, 0}
+    };
     int32_t c = 0;
     int32_t optionIndex = 0;
     optind = 0;
-    if ((c = getopt_long(argc, argv, "MKT?", headOptions, &optionIndex)) != -1) {
+    if ((c = getopt_long(argc, argv, "MKTJ?", headOptions, &optionIndex)) != -1) {
         switch (c) {
             case 'M': {
                 int32_t px = 0;
@@ -266,7 +291,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 item.SetDisplayY(py);
                                 pointerEvent->SetPointerId(0);
                                 pointerEvent->AddPointerItem(item);
-                                pointerEvent->SetButtonPressed(-1);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -794,7 +818,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             while (currentTimeMs < endTimeMs) {
                                 item.SetDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs, px1, px2));
                                 item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs, py1, py2));
-                                pointerEvent->SetActionTime(currentTimeMs);
+                                pointerEvent->SetActionTime(currentTimeMs * 1000);
                                 pointerEvent->UpdatePointerItem(0, item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -807,7 +831,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
-                            pointerEvent->SetActionTime(endTimeMs);
+                            pointerEvent->SetActionTime(endTimeMs * 1000);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -815,7 +839,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
-                            pointerEvent->SetActionTime(endTimeMs + BLOCK_TIME_MS);
+                            pointerEvent->SetActionTime((endTimeMs + BLOCK_TIME_MS) * 1000);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -1054,6 +1078,155 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 }
                 break;
             }
+            case 'J': {
+                JoystickInfo joyInfo;
+                std::vector<std::pair<int32_t, JoystickInfo>> state;
+                while ((c = getopt_long(argc, argv, "m:d:u:c:i:", joystickSensorOptions, &optionIndex)) != -1) {
+                    switch (c) {
+                        case 'm': {
+                            std::string arg(optarg);
+                            std::string::size_type pos = arg.find('=');
+                            if (pos == std::string::npos) {
+                                std::cout << "Parameter format is error" << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
+                            std::string absAction = arg.substr(0, pos);
+                            if (absAction == "x") {
+                                joyInfo.absType = PointerEvent::AxisType::AXIS_TYPE_ABS_X;
+                            } else if (absAction == "y") {
+                                joyInfo.absType = PointerEvent::AxisType::AXIS_TYPE_ABS_Y;
+                            } else if (absAction == "z") {
+                                joyInfo.absType = PointerEvent::AxisType::AXIS_TYPE_ABS_Z;
+                            } else if (absAction == "rz") {
+                                joyInfo.absType = PointerEvent::AxisType::AXIS_TYPE_ABS_RZ;
+                            } else if (absAction == "gas") {
+                                joyInfo.absType = PointerEvent::AxisType::AXIS_TYPE_ABS_GAS;
+                            } else if (absAction == "brake") {
+                                joyInfo.absType = PointerEvent::AxisType::AXIS_TYPE_ABS_BRAKE;
+                            } else if (absAction == "hat0x") {
+                                joyInfo.absType = PointerEvent::AxisType::AXIS_TYPE_ABS_HAT0X;
+                            } else if (absAction == "hat0y") {
+                                joyInfo.absType = PointerEvent::AxisType::AXIS_TYPE_ABS_HAT0Y;
+                            } else if (absAction == "throttle") {
+                                joyInfo.absType = PointerEvent::AxisType::AXIS_TYPE_ABS_THROTTLE;
+                            } else {
+                                std::cout << "Invalid abstype" << std::endl;
+                                return RET_ERR;
+                            }
+                            if (!StrToInt(arg.substr(pos + 1), joyInfo.absValue)) {
+                                std::cout << "Invalid parameter to move absValue" << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
+                            state.push_back(std::pair<int32_t, JoystickInfo>(JOYSTICK_MOVE, joyInfo));
+                            break;
+                        }
+                        case 'd': {
+                            if (!StrToInt(optarg, joyInfo.buttonId)) {
+                                std::cout << "Invalid button press command" << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
+                            if (joyInfo.buttonId > JOYSTICK_BUTTON_ID) {
+                                std::cout << "Pressed button value is greater than the max value" << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
+                            state.push_back(std::pair<int32_t, JoystickInfo>(JOYSTICK_BUTTON_PRESS, joyInfo));
+                            break;
+                        }
+                        case 'u': {
+                            if (!StrToInt(optarg, joyInfo.buttonId)) {
+                                std::cout << "Invalid raise button command" << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
+                            if (joyInfo.buttonId > JOYSTICK_BUTTON_ID) {
+                                std::cout << "Raise button value is greater than the max value" << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
+                            state.push_back(std::pair<int32_t, JoystickInfo>(JOYSTICK_BUTTON_UP, joyInfo));
+                            break;
+                        }
+                        case 'c': {
+                            if (!StrToInt(optarg, joyInfo.buttonId)) {
+                                std::cout << "Invalid click button command" << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
+                            if (joyInfo.buttonId > JOYSTICK_BUTTON_ID) {
+                                std::cout << "Click button value is greater than the max value" << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
+                            state.push_back(std::pair<int32_t, JoystickInfo>(JOYSTICK_CLICK, joyInfo));
+                            break;
+                        }
+                        case 'i': {
+                            if (!StrToInt(optarg, joyInfo.taktTime)) {
+                                std::cout << "Invalid command to interval time" << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
+                            state.push_back(std::pair<int32_t, JoystickInfo>(JOYSTICK_INTERVAL, joyInfo));
+                            break;
+                        }
+                        default: {
+                            std::cout << "Invalid options" << std::endl;
+                            ShowUsage();
+                            return EVENT_REG_FAIL;
+                        }
+                    }
+                    std::this_thread::sleep_for(std::chrono::milliseconds(SLEEPTIME));
+                }
+                auto pointerEvent = PointerEvent::Create();
+                if (pointerEvent != nullptr) {
+                    if (optind < argc) {
+                        std::cout << "non-option argv elements: ";
+                        while (optind < argc) {
+                            std::cout << argv[optind++] << "\t";
+                        }
+                        std::cout << std::endl;
+                        return EVENT_REG_FAIL;
+                    }
+                    if (state.empty()) {
+                        std::cout << "Injection failed" << std::endl;
+                        return EVENT_REG_FAIL;
+                    }
+                    for (const auto &it : state) {
+                        if (it.first == JOYSTICK_BUTTON_PRESS) {
+                            std::cout << "Press down " << it.second.buttonId <<std::endl;
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+                            pointerEvent->SetButtonId(it.second.buttonId);
+                            pointerEvent->SetButtonPressed(it.second.buttonId);
+                        } else if (it.first == JOYSTICK_BUTTON_UP) {
+                            std::cout << "Lift up button " << it.second.buttonId << std::endl;
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+                            pointerEvent->SetButtonId(it.second.buttonId);
+                            pointerEvent->SetButtonPressed(it.second.buttonId);
+                        } else if (it.first == JOYSTICK_MOVE) {
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+                            pointerEvent->SetAxisValue(it.second.absType, it.second.absValue);
+                        } else if (it.first == JOYSTICK_CLICK) {
+                            std::cout << "Click " << it.second.buttonId << std::endl;
+                            pointerEvent->SetPointerId(0);
+                            pointerEvent->SetButtonId(it.second.buttonId);
+                            pointerEvent->SetButtonPressed(it.second.buttonId);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+
+                            pointerEvent->SetButtonId(it.second.buttonId);
+                            pointerEvent->SetButtonPressed(it.second.buttonId);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+                        } else if (it.first == JOYSTICK_INTERVAL) {
+                            if ((MIN_TAKTTIME_MS > joyInfo.taktTime) || (MAX_TAKTTIME_MS < joyInfo.taktTime)) {
+                                std::cout << "TaktTime is out of range" << std::endl;
+                                return EVENT_REG_FAIL;
+                            }
+                            std::this_thread::sleep_for(std::chrono::milliseconds(joyInfo.taktTime));
+                            continue;
+                        }
+                        pointerEvent->SetPointerId(0);
+                        pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+                        InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+                    }
+                }
+                break;
+            }
             case '?': {
                 ShowUsage();
                 return ERR_OK;
@@ -1080,7 +1253,7 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-M  --mouse                                    " << std::endl;
     std::cout << "commands for mouse:                            " << std::endl;
     std::cout << "-m <dx> <dy>              --move   <dx> <dy>  -move to relative position (dx,dy),"    << std::endl;
-    std::cout << "   <dx1> <dy1> <dx2> <dy2> [soomth time] --trace -dx1 dy1 to dx2 dy2 smooth movement" << std::endl;
+    std::cout << "   <dx1> <dy1> <dx2> <dy2> [smooth time] --trace -dx1 dy1 to dx2 dy2 smooth movement" << std::endl;
     std::cout << "-d <key>                  --down   key        -press down a button, "                 << std::endl;
     std::cout << "                                               0 is the left button, 1 is the right," << std::endl;
     std::cout << "                                               2 is the middle"   << std::endl;

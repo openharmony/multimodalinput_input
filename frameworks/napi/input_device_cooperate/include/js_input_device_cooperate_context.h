@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace MMI {
-class JsInputDeviceCooperateContext {
+class JsInputDeviceCooperateContext final {
 public:
     JsInputDeviceCooperateContext();
     ~JsInputDeviceCooperateContext();

@@ -30,25 +30,30 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventFilterService" };
 } // namespace
 
-EventFilterService::EventFilterService()
+int32_t EventFilterService::GetNextId()
 {
-    CALL_DEBUG_ENTER;
+    if (filterIdSeed_ == std::numeric_limits<int32_t>::max()) {
+        filterIdSeed_ = 0;
+    }    
+    return filterIdSeed_++;
 }
 
-EventFilterService::~EventFilterService()
+bool EventFilterService::HandleKeyEvent(const std::shared_ptr<KeyEvent> event)
 {
-    CALL_DEBUG_ENTER;
-}
-
-void EventFilterService::SetPointerEventPtr(std::function<bool(std::shared_ptr<PointerEvent>)> pointerFilter)
-{
-    pointerFilter_ = pointerFilter;
+    if (filter_ == nullptr) {
+        MMI_HILOGE("Filter is nullptr");
+        return false;
+    }
+    return filter_->OnInputEvent(event);
 }
 
 bool EventFilterService::HandlePointerEvent(const std::shared_ptr<PointerEvent> event)
 {
-    CHKPF(pointerFilter_);
-    return pointerFilter_(event);
+    if (filter_ == nullptr) {
+        MMI_HILOGE("Filter is nullptr");
+        return false;
+    }
+    return filter_->OnInputEvent(event);
 }
 } // namespace MMI
 } // namespace OHOS

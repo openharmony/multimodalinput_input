@@ -24,7 +24,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 int64_t g_nextEventId = 1;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputEvent"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEvent" };
 } // namespace
 
 InputEvent::InputEvent(int32_t eventType) : eventType_(eventType)
@@ -218,50 +218,30 @@ void InputEvent::MarkProcessed()
 bool InputEvent::WriteToParcel(Parcel &out) const
 {
     WRITEINT32(out, eventType_);
-
     WRITEINT32(out, id_);
-
     WRITEINT64(out, actionTime_);
-
     WRITEINT32(out, action_);
-
     WRITEINT64(out, actionStartTime_);
-
     WRITEINT32(out, deviceId_);
-
     WRITEINT32(out, targetDisplayId_);
-
     WRITEINT32(out, targetWindowId_);
-
     WRITEINT32(out, agentWindowId_);
-
     WRITEUINT32(out, bitwise_);
-
     return true;
 }
 
 bool InputEvent::ReadFromParcel(Parcel &in)
 {
     READINT32(in, eventType_);
-
     READINT32(in, id_);
-
     READINT64(in, actionTime_);
-
     READINT32(in, action_);
-
     READINT64(in, actionStartTime_);
-
     READINT32(in, deviceId_);
-
     READINT32(in, targetDisplayId_);
-
     READINT32(in, targetWindowId_);
-
     READINT32(in, agentWindowId_);
-
     READUINT32(in, bitwise_);
-
     return true;
 }
 } // namespace MMI

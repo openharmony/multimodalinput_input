@@ -27,6 +27,7 @@
 #include "key_map_manager.h"
 #include "msg_handler.h"
 #include "nocopyable.h"
+#include "pointer_drawing_manager.h"
 #include "singleton.h"
 #include "util.h"
 
@@ -36,10 +37,12 @@ class InputDeviceManager final : public IDeviceObject {
     DECLARE_DELAYED_SINGLETON(InputDeviceManager);
 
     struct InputDeviceInfo {
-        struct libinput_device *inputDeviceOrigin_ { nullptr };
-        std::string networkIdOrigin_;
-        bool isRemote_ { false };
-        std::string dhid_;
+        struct libinput_device *inputDeviceOrigin { nullptr };
+        std::string networkIdOrigin;
+        bool isRemote { false };
+        bool isPointerDevice { false };
+        bool isTouchableDevice { false };
+        std::string dhid;
     };
 public:
     DISALLOW_COPY_AND_MOVE(InputDeviceManager);
@@ -47,12 +50,12 @@ public:
     void OnInputDeviceRemoved(struct libinput_device *inputDevice);
     std::vector<int32_t> GetInputDeviceIds() const;
     std::shared_ptr<InputDevice> GetInputDevice(int32_t id) const;
-    std::vector<bool> SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes);
+    int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes, std::vector<bool> &keystroke);
     int32_t FindInputDeviceId(struct libinput_device* inputDevice);
     int32_t GetKeyboardBusMode(int32_t deviceId);
     bool GetDeviceConfig(int32_t deviceId, int32_t &KeyboardType);
-    int32_t GetDeviceSupportKey(int32_t deviceId);
-    int32_t GetKeyboardType(int32_t deviceId);
+    int32_t GetDeviceSupportKey(int32_t deviceId, int32_t &keyboardType);
+    int32_t GetKeyboardType(int32_t deviceId, int32_t &keyboardType);
     void Attach(std::shared_ptr<IDeviceObserver> observer);
     void Detach(std::shared_ptr<IDeviceObserver> observer);
     void NotifyPointerDevice(bool hasPointerDevice, bool isVisible);
@@ -60,23 +63,24 @@ public:
     void RemoveDevListener(SessionPtr sess);
     void Dump(int32_t fd, const std::vector<std::string> &args);
     void DumpDeviceList(int32_t fd, const std::vector<std::string> &args);
+    bool IsRemote(struct libinput_device *inputDevice) const;
+    bool IsRemote(int32_t id) const;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     std::string GetOriginNetworkId(int32_t id);
     std::string GetOriginNetworkId(const std::string &dhid);
-    void GetLocalDeviceId(std::string &local);
     std::string GetDhid(int32_t deviceId) const;
     std::vector<std::string> GetCooperateDhids(int32_t deviceId);
     std::vector<std::string> GetCooperateDhids(const std::string &dhid);
     bool HasLocalPointerDevice() const;
-    bool IsRemote(struct libinput_device *inputDevice) const;
-    bool IsRemote(int32_t id) const;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     bool IsKeyboardDevice(struct libinput_device* device) const;
     bool IsPointerDevice(struct libinput_device* device) const;
+    bool IsTouchDevice(struct libinput_device* device) const;
     struct libinput_device* GetKeyboardDevice() const;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasPointerDevice();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    bool HasTouchDevice();
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
     const std::string& GetScreenId(int32_t deviceId) const;
 

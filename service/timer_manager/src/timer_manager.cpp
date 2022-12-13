@@ -20,7 +20,7 @@ namespace MMI {
 namespace {
 constexpr int32_t MIN_DELAY = -1;
 constexpr int32_t MIN_INTERVAL = 50;
-constexpr int32_t MAX_INTERVAL = 4096;
+constexpr int32_t MAX_INTERVAL_MS = 10000;
 constexpr int32_t MAX_TIMER_COUNT = 64;
 constexpr int32_t NONEXISTENT_ID = -1;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TimerManager" };
@@ -80,8 +80,8 @@ int32_t TimerManager::AddTimerInternal(int32_t intervalMs, int32_t repeatCount, 
 {
     if (intervalMs < MIN_INTERVAL) {
         intervalMs = MIN_INTERVAL;
-    } else if (intervalMs > MAX_INTERVAL) {
-        intervalMs = MAX_INTERVAL;
+    } else if (intervalMs > MAX_INTERVAL_MS) {
+        intervalMs = MAX_INTERVAL_MS;
     }
     if (!callback) {
         return NONEXISTENT_ID;
@@ -192,7 +192,7 @@ void TimerManager::ProcessTimersInternal()
             curTimer->callback();
             continue;
         }
-        if (!AddInt64(nowTime, curTimer->intervalMs, curTimer->nextCallTime)) {
+        if (!AddInt64(curTimer->nextCallTime, curTimer->intervalMs, curTimer->nextCallTime)) {
             MMI_HILOGE("The addition of nextCallTime in TimerItem overflows");
             return;
         }

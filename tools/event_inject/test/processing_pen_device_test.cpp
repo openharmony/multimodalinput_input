@@ -24,7 +24,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-using namespace OHOS::MMI;
 } // namespace
 
 class ProcessingPenDeviceTest : public testing::Test {

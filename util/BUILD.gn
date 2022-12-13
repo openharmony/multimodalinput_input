@@ -25,33 +25,16 @@ config("libmmi_util_public_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
   ]
 
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
-
-  if (input_feature_input_cooperation) {
-    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
-  }
+  defines = input_default_defines
 }
 
 ohos_shared_library("libmmi-util") {
   sources = [
     "common/src/input_event_data_transformation.cpp",
     "common/src/klog.cpp",
-    "common/src/run_shell_util.cpp",
     "common/src/util.cpp",
     "common/src/util_napi.cpp",
-    "common/src/uuid.cpp",
+    "common/src/util_napi_error.cpp",
     "network/src/circle_stream_buffer.cpp",
     "network/src/net_packet.cpp",
     "network/src/stream_buffer.cpp",
@@ -99,32 +82,12 @@ ohos_unittest("ut-mmi-util-out") {
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
+    "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
-  if (input_feature_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
-
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
-
-  if (input_feature_input_cooperation) {
-    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
-  }
+  defines = input_default_defines
 
   sources = [
-    "common/test/util_test.cpp",
     "network/test/net_packet_test.cpp",
     "socket/test/stream_buffer_test.cpp",
     "socket/test/uds_client_test.cpp",
@@ -139,66 +102,4 @@ ohos_unittest("ut-mmi-util-out") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
-}
-
-ohos_unittest("RunShellUtilTest") {
-  module_out_path = module_output_path
-  include_dirs = [
-    "//commonlibrary/c_utils/base/include",
-    "//third_party/googletest/googletest/include",
-    "//commonlibrary/c_utils/base/include",
-    "${mmi_path}/frameworks/proxy/event_handler",
-    "${mmi_path}/frameworks/proxy/event_handler/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/util/common",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/util/network",
-    "${mmi_path}/util/network/include",
-    "${mmi_path}/util/socket",
-    "${mmi_path}/util/socket/include",
-    "${mmi_path}/frameworks/proxy/event_handle",
-    "${mmi_path}/frameworks/proxy/event_handle/include",
-    "${mmi_path}/frameworks/proxy/module_loader",
-    "${mmi_path}/frameworks/proxy/module_loader/include",
-    "${mmi_path}/interfaces/native/innerkits/common/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/interfaces/native/innerkits/event/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-  ]
-
-  if (input_feature_libinput) {
-    include_dirs += [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-  }
-
-  defines = []
-
-  if (input_feature_debug) {
-    defines += [ "OHOS_BUILD_MMI_DEBUG" ]
-  }
-
-  if (input_feature_libinput) {
-    defines += [ "OHOS_BUILD_LIBINPUT" ]
-  }
-
-  if (input_feature_hdf) {
-    defines += [ "OHOS_BUILD_HDF" ]
-  }
-
-  if (input_feature_input_cooperation) {
-    defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
-  }
-
-  sources = [ "common/test/run_shell_util_test.cpp" ]
-
-  deps = [
-    "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/util:libmmi-util",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
-  external_deps = [
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
-  ]
 }

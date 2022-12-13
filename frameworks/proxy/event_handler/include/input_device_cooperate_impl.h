@@ -24,28 +24,26 @@
 
 #include "cooperation_message.h"
 #include "i_input_device_cooperate_listener.h"
-#include "mmi_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
-class InputDeviceCooperateImpl {
+class InputDeviceCooperateImpl final {
 public:
     static InputDeviceCooperateImpl &GetInstance();
     DISALLOW_COPY_AND_MOVE(InputDeviceCooperateImpl);
     ~InputDeviceCooperateImpl() = default;
 
     using FuncCooperationMessage = std::function<void(std::string, CooperationMessage)>;
-    using FuncCooperateionState = std::function<void(bool)>;
+    using FuncCooperationState = std::function<void(bool)>;
 
-    using DevCooperationMsg = std::pair<EventHandlerPtr, FuncCooperationMessage>;
-    using DevCooperateionState = std::pair<EventHandlerPtr, FuncCooperateionState>;
+    using DevCooperationMsg = FuncCooperationMessage;
+    using DevCooperationState = FuncCooperationState;
 
     using InputDevCooperateListenerPtr = std::shared_ptr<IInputDeviceCooperateListener>;
-    using DevCooperateListener = std::pair<EventHandlerPtr, InputDevCooperateListenerPtr>;
 
     struct CooperateEvent {
         DevCooperationMsg msg;
-        DevCooperateionState state;
+        DevCooperationState state;
     };
 
     int32_t RegisterCooperateListener(InputDevCooperateListenerPtr listener);
@@ -54,24 +52,19 @@ public:
     int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
         FuncCooperationMessage callback);
     int32_t StopDeviceCooperate(FuncCooperationMessage callback);
-    int32_t GetInputDeviceCooperateState(const std::string &deviceId, FuncCooperateionState callback);
-    void OnDevCooperateListener(const std::string deviceId, CooperationMessage msg);
-    void OnCooprationMessage(int32_t userData, const std::string deviceId, CooperationMessage msg);
+    int32_t GetInputDeviceCooperateState(const std::string &deviceId, FuncCooperationState callback);
+    void OnDevCooperateListener(const std::string &deviceId, const CooperationMessage &msg);
+    void OnCooperationMessage(int32_t userData, const std::string &deviceId, const CooperationMessage &msg);
     void OnCooperationState(int32_t userData, bool state);
     int32_t GetUserData();
 
 private:
-    const DevCooperationMsg *GetCooprateMessageEvent(int32_t userData) const;
-    const DevCooperateionState *GetCooprateStateEvent(int32_t userData) const;
-    void OnDevCooperateListenerTask(const DevCooperateListener &devCooperateMonitor,
-        const std::string &deviceId, CooperationMessage msg);
-    void OnCooperateMessageTask(const DevCooperationMsg &msgCooperation, int32_t userData,
-        const std::string &deviceId, CooperationMessage msg);
-    void OnCooperateStateTask(const DevCooperateionState &stateCooperation, int32_t userData, bool state);
+    const DevCooperationMsg *GetCooperateMessageEvent(int32_t userData) const;
+    const DevCooperationState *GetCooperateStateEvent(int32_t userData) const;
 
 private:
     InputDeviceCooperateImpl() = default;
-    std::list<DevCooperateListener> devCooperateListener_;
+    std::list<InputDevCooperateListenerPtr> devCooperateListener_;
     std::map<int32_t, CooperateEvent> devCooperateEvent_;
     std::mutex mtx_;
     int32_t userData_ { 0 };

@@ -84,9 +84,6 @@ group("input_jsapi_group") {
       "frameworks/napi/mouse_event:mouseevent",
       "frameworks/napi/touch_event:touchevent",
     ]
-    if (input_feature_distributed) {
-      deps += [ "frameworks/napi/distributed_input:distributedinput" ]
-    }
     if (input_feature_monitor) {
       deps += [ "frameworks/napi/input_monitor:inputmonitor" ]
     }
@@ -134,7 +131,7 @@ group("ut_mmi_debug_tools") {
 group("mmi_tests_manual") {
   testonly = true
   deps = [
-    "frameworks/proxy:InputManagerManualTest",
+    "frameworks/proxy:InputManagerFilterManualTest",
     "service:TransformPointTest",
   ]
 }
@@ -142,6 +139,7 @@ group("mmi_tests_manual") {
 group("mmi_tests") {
   testonly = true
   deps = [
+    "frameworks/proxy:InputManagerManualTest",
     "frameworks/proxy:InputManagerTest",
     "frameworks/proxy:KeyEventTest",
     "frameworks/proxy:PointerEventTest",
@@ -149,7 +147,6 @@ group("mmi_tests") {
     "service:ut-mmi-service-out",
     "test/fuzztest:test",
     "tools/inject_event:InjectEventTest",
-    "util:RunShellUtilTest",
     "util:ut-mmi-util-out",
   ]
 }
