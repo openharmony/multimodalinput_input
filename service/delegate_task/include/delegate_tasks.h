@@ -12,8 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef DELEGATE_TASKS_H
 #define DELEGATE_TASKS_H
+
 #include <cinttypes>
 #include <functional>
 #include <future>

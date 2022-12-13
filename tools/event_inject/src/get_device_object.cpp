@@ -16,8 +16,8 @@
 #include "get_device_object.h"
 
 #include <chrono>
+#include <regex>
 #include <thread>
-#include<regex>
 
 namespace OHOS {
 namespace MMI {

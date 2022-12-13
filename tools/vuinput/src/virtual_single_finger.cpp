@@ -23,9 +23,9 @@ constexpr int32_t ABS_MAX_Y = 4000;
 constexpr int32_t ABS_PRESSURE_MAX = 8191;
 
 AbsInfo absInfos[] = {
-    {ABS_X, 0, ABS_MAX_X, 0, 0},
-    {ABS_Y, 0, ABS_MAX_Y, 0, 0},
-    {ABS_PRESSURE, 0, ABS_PRESSURE_MAX, 0, 0}
+    { ABS_X, 0, ABS_MAX_X, 0, 0 },
+    { ABS_Y, 0, ABS_MAX_Y, 0, 0 },
+    { ABS_PRESSURE, 0, ABS_PRESSURE_MAX, 0, 0 }
 };
 } // namespace
 

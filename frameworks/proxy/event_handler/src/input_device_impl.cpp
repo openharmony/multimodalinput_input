@@ -270,7 +270,7 @@ const InputDeviceImpl::FunInputDevKeys* InputDeviceImpl::GetDeviceKeys(int32_t u
 const InputDeviceImpl::FunKeyboardTypes* InputDeviceImpl::GetKeyboardTypes(int32_t userData) const
 {
     auto iter = inputDevices_.find(userData);
-    return iter == inputDevices_.end()? nullptr : &iter->second.kbTypes;
+    return iter == inputDevices_.end() ? nullptr : &iter->second.kbTypes;
 }
 
 int32_t InputDeviceImpl::GetUserData()

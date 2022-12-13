@@ -15,16 +15,16 @@
 
 #include "multimodal_input_connect_stub.h"
 
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 #include "string_ex.h"
 
 #include "error_multimodal.h"
 #include "multimodal_input_connect_def_parcel.h"
-#include "time_cost_chk.h"
 #include "permission_helper.h"
+#include "time_cost_chk.h"
 
 namespace OHOS {
 namespace MMI {

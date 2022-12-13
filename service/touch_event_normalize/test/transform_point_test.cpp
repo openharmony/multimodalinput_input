@@ -12,9 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <cctype>
 #include <gtest/gtest.h>
 #include <thread>
+
 #include "mmi_log.h"
 #include "virtual_pen.h"
 

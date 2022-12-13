@@ -14,6 +14,7 @@
  */
 
 #include "js_input_device_context.h"
+
 #include "mmi_log.h"
 #include "napi_constants.h"
 #include "util_napi_error.h"
@@ -145,7 +146,7 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    char eventType[MAX_STRING_LEN] = {0};
+    char eventType[MAX_STRING_LEN] = { 0 };
     size_t ret = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), GET_VALUE_STRING_UTF8);
     std::string type = eventType;
@@ -184,7 +185,7 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
         return nullptr;
     }
 
-    char eventType[MAX_STRING_LEN] = {0};
+    char eventType[MAX_STRING_LEN] = { 0 };
     size_t ret = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), GET_VALUE_STRING_UTF8);
     std::string type = eventType;
@@ -416,7 +417,7 @@ napi_value JsInputDeviceContext::EnumClassConstructor(napi_env env, napi_callbac
 {
     CALL_DEBUG_ENTER;
     size_t argc = 0;
-    napi_value args[1] = {0};
+    napi_value args[1] = { 0 };
     napi_value ret = nullptr;
     void *data = nullptr;
     CHKRP(napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);

@@ -15,12 +15,12 @@
 
 #include "key_command_handler.h"
 
-#include "dfx_hisysevent.h"
 #include "ability_manager_client.h"
 #include "bytrace_adapter.h"
 #include "cJSON.h"
 #include "config_policy_utils.h"
 #include "define_multimodal.h"
+#include "dfx_hisysevent.h"
 #include "error_multimodal.h"
 #include "file_ex.h"
 #include "input_event_data_transformation.h"

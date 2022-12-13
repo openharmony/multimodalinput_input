@@ -15,12 +15,12 @@
 
 #include "klog.h"
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-#include <cstdarg>
-#include <ctime>
 #include <cerrno>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 
 #include <fcntl.h>
 #include <pthread.h>
@@ -31,7 +31,6 @@
 
 #include "hilog/log.h"
 #include "securec.h"
-
 
 namespace OHOS {
 namespace MMI {
