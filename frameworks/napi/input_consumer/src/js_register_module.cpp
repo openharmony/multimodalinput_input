@@ -197,10 +197,13 @@ static bool MatchCombinationKeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
         count++;
     }
     MMI_HILOGD("kevEventSize:%{public}d,infoSize:%{public}d", count, infoSize);
-    auto keyItem = keyEvent->GetKeyItem();
-    CHKPF(keyItem);
-    auto upTime = keyEvent->GetActionTime();
+    std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
+    if (!keyItem) { 
+        MMI_HILOGE("The keyItem is nullopt");
+        return false;
+    }
     auto downTime = keyItem->GetDownTime();
+    auto upTime = keyEvent->GetActionTime();
     auto curDurationTime = keyOption->GetFinalKeyDownDuration();
     if (curDurationTime > 0 && (upTime - downTime >= (static_cast<int64_t>(curDurationTime) * 1000))) {
         MMI_HILOGE("Skip, upTime - downTime >= duration");

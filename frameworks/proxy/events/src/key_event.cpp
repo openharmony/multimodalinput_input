@@ -964,29 +964,31 @@ void KeyEvent::AddPressedKeyItems(const KeyItem& keyItem)
 
 void KeyEvent::RemoveReleasedKeyItems(const KeyItem& keyItem)
 {
+    if (keyItem.IsPressed()) {
+        return;
+    }
     int32_t keyCode = keyItem.GetKeyCode();
-    std::vector<KeyItem> tempKeyItems = keys_;
-    keys_.clear();
-    for (const auto &item : tempKeyItems) {
-        if (item.GetKeyCode() != keyCode) {
-            keys_.push_back(item);
+    for (auto it = keys_.begin(); it != keys_.end(); ++it) {
+        if (it->GetKeyCode() == keyCode) {
+            keys_.erase(it);
+            return;
         }
     }
 }
 
-const KeyEvent::KeyItem* KeyEvent::GetKeyItem() const
+std::optional<KeyEvent::KeyItem> KeyEvent::GetKeyItem() const
 {
     return GetKeyItem(keyCode_);
 }
 
-const KeyEvent::KeyItem* KeyEvent::GetKeyItem(int32_t keyCode) const
+std::optional<KeyEvent::KeyItem> KeyEvent::GetKeyItem(int32_t keyCode) const
 {
     for (const auto &item : keys_) {
         if (item.GetKeyCode() == keyCode) {
-            return &item;
+            return std::make_optional(item);
         }
     }
-    return nullptr;
+    return std::nullopt;
 }
 
 const char* KeyEvent::ActionToString(int32_t action)
