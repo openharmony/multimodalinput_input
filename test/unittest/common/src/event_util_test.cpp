@@ -243,8 +243,8 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<KeyEvent>& keyEv
             return "";
         }
         strm << ", KeyCode:" << keyItem->GetKeyCode()
-             << ", DeviceId:" << keyItem->GetDeviceId()
-             << ", Unicode:" << keyItem->GetUnicode();
+            << ", DeviceId:" << keyItem->GetDeviceId()
+            << ", Unicode:" << keyItem->GetUnicode();
     }
     return strm.str();
 }
