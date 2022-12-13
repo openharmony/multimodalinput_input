@@ -17,6 +17,7 @@
 #define TIME_COST_CHK_H
 
 #include <cinttypes>
+#include <map>
 
 #include "nocopyable.h"
 
@@ -24,6 +25,25 @@ namespace OHOS {
 namespace MMI {
 inline constexpr int64_t MAX_INPUT_EVENT_TIME = 1000;
 inline constexpr int64_t MAX_OVER_TIME = 300;
+static std::map<int32_t, std::string> paramType = {
+        {1, "device_added"},
+        {2, "device_removed"},
+        {300, "keyboard_key"},
+        {400, "pointer_monitor"},
+        {401, "pointer_monitor_absolute"},
+        {402, "pointer_button"},
+        {403, "pointer_axis"},
+        {500, "touch_down"},
+        {501, "touch_up"},
+        {502, "touch_monitor"},
+        {600, "tablet_tool_axis"},
+        {800, "gesture_swipe_begin"},
+        {801, "gesture_swipe_update"},
+        {802, "gesturn_swipe_end"},
+        {803, "gesturn_pinch_begin"},
+        {804, "gesturn_pinch_update"},
+        {805, "gesturn_pinch_end"},
+};
 template<class T>
 class TimeCostChk {
     static inline constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "TimeCostChk" };
@@ -44,8 +64,8 @@ public:
             if (llParam1_ != 0 || llParam2_ != 0) {
                 MMI_HILOGW("Time cost overtime (%{public}" PRId64 ",(us)>%{public}" PRId64
                          "(us)) when Reason:%{public}s,chk:%{public}s,"
-                         "param1:%{public}" PRId64 ",param2:%{public}" PRId64 "",
-                         ullCost, uiTime_, strReason_.c_str(), strOutput_.c_str(), llParam1_, llParam2_);
+                         "paramType:%{public}s, param2:%{public}" PRId64 "",
+                         ullCost, uiTime_, strReason_.c_str(), strOutput_.c_str(), paramType[llParam1_].data(), llParam2_);
             } else {
                 MMI_HILOGW("Overtime(%{public}" PRId64 ",(us)>%{public}" PRId64
                          "(us)) when Reason:%{public}s,chk:%{public}s",
