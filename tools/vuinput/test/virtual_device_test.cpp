@@ -19,7 +19,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-using namespace OHOS::MMI;
 } // namespace
 
 class VirtualDeviceTest : public testing::Test {
@@ -230,12 +229,12 @@ HWTEST_F(VirtualDeviceTest, Test_AddDevice_false02, TestSize.Level1)
 }
 
 /**
- * @tc.name:Test_CloseDevice_flase02
+ * @tc.name:Test_CloseDevice_false02
  * @tc.desc:Verify VirtualDevice function CloseDevice
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(VirtualDeviceTest, Test_CloseDevice_flase02, TestSize.Level1)
+HWTEST_F(VirtualDeviceTest, Test_CloseDevice_false02, TestSize.Level1)
 {
     VirtualDevice device(DEVICE, BUS_TYPE, VENDOR_ID, PRODUCT_ID);
     std::vector<std::string> fileList;
@@ -343,6 +342,7 @@ HWTEST_F(VirtualDeviceTest, Test_FindDevice_closeTrue01, TestSize.Level1)
     symbolFileTest.append(g_folderPath).append("1111111").append("_").append("testDevice");
     std::ofstream flagFile;
     flagFile.open(symbolFileTest.c_str());
+    flagFile.close(symbolFileTest.c_str());
     std::vector<std::string> argvList;
     argvList.push_back("binName ");
     argvList.push_back("close ");

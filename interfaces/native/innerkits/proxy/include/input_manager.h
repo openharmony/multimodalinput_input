@@ -25,11 +25,12 @@
 
 #include "cooperation_message.h"
 #include "i_anr_observer.h"
-#include "display_info.h"
+#include "window_info.h"
 #include "error_multimodal.h"
 #include "i_input_device_listener.h"
 #include "i_input_device_cooperate_listener.h"
 #include "i_input_event_consumer.h"
+#include "i_input_event_filter.h"
 #include "input_device.h"
 #include "key_option.h"
 
@@ -52,17 +53,8 @@ public:
      */
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
 
-    /**
-     * @brief Sets a globally unique input event filter.
-     * @param filter Indicates the input event filter to set. When an input event occurs, this filter is
-     * called and returns a value indicating whether to continue processing the input event.If the filter
-     * returns <b>true</b>, the processing of the input event ends. If the filter returns <b>false</b>,
-     * the processing of the input event continues.
-     * @return return Returns a value greater than or equal to <b>0</b> if the input event filter is added
-     * successfully; returns a value less than <b>0</b> otherwise.
-     * @since 9
-     */
-    int32_t AddInputEventFilter(std::function<bool(std::shared_ptr<PointerEvent>)> filter);
+    int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority);
+    int32_t RemoveInputEventFilter(int32_t filterId);
 
     /**
      * @brief Sets a consumer for the window input event of the current process.
@@ -177,6 +169,7 @@ public:
      */
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor);
     int32_t AddInterceptor(std::function<void(std::shared_ptr<KeyEvent>)> interceptor);
+    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor, int32_t priority, uint32_t deviceTags);
 
     /**
      * @brief Removes an interceptor.
@@ -267,7 +260,22 @@ public:
      */
     bool IsPointerVisible();
 
+    /**
+     * @brief 设置鼠标指针样式
+     * @param windowId 指定要更改鼠标指针样式的窗口ID
+     * @param pointerStyle 指定要更改的鼠标指针样式ID
+     * @return 成功返回0，否则返回失败
+     * @since 9
+     */
     int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle);
+
+    /**
+     * @brief 获取鼠标指针样式
+     * @param windowId 指定要获取鼠标指针样式的窗口ID
+     * @param pointerStyle 返回获取的鼠标指针样式ID
+     * @return 成功返回0，否则返回失败
+     * @since 9
+     */
     int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle);
 
     /**
@@ -302,63 +310,6 @@ public:
      * @since 9
      */
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
-
-    /**
-     * @brief 设置鼠标光标的位置.
-     * @param x x 坐标
-     * @param y y 坐标
-     * @return 0表示返回成功，否则表示返回失败
-     */
-    int32_t SetPointerLocation(int32_t x, int32_t y);
-
-    /**
-     * @brief 获取远端输入能力.
-     * @param deviceId 远端的deviceId
-     * @param remoteTypes 返回远端输入能力
-     * @return 0表示返回成功，否则表示返回失败
-     * @since 9
-     */
-    int32_t GetRemoteInputAbility(std::string deviceId, std::function<void(std::set<int32_t>)> remoteTypes);
-
-    /**
-     * @brief 准备分布式.
-     * @param deviceId 准备分布式的那台设备的ID
-     * @param callback 准备分布式的回调，如果准备分布式执行完了，此回调被调用
-     * 如果准备分布式成功，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值.
-     * @return 0表示返回成功，否则表示返回失败
-     */
-    int32_t PrepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
-
-    /**
-     * @brief 取消准备分布式.
-     * @param deviceId 取消准备分布式的那台设备的ID
-     * @param callback 取消准备分布式的回调，如果取消准备分布式执行完了，此回调被调用
-     * 如果取消准备分布式成功，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值.
-     * @return 0表示返回成功，否则表示返回失败
-     */
-    int32_t UnprepareRemoteInput(const std::string& deviceId, std::function<void(int32_t)> callback);
-
-    /**
-     * @brief 开始分布式.
-     * @param deviceId 开始分布式的那台设备的ID
-     * @param callback 开始分布式的回调，如果开始分布式执行完了，此回调被调用
-     * 如果开始分布式成功，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值.
-     * @return 0表示返回成功，否则表示返回失败
-     */
-    int32_t StartRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
-
-    /**
-     * @brief 取消分布式.
-     * @param deviceId 取消分布式的那台设备的ID
-     * @param callback 取消分布式的回调，如果取消分布式执行完了，此回调被调用
-     * 如果取消分布式成功，则返回大于或等于 <b>0</b> 的值
-     * 否则返回小于 <b>0</b> 的值.
-     * @return 0表示返回成功，否则表示返回失败
-     */
-    int32_t StopRemoteInput(const std::string& deviceId, uint32_t inputAbility, std::function<void(int32_t)> callback);
 
     /**
      * @brief 设置指定输入设备对应的屏幕ID
@@ -442,6 +393,14 @@ public:
      * @return 0 表示设置成功，其他值表示设置失败。
      */
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
+
+    /**
+     * @brief 设置鼠标绝对坐标
+     * @param x 指定设置鼠标的x坐标
+     * @param y 指定设置鼠标的y坐标
+     * @return void
+     */
+    void SetPointerLocation(int32_t x, int32_t y);
 
 private:
     InputManager() = default;

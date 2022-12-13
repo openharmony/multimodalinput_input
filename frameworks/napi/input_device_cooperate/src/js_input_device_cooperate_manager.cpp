@@ -33,46 +33,50 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInp
 napi_value JsInputDeviceCooperateManager::Enable(napi_env env, bool enable, napi_value handle)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = InputDevCooperateImpl.GetUserData();
-    napi_value result = CreateCallbackInfo(env, handle, userData);
-    auto callback = std::bind(EmitJsEnable, userData, std::placeholders::_1, std::placeholders::_2);
-    InputMgr->EnableInputDeviceCooperate(enable, callback);
-    return result;
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value ret = CreateCallbackInfo(env, handle, cb);
+    auto callback = std::bind(EmitJsEnable, cb, std::placeholders::_1, std::placeholders::_2);
+    int32_t errCode = InputMgr->EnableInputDeviceCooperate(enable, callback);
+    HandleExecuteResult(env, errCode);
+    return ret;
 }
 
 napi_value JsInputDeviceCooperateManager::Start(napi_env env, const std::string &sinkDeviceDescriptor,
     int32_t srcInputDeviceId, napi_value handle)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = InputDevCooperateImpl.GetUserData();
-    napi_value result = CreateCallbackInfo(env, handle, userData);
-    auto callback = std::bind(EmitJsStart, userData, std::placeholders::_1, std::placeholders::_2);
-    InputMgr->StartInputDeviceCooperate(sinkDeviceDescriptor, srcInputDeviceId, callback);
-    return result;
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value ret = CreateCallbackInfo(env, handle, cb);
+    auto callback = std::bind(EmitJsStart, cb, std::placeholders::_1, std::placeholders::_2);
+    int32_t errCode = InputMgr->StartInputDeviceCooperate(sinkDeviceDescriptor, srcInputDeviceId, callback);
+    HandleExecuteResult(env, errCode);
+    return ret;
 }
 
 napi_value JsInputDeviceCooperateManager::Stop(napi_env env, napi_value handle)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = InputDevCooperateImpl.GetUserData();
-    napi_value result = CreateCallbackInfo(env, handle, userData);
-    auto callback = std::bind(EmitJsStop, userData, std::placeholders::_1, std::placeholders::_2);
-    InputMgr->StopDeviceCooperate(callback);
-    return result;
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value ret = CreateCallbackInfo(env, handle, cb);
+    auto callback = std::bind(EmitJsStop, cb, std::placeholders::_1, std::placeholders::_2);
+    int32_t errCode = InputMgr->StopDeviceCooperate(callback);
+    HandleExecuteResult(env, errCode);
+    return ret;
 }
 
 napi_value JsInputDeviceCooperateManager::GetState(napi_env env, const std::string &deviceDescriptor, napi_value handle)
 {
     CALL_INFO_TRACE;
-    std::lock_guard<std::mutex> guard(mutex_);
-    int32_t userData = InputDevCooperateImpl.GetUserData();
-    napi_value result = CreateCallbackInfo(env, handle, userData);
-    auto callback = std::bind(EmitJsGetState, userData, std::placeholders::_1);
-    InputMgr->GetInputDeviceCooperateState(deviceDescriptor, callback);
-    return result;
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    napi_value ret = CreateCallbackInfo(env, handle, cb);
+    auto callback = std::bind(EmitJsGetState, cb, std::placeholders::_1);
+    int32_t errCode = InputMgr->GetInputDeviceCooperateState(deviceDescriptor, callback);
+    HandleExecuteResult(env, errCode);
+    return ret;
 }
 
 void JsInputDeviceCooperateManager::RegisterListener(napi_env env, const std::string &type, napi_value handle)

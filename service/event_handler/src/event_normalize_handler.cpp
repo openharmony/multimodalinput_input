@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,6 +22,7 @@
 #include "event_log_helper.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
+#include "input_device_cooperate_util.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_manager.h"
 #include "input_event_handler.h"
@@ -103,6 +104,12 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
             HandleTableToolEvent(event);
             break;
         }
+        case LIBINPUT_EVENT_JOYSTICK_BUTTON:
+        case LIBINPUT_EVENT_JOYSTICK_AXIS: {
+            HandleJoystickEvent(event);
+            DfxHisysevent::CalcPointerDispTimes();
+            break;
+        }
         default: {
             MMI_HILOGW("This device does not support");
             break;
@@ -119,7 +126,9 @@ int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
     InputDevMgr->OnInputDeviceAdded(device);
     KeyMapMgr->ParseDeviceConfigFile(device);
     KeyRepeat->AddDeviceConfig(device);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventHdr->ResetKeyEvent(device);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
 
@@ -134,13 +143,14 @@ int32_t EventNormalizeHandler::OnEventDeviceRemoved(libinput_event *event)
     return RET_OK;
 }
 
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Keyboard device does not support");
         return;
     }
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    DfxHisysevent::GetDispStartTime();
     CHKPV(keyEvent);
     EventLogHelper::PrintEventData(keyEvent);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
@@ -150,16 +160,19 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     nextHandler_->HandleKeyEvent(keyEvent);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    DfxHisysevent::CalcKeyDispTimes();
+    DfxHisysevent::ReportDispTimes();
 }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
 void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Pointer device does not support");
         return;
     }
-#ifdef OHOS_BUILD_ENABLE_POINTER
+    DfxHisysevent::GetDispStartTime();
     CHKPV(pointerEvent);
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) {
         MMI_HILOGI("MouseEvent Normalization Results, PointerAction:%{public}d,PointerId:%{public}d,"
@@ -182,21 +195,26 @@ void EventNormalizeHandler::HandlePointerEvent(const std::shared_ptr<PointerEven
     }
     WinMgr->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER
+    DfxHisysevent::CalcPointerDispTimes();
+    DfxHisysevent::ReportDispTimes();
 }
+#endif // OHOS_BUILD_ENABLE_POINTER
 
+#ifdef OHOS_BUILD_ENABLE_TOUCH
 void EventNormalizeHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Touchscreen device does not support");
         return;
     }
-#ifdef OHOS_BUILD_ENABLE_TOUCH
+    DfxHisysevent::GetDispStartTime();
     CHKPV(pointerEvent);
     WinMgr->UpdateTargetPointer(pointerEvent);
     nextHandler_->HandleTouchEvent(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_TOUCH
+    DfxHisysevent::CalcPointerDispTimes();
+    DfxHisysevent::ReportDispTimes();
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 {
@@ -248,7 +266,7 @@ bool EventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> key
     CHKPF(keyEvent);
     InputHandler->SetJumpInterceptState(false);
     int32_t keyCode = keyEvent->GetKeyCode();
-    if(keyCode == KeyEvent::KEYCODE_BACK || keyCode == KeyEvent::KEYCODE_VOLUME_UP
+    if (keyCode == KeyEvent::KEYCODE_BACK || keyCode == KeyEvent::KEYCODE_VOLUME_UP
         || keyCode == KeyEvent::KEYCODE_VOLUME_DOWN || keyCode == KeyEvent::KEYCODE_POWER) {
         return true;
     }
@@ -261,8 +279,7 @@ bool EventNormalizeHandler::CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> key
             return !IsNeedFilterOut(networkId, keyEvent);
         }
     } else if (state == CooperateState::STATE_OUT) {
-        std::string networkId;
-        InputDevMgr->GetLocalDeviceId(networkId);
+        std::string networkId = GetLocalDeviceId();
         if (!IsNeedFilterOut(networkId, keyEvent)) {
             if (keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
                 KeyRepeat->SelectAutoRepeat(keyEvent);
@@ -307,16 +324,20 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     MouseEventHdr->Normalize(event);
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
     for (const int32_t& keyCode : pressedKeys) {
         MMI_HILOGI("Pressed keyCode:%{public}d", keyCode);
     }
     pointerEvent->SetPressedKeys(pressedKeys);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandlePointerEvent(pointerEvent);
 #else
@@ -333,7 +354,7 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH_PAD);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     nextHandler_->HandlePointerEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
@@ -359,7 +380,7 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_GESTURE);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::GESTURE);
     CHKPR(pointerEvent, GESTURE_EVENT_PKG_FAIL);
     MMI_HILOGD("GestureEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
                "action:%{public}d,actionStartTime:%{public}" PRId64 ","
@@ -394,15 +415,8 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_TOUCH);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
-#ifdef OHOS_DISTRIBUTED_INPUT_MODEL
-    if (InputDevCooSM->CheckTouchEvent(event)) {
-        MMI_HILOGW("Touch event filter out");
-        ResetTouchUpEvent(pointerEvent, event);
-        return RET_OK;
-    }
-#endif // OHOS_DISTRIBUTED_INPUT_MODEL
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
     ResetTouchUpEvent(pointerEvent, event);
@@ -431,12 +445,12 @@ void EventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> poin
 int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
 {
     if (nextHandler_ == nullptr) {
-        MMI_HILOGW("Touchscreen device does not support");
+        MMI_HILOGW("TableTool device does not support");
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, INPUT_DEVICE_CAP_TABLET_TOOL);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TABLET_TOOL);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
     nextHandler_->HandleTouchEvent(pointerEvent);
@@ -444,8 +458,27 @@ int32_t EventNormalizeHandler::HandleTableToolEvent(libinput_event* event)
         pointerEvent->Reset();
     }
 #else
-    MMI_HILOGW("Touchscreen device does not support");
+    MMI_HILOGW("TableTool device does not support");
 #endif // OHOS_BUILD_ENABLE_TOUCH
+    return RET_OK;
+}
+
+int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
+{
+    CALL_DEBUG_ENTER;
+    if (nextHandler_ == nullptr) {
+        MMI_HILOGW("Joystick device does not support");
+        return ERROR_UNSUPPORT;
+    }
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+    CHKPR(event, ERROR_NULL_POINTER);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::JOYSTICK);
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+    nextHandler_->HandlePointerEvent(pointerEvent);
+#else
+    MMI_HILOGW("Joystick device does not support");
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
     return RET_OK;
 }
 
@@ -453,12 +486,14 @@ int32_t EventNormalizeHandler::AddHandleTimer(int32_t timeout)
 {
     CALL_DEBUG_ENTER;
     timerId_ = TimerMgr->AddTimer(timeout, 1, [this]() {
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
         auto keyEvent = KeyEventHdr->GetKeyEvent();
         CHKPV(keyEvent);
         CHKPV(nextHandler_);
         nextHandler_->HandleKeyEvent(keyEvent);
         int32_t triggerTime = KeyRepeat->GetIntervalTime(keyEvent->GetDeviceId());
         this->AddHandleTimer(triggerTime);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     });
     return timerId_;
 }

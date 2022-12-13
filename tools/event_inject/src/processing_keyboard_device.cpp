@@ -15,8 +15,8 @@
 
 #include "processing_keyboard_device.h"
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingKeyboardDevice" };
 constexpr int32_t EVENT_REPORT_COUNTS = 50;
@@ -114,3 +114,5 @@ void ProcessingKeyboardDevice::TransformKeyClickEvent(const KeyBoardEvent& keyBo
     SetKeyReleaseEvent(inputEventArray, keyBoardEvent.blockTime, keyValue);
     SetSynReport(inputEventArray);
 }
+} // namespace MMI
+} // namespace OHOS

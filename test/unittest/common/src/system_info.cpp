@@ -22,6 +22,8 @@
 #include <fstream>
 #include <string>
 
+#include "securec.h"
+
 #include "error_multimodal.h"
 #include "mmi_log.h"
 
@@ -58,30 +60,38 @@ int32_t CpuInfo::GetTaskPidFile(const std::string &process_name)
             continue;
         }
         const std::string path = procPath + "/" + pidFile->d_name + "/status";
-        std::ifstream filePath(path);
-        if (!filePath.is_open()) {
+        std::ifstream file(path);
+        if (!file.is_open()) {
             continue;
         }
         std::string strLine;
-        std::getline(filePath, strLine);
+        if (!std::getline(file, strLine)) {
+            MMI_HILOGE("getline failed");
+            file.close();
+            return DEFAULT_PID;
+        }
         if (strLine.empty()) {
-            filePath.close();
+            file.close();
             continue;
         }
         if ((strLine.find(process_name)) == std::string::npos) {
-            filePath.close();
+            file.close();
             continue;
         }
-        while (std::getline(filePath, strLine)) {
+        while (std::getline(file, strLine)) {
             if ((strLine.find("Pid")) != std::string::npos) {
-                (void)::sscanf(strLine.c_str(), "%*s%d", &pid);
+                if (::sscanf_s(strLine.c_str(), "%*s%d", &pid, sizeof(pid)) != 1) {
+                    MMI_HILOGE("Failed to cut out the pid");
+                }
                 break;
             }
         }
-        filePath.close();
+        file.close();
         break;
     }
-    ::closedir(dir);
+    if (::closedir(dir) != 0) {
+        MMI_HILOGE("Failed to closedir");
+    }
 
     return pid;
 }
@@ -111,7 +121,7 @@ int32_t CpuInfo::GetTaskPidCmd(const std::string &process_name, int32_t flag, st
         return DEFAULT_PID;
     }
     ::pclose(fp);
-    return ::atoi(buf);
+    return std::stoi(buf);
 }
 
 int32_t CpuInfo::GetProcOccupy(int32_t pid)
@@ -191,14 +201,14 @@ double CpuInfo::GetSystemCpuUsage()
     int32_t ret = GetSystemCpuStatInfo(first);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to obtain CPU information, errcode:%{public}d", ret);
-        return CPU_USAGE_UNKONW;
+        return CPU_USAGE_UNKNOWN;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     Total_Cpu_Occupy second {};
     ret = GetSystemCpuStatInfo(second);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to obtain CPU information, errcode:%{public}d", ret);
-        return CPU_USAGE_UNKONW;
+        return CPU_USAGE_UNKNOWN;
     }
 
     return GetCpuUsage(first, second);
@@ -225,22 +235,22 @@ double CpuInfo::GetProcCpuUsage(const std::string &process_name)
 
     if ((totalTime1 = GetSystemTotalOccupy()) == RET_ERR) {
         MMI_HILOGE("Failed to obtain CPU occupy");
-        return CPU_USAGE_UNKONW;
+        return CPU_USAGE_UNKNOWN;
     }
     if ((procTime1 = GetProcOccupy(pid)) == RET_ERR) {
         MMI_HILOGE("Failed to obtain process CPU information");
-        return CPU_USAGE_UNKONW;
+        return CPU_USAGE_UNKNOWN;
     }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     if ((totalTime2 = GetSystemTotalOccupy()) == RET_ERR) {
         MMI_HILOGE("Failed to obtain CPU occupy");
-        return CPU_USAGE_UNKONW;
+        return CPU_USAGE_UNKNOWN;
     }
     if ((procTime2 = GetProcOccupy(pid)) == RET_ERR) {
         MMI_HILOGE("Failed to obtain process CPU information");
-        return CPU_USAGE_UNKONW;
+        return CPU_USAGE_UNKNOWN;
     }
 
     return CHK_RATE(CPU_USAGE_MAX * (procTime2 - procTime1) / (totalTime2 - totalTime1));

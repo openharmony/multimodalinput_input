@@ -23,7 +23,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 std::shared_ptr<KeyboardInject> g_instance = nullptr;
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "keyBoardInject"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "keyBoardInject" };
 constexpr int32_t INPUT_KEY_BACK = 2;
 constexpr int32_t LINUX_KEY_BACK = 158;
 } // namespace
@@ -40,10 +40,6 @@ KeyboardInject::KeyboardInject()
         MMI_HILOGD("ret.second:%{public}d", ret.second);
     }
     injectThread_ = std::make_unique<InjectThread>();
-    if (injectThread_ == nullptr) {
-        MMI_HILOGE("The injectThread_ is null");
-        return;
-    }
     g_pKeyboard = std::make_unique<VirtualKeyboard>();
     g_pKeyboard->SetUp();
 }

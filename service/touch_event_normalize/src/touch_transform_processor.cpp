@@ -18,36 +18,34 @@
 #include <linux/input.h>
 
 #include "event_log_helper.h"
+#include "input_windows_manager.h"
 #include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformProcessor"};
-constexpr int32_t MT_TOOL_NONE      = -1;
-constexpr int32_t BTN_DOWN          = 1;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "TouchTransformProcessor" };
+constexpr int32_t MT_TOOL_NONE { -1 };
+constexpr int32_t BTN_DOWN { 1 };
 } // namespace
 
-TouchTransformProcessor::TouchTransformProcessor(int32_t deviceId) : deviceId_(deviceId)
+TouchTransformProcessor::TouchTransformProcessor(int32_t deviceId)
+    : deviceId_(deviceId)
 {
-    pointerEvent_ = PointerEvent::Create();
-    CHKPL(pointerEvent_);
     InitToolTypes();
 }
-
-TouchTransformProcessor::~TouchTransformProcessor() {}
 
 bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPF(event);
-    auto data = libinput_event_get_touch_event(event);
-    CHKPF(data);
+    auto touch = libinput_event_get_touch_event(event);
+    CHKPF(touch);
     auto device = libinput_event_get_device(event);
     CHKPF(device);
     EventTouch touchInfo;
     int32_t logicalDisplayId = -1;
-    if (!WinMgr->TouchPointToDisplayPoint(deviceId_, data, touchInfo, logicalDisplayId)) {
+    if (!WinMgr->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId)) {
         MMI_HILOGE("TouchDownPointToDisplayPoint failed");
         return false;
     }
@@ -61,14 +59,14 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
 
     PointerEvent::PointerItem item;
-    double pressure = libinput_event_touch_get_pressure(data);
-    int32_t seatSlot = libinput_event_touch_get_seat_slot(data);
-    int32_t longAxis = libinput_event_get_touch_contact_long_axis(data);
-    int32_t shortAxis = libinput_event_get_touch_contact_short_axis(data);
+    double pressure = libinput_event_touch_get_pressure(touch);
+    int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
+    int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
+    int32_t shortAxis = libinput_event_get_touch_contact_short_axis(touch);
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
-    int32_t toolType = GetTouchToolType(data, device);
+    int32_t toolType = GetTouchToolType(touch, device);
     item.SetToolType(toolType);
     item.SetPointerId(seatSlot);
     item.SetDownTime(time);
@@ -92,26 +90,26 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPF(event);
-    auto data = libinput_event_get_touch_event(event);
-    CHKPF(data);
+    auto touch = libinput_event_get_touch_event(event);
+    CHKPF(touch);
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     EventTouch touchInfo;
     int32_t logicalDisplayId = pointerEvent_->GetTargetDisplayId();
-    if (!WinMgr->TouchPointToDisplayPoint(deviceId_, data, touchInfo, logicalDisplayId)) {
+    if (!WinMgr->TouchPointToDisplayPoint(deviceId_, touch, touchInfo, logicalDisplayId)) {
         MMI_HILOGE("Get TouchMotionPointToDisplayPoint failed");
         return false;
     }
     PointerEvent::PointerItem item;
-    int32_t seatSlot = libinput_event_touch_get_seat_slot(data);
+    int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
         MMI_HILOGE("Get pointer parameter failed");
         return false;
     }
-    double pressure = libinput_event_touch_get_pressure(data);
-    int32_t longAxis = libinput_event_get_touch_contact_long_axis(data);
-    int32_t shortAxis = libinput_event_get_touch_contact_short_axis(data);
+    double pressure = libinput_event_touch_get_pressure(touch);
+    int32_t longAxis = libinput_event_get_touch_contact_long_axis(touch);
+    int32_t shortAxis = libinput_event_get_touch_contact_short_axis(touch);
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
@@ -132,14 +130,14 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPF(event);
-    auto data = libinput_event_get_touch_event(event);
-    CHKPF(data);
+    auto touch = libinput_event_get_touch_event(event);
+    CHKPF(touch);
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
 
     PointerEvent::PointerItem item;
-    int32_t seatSlot = libinput_event_touch_get_seat_slot(data);
+    int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
     if (!(pointerEvent_->GetPointerItem(seatSlot, item))) {
         MMI_HILOGE("Get pointer parameter failed");
         return false;
@@ -150,11 +148,14 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
     return true;
 }
 
-std::shared_ptr<PointerEvent> TouchTransformProcessor::OnLibinputTouchEvent(struct libinput_event *event)
+std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
     CHKPP(event);
-    CHKPP(pointerEvent_);
+    if (pointerEvent_ == nullptr) {
+        pointerEvent_ = PointerEvent::Create();
+        CHKPP(pointerEvent_);
+    }
     auto type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {

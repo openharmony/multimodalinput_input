@@ -16,10 +16,6 @@ import("//build/ohos.gni")
 mmi_path = "//foundation/multimodalinput/input"
 ability_runtime_path = "//foundation/ability/ability_runtime"
 ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
-input_feature_libinput = true
-input_feature_hdf = false
-input_feature_debug = false
-input_feature_distributed = false
 
 declare_args() {
   resource_schedule_service_enabled = false
@@ -29,6 +25,7 @@ declare_args() {
   input_feature_monitor = true
   input_feature_keyboard = true
   input_feature_mouse = true
+  input_feature_joystick = true
   input_feature_touchscreen = true
   input_feature_input_device = true
   input_feature_input_cooperation = false
@@ -39,16 +36,51 @@ declare_args() {
   }
 }
 
-print("input_feature_libinput = ${input_feature_libinput}")
-print("input_feature_hdf = ${input_feature_hdf}")
-print("input_feature_debug = ${input_feature_debug}")
+if (input_feature_joystick) {
+  input_feature_mouse = true
+}
+
 print("input_feature_combination_key = ${input_feature_combination_key}")
 print("input_feature_pointer_drawing = ${input_feature_pointer_drawing}")
 print("input_feature_monitor = ${input_feature_monitor}")
 print("input_feature_interceptor = ${input_feature_interceptor}")
-print("input_feature_distributed = ${input_feature_distributed}")
 print("input_feature_keyboard = ${input_feature_keyboard}")
 print("input_feature_mouse = ${input_feature_mouse}")
+print("input_feature_joystick = ${input_feature_joystick}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
 print("input_feature_input_cooperation = ${input_feature_input_cooperation}")
+
+input_default_defines = []
+
+if (input_feature_pointer_drawing) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_POINTER_DRAWING" ]
+}
+
+if (input_feature_interceptor) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_INTERCEPTOR" ]
+}
+
+if (input_feature_keyboard) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_KEYBOARD" ]
+}
+
+if (input_feature_monitor) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
+}
+
+if (input_feature_input_cooperation) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
+}
+
+if (input_feature_touchscreen) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
+}
+
+if (input_feature_mouse) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
+}
+
+if (input_feature_joystick) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_JOYSTICK" ]
+}

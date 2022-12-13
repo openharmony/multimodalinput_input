@@ -36,28 +36,28 @@ namespace MMI {
 class JsEventTarget : public IInputDeviceCooperateListener, public std::enable_shared_from_this<JsEventTarget> {
 public:
     JsEventTarget();
-    ~JsEventTarget() = default;
+    virtual ~JsEventTarget() = default;
     DISALLOW_COPY_AND_MOVE(JsEventTarget);
 
-    static void EmitJsEnable(int32_t userData, std::string deviceId, CooperationMessage msg);
-    static void EmitJsStart(int32_t userData, std::string, CooperationMessage msg);
-    static void EmitJsStop(int32_t userData, std::string, CooperationMessage msg);
-    static void EmitJsGetState(int32_t userData, bool state);
+    static void EmitJsEnable(sptr<JsUtil::CallbackInfo> cb, const std::string &deviceId, const CooperationMessage &msg);
+    static void EmitJsStart(sptr<JsUtil::CallbackInfo> cb, const std::string &deviceId, const CooperationMessage &msg);
+    static void EmitJsStop(sptr<JsUtil::CallbackInfo> cb, const std::string &deviceId, const CooperationMessage &msg);
+    static void EmitJsGetState(sptr<JsUtil::CallbackInfo> cb, bool state);
 
     void AddListener(napi_env env, const std::string &type, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);
-    napi_value CreateCallbackInfo(napi_env, napi_value handle, int32_t userData);
+    napi_value CreateCallbackInfo(napi_env, napi_value handle, sptr<JsUtil::CallbackInfo> cb);
+    void HandleExecuteResult(napi_env env, int32_t errCode);
     void ResetEnv();
 
     void OnCooperateMessage(const std::string &deviceId, CooperationMessage msg) override;
 
 private:
     inline static std::map<std::string_view, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>>
-        cooperateListener_ = {};
-    inline static std::map<int32_t, std::unique_ptr<JsUtil::CallbackInfo>> callback_ = {};
+        cooperateListener_ {};
     bool isListeningProcess_ { false };
 
-    static void CallEnablePromsieWork(uv_work_t *work, int32_t status);
+    static void CallEnablePromiseWork(uv_work_t *work, int32_t status);
     static void CallEnableAsyncWork(uv_work_t *work, int32_t status);
     static void CallStartPromiseWork(uv_work_t *work, int32_t status);
     static void CallStartAsyncWork(uv_work_t *work, int32_t status);
@@ -66,8 +66,6 @@ private:
     static void CallGetStatePromiseWork(uv_work_t *work, int32_t status);
     static void CallGetStateAsyncWork(uv_work_t *work, int32_t status);
     static void EmitCooperateMessageEvent(uv_work_t *work, int32_t status);
-
-    static std::unique_ptr<JsUtil::CallbackInfo> GetCallbackInfo(uv_work_t *work);
 };
 } // namespace MMI
 } // namespace OHOS

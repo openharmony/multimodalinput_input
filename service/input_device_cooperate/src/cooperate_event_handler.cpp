@@ -15,28 +15,35 @@
 
 #include "cooperate_event_handler.h"
 
+#include "mmi_log.h"
+
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "CooperateEventHandler" };
+} // namespace
 CooperateEventHandler::CooperateEventHandler(
     const std::shared_ptr<AppExecFwk::EventRunner> &runner)
     : AppExecFwk::EventHandler(runner)
 {
 }
-CooperateEventHandler::~CooperateEventHandler() = default;
 
 bool CooperateEventHandler::ProxyPostTask(const Callback &callback, int64_t delayTime)
 {
+    CALL_DEBUG_ENTER;
     return AppExecFwk::EventHandler::PostTask(callback, delayTime);
 }
 
 bool CooperateEventHandler::ProxyPostTask(const Callback &callback, const std::string &name,
     int64_t delayTime)
 {
+    CALL_DEBUG_ENTER;
     return AppExecFwk::EventHandler::PostTask(callback, name, delayTime);
 }
 
 void CooperateEventHandler::ProxyRemoveTask(const std::string &name)
 {
+    CALL_DEBUG_ENTER;
     AppExecFwk::EventHandler::RemoveTask(name);
 }
 } // namespace MMI

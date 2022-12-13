@@ -16,14 +16,13 @@
 #ifndef INPUT_DEVICE_COOPERATE_STATE_FREE_H
 #define INPUT_DEVICE_COOPERATE_STATE_FREE_H
 
-#include "distributed_input_adapter.h"
 #include "i_input_device_cooperate_state.h"
 
 namespace OHOS {
 namespace MMI {
-class InputDeviceCooperateStateFree : public IInputDeviceCooperateState {
+class InputDeviceCooperateStateFree final : public IInputDeviceCooperateState {
 public:
-    virtual int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId) override;
+    int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId) override;
 
 private:
     int32_t ProcessStart(const std::string &remoteNetworkId, int32_t startInputDeviceId);

@@ -27,9 +27,15 @@ public:
     EventNormalizeHandler() = default;
     ~EventNormalizeHandler() = default;
     void HandleEvent(libinput_event* event);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_POINTER
     void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
+#endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t AddHandleTimer(int32_t timeout = 300);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     bool CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> keyEvent);
@@ -44,6 +50,7 @@ private:
     int32_t HandleMouseEvent(libinput_event* event);
     int32_t HandleTouchEvent(libinput_event* event);
     int32_t HandleTableToolEvent(libinput_event* event);
+    int32_t HandleJoystickEvent(libinput_event* event);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     bool IsNeedFilterOut(const std::string& deviceId, const std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_COOPERATE

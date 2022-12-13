@@ -30,15 +30,6 @@ public:
     bool Marshalling(Parcel &out) const override;
     ConnectDefReq data;
 };
-
-class ConnectRespParcel final : public Parcelable {
-public:
-    static ConnectRespParcel *Unmarshalling(Parcel &in);
-    ConnectRespParcel() = default;
-    ~ConnectRespParcel() override = default;
-    bool Marshalling(Parcel &out) const override;
-    ConnectDefResp data;
-};
 } // namespace MMI
 } // namespace OHOS
 #endif // MULTIMODAL_INPUT_CONNECT_DEF_PARCEL_H

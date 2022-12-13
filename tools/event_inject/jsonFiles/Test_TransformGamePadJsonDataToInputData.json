@@ -12,7 +12,7 @@
                 {"eventType": "KEY_EVENT_CLICK", "keyValue": 304},
                 {"eventType": "KEY_EVENT_CLICK", "keyValue": 305},
                 {"eventType": "KEY_EVENT_PRESS", "keyValue": 317},
-                {"eventType": "KEY_EVENT_RELESE", "keyValue": 317},
+                {"eventType": "KEY_EVENT_RELEASE", "keyValue": 317},
                 {"eventType": "KEY_EVENT_PRESS", "keyValue": 318},
                 {"eventType": "KEY_EVENT_RELEASE", "keyValue": 318},
                 {"eventType": "DIRECTION_KEY", "direction":"up"},

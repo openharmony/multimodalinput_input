@@ -25,6 +25,8 @@
 
 #include "cooperation_message.h"
 
+#include "refbase.h"
+
 namespace OHOS {
 namespace MMI {
 class JsUtil {
@@ -42,10 +44,11 @@ public:
         bool stopResult { false };
         bool cooperateOpened { false };
         std::string deviceDescriptor;
+        int32_t errCode { 0 };
         CooperationMessage msg = CooperationMessage::OPEN_SUCCESS;
     };
 
-    struct CallbackInfo {
+    struct CallbackInfo : RefBase {
         CallbackInfo() = default;
         ~CallbackInfo();
         napi_env env { nullptr };
@@ -56,11 +59,12 @@ public:
         UserData uData;
     };
 
-    static napi_value GetEnableInfo(const std::unique_ptr<CallbackInfo> &cb);
-    static napi_value GetStartInfo(const std::unique_ptr<CallbackInfo> &cb);
-    static napi_value GetStopInfo(const std::unique_ptr<CallbackInfo> &cb);
-    static napi_value GetStateInfo(const std::unique_ptr<CallbackInfo> &cb);
-    static napi_value GetResult(napi_env env, bool result);
+    static napi_value GetEnableInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStartInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStopInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStateInfo(sptr<CallbackInfo> cb);
+    static napi_value GetStateResult(napi_env env, bool result);
+    static napi_value GetResult(napi_env env, bool result, int32_t errCode);
     static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
 
     template <typename T>

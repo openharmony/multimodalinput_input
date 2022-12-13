@@ -30,14 +30,14 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "LibinputAdapter" };
-constexpr int32_t WAIT_TIME_FOR_INPUT { 500 };
-constexpr int32_t MAX_RETRY_COUNT = 60;
+constexpr int32_t WAIT_TIME_FOR_INPUT { 10 };
 } // namespace
 
 static void HiLogFunc(struct libinput* input, libinput_log_priority priority, const char* fmt, va_list args)
 {
     CHKPV(input);
-    char buffer[256];
+    CHKPV(fmt);
+    char buffer[256] = {};
     if (vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args) == -1) {
         MMI_HILOGE("Call vsnprintf_s failed");
         va_end(args);
@@ -79,14 +79,9 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
             return RET_ERR;
         }
         char realPath[PATH_MAX] = {};
-        int32_t count = 0;
-        while ((realpath(path, realPath) == nullptr) && (count < MAX_RETRY_COUNT)) {
-            MMI_HILOGWK("Path is error, count:%{public}d, path:%{public}s", count, path);
+        if (realpath(path, realPath) == nullptr) {
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
-            ++count;
-        }
-        if (count >= MAX_RETRY_COUNT) {
-            MMI_HILOGWK("Retry %{public}d times realpath failed", count);
+            MMI_HILOGWK("The error path is %{public}s", path);
             return RET_ERR;
         }
         int32_t fd = open(realPath, flags);
@@ -100,10 +95,6 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
         close(fd);
     },
 };
-
-LibinputAdapter::LibinputAdapter() {}
-
-LibinputAdapter::~LibinputAdapter() {}
 
 bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_id)
 {
@@ -198,7 +189,8 @@ void LibinputAdapter::RetriggerHotplugEvents()
         MMI_HILOGE("Failed to open directory: \'/sys/class/input\'");
         return;
     }
-    for (struct dirent *pdirent = readdir(pdir); pdirent != nullptr; pdirent = readdir(pdir)) {
+    struct dirent *pdirent = nullptr;
+    while ((pdirent = readdir(pdir)) != nullptr) {
         char path[PATH_MAX];
         if (sprintf_s(path, sizeof(path), "/sys/class/input/%s/uevent", pdirent->d_name) < 0) {
             continue;

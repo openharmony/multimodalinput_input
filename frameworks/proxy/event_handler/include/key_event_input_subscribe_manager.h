@@ -24,7 +24,6 @@
 
 #include "key_event.h"
 #include "key_option.h"
-#include "mmi_event_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -35,8 +34,7 @@ public:
     class SubscribeKeyEventInfo {
     public:
         SubscribeKeyEventInfo(std::shared_ptr<KeyOption> keyOption,
-            std::function<void(std::shared_ptr<KeyEvent>)> callback,
-            EventHandlerPtr eventHandler);
+            std::function<void(std::shared_ptr<KeyEvent>)> callback);
         ~SubscribeKeyEventInfo() = default;
 
         int32_t GetSubscribeId() const
@@ -49,11 +47,6 @@ public:
             return keyOption_;
         }
 
-        EventHandlerPtr GetEventHandler() const
-        {
-            return eventHandler_;
-        }
-
         std::function<void(std::shared_ptr<KeyEvent>)> GetCallback() const
         {
             return callback_;
@@ -64,7 +57,6 @@ public:
     private:
         std::shared_ptr<KeyOption> keyOption_ { nullptr };
         std::function<void(std::shared_ptr<KeyEvent>)> callback_ { nullptr };
-        EventHandlerPtr eventHandler_ { nullptr };
         int32_t subscribeId_ { -1 };
     };
 
@@ -80,9 +72,6 @@ public:
 
 private:
     const SubscribeKeyEventInfo* GetSubscribeKeyEvent(int32_t id);
-    bool PostTask(int32_t subscribeId, const AppExecFwk::EventHandler::Callback &callback);
-    void OnSubscribeKeyEventCallbackTask(KeyEventInputSubscribeManager::SubscribeKeyEventInfo info,
-        std::shared_ptr<KeyEvent> event, int32_t subscribeId);
 
 private:
     std::set<SubscribeKeyEventInfo> subscribeInfos_;

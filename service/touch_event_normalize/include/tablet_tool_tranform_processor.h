@@ -20,11 +20,11 @@
 
 namespace OHOS {
 namespace MMI {
-class TabletToolTransformProcessor : public TransformProcessor {
+class TabletToolTransformProcessor final : public TransformProcessor {
 public:
     explicit TabletToolTransformProcessor(int32_t deviceId);
     DISALLOW_COPY_AND_MOVE(TabletToolTransformProcessor);
-    virtual ~TabletToolTransformProcessor() = default;
+    ~TabletToolTransformProcessor() = default;
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
 
 private:
@@ -35,7 +35,7 @@ private:
     bool OnTipUp(struct libinput_event_tablet_tool* event);
 
 private:
-    int32_t deviceId_ { -1 };
+    const int32_t deviceId_ { -1 };
     std::shared_ptr<PointerEvent> pointerEvent_  { nullptr };
 };
 } // namespace MMI

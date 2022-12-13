@@ -71,7 +71,6 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
                 MMI_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
-                usleep(SEND_RETRY_SLEEP_TIME);
                 continue;
             }
             MMI_HILOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
@@ -80,6 +79,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         idx += count;
         remSize -= count;
         if (remSize > 0) {
+            MMI_HILOGW("Remsize:%{public}d", remSize);
             usleep(SEND_RETRY_SLEEP_TIME);
         }
     }
@@ -109,9 +109,6 @@ void UDSSession::UpdateDescript()
         << ", programName = " << programName_
         << ", moduleType = " << moduleType_
         << ((fd_ < 0) ? ", closed" : ", opened")
-#ifdef OHOS_BUILD_MMI_DEBUG
-        << ", clientFd = " << clientFd_
-#endif // OHOS_BUILD_MMI_DEBUG
         << ", uid = " << uid_
         << ", pid = " << pid_
         << ", tokenType = " << tokenType_
@@ -147,11 +144,13 @@ std::vector<int32_t> UDSSession::GetTimerIds(int32_t type)
         MMI_HILOGE("Current events have no event type:%{public}d", type);
         return {};
     }
-    std::vector<int32_t> Timers;
+    std::vector<int32_t> timers;
     for (auto &item : iter->second) {
-        Timers.push_back(item.timerId);
+        timers.push_back(item.timerId);
+        item.timerId = -1;
     }
-    return Timers;
+    events_[iter->first] = iter->second;
+    return timers;
 }
 
 std::list<int32_t> UDSSession::DelEvents(int32_t type, int32_t id)

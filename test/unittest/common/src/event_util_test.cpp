@@ -74,6 +74,46 @@ void InputEventCallback::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
     }
 }
 
+void PriorityMiddleCallback::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
+{
+    CALL_DEBUG_ENTER;
+    if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
+        TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+        ASSERT_TRUE(pointerEvent != nullptr);
+        TestUtil->AddEventDump("Call middle interceptor");
+    }
+}
+
+void PriorityMiddleCallback::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    CALL_DEBUG_ENTER;
+    if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
+        TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+        ASSERT_TRUE(keyEvent != nullptr);
+        TestUtil->AddEventDump("Call middle interceptor");
+    }
+}
+
+void PriorityHighCallback::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const
+{
+    CALL_DEBUG_ENTER;
+    if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
+        TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+        ASSERT_TRUE(pointerEvent != nullptr);
+        TestUtil->AddEventDump("Call high interceptor");
+    }
+}
+
+void PriorityHighCallback::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
+{
+    CALL_DEBUG_ENTER;
+    if (TestUtil->GetRecvFlag() != RECV_FLAG::RECV_MARK_CONSUMED) {
+        TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
+        ASSERT_TRUE(keyEvent != nullptr);
+        TestUtil->AddEventDump("Call high interceptor");
+    }
+}
+
 void WindowEventConsumer::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const
 {
     threadId_ = GetThisThreadId();
@@ -135,7 +175,11 @@ bool EventUtilTest::Init()
     CHKPF(window_);
     auto listener_ = GetPtr<InputEventConsumer>();
     CHKPF(listener_);
-    MMI::InputManager::GetInstance()->SetWindowInputEventConsumer(listener_);
+    const std::string threadTest = "EventUtilTest";
+    auto runner = AppExecFwk::EventRunner::Create(threadTest);
+    CHKPF(runner);
+    auto eventHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
+    MMI::InputManager::GetInstance()->SetWindowInputEventConsumer(listener_, eventHandler);
     return true;
 }
 
@@ -153,6 +197,7 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& p
          << ",PointerAction:" << pointerEvent->DumpPointerAction()
          << ",SourceType:" << pointerEvent->DumpSourceType()
          << ",ButtonId:" << pointerEvent->GetButtonId()
+         << ",DeviceId:" << pointerEvent->GetDeviceId()
          << ",VerticalAxisValue:" << std::fixed << std::setprecision(precision)
          << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
          << ",HorizontalAxisValue:" << std::fixed << std::setprecision(precision)
@@ -174,7 +219,8 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& p
             << ",ToolWidth:" << item.GetToolWidth() << ",ToolHeight:" << item.GetToolHeight()
             << ",Pressure:" << item.GetPressure() << ",ToolType:" << item.GetToolType()
             << ",LongAxis:" << item.GetLongAxis() << ",ShortAxis:" << item.GetShortAxis()
-            << ",DeviceId:" << item.GetDeviceId();
+            << ",DeviceId:" << item.GetDeviceId() << ",RawDx:" << item.GetRawDx()
+            << ",RawDy:" << item.GetRawDy();
     }
     return ostream.str();
 }
@@ -193,7 +239,9 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<KeyEvent>& keyEv
     for (const int32_t &key : pressedKeys) {
         auto keyItem = keyEvent->GetKeyItem(key);
         CHKPS(keyItem);
-        keyItem->GetDeviceId();
+        strm << ", KeyCode:" << keyItem->GetKeyCode()
+            << ", DeviceId:" << keyItem->GetDeviceId()
+            << ", Unicode:" << keyItem->GetUnicode();
     }
     return strm.str();
 }
@@ -202,6 +250,7 @@ bool EventUtilTest::CompareDump(const std::shared_ptr<PointerEvent>& pointerEven
 {
     CALL_DEBUG_ENTER;
     std::string before = DumpInputEvent(pointerEvent);
+    MMI_HILOGD("before:%{public}s", before.c_str());
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::string after = GetEventDump();
     MMI_HILOGD("after:%{public}s", after.c_str());
@@ -213,6 +262,7 @@ bool EventUtilTest::CompareDump(const std::shared_ptr<KeyEvent>& keyEvent)
 {
     CALL_DEBUG_ENTER;
     std::string before = DumpInputEvent(keyEvent);
+    MMI_HILOGD("before:%{public}s", before.c_str());
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     std::string after = GetEventDump();
     MMI_HILOGD("after:%{public}s", after.c_str());

@@ -27,7 +27,7 @@
 namespace OHOS {
 namespace MMI {
 using DTaskCallback = std::function<int32_t()>;
-class DelegateTasks : public IdFactory<int32_t> {
+class DelegateTasks final : public IdFactory<int32_t> {
 public:
     struct TaskData {
         uint64_t tid { 0 };
@@ -68,7 +68,7 @@ public:
 
 public:
     DelegateTasks() = default;
-    virtual ~DelegateTasks() = default;
+    ~DelegateTasks();
 
     bool Init();
     void ProcessTasks();

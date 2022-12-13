@@ -32,7 +32,7 @@ enum class ReturnType {
 bool JsCommon::TypeOf(napi_env env, napi_value value, napi_valuetype type)
 {
     napi_valuetype valueType = napi_undefined;
-    CHKRF(env, napi_typeof(env, value, &valueType), TYPEOF);
+    CHKRF(napi_typeof(env, value, &valueType), TYPEOF);
     if (valueType != type) {
         return false;
     }
@@ -43,25 +43,39 @@ AsyncContext::~AsyncContext()
 {
     CALL_DEBUG_ENTER;
     if (work != nullptr) {
-        CHKRV(env, napi_delete_async_work(env, work), DELETE_ASYNC_WORK);
+        CHKRV(napi_delete_async_work(env, work), DELETE_ASYNC_WORK);
     }
     if (callback != nullptr && env != nullptr) {
-        CHKRV(env, napi_delete_reference(env, callback), DELETE_REFERENCE);
+        CHKRV(napi_delete_reference(env, callback), DELETE_REFERENCE);
         env = nullptr;
     }
 }
 
-void getResult(sptr<AsyncContext> asyncContext, napi_value * results)
+bool getResult(sptr<AsyncContext> asyncContext, napi_value * results)
 {
     CALL_DEBUG_ENTER;
     napi_env env = asyncContext->env;
-    if (asyncContext->errorCode == RET_OK) {
-        CHKRV(env, napi_get_undefined(env, &results[0]), GET_UNDEFINED);
-    } else {
-        CHKRV(env, napi_create_object(env, &results[0]), CREATE_OBJECT);
+    if (asyncContext->errorCode != RET_OK) {
+        if (asyncContext->errorCode == RET_ERR) {
+            MMI_HILOGE("Other errors");
+            return false;
+        }
+        NapiError codeMsg;
+        if (!UtilNapiError::GetApiError(asyncContext->errorCode, codeMsg)) {
+            MMI_HILOGE("ErrorCode not found, errCode:%{public}d", asyncContext->errorCode);
+            return false;
+        }
         napi_value errCode = nullptr;
-        CHKRV(env, napi_create_int32(env, asyncContext->errorCode, &errCode), CREATE_INT32);
-        CHKRV(env, napi_set_named_property(env, results[0], "code", errCode), SET_NAMED_PROPERTY);
+        napi_value errMsg = nullptr;
+        napi_value businessError = nullptr;
+        CHKRF(napi_create_int32(env, asyncContext->errorCode, &errCode), CREATE_INT32);
+        CHKRF(napi_create_string_utf8(env, codeMsg.msg.c_str(),
+            NAPI_AUTO_LENGTH, &errMsg), CREATE_STRING_UTF8);
+        CHKRF(napi_create_error(env, nullptr, errMsg, &businessError), CREATE_ERROR);
+        CHKRF(napi_set_named_property(env, businessError, ERR_CODE.c_str(), errCode), SET_NAMED_PROPERTY);
+        results[0] = businessError;
+    } else {
+        CHKRF(napi_get_undefined(env, &results[0]), GET_UNDEFINED);
     }
 
     ReturnType resultType;
@@ -69,14 +83,15 @@ void getResult(sptr<AsyncContext> asyncContext, napi_value * results)
     if (resultType == ReturnType::BOOL) {
         bool temp;
         asyncContext->reserve >> temp;
-        CHKRV(env, napi_get_boolean(env, temp, &results[1]), CREATE_BOOL);
+        CHKRF(napi_get_boolean(env, temp, &results[1]), GET_BOOLEAN);
     } else if (resultType == ReturnType::NUMBER) {
         int32_t temp;
         asyncContext->reserve >> temp;
-        CHKRV(env, napi_create_int32(env, temp, &results[1]), CREATE_INT32);
+        CHKRF(napi_create_int32(env, temp, &results[1]), CREATE_INT32);
     } else {
-        CHKRV(env, napi_get_undefined(env, &results[1]), GET_UNDEFINED);
+        CHKRF(napi_get_undefined(env, &results[1]), GET_UNDEFINED);
     }
+    return true;
 }
 
 void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
@@ -86,32 +101,35 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
     CHKPV(asyncContext->env);
     napi_env env = asyncContext->env;
     napi_value resource = nullptr;
-    CHKRV(env, napi_create_string_utf8(env, "AsyncCallbackWork", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
+    CHKRV(napi_create_string_utf8(env, "AsyncCallbackWork", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
     asyncContext->IncStrongRef(nullptr);
     napi_status status = napi_create_async_work(env, nullptr, resource, [](napi_env env, void* data) {},
         [](napi_env env, napi_status status, void* data) {
             sptr<AsyncContext> asyncContext(static_cast<AsyncContext *>(data));
             /**
              * After the asynchronous task is created, the asyncCallbackInfo reference count is reduced
-             * to 0 destructions, so you need to add 1 to the asyncCallbackInfo reference count when the
+             * to 0 destruction, so you need to add 1 to the asyncCallbackInfo reference count when the
              * asynchronous task is created, and subtract 1 from the reference count after the naked
              * pointer is converted to a pointer when the asynchronous task is executed, the reference
              * count of the smart pointer is guaranteed to be 1.
              */
             asyncContext->DecStrongRef(nullptr);
             napi_value results[2] = { 0 };
-            getResult(asyncContext, results);
+            if (!getResult(asyncContext, results)) {
+                MMI_HILOGE("Failed to create napi data");
+                return;
+            }
             if (asyncContext->deferred) {
                 if (asyncContext->errorCode == RET_OK) {
-                    CHKRV(env, napi_resolve_deferred(env, asyncContext->deferred, results[1]), RESOLVE_DEFERRED);
+                    CHKRV(napi_resolve_deferred(env, asyncContext->deferred, results[1]), RESOLVE_DEFERRED);
                 } else {
-                    CHKRV(env, napi_reject_deferred(env, asyncContext->deferred, results[0]), REJECT_DEFERRED);
+                    CHKRV(napi_reject_deferred(env, asyncContext->deferred, results[0]), REJECT_DEFERRED);
                 }
             } else {
                 napi_value callback = nullptr;
-                CHKRV(env, napi_get_reference_value(env, asyncContext->callback, &callback), GET_REFERENCE);
+                CHKRV(napi_get_reference_value(env, asyncContext->callback, &callback), GET_REFERENCE_VALUE);
                 napi_value callResult = nullptr;
-                CHKRV(env, napi_call_function(env, nullptr, callback, 2, results, &callResult), CALL_FUNCTION);
+                CHKRV(napi_call_function(env, nullptr, callback, 2, results, &callResult), CALL_FUNCTION);
             }
         },
         asyncContext.GetRefPtr(), &asyncContext->work);
@@ -125,20 +143,17 @@ napi_value JsPointerManager::SetPointerVisible(napi_env env, bool visible, napi_
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    if (asyncContext == nullptr) {
-        THROWERR(env, "create AsyncContext failed");
-        return nullptr;
-    }
+    CHKPP(asyncContext);
 
     asyncContext->errorCode = InputManager::GetInstance()->SetPointerVisible(visible);
     asyncContext->reserve << ReturnType::VOID;
 
     napi_value promise = nullptr;
     if (handle != nullptr) {
-        CHKRP(env, napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
-        CHKRP(env, napi_get_undefined(env, &promise), GET_UNDEFINED);
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
     } else {
-        CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
     }
     AsyncCallbackWork(asyncContext);
     return promise;
@@ -148,10 +163,7 @@ napi_value JsPointerManager::IsPointerVisible(napi_env env, napi_value handle)
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    if (asyncContext == nullptr) {
-        THROWERR(env, "create AsyncContext failed");
-        return nullptr;
-    }
+    CHKPP(asyncContext);
 
     bool visible = InputManager::GetInstance()->IsPointerVisible();
     asyncContext->errorCode = ERR_OK;
@@ -159,10 +171,10 @@ napi_value JsPointerManager::IsPointerVisible(napi_env env, napi_value handle)
 
     napi_value promise = nullptr;
     if (handle != nullptr) {
-        CHKRP(env, napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
-        CHKRP(env, napi_get_undefined(env, &promise), GET_UNDEFINED);
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
     } else {
-        CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
     }
     AsyncCallbackWork(asyncContext);
     return promise;
@@ -172,18 +184,15 @@ napi_value JsPointerManager::SetPointerSpeed(napi_env env, int32_t pointerSpeed,
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    if (asyncContext == nullptr) {
-        THROWERR(env, "Create AsyncContext failed");
-        return nullptr;
-    }
+    CHKPP(asyncContext);
     asyncContext->errorCode = InputManager::GetInstance()->SetPointerSpeed(pointerSpeed);
     asyncContext->reserve << ReturnType::VOID;
     napi_value promise = nullptr;
     if (handle != nullptr) {
-        CHKRP(env, napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
-        CHKRP(env, napi_get_undefined(env, &promise), GET_UNDEFINED);
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
     } else {
-        CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
     }
     AsyncCallbackWork(asyncContext);
     return promise;
@@ -193,43 +202,17 @@ napi_value JsPointerManager::GetPointerSpeed(napi_env env, napi_value handle)
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    if (asyncContext == nullptr) {
-        THROWERR(env, "Create AsyncContext failed");
-        return nullptr;
-    }
+    CHKPP(asyncContext);
     int32_t pointerSpeed = 0;
     asyncContext->errorCode = InputManager::GetInstance()->GetPointerSpeed(pointerSpeed);
     asyncContext->reserve << ReturnType::NUMBER << pointerSpeed;
     napi_value promise = nullptr;
     uint32_t initial_refcount = 1;
     if (handle != nullptr) {
-        CHKRP(env, napi_create_reference(env, handle, initial_refcount, &asyncContext->callback), CREATE_REFERENCE);
-        CHKRP(env, napi_get_undefined(env, &promise), GET_UNDEFINED);
+        CHKRP(napi_create_reference(env, handle, initial_refcount, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
     } else {
-        CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
-    }
-    AsyncCallbackWork(asyncContext);
-    return promise;
-}
-
-napi_value JsPointerManager::SetPointerLocation(napi_env env, napi_value handle, int32_t x, int32_t y)
-{
-    CALL_DEBUG_ENTER;
-    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    if (asyncContext == nullptr) {
-        THROWERR(env, "create AsyncContext failed");
-        return nullptr;
-    }
-    asyncContext->errorCode = InputManager::GetInstance()->SetPointerLocation(x, y);
-    asyncContext->reserve << ReturnType::VOID;
-    napi_value promise = nullptr;
-    uint32_t initial_refcount = 1;
-    if (handle != nullptr) {
-        CHKRP(env, napi_create_reference(env, handle, initial_refcount, &asyncContext->callback), CREATE_REFERENCE);
-        CHKRP(env, napi_get_undefined(env, &promise), GET_UNDEFINED);
-        napi_delete_reference(env, asyncContext->callback);
-    } else {
-        CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
     }
     AsyncCallbackWork(asyncContext);
     return promise;
@@ -239,19 +222,16 @@ napi_value JsPointerManager::SetPointerStyle(napi_env env, int32_t windowid, int
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    if (asyncContext == nullptr) {
-        THROWERR(env, "Create AsyncContext failed");
-        return nullptr;
-    }
+    CHKPP(asyncContext);
     asyncContext->errorCode = InputManager::GetInstance()->SetPointerStyle(windowid, pointerStyle);
     asyncContext->reserve << ReturnType::VOID;
 
     napi_value promise = nullptr;
     if (handle != nullptr) {
-        CHKRP(env, napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
-        CHKRP(env, napi_get_undefined(env, &promise), GET_UNDEFINED);
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
     } else {
-        CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
     }
     AsyncCallbackWork(asyncContext);
     return promise;
@@ -261,19 +241,16 @@ napi_value JsPointerManager::GetPointerStyle(napi_env env, int32_t windowid, nap
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    if (asyncContext == nullptr) {
-        THROWERR(env, "Create AsyncContext failed");
-        return nullptr;
-    }
+    CHKPP(asyncContext);
     int32_t pointerStyle = 0;
     asyncContext->errorCode = InputManager::GetInstance()->GetPointerStyle(windowid, pointerStyle);
     asyncContext->reserve << ReturnType::NUMBER << pointerStyle;
     napi_value promise = nullptr;
     if (handle != nullptr) {
-        CHKRP(env, napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
-        CHKRP(env, napi_get_undefined(env, &promise), GET_UNDEFINED);
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
     } else {
-        CHKRP(env, napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
     }
     AsyncCallbackWork(asyncContext);
     return promise;

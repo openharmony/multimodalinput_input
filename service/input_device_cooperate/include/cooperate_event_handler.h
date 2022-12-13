@@ -23,10 +23,10 @@
 
 namespace OHOS {
 namespace MMI {
-class CooperateEventHandler : public AppExecFwk::EventHandler {
+class CooperateEventHandler final : public AppExecFwk::EventHandler {
 public:
     explicit CooperateEventHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
-    virtual ~CooperateEventHandler();
+    ~CooperateEventHandler() override = default;
     bool ProxyPostTask(const Callback &callback, int64_t delayTime);
     bool ProxyPostTask(const Callback &callback, const std::string &name = std::string(), int64_t delayTime = 0);
     void ProxyRemoveTask(const std::string &name);

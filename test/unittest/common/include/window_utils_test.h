@@ -42,7 +42,7 @@ private:
         Rosen::WindowMode mode;
         bool needAvoid { false };
         bool parentLimit { false };
-        std::string parentName;
+        uint32_t parentId;
         bool focusable_ { true };
         Rosen::Orientation orientation_ { Rosen::Orientation::UNSPECIFIED };
     };

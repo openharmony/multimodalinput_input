@@ -20,11 +20,11 @@
 
 namespace OHOS {
 namespace MMI {
-class InputDeviceCooperateStateIn : public IInputDeviceCooperateState {
+class InputDeviceCooperateStateIn final : public IInputDeviceCooperateState {
 public:
     explicit InputDeviceCooperateStateIn(const std::string &startDhid);
-    virtual int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId) override;
-    virtual int32_t StopInputDeviceCooperate(const std::string &networkId) override;
+    int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId) override;
+    int32_t StopInputDeviceCooperate(const std::string &networkId) override;
 
 private:
     void ComeBack(const std::string &sinkNetworkId, int32_t startInputDeviceId);

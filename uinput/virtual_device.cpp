@@ -25,7 +25,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace OHOS::HiviewDFX;
-constexpr HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "VirtualDevice"};
+constexpr HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "VirtualDevice" };
 constexpr uint32_t MAX_NAME_LENGTH = 80;
 
 bool DoIoctl(int32_t fd, int32_t request, const uint32_t value)
