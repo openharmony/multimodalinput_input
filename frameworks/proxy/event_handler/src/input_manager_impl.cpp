@@ -967,8 +967,8 @@ int32_t InputManagerImpl::EnterCaptureMode(int32_t windowId)
     }
     return ret;
 #else
-        MMI_HILOGW("Pointer device module does not support");
-        return ERROR_UNSUPPORT;
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -983,8 +983,8 @@ int32_t InputManagerImpl::LeaveCaptureMode(int32_t windowId)
     }
     return ret;
 #else
-        MMI_HILOGW("Pointer device module does not support");
-        return ERROR_UNSUPPORT;
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 } // namespace MMI
