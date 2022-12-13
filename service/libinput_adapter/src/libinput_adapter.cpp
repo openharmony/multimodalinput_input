@@ -30,16 +30,16 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "LibinputAdapter" };
-constexpr int32_t WAIT_TIME_FOR_INPUT { 500 };
-constexpr int32_t MAX_RETRY_COUNT = 60;
+constexpr int32_t WAIT_TIME_FOR_INPUT { 10 };
 } // namespace
 
 static void HiLogFunc(struct libinput* input, libinput_log_priority priority, const char* fmt, va_list args)
 {
     CHKPV(input);
-    char buffer[256];
+    CHKPV(fmt);
+    char buffer[256] = {};
     if (vsnprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1, fmt, args) == -1) {
-        MMI_HILOGE("Call vsnprintf_s fail");
+        MMI_HILOGE("Call vsnprintf_s failed");
         va_end(args);
         return;
     }
@@ -66,6 +66,12 @@ void LibinputAdapter::LoginfoPackagingTool(struct libinput_event *event)
     InitHiLogFunc(context);
 }
 
+int32_t LibinputAdapter::DeviceLedUpdate(struct libinput_device *device, int32_t funcKey, bool enable)
+{
+    CHKPR(device, RET_ERR);
+    return libinput_set_led_state(device, funcKey, enable);
+}
+
 constexpr static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
         if (path == nullptr) {
@@ -73,14 +79,9 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
             return RET_ERR;
         }
         char realPath[PATH_MAX] = {};
-        int32_t count = 0;
-        while ((realpath(path, realPath) == nullptr) && (count < MAX_RETRY_COUNT)) {
-            MMI_HILOGWK("Path is error, count: %{public}d, path:%{public}s", count, path);
+        if (realpath(path, realPath) == nullptr) {
             std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
-            ++count;
-        }
-        if (count >= MAX_RETRY_COUNT) {
-            MMI_HILOGWK("Retry %{public}d times realpath failed", count);
+            MMI_HILOGWK("The error path is %{public}s", path);
             return RET_ERR;
         }
         int32_t fd = open(realPath, flags);
@@ -94,10 +95,6 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
         close(fd);
     },
 };
-
-LibinputAdapter::LibinputAdapter() {}
-
-LibinputAdapter::~LibinputAdapter() {}
 
 bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_id)
 {
@@ -192,7 +189,8 @@ void LibinputAdapter::RetriggerHotplugEvents()
         MMI_HILOGE("Failed to open directory: \'/sys/class/input\'");
         return;
     }
-    for (struct dirent *pdirent = readdir(pdir); pdirent != nullptr; pdirent = readdir(pdir)) {
+    struct dirent *pdirent = nullptr;
+    while ((pdirent = readdir(pdir)) != nullptr) {
         char path[PATH_MAX];
         if (sprintf_s(path, sizeof(path), "/sys/class/input/%s/uevent", pdirent->d_name) < 0) {
             continue;
@@ -203,14 +201,14 @@ void LibinputAdapter::RetriggerHotplugEvents()
             continue;
         }
         if (fputs("add", fs) < 0) {
-            MMI_HILOGW("fputs error: %{public}s", strerror(errno));
+            MMI_HILOGW("fputs error:%{public}s", strerror(errno));
         }
         if (fclose(fs) != 0) {
-            MMI_HILOGW("fclose error: %{public}s", strerror(errno));
+            MMI_HILOGW("fclose error:%{public}s", strerror(errno));
         }
     }
     if (closedir(pdir) != 0) {
-        MMI_HILOGW("closedir error: %{public}s", strerror(errno));
+        MMI_HILOGW("closedir error:%{public}s", strerror(errno));
     }
 }
 } // namespace MMI

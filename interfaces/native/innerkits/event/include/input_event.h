@@ -295,13 +295,6 @@ public:
     void ClearFlag();
 
     /**
-     * @brief Assigns a new ID for an input event.
-     * @return void
-     * @since 9
-     */
-    void AssignNewId();
-
-    /**
      * @brief Marks an input event as completed.
      * This method can only be called once.
      * @return void
@@ -355,8 +348,6 @@ private:
     uint32_t bitwise_;
     std::function<void(int32_t)> processedCallback_;
 };
-
-std::ostream& operator<<(std::ostream&, InputEvent&);
 } // namespace MMI
 } // namespace OHOS
 #endif // INPUT_EVENT_H

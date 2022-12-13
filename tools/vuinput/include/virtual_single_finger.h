@@ -22,8 +22,8 @@ namespace MMI {
 class VirtualSingleFinger : public VirtualDevice {
 public:
     VirtualSingleFinger();
-    ~VirtualSingleFinger() = default;
     DISALLOW_COPY_AND_MOVE(VirtualSingleFinger);
+    ~VirtualSingleFinger() = default;
 };
 } // namespace MMI
 } // namespace OHOS

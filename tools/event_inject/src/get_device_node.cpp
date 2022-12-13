@@ -15,8 +15,8 @@
 
 #include "get_device_node.h"
 
-using namespace OHOS::MMI;
-
+namespace OHOS {
+namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetDeviceNode" };
 const std::string DEVICES_INFO_PATH = "/proc/bus/input/devices";
@@ -90,7 +90,7 @@ std::vector<std::string> GetDeviceNode::ReadDeviceFile()
     }
     FILE* fp = fopen(DEVICES_INFO_PATH.c_str(), "r");
     if (fp == nullptr) {
-        MMI_HILOGW("Open file: %{public}s failed", DEVICES_INFO_PATH.c_str());
+        MMI_HILOGW("Open file:%{public}s failed", DEVICES_INFO_PATH.c_str());
         return {};
     }
     char buf[READ_CMD_BUFF_SIZE] = {};
@@ -99,12 +99,12 @@ std::vector<std::string> GetDeviceNode::ReadDeviceFile()
         deviceStrs.push_back(buf);
     }
     if (fclose(fp) != 0) {
-        MMI_HILOGW("Close file: %{public}s failed", DEVICES_INFO_PATH.c_str());
+        MMI_HILOGW("Close file:%{public}s failed", DEVICES_INFO_PATH.c_str());
     }
     return deviceStrs;
 }
 
-void GetDeviceNode::AnalyseDevices(const std::vector<std::string>& deviceStrs, DeviceList& deviceList) const
+void GetDeviceNode::AnalyseDevices(const std::vector<std::string> &deviceStrs, DeviceList &deviceList) const
 {
     std::string name;
     for (const auto &item : deviceStrs) {
@@ -132,3 +132,5 @@ void GetDeviceNode::AnalyseDevices(const std::vector<std::string>& deviceStrs, D
         }
     }
 }
+} // namespace MMI
+} // namespace OHOS

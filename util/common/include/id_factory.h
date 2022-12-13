@@ -50,7 +50,7 @@ public:
     }
 
 private:
-    T seed_ = 0;
+    T seed_ { 0 };
     const T maxLimit_ = std::numeric_limits<T>::max();
     std::set<T> ids_;
 };

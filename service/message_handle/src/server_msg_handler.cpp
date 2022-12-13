@@ -27,14 +27,13 @@
 #include "input_event_handler.h"
 #include "input_event.h"
 #include "input_windows_manager.h"
-#include "key_event_handler.h"
-#include "key_event_subscriber.h"
+#include "key_event_normalize.h"
+#include "i_pointer_drawing_manager.h"
+#include "key_subscriber_handler.h"
+#include "libinput_adapter.h"
 #include "mmi_func_callback.h"
-#include "mouse_event_handler.h"
+#include "mouse_event_normalize.h"
 #include "time_cost_chk.h"
-#ifdef OHOS_BUILD_HDF
-#include "hdi_inject.h"
-#endif
 
 namespace OHOS {
 namespace MMI {
@@ -42,30 +41,14 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerMsgHandler" };
 } // namespace
 
-ServerMsgHandler::ServerMsgHandler() {}
-
-ServerMsgHandler::~ServerMsgHandler() {}
-
 void ServerMsgHandler::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
-#ifdef OHOS_BUILD_HDF
-    if (!(MMIHdiInject->Init(udsServer))) {
-        MMI_HILOGE("Input device initialization failed");
-        return;
-    }
-#endif
     MsgCallback funs[] = {
         {MmiMessageId::MARK_PROCESS, MsgCallbackBind2(&ServerMsgHandler::MarkProcessed, this)},
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
-#ifdef OHOS_BUILD_MMI_DEBUG
-        {MmiMessageId::BIGPACKET_TEST, MsgCallbackBind2(&ServerMsgHandler::OnBigPacketTest, this)},
-#endif // OHOS_BUILD_MMI_DEBUG
-#ifdef OHOS_BUILD_HDF
-        {MmiMessageId::HDI_INJECT, MsgCallbackBind2(&ServerMsgHandler::OnHdiInject, this)},
-#endif // OHOS_BUILD_HDF
     };
-    for (auto& it : funs) {
+    for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
             MMI_HILOGW("Failed to register event errCode:%{public}d", EVENT_REG_FAIL);
             continue;
@@ -89,27 +72,6 @@ void ServerMsgHandler::OnMsgHandler(SessionPtr sess, NetPacket& pkt)
     }
 }
 
-#ifdef OHOS_BUILD_HDF
-int32_t ServerMsgHandler::OnHdiInject(SessionPtr sess, NetPacket& pkt)
-{
-    MMI_HILOGI("Hdfinject server access hditools info");
-    CHKPR(sess, ERROR_NULL_POINTER);
-    CHKPR(udsServer_, ERROR_NULL_POINTER);
-    const int32_t processingCode = MMIHdiInject->ManageHdfInject(sess, pkt);
-    NetPacket pkt(MmiMessageId::HDI_INJECT);
-    pkt << processingCode;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write reply message failed");
-        return RET_ERR;
-    }
-    if (!sess->SendMsg(pkt)) {
-        MMI_HILOGE("OnHdiInject reply message error");
-        return RET_ERR;
-    }
-    return RET_OK;
-}
-#endif // OHOS_BUILD_HDF
-
 int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
@@ -117,7 +79,7 @@ int32_t ServerMsgHandler::MarkProcessed(SessionPtr sess, NetPacket& pkt)
     int32_t eventId = 0;
     int32_t eventType = 0;
     pkt >> eventId >> eventType;
-    MMI_HILOGD("event is: %{public}d", eventId);
+    MMI_HILOGD("Event type:%{public}d, id:%{public}d", eventType, eventId);
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read data failed");
         return PACKET_READ_FAIL;
@@ -131,10 +93,42 @@ int32_t ServerMsgHandler::OnInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEv
 {
     CALL_INFO_TRACE;
     CHKPR(keyEvent, ERROR_NULL_POINTER);
-    auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+    auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
     CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
     inputEventNormalizeHandler->HandleKeyEvent(keyEvent);
     MMI_HILOGD("Inject keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnGetFunctionKeyState(int32_t funcKey, bool &state)
+{
+    CALL_INFO_TRACE;
+    const auto &keyEvent = KeyEventHdr->GetKeyEvent();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    state = keyEvent->GetFunctionKey(funcKey);
+    MMI_HILOGD("Get the function key:%{public}d status as %{public}s", funcKey, state ? "open" : "close");
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnSetFunctionKeyState(int32_t funcKey, bool enable)
+{
+    CALL_INFO_TRACE;
+    auto device = InputDevMgr->GetKeyboardDevice();
+    CHKPR(device, ERROR_NULL_POINTER);
+    if (LibinputAdapter::DeviceLedUpdate(device, funcKey, enable) != RET_OK) {
+        MMI_HILOGE("Failed to set the keyboard led");
+        return RET_ERR;
+    }
+    int32_t state = libinput_get_funckey_state(device, funcKey);
+
+    auto keyEvent = KeyEventHdr->GetKeyEvent();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    int32_t ret = keyEvent->SetFunctionKey(funcKey, state);
+    if (ret != funcKey) {
+        MMI_HILOGE("Failed to enable the function key");
+        return RET_ERR;
+    }
+    MMI_HILOGD("Update function key:%{public}d succeed", funcKey);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -146,36 +140,32 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     pointerEvent->UpdateId();
     int32_t action = pointerEvent->GetPointerAction();
-    if ((action == PointerEvent::POINTER_ACTION_MOVE || action == PointerEvent::POINTER_ACTION_UP)
-        && targetWindowId_ > 0) {
-        pointerEvent->SetTargetWindowId(targetWindowId_);
-        PointerEvent::PointerItem pointerItem;
-        auto pointerIds = pointerEvent->GetPointerIds();
-        if (pointerIds.empty()) {
-            MMI_HILOGE("GetPointerIds is empty");
-            return RET_ERR;
-        }
-        auto id = pointerIds.front();
-        if (!pointerEvent->GetPointerItem(id, pointerItem)) {
-            MMI_HILOGE("Can't find pointer item");
-            return RET_ERR;
-        }
-        pointerItem.SetTargetWindowId(targetWindowId_);
-        pointerEvent->UpdatePointerItem(id, pointerItem);
-    }
     auto source = pointerEvent->GetSourceType();
     switch (source) {
         case PointerEvent::SOURCE_TYPE_TOUCHSCREEN: {
-            auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+            auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+            if (!FixTargetWindowId(pointerEvent, action)) {
+                return RET_ERR;
+            }
             inputEventNormalizeHandler->HandleTouchEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_TOUCH
             break;
         }
         case PointerEvent::SOURCE_TYPE_MOUSE:
-        case PointerEvent::SOURCE_TYPE_TOUCHPAD : {
-            auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+        case PointerEvent::SOURCE_TYPE_JOYSTICK:
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
+        case PointerEvent::SOURCE_TYPE_TOUCHPAD: {
+#ifdef OHOS_BUILD_ENABLE_POINTER
+            auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
+            if (!IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
+                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true);
+            }
             inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
+#endif // OHOS_BUILD_ENABLE_POINTER
             break;
         }
         default: {
@@ -183,12 +173,37 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             break;
         }
     }
-    if (action == PointerEvent::POINTER_ACTION_DOWN) {
+    if (source == PointerEvent::SOURCE_TYPE_TOUCHSCREEN && action == PointerEvent::POINTER_ACTION_DOWN) {
         targetWindowId_ = pointerEvent->GetTargetWindowId();
     }
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action)
+{
+    if (action == PointerEvent::POINTER_ACTION_DOWN || targetWindowId_ < 0) {
+        MMI_HILOGD("Down event or targetWindowId_ less 0 is not need fix window id");
+        return true;
+    }
+    pointerEvent->SetTargetWindowId(targetWindowId_);
+    PointerEvent::PointerItem pointerItem;
+    auto pointerIds = pointerEvent->GetPointerIds();
+    if (pointerIds.empty()) {
+        MMI_HILOGE("GetPointerIds is empty");
+        return false;
+    }
+    auto id = pointerIds.front();
+    if (!pointerEvent->GetPointerItem(id, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item");
+        return false;
+    }
+    pointerItem.SetTargetWindowId(targetWindowId_);
+    pointerEvent->UpdatePointerItem(id, pointerItem);
+    return true;
+}
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 {
@@ -208,15 +223,15 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
             >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
         displayGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read display info failed");
-        return RET_ERR;
-    }
+            MMI_HILOGE("Packet read display info failed");
+            return RET_ERR;
+        }
     }
     pkt >> num;
     for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
         pkt >> info.id >> info.x >> info.y >> info.width >> info.height
-            >> info.name >> info.uniq >> info.direction;
+            >> info.dpi >> info.name >> info.uniq >> info.direction;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read display info failed");
@@ -227,13 +242,13 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         MMI_HILOGE("Packet read display info failed");
         return RET_ERR;
     }
-    InputWindowsManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
+    WinMgr->UpdateDisplayInfo(displayGroupInfo);
     return RET_OK;
 }
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType,
-    HandleEventType eventType)
+    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGD("handlerType:%{public}d", handlerType);
@@ -241,7 +256,7 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType ha
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         auto interceptorHandler = InputHandler->GetInterceptorHandler();
         CHKPR(interceptorHandler, ERROR_NULL_POINTER);
-        return interceptorHandler->AddInputHandler(handlerType, eventType, sess);
+        return interceptorHandler->AddInputHandler(handlerType, eventType, priority, deviceTags, sess);
     }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
@@ -255,7 +270,7 @@ int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType ha
 }
 
 int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType handlerType,
-                                               HandleEventType eventType)
+    HandleEventType eventType, int32_t priority, uint32_t deviceTags)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
     MMI_HILOGD("OnRemoveInputHandler handlerType:%{public}d eventType:%{public}u", handlerType, eventType);
@@ -263,7 +278,7 @@ int32_t ServerMsgHandler::OnRemoveInputHandler(SessionPtr sess, InputHandlerType
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         auto interceptorHandler = InputHandler->GetInterceptorHandler();
         CHKPR(interceptorHandler, ERROR_NULL_POINTER);
-        interceptorHandler->RemoveInputHandler(handlerType, eventType, sess);
+        interceptorHandler->RemoveInputHandler(handlerType, eventType, priority, deviceTags, sess);
     }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 #ifdef OHOS_BUILD_ENABLE_MONITOR
@@ -295,7 +310,7 @@ int32_t ServerMsgHandler::OnMoveMouse(int32_t offsetX, int32_t offsetY)
     if (MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY)) {
         auto pointerEvent = MouseEventHdr->GetPointerEvent();
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
-        auto inputEventNormalizeHandler = InputHandler->GetInputEventNormalizeHandler();
+        auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
         inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
         MMI_HILOGD("Mouse movement message processed successfully");
@@ -330,64 +345,20 @@ int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid,
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-int32_t ServerMsgHandler::AddInputEventFilter(sptr<IEventFilter> filter)
+int32_t ServerMsgHandler::AddInputEventFilter(sptr<IEventFilter> filter,
+    int32_t filterId, int32_t priority, int32_t clientPid)
 {
     auto filterHandler = InputHandler->GetFilterHandler();
     CHKPR(filterHandler, ERROR_NULL_POINTER);
-    filterHandler->AddInputEventFilter(filter);
-    return RET_OK;
+    return filterHandler->AddInputEventFilter(filter, filterId, priority, clientPid);
+}
+
+int32_t ServerMsgHandler::RemoveInputEventFilter(int32_t clientPid, int32_t filterId)
+{
+    auto filterHandler = InputHandler->GetFilterHandler();
+    CHKPR(filterHandler, ERROR_NULL_POINTER);
+    return filterHandler->RemoveInputEventFilter(clientPid, filterId);   
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-
-#ifdef OHOS_BUILD_MMI_DEBUG
-int32_t ServerMsgHandler::OnBigPacketTest(SessionPtr sess, NetPacket& pkt)
-{
-    CHKPR(sess, ERROR_NULL_POINTER);
-    int32_t width = 0;
-    int32_t height = 0;
-    int32_t focusWindowId = 0;
-    pkt >> width >> height >> focusWindowId;
-    MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
-        width, height, focusWindowId);
-    uint32_t num = 0;
-    pkt >> num;
-    for (uint32_t i = 0; i < num; i++) {
-        WindowInfo info;
-        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
-            >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
-        MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
-            "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
-            "defaultHotAreas:size:%{public}zu,pointerHotAreas:size:%{public}zu,"
-            "agentWindowId:%{public}d,flags:%{public}d",
-            info.id, info.pid, info.uid, info.area.x, info.area.y, info.area.width,
-            info.area.height, info.defaultHotAreas.size(), info.pointerHotAreas.size(),
-            info.agentWindowId, info.flags);
-        for (const auto &win : info.defaultHotAreas) {
-            MMI_HILOGD("defaultHotAreas,x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
-                win.x, win.y, win.width, win.height);
-        }
-        for (const auto &pointer : info.pointerHotAreas) {
-            MMI_HILOGD("pointerHotAreas,x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
-                pointer.x, pointer.y, pointer.width, pointer.height);
-        }
-    }
-    pkt >> num;
-    for (uint32_t i = 0; i < num; i++) {
-        DisplayInfo info;
-        pkt >> info.id >> info.x >> info.y >> info.width >> info.height
-            >> info.name >> info.uniq >> info.direction;
-        MMI_HILOGD("displaysInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
-            "width:%{public}d,height:%{public}d,name:%{public}s,"
-            "uniq:%{public}s,direction:%{public}d",
-            info.id, info.x, info.y, info.width, info.height, info.name.c_str(),
-            info.uniq.c_str(), info.direction);
-    }
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet read data failed");
-        return PACKET_READ_FAIL;
-    }
-    return RET_OK;
-}
-#endif // OHOS_BUILD_MMI_DEBUG
 } // namespace MMI
 } // namespace OHOS

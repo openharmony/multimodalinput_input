@@ -31,6 +31,7 @@ public:
     void ShowUsage();
 private:
     void InitializeMouseDeathStub();
+    void SleepAndUpdateTime(int64_t &currentTimeMs);
     int32_t NextPos(int64_t begTimeMs, int64_t curtTimeMs, int32_t totalTimeMs, int32_t begPos, int32_t endPos);
 };
 } // namespace MMI

@@ -18,20 +18,18 @@
 
 #include "get_device_object.h"
 #include "get_device_node.h"
-#include "send_message.h"
 
 namespace OHOS {
 namespace MMI {
 class ManageInjectDevice {
 public:
     ManageInjectDevice() = default;
-    ~ManageInjectDevice() = default;
     DISALLOW_COPY_AND_MOVE(ManageInjectDevice);
-    int32_t TransformJsonData(const DeviceItems& configData);
+    ~ManageInjectDevice() = default;
+    int32_t TransformJsonData(const DeviceItems &configData);
 private:
-    int32_t SendEvent(const InputEventArray& inputEventArray);
-    int32_t SendEventToHdi(const InputEventArray& inputEventArray);
-    int32_t SendEventToDeviceNode(const InputEventArray& inputEventArray);
+    int32_t SendEvent(const InputEventArray &inputEventArray);
+    int32_t SendEventToDeviceNode(const InputEventArray &inputEventArray);
 private:
     GetDeviceNode getDeviceNodeObject_;
 };

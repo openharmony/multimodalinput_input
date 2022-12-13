@@ -26,10 +26,20 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MarkConsumedFuzzTest" };
 } // namespace
+
+class InputEventConsumerTest : public IInputEventConsumer {
+public:
+    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
+    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+    {
+        MMI_HILOGD("Report pointer event success");
+    };
+    virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
+};
+
 template<class T>
-T GetObject(const uint8_t *data, size_t size)
+size_t GetObject(const uint8_t *data, size_t size, T &object)
 {
-    T object;
     size_t objectSize = sizeof(object);
     if (objectSize > size) {
         return 0;
@@ -38,15 +48,18 @@ T GetObject(const uint8_t *data, size_t size)
     if (ret != EOK) {
         return 0;
     }
-    return object;
+    return objectSize;
 }
 
 void MarkConsumedFuzzTest(const uint8_t* data, size_t size)
 {
     CALL_DEBUG_ENTER;
-    int32_t monitorId = GetObject<int32_t>(data, size);
-    int32_t eventId = GetObject<int32_t>(data, size);
+    int32_t eventId;
+    GetObject<int32_t>(data, size, eventId);
+    auto consumer = std::make_shared<InputEventConsumerTest>();
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(consumer);
     InputManager::GetInstance()->MarkConsumed(monitorId, eventId);
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 } // namespace MMI
 } // namespace OHOS

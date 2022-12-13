@@ -22,8 +22,8 @@ namespace MMI {
 class VirtualTrackpadMouse : public VirtualDevice {
 public:
     VirtualTrackpadMouse();
-    ~VirtualTrackpadMouse() = default;
     DISALLOW_COPY_AND_MOVE(VirtualTrackpadMouse);
+    ~VirtualTrackpadMouse() = default;
 };
 } // namespace MMI
 } // namespace OHOS

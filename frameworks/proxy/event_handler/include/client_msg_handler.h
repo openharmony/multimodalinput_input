@@ -23,11 +23,11 @@
 namespace OHOS {
 namespace MMI {
 typedef std::function<int32_t(const UDSClient&, NetPacket&)> ClientMsgFun;
-class ClientMsgHandler : public MsgHandler<MmiMessageId, ClientMsgFun> {
+class ClientMsgHandler final : public MsgHandler<MmiMessageId, ClientMsgFun> {
 public:
     ClientMsgHandler() = default;
-    virtual ~ClientMsgHandler();
     DISALLOW_COPY_AND_MOVE(ClientMsgHandler);
+    ~ClientMsgHandler() override = default;
 
     void Init();
     void InitProcessedCallback();
@@ -58,9 +58,13 @@ protected:
     int32_t OnInputKeyboardType(const UDSClient& client, NetPacket& pkt);
     int32_t OnDevListener(const UDSClient& client, NetPacket& pkt);
     int32_t OnAnr(const UDSClient& client, NetPacket& pkt);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    int32_t OnCooperationListener(const UDSClient& client, NetPacket& pkt);
+    int32_t OnCooperationMessage(const UDSClient& client, NetPacket& pkt);
+    int32_t OnCooperationState(const UDSClient& client, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
-    static void OnEventProcessed(int32_t eventId, int32_t eventType);
     static void OnDispatchEventProcessed(int32_t eventId);
 
 private:

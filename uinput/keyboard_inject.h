@@ -20,17 +20,15 @@
 #include <memory>
 #include <mutex>
 
-#include "nocopyable.h"
 #include "singleton.h"
 
 #include "inject_thread.h"
 
 namespace OHOS {
 namespace MMI {
-class KeyboardInject : public Singleton<KeyboardInject> {
+class KeyboardInject final {
+    DECLARE_DELAYED_SINGLETON(KeyboardInject);
 public:
-    KeyboardInject();
-    virtual ~KeyboardInject() = default;
     DISALLOW_COPY_AND_MOVE(KeyboardInject);
     void InjectKeyEvent(uint16_t code, uint32_t value) const;
 

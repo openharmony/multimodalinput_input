@@ -22,8 +22,8 @@ namespace MMI {
 class VirtualGamePad : public VirtualDevice {
 public:
     VirtualGamePad();
-    ~VirtualGamePad() = default;
     DISALLOW_COPY_AND_MOVE(VirtualGamePad);
+    ~VirtualGamePad() = default;
 };
 } // namespace MMI
 } // namespace OHOS

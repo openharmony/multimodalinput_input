@@ -35,8 +35,8 @@ class ProcessingPenDevice : public DeviceBase {
     };
 public:
     ProcessingPenDevice() = default;
-    ~ProcessingPenDevice() = default;
     DISALLOW_COPY_AND_MOVE(ProcessingPenDevice);
+    ~ProcessingPenDevice() = default;
     int32_t TransformJsonDataToInputData(const DeviceItem& inputEventArrays, InputEventArray& inputEventArray);
 private:
     void TransformPenEventToInputEvent(const std::vector<PenEvent>& penEventArray, InputEventArray& inputEventArray);

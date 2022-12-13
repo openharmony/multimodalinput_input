@@ -15,14 +15,13 @@
 
 #include <gtest/gtest.h>
 
-#include "event_dispatch.h"
+#include "event_dispatch_handler.h"
 #include "define_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-using namespace OHOS::MMI;
 } // namespace
 
 class EventDispatchTest : public testing::Test {

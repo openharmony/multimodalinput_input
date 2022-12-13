@@ -22,8 +22,8 @@ namespace MMI {
 class VirtualKeyboard : public VirtualDevice {
 public:
     VirtualKeyboard();
-    ~VirtualKeyboard() = default;
     DISALLOW_COPY_AND_MOVE(VirtualKeyboard);
+    ~VirtualKeyboard() = default;
 };
 } // namespace MMI
 } // namespace OHOS

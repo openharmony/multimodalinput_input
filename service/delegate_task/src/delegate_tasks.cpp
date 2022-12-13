@@ -42,6 +42,18 @@ void DelegateTasks::Task::ProcessTask()
     }
 }
 
+DelegateTasks::~DelegateTasks()
+{
+    if (fds_[0] >= 0) {
+        close(fds_[0]);
+        fds_[0] = -1;
+    }
+    if (fds_[1] >= 0) {
+        close(fds_[1]);
+        fds_[1] = -1;
+    }
+}
+
 bool DelegateTasks::Init()
 {
     CALL_DEBUG_ENTER;
@@ -52,10 +64,12 @@ bool DelegateTasks::Init()
     }
     if (fcntl(fds_[0], F_SETFL, O_NONBLOCK) == -1) {
         MMI_HILOGE("The fcntl read failed,errno:%{public}d", errno);
+        close(fds_[0]);
         return false;
     }
     if (fcntl(fds_[1], F_SETFL, O_NONBLOCK) == -1) {
         MMI_HILOGE("The fcntl write failed,errno:%{public}d", errno);
+        close(fds_[1]);
         return false;
     }
     return true;
@@ -74,6 +88,7 @@ void DelegateTasks::ProcessTasks()
 int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(callback, ERROR_NULL_POINTER);
     if (IsCallFromWorkerThread()) {
         return callback();
     }
@@ -101,6 +116,7 @@ int32_t DelegateTasks::PostSyncTask(DTaskCallback callback)
 
 int32_t DelegateTasks::PostAsyncTask(DTaskCallback callback)
 {
+    CHKPR(callback, ERROR_NULL_POINTER);
     if (IsCallFromWorkerThread()) {
         return callback();
     }
@@ -151,11 +167,6 @@ DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *
         return nullptr;
     }
     TaskPtr task = std::make_shared<Task>(id, callback, promise);
-    if (task == nullptr) {
-        RecoveryId(id);
-        MMI_HILOGE("Make task failed");
-        return nullptr;
-    }
     tasks_.push(task);
     std::string taskType = ((promise == nullptr) ? "Async" : "Sync");
     MMI_HILOGD("Post %{public}s", taskType.c_str());

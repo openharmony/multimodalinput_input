@@ -22,8 +22,8 @@ namespace MMI {
 class VirtualTrackpadSysCtrl : public VirtualDevice {
 public:
     VirtualTrackpadSysCtrl();
-    ~VirtualTrackpadSysCtrl() = default;
     DISALLOW_COPY_AND_MOVE(VirtualTrackpadSysCtrl);
+    ~VirtualTrackpadSysCtrl() = default;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -25,8 +25,8 @@ namespace MMI {
 class DeviceBase {
 public:
     DeviceBase() = default;
-    virtual ~DeviceBase() = default;
     DISALLOW_COPY_AND_MOVE(DeviceBase);
+    virtual ~DeviceBase() = default;
     virtual int32_t TransformJsonDataToInputData(const DeviceItem& inputEventArrays,
                                                  InputEventArray& inputEventArray) = 0;
     void SetTimeToLibinputEvent(InjectEvent& injectEvent);
@@ -73,8 +73,8 @@ public:
     void SetThrottle(InputEventArray& inputEventArray, int64_t blockTime, int32_t value);
     void SetSynMtReport(InputEventArray& inputEventArray, int64_t blockTime, int32_t value = 0);
 private:
-    static constexpr int32_t BTN_STYLUS_DEFAULT_CODE = 331;
-    static constexpr int32_t BTN_MSC_SERIAL_DEFAULT_VALUE = 0xA806D21;
+    static constexpr int32_t BTN_STYLUS_DEFAULT_CODE { 331 };
+    static constexpr int32_t BTN_MSC_SERIAL_DEFAULT_VALUE { 0xA806D21 };
 };
 } // namespace MMI
 } // namespace OHOS

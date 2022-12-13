@@ -28,8 +28,9 @@
 
 namespace OHOS {
 namespace MMI {
-class DeviceProfileAdapter : public DelayedSingleton<DeviceProfileAdapter> {
-    class ProfileEventCallbackImpl : public DeviceProfile::IProfileEventCallback {
+class DeviceProfileAdapter final {
+    DECLARE_DELAYED_SINGLETON(DeviceProfileAdapter);
+    class ProfileEventCallbackImpl final : public DeviceProfile::IProfileEventCallback {
     public:
         void OnSyncCompleted(const DeviceProfile::SyncResult &syncResults) override;
         void OnProfileChanged(const DeviceProfile::ProfileChangeNotification &changeNotification) override;
@@ -37,14 +38,12 @@ class DeviceProfileAdapter : public DelayedSingleton<DeviceProfileAdapter> {
 public:
     using ProfileEventCallback = std::shared_ptr<DeviceProfile::IProfileEventCallback>;
     using DPCallback = std::function<void(const std::string &, bool)>;
-    DeviceProfileAdapter();
-    ~DeviceProfileAdapter();
     DISALLOW_COPY_AND_MOVE(DeviceProfileAdapter);
 
     int32_t UpdateCrossingSwitchState(bool state);
     int32_t UpdateCrossingSwitchState(bool state, const std::vector<std::string> &deviceIds);
     bool GetCrossingSwitchState(const std::string &deviceId);
-    int32_t RegisterCrossingStateListener(const std::string &deviceId, ProfileEventCallback callback);
+    int32_t RegisterCrossingStateListener(const std::string &deviceId, DPCallback callback);
     int32_t UnregisterCrossingStateListener(const std::string &deviceId);
 
 private:
@@ -52,10 +51,10 @@ private:
     void OnProfileChanged(const std::string &deviceId);
     std::map<std::string, DeviceProfileAdapter::ProfileEventCallback> profileEventCallbacks_;
     std::mutex adapterLock_;
-    std::map<std::string, DPCallback> callbacks_;
+    std::map<std::string, DeviceProfileAdapter::DPCallback> callbacks_;
 };
 
-#define DProfileAdapter DeviceProfileAdapter::GetInstance()
+#define DProfileAdapter ::OHOS::DelayedSingleton<DeviceProfileAdapter>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 

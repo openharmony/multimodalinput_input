@@ -22,8 +22,8 @@ namespace MMI {
 class VirtualKnobConsumerCtrl : public VirtualDevice {
 public:
     VirtualKnobConsumerCtrl();
-    ~VirtualKnobConsumerCtrl() = default;
     DISALLOW_COPY_AND_MOVE(VirtualKnobConsumerCtrl);
+    ~VirtualKnobConsumerCtrl() = default;
 };
 } // namespace MMI
 } // namespace OHOS

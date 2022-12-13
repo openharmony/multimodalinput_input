@@ -24,8 +24,8 @@ namespace MMI {
 class ProcessingGamePadDevice : public DeviceBase {
 public:
     ProcessingGamePadDevice() = default;
-    ~ProcessingGamePadDevice() = default;
     DISALLOW_COPY_AND_MOVE(ProcessingGamePadDevice);
+    ~ProcessingGamePadDevice() = default;
     int32_t TransformJsonDataToInputData(const DeviceItem& originalEvent, InputEventArray& inputEventArray);
 private:
     void TransformPadEventToInputEvent(const std::vector<DeviceEvent>& inputData,

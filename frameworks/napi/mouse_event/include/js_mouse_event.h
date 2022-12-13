@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace MMI {
-class JsMouseEvent {
+class JsMouseEvent final {
 public:
     JsMouseEvent() = default;
     ~JsMouseEvent() = default;

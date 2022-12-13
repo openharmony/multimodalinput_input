@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace MMI {
-class JsKeyCode {
+class JsKeyCode final {
 public:
     JsKeyCode() = default;
     ~JsKeyCode() = default;

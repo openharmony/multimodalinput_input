@@ -31,17 +31,22 @@ public:
     IInputEventHandler() = default;
     DISALLOW_COPY_AND_MOVE(IInputEventHandler);
     virtual ~IInputEventHandler() = default;
-    virtual void HandleEvent(libinput_event* event) {};
-    virtual void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) {};
-    virtual void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) {};
-    virtual void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) {};
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    virtual void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) = 0;
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    virtual void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    virtual void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
+#endif // OHOS_BUILD_ENABLE_TOUCH
     virtual void SetNext(std::shared_ptr<IInputEventHandler> nextHandler)
     {
         nextHandler_ = nextHandler;
     };
 
 protected:
-    std::shared_ptr<IInputEventHandler> nextHandler_ = nullptr;
+    std::shared_ptr<IInputEventHandler> nextHandler_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS

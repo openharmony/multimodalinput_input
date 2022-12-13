@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace MMI {
-class JsTouchEvent {
+class JsTouchEvent final {
 public:
     JsTouchEvent() = default;
     ~JsTouchEvent() = default;

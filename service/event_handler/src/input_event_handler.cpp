@@ -25,8 +25,10 @@
 #include <unistd.h>
 
 #include "libinput.h"
-
-#include "key_command_manager.h"
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+#include "input_device_cooperate_sm.h"
+#endif // OHOS_BUILD_ENABLE_COOPERATE
+#include "key_command_handler.h"
 #include "timer_manager.h"
 #include "util.h"
 
@@ -65,8 +67,12 @@ void InputEventHandler::OnEvent(void *event)
     int64_t beginTime = GetSysClockTime();
     MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
                "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType, beginTime);
-    CHKPV(inputEventNormalizeHandler_);
-    inputEventNormalizeHandler_->HandleEvent(lpEvent);
+    CHKPV(eventNormalizeHandler_);
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    InputDevCooSM->HandleEvent(lpEvent);
+#else
+    eventNormalizeHandler_->HandleEvent(lpEvent);
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     int64_t endTime = GetSysClockTime();
     int64_t lostTime = endTime - beginTime;
     MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
@@ -75,48 +81,41 @@ void InputEventHandler::OnEvent(void *event)
 
 int32_t InputEventHandler::BuildInputHandlerChain()
 {
-    inputEventNormalizeHandler_ = std::make_shared<InputEventNormalizeHandler>();
-    CHKPR(inputEventNormalizeHandler_, ERROR_NULL_POINTER);
+    eventNormalizeHandler_ = std::make_shared<EventNormalizeHandler>();
 #if !defined(OHOS_BUILD_ENABLE_KEYBOARD) && !defined(OHOS_BUILD_ENABLE_POINTER) && !defined(OHOS_BUILD_ENABLE_TOUCH)
     return RET_OK;
 #endif // !OHOS_BUILD_ENABLE_KEYBOARD && !OHOS_BUILD_ENABLE_POINTER && !OHOS_BUILD_ENABLE_TOUCH
 
-    std::shared_ptr<IInputEventHandler> tmp = inputEventNormalizeHandler_;
+    std::shared_ptr<IInputEventHandler> handler = eventNormalizeHandler_;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    eventfilterHandler_ = std::make_shared<EventFilterWrap>();
-    CHKPR(eventfilterHandler_, ERROR_NULL_POINTER);
-    tmp->SetNext(eventfilterHandler_);
-    tmp = eventfilterHandler_;
+    eventFilterHandler_ = std::make_shared<EventFilterHandler>();
+    handler->SetNext(eventFilterHandler_);
+    handler = eventFilterHandler_;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-    interceptorHandler_  = std::make_shared<EventInterceptorHandler>();
-    CHKPR(interceptorHandler_, ERROR_NULL_POINTER);
-    tmp->SetNext(interceptorHandler_);
-    tmp = interceptorHandler_;
+    eventInterceptorHandler_  = std::make_shared<EventInterceptorHandler>();
+    handler->SetNext(eventInterceptorHandler_);
+    handler = eventInterceptorHandler_;
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_COMBINATION_KEY
-    auto keyCommandHandler = std::make_shared<KeyCommandManager>();
-    CHKPR(keyCommandHandler, ERROR_NULL_POINTER);
-    tmp->SetNext(keyCommandHandler);
-    tmp = keyCommandHandler;
+    eventKeyCommandHandler_ = std::make_shared<KeyCommandHandler>();
+    handler->SetNext(eventKeyCommandHandler_);
+    handler = eventKeyCommandHandler_;
 #endif // OHOS_BUILD_ENABLE_COMBINATION_KEY
-    subscriberHandler_ = std::make_shared<KeyEventSubscriber>();
-    CHKPR(subscriberHandler_, ERROR_NULL_POINTER);
-    tmp->SetNext(subscriberHandler_);
-    tmp = subscriberHandler_;
+    eventSubscriberHandler_ = std::make_shared<KeySubscriberHandler>();
+    handler->SetNext(eventSubscriberHandler_);
+    handler = eventSubscriberHandler_;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-    monitorHandler_ = std::make_shared<EventMonitorHandler>();
-    CHKPR(monitorHandler_, ERROR_NULL_POINTER);
-    tmp->SetNext(monitorHandler_);
-    tmp = monitorHandler_;
+    eventMonitorHandler_ = std::make_shared<EventMonitorHandler>();
+    handler->SetNext(eventMonitorHandler_);
+    handler = eventMonitorHandler_;
 #endif // OHOS_BUILD_ENABLE_MONITOR
-    auto dispatchHandler = std::make_shared<EventDispatch>();
-    CHKPR(dispatchHandler, ERROR_NULL_POINTER);
-    tmp->SetNext(dispatchHandler);
+    auto dispatchHandler = std::make_shared<EventDispatchHandler>();
+    handler->SetNext(dispatchHandler);
     return RET_OK;
 }
 
@@ -125,29 +124,46 @@ UDSServer* InputEventHandler::GetUDSServer() const
     return udsServer_;
 }
 
-std::shared_ptr<InputEventNormalizeHandler> InputEventHandler::GetInputEventNormalizeHandler() const
+std::shared_ptr<EventNormalizeHandler> InputEventHandler::GetEventNormalizeHandler() const
 {
-    return inputEventNormalizeHandler_;
+    return eventNormalizeHandler_;
 }
 
 std::shared_ptr<EventInterceptorHandler> InputEventHandler::GetInterceptorHandler() const
 {
-    return interceptorHandler_;
+    return eventInterceptorHandler_;
 }
 
-std::shared_ptr<KeyEventSubscriber> InputEventHandler::GetSubscriberHandler() const
+std::shared_ptr<KeySubscriberHandler> InputEventHandler::GetSubscriberHandler() const
 {
-    return subscriberHandler_;
+    return eventSubscriberHandler_;
+}
+
+std::shared_ptr<KeyCommandHandler> InputEventHandler::GetKeyCommandHandler() const
+{
+    return eventKeyCommandHandler_;
 }
 
 std::shared_ptr<EventMonitorHandler> InputEventHandler::GetMonitorHandler() const
 {
-    return monitorHandler_;
+    return eventMonitorHandler_;
 }
 
-std::shared_ptr<EventFilterWrap> InputEventHandler::GetFilterHandler() const
+std::shared_ptr<EventFilterHandler> InputEventHandler::GetFilterHandler() const
 {
-    return eventfilterHandler_;
+    return eventFilterHandler_;
 }
+
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+void InputEventHandler::SetJumpInterceptState(bool isJump)
+{
+    isJumpIntercept_ = isJump;
+}
+
+bool InputEventHandler::GetJumpInterceptState() const
+{
+    return isJumpIntercept_;
+}
+#endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace MMI
 } // namespace OHOS

@@ -459,5 +459,58 @@ int32_t InputTransformationKeyValue(int32_t keyCode)
     }
     return INVALID_KEY_CODE;
 }
+
+namespace {
+const std::map<int64_t, int32_t> MAP_KEY_INTENTION = {
+    {(int64_t)KeyEvent::KEYCODE_DPAD_UP, KeyEvent::INTENTION_UP},
+    {(int64_t)KeyEvent::KEYCODE_DPAD_DOWN, KeyEvent::INTENTION_DOWN},
+    {(int64_t)KeyEvent::KEYCODE_DPAD_LEFT, KeyEvent::INTENTION_LEFT},
+    {(int64_t)KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::INTENTION_RIGHT},
+    {(int64_t)KeyEvent::KEYCODE_SPACE, KeyEvent::INTENTION_SELECT},
+    {(int64_t)KeyEvent::KEYCODE_NUMPAD_ENTER, KeyEvent::INTENTION_SELECT},
+    {(int64_t)KeyEvent::KEYCODE_ESCAPE, KeyEvent::INTENTION_ESCAPE},
+    {((int64_t)KeyEvent::KEYCODE_ALT_LEFT << 16) + KeyEvent::KEYCODE_DPAD_LEFT, KeyEvent::INTENTION_BACK},
+    {((int64_t)KeyEvent::KEYCODE_ALT_LEFT << 16) + KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::INTENTION_FORWARD},
+    {((int64_t)KeyEvent::KEYCODE_ALT_RIGHT << 16) + KeyEvent::KEYCODE_DPAD_LEFT, KeyEvent::INTENTION_BACK},
+    {((int64_t)KeyEvent::KEYCODE_ALT_RIGHT << 16) + KeyEvent::KEYCODE_DPAD_RIGHT, KeyEvent::INTENTION_FORWARD},
+    {((int64_t)KeyEvent::KEYCODE_SHIFT_LEFT << 16) + KeyEvent::KEYCODE_F10, KeyEvent::INTENTION_MENU},
+    {((int64_t)KeyEvent::KEYCODE_SHIFT_RIGHT << 16) + KeyEvent::KEYCODE_F10, KeyEvent::INTENTION_MENU},
+    {(int64_t)KeyEvent::KEYCODE_COMPOSE, KeyEvent::INTENTION_MENU},
+    {(int64_t)KeyEvent::KEYCODE_PAGE_UP, KeyEvent::INTENTION_PAGE_UP},
+    {(int64_t)KeyEvent::KEYCODE_PAGE_DOWN, KeyEvent::INTENTION_PAGE_DOWN},
+    {((int64_t)KeyEvent::KEYCODE_CTRL_LEFT << 16) + KeyEvent::KEYCODE_PLUS, KeyEvent::INTENTION_ZOOM_OUT},
+    {((int64_t)KeyEvent::KEYCODE_CTRL_RIGHT << 16) + KeyEvent::KEYCODE_PLUS, KeyEvent::INTENTION_ZOOM_OUT},
+    {((int64_t)KeyEvent::KEYCODE_CTRL_LEFT << 16) + KeyEvent::KEYCODE_NUMPAD_ADD, KeyEvent::INTENTION_ZOOM_OUT},
+    {((int64_t)KeyEvent::KEYCODE_CTRL_RIGHT << 16) + KeyEvent::KEYCODE_NUMPAD_ADD, KeyEvent::INTENTION_ZOOM_OUT},
+    {((int64_t)KeyEvent::KEYCODE_CTRL_LEFT << 16) + KeyEvent::KEYCODE_MINUS, KeyEvent::INTENTION_ZOOM_IN},
+    {((int64_t)KeyEvent::KEYCODE_CTRL_RIGHT << 16) + KeyEvent::KEYCODE_MINUS, KeyEvent::INTENTION_ZOOM_IN},
+    {((int64_t)KeyEvent::KEYCODE_CTRL_LEFT << 16) + KeyEvent::KEYCODE_NUMPAD_SUBTRACT, KeyEvent::INTENTION_ZOOM_IN},
+    {((int64_t)KeyEvent::KEYCODE_CTRL_RIGHT << 16) + KeyEvent::KEYCODE_NUMPAD_SUBTRACT, KeyEvent::INTENTION_ZOOM_IN},
+    {(int64_t)KeyEvent::KEYCODE_VOLUME_MUTE, KeyEvent::INTENTION_MEDIA_MUTE},
+    {(int64_t)KeyEvent::KEYCODE_MUTE, KeyEvent::INTENTION_MEDIA_MUTE},
+    {(int64_t)KeyEvent::KEYCODE_VOLUME_UP, KeyEvent::INTENTION_VOLUTE_UP},
+    {(int64_t)KeyEvent::KEYCODE_VOLUME_DOWN, KeyEvent::INTENTION_VOLUTE_DOWN},
+    {(int64_t)KeyEvent::KEYCODE_APPSELECT, KeyEvent::INTENTION_SELECT},
+    {(int64_t)KeyEvent::KEYCODE_BACK, KeyEvent::INTENTION_BACK},
+    {(int64_t)KeyEvent::KEYCODE_MOVE_HOME, KeyEvent::INTENTION_HOME},
+};
+} // namespace
+
+int32_t keyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items)
+{
+    if (items.size() < 1 || items.size() > 3) {
+        return KeyEvent::INTENTION_UNKNOWN;
+    }
+
+    int64_t keyCodes = 0;
+    for (const auto &item : items) {
+        keyCodes = (keyCodes << 16) + item.GetKeyCode();
+    }
+    auto iter = MAP_KEY_INTENTION.find(keyCodes);
+    if (iter == MAP_KEY_INTENTION.end()) {
+        return KeyEvent::INTENTION_UNKNOWN;
+    }
+    return iter->second;
+}
 } // namespace MMI
 } // namespace OHOS
