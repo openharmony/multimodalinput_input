@@ -278,7 +278,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     CALL_DEBUG_ENTER;
     CHKPV(work);
     if (work->data == nullptr) {
-        MMI_HILOGE("Check data is null");
+        MMI_HILOGE("Check data is nullptr");
         delete work;
         work = nullptr;
         return;
