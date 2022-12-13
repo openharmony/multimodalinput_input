@@ -37,21 +37,24 @@ public:
     {
         return tokenType_;
     }
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter);
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority);
+    int32_t RemoveInputEventFilter(int32_t filterId);
     int32_t SetPointerVisible(bool visible);
     int32_t IsPointerVisible(bool &visible);
     int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed(int32_t &speed);
     int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle);
     int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle);
-    int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys);
-    int32_t GetDeviceIds(int32_t userData);
-    int32_t GetDevice(int32_t userData, int32_t id);
+    int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke);
+    int32_t GetDeviceIds(std::vector<int32_t> &ids);
+    int32_t GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice);
     int32_t RegisterDevListener();
     int32_t UnregisterDevListener();
-    int32_t GetKeyboardType(int32_t userData, int32_t deviceId);
-    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType);
-    int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType);
+    int32_t GetKeyboardType(int32_t deviceId, int32_t &keyboardType);
+    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
+        uint32_t deviceTags);
+    int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
+        uint32_t deviceTags);
     int32_t MarkEventConsumed(int32_t eventId);
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY);
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
@@ -68,6 +71,7 @@ public:
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
+    int32_t SetPointerLocation(int32_t x, int32_t y);
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
 
 private:

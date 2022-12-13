@@ -32,6 +32,7 @@ public:
     virtual ~EventFilterStub() = default;
     int32_t OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply, MessageOption& options) override;
 protected:
+    int32_t StubHandleKeyEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubHandlePointerEvent(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace MMI

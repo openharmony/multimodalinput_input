@@ -27,28 +27,28 @@ enum Direction {
      *
      * @since 9
      */
-    Direction0,
+    DIRECTION0,
 
     /**
      * Rotating the display clockwise by 90 degrees
      *
      * @since 9
      */
-    Direction90,
+    DIRECTION90,
 
     /**
      * Rotating the display clockwise by 180 degrees
      *
      * @since 9
      */
-    Direction180,
+    DIRECTION180,
 
     /**
      * Rotating the display clockwise by 270 degrees
      *
      * @since 9
      */
-    Direction270
+    DIRECTION270
 };
 
 struct Rect {
@@ -198,6 +198,13 @@ struct DisplayInfo {
      * @since 9
      */
     int32_t height;
+
+    /**
+     * 像素密度，表示一英寸包含的像素点数。
+     *
+     * @since 10
+     */
+    int32_t dpi;
 
     /**
      * Name of the physical display, which is used for debugging

@@ -32,7 +32,6 @@ IInputDeviceCooperateState::IInputDeviceCooperateState()
     runner_ = AppExecFwk::EventRunner::Create(true);
     CHKPL(runner_);
     eventHandler_ = std::make_shared<CooperateEventHandler>(runner_);
-    CHKPL(eventHandler_);
 }
 
 int32_t IInputDeviceCooperateState::PrepareAndStart(const std::string &srcNetworkId, int32_t startInputDeviceId)
@@ -73,7 +72,7 @@ void IInputDeviceCooperateState::OnPrepareDistributedInput(
         std::function<void()> handleStartDinputFunc =
             std::bind(&IInputDeviceCooperateState::StartRemoteInput, this, startInputDeviceId);
         CHKPV(eventHandler_);
-        eventHandler_->PostTask(handleStartDinputFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
+        eventHandler_->ProxyPostTask(handleStartDinputFunc, taskName, 0);
     }
 }
 
@@ -105,7 +104,7 @@ void IInputDeviceCooperateState::OnStartRemoteInput(
     std::function<void()> handleStartFinishFunc =
         std::bind(&InputDeviceCooperateSM::OnStartFinish, InputDevCooSM, isSuccess, srcNetworkId, startInputDeviceId);
     CHKPV(eventHandler_);
-    eventHandler_->PostTask(handleStartFinishFunc, taskName, 0, AppExecFwk::EventQueue::Priority::HIGH);
+    eventHandler_->ProxyPostTask(handleStartFinishFunc, taskName, 0);
 }
 
 bool IInputDeviceCooperateState::NeedPrepare(const std::string &srcNetworkId, const std::string &sinkNetworkId)

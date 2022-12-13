@@ -22,15 +22,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceContext" };
-
-enum KeyboardType {
-    NONE = 0,
-    UNKNOWN = 1,
-    ALPHABETIC_KEYBOARD = 2,
-    DIGITAL_KEYBOARD = 3,
-    HANDWRITING_PEN = 4,
-    REMOTE_CONTROL = 5,
-};
 constexpr uint32_t MIN_N_SIZE = 1;
 constexpr uint32_t MAX_N_SIZE = 5;
 } // namespace
@@ -38,7 +29,6 @@ constexpr uint32_t MAX_N_SIZE = 5;
 JsInputDeviceContext::JsInputDeviceContext()
 {
     mgr_ = std::make_shared<JsInputDeviceManager>();
-    CHKPL(mgr_);
 }
 
 JsInputDeviceContext::~JsInputDeviceContext()
@@ -55,29 +45,29 @@ napi_value JsInputDeviceContext::CreateInstance(napi_env env)
 {
     CALL_DEBUG_ENTER;
     napi_value global = nullptr;
-    CHKRP(env, napi_get_global(env, &global), GET_GLOBAL);
+    CHKRP(napi_get_global(env, &global), GET_GLOBAL);
 
     constexpr char className[] = "JsInputDeviceContext";
     napi_value jsClass = nullptr;
     napi_property_descriptor desc[] = {};
     napi_status status = napi_define_class(env, className, sizeof(className), JsInputDeviceContext::JsConstructor,
                                            nullptr, sizeof(desc) / sizeof(desc[0]), nullptr, &jsClass);
-    CHKRP(env, status, DEFINE_CLASS);
+    CHKRP(status, DEFINE_CLASS);
 
     status = napi_set_named_property(env, global, "multimodalinput_input_device_class", jsClass);
-    CHKRP(env, status, SET_NAMED_PROPERTY);
+    CHKRP(status, SET_NAMED_PROPERTY);
 
     napi_value jsInstance = nullptr;
-    CHKRP(env, napi_new_instance(env, jsClass, 0, nullptr, &jsInstance), NEW_INSTANCE);
-    CHKRP(env, napi_set_named_property(env, global, "multimodal_input_device", jsInstance), SET_NAMED_PROPERTY);
+    CHKRP(napi_new_instance(env, jsClass, 0, nullptr, &jsInstance), NEW_INSTANCE);
+    CHKRP(napi_set_named_property(env, global, "multimodal_input_device", jsInstance), SET_NAMED_PROPERTY);
 
     JsInputDeviceContext *jsContext = nullptr;
-    CHKRP(env, napi_unwrap(env, jsInstance, (void**)&jsContext), UNWRAP);
+    CHKRP(napi_unwrap(env, jsInstance, (void**)&jsContext), UNWRAP);
     CHKPP(jsContext);
-    CHKRP(env, napi_create_reference(env, jsInstance, 1, &(jsContext->contextRef_)), CREATE_REFERENCE);
+    CHKRP(napi_create_reference(env, jsInstance, 1, &(jsContext->contextRef_)), CREATE_REFERENCE);
 
     uint32_t refCount = 0;
-    CHKRP(env, napi_reference_ref(env, jsContext->contextRef_, &refCount), REFERENCE_REF);
+    CHKRP(napi_reference_ref(env, jsContext->contextRef_, &refCount), REFERENCE_REF);
     return jsInstance;
 }
 
@@ -86,7 +76,7 @@ napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info 
     CALL_DEBUG_ENTER;
     napi_value thisVar = nullptr;
     void *data = nullptr;
-    CHKRP(env, napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, nullptr, nullptr, &thisVar, &data), GET_CB_INFO);
 
     JsInputDeviceContext *jsContext = new (std::nothrow) JsInputDeviceContext();
     CHKPP(jsContext);
@@ -94,6 +84,7 @@ napi_value JsInputDeviceContext::JsConstructor(napi_env env, napi_callback_info 
         MMI_HILOGI("jsvm ends");
         JsInputDeviceContext *context = static_cast<JsInputDeviceContext*>(data);
         delete context;
+        context = nullptr;
     }, nullptr, nullptr);
     if (status != napi_ok) {
         delete jsContext;
@@ -107,24 +98,24 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
 {
     CALL_DEBUG_ENTER;
     napi_value global = nullptr;
-    CHKRP(env, napi_get_global(env, &global), GET_GLOBAL);
+    CHKRP(napi_get_global(env, &global), GET_GLOBAL);
 
     bool result = false;
-    CHKRP(env, napi_has_named_property(env, global, "multimodal_input_device", &result), HAS_NAMED_PROPERTY);
+    CHKRP(napi_has_named_property(env, global, "multimodal_input_device", &result), HAS_NAMED_PROPERTY);
     if (!result) {
         MMI_HILOGE("multimodal_input_device was not found");
         return nullptr;
     }
 
     napi_value object = nullptr;
-    CHKRP(env, napi_get_named_property(env, global, "multimodal_input_device", &object), GET_NAMED_PROPERTY);
+    CHKRP(napi_get_named_property(env, global, "multimodal_input_device", &object), GET_NAMED_PROPERTY);
     if (object == nullptr) {
         MMI_HILOGE("object is nullptr");
         return nullptr;
     }
 
     JsInputDeviceContext *instance = nullptr;
-    CHKRP(env, napi_unwrap(env, object, (void**)&instance), UNWRAP);
+    CHKRP(napi_unwrap(env, object, (void**)&instance), UNWRAP);
     if (instance == nullptr) {
         MMI_HILOGE("instance is nullptr");
         return nullptr;
@@ -142,7 +133,7 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
     CALL_DEBUG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("Require two parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
@@ -156,7 +147,7 @@ napi_value JsInputDeviceContext::On(napi_env env, napi_callback_info info)
 
     char eventType[MAX_STRING_LEN] = {0};
     size_t ret = 0;
-    CHKRP(env, napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), GET_STRING_UTF8);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), GET_VALUE_STRING_UTF8);
     std::string type = eventType;
     if (type != CHANGED_TYPE) {
         MMI_HILOGE("Type is not change");
@@ -181,7 +172,7 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
     CALL_DEBUG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("Require two parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
@@ -195,7 +186,7 @@ napi_value JsInputDeviceContext::Off(napi_env env, napi_callback_info info)
 
     char eventType[MAX_STRING_LEN] = {0};
     size_t ret = 0;
-    CHKRP(env, napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), GET_STRING_UTF8);
+    CHKRP(napi_get_value_string_utf8(env, argv[0], eventType, MAX_STRING_LEN - 1, &ret), GET_VALUE_STRING_UTF8);
     std::string type = eventType;
     if (type != CHANGED_TYPE) {
         MMI_HILOGE("Type is not change");
@@ -224,7 +215,7 @@ napi_value JsInputDeviceContext::GetDeviceIds(napi_env env, napi_callback_info i
     CALL_DEBUG_ENTER;
     size_t argc = 1;
     napi_value argv[1];
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc > 1) {
         THROWERR(env, "too many parameters");
         return nullptr;
@@ -248,7 +239,7 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
     CALL_DEBUG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1 || argc > 2) {
         THROWERR(env, "the number of parameters is not as expected");
         return nullptr;
@@ -258,7 +249,7 @@ napi_value JsInputDeviceContext::GetDevice(napi_env env, napi_callback_info info
         return nullptr;
     }
     int32_t id = 0;
-    CHKRP(env, napi_get_value_int32(env, argv[0], &id), GET_INT32);
+    CHKRP(napi_get_value_int32(env, argv[0], &id), GET_VALUE_INT32);
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
     auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
@@ -277,7 +268,7 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
     CALL_DEBUG_ENTER;
     size_t argc = 3;
     napi_value argv[3];
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 2) {
         MMI_HILOGE("Require three parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
@@ -290,7 +281,7 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
         return nullptr;
     }
     int32_t deviceId = 0;
-    CHKRP(env, napi_get_value_int32(env, argv[0], &deviceId), GET_INT32);
+    CHKRP(napi_get_value_int32(env, argv[0], &deviceId), GET_VALUE_INT32);
 
     if (!JsUtil::TypeOf(env, argv[1], napi_object)) {
         MMI_HILOGE("Second parameter type error");
@@ -298,7 +289,7 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
         return nullptr;
     }
     uint32_t size = 0;
-    CHKRP(env, napi_get_array_length(env, argv[1], &size), GET_ARRAY_LENGTH);
+    CHKRP(napi_get_array_length(env, argv[1], &size), GET_ARRAY_LENGTH);
     if (size < MIN_N_SIZE || size > MAX_N_SIZE) {
         MMI_HILOGE("Size range error");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "size range error");
@@ -309,13 +300,13 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
     std::vector<int32_t> keyCodes;
     for (uint32_t i = 0; i < size; ++i) {
         napi_value keyValue = nullptr;
-        CHKRP(env, napi_get_element(env, argv[1], i, &keyValue), GET_ELEMENT);
+        CHKRP(napi_get_element(env, argv[1], i, &keyValue), GET_ELEMENT);
         if (!JsUtil::TypeOf(env, keyValue, napi_number)) {
             MMI_HILOGE("Second parameter type error");
             THROWERR_API9(env, COMMON_PARAMETER_ERROR, "KeyCode", "number");
             return nullptr;
         }
-        CHKRP(env, napi_get_value_int32(env, keyValue, &data), GET_INT32);
+        CHKRP(napi_get_value_int32(env, keyValue, &data), GET_VALUE_INT32);
         keyCodes.push_back(data);
     }
 
@@ -337,7 +328,7 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
     CALL_DEBUG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("Require two parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
@@ -350,7 +341,7 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
         return nullptr;
     }
     int32_t id = 0;
-    CHKRP(env, napi_get_value_int32(env, argv[0], &id), GET_INT32);
+    CHKRP(napi_get_value_int32(env, argv[0], &id), GET_VALUE_INT32);
 
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
@@ -372,7 +363,7 @@ napi_value JsInputDeviceContext::GetDeviceList(napi_env env, napi_callback_info 
     CALL_DEBUG_ENTER;
     size_t argc = 1;
     napi_value argv[1];
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
 
     JsInputDeviceContext *jsIds = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsIds);
@@ -393,7 +384,7 @@ napi_value JsInputDeviceContext::GetDeviceInfo(napi_env env, napi_callback_info 
     CALL_DEBUG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
         MMI_HILOGE("Require two parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
@@ -405,7 +396,7 @@ napi_value JsInputDeviceContext::GetDeviceInfo(napi_env env, napi_callback_info 
         return nullptr;
     }
     int32_t id = 0;
-    CHKRP(env, napi_get_value_int32(env, argv[0], &id), GET_INT32);
+    CHKRP(napi_get_value_int32(env, argv[0], &id), GET_VALUE_INT32);
 
     JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
     CHKPP(jsDev);
@@ -428,7 +419,7 @@ napi_value JsInputDeviceContext::EnumClassConstructor(napi_env env, napi_callbac
     napi_value args[1] = {0};
     napi_value ret = nullptr;
     void *data = nullptr;
-    CHKRP(env, napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);
     return ret;
 }
 
@@ -436,17 +427,17 @@ napi_value JsInputDeviceContext::CreateEnumKeyboardType(napi_env env, napi_value
 {
     CALL_DEBUG_ENTER;
     napi_value none = nullptr;
-    CHKRP(env, napi_create_int32(env, KeyboardType::NONE, &none), CREATE_INT32);
+    CHKRP(napi_create_int32(env, KeyboardType::KEYBOARD_TYPE_NONE, &none), CREATE_INT32);
     napi_value unknown = nullptr;
-    CHKRP(env, napi_create_int32(env, KeyboardType::UNKNOWN, &unknown), CREATE_INT32);
+    CHKRP(napi_create_int32(env, KeyboardType::KEYBOARD_TYPE_UNKNOWN, &unknown), CREATE_INT32);
     napi_value alphabeticKeyboard = nullptr;
-    CHKRP(env, napi_create_int32(env, KeyboardType::ALPHABETIC_KEYBOARD, &alphabeticKeyboard), CREATE_INT32);
+    CHKRP(napi_create_int32(env, KeyboardType::KEYBOARD_TYPE_ALPHABETICKEYBOARD, &alphabeticKeyboard), CREATE_INT32);
     napi_value digitalKeyboard = nullptr;
-    CHKRP(env, napi_create_int32(env, KeyboardType::DIGITAL_KEYBOARD, &digitalKeyboard), CREATE_INT32);
+    CHKRP(napi_create_int32(env, KeyboardType::KEYBOARD_TYPE_DIGITALKEYBOARD, &digitalKeyboard), CREATE_INT32);
     napi_value handwritingPen = nullptr;
-    CHKRP(env, napi_create_int32(env, KeyboardType::HANDWRITING_PEN, &handwritingPen), CREATE_INT32);
+    CHKRP(napi_create_int32(env, KeyboardType::KEYBOARD_TYPE_HANDWRITINGPEN, &handwritingPen), CREATE_INT32);
     napi_value remoteControl = nullptr;
-    CHKRP(env, napi_create_int32(env, KeyboardType::REMOTE_CONTROL, &remoteControl), CREATE_INT32);
+    CHKRP(napi_create_int32(env, KeyboardType::KEYBOARD_TYPE_REMOTECONTROL, &remoteControl), CREATE_INT32);
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("NONE", none),
         DECLARE_NAPI_STATIC_PROPERTY("UNKNOWN", unknown),
@@ -456,9 +447,9 @@ napi_value JsInputDeviceContext::CreateEnumKeyboardType(napi_env env, napi_value
         DECLARE_NAPI_STATIC_PROPERTY("REMOTE_CONTROL", remoteControl),
     };
     napi_value result = nullptr;
-    CHKRP(env, napi_define_class(env, "KeyboardType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+    CHKRP(napi_define_class(env, "KeyboardType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
-    CHKRP(env, napi_set_named_property(env, exports, "KeyboardType", result), SET_NAMED_PROPERTY);
+    CHKRP(napi_set_named_property(env, exports, "KeyboardType", result), SET_NAMED_PROPERTY);
     return exports;
 }
 
@@ -480,7 +471,7 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceList", GetDeviceList),
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceInfo", GetDeviceInfo),
     };
-    CHKRP(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
+    CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreateEnumKeyboardType(env, exports) == nullptr) {
         MMI_HILOGE("Failed to create keyboard type enum");
         return nullptr;

@@ -21,7 +21,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-using namespace OHOS::MMI;
 } // namespace
 class InjectEventTest : public testing::Test {
 public:
@@ -144,7 +143,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_006, TestSize.Level1)
 
 /**
  * @tc.name:InjectEvent_InjectMouse_007
- * @tc.desc: test inject mouse soomth movement interface
+ * @tc.desc: test inject mouse smooth movement interface
  * @tc.type: FUNC
  * @tc.require:SR000GGQBJ
  */

@@ -18,7 +18,6 @@
 #include "message_option.h"
 #include "string_ex.h"
 
-#include "event_filter_parcel.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -30,6 +29,37 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Event
 EventFilterProxy::EventFilterProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IEventFilter>(impl)
 {
     MMI_HILOGI("EventFilterProxy()");
+}
+
+bool EventFilterProxy::HandleKeyEvent(const std::shared_ptr<KeyEvent> event)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(event);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    if (!data.WriteInterfaceToken(EventFilterProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return false;
+    }
+
+    if (!event->WriteToParcel(data)) {
+        MMI_HILOGE("Failed to write event to req");
+        return false;
+    }
+
+    sptr<IRemoteObject> remote = Remote();
+    CHKPF(remote);
+    const uint32_t code = static_cast<uint32_t>(OPERATOR_TYPE::HANDLE_KEY_EVENT);
+    int32_t ret = remote->SendRequest(code, data, reply, option);
+    if (ret != NO_ERROR) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return false;
+    }
+
+    bool result = false;
+    READBOOL(reply, result);
+    return result;
 }
 
 bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> event)

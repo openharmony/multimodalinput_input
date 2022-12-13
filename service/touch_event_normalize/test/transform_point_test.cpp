@@ -22,7 +22,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-using namespace OHOS::MMI;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "TransformPointTest" };
 constexpr int32_t WAIT_TIME_FOR_INPUT { 1000 };
 constexpr int32_t WAIT_TIME_FOR_EVENTS { 10 };

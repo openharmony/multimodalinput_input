@@ -23,7 +23,6 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 using namespace OHOS;
-using namespace OHOS::MMI;
 } // namespace
 class UtilExTest : public testing::Test {
 public:

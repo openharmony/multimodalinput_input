@@ -44,33 +44,5 @@ ConnectReqParcel *ConnectReqParcel::Unmarshalling(Parcel& in)
     request->data.clientName = in.ReadString();
     return request;
 }
-
-bool ConnectRespParcel::Marshalling(Parcel &out) const
-{
-    WRITEINT32(out, data.returnCode);
-    WRITEINT32(out, data.allocedSocketId);
-    return true;
-}
-
-ConnectRespParcel *ConnectRespParcel::Unmarshalling(Parcel &in)
-{
-    auto *response = new (std::nothrow) ConnectRespParcel();
-    if (response == nullptr) {
-        return nullptr;
-    }
-
-    if (!in.ReadInt32(response->data.returnCode)) {
-        delete response;
-        response = nullptr;
-        return nullptr;
-    }
-
-    if (!in.ReadInt32(response->data.allocedSocketId)) {
-        delete response;
-        response = nullptr;
-        return nullptr;
-    }
-    return response;
-}
 } // namespace MMI
 } // namespace OHOS
