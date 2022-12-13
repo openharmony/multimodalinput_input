@@ -234,17 +234,17 @@ static void StartPen()
 
 using virtualFun = void (*)();
 std::map<std::string, virtualFun> mapFun = {
-    {"mouse", &StartMouse},
-    {"keyboard", &StartKeyboard},
-    {"joystick", &StartJoystick},
-    {"trackball", &StartTrackball},
-    {"remotecontrol", &StartRemoteControl},
-    {"trackpad", &StartTrackpad},
-    {"knob", &StartKnob},
-    {"gamepad", &StartGamePad},
-    {"touchpad", &StartTouchPad},
-    {"touchscreen", &StartTouchScreen},
-    {"pen", &StartPen}
+    { "mouse", &StartMouse },
+    { "keyboard", &StartKeyboard },
+    { "joystick", &StartJoystick },
+    { "trackball", &StartTrackball },
+    { "remotecontrol", &StartRemoteControl },
+    { "trackpad", &StartTrackpad },
+    { "knob", &StartKnob },
+    { "gamepad", &StartGamePad },
+    { "touchpad", &StartTouchPad },
+    { "touchscreen", &StartTouchScreen },
+    { "pen", &StartPen }
 };
 
 static void StartAllDevices()
@@ -388,31 +388,31 @@ bool VirtualDevice::SetPhys(const std::string& deviceName)
 {
     std::string phys;
     std::map<std::string, std::string> typeDevice = {
-        {"Virtual Mouse",                "mouse"},
-        {"Virtual keyboard",             "keyboard"},
-        {"Virtual KeyboardConsumerCtrl", "keyboard"},
-        {"Virtual keyboardExt",          "keyboard"},
-        {"Virtual KeyboardSysCtrl",      "keyboard"},
-        {"Virtual Knob",                 "knob"},
-        {"Virtual KnobConsumerCtrl",     "knob"},
-        {"Virtual KnobMouse",            "knob"},
-        {"Virtual KnobSysCtrl",          "knob"},
-        {"Virtual Trackpad",             "trackpad"},
-        {"Virtual TrackPadMouse",        "trackpad"},
-        {"Virtual TrackpadSysCtrl",      "trackpad"},
-        {"Virtual Finger",               "touchpad"},
-        {"Virtual SingleFinger",         "touchpad"},
-        {"Virtual Stylus",               "touchpad"},
-        {"Virtual Touchpad",             "touchpad"},
-        {"Virtual RemoteControl",        "remotecontrol"},
-        {"Virtual Joystick",             "joystick"},
-        {"Virtual GamePad",              "gamepad"},
-        {"Virtual Trackball",            "trackball"},
-        {"Virtual TouchScreen",          "touchscreen"},
-        {"Virtual SingleTouchScreen",    "touchscreen"},
-        {"V-Pencil",                     "pen"},
-        {"V-Pencil-mouse",               "pen"},
-        {"V-Pencil-keyboard",            "pen"},
+        { "Virtual Mouse",                "mouse" },
+        { "Virtual keyboard",             "keyboard" },
+        { "Virtual KeyboardConsumerCtrl", "keyboard" },
+        { "Virtual keyboardExt",          "keyboard" },
+        { "Virtual KeyboardSysCtrl",      "keyboard" },
+        { "Virtual Knob",                 "knob" },
+        { "Virtual KnobConsumerCtrl",     "knob" },
+        { "Virtual KnobMouse",            "knob" },
+        { "Virtual KnobSysCtrl",          "knob" },
+        { "Virtual Trackpad",             "trackpad" },
+        { "Virtual TrackPadMouse",        "trackpad" },
+        { "Virtual TrackpadSysCtrl",      "trackpad" },
+        { "Virtual Finger",               "touchpad" },
+        { "Virtual SingleFinger",         "touchpad" },
+        { "Virtual Stylus",               "touchpad" },
+        { "Virtual Touchpad",             "touchpad" },
+        { "Virtual RemoteControl",        "remotecontrol" },
+        { "Virtual Joystick",             "joystick" },
+        { "Virtual GamePad",              "gamepad" },
+        { "Virtual Trackball",            "trackball" },
+        { "Virtual TouchScreen",          "touchscreen" },
+        { "Virtual SingleTouchScreen",    "touchscreen" },
+        { "V-Pencil",                     "pen" },
+        { "V-Pencil-mouse",               "pen" },
+        { "V-Pencil-keyboard",            "pen" },
     };
     std::string deviceType = typeDevice.find(deviceName)->second;
     phys.append(deviceType).append(g_pid).append("/").append(g_pid);
@@ -507,7 +507,7 @@ std::string VirtualDevice::ReadFile(const std::string& filePath)
 
 int32_t VirtualDevice::GetFileSize(const std::string& filePath)
 {
-    struct stat statbuf = {0};
+    struct stat statbuf = { 0 };
     if (stat(filePath.c_str(), &statbuf) != 0) {
         std::cout << "Get file size error" << std::endl;
         return INVALID_FILE_SIZE;

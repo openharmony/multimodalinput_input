@@ -21,8 +21,8 @@
 #include "singleton.h"
 
 #include "input_handler_manager.h"
-#include "i_input_event_consumer.h"
 #include "input_handler_type.h"
+#include "i_input_event_consumer.h"
 
 namespace OHOS {
 namespace MMI {

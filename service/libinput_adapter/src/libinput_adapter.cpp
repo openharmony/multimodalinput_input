@@ -14,8 +14,9 @@
  */
 
 #include "libinput_adapter.h"
-#include <climits>
+
 #include <cinttypes>
+#include <climits>
 #include <dirent.h>
 #include <fcntl.h>
 #include <sys/epoll.h>
@@ -24,7 +25,6 @@
 #include "define_multimodal.h"
 #include "input_windows_manager.h"
 #include "util.h"
-
 
 namespace OHOS {
 namespace MMI {

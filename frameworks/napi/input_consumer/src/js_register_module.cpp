@@ -21,8 +21,8 @@
 #include "input_manager.h"
 #include "js_register_util.h"
 #include "napi_constants.h"
-#include "util_napi_error.h"
 #include "util_napi.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace MMI {
@@ -111,7 +111,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     subKeyNames += ",";
     keyOption->SetFinalKeyDown(isFinalKeyDown);
     MMI_HILOGD("IsFinalKeyDown:%{public}d,map_key:%{public}s",
-        (isFinalKeyDown == true?1:0), subKeyNames.c_str());
+        (isFinalKeyDown == true ? 1 : 0), subKeyNames.c_str());
     std::optional<int32_t> tempKeyDownDuration = GetNamedPropertyInt32(env, argv[1], "finalKeyDownDuration");
     if (!tempKeyDownDuration) {
         MMI_HILOGE("GetNamedPropertyInt32 failed");

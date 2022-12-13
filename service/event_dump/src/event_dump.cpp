@@ -78,20 +78,20 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
     }
     int32_t optionIndex = 0;
     struct option dumpOptions[] = {
-        {"help", no_argument, 0, 'h'},
-        {"device", no_argument, 0, 'd'},
-        {"devicelist", no_argument, 0, 'l'},
-        {"windows", no_argument, 0, 'w'},
-        {"udsserver", no_argument, 0, 'u'},
-        {"subscriber", no_argument, 0, 's'},
-        {"monitor", no_argument, 0, 'o'},
-        {"interceptor", no_argument, 0, 'i'},
-        {"filter", no_argument, 0, 'f'},
-        {"mouse", no_argument, 0, 'm'},
+        { "help", no_argument, 0, 'h' },
+        { "device", no_argument, 0, 'd' },
+        { "devicelist", no_argument, 0, 'l' },
+        { "windows", no_argument, 0, 'w' },
+        { "udsserver", no_argument, 0, 'u' },
+        { "subscriber", no_argument, 0, 's' },
+        { "monitor", no_argument, 0, 'o' },
+        { "interceptor", no_argument, 0, 'i' },
+        { "filter", no_argument, 0, 'f' },
+        { "mouse", no_argument, 0, 'm' },
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-        {"inputdevcoosm", no_argument, 0, 'k'},
+        { "inputdevcoosm", no_argument, 0, 'k' },
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-        {NULL, 0, 0, 0}
+        { NULL, 0, 0, 0 }
     };
     if (args.empty()) {
         MMI_HILOGE("size of args can't be zero");

@@ -12,8 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef CIRCLE_STREAM_BUFFER_H
 #define CIRCLE_STREAM_BUFFER_H
+
 #include "stream_buffer.h"
 
 namespace OHOS {

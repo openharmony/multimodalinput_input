@@ -16,8 +16,8 @@
 #include "setanrobserver_fuzzer.h"
 
 #include "input_manager.h"
-#include "mmi_log.h"
 #include "i_anr_observer.h"
+#include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {

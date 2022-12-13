@@ -14,6 +14,7 @@
  */
 
 #include "input_monitor_manager.h"
+
 #include "multimodal_input_connect_manager.h"
 #include "util.h"
 

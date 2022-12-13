@@ -26,12 +26,12 @@ constexpr int32_t ABS_FLAT_RZ = 15;
 constexpr int32_t ABS_MIN_HAT = -1;
 
 AbsInfo absInfos[] = {
-    {ABS_X, 0, ABS_MAX_XY, ABS_FUZZ, ABS_FLAT},
-    {ABS_Y, 0, ABS_MAX_XY, ABS_FUZZ, ABS_FLAT},
-    {ABS_RZ, 0, ABS_MAX_RZ, 0, ABS_FLAT_RZ},
-    {ABS_THROTTLE, 0, ABS_MAX_RZ, 0, ABS_FLAT_RZ},
-    {ABS_HAT0X, ABS_MIN_HAT, 1, 0, 0},
-    {ABS_HAT0Y, ABS_MIN_HAT, 1, 0, 0}
+    { ABS_X, 0, ABS_MAX_XY, ABS_FUZZ, ABS_FLAT },
+    { ABS_Y, 0, ABS_MAX_XY, ABS_FUZZ, ABS_FLAT },
+    { ABS_RZ, 0, ABS_MAX_RZ, 0, ABS_FLAT_RZ },
+    { ABS_THROTTLE, 0, ABS_MAX_RZ, 0, ABS_FLAT_RZ },
+    { ABS_HAT0X, ABS_MIN_HAT, 1, 0, 0 },
+    { ABS_HAT0Y, ABS_MIN_HAT, 1, 0, 0 }
 };
 } // namespace
 

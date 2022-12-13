@@ -53,9 +53,9 @@ void KeyboardInject::InjectKeyEvent(uint16_t code, uint32_t value) const
     if (it == keyCodeMap_.end()) {
         return;
     }
-    InjectInputEvent injectInputEvent = {injectThread_->KEYBOARD_DEVICE_ID, EV_KEY, it->second, value};
+    InjectInputEvent injectInputEvent = { injectThread_->KEYBOARD_DEVICE_ID, EV_KEY, it->second, value };
     injectThread_->WaitFunc(injectInputEvent);
-    InjectInputEvent injectInputSync = {injectThread_->KEYBOARD_DEVICE_ID, EV_SYN, SYN_REPORT, 0};
+    InjectInputEvent injectInputSync = { injectThread_->KEYBOARD_DEVICE_ID, EV_SYN, SYN_REPORT, 0 };
     injectThread_->WaitFunc(injectInputSync);
 }
 } // namespace MMI

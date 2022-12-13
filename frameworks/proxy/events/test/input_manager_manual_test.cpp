@@ -58,16 +58,16 @@ PermissionDef infoManagerTestPermDef = {
 PermissionStateFull infoManagerTestState = {
     .permissionName = "ohos.permission.test",
     .isGeneral = true,
-    .resDeviceID = {"local"},
-    .grantStatus = {PermissionState::PERMISSION_GRANTED},
-    .grantFlags = {1},
+    .resDeviceID = { "local" },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 1 },
 };
 
 HapPolicyParams infoManagerTestPolicyPrams = {
     .apl = APL_SYSTEM_CORE,
     .domain = "test.domain",
-    .permList = {infoManagerTestPermDef},
-    .permStateList = {infoManagerTestState}
+    .permList = { infoManagerTestPermDef },
+    .permStateList = { infoManagerTestState }
 };
 } // namespace
 

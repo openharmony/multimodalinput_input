@@ -1565,7 +1565,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_03, TestSize.Level
 HWTEST_F(InputManagerTest, TestGetKeystrokeAbility_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    std::vector<int32_t> keyCodes = {17, 22, 2055};
+    std::vector<int32_t> keyCodes = { 17, 22, 2055 };
     InputManager::GetInstance()->SupportKeys(0, keyCodes, [](std::vector<bool> keystrokeAbility) {
         MMI_HILOGD("TestGetKeystrokeAbility_001 callback ok");
     });

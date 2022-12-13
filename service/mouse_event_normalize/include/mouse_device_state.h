@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef MOUSE_DEVICE_STATE_H
 #define MOUSE_DEVICE_STATE_H
 
@@ -45,14 +46,14 @@ public:
         int32_t physicalY { 0 };
     };
     const std::map<uint32_t, int32_t> mapLibinputChangeToPointer = {
-        {LIBINPUT_LEFT_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_LEFT},
-        {LIBINPUT_RIGHT_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_RIGHT},
-        {LIBINPUT_MIDDLE_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_MIDDLE},
-        {LIBINPUT_SIDE_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_SIDE},
-        {LIBINPUT_EXTRA_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_EXTRA},
-        {LIBINPUT_FORWARD_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_FORWARD},
-        {LIBINPUT_BACK_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_BACK},
-        {LIBINPUT_TASK_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_TASK},
+        { LIBINPUT_LEFT_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_LEFT },
+        { LIBINPUT_RIGHT_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_RIGHT },
+        { LIBINPUT_MIDDLE_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_MIDDLE },
+        { LIBINPUT_SIDE_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_SIDE },
+        { LIBINPUT_EXTRA_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_EXTRA },
+        { LIBINPUT_FORWARD_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_FORWARD },
+        { LIBINPUT_BACK_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_BACK },
+        { LIBINPUT_TASK_BUTTON_CODE, PointerEvent::MOUSE_BUTTON_TASK },
     };
 public:
     DISALLOW_COPY_AND_MOVE(MouseDeviceState);

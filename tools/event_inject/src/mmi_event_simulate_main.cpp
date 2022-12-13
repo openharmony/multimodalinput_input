@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "injection_event_dispatch.h"
 #include "error_multimodal.h"
+#include "injection_event_dispatch.h"
 #include "mmi_log.h"
 
 namespace {

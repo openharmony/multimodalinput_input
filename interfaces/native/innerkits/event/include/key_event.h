@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef KEY_EVENT_H
 #define KEY_EVENT_H
 
@@ -28,28 +29,28 @@ namespace MMI {
 class KeyEvent : public InputEvent {
 public:
     /**
-     * 未知的功能按键
+     * Unknown function key
      *
      * @since 9
      */
     static const int32_t UNKNOWN_FUNCTION_KEY;
 
     /**
-     * Num Lock功能按键
+     * Num Lock key
      *
      * @since 9
      */
     static const int32_t NUM_LOCK_FUNCTION_KEY;
 
     /**
-     * Caps Lock功能按键
+     * Caps Lock key
      *
      * @since 9
      */
     static const int32_t CAPS_LOCK_FUNCTION_KEY;
 
     /**
-     * Scroll Lock功能按键
+     * Scroll Lock key
      *
      * @since 9
      */
@@ -2927,16 +2928,16 @@ public:
         void SetPressed(bool pressed);
 
         /**
-         * @brief 设置当前按键对应的unicode值
-         * @param unicode 指定的unicode值
-         * @return 空
+         * @brief Sets the Unicode value corresponding to the current key.
+         * @param unicode Unicode value.
+         * @return Null
          * @since 9
          */
         void SetUnicode(uint32_t unicode);
 
         /**
-         * @brief 获取当前按键的unicode值
-         * @return 返回unicode值
+         * @brief Obtains the Unicode value of the current key.
+         * @return Returns the Unicode value.
          * @since 9
          */
         uint32_t GetUnicode() const;
@@ -3100,26 +3101,26 @@ public:
     bool IsValid() const;
 
     /**
-     * @brief 把指定的按键转换为功能按键。
-     * @param keyCode 待转换的键值。
-     * @return 返回转换后的功能按键。
+     * @brief Converts a specific key to a function key.
+     * @param keyCode Indicates the keycode of the key to convert.
+     * @return Returns the converted function key.
      * @since 9
      */
     int32_t TransitionFunctionKey(int32_t keyCode);
 
     /**
-     * @brief 给指定的功能按键设置使能状态。
-     * @param funcKey 指定的功能按键。
-     * @param value 待设置的功能按键状态。
-     * @return 返回是否设置成功。
+     * @brief Sets the enable status of the specified function key.
+     * @param funcKey Indicates the function key.
+     * @param value Indicates the enable status of the function key.
+     * @return Returns the result indicating whether the setting is successful.
      * @since 9
      */
     int32_t SetFunctionKey(int32_t funcKey, int32_t value);
 
     /**
-     * @brief 获取指定功能按键的使能状态。
-     * @param funcKey 指定的功能按键。
-     * @return 返回指定功能按键的使能状态。
+     * @brief Obtains the enable status of the specified function key.
+     * @param funcKey Indicates the function key.
+     * @return Returns the enable status of the function key.
      * @since 9
      */
     bool GetFunctionKey(int32_t funcKey) const;
