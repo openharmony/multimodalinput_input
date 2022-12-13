@@ -19,7 +19,6 @@
 #include <array>
 #include <list>
 #include <memory>
-#include <ostream>
 #include <set>
 #include <vector>
 
@@ -555,6 +554,27 @@ public:
      * @since 9
      */
     static constexpr int32_t JOYSTICK_BUTTON_DEAD = 25;
+
+    /**
+     * 表示操纵杆的C按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_C = 26;
+
+    /**
+     * 表示操纵杆的Z按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_Z = 27;
+
+    /**
+     *表示操纵杆的MODE按键。
+     *
+     * @since 9
+     */
+    static constexpr int32_t JOYSTICK_BUTTON_MODE = 28;
 
 public:
     static std::shared_ptr<PointerEvent> from(std::shared_ptr<InputEvent> inputEvent);
@@ -1285,7 +1305,7 @@ private:
     int32_t pointerAction_ { POINTER_ACTION_UNKNOWN };
     int32_t buttonId_ { -1 };
     uint32_t axes_ { 0U };
-    std::array<double, AXIS_TYPE_MAX>   axisValues_ {};
+    std::array<double, AXIS_TYPE_MAX> axisValues_ {};
     std::vector<int32_t> pressedKeys_;
 };
 

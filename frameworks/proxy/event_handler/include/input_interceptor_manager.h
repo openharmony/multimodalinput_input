@@ -21,7 +21,6 @@
 #include "singleton.h"
 
 #include "input_handler_manager.h"
-#include "i_input_event_consumer.h"
 #include "input_handler_type.h"
 
 namespace OHOS {
@@ -31,6 +30,8 @@ class InputInterceptorManager final : public InputHandlerManager {
 public:
     DISALLOW_COPY_AND_MOVE(InputInterceptorManager);
     int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor, HandleEventType eventType);
+    int32_t AddInterceptor(std::shared_ptr<IInputEventConsumer> interceptor, HandleEventType eventType,
+        int32_t priority, uint32_t deviceTags);
     void RemoveInterceptor(int32_t interceptorId);
     InputHandlerType GetHandlerType() const override;
 };

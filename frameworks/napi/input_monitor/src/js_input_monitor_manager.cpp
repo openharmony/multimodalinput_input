@@ -47,7 +47,6 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
         }
     }
     auto monitor = std::make_shared<JsInputMonitor>(jsEnv, typeName, callback, nextId_++);
-    CHKPV(monitor);
     int32_t ret = monitor->Start();
     if (ret < 0) {
         MMI_HILOGE("js monitor startup failed");
@@ -216,7 +215,7 @@ void JsInputMonitorManager::RemoveEnv(std::map<napi_env, napi_ref>::iterator it)
 {
     CALL_DEBUG_ENTER;
     uint32_t refCount;
-    CHKRV(it->first, napi_reference_unref(it->first, it->second, &refCount), REFERENCE_UNREF);
+    CHKRV(napi_reference_unref(it->first, it->second, &refCount), REFERENCE_UNREF);
     envManager_.erase(it);
 }
 

@@ -39,6 +39,7 @@ public:
 protected:
     int32_t StubHandleAllocSocketFd(MessageParcel &data, MessageParcel &reply);
     int32_t StubAddInputEventFilter(MessageParcel& data, MessageParcel& reply);
+    int32_t StubRemoveInputEventFilter(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerStyle(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerStyle(MessageParcel& data, MessageParcel& reply);
@@ -69,6 +70,7 @@ protected:
     int32_t StubSetInputDevice(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetFunctionKeyState(MessageParcel &data, MessageParcel &reply);
     int32_t StubSetFunctionKeyState(MessageParcel &data, MessageParcel &reply);
+    int32_t StubSetPointerLocation(MessageParcel &data, MessageParcel &reply);
 };
 } // namespace MMI
 } // namespace OHOS

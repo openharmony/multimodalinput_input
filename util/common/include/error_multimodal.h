@@ -49,7 +49,7 @@ enum {
 
 enum {
     // 发送消息失败
-    MSG_SEND_FAIL = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_SERVER),
+    MSG_SEND_FAIL = 0x3E20000, //ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_SERVER),
     // 未知的事件
     UNKNOWN_EVENT,
     // 空指针
@@ -93,7 +93,9 @@ enum {
     // 生成异步任务失败
     ETASKS_POST_ASYNCTASK_FAIL,
     // DUMP参数错误
-    DUMP_PARAM_ERR
+    DUMP_PARAM_ERR,
+    // 过滤器增加失败
+    ERROR_FILTER_ADD_FAIL,
 };
 
 enum {

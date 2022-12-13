@@ -48,7 +48,7 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
     DeviceConfig devConf;
     auto ret = ReadTomlFile(GetTomlFilePath(fileName), devConf);
     if (ret == RET_ERR) {
-        MMI_HILOGE("Read device config file error");
+        MMI_HILOGI("Can not read device config file");
         return RET_ERR;
     }
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
@@ -83,7 +83,7 @@ void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
     if (keyEvent_->GetKeyAction() == KeyEvent::KEY_ACTION_UP && TimerMgr->IsExist(timerId_)) {
         TimerMgr->RemoveTimer(timerId_);
         timerId_ = -1;
-        MMI_HILOGI("Stop kayboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
+        MMI_HILOGI("Stop keyboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
         if (repeatKeyCode_ != keyEvent_->GetKeyCode()) {
             auto pressedKeyItem = keyEvent_->GetKeyItem(keyEvent_->GetKeyCode());
             if (pressedKeyItem != nullptr) {
@@ -147,7 +147,7 @@ void KeyAutoRepeat::RemoveDeviceConfig(struct libinput_device *device)
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     auto iter = deviceConfig_.find(deviceId);
     if (iter == deviceConfig_.end()) {
-        MMI_HILOGE("Device config file remove failed");
+        MMI_HILOGI("Can not remove device config file");
         return;
     }
     deviceConfig_.erase(iter);

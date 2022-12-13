@@ -94,7 +94,7 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> key, HandlerType han
             break;
         }
         default: {
-            checkKeyCode = "Unknow keycode:" + std::to_string(keyCode);
+            checkKeyCode = "Unknown keycode:" + std::to_string(keyCode);
             break;
         }
     }
@@ -126,7 +126,7 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent, TraceBtn t
                 break;
             }
             default: {
-                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "Unknow keycode:" + std::to_string(keyCode));
+                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "Unknown keycode:" + std::to_string(keyCode));
                 break;
             }
         }
@@ -145,7 +145,7 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent, TraceBtn t
                 break;
             }
             default: {
-                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "Unknow keycode:" + std::to_string(keyCode));
+                HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "Unknown keycode:" + std::to_string(keyCode));
                 break;
             }
         }

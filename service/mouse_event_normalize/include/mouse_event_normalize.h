@@ -55,6 +55,7 @@ public:
     int32_t GetPointerSpeed() const;
     void OnDisplayLost(int32_t displayId);
     int32_t GetDisplayId() const;
+    int32_t SetPointerLocation(int32_t x, int32_t y);
     int32_t GetPointerSpeedByDeviceId(int32_t deviceId) const;
 
 private:
@@ -71,9 +72,7 @@ private:
     bool GetSpeedGain(double vin, double& gain, int32_t deviceId) const;
     void DumpInner();
     void InitAbsolution();
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
     void SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, libinput_event_pointer* data);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
     int32_t GetSpeed(int32_t deviceId) const;
 
 private:
