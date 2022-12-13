@@ -27,7 +27,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 std::string GetLocalDeviceId()
 {
     auto localNode = std::make_unique<NodeBasicInfo>();
-    CHKPS(localNode);
     int32_t ret = GetLocalNodeDeviceInfo(MMI_DINPUT_PKG_NAME, localNode.get());
     if (ret != RET_OK) {
         MMI_HILOGE("GetLocalNodeDeviceInfo ret:%{public}d", ret);

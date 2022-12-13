@@ -105,7 +105,6 @@ bool MMIClient::StartEventRunner()
     if (eventHandler_ == nullptr) {
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
-        CHKPF(eventHandler_);
         MMI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
     }
 
@@ -136,7 +135,6 @@ bool MMIClient::AddFdListener(int32_t fd)
     }
     CHKPF(eventHandler_);
     auto fdListener = std::make_shared<MMIFdListener>(GetSharedPtr());
-    CHKPF(fdListener);
     auto errCode = eventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener);
     if (errCode != ERR_OK) {
         MMI_HILOGE("Add fd listener failed,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
@@ -155,6 +153,7 @@ bool MMIClient::DelFdListener(int32_t fd)
     CHKPF(eventHandler_);
     if (fd >= 0) {
         eventHandler_->RemoveFileDescriptorListener(fd);
+        MMI_HILOGI("Remove file descriptor listener success");
     } else {
         MMI_HILOGE("Invalid fd:%{public}d", fd);
     }
@@ -162,6 +161,7 @@ bool MMIClient::DelFdListener(int32_t fd)
     CHKPF(runner);
     if (runner->GetRunnerThreadName() == THREAD_NAME) {
         eventHandler_->RemoveAllEvents();
+        MMI_HILOGI("Remove all events success");
     }
     isRunning_ = false;
     return true;
@@ -261,7 +261,7 @@ int32_t MMIClient::Socket()
     int32_t ret = MultimodalInputConnMgr->AllocSocketPair(IMultimodalInputConnect::CONNECT_MODULE_TYPE_MMI_CLIENT);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AllocSocketPair return %{public}d", ret);
-        return RET_ERR;
+        return IMultimodalInputConnect::INVALID_SOCKET_FD;
     }
     fd_ = MultimodalInputConnMgr->GetClientSocketFdOfAllocedSocketPair();
     if (fd_ == IMultimodalInputConnect::INVALID_SOCKET_FD) {
@@ -283,6 +283,7 @@ void MMIClient::Stop()
             runner->Stop();
             eventHandler_->RemoveAllEvents();
             eventHandler_->RemoveAllFileDescriptorListeners();
+            MMI_HILOGI("Remove all file descriptor listeners success");
         }
     }
 }

@@ -71,7 +71,6 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         if (count < 0) {
             if (errno == EAGAIN || errno == EINTR || errno == EWOULDBLOCK) {
                 MMI_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
-                usleep(SEND_RETRY_SLEEP_TIME);
                 continue;
             }
             MMI_HILOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
@@ -80,6 +79,7 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
         idx += count;
         remSize -= count;
         if (remSize > 0) {
+            MMI_HILOGW("Remsize:%{public}d", remSize);
             usleep(SEND_RETRY_SLEEP_TIME);
         }
     }

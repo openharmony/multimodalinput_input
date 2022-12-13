@@ -32,21 +32,24 @@ public:
     ~MultimodalInputConnectProxy() override = default;
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) override;
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter) override;
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority) override;
+    int32_t RemoveInputEventFilter(int32_t filterId) override;
     int32_t SetPointerVisible(bool visible) override;
     int32_t IsPointerVisible(bool &visible) override;
     int32_t SetPointerSpeed(int32_t speed) override;
     int32_t GetPointerSpeed(int32_t &speed) override;
     int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle) override;
     int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle) override;
-    int32_t SupportKeys(int32_t userData, int32_t deviceId, std::vector<int32_t> &keys) override;
-    int32_t GetDeviceIds(int32_t userData) override;
-    int32_t GetDevice(int32_t userData, int32_t deviceId) override;
+    int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke) override;
+    int32_t GetDeviceIds(std::vector<int32_t> &ids) override;
+    int32_t GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice) override;
     int32_t RegisterDevListener() override;
     int32_t UnregisterDevListener() override;
-    int32_t GetKeyboardType(int32_t userData, int32_t deviceId) override;
-    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType) override;
-    int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType) override;
+    int32_t GetKeyboardType(int32_t deviceId, int32_t &keyboardType) override;
+    int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+        int32_t priority, uint32_t deviceTags) override;
+    int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
+        int32_t priority, uint32_t deviceTags) override;
     int32_t MarkEventConsumed(int32_t eventId) override;
     int32_t MoveMouseEvent(int32_t offsetX, int32_t offsetY) override;
     int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
@@ -64,6 +67,7 @@ public:
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) override;
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
+    int32_t SetPointerLocation(int32_t x, int32_t y) override;
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) override;
 
 private:

@@ -29,7 +29,6 @@ ohos_source_set("mmi_event_filter_service") {
   part_name = "input"
   subsystem_name = "multimodalinput"
   sources = [
-    "${event_filter_path}/src/event_filter_parcel.cpp",
     "${event_filter_path}/src/event_filter_service.cpp",
     "${event_filter_path}/src/event_filter_stub.cpp",
   ]
@@ -49,26 +48,12 @@ ohos_source_set("mmi_event_filter_proxy") {
   sources = [
     "${event_filter_path}/src/event_filter_death_recipient.cpp",
     "${event_filter_path}/src/event_filter_handler.cpp",
-    "${event_filter_path}/src/event_filter_parcel.cpp",
     "${event_filter_path}/src/event_filter_proxy.cpp",
   ]
 
   configs = [ ":mmi_event_filter_config" ]
 
-  defines = []
-
-  if (input_feature_keyboard) {
-    defines += [ "OHOS_BUILD_ENABLE_KEYBOARD" ]
-  }
-  if (input_feature_touchscreen) {
-    defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
-  }
-  if (input_feature_mouse) {
-    defines += [ "OHOS_BUILD_ENABLE_POINTER" ]
-  }
-  if (input_feature_touchscreen) {
-    defines += [ "OHOS_BUILD_ENABLE_TOUCH" ]
-  }
+  defines = input_default_defines
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",

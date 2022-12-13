@@ -16,25 +16,28 @@
 #ifndef EVENT_FILTER_SERVICE_H
 #define EVENT_FILTER_SERVICE_H
 
+#include <list>
+
 #include "iremote_object.h"
 #include "nocopyable.h"
 
+#include "i_input_event_filter.h"
 #include "event_filter_stub.h"
-
 
 namespace OHOS {
 namespace MMI {
 enum class ServiceRunningState { STATE_NOT_START, STATE_RUNNING };
 class EventFilterService final : public EventFilterStub {
 public:
-    EventFilterService() = default;
+    static int32_t GetNextId();
+    EventFilterService(std::shared_ptr<IInputEventFilter> filter) : filter_(filter) {}
     DISALLOW_COPY_AND_MOVE(EventFilterService);
     ~EventFilterService() override = default;
+    bool HandleKeyEvent(const std::shared_ptr<KeyEvent> event) override;
     bool HandlePointerEvent(const std::shared_ptr<PointerEvent> event) override;
-    void SetPointerEventPtr(std::function<bool(std::shared_ptr<PointerEvent>)> pointerFilter);
-
 private:
-    std::function<bool(std::shared_ptr<PointerEvent>)> pointerFilter_ { nullptr };
+    const std::shared_ptr<IInputEventFilter> filter_;
+    static inline int32_t filterIdSeed_ = 0;
 };
 } // namespace MMI
 } // namespace OHOS

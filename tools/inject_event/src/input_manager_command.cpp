@@ -818,7 +818,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             while (currentTimeMs < endTimeMs) {
                                 item.SetDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs, px1, px2));
                                 item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs, py1, py2));
-                                pointerEvent->SetActionTime(currentTimeMs);
+                                pointerEvent->SetActionTime(currentTimeMs * 1000);
                                 pointerEvent->UpdatePointerItem(0, item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -831,7 +831,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
-                            pointerEvent->SetActionTime(endTimeMs);
+                            pointerEvent->SetActionTime(endTimeMs * 1000);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -839,7 +839,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
-                            pointerEvent->SetActionTime(endTimeMs + BLOCK_TIME_MS);
+                            pointerEvent->SetActionTime((endTimeMs + BLOCK_TIME_MS) * 1000);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -1126,7 +1126,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return EVENT_REG_FAIL;
                             }
                             if (joyInfo.buttonId > JOYSTICK_BUTTON_ID) {
-                                std::cout << "Pressd button value is greater than the max value" << std::endl;
+                                std::cout << "Pressed button value is greater than the max value" << std::endl;
                                 return EVENT_REG_FAIL;
                             }
                             state.push_back(std::pair<int32_t, JoystickInfo>(JOYSTICK_BUTTON_PRESS, joyInfo));
@@ -1253,7 +1253,7 @@ void InputManagerCommand::ShowUsage()
     std::cout << "-M  --mouse                                    " << std::endl;
     std::cout << "commands for mouse:                            " << std::endl;
     std::cout << "-m <dx> <dy>              --move   <dx> <dy>  -move to relative position (dx,dy),"    << std::endl;
-    std::cout << "   <dx1> <dy1> <dx2> <dy2> [soomth time] --trace -dx1 dy1 to dx2 dy2 smooth movement" << std::endl;
+    std::cout << "   <dx1> <dy1> <dx2> <dy2> [smooth time] --trace -dx1 dy1 to dx2 dy2 smooth movement" << std::endl;
     std::cout << "-d <key>                  --down   key        -press down a button, "                 << std::endl;
     std::cout << "                                               0 is the left button, 1 is the right," << std::endl;
     std::cout << "                                               2 is the middle"   << std::endl;

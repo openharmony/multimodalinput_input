@@ -32,10 +32,8 @@ struct DeviceConfig {
 };
 
 int64_t GetSysClockTime();
-
+ 
 int64_t GetMillisTime();
-
-std::string GetUUid();
 
 uint64_t GetThisThreadId();
 
