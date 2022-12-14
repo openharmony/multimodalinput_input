@@ -362,5 +362,11 @@ void MultimodalInputConnectManager::NotifyDeath()
         }
     } while (--retryCount > 0);
 }
+
+int32_t MultimodalInputConnectManager::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetMouseCaptureMode(windowId, isCaptureMode);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -1284,5 +1284,15 @@ int32_t MMIService::OnGetInputDeviceCooperateState(int32_t pid, int32_t userData
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+
+int32_t MMIService::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = WinMgr->SetMouseCaptureMode(windowId, isCaptureMode);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set capture failed,return %{public}d", ret);
+    }
+    return ret;;
+}
 } // namespace MMI
 } // namespace OHOS

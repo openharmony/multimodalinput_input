@@ -133,8 +133,10 @@ int32_t MouseEventNormalize::HandleMotionAccelerate(struct libinput_event_pointe
     MMI_HILOGD("Get and process the movement coordinates, dx:%{public}lf, dy:%{public}lf,"
                "correctionX:%{public}lf, correctionY:%{public}lf, gain:%{public}lf",
                dx, dy, correctionX, correctionY, gain);
-    absolutionX_ += correctionX;
-    absolutionY_ += correctionY;
+    if (!WinMgr->GetMouseIsCaptureMode()) {
+        absolutionX_ += correctionX;
+        absolutionY_ += correctionY;
+    }
     return RET_OK;
 }
 
@@ -254,6 +256,10 @@ void MouseEventNormalize::HandlePostInner(struct libinput_event_pointer* data, i
     CHKPV(data);
     auto mouseInfo = WinMgr->GetMouseInfo();
     MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
+    if (WinMgr->GetMouseIsCaptureMode()) {
+        pointerItem.SetRawDx(static_cast<int32_t>(libinput_event_pointer_get_dx(data)));
+        pointerItem.SetRawDy(static_cast<int32_t>(libinput_event_pointer_get_dy(data)));
+    }
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerItem.SetWindowX(0);

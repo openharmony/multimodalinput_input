@@ -107,6 +107,8 @@ public:
     void OnAnr(int32_t pid);
 
     int32_t RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener);
+    int32_t EnterCaptureMode(int32_t windowId);
+    int32_t LeaveCaptureMode(int32_t windowId);
     int32_t UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener = nullptr);
     int32_t EnableInputDeviceCooperate(bool enabled, std::function<void(std::string, CooperationMessage)> callback);
     int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,

@@ -59,6 +59,7 @@ public:
         SET_FUNCTION_KEY_STATE = 25,
         GET_FUNCTION_KEY_STATE = 26,
         RMV_INPUT_EVENT_FILTER = 27,
+        SET_CAPTURE_MODE = 28,
         REGISTER_COOPERATE_MONITOR = 30,
         UNREGISTER_COOPERATE_MONITOR = 31,
         ENABLE_INPUT_DEVICE_COOPERATE = 32,
@@ -115,6 +116,7 @@ public:
     virtual int32_t GetFunctionKeyState(int32_t funckey, bool &state) = 0;
     virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) = 0;
     virtual int32_t SetPointerLocation(int32_t x, int32_t y) = 0;
+    virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

@@ -551,6 +551,7 @@ int32_t InputManagerImpl::SetPointerVisible(bool visible)
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MultimodalInputConnMgr->SetPointerVisible(visible);
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer visible failed, ret:%{public}d", ret);
@@ -566,6 +567,7 @@ bool InputManagerImpl::IsPointerVisible()
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     bool visible;
     int32_t ret = MultimodalInputConnMgr->IsPointerVisible(visible);
     if (ret != 0) {
@@ -958,6 +960,38 @@ void InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
 #else
     MMI_HILOGW("Pointer device or pointer drawing module does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+}
+
+int32_t InputManagerImpl::EnterCaptureMode(int32_t windowId)
+{
+#if defined(OHOS_BUILD_ENABLE_POINTER)
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetMouseCaptureMode(windowId, true);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Enter captrue mode failed");
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::LeaveCaptureMode(int32_t windowId)
+{
+#if defined(OHOS_BUILD_ENABLE_POINTER)
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetMouseCaptureMode(windowId, false);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Leave captrue mode failed");
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 } // namespace MMI
 } // namespace OHOS
