@@ -153,6 +153,12 @@ int32_t InputManagerImpl::RemoveInputEventFilter(int32_t filterId)
     return RET_OK;
 }
 
+EventHandlerPtr InputManagerImpl::GetEventHandler() const
+{
+    CHKPP(eventHandler_);
+    return eventHandler_;
+}
+
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {

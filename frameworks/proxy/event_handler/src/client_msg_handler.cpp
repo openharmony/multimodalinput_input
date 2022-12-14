@@ -29,6 +29,7 @@
 #include "input_event_data_transformation.h"
 #include "input_handler_manager.h"
 #include "input_manager_impl.h"
+#include "anr_handler.h"
 #ifdef OHOS_BUILD_ENABLE_MONITOR
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -88,7 +89,8 @@ void ClientMsgHandler::InitProcessedCallback()
     int32_t tokenType = MultimodalInputConnMgr->GetTokenType();
     if (tokenType == TokenType::TOKEN_HAP) {
         MMI_HILOGD("Current session is hap");
-        dispatchCallback_ = std::bind(&ClientMsgHandler::OnDispatchEventProcessed, std::placeholders::_1);
+        dispatchCallback_ = std::bind(&ClientMsgHandler::OnDispatchEventProcessed, std::placeholders::_1,
+            std::placeholders::_2);
     } else if (tokenType == static_cast<int32_t>(TokenType::TOKEN_NATIVE)) {
         MMI_HILOGD("Current session is native");
     } else {
@@ -288,21 +290,10 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
-void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId)
+void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId, int64_t actionTime)
 {
     CALL_DEBUG_ENTER;
-    MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
-    NetPacket pkt(MmiMessageId::MARK_PROCESS);
-    pkt << eventId << ANR_DISPATCH;
-    if (pkt.ChkRWError()) {
-        MMI_HILOGE("Packet write event failed");
-        return;
-    }
-    if (!client->SendMessage(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
-    }
+    ANRHdl->SetLastProcessedEventId(ANR_DISPATCH, eventId, actionTime);
 }
 
 int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)

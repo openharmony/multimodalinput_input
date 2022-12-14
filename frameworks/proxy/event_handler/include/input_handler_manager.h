@@ -76,7 +76,7 @@ private:
         uint32_t deviceTags);
 
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
-    void OnDispatchEventProcessed(int32_t eventId);
+    void OnDispatchEventProcessed(int32_t eventId, int64_t actionTime);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void GetConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags,
         std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos);
@@ -87,7 +87,7 @@ private:
     std::map<int32_t, Handler> inputHandlers_;
     std::map<int32_t, int32_t> processedEvents_;
     std::set<int32_t> mouseEventIds_;
-    std::function<void(int32_t)> monitorCallback_ { nullptr };
+    std::function<void(int32_t, int64_t)> monitorCallback_ { nullptr };
     int32_t nextId_ { 1 };
     std::mutex mtxHandlers_;
 };
