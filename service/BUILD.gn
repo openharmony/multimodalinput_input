@@ -137,6 +137,7 @@ ohos_shared_library("libmmi-server") {
       sources += [
         "mouse_event_normalize/src/mouse_device_state.cpp",
         "mouse_event_normalize/src/mouse_event_normalize.cpp",
+        "mouse_event_normalize/src/mouse_transform_processor.cpp",
         "touch_event_normalize/src/gesture_transform_processor.cpp",
         "touch_event_normalize/src/touchpad_transform_processor.cpp",
       ]
