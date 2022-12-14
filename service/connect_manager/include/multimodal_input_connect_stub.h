@@ -72,6 +72,7 @@ protected:
     int32_t StubGetFunctionKeyState(MessageParcel &data, MessageParcel &reply);
     int32_t StubSetFunctionKeyState(MessageParcel &data, MessageParcel &reply);
     int32_t StubSetPointerLocation(MessageParcel &data, MessageParcel &reply);
+    int32_t StubSetMouseCaptureMode(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace MMI
 } // namespace OHOS

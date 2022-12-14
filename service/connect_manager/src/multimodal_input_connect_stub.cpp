@@ -87,7 +87,8 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::SET_INPUT_DEVICE_TO_SCREEN, &MultimodalInputConnectStub::StubSetInputDevice},
         {IMultimodalInputConnect::GET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubGetFunctionKeyState},
         {IMultimodalInputConnect::SET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubSetFunctionKeyState},
-        {IMultimodalInputConnect::SET_POINTER_LOCATION, &MultimodalInputConnectStub::StubSetPointerLocation}
+        {IMultimodalInputConnect::SET_POINTER_LOCATION, &MultimodalInputConnectStub::StubSetPointerLocation},
+        {IMultimodalInputConnect::SET_CAPTURE_MODE, &MultimodalInputConnectStub::StubSetMouseCaptureMode},
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -843,6 +844,20 @@ int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel &data, 
     int32_t ret = SetPointerLocation(x, y);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetFunctionKeyState failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetMouseCaptureMode(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t windowId = -1;
+    bool isCaptureMode = false;
+    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, isCaptureMode, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetMouseCaptureMode(windowId, isCaptureMode);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Fail to call SetMouseCaptureMode, ret:%{public}d", ret);
     }
     return ret;
 }
