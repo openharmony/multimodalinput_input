@@ -133,6 +133,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
         {"down", required_argument, NULL, 'd'},
         {"up", required_argument, NULL, 'u'},
         {"scroll", required_argument, NULL, 's'},
+        {"drag", required_argument, NULL, 'g'},
         {"interval", required_argument, NULL, 'i'},
         {NULL, 0, NULL, 0}
     };
@@ -170,7 +171,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                 int32_t py = 0;
                 int32_t buttonId;
                 int32_t scrollValue;
-                while ((c = getopt_long(argc, argv, "m:d:u:c:b:s:i:", mouseSensorOptions, &optionIndex)) != -1) {
+                while ((c = getopt_long(argc, argv, "m:d:u:c:b:s:g:i:", mouseSensorOptions, &optionIndex)) != -1) {
                     switch (c) {
                         case 'm': {
                             if (argc - optind < 1) {
@@ -547,6 +548,97 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             InputMgr->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
                             item.SetPressed(false);
+                            pointerEvent->UpdatePointerItem(0, item);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+                            InputMgr->SimulateInputEvent(pointerEvent);
+                            break;
+                        }
+                        case 'g': {
+                            int32_t px1 = 0;
+                            int32_t py1 = 0;
+                            int32_t px2 = 0;
+                            int32_t py2 = 0;
+                            int32_t buttonId = 0;
+                            int32_t totalTimeMs = 1000;
+                            if (argc < 7) {
+                                std::cout << "argc:" << argc << std::endl;
+                                std::cout << "Wrong number of parameters" << std::endl;
+                                return RET_ERR;
+                            }
+                            if (argc >= 7) {
+                                if ((!StrToInt(optarg, px1)) ||
+                                    (!StrToInt(argv[optind], py1)) ||
+                                    (!StrToInt(argv[optind + 1], px2)) ||
+                                    (!StrToInt(argv[optind + 2], py2))) {
+                                        std::cout << "Invalid coordinate value" << std::endl;
+                                        return RET_ERR;
+                                }
+                            }
+                            if ((px1 < 0) || (py1 < 0) || (px2 < 0) || (py2 < 0)) {
+                                std::cout << "Coordinate value must be greater than 0" << std::endl;
+                                return RET_ERR;
+                            }
+                            if (argc >= 8) {
+                                if (!StrToInt(argv[optind + 3], totalTimeMs)) {
+                                    std::cout << "Invalid total times" << std::endl;
+                                    return RET_ERR;
+                                }
+                            }
+                            static const int64_t minTotalTimeMs = 1;
+                            static const int64_t maxTotalTimeMs = 15000;
+                            if ((totalTimeMs < minTotalTimeMs) || (totalTimeMs > maxTotalTimeMs)) {
+                                std::cout << "Total time is out of range:"
+                                    << minTotalTimeMs << "ms" << " <= " << totalTimeMs << "ms" << " <= "
+                                    << maxTotalTimeMs << "ms" << std::endl;
+                                return RET_ERR;
+                            }
+                            std::cout << "start coordinate: (" << px1 << ", "  << py1 << ")" << std::endl;
+                            std::cout << "  end coordinate: (" << px2 << ", "  << py2 << ")" << std::endl;
+                            std::cout << "      total time: "  << totalTimeMs  << "ms"       << std::endl;
+                            auto pointerEvent = PointerEvent::Create();
+                            CHKPR(pointerEvent, ERROR_NULL_POINTER);
+                            PointerEvent::PointerItem item;
+                            item.SetPointerId(0);
+                            item.SetDisplayX(px1);
+                            item.SetDisplayY(py1);
+                            item.SetPressed(false);
+                            pointerEvent->SetPointerId(0);
+                            pointerEvent->AddPointerItem(item);
+                            pointerEvent->SetButtonPressed(0);
+                            pointerEvent->SetButtonId(buttonId);
+                            pointerEvent->SetButtonPressed(buttonId);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+                            pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+                            InputMgr->SimulateInputEvent(pointerEvent);
+
+                            int64_t startTimeMs = GetSysClockTime() / 1000;
+                            int64_t endTimeMs = 0;
+                            if (!AddInt64(startTimeMs, totalTimeMs, endTimeMs)) {
+                                std::cout << "System time error" << std::endl;
+                                return RET_ERR;
+                            }
+                            int64_t currentTimeMs = startTimeMs;
+                            while (currentTimeMs < endTimeMs) {
+                                item.SetDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs, px1, px2));
+                                item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs, py1, py2));
+                                pointerEvent->SetActionTime(currentTimeMs);
+                                pointerEvent->UpdatePointerItem(0, item);
+                                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                                InputMgr->SimulateInputEvent(pointerEvent);
+                                SleepAndUpdateTime(currentTimeMs);
+                            }
+                            item.SetDisplayX(px2);
+                            item.SetDisplayY(py2);
+                            pointerEvent->SetActionTime(endTimeMs);
+                            pointerEvent->UpdatePointerItem(0, item);
+                            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+                            InputMgr->SimulateInputEvent(pointerEvent);
+                            std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
+
+                            item.SetDisplayX(px2);
+                            item.SetDisplayY(py2);
+                            item.SetPressed(true);
+                            pointerEvent->SetActionTime(endTimeMs);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
                             InputMgr->SimulateInputEvent(pointerEvent);
@@ -1273,6 +1365,9 @@ void InputManagerCommand::ShowUsage()
     std::cout << "   key value:6 - button back"     << std::endl;
     std::cout << "   key value:7 - button task"     << std::endl;
     std::cout << "-s <key>                  --scroll <key>      -positive values are sliding backwards" << std::endl;
+    std::cout << "-g <dx1> <dy1> <dx2> <dy2> [total time]       --drag <dx1> <dy1> <dx2> <dy2> [total time],";
+    std::cout << std::endl;
+    std::cout << "                                              dx1 dy1 to dx2 dy2 smooth drag"         << std::endl;
     std::cout << "-i <time>                 --interval <time>   -the program interval for the (time) milliseconds";
     std::cout << std::endl;
     std::cout << "                                               negative values are sliding forwards"  << std::endl;
