@@ -54,7 +54,7 @@ void ClientMsgHandler::Init()
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         { MmiMessageId::ON_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnKeyEvent, this) },
         { MmiMessageId::ON_SUBSCRIBE_KEY, std::bind(&ClientMsgHandler::OnSubscribeKeyEventCallback,
-                                                   this, std::placeholders::_1, std::placeholders::_2) },
+            this, std::placeholders::_1, std::placeholders::_2) },
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         { MmiMessageId::ON_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnPointerEvent, this) },
