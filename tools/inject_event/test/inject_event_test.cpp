@@ -166,6 +166,29 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_007, TestSize.Level1)
 }
 
 /**
+ * @tc.name:InjectEvent_InjectMouse_008
+ * @tc.desc: test inject mouse soomth drag interface
+ * @tc.type: FUNC
+ * @tc.require:SR000GGQBJ
+ */
+HWTEST_F(InjectEventTest, InjectEvent_InjectMouse_008, TestSize.Level1)
+{
+    std::unique_ptr<InputManagerCommand> inputManagerCommand = std::make_unique<InputManagerCommand>();
+    char command1[] = {"uinput"};
+    char command2[] = {"-M"};
+    char command3[] = {"-g"};
+    char command4[] = {"100"};
+    char command5[] = {"200"};
+    char command6[] = {"100"};
+    char command7[] = {"700"};
+    char command8[] = {"3000"};
+
+    char *argv[] = {command1, command2, command3, command4, command5, command6, command7, command8};
+    int32_t result = inputManagerCommand->ParseCommand(8, argv);
+    EXPECT_EQ(OHOS::ERR_OK, result);
+}
+
+/**
  * @tc.name:InjectEvent_InjectKey_001
  * @tc.desc: test inject key down interface
  * @tc.type: FUNC
