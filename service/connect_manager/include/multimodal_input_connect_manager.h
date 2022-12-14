@@ -41,6 +41,7 @@ public:
     int32_t RemoveInputEventFilter(int32_t filterId);
     int32_t SetPointerVisible(bool visible);
     int32_t IsPointerVisible(bool &visible);
+    int32_t MarkProcessed(int32_t eventType, int32_t eventId);
     int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed(int32_t &speed);
     int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle);
@@ -72,6 +73,7 @@ public:
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
     int32_t SetPointerLocation(int32_t x, int32_t y);
+    int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
 
 private:
     MultimodalInputConnectManager() = default;

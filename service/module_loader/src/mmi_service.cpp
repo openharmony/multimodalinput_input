@@ -452,6 +452,18 @@ int32_t MMIService::IsPointerVisible(bool &visible)
     return RET_OK;
 }
 
+int32_t MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ANRManager::MarkProcessed, ANRMgr, GetCallingPid(), eventType, eventId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Mark event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t MMIService::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;
@@ -1272,5 +1284,15 @@ int32_t MMIService::OnGetInputDeviceCooperateState(int32_t pid, int32_t userData
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+
+int32_t MMIService::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = WinMgr->SetMouseCaptureMode(windowId, isCaptureMode);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set capture failed,return %{public}d", ret);
+    }
+    return ret;;
+}
 } // namespace MMI
 } // namespace OHOS

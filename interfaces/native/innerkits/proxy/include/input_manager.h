@@ -402,6 +402,22 @@ public:
      */
     void SetPointerLocation(int32_t x, int32_t y);
 
+    /**
+     * @brief 进入捕获模式
+     * @param windowId 窗口id.
+     * @return 进入捕获模式成功或失败.
+     * @since 9
+     */
+    int32_t EnterCaptureMode(int32_t windowId);
+
+    /**
+     * @brief 退出捕获模式
+     * @param windowId 窗口id.
+     * @return 退出捕获模式成功或失败.
+     * @since 9
+     */
+    int32_t LeaveCaptureMode(int32_t windowId);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

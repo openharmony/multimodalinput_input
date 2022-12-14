@@ -65,6 +65,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::GET_POINTER_SPEED, &MultimodalInputConnectStub::StubGetPointerSpeed},
         {IMultimodalInputConnect::SUBSCRIBE_KEY_EVENT, &MultimodalInputConnectStub::StubSubscribeKeyEvent},
         {IMultimodalInputConnect::UNSUBSCRIBE_KEY_EVENT, &MultimodalInputConnectStub::StubUnsubscribeKeyEvent},
+        {IMultimodalInputConnect::MARK_PROCESSED, &MultimodalInputConnectStub::StubMarkProcessed},
         {IMultimodalInputConnect::ADD_INPUT_HANDLER, &MultimodalInputConnectStub::StubAddInputHandler},
         {IMultimodalInputConnect::REMOVE_INPUT_HANDLER, &MultimodalInputConnectStub::StubRemoveInputHandler},
         {IMultimodalInputConnect::MARK_EVENT_CONSUMED, &MultimodalInputConnectStub::StubMarkEventConsumed},
@@ -86,7 +87,8 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::SET_INPUT_DEVICE_TO_SCREEN, &MultimodalInputConnectStub::StubSetInputDevice},
         {IMultimodalInputConnect::GET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubGetFunctionKeyState},
         {IMultimodalInputConnect::SET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubSetFunctionKeyState},
-        {IMultimodalInputConnect::SET_POINTER_LOCATION, &MultimodalInputConnectStub::StubSetPointerLocation}
+        {IMultimodalInputConnect::SET_POINTER_LOCATION, &MultimodalInputConnectStub::StubSetPointerLocation},
+        {IMultimodalInputConnect::SET_CAPTURE_MODE, &MultimodalInputConnectStub::StubSetMouseCaptureMode},
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -197,6 +199,24 @@ int32_t MultimodalInputConnectStub::StubIsPointerVisible(MessageParcel& data, Me
     }
     WRITEBOOL(reply, visible, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("visible:%{public}d,ret:%{public}d,pid:%{public}d", visible, ret, GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubMarkProcessed(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+    }
+    int32_t eventType;
+    READINT32(data, eventType, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t eventId;
+    READINT32(data, eventId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = MarkProcessed(eventType, eventId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("MarkProcessed failed, ret:%{public}d", ret);
+        return ret;
+    }
     return RET_OK;
 }
 
@@ -824,6 +844,20 @@ int32_t MultimodalInputConnectStub::StubSetPointerLocation(MessageParcel &data, 
     int32_t ret = SetPointerLocation(x, y);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetFunctionKeyState failed ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetMouseCaptureMode(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t windowId = -1;
+    bool isCaptureMode = false;
+    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, isCaptureMode, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetMouseCaptureMode(windowId, isCaptureMode);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Fail to call SetMouseCaptureMode, ret:%{public}d", ret);
     }
     return ret;
 }

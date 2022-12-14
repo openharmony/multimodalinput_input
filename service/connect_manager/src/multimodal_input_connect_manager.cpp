@@ -105,6 +105,12 @@ int32_t MultimodalInputConnectManager::IsPointerVisible(bool &visible)
     return multimodalInputConnectService_->IsPointerVisible(visible);
 }
 
+int32_t MultimodalInputConnectManager::MarkProcessed(int32_t eventType, int32_t eventId)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->MarkProcessed(eventType, eventId);
+}
+
 int32_t MultimodalInputConnectManager::SetPointerSpeed(int32_t speed)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
@@ -355,6 +361,12 @@ void MultimodalInputConnectManager::NotifyDeath()
             return;
         }
     } while (--retryCount > 0);
+}
+
+int32_t MultimodalInputConnectManager::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetMouseCaptureMode(windowId, isCaptureMode);
 }
 } // namespace MMI
 } // namespace OHOS
