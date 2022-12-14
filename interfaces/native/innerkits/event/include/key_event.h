@@ -1370,7 +1370,7 @@ public:
     static const int32_t KEYCODE_BUTTON_DEAD;
 
     /**
-     * 键盘list菜单键
+     *  List Menu key on keyboard
      *
      * @since 9
      */
@@ -2867,196 +2867,196 @@ public:
     static const int32_t KEY_ACTION_UP;
 
     /**
-     * 未知意图
+     * Unknown intention
      *
      * @since 9
      */
     static const int32_t INTENTION_UNKNOWN;
 
     /**
-     * D-pad 上
+     * Up intention
      *
      * @since 9
      */
     static const int32_t INTENTION_UP;
 
     /**
-     * D-pad 下
+     * Down intention
      *
      * @since 9
      */
     static const int32_t INTENTION_DOWN;
 
     /**
-     * D-pad 左
+     * Left intention
      *
      * @since 9
      */
     static const int32_t INTENTION_LEFT;
 
     /**
-     * D-pad 右
+     * Right intention
      *
      * @since 9
      */
     static const int32_t INTENTION_RIGHT;
 
     /**
-     * 选中
+     * Select intention
      *
      * @since 9
      */
     static const int32_t INTENTION_SELECT;
 
     /**
-     * 逃逸
+     * Escape intention
      *
      * @since 9
      */
     static const int32_t INTENTION_ESCAPE;
 
     /**
-     * 返回
+     * Back intention
      *
      * @since 9
      */
     static const int32_t INTENTION_BACK;
 
     /**
-     * 前进
+     * Forward intention
      *
      * @since 9
      */
     static const int32_t INTENTION_FORWARD;
 
     /**
-     * 菜单
+     * Menu intention
      *
      * @since 9
      */
     static const int32_t INTENTION_MENU;
     
     /**
-     * 回到桌面
+     * Home intention
      *
      * @since 9
      */
     static const int32_t INTENTION_HOME;
     
     /**
-     * 上一页
+     * Page Up intention
      *
      * @since 9
      */
     static const int32_t INTENTION_PAGE_UP;
     
     /**
-     * 下一页
+     * Page down intention
      *
      * @since 9
      */
     static const int32_t INTENTION_PAGE_DOWN;
     
     /**
-     * 放大键
+     * Zoom out intention
      *
      * @since 9
      */
     static const int32_t INTENTION_ZOOM_OUT;
     
     /**
-     * 缩小键
+     * Zoom in intention
      *
      * @since 9
      */
     static const int32_t INTENTION_ZOOM_IN;
 
     /**
-     * 播放/暂停
+     * Media play/pause intention
      *
      * @since 9
      */
     static const int32_t INTENTION_MEDIA_PLAY_PAUSE;
     
     /**
-     * 快进
+     * Media fast forward intention
      *
      * @since 9
      */
     static const int32_t INTENTION_MEDIA_FAST_FORWARD;
     
     /**
-     * 快退
+     * Media fast rewind intention
      *
      * @since 9
      */
     static const int32_t INTENTION_MEDIA_FAST_REWIND;
     
     /**
-     * 倍速播放
+     * Media fast playback intention
      *
      * @since 9
      */
     static const int32_t INTENTION_MEDIA_FAST_PLAYBACK;
     
     /**
-     * 下一首/下一集
+     * Media next intention
      *
      * @since 9
      */
     static const int32_t INTENTION_MEDIA_NEXT;
     
     /**
-     * 上一首/上一集
+     * Media previous intention
      *
      * @since 9
      */
     static const int32_t INTENTION_MEDIA_PREVIOUS;
     
     /**
-     * 扬声器静音键
+     * Media mute intention
      *
      * @since 9
      */
     static const int32_t INTENTION_MEDIA_MUTE;
 
     /**
-     * 音量增加键
+     * Volume up intention
      *
      * @since 9
      */
     static const int32_t INTENTION_VOLUTE_UP;
     
     /**
-     * 音量减小键
+     * Volume down intention
      *
      * @since 9
      */
     static const int32_t INTENTION_VOLUTE_DOWN;
 
     /**
-     * 接听/挂断/拨号
+     * Call intention
      *
      * @since 9
      */
     static const int32_t INTENTION_CALL;
     
     /**
-     * 挂断
+     * End call intention
      *
      * @since 9
      */
     static const int32_t INTENTION_ENDCALL;
     
     /**
-     * 拒绝
+     * Reject call intention
      *
      * @since 9
      */
     static const int32_t INTENTION_REJECTCALL;
 
     /**
-     * 拍照键
+     * Camera intention
      *
      * @since 9
      */
@@ -3329,16 +3329,16 @@ public:
     bool GetFunctionKey(int32_t funcKey) const;
 
     /**
-     * @brief 获取当前事件的按键意图。
+     * @brief Obtains the key intention of the current event.
      * @param void
-     * @return 返回当前事件的按键意图。
+     * @return Returns the key intention of the current event.
      * @since 9
      */
     int32_t GetKeyIntention() const;
 
     /**
-     * @brief 给当前按键事件设置按键意图。
-     * @param keyIntention 指定的按键意图。
+     * @brief Sets the key intention for the current key event.
+     * @param keyIntention Specified key intention.
      * @return void
      * @since 9
      */
