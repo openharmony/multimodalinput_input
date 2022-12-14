@@ -465,7 +465,7 @@ napi_value JsPointerContext::EnterCaptureMode(napi_env env, napi_callback_info i
     int32_t windowId = 0;
     CHKRP(napi_get_value_int32(env, argv[0], &windowId), GET_VALUE_INT32);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
-    CHKPV(jsPointer);
+    CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     if(argc == 1) {
         return jsPointerMgr->EnterCaptureMode(env, windowId);
@@ -482,7 +482,7 @@ napi_value JsPointerContext::LeaveCaptureMode(napi_env env, napi_callback_info i
     CALL_DEBUG_ENTER;
     size_t argc = 2;
     napi_value argv[2];
-    CHKPP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 1 || argc > 2) {
         THROWERR(env, "The number of parameters is not as expected");
         return nullptr;
