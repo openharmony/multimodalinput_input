@@ -57,7 +57,6 @@ public:
     int32_t GetDisplayId() const;
     int32_t SetPointerLocation(int32_t x, int32_t y);
     int32_t GetPointerSpeedByDeviceId(int32_t deviceId) const;
-
 private:
     int32_t HandleMotionInner(struct libinput_event_pointer* data, int32_t deviceId);
     int32_t HandleButtonInner(struct libinput_event_pointer* data);

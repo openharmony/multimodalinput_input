@@ -88,7 +88,7 @@ int32_t MouseEventNormalize::GetSpeed(int32_t deviceId) const
     }
 }
 
-bool MouseEventNormalize::GetSpeedGain(double vin, double &gain) const
+bool MouseEventNormalize::GetSpeedGain(double vin, double &gain, int32_t deviceId) const
 {
     if (fabs(vin) < DOUBLE_ZERO) {
         MMI_HILOGE("The value of the parameter passed in is 0");
@@ -338,7 +338,6 @@ int32_t MouseEventNormalize::Normalize(struct libinput_event *event)
             return RET_ERR;
         }
     }
-
     PointerEvent::PointerItem pointerItem;
     HandlePostInner(data, deviceId, pointerItem);
     WinMgr->UpdateTargetPointer(pointerEvent_);

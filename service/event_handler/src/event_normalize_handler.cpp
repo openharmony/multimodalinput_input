@@ -18,6 +18,7 @@
 #include "dfx_hisysevent.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
+#include "device_config_file_parser.h"
 #include "error_multimodal.h"
 #include "event_log_helper.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
@@ -34,7 +35,6 @@
 #include "time_cost_chk.h"
 #include "timer_manager.h"
 #include "touch_event_normalize.h"
-#include "device_config_file_parser.h"
 
 namespace OHOS {
 namespace MMI {
