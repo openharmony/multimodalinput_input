@@ -36,6 +36,7 @@ public:
         ADD_INPUT_EVENT_FILTER = 1,
         SET_POINTER_VISIBLE = 2,
         IS_POINTER_VISIBLE = 3,
+        MARK_PROCESSED = 4,
         SUBSCRIBE_KEY_EVENT = 6,
         UNSUBSCRIBE_KEY_EVENT = 7,
         ADD_INPUT_HANDLER = 8,
@@ -58,6 +59,7 @@ public:
         SET_FUNCTION_KEY_STATE = 25,
         GET_FUNCTION_KEY_STATE = 26,
         RMV_INPUT_EVENT_FILTER = 27,
+        SET_CAPTURE_MODE = 28,
         REGISTER_COOPERATE_MONITOR = 30,
         UNREGISTER_COOPERATE_MONITOR = 31,
         ENABLE_INPUT_DEVICE_COOPERATE = 32,
@@ -81,6 +83,7 @@ public:
     virtual int32_t RemoveInputEventFilter(int32_t filterId) = 0;
     virtual int32_t SetPointerVisible(bool visible) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
+    virtual int32_t MarkProcessed(int32_t eventType, int32_t eventId) = 0;
     virtual int32_t SetPointerSpeed(int32_t speed) = 0;
     virtual int32_t GetPointerSpeed(int32_t &speed) = 0;
     virtual int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle) = 0;
@@ -113,6 +116,7 @@ public:
     virtual int32_t GetFunctionKeyState(int32_t funckey, bool &state) = 0;
     virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) = 0;
     virtual int32_t SetPointerLocation(int32_t x, int32_t y) = 0;
+    virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

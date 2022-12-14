@@ -249,5 +249,15 @@ void InputManager::SetPointerLocation(int32_t x, int32_t y)
 {
     InputMgrImpl.SetPointerLocation(x, y);
 }
+
+int32_t InputManager::EnterCaptureMode(int32_t windowId)
+{
+    return InputMgrImpl.EnterCaptureMode(windowId);
+}
+
+int32_t InputManager::LeaveCaptureMode(int32_t windowId)
+{
+    return InputMgrImpl.LeaveCaptureMode(windowId);
+}
 } // namespace MMI
 } // namespace OHOS

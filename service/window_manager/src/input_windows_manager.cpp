@@ -212,6 +212,11 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
     CALL_DEBUG_ENTER;
     CheckFocusWindowChange(displayGroupInfo);
     CheckZorderWindowChange(displayGroupInfo);
+    if (captureModeInfo_.isCaptureMode &&
+        ((displayGroupInfo_.focusWindowId != displayGroupInfo.focusWindowId) ||
+        (displayGroupInfo_.windowsInfo[0].id != displayGroupInfo.windowsInfo[0].id))) {
+        captureModeInfo_.isCaptureMode = false;
+    }
     displayGroupInfo_ = displayGroupInfo;
     PrintDisplayInfo();
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -918,6 +923,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
         pointerItem.GetDisplayY(), MOUSE_ICON(mouseStyle));
+    if (captureModeInfo_.isCaptureMode && (touchWindow->id != captureModeInfo_.windowId)) {
+        captureModeInfo_.isCaptureMode = false;
+    }
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     int32_t windowX = logicalX - touchWindow->area.x;
@@ -945,6 +953,27 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     return ERR_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
+
+int32_t InputWindowsManager::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
+{
+    if (windowId < 0) {
+        MMI_HILOGE("Windowid(%{public}d) is invalid", windowId);
+        return RET_ERR;
+    }
+    if ((captureModeInfo_.isCaptureMode == isCaptureMode) && !isCaptureMode) {
+        MMI_HILOGE("Windowid:(%{public}d) is not capture mode", windowId);
+        return RET_OK;
+    }
+    captureModeInfo_.windowId = windowId;
+    captureModeInfo_.isCaptureMode = isCaptureMode;
+    MMI_HILOGI("Windowid:(%{public}d) is (%{public}d)", windowId, isCaptureMode);
+    return RET_OK;
+}
+
+bool InputWindowsManager::GetMouseIsCaptureMode() const
+{
+    return captureModeInfo_.isCaptureMode;
+}
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)

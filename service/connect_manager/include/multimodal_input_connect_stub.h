@@ -44,6 +44,7 @@ protected:
     int32_t StubSetPointerStyle(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerStyle(MessageParcel& data, MessageParcel& reply);
     int32_t StubIsPointerVisible(MessageParcel& data, MessageParcel& reply);
+    int32_t StubMarkProcessed(MessageParcel& data, MessageParcel& reply);
     int32_t StubSupportKeys(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetDeviceIds(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetDevice(MessageParcel& data, MessageParcel& reply);
@@ -71,6 +72,7 @@ protected:
     int32_t StubGetFunctionKeyState(MessageParcel &data, MessageParcel &reply);
     int32_t StubSetFunctionKeyState(MessageParcel &data, MessageParcel &reply);
     int32_t StubSetPointerLocation(MessageParcel &data, MessageParcel &reply);
+    int32_t StubSetMouseCaptureMode(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace MMI
 } // namespace OHOS
