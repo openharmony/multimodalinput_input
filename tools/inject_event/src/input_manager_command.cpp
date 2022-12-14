@@ -58,6 +58,7 @@ constexpr int32_t THREE_MORE_COMMAND = 3;
 constexpr int32_t MAX_PRESSED_COUNT = 30;
 constexpr int32_t ACTION_TIME = 3000;
 constexpr int32_t BLOCK_TIME_MS = 10;
+constexpr int32_t MS_TO_US = 10;
 } // namespace
 
 void InputManagerCommand::SleepAndUpdateTime(int64_t &currentTimeMs)
@@ -793,7 +794,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             while (currentTimeMs < endTimeMs) {
                                 item.SetDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs, px1, px2));
                                 item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs, py1, py2));
-                                pointerEvent->SetActionTime(currentTimeMs);
+                                pointerEvent->SetActionTime(currentTimeMs * MS_TO_US);
                                 pointerEvent->UpdatePointerItem(0, item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -806,7 +807,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
-                            pointerEvent->SetActionTime(endTimeMs);
+                            pointerEvent->SetActionTime(endTimeMs * MS_TO_US);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -814,7 +815,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
-                            pointerEvent->SetActionTime(endTimeMs + BLOCK_TIME_MS);
+                            pointerEvent->SetActionTime((endTimeMs + BLOCK_TIME_MS) * MS_TO_US);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
