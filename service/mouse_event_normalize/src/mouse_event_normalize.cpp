@@ -450,7 +450,6 @@ int32_t MouseEventNormalize::SetPointerSpeedWithDeviceId(int32_t deviceId, int32
     CALL_DEBUG_ENTER;
     pointerDeviceSpeeds[deviceId] = PointerSpeedCheck(speed);
     MMI_HILOGD("Set pointer speed:%{public}d", pointerDeviceSpeeds[deviceId]);
-    // Notify
     return RET_OK;
 }
 
@@ -462,7 +461,6 @@ int32_t MouseEventNormalize::RemovePointerSpeed(int32_t deviceId)
         pointerDeviceSpeeds.erase(it);
         MMI_HILOGD("remove pointer speed with deviceId:%{public}d", deviceId);
     }
-    // notify
     return RET_OK;
 }
 

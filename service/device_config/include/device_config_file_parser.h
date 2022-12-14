@@ -22,8 +22,7 @@ struct libinput_device;
 
 namespace OHOS {
 namespace MMI {
-enum class ConfigFileItem
-{
+enum class ConfigFileItem {
     INVALID = -1,
     POINTER_BASE = 0,
     POINTER_SPEED,
