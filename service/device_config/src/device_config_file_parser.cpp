@@ -14,12 +14,13 @@
  */
 
 #include "device_config_file_parser.h"
+
 #include <fstream>
-#include "libinput.h"
-#include "input_device.h"
+
 #include "error_multimodal.h"
-#include "mouse_event_handler.h"
+#include "input_device.h"
 #include "input_device_manager.h"
+#include "libinput.h"
 
 namespace OHOS {
 namespace MMI {
