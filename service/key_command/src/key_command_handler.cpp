@@ -48,7 +48,7 @@ enum SpecialType {
 const std::map<int32_t, SpecialType> SPECIAL_KEYS = {
     { KeyEvent::KEYCODE_POWER, SpecialType::KEY_DOWN_ACTION },
     { KeyEvent::KEYCODE_VOLUME_DOWN, SpecialType::SPECIAL_ALL },
-    { KeyEvent::KEYCODE_VOLUME_UP, SpecialType::SUBSCRIBER_BEFORE_DELAY }
+    { KeyEvent::KEYCODE_VOLUME_UP, SpecialType::SPECIAL_ALL }
 };
 struct JsonParser {
     JsonParser() = default;
@@ -870,7 +870,7 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
             isLaunchAbility = true;
             return true;
         }
-        sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay, 1, [this, sequence] () {
+        sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay/SECONDS_SYSTEM, 1, [this, sequence] () {
             MMI_HILOGD("Timer callback");
             LaunchAbility(sequence);
         });
@@ -1010,6 +1010,7 @@ void KeyCommandHandler::LaunchAbility(const Sequence &sequence)
     }
     DfxHisysevent::CalcComboStartTimes(sequence.abilityStartDelay);
     DfxHisysevent::ReportComboStartTimes();
+    ResetSequenceKeys();
     MMI_HILOGD("Start launch ability, bundleName:%{public}s", sequence.ability.bundleName.c_str());
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {
