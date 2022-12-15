@@ -58,8 +58,7 @@ int32_t PointerSpeedCheck(int32_t speed)
     if (speed < MIN_SPEED) {
         MMI_HILOGW("Set pointer speed less than minimum speed:%{public}d", speed);
         return MIN_SPEED;
-    }
-    if (speed > MAX_SPEED) {
+    } else if (speed > MAX_SPEED) {
         MMI_HILOGW("Set pointer speed greater than the maximum value speed:%{public}d", speed);
         return MAX_SPEED;
     }
@@ -81,11 +80,7 @@ std::shared_ptr<PointerEvent> MouseEventNormalize::GetPointerEvent() const
 
 int32_t MouseEventNormalize::GetSpeed(int32_t deviceId) const
 {
-    if (isSpeedSetByUser_) {
-        return speed_;
-    } else {
-        return GetPointerSpeedByDeviceId(deviceId);
-    }
+    return isSpeedSetByUser_ ? speed_ : GetPointerSpeedByDeviceId(deviceId);
 }
 
 bool MouseEventNormalize::GetSpeedGain(double vin, double &gain, int32_t deviceId) const

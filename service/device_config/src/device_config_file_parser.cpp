@@ -115,14 +115,15 @@ std::map<ConfigFileItem, int32_t> DeviceConfigManagement::ReadConfigFile(const s
 int32_t DeviceConfigManagement::DeviceConfiguration(struct libinput_device *device, DeviceId deviceId)
 {
     CALL_DEBUG_ENTER;
-    std::string fileName = "/vendor/etc/pointer/" + CombDeviceFileName(device) + ".TOML";
-    if(FileVerification(fileName, "TOML") != RET_OK) {
+    std::string filePath = "/vendor/etc/pointer/" + CombDeviceFileName(device) + ".TOML";
+    auto path = FileVerification(filePath, "TOML");
+    if(path.empty()) {
         MMI_HILOGE("File validation failed");
         return RET_ERR;
     }
-    auto configList = ReadConfigFile(fileName);
+    auto configList = ReadConfigFile(path);
     if (configList.empty()) {
-        MMI_HILOGE("ConfigList is empty");
+        MMI_HILOGE("configList is empty");
         return RET_ERR;
     }
     deviceConfigs_[deviceId] = configList;
