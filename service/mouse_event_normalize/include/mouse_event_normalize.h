@@ -21,26 +21,19 @@
 #include "libinput.h"
 #include "singleton.h"
 
+#include "define_multimodal.h"
+#include "mouse_transform_processor.h"
 #include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
-namespace {
-constexpr int32_t DEFAULT_SPEED = 5;
-} // namespace
-
-struct AccelerateCurve {
-    std::vector<int32_t> speeds;
-    std::vector<double> slopes;
-    std::vector<double> diffNums;
-};
-
 class MouseEventNormalize final : public std::enable_shared_from_this<MouseEventNormalize> {
     DECLARE_DELAYED_SINGLETON(MouseEventNormalize);
 public:
     DISALLOW_COPY_AND_MOVE(MouseEventNormalize);
-    std::shared_ptr<PointerEvent> GetPointerEvent() const;
-    int32_t Normalize(struct libinput_event *event);
+    std::shared_ptr<PointerEvent> GetPointerEvent();
+    int32_t OnEvent(struct libinput_event *event);
+    bool GetSpeedGain(double vin, double &gain) const;
     void Dump(int32_t fd, const std::vector<std::string> &args);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     void SetAbsolutionLocation(double xPercent, double yPercent);
@@ -53,33 +46,19 @@ public:
     void OnDisplayLost(int32_t displayId);
     int32_t GetDisplayId() const;
     int32_t SetPointerLocation(int32_t x, int32_t y);
-private:
-    int32_t HandleMotionInner(struct libinput_event_pointer* data);
-    int32_t HandleButtonInner(struct libinput_event_pointer* data);
-    int32_t HandleAxisInner(struct libinput_event_pointer* data);
-    void HandlePostInner(struct libinput_event_pointer* data, int32_t deviceId, PointerEvent::PointerItem &pointerItem);
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
-    void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    int32_t HandleButtonValueInner(struct libinput_event_pointer* data);
-    int32_t HandleMotionAccelerate(struct libinput_event_pointer* data);
-    bool GetSpeedGain(double vin, double &gain) const;
-    void DumpInner();
-    void InitAbsolution();
-    void SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, libinput_event_pointer* data);
 
 private:
-    std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
-    int32_t timerId_ { -1 };
-    double absolutionX_ { -1.0 };
-    double absolutionY_ { -1.0 };
+    std::shared_ptr<MouseTransformProcessor> GetProcessor(int32_t deviceId) const;
+    std::shared_ptr<MouseTransformProcessor> GetCurrentProcessor() const;
+    void SetCurrentDeviceId(int32_t deviceId);
+    int32_t GetCurrentDeviceId() const;
+
+private:
     int32_t buttonId_ { -1 };
     bool isPressed_ { false };
-    int32_t currentDisplayId_ { -1 };
-    int32_t speed_ { DEFAULT_SPEED };
+    std::map<int32_t, std::shared_ptr<MouseTransformProcessor>> processors_;
+    int32_t currentDeviceId_ { -1 };
 };
-
 #define MouseEventHdr ::OHOS::DelayedSingleton<MouseEventNormalize>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
