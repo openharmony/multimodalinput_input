@@ -17,8 +17,8 @@
 #define VIRTUAL_KEYBOARD_H
 
 #include <cstdint>
-#include "nocopyable.h"
 
+#include "nocopyable.h"
 #include "virtual_device.h"
 
 namespace OHOS {

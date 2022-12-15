@@ -20,8 +20,8 @@
 #include <string>
 
 #include "event_dispatch_handler.h"
-#include "key_map_manager.h"
 #include "key_event.h"
+#include "key_map_manager.h"
 #include "libinput.h"
 #include "singleton.h"
 #include "util.h"

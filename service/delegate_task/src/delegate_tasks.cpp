@@ -12,10 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "delegate_tasks.h"
 
-#include <sys/syscall.h>
 #include <fcntl.h>
+#include <sys/syscall.h>
 #include <unistd.h>
 
 #include "error_multimodal.h"
@@ -159,7 +160,7 @@ DelegateTasks::TaskPtr DelegateTasks::PostTask(DTaskCallback callback, Promise *
         return nullptr;
     }
     int32_t id = GenerateId();
-    TaskData data = {GetThisThreadId(), id};
+    TaskData data = { GetThisThreadId(), id };
     auto res = write(fds_[1], &data, sizeof(data));
     if (res == -1) {
         RecoveryId(id);

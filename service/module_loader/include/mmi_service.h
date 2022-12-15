@@ -26,8 +26,8 @@
 
 #include "delegate_tasks.h"
 #include "input_event_handler.h"
-#include "multimodal_input_connect_stub.h"
 #include "libinput_adapter.h"
+#include "multimodal_input_connect_stub.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
 

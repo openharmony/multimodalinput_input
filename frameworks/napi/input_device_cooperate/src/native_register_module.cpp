@@ -26,7 +26,7 @@ static napi_module mmiInputDeviceCooperateModule = {
     .nm_register_func = JsInputDeviceCooperateContext::Export,
     .nm_modname = "multimodalInput.inputDeviceCooperate",
     .nm_priv = ((void *)0),
-    .reserved = {0},
+    .reserved = { 0 },
 };
 
 extern "C" __attribute__((constructor)) void RegisterModule(void)

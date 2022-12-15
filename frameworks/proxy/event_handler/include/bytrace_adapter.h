@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef BYTRACE_ADAPTER_H
 #define BYTRACE_ADAPTER_H
 

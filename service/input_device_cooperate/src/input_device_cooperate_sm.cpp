@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "input_device_cooperate_sm.h"
 
 #include <cstdio>
@@ -22,8 +23,8 @@
 #include "bytrace_adapter.h"
 #include "cooperate_event_manager.h"
 #include "cooperation_message.h"
-#include "device_cooperate_softbus_adapter.h"
 #include "define_multimodal.h"
+#include "device_cooperate_softbus_adapter.h"
 #include "device_profile_adapter.h"
 #include "i_pointer_drawing_manager.h"
 #include "input_device_cooperate_state_free.h"
@@ -38,7 +39,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceCooperateSM"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceCooperateSM" };
 constexpr int32_t INTERVAL_MS = 2000;
 constexpr int32_t MOUSE_ABS_LOCATION = 100;
 constexpr int32_t MOUSE_ABS_LOCATION_X = 50;

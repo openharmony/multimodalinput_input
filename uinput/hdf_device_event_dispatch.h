@@ -18,8 +18,8 @@
 
 #include <cstdint>
 
-#include "input_type.h"
 #include "inject_thread.h"
+#include "input_type.h"
 #include "nocopyable.h"
 
 namespace OHOS {

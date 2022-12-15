@@ -49,7 +49,7 @@ void HdfDeviceEventDispatch::GetEventCallbackDispatch(
             continue;
         }
         if ((pkgs[i]->type == 0) && (pkgs[i]->code == 0) && (pkgs[i]->value == 0)) {
-            InjectInputEvent injectInputSync = {injectThread_.TOUCH_SCREEN_DEVICE_ID, 0, SYN_MT_REPORT, 0};
+            InjectInputEvent injectInputSync = { injectThread_.TOUCH_SCREEN_DEVICE_ID, 0, SYN_MT_REPORT, 0 };
             injectThread_.WaitFunc(injectInputSync);
         }
         InjectInputEvent injectInputEvent = {
