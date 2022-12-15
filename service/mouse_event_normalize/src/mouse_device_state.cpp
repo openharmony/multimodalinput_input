@@ -40,7 +40,7 @@ int32_t MouseDeviceState::GetMouseCoordsY() const
     return mouseCoord_.physicalY;
 }
 
-void MouseDeviceState::SetMouseCoords(const int32_t x, const int32_t y)
+void MouseDeviceState::SetMouseCoords(int32_t x, int32_t y)
 {
     mouseCoord_.physicalX = x;
     mouseCoord_.physicalY = y;
@@ -62,11 +62,6 @@ void MouseDeviceState::GetPressedButtons(std::vector<int32_t>& pressedButtons)
             pressedButtons.push_back(LibinputChangeToPointer(item.first));
         }
     }
-}
-
-std::map<uint32_t, int32_t> MouseDeviceState::GetMouseBtnState() const
-{
-    return mouseBtnState_;
 }
 
 void MouseDeviceState::MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState)
