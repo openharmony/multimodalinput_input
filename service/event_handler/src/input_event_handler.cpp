@@ -15,11 +15,11 @@
 
 #include "input_event_handler.h"
 
+#include <cinttypes>
 #include <cstdio>
 #include <cstring>
 #include <functional>
 #include <vector>
-#include <cinttypes>
 
 #include <sys/stat.h>
 #include <unistd.h>

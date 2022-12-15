@@ -20,8 +20,8 @@
 #include <uv.h>
 
 #include "define_multimodal.h"
-#include "napi_constants.h"
 #include "js_input_monitor_manager.h"
+#include "napi_constants.h"
 #include "proto.h"
 #include "util_napi_error.h"
 

@@ -29,7 +29,7 @@ NetPacket::~NetPacket() {}
 
 void NetPacket::MakeData(StreamBuffer &buf) const
 {
-    PACKHEAD head = {msgId_, wPos_};
+    PACKHEAD head = { msgId_, wPos_ };
     buf << head;
     if (wPos_ > 0) {
         if (!buf.Write(&szBuff_[0], wPos_)) {

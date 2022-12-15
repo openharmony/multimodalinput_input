@@ -19,13 +19,13 @@
 #include <cstdio>
 
 #include "dfx_hisysevent.h"
-#include "i_pointer_drawing_manager.h"
 #include "input_device_manager.h"
+#include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
 #include "pointer_drawing_manager.h"
+#include "util.h"
 #include "util_ex.h"
 #include "util_napi_error.h"
-#include "util.h"
 
 namespace OHOS {
 namespace MMI {
@@ -696,7 +696,7 @@ void InputWindowsManager::UpdatePointerStyle()
         int32_t pid = windowItem.pid;
         auto it = pointerStyle_.find(pid);
         if (it == pointerStyle_.end()) {
-            std::map<int32_t, int32_t> tmpPointerStyle = {{windowItem.id, DEFAULT_POINTER_STYLE}};
+            std::map<int32_t, int32_t> tmpPointerStyle = { { windowItem.id, DEFAULT_POINTER_STYLE } };
             auto iter = pointerStyle_.insert(std::make_pair(pid, tmpPointerStyle));
             if (!iter.second) {
                 MMI_HILOGW("The pd is duplicated");

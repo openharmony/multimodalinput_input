@@ -12,8 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef TOUCHPAD_TRANSFORM_PROCESSOR_H
 #define TOUCHPAD_TRANSFORM_PROCESSOR_H
+
 #include "nocopyable.h"
 #include "transform_processor.h"
 

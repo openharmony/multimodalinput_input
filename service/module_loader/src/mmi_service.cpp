@@ -19,7 +19,6 @@
 #include <csignal>
 #include <parameters.h>
 #include <sys/signalfd.h>
-#include "dfx_hisysevent.h"
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
 #endif
@@ -28,6 +27,7 @@
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "cooperate_event_manager.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+#include "dfx_hisysevent.h"
 #include "event_dump.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_cooperate_sm.h"
@@ -36,20 +36,20 @@
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "key_map_manager.h"
-#include "mmi_log.h"
-#include "string_ex.h"
-#include "util_ex.h"
-#include "util_napi_error.h"
 #include "multimodal_input_connect_def_parcel.h"
+#include "permission_helper.h"
+#include "string_ex.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
 #include "res_type.h"
 #include "system_ability_definition.h"
 #endif
-#include "permission_helper.h"
+
+#include "mmi_log.h"
 #include "timer_manager.h"
-#include "input_device_manager.h"
 #include "util.h"
+#include "util_ex.h"
+#include "util_napi_error.h"
 #include "xcollie/watchdog.h"
 
 namespace OHOS {
@@ -966,7 +966,7 @@ void MMIService::OnThread()
 bool MMIService::InitSignalHandler()
 {
     CALL_DEBUG_ENTER;
-    sigset_t mask = {0};
+    sigset_t mask = { 0 };
     int32_t retCode = sigfillset(&mask);
     if (retCode < 0) {
         MMI_HILOGE("Fill signal set failed:%{public}d", errno);

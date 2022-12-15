@@ -17,10 +17,10 @@
 
 #include <cinttypes>
 
+#include "js_register_module.h"
 #include "napi_constants.h"
 #include "util_napi.h"
 #include "util_napi_error.h"
-#include "js_register_module.h"
 
 namespace OHOS {
 namespace MMI {

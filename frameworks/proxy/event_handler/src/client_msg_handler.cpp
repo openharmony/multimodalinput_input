@@ -52,27 +52,27 @@ void ClientMsgHandler::Init()
 {
     MsgCallback funs[] = {
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-        {MmiMessageId::ON_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnKeyEvent, this)},
-        {MmiMessageId::ON_SUBSCRIBE_KEY, std::bind(&ClientMsgHandler::OnSubscribeKeyEventCallback,
-                                                   this, std::placeholders::_1, std::placeholders::_2)},
+        { MmiMessageId::ON_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnKeyEvent, this) },
+        { MmiMessageId::ON_SUBSCRIBE_KEY, std::bind(&ClientMsgHandler::OnSubscribeKeyEventCallback,
+            this, std::placeholders::_1, std::placeholders::_2) },
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-        {MmiMessageId::ON_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnPointerEvent, this)},
+        { MmiMessageId::ON_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnPointerEvent, this) },
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-        {MmiMessageId::ADD_INPUT_DEVICE_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnDevListener, this)},
-        {MmiMessageId::NOTICE_ANR, MsgCallbackBind2(&ClientMsgHandler::OnAnr, this)},
+        { MmiMessageId::ADD_INPUT_DEVICE_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnDevListener, this) },
+        { MmiMessageId::NOTICE_ANR, MsgCallbackBind2(&ClientMsgHandler::OnAnr, this) },
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || \
     defined(OHOS_BUILD_ENABLE_MONITOR))
-        {MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this)},
+        { MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this) },
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
     (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR))
-        {MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this)},
+        { MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this) },
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-        {MmiMessageId::COOPERATION_ADD_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnCooperationListener, this)},
-        {MmiMessageId::COOPERATION_MESSAGE, MsgCallbackBind2(&ClientMsgHandler::OnCooperationMessage, this)},
-        {MmiMessageId::COOPERATION_GET_STATE, MsgCallbackBind2(&ClientMsgHandler::OnCooperationState, this)},
+        { MmiMessageId::COOPERATION_ADD_LISTENER, MsgCallbackBind2(&ClientMsgHandler::OnCooperationListener, this) },
+        { MmiMessageId::COOPERATION_MESSAGE, MsgCallbackBind2(&ClientMsgHandler::OnCooperationMessage, this) },
+        { MmiMessageId::COOPERATION_GET_STATE, MsgCallbackBind2(&ClientMsgHandler::OnCooperationState, this) },
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     };
     for (auto &it : funs) {

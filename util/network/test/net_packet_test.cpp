@@ -234,7 +234,7 @@ HWTEST_F(NetPacketTest, WriteError, TestSize.Level1)
         int32_t xx;
         char szTest[MAX_STREAM_BUF_SIZE];
     };
-    TestData data = {333, "test111"};
+    TestData data = { 333, "test111" };
     pkt << data;
     EXPECT_TRUE(pkt.ChkRWError());
 }

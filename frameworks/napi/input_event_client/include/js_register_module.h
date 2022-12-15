@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef JS_REGISTER_MODULE_H
 #define JS_REGISTER_MODULE_H
 
