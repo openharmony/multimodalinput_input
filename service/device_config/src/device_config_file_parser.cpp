@@ -70,7 +70,7 @@ ConfigFileItem DeviceConfigManagement::ConfigItemName2Id(const std::string &name
 
     auto iter = configList.find(name);
     if (iter == configList.end()) {
-        MMI_HILOGE("Device config file remove failed");
+        MMI_HILOGE("Device name failed");
         return ConfigFileItem::INVALID;
     }
     return configList.at(name);
