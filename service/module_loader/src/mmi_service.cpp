@@ -732,7 +732,7 @@ int32_t MMIService::CheckMarkConsumed(int32_t pid, int32_t eventId)
 
 int32_t MMIService::MarkEventConsumed(int32_t eventId)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(
@@ -761,7 +761,7 @@ int32_t MMIService::MoveMouseEvent(int32_t offsetX, int32_t offsetY)
 
 int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent));
@@ -791,7 +791,7 @@ int32_t MMIService::CheckInjectPointerEvent(const std::shared_ptr<PointerEvent> 
 
 int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret = delegateTasks_.PostSyncTask(
         std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
