@@ -59,10 +59,9 @@ public:
     DISALLOW_COPY_AND_MOVE(MouseDeviceState);
     int32_t GetMouseCoordsX() const;
     int32_t GetMouseCoordsY() const;
-    void SetMouseCoords(const int32_t x, const int32_t y);
+    void SetMouseCoords(int32_t x, int32_t y);
     bool IsLeftBtnPressed();
     void GetPressedButtons(std::vector<int32_t>& pressedButtons);
-    std::map<uint32_t, int32_t> GetMouseBtnState() const;
     void MouseBtnStateCounts(uint32_t btnCode, const BUTTON_STATE btnState);
     int32_t LibinputChangeToPointer(const uint32_t keyValue);
 
