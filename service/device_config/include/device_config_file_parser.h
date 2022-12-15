@@ -39,7 +39,7 @@ public:
 private:
     using DeviceId = int32_t;
     std::map<DeviceId, std::map<ConfigFileItem, int32_t>> deviceConfigs_;
-private:
+
     int32_t DeviceClassification(struct libinput_device *device, DeviceId deviceId);
     int32_t DeviceConfiguration(struct libinput_device *device, DeviceId deviceId);
     std::map<ConfigFileItem, int32_t> ReadConfigFile(const std::string &filePath);

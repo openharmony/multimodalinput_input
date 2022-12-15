@@ -553,31 +553,30 @@ std::string StringPrintf(const char *format, ...)
     return result;
 }
 
-int32_t FileVerification(std::string &filePath, const std::string &checkExtension) {
+std::string FileVerification(std::string &filePath, const std::string &checkExtension) {
     if (filePath.empty()) {
         MMI_HILOGE("FilePath is empty");
-        return RET_ERR;
+        return "";
     }
     char realPath[PATH_MAX] = {};
     if (realpath(filePath.c_str(), realPath) == nullptr) {
         MMI_HILOGI("The realpath return nullptr");
-        return RET_ERR;
+        return "";
     }
     if (!IsFileExists(realPath)) {
         MMI_HILOGE("File is not existent");
-        return RET_ERR;
+        return "";
     }
     if (!CheckFileExtendName(realPath, checkExtension)) {
         MMI_HILOGE("Unable to parse files other than json format");
-        return RET_ERR;
+        return "";
     }
     int32_t fileSize = GetFileSize(realPath);
     if ((fileSize <= 0) || (fileSize > FILE_SIZE_MAX)) {
         MMI_HILOGE("File size out of read range");
-        return RET_ERR;
+        return "";
     }
-    filePath = realPath;
-    return RET_OK;
+    return realPath;
 }
 } // namespace MMI
 } // namespace OHOS
