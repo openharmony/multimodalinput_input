@@ -58,12 +58,12 @@ int32_t PointerSpeedCheck(int32_t speed)
     if (speed < MIN_SPEED) {
         MMI_HILOGW("Set pointer speed less than minimum speed:%{public}d", speed);
         return MIN_SPEED;
-    } else if (speed > MAX_SPEED) {
+    }
+    if (speed > MAX_SPEED) {
         MMI_HILOGW("Set pointer speed greater than the maximum value speed:%{public}d", speed);
         return MAX_SPEED;
-    } else {
-        return speed;
     }
+    return speed;
 }
 } // namespace
 MouseEventNormalize::MouseEventNormalize()
@@ -450,23 +450,21 @@ int32_t MouseEventNormalize::SetPointerSpeed(int32_t speed)
     return RET_OK;
 }
 
-int32_t MouseEventNormalize::SetPointerSpeedWithDeviceId(int32_t deviceId, int32_t speed)
+void MouseEventNormalize::SetPointerSpeedWithDeviceId(int32_t deviceId, int32_t speed)
 {
     CALL_DEBUG_ENTER;
     pointerDeviceSpeeds[deviceId] = PointerSpeedCheck(speed);
     MMI_HILOGD("Set pointer speed:%{public}d", pointerDeviceSpeeds[deviceId]);
-    return RET_OK;
 }
 
-int32_t MouseEventNormalize::RemovePointerSpeed(int32_t deviceId)
+void MouseEventNormalize::RemovePointerSpeed(int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
     auto it = pointerDeviceSpeeds.find(deviceId);
-    if (it == pointerDeviceSpeeds.end()) {
+    if (it != pointerDeviceSpeeds.end()) {
         pointerDeviceSpeeds.erase(it);
         MMI_HILOGD("remove pointer speed with deviceId:%{public}d", deviceId);
     }
-    return RET_OK;
 }
 
 int32_t MouseEventNormalize::GetPointerSpeedByDeviceId(int32_t deviceId) const

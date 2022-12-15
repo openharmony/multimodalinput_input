@@ -16,11 +16,13 @@
 #include "device_config_file_parser.h"
 
 #include <fstream>
+#include <regex>
 
 #include "error_multimodal.h"
 #include "input_device.h"
 #include "input_device_manager.h"
 #include "libinput.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
@@ -98,8 +100,13 @@ std::map<ConfigFileItem, int32_t> DeviceConfigManagement::ReadConfigFile(const s
             continue;
         }
         std::string key = tmp.substr(0, pos);
-        std::string value = tmp.substr(pos + 1);
-        configList[ConfigItemName2Id(key)] = std::stoi(value);
+
+        std::smatch match;
+        bool isNumber = std::regex_search(tmp, match, std::regex("\\d+"));
+        if (!isNumber) {
+            continue;
+        }
+        configList[ConfigItemName2Id(key)] = std::stoi(match[0]);
     }
     cfgFile.close();
     return configList;
@@ -109,18 +116,18 @@ int32_t DeviceConfigManagement::DeviceConfiguration(struct libinput_device *devi
 {
     CALL_DEBUG_ENTER;
     std::string fileName = "/vendor/etc/pointer/" + CombDeviceFileName(device) + ".TOML";
+    if(FileVerification(fileName, "TOML") != RET_OK) {
+        MMI_HILOGE("File validation failed");
+        return RET_ERR;
+    }
     auto configList = ReadConfigFile(fileName);
     if (configList.empty()) {
-        MMI_HILOGE("configList is empty");
+        MMI_HILOGE("ConfigList is empty");
         return RET_ERR;
     }
     deviceConfigs_[deviceId] = configList;
-    int32_t ret = MouseEventHdr->SetPointerSpeedWithDeviceId(deviceId,
-        configList[ConfigFileItem::POINTER_SPEED]);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Pointer speed set failed, ret : %{public}d", ret);
-    }
-    return ret;
+    MouseEventHdr->SetPointerSpeedWithDeviceId(deviceId, configList[ConfigFileItem::POINTER_SPEED]);
+    return RET_OK;
 }
 
 int32_t DeviceConfigManagement::DeviceClassification(struct libinput_device *device, DeviceId deviceId)
@@ -144,7 +151,7 @@ int32_t DeviceConfigManagement::OnDeviceAdd(struct libinput_device *device)
     CHKPR(device, ERROR_NULL_POINTER);
     int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
     if (deviceId == INVALID_DEVICE_ID) {
-        MMI_HILOGE("Find to device failed");
+        MMI_HILOGE("Find device failed");
         return RET_ERR;
     }
     return DeviceClassification(device, deviceId);
@@ -160,10 +167,7 @@ void DeviceConfigManagement::OnDeviceRemove(struct libinput_device *device)
         MMI_HILOGE("Device config file remove failed");
         return;
     }
-    int32_t ret = MouseEventHdr->RemovePointerSpeed(deviceId);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Pointer speed set failed, ret : %{public}d", ret);
-    }
+    MouseEventHdr->RemovePointerSpeed(deviceId);
     deviceConfigs_.erase(iter);
 }
 } // namespace MMI

@@ -50,8 +50,8 @@ public:
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t SetPointerSpeed(int32_t speed);
-    int32_t SetPointerSpeedWithDeviceId(int32_t deviceId, int32_t speed);
-    int32_t RemovePointerSpeed(int32_t deviceId);
+    void SetPointerSpeedWithDeviceId(int32_t deviceId, int32_t speed);
+    void RemovePointerSpeed(int32_t deviceId);
     int32_t GetPointerSpeed() const;
     void OnDisplayLost(int32_t displayId);
     int32_t GetDisplayId() const;
