@@ -16,23 +16,23 @@
 #ifndef INPUT_MANAGER_H
 #define INPUT_MANAGER_H
 
+#include <list>
 #include <map>
 #include <memory>
-#include <list>
 
 #include "event_handler.h"
 #include "nocopyable.h"
 
 #include "cooperation_message.h"
-#include "i_anr_observer.h"
-#include "window_info.h"
 #include "error_multimodal.h"
-#include "i_input_device_listener.h"
+#include "i_anr_observer.h"
 #include "i_input_device_cooperate_listener.h"
+#include "i_input_device_listener.h"
 #include "i_input_event_consumer.h"
 #include "i_input_event_filter.h"
 #include "input_device.h"
 #include "key_option.h"
+#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -237,7 +237,7 @@ public:
      * @brief Checks whether the specified key codes of an input device are supported.
      * @param deviceId Indicates the ID of the input device.
      * @param keyCodes Indicates the key codes of the input device.
-     * @param callback Callback function, receive reported data.
+     * @param callback Indicates the callback used to receive the reported data.
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
@@ -246,7 +246,7 @@ public:
 
     /**
      * @brief Sets whether the pointer icon is visible.
-     * @param visible Whether the pointer icon is visible. The value <b>true</b> indicates that
+     * @param visible Indicates whether the pointer icon is visible. The value <b>true</b> indicates that
      * the pointer icon is visible, and the value <b>false</b> indicates the opposite.
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
@@ -261,19 +261,19 @@ public:
     bool IsPointerVisible();
 
     /**
-     * @brief 设置鼠标指针样式
-     * @param windowId 指定要更改鼠标指针样式的窗口ID
-     * @param pointerStyle 指定要更改的鼠标指针样式ID
-     * @return 成功返回0，否则返回失败
+     * @brief Sets the mouse pointer style.
+     * @param windowId Indicates the ID of the window for which the mouse pointer style is set.
+     * @param pointerStyle Indicates the ID of the mouse pointer style.
+     * @return Returns <b>0</b> if the operation is successful; returns an error code otherwise.
      * @since 9
      */
     int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle);
 
     /**
-     * @brief 获取鼠标指针样式
-     * @param windowId 指定要获取鼠标指针样式的窗口ID
-     * @param pointerStyle 返回获取的鼠标指针样式ID
-     * @return 成功返回0，否则返回失败
+     * @brief Obtains the mouse pointer style.
+     * @param windowId Indicates the ID of the window for which the mouse pointer style is obtained.
+     * @param pointerStyle Indicates the ID of the mouse pointer style.
+     * @return Returns <b>0</b> if the operation is successful; returns an error code otherwise.
      * @since 9
      */
     int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle);
@@ -312,92 +312,92 @@ public:
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
 
     /**
-     * @brief 设置指定输入设备对应的屏幕ID
-     * @param dhid 输入设备唯一ID
-     * @param screenId 输入设备对应的屏幕ID
-     * @return 0表示返回成功，否则表示返回失败
+     * @brief Sets the screen ID corresponding to the specified input device.
+     * @param dhid Indicates the ID of the input device.
+     * @param screenId Indicates the screen ID corresponding to the input device.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      */
-    int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
+    int32_t SetInputDevice(const std::string &dhid, const std::string &screenId);
 
     /**
-     * @brief 注册键鼠穿越管理事件监听。
-     * @param listener 穿越管理事件监听回调。
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Registers a listener for screen hopping events of the mouse pointer.
+     * @param listener Indicates the listener for screen hopping events of the mouse pointer.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener);
 
     /**
-     * @brief 注销键鼠穿越管理事件监听。
-     * @param listener 事件监听回调.
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Unregisters the listener for screen hopping events of the mouse pointer.
+     * @param listener Indicates the listener for screen hopping events of the mouse pointer.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener = nullptr);
 
     /**
-     * @brief 开启/关闭键鼠穿越管理接口。
-     * @param enabled 开启/关闭。
-     * @param callback 开启/关闭键鼠穿越，此回调被调用
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Enables or disables screen hopping for the mouse pointer.
+     * @param enabled Indicates whether to enable or disable screen hopping for the mouse pointer.
+     * @param callback Indicates the callback used to receive the result of enabling or disabling screen hopping.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t EnableInputDeviceCooperate(bool enabled, std::function<void(std::string, CooperationMessage)> callback);
 
     /**
-     * @brief 启动跨设备键鼠穿越。
-     * @param sinkDeviceId 键鼠穿越目标设备描述符（networkID）
-     * @param srcInputDeviceId 键鼠穿越待穿越输入外设标识符（设备ID句柄）
-     * @param callback 启动跨设备键鼠穿越，此回调被调用
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Starts screen hopping for the mouse pointer.
+     * @param sinkDeviceId Indicates the descriptor of the target input device (network ID) for screen hopping.
+     * @param srcInputDeviceId Indicates the ID of the source input device (device ID handle) for screen hopping.
+     * @param callback Indicates the callback used to receive the result of starting screen hopping.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
         std::function<void(std::string, CooperationMessage)> callback);
 
     /**
-     * @brief 停止跨设备键鼠穿越。
-     * @param callback 停止跨设备键鼠穿越，此回调被调用
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Stops screen hopping for the mouse pointer.
+     * @param callback Indicates the callback used to receive the result of stopping screen hopping.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback);
 
     /**
-     * @brief 获取指定设备键鼠穿越状态。
-     * @param deviceId 指定设备描述符。
-     * @param callback 获取穿越管理设备状态，此回调被调用
-     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
+     * @brief Obtains the screen hopping status of a mouse pointer.
+     * @param deviceId Indicates the descriptor of the input device.
+     * @param callback Indicates the callback used to receive the screen hopping status.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
     int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
 
     /**
-     * @brief 获取键盘设备指定功能按键的使能状态。
-     * @param funcKey 指定的功能按键，当前支持的功能按键有：
+     * @brief Obtains the enablement status of the specified function key on the keyboard.
+     * @param funcKey Indicates the function key. Currently, the following function keys are supported:
      * NUM_LOCK_FUNCTION_KEY
      * CAPS_LOCK_FUNCTION_KEY
-     * SCROLL_LOCK_FUNCTION_KEY。
-     * @return 返回功能按键的使能状态，true表示功能按键使能，
-     * false表示功能按键未使能。
+     * SCROLL_LOCK_FUNCTION_KEY
+     * @return Returns <b>true</b> if the function key is enabled;
+     * returns <b>false</b> otherwise.
      */
     bool GetFunctionKeyState(int32_t funcKey);
 
     /**
-     * @brief 设置键盘设备指定功能按键的使能状态。
-     * @param funcKey 指定的功能按键，当前支持的功能按键有：
+     * @brief Sets the enablement status of the specified function key on the keyboard.
+     * @param funcKey Indicates the function key. Currently, the following function keys are supported:
      * NUM_LOCK_FUNCTION_KEY
      * CAPS_LOCK_FUNCTION_KEY
-     * SCROLL_LOCK_FUNCTION_KEY。
-     * @param isEnable 待设置的使能状态。
-     * @return 0 表示设置成功，其他值表示设置失败。
+     * SCROLL_LOCK_FUNCTION_KEY
+     * @param isEnable Indicates the enablement status to set.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      */
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
 
     /**
-     * @brief 设置鼠标绝对坐标
-     * @param x 指定设置鼠标的x坐标
-     * @param y 指定设置鼠标的y坐标
+     * @brief Sets the absolute coordinate of mouse.
+     * @param x Specifies the x coordinate of the mouse to be set.
+     * @param y Specifies the y coordinate of the mouse to be set.
      * @return void
      */
     void SetPointerLocation(int32_t x, int32_t y);

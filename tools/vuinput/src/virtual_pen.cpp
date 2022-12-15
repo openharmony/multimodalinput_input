@@ -28,17 +28,17 @@ constexpr int32_t ABS_MAX_TYPE = 15;
 constexpr int32_t PEN_ABS_RANGE = 200;
 
 ResolutionInfo resolutionInfos[] = {
-    {ABS_X, PEN_ABS_RANGE},
-    {ABS_Y, PEN_ABS_RANGE}
+    { ABS_X, PEN_ABS_RANGE },
+    { ABS_Y, PEN_ABS_RANGE }
 };
 
 AbsInfo absInfos[] = {
-    {ABS_X, 0, ABS_MAX_X, 0, 0},
-    {ABS_Y, 0, ABS_MAX_Y, 0, 0},
-    {ABS_PRESSURE, 0, ABS_MAX_PRESSURE, 0, 0},
-    {ABS_TILT_X, ABS_MIN_TILT_X, ABS_MAX_TILT_X, 0, 0},
-    {ABS_TILT_Y, ABS_MIN_TILT_Y, ABS_MAX_TILT_Y, 0, 0},
-    {ABS_MT_TOOL_TYPE, 0, ABS_MAX_TYPE, 0, 0}
+    { ABS_X, 0, ABS_MAX_X, 0, 0 },
+    { ABS_Y, 0, ABS_MAX_Y, 0, 0 },
+    { ABS_PRESSURE, 0, ABS_MAX_PRESSURE, 0, 0 },
+    { ABS_TILT_X, ABS_MIN_TILT_X, ABS_MAX_TILT_X, 0, 0 },
+    { ABS_TILT_Y, ABS_MIN_TILT_Y, ABS_MAX_TILT_Y, 0, 0 },
+    { ABS_MT_TOOL_TYPE, 0, ABS_MAX_TYPE, 0, 0 }
 };
 } // namespace
 

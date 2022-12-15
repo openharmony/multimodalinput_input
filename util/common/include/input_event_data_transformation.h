@@ -12,8 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef INPUT_EVENT_DATA_TRANSFORMATION_H
 #define INPUT_EVENT_DATA_TRANSFORMATION_H
+
 #include "key_event.h"
 #include "net_packet.h"
 #include "pointer_event.h"

@@ -50,14 +50,14 @@ const std::string DH_ID_PREFIX = "Input_";
 #endif // OHOS_BUILD_ENABLE_COOPERATE
 const std::string INPUT_VIRTUAL_DEVICE_NAME = "DistributedInput ";
 std::unordered_map<int32_t, std::string> axisType {
-    {ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR"},
-    {ABS_MT_TOUCH_MINOR, "TOUCH_MINOR"},
-    {ABS_MT_ORIENTATION, "ORIENTATION"},
-    {ABS_MT_POSITION_X, "POSITION_X"},
-    {ABS_MT_POSITION_Y, "POSITION_Y"},
-    {ABS_MT_PRESSURE, "PRESSURE"},
-    {ABS_MT_WIDTH_MAJOR, "WIDTH_MAJOR"},
-    {ABS_MT_WIDTH_MINOR, "WIDTH_MINOR"}
+    { ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR" },
+    { ABS_MT_TOUCH_MINOR, "TOUCH_MINOR" },
+    { ABS_MT_ORIENTATION, "ORIENTATION" },
+    { ABS_MT_POSITION_X, "POSITION_X" },
+    { ABS_MT_POSITION_Y, "POSITION_Y" },
+    { ABS_MT_PRESSURE, "PRESSURE" },
+    { ABS_MT_WIDTH_MAJOR, "WIDTH_MAJOR" },
+    { ABS_MT_WIDTH_MINOR, "WIDTH_MINOR" }
 };
 
 std::vector<std::pair<enum libinput_device_capability, InputDeviceCapability>> devCapEnumMaps {
@@ -684,7 +684,7 @@ std::string InputDeviceManager::MakeNetworkId(const char *phys) const
 
 std::string InputDeviceManager::Sha256(const std::string &in) const
 {
-    unsigned char out[SHA256_DIGEST_LENGTH * 2 + 1] = {0};
+    unsigned char out[SHA256_DIGEST_LENGTH * 2 + 1] = { 0 };
     SHA256_CTX ctx;
     SHA256_Init(&ctx);
     SHA256_Update(&ctx, in.data(), in.size());

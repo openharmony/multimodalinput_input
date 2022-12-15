@@ -38,7 +38,7 @@ napi_value JsKeyCode::EnumClassConstructor(napi_env env, napi_callback_info info
 {
     CALL_DEBUG_ENTER;
     size_t argc = 0;
-    napi_value args[1] = {0};
+    napi_value args[1] = { 0 };
     napi_value ret = nullptr;
     void *data = nullptr;
     CHKRP(napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);

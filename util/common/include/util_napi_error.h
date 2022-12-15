@@ -45,13 +45,13 @@ enum NapiErrorCode : int32_t {
 };
 
 const std::map<int32_t, NapiError> NAPI_ERRORS = {
-    {COMMON_PERMISSION_CHECK_ERROR,
-        {COMMON_PERMISSION_CHECK_ERROR, "Permission denied. An attempt was made to %s forbidden by permission:%s."}},
-    {COMMON_PARAMETER_ERROR, {COMMON_PARAMETER_ERROR, "Parameter error. The type of %s must be %s."}},
-    {COOPERATOR_TARGET_DEV_DESCRIPTOR_ERROR,
-        {COOPERATOR_TARGET_DEV_DESCRIPTOR_ERROR, "Incorrect descriptor for the target device"}},
-    {COOPERATOR_DEVICE_ID_ERROR, {COMMON_PARAMETER_ERROR, "Incorrect ID of the input device"}},
-    {COOPERATOR_FAIL, {COOPERATOR_FAIL, "Input device operation failed"}},
+    { COMMON_PERMISSION_CHECK_ERROR,
+        { COMMON_PERMISSION_CHECK_ERROR, "Permission denied. An attempt was made to %s forbidden by permission:%s." } },
+    { COMMON_PARAMETER_ERROR, { COMMON_PARAMETER_ERROR, "Parameter error. The type of %s must be %s." } },
+    { COOPERATOR_TARGET_DEV_DESCRIPTOR_ERROR,
+        { COOPERATOR_TARGET_DEV_DESCRIPTOR_ERROR, "Incorrect descriptor for the target device" } },
+    { COOPERATOR_DEVICE_ID_ERROR, { COMMON_PARAMETER_ERROR, "Incorrect ID of the input device" } },
+    { COOPERATOR_FAIL, { COOPERATOR_FAIL, "Input device operation failed" } },
 };
 
 #define THROWERR_CUSTOM(env, code, msg) \

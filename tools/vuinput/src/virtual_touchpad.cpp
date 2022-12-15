@@ -22,15 +22,15 @@ constexpr int32_t ABS_MAX_WHEEL = 71;
 constexpr int32_t ABS_RANGE = 200;
 
 AbsInfo absInfos[] = {
-    {ABS_X, 0, 1, 0, 0},
-    {ABS_Y, 0, 1, 0, 0},
-    {ABS_WHEEL, 0, ABS_MAX_WHEEL, 0, 0},
-    {ABS_MISC, 0, 0, 0, 0},
+    { ABS_X, 0, 1, 0, 0 },
+    { ABS_Y, 0, 1, 0, 0 },
+    { ABS_WHEEL, 0, ABS_MAX_WHEEL, 0, 0 },
+    { ABS_MISC, 0, 0, 0, 0 },
 };
 
 ResolutionInfo resolutionInfos[] = {
-    {ABS_X, ABS_RANGE},
-    {ABS_Y, ABS_RANGE}
+    { ABS_X, ABS_RANGE },
+    { ABS_Y, ABS_RANGE }
 };
 } // namespace
 

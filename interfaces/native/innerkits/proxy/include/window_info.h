@@ -16,8 +16,8 @@
 #ifndef DISPLAY_INFO_H
 #define DISPLAY_INFO_H
 
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace OHOS {
 namespace MMI {
@@ -200,7 +200,7 @@ struct DisplayInfo {
     int32_t height;
 
     /**
-     * 像素密度，表示一英寸包含的像素点数。
+     * Pixel density, which indicates the number of pixels in an inch
      *
      * @since 10
      */

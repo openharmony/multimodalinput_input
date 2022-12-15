@@ -21,13 +21,13 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "napi_constants.h"
-#include "utils/log.h"
 #include "refbase.h"
+#include "utils/log.h"
 
-#include "stream_buffer.h"
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_manager.h"
+#include "stream_buffer.h"
 #include "util_napi.h"
 #include "util_napi_error.h"
 

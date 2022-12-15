@@ -507,7 +507,7 @@ std::string VirtualDevice::ReadFile(const std::string& filePath)
 
 int32_t VirtualDevice::GetFileSize(const std::string& filePath)
 {
-    struct stat statbuf = {0};
+    struct stat statbuf = { 0 };
     if (stat(filePath.c_str(), &statbuf) != 0) {
         std::cout << "Get file size error" << std::endl;
         return INVALID_FILE_SIZE;

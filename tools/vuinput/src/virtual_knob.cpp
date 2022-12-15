@@ -21,7 +21,7 @@ VirtualKnob::VirtualKnob() : VirtualDevice("Virtual Knob", BUS_USB, 0x5ac, 0x202
 {
     eventTypes_ = { EV_KEY, EV_MSC, EV_LED, EV_REP };
     miscellaneous_ = { MSC_SCAN };
-    leds_ = {LED_NUML, LED_CAPSL, LED_SCROLLL};
+    leds_ = { LED_NUML, LED_CAPSL, LED_SCROLLL };
     repeats_ = { REP_DELAY, REP_PERIOD };
     keys_ = {
         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,

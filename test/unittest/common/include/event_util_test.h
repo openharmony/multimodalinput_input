@@ -51,18 +51,18 @@ PermissionDef infoManagerTestPermDef_ = {
 };
 
 PermissionStateFull infoManagerTestState_ = {
-    .grantFlags = {1},
-    .grantStatus = {PermissionState::PERMISSION_GRANTED},
+    .grantFlags = { 1 },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
     .permissionName = "ohos.permission.INPUT_MONITORING",
-    .resDeviceID = {"local"}
+    .resDeviceID = { "local" }
 };
 
 HapPolicyParams infoManagerTestPolicyPrams_ = {
     .apl = APL_NORMAL,
     .domain = "test.domain",
-    .permList = {infoManagerTestPermDef_},
-    .permStateList = {infoManagerTestState_}
+    .permList = { infoManagerTestPermDef_ },
+    .permStateList = { infoManagerTestState_ }
 };
 
 HapInfoParams infoManagerTestInfoParms_ = {
