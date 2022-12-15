@@ -15,9 +15,9 @@
 
 #include "input_parse.h"
 
-#include "cJSON.h"
-
 #include <sstream>
+
+#include "cJSON.h"
 #include "define_multimodal.h"
 
 namespace OHOS {

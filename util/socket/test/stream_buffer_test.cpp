@@ -17,7 +17,6 @@
 
 #include "stream_buffer.h"
 
-
 namespace OHOS {
 namespace MMI {
 namespace {

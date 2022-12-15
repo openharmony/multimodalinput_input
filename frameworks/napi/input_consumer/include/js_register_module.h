@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef JS_REGISTER_MODULE_H
 #define JS_REGISTER_MODULE_H
 
@@ -25,9 +26,9 @@
 #include "napi/native_node_api.h"
 #include "utils/log.h"
 
+#include "define_multimodal.h"
 #include "key_event.h"
 #include "key_option.h"
-#include "define_multimodal.h"
 
 #define SUCCESS_CODE 0
 #define ERROR_CODE (-1)

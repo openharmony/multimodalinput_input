@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
+#include "ipc_skeleton.h"
 #include "permission_helper.h"
 #include "proto.h"
-#include "ipc_skeleton.h"
+
 #include "mmi_log.h"
 
 namespace OHOS {

@@ -21,8 +21,8 @@
 
 #include "error_multimodal.h"
 #include "napi_constants.h"
-#include "util_napi_error.h"
 #include "util_napi.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace MMI {

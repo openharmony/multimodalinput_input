@@ -16,27 +16,26 @@
 #ifndef VIRTUAL_DEVICE_CONFIG_H
 #define VIRTUAL_DEVICE_CONFIG_H
 
-#include <cstdint>
-#include <functional>
-#include <getopt.h>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <map>
-#include <unistd.h>
-#include <cstring>
-#include <sys/stat.h>
-#include <dirent.h>
-#include <csignal>
-#include <fstream>
-#include <memory>
-#include <cinttypes>
 #include <cerrno>
+#include <cinttypes>
+#include <csignal>
+#include <cstdint>
+#include <cstring>
+#include <dirent.h>
 #include <fcntl.h>
+#include <fstream>
+#include <functional>
+#include <iostream>
+#include <map>
+#include <memory>
 #include <sstream>
-#include "securec.h"
+#include <sys/stat.h>
+#include <unistd.h>
+#include <vector>
+
 #include "linux/input.h"
 #include "linux/uinput.h"
+#include "securec.h"
 
 #ifndef REL_WHEEL_HI_RES
 #define REL_WHEEL_HI_RES    0x0b

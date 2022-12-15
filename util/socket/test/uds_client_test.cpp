@@ -19,7 +19,6 @@
 
 #include "uds_client.h"
 
-
 namespace OHOS {
 namespace MMI {
 namespace {

@@ -25,7 +25,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Mouse
 
 MouseDeviceState::MouseDeviceState()
 {
-    mouseCoord_ = {0, 0};
+    mouseCoord_ = { 0, 0 };
 }
 
 MouseDeviceState::~MouseDeviceState() {}
