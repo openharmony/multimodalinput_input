@@ -19,7 +19,6 @@
 #include "define_multimodal.h"
 #include "dfx_hisysevent.h"
 
-#include "device_config_file_parser.h"
 #include "error_multimodal.h"
 #include "event_log_helper.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE

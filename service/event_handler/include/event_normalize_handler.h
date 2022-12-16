@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "device_config_file_parser.h"
 #include "i_input_event_handler.h"
 
 namespace OHOS {
