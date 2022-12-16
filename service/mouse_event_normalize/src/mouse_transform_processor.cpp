@@ -245,7 +245,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     return RET_OK;
 }
 
-void MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* data, 
+void MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* data,
     PointerEvent::PointerItem &pointerItem)
 {
     CALL_DEBUG_ENTER;

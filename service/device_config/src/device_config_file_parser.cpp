@@ -127,9 +127,7 @@ int32_t DeviceConfigManagement::DeviceConfiguration(struct libinput_device *devi
         return RET_ERR;
     }
     deviceConfigs_[deviceId] = configList;
-    auto processor = MouseEventHdr->GetProcessor(deviceId);
-    CHKPR(processor, RET_ERR);
-    processor->SetPointerSpeedWithDeviceId(deviceId, configList[ConfigFileItem::POINTER_SPEED]);
+    MouseEventHdr->SetPointerSpeedWithDeviceId(deviceId, configList[ConfigFileItem::POINTER_SPEED]);
     return RET_OK;
 }
 
@@ -170,9 +168,7 @@ void DeviceConfigManagement::OnDeviceRemove(struct libinput_device *device)
         MMI_HILOGE("Device config file remove failed");
         return;
     }
-    auto processor = MouseEventHdr->GetProcessor(deviceId);
-    CHKPV(processor);
-    processor->RemovePointerSpeed(deviceId);
+    MouseEventHdr->RemovePointerSpeed(deviceId);
     deviceConfigs_.erase(iter);
 }
 } // namespace MMI
