@@ -59,6 +59,8 @@ int32_t ReadCursorStyleFile(const std::string &filePath);
 
 int32_t ReadTomlFile(const std::string &filePath, DeviceConfig &devConf);
 
+std::string FileVerification(std::string &filePath, const std::string &checkExtension);
+
 std::string StringPrintf(const char *format, ...);
 
 inline void RemoveSpace(std::string &str)

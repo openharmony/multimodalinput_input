@@ -54,12 +54,26 @@ const std::vector<AccelerateCurve> ACCELERATE_CURVES {
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 constexpr double PERCENT_CONST = 100.0;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+
+int32_t PointerSpeedCheck(int32_t speed)
+{
+    if (speed < MIN_SPEED) {
+        MMI_HILOGW("Set pointer speed less than minimum speed:%{public}d", speed);
+        return MIN_SPEED;
+    } else if (speed > MAX_SPEED) {
+        MMI_HILOGW("Set pointer speed greater than the maximum value speed:%{public}d", speed);
+        return MAX_SPEED;
+    }
+    return speed;
+}
 } // namespace
 
 double MouseTransformProcessor::absolutionX_ = -1.0;
 double MouseTransformProcessor::absolutionY_ = -1.0;
 int32_t MouseTransformProcessor::currentDisplayId_ = -1;
 int32_t MouseTransformProcessor::speed_ = DEFAULT_SPEED;
+bool MouseTransformProcessor::isSpeedSetByUser_ = false;
+std::map<int32_t, int32_t> MouseTransformProcessor::pointerDeviceSpeeds = {};
 
 MouseTransformProcessor::MouseTransformProcessor(int32_t deviceId)
     : pointerEvent_(PointerEvent::Create()), deviceId_(deviceId)
@@ -70,7 +84,7 @@ std::shared_ptr<PointerEvent> MouseTransformProcessor::GetPointerEvent() const
     return pointerEvent_;
 }
 
-int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer* data)
+int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer* data, int32_t deviceId)
 {
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
@@ -86,7 +100,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         return RET_ERR;
     }
 
-    int32_t ret = HandleMotionAccelerate(data);
+    int32_t ret = HandleMotionAccelerate(data, deviceId);
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to handle motion correction");
         return ret;
@@ -98,14 +112,14 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     return RET_OK;
 }
 
-int32_t MouseTransformProcessor::HandleMotionAccelerate(struct libinput_event_pointer* data)
+int32_t MouseTransformProcessor::HandleMotionAccelerate(struct libinput_event_pointer* data, int32_t deviceId)
 {
     CHKPR(data, ERROR_NULL_POINTER);
     double dx = libinput_event_pointer_get_dx(data);
     double dy = libinput_event_pointer_get_dy(data);
     double vin = (fmax(abs(dx), abs(dy)) + fmin(abs(dx), abs(dy))) / 2.0;
     double gain { 0.0 };
-    if (!GetSpeedGain(vin, gain)) {
+    if (!GetSpeedGain(vin, deviceId, gain)) {
         MMI_HILOGE("Get speed gain failed");
         return RET_ERR;
     }
@@ -231,7 +245,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     return RET_OK;
 }
 
-void MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* data, 
+void MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* data,
     PointerEvent::PointerItem &pointerItem)
 {
     CALL_DEBUG_ENTER;
@@ -279,7 +293,7 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
     switch (type) {
         case LIBINPUT_EVENT_POINTER_MOTION:
         case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE: {
-            result = HandleMotionInner(data);
+            result = HandleMotionInner(data, InputDevMgr->FindInputDeviceId(libinput_event_get_device(event)));
             break;
         }
         case LIBINPUT_EVENT_POINTER_BUTTON: {
@@ -402,13 +416,8 @@ void MouseTransformProcessor::Dump(int32_t fd, const std::vector<std::string> &a
 int32_t MouseTransformProcessor::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;
-    if (speed < MIN_SPEED) {
-        speed_ = MIN_SPEED;
-    } else if (speed > MAX_SPEED) {
-        speed_ = MAX_SPEED;
-    } else {
-        speed_ = speed;
-    }
+    speed_ = PointerSpeedCheck(speed);
+    isSpeedSetByUser_ = true;
     MMI_HILOGD("Set pointer speed:%{public}d", speed_);
     return RET_OK;
 }
@@ -420,17 +429,17 @@ int32_t MouseTransformProcessor::GetPointerSpeed()
     return speed_;
 }
 
-bool MouseTransformProcessor::GetSpeedGain(double vin, double &gain)
+bool MouseTransformProcessor::GetSpeedGain(double vin, int32_t deviceId, double &gain)
 {
     if (fabs(vin) < DOUBLE_ZERO) {
         MMI_HILOGE("The value of the parameter passed in is 0");
         return false;
     }
-    if (speed_ < 1) {
+    if (GetSpeed(deviceId) < 1) {
         MMI_HILOGE("The speed value can't be less than 1");
         return false;
     }
-    const AccelerateCurve& curve = ACCELERATE_CURVES[speed_ - 1];
+    const AccelerateCurve& curve = ACCELERATE_CURVES[GetSpeed(deviceId) - 1];
     int32_t num = static_cast<int32_t>(ceil(fabs(vin)));
     for (size_t i = 0; i < curve.speeds.size(); ++i) {
         if (num <= curve.speeds[i]) {
@@ -509,5 +518,40 @@ void MouseTransformProcessor::SetAbsolutionLocation(double xPercent, double yPer
     IPointerDrawingManager::GetInstance()->SetPointerLocation(getpid(), physicalX, physicalY);
 }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+
+int32_t MouseTransformProcessor::GetSpeed(int32_t deviceId)
+{
+    return isSpeedSetByUser_ ? speed_ : GetPointerSpeedByDeviceId(deviceId);
+}
+
+void MouseTransformProcessor::SetPointerSpeedWithDeviceId(int32_t deviceId, int32_t speed)
+{
+    CALL_DEBUG_ENTER;
+    pointerDeviceSpeeds[deviceId] = PointerSpeedCheck(speed);
+    MMI_HILOGD("Set pointer speed:%{public}d", pointerDeviceSpeeds[deviceId]);
+}
+
+void MouseTransformProcessor::RemovePointerSpeed(int32_t deviceId)
+{
+    CALL_DEBUG_ENTER;
+    auto it = pointerDeviceSpeeds.find(deviceId);
+    if (it != pointerDeviceSpeeds.end()) {
+        pointerDeviceSpeeds.erase(it);
+        MMI_HILOGD("remove pointer speed with deviceId:%{public}d", deviceId);
+    }
+}
+
+int32_t MouseTransformProcessor::GetPointerSpeedByDeviceId(int32_t deviceId)
+{
+    CALL_DEBUG_ENTER;
+    auto it = pointerDeviceSpeeds.find(deviceId);
+    if (it == pointerDeviceSpeeds.end()) {
+        MMI_HILOGD("Not find speed with deviceId:%{public}d", deviceId);
+        return speed_;
+    }
+    MMI_HILOGD("Get pointer speed:%{public}d", speed_);
+    return pointerDeviceSpeeds.at(deviceId);
+}
+
 } // namespace MMI
 } // namespace OHOS
