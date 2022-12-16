@@ -85,11 +85,11 @@ void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
         timerId_ = -1;
         MMI_HILOGI("Stop keyboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
         if (repeatKeyCode_ != keyEvent_->GetKeyCode()) {
-            auto pressedKeyItem = keyEvent_->GetKeyItem(keyEvent_->GetKeyCode());
-            if (pressedKeyItem != nullptr) {
+            std::optional<KeyEvent::KeyItem> pressedKeyItem = keyEvent_->GetKeyItem(keyEvent_->GetKeyCode());
+            if (pressedKeyItem) {
                 keyEvent_->RemoveReleasedKeyItems(*pressedKeyItem);
             } else {
-                MMI_HILOGW("The pressedKeyItem is nullptr");
+                MMI_HILOGW("The pressedKeyItem is nullopt");
             }
             keyEvent_->SetKeyCode(repeatKeyCode_);
             keyEvent_->SetAction(KeyEvent::KEY_ACTION_DOWN);

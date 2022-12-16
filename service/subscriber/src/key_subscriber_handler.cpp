@@ -392,8 +392,11 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
             continue;
         }
 
-        const KeyEvent::KeyItem* keyItem = keyEvent->GetKeyItem();
-        CHKPF(keyItem);
+        std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
+        if (!keyItem) {
+            MMI_HILOGE("The keyItem is nullopt");
+            return false;
+        }
         auto upTime = keyEvent->GetActionTime();
         auto downTime = keyItem->GetDownTime();
         if (upTime - downTime >= (static_cast<int64_t>(duration) * 1000)) {
