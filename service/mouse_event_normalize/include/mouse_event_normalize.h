@@ -33,7 +33,7 @@ public:
     DISALLOW_COPY_AND_MOVE(MouseEventNormalize);
     std::shared_ptr<PointerEvent> GetPointerEvent();
     int32_t OnEvent(struct libinput_event *event);
-    bool GetSpeedGain(double vin, double &gain, int32_t deviceId) const;
+    bool GetSpeedGain(double vin, int32_t deviceId, double &gain) const;
     void Dump(int32_t fd, const std::vector<std::string> &args);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     void SetAbsolutionLocation(double xPercent, double yPercent);

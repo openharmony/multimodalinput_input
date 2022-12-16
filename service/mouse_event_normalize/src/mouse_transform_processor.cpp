@@ -119,7 +119,7 @@ int32_t MouseTransformProcessor::HandleMotionAccelerate(struct libinput_event_po
     double dy = libinput_event_pointer_get_dy(data);
     double vin = (fmax(abs(dx), abs(dy)) + fmin(abs(dx), abs(dy))) / 2.0;
     double gain { 0.0 };
-    if (!GetSpeedGain(vin, gain, deviceId)) {
+    if (!GetSpeedGain(vin, deviceId, gain)) {
         MMI_HILOGE("Get speed gain failed");
         return RET_ERR;
     }
@@ -429,7 +429,7 @@ int32_t MouseTransformProcessor::GetPointerSpeed()
     return speed_;
 }
 
-bool MouseTransformProcessor::GetSpeedGain(double vin, double &gain, int32_t deviceId)
+bool MouseTransformProcessor::GetSpeedGain(double vin, int32_t deviceId, double &gain)
 {
     if (fabs(vin) < DOUBLE_ZERO) {
         MMI_HILOGE("The value of the parameter passed in is 0");

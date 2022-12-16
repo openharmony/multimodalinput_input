@@ -18,6 +18,7 @@
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "dfx_hisysevent.h"
+
 #include "device_config_file_parser.h"
 #include "error_multimodal.h"
 #include "event_log_helper.h"
@@ -40,7 +41,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventNormalizeHandler" };
-DeviceConfigManagement configManagement_;
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event)

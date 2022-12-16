@@ -38,9 +38,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Mouse
 MouseEventNormalize::MouseEventNormalize() {}
 MouseEventNormalize::~MouseEventNormalize() {}
 
-bool MouseEventNormalize::GetSpeedGain(double vin, double &gain, int32_t deviceId) const
+bool MouseEventNormalize::GetSpeedGain(double vin, int32_t deviceId, double &gain) const
 {
-    return MouseTransformProcessor::GetSpeedGain(vin, gain, deviceId);
+    return MouseTransformProcessor::GetSpeedGain(vin, deviceId, gain);
 }
 
 std::shared_ptr<MouseTransformProcessor> MouseEventNormalize::GetProcessor(int32_t deviceId) const
