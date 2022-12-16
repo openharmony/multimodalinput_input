@@ -51,7 +51,7 @@ std::shared_ptr<MouseTransformProcessor> MouseEventNormalize::GetProcessor(int32
         return nullptr;
     }
     return iter->second;
-}   
+}
 
 std::shared_ptr<MouseTransformProcessor> MouseEventNormalize::GetCurrentProcessor() const
 {
@@ -154,5 +154,20 @@ void MouseEventNormalize::SetAbsolutionLocation(double xPercent, double yPercent
     MouseTransformProcessor::SetAbsolutionLocation(xPercent, yPercent);
 }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+
+void MouseEventNormalize::SetPointerSpeedWithDeviceId(int32_t deviceId, int32_t speed)
+{
+    MouseTransformProcessor::SetPointerSpeedWithDeviceId(deviceId, speed);
+}
+
+void MouseEventNormalize::RemovePointerSpeed(int32_t deviceId)
+{
+    MouseTransformProcessor::RemovePointerSpeed(deviceId);
+}
+
+int32_t MouseEventNormalize::GetPointerSpeedByDeviceId(int32_t deviceId)
+{
+    return MouseTransformProcessor::GetPointerSpeedByDeviceId(deviceId);
+}
 } // namespace MMI
 } // namespace OHOS
