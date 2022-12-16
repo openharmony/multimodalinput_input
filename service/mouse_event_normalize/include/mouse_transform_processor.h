@@ -16,6 +16,7 @@
 #ifndef MOUSE_TRANSFORM_PROCESSOR_H
 #define MOUSE_TRANSFORM_PROCESSOR_H
 
+#include <map>
 #include <memory>
 
 #include "libinput.h"
@@ -46,7 +47,7 @@ public:
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 private:
-    int32_t HandleMotionInner(struct libinput_event_pointer* data);
+    int32_t HandleMotionInner(struct libinput_event_pointer* data, int32_t deviceId);
     int32_t HandleButtonInner(struct libinput_event_pointer* data);
     int32_t HandleAxisInner(struct libinput_event_pointer* data);
     void HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
@@ -55,7 +56,7 @@ private:
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t HandleButtonValueInner(struct libinput_event_pointer* data);
-    int32_t HandleMotionAccelerate(struct libinput_event_pointer* data);
+    int32_t HandleMotionAccelerate(struct libinput_event_pointer* data, int32_t deviceId);
     void DumpInner();
     void SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, struct libinput_event_pointer* data);
 public:
@@ -64,8 +65,12 @@ public:
     static int32_t GetDisplayId();
     static int32_t SetPointerSpeed(int32_t speed);
     static int32_t GetPointerSpeed();
-    static bool GetSpeedGain(double vin, double &gain);
+    static bool GetSpeedGain(double vin, int32_t deviceId, double &gain);
     static int32_t SetPointerLocation(int32_t x, int32_t y);
+    static void SetPointerSpeedWithDeviceId(int32_t deviceId, int32_t speed);
+    static void RemovePointerSpeed(int32_t deviceId);
+    static int32_t GetPointerSpeedByDeviceId(int32_t deviceId);
+    static int32_t GetSpeed(int32_t deviceId);
 
 private:
     static double absolutionX_;
@@ -77,6 +82,8 @@ private:
     int32_t buttonId_ { -1 };
     bool isPressed_ { false };
     int32_t deviceId_ { -1 };
+    static std::map<int32_t, int32_t> pointerDeviceSpeeds;
+    static bool isSpeedSetByUser_;
 };
 } // namespace MMI
 } // namespace OHOS

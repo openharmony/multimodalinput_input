@@ -38,9 +38,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Mouse
 MouseEventNormalize::MouseEventNormalize() {}
 MouseEventNormalize::~MouseEventNormalize() {}
 
-bool MouseEventNormalize::GetSpeedGain(double vin, double &gain) const
+bool MouseEventNormalize::GetSpeedGain(double vin, int32_t deviceId, double &gain) const
 {
-    return MouseTransformProcessor::GetSpeedGain(vin, gain);
+    return MouseTransformProcessor::GetSpeedGain(vin, deviceId, gain);
 }
 
 std::shared_ptr<MouseTransformProcessor> MouseEventNormalize::GetProcessor(int32_t deviceId) const
@@ -51,7 +51,7 @@ std::shared_ptr<MouseTransformProcessor> MouseEventNormalize::GetProcessor(int32
         return nullptr;
     }
     return iter->second;
-}   
+}
 
 std::shared_ptr<MouseTransformProcessor> MouseEventNormalize::GetCurrentProcessor() const
 {
@@ -154,5 +154,20 @@ void MouseEventNormalize::SetAbsolutionLocation(double xPercent, double yPercent
     MouseTransformProcessor::SetAbsolutionLocation(xPercent, yPercent);
 }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+
+void MouseEventNormalize::SetPointerSpeedWithDeviceId(int32_t deviceId, int32_t speed)
+{
+    MouseTransformProcessor::SetPointerSpeedWithDeviceId(deviceId, speed);
+}
+
+void MouseEventNormalize::RemovePointerSpeed(int32_t deviceId)
+{
+    MouseTransformProcessor::RemovePointerSpeed(deviceId);
+}
+
+int32_t MouseEventNormalize::GetPointerSpeedByDeviceId(int32_t deviceId)
+{
+    return MouseTransformProcessor::GetPointerSpeedByDeviceId(deviceId);
+}
 } // namespace MMI
 } // namespace OHOS

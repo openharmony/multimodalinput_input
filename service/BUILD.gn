@@ -26,6 +26,7 @@ ohos_prebuilt_etc("mmi_device_config.ini") {
 config("libmmi_server_config") {
   include_dirs = [
     "input_device_cooperate/include",
+    "device_config/include",
     "device_manager/include",
     "device_scalability/include",
     "delegate_task/include",
@@ -85,6 +86,7 @@ ohos_shared_library("libmmi-server") {
   sources = [
     "//foundation/multimodalinput/input/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
     "delegate_task/src/delegate_tasks.cpp",
+    "device_config/src/device_config_file_parser.cpp",
     "device_manager/src/input_device_manager.cpp",
     "dfx/src/dfx_hisysevent.cpp",
     "event_dispatch/src/event_dispatch_handler.cpp",
