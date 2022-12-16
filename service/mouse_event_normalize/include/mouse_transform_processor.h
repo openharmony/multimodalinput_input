@@ -65,7 +65,7 @@ public:
     static int32_t GetDisplayId();
     static int32_t SetPointerSpeed(int32_t speed);
     static int32_t GetPointerSpeed();
-    static bool GetSpeedGain(double vin, double &gain, int32_t deviceId);
+    static bool GetSpeedGain(double vin, int32_t deviceId, double &gain);
     static int32_t SetPointerLocation(int32_t x, int32_t y);
     static void SetPointerSpeedWithDeviceId(int32_t deviceId, int32_t speed);
     static void RemovePointerSpeed(int32_t deviceId);
