@@ -57,11 +57,11 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
         (KeyEvent::KEY_ACTION_UP) : (KeyEvent::KEY_ACTION_DOWN);
     auto preAction = keyEvent->GetAction();
     if (preAction == KeyEvent::KEY_ACTION_UP) {
-        auto preUpKeyItem = keyEvent->GetKeyItem();
-        if (preUpKeyItem != nullptr) {
+        std::optional<KeyEvent::KeyItem> preUpKeyItem = keyEvent->GetKeyItem();
+        if (preUpKeyItem) {
             keyEvent->RemoveReleasedKeyItems(*preUpKeyItem);
         } else {
-            MMI_HILOGE("The preUpKeyItem is null");
+            MMI_HILOGE("The preUpKeyItem is nullopt");
         }
     }
     int64_t time = GetSysClockTime();
@@ -94,8 +94,8 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
                            funcKey, keyEvent->GetFunctionKey(funcKey));
             }
         }
-        auto pressedKeyItem = keyEvent->GetKeyItem(keyCode);
-        if (pressedKeyItem != nullptr) {
+        std::optional<KeyEvent::KeyItem> pressedKeyItem = keyEvent->GetKeyItem(keyCode);
+        if (pressedKeyItem) {
             item.SetDownTime(pressedKeyItem->GetDownTime());
         } else {
             MMI_HILOGE("Find pressed key failed, keyCode:%{public}d", keyCode);

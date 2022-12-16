@@ -16,8 +16,10 @@
 #ifndef KEY_EVENT_H
 #define KEY_EVENT_H
 
+
 #include <memory>
 #include <vector>
+#include <set>
 
 #include "nocopyable.h"
 #include "parcel.h"
@@ -3283,18 +3285,18 @@ public:
 
     /**
      * @brief Obtains the key item of this key event.
-     * @return Returns the pointer to the key item.
+     * @return Returns the key item.
      * @since 9
      */
-    const KeyItem* GetKeyItem() const;
+    std::optional<KeyEvent::KeyItem> GetKeyItem() const;
 
     /**
      * @brief Obtains the key item based on a key code.
      * @param keyCode Indicates the key code.
-     * @return Returns the pointer to the key item.
+     * @return Returns the key item.
      * @since 9
      */
-    const KeyItem* GetKeyItem(int32_t keyCode) const;
+    std::optional<KeyEvent::KeyItem> GetKeyItem(int32_t keyCode) const;
 
     /**
      * @brief Checks whether this key event is valid.
