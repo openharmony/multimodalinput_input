@@ -46,12 +46,13 @@ public:
     void OnDisplayLost(int32_t displayId);
     int32_t GetDisplayId() const;
     int32_t SetPointerLocation(int32_t x, int32_t y);
-    std::shared_ptr<MouseTransformProcessor> GetCurrentProcessor() const;
     void SetPointerSpeedWithDeviceId(int32_t deviceId, int32_t speed);
     void RemovePointerSpeed(int32_t deviceId);
     int32_t GetPointerSpeedByDeviceId(int32_t deviceId);
+
 private:
     std::shared_ptr<MouseTransformProcessor> GetProcessor(int32_t deviceId) const;
+    std::shared_ptr<MouseTransformProcessor> GetCurrentProcessor() const;
     void SetCurrentDeviceId(int32_t deviceId);
     int32_t GetCurrentDeviceId() const;
 
