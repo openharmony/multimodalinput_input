@@ -32,6 +32,16 @@ InputManager *InputManager::GetInstance()
     return instance_;
 }
 
+int32_t InputManager::GetDisplayBindInfo(DisplayBindInfos &infos)
+{
+    return InputMgrImpl.GetDisplayBindInfo(infos);
+}
+
+int32_t InputManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
+{
+    return InputMgrImpl.SetDisplayBind(deviceId, displayId, msg);
+}
+
 void InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);

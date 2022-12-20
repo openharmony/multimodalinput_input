@@ -73,6 +73,8 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::INJECT_KEY_EVENT, &MultimodalInputConnectStub::StubInjectKeyEvent},
         {IMultimodalInputConnect::INJECT_POINTER_EVENT, &MultimodalInputConnectStub::StubInjectPointerEvent},
         {IMultimodalInputConnect::SET_ANR_OBSERVER, &MultimodalInputConnectStub::StubSetAnrListener},
+        {IMultimodalInputConnect::GET_DISPLAY_BIND_INFO, &MultimodalInputConnectStub::StubGetDisplayBindInfo},
+        {IMultimodalInputConnect::SET_DISPLAY_BIND, &MultimodalInputConnectStub::StubSetDisplayBind},
         {IMultimodalInputConnect::REGISTER_COOPERATE_MONITOR,
             &MultimodalInputConnectStub::StubRegisterCooperateMonitor},
         {IMultimodalInputConnect::UNREGISTER_COOPERATE_MONITOR,
@@ -627,6 +629,60 @@ int32_t MultimodalInputConnectStub::StubSetAnrListener(MessageParcel& data, Mess
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetAnrObserver failed, ret:%{public}d", ret);
     }
+    return ret;
+}
+
+
+int32_t MultimodalInputConnectStub::StubGetDisplayBindInfo(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    DisplayBindInfos infos;
+    int32_t ret = GetDisplayBindInfo(infos);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetDisplayBindInfo failed, ret:%{public}d", ret);
+        return ret;
+    }
+    int32_t size = static_cast<int32_t>(infos.size());
+    WRITEINT32(reply, size, ERR_INVALID_VALUE);
+    infos.reserve(size);
+    for (const auto &info : infos) {
+        WRITEINT32(reply, info.inputDeviceId, ERR_INVALID_VALUE);
+        WRITESTRING(reply, info.inputDeviceName, ERR_INVALID_VALUE);
+        WRITEINT32(reply, info.displayId, ERR_INVALID_VALUE);
+        WRITESTRING(reply, info.displayName, ERR_INVALID_VALUE);
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetDisplayBind(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t inputDeviceId = -1;
+    READINT32(data, inputDeviceId, ERR_INVALID_VALUE);
+    int32_t displayId = -1;
+    READINT32(data, displayId, ERR_INVALID_VALUE); 
+    std::string msg;  
+    int32_t ret = SetDisplayBind(inputDeviceId, displayId, msg);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetDisplayBind failed, ret:%{public}d", ret);
+    }
+    WRITESTRING(reply, msg, ERR_INVALID_VALUE);  
     return ret;
 }
 

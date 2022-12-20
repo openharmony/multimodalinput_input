@@ -43,6 +43,7 @@ class InputDeviceManager final : public IDeviceObject {
         bool isPointerDevice { false };
         bool isTouchableDevice { false };
         std::string dhid;
+        std::string sysUid;
     };
 public:
     DISALLOW_COPY_AND_MOVE(InputDeviceManager);
@@ -83,7 +84,8 @@ public:
     bool HasTouchDevice();
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
     const std::string& GetScreenId(int32_t deviceId) const;
-
+    using inputDeviceCallback = std::function<void(int32_t deviceId, std::string devName, std::string devStatus)>;
+    void SetInputStatusChangeCallback(inputDeviceCallback callback);
 private:
     void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);
     bool IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const;
@@ -93,11 +95,16 @@ private:
     std::string Sha256(const std::string &in) const;
     std::string GenerateDescriptor(struct libinput_device *inputDevice, bool isRemote) const;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+    std::string GetInputIdentification(struct libinput_device* inputDevice);
+    void NotifyDevCallback(int32_t deviceId,  struct InputDeviceInfo inDevice);
+private:
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;
     std::map<std::string, std::string> inputDeviceScreens_;
     int32_t nextId_ { 0 };
     std::list<std::shared_ptr<IDeviceObserver>> observers_;
     std::map<SessionPtr, std::function<void(int32_t, const std::string&)>> devListener_;
+    inputDeviceCallback devCallbacks_ = { nullptr };
+    std::map<int32_t, std::string> displayInputBindInfos_;
 };
 
 #define InputDevMgr ::OHOS::DelayedSingleton<InputDeviceManager>::GetInstance()

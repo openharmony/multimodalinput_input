@@ -150,3 +150,7 @@ group("mmi_tests") {
     "util:ut-mmi-util-out",
   ]
 }
+
+group("examples_group") {
+  deps = [ "examples/input_device_display_bind:input_device_display_bind" ]
+}

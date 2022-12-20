@@ -35,19 +35,37 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 constexpr size_t MAX_WINDOW_COUNT = 20;
 #endif // OHOS_BUILD_ENABLE_POINTER
+const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/display_bind.cfg";
 } // namespace
 
-InputWindowsManager::InputWindowsManager() {}
+InputWindowsManager::InputWindowsManager() : bindInfo_(bindCfgFileName)
+{
+    MMI_HILOGI("Bind cfg file name:%{public}s", bindCfgFileName.c_str());
+}
+
 InputWindowsManager::~InputWindowsManager() {}
+
+void InputWindowsManager::DeviceStatusChanged(int32_t deviceId, const std::string &sysUid, const std::string devStatus)
+{
+    CALL_INFO_TRACE;
+    if (devStatus == "add") {
+        bindInfo_.AddInputDevice(deviceId, sysUid);
+    } else {
+        bindInfo_.RemoveInputDevice(deviceId);
+    }
+}
 
 void InputWindowsManager::Init(UDSServer& udsServer)
 {
     udsServer_ = &udsServer;
     CHKPV(udsServer_);
+    bindInfo_.Load();
 #ifdef OHOS_BUILD_ENABLE_POINTER
     udsServer_->AddSessionDeletedCallback(std::bind(&InputWindowsManager::OnSessionLost, this, std::placeholders::_1));
     InitMouseDownInfo();
 #endif // OHOS_BUILD_ENABLE_POINTER
+    InputDevMgr->SetInputStatusChangeCallback(std::bind(&InputWindowsManager::DeviceStatusChanged, this,
+        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -207,6 +225,43 @@ void InputWindowsManager::CheckZorderWindowChange(const DisplayGroupInfo &displa
         oldZorderFirstWindowPid, newZorderFirstWindowPid);
 }
 
+void InputWindowsManager::UpdateDisplayIdAndName() {
+    using IdNames = std::set<std::pair<int32_t, std::string>>;
+    IdNames newInfo;
+    for (const auto &item : displayGroupInfo_.displaysInfo) {
+        newInfo.insert(std::make_pair(item.id, item.uniq));
+    }
+    auto oldInfo = bindInfo_.GetDisplayIdNames();
+    if (newInfo == oldInfo) {
+        return;
+    }
+    for (auto it = oldInfo.begin(); it != oldInfo.end();) {
+        if (newInfo.find(*it) == newInfo.end()) {
+            bindInfo_.RemoveDisplay(it->first);
+            oldInfo.erase(it++);
+        } else {
+            ++it;
+        }
+    }
+    for (const auto &item : newInfo) {
+        if (!bindInfo_.IsDisplayAdd(item.first, item.second)) {
+            bindInfo_.AddDisplay(item.first, item.second);
+        }
+    }
+}
+
+int32_t InputWindowsManager::GetDisplayBindInfo(DisplayBindInfos &infos)
+{
+    CALL_DEBUG_ENTER;
+    return bindInfo_.GetDisplayBindInfo(infos);
+}
+
+int32_t InputWindowsManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
+{
+    CALL_DEBUG_ENTER;
+    return bindInfo_.SetDisplayBind(deviceId, displayId, msg);    
+}
+
 void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
@@ -219,6 +274,7 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
     }
     displayGroupInfo_ = displayGroupInfo;
     PrintDisplayInfo();
+    UpdateDisplayIdAndName();
 #ifdef OHOS_BUILD_ENABLE_POINTER
     UpdatePointerStyle();
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -552,9 +608,9 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
     EventTouch& touchInfo, int32_t& physicalDisplayId)
 {
     CHKPF(touch);
-    std::string screenId = InputDevMgr->GetScreenId(deviceId);
+    const std::string screenId = bindInfo_.GetBindDisplayNameByInputDevice(deviceId);
     if (screenId.empty()) {
-        screenId = "default0";
+        return false;
     }
     auto info = FindPhysicalDisplayInfo(screenId);
     CHKPF(info);
@@ -1268,6 +1324,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
                 item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
                 item.uniq.c_str(), item.direction);
     }
+    mprintf(fd, "Input device and display bind info:\n%s\n", bindInfo_.Dumps().c_str());
 }
 } // namespace MMI
 } // namespace OHOS

@@ -91,7 +91,8 @@
           "//third_party/mtdev:libmtdev",
           "//third_party/libevdev:libevdev",
           "//foundation/multimodalinput/input:uinput_inject",
-          "//foundation/multimodalinput/input:mmi_uinput.rc"
+          "//foundation/multimodalinput/input:mmi_uinput.rc",
+          "//foundation/multimodalinput/input:examples_group"
         ]
       },
       "inner_kits": [

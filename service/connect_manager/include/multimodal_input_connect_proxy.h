@@ -58,6 +58,8 @@ public:
     int32_t UnsubscribeKeyEvent(int32_t subscribeId) override;
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     int32_t SetAnrObserver() override;
+    int32_t GetDisplayBindInfo(DisplayBindInfos &infos) override;
+    int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) override;
     int32_t RegisterCooperateListener() override;
     int32_t UnregisterCooperateListener() override;
     int32_t EnableInputDeviceCooperate(int32_t userData, bool enabled) override;
