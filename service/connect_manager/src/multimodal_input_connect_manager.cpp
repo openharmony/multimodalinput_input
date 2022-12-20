@@ -73,6 +73,26 @@ int32_t MultimodalInputConnectManager::GetClientSocketFdOfAllocedSocketPair() co
     return socketFd_;
 }
 
+int32_t MultimodalInputConnectManager::GetDisplayBindInfo(DisplayBindInfos &infos)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    if (multimodalInputConnectService_ == nullptr) {
+        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        return RET_ERR;
+    }
+    return multimodalInputConnectService_->GetDisplayBindInfo(infos);
+}
+
+int32_t MultimodalInputConnectManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    if (multimodalInputConnectService_ == nullptr) {
+        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        return RET_ERR;
+    }
+    return multimodalInputConnectService_->SetDisplayBind(deviceId, displayId, msg);    
+}
+
 int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority)
 {
     std::lock_guard<std::mutex> guard(lock_);

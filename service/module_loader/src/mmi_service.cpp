@@ -863,6 +863,30 @@ int32_t MMIService::SetAnrObserver()
     return RET_OK;
 }
 
+int32_t MMIService::GetDisplayBindInfo(DisplayBindInfos &infos)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&InputWindowsManager::GetDisplayBindInfo, WinMgr, std::ref(infos)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetDisplayBindInfo pid failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MMIService::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&InputWindowsManager::SetDisplayBind, WinMgr, deviceId, displayId, std::ref(msg)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetDisplayBind pid failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;    
+}
+
 int32_t MMIService::GetFunctionKeyState(int32_t funcKey, bool &state)
 {
     CALL_INFO_TRACE;
