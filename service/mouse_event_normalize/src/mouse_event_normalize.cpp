@@ -38,11 +38,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Mouse
 MouseEventNormalize::MouseEventNormalize() {}
 MouseEventNormalize::~MouseEventNormalize() {}
 
-bool MouseEventNormalize::GetSpeedGain(double vin, int32_t deviceId, double &gain) const
-{
-    return MouseTransformProcessor::GetSpeedGain(vin, deviceId, gain);
-}
-
 std::shared_ptr<MouseTransformProcessor> MouseEventNormalize::GetProcessor(int32_t deviceId) const
 {
     auto iter = processors_.find(deviceId);
@@ -97,7 +92,10 @@ int32_t MouseEventNormalize::OnEvent(struct libinput_event *event)
         processor = it->second;
     } else {
         processor = std::make_shared<MouseTransformProcessor>(deviceId);
-        CHKPR(processor, RET_ERR);
+        auto vendorConfig = InputDevMgr->GetVendorConfig(deviceId);
+        if (vendorConfig.pointerSpeed != -1) {
+            processor->SetConfigPointerSpeed(vendorConfig.pointerSpeed);
+        }
         auto [tIter, isOk] = processors_.emplace(deviceId, processor);
         if (!isOk) {
             MMI_HILOGE("Duplicate device record:%{public}d", deviceId);
@@ -154,20 +152,5 @@ void MouseEventNormalize::SetAbsolutionLocation(double xPercent, double yPercent
     MouseTransformProcessor::SetAbsolutionLocation(xPercent, yPercent);
 }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-
-void MouseEventNormalize::SetPointerSpeedWithDeviceId(int32_t deviceId, int32_t speed)
-{
-    MouseTransformProcessor::SetPointerSpeedWithDeviceId(deviceId, speed);
-}
-
-void MouseEventNormalize::RemovePointerSpeed(int32_t deviceId)
-{
-    MouseTransformProcessor::RemovePointerSpeed(deviceId);
-}
-
-int32_t MouseEventNormalize::GetPointerSpeedByDeviceId(int32_t deviceId)
-{
-    return MouseTransformProcessor::GetPointerSpeedByDeviceId(deviceId);
-}
 } // namespace MMI
 } // namespace OHOS
