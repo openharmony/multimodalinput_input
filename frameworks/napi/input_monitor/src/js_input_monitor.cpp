@@ -707,7 +707,7 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
                 markProcessedEvent->MarkProcessed();
                 std::queue<std::shared_ptr<PointerEvent>> tmp;
                 std::swap(evQueue_, tmp);
-                evQueue_.push(pointerEvent); 
+                evQueue_.push(pointerEvent);
             }
         } else {
             evQueue_.push(pointerEvent);
