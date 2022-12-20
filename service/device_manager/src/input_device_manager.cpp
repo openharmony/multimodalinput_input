@@ -360,7 +360,7 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
     }
     info.dhid = GenerateDescriptor(inputDevice, info.isRemote);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-    info.vendorConfig = configManagement_.OnDeviceAdd(inputDevice);
+    info.vendorConfig = configManagement_.GetVendorConfig(inputDevice);
 }
 
 void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevice)

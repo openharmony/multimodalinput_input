@@ -60,7 +60,7 @@ std::string DeviceConfigManagement::CombDeviceFileName(struct libinput_device *d
     return fileName;
 }
 
-ConfigFileItem DeviceConfigManagement::ConfigItemName2Id(const std::string &name)
+ConfigFileItem DeviceConfigManagement::ConfigItemName2Id(const std::string &name) const
 {
     static const std::map<const std::string, ConfigFileItem> configList = {
         {"speed", ConfigFileItem::POINTER_SPEED},
@@ -74,7 +74,7 @@ ConfigFileItem DeviceConfigManagement::ConfigItemName2Id(const std::string &name
     return configList.at(name);
 }
 
-std::map<ConfigFileItem, int32_t> DeviceConfigManagement::ReadConfigFile(const std::string &filePath)
+std::map<ConfigFileItem, int32_t> DeviceConfigManagement::ReadConfigFile(const std::string &filePath) const
 {
     std::map<ConfigFileItem, int32_t> configList;
     std::ifstream cfgFile(filePath);
@@ -110,12 +110,13 @@ std::map<ConfigFileItem, int32_t> DeviceConfigManagement::ReadConfigFile(const s
     return configList;
 }
 
-VendorConfig DeviceConfigManagement::DeviceConfiguration(struct libinput_device *device)
+VendorConfig DeviceConfigManagement::GetVendorConfig(struct libinput_device *device) const
 {
     CALL_DEBUG_ENTER;
+    CHKPO(device);
     std::string filePath = "/vendor/etc/pointer/" + CombDeviceFileName(device) + ".TOML";
+     VendorConfig vendorConfigTmp;
     auto path = FileVerification(filePath, "TOML");
-    VendorConfig vendorConfigTmp;
     if(path.empty()) {
         MMI_HILOGE("File validation failed");
         return vendorConfigTmp;
@@ -131,13 +132,6 @@ VendorConfig DeviceConfigManagement::DeviceConfiguration(struct libinput_device 
     }
     vendorConfigTmp.pointerSpeed = configList[ConfigFileItem::POINTER_SPEED];
     return vendorConfigTmp;
-}
-
-VendorConfig DeviceConfigManagement::OnDeviceAdd(struct libinput_device *device)
-{
-    CALL_DEBUG_ENTER;
-    CHKPO(device);
-    return DeviceConfiguration(device);
 }
 } // namespace MMI
 } // namespace OHOS

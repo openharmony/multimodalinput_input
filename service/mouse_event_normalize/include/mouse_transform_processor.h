@@ -74,7 +74,7 @@ private:
     static double absolutionX_;
     static double absolutionY_;
     static int32_t currentDisplayId_;
-    static int32_t globalSpeed_;
+    static int32_t globalPointerSpeed_;
     static bool isUserSetSpeedStatus_;
 
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
@@ -82,7 +82,7 @@ private:
     int32_t buttonId_ { -1 };
     bool isPressed_ { false };
     int32_t deviceId_ { -1 };
-    int32_t configSpeed_ { -1 };
+    int32_t vendorConfigPointerSpeed_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS
