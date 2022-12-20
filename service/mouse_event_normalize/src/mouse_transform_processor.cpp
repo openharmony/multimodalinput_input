@@ -59,7 +59,7 @@ constexpr double PERCENT_CONST = 100.0;
 double MouseTransformProcessor::absolutionX_ = -1.0;
 double MouseTransformProcessor::absolutionY_ = -1.0;
 int32_t MouseTransformProcessor::currentDisplayId_ = -1;
-int32_t MouseTransformProcessor::globalSpeed_ = DEFAULT_SPEED;
+int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
 bool MouseTransformProcessor::isUserSetSpeedStatus_ = false;
 
 MouseTransformProcessor::MouseTransformProcessor(int32_t deviceId)
@@ -404,22 +404,22 @@ int32_t MouseTransformProcessor::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;
     if (speed < MIN_SPEED) {
-        globalSpeed_ = MIN_SPEED;
+        globalPointerSpeed_ = MIN_SPEED;
     } else if (speed > MAX_SPEED) {
-        globalSpeed_ = MAX_SPEED;
+        globalPointerSpeed_ = MAX_SPEED;
     } else {
-        globalSpeed_ = speed;
+        globalPointerSpeed_ = speed;
     }
     isUserSetSpeedStatus_ = true;
-    MMI_HILOGD("Set pointer speed:%{public}d", globalSpeed_);
+    MMI_HILOGD("Set pointer speed:%{public}d", globalPointerSpeed_);
     return RET_OK;
 }
 
 int32_t MouseTransformProcessor::GetPointerSpeed()
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Get pointer speed:%{public}d", globalSpeed_);
-    return globalSpeed_;
+    MMI_HILOGD("Get pointer speed:%{public}d", globalPointerSpeed_);
+    return globalPointerSpeed_;
 }
 
 bool MouseTransformProcessor::GetSpeedGain(double vin, double &gain)
@@ -514,20 +514,20 @@ void MouseTransformProcessor::SetAbsolutionLocation(double xPercent, double yPer
 
 int32_t MouseTransformProcessor::GetSpeed() const
 {
-    if ((configSpeed_ == -1) || isUserSetSpeedStatus_) {
-        return globalSpeed_;
+    if ((vendorConfigPointerSpeed_ == -1) || isUserSetSpeedStatus_) {
+        return globalPointerSpeed_;
     }
-    return configSpeed_;
+    return vendorConfigPointerSpeed_;
 }
 
 void MouseTransformProcessor::SetConfigPointerSpeed(int32_t speed)
 {
     if (speed < MIN_SPEED) {
-        configSpeed_ = MIN_SPEED;
+        vendorConfigPointerSpeed_ = MIN_SPEED;
     } else if (speed > MAX_SPEED) {
-        configSpeed_ = MAX_SPEED;
+        vendorConfigPointerSpeed_ = MAX_SPEED;
     } else {
-        configSpeed_ = speed;
+        vendorConfigPointerSpeed_ = speed;
     }
 }
 } // namespace MMI

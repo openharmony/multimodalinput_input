@@ -37,13 +37,12 @@ public:
     DeviceConfigManagement() = default;
     ~DeviceConfigManagement() = default;
 public:
-    VendorConfig OnDeviceAdd(struct libinput_device *device);
+    VendorConfig GetVendorConfig(struct libinput_device *device) const;
 
 private:
     std::string CombDeviceFileName(struct libinput_device *device) const;
-    VendorConfig DeviceConfiguration(struct libinput_device *device);
-    std::map<ConfigFileItem, int32_t> ReadConfigFile(const std::string &filePath);
-    ConfigFileItem ConfigItemName2Id(const std::string &name);
+    std::map<ConfigFileItem, int32_t> ReadConfigFile(const std::string &filePath) const;
+    ConfigFileItem ConfigItemName2Id(const std::string &name) const;
 };
 } // namespace MMI
 } // namespace OHOS
