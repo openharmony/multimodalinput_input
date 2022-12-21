@@ -4057,7 +4057,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_InputDeviceInterface_002, TestSize.L
     ASSERT_EQ(iter[0].GetMaximum(), 1);
     ASSERT_EQ(iter[0].GetFuzz(), 0);
     ASSERT_EQ(iter[0].GetFlat(), 1);
-    ASSERT_EQ(iter[0].GetResolution(), 0);    
+    ASSERT_EQ(iter[0].GetResolution(), 0);
 }
 
 /**
