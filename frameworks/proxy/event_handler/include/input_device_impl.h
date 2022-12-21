@@ -54,7 +54,6 @@ public:
     void OnDevListener(int32_t deviceId, const std::string &type);
     void OnKeyboardType(int32_t userData, int32_t keyboardType);
     int32_t GetUserData();
-    std::shared_ptr<InputDevice> DevDataUnmarshalling(NetPacket &pkt);
 
 private:
     InputDeviceImpl() = default;

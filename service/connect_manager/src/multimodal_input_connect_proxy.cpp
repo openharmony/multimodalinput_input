@@ -50,6 +50,9 @@ int32_t ParseInputDevice(MessageParcel &reply, std::shared_ptr<InputDevice> &inp
     std::string uniq;
     READSTRING(reply, uniq, IPC_PROXY_DEAD_OBJECT_ERR);
     inputDevice->SetUniq(uniq);
+    uint64_t caps;
+    READUINT64(reply, caps, IPC_PROXY_DEAD_OBJECT_ERR);
+    inputDevice->SetCapabilities(static_cast<unsigned long>(caps));
 
     uint32_t size;
     READUINT32(reply, size, IPC_PROXY_DEAD_OBJECT_ERR);
