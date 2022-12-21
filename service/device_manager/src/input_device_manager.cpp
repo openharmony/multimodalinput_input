@@ -360,6 +360,7 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
     }
     info.dhid = GenerateDescriptor(inputDevice, info.isRemote);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+    info.vendorConfig = configManagement_.GetVendorConfig(inputDevice);
 }
 
 void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevice)
@@ -770,6 +771,17 @@ const std::string& InputDeviceManager::GetScreenId(int32_t deviceId) const
     MMI_HILOGE("Find input device screen id failed");
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     return UNKNOWN_SCREEN_ID;
+}
+
+VendorConfig InputDeviceManager::GetVendorConfig(int32_t deviceId) const
+{
+    CALL_DEBUG_ENTER;
+    auto it = inputDevice_.find(deviceId);
+    if (it == inputDevice_.end()) {
+        MMI_HILOGE("Device info not find id: %{public}d", deviceId);
+        return {};
+    }
+    return it->second.vendorConfig;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -20,7 +20,6 @@
 
 #include "error_multimodal.h"
 #include "input_device.h"
-#include "input_device_manager.h"
 #include "libinput.h"
 #include "util.h"
 
@@ -28,7 +27,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DeviceConfigManagement" };
-constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t COMMENT_SUBSCRIPT = 0;
 } // namespace
 
@@ -47,7 +45,7 @@ enum evdev_device_udev_tags {
     EVDEV_UDEV_TAG_SWITCH = 1 << 11,
 };
 
-std::string DeviceConfigManagement::CombDeviceFileName(struct libinput_device *device)
+std::string DeviceConfigManagement::CombDeviceFileName(struct libinput_device *device) const
 {
     CALL_DEBUG_ENTER;
     CHKPS(device);
@@ -62,7 +60,7 @@ std::string DeviceConfigManagement::CombDeviceFileName(struct libinput_device *d
     return fileName;
 }
 
-ConfigFileItem DeviceConfigManagement::ConfigItemName2Id(const std::string &name)
+ConfigFileItem DeviceConfigManagement::ConfigItemName2Id(const std::string &name) const
 {
     static const std::map<const std::string, ConfigFileItem> configList = {
         {"speed", ConfigFileItem::POINTER_SPEED},
@@ -76,7 +74,7 @@ ConfigFileItem DeviceConfigManagement::ConfigItemName2Id(const std::string &name
     return configList.at(name);
 }
 
-std::map<ConfigFileItem, int32_t> DeviceConfigManagement::ReadConfigFile(const std::string &filePath)
+std::map<ConfigFileItem, int32_t> DeviceConfigManagement::ReadConfigFile(const std::string &filePath) const
 {
     std::map<ConfigFileItem, int32_t> configList;
     std::ifstream cfgFile(filePath);
@@ -112,64 +110,28 @@ std::map<ConfigFileItem, int32_t> DeviceConfigManagement::ReadConfigFile(const s
     return configList;
 }
 
-int32_t DeviceConfigManagement::DeviceConfiguration(struct libinput_device *device, DeviceId deviceId)
+VendorConfig DeviceConfigManagement::GetVendorConfig(struct libinput_device *device) const
 {
     CALL_DEBUG_ENTER;
+    CHKPO(device);
     std::string filePath = "/vendor/etc/pointer/" + CombDeviceFileName(device) + ".TOML";
+    VendorConfig vendorConfigTmp = {};
     auto path = FileVerification(filePath, "TOML");
     if(path.empty()) {
         MMI_HILOGE("File validation failed");
-        return RET_ERR;
+        return vendorConfigTmp;
     }
     auto configList = ReadConfigFile(path);
     if (configList.empty()) {
         MMI_HILOGE("configList is empty");
-        return RET_ERR;
+        return vendorConfigTmp;
     }
-    deviceConfigs_[deviceId] = configList;
-    MouseEventHdr->SetPointerSpeedWithDeviceId(deviceId, configList[ConfigFileItem::POINTER_SPEED]);
-    return RET_OK;
-}
-
-int32_t DeviceConfigManagement::DeviceClassification(struct libinput_device *device, DeviceId deviceId)
-{
-    CHKPR(device, ERROR_NULL_POINTER);
-    uint32_t udevTags = static_cast<int32_t>(libinput_device_get_tags(device));
-    if (udevTags & (EVDEV_UDEV_TAG_MOUSE |
-                    EVDEV_UDEV_TAG_TRACKBALL |
-                    EVDEV_UDEV_TAG_POINTINGSTICK |
-                    EVDEV_UDEV_TAG_TOUCHPAD |
-                    EVDEV_UDEV_TAG_TABLET_PAD)) {
-        return DeviceConfiguration(device, deviceId);
+    if (configList.find(ConfigFileItem::POINTER_SPEED) == configList.end()) {
+        MMI_HILOGE("configList not find POINTER_SPEED");
+        return vendorConfigTmp;
     }
-    MMI_HILOGE("Device config set failed");
-    return RET_ERR;
-}
-
-int32_t DeviceConfigManagement::OnDeviceAdd(struct libinput_device *device)
-{
-    CALL_DEBUG_ENTER;
-    CHKPR(device, ERROR_NULL_POINTER);
-    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
-    if (deviceId == INVALID_DEVICE_ID) {
-        MMI_HILOGE("Find device failed");
-        return RET_ERR;
-    }
-    return DeviceClassification(device, deviceId);
-}
-
-void DeviceConfigManagement::OnDeviceRemove(struct libinput_device *device)
-{
-    CALL_DEBUG_ENTER;
-    CHKPV(device);
-    int32_t deviceId = InputDevMgr->FindInputDeviceId(device);
-    auto iter = deviceConfigs_.find(deviceId);
-    if (iter == deviceConfigs_.end()) {
-        MMI_HILOGE("Device config file remove failed");
-        return;
-    }
-    MouseEventHdr->RemovePointerSpeed(deviceId);
-    deviceConfigs_.erase(iter);
+    vendorConfigTmp.pointerSpeed = configList[ConfigFileItem::POINTER_SPEED];
+    return vendorConfigTmp;
 }
 } // namespace MMI
 } // namespace OHOS
