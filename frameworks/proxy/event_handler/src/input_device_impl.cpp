@@ -177,52 +177,5 @@ int32_t InputDeviceImpl::GetUserData()
 {
     return userData_;
 }
-
-std::shared_ptr<InputDevice> InputDeviceImpl::DevDataUnmarshalling(NetPacket &pkt)
-{
-    auto devData = std::make_shared<InputDevice>();
-    int32_t deviceId;
-    std::string name;
-    int32_t deviceType;
-    int32_t bus;
-    int32_t product;
-    int32_t vendor;
-    int32_t version;
-    std::string phys;
-    std::string uniq;
-    unsigned long caps;
-    pkt >> deviceId >> name >> deviceType >> bus >> product >> vendor >> version >> phys >> uniq >> caps;
-    devData->SetId(deviceId);
-    devData->SetName(name);
-    devData->SetType(deviceType);
-    devData->SetBus(bus);
-    devData->SetProduct(product);
-    devData->SetVendor(vendor);
-    devData->SetVersion(version);
-    devData->SetPhys(phys);
-    devData->SetUniq(uniq);
-    devData->SetCapabilities(caps);
-
-    size_t size;
-    pkt >> size;
-    for (size_t i = 0; i < size; ++i) {
-        InputDevice::AxisInfo axis;
-        int32_t type;
-        int32_t min;
-        int32_t max;
-        int32_t fuzz;
-        int32_t flat;
-        int32_t resolution;
-        pkt >> type >> min >> max >> fuzz >> flat >> resolution;
-        axis.SetAxisType(type);
-        axis.SetMinimum(min);
-        axis.SetMaximum(max);
-        axis.SetFuzz(fuzz);
-        axis.SetFlat(flat);
-        axis.SetResolution(resolution);
-        devData->AddAxisInfo(axis);
-    }
-    return devData;
-}
 } // namespace MMI
 } // namespace OHOS
