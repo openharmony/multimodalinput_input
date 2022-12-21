@@ -251,6 +251,14 @@ inline constexpr int32_t INVALID_PID { -1 };
         } \
     } while (0)
 
+#define WRITEUINT64(parcel, data, ...) \
+    do { \
+        if (!(parcel).WriteUint64(data)) { \
+            MMI_HILOGE("WriteUint64 "#data" failed"); \
+            return DEFRET(false, ##__VA_ARGS__); \
+        } \
+    } while (0)
+
 #define WRITEDOUBLE(parcel, data, ...) \
     do { \
         if (!(parcel).WriteDouble(data)) { \
@@ -295,6 +303,14 @@ inline constexpr int32_t INVALID_PID { -1 };
     do { \
         if (!(parcel).ReadUint32(data)) { \
             MMI_HILOGE("ReadUint32 "#data" failed"); \
+            return DEFRET(false, ##__VA_ARGS__); \
+        } \
+    } while (0)
+
+#define READUINT64(parcel, data, ...) \
+    do { \
+        if (!(parcel).ReadUint64(data)) { \
+            MMI_HILOGE("ReadUint64 "#data" failed"); \
             return DEFRET(false, ##__VA_ARGS__); \
         } \
     } while (0)

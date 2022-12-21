@@ -351,6 +351,7 @@ int32_t MultimodalInputConnectStub::StubGetDevice(MessageParcel& data, MessagePa
     WRITEINT32(reply, inputDevice->GetVendor(), IPC_STUB_WRITE_PARCEL_ERR);
     WRITESTRING(reply, inputDevice->GetPhys(), IPC_STUB_WRITE_PARCEL_ERR);
     WRITESTRING(reply, inputDevice->GetUniq(), IPC_STUB_WRITE_PARCEL_ERR);
+    WRITEUINT64(reply, static_cast<uint64_t>(inputDevice->GetCapabilities()), IPC_STUB_WRITE_PARCEL_ERR);
     WRITEUINT32(reply, static_cast<uint32_t>(inputDevice->GetAxisInfo().size()), IPC_STUB_WRITE_PARCEL_ERR);
     for (const auto &item : inputDevice->GetAxisInfo()) {
         WRITEINT32(reply, item.GetMinimum(), IPC_STUB_WRITE_PARCEL_ERR);
