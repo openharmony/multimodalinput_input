@@ -19,6 +19,7 @@
 #include <list>
 #include <string>
 
+#include "device_config_file_parser.h"
 #include "device_observer.h"
 #include "event_dispatch_handler.h"
 #include "input_device.h"
@@ -43,6 +44,7 @@ class InputDeviceManager final : public IDeviceObject {
         bool isPointerDevice { false };
         bool isTouchableDevice { false };
         std::string dhid;
+        VendorConfig vendorConfig;
     };
 public:
     DISALLOW_COPY_AND_MOVE(InputDeviceManager);
@@ -83,6 +85,7 @@ public:
     bool HasTouchDevice();
     int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
     const std::string& GetScreenId(int32_t deviceId) const;
+    VendorConfig GetVendorConfig(int32_t deviceId) const;
 
 private:
     void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);
@@ -98,6 +101,7 @@ private:
     int32_t nextId_ { 0 };
     std::list<std::shared_ptr<IDeviceObserver>> observers_;
     std::map<SessionPtr, std::function<void(int32_t, const std::string&)>> devListener_;
+    DeviceConfigManagement configManagement_;
 };
 
 #define InputDevMgr ::OHOS::DelayedSingleton<InputDeviceManager>::GetInstance()
