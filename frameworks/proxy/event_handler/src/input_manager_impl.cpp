@@ -71,6 +71,30 @@ private:
 InputManagerImpl::InputManagerImpl() {}
 InputManagerImpl::~InputManagerImpl() {}
 
+
+int32_t InputManagerImpl::GetDisplayBindInfo(DisplayBindInfos &infos)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->GetDisplayBindInfo(infos);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetDisplayBindInfo failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t InputManagerImpl::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
+{
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetDisplayBind(deviceId, displayId, msg);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetDisplayBind failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;

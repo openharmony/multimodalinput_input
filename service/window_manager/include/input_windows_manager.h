@@ -23,7 +23,9 @@
 
 #include "window_info.h"
 #include "input_event.h"
+#include "input_display_bind_helper.h"
 #include "input_event_data_transformation.h"
+#include "input_event.h"
 #include "pointer_event.h"
 #include "uds_server.h"
 
@@ -85,7 +87,9 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
     bool GetMouseIsCaptureMode() const;
-
+    void DeviceStatusChanged(int32_t deviceId, const std::string &sysUid, const std::string devStatus);
+    int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
+    int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
 private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const;
@@ -132,6 +136,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER
     void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo);
+    void UpdateDisplayIdAndName();
 private:
     UDSServer* udsServer_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -146,6 +151,7 @@ private:
     DisplayGroupInfo displayGroupInfo_;
     MouseLocation mouseLocation_ = { -1, -1 };
     std::map<int32_t, WindowInfo> touchItemDownInfos_;
+    InputDisplayBindHelper bindInfo_;
     struct CaptureModeInfo {
         int32_t windowId { -1 };
         bool isCaptureMode { false };

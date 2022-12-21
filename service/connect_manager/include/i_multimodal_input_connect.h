@@ -19,13 +19,14 @@
 #include "iremote_broker.h"
 
 #include "i_event_filter.h"
-#include "input_device.h"
 #include "i_input_event_filter.h"
+#include "input_device.h"
 #include "input_handler_type.h"
 #include "key_event.h"
 #include "key_option.h"
 #include "pointer_event.h"
 #include "system_ability_definition.h"
+#include "window_info.h"
 
 namespace OHOS {
 namespace MMI {
@@ -60,12 +61,14 @@ public:
         GET_FUNCTION_KEY_STATE = 26,
         RMV_INPUT_EVENT_FILTER = 27,
         SET_CAPTURE_MODE = 28,
+        GET_DISPLAY_BIND_INFO = 29,
         REGISTER_COOPERATE_MONITOR = 30,
         UNREGISTER_COOPERATE_MONITOR = 31,
         ENABLE_INPUT_DEVICE_COOPERATE = 32,
         START_INPUT_DEVICE_COOPERATE = 33,
         STOP_DEVICE_COOPERATE = 34,
-        GET_INPUT_DEVICE_COOPERATE_STATE = 35,
+        GET_INPUT_DEVICE_COOPERATE_STATE = 35,        
+        SET_DISPLAY_BIND = 36,
         SET_INPUT_DEVICE_TO_SCREEN = 50,
         SET_POINTER_LOCATION = 51,
     };
@@ -105,6 +108,8 @@ public:
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) = 0;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t SetAnrObserver() = 0;
+    virtual int32_t GetDisplayBindInfo(DisplayBindInfos &infos) = 0;
+    virtual int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
     virtual int32_t RegisterCooperateListener() = 0;
     virtual int32_t UnregisterCooperateListener() = 0;
     virtual int32_t EnableInputDeviceCooperate(int32_t userData, bool enabled) = 0;

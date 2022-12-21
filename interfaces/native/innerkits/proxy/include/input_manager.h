@@ -46,6 +46,9 @@ public:
     static InputManager *GetInstance();
     virtual ~InputManager() = default;
 
+    int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
+    int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
+
     /**
      * @brief Updates the screen and window information.
      * @param displayGroupInfo Indicates the logical screen information.
