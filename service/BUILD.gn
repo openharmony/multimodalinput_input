@@ -103,6 +103,7 @@ ohos_shared_library("libmmi-server") {
     "module_loader/src/uds_server.cpp",
     "permission_helper/src/permission_helper.cpp",
     "timer_manager/src/timer_manager.cpp",
+    "window_manager/src/input_display_bind_helper.cpp",
     "window_manager/src/input_windows_manager.cpp",
   ]
 
@@ -265,6 +266,7 @@ ohos_unittest("ut-mmi-service-out") {
   sources = [
     "event_dispatch/test/event_dispatch_test.cpp",
     "module_loader/test/uds_server_test.cpp",
+    "window_manager/test/input_display_bind_helper_test.cpp",
     "window_manager/test/input_windows_manager_test.cpp",
   ]
 

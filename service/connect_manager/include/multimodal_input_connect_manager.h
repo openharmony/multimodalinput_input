@@ -39,6 +39,8 @@ public:
     }
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority);
     int32_t RemoveInputEventFilter(int32_t filterId);
+    int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
+    int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t SetPointerVisible(bool visible);
     int32_t IsPointerVisible(bool &visible);
     int32_t MarkProcessed(int32_t eventType, int32_t eventId);

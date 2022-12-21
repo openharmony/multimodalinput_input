@@ -42,7 +42,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceManager" };
 constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t SUPPORT_KEY = 1;
-
 const std::string UNKNOWN_SCREEN_ID = "";
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 const char *SPLIT_SYMBOL = "|";
@@ -249,6 +248,12 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardT
     return GetDeviceSupportKey(deviceId, keyboardType);
 }
 
+void InputDeviceManager::SetInputStatusChangeCallback(inputDeviceCallback callback)
+{
+    CALL_DEBUG_ENTER;
+    devCallbacks_ = callback;
+}
+
 void InputDeviceManager::AddDevListener(SessionPtr sess, std::function<void(int32_t, const std::string&)> callback)
 {
     CALL_DEBUG_ENTER;
@@ -293,6 +298,45 @@ bool InputDeviceManager::HasTouchDevice()
     return false;
 }
 
+std::string InputDeviceManager::GetInputIdentification(struct libinput_device* inputDevice)
+{
+    CALL_DEBUG_ENTER;
+    uint32_t deviceVendor = libinput_device_get_id_vendor(inputDevice);
+    uint32_t deviceProduct = libinput_device_get_id_product(inputDevice);
+    struct udev_device* udevDevice = libinput_device_get_udev_device(inputDevice);
+    std::string sysPath = udev_device_get_syspath(udevDevice);
+    if ((deviceVendor < 0) || (deviceProduct < 0) || sysPath.empty()) {
+        MMI_HILOGE("Get device identification failed");
+        return "";
+    }
+    const size_t bufSize = 10;
+    char vid[bufSize] = "";
+    char pid[bufSize] = "";
+    sprintf_s(vid, sizeof(vid), "%04X", deviceVendor);
+    sprintf_s(pid, sizeof(pid), "%04X", deviceProduct);
+    std::string strVid(vid);
+    std::string strPid(pid);
+    std::string vendorProduct = strVid + ":" + strPid;
+    std::string deviceIdentification = sysPath.substr(0, sysPath.find(vendorProduct)) + vendorProduct;
+    MMI_HILOGI("Device identification is:%{public}s", deviceIdentification.c_str());
+    return deviceIdentification;
+}
+
+void InputDeviceManager::NotifyDevCallback(int32_t deviceId,  struct InputDeviceInfo inDevice)
+{
+    if (!inDevice.isTouchableDevice || (deviceId < 0)) {
+        MMI_HILOGI("The device is not touchable device already existent");
+        return;
+    }
+    if (!inDevice.sysUid.empty()) {
+        devCallbacks_(deviceId, inDevice.sysUid, "add");
+        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%{public}s, status:add",
+            deviceId, inDevice.sysUid.c_str());
+    } else {
+        MMI_HILOGE("Get device system uid id is empty, deviceId:%{public}d", deviceId);
+    }
+}
+
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 {
     CALL_DEBUG_ENTER;
@@ -320,6 +364,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         CHKPC(item.first);
         item.second(nextId_, "add");
     }
+    NotifyDevCallback(nextId_, info);
     ++nextId_;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (IsKeyboardDevice(inputDevice)) {
@@ -354,6 +399,7 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
     info.isRemote = IsRemote(inputDevice);
     info.isPointerDevice = IsPointerDevice(inputDevice);
     info.isTouchableDevice = IsTouchDevice(inputDevice);
+    info.sysUid = GetInputIdentification(inputDevice);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (info.isRemote) {
         info.networkIdOrigin = MakeNetworkId(libinput_device_get_phys(inputDevice));
@@ -384,6 +430,13 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
             break;
         }
     }
+    std::string sysUid = GetInputIdentification(inputDevice);
+    if (!sysUid.empty()) {
+        devCallbacks_(deviceId, sysUid, "remove");
+        MMI_HILOGI("Send device info to window manager, device id:%{public}d, system uid:%{public}s, status:remove",
+            deviceId, sysUid.c_str());
+    }
+
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (IsPointerDevice(inputDevice) && !HasPointerDevice() &&
         IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {

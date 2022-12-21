@@ -19,6 +19,7 @@ config("mmi_connect_manager_config") {
   include_dirs = [
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/util/network/include",
     "//foundation/multimodalinput/input/util/socket/include",
