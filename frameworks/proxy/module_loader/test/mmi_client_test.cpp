@@ -32,8 +32,8 @@ public:
 ConnectCallback connectFun;
 
 /**
- * @tc.name:RegisterConnectedFunction
- * @tc.desc:Verify register connected
+ * @tc.name: RegisterConnectedFunction
+ * @tc.desc: Verify register connected
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -44,8 +44,8 @@ HWTEST_F(MMIClientTest, RegisterConnectedFunction, TestSize.Level1)
 }
 
 /**
- * @tc.name:RegisterDisconnectedFunction
- * @tc.desc:Verify register disconnected
+ * @tc.name: RegisterDisconnectedFunction
+ * @tc.desc: Verify register disconnected
  * @tc.type: FUNC
  * @tc.require:
  */

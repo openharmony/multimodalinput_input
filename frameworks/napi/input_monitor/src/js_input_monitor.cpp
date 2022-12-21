@@ -697,22 +697,25 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
     }
     CHKPV(monitor_);
     CHKPV(pointerEvent);
-    int32_t num = 0;
     {
         std::lock_guard<std::mutex> guard(mutex_);
-        std::queue<std::shared_ptr<PointerEvent>> tmp;
         if (!evQueue_.empty()) {
-            auto markProcessedEvent = evQueue_.front();
-            CHKPV(markProcessedEvent);
-            markProcessedEvent->MarkProcessed();
+            if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+                pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+                auto markProcessedEvent = evQueue_.front();
+                CHKPV(markProcessedEvent);
+                markProcessedEvent->MarkProcessed();
+                std::queue<std::shared_ptr<PointerEvent>> tmp;
+                std::swap(evQueue_, tmp);
+                evQueue_.push(pointerEvent);
+            }
+        } else {
+            evQueue_.push(pointerEvent);
         }
-        std::swap(evQueue_, tmp);
-        evQueue_.push(pointerEvent);
-        num = jsTaskNum_;
         jsTaskNum_ = 1;
     }
 
-    if (num < 1) {
+    if (!evQueue_.empty()) {
         int32_t *id = &monitorId_;
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);

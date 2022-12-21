@@ -18,7 +18,6 @@
 
 #include <memory>
 
-#include "device_config_file_parser.h"
 #include "i_input_event_handler.h"
 
 namespace OHOS {
@@ -59,7 +58,6 @@ private:
 private:
     int32_t timerId_ { -1 };
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
-    DeviceConfigManagement configManagement_;
 };
 } // namespace MMI
 } // namespace OHOS

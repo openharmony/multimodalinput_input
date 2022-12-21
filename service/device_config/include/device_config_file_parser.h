@@ -21,6 +21,10 @@
 
 struct libinput_device;
 
+struct VendorConfig {
+    int32_t pointerSpeed { -1 };
+};
+
 namespace OHOS {
 namespace MMI {
 enum class ConfigFileItem {
@@ -33,17 +37,12 @@ public:
     DeviceConfigManagement() = default;
     ~DeviceConfigManagement() = default;
 public:
-    int32_t OnDeviceAdd(struct libinput_device *device);
-    void OnDeviceRemove(struct libinput_device *device);
-    std::string CombDeviceFileName(struct libinput_device *device);
-private:
-    using DeviceId = int32_t;
-    std::map<DeviceId, std::map<ConfigFileItem, int32_t>> deviceConfigs_;
+    VendorConfig GetVendorConfig(struct libinput_device *device) const;
 
-    int32_t DeviceClassification(struct libinput_device *device, DeviceId deviceId);
-    int32_t DeviceConfiguration(struct libinput_device *device, DeviceId deviceId);
-    std::map<ConfigFileItem, int32_t> ReadConfigFile(const std::string &filePath);
-    ConfigFileItem ConfigItemName2Id(const std::string &name);
+private:
+    std::string CombDeviceFileName(struct libinput_device *device) const;
+    std::map<ConfigFileItem, int32_t> ReadConfigFile(const std::string &filePath) const;
+    ConfigFileItem ConfigItemName2Id(const std::string &name) const;
 };
 } // namespace MMI
 } // namespace OHOS
