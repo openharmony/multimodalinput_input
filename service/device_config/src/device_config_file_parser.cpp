@@ -115,7 +115,7 @@ VendorConfig DeviceConfigManagement::GetVendorConfig(struct libinput_device *dev
     CALL_DEBUG_ENTER;
     CHKPO(device);
     std::string filePath = "/vendor/etc/pointer/" + CombDeviceFileName(device) + ".TOML";
-     VendorConfig vendorConfigTmp;
+    VendorConfig vendorConfigTmp = {};
     auto path = FileVerification(filePath, "TOML");
     if(path.empty()) {
         MMI_HILOGE("File validation failed");
