@@ -581,6 +581,7 @@ int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, Mess
         MMI_HILOGE("Read Key Event failed");
         return IPC_PROXY_DEAD_OBJECT_ERR;
     }
+    event->UpdateId();
     int32_t ret = InjectKeyEvent(event);
     if (ret != RET_OK) {
         MMI_HILOGE("InjectKeyEvent failed, ret:%{public}d", ret);
