@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "list": "cpp",
-        "iterator": "cpp",
-        "vector": "cpp"
-    }
-}
