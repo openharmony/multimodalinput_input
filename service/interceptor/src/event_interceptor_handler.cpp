@@ -314,12 +314,16 @@ void EventInterceptorHandler::InterceptorCollection::RemoveInterceptor(const Ses
 void EventInterceptorHandler::InterceptorCollection::OnSessionLost(SessionPtr session)
 {
     CALL_INFO_TRACE;
-    for (auto iter = interceptors_.begin(); iter != interceptors_.end(); ++iter) {
-        if (iter->session_ == session) {
-            interceptors_.erase(iter);
+    auto iter = interceptors_.cbegin();
+    while (iter != interceptors_.cend()) {
+        if (iter->session_ != session) {
+            ++iter;
+        } else {
+            iter = interceptors_.erase(iter);
         }
     }
 }
+
 void EventInterceptorHandler::Dump(int32_t fd, const std::vector<std::string> &args)
 {
     return interceptors_.Dump(fd, args);
