@@ -77,8 +77,8 @@ INPUT_DEV_DISCONNECTION_FAILURE:
 
 CLIENT_CONNECTION_SUCCESS:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: client connection event success}
-  PID: {type: INT32, desc: pid}
-  UID: {type: INT32, desc: uid}
+  PID: {type: INT32, desc: session pid}
+  UID: {type: INT32, desc: session uid}
   MODULE_TYPE: {type: INT32, desc: module type}
   FD: {type: INT32, desc: server fd}
   PROGRAMNAME: {type: STRING, desc: program name}
@@ -86,16 +86,16 @@ CLIENT_CONNECTION_SUCCESS:
 
 CLIENT_CONNECTION_FAILURE:
   __BASE: {type: FAULT, level: MINOR, tag: PowerStats, desc: client connection event failure}
-  PID: {type: INT32, desc: pid}
-  UID: {type: INT32, desc: uid}
+  PID: {type: INT32, desc: session pid}
+  UID: {type: INT32, desc: session uid}
   MODULE_TYPE: {type: INT32, desc: module type}
   PROGRAMNAME: {type: STRING, desc: program name}
   MSG: {type: STRING, desc: message}
 
 CLIENT_DISCONNECTION_SUCCESS:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: client disconnection event success}
-  PID: {type: INT32, desc: pid}
-  UID: {type: INT32, desc: uid}
+  PID: {type: INT32, desc: session pid}
+  UID: {type: INT32, desc: session uid}
   MODULE_TYPE: {type: INT32, desc: module type}
   FD: {type: INT32, desc: server fd}
   PROGRAMNAME: {type: STRING, desc: program name}
@@ -110,7 +110,7 @@ TARGET_POINTER_EVENT_SUCCESS:
   EVENTTYPE: {type: INT32, desc: event type}
   AGENT_WINDOWID: {type: INT32, desc: agent windowid}
   TARGET_WINDOWID: {type: INT32, desc: target windowid}
-  PID: {type: INT32, desc: pid}
+  PID: {type: INT32, desc: session pid}
   FD: {type: INT32, desc: target fd}
   MSG: {type: STRING, desc: message}
 
@@ -122,27 +122,27 @@ TARGET_POINTER_EVENT_FAILURE:
 TARGET_KEY_EVENT_SUCCESS:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: target key event success}
   EVENTTYPE: {type: INT32, desc: event type}
-  KEYCODE: {type: INT32, desc: keycode}
-  ACTION: {type: INT32, desc: action}
+  KEYCODE: {type: INT32, desc: key code}
+  ACTION: {type: INT32, desc: key action}
   ACTION_TIME: {type: UINT64, desc: action time}
   ACTION_STARTTIME: {type: UINT64, desc: action start time}
-  FLAG: {type: INT32, desc: flag}
-  KEYACTION: {type: INT32, desc: keyaction}
+  FLAG: {type: INT32, desc: key flag}
+  KEYACTION: {type: INT32, desc: key action}
   FD: {type: INT32, desc: target fd}
   AGENT_WINDOWID: {type: INT32, desc: agent windowid}
   TARGET_WINDOWID: {type: INT32, desc: target windowid}
-  PID: {type: INT32, desc: pid}
+  PID: {type: INT32, desc: session pid}
   MSG: {type: STRING, desc: message}
 
 TARGET_KEY_EVENT_FAILURE:
   __BASE: {type: FAULT, level: MINOR, tag: PowerStats, desc: target key event failure}
   EVENTTYPE: {type: INT32, desc: event type}
-  KEYCODE: {type: INT32, desc: keycode}
-  ACTION: {type: INT32, desc: action}
+  KEYCODE: {type: INT32, desc: key code}
+  ACTION: {type: INT32, desc: key action}
   ACTION_TIME: {type: UINT64, desc: action time}
   ACTION_STARTTIME: {type: UINT64, desc: action start time}
-  FLAG: {type: INT32, desc: flag}
-  KEYACTION: {type: INT32, desc: keyaction}
+  FLAG: {type: INT32, desc: key flag}
+  KEYACTION: {type: INT32, desc: key action}
   MSG: {type: STRING, desc: message}
 
 FOCUS_WINDOW_CHANGE:
