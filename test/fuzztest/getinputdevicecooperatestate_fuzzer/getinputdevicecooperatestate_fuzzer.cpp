@@ -17,7 +17,7 @@
 
 #include "securec.h"
 
-#include "input_manager.h"
+#include "input_manager_impl.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -35,7 +35,7 @@ void GetInputDeviceCooperateStateFuzzTest(const uint8_t* data, size_t size)
     auto fun = [](bool inputdevice) {
         MMI_HILOGD("Get inputdevice state success");
     };
-    InputManager::GetInstance()->GetInputDeviceCooperateState(deviceId, fun);
+    InputMgrImpl.GetInputDeviceCooperateState(deviceId, fun);
 }
 } // namespace MMI
 } // namespace OHOS

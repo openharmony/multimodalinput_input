@@ -180,7 +180,7 @@ ohos_shared_library("libmmi-server") {
     "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
     "//foundation/multimodalinput/input/util:libmmi-util",
-    "//third_party/cJSON:cjson_static",
+    "//third_party/cJSON:cjson",
   ]
 
   if (resource_schedule_service_enabled) {

@@ -121,7 +121,7 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
         napi_value deviceId = nullptr;
         CHKRV_SCOPE(item->env, napi_create_int32(item->env, item->data.deviceId, &deviceId),
              CREATE_INT32, scope);
-        
+
         napi_value object = nullptr;
         CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
         CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "type", eventType),
@@ -223,7 +223,7 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
         CHKRV_SCOPE(cb->env, napi_set_element(cb->env, arr[1], index, value), SET_ELEMENT, scope);
         ++index;
     }
-    
+
     napi_value handler = nullptr;
     CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
@@ -876,7 +876,7 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     iter->second.push_back(std::move(monitor));
     if (!isListeningProcess_) {
         isListeningProcess_ = true;
-        InputMgr->RegisterDevListener("change", shared_from_this());
+        InputManager::GetInstance()->RegisterDevListener("change", shared_from_this());
     }
 }
 
@@ -908,7 +908,7 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
 monitorLabel:
     if (isListeningProcess_ && iter->second.empty()) {
         isListeningProcess_ = false;
-        InputMgr->UnregisterDevListener("change", shared_from_this());
+        InputManager::GetInstance()->UnregisterDevListener("change", shared_from_this());
     }
 }
 
@@ -944,7 +944,7 @@ void JsEventTarget::ResetEnv()
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     devListener_.clear();
-    InputMgr->UnregisterDevListener("change", shared_from_this());
+    InputManager::GetInstance()->UnregisterDevListener("change", shared_from_this());
 }
 } // namespace MMI
 } // namespace OHOS

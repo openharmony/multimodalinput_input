@@ -213,38 +213,6 @@ int32_t InputManager::SetInputDevice(const std::string& dhid, const std::string&
     return InputMgrImpl.SetInputDevice(dhid, screenId);
 }
 
-int32_t InputManager::RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener)
-{
-    return InputMgrImpl.RegisterCooperateListener(listener);
-}
-
-int32_t InputManager::UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener)
-{
-    return InputMgrImpl.UnregisterCooperateListener(listener);
-}
-
-int32_t InputManager::EnableInputDeviceCooperate(bool enabled,
-    std::function<void(std::string, CooperationMessage)> callback)
-{
-    return InputMgrImpl.EnableInputDeviceCooperate(enabled, callback);
-}
-
-int32_t InputManager::StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
-    std::function<void(std::string, CooperationMessage)> callback)
-{
-    return InputMgrImpl.StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, callback);
-}
-
-int32_t InputManager::StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback)
-{
-    return InputMgrImpl.StopDeviceCooperate(callback);
-}
-
-int32_t InputManager::GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback)
-{
-    return InputMgrImpl.GetInputDeviceCooperateState(deviceId, callback);
-}
-
 bool InputManager::GetFunctionKeyState(int32_t funcKey)
 {
     return InputMgrImpl.GetFunctionKeyState(funcKey);
