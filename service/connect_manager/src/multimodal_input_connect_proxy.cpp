@@ -737,6 +737,31 @@ int32_t MultimodalInputConnectProxy::SetDisplayBind(int32_t deviceId, int32_t di
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectProxy::GetWindowPid(int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+
+    WRITEINT32(data, windowId, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(GET_WINDOW_PID, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, result:%{public}d", ret);
+        return ret;
+    }
+    int32_t windowPid = -1;
+    READINT32(reply, windowPid, ERR_INVALID_VALUE);
+    return windowPid;
+}
+
 int32_t MultimodalInputConnectProxy::SetInputDevice(const std::string& dhid, const std::string& screenId)
 {
     CALL_DEBUG_ENTER;

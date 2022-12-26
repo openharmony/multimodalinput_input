@@ -368,6 +368,7 @@ public:
      */
     int32_t LeaveCaptureMode(int32_t windowId);
 
+    int32_t GetWindowPid(int32_t windowId);
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
