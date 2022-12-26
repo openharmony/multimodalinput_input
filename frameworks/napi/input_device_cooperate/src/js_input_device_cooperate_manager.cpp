@@ -19,7 +19,7 @@
 
 #include "define_multimodal.h"
 #include "input_device_cooperate_impl.h"
-#include "input_manager.h"
+#include "input_manager_impl.h"
 #include "mmi_log.h"
 #include "napi_constants.h"
 #include "util_napi.h"
@@ -37,7 +37,7 @@ napi_value JsInputDeviceCooperateManager::Enable(napi_env env, bool enable, napi
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsEnable, cb, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InputMgr->EnableInputDeviceCooperate(enable, callback);
+    int32_t errCode = InputMgrImpl.EnableInputDeviceCooperate(enable, callback);
     HandleExecuteResult(env, errCode);
     return ret;
 }
@@ -50,7 +50,7 @@ napi_value JsInputDeviceCooperateManager::Start(napi_env env, const std::string 
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsStart, cb, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InputMgr->StartInputDeviceCooperate(sinkDeviceDescriptor, srcInputDeviceId, callback);
+    int32_t errCode = InputMgrImpl.StartInputDeviceCooperate(sinkDeviceDescriptor, srcInputDeviceId, callback);
     HandleExecuteResult(env, errCode);
     return ret;
 }
@@ -62,7 +62,7 @@ napi_value JsInputDeviceCooperateManager::Stop(napi_env env, napi_value handle)
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsStop, cb, std::placeholders::_1, std::placeholders::_2);
-    int32_t errCode = InputMgr->StopDeviceCooperate(callback);
+    int32_t errCode = InputMgrImpl.StopDeviceCooperate(callback);
     HandleExecuteResult(env, errCode);
     return ret;
 }
@@ -74,7 +74,7 @@ napi_value JsInputDeviceCooperateManager::GetState(napi_env env, const std::stri
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
     auto callback = std::bind(EmitJsGetState, cb, std::placeholders::_1);
-    int32_t errCode = InputMgr->GetInputDeviceCooperateState(deviceDescriptor, callback);
+    int32_t errCode = InputMgrImpl.GetInputDeviceCooperateState(deviceDescriptor, callback);
     HandleExecuteResult(env, errCode);
     return ret;
 }
