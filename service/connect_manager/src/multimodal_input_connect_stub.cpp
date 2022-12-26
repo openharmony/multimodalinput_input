@@ -926,8 +926,8 @@ int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, Messag
     int32_t windowId = 0;
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = GetWindowPid(windowId);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Fail to call SetMouseCaptureMode, ret:%{public}d", ret);
+    if (ret == RET_ERR) {
+        MMI_HILOGE("Get window pid failed");
     }
     WRITEINT32(reply, ret, ERR_INVALID_VALUE);
     return RET_OK;
