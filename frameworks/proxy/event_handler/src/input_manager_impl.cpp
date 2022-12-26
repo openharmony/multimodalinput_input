@@ -98,12 +98,7 @@ int32_t InputManagerImpl::SetDisplayBind(int32_t deviceId, int32_t displayId, st
 int32_t InputManagerImpl::GetWindowPid(int32_t windowId)
 {
     std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MultimodalInputConnMgr->GetWindowPid(windowId);
-    if (ret != RET_OK) {
-        MMI_HILOGE("SetDisplayBind failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    return RET_OK;
+    return MultimodalInputConnMgr->GetWindowPid(windowId);;
 }
 
 void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
