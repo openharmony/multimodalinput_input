@@ -71,6 +71,7 @@ public:
         SET_DISPLAY_BIND = 36,
         SET_INPUT_DEVICE_TO_SCREEN = 50,
         SET_POINTER_LOCATION = 51,
+        GET_WINDOW_PID = 52,
     };
 
     enum {
@@ -122,6 +123,7 @@ public:
     virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) = 0;
     virtual int32_t SetPointerLocation(int32_t x, int32_t y) = 0;
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) = 0;
+    virtual int32_t GetWindowPid(int32_t windowId) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
