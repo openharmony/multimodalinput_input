@@ -46,6 +46,7 @@ int32_t InputManager::GetWindowPid(int32_t windowId)
 {
     return InputMgrImpl.GetWindowPid(windowId);
 }
+
 void InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
