@@ -132,6 +132,13 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
     CALL_DEBUG_ENTER;
     std::vector<int32_t> ids;
     for (const auto &item : inputDevice_) {
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+        if (IsRemote(item.second.inputDeviceOrigin) &&
+            InputDevCooSM->GetCurrentCooperateState() == CooperateState::STATE_FREE) {
+            MMI_HILOGW("Current device is remote and in STATUS_STATE");
+            continue;
+        }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
         ids.push_back(item.first);
     }
     return ids;
@@ -360,10 +367,19 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     struct InputDeviceInfo info;
     MakeDeviceInfo(inputDevice, info);
     inputDevice_[nextId_] = info;
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    if (IsRemote(inputDevice) && InputDevCooSM->GetCurrentCooperateState() != CooperateState::STATE_FREE) {
+        for (const auto &item : devListener_) {
+            CHKPC(item.first);
+            item.second(nextId_, "add");
+        }
+    }
+#else
     for (const auto &item : devListener_) {
         CHKPC(item.first);
         item.second(nextId_, "add");
     }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     NotifyDevCallback(nextId_, info);
     ++nextId_;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
@@ -445,10 +461,19 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#ifdef OHOS_BUILD_ENABLE_COOPERATE
+    if (IsRemote(inputDevice) && InputDevCooSM->GetCurrentCooperateState() != CooperateState::STATE_FREE) {
+        for (const auto &item : devListener_) {
+            CHKPC(item.first);
+            item.second(deviceId, "remove");
+        }
+    }
+#else
     for (const auto &item : devListener_) {
         CHKPC(item.first);
         item.second(deviceId, "remove");
     }
+#endif // OHOS_BUILD_ENABLE_COOPERATE
     ScanPointerDevice();
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (IsPointerDevice(inputDevice)) {
