@@ -368,7 +368,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     MakeDeviceInfo(inputDevice, info);
     inputDevice_[nextId_] = info;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    if (IsRemote(inputDevice) && InputDevCooSM->GetCurrentCooperateState() != CooperateState::STATE_FREE) {
+    if (!IsRemote(inputDevice) || InputDevCooSM->GetCurrentCooperateState() != CooperateState::STATE_FREE) {
         for (const auto &item : devListener_) {
             CHKPC(item.first);
             item.second(nextId_, "add");
@@ -462,7 +462,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    if (IsRemote(inputDevice) && InputDevCooSM->GetCurrentCooperateState() != CooperateState::STATE_FREE) {
+    if (!IsRemote(inputDevice) || InputDevCooSM->GetCurrentCooperateState() != CooperateState::STATE_FREE) {
         for (const auto &item : devListener_) {
             CHKPC(item.first);
             item.second(deviceId, "remove");
