@@ -77,6 +77,8 @@ public:
     int32_t SetPointerLocation(int32_t x, int32_t y);
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
     int32_t GetWindowPid(int32_t windowId);
+    int32_t AppendExtraData(const ExtraData& extraData);
+
 private:
     MultimodalInputConnectManager() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);
