@@ -1316,7 +1316,17 @@ int32_t MMIService::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
     if (ret != RET_OK) {
         MMI_HILOGE("Set capture failed,return %{public}d", ret);
     }
-    return ret;;
+    return ret;
+}
+
+int32_t MMIService::GetWindowPid(int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = WinMgr->GetWindowPid(windowId);
+    if (ret == RET_ERR) {
+        MMI_HILOGE("Get window pid failed");
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

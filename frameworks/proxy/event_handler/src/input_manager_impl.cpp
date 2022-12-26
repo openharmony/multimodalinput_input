@@ -95,6 +95,12 @@ int32_t InputManagerImpl::SetDisplayBind(int32_t deviceId, int32_t displayId, st
     return RET_OK;
 }
 
+int32_t InputManagerImpl::GetWindowPid(int32_t windowId)
+{
+    std::lock_guard<std::mutex> guard(mtx_);
+    return MultimodalInputConnMgr->GetWindowPid(windowId);
+}
+
 void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;

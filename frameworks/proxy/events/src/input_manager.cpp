@@ -42,6 +42,11 @@ int32_t InputManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::s
     return InputMgrImpl.SetDisplayBind(deviceId, displayId, msg);
 }
 
+int32_t InputManager::GetWindowPid(int32_t windowId)
+{
+    return InputMgrImpl.GetWindowPid(windowId);
+}
+
 void InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
