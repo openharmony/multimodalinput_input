@@ -91,6 +91,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::SET_FUNCTION_KEY_STATE, &MultimodalInputConnectStub::StubSetFunctionKeyState},
         {IMultimodalInputConnect::SET_POINTER_LOCATION, &MultimodalInputConnectStub::StubSetPointerLocation},
         {IMultimodalInputConnect::SET_CAPTURE_MODE, &MultimodalInputConnectStub::StubSetMouseCaptureMode},
+        {IMultimodalInputConnect::GET_WINDOW_PID, &MultimodalInputConnectStub::StubGetWindowPid},
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -919,5 +920,19 @@ int32_t MultimodalInputConnectStub::StubSetMouseCaptureMode(MessageParcel& data,
     }
     return ret;
 }
+
+
+int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, MessageParcel& reply)
+{
+    int32_t windowId = 0;
+    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = GetWindowPid(windowId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Fail to call SetMouseCaptureMode, ret:%{public}d", ret);
+    }
+    WRITEINT32(reply, ret, ERR_INVALID_VALUE);
+    return RET_OK;
+}
+
 } // namespace MMI
 } // namespace OHOS
