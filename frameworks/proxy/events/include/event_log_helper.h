@@ -66,6 +66,11 @@ private:
     static void Print(const std::shared_ptr<PointerEvent> event)
     {
         std::vector<int32_t> pointerIds { event->GetPointerIds() };
+        std::string str;
+        std::vector<uint8_t> buffer = event->GetBuffer();
+        for (const auto& buff : buffer) {
+            str += std::to_string(buff);
+        }
         MMI_HILOGD("EventType:%{public}s,ActionTime:%{public}" PRId64 ",Action:%{public}d,"
             "ActionStartTime:%{public}" PRId64 ",Flag:%{public}d,PointerAction:%{public}s,"
             "SourceType:%{public}s,ButtonId:%{public}d,VerticalAxisValue:%{public}.2f,"
@@ -73,7 +78,8 @@ private:
             "XAbsValue:%{public}.2f,YAbsValue:%{public}.2f,ZAbsValue:%{public}.2f,"
             "RzAbsValue:%{public}.2f,GasAbsValue:%{public}.2f,BrakeAbsValue:%{public}.2f,"
             "Hat0xAbsValue:%{public}.2f,Hat0yAbsValue:%{public}.2f,ThrottleAbsValue:%{public}.2f,"
-            "PointerId:%{public}d,PointerCount:%{public}zu,EventNumber:%{public}d",
+            "PointerId:%{public}d,PointerCount:%{public}zu,EventNumber:%{public}d,"
+            "BufferCount:%{public}d,Buffer:%{public}s",
             InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
             event->GetAction(), event->GetActionStartTime(), event->GetFlag(),
             event->DumpPointerAction(), event->DumpSourceType(), event->GetButtonId(),
@@ -89,8 +95,8 @@ private:
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0X),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0Y),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_THROTTLE),
-            event->GetPointerId(), pointerIds.size(), event->GetId());
-
+            event->GetPointerId(), pointerIds.size(), event->GetId(), buffer.size(), str.c_str());
+        
         for (const auto& pointerId : pointerIds) {
             PointerEvent::PointerItem item;
             if (!event->GetPointerItem(pointerId, item)) {

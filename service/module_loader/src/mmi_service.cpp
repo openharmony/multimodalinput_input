@@ -1345,5 +1345,16 @@ int32_t MMIService::GetWindowPid(int32_t windowId)
     MMI_HILOGD("windowpid is %{public}d", windowPid);
     return windowPid;
 }
+
+int32_t MMIService::AppendExtraData(const ExtraData& extraData)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::AppendExtraData,
+        WinMgr, extraData));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Append extra data failed:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS

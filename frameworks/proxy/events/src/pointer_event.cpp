@@ -355,7 +355,7 @@ PointerEvent::PointerEvent(const PointerEvent& other)
       pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
       pointerAction_(other.pointerAction_), buttonId_(other.buttonId_),
       axes_(other.axes_), axisValues_(other.axisValues_),
-      pressedKeys_(other.pressedKeys_) {}
+      pressedKeys_(other.pressedKeys_), buffer_(other.buffer_) {}
 
 PointerEvent::~PointerEvent() {}
 
@@ -890,6 +890,21 @@ bool PointerEvent::IsValid() const
         }
     }
     return true;
+}
+
+void PointerEvent::SetBuffer(std::vector<uint8_t> buffer)
+{
+    buffer_ = buffer;
+}
+
+void PointerEvent::ClearBuffer()
+{
+    buffer_.clear();
+}
+
+std::vector<uint8_t> PointerEvent::GetBuffer() const
+{
+    return buffer_;
 }
 } // namespace MMI
 } // namespace OHOS

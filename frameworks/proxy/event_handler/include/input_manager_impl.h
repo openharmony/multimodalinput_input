@@ -26,6 +26,7 @@
 #include "window_info.h"
 #include "event_filter_service.h"
 #include "event_handler.h"
+#include "extra_data.h"
 #include "if_mmi_client.h"
 #include "input_device_impl.h"
 #include "input_device_cooperate_impl.h"
@@ -124,6 +125,7 @@ public:
     void SetPointerLocation(int32_t x, int32_t y);
 
     EventHandlerPtr GetEventHandler() const;
+    void AppendExtraData(const ExtraData& extraData);
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt);

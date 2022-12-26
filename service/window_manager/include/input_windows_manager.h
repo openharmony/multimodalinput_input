@@ -17,6 +17,7 @@
 
 #include <vector>
 
+#include "extra_data.h"
 #include "libinput.h"
 #include "nocopyable.h"
 #include "singleton.h"
@@ -90,6 +91,7 @@ public:
     void DeviceStatusChanged(int32_t deviceId, const std::string &sysUid, const std::string devStatus);
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
+    int32_t AppendExtraData(const ExtraData& extraData);
 private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const;
@@ -156,6 +158,7 @@ private:
         int32_t windowId { -1 };
         bool isCaptureMode { false };
     } captureModeInfo_;
+    ExtraData extraData_;
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
