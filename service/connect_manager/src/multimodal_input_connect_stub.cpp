@@ -923,6 +923,16 @@ int32_t MultimodalInputConnectStub::StubSetMouseCaptureMode(MessageParcel& data,
 
 int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, MessageParcel& reply)
 {
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
     int32_t windowId = 0;
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = GetWindowPid(windowId);
