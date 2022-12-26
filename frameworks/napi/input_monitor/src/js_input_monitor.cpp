@@ -48,7 +48,7 @@ int32_t InputMonitor::Start()
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
     if (monitorId_ < 0) {
-        monitorId_ = InputMgr->AddMonitor(shared_from_this());
+        monitorId_ = InputManager::GetInstance()->AddMonitor(shared_from_this());
     }
     return monitorId_;
 }
@@ -61,7 +61,7 @@ void InputMonitor::Stop()
         MMI_HILOGE("Invalid values");
         return;
     }
-    InputMgr->RemoveMonitor(monitorId_);
+    InputManager::GetInstance()->RemoveMonitor(monitorId_);
     monitorId_ = -1;
     return;
 }
@@ -140,7 +140,7 @@ void InputMonitor::MarkConsumed(int32_t eventId)
         MMI_HILOGE("Invalid values");
         return;
     }
-    InputMgr->MarkConsumed(monitorId_, eventId);
+    InputManager::GetInstance()->MarkConsumed(monitorId_, eventId);
     consumed_ = true;
 }
 

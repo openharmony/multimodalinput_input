@@ -534,23 +534,23 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetButtonId(buttonId);
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-                            InputMgr->SimulateInputEvent(pointerEvent);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
                             item.SetPressed(false);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
-                            InputMgr->SimulateInputEvent(pointerEvent);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(clickIntervalTimeMs));
 
                             item.SetPressed(true);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-                            InputMgr->SimulateInputEvent(pointerEvent);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
                             item.SetPressed(false);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
-                            InputMgr->SimulateInputEvent(pointerEvent);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             break;
                         }
                         case 'g': {
@@ -609,7 +609,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetButtonPressed(buttonId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-                            InputMgr->SimulateInputEvent(pointerEvent);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
                             int64_t startTimeMs = GetSysClockTime() / 1000;
                             int64_t endTimeMs = 0;
@@ -624,7 +624,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 pointerEvent->SetActionTime(currentTimeMs);
                                 pointerEvent->UpdatePointerItem(0, item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-                                InputMgr->SimulateInputEvent(pointerEvent);
+                                InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 SleepAndUpdateTime(currentTimeMs);
                             }
                             item.SetDisplayX(px2);
@@ -632,7 +632,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetActionTime(endTimeMs);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-                            InputMgr->SimulateInputEvent(pointerEvent);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             std::this_thread::sleep_for(std::chrono::milliseconds(BLOCK_TIME_MS));
 
                             item.SetDisplayX(px2);
@@ -641,7 +641,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetActionTime(endTimeMs);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
-                            InputMgr->SimulateInputEvent(pointerEvent);
+                            InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                             break;
                         }
                         case 'i': {
@@ -796,13 +796,13 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 return RET_ERR;
                             }
                             keyEventTemp->AddKeyItem(item);
-                            InputMgr->SimulateInputEvent(keyEventTemp);
+                            InputManager::GetInstance()->SimulateInputEvent(keyEventTemp);
                             std::this_thread::sleep_for(std::chrono::milliseconds(pressTimeMs));
 
                             keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
                             item.SetPressed(false);
                             keyEvent->AddKeyItem(item);
-                            InputMgr->SimulateInputEvent(keyEvent);
+                            InputManager::GetInstance()->SimulateInputEvent(keyEvent);
                             break;
                         }
                         case 'i': {
