@@ -921,7 +921,6 @@ int32_t MultimodalInputConnectStub::StubSetMouseCaptureMode(MessageParcel& data,
     return ret;
 }
 
-
 int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, MessageParcel& reply)
 {
     int32_t windowId = 0;
@@ -933,6 +932,5 @@ int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, Messag
     WRITEINT32(reply, ret, ERR_INVALID_VALUE);
     return RET_OK;
 }
-
 } // namespace MMI
 } // namespace OHOS

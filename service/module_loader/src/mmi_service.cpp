@@ -1328,6 +1328,5 @@ int32_t MMIService::GetWindowPid(int32_t windowId)
     }
     return ret;
 }
-
 } // namespace MMI
 } // namespace OHOS
