@@ -16,6 +16,7 @@
 #include "event_log_helper.h"
 #include "event_util_test.h"
 #include "input_handler_type.h"
+#include "input_manager_impl.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
 #include "system_info.h"
@@ -3786,7 +3787,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RegisterCooperateListener_001, TestS
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<IInputDeviceCooperateListener> consumer = nullptr;
-    int32_t ret = InputManager::GetInstance()->RegisterCooperateListener(consumer);
+    int32_t ret = InputMgrImpl.RegisterCooperateListener(consumer);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     ASSERT_EQ(ret, RET_ERR);
 #else
@@ -3812,13 +3813,13 @@ HWTEST_F(InputManagerTest, InputManagerTest_RegisterCooperateListener_002, TestS
         };
     };
     std::shared_ptr<InputDeviceCooperateListenerTest> consumer = std::make_shared<InputDeviceCooperateListenerTest>();
-    int32_t ret = InputManager::GetInstance()->RegisterCooperateListener(consumer);
+    int32_t ret = InputMgrImpl.RegisterCooperateListener(consumer);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     ASSERT_EQ(ret, RET_OK);
 #else
     ASSERT_EQ(ret, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-    ret = InputManager::GetInstance()->UnregisterCooperateListener(consumer);
+    ret = InputMgrImpl.UnregisterCooperateListener(consumer);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     ASSERT_EQ(ret, RET_OK);
 #else
@@ -3836,7 +3837,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_UnregisterCooperateListener, TestSiz
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<IInputDeviceCooperateListener> consumer = nullptr;
-    int32_t ret = InputManager::GetInstance()->UnregisterCooperateListener(consumer);
+    int32_t ret = InputMgrImpl.UnregisterCooperateListener(consumer);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     ASSERT_EQ(ret, RET_OK);
 #else
@@ -3857,7 +3858,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_EnableInputDeviceCooperate, TestSize
     auto fun = [](std::string listener, CooperationMessage cooperateMessages) {
         MMI_HILOGD("Enable input device cooperate success");
     };
-    int32_t ret = InputManager::GetInstance()->EnableInputDeviceCooperate(enabled, fun);
+    int32_t ret = InputMgrImpl.EnableInputDeviceCooperate(enabled, fun);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     ASSERT_EQ(ret, RET_OK);
 #else
@@ -3879,7 +3880,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_StartInputDeviceCooperate, TestSize.
     auto fun = [](std::string listener, CooperationMessage cooperateMessages) {
         MMI_HILOGD("Start input device cooperate success");
     };
-    int32_t ret = InputManager::GetInstance()->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, fun);
+    int32_t ret = InputMgrImpl.StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, fun);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     ASSERT_NE(ret, RET_OK);
 #else
@@ -3899,7 +3900,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_StopDeviceCooperate, TestSize.Level1
     auto fun = [](std::string listener, CooperationMessage cooperateMessages) {
         MMI_HILOGD("Start input device cooperate success");
     };
-    int32_t ret = InputManager::GetInstance()->StopDeviceCooperate(fun);
+    int32_t ret = InputMgrImpl.StopDeviceCooperate(fun);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     ASSERT_NE(ret, ERROR_UNSUPPORT);
 #else
@@ -3920,7 +3921,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetInputDeviceCooperateState, TestSi
     auto fun = [](bool state) {
         MMI_HILOGD("Get inputdevice state success");
     };
-    int32_t ret = InputManager::GetInstance()->GetInputDeviceCooperateState(deviceId, fun);
+    int32_t ret = InputMgrImpl.GetInputDeviceCooperateState(deviceId, fun);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     ASSERT_EQ(ret, RET_OK);
 #else
