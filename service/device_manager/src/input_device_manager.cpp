@@ -132,6 +132,11 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
     CALL_DEBUG_ENTER;
     std::vector<int32_t> ids;
     for (const auto &item : inputDevice_) {
+        if (IsRemote(item.second.inputDeviceOrigin) &&
+            InputDevCooSM->GetCooperateState() == CooperateState::STATE_FREE) {
+            MMI_HILOGW("Current device id remote and in STATUS_STATE");
+            continue;
+        }
         ids.push_back(item.first);
     }
     return ids;
@@ -360,9 +365,11 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     struct InputDeviceInfo info;
     MakeDeviceInfo(inputDevice, info);
     inputDevice_[nextId_] = info;
-    for (const auto &item : devListener_) {
-        CHKPC(item.first);
-        item.second(nextId_, "add");
+    if (IsRemote(inputDevice) && InputDevCooSM->GetCooperateState() != CooperateState::STATE_FREE) {
+        for (const auto &item : devListener_) {
+            CHKPC(item.first);
+            item.second(nextId_, "add");
+        }
     }
     NotifyDevCallback(nextId_, info);
     ++nextId_;
@@ -445,9 +452,11 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    for (const auto &item : devListener_) {
-        CHKPC(item.first);
-        item.second(deviceId, "remove");
+    if (IsRemote(inputDevice) && InputDevCooSM->GetCooperateState() != CooperateState::STATE_FREE) {
+        for (const auto &item : devListener_) {
+            CHKPC(item.first);
+            item.second(deviceId, "remove");
+        }
     }
     ScanPointerDevice();
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
