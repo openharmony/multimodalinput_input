@@ -134,7 +134,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
     for (const auto &item : inputDevice_) {
         if (IsRemote(item.second.inputDeviceOrigin) &&
             InputDevCooSM->GetCooperateState() == CooperateState::STATE_FREE) {
-            MMI_HILOGW("Current device id remote and in STATUS_STATE");
+            MMI_HILOGW("Current device is remote and in STATUS_STATE");
             continue;
         }
         ids.push_back(item.first);
