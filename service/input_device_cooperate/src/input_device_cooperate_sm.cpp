@@ -434,7 +434,6 @@ void InputDeviceCooperateSM::UpdatePreparedDevices(const std::string &srcNetwork
 std::pair<std::string, std::string> InputDeviceCooperateSM::GetPreparedDevices() const
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     return preparedNetworkId_;
 }
 

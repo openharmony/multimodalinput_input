@@ -17,7 +17,7 @@
 
 #include "securec.h"
 
-#include "input_manager.h"
+#include "input_manager_impl.h"
 #include "mmi_log.h"
 #include "i_input_device_cooperate_listener.h"
 
@@ -39,8 +39,8 @@ public:
 void RegisterCooperateListenerFuzzTest(const uint8_t* data, size_t size)
 {
     std::shared_ptr<InputDeviceCooperateListenerTest> consumer = std::make_shared<InputDeviceCooperateListenerTest>();
-    InputManager::GetInstance()->RegisterCooperateListener(consumer);
-    InputManager::GetInstance()->UnregisterCooperateListener(consumer);
+    InputMgrImpl.RegisterCooperateListener(consumer);
+    InputMgrImpl.UnregisterCooperateListener(consumer);
 }
 } // namespace MMI
 } // namespace OHOS
