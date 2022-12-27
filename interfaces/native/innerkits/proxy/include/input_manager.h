@@ -376,5 +376,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-#define InputMgr OHOS::MMI::InputManager::GetInstance()
 #endif // INPUT_MANAGER_H
