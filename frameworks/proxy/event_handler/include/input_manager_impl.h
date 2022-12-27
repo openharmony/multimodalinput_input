@@ -56,7 +56,7 @@ public:
         std::function<void(std::shared_ptr<KeyEvent>)> callback
     );
     void UnsubscribeKeyEvent(int32_t subscriberId);
-    int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority);
+    int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);
 
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
@@ -140,7 +140,7 @@ private:
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 private:
-    std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t>> eventFilterServices_;
+    std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t, uint32_t>> eventFilterServices_;
     std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
 

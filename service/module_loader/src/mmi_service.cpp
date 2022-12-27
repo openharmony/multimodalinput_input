@@ -367,14 +367,15 @@ int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t 
     return RET_OK;
 }
 
-int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority)
+int32_t MMIService::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
+    uint32_t deviceTags)
 {
     CALL_INFO_TRACE;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH) || defined(OHOS_BUILD_ENABLE_KEYBOARD)
     CHKPR(filter, ERROR_NULL_POINTER);
     int32_t clientPid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&ServerMsgHandler::AddInputEventFilter,
-        &sMsgHandler_, filter, filterId, priority, clientPid));
+        &sMsgHandler_, filter, filterId, priority, deviceTags, clientPid));
     if (ret != RET_OK) {
         MMI_HILOGE("Add event filter failed,return %{public}d", ret);
         return ret;

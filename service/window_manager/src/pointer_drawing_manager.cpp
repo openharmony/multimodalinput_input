@@ -23,6 +23,7 @@
 
 #include "define_multimodal.h"
 #include "input_device_manager.h"
+#include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "util.h"
 

@@ -120,7 +120,8 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority)
+int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
+    uint32_t deviceTags)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -134,6 +135,7 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
     }
     WRITEINT32(data, filterId, ERR_INVALID_VALUE);
     WRITEINT32(data, priority, ERR_INVALID_VALUE);
+    WRITEUINT32(data, deviceTags, ERR_INVALID_VALUE);
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();

@@ -257,7 +257,8 @@ HWTEST_F(InputManagerFilterManualTest, HandlePointerEventFilter_001, TestSize.Le
     bool result = false;
     auto filter = std::make_shared<PointerFilter>(10, 10, sem, result);
     const int32_t priority = 201;
-    const int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, priority);
+    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+    const int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, priority, touchTags);
     ASSERT_NE(filterId, -1);
     ASSERT_EQ(GetSelfHidumperFilterNum(), 1);
 
@@ -346,7 +347,8 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_002, TestSize.Level1
     ASSERT_EQ(ret, 0);
     bool resultA = false;
     auto filterA = std::make_shared<KeyFilter>(KeyEvent::KEYCODE_A, semA, resultA);
-    const int32_t filterIdA = InputManager::GetInstance()->AddInputEventFilter(filterA, 220);
+    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+    const int32_t filterIdA = InputManager::GetInstance()->AddInputEventFilter(filterA, 220, touchTags);
     ASSERT_NE(filterIdA, RET_ERR);
 
     sem_t semB;
@@ -354,7 +356,7 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_002, TestSize.Level1
     ASSERT_EQ(ret, 0);
     bool resultB = false;
     auto filterB = std::make_shared<KeyFilter>(KeyEvent::KEYCODE_B, semB, resultB);
-    const int32_t filterIdB = InputManager::GetInstance()->AddInputEventFilter(filterB, 210);
+    const int32_t filterIdB = InputManager::GetInstance()->AddInputEventFilter(filterB, 210, touchTags);
     ASSERT_NE(filterIdB, RET_ERR);
     ASSERT_EQ(GetSelfHidumperFilterNum(), 2);
 
@@ -372,7 +374,13 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_002, TestSize.Level1
     resultB = false;
     auto keyAEvent = KeyEvent::Create();
     ASSERT_NE(keyAEvent, nullptr);
+    KeyEvent::KeyItem kitDownA;
+    kitDownA.SetKeyCode(KeyEvent::KEYCODE_A);
+    kitDownA.SetPressed(true);
+    kitDownA.SetDeviceId(1);
     keyAEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    keyAEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyAEvent->AddPressedKeyItems(kitDownA);
     MMI_HILOGI("SimulateInputEvent key event KEYCODE_A(2017)");
     InputManager::GetInstance()->SimulateInputEvent(keyAEvent);
     waitEnd(semA);
@@ -383,7 +391,13 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_002, TestSize.Level1
     resultB = false;
     auto keyBEvent = KeyEvent::Create();
     ASSERT_NE(keyAEvent, nullptr);
+    KeyEvent::KeyItem kitDownB;
+    kitDownB.SetKeyCode(KeyEvent::KEYCODE_B);
+    kitDownB.SetPressed(true);
+    kitDownB.SetDeviceId(1);
     keyBEvent->SetKeyCode(KeyEvent::KEYCODE_B);
+    keyBEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyBEvent->AddPressedKeyItems(kitDownB);
     MMI_HILOGI("SimulateInputEvent key event KEYCODE_B(2018)");
     InputManager::GetInstance()->SimulateInputEvent(keyBEvent);
     waitEnd(semB);
@@ -419,7 +433,8 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_003, TestSize.Level1
     AccessToken accessToken;
     auto addFilter = []() -> int32_t {
         auto filter = std::make_shared<KeyFilter>();
-        const int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, 220);
+        uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+        const int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, 220, touchTags);
         return filterId;
     };
     ASSERT_EQ(GetSelfHidumperFilterNum(), 0);
@@ -469,7 +484,8 @@ HWTEST_F(InputManagerFilterManualTest, DISABLED_HandleKeyEventFilter_004, TestSi
     AccessToken accessToken;
     auto addFilter = []() -> int32_t {
         auto filter = std::make_shared<KeyFilter>();
-        const int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, 220);
+        uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+        const int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, 220, touchTags);
         return filterId;
     };
     const size_t singleClientSuportMaxNum = 4;
@@ -501,7 +517,8 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_005, TestSize.Level1
     AccessToken accessToken;
     auto addFilter = []() -> int32_t {
         auto filter = std::make_shared<KeyFilter>();
-        const int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, 220);
+        uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+        const int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, 220, touchTags);
         return filterId;
     };
     ASSERT_EQ(GetSelfHidumperFilterNum(), 0);
@@ -537,7 +554,8 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_006, TestSize.Level1
     AccessToken accessToken;
     auto addFilter = []() -> int32_t {
         auto filter = std::make_shared<KeyFilter>();
-        const int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, 220);
+        uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+        const int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, 220, touchTags);
         return filterId;
     };
     const size_t singleClientSuportMaxNum = 4;
