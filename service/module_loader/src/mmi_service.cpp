@@ -1312,11 +1312,13 @@ int32_t MMIService::OnGetInputDeviceCooperateState(int32_t pid, int32_t userData
 int32_t MMIService::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = WinMgr->SetMouseCaptureMode(windowId, isCaptureMode);
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&InputWindowsManager::SetMouseCaptureMode, WinMgr, windowId, isCaptureMode));
     if (ret != RET_OK) {
         MMI_HILOGE("Set capture failed,return %{public}d", ret);
+        return RET_ERR;
     }
-    return ret;
+    return RET_OK;
 }
 
 int32_t MMIService::OnGetWindowPid(int32_t windowId, int32_t &windowPid)
