@@ -87,7 +87,7 @@ public:
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
     int32_t SetPointerLocation(int32_t x, int32_t y) override;
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) override;
-
+    int32_t GetWindowPid(int32_t windowId) override;
 #ifdef OHOS_RSS_CLIENT
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 #endif

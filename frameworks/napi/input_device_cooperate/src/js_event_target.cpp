@@ -21,7 +21,7 @@
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
-#include "input_manager.h"
+#include "input_manager_impl.h"
 #include "mmi_log.h"
 #include "napi_constants.h"
 #include "util_napi.h"
@@ -170,7 +170,7 @@ void JsEventTarget::AddListener(napi_env env, const std::string &type, napi_valu
     iter->second.push_back(std::move(monitor));
     if (!isListeningProcess_) {
         isListeningProcess_ = true;
-        InputMgr->RegisterCooperateListener(shared_from_this());
+        InputMgrImpl.RegisterCooperateListener(shared_from_this());
     }
 }
 
@@ -198,7 +198,7 @@ void JsEventTarget::RemoveListener(napi_env env, const std::string &type, napi_v
 monitorLabel:
     if (isListeningProcess_ && iter->second.empty()) {
         isListeningProcess_ = false;
-        InputMgr->UnregisterCooperateListener(shared_from_this());
+        InputMgrImpl.UnregisterCooperateListener(shared_from_this());
     }
 }
 
@@ -221,7 +221,7 @@ void JsEventTarget::ResetEnv()
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mutex_);
     cooperateListener_.clear();
-    InputMgr->UnregisterCooperateListener(shared_from_this());
+    InputMgrImpl.UnregisterCooperateListener(shared_from_this());
 }
 
 void JsEventTarget::OnCooperateMessage(const std::string &deviceId, CooperationMessage msg)
