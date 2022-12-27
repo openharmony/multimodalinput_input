@@ -26,12 +26,7 @@ config("inputmonitor_config") {
 }
 
 ohos_shared_library("inputmonitor") {
-  sources = [
-    "src/js_input_monitor.cpp",
-    "src/js_input_monitor_manager.cpp",
-    "src/js_input_monitor_module.cpp",
-    "src/js_input_monitor_util.cpp",
-  ]
+  sources = inputmonitor_sources
 
   configs = [ ":inputmonitor_config" ]
 

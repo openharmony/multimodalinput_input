@@ -27,13 +27,7 @@ config("inputdevice_config") {
 }
 
 ohos_shared_library("inputdevice") {
-  sources = [
-    "src/js_event_target.cpp",
-    "src/js_input_device_context.cpp",
-    "src/js_input_device_manager.cpp",
-    "src/js_util.cpp",
-    "src/native_register_module.cpp",
-  ]
+  sources = inputdevice_sources
 
   configs = [ ":inputdevice_config" ]
 
