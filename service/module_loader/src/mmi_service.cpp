@@ -1319,14 +1319,28 @@ int32_t MMIService::SetMouseCaptureMode(int32_t windowId, bool isCaptureMode)
     return ret;
 }
 
+int32_t MMIService::OnGetWindowPid(int32_t windowId, int32_t &windowPid)
+{
+    CALL_DEBUG_ENTER;
+    windowPid = WinMgr->GetWindowPid(windowId);
+    if (windowPid == RET_ERR) {
+        MMI_HILOGE("Get window pid failed");
+    }
+    MMI_HILOGD("windowpid is %{public}d", windowPid);
+    return RET_OK;
+}
+
 int32_t MMIService::GetWindowPid(int32_t windowId)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = WinMgr->GetWindowPid(windowId);
-    if (ret == RET_ERR) {
-        MMI_HILOGE("Get window pid failed");
+    int32_t windowPid = -1;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetWindowPid, this, windowId, std::ref(windowPid)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnGetWindowPid failed, ret:%{public}d", ret);
+        return RET_ERR;
     }
-    return ret;
+    MMI_HILOGD("windowpid is %{public}d", windowPid);
+    return windowPid;
 }
 } // namespace MMI
 } // namespace OHOS
