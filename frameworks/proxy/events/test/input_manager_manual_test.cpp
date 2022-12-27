@@ -199,7 +199,8 @@ HWTEST_F(InputManagerManualTest, HandleKeyEventFilter_003, TestSize.Level1)
         bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override { return false; }
     };
     AccessToken accessToken;auto filter = std::make_shared<KeyFilter>();
-    const int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, 220);
+    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+    const int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, 220, touchTags);
     ASSERT_NE(filterId, RET_ERR);
     auto retCode = InputManager::GetInstance()->RemoveInputEventFilter(filterId);
     ASSERT_EQ(retCode, RET_OK);
