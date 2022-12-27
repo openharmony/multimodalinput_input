@@ -33,34 +33,7 @@ config("virtual_device_public_config") {
 }
 
 ohos_source_set("libmmi-virtual-device") {
-  sources = [
-    "src/virtual_device.cpp",
-    "src/virtual_finger.cpp",
-    "src/virtual_gamepad.cpp",
-    "src/virtual_joystick.cpp",
-    "src/virtual_keyboard.cpp",
-    "src/virtual_keyboard_consumer_ctrl.cpp",
-    "src/virtual_keyboard_ext.cpp",
-    "src/virtual_keyboard_sys_ctrl.cpp",
-    "src/virtual_knob.cpp",
-    "src/virtual_knob_consumer_ctrl.cpp",
-    "src/virtual_knob_mouse.cpp",
-    "src/virtual_knob_sys_ctrl.cpp",
-    "src/virtual_mouse.cpp",
-    "src/virtual_pen.cpp",
-    "src/virtual_pen_keyboard.cpp",
-    "src/virtual_pen_mouse.cpp",
-    "src/virtual_remote_control.cpp",
-    "src/virtual_single_finger.cpp",
-    "src/virtual_single_touchscreen.cpp",
-    "src/virtual_stylus.cpp",
-    "src/virtual_touchpad.cpp",
-    "src/virtual_touchscreen.cpp",
-    "src/virtual_trackball.cpp",
-    "src/virtual_trackpad.cpp",
-    "src/virtual_trackpad_mouse.cpp",
-    "src/virtual_trackpad_sys_ctrl.cpp",
-  ]
+  sources = libmmi_virtual_device_sources
 
   configs = [ ":libmmi_virtual_device_config" ]
 
