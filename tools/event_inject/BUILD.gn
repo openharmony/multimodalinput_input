@@ -38,23 +38,7 @@ config("event_injection_public_config") {
 }
 
 ohos_source_set("event-injection") {
-  sources = [
-    "src/device_base.cpp",
-    "src/get_device_node.cpp",
-    "src/get_device_object.cpp",
-    "src/injection_event_dispatch.cpp",
-    "src/injection_tools_help_func.cpp",
-    "src/input_parse.cpp",
-    "src/manage_inject_device.cpp",
-    "src/processing_finger_device.cpp",
-    "src/processing_game_pad_device.cpp",
-    "src/processing_joystick_device.cpp",
-    "src/processing_keyboard_device.cpp",
-    "src/processing_mouse_device.cpp",
-    "src/processing_pad_device.cpp",
-    "src/processing_pen_device.cpp",
-    "src/processing_touch_screen_device.cpp",
-  ]
+  sources = event_injection_sources
 
   configs = [
     ":event_injection_config",

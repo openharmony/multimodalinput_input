@@ -31,15 +31,7 @@ ohos_prebuilt_etc("multimodalinput.rc") {
 ohos_executable("uinput_inject") {
   install_enable = true
 
-  sources = [
-    "uinput/hdf_device_event_dispatch.cpp",
-    "uinput/hdf_device_event_manager.cpp",
-    "uinput/inject_thread.cpp",
-    "uinput/keyboard_inject.cpp",
-    "uinput/virtual_device.cpp",
-    "uinput/virtual_keyboard.cpp",
-    "uinput/virtual_touch_screen.cpp",
-  ]
+  sources = uinput_inject_sources
 
   include_dirs = [
     "//foundation/multimodalinput/input/util/common/include",
@@ -54,10 +46,6 @@ ohos_executable("uinput_inject") {
 
   part_name = "input"
   subsystem_name = "multimodalinput"
-}
-
-config("multimodalinput_mmi_public_config") {
-  include_dirs = [ "util/common/include/" ]
 }
 
 group("multimodalinput_mmi_base") {
