@@ -93,14 +93,15 @@ int32_t MultimodalInputConnectManager::SetDisplayBind(int32_t deviceId, int32_t 
     return multimodalInputConnectService_->SetDisplayBind(deviceId, displayId, msg);    
 }
 
-int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority)
+int32_t MultimodalInputConnectManager::AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
+    uint32_t deviceTags)
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
         MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
-    return multimodalInputConnectService_->AddInputEventFilter(filter, filterId, priority);
+    return multimodalInputConnectService_->AddInputEventFilter(filter, filterId, priority, deviceTags);
 }
 
 int32_t MultimodalInputConnectManager::RemoveInputEventFilter(int32_t filterId)

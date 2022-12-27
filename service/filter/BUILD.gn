@@ -19,8 +19,12 @@ config("mmi_event_filter_config") {
   include_dirs = [
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "//foundation/multimodalinput/input/service/device_config/include",
     "//foundation/multimodalinput/input/service/event_handler/include",
+    "//foundation/multimodalinput/input/service/device_manager/include",
     "//foundation/multimodalinput/input/util/common/include",
+    "//foundation/multimodalinput/input/util/network/include",
+    "//foundation/multimodalinput/input/util/socket/include",
     "${event_filter_path}/include",
   ]
 }

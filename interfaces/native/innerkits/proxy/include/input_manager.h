@@ -56,7 +56,7 @@ public:
      */
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
 
-    int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority);
+    int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);
 
     /**
