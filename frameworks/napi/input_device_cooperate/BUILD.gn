@@ -20,13 +20,7 @@ config("inputdevicecooperate_config") {
 }
 
 ohos_shared_library("inputdevicecooperate") {
-  sources = [
-    "src/js_event_target.cpp",
-    "src/js_input_device_cooperate_context.cpp",
-    "src/js_input_device_cooperate_manager.cpp",
-    "src/js_util.cpp",
-    "src/native_register_module.cpp",
-  ]
+  sources = inputdevicecooperate_sources
 
   configs = [ ":inputdevicecooperate_config" ]
 
