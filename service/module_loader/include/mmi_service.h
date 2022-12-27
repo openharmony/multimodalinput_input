@@ -109,6 +109,7 @@ protected:
     int32_t OnGetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice);
     int32_t OnSupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke);
     int32_t OnGetKeyboardType(int32_t deviceId, int32_t &keyboardType);
+    int32_t OnGetWindowPid(int32_t windowId, int32_t &windowPid);
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
     int32_t CheckAddInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags);
