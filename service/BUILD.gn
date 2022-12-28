@@ -83,7 +83,6 @@ config("libmmi_server_config") {
 }
 
 ohos_shared_library("libmmi-server") {
-
   sources = libmmi_service_sources
 
   if (input_feature_input_cooperation) {
