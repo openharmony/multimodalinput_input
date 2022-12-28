@@ -28,7 +28,11 @@ ohos_shared_library("inputdevicecooperate") {
     "src/native_register_module.cpp",
   ]
 
-  configs = [ ":inputdevicecooperate_config" ]
+  configs = [
+    ":inputdevicecooperate_config",
+    "//foundation/multimodalinput/input/util:libmmi_util_public_config",
+    "//foundation/multimodalinput/input/service/filter:mmi_event_filter_config",
+  ]
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
