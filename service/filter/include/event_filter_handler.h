@@ -42,7 +42,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
-    int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority, int32_t clientPid);
+    int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority, uint32_t deviceTags,
+        int32_t clientPid);
     int32_t RemoveInputEventFilter(int32_t filterId, int32_t clientPid);
     void Dump(int32_t fd, const std::vector<std::string> &args);
     bool HandleKeyEventFilter(std::shared_ptr<KeyEvent> event);
@@ -55,6 +56,7 @@ private:
         sptr<IRemoteObject::DeathRecipient> deathRecipient { nullptr };
         const int32_t filterId;
         const int32_t priority;
+        const uint32_t deviceTags;
         const int32_t clientPid;
         bool IsSameClient(int32_t id, int32_t pid) const { return ((filterId == id) && (clientPid == pid)); }
     };

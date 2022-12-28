@@ -52,9 +52,10 @@ void InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
     InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
 }
 
-int32_t InputManager::AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority)
+int32_t InputManager::AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority,
+    uint32_t deviceTags)
 {
-    return InputMgrImpl.AddInputEventFilter(filter, priority);
+    return InputMgrImpl.AddInputEventFilter(filter, priority, deviceTags);
 }
 
 int32_t InputManager::RemoveInputEventFilter(int32_t filterId)
