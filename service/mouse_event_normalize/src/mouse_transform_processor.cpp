@@ -115,8 +115,10 @@ int32_t MouseTransformProcessor::HandleMotionAccelerate(struct libinput_event_po
     MMI_HILOGD("Get and process the movement coordinates, dx:%{public}lf, dy:%{public}lf,"
                "correctionX:%{public}lf, correctionY:%{public}lf, gain:%{public}lf",
                dx, dy, correctionX, correctionY, gain);
-    absolutionX_ += correctionX;
-    absolutionY_ += correctionY;
+    if (!WinMgr->GetMouseIsCaptureMode()) {
+        absolutionX_ += correctionX;
+        absolutionY_ += correctionY;
+    }
     return RET_OK;
 }
 
