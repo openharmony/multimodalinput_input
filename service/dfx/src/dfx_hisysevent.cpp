@@ -15,6 +15,8 @@
 
 #include "dfx_hisysevent.h"
 
+#include "input_windows_manager.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {

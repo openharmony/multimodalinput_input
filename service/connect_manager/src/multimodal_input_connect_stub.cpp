@@ -150,7 +150,9 @@ int32_t MultimodalInputConnectStub::StubAddInputEventFilter(MessageParcel& data,
     READINT32(data, filterId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t priority = 0;
     READINT32(data, priority, IPC_PROXY_DEAD_OBJECT_ERR);
-    int32_t ret = AddInputEventFilter(filter, filterId, priority);
+    uint32_t deviceTags = 0;
+    READUINT32(data, deviceTags, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = AddInputEventFilter(filter, filterId, priority, deviceTags);
     if (ret != RET_OK) {
         MMI_HILOGE("Call AddInputEventFilter failed ret:%{public}d", ret);
         return ret;

@@ -128,7 +128,8 @@ void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInf
     PrintDisplayInfo();
 }
 
-int32_t InputManagerImpl::AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority)
+int32_t InputManagerImpl::AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority,
+    uint32_t deviceTags)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -140,13 +141,13 @@ int32_t InputManagerImpl::AddInputEventFilter(std::shared_ptr<IInputEventFilter>
     sptr<IEventFilter> service = new (std::nothrow) EventFilterService(filter);
     CHKPR(service, RET_ERR);
     const int32_t filterId = EventFilterService::GetNextId();
-    int32_t ret = MultimodalInputConnMgr->AddInputEventFilter(service, filterId, priority);
+    int32_t ret = MultimodalInputConnMgr->AddInputEventFilter(service, filterId, priority, deviceTags);
     if (ret != RET_OK) {
         MMI_HILOGE("AddInputEventFilter has send to server failed, priority:%{public}d, ret:%{public}d", priority, ret);
         service = nullptr;
         return RET_ERR;
     }
-    auto it =  eventFilterServices_.emplace(filterId, std::make_tuple(service, priority));
+    auto it =  eventFilterServices_.emplace(filterId, std::make_tuple(service, priority, deviceTags));
     if (!it.second) {
         MMI_HILOGW("Filter id duplicate");
     }
@@ -161,7 +162,7 @@ int32_t InputManagerImpl::RemoveInputEventFilter(int32_t filterId)
         MMI_HILOGE("Filters is empty, size:%{public}zu", eventFilterServices_.size());
         return RET_OK;
     }
-    std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t>>::iterator it;
+    std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t, uint32_t>>::iterator it;
     if (filterId != -1) {
         it = eventFilterServices_.find(filterId);
         if (it == eventFilterServices_.end()) {
@@ -713,10 +714,11 @@ void InputManagerImpl::ReAddInputEventFilter()
         return;
     }
     for (const auto &[filterId, t] : eventFilterServices_) {
-        const auto &[service, priority] = t;
-        int32_t ret = MultimodalInputConnMgr->AddInputEventFilter(service, filterId, priority);
+        const auto &[service, priority, deviceTags] = t;
+        int32_t ret = MultimodalInputConnMgr->AddInputEventFilter(service, filterId, priority, deviceTags);
         if (ret != RET_OK) {
-            MMI_HILOGE("AddInputEventFilter has send to server failed, filterId:%{public}d, priority:%{public}d, ret:%{public}d", filterId, priority, ret);
+            MMI_HILOGE("AddInputEventFilter has send to server failed, filterId:%{public}d, priority:%{public}d,"
+                "deviceTags:%{public}zu, ret:%{public}d", filterId, priority, deviceTags, ret);
         }
     }
 }
