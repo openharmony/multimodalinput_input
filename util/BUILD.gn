@@ -15,7 +15,10 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
+defines = input_default_defines
+
 module_output_path = "multimodalinput/unit_out"
+
 config("libmmi_util_public_config") {
   include_dirs = [
     "common/include",
@@ -24,29 +27,12 @@ config("libmmi_util_public_config") {
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
   ]
-
-  defines = input_default_defines
 }
 
 ohos_shared_library("libmmi-util") {
-  sources = [
-    "common/src/input_event_data_transformation.cpp",
-    "common/src/klog.cpp",
-    "common/src/util.cpp",
-    "common/src/util_napi.cpp",
-    "common/src/util_napi_error.cpp",
-    "network/src/circle_stream_buffer.cpp",
-    "network/src/net_packet.cpp",
-    "network/src/stream_buffer.cpp",
-    "socket/src/uds_client.cpp",
-    "socket/src/uds_session.cpp",
-    "socket/src/uds_socket.cpp",
-  ]
+  sources = libmmi_util_sources
 
-  configs = [
-    "//foundation/multimodalinput/input:multimodalinput_mmi_public_config",
-    ":libmmi_util_public_config",
-  ]
+  configs = [ ":libmmi_util_public_config" ]
 
   public_deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
@@ -84,8 +70,6 @@ ohos_unittest("ut-mmi-util-out") {
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  defines = input_default_defines
 
   sources = [
     "network/test/net_packet_test.cpp",

@@ -112,42 +112,7 @@ config("libinput-third_public_config") {
 ohos_source_set("patch_gen_libinput-third-mmi") {
   part_name = "input"
   subsystem_name = "multimodalinput"
-  sources = [
-    "$gen_dst_dir/src/evdev-debounce.c",
-    "$gen_dst_dir/src/evdev-fallback.c",
-    "$gen_dst_dir/src/evdev-joystick.c",
-    "$gen_dst_dir/src/evdev-middle-button.c",
-    "$gen_dst_dir/src/evdev-mt-touchpad-buttons.c",
-    "$gen_dst_dir/src/evdev-mt-touchpad-edge-scroll.c",
-    "$gen_dst_dir/src/evdev-mt-touchpad-gestures.c",
-    "$gen_dst_dir/src/evdev-mt-touchpad-tap.c",
-    "$gen_dst_dir/src/evdev-mt-touchpad-thumb.c",
-    "$gen_dst_dir/src/evdev-mt-touchpad.c",
-    "$gen_dst_dir/src/evdev-tablet-pad-leds.c",
-    "$gen_dst_dir/src/evdev-tablet-pad.c",
-    "$gen_dst_dir/src/evdev-tablet.c",
-    "$gen_dst_dir/src/evdev-totem.c",
-    "$gen_dst_dir/src/evdev.c",
-    "$gen_dst_dir/src/filter-flat.c",
-    "$gen_dst_dir/src/filter-low-dpi.c",
-    "$gen_dst_dir/src/filter-mouse.c",
-    "$gen_dst_dir/src/filter-tablet.c",
-    "$gen_dst_dir/src/filter-touchpad-flat.c",
-    "$gen_dst_dir/src/filter-touchpad-x230.c",
-    "$gen_dst_dir/src/filter-touchpad.c",
-    "$gen_dst_dir/src/filter-trackpoint.c",
-    "$gen_dst_dir/src/filter.c",
-    "$gen_dst_dir/src/libinput-util.c",
-    "$gen_dst_dir/src/libinput.c",
-    "$gen_dst_dir/src/path-seat.c",
-    "$gen_dst_dir/src/quirks.c",
-    "$gen_dst_dir/src/timer.c",
-    "$gen_dst_dir/src/udev-seat.c",
-    "$gen_dst_dir/src/util-list.c",
-    "$gen_dst_dir/src/util-prop-parsers.c",
-    "$gen_dst_dir/src/util-ratelimit.c",
-    "$gen_dst_dir/src/util-strings.c",
-  ]
+  sources = patch_gen_libinput_third_mmi_sources
 
   configs = [ ":libinput-third_config" ]
 

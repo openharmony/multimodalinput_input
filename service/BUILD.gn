@@ -14,6 +14,8 @@
 import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
+defines = input_default_defines
+
 mmi_service_path = "${mmi_path}/service"
 
 ohos_prebuilt_etc("mmi_device_config.ini") {
@@ -63,8 +65,6 @@ config("libmmi_server_config") {
     "//third_party/cJSON",
   ]
 
-  defines = input_default_defines
-
   if (input_feature_combination_key) {
     defines += [ "OHOS_BUILD_ENABLE_COMBINATION_KEY" ]
   }
@@ -83,29 +83,7 @@ config("libmmi_server_config") {
 }
 
 ohos_shared_library("libmmi-server") {
-  sources = [
-    "//foundation/multimodalinput/input/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
-    "delegate_task/src/delegate_tasks.cpp",
-    "device_config/src/device_config_file_parser.cpp",
-    "device_manager/src/input_device_manager.cpp",
-    "dfx/src/dfx_hisysevent.cpp",
-    "event_dispatch/src/event_dispatch_handler.cpp",
-    "event_dump/src/event_dump.cpp",
-    "event_handler/src/anr_manager.cpp",
-    "event_handler/src/event_normalize_handler.cpp",
-    "event_handler/src/input_event_handler.cpp",
-    "event_handler/src/key_auto_repeat.cpp",
-    "event_handler/src/key_event_value_transformation.cpp",
-    "event_handler/src/key_map_manager.cpp",
-    "libinput_adapter/src/libinput_adapter.cpp",
-    "message_handle/src/server_msg_handler.cpp",
-    "module_loader/src/mmi_service.cpp",
-    "module_loader/src/uds_server.cpp",
-    "permission_helper/src/permission_helper.cpp",
-    "timer_manager/src/timer_manager.cpp",
-    "window_manager/src/input_display_bind_helper.cpp",
-    "window_manager/src/input_windows_manager.cpp",
-  ]
+  sources = libmmi_service_sources
 
   if (input_feature_input_cooperation) {
     sources += [
@@ -270,8 +248,6 @@ ohos_unittest("ut-mmi-service-out") {
     "window_manager/test/input_windows_manager_test.cpp",
   ]
 
-  defines = input_default_defines
-
   configs = [ ":libmmi_server_config" ]
 
   deps = [
@@ -298,8 +274,6 @@ ohos_unittest("TransformPointTest") {
   ]
 
   sources = [ "touch_event_normalize/test/transform_point_test.cpp" ]
-
-  defines = input_default_defines
 
   deps = [
     "${mmi_path}/tools/vuinput:libmmi-virtual-device",
