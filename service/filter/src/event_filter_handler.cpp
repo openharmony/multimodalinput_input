@@ -16,6 +16,7 @@
 #include "event_filter_handler.h"
 
 #include "error_multimodal.h"
+#include "input_device_manager.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -65,7 +66,7 @@ void EventFilterHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> po
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 int32_t EventFilterHandler::AddInputEventFilter(sptr<IEventFilter> filter,
-    int32_t filterId, int32_t priority, int32_t clientPid)
+    int32_t filterId, int32_t priority, uint32_t deviceTags, int32_t clientPid)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(lockFilter_);
@@ -91,8 +92,8 @@ int32_t EventFilterHandler::AddInputEventFilter(sptr<IEventFilter> filter,
     CHKPR(deathRecipient, RET_ERR);
     filter->AsObject()->AddDeathRecipient(deathRecipient);
     
-    FilterInfo info { .filter = filter, .deathRecipient = deathRecipient,
-        .filterId = filterId, .priority = priority, .clientPid = clientPid };
+    FilterInfo info { .filter = filter, .deathRecipient = deathRecipient, .filterId = filterId,
+        .priority = priority, .deviceTags = deviceTags, .clientPid = clientPid };
     auto it = filters_.cbegin();
     for (; it != filters_.cend(); ++it) {
         if (info.priority < it->priority) {
@@ -159,7 +160,17 @@ bool EventFilterHandler::HandleKeyEventFilter(std::shared_ptr<KeyEvent> event)
     if (filters_.empty()) {
         return false;
     }
+    std::vector<KeyEvent::KeyItem> keyItems = event->GetKeyItems();
+    if (keyItems.empty()) {
+        MMI_HILOGE("keyItems is empty");
+        return false;
+    }
+    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(keyItems.front().GetDeviceId());
+    CHKPF(inputDevice);
     for (auto &i: filters_) {
+        if (!inputDevice->HasCapability(i.deviceTags)) {
+            continue;
+        }
         if (i.filter->HandleKeyEvent(event)) {
             MMI_HILOGD("Call HandleKeyEventFilter return true");
             return true;
@@ -176,7 +187,18 @@ bool EventFilterHandler::HandlePointerEventFilter(std::shared_ptr<PointerEvent> 
     if (filters_.empty()) {
         return false;
     }
+    PointerEvent::PointerItem pointerItem;
+    int32_t pointerId = event->GetPointerId();
+    if (!event->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("GetPointerItem:%{public}d fail", pointerId);
+        return false;
+    }
+    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(pointerItem.GetDeviceId());
+    CHKPF(inputDevice);
     for (auto &i: filters_) {
+        if (!inputDevice->HasCapability(i.deviceTags)) {
+            continue;
+        }
         if (i.filter->HandlePointerEvent(event)) {
             MMI_HILOGD("Call HandlePointerEvent return true");
             return true;

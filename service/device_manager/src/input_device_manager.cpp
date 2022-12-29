@@ -28,8 +28,13 @@
 #include "input_device_cooperate_sm.h"
 #include "input_device_cooperate_util.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+#include "event_dispatch_handler.h"
 #include "input_windows_manager.h"
+#include "key_auto_repeat.h"
+#include "key_event_normalize.h"
 #include "key_event_value_transformation.h"
+#include "key_map_manager.h"
+#include "pointer_drawing_manager.h"
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include "util.h"
 #endif // OHOS_BUILD_ENABLE_COOPERATE
