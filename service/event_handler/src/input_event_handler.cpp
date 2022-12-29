@@ -69,7 +69,11 @@ void InputEventHandler::OnEvent(void *event)
                "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType, beginTime);
     CHKPV(eventNormalizeHandler_);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
-    InputDevCooSM->HandleEvent(lpEvent);
+    if (InputDevCooSM->GetCooperateEnableState()) {
+        InputDevCooSM->HandleEvent(lpEvent);
+    } else {
+        eventNormalizeHandler_->HandleEvent(lpEvent);
+    }
 #else
     eventNormalizeHandler_->HandleEvent(lpEvent);
 #endif // OHOS_BUILD_ENABLE_COOPERATE
