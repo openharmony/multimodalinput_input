@@ -32,6 +32,7 @@
 #include "input_device_cooperate_state_out.h"
 #include "input_device_cooperate_util.h"
 #include "input_device_manager.h"
+#include "input_windows_manager.h"
 #include "mouse_event_normalize.h"
 #include "timer_manager.h"
 #include "util_ex.h"
