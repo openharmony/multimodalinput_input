@@ -63,8 +63,8 @@ class InputDeviceCooperateSM final {
 public:
     using DelegateTasksCallback = std::function<int32_t(std::function<int32_t()>)>;
     DISALLOW_COPY_AND_MOVE(InputDeviceCooperateSM);
-    void Init(DelegateTasksCallback delegateTasksCallback);
-    void EnableInputDeviceCooperate(bool enabled);
+    void Init(DelegateTasksCallback delegateTasksCallback, UDSServer &udsServer);
+    void EnableInputDeviceCooperate(bool enabled, int32_t pid);
     int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId);
     int32_t StopInputDeviceCooperate();
     void GetCooperateState(const std::string &deviceId);
@@ -91,8 +91,10 @@ public:
     bool IsStopping() const;
     void Reset(const std::string &networkId);
     void Dump(int32_t fd, const std::vector<std::string> &args);
+    bool GetCooperateEnableState() const;
 
 private:
+    void OnSessionLost(SessionPtr session);
     void Reset(bool adjustAbsolutionLocation = false);
     void CheckPointerEvent(struct libinput_event *event);
     void OnCloseCooperation(const std::string &networkId, bool isLocal);
@@ -113,6 +115,8 @@ private:
     std::atomic<bool> isStopping_ { false };
     std::pair<int32_t, int32_t> mouseLocation_ { std::make_pair(0, 0) };
     DelegateTasksCallback delegateTasksCallback_ { nullptr };
+    bool isEnable_ { false };
+    int32_t pid_ { -1 };
 };
 
 #define DisHardware DistributedHardware::DeviceManager::GetInstance()
