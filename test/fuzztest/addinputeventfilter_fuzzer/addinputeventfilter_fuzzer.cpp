@@ -42,7 +42,8 @@ void AddInputEventFilterFuzzTest(const uint8_t* data, size_t size)
     };
     auto filter = std::make_shared<TestFilter>();
     const auto priority = 200 + (size % 100);
-    const auto filterId = InputManager::GetInstance()->AddInputEventFilter(filter, priority);
+    uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+    const auto filterId = InputManager::GetInstance()->AddInputEventFilter(filter, priority, touchTags);
     if (filterId == -1) {
         MMI_HILOGE("Add filter,ret:%{public}d", filterId);
         return;

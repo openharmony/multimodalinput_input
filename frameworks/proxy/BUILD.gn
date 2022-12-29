@@ -14,6 +14,9 @@
 import("//build/ohos.gni")
 import("//build/test.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+
+defines = input_default_defines
+
 module_output_path = "multimodalinput/unit_out"
 
 config("libmmi_client_config") {
@@ -56,16 +59,7 @@ config("libmmi_test_util") {
 }
 
 ohos_source_set("libmmi-common") {
-  sources = [
-    "events/src/input_device.cpp",
-    "events/src/input_event.cpp",
-    "events/src/key_event.cpp",
-    "events/src/key_option.cpp",
-    "events/src/pointer_event.cpp",
-  ]
-
-  defines = input_default_defines
-
+  sources = libmmi_common_sources
   public_configs = [ ":libmmi_client_config" ]
 
   external_deps = [
@@ -78,24 +72,10 @@ ohos_source_set("libmmi-common") {
 }
 
 ohos_shared_library("libmmi-client") {
-  sources = [
-    "event_handler/src/anr_handler.cpp",
-    "event_handler/src/bytrace_adapter.cpp",
-    "event_handler/src/client_msg_handler.cpp",
-    "event_handler/src/input_device_impl.cpp",
-    "event_handler/src/input_handler_manager.cpp",
-    "event_handler/src/input_manager_impl.cpp",
-    "event_handler/src/multimodal_event_handler.cpp",
-    "events/src/axis_event.cpp",
-    "events/src/input_manager.cpp",
-    "module_loader/src/mmi_client.cpp",
-    "module_loader/src/mmi_fd_listener.cpp",
-  ]
+  sources = libmmi_client_sources
   if (input_feature_input_cooperation) {
     sources += [ "event_handler/src/input_device_cooperate_impl.cpp" ]
   }
-
-  defines = input_default_defines
 
   if (input_feature_interceptor) {
     sources += [ "event_handler/src/input_interceptor_manager.cpp" ]
@@ -143,8 +123,6 @@ ohos_unittest("ut-mmi-proxy-out") {
     "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
-  defines = input_default_defines
-
   sources = [ "module_loader/test/mmi_client_test.cpp" ]
 
   configs = [ ":libmmi_test_util" ]
@@ -168,8 +146,6 @@ ohos_unittest("KeyEventTest") {
     "//commonlibrary/c_utils/base/include",
     "$root_out_dir/diff_libinput_mmi/export_include",
   ]
-
-  defines = input_default_defines
 
   sources = [
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
@@ -205,8 +181,6 @@ ohos_unittest("InputManagerTest") {
     "${mmi_path}/service/filter/include",
   ]
 
-  defines = input_default_defines
-
   sources = [
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
     "${mmi_path}/test/unittest/common/src/system_info.cpp",
@@ -238,8 +212,6 @@ ohos_unittest("InputManagerManualTest") {
   module_out_path = module_output_path
   include_dirs = [ "//commonlibrary/c_utils/base/include" ]
 
-  defines = input_default_defines
-
   sources = [ "events/test/input_manager_manual_test.cpp" ]
 
   configs = [ ":libmmi_test_util" ]
@@ -263,8 +235,6 @@ ohos_unittest("InputManagerFilterManualTest") {
   module_out_path = module_output_path
   include_dirs = [ "//commonlibrary/c_utils/base/include" ]
 
-  defines = input_default_defines
-
   sources = [ "events/test/input_manager_filter_manual_test.cpp" ]
 
   configs = [ ":libmmi_test_util" ]
@@ -287,8 +257,6 @@ ohos_unittest("InputManagerFilterManualTest") {
 ohos_unittest("PointerEventTest") {
   module_out_path = module_output_path
   include_dirs = [ "$root_out_dir/diff_libinput_mmi/export_include" ]
-
-  defines = input_default_defines
 
   sources = [
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",

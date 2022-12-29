@@ -34,6 +34,183 @@ declare_args() {
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
     resource_schedule_service_enabled = true
   }
+
+  uinput_inject_sources = [
+    "uinput/hdf_device_event_dispatch.cpp",
+    "uinput/hdf_device_event_manager.cpp",
+    "uinput/inject_thread.cpp",
+    "uinput/keyboard_inject.cpp",
+    "uinput/virtual_device.cpp",
+    "uinput/virtual_keyboard.cpp",
+    "uinput/virtual_touch_screen.cpp",
+  ]
+
+  libmmi_common_sources = [
+    "events/src/input_device.cpp",
+    "events/src/input_event.cpp",
+    "events/src/key_event.cpp",
+    "events/src/key_option.cpp",
+    "events/src/pointer_event.cpp",
+  ]
+
+  libmmi_client_sources = [
+    "event_handler/src/anr_handler.cpp",
+    "event_handler/src/bytrace_adapter.cpp",
+    "event_handler/src/client_msg_handler.cpp",
+    "event_handler/src/input_device_impl.cpp",
+    "event_handler/src/input_handler_manager.cpp",
+    "event_handler/src/input_manager_impl.cpp",
+    "event_handler/src/multimodal_event_handler.cpp",
+    "events/src/axis_event.cpp",
+    "events/src/input_manager.cpp",
+    "module_loader/src/mmi_client.cpp",
+    "module_loader/src/mmi_fd_listener.cpp",
+  ]
+
+  libmmi_service_sources = [
+    "$mmi_path/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
+    "delegate_task/src/delegate_tasks.cpp",
+    "device_config/src/device_config_file_parser.cpp",
+    "device_manager/src/input_device_manager.cpp",
+    "dfx/src/dfx_hisysevent.cpp",
+    "event_dispatch/src/event_dispatch_handler.cpp",
+    "event_dump/src/event_dump.cpp",
+    "event_handler/src/anr_manager.cpp",
+    "event_handler/src/event_normalize_handler.cpp",
+    "event_handler/src/input_event_handler.cpp",
+    "event_handler/src/key_auto_repeat.cpp",
+    "event_handler/src/key_event_value_transformation.cpp",
+    "event_handler/src/key_map_manager.cpp",
+    "libinput_adapter/src/libinput_adapter.cpp",
+    "message_handle/src/server_msg_handler.cpp",
+    "module_loader/src/mmi_service.cpp",
+    "module_loader/src/uds_server.cpp",
+    "permission_helper/src/permission_helper.cpp",
+    "timer_manager/src/timer_manager.cpp",
+    "window_manager/src/input_display_bind_helper.cpp",
+    "window_manager/src/input_windows_manager.cpp",
+  ]
+
+  inputdevice_sources = [
+    "src/js_event_target.cpp",
+    "src/js_input_device_context.cpp",
+    "src/js_input_device_manager.cpp",
+    "src/js_util.cpp",
+    "src/native_register_module.cpp",
+  ]
+
+  inputdevicecooperate_sources = [
+    "src/js_event_target.cpp",
+    "src/js_input_device_cooperate_context.cpp",
+    "src/js_input_device_cooperate_manager.cpp",
+    "src/js_util.cpp",
+    "src/native_register_module.cpp",
+  ]
+
+  inputmonitor_sources = [
+    "src/js_input_monitor.cpp",
+    "src/js_input_monitor_manager.cpp",
+    "src/js_input_monitor_module.cpp",
+    "src/js_input_monitor_util.cpp",
+  ]
+
+  patch_gen_libinput_third_mmi_sources = [
+    root_out_dir + "/diff_libinput_mmi/src/evdev-debounce.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev-fallback.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev-joystick.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev-middle-button.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev-mt-touchpad-buttons.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev-mt-touchpad-edge-scroll.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev-mt-touchpad-gestures.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev-mt-touchpad-tap.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev-mt-touchpad-thumb.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev-mt-touchpad.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev-tablet-pad-leds.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev-tablet-pad.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev-tablet.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev-totem.c",
+    root_out_dir + "/diff_libinput_mmi/src/evdev.c",
+    root_out_dir + "/diff_libinput_mmi/src/filter-flat.c",
+    root_out_dir + "/diff_libinput_mmi/src/filter-low-dpi.c",
+    root_out_dir + "/diff_libinput_mmi/src/filter-mouse.c",
+    root_out_dir + "/diff_libinput_mmi/src/filter-tablet.c",
+    root_out_dir + "/diff_libinput_mmi/src/filter-touchpad-flat.c",
+    root_out_dir + "/diff_libinput_mmi/src/filter-touchpad-x230.c",
+    root_out_dir + "/diff_libinput_mmi/src/filter-touchpad.c",
+    root_out_dir + "/diff_libinput_mmi/src/filter-trackpoint.c",
+    root_out_dir + "/diff_libinput_mmi/src/filter.c",
+    root_out_dir + "/diff_libinput_mmi/src/libinput-util.c",
+    root_out_dir + "/diff_libinput_mmi/src/libinput.c",
+    root_out_dir + "/diff_libinput_mmi/src/path-seat.c",
+    root_out_dir + "/diff_libinput_mmi/src/quirks.c",
+    root_out_dir + "/diff_libinput_mmi/src/timer.c",
+    root_out_dir + "/diff_libinput_mmi/src/udev-seat.c",
+    root_out_dir + "/diff_libinput_mmi/src/util-list.c",
+    root_out_dir + "/diff_libinput_mmi/src/util-prop-parsers.c",
+    root_out_dir + "/diff_libinput_mmi/src/util-ratelimit.c",
+    root_out_dir + "/diff_libinput_mmi/src/util-strings.c",
+  ]
+
+  event_injection_sources = [
+    "src/device_base.cpp",
+    "src/get_device_node.cpp",
+    "src/get_device_object.cpp",
+    "src/injection_event_dispatch.cpp",
+    "src/injection_tools_help_func.cpp",
+    "src/input_parse.cpp",
+    "src/manage_inject_device.cpp",
+    "src/processing_finger_device.cpp",
+    "src/processing_game_pad_device.cpp",
+    "src/processing_joystick_device.cpp",
+    "src/processing_keyboard_device.cpp",
+    "src/processing_mouse_device.cpp",
+    "src/processing_pad_device.cpp",
+    "src/processing_pen_device.cpp",
+    "src/processing_touch_screen_device.cpp",
+  ]
+
+  libmmi_virtual_device_sources = [
+    "src/virtual_device.cpp",
+    "src/virtual_finger.cpp",
+    "src/virtual_gamepad.cpp",
+    "src/virtual_joystick.cpp",
+    "src/virtual_keyboard.cpp",
+    "src/virtual_keyboard_consumer_ctrl.cpp",
+    "src/virtual_keyboard_ext.cpp",
+    "src/virtual_keyboard_sys_ctrl.cpp",
+    "src/virtual_knob.cpp",
+    "src/virtual_knob_consumer_ctrl.cpp",
+    "src/virtual_knob_mouse.cpp",
+    "src/virtual_knob_sys_ctrl.cpp",
+    "src/virtual_mouse.cpp",
+    "src/virtual_pen.cpp",
+    "src/virtual_pen_keyboard.cpp",
+    "src/virtual_pen_mouse.cpp",
+    "src/virtual_remote_control.cpp",
+    "src/virtual_single_finger.cpp",
+    "src/virtual_single_touchscreen.cpp",
+    "src/virtual_stylus.cpp",
+    "src/virtual_touchpad.cpp",
+    "src/virtual_touchscreen.cpp",
+    "src/virtual_trackball.cpp",
+    "src/virtual_trackpad.cpp",
+    "src/virtual_trackpad_mouse.cpp",
+    "src/virtual_trackpad_sys_ctrl.cpp",
+  ]
+
+  libmmi_util_sources = [
+    "common/src/input_event_data_transformation.cpp",
+    "common/src/klog.cpp",
+    "common/src/util.cpp",
+    "common/src/util_napi.cpp",
+    "common/src/util_napi_error.cpp",
+    "network/src/circle_stream_buffer.cpp",
+    "network/src/net_packet.cpp",
+    "network/src/stream_buffer.cpp",
+    "socket/src/uds_client.cpp",
+    "socket/src/uds_session.cpp",
+    "socket/src/uds_socket.cpp",
+  ]
 }
 
 if (input_feature_joystick) {
