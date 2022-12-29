@@ -718,7 +718,7 @@ void InputManagerImpl::ReAddInputEventFilter()
         int32_t ret = MultimodalInputConnMgr->AddInputEventFilter(service, filterId, priority, deviceTags);
         if (ret != RET_OK) {
             MMI_HILOGE("AddInputEventFilter has send to server failed, filterId:%{public}d, priority:%{public}d,"
-                "deviceTags:%{public}zu, ret:%{public}d", filterId, priority, deviceTags, ret);
+                "deviceTags:%{public}u, ret:%{public}d", filterId, priority, deviceTags, ret);
         }
     }
 }
