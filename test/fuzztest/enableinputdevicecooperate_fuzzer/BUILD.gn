@@ -21,8 +21,11 @@ module_output_path = "multimodalinput/fuzz"
 ohos_fuzztest("EnableInputDeviceCooperateFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file = "//foundation/multimodalinput/input/test/fuzztest/enableinputdevicecooperate_fuzzer"
-  include_dirs =
-      [ "//foundation/multimodalinput/input/interfaces/util/common/include" ]
+  include_dirs = [
+    "//foundation/multimodalinput/input/interfaces/util/common/include",
+    "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
+    "//foundation/multimodalinput/input/frameworks/proxy/module_loader/include",
+  ]
   cflags = [
     "-g",
     "-O0",
@@ -30,6 +33,10 @@ ohos_fuzztest("EnableInputDeviceCooperateFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "enableinputdevicecooperate_fuzzer.cpp" ]
+  configs = [
+    "//foundation/multimodalinput/input/util:libmmi_util_public_config",
+    "//foundation/multimodalinput/input/service/filter:mmi_event_filter_config",
+  ]
   deps = [ "${mmi_path}/frameworks/proxy:libmmi-client" ]
   external_deps = [
     "c_utils:utils",
