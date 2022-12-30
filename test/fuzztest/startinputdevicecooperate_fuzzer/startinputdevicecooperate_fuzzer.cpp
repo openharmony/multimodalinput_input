@@ -15,7 +15,7 @@
 
 #include "startinputdevicecooperate_fuzzer.h"
 
-#include "input_manager.h"
+#include "input_manager_impl.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -34,7 +34,7 @@ void StartInputDeviceCooperateFuzzTest(const uint8_t* data, size_t  size)
     auto fun = [](std::string listener, CooperationMessage cooperateMessages) {
         MMI_HILOGD("StartInputDeviceCooperateFuzzTest");
     };
-    InputManager::GetInstance()->StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, fun);
+    InputMgrImpl.StartInputDeviceCooperate(sinkDeviceId, srcInputDeviceId, fun);
 }
 } // MMI
 } // OHOS
