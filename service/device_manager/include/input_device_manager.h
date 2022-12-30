@@ -87,6 +87,7 @@ public:
     VendorConfig GetVendorConfig(int32_t deviceId) const;
 
 private:
+    int32_t ParseDeviceId(const std::string &sysName);
     void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);
     bool IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const;
     void ScanPointerDevice();
@@ -100,7 +101,6 @@ private:
 private:
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;
     std::map<std::string, std::string> inputDeviceScreens_;
-    int32_t nextId_ { 0 };
     std::list<std::shared_ptr<IDeviceObserver>> observers_;
     std::map<SessionPtr, std::function<void(int32_t, const std::string&)>> devListener_;
     inputDeviceCallback devCallbacks_ = { nullptr };
