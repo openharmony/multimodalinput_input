@@ -15,7 +15,7 @@
 
 #include "enableinputdevicecooperate_fuzzer.h"
 #include "securec.h"
-#include "input_manager.h"
+#include "input_manager_impl.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -31,7 +31,7 @@ void EnableInputDeviceCooperateFuzzTest(const uint8_t* data, size_t size)
     auto fun = [](std::string listener, CooperationMessage cooperateMessages) {
         MMI_HILOGD("EnableInputDeviceCooperateFuzzTest");
     };
-    InputManager::GetInstance()->EnableInputDeviceCooperate(enabled, fun);
+    InputMgrImpl.EnableInputDeviceCooperate(enabled, fun);
 }
 } // namespace MMI
 } // namespace OHOS
