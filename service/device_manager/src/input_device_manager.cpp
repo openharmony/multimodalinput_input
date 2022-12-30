@@ -19,8 +19,8 @@
 #include <parameters.h>
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
 #include <openssl/sha.h>
-#include <regex>
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+#include <regex>
 #include <unordered_map>
 
 #include "dfx_hisysevent.h"
@@ -74,6 +74,9 @@ std::vector<std::pair<enum libinput_device_capability, InputDeviceCapability>> d
     { LIBINPUT_DEVICE_CAP_SWITCH, InputDeviceCapability::INPUT_DEV_CAP_SWITCH },
     { LIBINPUT_DEVICE_CAP_JOYSTICK, InputDeviceCapability::INPUT_DEV_CAP_JOYSTICK },
 };
+
+constexpr size_t EXPECTED_N_SUBMATCHES { 2 };
+constexpr size_t EXPECTED_SUBMATCH { 1 };
 } // namespace
 
 InputDeviceManager::InputDeviceManager() {}
@@ -349,6 +352,20 @@ void InputDeviceManager::NotifyDevCallback(int32_t deviceId,  struct InputDevice
     }
 }
 
+int32_t InputDeviceManager::ParseDeviceId(const std::string &sysName)
+{
+    CALL_DEBUG_ENTER;
+    std::regex pattern("^event(\\d+)$");
+    std::smatch mr;
+
+    if (std::regex_match(sysName, mr, pattern)) {
+        if (mr.ready() && mr.size() == EXPECTED_N_SUBMATCHES) {
+            return std::stoi(mr[EXPECTED_SUBMATCH].str());
+        }
+    }
+    return -1;
+}
+
 void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 {
     CALL_DEBUG_ENTER;
@@ -364,29 +381,33 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
             hasLocalPointer = true;
         }
     }
-    if (nextId_ == INT32_MAX) {
-        MMI_HILOGE("The nextId_ exceeded the upper limit");
-        DfxHisysevent::OnDeviceConnect(INT32_MAX, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
+
+    const char *sysName = libinput_device_get_sysname(inputDevice);
+    CHKPV(sysName);
+    int32_t deviceId = ParseDeviceId(std::string(sysName));
+    if (deviceId < 0) {
+        MMI_HILOGE("Parsing sysname failed: \'%{public}s\'", sysName);
         return;
     }
+
     struct InputDeviceInfo info;
     MakeDeviceInfo(inputDevice, info);
-    inputDevice_[nextId_] = info;
+    inputDevice_[deviceId] = info;
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (!IsRemote(inputDevice) || InputDevCooSM->GetCurrentCooperateState() != CooperateState::STATE_FREE) {
         for (const auto &item : devListener_) {
             CHKPC(item.first);
-            item.second(nextId_, "add");
+            item.second(deviceId, "add");
         }
     }
 #else
     for (const auto &item : devListener_) {
         CHKPC(item.first);
-        item.second(nextId_, "add");
+        item.second(deviceId, "add");
     }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-    NotifyDevCallback(nextId_, info);
-    ++nextId_;
+    NotifyDevCallback(deviceId, info);
+
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (IsKeyboardDevice(inputDevice)) {
         InputDevCooSM->OnKeyboardOnline(info.dhid);
@@ -411,7 +432,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    DfxHisysevent::OnDeviceConnect(nextId_ - 1, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
+    DfxHisysevent::OnDeviceConnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
 }
 
 void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info)
