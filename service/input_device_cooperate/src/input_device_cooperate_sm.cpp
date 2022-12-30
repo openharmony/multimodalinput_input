@@ -50,16 +50,31 @@ constexpr int32_t MOUSE_ABS_LOCATION_Y = 50;
 InputDeviceCooperateSM::InputDeviceCooperateSM() {}
 InputDeviceCooperateSM::~InputDeviceCooperateSM() {}
 
-void InputDeviceCooperateSM::Init(DelegateTasksCallback delegateTasksCallback)
+void InputDeviceCooperateSM::Init(DelegateTasksCallback delegateTasksCallback, UDSServer &udsServer)
 {
+    CALL_INFO_TRACE;
     CHKPL(delegateTasksCallback);
     delegateTasksCallback_ = delegateTasksCallback;
     preparedNetworkId_ = std::make_pair("", "");
+    udsServer.AddSessionDeletedCallback(std::bind(
+        &InputDeviceCooperateSM::OnSessionLost, this, std::placeholders::_1));
     currentStateSM_ = std::make_shared<InputDeviceCooperateStateFree>();
     DevCooperateSoftbusAdapter->Init();
     TimerMgr->AddTimer(INTERVAL_MS, 1, [this]() {
         this->InitDeviceManager();
     });
+}
+
+void InputDeviceCooperateSM::OnSessionLost(SessionPtr session)
+{
+    CALL_INFO_TRACE;
+    CHKPV(session);
+    int32_t pid = session->GetPid();
+    MMI_HILOGD("pid:%{public}d, pid_:%{public}d", pid, pid_);
+    if (pid == pid_) {
+        isEnable_ = false;
+        pid_ = -1;
+    }
 }
 
 void InputDeviceCooperateSM::Reset(const std::string &networkId)
@@ -149,7 +164,12 @@ void InputDeviceCooperateSM::GetCooperateState(const std::string &deviceId)
     CooperateEventMgr->OnGetState(state);
 }
 
-void InputDeviceCooperateSM::EnableInputDeviceCooperate(bool enabled)
+bool InputDeviceCooperateSM::GetCooperateEnableState() const
+{
+    return isEnable_;
+}
+
+void InputDeviceCooperateSM::EnableInputDeviceCooperate(bool enabled, int32_t pid)
 {
     CALL_INFO_TRACE;
     if (enabled) {
@@ -161,6 +181,8 @@ void InputDeviceCooperateSM::EnableInputDeviceCooperate(bool enabled)
         std::string localNetworkId = GetLocalDeviceId();
         OnCloseCooperation(localNetworkId, true);
     }
+    isEnable_ = enabled;
+    pid_ = pid;
 }
 
 int32_t InputDeviceCooperateSM::StartInputDeviceCooperate(
