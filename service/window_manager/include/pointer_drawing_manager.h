@@ -53,8 +53,8 @@ public:
     bool Init() override;
     void DeletePointerVisible(int32_t pid) override;
     int32_t SetPointerVisible(int32_t pid, bool visible) override;
-    int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle) override;
-    int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle) override;
+    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle) override;
+    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) override;
     void DrawPointerStyle() override;
     bool IsPointerVisible() override;
     void SetPointerLocation(int32_t pid, int32_t x, int32_t y) override;
@@ -85,7 +85,7 @@ private:
     bool hasPointerDevice_ { false };
     int32_t lastPhysicalX_ { -1 };
     int32_t lastPhysicalY_ { -1 };
-    int32_t lastMouseStyle_ { 0 };
+    PointerStyle lastMouseStyle_ {};
     int32_t pid_ { 0 };
     int32_t windowId_ { 0 };
     int32_t imageWidth_ { 0 };

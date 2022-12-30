@@ -154,13 +154,13 @@ int32_t MultimodalInputConnectManager::GetPointerSpeed(int32_t &speed)
     return multimodalInputConnectService_->GetPointerSpeed(speed);
 }
 
-int32_t MultimodalInputConnectManager::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
+int32_t MultimodalInputConnectManager::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->SetPointerStyle(windowId, pointerStyle);
 }
 
-int32_t MultimodalInputConnectManager::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
+int32_t MultimodalInputConnectManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
     return multimodalInputConnectService_->GetPointerStyle(windowId, pointerStyle);

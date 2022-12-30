@@ -204,12 +204,12 @@ void InputManager::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
     InputMgrImpl.SetAnrObserver(observer);
 }
 
-int32_t InputManager::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
+int32_t InputManager::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle)
 {
     return InputMgrImpl.SetPointerStyle(windowId, pointerStyle);
 }
 
-int32_t InputManager::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
+int32_t InputManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
 {
     return InputMgrImpl.GetPointerStyle(windowId, pointerStyle);
 }
