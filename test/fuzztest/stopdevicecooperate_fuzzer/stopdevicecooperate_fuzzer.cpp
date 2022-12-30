@@ -15,7 +15,7 @@
 
 #include "stopdevicecooperate_fuzzer.h"
 
-#include "input_manager.h"
+#include "input_manager_impl.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -30,7 +30,7 @@ void StopDeviceCooperateFuzzTest(size_t  size)
         MMI_HILOGD("StopDeviceCooperateFuzzTest");
     };
 
-    InputManager::GetInstance()->StopDeviceCooperate(fun);
+    InputMgrImpl.StopDeviceCooperate(fun);
 }
 } // MMI
 } // OHOS
