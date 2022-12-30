@@ -101,7 +101,7 @@ public:
 
     int32_t SetPointerVisible(bool visible);
     bool IsPointerVisible();
-    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle);
+    int32_t SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle);
     int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle);
 
     int32_t SetPointerSpeed(int32_t speed);
