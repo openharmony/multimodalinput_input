@@ -499,7 +499,8 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
     }
 
     if (!WinMgr->IsNeedRefreshLayer(windowId)) {
-        MMI_HILOGD("Not need refresh layer, window type:%{public}d, pointer style:%{public}d", windowId, pointerStyle.id);
+        MMI_HILOGD("Not need refresh layer, window type:%{public}d, pointer style:%{public}d",
+            windowId, pointerStyle.id);
         return RET_OK;
     }
 
