@@ -279,7 +279,7 @@ int32_t MultimodalInputConnectProxy::GetPointerSpeed(int32_t &speed)
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
+int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -289,7 +289,11 @@ int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, int32_t p
     }
 
     WRITEINT32(data, windowId, RET_ERR);
-    WRITEINT32(data, pointerStyle, RET_ERR);
+    WRITEINT32(data, pointerStyle.size, RET_ERR);
+    WRITEUINT8(data, pointerStyle.color.r, RET_ERR);
+    WRITEUINT8(data, pointerStyle.color.g, RET_ERR);
+    WRITEUINT8(data, pointerStyle.color.b, RET_ERR);
+    WRITEINT32(data, pointerStyle.id, RET_ERR);
 
     MessageParcel reply;
     MessageOption option;
@@ -303,7 +307,7 @@ int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, int32_t p
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
+int32_t MultimodalInputConnectProxy::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -321,7 +325,11 @@ int32_t MultimodalInputConnectProxy::GetPointerStyle(int32_t windowId, int32_t &
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
         return ret;
     }
-    READINT32(reply, pointerStyle, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(reply, pointerStyle.size, IPC_PROXY_DEAD_OBJECT_ERR);
+    READUINT8(reply, pointerStyle.color.r, IPC_PROXY_DEAD_OBJECT_ERR);
+    READUINT8(reply, pointerStyle.color.g, IPC_PROXY_DEAD_OBJECT_ERR);
+    READUINT8(reply, pointerStyle.color.b, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(reply, pointerStyle.id, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
 }
 

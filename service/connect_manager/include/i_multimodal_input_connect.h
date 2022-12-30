@@ -26,6 +26,7 @@
 #include "key_event.h"
 #include "key_option.h"
 #include "pointer_event.h"
+#include "pointer_style.h"
 #include "system_ability_definition.h"
 #include "window_info.h"
 
@@ -93,8 +94,8 @@ public:
     virtual int32_t MarkProcessed(int32_t eventType, int32_t eventId) = 0;
     virtual int32_t SetPointerSpeed(int32_t speed) = 0;
     virtual int32_t GetPointerSpeed(int32_t &speed) = 0;
-    virtual int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle) = 0;
-    virtual int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle) = 0;
+    virtual int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle) = 0;
+    virtual int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle) = 0;
     virtual int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke) = 0;
     virtual int32_t GetDeviceIds(std::vector<int32_t> &ids) = 0;
     virtual int32_t GetDevice(int32_t deviceId, std::shared_ptr<InputDevice> &inputDevice) = 0;

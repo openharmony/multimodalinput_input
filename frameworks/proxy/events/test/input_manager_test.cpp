@@ -3576,10 +3576,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointerStyle_001, TestSize.Level1
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
     uint32_t windowId = window->GetWindowId();
-    int32_t pointerStyle;
-    if (InputManager::GetInstance()->SetPointerStyle(windowId, MOUSE_ICON::CROSS) == RET_OK) {
+    PointerStyle pointerStyle;
+    pointerStyle.id = MOUSE_ICON::CROSS;
+    if (InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle) == RET_OK) {
         ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
-        ASSERT_EQ(pointerStyle, MOUSE_ICON::CROSS);
+        ASSERT_EQ(pointerStyle.id, MOUSE_ICON::CROSS);
     }
 }
 

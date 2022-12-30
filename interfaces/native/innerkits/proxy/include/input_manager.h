@@ -33,6 +33,7 @@
 #include "i_input_event_filter.h"
 #include "input_device.h"
 #include "key_option.h"
+#include "pointer_style.h"
 #include "window_info.h"
 
 namespace OHOS {
@@ -271,7 +272,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns an error code otherwise.
      * @since 9
      */
-    int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle);
+    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle);
 
     /**
      * @brief Obtains the mouse pointer style.
@@ -280,7 +281,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns an error code otherwise.
      * @since 9
      */
-    int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle);
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle);
 
     /**
      * @brief Sets the mouse pointer speed, which ranges from 1 to 11.

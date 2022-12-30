@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "pointer_style.h"
 #include "window_info.h"
 #include "struct_multimodal.h"
 
@@ -43,11 +44,11 @@ public:
     {
         return 0;
     }
-    virtual int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle)
+    virtual int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
     {
         return 0;
     }
-    virtual int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle)
+    virtual int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle)
     {
         return 0;
     }

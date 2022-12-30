@@ -117,8 +117,8 @@ void PointerStyleFuzzTest(const uint8_t* data, size_t size)
     size_t startPos = 0;
     startPos += GetObject<int32_t>(data + startPos, size - startPos, windowId);
     UpdateDisplayInfo(data, size, windowId);
-    int32_t pointerStyle;
-    GetObject<int32_t>(data + startPos, size - startPos, pointerStyle);
+    PointerStyle pointerStyle;
+    GetObject<int32_t>(data + startPos, size - startPos, pointerStyle.id);
     InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle);
     InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle);
 }

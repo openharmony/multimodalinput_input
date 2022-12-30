@@ -713,7 +713,7 @@ void InputWindowsManager::OnSessionLost(SessionPtr session)
     }
 }
 
-int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle)
+int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
     auto it = pointerStyle_.find(pid);
@@ -729,11 +729,11 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, int3
     }
     
     iter->second = pointerStyle;
-    MMI_HILOGD("Window id:%{public}d set pointer style:%{public}d success", windowId, pointerStyle);
+    MMI_HILOGD("Window id:%{public}d set pointer style:%{public}d success", windowId, pointerStyle.id);
     return RET_OK;
 }
 
-int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle) const
+int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) const
 {
     CALL_DEBUG_ENTER;
     auto it = pointerStyle_.find(pid);
@@ -745,11 +745,11 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, int3
     auto iter = it->second.find(windowId);
     if (iter == it->second.end()) {
         MMI_HILOGW("The window id is invalid");
-        pointerStyle = DEFAULT_POINTER_STYLE;
+        pointerStyle.id = DEFAULT_POINTER_STYLE;
         return RET_OK;
     }
     
-    MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, iter->second);
+    MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, iter->second.id);
     pointerStyle = iter->second;
     return RET_OK;
 }
@@ -757,11 +757,13 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, int3
 void InputWindowsManager::UpdatePointerStyle()
 {
     CALL_DEBUG_ENTER;
+    PointerStyle pointerStyle;
+    pointerStyle.id = DEFAULT_POINTER_STYLE;
     for (const auto& windowItem : displayGroupInfo_.windowsInfo) {
         int32_t pid = windowItem.pid;
         auto it = pointerStyle_.find(pid);
         if (it == pointerStyle_.end()) {
-            std::map<int32_t, int32_t> tmpPointerStyle = { { windowItem.id, DEFAULT_POINTER_STYLE } };
+            std::map<int32_t, PointerStyle> tmpPointerStyle = { { windowItem.id, pointerStyle } };
             auto iter = pointerStyle_.insert(std::make_pair(pid, tmpPointerStyle));
             if (!iter.second) {
                 MMI_HILOGW("The pd is duplicated");
@@ -775,7 +777,8 @@ void InputWindowsManager::UpdatePointerStyle()
                 MMI_HILOGD("The window count:%{public}zu exceeds limit in same pd", it->second.size());
                 it->second.erase(it->second.begin());
             }
-            auto iter = it->second.insert(std::make_pair(windowItem.id, DEFAULT_POINTER_STYLE));
+
+            auto iter = it->second.insert(std::make_pair(windowItem.id, pointerStyle));
             if (!iter.second) {
                 MMI_HILOGW("The window type is duplicated");
             }
@@ -982,8 +985,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
         MMI_HILOGD("mouse event send cancel, window:%{public}d", touchWindow->id);
     }
-    int32_t mouseStyle = -1;
-    int32_t ret = GetPointerStyle(touchWindow->pid, touchWindow->id, mouseStyle);
+    PointerStyle pointerStyle;
+    int32_t ret = GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
         return ret;
@@ -996,7 +999,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
     IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
-        pointerItem.GetDisplayY(), MOUSE_ICON(mouseStyle));
+        pointerItem.GetDisplayY(), MOUSE_ICON(pointerStyle.id));
     if (captureModeInfo_.isCaptureMode && (touchWindow->id != captureModeInfo_.windowId)) {
         captureModeInfo_.isCaptureMode = false;
     }

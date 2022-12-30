@@ -39,6 +39,7 @@
 #include "i_anr_observer.h"
 #include "key_option.h"
 #include "pointer_event.h"
+#include "pointer_style.h"
 
 namespace OHOS {
 namespace MMI {
@@ -101,8 +102,8 @@ public:
 
     int32_t SetPointerVisible(bool visible);
     bool IsPointerVisible();
-    int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle);
-    int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle);
+    int32_t SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle);
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle);
 
     int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed(int32_t &speed);

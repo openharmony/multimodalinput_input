@@ -28,6 +28,7 @@
 #include "input_event_data_transformation.h"
 #include "input_event.h"
 #include "pointer_event.h"
+#include "pointer_style.h"
 #include "uds_server.h"
 
 namespace OHOS {
@@ -73,8 +74,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     const DisplayGroupInfo& GetDisplayGroupInfo();
-    int32_t SetPointerStyle(int32_t pid, int32_t windowId, int32_t pointerStyle);
-    int32_t GetPointerStyle(int32_t pid, int32_t windowId, int32_t &pointerStyle) const;
+    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle);
+    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) const;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool IsNeedRefreshLayer(int32_t windowId);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -147,7 +148,7 @@ private:
     int32_t lastLogicY_ { -1 };
     WindowInfo lastWindowInfo_;
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
-    std::map<int32_t, std::map<int32_t, int32_t>> pointerStyle_;
+    std::map<int32_t, std::map<int32_t, PointerStyle>> pointerStyle_;
     WindowInfo mouseDownInfo_;
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
