@@ -79,7 +79,7 @@ private:
             "RzAbsValue:%{public}.2f,GasAbsValue:%{public}.2f,BrakeAbsValue:%{public}.2f,"
             "Hat0xAbsValue:%{public}.2f,Hat0yAbsValue:%{public}.2f,ThrottleAbsValue:%{public}.2f,"
             "PointerId:%{public}d,PointerCount:%{public}zu,EventNumber:%{public}d,"
-            "BufferCount:%{public}d,Buffer:%{public}s",
+            "BufferCount:%{public}zu,Buffer:%{public}s",
             InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
             event->GetAction(), event->GetActionStartTime(), event->GetFlag(),
             event->DumpPointerAction(), event->DumpSourceType(), event->GetButtonId(),
