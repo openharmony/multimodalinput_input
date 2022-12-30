@@ -643,7 +643,7 @@ int32_t InputManagerImpl::GetPointerSpeed(int32_t &speed)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle)
+int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle)
 {
     CALL_DEBUG_ENTER;
     if (windowId < 0 || pointerStyle.id < 0) {
