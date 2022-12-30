@@ -1031,7 +1031,7 @@ void InputManagerImpl::AppendExtraData(const ExtraData& extraData)
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (extraData.buffer.size() > ExtraData::MAX_BUFFER_SIZE) {
-        MMI_HILOGE("Append extra data failed, buffer is oversize:%{public}d", extraData.buffer.size());
+        MMI_HILOGE("Append extra data failed, buffer is oversize:%{public}zu", extraData.buffer.size());
         return;
     }
     int32_t ret = MultimodalInputConnMgr->AppendExtraData(extraData);
