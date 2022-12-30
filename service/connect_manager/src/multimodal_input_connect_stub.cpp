@@ -92,6 +92,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::SET_POINTER_LOCATION, &MultimodalInputConnectStub::StubSetPointerLocation},
         {IMultimodalInputConnect::SET_CAPTURE_MODE, &MultimodalInputConnectStub::StubSetMouseCaptureMode},
         {IMultimodalInputConnect::GET_WINDOW_PID, &MultimodalInputConnectStub::StubGetWindowPid},
+        {IMultimodalInputConnect::APPEND_EXTRA_DATA, &MultimodalInputConnectStub::StubAppendExtraData},
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -943,6 +944,34 @@ int32_t MultimodalInputConnectStub::StubGetWindowPid(MessageParcel& data, Messag
     }
     WRITEINT32(reply, ret, ERR_INVALID_VALUE);
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    ExtraData extraData;
+    READBOOL(data, extraData.appended, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t size = 0;
+    READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (size > ExtraData::MAX_BUFFER_SIZE) {
+        MMI_HILOGE("Append extra data failed, buffer is oversize:%{public}d", size);
+        return ERROR_OVER_SIZE_BUFFER;
+    }
+    uint8_t buffer = 0;
+    for (int32_t i = 0; i < size; ++i) {
+        READUINT8(data, buffer, IPC_PROXY_DEAD_OBJECT_ERR);
+        extraData.buffer.push_back(buffer);
+    }
+    READINT32(data, extraData.sourceType, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = AppendExtraData(extraData);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Fail to call AppendExtraData, ret:%{public}d", ret);
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS

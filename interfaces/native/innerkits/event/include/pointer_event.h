@@ -1257,6 +1257,29 @@ public:
      * @since 9
      */
     bool IsValid() const;
+
+    /**
+     * @brief 设置buffer值.
+     * @param buffer 表示该事件所携带的buffer值.
+     * @return void.
+     * @since 9
+     */
+    void SetBuffer(std::vector<uint8_t> buffer);
+
+    /**
+     * @brief 清空buffer值.
+     * @param void.
+     * @return void.
+     * @since 9
+     */
+    void ClearBuffer();
+
+    /**
+     * @brief 获取buffer值.
+     * @return Returns buffer.
+     * @since 9
+     */
+    std::vector<uint8_t> GetBuffer() const;
 public:
     /**
      * @brief Checks whether the axes set represented by <b>axes</b> contains a specified type of axis.
@@ -1308,6 +1331,7 @@ private:
     uint32_t axes_ { 0U };
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
     std::vector<int32_t> pressedKeys_;
+    std::vector<uint8_t> buffer_;
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const

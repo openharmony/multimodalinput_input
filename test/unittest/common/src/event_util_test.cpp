@@ -188,6 +188,11 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& p
     const int precision = 2;
     std::ostringstream ostream;
     std::vector<int32_t> pointerIds { pointerEvent->GetPointerIds() };
+    std::string str;
+    std::vector<uint8_t> buffer = pointerEvent->GetBuffer();
+    for (const auto& buff : buffer) {
+        str += std::to_string(buff);
+    }
     ostream << "ClientMsgHandler: in OnPointerEvent"
          << ",EventType:" << pointerEvent->GetEventType()
          << ",ActionTime:" << pointerEvent->GetActionTime()
@@ -201,7 +206,9 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& p
          << ",VerticalAxisValue:" << std::fixed << std::setprecision(precision)
          << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL)
          << ",HorizontalAxisValue:" << std::fixed << std::setprecision(precision)
-         << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL);
+         << pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL)
+         <<",BufferCount:" << buffer.size()
+         <<",Buffer:" << str.c_str();
     for (const auto &pointerId : pointerIds) {
         PointerEvent::PointerItem item;
         if (!pointerEvent->GetPointerItem(pointerId, item)) {
@@ -222,6 +229,7 @@ std::string EventUtilTest::DumpInputEvent(const std::shared_ptr<PointerEvent>& p
             << ",DeviceId:" << item.GetDeviceId() << ",RawDx:" << item.GetRawDx()
             << ",RawDy:" << item.GetRawDy();
     }
+
     return ostream.str();
 }
 

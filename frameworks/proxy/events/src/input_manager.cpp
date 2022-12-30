@@ -243,5 +243,10 @@ int32_t InputManager::LeaveCaptureMode(int32_t windowId)
 {
     return InputMgrImpl.LeaveCaptureMode(windowId);
 }
+
+void InputManager::AppendExtraData(const ExtraData& extraData)
+{
+    InputMgrImpl.AppendExtraData(extraData);
+}
 } // namespace MMI
 } // namespace OHOS

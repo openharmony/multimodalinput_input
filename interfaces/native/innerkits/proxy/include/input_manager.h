@@ -25,6 +25,7 @@
 
 #include "cooperation_message.h"
 #include "error_multimodal.h"
+#include "extra_data.h"
 #include "i_anr_observer.h"
 #include "i_input_device_cooperate_listener.h"
 #include "i_input_device_listener.h"
@@ -369,6 +370,14 @@ public:
     int32_t LeaveCaptureMode(int32_t windowId);
 
     int32_t GetWindowPid(int32_t windowId);
+
+    /**
+     * @brief pointer event添加辅助信息
+     * @param extraData 添加的信息.
+     * @return void
+     * @since 9
+     */
+    void AppendExtraData(const ExtraData& extraData);
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

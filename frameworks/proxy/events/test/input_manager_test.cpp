@@ -4167,5 +4167,60 @@ HWTEST_F(InputManagerTest, InputManagerTest_InterceptTabletToolEvent_001, TestSi
     }
 }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+HWTEST_F(InputManagerTest, AppendExtraData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = GetPtr<InputEventConsumer>();
+    ASSERT_TRUE(consumer != nullptr);
+    const std::string threadTest = "EventUtilTest";
+    auto runner = AppExecFwk::EventRunner::Create(threadTest);
+    ASSERT_TRUE(runner != nullptr);
+    auto eventHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
+    MMI::InputManager::GetInstance()->SetWindowInputEventConsumer(consumer, eventHandler);
+    std::vector<uint8_t> buffer(512, 1);
+    ExtraData extraData;
+    extraData.appended = true;
+    extraData.buffer = buffer;
+    extraData.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    InputManager::GetInstance()->AppendExtraData(extraData);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    auto pointerEvent = SetupPointerEvent001();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
+
+    extraData.appended = false;
+    extraData.buffer.clear();
+    InputManager::GetInstance()->AppendExtraData(extraData);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+HWTEST_F(InputManagerTest, AppendExtraData_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<uint8_t> buffer(512, 1);
+    ExtraData extraData;
+    extraData.appended = true;
+    extraData.buffer = buffer;
+    extraData.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    InputManager::GetInstance()->AppendExtraData(extraData);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    auto pointerEvent = SetupPointerEvent006();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
+
+    extraData.appended = false;
+    extraData.buffer.clear();
+    InputManager::GetInstance()->AppendExtraData(extraData);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent);
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
 } // namespace MMI
 } // namespace OHOS
