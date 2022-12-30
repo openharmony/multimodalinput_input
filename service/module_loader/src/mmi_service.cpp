@@ -500,7 +500,7 @@ int32_t MMIService::GetPointerSpeed(int32_t &speed)
     return RET_OK;
 }
 
-int32_t MMIService::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
+int32_t MMIService::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -514,7 +514,7 @@ int32_t MMIService::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
     return RET_OK;
 }
 
-int32_t MMIService::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
+int32_t MMIService::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER

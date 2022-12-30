@@ -27,6 +27,7 @@
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "input_manager.h"
+#include "pointer_style.h"
 #include "stream_buffer.h"
 #include "util_napi.h"
 #include "util_napi_error.h"

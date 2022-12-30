@@ -643,10 +643,10 @@ int32_t InputManagerImpl::GetPointerSpeed(int32_t &speed)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, int32_t pointerStyle)
+int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, const PointerStyle& pointerStyle)
 {
     CALL_DEBUG_ENTER;
-    if (windowId < 0 || pointerStyle < 0) {
+    if (windowId < 0 || pointerStyle.id < 0) {
         MMI_HILOGE("The param is invalid");
         return RET_ERR;
     }
@@ -658,7 +658,7 @@ int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, int32_t pointerStyle
     return RET_OK;
 }
 
-int32_t InputManagerImpl::GetPointerStyle(int32_t windowId, int32_t &pointerStyle)
+int32_t InputManagerImpl::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
 {
     CALL_DEBUG_ENTER;
     if (windowId < 0) {

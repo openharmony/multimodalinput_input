@@ -266,14 +266,18 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
     CALL_DEBUG_ENTER;
     int32_t windowId;
     READINT32(data, windowId, RET_ERR);
-    int32_t pointerStyle;
-    READINT32(data, pointerStyle, RET_ERR);
+    PointerStyle pointerStyle;
+    READINT32(data, pointerStyle.size, RET_ERR);
+    READUINT8(data, pointerStyle.color.r, RET_ERR);
+    READUINT8(data, pointerStyle.color.g, RET_ERR);
+    READUINT8(data, pointerStyle.color.b, RET_ERR);
+    READINT32(data, pointerStyle.id, RET_ERR);
     int32_t ret = SetPointerStyle(windowId, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetPointerStyle failed ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("Successfully set window:%{public}d, icon:%{public}d", windowId, pointerStyle);
+    MMI_HILOGD("Successfully set window:%{public}d, icon:%{public}d", windowId, pointerStyle.id);
     return RET_OK;
 }
 
@@ -282,14 +286,18 @@ int32_t MultimodalInputConnectStub::StubGetPointerStyle(MessageParcel& data, Mes
     CALL_DEBUG_ENTER;
     int32_t windowId;
     READINT32(data, windowId, RET_ERR);
-    int32_t pointerStyle;
+    PointerStyle pointerStyle;
     int32_t ret = GetPointerStyle(windowId, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetPointerStyle failed ret:%{public}d", ret);
         return ret;
     }
-    WRITEINT32(reply, pointerStyle, RET_ERR);
-    MMI_HILOGD("Successfully get window:%{public}d, icon:%{public}d", windowId, pointerStyle);
+    WRITEINT32(reply, pointerStyle.size, RET_ERR);
+    WRITEUINT8(reply, pointerStyle.color.r, RET_ERR);
+    WRITEUINT8(reply, pointerStyle.color.g, RET_ERR);
+    WRITEUINT8(reply, pointerStyle.color.b, RET_ERR);
+    WRITEINT32(reply, pointerStyle.id, RET_ERR);
+    MMI_HILOGD("Successfully get window:%{public}d, icon:%{public}d", windowId, pointerStyle.id);
     return RET_OK;
 }
 
