@@ -50,6 +50,15 @@ int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevLi
     }
     auto &listeners = iter->second;
 
+    if (!isListeningProcess_) {
+        MMI_HILOGI("Start monitoring");
+        isListeningProcess_ = true;
+        int32_t ret = MultimodalInputConnMgr->RegisterDevListener();
+        if (ret != RET_OK) {
+            MMI_HILOGE("Failed to register");
+            return ret;
+        }
+    }
     if (std::all_of(listeners.cbegin(), listeners.cend(),
                     [listener](InputDevListenerPtr tListener) {
                         return (tListener != listener);
@@ -58,11 +67,6 @@ int32_t InputDeviceImpl::RegisterDevListener(const std::string &type, InputDevLi
         listeners.push_back(listener);
     } else {
         MMI_HILOGW("The listener already exists");
-    }
-    if (!isListeningProcess_) {
-        MMI_HILOGI("Start monitoring");
-        isListeningProcess_ = true;
-        return MultimodalInputConnMgr->RegisterDevListener();
     }
     return RET_OK;
 }
