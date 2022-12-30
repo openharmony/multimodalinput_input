@@ -223,7 +223,9 @@ napi_value JsPointerManager::SetPointerStyle(napi_env env, int32_t windowid, int
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     CHKPP(asyncContext);
-    asyncContext->errorCode = InputManager::GetInstance()->SetPointerStyle(windowid, pointerStyle);
+    PointerStyle style;
+    style.id = pointerStyle;
+    asyncContext->errorCode = InputManager::GetInstance()->SetPointerStyle(windowid, style);
     asyncContext->reserve << ReturnType::VOID;
 
     napi_value promise = nullptr;
@@ -242,9 +244,9 @@ napi_value JsPointerManager::GetPointerStyle(napi_env env, int32_t windowid, nap
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     CHKPP(asyncContext);
-    int32_t pointerStyle = 0;
+    PointerStyle pointerStyle;
     asyncContext->errorCode = InputManager::GetInstance()->GetPointerStyle(windowid, pointerStyle);
-    asyncContext->reserve << ReturnType::NUMBER << pointerStyle;
+    asyncContext->reserve << ReturnType::NUMBER << pointerStyle.id;
     napi_value promise = nullptr;
     if (handle != nullptr) {
         CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);

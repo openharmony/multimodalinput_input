@@ -32,6 +32,7 @@
 #include "i_input_event_filter.h"
 #include "input_device.h"
 #include "key_option.h"
+#include "pointer_style.h"
 #include "window_info.h"
 
 namespace OHOS {
@@ -270,7 +271,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns an error code otherwise.
      * @since 9
      */
-    int32_t SetPointerStyle(int32_t windowId, int32_t pointerStyle);
+    int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle);
 
     /**
      * @brief Obtains the mouse pointer style.
@@ -279,7 +280,7 @@ public:
      * @return Returns <b>0</b> if the operation is successful; returns an error code otherwise.
      * @since 9
      */
-    int32_t GetPointerStyle(int32_t windowId, int32_t &pointerStyle);
+    int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle);
 
     /**
      * @brief Sets the mouse pointer speed, which ranges from 1 to 11.
@@ -321,6 +322,59 @@ public:
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      */
     int32_t SetInputDevice(const std::string &dhid, const std::string &screenId);
+
+    /**
+     * @brief Registers a listener for screen hopping events of the mouse pointer.
+     * @param listener Indicates the listener for screen hopping events of the mouse pointer.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener);
+
+    /**
+     * @brief Unregisters the listener for screen hopping events of the mouse pointer.
+     * @param listener Indicates the listener for screen hopping events of the mouse pointer.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener = nullptr);
+
+    /**
+     * @brief Enables or disables screen hopping for the mouse pointer.
+     * @param enabled Indicates whether to enable or disable screen hopping for the mouse pointer.
+     * @param callback Indicates the callback used to receive the result of enabling or disabling screen hopping.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t EnableInputDeviceCooperate(bool enabled, std::function<void(std::string, CooperationMessage)> callback);
+
+    /**
+     * @brief Starts screen hopping for the mouse pointer.
+     * @param sinkDeviceId Indicates the descriptor of the target input device (network ID) for screen hopping.
+     * @param srcInputDeviceId Indicates the ID of the source input device (device ID handle) for screen hopping.
+     * @param callback Indicates the callback used to receive the result of starting screen hopping.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
+        std::function<void(std::string, CooperationMessage)> callback);
+
+    /**
+     * @brief Stops screen hopping for the mouse pointer.
+     * @param callback Indicates the callback used to receive the result of stopping screen hopping.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback);
+
+    /**
+     * @brief Obtains the screen hopping status of a mouse pointer.
+     * @param deviceId Indicates the descriptor of the input device.
+     * @param callback Indicates the callback used to receive the screen hopping status.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
 
     /**
      * @brief Obtains the enablement status of the specified function key on the keyboard.
@@ -376,4 +430,5 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
+#define InputMgr OHOS::MMI::InputManager::GetInstance()
 #endif // INPUT_MANAGER_H
