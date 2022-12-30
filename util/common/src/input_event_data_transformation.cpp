@@ -16,6 +16,7 @@
 #include "input_event_data_transformation.h"
 
 #include "define_multimodal.h"
+#include "extra_data.h"
 
 namespace OHOS {
 namespace MMI {
@@ -194,6 +195,15 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
     for (const auto &keyCode : pressedKeys) {
         pkt << keyCode;
     }
+    std::vector<uint8_t> buffer = event->GetBuffer();
+    if (buffer.size() > ExtraData::MAX_BUFFER_SIZE) {
+        MMI_HILOGE("buffer is oversize:%{public}d", buffer.size());
+        return RET_ERR;
+    }
+    pkt << buffer.size();
+    for (const auto &buf : buffer) {
+        pkt << buf;
+    }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Marshalling pointer event failed");
         return RET_ERR;
@@ -248,6 +258,20 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
         return RET_ERR;
     }
     event->SetPressedKeys(pressedKeys);
+    
+    std::vector<uint8_t> buffer;
+    std::vector<uint8_t>::size_type bufferSize;
+    pkt >> bufferSize;
+    uint8_t buff = 0;
+    while (bufferSize-- > 0) {
+        pkt >> buff;
+        buffer.push_back(buff);
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Unmarshalling pointer event failed");
+        return RET_ERR;
+    }
+    event->SetBuffer(buffer);
     return RET_OK;
 }
 

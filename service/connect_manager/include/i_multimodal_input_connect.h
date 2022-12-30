@@ -18,6 +18,7 @@
 
 #include "iremote_broker.h"
 
+#include "extra_data.h"
 #include "i_event_filter.h"
 #include "i_input_event_filter.h"
 #include "input_device.h"
@@ -72,6 +73,7 @@ public:
         SET_INPUT_DEVICE_TO_SCREEN = 50,
         SET_POINTER_LOCATION = 51,
         GET_WINDOW_PID = 52,
+        APPEND_EXTRA_DATA = 53,
     };
 
     enum {
@@ -125,6 +127,7 @@ public:
     virtual int32_t SetPointerLocation(int32_t x, int32_t y) = 0;
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) = 0;
     virtual int32_t GetWindowPid(int32_t windowId) = 0;
+    virtual int32_t AppendExtraData(const ExtraData& extraData) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

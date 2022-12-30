@@ -96,6 +96,8 @@ enum {
     DUMP_PARAM_ERR,
     // 过滤器增加失败
     ERROR_FILTER_ADD_FAIL,
+    // buffer过长失败
+    ERROR_OVER_SIZE_BUFFER,
 };
 
 enum {
