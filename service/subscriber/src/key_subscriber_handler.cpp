@@ -274,7 +274,6 @@ void KeySubscriberHandler::OnTimer(const std::shared_ptr<Subscriber> subscriber)
 {
     CALL_DEBUG_ENTER;
     CHKPV(subscriber);
-    hasEventExecuting_ = false;
     subscriber->timerId_ = -1;
     if (subscriber->keyEvent_ == nullptr) {
         MMI_HILOGE("Leave, subscriber->keyEvent is nullptr, subscribeId:%{public}d", subscriber->id_);
