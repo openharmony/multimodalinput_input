@@ -111,6 +111,9 @@ private:
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
+    void PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
+        const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
+    void DispatchTouch(int32_t pointerAction);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent);
@@ -140,6 +143,7 @@ private:
     void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void UpdateDisplayIdAndName();
+    void UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent);
 private:
     UDSServer* udsServer_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -150,6 +154,12 @@ private:
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
     std::map<int32_t, std::map<int32_t, PointerStyle>> pointerStyle_;
     WindowInfo mouseDownInfo_;
+#endif // OHOS_BUILD_ENABLE_POINTER
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    int32_t lastTouchLogicX_ { -1 };
+    int32_t lastTouchLogicY_ { -1 };
+    WindowInfo lastTouchWindowInfo_;
+    std::shared_ptr<PointerEvent> lastTouchEvent_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
     MouseLocation mouseLocation_ = { -1, -1 };
