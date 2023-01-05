@@ -17,6 +17,7 @@
 #include <cinttypes>
 #include <condition_variable>
 
+#include "anr_handler.h"
 #include "mmi_log.h"
 #include "proto.h"
 #include "util.h"
@@ -223,6 +224,7 @@ void MMIClient::OnDisconnected()
     MMI_HILOGI("Disconnected from server, fd:%{public}d", fd_);
     isConnected_ = false;
     isListening_ = false;
+    ANRHdl->ResetAnrArray();
     if (funDisconnected_) {
         funDisconnected_(*this);
     }
