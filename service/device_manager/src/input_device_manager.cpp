@@ -371,14 +371,18 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     CALL_DEBUG_ENTER;
     CHKPV(inputDevice);
     bool hasLocalPointer = false;
+    bool hasPointer = false;
     for (const auto &item : inputDevice_) {
         if (item.second.inputDeviceOrigin == inputDevice) {
             MMI_HILOGI("The device is already existent");
             DfxHisysevent::OnDeviceConnect(item.first, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
             return;
         }
-        if (!item.second.isRemote && item.second.isPointerDevice) {
-            hasLocalPointer = true;
+        if (item.second.isPointerDevice) {
+            hasPointer = true;
+            if (!item.second.isRemote) {
+                hasLocalPointer = true;
+            }
         }
     }
 
@@ -413,7 +417,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         InputDevCooSM->OnKeyboardOnline(info.dhid);
     }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-    if (info.isPointerDevice) {
+    if (!hasPointer && info.isPointerDevice) {
         bool visible = !info.isRemote || hasLocalPointer;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
         if (HasTouchDevice()) {
