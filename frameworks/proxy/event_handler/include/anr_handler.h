@@ -31,6 +31,7 @@ public:
 
     void SetLastProcessedEventId(int32_t eventType, int32_t eventId, uint64_t actionTime);
     void MarkProcessed(int32_t eventType);
+    void ResetAnrArray();
     std::mutex anrMtx_;
 
 private:
