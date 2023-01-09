@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-#include "error_multimodal.h"
 #include "injection_event_dispatch.h"
+
+#include "error_multimodal.h"
 #include "mmi_log.h"
 
 namespace {
@@ -23,6 +24,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOM
 
 int32_t main(int32_t argc, char* argv[])
 {
+    using namespace OHOS::MMI;
     do {
         SetThreadName("main");
         InjectionToolsHelpFunc helpFunc;

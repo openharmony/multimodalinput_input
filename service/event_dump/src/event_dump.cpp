@@ -27,9 +27,6 @@
 
 #include "event_interceptor_handler.h"
 #include "event_monitor_handler.h"
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-#include "input_device_cooperate_sm.h"
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "input_device_manager.h"
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
@@ -88,9 +85,6 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         { "interceptor", no_argument, 0, 'i' },
         { "filter", no_argument, 0, 'f' },
         { "mouse", no_argument, 0, 'm' },
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-        { "inputdevcoosm", no_argument, 0, 'k' },
-#endif // OHOS_BUILD_ENABLE_COOPERATE
         { NULL, 0, 0, 0 }
     };
     if (args.empty()) {
@@ -139,14 +133,6 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
                 auto udsServer = InputHandler->GetUDSServer();
                 CHKPV(udsServer);
                 udsServer->Dump(fd, args);
-                break;
-            }
-            case 'c': {
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-                InputDevCooSM->Dump(fd, args);
-#else
-                mprintf(fd, "Input device cooperate does not support");
-#endif // OHOS_BUILD_ENABLE_COOPERATE
                 break;
             }
             case 's': {
@@ -227,7 +213,6 @@ void EventDump::DumpHelp(int32_t fd)
     mprintf(fd, "      -i, --interceptor: dump the interceptor information\t");
     mprintf(fd, "      -f, --filter: dump the filter information\t");
     mprintf(fd, "      -m, --mouse: dump the mouse information\t");
-    mprintf(fd, "      -c, --dump Keyboard and mouse crossing information\t");
 }
 } // namespace MMI
 } // namespace OHOS
