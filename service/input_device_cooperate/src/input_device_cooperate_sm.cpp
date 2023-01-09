@@ -33,6 +33,7 @@
 #include "input_device_cooperate_util.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
+#include "key_auto_repeat.h"
 #include "mouse_event_normalize.h"
 #include "timer_manager.h"
 #include "util_ex.h"
@@ -296,6 +297,8 @@ void InputDeviceCooperateSM::StopRemoteCooperateResult(bool isSuccess)
     if (isSuccess) {
         Reset(true);
     }
+    KeyRepeat->RemoveTimer();
+    MMI_HILOGD("Remove key auto repeat timer");
     isStopping_ = false;
 }
 
@@ -331,6 +334,8 @@ void InputDeviceCooperateSM::OnStartFinish(bool isSuccess,
                 DevCooperateSoftbusAdapter->StartCooperateOtherResult(sink, remoteNetworkId);
             }
             UpdateState(CooperateState::STATE_FREE);
+            MMI_HILOGD("Remove key auto repeat timer");
+            KeyRepeat->RemoveTimer();
         } else {
             MMI_HILOGI("Current state is out");
         }
