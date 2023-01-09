@@ -298,7 +298,6 @@ void InputDeviceCooperateSM::StopRemoteCooperateResult(bool isSuccess)
         Reset(true);
     }
     KeyRepeat->RemoveTimer();
-    MMI_HILOGD("Remove key auto repeat timer");
     isStopping_ = false;
 }
 
@@ -334,7 +333,6 @@ void InputDeviceCooperateSM::OnStartFinish(bool isSuccess,
                 DevCooperateSoftbusAdapter->StartCooperateOtherResult(sink, remoteNetworkId);
             }
             UpdateState(CooperateState::STATE_FREE);
-            MMI_HILOGD("Remove key auto repeat timer");
             KeyRepeat->RemoveTimer();
         } else {
             MMI_HILOGI("Current state is out");
