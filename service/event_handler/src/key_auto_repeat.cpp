@@ -152,5 +152,11 @@ void KeyAutoRepeat::RemoveDeviceConfig(struct libinput_device *device)
     }
     deviceConfig_.erase(iter);
 }
+
+void KeyAutoRepeat::RemoveTimer()
+{
+    CALL_DEBUG_ENTER;
+    TimerMgr->RemoveTimer(timerId_);
+}
 } // namespace MMI
 } // namespace OHOS
