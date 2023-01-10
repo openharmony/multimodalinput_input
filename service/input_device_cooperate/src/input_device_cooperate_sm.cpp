@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "input_device_cooperate_sm.h"
 
 #include <cstdio>
@@ -22,8 +23,8 @@
 #include "bytrace_adapter.h"
 #include "cooperate_event_manager.h"
 #include "cooperation_message.h"
-#include "device_cooperate_softbus_adapter.h"
 #include "define_multimodal.h"
+#include "device_cooperate_softbus_adapter.h"
 #include "device_profile_adapter.h"
 #include "i_pointer_drawing_manager.h"
 #include "input_device_cooperate_state_free.h"
@@ -31,6 +32,7 @@
 #include "input_device_cooperate_state_out.h"
 #include "input_device_cooperate_util.h"
 #include "input_device_manager.h"
+#include "key_auto_repeat.h"
 #include "mouse_event_normalize.h"
 #include "timer_manager.h"
 #include "util_ex.h"
@@ -38,7 +40,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceCooperateSM"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputDeviceCooperateSM" };
 constexpr int32_t INTERVAL_MS = 2000;
 constexpr int32_t MOUSE_ABS_LOCATION = 100;
 constexpr int32_t MOUSE_ABS_LOCATION_X = 50;
@@ -272,6 +274,7 @@ void InputDeviceCooperateSM::StopRemoteCooperateResult(bool isSuccess)
     if (isSuccess) {
         Reset(true);
     }
+    KeyRepeat->RemoveTimer();
     isStopping_ = false;
 }
 
@@ -298,7 +301,7 @@ void InputDeviceCooperateSM::OnStartFinish(bool isSuccess,
         NotifyRemoteStartFail(remoteNetworkId);
     } else {
         startDhid_ = InputDevMgr->GetDhid(startInputDeviceId);
-        NotifyRemoteStartSucess(remoteNetworkId, startDhid_);
+        NotifyRemoteStartSuccess(remoteNetworkId, startDhid_);
         if (cooperateState_ == CooperateState::STATE_FREE) {
             UpdateState(CooperateState::STATE_OUT);
         } else if (cooperateState_ == CooperateState::STATE_IN) {
@@ -307,6 +310,7 @@ void InputDeviceCooperateSM::OnStartFinish(bool isSuccess,
                 DevCooperateSoftbusAdapter->StartCooperateOtherResult(sink, remoteNetworkId);
             }
             UpdateState(CooperateState::STATE_FREE);
+            KeyRepeat->RemoveTimer();
         } else {
             MMI_HILOGI("Current state is out");
         }
@@ -345,7 +349,7 @@ void InputDeviceCooperateSM::NotifyRemoteStartFail(const std::string &remoteNetw
     CooperateEventMgr->OnStart(CooperationMessage::INFO_FAIL);
 }
 
-void InputDeviceCooperateSM::NotifyRemoteStartSucess(const std::string &remoteNetworkId, const std::string& startDhid)
+void InputDeviceCooperateSM::NotifyRemoteStartSuccess(const std::string &remoteNetworkId, const std::string& startDhid)
 {
     CALL_DEBUG_ENTER;
     DevCooperateSoftbusAdapter->StartRemoteCooperateResult(remoteNetworkId,
@@ -368,7 +372,7 @@ bool InputDeviceCooperateSM::UpdateMouseLocation()
 {
     CALL_DEBUG_ENTER;
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
-    CHKPR(pointerEvent, false);
+    CHKPF(pointerEvent);
     int32_t displayId = pointerEvent->GetTargetDisplayId();
     auto displayGroupInfo =  WinMgr->GetDisplayGroupInfo();
     struct DisplayInfo physicalDisplayInfo;
@@ -381,7 +385,7 @@ bool InputDeviceCooperateSM::UpdateMouseLocation()
     int32_t displayWidth = physicalDisplayInfo.width;
     int32_t displayHeight = physicalDisplayInfo.height;
     if (displayWidth == 0 || displayHeight == 0) {
-        MMI_HILOGE("diaplay width or height is 0");
+        MMI_HILOGE("display width or height is 0");
         return false;
     }
     auto mouseInfo = WinMgr->GetMouseInfo();
@@ -433,7 +437,6 @@ void InputDeviceCooperateSM::UpdatePreparedDevices(const std::string &srcNetwork
 std::pair<std::string, std::string> InputDeviceCooperateSM::GetPreparedDevices() const
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mutex_);
     return preparedNetworkId_;
 }
 
