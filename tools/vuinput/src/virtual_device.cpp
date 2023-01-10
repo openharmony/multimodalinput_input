@@ -15,6 +15,7 @@
 
 #include "virtual_device.h"
 
+#include <getopt.h>
 #include <sys/stat.h>
 
 #include "virtual_finger.h"
