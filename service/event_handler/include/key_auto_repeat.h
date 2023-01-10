@@ -38,6 +38,7 @@ public:
     void RemoveDeviceConfig(struct libinput_device *device);
     int32_t GetIntervalTime(int32_t deviceId) const;
     std::map<int32_t, DeviceConfig> GetDeviceConfig() const;
+    void RemoveTimer();
 private:
     std::string GetTomlFilePath(const std::string &fileName) const;
     DeviceConfig GetAutoSwitch(int32_t deviceId);
