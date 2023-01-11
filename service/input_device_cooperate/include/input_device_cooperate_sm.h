@@ -97,7 +97,7 @@ private:
     void CheckPointerEvent(struct libinput_event *event);
     void OnCloseCooperation(const std::string &networkId, bool isLocal);
     void NotifyRemoteStartFail(const std::string &remoteNetworkId);
-    void NotifyRemoteStartSucess(const std::string &remoteNetworkId, const std::string &startDhid);
+    void NotifyRemoteStartSuccess(const std::string &remoteNetworkId, const std::string &startDhid);
     void NotifyRemoteStopFinish(bool isSuccess, const std::string &remoteNetworkId);
     bool UpdateMouseLocation();
     std::shared_ptr<IInputDeviceCooperateState> currentStateSM_ { nullptr };
