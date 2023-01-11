@@ -139,7 +139,7 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
     CALL_DEBUG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
     auto fd = WinMgr->UpdateTarget(key);
-    currentTime_ = point->GetActionTime();
+    currentTime_ = key->GetActionTime();
     if (fd < 0 && currentTime_ - eventTime_ > INTERVAL_TIME) {
         eventTime_ = currentTime_;
         MMI_HILOGE("Invalid fd, fd:%{public}d", fd);
