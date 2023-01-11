@@ -62,6 +62,8 @@ private:
     std::mutex lock_;
     std::vector<DinputSimulateEvent> dinputSimulateEvent_;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+    int32_t eventTime_ { 0 };
+    int32_t currentTime_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
