@@ -41,6 +41,7 @@ namespace {
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) || defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventDispatchHandler" };
 #endif // OHOS_BUILD_ENABLE_KEYBOARD ||  OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+constexpr int32_t INTERVAL_TIME = 3000; // log time interval is 3 seconds.
 } // namespace
 
 EventDispatchHandler::EventDispatchHandler()
@@ -83,7 +84,9 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     CALL_DEBUG_ENTER;
     CHKPV(point);
     auto fd = WinMgr->GetClientFd(point);
-    if (fd < 0) {
+    currentTime_ = point->GetActionTime();
+    if (fd < 0 && currentTime_ - eventTime_ > INTERVAL_TIME) {
+        eventTime_ = currentTime_;
         MMI_HILOGE("The fd less than 0, fd:%{public}d", fd);
         DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
@@ -136,7 +139,9 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
     CALL_DEBUG_ENTER;
     CHKPR(key, PARAM_INPUT_INVALID);
     auto fd = WinMgr->UpdateTarget(key);
-    if (fd < 0) {
+    currentTime_ = key->GetActionTime();
+    if (fd < 0 && currentTime_ - eventTime_ > INTERVAL_TIME) {
+        eventTime_ = currentTime_;
         MMI_HILOGE("Invalid fd, fd:%{public}d", fd);
         DfxHisysevent::OnUpdateTargetKey(key, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return RET_ERR;
