@@ -116,6 +116,16 @@ public:
      */
     static constexpr int32_t POINTER_ACTION_LEAVE_WINDOW = 11;
 
+    static constexpr int32_t POINTER_ACTION_PULL_DOWN = 12;
+
+    static constexpr int32_t POINTER_ACTION_PULL_MOVE = 13;
+
+    static constexpr int32_t POINTER_ACTION_PULL_UP = 14;
+
+    static constexpr int32_t POINTER_ACTION_PULL_IN_WINDOW = 15;
+
+    static constexpr int32_t POINTER_ACTION_PULL_OUT_WINDOW = 16;
+
     enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.

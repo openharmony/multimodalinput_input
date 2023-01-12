@@ -426,6 +426,21 @@ const char* PointerEvent::DumpPointerAction() const
         case PointerEvent::POINTER_ACTION_LEAVE_WINDOW: {
             return "leave-window";
         }
+        case PointerEvent::POINTER_ACTION_PULL_DOWN: {
+            return "pull-down";
+        }
+        case PointerEvent::POINTER_ACTION_PULL_MOVE: {
+            return "pull-move";
+        }
+        case PointerEvent::POINTER_ACTION_PULL_UP: {
+            return "pull-up";
+        }
+        case PointerEvent::POINTER_ACTION_PULL_IN_WINDOW: {
+            return "pull-in-window";
+        }
+        case PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW: {
+            return "pull-out-window";
+        }
         default: {
             break;
         }
