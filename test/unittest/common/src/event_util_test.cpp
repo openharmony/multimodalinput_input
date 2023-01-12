@@ -47,7 +47,9 @@ void InputEventConsumer::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent
         ASSERT_TRUE(pointerEvent != nullptr);
         auto pointerAction = pointerEvent->GetPointerAction();
         if (pointerAction != PointerEvent::POINTER_ACTION_ENTER_WINDOW &&
-            pointerAction != PointerEvent::POINTER_ACTION_LEAVE_WINDOW) {
+            pointerAction != PointerEvent::POINTER_ACTION_LEAVE_WINDOW &&
+            pointerAction != PointerEvent::POINTER_ACTION_PULL_IN_WINDOW &&
+            pointerAction != PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW) {
             TestUtil->AddEventDump(TestUtil->DumpInputEvent(pointerEvent));
         }
     }
