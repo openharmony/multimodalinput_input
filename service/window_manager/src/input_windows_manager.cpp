@@ -33,7 +33,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManager" };
 #ifdef OHOS_BUILD_ENABLE_POINTER
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
-constexpr int32_t GLOBAL_WINDOWID = -1;
+constexpr int32_t GLOBAL_WINDOW_ID = -1;
 #endif // OHOS_BUILD_ENABLE_POINTER
 const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/display_bind.cfg";
 } // namespace
@@ -718,7 +718,7 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
     CALL_DEBUG_ENTER;
     if (windowId == GLOBAL_WINDOWID) {
         globalStyle_.id = pointerStyle.id;
-        MMI_HILOGD("is setting global pointer style");
+        MMI_HILOGD("setting global pointer style");
         return RET_OK;
     }
     auto it = pointerStyle_.find(pid);
@@ -753,7 +753,7 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, Poin
         return RET_ERR;
     }
     if (windowId == GLOBAL_WINDOWID) {
-         MMI_HILOGD("is getting global pointer style");
+         MMI_HILOGD("getting global pointer style");
         pointerStyle.id = globalStyle_.id;
         return RET_OK;
     }
