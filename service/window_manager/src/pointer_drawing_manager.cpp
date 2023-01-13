@@ -486,11 +486,13 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         MMI_HILOGE("The param pointerStyle is invalid");
         return RET_ERR;
     }
+
     int32_t ret = WinMgr->SetPointerStyle(pid, windowId, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer style failed");
         return ret;
     }
+
     if (!InputDevMgr->HasPointerDevice()) {
         MMI_HILOGD("The pointer device is not exist");
         return RET_OK;
