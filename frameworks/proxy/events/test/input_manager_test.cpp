@@ -3585,6 +3585,24 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointerStyle_001, TestSize.Level1
 }
 
 /**
+ * @tc.name: InputManagerTest_SetPointerStyle_002
+ * @tc.desc: Sets the pointer style of the window
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointerStyle_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    uint32_t windowId = -1;
+    PointerStyle pointerStyle;
+    pointerStyle.id = MOUSE_ICON::CROSS;
+    if (InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
+        ASSERT_EQ(pointerStyle.id, MOUSE_ICON::CROSS);
+    }
+}
+
+/**
  * @tc.name: InputManagerTest_FunctionKeyState_001
  * @tc.desc: Set NumLock for the keyboard enablement state to true
  * @tc.type: FUNC

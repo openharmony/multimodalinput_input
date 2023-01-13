@@ -150,6 +150,7 @@ private:
     std::shared_ptr<PointerEvent> lastPointerEvent_ { nullptr };
     std::map<int32_t, std::map<int32_t, PointerStyle>> pointerStyle_;
     WindowInfo mouseDownInfo_;
+    PointerStyle globalStyle_;
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
     MouseLocation mouseLocation_ = { -1, -1 };

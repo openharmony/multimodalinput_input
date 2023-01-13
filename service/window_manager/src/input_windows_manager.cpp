@@ -34,6 +34,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 #ifdef OHOS_BUILD_ENABLE_POINTER
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 constexpr size_t MAX_WINDOW_COUNT = 20;
+constexpr int32_t GLOBAL_WINDOWID = -1;
 #endif // OHOS_BUILD_ENABLE_POINTER
 const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/display_bind.cfg";
 } // namespace
@@ -674,6 +675,10 @@ const DisplayGroupInfo& InputWindowsManager::GetDisplayGroupInfo()
 bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
 {
     CALL_DEBUG_ENTER;
+    if (windowId == GLOBAL_WINDOWID) {
+        MMI_HILOGD("is setting global pointer style");
+        return true;
+    }
     MouseLocation mouseLocation = GetMouseInfo();
     int32_t displayId = MouseEventHdr->GetDisplayId();
     if (displayId < 0) {
@@ -716,12 +721,16 @@ void InputWindowsManager::OnSessionLost(SessionPtr session)
 int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
+    if (windowId == GLOBAL_WINDOWID) {
+        globalStyle_.id = pointerStyle.id;
+        MMI_HILOGD("is setting global pointer style");
+        return RET_OK;
+    }
     auto it = pointerStyle_.find(pid);
     if (it == pointerStyle_.end()) {
         MMI_HILOGE("The pointer style map is not include param pd:%{public}d", pid);
         return COMMON_PARAMETER_ERROR ;
     }
-    
     auto iter = it->second.find(windowId);
     if (iter == it->second.end()) {
         MMI_HILOGE("The window id is invalid");
@@ -741,11 +750,16 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, Poin
         MMI_HILOGE("The pointer style map is not include param pd, %{public}d", pid);
         return RET_ERR;
     }
-    
+    if (windowId == GLOBAL_WINDOWID) {
+         MMI_HILOGD("is getting global pointer style");
+        pointerStyle.id = globalStyle_.id;
+        return RET_OK;
+    }
+
     auto iter = it->second.find(windowId);
     if (iter == it->second.end()) {
         MMI_HILOGW("The window id is invalid");
-        pointerStyle.id = DEFAULT_POINTER_STYLE;
+        pointerStyle.id = globalStyle_.id;
         return RET_OK;
     }
     
