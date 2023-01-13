@@ -734,12 +734,15 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
     }
     for (const auto& windowInfo : displayGroupInfo_.windowsInfo) {
         if (windowId == windowInfo.id && pid == windowInfo.pid) {
-            iter->second.insert(std::make_pair(windowId, pointerStyle));
+            auto iter = it->second.insert(std::make_pair(windowId, pointerStyle));
+            if (!iter.second) {
+                MMI_HILOGW("The window type is duplicated");
+            }
             return RET_OK;
         }
     }
-    MMI_HILOGD("Window id:%{public}d set pointer style:%{public}d success", windowId, pointerStyle.id);
-    return RET_OK;
+    MMI_HILOGE("The window id is invalid");
+    return COMMON_PARAMETER_ERROR;
 }
 
 int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) const
