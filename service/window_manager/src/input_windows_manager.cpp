@@ -716,7 +716,7 @@ void InputWindowsManager::OnSessionLost(SessionPtr session)
 int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
-    if (windowId == GLOBAL_WINDOWID) {
+    if (windowId == GLOBAL_WINDOW_ID) {
         globalStyle_.id = pointerStyle.id;
         MMI_HILOGD("setting global pointer style");
         return RET_OK;
@@ -752,7 +752,7 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, Poin
         MMI_HILOGE("The pointer style map is not include param pd, %{public}d", pid);
         return RET_ERR;
     }
-    if (windowId == GLOBAL_WINDOWID) {
+    if (windowId == GLOBAL_WINDOW_ID) {
          MMI_HILOGD("getting global pointer style");
         pointerStyle.id = globalStyle_.id;
         return RET_OK;
