@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace MMI {
+inline constexpr int32_t GLOBAL_WINDOW_ID = -1;
 enum Direction {
     /**
      * Rotating the display clockwise by 0 degree
