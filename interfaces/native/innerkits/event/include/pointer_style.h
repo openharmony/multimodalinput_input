@@ -28,7 +28,7 @@ struct PointerStyleColor {
 struct PointerStyle {
     int32_t size { -1 };
     PointerStyleColor color { 0 };
-    int32_t id { -1 };
+    int32_t id { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
