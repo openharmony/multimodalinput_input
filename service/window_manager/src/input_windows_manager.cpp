@@ -718,7 +718,7 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
     CALL_DEBUG_ENTER;
     if (windowId == GLOBAL_WINDOW_ID) {
         globalStyle_.id = pointerStyle.id;
-        MMI_HILOGD("setting global pointer style");
+        MMI_HILOGD("Setting global pointer style");
         return RET_OK;
     }
     auto it = pointerStyle_.find(pid);
