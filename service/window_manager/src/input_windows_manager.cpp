@@ -753,7 +753,7 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, Poin
         return RET_ERR;
     }
     if (windowId == GLOBAL_WINDOW_ID) {
-         MMI_HILOGD("getting global pointer style");
+        MMI_HILOGD("Getting global pointer style");
         pointerStyle.id = globalStyle_.id;
         return RET_OK;
     }
