@@ -62,7 +62,6 @@
         "common"
       ],
       "third_party": [
-        "quickjs",
         "node",
         "libuv",
         "json"
