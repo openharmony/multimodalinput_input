@@ -618,9 +618,9 @@ bool InputWindowsManager::TouchPointToDisplayPoint(int32_t deviceId, struct libi
     EventTouch& touchInfo, int32_t& physicalDisplayId)
 {
     CHKPF(touch);
-    const std::string screenId = bindInfo_.GetBindDisplayNameByInputDevice(deviceId);
+    std::string screenId = bindInfo_.GetBindDisplayNameByInputDevice(deviceId);
     if (screenId.empty()) {
-        return false;
+        screenId = "default0";
     }
     auto info = FindPhysicalDisplayInfo(screenId);
     CHKPF(info);
