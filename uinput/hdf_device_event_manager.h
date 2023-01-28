@@ -20,11 +20,11 @@
 #include <thread>
 
 #include "inject_thread.h"
-#include "input_manager.h"
-#include "input_type.h"
+#include "v1_0/iinput_interfaces.h"
 
 namespace OHOS {
 namespace MMI {
+using namespace OHOS::HDI::Input::V1_0;
 class HdfDeviceEventManager {
 public:
     HdfDeviceEventManager();
@@ -34,9 +34,9 @@ public:
     std::thread thread_;
 
 private:
-    InputDeviceInfo *iDevInfo_ { nullptr };
-    IInputInterface *inputInterface_ { nullptr };
-    InputEventCb callback_ {};
+    DeviceInfo iDevInfo_;
+    sptr<IInputInterfaces> inputInterface_ { nullptr };
+    sptr<IInputCallback> callback_ { nullptr };
     const uint32_t TOUCH_DEV_ID { 1 };
 };
 } // namespace MMI
