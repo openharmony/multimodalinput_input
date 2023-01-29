@@ -32,7 +32,6 @@ ohos_shared_library("inputmonitor") {
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/util:libmmi-util",
   ]
 
