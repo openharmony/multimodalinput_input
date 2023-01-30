@@ -17,7 +17,6 @@ import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 ohos_executable("mmi-server") {
   sources = [ "src/mmi_service_main.cpp" ]
   deps = [
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
     "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//foundation/multimodalinput/input/service:libmmi-server",
     "//foundation/multimodalinput/input/util:libmmi-util",
