@@ -37,29 +37,32 @@ HdfDeviceEventDispatch::HdfDeviceEventDispatch(const uint32_t maxX, const uint32
 
 HdfDeviceEventDispatch::~HdfDeviceEventDispatch() {}
 
-void HdfDeviceEventDispatch::GetEventCallbackDispatch(
-    const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex)
+int32_t HdfDeviceEventDispatch::EventPkgCallback(const std::vector<EventPackage> &pkgs, uint32_t devIndex)
 {
-    if (pkgs == nullptr) {
-        MMI_HILOGE("The pkgs is nullptr");
-        return;
+    if (pkgs.empty()) {
+        MMI_HILOGE("The pkgs is empty");
+        return HDF_FAILURE;
     }
-    for (uint32_t i = 0; i < count; i++) {
-        if (pkgs[i] == nullptr) {
-            continue;
-        }
-        if ((pkgs[i]->type == 0) && (pkgs[i]->code == 0) && (pkgs[i]->value == 0)) {
+
+    for (const auto &item : pkgs) {
+        if ((item.type == 0) && (item.code == 0) && (item.value == 0)) {
             InjectInputEvent injectInputSync = { injectThread_.TOUCH_SCREEN_DEVICE_ID, 0, SYN_MT_REPORT, 0 };
             injectThread_.WaitFunc(injectInputSync);
         }
         InjectInputEvent injectInputEvent = {
             injectThread_.TOUCH_SCREEN_DEVICE_ID,
-            pkgs[i]->type,
-            pkgs[i]->code,
-            pkgs[i]->value
+            item.type,
+            item.code,
+            item.value
         };
         injectThread_.WaitFunc(injectInputEvent);
     }
+    return HDF_SUCCESS;
+}
+
+int32_t HdfDeviceEventDispatch::HotPlugCallback(const HotPlugEvent &event)
+{
+    return HDF_SUCCESS;
 }
 } // namespace MMI
 } // namespace OHOS
