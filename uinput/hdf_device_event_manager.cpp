@@ -25,6 +25,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "HdfDeviceEventManager" };
+constexpr int32_t SLEEP_TIME = 50000;
+constexpr int32_t CALL_NUMBER = 70;
 } // namespace
 
 HdfDeviceEventManager::HdfDeviceEventManager() {}
@@ -33,30 +35,34 @@ HdfDeviceEventManager::~HdfDeviceEventManager() {}
 
 void HdfDeviceEventManager::ConnectHDFInit()
 {
-    int32_t ret = GetInputInterface(&inputInterface_);
-    if (ret != 0) {
-        MMI_HILOGE("Initialize failed");
-        return;
-    }
-
-    if (inputInterface_ == nullptr || inputInterface_->iInputManager == nullptr) {
-        MMI_HILOGE("The inputInterface_ or iInputManager is nullptr");
-        return;
-    }
-
-    thread_ = std::thread(&InjectThread::InjectFunc, injectThread_);
-    ret = inputInterface_->iInputManager->OpenInputDevice(TOUCH_DEV_ID);
-    if ((ret == INPUT_SUCCESS) && (inputInterface_->iInputReporter != nullptr)) {
-        ret = inputInterface_->iInputManager->GetInputDevice(TOUCH_DEV_ID, &iDevInfo_);
-        if (ret != INPUT_SUCCESS) {
-            MMI_HILOGE("GetInputDevice error");
+    int32_t count = 0;
+    do {
+        inputInterface_ = IInputInterfaces::Get();
+        usleep(SLEEP_TIME);
+        if (++count > CALL_NUMBER) {
+            MMI_HILOGE("The inputInterface_ is nullptr");
             return;
         }
-        std::unique_ptr<HdfDeviceEventDispatch> hdf = std::make_unique<HdfDeviceEventDispatch>(\
-            iDevInfo_->attrSet.axisInfo[ABS_MT_POSITION_X].max, iDevInfo_->attrSet.axisInfo[ABS_MT_POSITION_Y].max);
-        callback_.EventPkgCallback = hdf->GetEventCallbackDispatch;
-        ret = inputInterface_->iInputReporter->RegisterReportCallback(TOUCH_DEV_ID, &callback_);
+    } while (inputInterface_ == nullptr);
+
+    thread_ = std::thread(&InjectThread::InjectFunc, injectThread_);
+    int32_t ret = inputInterface_->OpenInputDevice(TOUCH_DEV_ID);
+    if (ret == HDF_SUCCESS) {
+        ret = inputInterface_->GetInputDevice(TOUCH_DEV_ID, iDevInfo_);
+        if (ret != HDF_SUCCESS) {
+            MMI_HILOGE("Get input device failed");
+            return;
+        }
+        callback_ = new (std::nothrow) HdfDeviceEventDispatch(iDevInfo_.attrSet.axisInfo[ABS_MT_POSITION_X].max,
+            iDevInfo_.attrSet.axisInfo[ABS_MT_POSITION_Y].max);
+        if (callback_ == nullptr) {
+            MMI_HILOGE("The callback_ is nullptr");
+            return;
+        }
+        ret = inputInterface_->RegisterReportCallback(TOUCH_DEV_ID, callback_);
         MMI_HILOGD("RegisterReportCallback ret:%{public}d", ret);
+    } else {
+        MMI_HILOGE("Open input device failed");
     }
 }
 } // namespace MMI
