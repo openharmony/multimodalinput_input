@@ -15,12 +15,12 @@
 #ifndef LIBINPUT_ADAPTER_H
 #define LIBINPUT_ADAPTER_H
 
+#include <array>
 #include <functional>
 #include <thread>
+#include <unordered_map>
 
-#include <libudev.h>
-#include <sys/epoll.h>
-
+#include "hotplug_detector.h"
 #include "libinput.h"
 #include "nocopyable.h"
 
@@ -29,33 +29,33 @@ namespace MMI {
 typedef std::function<void(void *event)> FunInputEvent;
 class LibinputAdapter final {
 public:
-    static void LoginfoPackagingTool(struct libinput_event *event);
     static int32_t DeviceLedUpdate(struct libinput_device *device, int32_t funcKey, bool isEnable);
     LibinputAdapter() = default;
     DISALLOW_COPY_AND_MOVE(LibinputAdapter);
     ~LibinputAdapter() = default;
-    bool Init(FunInputEvent funInputEvent, const std::string& seat_id = "seat0");
-    void EventDispatch(struct epoll_event& ev);
+    bool Init(FunInputEvent funInputEvent);
+    void EventDispatch(int32_t fd);
     void Stop();
     void ProcessPendingEvents();
     void ReloadDevice();
-    void RetriggerHotplugEvents();
 
-    int32_t GetInputFd() const
+    auto GetInputFds() const
     {
-        return fd_;
+        return std::array{fd_, hotplugDetector_.GetFd()};
     }
 
-protected:
+private:
     void OnEventHandler();
+    void OnDeviceAdded(std::string path);
+    void OnDeviceRemoved(std::string path);
 
-protected:
     int32_t fd_ { -1 };
-    udev *udev_ { nullptr };
     libinput *input_ { nullptr };
 
     FunInputEvent funInputEvent_;
-    std::string seat_id_;
+
+    HotplugDetector hotplugDetector_;
+    std::unordered_map<std::string, libinput_device*> devices_;
 };
 } // namespace MMI
 } // namespace OHOS

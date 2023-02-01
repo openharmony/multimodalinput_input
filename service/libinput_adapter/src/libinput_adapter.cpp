@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 #include <climits>
+
 #include <dirent.h>
 #include <fcntl.h>
 #include <sys/epoll.h>
@@ -31,9 +32,8 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "LibinputAdapter" };
 constexpr int32_t WAIT_TIME_FOR_INPUT { 10 };
-} // namespace
 
-static void HiLogFunc(struct libinput* input, libinput_log_priority priority, const char* fmt, va_list args)
+void HiLogFunc(struct libinput* input, libinput_log_priority priority, const char* fmt, va_list args)
 {
     CHKPV(input);
     CHKPV(fmt);
@@ -46,25 +46,7 @@ static void HiLogFunc(struct libinput* input, libinput_log_priority priority, co
     MMI_HILOGE("PrintLog_Info:%{public}s", buffer);
     va_end(args);
 }
-
-static void InitHiLogFunc(struct libinput* input)
-{
-    CHKPV(input);
-    static bool initFlag = false;
-    if (initFlag) {
-        return;
-    }
-    libinput_log_set_handler(input, &HiLogFunc);
-    initFlag = true;
-}
-
-void LibinputAdapter::LoginfoPackagingTool(struct libinput_event *event)
-{
-    CHKPV(event);
-    auto context = libinput_event_get_context(event);
-    CHKPV(context);
-    InitHiLogFunc(context);
-}
+} // namespace
 
 int32_t LibinputAdapter::DeviceLedUpdate(struct libinput_device *device, int32_t funcKey, bool enable)
 {
@@ -96,65 +78,53 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
     },
 };
 
-bool LibinputAdapter::Init(FunInputEvent funInputEvent, const std::string& seat_id)
+bool LibinputAdapter::Init(FunInputEvent funInputEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(funInputEvent);
     funInputEvent_ = funInputEvent;
-    seat_id_ = seat_id;
-    if (seat_id_.empty()) {
-        seat_id_ = DEF_SEAT_ID;
-    }
-    udev_ = udev_new();
-    CHKPF(udev_);
-    input_ = libinput_udev_create_context(&LIBINPUT_INTERFACE, nullptr, udev_);
+    input_ = libinput_path_create_context(&LIBINPUT_INTERFACE, nullptr);
     CHKPF(input_);
-    int32_t rt = libinput_udev_assign_seat(input_, seat_id_.c_str());
-    if (rt != 0) {
-        libinput_unref(input_);
-        udev_unref(udev_);
-        MMI_HILOGE("The rt is not 0");
-        return false;
-    }
+    libinput_log_set_handler(input_, &HiLogFunc);
     fd_ = libinput_get_fd(input_);
     if (fd_ < 0) {
         libinput_unref(input_);
-        udev_unref(udev_);
         fd_ = -1;
         MMI_HILOGE("The fd_ is less than 0");
         return false;
     }
-    return true;
+    return hotplugDetector_.Init([this](std::string path) { OnDeviceAdded(std::move(path)); },
+        [this](std::string path) { OnDeviceRemoved(std::move(path)); });
 }
 
-void LibinputAdapter::EventDispatch(struct epoll_event& ev)
+void LibinputAdapter::EventDispatch(int32_t fd)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(ev.data.ptr);
-    auto fd = *static_cast<int*>(ev.data.ptr);
-    if ((ev.events & EPOLLERR) || (ev.events & EPOLLHUP)) {
-        MMI_HILOGF("Epoll unrecoverable error,"
-            "The service must be restarted. fd:%{public}d", fd);
-        free(ev.data.ptr);
-        ev.data.ptr = nullptr;
-        return;
+    if (fd == fd_) {
+        if (libinput_dispatch(input_) != 0) {
+            MMI_HILOGE("Failed to dispatch libinput");
+            return;
+        }
+        OnEventHandler();
+    } else if (fd == hotplugDetector_.GetFd()) {
+        hotplugDetector_.OnEvent();
+    } else {
+        MMI_HILOGE("EventDispatch() called with unknown fd: %{public}d.", fd);
     }
-    if (libinput_dispatch(input_) != 0) {
-        MMI_HILOGE("Failed to dispatch libinput");
-        return;
-    }
-    OnEventHandler();
 }
 
 void LibinputAdapter::Stop()
 {
     CALL_DEBUG_ENTER;
+    hotplugDetector_.Stop();
     if (fd_ >= 0) {
         close(fd_);
         fd_ = -1;
     }
-    libinput_unref(input_);
-    udev_unref(udev_);
+    if (input_ != nullptr) {
+        libinput_unref(input_);
+        input_ = nullptr;
+    }
 }
 
 void LibinputAdapter::ProcessPendingEvents()
@@ -181,34 +151,27 @@ void LibinputAdapter::ReloadDevice()
     libinput_resume(input_);
 }
 
-void LibinputAdapter::RetriggerHotplugEvents()
+void LibinputAdapter::OnDeviceAdded(std::string path)
 {
-    CALL_INFO_TRACE;
-    DIR *pdir = opendir("/sys/class/input");
-    if (pdir == nullptr) {
-        MMI_HILOGE("Failed to open directory: \'/sys/class/input\'");
-        return;
+    CALL_DEBUG_ENTER;
+    libinput_device* device = libinput_path_add_device(input_, path.c_str());
+    if (device != nullptr) {
+        devices_[std::move(path)] = libinput_device_ref(device);
+        // Libinput doesn't signal device adding event in path mode. Process manually.
+        OnEventHandler();
     }
-    struct dirent *pdirent = nullptr;
-    while ((pdirent = readdir(pdir)) != nullptr) {
-        char path[PATH_MAX];
-        if (sprintf_s(path, sizeof(path), "/sys/class/input/%s/uevent", pdirent->d_name) < 0) {
-            continue;
-        }
-        MMI_HILOGD("trigger \'%{public}s\'", path);
-        FILE *fs = fopen(path, "r+");
-        if (fs == nullptr) {
-            continue;
-        }
-        if (fputs("add", fs) < 0) {
-            MMI_HILOGW("fputs error:%{public}s", strerror(errno));
-        }
-        if (fclose(fs) != 0) {
-            MMI_HILOGW("fclose error:%{public}s", strerror(errno));
-        }
-    }
-    if (closedir(pdir) != 0) {
-        MMI_HILOGW("closedir error:%{public}s", strerror(errno));
+}
+
+void LibinputAdapter::OnDeviceRemoved(std::string path)
+{
+    CALL_DEBUG_ENTER;
+    auto pos = devices_.find(path);
+    if (pos != devices_.end()) {
+        libinput_path_remove_device(pos->second);
+        libinput_device_unref(pos->second);
+        devices_.erase(pos);
+        // Libinput doesn't signal device removing event in path mode. Process manually.
+        OnEventHandler();
     }
 }
 } // namespace MMI
