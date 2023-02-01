@@ -18,9 +18,6 @@
 
 namespace OHOS {
 namespace MMI {
-// Default libinput seat
-#define DEF_SEAT_ID "seat0"
-
 #define DEF_MMI_EVENT_INJECTION "/system/bin/mmi-event-injection"
 #define DEF_MMI_VIRTUAL_DEVICE_MANAGER "/system/bin/mmi-virtual-device-manager"
 #define DEF_MMI_DATA_ROOT "/data/mmi/"

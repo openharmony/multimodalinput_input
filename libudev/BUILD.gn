@@ -1,0 +1,84 @@
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+
+defines = input_default_defines
+
+config("mmi_libudev_public_config") {
+  include_dirs = [ "//third_party/eudev/export_include" ]
+}
+
+config("mmi_libudev_config") {
+  include_dirs = [ "${mmi_path}/util/common/include" ]
+}
+
+ohos_static_library("mmi_libudev") {
+  public_configs = [ ":mmi_libudev_public_config" ]
+  configs = [ ":mmi_libudev_config" ]
+
+  sources = [ "src/udev_device.cpp" ]
+
+  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+}
+
+import("//build/test.gni")
+output_path = "multimodalinput/unit_out"
+
+group("test") {
+  testonly = true
+  deps = [
+    ":e2e-libudev-test",
+    ":libudev-test",
+  ]
+}
+
+ohos_unittest("libudev-test") {
+  module_out_path = output_path
+  include_dirs = [
+    "${mmi_path}/test/unittest/standalone/include",
+    "//third_party/libevdev",
+  ]
+
+  configs = [
+    ":mmi_libudev_config",
+    ":mmi_libudev_public_config",
+  ]
+
+  sources = [
+    "src/udev_device.cpp",
+    "test/custom_udev_test.cpp",
+  ]
+
+  deps = [
+    "//third_party/googletest:gmock_main",
+    "//third_party/libevdev",
+  ]
+}
+
+ohos_unittest("e2e-libudev-test") {
+  module_out_path = output_path
+  include_dirs = [ "//third_party/libevdev" ]
+
+  sources = [ "test/e2e_udev_test.cpp" ]
+
+  deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "//third_party/googletest:gmock_main",
+    "//third_party/libevdev",
+  ]
+}
