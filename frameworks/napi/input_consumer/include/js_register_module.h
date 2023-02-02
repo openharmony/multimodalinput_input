@@ -50,11 +50,11 @@ struct KeyEventMonitorInfo {
     std::string name;
     napi_value handle { nullptr };
     std::shared_ptr<KeyEvent> keyEvent { nullptr };
-    napi_ref callback[1] {};
+    napi_ref callback[1] { nullptr };
     int32_t subscribeId { 0 };
     std::shared_ptr<KeyOption> keyOption { nullptr };
 };
-
+static std::mutex sCallBacksMutex_;
 typedef std::map<std::string, std::list<KeyEventMonitorInfo *>> Callbacks;
 } // namespace MMI
 } // namespace OHOS
