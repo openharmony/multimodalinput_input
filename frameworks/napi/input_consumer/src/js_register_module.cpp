@@ -216,6 +216,7 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
+    std::lock_guard guard(sCallBacksMutex_);
     auto iter = callbacks.begin();
     while (iter != callbacks.end()) {
         auto &list = iter->second;
