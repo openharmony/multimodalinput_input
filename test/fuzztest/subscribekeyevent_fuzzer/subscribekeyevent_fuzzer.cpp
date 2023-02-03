@@ -17,6 +17,7 @@
 
 #include "securec.h"
 
+#include "common_method.h"
 #include "input_manager.h"
 #include "mmi_log.h"
 
@@ -36,20 +37,6 @@ public:
     };
     virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
 };
-
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
 
 void SubscribeKeyEventFuzzTest(const uint8_t* data, size_t size)
 {

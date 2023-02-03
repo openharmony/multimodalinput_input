@@ -44,6 +44,7 @@ ohos_executable("uinput_inject") {
   include_dirs = [
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
+    "//foundation/multimodalinput/input/test/unittest/common/include",
   ]
 
   external_deps = [
