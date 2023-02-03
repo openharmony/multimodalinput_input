@@ -17,6 +17,7 @@
 
 #include "securec.h"
 
+#include "common_method.h"
 #include "input_manager.h"
 #include "mmi_log.h"
 
@@ -28,20 +29,6 @@ constexpr int32_t FUZZ_FST_DATA = 0;
 constexpr int32_t MAX_SUPPORT_KEY = 5;
 } // namespace
 
-template<class T>
-size_t GetObject(const uint8_t *data, size_t size, T &object)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
 void SupportKeysFuzzTest(const uint8_t* data, size_t size)
 {
     int32_t id = data[FUZZ_FST_DATA];
@@ -49,7 +36,7 @@ void SupportKeysFuzzTest(const uint8_t* data, size_t size)
     std::vector<int32_t> keycodes;
     for (int32_t i = 0; i < MAX_SUPPORT_KEY; i++) {
         int32_t preKey;
-        startPos += GetObject<int32_t>(data + startPos, size - startPos, preKey);
+        startPos += GetObject<int32_t>(preKey, data + startPos, size - startPos);
         keycodes.push_back(preKey);
     }
     auto fun = [](std::vector<bool> isSupport) {

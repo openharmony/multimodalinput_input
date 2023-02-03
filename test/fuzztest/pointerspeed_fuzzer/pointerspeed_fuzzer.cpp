@@ -17,6 +17,7 @@
 
 #include "securec.h"
 
+#include "common_method.h"
 #include "input_manager.h"
 #include "mmi_log.h"
 
@@ -26,31 +27,17 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerSpeedFuzzTest" };
 } // namespace
 
-template<class T>
-size_t GetObject(const uint8_t *data, size_t size, T &object)
-{
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
-        return 0;
-    }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
-        return 0;
-    }
-    return objectSize;
-}
-
 void PointerSpeedFuzzTest(const uint8_t* data, size_t size)
 {
     int32_t speed;
     size_t startPos = 0;
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, speed);
+    startPos += GetObject<int32_t>(speed, data + startPos, size - startPos);
     InputManager::GetInstance()->SetPointerSpeed(speed);
     if (InputManager::GetInstance()->SetPointerSpeed(speed) == RET_OK) {
         MMI_HILOGD("Set pointer speed success");
     }
 
-    startPos += GetObject<int32_t>(data + startPos, size - startPos, speed);
+    startPos += GetObject<int32_t>(speed, data + startPos, size - startPos);
     if (InputManager::GetInstance()->GetPointerSpeed(speed) == RET_OK) {
         MMI_HILOGD("Get pointer speed success");
     }
