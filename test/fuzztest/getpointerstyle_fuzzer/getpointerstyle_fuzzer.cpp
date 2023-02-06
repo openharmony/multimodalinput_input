@@ -17,8 +17,9 @@
 
 #include "securec.h"
 
-#include "input_manager.h"
+#include "common_method.h"
 #include "define_multimodal.h"
+#include "input_manager.h"
 #include "mmi_log.h"
 
 namespace OHOS {
