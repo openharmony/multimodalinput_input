@@ -25,8 +25,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "HdfDeviceEventManager" };
-constexpr int32_t SLEEP_TIME = 50000;
-constexpr int32_t CALL_NUMBER = 70;
 } // namespace
 
 HdfDeviceEventManager::HdfDeviceEventManager() {}
@@ -35,16 +33,11 @@ HdfDeviceEventManager::~HdfDeviceEventManager() {}
 
 void HdfDeviceEventManager::ConnectHDFInit()
 {
-    int32_t count = 0;
-    do {
-        inputInterface_ = IInputInterfaces::Get();
-        usleep(SLEEP_TIME);
-        if (++count > CALL_NUMBER) {
-            MMI_HILOGE("The inputInterface_ is nullptr");
-            return;
-        }
-    } while (inputInterface_ == nullptr);
-
+    inputInterface_ = IInputInterfaces::Get(true);
+    if (inputInterface_ == nullptr) {
+        MMI_HILOGE("The inputInterface_ is nullptr");
+        return;
+    }
     thread_ = std::thread(&InjectThread::InjectFunc, injectThread_);
     int32_t ret = inputInterface_->OpenInputDevice(TOUCH_DEV_ID);
     if (ret == HDF_SUCCESS) {
