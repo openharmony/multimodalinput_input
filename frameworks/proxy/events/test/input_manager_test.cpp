@@ -423,22 +423,22 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent014()
 {
     auto pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->SetPointerId(0);
     PointerEvent::PointerItem item;
-    item.SetPointerId(0);
     item.SetDownTime(0);
+    item.SetPointerId(0);
     item.SetPressed(false);
 
     item.SetDisplayX(10);
-    item.SetDisplayY(10);
     item.SetWindowX(10);
+    item.SetDisplayY(10);
     item.SetWindowY(10);
 
     item.SetWidth(0);
-    item.SetHeight(0);
     item.SetPressure(0);
+    item.SetHeight(0);
     item.SetDeviceId(0);
     pointerEvent->AddPointerItem(item);
     return pointerEvent;
@@ -485,12 +485,12 @@ std::shared_ptr<KeyEvent> InputManagerTest::SetupKeyEvent001()
     CHKPP(keyEvent);
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
     kitDown.SetPressed(true);
     kitDown.SetDownTime(downTime);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
-    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
     keyEvent->AddPressedKeyItems(kitDown);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
 
     return keyEvent;
 }
@@ -588,11 +588,11 @@ void InputManagerTest::TestMarkConsumedStep4()
     auto pointerEvent = PointerEvent::Create();
     CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
-    item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetDisplayX(523);  // test code，set the DisplayX = 523
-    item.SetDisplayY(723);   // test code，set the DisplayY = 723
-    item.SetPressure(5);    // test code，set the Pressure = 5
+    item.SetPointerId(0);   // test code，set the PointerId = 0
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
+    item.SetPressure(5);    // test code，set the Pressure = 5
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
     pointerEvent->AddPointerItem(item);
 
     pointerEvent->SetId(std::numeric_limits<int32_t>::max() - INDEX_FIRST);
@@ -636,10 +636,10 @@ void InputManagerTest::TestMarkConsumedStep6()
     CHKPV(pointerEvent);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);   // test code，set the PointerId = 0
-    item.SetDisplayX(523);   // test code，set the DisplayX = 523
     item.SetDisplayY(723);   // test code，set the DisplayY = 723
-    item.SetPressure(5);    // test code，set the Pressure = 5
     item.SetDeviceId(1);    // test code，set the DeviceId = 1
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetPressure(5);    // test code，set the Pressure = 5
     pointerEvent->AddPointerItem(item);
 
     pointerEvent->SetId(std::numeric_limits<int32_t>::max());
@@ -809,12 +809,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_001, TestSize.Level
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
     KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
     kitDown.SetPressed(true);
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
     kitDown.SetDownTime(downTime);
     injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     TestSimulateInputEvent(injectDownEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -823,12 +823,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_001, TestSize.Level
     ASSERT_TRUE(injectUpEvent != nullptr);
     downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     KeyEvent::KeyItem kitUp;
-    kitUp.SetKeyCode(KeyEvent::KEYCODE_BACK);
     kitUp.SetPressed(false);
+    kitUp.SetKeyCode(KeyEvent::KEYCODE_BACK);
     kitUp.SetDownTime(downTime);
+    injectUpEvent->RemoveReleasedKeyItems(kitUp);
     injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    injectUpEvent->RemoveReleasedKeyItems(kitUp);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     TestSimulateInputEvent(injectUpEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -1417,14 +1417,14 @@ HWTEST_F(InputManagerTest, InputManager_NotResponse_002, TestSize.Level1)
     ASSERT_NE(pointerEvent, nullptr);
 
     PointerEvent::PointerItem item;
+    item.SetPressure(5);
     item.SetPointerId(0);
     item.SetDisplayX(523);
     item.SetDisplayY(723);
-    item.SetPressure(5);
+    pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->SetPointerId(0);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -1599,13 +1599,13 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_001, TestSize.Level1)
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
-    item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetDownTime(10010);
+    item.SetPointerId(DEFAULT_POINTER_ID);
     item.SetPressed(true);
-    item.SetDisplayX(523);
-    item.SetDisplayY(723);
-    item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
+    item.SetDisplayY(723);
+    item.SetDisplayX(523);
+    item.SetDeviceId(1);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     pointerEvent->SetPointerId(DEFAULT_POINTER_ID);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -1642,12 +1642,12 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_002, TestSize.Level1)
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(DEFAULT_POINTER_ID);
-    item.SetDownTime(10010);
-    item.SetPressed(true);
     item.SetDisplayX(523);
     item.SetDisplayY(723);
     item.SetDeviceId(1);
+    item.SetDownTime(10010);
     pointerEvent->AddPointerItem(item);
+    item.SetPressed(true);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->SetPointerId(DEFAULT_POINTER_ID);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
@@ -2377,17 +2377,16 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_003, TestSize.L
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
-    item.SetPointerId(0);
     item.SetDownTime(10010);
+    item.SetPointerId(0);
     item.SetPressed(true);
-    item.SetDisplayX(523);
     item.SetDisplayY(723);
+    item.SetDisplayX(523);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     pointerEvent->SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-
     auto callbackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callbackPtr != nullptr);
     int32_t monitorId = TestAddMonitor(callbackPtr);
@@ -2421,14 +2420,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_004, TestSize.L
     auto pointerEvent = PointerEvent::Create();
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
+    item.SetPressed(true);
     item.SetPointerId(0);
     item.SetDownTime(10010);
-    item.SetPressed(true);
     item.SetDisplayX(523);
-    item.SetDisplayY(723);
     item.SetDeviceId(1);
-    pointerEvent->AddPointerItem(item);
+    item.SetDisplayY(723);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerId(0);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
@@ -2476,15 +2475,15 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddTouchPadMonitor_005, TestSize.L
     ASSERT_TRUE(pointerEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
+    item.SetDeviceId(1);
     item.SetDownTime(10010);
     item.SetPressed(true);
     item.SetDisplayX(523);
     item.SetDisplayY(723);
-    item.SetDeviceId(1);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
     pointerEvent->SetPointerId(0);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
     auto callbackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callbackPtr != nullptr);
