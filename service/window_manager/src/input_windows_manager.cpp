@@ -748,17 +748,16 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
 int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) const
 {
     CALL_DEBUG_ENTER;
-    auto it = pointerStyle_.find(pid);
-    if (it == pointerStyle_.end()) {
-        MMI_HILOGE("The pointer style map is not include param pd, %{public}d", pid);
-        return RET_ERR;
-    }
     if (windowId == GLOBAL_WINDOW_ID) {
         MMI_HILOGD("Getting global pointer style");
         pointerStyle.id = globalStyle_.id;
         return RET_OK;
     }
-
+    auto it = pointerStyle_.find(pid);
+    if (it == pointerStyle_.end()) {
+        MMI_HILOGE("The pointer style map is not include param pd, %{public}d", pid);
+        return RET_ERR;
+    }
     auto iter = it->second.find(windowId);
     if (iter == it->second.end()) {
         pointerStyle.id = globalStyle_.id;
