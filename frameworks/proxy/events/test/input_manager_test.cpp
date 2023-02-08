@@ -203,8 +203,9 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent006()
 {
     auto pointerEventForTest006 = PointerEvent::Create();
     CHKPP(pointerEventForTest006);
+	pointerEventForTest006->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     pointerEventForTest006->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEventForTest006->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+
     pointerEventForTest006->SetPointerId(0);
     PointerEvent::PointerItem item06;
     item06.SetPointerId(0);
@@ -452,9 +453,9 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent015()
     pointerEventForTest015->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEventForTest015->SetPointerId(0);
     PointerEvent::PointerItem item015;
-    item015.SetPressed(false);
+	item015.SetPointerId(0);
     item015.SetDownTime(0);
-    item015.SetPointerId(0);
+	item015.SetPressed(false);
 
     item015.SetDisplayX(0);
     item015.SetDisplayY(1259);
@@ -531,7 +532,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep1()
 {
     auto pointerEventForStep1 = PointerEvent::Create();
     CHKPP(pointerEvent);
-    pointerEventForStep1::PointerItem itemStep1;
+    PointerEvent::PointerItem itemStep1;
     itemStep1.SetPointerId(0);   // test code，set the PointerId = 0
     itemStep1.SetDisplayX(523);   // test code，set the DisplayX = 523
     itemStep1.SetDisplayY(723);   // test code，set the DisplayY = 723
