@@ -98,52 +98,52 @@ std::string InputManagerTest::GetEventDump()
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent001()
 {
-    auto pointerEvent001 = PointerEvent::Create();
-    CHKPP(pointerEvent001);
-    PointerEvent::PointerItem item001;
-    item001.SetDeviceId(1);    // test code，set the DeviceId = 1
-    item001.SetPointerId(0);   // test code，set the PointerId = 0
-    item001.SetDisplayY(723);   // test code，set the DisplayY = 723
-    item001.SetDisplayX(523);   // test code，set the DisplayX = 523
-    item001.SetPressure(5);    // test code，set the Pressure = 5
-    pointerEvent001->AddPointerItem(item001);
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);   // test code，set the PointerId = 0
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
+    item.SetPressure(5);    // test code，set the Pressure = 5
+    item.SetDeviceId(1);    // test code，set the DeviceId = 1
+    pointerEvent->AddPointerItem(item);
 
-    item001.SetDeviceId(1);    // test code，set the DeviceId = 1
-    item001.SetDisplayY(910);   // test code，set the DisplayY = 910
-    item001.SetPointerId(1);   // test code，set the PointerId = 1
-    item001.SetDisplayX(610);   // test code，set the DisplayX = 610
-    item001.SetPressure(7);    // test code，set the Pressure = 7
-    pointerEvent001->AddPointerItem(item001);
+    item.SetPointerId(1);   // test code，set the PointerId = 1
+    item.SetDisplayX(610);   // test code，set the DisplayX = 610
+    item.SetDisplayY(910);   // test code，set the DisplayY = 910
+    item.SetPressure(7);    // test code，set the Pressure = 7
+    item.SetDeviceId(1);    // test code，set the DeviceId = 1
+    pointerEvent->AddPointerItem(item);
 
-    pointerEvent001->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent001->SetPointerId(1);  // test code，set the PointerId = 1
-    pointerEvent001->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    return pointerEvent001;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(1);  // test code，set the PointerId = 1
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    return pointerEvent;
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent002()
 {
-    auto pointerEvent002 = PointerEvent::Create();
-    CHKPP(pointerEvent002);
-    PointerEvent::PointerItem item002;
-    item002.SetPointerId(0);   // test code，set the PointerId = 0
-    item002.SetDisplayX(523);   // test code，set the DisplayX = 523
-    item002.SetDisplayY(723);   // test code，set the DisplayY = 723
-    item002.SetPressure(5);    // test code，set the Pressure = 5
-    item002.SetDeviceId(1);    // test code，set the DeviceId = 1
-    pointerEvent002->AddPointerItem(item002);
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);   // test code，set the PointerId = 0
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
+    item.SetPressure(5);    // test code，set the Pressure = 5
+    item.SetDeviceId(1);    // test code，set the DeviceId = 1
+    pointerEvent->AddPointerItem(item);
 
-    item002.SetPointerId(1);   // test code，set the PointerId = 1
-    item002.SetDisplayX(600);   // test code，set the DisplayX = 600
-    item002.SetDisplayY(610);   // test code，set the DisplayY = 610
-    item002.SetPressure(7);    // test code，set the Pressure = 7
-    item002.SetDeviceId(1);    // test code，set the DeviceId = 1
-    pointerEvent002->AddPointerItem(item002);
+    item.SetPointerId(1);   // test code，set the PointerId = 1
+    item.SetDisplayX(600);   // test code，set the DisplayX = 600
+    item.SetDisplayY(610);   // test code，set the DisplayY = 610
+    item.SetPressure(7);    // test code，set the Pressure = 7
+    item.SetDeviceId(1);    // test code，set the DeviceId = 1
+    pointerEvent->AddPointerItem(item);
 
-    pointerEvent002->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent002->SetPointerId(1);  // test code，set the PointerId = 1
-    pointerEvent002->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    return pointerEvent002;
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(1);  // test code，set the PointerId = 1
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    return pointerEvent;
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent003()
@@ -201,28 +201,25 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent005()
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent006()
 {
-    auto pointerEventForTest006 = PointerEvent::Create();
-    CHKPP(pointerEventForTest006);
-	pointerEventForTest006->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEventForTest006->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-
-    pointerEventForTest006->SetPointerId(0);
-    PointerEvent::PointerItem item06;
-    item06.SetPointerId(0);
-    item06.SetDownTime(0);
-    item06.SetPressed(false);
-
-    item06.SetDisplayX(50);
-    item06.SetDisplayY(50);
-    item06.SetWindowX(70);
-    item06.SetWindowY(70);
-
-    item06.SetWidth(0);
-    item06.SetHeight(0);
-    item06.SetPressure(0);
-    item06.SetDeviceId(0);
-    pointerEventForTest006->AddPointerItem(item06);
-    return pointerEventForTest006;
+    auto EventTest = PointerEvent::Create();
+    CHKPP(EventTest);
+    EventTest->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    EventTest->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    EventTest->SetPointerId(0);
+    PointerEvent::PointerItem pointerItem;
+    pointerItem.SetPointerId(0);
+    pointerItem.SetDownTime(0);
+    pointerItem.SetPressed(false);
+    pointerItem.SetDisplayX(50);
+    pointerItem.SetDisplayY(50);
+    pointerItem.SetWindowX(70);
+    pointerItem.SetWindowY(70);
+    pointerItem.SetWidth(0);
+    pointerItem.SetHeight(0);
+    pointerItem.SetPressure(0);
+    pointerItem.SetDeviceId(0);
+    EventTest->AddPointerItem(pointerItem);
+    return EventTest;
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent007()
@@ -261,213 +258,212 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent009()
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
     pointerEvent->SetPointerId(1);
     pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, -1.0000);
-    PointerEvent::PointerItem item009;
-    item009.SetPointerId(1);
-    item009.SetDownTime(0);
-    item009.SetPressed(false);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDownTime(0);
+    item.SetPressed(false);
 
-    item009.SetDisplayX(50);
-    item009.SetDisplayY(50);
-    item009.SetWindowX(70);
-    item009.SetWindowY(70);
+    item.SetDisplayX(50);
+    item.SetDisplayY(50);
+    item.SetWindowX(70);
+    item.SetWindowY(70);
 
-    item009.SetWidth(0);
-    item009.SetHeight(0);
-    item009.SetPressure(0);
-    item009.SetDeviceId(0);
-    pointerEvent->AddPointerItem(item009);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetPressure(0);
+    item.SetDeviceId(0);
+    pointerEvent->AddPointerItem(item);
     return pointerEvent;
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent010()
 {
-    auto pointerEventForTest010 = PointerEvent::Create();
-    CHKPP(pointerEventForTest010);
-    pointerEventForTest010->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEventForTest010->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
-    pointerEventForTest010->SetPointerId(1);
-    pointerEventForTest010->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 30.0);
-    pointerEventForTest010->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, 40.0);
-    PointerEvent::PointerItem item010;
-    item010.SetPointerId(1);
-    item010.SetDownTime(0);
-    item010.SetPressed(false);
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 30.0);
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, 40.0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDownTime(0);
+    item.SetPressed(false);
 
-    item010.SetDisplayX(200);
-    item010.SetDisplayY(200);
-    item010.SetWindowX(300);
-    item010.SetWindowY(300);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    item.SetWindowX(300);
+    item.SetWindowY(300);
 
-    item010.SetWidth(0);
-    item010.SetHeight(0);
-    item010.SetPressure(0);
-    item010.SetDeviceId(0);
-    pointerEventForTest010->AddPointerItem(item010);
-    return pointerEventForTest010;
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetPressure(0);
+    item.SetDeviceId(0);
+    pointerEvent->AddPointerItem(item);
+    return pointerEvent;
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent011()
 {
-    auto pointerEventForTest011 = PointerEvent::Create();
-    CHKPP(pointerEventForTest011);
-    pointerEventForTest011->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEventForTest011->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEventForTest011->SetPointerId(1);
-    PointerEvent::PointerItem item011;
-    item011.SetPointerId(0);
-    item011.SetDownTime(0);
-    item011.SetDisplayX(523);
-    item011.SetDisplayY(723);
-    item011.SetWindowX(323);
-    item011.SetWindowY(453);
-    item011.SetWidth(0);
-    item011.SetHeight(0);
-    item011.SetTiltX(2.12);
-    item011.SetTiltY(5.43);
-    item011.SetPressure(0.15);
-    item011.SetDeviceId(1);
-    pointerEventForTest011->AddPointerItem(item011);
+    auto Event = PointerEvent::Create();
+    CHKPP(Event);
+    Event->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    Event->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    Event->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetDownTime(0);
+    item.SetPointerId(0);
+    item.SetDisplayX(523);
+    item.SetPressure(0.15);
+    item.SetDisplayY(723);
+    item.SetWindowX(323);
+    item.SetWindowY(453);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetDeviceId(1);
+    item.SetTiltX(2.12);
+    item.SetTiltY(5.43);
+    Event->AddPointerItem(item);
 
-    item011.SetPointerId(1);
-    item011.SetDownTime(0);
-    item011.SetDisplayX(50);
-    item011.SetDisplayY(50);
-    item011.SetWindowX(70);
-    item011.SetWindowY(70);
-    item011.SetWidth(0);
-    item011.SetHeight(0);
-    item011.SetTiltX(12.22);
-    item011.SetTiltY(15.33);
-    item011.SetPressure(0.45);
-    item011.SetDeviceId(1);
-    pointerEventForTest011->AddPointerItem(item011);
-    return pointerEventForTest011;
+    item.SetPointerId(1);
+    item.SetDownTime(0);
+    item.SetDisplayX(50);
+    item.SetPressure(0.45);
+    item.SetDisplayY(50);
+    item.SetWindowX(70);
+    item.SetWindowY(70);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetDeviceId(1);
+    item.SetTiltX(12.22);
+    item.SetTiltY(15.33);
+    
+    Event->AddPointerItem(item);
+    return Event;
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent012()
 {
-    auto pointerEventForTest012 = PointerEvent::Create();
-    CHKPP(pointerEventForTest012);
-    pointerEventForTest012->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEventForTest012->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEventForTest012->SetPointerId(1);
-    PointerEvent::PointerItem item012;
-    item012.SetPointerId(0);
-    item012.SetDownTime(0);
-    item012.SetDisplayX(523);
-    item012.SetDisplayY(723);
-    item012.SetWindowX(323);
-    item012.SetWindowY(453);
-    item012.SetWidth(0);
-    item012.SetHeight(0);
-    item012.SetTiltX(2.12);
-    item012.SetTiltY(5.43);
-    item012.SetPressure(0.15);
-    item012.SetDeviceId(1);
-    pointerEventForTest012->AddPointerItem(item012);
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDownTime(0);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
+    item.SetWindowX(323);
+    item.SetWindowY(453);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetTiltX(2.12);
+    item.SetTiltY(5.43);
+    item.SetPressure(0.15);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
 
-    item012.SetPointerId(1);
-    item012.SetDownTime(0);
-    item012.SetDisplayX(50);
-    item012.SetDisplayY(50);
-    item012.SetWindowX(70);
-    item012.SetWindowY(70);
-    item012.SetWidth(0);
-    item012.SetHeight(0);
-    item012.SetTiltX(12.22);
-    item012.SetTiltY(15.33);
-    item012.SetPressure(0.45);
-    item012.SetDeviceId(1);
-    pointerEventForTest012->AddPointerItem(item012);
-    return pointerEventForTest012;
+    item.SetPointerId(1);
+    item.SetDownTime(0);
+    item.SetDisplayX(50);
+    item.SetDisplayY(50);
+    item.SetWindowX(70);
+    item.SetWindowY(70);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetTiltX(12.22);
+    item.SetTiltY(15.33);
+    item.SetPressure(0.45);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    return pointerEvent;
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent013()
 {
-    auto pointerEventForTest013 = PointerEvent::Create();
-    CHKPP(pointerEventForTest013);
-    pointerEventForTest013->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEventForTest013->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    pointerEventForTest013->SetPointerId(1);
-    PointerEvent::PointerItem item013;
-    item013.SetPointerId(0);
-    item013.SetDownTime(0);
-    item013.SetDisplayX(523);
-    item013.SetDisplayY(723);
-    item013.SetWindowX(323);
-    item013.SetWindowY(453);
-    item013.SetWidth(0);
-    item013.SetHeight(0);
-    item013.SetTiltX(2.12);
-    item013.SetTiltY(5.43);
-    item013.SetPressure(0.15);
-    item013.SetDeviceId(1);
-    pointerEventForTest013->AddPointerItem(item013);
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetPointerId(1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDownTime(0);
+    item.SetDisplayX(523);
+    item.SetDisplayY(723);
+    item.SetWindowX(323);
+    item.SetWindowY(453);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetTiltX(2.12);
+    item.SetTiltY(5.43);
+    item.SetPressure(0.15);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
 
-    item013.SetPointerId(1);
-    item013.SetDownTime(0);
-    item013.SetDisplayX(50);
-    item013.SetDisplayY(50);
-    item013.SetWindowX(70);
-    item013.SetWindowY(70);
-    item013.SetWidth(0);
-    item013.SetHeight(0);
-    item013.SetTiltX(12.22);
-    item013.SetTiltY(15.33);
-    item013.SetPressure(0.45);
-    item013.SetDeviceId(1);
-    pointerEventForTest013->AddPointerItem(item013);
-    return pointerEventForTest013;
+    item.SetPointerId(1);
+    item.SetDownTime(0);
+    item.SetDisplayX(50);
+    item.SetDisplayY(50);
+    item.SetWindowX(70);
+    item.SetWindowY(70);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetTiltX(12.22);
+    item.SetTiltY(15.33);
+    item.SetPressure(0.45);
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    return pointerEvent;
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent014()
 {
-    auto pointerEventForTest014 = PointerEvent::Create();
-    CHKPP(pointerEventForTest014);
-    pointerEventForTest014->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEventForTest014->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEventForTest014->SetPointerId(0);
-    PointerEvent::PointerItem item014;
-    item014.SetDownTime(0);
-    item014.SetPointerId(0);
-    item014.SetPressed(false);
+    auto mouseEvent = PointerEvent::Create();
+    CHKPP(mouseEvent);
+    mouseEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    mouseEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    mouseEvent->SetPointerId(0);
+    PointerEvent::PointerItem mouseItem;
+    mouseItem.SetDownTime(0);
+    mouseItem.SetPointerId(0);
+    mouseItem.SetPressed(false);
 
-    item014.SetDisplayX(10);
-    item014.SetWindowX(10);
-    item014.SetDisplayY(10);
-    item014.SetWindowY(10);
+    mouseItem.SetDisplayX(10);
+    mouseItem.SetWindowX(10);
+    mouseItem.SetDisplayY(10);
+    mouseItem.SetWindowY(10);
 
-    item014.SetWidth(0);
-    item014.SetPressure(0);
-    item014.SetHeight(0);
-    item014.SetDeviceId(0);
-    pointerEventForTest014->AddPointerItem(item014);
-    return pointerEventForTest014;
+    mouseItem.SetWidth(0);
+    mouseItem.SetPressure(0);
+    mouseItem.SetHeight(0);
+    mouseItem.SetDeviceId(0);
+    mouseEvent->AddPointerItem(mouseItem);
+    return mouseEvent;
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent015()
 {
-    auto pointerEventForTest015 = PointerEvent::Create();
-    CHKPP(pointerEventForTest015);
-    pointerEventForTest015->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEventForTest015->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEventForTest015->SetPointerId(0);
-    PointerEvent::PointerItem item015;
-	item015.SetPointerId(0);
-    item015.SetDownTime(0);
-	item015.SetPressed(false);
-
-    item015.SetDisplayX(0);
-    item015.SetDisplayY(1259);
-    item015.SetWindowX(10);
-    item015.SetWindowY(10);
-
-    item015.SetWidth(0);
-    item015.SetHeight(0);
-    item015.SetPressure(0);
-    item015.SetDeviceId(0);
-    pointerEventForTest015->AddPointerItem(item015);
-    return pointerEventForTest015;
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    PointerEvent::PointerItem pointItem;
+    pointItem.SetPointerId(0);
+    pointItem.SetDownTime(0);
+    pointItem.SetPressed(false);
+    pointItem.SetDisplayY(1259);
+    pointItem.SetDisplayX(0);
+    pointItem.SetWindowX(10);
+    pointItem.SetWindowY(10);
+    pointItem.SetWidth(0);
+    pointItem.SetPressure(0);
+    pointItem.SetHeight(0);
+    pointItem.SetDeviceId(0);
+    pointerEvent->AddPointerItem(pointItem);
+    return pointerEvent;
 }
 
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
@@ -482,98 +478,99 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent016()
 
 std::shared_ptr<KeyEvent> InputManagerTest::SetupKeyEvent001()
 {
-    std::shared_ptr<KeyEvent> keyEventForTest001 = KeyEvent::Create();
-    CHKPP(keyEventForTest001);
+    std::shared_ptr<KeyEvent> pointEvent = KeyEvent::Create();
+    CHKPP(pointEvent);
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitDown001;
-    kitDown001.SetPressed(true);
-    kitDown001.SetDownTime(downTime);
-    kitDown001.SetKeyCode(KeyEvent::KEYCODE_BACK);
-    keyEventForTest001->AddPressedKeyItems(kitDown001);
-    keyEventForTest001->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    keyEventForTest001->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetPressed(true);
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
+    kitDown.SetDownTime(downTime);
+    
+    pointEvent->AddPressedKeyItems(kitDown);
+    pointEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    pointEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 
-    return keyEventForTest001;
+    return pointEvent;
 }
 
 std::shared_ptr<KeyEvent> InputManagerTest::SetupKeyEvent002()
 {
-    std::shared_ptr<KeyEvent> keyEventForTest002 = KeyEvent::Create();
-    CHKPP(keyEventForTest002);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    CHKPP(keyEvent);
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitDown002;
-    kitDown002.SetKeyCode(KeyEvent::KEYCODE_BACK);
-    kitDown002.SetPressed(true);
-    kitDown002.SetDownTime(downTime);
-    keyEventForTest002->SetKeyCode(KeyEvent::KEYCODE_BACK);
-    keyEventForTest002->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    keyEventForTest002->AddPressedKeyItems(kitDown002);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->AddPressedKeyItems(kitDown);
 
-    return keyEventForTest002;
+    return keyEvent;
 }
 
 std::shared_ptr<KeyEvent> InputManagerTest::SetupKeyEvent003()
 {
-    std::shared_ptr<KeyEvent> keyEventForTest003 = KeyEvent::Create();
-    CHKPP(keyEventForTest003);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    CHKPP(keyEvent);
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitDown003;
-    kitDown003.SetKeyCode(KeyEvent::KEYCODE_HOME);
-    kitDown003.SetPressed(true);
-    kitDown003.SetDownTime(downTime);
-    keyEventForTest003->SetKeyCode(KeyEvent::KEYCODE_HOME);
-    keyEventForTest003->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    keyEventForTest003->AddPressedKeyItems(kitDown003);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_HOME);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    keyEvent->AddPressedKeyItems(kitDown);
 
-    return keyEventForTest003;
+    return keyEvent;
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep1()
 {
-    auto pointerEventForStep1 = PointerEvent::Create();
+    auto pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
-    PointerEvent::PointerItem itemStep1;
-    itemStep1.SetPointerId(0);   // test code，set the PointerId = 0
-    itemStep1.SetDisplayX(523);   // test code，set the DisplayX = 523
-    itemStep1.SetDisplayY(723);   // test code，set the DisplayY = 723
-    itemStep1.SetPressure(5);    // test code，set the Pressure = 5
-    itemStep1.SetDeviceId(1);    // test code，set the DeviceId = 1
-    pointerEventForStep1->AddPointerItem(itemStep1);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);   // test code，set the PointerId = 0
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
+    item.SetPressure(5);    // test code，set the Pressure = 5
+    item.SetDeviceId(1);    // test code，set the DeviceId = 1
+    pointerEvent->AddPointerItem(item);
 
-    pointerEventForStep1->SetId(std::numeric_limits<int32_t>::max() - INDEX_THIRD);
-    pointerEventForStep1->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEventForStep1->SetPointerId(0);  // test code，set the PointerId = 1
-    pointerEventForStep1->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetId(std::numeric_limits<int32_t>::max() - INDEX_THIRD);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(0);  // test code，set the PointerId = 1
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    TestSimulateInputEvent(pointerEventForStep1);
+    TestSimulateInputEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    return pointerEventForStep1;
+    return pointerEvent;
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::TestMarkConsumedStep2()
 {
-    auto pointerEventStep2 = PointerEvent::Create();
-    CHKPP(pointerEventStep2);
-    PointerEvent::PointerItem itemStep2;
-    itemStep2.SetPointerId(0);   // test code，set the PointerId = 0
-    itemStep2.SetDisplayX(623);  // test code，set the DisplayX = 623
-    itemStep2.SetDisplayY(723);   // test code，set the DisplayY = 723
-    itemStep2.SetPressure(5);    // test code，set the Pressure = 5
-    itemStep2.SetDeviceId(1);    // test code，set the DeviceId = 1
-    pointerEventStep2->AddPointerItem(itemStep2);
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);   // test code，set the PointerId = 0
+    item.SetDisplayX(623);  // test code，set the DisplayX = 623
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
+    item.SetPressure(5);    // test code，set the Pressure = 5
+    item.SetDeviceId(1);    // test code，set the DeviceId = 1
+    pointerEvent->AddPointerItem(item);
 
-    pointerEventStep2->SetId(std::numeric_limits<int32_t>::max() - INDEX_SECOND);
-    pointerEventStep2->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEventStep2->SetPointerId(0);  // test code，set the PointerId = 1
-    pointerEventStep2->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetId(std::numeric_limits<int32_t>::max() - INDEX_SECOND);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(0);  // test code，set the PointerId = 1
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    TestSimulateInputEvent(pointerEventStep2);
+    TestSimulateInputEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    return pointerEventStep2;
+    return pointerEvent;
 }
 
 void InputManagerTest::TestMarkConsumedStep3(int32_t monitorId, int32_t eventId)
@@ -586,46 +583,46 @@ void InputManagerTest::TestMarkConsumedStep3(int32_t monitorId, int32_t eventId)
 
 void InputManagerTest::TestMarkConsumedStep4()
 {
-    auto pointerEventStep4 = PointerEvent::Create();
-    CHKPV(pointerEventStep4);
-    PointerEvent::PointerItem itemStep4;
-    itemStep4.SetDisplayX(523);  // test code，set the DisplayX = 523
-    itemStep4.SetPointerId(0);   // test code，set the PointerId = 0
-    itemStep4.SetDeviceId(1);    // test code，set the DeviceId = 1
-    itemStep4.SetPressure(5);    // test code，set the Pressure = 5
-    itemStep4.SetDisplayY(723);   // test code，set the DisplayY = 723
-    pointerEventStep4->AddPointerItem(itemStep4);
+    auto keyEvent = PointerEvent::Create();
+    CHKPV(keyEvent);
+    PointerEvent::PointerItem item;
+    item.SetDisplayX(523);  // test code，set the DisplayX = 523
+    item.SetPointerId(0);   // test code，set the PointerId = 0
+    item.SetDeviceId(1);    // test code，set the DeviceId = 1
+    item.SetPressure(5);    // test code，set the Pressure = 5
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
+    keyEvent->AddPointerItem(item);
 
-    pointerEventStep4->SetId(std::numeric_limits<int32_t>::max() - INDEX_FIRST);
-    pointerEventStep4->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEventStep4->SetPointerId(0);  // test code，set the PointerId = 1
-    pointerEventStep4->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    keyEvent->SetId(std::numeric_limits<int32_t>::max() - INDEX_FIRST);
+    keyEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    keyEvent->SetPointerId(0);  // test code，set the PointerId = 1
+    keyEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    TestSimulateInputEvent(pointerEventStep4, TestScene::EXCEPTION_TEST);
+    TestSimulateInputEvent(keyEvent, TestScene::EXCEPTION_TEST);
 #endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
 void InputManagerTest::TestMarkConsumedStep5()
 {
-    auto pointerEventStep5 = PointerEvent::Create();
-    CHKPV(pointerEventStep5);
-    PointerEvent::PointerItem itemStep5;
-    itemStep5.SetPointerId(0);   // test code，set the PointerId = 0
-    itemStep5.SetDisplayX(523);  // test code，set the DisplayX = 523
-    itemStep5.SetDisplayY(723);   // test code，set the DisplayY = 723
-    itemStep5.SetPressure(5);    // test code，set the Pressure = 5
-    itemStep5.SetDeviceId(1);    // test code，set the DeviceId = 1
-    pointerEventStep5->AddPointerItem(itemStep5);
+    auto mouseEventTest = PointerEvent::Create();
+    CHKPV(mouseEventTest);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);   // test code，set the PointerId = 0
+    item.SetDisplayX(523);  // test code，set the DisplayX = 523
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
+    item.SetPressure(5);    // test code，set the Pressure = 5
+    item.SetDeviceId(1);    // test code，set the DeviceId = 1
+    mouseEventTest->AddPointerItem(item);
 
-    pointerEventStep5->SetId(std::numeric_limits<int32_t>::max());
-    pointerEventStep5->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    pointerEventStep5->SetPointerId(0);  // test code，set the PointerId = 0
-    pointerEventStep5->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    mouseEventTest->SetId(std::numeric_limits<int32_t>::max());
+    mouseEventTest->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    mouseEventTest->SetPointerId(0);  // test code，set the PointerId = 0
+    mouseEventTest->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    TestSimulateInputEvent(pointerEventStep5, TestScene::EXCEPTION_TEST);
+    TestSimulateInputEvent(mouseEventTest, TestScene::EXCEPTION_TEST);
 #endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
@@ -633,113 +630,110 @@ void InputManagerTest::TestMarkConsumedStep5()
 void InputManagerTest::TestMarkConsumedStep6()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    auto pointerEventStep6 = PointerEvent::Create();
-    CHKPV(pointerEventStep6);
-    PointerEvent::PointerItem itemStep6;
-    itemStep6.SetPointerId(0);   // test code，set the PointerId = 0
-    itemStep6.SetDisplayY(723);   // test code，set the DisplayY = 723
-    itemStep6.SetDeviceId(1);    // test code，set the DeviceId = 1
-    itemStep6.SetDisplayX(523);   // test code，set the DisplayX = 523
-    itemStep6.SetPressure(5);    // test code，set the Pressure = 5
-    pointerEventStep6->AddPointerItem(itemStep6);
+    auto pointerEvent = PointerEvent::Create();
+    CHKPV(pointerEvent);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);   // test code，set the PointerId = 0
+    item.SetDisplayY(723);   // test code，set the DisplayY = 723
+    item.SetDeviceId(1);    // test code，set the DeviceId = 1
+    item.SetDisplayX(523);   // test code，set the DisplayX = 523
+    item.SetPressure(5);    // test code，set the Pressure = 5
+    pointerEvent->AddPointerItem(item);
 
-    pointerEventStep6->SetId(std::numeric_limits<int32_t>::max());
-    pointerEventStep6->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEventStep6->SetPointerId(0);  // test code，set the PointerId = 0
-    pointerEventStep6->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetId(std::numeric_limits<int32_t>::max());
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(0);  // test code，set the PointerId = 0
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
 
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_FOCUS);
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    TestSimulateInputEvent(pointerEventStep6);
+    TestSimulateInputEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupmouseEvent001()
 {
-    auto pointerEventForTest001 = PointerEvent::Create();
-    CHKPP(pointerEventForTest001);
-    pointerEventForTest001->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEventForTest001->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEventForTest001->SetPointerId(0);
-    PointerEvent::PointerItem item001;
-    item001.SetWidth(0);
-    item001.SetPressed(false);
-    item001.SetHeight(0);
-    item001.SetDeviceId(0);
-    item001.SetWindowX(10);
-    item001.SetPointerId(0);
-    item001.SetDownTime(0);
-    item001.SetDisplayX(10);
-    item001.SetDisplayY(10);
-    item001.SetPressure(0);
-    item001.SetWindowY(10);
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDownTime(0);
+    item.SetPressed(false);
 
-    
-    pointerEventForTest001->AddPointerItem(item001);
-    return pointerEventForTest001;
+    item.SetDisplayX(10);
+    item.SetDisplayY(10);
+    item.SetWindowX(10);
+    item.SetWindowY(10);
+
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetPressure(0);
+    item.SetDeviceId(0);
+    pointerEvent->AddPointerItem(item);
+    return pointerEvent;
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupmouseEvent002()
 {
-    auto pointerEventForTest002 = PointerEvent::Create();
-    CHKPP(pointerEventForTest002);
-    pointerEventForTest002->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEventForTest002->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEventForTest002->SetPointerId(0);
-    PointerEvent::PointerItem item002;
-    
-    item002.SetDownTime(0);
-    item002.SetPressure(0);
-    item002.SetPointerId(0);
-    item002.SetPressed(false);
-    item002.SetWindowX(70);
-    item002.SetHeight(0);
-    item002.SetWindowY(70);
-    item002.SetDisplayX(50);
-    item002.SetDisplayY(50);
-    item002.SetDeviceId(0);
-    item002.SetWidth(0);
-    
-    
-    pointerEventForTest002->AddPointerItem(item002);
-    return pointerEventForTest002;
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDownTime(0);
+    item.SetPressed(false);
+
+    item.SetDisplayX(50);
+    item.SetDisplayY(50);
+    item.SetWindowX(70);
+    item.SetWindowY(70);
+
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetPressure(0);
+    item.SetDeviceId(0);
+    pointerEvent->AddPointerItem(item);
+    return pointerEvent;
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupTouchScreenEvent001()
 {
-    auto pointerEvent001 = PointerEvent::Create();
-    CHKPP(pointerEvent001);
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
-    item.SetDisplayY(10);
     item.SetPointerId(0);
-    item.SetDeviceId(1);
     item.SetDisplayX(10);
+    item.SetDisplayY(10);
     item.SetPressure(5);
-    
-    pointerEvent001->SetPointerId(0);
-    pointerEvent001->AddPointerItem(item);
-    pointerEvent001->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent001->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    return pointerEvent001;
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    return pointerEvent;
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupTouchScreenEvent002()
 {
-    auto pointerEvent002 = PointerEvent::Create();
-    CHKPP(pointerEvent002);
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
     PointerEvent::PointerItem item;
-    item.SetDisplayY(50);
     item.SetPointerId(0);
-    item.SetDeviceId(1);
     item.SetDisplayX(50);
+    item.SetDisplayY(50);
     item.SetPressure(5);
-    
-    pointerEvent002->AddPointerItem(item);
-    pointerEvent002->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent002->SetPointerId(0);
-    pointerEvent002->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    return pointerEvent002;
+    item.SetDeviceId(1);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    return pointerEvent;
 }
 
 int32_t InputManagerTest::TestAddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
@@ -812,12 +806,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_001, TestSize.Level
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetPressed(true);
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
-    kitDown.SetDownTime(downTime);
+    KeyEvent::KeyItem kitDownTest;
+    kitDownTest.SetPressed(true);
+    kitDownTest.SetKeyCode(KeyEvent::KEYCODE_BACK);
+    kitDownTest.SetDownTime(downTime);
     injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
-    injectDownEvent->AddPressedKeyItems(kitDown);
+    injectDownEvent->AddPressedKeyItems(kitDownTest);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     TestSimulateInputEvent(injectDownEvent);
@@ -826,11 +820,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_001, TestSize.Level
     std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
     ASSERT_TRUE(injectUpEvent != nullptr);
     downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
-    KeyEvent::KeyItem kitUp;
-    kitUp.SetPressed(false);
-    kitUp.SetKeyCode(KeyEvent::KEYCODE_BACK);
-    kitUp.SetDownTime(downTime);
-    injectUpEvent->RemoveReleasedKeyItems(kitUp);
+    KeyEvent::KeyItem kitUpTest;
+    kitUpTest.SetPressed(false);
+    kitUpTest.SetKeyCode(KeyEvent::KEYCODE_BACK);
+    kitUpTest.SetDownTime(downTime);
+    injectUpEvent->RemoveReleasedKeyItems(kitUpTest);
     injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -1142,22 +1136,21 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_011, Test
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
     pointerEvent->SetPointerId(1);
     pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 30.0);
-    PointerEvent::PointerItem item011;
-    item011.SetPointerId(1);
-    item011.SetDownTime(0);
-    item011.SetPressed(false);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDownTime(0);
+    item.SetPressed(false);
 
-    item011.SetDisplayX(200);
-    item011.SetDisplayY(200);
-    item011.SetWindowY(300);
-    item011.SetWindowX(300);
-    
-    item011.SetDeviceId(0);
-    item011.SetWidth(0);
-    item011.SetHeight(0);
-    item011.SetPressure(0);
-    
-    pointerEvent->AddPointerItem(item011);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    item.SetWindowX(300);
+    item.SetWindowY(300);
+
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetPressure(0);
+    item.SetDeviceId(0);
+    pointerEvent->AddPointerItem(item);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     TestSimulateInputEvent(pointerEvent);
@@ -1173,30 +1166,30 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_011, Test
 HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_012, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    auto pointerEventForTest012 = PointerEvent::Create();
-    ASSERT_TRUE(pointerEventForTest012 != nullptr);
-    pointerEventForTest012->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEventForTest012->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
-    pointerEventForTest012->SetPointerId(1);
-    pointerEventForTest012->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 30.0);
-    PointerEvent::PointerItem item012;
-    item012.SetPointerId(1);
-    item012.SetDownTime(0);
-    item012.SetPressed(false);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 30.0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDownTime(0);
+    item.SetPressed(false);
 
-    item012.SetDisplayX(200);
-    item012.SetDisplayY(200);
-    item012.SetWindowX(300);
-    item012.SetWindowY(300);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    item.SetWindowX(300);
+    item.SetWindowY(300);
 
-    item012.SetWidth(0);
-    item012.SetHeight(0);
-    item012.SetPressure(0);
-    item012.SetDeviceId(0);
-    pointerEventForTest012->AddPointerItem(item012);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetPressure(0);
+    item.SetDeviceId(0);
+    pointerEvent->AddPointerItem(item);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEventForTest012);
+    TestSimulateInputEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1209,30 +1202,30 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_012, Test
 HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_013, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    auto pointerEventForTest013 = PointerEvent::Create();
-    ASSERT_TRUE(pointerEventForTest013 != nullptr);
-    pointerEventForTest013->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-    pointerEventForTest013->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
-    pointerEventForTest013->SetPointerId(1);
-    pointerEventForTest013->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 30.0);
-    PointerEvent::PointerItem item013;
-    item013.SetPointerId(1);
-    item013.SetDownTime(0);
-    item013.SetPressed(false);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 30.0);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDownTime(0);
+    item.SetPressed(false);
 
-    item013.SetDisplayX(200);
-    item013.SetDisplayY(200);
-    item013.SetWindowX(300);
-    item013.SetWindowY(300);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    item.SetWindowX(300);
+    item.SetWindowY(300);
 
-    item013.SetWidth(0);
-    item013.SetHeight(0);
-    item013.SetPressure(0);
-    item013.SetDeviceId(0);
-    pointerEventForTest013->AddPointerItem(item013);
+    item.SetWidth(0);
+    item.SetHeight(0);
+    item.SetPressure(0);
+    item.SetDeviceId(0);
+    pointerEvent->AddPointerItem(item);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEventForTest013);
+    TestSimulateInputEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1392,21 +1385,21 @@ HWTEST_F(InputManagerTest, InputManager_Pencil2InputEvent_004, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManager_NotResponse_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
+    auto keyEventTest = PointerEvent::Create();
+    ASSERT_NE(keyEventTest, nullptr);
 
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDisplayX(523);
-    item.SetDisplayY(723);
     item.SetPressure(5);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    pointerEvent->SetPointerId(0);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    item.SetDisplayY(723);
+    keyEventTest->AddPointerItem(item);
+    keyEventTest->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    keyEventTest->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    keyEventTest->SetPointerId(0);
+    InputManager::GetInstance()->SimulateInputEvent(keyEventTest);
+    InputManager::GetInstance()->SimulateInputEvent(keyEventTest);
+    InputManager::GetInstance()->SimulateInputEvent(keyEventTest);
 }
 
 /**
@@ -1912,8 +1905,8 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_008, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_INTERCEPT);
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_TRUE(pointerEvent != nullptr);
+    auto keyEvent = PointerEvent::Create();
+    ASSERT_TRUE(keyEvent != nullptr);
     PointerEvent::PointerItem item;
     item.SetPointerId(0);
     item.SetDownTime(10010);
@@ -1921,10 +1914,10 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_008, TestSize.Level1)
     item.SetDisplayX(523);
     item.SetDisplayY(723);
     item.SetDeviceId(1);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    keyEvent->AddPointerItem(item);
+    keyEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    keyEvent->SetPointerId(0);
+    keyEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
 
     auto interceptor = GetPtr<InputEventCallback>();
     int32_t interceptorId = InputManager::GetInstance()->AddInterceptor(interceptor);
@@ -1935,7 +1928,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_008, TestSize.Level1)
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
-    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
 
     std::string sPointerEs = InputManagerTest::GetEventDump();
     MMI_HILOGD("sPointerEs:%{public}s", sPointerEs.c_str());
@@ -2120,25 +2113,25 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_012, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_001, TestSize.Level1)
 {
     CALL_DEBUG_ENTER;
-    auto pointerEvent = SetupPointerEvent001();
-    ASSERT_TRUE(pointerEvent != nullptr);
+    auto pointerEventTest = SetupPointerEvent001();
+    ASSERT_TRUE(pointerEventTest != nullptr);
 
     auto callbackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callbackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callbackPtr);
+    int32_t monitorIdTest = TestAddMonitor(callbackPtr);
 #ifdef OHOS_BUILD_ENABLE_MONITOR
-    EXPECT_TRUE(IsValidHandlerId(monitorId));
+    EXPECT_TRUE(IsValidHandlerId(monitorIdTest));
 #else
-    EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
+    EXPECT_EQ(monitorIdTest, ERROR_UNSUPPORT);
 #endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    TestSimulateInputEvent(pointerEvent);
+    TestSimulateInputEvent(pointerEventTest);
 #endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
 
-    if (IsValidHandlerId(monitorId)) {
-        TestRemoveMonitor(monitorId);
+    if (IsValidHandlerId(monitorIdTest)) {
+        TestRemoveMonitor(monitorIdTest);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
