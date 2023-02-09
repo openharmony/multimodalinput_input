@@ -37,8 +37,11 @@ public:
 private:
     static void Print(const std::shared_ptr<KeyEvent> event)
     {
+        if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG) && event->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
+            return;
+        }
         std::vector<KeyEvent::KeyItem> eventItems { event->GetKeyItems() };
-        MMI_HILOGD("KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64
+        MMI_HILOGI("KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64
             ",EventType:%{public}s,Flag:%{public}d,KeyAction:%{public}s,NumLock:%{public}d,"
             "CapsLock:%{public}d,ScrollLock:%{public}d,EventNumber:%{public}d,keyItemsCount:%{public}zu",
             event->GetKeyCode(), event->GetActionTime(), event->GetActionStartTime(),
@@ -48,7 +51,7 @@ private:
             event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY),
             event->GetId(), eventItems.size());
         for (const auto &item : eventItems) {
-            MMI_HILOGD("DeviceNumber:%{public}d,KeyCode:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
+            MMI_HILOGI("DeviceNumber:%{public}d,KeyCode:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
                 "GetUnicode:%{public}d", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed(),
                 item.GetUnicode());
         }
@@ -59,7 +62,7 @@ private:
             for (; cItr != pressedKeys.cend(); ++cItr) {
                 tmpStr += ("," + std::to_string(*cItr));
             }
-            MMI_HILOGD("%{public}s]", tmpStr.c_str());
+            MMI_HILOGI("%{public}s]", tmpStr.c_str());
         }
     }
 
@@ -134,7 +137,7 @@ template <class T>
 void EventLogHelper::PrintEventData(std::shared_ptr<T> event)
 {
     CHKPV(event);
-    if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+    if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG) || (event->GetAction() == InputEvent::EVENT_TYPE_KEY)) {
         EventLogHelper::Print(event);
     }
 }
