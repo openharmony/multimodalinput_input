@@ -27,14 +27,14 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsUtil" };
 
 std::map<int32_t, std::string> axisType = {
-    { ABS_MT_TOUCH_MAJOR, "touchMajor" },
-    { ABS_MT_TOUCH_MINOR, "touchMinor" },
+    { ABS_MT_TOUCH_MAJOR, "touchmajor" },
+    { ABS_MT_TOUCH_MINOR, "touchminor" },
     { ABS_MT_ORIENTATION, "orientation" },
     { ABS_MT_POSITION_X, "x" },
     { ABS_MT_POSITION_Y, "y" },
     { ABS_MT_PRESSURE, "pressure" },
-    { ABS_MT_WIDTH_MAJOR, "toolMajor" },
-    { ABS_MT_WIDTH_MINOR, "toolMinor" },
+    { ABS_MT_WIDTH_MAJOR, "toolmajor" },
+    { ABS_MT_WIDTH_MINOR, "toolminor" },
 };
 
 constexpr uint32_t EVDEV_UDEV_TAG_TOUCHSCREEN = (1 << 4);
