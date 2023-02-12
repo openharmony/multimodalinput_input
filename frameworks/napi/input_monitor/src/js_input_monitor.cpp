@@ -349,10 +349,10 @@ MapFun JsInputMonitor::GetFuns(const std::shared_ptr<PointerEvent> pointerEvent,
     mapFun["screenId"] = std::bind(&PointerEvent::GetTargetDisplayId, pointerEvent);
     mapFun["windowId"] = std::bind(&PointerEvent::GetTargetWindowId, pointerEvent);
     mapFun["deviceId"] = std::bind(&PointerEvent::PointerItem::GetDeviceId, item);
-    mapFun["windowX"] = std::bind(&PointerEvent::PointerItem::GetDisplayX, item);
-    mapFun["windowY"] = std::bind(&PointerEvent::PointerItem::GetDisplayY, item);
-    mapFun["screenX"] = std::bind(&PointerEvent::PointerItem::GetWindowX, item);
-    mapFun["screenY"] = std::bind(&PointerEvent::PointerItem::GetWindowY, item);
+    mapFun["windowX"] = std::bind(&PointerEvent::PointerItem::GetWindowX, item);
+    mapFun["windowY"] = std::bind(&PointerEvent::PointerItem::GetWindowY, item);
+    mapFun["screenX"] = std::bind(&PointerEvent::PointerItem::GetDisplayX, item);
+    mapFun["screenY"] = std::bind(&PointerEvent::PointerItem::GetDisplayY, item);
     mapFun["rawDeltaX"] = std::bind(&PointerEvent::PointerItem::GetRawDx, item);
     mapFun["rawDeltaY"] = std::bind(&PointerEvent::PointerItem::GetRawDy, item);
     return mapFun;
