@@ -60,7 +60,7 @@ if [ $? -ne 0 ]; then
     exit 0
 fi
 
-PATCH_FILE=$(realpath $(ls -l $path_file_dir/*.diff | tail -n 1 | awk '{print $9}'))
+PATCH_FILE=$(realpath $(ls $path_file_dir/*.diff | tail -n 1))
 
 echo "PATCH_FILE: $PATCH_FILE"
 
