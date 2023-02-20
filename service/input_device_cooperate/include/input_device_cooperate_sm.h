@@ -68,6 +68,8 @@ public:
     int32_t StartInputDeviceCooperate(const std::string &remoteNetworkId, int32_t startInputDeviceId);
     int32_t StopInputDeviceCooperate();
     void GetCooperateState(const std::string &deviceId);
+    void SetVirtualKeyBoardDevId(int32_t deviceId);
+    int32_t GetVirtualKeyBoardDevId();
     void StartRemoteCooperate(const std::string &remoteNetworkId);
     void StartRemoteCooperateResult(bool isSuccess, const std::string &startDhid, int32_t xPercent, int32_t yPercent);
     void StopRemoteCooperate();
@@ -104,6 +106,7 @@ private:
     std::pair<std::string, std::string> preparedNetworkId_;
     std::string startDhid_ ;
     std::string srcNetworkId_;
+    int32_t virtualKeyBoardId_ { -1 };
     CooperateState cooperateState_ { CooperateState::STATE_FREE };
     std::shared_ptr<DistributedHardware::DmInitCallback> initCallback_ { nullptr };
     std::shared_ptr<DistributedHardware::DeviceStateCallback> stateCallback_ { nullptr };
