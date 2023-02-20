@@ -142,6 +142,15 @@ void InputDeviceCooperateSM::OnCloseCooperation(const std::string &networkId, bo
     }
 }
 
+void InputDeviceCooperateSM::SetVirtualKeyBoardDevId(int32_t deviceId) {
+    virtualKeyBoardId_ = deviceId;
+    MMI_HILOGI("virtualKeyBoardId_ has been set to%{public}d", virtualKeyBoardId_);
+}
+
+int32_t InputDeviceCooperateSM::GetVirtualKeyBoardDevId() {
+    return virtualKeyBoardId_;
+}
+
 void InputDeviceCooperateSM::GetCooperateState(const std::string &deviceId)
 {
     CALL_INFO_TRACE;
@@ -248,6 +257,7 @@ void InputDeviceCooperateSM::StartRemoteCooperateResult(bool isSuccess,
     if (cooperateState_ == CooperateState::STATE_FREE) {
         MouseEventHdr->SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
         UpdateState(CooperateState::STATE_IN);
+        InputDevMgr->NotifyVirtualKeyBoardStatus(GetVirtualKeyBoardDevId(), true);
     }
     if (cooperateState_ == CooperateState::STATE_OUT) {
         MouseEventHdr->SetAbsolutionLocation(MOUSE_ABS_LOCATION - xPercent, yPercent);
@@ -310,6 +320,7 @@ void InputDeviceCooperateSM::OnStartFinish(bool isSuccess,
                 DevCooperateSoftbusAdapter->StartCooperateOtherResult(sink, remoteNetworkId);
             }
             UpdateState(CooperateState::STATE_FREE);
+            InputDevMgr->NotifyVirtualKeyBoardStatus(GetVirtualKeyBoardDevId(), false);
             KeyRepeat->RemoveTimer();
         } else {
             MMI_HILOGI("Current state is out");
