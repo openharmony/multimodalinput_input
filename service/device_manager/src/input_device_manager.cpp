@@ -410,6 +410,9 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
 
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (IsKeyboardDevice(inputDevice)) {
+        if (IsRemote(inputDevice)) {
+            InputDevCooSM->SetVirtualKeyBoardDevId(deviceId);
+        }
         InputDevCooSM->OnKeyboardOnline(info.dhid);
     }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
@@ -769,6 +772,19 @@ bool InputDeviceManager::HasLocalPointerDevice() const
         }
     }
     return false;
+}
+
+void InputDeviceManager::NotifyVirtualKeyBoardStatus(int32_t deviceId, bool isAvailable) const {
+    MMI_HILOGI("virtual keyboard device %{public}s", isAvailable ? "online" : "offline");
+    if (deviceId == -1) {
+        MMI_HILOGE("no virtual keyboard device for this device!");
+        return;
+    }
+
+    for (const auto &item : devListener_) {
+        CHKPC(item.first);
+        item.second(deviceId, isAvailable ? "add" : "remove");
+    }
 }
 
 std::string InputDeviceManager::MakeNetworkId(const char *phys) const
