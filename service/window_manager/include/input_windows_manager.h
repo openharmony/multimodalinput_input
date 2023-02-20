@@ -144,6 +144,7 @@ private:
     void CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void UpdateDisplayIdAndName();
     void UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent);
+    void ClearExtraData();
 private:
     UDSServer* udsServer_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_POINTER
