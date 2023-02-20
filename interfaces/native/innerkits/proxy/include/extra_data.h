@@ -45,6 +45,12 @@ struct ExtraData {
      * @since 9
      */
     int32_t sourceType { -1 };
+    /**
+     * 事件触发的pointer id
+     *
+     * @since 9
+     */
+    int32_t pointerId { -1 };
 };
 } // namespace MMI
 } // namespace OHOS
