@@ -72,6 +72,7 @@ public:
     std::vector<std::string> GetCooperateDhids(int32_t deviceId);
     std::vector<std::string> GetCooperateDhids(const std::string &dhid);
     bool HasLocalPointerDevice() const;
+    void NotifyVirtualKeyBoardStatus(int32_t deviceId, bool isAvailable) const;
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     bool IsKeyboardDevice(struct libinput_device* device) const;
     bool IsPointerDevice(struct libinput_device* device) const;
