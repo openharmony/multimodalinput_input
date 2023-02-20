@@ -1029,6 +1029,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         InitMouseDownInfo();
         MMI_HILOGD("Mouse up, clear mouse down info");
     }
+    if (action == PointerEvent::POINTER_ACTION_PULL_UP) {
+        ClearExtraData();
+    }
     MMI_HILOGD("pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
                "logicalX:%{public}d,logicalY:%{public}d,"
                "displayX:%{public}d,displayY:%{public}d,windowX:%{public}d,windowY:%{public}d",
@@ -1101,7 +1104,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                        "window:%{public}d, flags:%{public}d", item.id, item.flags);
             continue;
         }
-        if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+        if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+            extraData_.pointerId == pointerId) {
             if (IsInHotArea(logicalX, logicalY, item.defaultHotAreas)) {
                 touchWindow = &item;
                 break;
@@ -1143,7 +1147,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetToolWindowY(pointerItem.GetToolDisplayY() + physicDisplayInfo->y - touchWindow->area.y);
     pointerItem.SetTargetWindowId(touchWindow->id);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-    if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+    if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+        extraData_.pointerId == pointerId) {
         pointerEvent->SetBuffer(extraData_.buffer);
         UpdatePointerAction(pointerEvent);
         PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
@@ -1172,6 +1177,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             touchItemDownInfos_.erase(iter);
             MMI_HILOGD("Clear the touch info, action is up, pointerid:%{public}d", pointerId);
         }
+    }
+    if (pointerAction == PointerEvent::POINTER_ACTION_PULL_UP) {
+        ClearExtraData();
     }
     return ERR_OK;
 }
@@ -1432,7 +1440,17 @@ int32_t InputWindowsManager::AppendExtraData(const ExtraData& extraData)
     extraData_.appended = extraData.appended;
     extraData_.buffer = extraData.buffer;
     extraData_.sourceType = extraData.sourceType;
+    extraData_.pointerId = extraData.pointerId;
     return RET_OK;
+}
+
+void InputWindowsManager::ClearExtraData()
+{
+    CALL_DEBUG_ENTER;
+    extraData_.appended = false;
+    extraData_.buffer.clear();
+    extraData_.sourceType = -1;
+    extraData_.pointerId = -1;
 }
 
 void InputWindowsManager::UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent)
