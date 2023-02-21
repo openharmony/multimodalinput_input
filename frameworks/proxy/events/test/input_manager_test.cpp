@@ -4203,6 +4203,7 @@ HWTEST_F(InputManagerTest, AppendExtraData_001, TestSize.Level1)
     extraData.appended = true;
     extraData.buffer = buffer;
     extraData.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    extraData.pointerId = 1;
     InputManager::GetInstance()->AppendExtraData(extraData);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     auto pointerEvent = SetupPointerEvent001();
@@ -4211,6 +4212,7 @@ HWTEST_F(InputManagerTest, AppendExtraData_001, TestSize.Level1)
 
     extraData.appended = false;
     extraData.buffer.clear();
+    extraData.pointerId = -1;
     InputManager::GetInstance()->AppendExtraData(extraData);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     ASSERT_TRUE(pointerEvent != nullptr);
