@@ -575,13 +575,15 @@ int32_t JsInputMonitor::TransformTsActionValue(int32_t pointerAction)
         case PointerEvent::POINTER_ACTION_CANCEL: {
             return CANCEL;
         }
-        case PointerEvent::POINTER_ACTION_MOVE: {
+        case PointerEvent::POINTER_ACTION_MOVE:
+        case PointerEvent::POINTER_ACTION_PULL_MOVE: {
             return MOVE;
         }
         case PointerEvent::POINTER_ACTION_BUTTON_DOWN: {
             return BUTTON_DOWN;
         }
-        case PointerEvent::POINTER_ACTION_BUTTON_UP: {
+        case PointerEvent::POINTER_ACTION_BUTTON_UP:
+        case PointerEvent::POINTER_ACTION_PULL_UP: {
             return BUTTON_UP;
         }
         case PointerEvent::POINTER_ACTION_AXIS_BEGIN: {
