@@ -345,7 +345,6 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         item.second(deviceId, "add");
     }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
-    NotifyDevCallback(deviceId, info);
 
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (IsKeyboardDevice(inputDevice)) {
