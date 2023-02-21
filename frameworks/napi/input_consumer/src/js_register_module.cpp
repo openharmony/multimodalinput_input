@@ -240,7 +240,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     size_t argc = 3;
     napi_value argv[3] = { 0 };
     napi_value thisArg = nullptr;
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, &thisArg, nullptr), GET_CB_INFO);
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, &thisArg, nullptr), GET_CB_INFO);
     if (argc < 3) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
@@ -250,7 +250,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         return nullptr;
     }
     napi_valuetype valueOfThis = napi_undefined;
-    CHKRP(env, napi_typeof(env, thisArg, &valueOfThis), TYPEOF);
+    CHKRP(napi_typeof(env, thisArg, &valueOfThis), TYPEOF);
     if (valueOfThis == napi_undefined) {
         MMI_HILOGE("%{public}s, Wrong value of this.", __func__);
         return nullptr;
