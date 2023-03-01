@@ -185,6 +185,7 @@ ohos_shared_library("libmmi-server") {
     "ipc:ipc_core",
     "multimedia_image_framework:image_native",
     "safwk:system_ability_fwk",
+    "access_token:libtokenid_sdk",
   ]
 
   if (input_feature_input_cooperation) {
