@@ -32,7 +32,7 @@ PermissionHelper::~PermissionHelper() {}
 
 bool PermissionHelper::VerifySystemApp()
 {
-    MMI_HILOGI("verify system App");
+    MMI_HILOGD("verify system App");
     auto callerToken = IPCSkeleton::GetCallingTokenID();
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
     MMI_HILOGD("token type is %{public}d", static_cast<int32_t>(tokenType));
