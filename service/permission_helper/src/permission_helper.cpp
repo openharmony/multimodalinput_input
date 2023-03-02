@@ -19,6 +19,8 @@
 
 #include "mmi_log.h"
 
+#include "tokenid_kit.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -27,6 +29,27 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Permi
 
 PermissionHelper::PermissionHelper() {}
 PermissionHelper::~PermissionHelper() {}
+
+bool PermissionHelper::VerifySystemApp()
+{
+    MMI_HILOGD("verify system App");
+    auto callerToken = IPCSkeleton::GetCallingTokenID();
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
+    MMI_HILOGD("token type is %{public}d", static_cast<int32_t>(tokenType));
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
+    if (tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE
+        || tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL
+        || callingUid == ROOT_UID) {
+        MMI_HILOGD("called tokenType is native, verify success");
+        return true;
+    }
+    uint64_t accessTokenIdEx = IPCSkeleton::GetCallingFullTokenID();
+    if (!OHOS::Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(accessTokenIdEx)) {
+        MMI_HILOGE("system api is called by non-system app");
+        return false;
+    }
+    return true;
+}
 
 bool PermissionHelper::CheckPermission(uint32_t required)
 {

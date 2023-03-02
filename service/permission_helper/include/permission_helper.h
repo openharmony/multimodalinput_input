@@ -28,12 +28,15 @@ public:
     static const uint32_t APL_SYSTEM_BASIC = 1 << OHOS::Security::AccessToken::APL_SYSTEM_BASIC;
     static const uint32_t APL_SYSTEM_CORE = 1 << OHOS::Security::AccessToken::APL_SYSTEM_CORE;
     static const uint32_t APL_SYSTEM_BASIC_CORE = APL_SYSTEM_BASIC + APL_SYSTEM_CORE;
+    static const uint32_t ROOT_UID = 0;
 
 public:
     DISALLOW_COPY_AND_MOVE(PermissionHelper);
     bool CheckPermission(uint32_t required);
     bool CheckMonitor();
     int32_t GetTokenType();
+
+    bool VerifySystemApp();
 
 private:
     bool CheckHapPermission(uint32_t tokenId, uint32_t required);
