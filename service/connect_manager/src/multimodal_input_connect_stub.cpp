@@ -414,6 +414,11 @@ int32_t MultimodalInputConnectStub::StubGetKeyboardType(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -447,6 +452,11 @@ int32_t MultimodalInputConnectStub::StubAddInputHandler(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubRemoveInputHandler(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
@@ -502,6 +512,11 @@ int32_t MultimodalInputConnectStub::StubMarkEventConsumed(MessageParcel& data, M
 int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
@@ -531,6 +546,11 @@ int32_t MultimodalInputConnectStub::StubSubscribeKeyEvent(MessageParcel& data, M
 int32_t MultimodalInputConnectStub::StubUnsubscribeKeyEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
@@ -580,6 +600,11 @@ int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel& data, Mess
 int32_t MultimodalInputConnectStub::StubInjectKeyEvent(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
@@ -703,6 +728,11 @@ int32_t MultimodalInputConnectStub::StubSetDisplayBind(MessageParcel& data, Mess
 int32_t MultimodalInputConnectStub::StubRegisterCooperateMonitor(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
@@ -721,6 +751,11 @@ int32_t MultimodalInputConnectStub::StubRegisterCooperateMonitor(MessageParcel& 
 int32_t MultimodalInputConnectStub::StubUnregisterCooperateMonitor(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
@@ -739,6 +774,11 @@ int32_t MultimodalInputConnectStub::StubUnregisterCooperateMonitor(MessageParcel
 int32_t MultimodalInputConnectStub::StubEnableInputDeviceCooperate(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
@@ -761,6 +801,11 @@ int32_t MultimodalInputConnectStub::StubEnableInputDeviceCooperate(MessageParcel
 int32_t MultimodalInputConnectStub::StubStartInputDeviceCooperate(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
@@ -785,6 +830,11 @@ int32_t MultimodalInputConnectStub::StubStartInputDeviceCooperate(MessageParcel&
 int32_t MultimodalInputConnectStub::StubStopDeviceCooperate(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
@@ -805,6 +855,11 @@ int32_t MultimodalInputConnectStub::StubStopDeviceCooperate(MessageParcel& data,
 int32_t MultimodalInputConnectStub::StubGetInputDeviceCooperateState(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
