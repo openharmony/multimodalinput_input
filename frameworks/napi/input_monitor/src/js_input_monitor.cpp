@@ -808,6 +808,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
             bool retValue = false;
             status = napi_get_value_bool(jsEnv_, result, &retValue);
             if (status != napi_ok) {
+                napi_close_handle_scope(jsEnv_, scope);
                 return;
             }
             if (retValue) {
