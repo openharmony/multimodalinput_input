@@ -84,7 +84,6 @@ config("libmmi_server_config") {
 
 ohos_shared_library("libmmi-server") {
   sources = libmmi_service_sources
-
   if (input_feature_input_cooperation) {
     sources += [
       "input_device_cooperate/src/cooperate_event_handler.cpp",
@@ -183,7 +182,7 @@ ohos_shared_library("libmmi-server") {
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "multimedia_image_framework:image_native",
     "safwk:system_ability_fwk",
   ]

@@ -61,6 +61,7 @@ config("libmmi_test_util") {
 ohos_source_set("libmmi-common") {
   sources = libmmi_common_sources
   public_configs = [ ":libmmi_client_config" ]
+  visibility = [ "${mmi_path}/*" ]
 
   external_deps = [
     "c_utils:utils",
@@ -73,6 +74,8 @@ ohos_source_set("libmmi-common") {
 
 ohos_shared_library("libmmi-client") {
   sources = libmmi_client_sources
+  version_script = "${mmi_path}/interfaces/native/innerkits/libmmi-client-map"
+  innerapi_tags = [ "platformsdk" ]
   if (input_feature_input_cooperation) {
     sources += [ "event_handler/src/input_device_cooperate_impl.cpp" ]
   }
@@ -112,7 +115,7 @@ ohos_shared_library("libmmi-client") {
     "eventhandler:libeventhandler",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
   ]
 }
 
@@ -136,7 +139,7 @@ ohos_unittest("ut-mmi-proxy-out") {
   external_deps = [
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
   ]
 }
 
@@ -167,7 +170,7 @@ ohos_unittest("KeyEventTest") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "window_manager:libwm",
   ]
 }
@@ -203,7 +206,7 @@ ohos_unittest("InputManagerTest") {
     "access_token:libtoken_setproc",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "window_manager:libwm",
   ]
 }
@@ -227,7 +230,7 @@ ohos_unittest("InputManagerManualTest") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
   ]
 }
 
@@ -250,7 +253,7 @@ ohos_unittest("InputManagerFilterManualTest") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
   ]
 }
 
@@ -278,7 +281,7 @@ ohos_unittest("PointerEventTest") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "window_manager:libwm",
   ]
 }
