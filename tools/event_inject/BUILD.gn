@@ -53,7 +53,7 @@ ohos_source_set("event-injection") {
     "//third_party/cJSON:cjson",
   ]
 
-  external_deps = [ "ipc:ipc_core" ]
+  external_deps = [ "ipc:ipc_single" ]
 
   part_name = "input"
   subsystem_name = "multimodalinput"
@@ -126,7 +126,7 @@ ohos_unittest("ut-event-injection-out") {
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
   ]
 }
 

@@ -289,6 +289,7 @@ int32_t MMIService::Init()
 void MMIService::OnStart()
 {
     int sleepSeconds = 3;
+    std::string name = "mmi-service";
     sleep(sleepSeconds);
     CHK_PID_AND_TID();
     int32_t ret = Init();
@@ -300,6 +301,7 @@ void MMIService::OnStart()
     MMI_HILOGD("Started successfully");
     AddReloadDeviceTimer();
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
+    pthread_setname_np(t_.native_handle(), name.c_str());
 #ifdef OHOS_RSS_CLIENT
     MMI_HILOGI("Add system ability listener start");
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
