@@ -279,7 +279,7 @@ int32_t EventInterceptorHandler::InterceptorCollection::AddInterceptor(const Ses
     auto sIter = interceptors_.emplace(iterIndex, interceptor);
     if (sIter == interceptors_.end()) {
         MMI_HILOGE("Failed to add interceptor");
-        RET_ERR;
+        return RET_ERR;
     }
     return RET_OK;
 }
@@ -306,7 +306,7 @@ void EventInterceptorHandler::InterceptorCollection::RemoveInterceptor(const Ses
     auto sIter = interceptors_.emplace(iterIndex, interceptor);
     if (sIter == interceptors_.end()) {
         MMI_HILOGE("Internal error, interceptor has been removed");
-        RET_ERR;
+        return;
     }
     MMI_HILOGD("Event type is updated:%{public}u", interceptor.eventType_);
 }
