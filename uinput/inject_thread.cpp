@@ -15,6 +15,7 @@
 
 #include "inject_thread.h"
 
+#include <sys/prctl.h>
 namespace OHOS {
 namespace MMI {
 std::mutex InjectThread::mutex_;
@@ -23,6 +24,7 @@ std::vector<InjectInputEvent> InjectThread::injectQueue_;
 
 void InjectThread::InjectFunc() const
 {
+    prctl(PR_SET_NAME, "mmi-inject");
     std::unique_lock<std::mutex> uniqueLock(mutex_);
     while (true) {
         conditionVariable_.wait(uniqueLock);
