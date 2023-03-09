@@ -848,7 +848,7 @@ std::string InputDeviceManager::GenerateDescriptor(struct libinput_device *input
     if (uniqueId != nullptr && uniqueId[0] != '\0') {
         rawDescriptor += "uniqueId:" + std::string(uniqueId);
     }
-    if (physicalPath != nullptr) {
+    if (physicalPath != nullptr && physicalPath[0] != '\0') {
         rawDescriptor += "physicalPath:" + std::string(physicalPath);
     }
     if (name != nullptr && name[0] != '\0') {
