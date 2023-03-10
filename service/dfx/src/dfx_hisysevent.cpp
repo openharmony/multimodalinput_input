@@ -399,12 +399,16 @@ void DfxHisysevent::ReportComboStartTimes()
 
 void DfxHisysevent::ReportPowerInfo(std::shared_ptr<KeyEvent> key, OHOS::HiviewDFX::HiSysEvent::EventType type)
 {
+    if (key == nullptr) {
+        MMI_HILOGE("get key is failed");
+        return;
+    }
     if (key->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         int32_t ret = HiSysEventWrite(
             OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
             "INPUT_POWER_UP",
             type);
-        if (ret != 0) {
+        if (ret != RET_OK) {
             MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
     } else if (key->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
@@ -412,11 +416,11 @@ void DfxHisysevent::ReportPowerInfo(std::shared_ptr<KeyEvent> key, OHOS::HiviewD
             OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
             "INPUT_POWER_DOWN",
             type);
-        if (ret != 0) {
+        if (ret != RET_OK) {
             MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
         }
     } else {
-        MMI_HILOGE("press power key is error");
+        MMI_HILOGW("press power key is error");
     }
 }
 }
