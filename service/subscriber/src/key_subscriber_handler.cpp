@@ -17,6 +17,7 @@
 
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
+#include "dfx_hisysevent.h"
 #include "error_multimodal.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
@@ -193,6 +194,9 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     CHKPV(subscriber);
     auto udsServerPtr = InputHandler->GetUDSServer();
     CHKPV(udsServerPtr);
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER) {
+        DfxHisysevent::ReportPowerInfo(keyEvent, OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC);
+    }
     NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
     int32_t fd = subscriber->sess_->GetFd();
