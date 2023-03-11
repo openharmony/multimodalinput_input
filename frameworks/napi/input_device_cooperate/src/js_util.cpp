@@ -29,10 +29,49 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsUti
 JsUtil::CallbackInfo::~CallbackInfo()
 {
     CALL_DEBUG_ENTER;
-    if (ref != nullptr && env != nullptr) {
-        CHKRV(napi_delete_reference(env, ref), DELETE_REFERENCE);
-        env = nullptr;
+    if (ref == nullptr || env == nullptr) {
+        return;
     }
+    DeleteNapiRef(env, ref);
+}
+
+void JsUtil::DeleteNapiRef(napi_env env, napi_ref ref)
+{
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(env, &loop), GET_UV_EVENT_LOOP);
+    CallbackReceiveInfoWorker *dataWorker = new (std::nothrow) CallbackReceiveInfoWorker();
+    if (dataWorker == nullptr) {
+        return;
+    }
+
+    dataWorker->env = env;
+    dataWorker->ref = ref;
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    if (work == nullptr) {
+        MMI_HILOGE("deleteNapiRef new work falied.");
+        DeletePtr(dataWorker);
+        return;
+    }
+    work->data = static_cast<void *>(dataWorker);
+    int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, UvQueueWorkDeleteRef);
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work failed");
+        DeletePtr(dataWorker);
+        DeletePtr<uv_work_t*>(work);
+    }
+}
+
+void JsUtil::UvQueueWorkDeleteRef(uv_work_t *work, int32_t status)
+{
+    CHKPV(work);
+    CallbackReceiveInfoWorker *dataWorkerData = static_cast<CallbackReceiveInfoWorker *>(work->data);
+    if (dataWorkerData == nullptr) {
+        DeletePtr<uv_work_t*>(work);
+        return;
+    }
+    CHKRV(napi_delete_reference(dataWorkerData->env, dataWorkerData->ref), DELETE_REFERENCE);
+    DeletePtr(dataWorkerData);
+    DeletePtr<uv_work_t*>(work);
 }
 
 napi_value JsUtil::GetEnableInfo(sptr<CallbackInfo> cb)
