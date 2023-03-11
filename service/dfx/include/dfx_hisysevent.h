@@ -71,6 +71,7 @@ public:
     static void CalcComboStartTimes(int32_t keyDownDuration);
     static void ReportDispTimes();
     static void ReportComboStartTimes();
+    static void ReportPowerInfo(std::shared_ptr<KeyEvent> key, OHOS::HiviewDFX::HiSysEvent::EventType type);
     static inline void GetComboStartTime()
     {
         comboStartTime_ = GetSysClockTime();

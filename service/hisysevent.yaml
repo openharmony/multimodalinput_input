@@ -176,3 +176,9 @@ COMBO_START_TIME:
   BELOW50MS: {type: UINT32, desc: times below 50ms}
   ABOVE50MS: {type: UINT32, desc: times above 50ms}
   MSG: {type: STRING, desc: message}
+
+INPUT_POWER_UP:
+  __BASE: {type: STATISTIC, level: CRITICAL, desc: power input up}
+
+INPUT_POWER_DOWN:
+  __BASE: {type: STATISTIC, level: CRITICAL, desc: power input down}
