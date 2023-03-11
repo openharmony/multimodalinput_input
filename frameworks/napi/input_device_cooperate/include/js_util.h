@@ -20,10 +20,12 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <uv.h>
 
 #include <napi/native_api.h>
 
 #include "cooperation_message.h"
+#include "napi_constants.h"
 
 #include "refbase.h"
 
@@ -59,6 +61,16 @@ public:
         UserData uData;
     };
 
+    struct CallbackReceiveInfoWorker {
+        napi_env env { nullptr };
+        napi_ref ref { nullptr };
+        napi_deferred deferred { nullptr };
+        int32_t errCode { 0 };
+        CallbackData data;
+        UserData uData;
+        std::unique_ptr<CallbackInfo> callback = nullptr;
+    };
+
     static napi_value GetEnableInfo(sptr<CallbackInfo> cb);
     static napi_value GetStartInfo(sptr<CallbackInfo> cb);
     static napi_value GetStopInfo(sptr<CallbackInfo> cb);
@@ -66,6 +78,8 @@ public:
     static napi_value GetStateResult(napi_env env, bool result);
     static napi_value GetResult(napi_env env, bool result, int32_t errCode);
     static bool IsSameHandle(napi_env env, napi_value handle, napi_ref ref);
+    static void DeleteNapiRef(napi_env env, napi_ref ref);
+    static void UvQueueWorkDeleteRef(uv_work_t *work, int32_t status);
 
     template <typename T>
     static void DeletePtr(T &ptr)
