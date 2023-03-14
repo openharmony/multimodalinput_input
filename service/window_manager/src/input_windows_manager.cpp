@@ -866,7 +866,7 @@ bool InputWindowsManager::UpdateDisplayId(int32_t& displayId)
 std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX, int32_t logicalY,
     const std::shared_ptr<PointerEvent>& pointerEvent)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     int32_t action = pointerEvent->GetPointerAction();
     if ((firstBtnDownWindowId_ == -1) ||
         ((action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) && (pointerEvent->GetPressedButtons().size() == 1)) ||
