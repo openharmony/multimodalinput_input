@@ -22,6 +22,7 @@
 #include "key_event_input_subscribe_manager.h"
 #include "pointer_event.h"
 #include "proto.h"
+#include "switch_event_input_subscribe_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -43,6 +44,10 @@ public:
     int32_t UnsubscribeKeyEvent(int32_t subscribeId);
     int32_t InjectEvent(const std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    int32_t SubscribeSwitchEvent(int32_t subscribeId);
+    int32_t UnsubscribeSwitchEvent(int32_t subscribeId);
+#endif // OHOS_BUILD_ENABLE_SWITCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH

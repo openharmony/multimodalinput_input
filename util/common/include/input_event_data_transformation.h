@@ -19,6 +19,7 @@
 #include "key_event.h"
 #include "net_packet.h"
 #include "pointer_event.h"
+#include "switch_event.h"
 
 namespace OHOS {
 namespace MMI {
@@ -29,6 +30,8 @@ class InputEventDataTransformation {
 public:
     static int32_t KeyEventToNetPacket(const std::shared_ptr<KeyEvent> key, NetPacket &pkt);
     static int32_t NetPacketToKeyEvent(NetPacket &pkt, std::shared_ptr<KeyEvent> key);
+    static int32_t SwitchEventToNetPacket(const std::shared_ptr<SwitchEvent> key, NetPacket &pkt);
+    static int32_t NetPacketToSwitchEvent(NetPacket &pkt, std::shared_ptr<SwitchEvent> key);
     static int32_t SerializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &pkt);
     static int32_t DeserializeInputEvent(NetPacket &pkt, std::shared_ptr<InputEvent> event);
     static int32_t Marshalling(std::shared_ptr<PointerEvent> event, NetPacket &pkt);

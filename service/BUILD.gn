@@ -111,6 +111,10 @@ ohos_shared_library("libmmi-server") {
     }
   }
 
+  if (input_feature_switch) {
+    sources += [ "subscriber/src/switch_subscriber_handler.cpp" ]
+  }
+
   if (input_feature_mouse || input_feature_touchscreen) {
     sources += [ "touch_event_normalize/src/touch_event_normalize.cpp" ]
     if (input_feature_mouse) {

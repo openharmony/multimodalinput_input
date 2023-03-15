@@ -58,6 +58,8 @@ protected:
     int32_t StubInjectKeyEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubSubscribeKeyEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubUnsubscribeKeyEvent(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply);
+    int32_t StubUnsubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubInjectPointerEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetAnrListener(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetDisplayBindInfo(MessageParcel& data, MessageParcel& reply);

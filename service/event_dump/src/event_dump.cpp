@@ -32,6 +32,7 @@
 #include "input_windows_manager.h"
 #include "key_subscriber_handler.h"
 #include "mouse_event_normalize.h"
+#include "switch_subscriber_handler.h"
 #include "securec.h"
 #include "util_ex.h"
 #include "util.h"
