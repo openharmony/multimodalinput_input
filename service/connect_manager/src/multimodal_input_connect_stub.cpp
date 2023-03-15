@@ -593,9 +593,8 @@ int32_t MultimodalInputConnectStub::StubSubscribeSwitchEvent(MessageParcel& data
     int32_t ret = SubscribeSwitchEvent(subscribeId);
     if (ret != RET_OK) {
         MMI_HILOGE("SubscribeSwitchEvent failed, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubUnsubscribeSwitchEvent(MessageParcel& data, MessageParcel& reply)
@@ -617,9 +616,8 @@ int32_t MultimodalInputConnectStub::StubUnsubscribeSwitchEvent(MessageParcel& da
     int32_t ret = UnsubscribeSwitchEvent(subscribeId);
     if (ret != RET_OK) {
         MMI_HILOGE("UnsubscribeSwitchEvent failed, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubMoveMouseEvent(MessageParcel& data, MessageParcel& reply)
