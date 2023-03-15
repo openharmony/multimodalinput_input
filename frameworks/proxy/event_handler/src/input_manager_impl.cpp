@@ -239,7 +239,6 @@ int32_t InputManagerImpl::SubscribeSwitchEvent(std::function<void(std::shared_pt
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
-    std::lock_guard<std::mutex> guard(mtx_);
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     CHKPR(callback, RET_ERR);
     return SwitchEventInputSubscribeMgr.SubscribeSwitchEvent(callback);
@@ -253,7 +252,6 @@ void InputManagerImpl::UnsubscribeSwitchEvent(int32_t subscriberId)
 {
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
-    std::lock_guard<std::mutex> guard(mtx_);
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     SwitchEventInputSubscribeMgr.UnsubscribeSwitchEvent(subscriberId);
 #else
