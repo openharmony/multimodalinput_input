@@ -52,7 +52,7 @@ int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
     ++SwitchEventInputSubscribeManager::subscribeManagerId_;
     subscribeInfos_[subscribeId] = callback;
     MMIEventHdl.SubscribeSwitchEvent(subscribeId);
-    MMI_HILOGW("subscribeId:%{public}d,", subscribeId);
+    MMI_HILOGI("subscribeId:%{public}d,", subscribeId);
 
     return subscribeId;
 }
