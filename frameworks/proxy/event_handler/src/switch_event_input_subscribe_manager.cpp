@@ -103,11 +103,7 @@ int32_t SwitchEventInputSubscribeManager::OnSubscribeSwitchEventCallback(std::sh
     if (it != subscribeInfos_.end()) {
         callback = it->second;
     }
-
-    if (callback == nullptr) {
-        MMI_HILOGE("Callback is null");
-        return RET_ERR;
-    }
+    CHKPR(callback, ERROR_NULL_POINTER);
     callback(event);
     MMI_HILOGD("Switch event id:%{public}d switchValue:%{public}d", subscribeId, event->GetSwitchValue());
     return RET_OK;
