@@ -664,9 +664,8 @@ int32_t MultimodalInputConnectProxy::SubscribeSwitchEvent(int32_t subscribeId)
     int32_t ret = remote->SendRequest(SUBSCRIBE_SWITCH_EVENT, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, result:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectProxy::UnsubscribeSwitchEvent(int32_t subscribeId)
@@ -686,9 +685,8 @@ int32_t MultimodalInputConnectProxy::UnsubscribeSwitchEvent(int32_t subscribeId)
     int32_t ret = remote->SendRequest(UNSUBSCRIBE_SWITCH_EVENT, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, result:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectProxy::InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
