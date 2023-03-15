@@ -157,12 +157,14 @@ void InputDeviceCooperateSM::OnCloseCooperation(const std::string &networkId, bo
     }
 }
 
-void InputDeviceCooperateSM::SetVirtualKeyBoardDevId(int32_t deviceId) {
+void InputDeviceCooperateSM::SetVirtualKeyBoardDevId(int32_t deviceId)
+{
     virtualKeyBoardId_ = deviceId;
     MMI_HILOGI("virtualKeyBoardId_ has been set to%{public}d", virtualKeyBoardId_);
 }
 
-int32_t InputDeviceCooperateSM::GetVirtualKeyBoardDevId() {
+int32_t InputDeviceCooperateSM::GetVirtualKeyBoardDevId()
+{
     return virtualKeyBoardId_;
 }
 
