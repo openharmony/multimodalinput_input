@@ -774,7 +774,8 @@ bool InputDeviceManager::HasLocalPointerDevice() const
     return false;
 }
 
-void InputDeviceManager::NotifyVirtualKeyBoardStatus(int32_t deviceId, bool isAvailable) const {
+void InputDeviceManager::NotifyVirtualKeyBoardStatus(int32_t deviceId, bool isAvailable) const
+{
     MMI_HILOGI("virtual keyboard device %{public}s", isAvailable ? "online" : "offline");
     if (deviceId == -1) {
         MMI_HILOGE("no virtual keyboard device for this device!");
