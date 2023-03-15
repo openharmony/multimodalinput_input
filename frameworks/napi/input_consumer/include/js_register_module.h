@@ -57,11 +57,13 @@ struct KeyEventMonitorInfo {
     std::shared_ptr<KeyOption> keyOption { nullptr };
     bool valid { true };
     std::mutex refLock;
-    void SetValid(bool flag) {
+    void SetValid(bool flag)
+    {
         std::lock_guard<std::mutex> lock(refLock);
         valid = flag;
     }
-    bool IsValid() {
+    bool IsValid()
+    {
         std::lock_guard<std::mutex> lock(refLock);
         return valid;
     }
