@@ -49,6 +49,7 @@ private:
     int32_t HandleGestureEvent(libinput_event* event);
     int32_t HandleMouseEvent(libinput_event* event);
     int32_t HandleTouchEvent(libinput_event* event);
+    int32_t HandleSwitchInputEvent(libinput_event* event);
     int32_t HandleTableToolEvent(libinput_event* event);
     int32_t HandleJoystickEvent(libinput_event* event);
 #ifdef OHOS_BUILD_ENABLE_COOPERATE

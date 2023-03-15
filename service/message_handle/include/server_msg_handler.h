@@ -49,6 +49,12 @@ public:
         int32_t subscribeId, const std::shared_ptr<KeyOption> option);
     int32_t OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid, int32_t subscribeId);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    int32_t OnSubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId);
+    int32_t OnUnsubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId);
+#endif // OHOS_BUILD_ENABLE_SWITCH
+
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     int32_t OnMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING

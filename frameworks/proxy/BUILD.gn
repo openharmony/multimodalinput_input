@@ -92,6 +92,10 @@ ohos_shared_library("libmmi-client") {
     sources += [ "event_handler/src/key_event_input_subscribe_manager.cpp" ]
   }
 
+  if (input_feature_switch) {
+    sources += [ "event_handler/src/switch_event_input_subscribe_manager.cpp" ]
+  }
+
   configs = [
     ":libmmi_client_config",
     "//foundation/multimodalinput/input/util:libmmi_util_public_config",

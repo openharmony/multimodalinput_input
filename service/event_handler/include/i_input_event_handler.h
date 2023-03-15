@@ -21,6 +21,7 @@
 #include "define_multimodal.h"
 #include "key_event.h"
 #include "pointer_event.h"
+#include "switch_event.h"
 
 struct libinput_event;
 
@@ -40,6 +41,14 @@ public:
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     virtual void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
 #endif // OHOS_BUILD_ENABLE_TOUCH
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    virtual void HandleSwitchEvent(const std::shared_ptr<SwitchEvent> switchEvent)
+    {
+        if (nextHandler_ != nullptr) {
+            nextHandler_->HandleSwitchEvent(switchEvent);
+        }
+    }
+#endif // OHOS_BUILD_ENABLE_SWITCH
     virtual void SetNext(std::shared_ptr<IInputEventHandler> nextHandler)
     {
         nextHandler_ = nextHandler;

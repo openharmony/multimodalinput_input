@@ -24,6 +24,7 @@ declare_args() {
   input_feature_interceptor = true
   input_feature_monitor = true
   input_feature_keyboard = true
+  input_feature_switch = false
   input_feature_mouse = true
   input_feature_joystick = true
   input_feature_touchscreen = true
@@ -222,6 +223,7 @@ print("input_feature_pointer_drawing = ${input_feature_pointer_drawing}")
 print("input_feature_monitor = ${input_feature_monitor}")
 print("input_feature_interceptor = ${input_feature_interceptor}")
 print("input_feature_keyboard = ${input_feature_keyboard}")
+print("input_feature_switch = ${input_feature_switch}")
 print("input_feature_mouse = ${input_feature_mouse}")
 print("input_feature_joystick = ${input_feature_joystick}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
@@ -240,6 +242,10 @@ if (input_feature_interceptor) {
 
 if (input_feature_keyboard) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_KEYBOARD" ]
+}
+
+if (input_feature_switch) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_SWITCH" ]
 }
 
 if (input_feature_monitor) {

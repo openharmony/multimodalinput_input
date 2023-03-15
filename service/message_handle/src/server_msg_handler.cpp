@@ -33,6 +33,7 @@
 #include "libinput_adapter.h"
 #include "mmi_func_callback.h"
 #include "mouse_event_normalize.h"
+#include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
 
 namespace OHOS {
@@ -328,6 +329,30 @@ int32_t ServerMsgHandler::OnUnsubscribeKeyEvent(IUdsServer *server, int32_t pid,
     return subscriberHandler->UnsubscribeKeyEvent(sess, subscribeId);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+int32_t ServerMsgHandler::OnSubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(server, ERROR_NULL_POINTER);
+    auto sess = server->GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    auto subscriberHandler = InputHandler->GetSwitchSubscriberHandler();
+    CHKPR(subscriberHandler, ERROR_NULL_POINTER);
+    return subscriberHandler->SubscribeSwitchEvent(sess, subscribeId);
+}
+
+int32_t ServerMsgHandler::OnUnsubscribeSwitchEvent(IUdsServer *server, int32_t pid, int32_t subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(server, ERROR_NULL_POINTER);
+    auto sess = server->GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    auto subscriberHandler = InputHandler->GetSwitchSubscriberHandler();
+    CHKPR(subscriberHandler, ERROR_NULL_POINTER);
+    return subscriberHandler->UnsubscribeSwitchEvent(sess, subscribeId);
+}
+#endif // OHOS_BUILD_ENABLE_SWITCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ServerMsgHandler::AddInputEventFilter(sptr<IEventFilter> filter,

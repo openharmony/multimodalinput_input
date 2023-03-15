@@ -107,6 +107,35 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
     return RET_OK;
 }
 
+int32_t InputEventDataTransformation::SwitchEventToNetPacket(
+    const std::shared_ptr<SwitchEvent> swEvent, NetPacket &pkt)
+{
+    if (SerializeInputEvent(swEvent, pkt) != RET_OK) {
+        MMI_HILOGE("Serialize input event failed");
+        return RET_ERR;
+    }
+    pkt << swEvent->GetSwitchValue() << swEvent->GetSwitchMask();
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write key event failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t InputEventDataTransformation::NetPacketToSwitchEvent(NetPacket &pkt, std::shared_ptr<SwitchEvent> swEvent)
+{
+    if (DeserializeInputEvent(pkt, swEvent) != RET_OK) {
+        MMI_HILOGE("Deserialize input event failed");
+        return RET_ERR;
+    }
+    int32_t data = 0;
+    pkt >> data;
+    swEvent->SetSwitchValue(data);
+    pkt >> data;
+    swEvent->SetSwitchMask(data);
+    return RET_OK;
+}
+
 int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &pkt)
 {
     CHKPR(event, ERROR_NULL_POINTER);
