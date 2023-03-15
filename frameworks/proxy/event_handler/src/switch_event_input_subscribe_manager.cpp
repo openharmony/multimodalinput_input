@@ -46,7 +46,7 @@ int32_t SwitchEventInputSubscribeManager::SubscribeSwitchEvent(
     }
     if (SwitchEventInputSubscribeManager::subscribeManagerId_ >= INT_MAX) {
         MMI_HILOGE("The subscribeId has reached the upper limit, cannot continue the subscription");
-        return -1;
+        return INVALID_SUBSCRIBE_ID;
     }
     int32_t subscribeId = SwitchEventInputSubscribeManager::subscribeManagerId_;
     ++SwitchEventInputSubscribeManager::subscribeManagerId_;
