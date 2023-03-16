@@ -40,6 +40,7 @@
 #include "key_option.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
+#include "switch_event.h"
 
 namespace OHOS {
 namespace MMI {
@@ -58,6 +59,8 @@ public:
         std::function<void(std::shared_ptr<KeyEvent>)> callback
     );
     void UnsubscribeKeyEvent(int32_t subscriberId);
+    int32_t SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback);
+    void UnsubscribeSwitchEvent(int32_t subscriberId);
     int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);
 

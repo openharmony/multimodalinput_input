@@ -100,6 +100,25 @@ public:
     void UnsubscribeKeyEvent(int32_t subscriberId);
 
     /**
+     * @brief Subscribes to the switch input event that meets a specific condition. When such an event occurs,
+     * the <b>callback</b> specified is invoked to process the event.
+     * @param callback Indicates the callback.
+     * @return Returns the subscription ID, which uniquely identifies a subscription in the process.
+     * If the value is greater than or equal to <b>0</b>,
+     * the subscription is successful. Otherwise, the subscription fails.
+     * @since 9
+     */
+    int32_t SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback);
+
+    /**
+     * @brief Unsubscribes from a switch input event.
+     * @param subscriberId Indicates the subscription ID, which is the return value of <b>SubscribeKeyEvent</b>.
+     * @return void
+     * @since 9
+     */
+    void UnsubscribeSwitchEvent(int32_t subscriberId);
+
+    /**
      * @brief Adds an input event monitor. After such a monitor is added,
      * an input event is copied and distributed to the monitor while being distributed to the original target.
      * @param monitor Indicates the input event monitor. After an input event is generated,

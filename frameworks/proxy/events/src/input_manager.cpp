@@ -86,6 +86,16 @@ void InputManager::UnsubscribeKeyEvent(int32_t subscriberId)
     InputMgrImpl.UnsubscribeKeyEvent(subscriberId);
 }
 
+int32_t InputManager::SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback)
+{
+    return InputMgrImpl.SubscribeSwitchEvent(callback);
+}
+
+void InputManager::UnsubscribeSwitchEvent(int32_t subscriberId)
+{
+    InputMgrImpl.UnsubscribeSwitchEvent(subscriberId);
+}
+
 int32_t InputManager::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
     return InputMgrImpl.AddMonitor(monitor);

@@ -26,6 +26,7 @@
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "switch_event_input_subscribe_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -232,6 +233,30 @@ void InputManagerImpl::UnsubscribeKeyEvent(int32_t subscriberId)
 #else
     MMI_HILOGW("Keyboard device does not support");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+}
+
+int32_t InputManagerImpl::SubscribeSwitchEvent(std::function<void(std::shared_ptr<SwitchEvent>)> callback)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    CHKPR(callback, RET_ERR);
+    return SwitchEventInputSubscribeMgr.SubscribeSwitchEvent(callback);
+#else
+    MMI_HILOGW("switch device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_SWITCH
+}
+
+void InputManagerImpl::UnsubscribeSwitchEvent(int32_t subscriberId)
+{
+    CALL_INFO_TRACE;
+    CHK_PID_AND_TID();
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    SwitchEventInputSubscribeMgr.UnsubscribeSwitchEvent(subscriberId);
+#else
+    MMI_HILOGW("switch device does not support");
+#endif // OHOS_BUILD_ENABLE_SWITCH
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD

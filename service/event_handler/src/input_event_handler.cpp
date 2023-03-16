@@ -113,6 +113,11 @@ int32_t InputEventHandler::BuildInputHandlerChain()
     handler->SetNext(eventSubscriberHandler_);
     handler = eventSubscriberHandler_;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    switchEventSubscriberHandler_ = std::make_shared<SwitchSubscriberHandler>();
+    handler->SetNext(switchEventSubscriberHandler_);
+    handler = switchEventSubscriberHandler_;
+#endif // OHOS_BUILD_ENABLE_SWITCH
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     eventMonitorHandler_ = std::make_shared<EventMonitorHandler>();
     handler->SetNext(eventMonitorHandler_);
@@ -141,6 +146,11 @@ std::shared_ptr<EventInterceptorHandler> InputEventHandler::GetInterceptorHandle
 std::shared_ptr<KeySubscriberHandler> InputEventHandler::GetSubscriberHandler() const
 {
     return eventSubscriberHandler_;
+}
+
+std::shared_ptr<SwitchSubscriberHandler> InputEventHandler::GetSwitchSubscriberHandler() const
+{
+    return switchEventSubscriberHandler_;
 }
 
 std::shared_ptr<KeyCommandHandler> InputEventHandler::GetKeyCommandHandler() const
