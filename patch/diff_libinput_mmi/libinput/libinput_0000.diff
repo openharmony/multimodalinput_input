@@ -2890,7 +2890,7 @@ diff -Naur old/src/evdev-mt-touchpad-gestures.c new/src/evdev-mt-touchpad-gestur
  	return GESTURE_STATE_SWIPE;
 diff -Naur old/src/evdev-mt-touchpad-tap.c new/src/evdev-mt-touchpad-tap.c
 --- old/src/evdev-mt-touchpad-tap.c	2021-01-01 00:00:00.000000000 +0800
-+++ new/src/evdev-mt-touchpad-tap.c	2022-12-12 19:49:27.376953599 +0800
++++ new/src/evdev-mt-touchpad-tap.c	2021-01-01 00:00:00.000000000 +0800
 @@ -72,6 +72,7 @@
  	CASE_RETURN_STRING(TAP_STATE_DRAGGING_OR_TAP);
  	CASE_RETURN_STRING(TAP_STATE_DRAGGING_2);
@@ -3743,7 +3743,7 @@ diff -Naur old/src/evdev.c new/src/evdev.c
  	default:
  		return false;
  	}
-@@ -2917,3 +2969,57 @@
+@@ -2917,3 +2969,75 @@
  #endif
  	return has_left_handed;
  }
@@ -3774,6 +3774,18 @@ diff -Naur old/src/evdev.c new/src/evdev.c
 +}
 +
 +static inline bool
++is_touchpad(const struct libevdev *evdev)
++{
++	return (libevdev_has_event_type(evdev, EV_ABS) &&
++			libevdev_has_event_code(evdev, EV_ABS, ABS_MT_POSITION_X));
++}
++
++static inline bool
++is_switch(const struct libevdev *evdev)
++{
++	return (libevdev_has_event_type(evdev, EV_SW));
++}
++
 +is_tablet_tool(const struct libevdev *evdev)
 +{
 +	return (libevdev_has_event_type(evdev, EV_KEY) &&
@@ -3798,6 +3810,12 @@ diff -Naur old/src/evdev.c new/src/evdev.c
 +	}
 +	if (is_tablet_tool(device->evdev)) {
 +		return (EVDEV_UDEV_TAG_INPUT | EVDEV_UDEV_TAG_TABLET);
++	}
++	if (is_touchpad(device->evdev)) {
++		return (EVDEV_UDEV_TAG_INPUT | EVDEV_UDEV_TAG_TOUCHPAD);
++	}
++	if (is_switch(device->evdev)) {
++		return (EVDEV_UDEV_TAG_INPUT | EVDEV_UDEV_TAG_SWITCH);
 +	}
 +    return 0;
 +}

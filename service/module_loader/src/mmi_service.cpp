@@ -853,6 +853,36 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
     return RET_OK;
 }
 
+int32_t MMIService::SubscribeSwitchEvent(int32_t subscribeId)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::OnSubscribeSwitchEvent, &sMsgHandler_, this, pid, subscribeId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("The subscribe switch event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_SWITCH
+    return RET_OK;
+}
+
+int32_t MMIService::UnsubscribeSwitchEvent(int32_t subscribeId)
+{
+    CALL_INFO_TRACE;
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    int32_t pid = GetCallingPid();
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::OnUnsubscribeSwitchEvent, &sMsgHandler_, this, pid, subscribeId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("The unsubscribe switch event processed failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_SWITCH
+    return RET_OK;
+}
+
 int32_t MMIService::SetAnrObserver()
 {
     CALL_DEBUG_ENTER;

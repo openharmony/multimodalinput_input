@@ -111,8 +111,12 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
             DfxHisysevent::CalcPointerDispTimes();
             break;
         }
+        case LIBINPUT_EVENT_SWITCH_TOGGLE: {
+            HandleSwitchInputEvent(event);
+            break;
+        }
         default: {
-            MMI_HILOGW("This device does not support");
+            MMI_HILOGW("This device does not support :%d", type);
             break;
         }
     }
@@ -480,6 +484,26 @@ int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
 #else
     MMI_HILOGW("Joystick device does not support");
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
+    return RET_OK;
+}
+
+int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
+{
+    if (nextHandler_ == nullptr) {
+        MMI_HILOGW("switch device does not support");
+        return ERROR_UNSUPPORT;
+    }
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    CHKPR(event, ERROR_NULL_POINTER);
+    struct libinput_event_switch *swev = libinput_event_get_switch_event(event);
+    CHKPR(swev, ERROR_NULL_POINTER);
+
+    enum libinput_switch_state state = libinput_event_switch_get_switch_state(swev);
+    auto swEvent = std::make_unique<SwitchEvent>(static_cast<int>state);
+    nextHandler_->HandleSwitchEvent(std::move(swEvent));
+#else
+    MMI_HILOGW("switch device does not support");
+#endif // OHOS_BUILD_ENABLE_SWITCH
     return RET_OK;
 }
 

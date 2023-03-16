@@ -21,6 +21,7 @@
 #include "axis_event.h"
 #include "key_event.h"
 #include "pointer_event.h"
+#include "switch_event.h"
 
 namespace OHOS {
 namespace MMI {

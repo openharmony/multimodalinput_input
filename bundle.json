@@ -20,14 +20,15 @@
     ],
     "features": [
       "input_feature_combination_key",
-      "input_feature_pointer_drawing",
-      "input_feature_interceptor",
-      "input_feature_monitor",
-      "input_feature_keyboard",
-      "input_feature_mouse",
-      "input_feature_touchscreen",
+      "input_feature_input_cooperation",
       "input_feature_input_device",
-      "input_feature_input_cooperation"
+      "input_feature_interceptor",
+      "input_feature_keyboard",
+      "input_feature_monitor",
+      "input_feature_mouse",
+      "input_feature_pointer_drawing",
+      "input_feature_switch",
+      "input_feature_touchscreen"
     ],
     "adapted_system_type": [
       "standard"

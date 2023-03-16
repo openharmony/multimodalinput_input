@@ -75,6 +75,8 @@ public:
         SET_POINTER_LOCATION = 51,
         GET_WINDOW_PID = 52,
         APPEND_EXTRA_DATA = 53,
+        SUBSCRIBE_SWITCH_EVENT = 54,
+        UNSUBSCRIBE_SWITCH_EVENT = 55,
     };
 
     enum {
@@ -111,6 +113,8 @@ public:
     virtual int32_t InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) = 0;
     virtual int32_t SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option) = 0;
     virtual int32_t UnsubscribeKeyEvent(int32_t subscribeId) = 0;
+    virtual int32_t SubscribeSwitchEvent(int32_t subscribeId) = 0;
+    virtual int32_t UnsubscribeSwitchEvent(int32_t subscribeId) = 0;
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t SetAnrObserver() = 0;
     virtual int32_t GetDisplayBindInfo(DisplayBindInfos &infos) = 0;

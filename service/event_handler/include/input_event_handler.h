@@ -30,6 +30,7 @@
 #include "key_command_handler.h"
 #include "key_subscriber_handler.h"
 #include "mouse_event_normalize.h"
+#include "switch_subscriber_handler.h"
 
 namespace OHOS {
 namespace MMI {
@@ -46,6 +47,7 @@ public:
     std::shared_ptr<EventNormalizeHandler> GetEventNormalizeHandler() const;
     std::shared_ptr<EventInterceptorHandler> GetInterceptorHandler() const;
     std::shared_ptr<KeySubscriberHandler> GetSubscriberHandler() const;
+    std::shared_ptr<SwitchSubscriberHandler> GetSwitchSubscriberHandler() const;
     std::shared_ptr<KeyCommandHandler> GetKeyCommandHandler() const;
     std::shared_ptr<EventMonitorHandler> GetMonitorHandler() const;
     std::shared_ptr<EventFilterHandler> GetFilterHandler() const;
@@ -62,6 +64,7 @@ private:
     std::shared_ptr<EventFilterHandler> eventFilterHandler_ { nullptr };
     std::shared_ptr<EventInterceptorHandler> eventInterceptorHandler_ { nullptr };
     std::shared_ptr<KeySubscriberHandler> eventSubscriberHandler_ { nullptr };
+    std::shared_ptr<SwitchSubscriberHandler> switchEventSubscriberHandler_ { nullptr };
     std::shared_ptr<KeyCommandHandler> eventKeyCommandHandler_ { nullptr };
     std::shared_ptr<EventMonitorHandler> eventMonitorHandler_ { nullptr };
 

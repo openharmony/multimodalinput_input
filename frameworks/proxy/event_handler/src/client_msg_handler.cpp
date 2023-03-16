@@ -56,6 +56,10 @@ void ClientMsgHandler::Init()
         { MmiMessageId::ON_SUBSCRIBE_KEY, std::bind(&ClientMsgHandler::OnSubscribeKeyEventCallback,
             this, std::placeholders::_1, std::placeholders::_2) },
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+        { MmiMessageId::ON_SUBSCRIBE_SWITCH, std::bind(&ClientMsgHandler::OnSubscribeSwitchEventCallback,
+            this, std::placeholders::_1, std::placeholders::_2) },
+#endif // OHOS_BUILD_ENABLE_SWITCH
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
         { MmiMessageId::ON_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::OnPointerEvent, this) },
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -202,6 +206,26 @@ int32_t ClientMsgHandler::OnSubscribeKeyEventCallback(const UDSClient &client, N
     return KeyEventInputSubscribeMgr.OnSubscribeKeyEventCallback(keyEvent, subscribeId);
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+int32_t ClientMsgHandler::OnSubscribeSwitchEventCallback(const UDSClient &client, NetPacket &pkt)
+{
+    std::shared_ptr<SwitchEvent> switchEvent = std::make_shared<SwitchEvent>(0);
+    int32_t ret = InputEventDataTransformation::NetPacketToSwitchEvent(pkt, switchEvent);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Read net packet failed");
+        return RET_ERR;
+    }
+    int32_t fd = -1;
+    int32_t subscribeId = -1;
+    pkt >> fd >> subscribeId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read fd failed");
+        return PACKET_READ_FAIL;
+    }
+    return SwitchEventInputSubscribeMgr.OnSubscribeSwitchEventCallback(switchEvent, subscribeId);
+}
+#endif
 
 int32_t ClientMsgHandler::OnDevListener(const UDSClient& client, NetPacket& pkt)
 {

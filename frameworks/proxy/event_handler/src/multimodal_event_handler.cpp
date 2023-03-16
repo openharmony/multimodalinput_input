@@ -24,6 +24,7 @@
 #include "input_handler_manager.h"
 #include "mmi_client.h"
 #include "multimodal_input_connect_manager.h"
+#include "switch_event_input_subscribe_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -38,6 +39,9 @@ void OnConnected(const IfMMIClient& client)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     KeyEventInputSubscribeMgr.OnConnected();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+    SwitchEventInputSubscribeMgr.OnConnected();
+#endif // OHOS_BUILD_ENABLE_SWITCH
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     IMonitorMgr->OnConnected();
 #endif // OHOS_BUILD_ENABLE_MONITOR
@@ -80,6 +84,20 @@ int32_t MultimodalEventHandler::InjectEvent(const std::shared_ptr<KeyEvent> keyE
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#ifdef OHOS_BUILD_ENABLE_SWITCH
+int32_t MultimodalEventHandler::SubscribeSwitchEvent(int32_t subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    return MultimodalInputConnMgr->SubscribeSwitchEvent(subscribeId);
+}
+
+int32_t MultimodalEventHandler::UnsubscribeSwitchEvent(int32_t subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    return MultimodalInputConnMgr->UnsubscribeSwitchEvent(subscribeId);
+}
+#endif // OHOS_BUILD_ENABLE_SWITCH
 
 bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
 {
