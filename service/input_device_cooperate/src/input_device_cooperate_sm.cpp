@@ -444,7 +444,6 @@ void InputDeviceCooperateSM::UpdateState(CooperateState state)
         }
         case CooperateState::STATE_OUT: {
             IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), false);
-
             currentStateSM_ = std::make_shared<InputDeviceCooperateStateOut>(startDhid_);
             break;
         }
@@ -572,7 +571,6 @@ void InputDeviceCooperateSM::CheckPointerEvent(struct libinput_event *event)
                 isStopping_ = false;
             }
         }
-        MMI_HILOGE("@@@filter out");
         return;
     } else {
         if (InputDevMgr->IsRemote(inputDevice)) {
