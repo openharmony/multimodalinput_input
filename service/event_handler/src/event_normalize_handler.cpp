@@ -499,7 +499,7 @@ int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
     CHKPR(swev, ERROR_NULL_POINTER);
 
     enum libinput_switch_state state = libinput_event_switch_get_switch_state(swev);
-    auto swEvent = std::make_unique<SwitchEvent>(static_cast<int>state);
+    auto swEvent = std::make_unique<SwitchEvent>(static_cast<int>(state));
     nextHandler_->HandleSwitchEvent(std::move(swEvent));
 #else
     MMI_HILOGW("switch device does not support");
