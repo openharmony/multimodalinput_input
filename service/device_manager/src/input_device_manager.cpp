@@ -505,7 +505,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     ScanPointerDevice();
 #ifdef OHOS_BUILD_ENABLE_COOPERATE
     if (IsPointerDevice(inputDevice)) {
-        InputDevCooSM->OnPointerOffline(removedInfo.dhid, removedInfo.networkIdOrigin, dhids);
+        InputDevCooSM->OnPointerOffline(removedInfo.dhid, dhids);
     }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
     if (deviceId == INVALID_DEVICE_ID) {
