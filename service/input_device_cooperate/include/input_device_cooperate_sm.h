@@ -82,8 +82,7 @@ public:
     CooperateState GetCurrentCooperateState() const;
     void OnCooperateChanged(const std::string &networkId, bool isOpen);
     void OnKeyboardOnline(const std::string &dhid);
-    void OnPointerOffline(const std::string &dhid, const std::string &sinkNetworkId,
-        const std::vector<std::string> &keyboards);
+    void OnPointerOffline(const std::string &dhid, const std::vector<std::string> &keyboards);
     bool InitDeviceManager();
     void OnDeviceOnline(const std::string &networkId);
     void OnDeviceOffline(const std::string &networkId);
