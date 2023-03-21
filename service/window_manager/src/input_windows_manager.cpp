@@ -84,6 +84,7 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     const WindowInfo* windowInfo = nullptr;
     for (const auto &item : displayGroupInfo_.windowsInfo) {
         if (item.id == pointerEvent->GetTargetWindowId()) {
+            MMI_HILOGD("find windowinfo by window id %{public}d", item.id);
             windowInfo = &item;
             break;
         }
@@ -91,15 +92,18 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     
     CHKPR(udsServer_, INVALID_FD);
     if (windowInfo != nullptr) {
+        MMI_HILOGD("get pid:%{public}d from idxPidMap", windowInfo->pid);
         return udsServer_->GetClientFd(windowInfo->pid);
     }
     if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_CANCEL) {
+        MMI_HILOGD("window info is null, so pointerEvent is dropped! return -1");
         return udsServer_->GetClientFd(-1);
     }
     int32_t pid = -1;
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
         if (iter != touchItemDownInfos_.end()) {
+            MMI_HILOGD("touchscreen occurs, update the old pid:%{public}d to new pid:%{public}d", pid, iter->second.pid);
             pid = iter->second.pid;
             touchItemDownInfos_.erase(iter);
         }
@@ -107,11 +111,13 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         if (mouseDownInfo_.pid != -1) {
+            MMI_HILOGD("mouseevent occurs, update the old pid:%{public}d to new pid:%{public}d", pid, mouseDownInfo_.pid);
             pid = mouseDownInfo_.pid;
             InitMouseDownInfo();
         }
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
+    MMI_HILOGD("get clientFd by %{public}d", pid);
     return udsServer_->GetClientFd(pid);
 }
 
