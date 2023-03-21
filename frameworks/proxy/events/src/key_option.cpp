@@ -25,11 +25,13 @@ constexpr int32_t PRE_KEYS_MAX_SIZE = 4;
 }
 std::set<int32_t> KeyOption::GetPreKeys() const
 {
+    std::lock_guard<std::mutex> lock(preKeysMutex_);
     return preKeys_;
 }
 
 void KeyOption::SetPreKeys(const std::set<int32_t> &preKeys)
 {
+    std::lock_guard<std::mutex> lock(preKeysMutex_);
     preKeys_ = preKeys;
 }
 
