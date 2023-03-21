@@ -37,7 +37,8 @@ public:
 private:
     static void Print(const std::shared_ptr<KeyEvent> event)
     {
-        if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG) && event->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
+        if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)
+            && event->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
             return;
         }
         std::vector<KeyEvent::KeyItem> eventItems { event->GetKeyItems() };
@@ -137,7 +138,8 @@ template <class T>
 void EventLogHelper::PrintEventData(std::shared_ptr<T> event)
 {
     CHKPV(event);
-    if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG) || (event->GetAction() == InputEvent::EVENT_TYPE_KEY)) {
+    if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)
+        || (event->GetAction() == InputEvent::EVENT_TYPE_KEY)) {
         EventLogHelper::Print(event);
     }
 }
