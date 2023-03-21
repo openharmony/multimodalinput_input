@@ -37,6 +37,7 @@
 touchpad:i8042:*
 touchpad:rmi:*
 touchpad:usb:*
+touchpad:i2c:*
  ID_INPUT_TOUCHPAD_INTEGRATION=internal
 
 touchpad:bluetooth:*
@@ -66,4 +67,10 @@ touchpad:usb:v046d*
 # Wacom
 ###########################################################
 touchpad:usb:v056a*
+ ID_INPUT_TOUCHPAD_INTEGRATION=external
+
+###########################################################
+# Huawei Touchpad
+###########################################################
+touchpad:i2c:v27c6*
  ID_INPUT_TOUCHPAD_INTEGRATION=external
