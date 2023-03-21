@@ -59,8 +59,7 @@ public:
     int64_t GetElapsed_micro() const
     {
         int64_t tm64Cost = std::chrono::duration_cast<std::chrono::microseconds>(
-                            std::chrono::high_resolution_clock::now() - beginTime_
-                        ).count();
+            std::chrono::high_resolution_clock::now() - beginTime_).count();
         return tm64Cost;
     }
 
