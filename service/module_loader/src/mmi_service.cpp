@@ -324,7 +324,6 @@ void MMIService::OnStart()
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc,
         WATCHDOG_INTERVAL_TIME, WATCHDOG_DELAY_TIME);
     MMI_HILOGI("Run periodical task success");
-    t_.join();
 }
 
 void MMIService::OnStop()
