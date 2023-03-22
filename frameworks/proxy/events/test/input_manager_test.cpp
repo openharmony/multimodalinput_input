@@ -3325,7 +3325,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetProcCpuUsage, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto runner = AppExecFwk::EventRunner::Create(true);
+    auto runner = AppExecFwk::EventRunner::Create("cooperateHdrTest");
     ASSERT_TRUE(runner != nullptr);
     auto eventHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
     ASSERT_TRUE(eventHandler != nullptr);
