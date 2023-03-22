@@ -29,7 +29,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "IInpu
 
 IInputDeviceCooperateState::IInputDeviceCooperateState()
 {
-    runner_ = AppExecFwk::EventRunner::Create(true);
+    runner_ = AppExecFwk::EventRunner::Create("cooperateHdr");
     CHKPL(runner_);
     eventHandler_ = std::make_shared<CooperateEventHandler>(runner_);
 }
