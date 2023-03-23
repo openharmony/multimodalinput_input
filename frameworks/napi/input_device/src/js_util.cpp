@@ -52,10 +52,13 @@ JsUtil::DeviceType g_deviceType[] = {
 } // namespace
 bool JsUtil::IsSameHandle(napi_env env, napi_value handle, napi_ref ref)
 {
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(env, &scope);
     napi_value handlerTemp = nullptr;
     CHKRF(napi_get_reference_value(env, ref, &handlerTemp), GET_REFERENCE_VALUE);
     bool isEqual = false;
     CHKRF(napi_strict_equals(env, handle, handlerTemp, &isEqual), STRICT_EQUALS);
+    napi_close_handle_scope(env, scope);
     return isEqual;
 }
 
