@@ -79,6 +79,7 @@ protected:
     int32_t StubSetMouseCaptureMode(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetWindowPid(MessageParcel& data, MessageParcel& reply);
     int32_t StubAppendExtraData(MessageParcel& data, MessageParcel& reply);
+    int32_t StubEnableInputDevice(MessageParcel& data, MessageParcel& reply);
 };
 } // namespace MMI
 } // namespace OHOS

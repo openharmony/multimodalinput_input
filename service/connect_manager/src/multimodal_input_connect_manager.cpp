@@ -417,5 +417,11 @@ int32_t MultimodalInputConnectManager::AppendExtraData(const ExtraData& extraDat
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->AppendExtraData(extraData);
 }
+
+int32_t MultimodalInputConnectManager::EnableInputDevice(bool enable)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->EnableInputDevice(enable);
+}
 } // namespace MMI
 } // namespace OHOS
