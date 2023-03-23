@@ -48,14 +48,14 @@ public:
     DISALLOW_COPY_AND_MOVE(InputDeviceManager);
     void OnInputDeviceAdded(struct libinput_device *inputDevice);
     void OnInputDeviceRemoved(struct libinput_device *inputDevice);
-    std::vector<int32_t> GetInputDeviceIds() const;  //1111
-    std::shared_ptr<InputDevice> GetInputDevice(int32_t id) const; //1111
-    int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes, std::vector<bool> &keystroke); //1111
+    std::vector<int32_t> GetInputDeviceIds() const;
+    std::shared_ptr<InputDevice> GetInputDevice(int32_t id) const;
+    int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes, std::vector<bool> &keystroke);
     int32_t FindInputDeviceId(struct libinput_device* inputDevice);
     int32_t GetKeyboardBusMode(int32_t deviceId);
     bool GetDeviceConfig(int32_t deviceId, int32_t &KeyboardType);
     int32_t GetDeviceSupportKey(int32_t deviceId, int32_t &keyboardType);
-    int32_t GetKeyboardType(int32_t deviceId, int32_t &keyboardType); //1111
+    int32_t GetKeyboardType(int32_t deviceId, int32_t &keyboardType);
     void Attach(std::shared_ptr<IDeviceObserver> observer);
     void Detach(std::shared_ptr<IDeviceObserver> observer);
     void NotifyPointerDevice(bool hasPointerDevice, bool isVisible);
