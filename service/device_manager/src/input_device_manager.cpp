@@ -91,7 +91,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
         return nullptr;
     }
     if (!iter->second.enable) {
-        MMI_HILOGW("The current device has been disabled");
+        MMI_HILOGE("The current device has been disabled");
         return nullptr;
     }
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
@@ -151,7 +151,7 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
         }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
         if (!item.second.enable) {
-            MMI_HILOGW("The current device has been disabled");
+            MMI_HILOGE("The current device has been disabled");
             continue;
         }
         ids.push_back(item.first);
