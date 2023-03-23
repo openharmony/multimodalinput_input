@@ -400,9 +400,9 @@ public:
     void AppendExtraData(const ExtraData& extraData);
 
     /**
-     * @brief 设置输入设备使能或者禁用
-     * @param enable 设置输入设备的使能状态
-     * @return void
+     * @brief 输入设备使能或者禁用
+     * @param enable 输入设备的使能状态
+     * @return 返回值如果是0表示接口调用成功，返回其他值表示接口调用失败。
      * @since 10
      */
     int32_t EnableInputDevice(bool enable);
