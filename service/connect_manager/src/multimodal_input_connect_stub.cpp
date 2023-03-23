@@ -1098,7 +1098,7 @@ int32_t MultimodalInputConnectStub::StubEnableInputDevice(MessageParcel& data, M
     READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = EnableInputDevice(enable);
     if (ret != RET_OK) {
-        MMI_HILOGE("Fail to call EnableInputDevice, ret:%{public}d", ret);
+        MMI_HILOGE("Call EnableInputDevice failed, ret:%{public}d", ret);
     }
     return ret;
 }
