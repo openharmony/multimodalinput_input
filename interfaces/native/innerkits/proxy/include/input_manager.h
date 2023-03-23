@@ -398,6 +398,15 @@ public:
      * @since 9
      */
     void AppendExtraData(const ExtraData& extraData);
+
+    /**
+     * @brief 设置输入设备使能或者禁用
+     * @param enable 设置输入设备的使能状态
+     * @return void
+     * @since 10
+     */
+    int32_t EnableInputDevice(bool enable);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

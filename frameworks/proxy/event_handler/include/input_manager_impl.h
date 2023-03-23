@@ -127,6 +127,7 @@ public:
     bool GetFunctionKeyState(int32_t funcKey);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
     void SetPointerLocation(int32_t x, int32_t y);
+    int32_t EnableInputDevice(bool enable);
 
     EventHandlerPtr GetEventHandler() const;
     void AppendExtraData(const ExtraData& extraData);
