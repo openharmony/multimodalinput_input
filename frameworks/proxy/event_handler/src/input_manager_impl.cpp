@@ -1066,7 +1066,7 @@ int32_t InputManagerImpl::EnableInputDevice(bool enable)
     CALL_DEBUG_ENTER;
     int32_t ret = MultimodalInputConnMgr->EnableInputDevice(enable);
     if (ret != RET_OK) {
-        MMI_HILOGE("enable input device failed, ret:%{public}d", ret);
+        MMI_HILOGE("Enable input device failed, ret:%{public}d", ret);
     }
     return ret;
 }
