@@ -1395,7 +1395,7 @@ int32_t MMIService::EnableInputDevice(bool enable)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceManager::OnEnableInputDevice,
         InputDevMgr, enable));
     if (ret != RET_OK) {
-        MMI_HILOGE("Append extra data failed:%{public}d", ret);
+        MMI_HILOGE("OnEnableInputDevice failed:%{public}d", ret);
     }
     return ret;
 }
