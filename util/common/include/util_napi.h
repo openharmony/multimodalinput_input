@@ -40,6 +40,16 @@ namespace MMI {
         } \
     } while (0)
 
+#define CHKRP_SCOPE(env, state, desc, scope) \
+    do { \
+        if ((state) != napi_ok) { \
+            MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
+            auto infoTemp = std::string(__FUNCTION__)+ ":" + std::string(desc) + " failed"; \
+            napi_close_handle_scope(env, scope); \
+            return nullptr; \
+        } \
+    } while (0)
+
 #define CHKRP(env, state, desc) \
     do { \
         if ((state) != napi_ok) { \
