@@ -924,7 +924,7 @@ VendorConfig InputDeviceManager::GetVendorConfig(int32_t deviceId) const
 int32_t InputDeviceManager::OnEnableInputDevice(bool enable)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGE("Enable input device: %{public}s", enable ? "true" : "false");
+    MMI_HILOGD("Enable input device: %{public}s", enable ? "true" : "false");
     for (auto & item : inputDevice_) {
         if (item.second.isRemote && item.second.enable != enable) {
             item.second.enable = enable;
