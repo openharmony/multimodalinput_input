@@ -931,11 +931,14 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, sp
     CHKPP(cb);
     cb->env = env;
     napi_value promise = nullptr;
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(env, &scope);
     if (handle == nullptr) {
         CHKRP(napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
     } else {
         CHKRP(napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
     }
+    napi_close_handle_scope(env, scope);
     return promise;
 }
 
