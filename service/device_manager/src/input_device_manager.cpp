@@ -166,7 +166,7 @@ int32_t InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &
     if (iter == inputDevice_.end()) {
         return COMMON_PARAMETER_ERROR;
     }
-    if (iter->second.enable) {
+    if (!iter->second.enable) {
         MMI_HILOGE("The current device has been disabled");
         return RET_ERR;
     }
@@ -268,7 +268,7 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardT
         MMI_HILOGE("Failed to search for the deviceID");
         return COMMON_PARAMETER_ERROR;
     }
-    if (iter->second.enable) {
+    if (!iter->second.enable) {
         MMI_HILOGE("The current device has been disabled");
         return RET_ERR;
     }
