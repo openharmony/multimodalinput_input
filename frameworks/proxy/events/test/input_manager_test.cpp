@@ -4256,7 +4256,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_EnableInputDevice_001, TestSize.Leve
     CALL_TEST_DEBUG;
     auto ret = InputManager::GetInstance()->EnableInputDevice(false);
     ASSERT_EQ(ret, RET_OK);
-    auto ret = InputManager::GetInstance()->EnableInputDevice(true);
+    ret = InputManager::GetInstance()->EnableInputDevice(true);
     ASSERT_EQ(ret, RET_OK);
 }
 } // namespace MMI
