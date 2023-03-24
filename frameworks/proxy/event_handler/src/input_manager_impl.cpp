@@ -1060,5 +1060,15 @@ void InputManagerImpl::AppendExtraData(const ExtraData& extraData)
         MMI_HILOGE("Append extra data failed:%{public}d", ret);
     }
 }
+
+int32_t InputManagerImpl::EnableInputDevice(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->EnableInputDevice(enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Enable input device failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS

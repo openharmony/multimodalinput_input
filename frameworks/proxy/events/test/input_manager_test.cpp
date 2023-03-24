@@ -4243,5 +4243,21 @@ HWTEST_F(InputManagerTest, AppendExtraData_002, TestSize.Level1)
     TestSimulateInputEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
+
+
+/**
+ * @tc.name: InputManagerTest_EnableInputDevice_001
+ * @tc.desc: Enable input device
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_EnableInputDevice_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto ret = InputManager::GetInstance()->EnableInputDevice(false);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->EnableInputDevice(true);
+    ASSERT_EQ(ret, RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS

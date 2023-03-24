@@ -80,6 +80,7 @@ public:
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
     int32_t GetWindowPid(int32_t windowId);
     int32_t AppendExtraData(const ExtraData& extraData);
+    int32_t EnableInputDevice(bool enable);
 
 private:
     MultimodalInputConnectManager() = default;

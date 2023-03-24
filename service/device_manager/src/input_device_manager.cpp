@@ -90,7 +90,10 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id) cons
         MMI_HILOGE("Failed to search for the device");
         return nullptr;
     }
-
+    if (!iter->second.enable) {
+        MMI_HILOGE("The current device has been disabled");
+        return nullptr;
+    }
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
     inputDevice->SetId(iter->first);
     struct libinput_device *inputDeviceOrigin = iter->second.inputDeviceOrigin;
@@ -147,6 +150,10 @@ std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const
             continue;
         }
 #endif // OHOS_BUILD_ENABLE_COOPERATE
+        if (!item.second.enable) {
+            MMI_HILOGE("The current device has been disabled");
+            continue;
+        }
         ids.push_back(item.first);
     }
     return ids;
@@ -158,6 +165,10 @@ int32_t InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &
     auto iter = inputDevice_.find(deviceId);
     if (iter == inputDevice_.end()) {
         return COMMON_PARAMETER_ERROR;
+    }
+    if (iter->second.enable) {
+        MMI_HILOGE("The current device has been disabled");
+        return RET_ERR;
     }
     for (const auto &item : keyCodes) {
         bool ret = false;
@@ -252,9 +263,14 @@ int32_t InputDeviceManager::GetKeyboardType(int32_t deviceId, int32_t &keyboardT
 {
     CALL_DEBUG_ENTER;
     int32_t tempKeyboardType = KEYBOARD_TYPE_NONE;
-    if (auto iter = inputDevice_.find(deviceId); iter == inputDevice_.end()) {
+    auto iter = inputDevice_.find(deviceId);
+    if (iter == inputDevice_.end()) {
         MMI_HILOGE("Failed to search for the deviceID");
         return COMMON_PARAMETER_ERROR;
+    }
+    if (iter->second.enable) {
+        MMI_HILOGE("The current device has been disabled");
+        return RET_ERR;
     }
     if (GetDeviceConfig(deviceId, tempKeyboardType)) {
         keyboardType = tempKeyboardType;
@@ -441,6 +457,7 @@ void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, str
 {
     info.inputDeviceOrigin = inputDevice;
     info.isRemote = IsRemote(inputDevice);
+    info.enable = info.isRemote ? false : true;
     info.isPointerDevice = IsPointerDevice(inputDevice);
     info.isTouchableDevice = IsTouchDevice(inputDevice);
     info.sysUid = GetInputIdentification(inputDevice);
@@ -902,6 +919,22 @@ VendorConfig InputDeviceManager::GetVendorConfig(int32_t deviceId) const
         return {};
     }
     return it->second.vendorConfig;
+}
+
+int32_t InputDeviceManager::OnEnableInputDevice(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("Enable input device: %{public}s", enable ? "true" : "false");
+    for (auto & item : inputDevice_) {
+        if (item.second.isRemote && item.second.enable != enable) {
+            item.second.enable = enable;
+            for (const auto &listener : devListener_) {
+                CHKPC(listener.first);
+                listener.second(item.first, enable ? "add" : "remove");
+            }
+        }
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
