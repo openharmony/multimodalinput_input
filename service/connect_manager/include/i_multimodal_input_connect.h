@@ -77,6 +77,7 @@ public:
         APPEND_EXTRA_DATA = 53,
         SUBSCRIBE_SWITCH_EVENT = 54,
         UNSUBSCRIBE_SWITCH_EVENT = 55,
+        ENABLE_INPUT_DEVICE = 56,
     };
 
     enum {
@@ -133,6 +134,7 @@ public:
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) = 0;
     virtual int32_t GetWindowPid(int32_t windowId) = 0;
     virtual int32_t AppendExtraData(const ExtraData& extraData) = 0;
+    virtual int32_t EnableInputDevice(bool enable) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

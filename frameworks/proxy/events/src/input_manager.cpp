@@ -258,5 +258,10 @@ void InputManager::AppendExtraData(const ExtraData& extraData)
 {
     InputMgrImpl.AppendExtraData(extraData);
 }
+
+int32_t InputManager::EnableInputDevice(bool enable)
+{
+    return InputMgrImpl.EnableInputDevice(enable);
+}
 } // namespace MMI
 } // namespace OHOS

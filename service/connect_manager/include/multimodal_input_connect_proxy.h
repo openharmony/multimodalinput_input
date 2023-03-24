@@ -77,6 +77,7 @@ public:
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) override;
     int32_t GetWindowPid(int32_t windowId) override;
     int32_t AppendExtraData(const ExtraData& extraData) override;
+    int32_t EnableInputDevice(bool enable) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

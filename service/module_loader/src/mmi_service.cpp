@@ -1387,5 +1387,16 @@ int32_t MMIService::AppendExtraData(const ExtraData& extraData)
     }
     return ret;
 }
+
+int32_t MMIService::EnableInputDevice(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputDeviceManager::OnEnableInputDevice,
+        InputDevMgr, enable));
+    if (ret != RET_OK) {
+        MMI_HILOGE("OnEnableInputDevice failed:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS

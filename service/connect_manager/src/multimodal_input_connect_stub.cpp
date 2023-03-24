@@ -95,6 +95,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::SET_CAPTURE_MODE, &MultimodalInputConnectStub::StubSetMouseCaptureMode},
         {IMultimodalInputConnect::GET_WINDOW_PID, &MultimodalInputConnectStub::StubGetWindowPid},
         {IMultimodalInputConnect::APPEND_EXTRA_DATA, &MultimodalInputConnectStub::StubAppendExtraData},
+        {IMultimodalInputConnect::ENABLE_INPUT_DEVICE, &MultimodalInputConnectStub::StubEnableInputDevice},
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -1082,6 +1083,22 @@ int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel& data, Mes
     int32_t ret = AppendExtraData(extraData);
     if (ret != RET_OK) {
         MMI_HILOGE("Fail to call AppendExtraData, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubEnableInputDevice(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    bool enable;
+    READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = EnableInputDevice(enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call EnableInputDevice failed, ret:%{public}d", ret);
     }
     return ret;
 }

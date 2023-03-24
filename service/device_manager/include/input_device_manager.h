@@ -39,6 +39,7 @@ class InputDeviceManager final : public IDeviceObject {
         bool isRemote { false };
         bool isPointerDevice { false };
         bool isTouchableDevice { false };
+        bool enable { false };
         std::string dhid;
         std::string sysUid;
         VendorConfig vendorConfig;
@@ -86,6 +87,7 @@ public:
     using inputDeviceCallback = std::function<void(int32_t deviceId, std::string devName, std::string devStatus)>;
     void SetInputStatusChangeCallback(inputDeviceCallback callback);
     VendorConfig GetVendorConfig(int32_t deviceId) const;
+    int32_t OnEnableInputDevice(bool enable);
 
 private:
     int32_t ParseDeviceId(const std::string &sysName);
