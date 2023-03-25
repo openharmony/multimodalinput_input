@@ -37,9 +37,6 @@ public:
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
 #endif // OHOS_BUILD_ENABLE_TOUCH
     int32_t AddHandleTimer(int32_t timeout = 300);
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    bool CheckKeyboardWhiteList(std::shared_ptr<KeyEvent> keyEvent);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 private:
     int32_t OnEventDeviceAdded(libinput_event *event);
     int32_t OnEventDeviceRemoved(libinput_event *event);
@@ -52,9 +49,6 @@ private:
     int32_t HandleSwitchInputEvent(libinput_event* event);
     int32_t HandleTableToolEvent(libinput_event* event);
     int32_t HandleJoystickEvent(libinput_event* event);
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    bool IsNeedFilterOut(const std::string& deviceId, const std::shared_ptr<KeyEvent> keyEvent);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
     int32_t timerId_ { -1 };

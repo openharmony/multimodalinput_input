@@ -64,20 +64,14 @@ public:
         RMV_INPUT_EVENT_FILTER = 27,
         SET_CAPTURE_MODE = 28,
         GET_DISPLAY_BIND_INFO = 29,
-        REGISTER_COOPERATE_MONITOR = 30,
-        UNREGISTER_COOPERATE_MONITOR = 31,
-        ENABLE_INPUT_DEVICE_COOPERATE = 32,
-        START_INPUT_DEVICE_COOPERATE = 33,
-        STOP_DEVICE_COOPERATE = 34,
-        GET_INPUT_DEVICE_COOPERATE_STATE = 35,        
-        SET_DISPLAY_BIND = 36,
-        SET_INPUT_DEVICE_TO_SCREEN = 50,
-        SET_POINTER_LOCATION = 51,
-        GET_WINDOW_PID = 52,
-        APPEND_EXTRA_DATA = 53,
-        SUBSCRIBE_SWITCH_EVENT = 54,
-        UNSUBSCRIBE_SWITCH_EVENT = 55,
-        ENABLE_INPUT_DEVICE = 56,
+        SET_DISPLAY_BIND = 30,
+        SET_INPUT_DEVICE_TO_SCREEN = 31,
+        SET_POINTER_LOCATION = 32,
+        GET_WINDOW_PID = 33,
+        APPEND_EXTRA_DATA = 34,
+        SUBSCRIBE_SWITCH_EVENT = 35,
+        UNSUBSCRIBE_SWITCH_EVENT = 36,
+        ENABLE_INPUT_DEVICE = 37,
     };
 
     enum {
@@ -120,14 +114,6 @@ public:
     virtual int32_t SetAnrObserver() = 0;
     virtual int32_t GetDisplayBindInfo(DisplayBindInfos &infos) = 0;
     virtual int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
-    virtual int32_t RegisterCooperateListener() = 0;
-    virtual int32_t UnregisterCooperateListener() = 0;
-    virtual int32_t EnableInputDeviceCooperate(int32_t userData, bool enabled) = 0;
-    virtual int32_t StartInputDeviceCooperate(int32_t userData, const std::string &sinkDeviceId,
-        int32_t srcInputDeviceId) = 0;
-    virtual int32_t StopDeviceCooperate(int32_t userData) = 0;
-    virtual int32_t GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId) = 0;
-    virtual int32_t SetInputDevice(const std::string& dhid, const std::string& screenId) = 0;
     virtual int32_t GetFunctionKeyState(int32_t funckey, bool &state) = 0;
     virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) = 0;
     virtual int32_t SetPointerLocation(int32_t x, int32_t y) = 0;

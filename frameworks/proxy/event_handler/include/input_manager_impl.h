@@ -29,7 +29,6 @@
 #include "extra_data.h"
 #include "if_mmi_client.h"
 #include "input_device_impl.h"
-#include "input_device_cooperate_impl.h"
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
 #include "input_interceptor_manager.h"
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
@@ -114,16 +113,8 @@ public:
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid);
 
-    int32_t RegisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener);
     int32_t EnterCaptureMode(int32_t windowId);
     int32_t LeaveCaptureMode(int32_t windowId);
-    int32_t UnregisterCooperateListener(std::shared_ptr<IInputDeviceCooperateListener> listener = nullptr);
-    int32_t EnableInputDeviceCooperate(bool enabled, std::function<void(std::string, CooperationMessage)> callback);
-    int32_t StartInputDeviceCooperate(const std::string &sinkDeviceId, int32_t srcInputDeviceId,
-        std::function<void(std::string, CooperationMessage)> callback);
-    int32_t StopDeviceCooperate(std::function<void(std::string, CooperationMessage)> callback);
-    int32_t GetInputDeviceCooperateState(const std::string &deviceId, std::function<void(bool)> callback);
-    int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
     bool GetFunctionKeyState(int32_t funcKey);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
     void SetPointerLocation(int32_t x, int32_t y);

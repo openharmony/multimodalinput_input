@@ -67,13 +67,6 @@ public:
     int32_t UnsubscribeSwitchEvent(int32_t subscribeId);
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
     int32_t SetAnrObserver();
-    int32_t RegisterCooperateListener();
-    int32_t UnregisterCooperateListener();
-    int32_t EnableInputDeviceCooperate(int32_t userData, bool enabled);
-    int32_t StartInputDeviceCooperate(int32_t userData, const std::string &sinkDeviceId, int32_t srcInputDeviceId);
-    int32_t StopDeviceCooperate(int32_t userData);
-    int32_t GetInputDeviceCooperateState(int32_t userData, const std::string &deviceId);
-    int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state);
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable);
     int32_t SetPointerLocation(int32_t x, int32_t y);

@@ -49,7 +49,7 @@ public:
     void OnInputDeviceAdded(struct libinput_device *inputDevice);
     void OnInputDeviceRemoved(struct libinput_device *inputDevice);
     std::vector<int32_t> GetInputDeviceIds() const;
-    std::shared_ptr<InputDevice> GetInputDevice(int32_t id) const;
+    std::shared_ptr<InputDevice> GetInputDevice(int32_t id, bool checked = true) const;
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keyCodes, std::vector<bool> &keystroke);
     int32_t FindInputDeviceId(struct libinput_device* inputDevice);
     int32_t GetKeyboardBusMode(int32_t deviceId);
@@ -65,15 +65,6 @@ public:
     void DumpDeviceList(int32_t fd, const std::vector<std::string> &args);
     bool IsRemote(struct libinput_device *inputDevice) const;
     bool IsRemote(int32_t id) const;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    std::string GetOriginNetworkId(int32_t id);
-    std::string GetOriginNetworkId(const std::string &dhid);
-    std::string GetDhid(int32_t deviceId) const;
-    std::vector<std::string> GetCooperateDhids(int32_t deviceId);
-    std::vector<std::string> GetCooperateDhids(const std::string &dhid);
-    bool HasLocalPointerDevice() const;
-    void NotifyVirtualKeyBoardStatus(int32_t deviceId, bool isAvailable) const;
-#endif // OHOS_BUILD_ENABLE_COOPERATE
     bool IsKeyboardDevice(struct libinput_device* device) const;
     bool IsPointerDevice(struct libinput_device* device) const;
     bool IsTouchDevice(struct libinput_device* device) const;
@@ -82,7 +73,6 @@ public:
     bool HasPointerDevice();
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool HasTouchDevice();
-    int32_t SetInputDevice(const std::string& dhid, const std::string& screenId);
     const std::string& GetScreenId(int32_t deviceId) const;
     using inputDeviceCallback = std::function<void(int32_t deviceId, std::string devName, std::string devStatus)>;
     void SetInputStatusChangeCallback(inputDeviceCallback callback);
@@ -94,11 +84,6 @@ private:
     void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);
     bool IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const;
     void ScanPointerDevice();
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    std::string MakeNetworkId(const char *phys) const;
-    std::string Sha256(const std::string &in) const;
-    std::string GenerateDescriptor(struct libinput_device *inputDevice, bool isRemote) const;
-#endif // OHOS_BUILD_ENABLE_COOPERATE
     std::string GetInputIdentification(struct libinput_device* inputDevice);
     void NotifyDevCallback(int32_t deviceId,  struct InputDeviceInfo inDevice);
 private:

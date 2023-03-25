@@ -17,9 +17,7 @@
         extern "C++" {
             OHOS::MMI::AxisEvent*;
             OHOS::MMI::BytraceAdapter*;
-            OHOS::MMI::CooperationMessage*;
             OHOS::MMI::InputDevice*;
-            OHOS::MMI::InputDeviceCooperateImpl*;
             OHOS::MMI::InputEvent*;
             OHOS::MMI::InputInterceptorManager*;
             OHOS::MMI::InputManager*;

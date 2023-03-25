@@ -145,12 +145,5 @@ int32_t MouseEventNormalize::SetPointerLocation(int32_t x, int32_t y)
 {
     return MouseTransformProcessor::SetPointerLocation(x, y);
 }
-
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-void MouseEventNormalize::SetAbsolutionLocation(double xPercent, double yPercent)
-{
-    MouseTransformProcessor::SetAbsolutionLocation(xPercent, yPercent);
-}
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace MMI
 } // namespace OHOS
