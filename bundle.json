@@ -15,12 +15,10 @@
       "SystemCapability.MultimodalInput.Input.Core",
       "SystemCapability.MultimodalInput.Input.InputSimulator",
       "SystemCapability.MultimodalInput.Input.InputMonitor",
-      "SystemCapability.MultimodalInput.Input.Pointer",
-      "SystemCapability.MultimodalInput.Input.Cooperator"
+      "SystemCapability.MultimodalInput.Input.Pointer"
     ],
     "features": [
       "input_feature_combination_key",
-      "input_feature_input_cooperation",
       "input_feature_input_device",
       "input_feature_interceptor",
       "input_feature_keyboard",

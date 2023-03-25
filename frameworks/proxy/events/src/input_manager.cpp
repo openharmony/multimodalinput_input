@@ -224,11 +224,6 @@ int32_t InputManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerSty
     return InputMgrImpl.GetPointerStyle(windowId, pointerStyle);
 }
 
-int32_t InputManager::SetInputDevice(const std::string& dhid, const std::string& screenId)
-{
-    return InputMgrImpl.SetInputDevice(dhid, screenId);
-}
-
 bool InputManager::GetFunctionKeyState(int32_t funcKey)
 {
     return InputMgrImpl.GetFunctionKeyState(funcKey);

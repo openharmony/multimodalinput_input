@@ -36,21 +36,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Event
 void EventInterceptorHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPV(keyEvent);
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    if (!InputHandler->GetJumpInterceptState() && OnHandleEvent(keyEvent)) {
-        MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{public}d",
-            keyEvent->GetKeyCode());
-        BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
-        return;
-    }
-#else
     if (OnHandleEvent(keyEvent)) {
         MMI_HILOGD("KeyEvent filter find a keyEvent from Original event keyCode:%{public}d",
             keyEvent->GetKeyCode());
         BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::KEY_INTERCEPT_EVENT);
         return;
     }
-#endif // OHOS_BUILD_ENABLE_COOPERATE
     CHKPV(nextHandler_);
     nextHandler_->HandleKeyEvent(keyEvent);
 }
