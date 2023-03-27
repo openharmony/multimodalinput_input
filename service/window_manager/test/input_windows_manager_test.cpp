@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-using namespace testing;
+using namespace testing::ext;
 } // namespace
 
 class InputWindowsManagerTest : public testing::Test {
