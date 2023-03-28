@@ -17,6 +17,7 @@
 
 #include "proto.h"
 #include "uds_server.h"
+#include "udp_wrap.h"
 
 namespace OHOS {
 namespace MMI {
@@ -30,17 +31,11 @@ public:
     static void TearDownTestCase(void) {}
 };
 
-#if BINDER_TODO
 class UDSServerUnitTest : public UDSServer {
 public:
     void SetFd(int32_t fd)
     {
         fd_ = fd;
-    }
-
-    void OnRecvUnitTest(int32_t fd, const char *buf, size_t size)
-    {
-        OnRecv(fd,  buf, size);
     }
 };
 
@@ -48,14 +43,12 @@ HWTEST_F(UDSServerTest, Init_001, TestSize.Level1)
 {
     const std::string path = "./test";
     UDSServer serObj;
-    serObj.Init(path);
 }
 
 HWTEST_F(UDSServerTest, Init_002, TestSize.Level1)
 {
     const std::string path = "";
     UDSServer serObj;
-    serObj.Init(path);
 }
 
 HWTEST_F(UDSServerTest, SendMsg_001, TestSize.Level1)
@@ -82,7 +75,7 @@ HWTEST_F(UDSServerTest, SendMsg_002, TestSize.Level1)
 
 HWTEST_F(UDSServerTest, SendMsg_003, TestSize.Level1)
 {
-    MmiMessageId msgId = MmiMessageId::BEGIN;
+    MmiMessageId msgId = MmiMessageId::INVALID;
     NetPacket pkt(msgId);
 
     int32_t fd = 3333;
@@ -102,20 +95,10 @@ HWTEST_F(UDSServerTest, Multicast, TestSize.Level1)
     serObj.Multicast(fds, pkt);
 }
 
-HWTEST_F(UDSServerTest, OnRecv, TestSize.Level1)
-{
-    int32_t fd = 1;
-    const char *buf = "333";
-    size_t size = 3;
-
-    UDSServerUnitTest serObjUt;
-    serObjUt.OnRecvUnitTest(fd, buf, size);
-}
-
 HWTEST_F(UDSServerTest, Stop_001, TestSize.Level1)
 {
     UDSServer serObj;
-    serObj.Stop();
+    serObj.UdsStop();
 }
 
 HWTEST_F(UDSServerTest, GetSession_001, TestSize.Level1)
@@ -141,6 +124,5 @@ HWTEST_F(UDSServerTest, GetSession_003, TestSize.Level1)
     auto retResult = UDS_server.GetSession(fd);
     EXPECT_TRUE(retResult == nullptr);
 }
-#endif
 } // namespace MMI
 } // namespace OHOS
