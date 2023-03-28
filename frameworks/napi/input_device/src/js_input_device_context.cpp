@@ -114,9 +114,13 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
     }
 
     napi_value object = nullptr;
-    CHKRP(env, napi_get_named_property(env, global, "multimodal_input_device", &object), GET_NAMED_PROPERTY);
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(env, &scope);
+    CHKRP_SCOPE(env, napi_get_named_property(env, global, "multimodal_input_device", &object), GET_NAMED_PROPERTY, scope);
+
     if (object == nullptr) {
         MMI_HILOGE("object is nullptr");
+        napi_close_handle_scope(env, scope);
         return nullptr;
     }
 
@@ -124,8 +128,10 @@ JsInputDeviceContext* JsInputDeviceContext::GetInstance(napi_env env)
     CHKRP(env, napi_unwrap(env, object, (void**)&instance), UNWRAP);
     if (instance == nullptr) {
         MMI_HILOGE("instance is nullptr");
+        napi_close_handle_scope(env, scope);
         return nullptr;
     }
+    napi_close_handle_scope(env, scope);
     return instance;
 }
 
