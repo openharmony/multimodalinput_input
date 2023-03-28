@@ -193,6 +193,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/include",
     "${mmi_path}/service/device_manager/include",
     "${mmi_path}/service/device_scalability/include",
+    "${mmi_path}/service/dfx/include",
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/key_event_normalize/include",
     "${mmi_path}/service/event_handler/include",
@@ -200,14 +201,18 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/libinput_adapter/include",
     "${mmi_path}/service/message_handle/include",
     "${mmi_path}/service/module_loader/include",
+    "${mmi_path}/service/monitor/include",
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/uinput",
     "$root_out_dir/diff_libinput_mmi/export_include",
   ]
 
   sources = [
+    "dfx/test/dfx_hisysevent_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
     "module_loader/test/uds_server_test.cpp",
+    "monitor/test/event_monitor_handler_test.cpp",
+    "subscriber/test/key_subscriber_handler_test.cpp",
     "window_manager/test/input_display_bind_helper_test.cpp",
     "window_manager/test/input_windows_manager_test.cpp",
   ]
