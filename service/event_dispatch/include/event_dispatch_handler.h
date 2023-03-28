@@ -35,7 +35,7 @@ class EventDispatchHandler final : public IInputEventHandler {
         int32_t value { PointerEvent::POINTER_ACTION_UNKNOWN };
     };
 public:
-    EventDispatchHandler();
+    EventDispatchHandler() = default;
     DISALLOW_COPY_AND_MOVE(EventDispatchHandler);
     ~EventDispatchHandler() override = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -53,16 +53,8 @@ public:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     void HandlePointerEventInner(const std::shared_ptr<PointerEvent> point);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    void OnDinputSimulateEvent(uint32_t type, uint32_t code, int32_t value);
-    bool CheckPointerEvent(std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    std::mutex lock_;
-    std::vector<DinputSimulateEvent> dinputSimulateEvent_;
-#endif // OHOS_BUILD_ENABLE_COOPERATE
     int32_t eventTime_ { 0 };
     int32_t currentTime_ { 0 };
 };

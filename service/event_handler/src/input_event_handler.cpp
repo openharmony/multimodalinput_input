@@ -25,9 +25,6 @@
 #include <unistd.h>
 
 #include "libinput.h"
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-#include "input_device_cooperate_sm.h"
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "key_command_handler.h"
 #include "timer_manager.h"
 #include "util.h"
@@ -68,15 +65,7 @@ void InputEventHandler::OnEvent(void *event)
     MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
                "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType, beginTime);
     CHKPV(eventNormalizeHandler_);
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    if (InputDevCooSM->GetCooperateEnableState()) {
-        InputDevCooSM->HandleEvent(lpEvent);
-    } else {
-        eventNormalizeHandler_->HandleEvent(lpEvent);
-    }
-#else
     eventNormalizeHandler_->HandleEvent(lpEvent);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
     int64_t endTime = GetSysClockTime();
     int64_t lostTime = endTime - beginTime;
     MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
@@ -167,17 +156,5 @@ std::shared_ptr<EventFilterHandler> InputEventHandler::GetFilterHandler() const
 {
     return eventFilterHandler_;
 }
-
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-void InputEventHandler::SetJumpInterceptState(bool isJump)
-{
-    isJumpIntercept_ = isJump;
-}
-
-bool InputEventHandler::GetJumpInterceptState() const
-{
-    return isJumpIntercept_;
-}
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace MMI
 } // namespace OHOS

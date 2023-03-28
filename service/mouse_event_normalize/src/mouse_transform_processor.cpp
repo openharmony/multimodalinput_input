@@ -51,9 +51,6 @@ const std::vector<AccelerateCurve> ACCELERATE_CURVES {
     { { 8, 32, 128 }, { 1.10, 3.75, 7.00 }, { 0.0, -21.20, -125.20 } },
     { { 8, 32, 128 }, { 1.16, 4.20, 7.84 }, { 0.0, -24.32, -140.80 } }
 };
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-constexpr double PERCENT_CONST = 100.0;
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace
 
 double MouseTransformProcessor::absolutionX_ = -1.0;
@@ -484,35 +481,6 @@ int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y)
     IPointerDrawingManager::GetInstance()->SetPointerLocation(getpid(), physicalX, physicalY);
     return RET_OK;
 }
-
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-void MouseTransformProcessor::SetAbsolutionLocation(double xPercent, double yPercent)
-{
-    MMI_HILOGI("Cross screen location, xPercent:%{public}lf, yPercent:%{public}lf",
-        xPercent, yPercent);
-    auto displayGroupInfo = WinMgr->GetDisplayGroupInfo();
-    if (currentDisplayId_ == -1) {
-        if (displayGroupInfo.displaysInfo.empty()) {
-            MMI_HILOGI("The displayInfo is empty");
-            return;
-        }
-        currentDisplayId_ = displayGroupInfo.displaysInfo[0].id;
-    }
-    struct DisplayInfo display;
-    for (auto &it : displayGroupInfo.displaysInfo) {
-        if (it.id == currentDisplayId_) {
-            display = it;
-            break;
-        }
-    }
-    absolutionX_ = display.width * xPercent / PERCENT_CONST;
-    absolutionY_ = display.height * yPercent / PERCENT_CONST;
-    WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
-    int32_t physicalX = WinMgr->GetMouseInfo().physicalX;
-    int32_t physicalY = WinMgr->GetMouseInfo().physicalY;
-    IPointerDrawingManager::GetInstance()->SetPointerLocation(getpid(), physicalX, physicalY);
-}
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 int32_t MouseTransformProcessor::GetSpeed() const
 {

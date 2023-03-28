@@ -22,9 +22,6 @@
 
 #include "anr_manager.h"
 #include "bytrace_adapter.h"
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-#include "distributed_input_adapter.h"
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 #include "error_multimodal.h"
 #include "input_event_data_transformation.h"
 #include "input_event_handler.h"
@@ -43,14 +40,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Event
 #endif // OHOS_BUILD_ENABLE_KEYBOARD ||  OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 constexpr int32_t INTERVAL_TIME = 3000; // log time interval is 3 seconds.
 } // namespace
-
-EventDispatchHandler::EventDispatchHandler()
-{
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    DistributedAdapter->RegisterEventCallback(std::bind(&EventDispatchHandler::OnDinputSimulateEvent, this,
-        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
-#endif // OHOS_BUILD_ENABLE_COOPERATE
-}
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventDispatchHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
@@ -91,12 +80,6 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
     }
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    if (CheckPointerEvent(point)) {
-        MMI_HILOGE("Check pointer event return true,filter out this pointer event");
-        return;
-    }
-#endif // OHOS_BUILD_ENABLE_COOPERATE
     auto udsServer = InputHandler->GetUDSServer();
     CHKPV(udsServer);
     auto session = udsServer->GetSession(fd);
@@ -172,37 +155,5 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-bool EventDispatchHandler::CheckPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    CHKPF(pointerEvent);
-    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_MOUSE) {
-        return false;
-    }
-    std::lock_guard<std::mutex> guard(lock_);
-    if (dinputSimulateEvent_.empty()) {
-        return false;
-    }
-    int32_t pointerAction = PointerEvent::POINTER_ACTION_BUTTON_DOWN;
-    if (dinputSimulateEvent_[0].value == BUTTON_STATE_RELEASED) {
-        pointerAction = PointerEvent::POINTER_ACTION_BUTTON_UP;
-    }
-    if ((dinputSimulateEvent_[0].type == EV_KEY) &&
-        (pointerAction == pointerEvent->GetPointerAction()) &&
-        (MouseState->LibinputChangeToPointer(dinputSimulateEvent_[0].code) == pointerEvent->GetButtonId())) {
-        dinputSimulateEvent_.clear();
-        return true;
-    }
-    return false;
-}
-
-void EventDispatchHandler::OnDinputSimulateEvent(uint32_t type, uint32_t code, int32_t value)
-{
-    std::lock_guard<std::mutex> guard(lock_);
-    dinputSimulateEvent_.clear();
-    dinputSimulateEvent_.push_back({type, code, value});
-}
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 } // namespace MMI
 } // namespace OHOS

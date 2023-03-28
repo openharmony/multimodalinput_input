@@ -29,7 +29,6 @@ declare_args() {
   input_feature_joystick = true
   input_feature_touchscreen = true
   input_feature_input_device = true
-  input_feature_input_cooperation = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -96,14 +95,6 @@ declare_args() {
     "src/js_event_target.cpp",
     "src/js_input_device_context.cpp",
     "src/js_input_device_manager.cpp",
-    "src/js_util.cpp",
-    "src/native_register_module.cpp",
-  ]
-
-  inputdevicecooperate_sources = [
-    "src/js_event_target.cpp",
-    "src/js_input_device_cooperate_context.cpp",
-    "src/js_input_device_cooperate_manager.cpp",
     "src/js_util.cpp",
     "src/native_register_module.cpp",
   ]
@@ -228,7 +219,6 @@ print("input_feature_mouse = ${input_feature_mouse}")
 print("input_feature_joystick = ${input_feature_joystick}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
-print("input_feature_input_cooperation = ${input_feature_input_cooperation}")
 
 input_default_defines = []
 
@@ -250,10 +240,6 @@ if (input_feature_switch) {
 
 if (input_feature_monitor) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_MONITOR" ]
-}
-
-if (input_feature_input_cooperation) {
-  input_default_defines += [ "OHOS_BUILD_ENABLE_COOPERATE" ]
 }
 
 if (input_feature_touchscreen) {
