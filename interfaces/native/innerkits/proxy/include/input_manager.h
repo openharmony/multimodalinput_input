@@ -23,11 +23,9 @@
 #include "event_handler.h"
 #include "nocopyable.h"
 
-#include "cooperation_message.h"
 #include "error_multimodal.h"
 #include "extra_data.h"
 #include "i_anr_observer.h"
-#include "i_input_device_cooperate_listener.h"
 #include "i_input_device_listener.h"
 #include "i_input_event_consumer.h"
 #include "i_input_event_filter.h"
@@ -334,14 +332,6 @@ public:
      * @since 9
      */
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
-
-    /**
-     * @brief Sets the screen ID corresponding to the specified input device.
-     * @param dhid Indicates the ID of the input device.
-     * @param screenId Indicates the screen ID corresponding to the input device.
-     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
-     */
-    int32_t SetInputDevice(const std::string &dhid, const std::string &screenId);
 
     /**
      * @brief Obtains the enablement status of the specified function key on the keyboard.

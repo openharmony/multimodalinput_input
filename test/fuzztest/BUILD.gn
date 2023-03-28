@@ -21,31 +21,22 @@ group("test") {
     "addinterceptor_fuzzer:fuzztest",
     "addmonitor_fuzzer:fuzztest",
     "functionkeystate_fuzzer:fuzztest",
+    "getdeviceIds_fuzzer:fuzztest",
+    "getdevice_fuzzer:fuzztest",
     "getkeyboardtype_fuzzer:fuzztest",
     "markconsumed_fuzzer:fuzztest",
     "movemouse_fuzzer:fuzztest",
     "pointerspeed_fuzzer:fuzztest",
     "pointerstyle_fuzzer:fuzztest",
     "pointervisible_fuzzer:fuzztest",
+    "registerdevListener_fuzzer:fuzztest",
+    "removeinterceptor_fuzzer:fuzztest",
+    "setanrobserver_fuzzer:fuzztest",
+    "setwindowinputeventconsumer_fuzzer:fuzztest",
     "simulateinputevent_fuzzer:fuzztest",
     "subscribekeyevent_fuzzer:fuzztest",
     "supportkeys_fuzzer:fuzztest",
+    "unregisterdevListener_fuzzer:fuzztest",
     "updatedisplayinfo_fuzzer:fuzztest",
   ]
-  if (input_feature_input_cooperation) {
-    deps += [
-      "enableinputdevicecooperate_fuzzer:fuzztest",
-      "getdeviceIds_fuzzer:fuzztest",
-      "getdevice_fuzzer:fuzztest",
-      "getinputdevicecooperatestate_fuzzer:fuzztest",
-      "registercooperatelistener_fuzzer:fuzztest",
-      "registerdevListener_fuzzer:fuzztest",
-      "removeinterceptor_fuzzer:fuzztest",
-      "setanrobserver_fuzzer:fuzztest",
-      "setwindowinputeventconsumer_fuzzer:fuzztest",
-      "startinputdevicecooperate_fuzzer:fuzztest",
-      "stopdevicecooperate_fuzzer:fuzztest",
-      "unregisterdevListener_fuzzer:fuzztest",
-    ]
-  }
 }

@@ -40,9 +40,6 @@ public:
     std::shared_ptr<PointerEvent> GetPointerEvent() const;
     int32_t Normalize(struct libinput_event *event);
     void Dump(int32_t fd, const std::vector<std::string> &args);
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    static void SetAbsolutionLocation(double xPercent, double yPercent);
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING

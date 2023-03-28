@@ -76,9 +76,6 @@ ohos_shared_library("libmmi-client") {
   sources = libmmi_client_sources
   version_script = "${mmi_path}/interfaces/native/innerkits/libmmi-client-map"
   innerapi_tags = [ "platformsdk" ]
-  if (input_feature_input_cooperation) {
-    sources += [ "event_handler/src/input_device_cooperate_impl.cpp" ]
-  }
 
   if (input_feature_interceptor) {
     sources += [ "event_handler/src/input_interceptor_manager.cpp" ]

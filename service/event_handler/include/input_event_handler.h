@@ -51,10 +51,6 @@ public:
     std::shared_ptr<KeyCommandHandler> GetKeyCommandHandler() const;
     std::shared_ptr<EventMonitorHandler> GetMonitorHandler() const;
     std::shared_ptr<EventFilterHandler> GetFilterHandler() const;
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    void SetJumpInterceptState(bool isJump);
-    bool GetJumpInterceptState() const;
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 
 private:
     int32_t BuildInputHandlerChain();
@@ -69,9 +65,6 @@ private:
     std::shared_ptr<EventMonitorHandler> eventMonitorHandler_ { nullptr };
 
     uint64_t idSeed_ { 0 };
-#ifdef OHOS_BUILD_ENABLE_COOPERATE
-    bool isJumpIntercept_ { false };
-#endif // OHOS_BUILD_ENABLE_COOPERATE
 };
 #define InputHandler ::OHOS::DelayedSingleton<InputEventHandler>::GetInstance()
 } // namespace MMI
