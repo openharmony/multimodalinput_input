@@ -946,9 +946,9 @@ napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, co
     cb->isApi9 = isApi9;
     napi_value promise = nullptr;
     if (handle == nullptr) {
-        CHKRP_SCOPE(env, napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE, scope);
+        CHKRP(env, napi_create_promise(env, &cb->deferred, &promise), CREATE_PROMISE);
     } else {
-        CHKRP_SCOPE(env, napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE, scope);
+        CHKRP(env, napi_create_reference(env, handle, 1, &cb->ref), CREATE_REFERENCE);
     }
     callback_.emplace(userData, std::move(cb));
     return promise;
