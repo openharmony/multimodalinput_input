@@ -55,10 +55,12 @@ void MouseTransformProcessorTest::TearDown()
  */
 HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetPointerEvent_001, TestSize.Level1)
 {
-    MouseTransformProcessor processor(0);
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
     processor.GetPointerEvent();
     processor.InitAbsolution();
-    processor.OnDisplayLost(0);
+    int32_t displayId = 0;
+    processor.OnDisplayLost(displayId);
 }
 
 /**
@@ -69,10 +71,12 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetPointerEven
  */
 HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_Dump_002, TestSize.Level1)
 {
-    std::vector<std::string> args = {};
-    std::vector<std::string> idNames = {};
-    MouseTransformProcessor processor(0);
-    processor.Dump(0, args);
+    std::vector<std::string> args;
+    std::vector<std::string> idNames;
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    int32_t fd = 0;
+    processor.Dump(fd, args);
     ASSERT_EQ(args, idNames);
 }
 
@@ -84,9 +88,12 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_Dump_002, Test
  */
 HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_NormalizeMoveMouse_003, TestSize.Level1)
 {
-    bool idNames = false;
-    MouseTransformProcessor processor(0);
-    ASSERT_EQ(processor.NormalizeMoveMouse(0, 0), idNames);
+    bool isNormalize = false;
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    int32_t offsetX = 0;
+    int32_t offsetY = 0;
+    ASSERT_EQ(processor.NormalizeMoveMouse(offsetX, offsetY), isNormalize);
 }
 
 /**
@@ -98,7 +105,8 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_NormalizeMoveM
 HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetDisplayId_004, TestSize.Level1)
 {
     int32_t idNames = -1;
-    MouseTransformProcessor processor(0);
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
     ASSERT_EQ(processor.GetDisplayId(), idNames);
 }
 
@@ -111,8 +119,10 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetDisplayId_0
 HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpeed_005, TestSize.Level1)
 {
     int32_t idNames = 0;
-    MouseTransformProcessor processor(0);
-    ASSERT_EQ(processor.SetPointerSpeed(5), idNames);
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    int32_t speed = 5;
+    ASSERT_EQ(processor.SetPointerSpeed(speed), idNames);
 }
 
 /**
@@ -124,8 +134,10 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpee
 HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpeed_006, TestSize.Level1)
 {
     int32_t idNames = 5;
-    MouseTransformProcessor processor(0);
-    processor.SetPointerSpeed(5);
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    int32_t speed = 5;
+    processor.SetPointerSpeed(speed);
     ASSERT_EQ(processor.GetPointerSpeed(), idNames);
 }
 
@@ -137,10 +149,12 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpee
  */
 HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetSpeedGain_007, TestSize.Level1)
 {
+    double vin = 0;
     double gain = 0;
-    bool idNames = false;
-    MouseTransformProcessor processor(0);
-    ASSERT_EQ(processor.GetSpeedGain(0, gain), idNames);
+    bool isGain = false;
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    ASSERT_EQ(processor.GetSpeedGain(vin, gain), isGain);
 }
 
 /**
@@ -152,8 +166,11 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetSpeedGain_0
 HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerLocation_008, TestSize.Level1)
 {
     int32_t idNames = -1;
-    MouseTransformProcessor processor(0);
-    ASSERT_EQ(processor.SetPointerLocation(0, 0), idNames);
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    int32_t x = 0;
+    int32_t y = 0;
+    ASSERT_EQ(processor.SetPointerLocation(x, y), idNames);
 }
 
 /**
@@ -165,13 +182,16 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerLoca
 HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetSpeed_009, TestSize.Level1)
 {
     int32_t idNames = 5;
-    MouseTransformProcessor processor(1);
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
     ASSERT_EQ(processor.GetSpeed(), idNames);
 
-    idNames = 5;
-    processor.SetConfigPointerSpeed(0);
-    processor.SetConfigPointerSpeed(6);
-    processor.SetConfigPointerSpeed(15);
+    int32_t speed = 0;
+    processor.SetConfigPointerSpeed(speed);
+    speed = 6;
+    processor.SetConfigPointerSpeed(speed);
+    speed = 15;
+    processor.SetConfigPointerSpeed(speed);
     ASSERT_EQ(processor.GetSpeed(), idNames);
 }
 }
