@@ -66,12 +66,14 @@ HWTEST_F(MouseDeviceStateTest, MouseDeviceStateTest_GetMouseCoordsX_001, TestSiz
  */
 HWTEST_F(MouseDeviceStateTest, MouseDeviceStateTest_IsLeftBtnPressed_002, TestSize.Level1)
 {
-    MouseState->SetMouseCoords(0, 0);
-    bool idNames = false;
-    ASSERT_EQ(MouseState->IsLeftBtnPressed(), idNames);
+    int32_t x = 0;
+    int32_t y = 0;
+    MouseState->SetMouseCoords(x, y);
+    bool isPress = false;
+    ASSERT_EQ(MouseState->IsLeftBtnPressed(), isPress);
     MouseState->MouseBtnStateCounts(MouseDeviceState::LIBINPUT_LEFT_BUTTON_CODE, BUTTON_STATE_PRESSED);
-    idNames = true;
-    ASSERT_EQ(MouseState->IsLeftBtnPressed(), idNames);
+    isPress = true;
+    ASSERT_EQ(MouseState->IsLeftBtnPressed(), isPress);
 }
 
 /**
