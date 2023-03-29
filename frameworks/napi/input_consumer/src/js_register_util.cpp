@@ -302,6 +302,11 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
     }
     napi_value callback = nullptr;
     MMI_HILOGD("deliver uv work from %{public}d", GetPid());
+    if (event->callback[0] == nullptr) {
+        MMI_HILOGE("event->callback[0] is nullptr");
+        napi_close_handle_scope(env, scope);
+        return;
+    }
     CHKRV_SCOPE(env, napi_get_reference_value(env, event->callback[0], &callback), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
     AsyncWorkFn(env, event, result);
