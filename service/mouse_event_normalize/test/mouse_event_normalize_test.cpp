@@ -67,8 +67,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetDisplayId_001, Test
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerEvent_002, TestSize.Level1)
 {
-    std::shared_ptr<PointerEvent> idNames = nullptr;
-    ASSERT_EQ(MouseEventHdr->GetPointerEvent(), idNames);
+    ASSERT_EQ(MouseEventHdr->GetPointerEvent(), nullptr);
 }
 
 /**
@@ -79,7 +78,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerEvent_002, T
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_OnEvent_003, TestSize.Level1)
 {
-    libinput_event *event = {};
+    libinput_event *event = nullptr;
     int idNames = -1;
     ASSERT_EQ(MouseEventHdr->OnEvent(event), idNames);
 }
@@ -92,8 +91,10 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_OnEvent_003, TestSize.
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_NormalizeMoveMouse_004, TestSize.Level1)
 {
-    bool idNames = false;
-    ASSERT_EQ(MouseEventHdr->NormalizeMoveMouse(0, 0), idNames);
+    bool isNormalize = false;
+    int32_t offsetX = 0;
+    int32_t offsetY = 0;
+    ASSERT_EQ(MouseEventHdr->NormalizeMoveMouse(offsetX, offsetY), isNormalize);
 }
 
 /**
@@ -104,9 +105,10 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_NormalizeMoveMouse_004
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_Dump_005, TestSize.Level1)
 {
-    std::vector<std::string> args = {};
-    std::vector<std::string> idNames = {};
-    MouseEventHdr->Dump(0, args);
+    std::vector<std::string> args;
+    std::vector<std::string> idNames;
+    int32_t fd = 0;
+    MouseEventHdr->Dump(fd, args);
     ASSERT_EQ(args, idNames);
 }
 
@@ -119,7 +121,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_Dump_005, TestSize.Lev
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetPointerSpeed_006, TestSize.Level1)
 {
     int32_t idNames = 0;
-    ASSERT_EQ(MouseEventHdr->SetPointerSpeed(2), idNames);
+    int32_t speed = 2;
+    ASSERT_EQ(MouseEventHdr->SetPointerSpeed(speed), idNames);
 }
 
 /**
@@ -130,7 +133,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetPointerSpeed_006, T
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerSpeed_007, TestSize.Level1)
 {
-    MouseEventHdr->SetPointerSpeed(2);
+    int32_t speed = 2;
+    MouseEventHdr->SetPointerSpeed(speed);
     int32_t idNames = 2;
     ASSERT_EQ(MouseEventHdr->GetPointerSpeed(), idNames);
 }
@@ -143,9 +147,10 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerSpeed_007, T
  */
 HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetPointerLocation_008, TestSize.Level1)
 {
-    // MouseEventHdr->SetAbsolutionLocation(0, 0);
     int32_t idNames = -1;
-    ASSERT_EQ(MouseEventHdr->SetPointerLocation(0, 0), idNames);
+    int32_t x = 0;
+    int32_t y = 0;
+    ASSERT_EQ(MouseEventHdr->SetPointerLocation(x, y), idNames);
 }
 }
 }
