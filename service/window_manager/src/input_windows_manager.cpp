@@ -1166,7 +1166,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         lastTouchEvent_ = nullptr;
         lastTouchWindowInfo_.id = -1;
     }
-    MMI_HILOGI("pid:%{public}d,logicalX:%{public}d,logicalY:%{public}d,eventId%{public}d,"
+    MMI_HILOGI("pid:%{public}d,logicalX:%{public}d,logicalY:%{public}d,eventId:%{public}d,"
                "physicalX:%{public}d,physicalY:%{public}d,windowX:%{public}d,windowY:%{public}d,"
                "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",
                touchWindow->pid, logicalX, logicalY, pointerEvent->GetId(), physicalX, physicalY,
