@@ -330,7 +330,7 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<Pointer
         auto iter = states_.find(pointerEvent->GetDeviceId());
         return (iter != states_.end() ? iter->second.isMonitorConsumed_ : false);
     }
-    MMI_HILOGI("This is not a touch-screen event");
+    MMI_HILOGD("This is not a touch-screen event");
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
