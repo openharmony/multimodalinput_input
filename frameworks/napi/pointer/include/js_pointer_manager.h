@@ -66,6 +66,8 @@ public:
     napi_value SetPointerLocation(napi_env env, napi_value handle, int32_t x, int32_t y);
     napi_value EnterCaptureMode(napi_env env, int32_t windowId, napi_value handle = nullptr);
     napi_value LeaveCaptureMode(napi_env env, int32_t windowId, napi_value handle = nullptr);
+    napi_value SetMousePrimaryButton(napi_env env, int32_t primaryButton, napi_value handle = nullptr);
+    napi_value GetMousePrimaryButton(napi_env env, napi_value handle = nullptr);
 };
 } // namespace MMI
 } // namespace OHOS

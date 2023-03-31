@@ -403,6 +403,42 @@ void MMIService::OnDisconnected(SessionPtr s)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+int32_t MMIService::SetMousePrimaryButton(int32_t primaryButton)
+{
+    CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetMousePrimaryButton,
+        MouseEventHdr, primaryButton));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set mouse primary button failed,return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+int32_t MMIService::ReadMousePrimaryButton(int32_t &primaryButton)
+{
+    primaryButton = MouseEventHdr->GetMousePrimaryButton();
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+int32_t MMIService::GetMousePrimaryButton(int32_t &primaryButton)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadMousePrimaryButton, this,
+        std::ref(primaryButton)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get mouse primary button failed,return %{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
 int32_t MMIService::SetPointerVisible(bool visible)
 {
     CALL_DEBUG_ENTER;

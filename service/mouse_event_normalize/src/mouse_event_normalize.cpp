@@ -131,6 +131,16 @@ void MouseEventNormalize::Dump(int32_t fd, const std::vector<std::string> &args)
     processor->Dump(fd, args);
 }
 
+int32_t MouseEventNormalize::SetMousePrimaryButton(int32_t primaryButton)
+{
+    return MouseTransformProcessor::SetMousePrimaryButton(primaryButton);
+}
+
+int32_t MouseEventNormalize::GetMousePrimaryButton() const
+{
+    return MouseTransformProcessor::GetMousePrimaryButton();
+}
+
 int32_t MouseEventNormalize::SetPointerSpeed(int32_t speed)
 {
     return MouseTransformProcessor::SetPointerSpeed(speed);

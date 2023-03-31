@@ -35,6 +35,8 @@ public:
     static napi_value SetPointerLocation(napi_env env, napi_callback_info info);
     static napi_value EnterCaptureMode(napi_env env, napi_callback_info info);
     static napi_value LeaveCaptureMode(napi_env env, napi_callback_info info);
+    static napi_value SetMousePrimaryButton(napi_env env, napi_callback_info info);
+    static napi_value GetMousePrimaryButton(napi_env env, napi_callback_info info);
 
 private:
     static napi_value CreateInstance(napi_env env);
@@ -42,6 +44,7 @@ private:
     static napi_value CreateJsObject(napi_env env, napi_callback_info info);
     static napi_value EnumConstructor(napi_env env, napi_callback_info info);
     static napi_value CreatePointerStyle(napi_env env, napi_value exports);
+    static napi_value CreateMousePrimaryButton(napi_env env, napi_value exports);
     std::shared_ptr<JsPointerManager> mgr_ { nullptr };
     napi_ref contextRef_ { nullptr };
 };
