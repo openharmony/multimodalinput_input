@@ -124,6 +124,18 @@ int32_t MultimodalInputConnectManager::RemoveInputEventFilter(int32_t filterId)
     return multimodalInputConnectService_->RemoveInputEventFilter(filterId);    
 }
 
+int32_t MultimodalInputConnectManager::SetMousePrimaryButton(int32_t primaryButton)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetMousePrimaryButton(primaryButton);
+}
+
+int32_t MultimodalInputConnectManager::GetMousePrimaryButton(int32_t &primaryButton)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetMousePrimaryButton(primaryButton);
+}
+
 int32_t MultimodalInputConnectManager::SetPointerVisible(bool visible)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);

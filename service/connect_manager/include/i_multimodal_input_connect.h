@@ -72,6 +72,8 @@ public:
         SUBSCRIBE_SWITCH_EVENT = 35,
         UNSUBSCRIBE_SWITCH_EVENT = 36,
         ENABLE_INPUT_DEVICE = 37,
+        SET_MOUSE_PRIMARY_BUTTON = 38,
+        GET_MOUSE_PRIMARY_BUTTON = 39,
     };
 
     enum {
@@ -86,6 +88,8 @@ public:
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
         uint32_t deviceTags) = 0;
     virtual int32_t RemoveInputEventFilter(int32_t filterId) = 0;
+    virtual int32_t SetMousePrimaryButton(int32_t primaryButton) = 0;
+    virtual int32_t GetMousePrimaryButton(int32_t &primaryButton) = 0;
     virtual int32_t SetPointerVisible(bool visible) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
     virtual int32_t MarkProcessed(int32_t eventType, int32_t eventId) = 0;

@@ -184,6 +184,16 @@ int32_t InputManager::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCode
     return InputMgrImpl.SupportKeys(deviceId, keyCodes, callback);
 }
 
+int32_t InputManager::SetMousePrimaryButton(int32_t primaryButton)
+{
+    return InputMgrImpl.SetMousePrimaryButton(primaryButton);
+}
+
+int32_t InputManager::GetMousePrimaryButton(int32_t &primaryButton)
+{
+    return InputMgrImpl.GetMousePrimaryButton(primaryButton);
+}
+
 int32_t InputManager::SetPointerVisible(bool visible)
 {
     return InputMgrImpl.SetPointerVisible(visible);
