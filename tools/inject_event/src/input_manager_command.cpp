@@ -400,7 +400,6 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 scrollValue);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            time = pointerEvent->GetActionStartTime();
 
                             time = pointerEvent->GetActionStartTime();
                             pointerEvent->SetActionTime(time + ACTION_TIME);
