@@ -47,7 +47,7 @@ void ANRHandler::UpdateLastProcessedEventId(int32_t eventType, int32_t eventId)
     event_[eventType].lastEventId = eventId;
 }
 
-void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, uint64_t actionTime)
+void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, int64_t actionTime)
 {
     CALL_DEBUG_ENTER;
     if (event_[eventType].lastEventId > eventId) {
