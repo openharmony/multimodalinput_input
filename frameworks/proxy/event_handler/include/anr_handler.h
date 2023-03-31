@@ -29,7 +29,7 @@ class ANRHandler {
 public:
     DISALLOW_COPY_AND_MOVE(ANRHandler);
 
-    void SetLastProcessedEventId(int32_t eventType, int32_t eventId, uint64_t actionTime);
+    void SetLastProcessedEventId(int32_t eventType, int32_t eventId, int64_t actionTime);
     void MarkProcessed(int32_t eventType);
     void ResetAnrArray();
     std::mutex anrMtx_;

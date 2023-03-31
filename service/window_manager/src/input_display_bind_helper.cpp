@@ -380,6 +380,10 @@ void InputDisplayBindHelper::Store()
 	if (infos_ == nullptr) {
 		return;
 	}
+    if (fileName_.empty()) {
+        MMI_HILOGE("file name is empty");
+        return;
+    }
 	std::ofstream ofs(fileName_.c_str(), std::ios::trunc | std::ios::out | std::ios_base::binary);
 	if (!ofs) {
 		MMI_HILOGE("Open file fail.%{public}s, errno:%{public}d", fileName_.c_str(), errno);
@@ -487,6 +491,10 @@ int32_t InputDisplayBindHelper::SetDisplayBind(int32_t deviceId, int32_t display
 void InputDisplayBindHelper::Load()
 {
 	CALL_DEBUG_ENTER;
+    if (fileName_.empty()) {
+        MMI_HILOGE("file name is empty");
+        return;
+    }
 	std::ifstream ifs(fileName_.c_str());
 	MMI_HILOGEK("Open file end:%{public}s", fileName_.c_str());
 	if (!ifs) {
