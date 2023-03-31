@@ -311,8 +311,8 @@ bool InputDeviceManager::HasTouchDevice()
 std::string InputDeviceManager::GetInputIdentification(struct libinput_device* inputDevice)
 {
     CALL_DEBUG_ENTER;
-    uint32_t deviceVendor = libinput_device_get_id_vendor(inputDevice);
-    uint32_t deviceProduct = libinput_device_get_id_product(inputDevice);
+    int32_t deviceVendor = libinput_device_get_id_vendor(inputDevice);
+    int32_t deviceProduct = libinput_device_get_id_product(inputDevice);
     struct udev_device* udevDevice = libinput_device_get_udev_device(inputDevice);
     std::string sysPath = udev_device_get_syspath(udevDevice);
     if ((deviceVendor < 0) || (deviceProduct < 0) || sysPath.empty()) {

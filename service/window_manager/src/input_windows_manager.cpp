@@ -740,8 +740,8 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
     }
     for (const auto& windowInfo : displayGroupInfo_.windowsInfo) {
         if (windowId == windowInfo.id && pid == windowInfo.pid) {
-            auto iter = it->second.insert(std::make_pair(windowId, pointerStyle));
-            if (!iter.second) {
+            auto iterator = it->second.insert(std::make_pair(windowId, pointerStyle));
+            if (!iterator.second) {
                 MMI_HILOGW("The window type is duplicated");
             }
             return RET_OK;
