@@ -50,9 +50,9 @@ int main(int argc, char *argv[])
 
     int32_t optionIndex = 0;
     optind = 0;
-    int32_t c = 0;
-    if ((c = getopt_long(argc, argv, "qs:h?", headOptions, &optionIndex)) != -1) {
-        switch (c) {
+    int32_t cases = 0;
+    if ((cases = getopt_long(argc, argv, "qs:h?", headOptions, &optionIndex)) != -1) {
+        switch (cases) {
             case 'q': {
                 printf("query\n");
                 OHOS::MMI::DisplayBindInfos infos;
