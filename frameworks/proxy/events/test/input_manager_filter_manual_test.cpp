@@ -98,7 +98,7 @@ public:
         SetSelfTokenID(currentID_);
     }
 private:
-    AccessTokenID currentID_ = 0;
+    AccessTokenID currentID_;
     AccessTokenID accessID_ = 0;
 };
 
@@ -126,7 +126,7 @@ public:
     pid_t GetProcessPidByName(const char* proc_name) const
     {
         FILE *fp;
-        char buf[100];
+        char buf[255];
         char cmd[200] = {'\0'};
         pid_t pid = -1;
         sprintf(cmd, "pidof %s", proc_name);
@@ -177,8 +177,8 @@ public:
             }
             std::string priority = match[1].str();
             std::string filterId = match[2].str();
-            std::string pid = match[3].str();
-            if (pid != strPid) {
+            std::string pidStr = match[3].str();
+            if (pidStr != strPid) {
                 continue;
             }
             auto ret = info.emplace(std::make_pair(priority, filterId));

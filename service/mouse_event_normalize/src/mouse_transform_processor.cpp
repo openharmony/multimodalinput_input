@@ -466,13 +466,6 @@ int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y)
         }
         currentDisplayId_ = displayGroupInfo.displaysInfo[0].id;
     }
-    struct DisplayInfo display;
-    for (auto& it : displayGroupInfo.displaysInfo) {
-        if (it.id == currentDisplayId_) {
-            display = it;
-            break;
-        }
-    }
     absolutionX_ = static_cast<double>(x);
     absolutionY_ = static_cast<double>(y);
     WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);

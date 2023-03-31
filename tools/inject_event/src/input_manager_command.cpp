@@ -558,7 +558,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             int32_t py1 = 0;
                             int32_t px2 = 0;
                             int32_t py2 = 0;
-                            int32_t buttonId = 0;
+                            int32_t buttonsId = 0;
                             int32_t totalTimeMs = 1000;
                             if (argc < 7) {
                                 std::cout << "argc:" << argc << std::endl;
@@ -605,8 +605,8 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetPointerId(0);
                             pointerEvent->AddPointerItem(item);
                             pointerEvent->SetButtonPressed(0);
-                            pointerEvent->SetButtonId(buttonId);
-                            pointerEvent->SetButtonPressed(buttonId);
+                            pointerEvent->SetButtonId(buttonsId);
+                            pointerEvent->SetButtonPressed(buttonsId);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
