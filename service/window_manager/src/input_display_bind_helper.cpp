@@ -58,10 +58,10 @@ public:
 	void UnbindDisplay(int32_t displayId);
 	BindInfo GetUnbindInputDevice(const std::string &displayName);
 	BindInfo GetUnbindDisplay(const std::string &inputDeviceName);    
-	std::string GetDisplayNameByInputDevice(const std::string &name);
+	std::string GetDisplayNameByInputDevice(const std::string &name) const;
 	int32_t GetBindDisplayIdByInputDevice(int32_t inputDeviceId) const;
 	std::string GetBindDisplayNameByInputDevice(int32_t inputDeviceId) const;
-	std::string GetInputDeviceByDisplayName(const std::string &name);
+	std::string GetInputDeviceByDisplayName(const std::string &name) const;
     std::string GetDesc() const;
 	const std::list<BindInfo> &GetInfos() const { return infos_; }
 	friend std::ostream& operator<<(std::ostream &os, const BindInfos &r);
@@ -135,7 +135,7 @@ std::istream& operator>>(std::istream &is, BindInfo &r) {
 std::string BindInfos::GetDesc() const {
 	int32_t index = 0;
 	std::ostringstream oss;
-	for (auto &info : infos_) {
+	for (const auto &info : infos_) {
 		oss << "index:" << index << "," << info.GetDesc() << std::endl;
 	}
 	return oss.str();
@@ -163,7 +163,7 @@ std::string BindInfos::GetBindDisplayNameByInputDevice(int32_t inputDeviceId) co
 	return "";
 }
 
-std::string BindInfos::GetDisplayNameByInputDevice(const std::string &name) {
+std::string BindInfos::GetDisplayNameByInputDevice(const std::string &name) const {
 	for (const auto &item : infos_) {
 		if (item.GetInputDeviceName() == name) {
 			return item.GetDisplayName();
@@ -172,7 +172,7 @@ std::string BindInfos::GetDisplayNameByInputDevice(const std::string &name) {
 	return "";
 }
 
-std::string BindInfos::GetInputDeviceByDisplayName(const std::string &name) {
+std::string BindInfos::GetInputDeviceByDisplayName(const std::string &name) const {
 	for (const auto &item : infos_) {
 		if (item.GetDisplayName() == name) {
 			return item.GetInputDeviceName();
