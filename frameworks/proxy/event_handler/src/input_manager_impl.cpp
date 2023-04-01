@@ -604,9 +604,13 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
 
 int32_t InputManagerImpl::SetMousePrimaryButton(int32_t primaryButton)
 {
-#if defined OHOS_BUILD_ENABLE_POINTER
     CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
     std::lock_guard<std::mutex> guard(mtx_);
+    if (primaryButton != LEFT_BUTTON && primaryButton != RIGHT_BUTTON) {
+        MMI_HILOGE("primaryButton is invalid");
+        return RET_ERR;
+    }
     int32_t ret = MultimodalInputConnMgr->SetMousePrimaryButton(primaryButton);
     if (ret != RET_OK) {
         MMI_HILOGE("Set mouse primary button failed, ret:%{public}d", ret);
