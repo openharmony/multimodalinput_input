@@ -197,7 +197,7 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
     std::string name = "primaryButton";
     int32_t primaryButton = pref->GetInt(name, 0);
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
-    if (primaryButton != 0) {
+    if (primaryButton == RIGHT_BUTTON) {
         if (buttonId == PointerEvent::MOUSE_BUTTON_LEFT) {
             buttonId = PointerEvent::MOUSE_BUTTON_RIGHT;
         } else if (buttonId == PointerEvent::MOUSE_BUTTON_RIGHT) {
