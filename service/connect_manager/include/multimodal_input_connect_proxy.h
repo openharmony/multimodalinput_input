@@ -35,6 +35,8 @@ public:
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
         uint32_t deviceTags) override;
     int32_t RemoveInputEventFilter(int32_t filterId) override;
+    int32_t SetMousePrimaryButton(int32_t primaryButton) override;
+    int32_t GetMousePrimaryButton(int32_t &primaryButton) override;
     int32_t SetPointerVisible(bool visible) override;
     int32_t IsPointerVisible(bool &visible) override;
     int32_t MarkProcessed(int32_t eventType, int32_t eventId) override;

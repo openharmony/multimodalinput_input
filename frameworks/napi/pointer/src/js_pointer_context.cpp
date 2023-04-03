@@ -508,6 +508,82 @@ napi_value JsPointerContext::LeaveCaptureMode(napi_env env, napi_callback_info i
     return jsPointerMgr->LeaveCaptureMode(env, windowId, argv[1]);
 }
 
+napi_value JsPointerContext::CreateMousePrimaryButton(napi_env env, napi_value exports)
+{
+    CALL_DEBUG_ENTER;
+    napi_value leftButton = nullptr;
+    CHKRP(napi_create_int32(env, PrimaryButton::LEFT_BUTTON, &leftButton), CREATE_INT32);
+    napi_value rightButton = nullptr;
+    CHKRP(napi_create_int32(env, PrimaryButton::RIGHT_BUTTON, &rightButton), CREATE_INT32);
+
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("LEFT", leftButton),
+        DECLARE_NAPI_STATIC_PROPERTY("RIGHT", rightButton),
+    };
+    napi_value result = nullptr;
+    CHKRP(napi_define_class(env, "PrimaryButton", NAPI_AUTO_LENGTH, EnumConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
+    CHKRP(napi_set_named_property(env, exports, "PrimaryButton", result), SET_NAMED_PROPERTY);
+    return exports;
+}
+
+napi_value JsPointerContext::SetMousePrimaryButton(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least one parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "primaryButton", "number");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("primaryButton parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "primaryButton", "number");
+        return nullptr;
+    }
+    int32_t primaryButton = 0;
+    CHKRP(napi_get_value_int32(env, argv[0], &primaryButton), GET_VALUE_INT32);
+    if (primaryButton < LEFT_BUTTON || primaryButton > RIGHT_BUTTON) {
+        MMI_HILOGE("Undefined mouse primary button");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Mouse primary button does not exist");
+        return nullptr;
+    }
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (argc == 1) {
+        return jsPointerMgr->SetMousePrimaryButton(env, primaryButton);
+    }
+    if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
+        MMI_HILOGE("callback parameter type is invalid ");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    return jsPointerMgr->SetMousePrimaryButton(env, primaryButton, argv[1]);
+}
+
+napi_value JsPointerContext::GetMousePrimaryButton(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (argc == 0) {
+        return jsPointerMgr->GetMousePrimaryButton(env);
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
+        MMI_HILOGE("callback parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    return jsPointerMgr->GetMousePrimaryButton(env, argv[0]);
+}
+
 napi_value JsPointerContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -525,10 +601,16 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getPointerStyle", GetPointerStyle),
         DECLARE_NAPI_STATIC_FUNCTION("enterCaptureMode", EnterCaptureMode),
         DECLARE_NAPI_STATIC_FUNCTION("leaveCaptureMode", LeaveCaptureMode),
+        DECLARE_NAPI_STATIC_FUNCTION("setMousePrimaryButton", SetMousePrimaryButton),
+        DECLARE_NAPI_STATIC_FUNCTION("getMousePrimaryButton", GetMousePrimaryButton),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreatePointerStyle(env, exports) == nullptr) {
         THROWERR(env, "Failed to create pointer style");
+        return nullptr;
+    }
+    if (CreateMousePrimaryButton(env, exports) == nullptr) {
+        THROWERR(env, "Failed to create mouse primary button");
         return nullptr;
     }
     return exports;

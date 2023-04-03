@@ -302,5 +302,44 @@ napi_value JsPointerManager::LeaveCaptureMode(napi_env env, int32_t windowId, na
     AsyncCallbackWork(asyncContext);
     return promise;
 }
+
+napi_value JsPointerManager::SetMousePrimaryButton(napi_env env, int32_t primaryButton, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+
+    asyncContext->errorCode = InputManager::GetInstance()->SetMousePrimaryButton(primaryButton);
+    asyncContext->reserve << ReturnType::VOID;
+
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::GetMousePrimaryButton(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+    int32_t primaryButton;
+    asyncContext->errorCode = InputManager::GetInstance()->GetMousePrimaryButton(primaryButton);
+    asyncContext->reserve << ReturnType::NUMBER << primaryButton;
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
 } // namespace MMI
 } // namespace OHOS

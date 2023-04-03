@@ -50,6 +50,8 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::ALLOC_SOCKET_FD, &MultimodalInputConnectStub::StubHandleAllocSocketFd},
         {IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubAddInputEventFilter},
         {IMultimodalInputConnect::RMV_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubRemoveInputEventFilter},
+        {IMultimodalInputConnect::SET_MOUSE_PRIMARY_BUTTON, &MultimodalInputConnectStub::StubSetMousePrimaryButton},
+        {IMultimodalInputConnect::GET_MOUSE_PRIMARY_BUTTON, &MultimodalInputConnectStub::StubGetMousePrimaryButton},
         {IMultimodalInputConnect::SET_POINTER_VISIBLE, &MultimodalInputConnectStub::StubSetPointerVisible},
         {IMultimodalInputConnect::SET_POINTER_STYLE, &MultimodalInputConnectStub::StubSetPointerStyle},
         {IMultimodalInputConnect::GET_POINTER_STYLE, &MultimodalInputConnectStub::StubGetPointerStyle},
@@ -168,6 +170,42 @@ int32_t MultimodalInputConnectStub::StubRemoveInputEventFilter(MessageParcel& da
         return ret;
     }
     MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetMousePrimaryButton(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    int32_t primaryButton = -1;
+    READINT32(data, primaryButton, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetMousePrimaryButton(primaryButton);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetMousePrimaryButton failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success primaryButton:%{public}d,pid:%{public}d", primaryButton, GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetMousePrimaryButton(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    int32_t primaryButton = -1;
+    int32_t ret = GetMousePrimaryButton(primaryButton);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetMousePrimaryButton failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEINT32(reply, primaryButton, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("mouse primaryButton:%{public}d,ret:%{public}d", primaryButton, ret);
     return RET_OK;
 }
 
