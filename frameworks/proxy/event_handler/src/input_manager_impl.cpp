@@ -626,6 +626,7 @@ int32_t InputManagerImpl::GetMousePrimaryButton(int32_t &primaryButton)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MultimodalInputConnMgr->GetMousePrimaryButton(primaryButton);
     if (ret != RET_OK) {
         MMI_HILOGE("Get mouse primary button failed");
