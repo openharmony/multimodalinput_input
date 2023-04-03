@@ -160,6 +160,11 @@ enum ICON_TYPE {
     ANGLE_CENTER = 8,
 };
 
+enum PrimaryButton {
+    LEFT_BUTTON = 0,
+    RIGHT_BUTTON = 1,
+};
+
 struct IconStyle {
     int32_t alignmentWay { 0 };
     std::string iconPath;

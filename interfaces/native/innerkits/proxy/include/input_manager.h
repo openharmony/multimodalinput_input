@@ -267,6 +267,24 @@ public:
         std::function<void(std::vector<bool>&)> callback);
 
     /**
+     * @brief Sets mouse primary button.
+     * @param primaryButton Indicates the ID of the mouse primary button.The value 0 indicates that
+     * the primary button is left button.The value 1 indicates that the primary button is right button.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t SetMousePrimaryButton(int32_t primaryButton);
+
+    /**
+     * @brief Gets mouse primary button.
+     * @param primaryButton Indicates the ID of the mouse primary button.The value 0 indicates that
+     * the primary button is left button.The value 1 indicates that the primary button is right button.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t GetMousePrimaryButton(int32_t &primaryButton);
+
+    /**
      * @brief Sets whether the pointer icon is visible.
      * @param visible Indicates whether the pointer icon is visible. The value <b>true</b> indicates that
      * the pointer icon is visible, and the value <b>false</b> indicates the opposite.

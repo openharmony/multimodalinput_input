@@ -52,6 +52,7 @@ config("libmmi_server_config") {
     "${mmi_service_path}/module_loader/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${preferences_path}/frameworks/native/include",
     "mouse_event_normalize/include",
     "//foundation/multimodalinput/interfaces/native/innerkits/event/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
@@ -156,6 +157,7 @@ ohos_shared_library("libmmi-server") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "multimedia_image_framework:image_native",
+    "preferences:native_preferences",
     "safwk:system_ability_fwk",
   ]
 

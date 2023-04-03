@@ -26,6 +26,11 @@
 #include "input_event_handler.h"
 #include "input_windows_manager.h"
 #include "mouse_device_state.h"
+#include "preferences.h"
+#include "preferences_impl.h"
+#include "preferences_errno.h"
+#include "preferences_helper.h"
+#include "preferences_xml_utils.h"
 #include "timer_manager.h"
 #include "util_ex.h"
 #include "util.h"
@@ -182,7 +187,29 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
         MMI_HILOGE("Unknown btn, btn:%{public}u", button);
         return RET_ERR;
     }
+
+    std::string file = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(file, errno);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr,  errno: %{public}d", errno);
+        return RET_ERR;
+    }
+    std::string name = "primaryButton";
+    int32_t primaryButton = pref->GetInt(name, 0);
+    MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
+    if (primaryButton == RIGHT_BUTTON) {
+        if (buttonId == PointerEvent::MOUSE_BUTTON_LEFT) {
+            buttonId = PointerEvent::MOUSE_BUTTON_RIGHT;
+        } else if (buttonId == PointerEvent::MOUSE_BUTTON_RIGHT) {
+            buttonId = PointerEvent::MOUSE_BUTTON_LEFT;
+        } else {
+            MMI_HILOGD("buttonId does not switch.");
+        }
+    }
+
     pointerEvent_->SetButtonId(buttonId);
+    pref = nullptr;
     return RET_OK;
 }
 
@@ -397,6 +424,44 @@ void MouseTransformProcessor::Dump(int32_t fd, const std::vector<std::string> &a
             pointerEvent_->GetPointerId(), pointerEvent_->DumpSourceType(), pointerEvent_->DumpPointerAction(),
             item.GetWindowX(), item.GetWindowY(), pointerEvent_->GetButtonId(), pointerEvent_->GetAgentWindowId(),
             pointerEvent_->GetTargetWindowId(), item.GetDownTime(), item.IsPressed() ? "true" : "false");
+}
+
+int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
+    std::string file = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(file, errno);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr,  errno: %{public}d", errno);
+        return RET_ERR;
+    }
+    std::string name = "primaryButton";
+    pref->PutInt(name, primaryButton);
+    int ret = pref->FlushSync();
+    if (ret != RET_OK) {
+        MMI_HILOGE("flush sync is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    pref = nullptr;
+    return RET_OK;
+}
+
+int32_t MouseTransformProcessor::GetMousePrimaryButton()
+{
+    CALL_DEBUG_ENTER;
+    std::string file = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(file, errno);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr,  errno: %{public}d", errno);
+        return RET_ERR;
+    }
+    std::string name = "primaryButton";
+    int32_t primaryButton = pref->GetInt(name, 0);
+    MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
+    return primaryButton;
 }
 
 int32_t MouseTransformProcessor::SetPointerSpeed(int32_t speed)

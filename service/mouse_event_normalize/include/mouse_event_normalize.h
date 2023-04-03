@@ -37,6 +37,8 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+    int32_t SetMousePrimaryButton(int32_t primaryButton);
+    int32_t GetMousePrimaryButton() const;
     int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed() const;
     void OnDisplayLost(int32_t displayId);
