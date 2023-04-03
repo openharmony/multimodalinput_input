@@ -551,6 +551,7 @@ napi_value JsPointerContext::SetMousePrimaryButton(napi_env env, napi_callback_i
         return nullptr;
     }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     if (argc == 1) {
         return jsPointerMgr->SetMousePrimaryButton(env, primaryButton);
@@ -571,6 +572,7 @@ napi_value JsPointerContext::GetMousePrimaryButton(napi_env env, napi_callback_i
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointer);
     if (argc == 0) {
         return jsPointerMgr->GetMousePrimaryButton(env);
     }
