@@ -271,7 +271,7 @@ public:
      * @param primaryButton Indicates the ID of the mouse primary button.The value 0 indicates that
      * the primary button is left button.The value 1 indicates that the primary button is right button.
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
-     * @since 10
+     * @since 9
      */
     int32_t SetMousePrimaryButton(int32_t primaryButton);
 
@@ -280,7 +280,7 @@ public:
      * @param primaryButton Indicates the ID of the mouse primary button.The value 0 indicates that
      * the primary button is left button.The value 1 indicates that the primary button is right button.
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
-     * @since 10
+     * @since 9
      */
     int32_t GetMousePrimaryButton(int32_t &primaryButton);
 
