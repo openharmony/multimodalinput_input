@@ -201,7 +201,7 @@ int32_t MultimodalInputConnectStub::StubGetMousePrimaryButton(MessageParcel& dat
     int32_t primaryButton = -1;
     int32_t ret = GetMousePrimaryButton(primaryButton);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SetMousePrimaryButton failed ret:%{public}d", ret);
+        MMI_HILOGE("Call GetMousePrimaryButton failed ret:%{public}d", ret);
         return ret;
     }
     WRITEINT32(reply, primaryButton, IPC_STUB_WRITE_PARCEL_ERR);
