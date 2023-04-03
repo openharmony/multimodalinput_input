@@ -192,7 +192,8 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
     std::shared_ptr<NativePreferences::Preferences> pref =
         NativePreferences::PreferencesHelper::GetPreferences(file, errno);
     if (pref == nullptr) {
-        MMI_HILOGE("pref is null,  errno: %{public}d", errno);
+        MMI_HILOGE("pref is nullptr,  errno: %{public}d", errno);
+        return RET_ERR;
     }
     std::string name = "primaryButton";
     int32_t primaryButton = pref->GetInt(name, 0);
@@ -431,7 +432,8 @@ int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
     std::shared_ptr<NativePreferences::Preferences> pref =
         NativePreferences::PreferencesHelper::GetPreferences(file, errno);
     if (pref == nullptr) {
-        MMI_HILOGE("pref is null,  errno: %{public}d", errno);
+        MMI_HILOGE("pref is nullptr,  errno: %{public}d", errno);
+        return RET_ERR;
     }
     std::string name = "primaryButton";
     pref->PutInt(name, primaryButton);
@@ -451,7 +453,8 @@ int32_t MouseTransformProcessor::GetMousePrimaryButton()
     std::shared_ptr<NativePreferences::Preferences> pref =
         NativePreferences::PreferencesHelper::GetPreferences(file, errno);
     if (pref == nullptr) {
-        MMI_HILOGE("pref is null,  errno: %{public}d", errno);
+        MMI_HILOGE("pref is nullptr,  errno: %{public}d", errno);
+        return RET_ERR;
     }
     std::string name = "primaryButton";
     int32_t primaryButton = pref->GetInt(name, 0);
