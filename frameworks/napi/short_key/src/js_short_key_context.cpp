@@ -18,6 +18,8 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+constexpr int32_t MAX_DELAY = 4000;
+constexpr int32_t MIN_DELAY = 0;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsShortKeyContext" };
 constexpr const char *SHORT_KEY_CLASS = "multimodalinput_short_key_class";
 constexpr const char *SHORT_KEY_INSTANCE = "multimodalinput_short_key";
@@ -135,7 +137,7 @@ napi_value JsShortKeyContext::SetKeyDownDuration(napi_env env, napi_callback_inf
     // 校验参数delay的合法性
     int32_t delay = 0;
     CHKRP(napi_get_value_int32(env, argv[1], &delay), GET_VALUE_INT32);
-    if (delay < 0 || delay > 4000) {
+    if (delay < MIN_DELAY || delay > MAX_DELAY) {
         MMI_HILOGE("Invalid delay");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "delay is invalid");
         return nullptr;
@@ -146,6 +148,7 @@ napi_value JsShortKeyContext::SetKeyDownDuration(napi_env env, napi_callback_inf
         return nullptr;
     }
     JsShortKeyContext *jsShortKey = JsShortKeyContext::GetInstance(env);
+    CHKPP(jsShortKey);
     auto jsShortKeyMgr = jsShortKey->GetJsShortKeyMgr();
     if (argc == 2) {
         return jsShortKeyMgr->SetKeyDownDuration(env, businessId, delay);
