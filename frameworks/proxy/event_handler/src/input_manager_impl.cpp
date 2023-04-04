@@ -979,5 +979,20 @@ int32_t InputManagerImpl::EnableInputDevice(bool enable)
     }
     return ret;
 }
+
+int32_t InputManagerImpl::SetKeyDownDuration(const std::string &businessId, int32_t delay)
+{
+    CALL_DEBUG_ENTER;
+    if (delay < 0) {
+        MMI_HILOGE("The param is invalid");
+        return RET_ERR;
+    }
+    int32_t ret = MultimodalInputConnMgr->SetKeyDownDuration(businessId, delay);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set Key down duration failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

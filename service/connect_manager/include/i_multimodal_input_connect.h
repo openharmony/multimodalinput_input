@@ -74,6 +74,7 @@ public:
         ENABLE_INPUT_DEVICE = 37,
         SET_MOUSE_PRIMARY_BUTTON = 38,
         GET_MOUSE_PRIMARY_BUTTON = 39,
+        SET_KEY_DOWN_DURATION =40,
     };
 
     enum {
@@ -125,6 +126,7 @@ public:
     virtual int32_t GetWindowPid(int32_t windowId) = 0;
     virtual int32_t AppendExtraData(const ExtraData& extraData) = 0;
     virtual int32_t EnableInputDevice(bool enable) = 0;
+    virtual int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

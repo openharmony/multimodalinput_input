@@ -988,5 +988,27 @@ int32_t MultimodalInputConnectProxy::EnableInputDevice(bool enable)
     }
     return ret;
 }
+
+int32_t MultimodalInputConnectProxy::SetKeyDownDuration(const std::string &businessId, int32_t delay)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    WRITESTRING(data, businessId, ERR_INVALID_VALUE);
+    WRITEINT32(data, delay, ERR_INVALID_VALUE);
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(SET_KEY_DOWN_DURATION, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

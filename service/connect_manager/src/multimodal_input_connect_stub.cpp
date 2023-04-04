@@ -86,6 +86,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::GET_WINDOW_PID, &MultimodalInputConnectStub::StubGetWindowPid},
         {IMultimodalInputConnect::APPEND_EXTRA_DATA, &MultimodalInputConnectStub::StubAppendExtraData},
         {IMultimodalInputConnect::ENABLE_INPUT_DEVICE, &MultimodalInputConnectStub::StubEnableInputDevice},
+        {IMultimodalInputConnect::SET_KEY_DOWN_DURATION, &MultimodalInputConnectStub::StubSetKeyDownDuration},
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -950,6 +951,29 @@ int32_t MultimodalInputConnectStub::StubEnableInputDevice(MessageParcel& data, M
         MMI_HILOGE("Call EnableInputDevice failed, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubSetKeyDownDuration(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    std::string businessId;
+    READSTRING(data, businessId, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t delay;
+    READINT32(data, delay, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetKeyDownDuration(businessId, delay);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set key down duration failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

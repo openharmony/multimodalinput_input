@@ -16,6 +16,7 @@ import("//build/ohos.gni")
 mmi_path = "//foundation/multimodalinput/input"
 ability_runtime_path = "//foundation/ability/ability_runtime"
 ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
+common_util = "//commonlibrary/c_utils"
 preferences_path = "//foundation/distributeddatamgr/preferences"
 
 declare_args() {
@@ -30,6 +31,7 @@ declare_args() {
   input_feature_joystick = true
   input_feature_touchscreen = true
   input_feature_input_device = true
+  input_feature_short_key = true
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -220,6 +222,7 @@ print("input_feature_mouse = ${input_feature_mouse}")
 print("input_feature_joystick = ${input_feature_joystick}")
 print("input_feature_touchscreen = ${input_feature_touchscreen}")
 print("input_feature_input_device = ${input_feature_input_device}")
+print("input_feature_short_key = ${input_feature_short_key}")
 
 input_default_defines = []
 
@@ -253,4 +256,8 @@ if (input_feature_mouse) {
 
 if (input_feature_joystick) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_JOYSTICK" ]
+}
+
+if (input_feature_short_key) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_SHORT_KEY" ]
 }
