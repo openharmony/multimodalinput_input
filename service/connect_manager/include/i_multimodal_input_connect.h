@@ -74,7 +74,7 @@ public:
         ENABLE_INPUT_DEVICE = 37,
         SET_MOUSE_PRIMARY_BUTTON = 38,
         GET_MOUSE_PRIMARY_BUTTON = 39,
-        SET_KEY_DOWN_DURATION =40,
+        SET_KEY_DOWN_DURATION = 40,
     };
 
     enum {
