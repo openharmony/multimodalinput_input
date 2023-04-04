@@ -372,7 +372,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
             DfxHisysevent::OnDeviceConnect(item.first, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
             return;
         }
-        if (item.second.isPointerDevice) {
+        if (!item.second.isRemote && item.second.isPointerDevice) {
             hasPointer = true;
         }
     }
