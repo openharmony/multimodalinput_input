@@ -194,5 +194,35 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetSpeed_009, 
     processor.SetConfigPointerSpeed(speed);
     ASSERT_EQ(processor.GetSpeed(), idNames);
 }
+
+/**
+ * @tc.name: MouseTransformProcessorTest_SetMousePrimaryButton_010
+ * @tc.desc: Test SetMousePrimaryButton
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetMousePrimaryButton_010, TestSize.Level1)
+{
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    int32_t primaryButton = 1;
+    ASSERT_TRUE(processor.SetMousePrimaryButton(primaryButton) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_GetMousePrimaryButton_011
+ * @tc.desc: Test GetMousePrimaryButton
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetMousePrimaryButton_011, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    int32_t primaryButton = 1;
+    processor.SetMousePrimaryButton(primaryButton);
+    int32_t primaryButtonRes = 1;
+    ASSERT_TRUE(processor.GetMousePrimaryButton() == primaryButtonRes);
+}
 }
 }
