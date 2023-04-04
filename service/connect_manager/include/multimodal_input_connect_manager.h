@@ -76,6 +76,7 @@ public:
     int32_t GetWindowPid(int32_t windowId);
     int32_t AppendExtraData(const ExtraData& extraData);
     int32_t EnableInputDevice(bool enable);
+    int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay);
 
 private:
     MultimodalInputConnectManager() = default;

@@ -31,6 +31,11 @@
 #include "i_input_event_handler.h"
 #include "key_event.h"
 #include "struct_multimodal.h"
+#include "preferences.h"
+#include "preferences_impl.h"
+#include "preferences_errno.h"
+#include "preferences_helper.h"
+#include "preferences_xml_utils.h"
 
 namespace OHOS {
 namespace MMI {
@@ -47,6 +52,7 @@ struct Ability {
 
 struct ShortcutKey {
     std::set<int32_t> preKeys;
+    std::string businessId;
     int32_t finalKey { -1 };
     int32_t keyDownDuration { 0 };
     int32_t triggerType { KeyEvent::KEY_ACTION_DOWN };
@@ -78,6 +84,7 @@ public:
     KeyCommandHandler() = default;
     DISALLOW_COPY_AND_MOVE(KeyCommandHandler);
     ~KeyCommandHandler() override = default;
+    static int32_t UpdateSettingsXml(const std::string &businessId, int32_t delay);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -107,6 +114,7 @@ private:
     void RemoveSubscribedTimer(int32_t keyCode);
     void HandleSpecialKeys(int32_t keyCode, int32_t keyAction);
     void InterruptTimers();
+    void GetKeyDownDurationFromXml(const std::string &abilityKey, int32_t &keyDownDurationInt);
     void ResetLastMatchedKey()
     {
         lastMatchedKey_.preKeys.clear();
