@@ -3603,6 +3603,48 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointerStyle_002, TestSize.Level1
 }
 
 /**
+ * @tc.name: InputManagerTest_SetMousePrimaryButton_001
+ * @tc.desc: Sets mouse primary button
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMousePrimaryButton_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t primaryButton = 1;
+    ASSERT_TRUE(InputManager::GetInstance()->SetMousePrimaryButton(primaryButton) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetMousePrimaryButton_002
+ * @tc.desc: Sets mouse primary button
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMousePrimaryButton_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t primaryButton = -1;
+    ASSERT_TRUE(InputManager::GetInstance()->SetMousePrimaryButton(primaryButton) == RET_ERR);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetMousePrimaryButton_001
+ * @tc.desc: Gets mouse primary button
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetMousePrimaryButton_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t primaryButton = 1;
+    if (InputManager::GetInstance()->SetMousePrimaryButton(primaryButton) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetMousePrimaryButton(primaryButton) == RET_OK);
+        ASSERT_EQ(primaryButton, PrimaryButton::RIGHT_BUTTON);
+    }
+}
+
+/**
  * @tc.name: InputManagerTest_FunctionKeyState_001
  * @tc.desc: Set NumLock for the keyboard enablement state to true
  * @tc.type: FUNC
