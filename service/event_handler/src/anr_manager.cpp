@@ -19,10 +19,12 @@
 
 #include "dfx_hisysevent.h"
 #include "input_event_handler.h"
+#include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "napi_constants.h"
 #include "proto.h"
 #include "timer_manager.h"
+#include "window_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -93,24 +95,23 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
     }
     int32_t timerId = TimerMgr->AddTimer(INPUT_UI_TIMEOUT_TIME, 1, [this, id, type, sess]() {
         CHKPV(sess);
-        sess->SetAnrStatus(type, true);
-        DfxHisysevent::ApplicationBlockInput(sess);
-        MMI_HILOGE("Application not responding. pid:%{public}d, anr type:%{public}d, eventId:%{public}d",
-            sess->GetPid(), type, id);
-        if (anrNoticedPid_ < 0) {
-            MMI_HILOGE("The anrNoticedPid_ is invalid");
-            return;
-        }
-        NetPacket pkt(MmiMessageId::NOTICE_ANR);
-        pkt << sess->GetPid();
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet write failed");
-            return;
-        }
-        auto fd = udsServer_->GetClientFd(anrNoticedPid_);
-        if (!udsServer_->SendMsg(fd, pkt)) {
-            MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-            return;
+        if (type == ANR_MONITOR || WinMgr->IsWindowVisible(sess->GetPid())) {
+            sess->SetAnrStatus(type, true);
+            DfxHisysevent::ApplicationBlockInput(sess);
+            MMI_HILOGE("Application not responding. pid:%{public}d, anr type:%{public}d, eventId:%{public}d",
+                sess->GetPid(), type, id);
+            CHK_INVALID_RV(anrNoticedPid_, "Add anr timer failed, timer count reached the maximum number");
+            NetPacket pkt(MmiMessageId::NOTICE_ANR);
+            pkt << sess->GetPid();
+            if (pkt.ChkRWError()) {
+                MMI_HILOGE("Packet write failed");
+                return;
+            }
+            auto fd = udsServer_->GetClientFd(anrNoticedPid_);
+            if (!udsServer_->SendMsg(fd, pkt)) {
+                MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+                return;
+            }
         }
         std::vector<int32_t> timerIds = sess->GetTimerIds(type);
         for (int32_t item : timerIds) {
@@ -122,10 +123,7 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
             }
         }
     });
-    if (timerId < 0) {
-        MMI_HILOGD("Add anr timer failed, timer count reached the maximum number");
-        return;
-    }
+    CHK_INVALID_RV(timerId, "Add anr timer failed, timer count reached the maximum number");
     anrTimerCount_++;
     MMI_HILOGD("Add anr timer success, anr type:%{public}d, eventId:%{public}d, timer id:%{public}d, count:%{public}d",
         type, id, timerId, anrTimerCount_);
