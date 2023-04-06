@@ -983,7 +983,7 @@ int32_t InputManagerImpl::EnableInputDevice(bool enable)
 int32_t InputManagerImpl::SetKeyDownDuration(const std::string &businessId, int32_t delay)
 {
     CALL_DEBUG_ENTER;
-    if (delay < 0) {
+    if (delay < 0 || delay > 4000) {
         MMI_HILOGE("The param is invalid");
         return RET_ERR;
     }
