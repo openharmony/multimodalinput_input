@@ -388,9 +388,11 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     struct InputDeviceInfo info;
     MakeDeviceInfo(inputDevice, info);
     inputDevice_[deviceId] = info;
-    for (const auto &item : devListener_) {
-        CHKPC(item.first);
-        item.second(deviceId, "add");
+    if (info.enable) {
+        for (const auto &item : devListener_) {
+            CHKPC(item.first);
+            item.second(deviceId, "add");
+        }
     }
     NotifyDevCallback(deviceId, info);
 
@@ -454,9 +456,11 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    for (const auto &item : devListener_) {
-        CHKPC(item.first);
-        item.second(deviceId, "remove");
+    if (info.enable) {
+        for (const auto &item : devListener_) {
+            CHKPC(item.first);
+            item.second(deviceId, "remove");
+        }
     }
     ScanPointerDevice();
     if (deviceId == INVALID_DEVICE_ID) {
@@ -646,7 +650,17 @@ int32_t InputDeviceManager::OnEnableInputDevice(bool enable)
     MMI_HILOGD("Enable input device: %{public}s", enable ? "true" : "false");
     for (auto &item : inputDevice_) {
         if (item.second.isRemote && item.second.enable != enable) {
-            item.second.enable = enable;
+            int32_t keyboardType = KEYBOARD_TYPE_NONE;
+            if (enable) {
+                item.second.enable = enable;
+                GetKeyboardType(item.first, keyboardType);
+            } else {
+                GetKeyboardType(item.first, keyboardType);
+                item.second.enable = enable;
+            }
+            if (keyboardType != KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
+                continue;
+            }
             for (const auto &listener : devListener_) {
                 CHKPC(listener.first);
                 listener.second(item.first, enable ? "add" : "remove");
