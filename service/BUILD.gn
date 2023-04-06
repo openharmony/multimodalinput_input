@@ -237,6 +237,7 @@ ohos_unittest("ut-mmi-service-out") {
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
+    "window_manager:libwm",
   ]
 }
 
