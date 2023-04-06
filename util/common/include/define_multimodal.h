@@ -145,6 +145,14 @@ inline constexpr int32_t INVALID_PID { -1 };
         } \
     } while (0)
 
+#define CHK_INVALID_RV(cond, desc) \
+    do { \
+        if ((cond) < 0) { \
+            MMI_HILOGE("(%{public}s less than 0, desc:%{public}s)", #cond, std::string(desc).c_str()); \
+            return; \
+        } \
+    } while (0)
+
 #define CHKPF(cond) \
     do { \
         if ((cond) == nullptr) { \
