@@ -433,9 +433,11 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     CALL_DEBUG_ENTER;
     CHKPV(inputDevice);
     int32_t deviceId = INVALID_DEVICE_ID;
+    bool enable = false;
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
         if (it->second.inputDeviceOrigin == inputDevice) {
             deviceId = it->first;
+            enable = it->second.enable;
             DfxHisysevent::OnDeviceDisconnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
             inputDevice_.erase(it);
             break;
@@ -456,7 +458,7 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    if (info.enable) {
+    if (enable) {
         for (const auto &item : devListener_) {
             CHKPC(item.first);
             item.second(deviceId, "remove");
