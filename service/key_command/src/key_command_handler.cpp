@@ -961,8 +961,6 @@ void KeyCommandHandler::GetKeyDownDurationFromXml(const std::string &businessId,
     std::shared_ptr<NativePreferences::Preferences> pref = NativePreferences::PreferencesHelper::GetPreferences(shortKeyFileName, errno);
     CHKPV(pref);
     int32_t delay = pref->GetInt(businessId, -1000);
-    pref = nullptr;
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache("/data/service/el1/public/multimodalinput/Settings");
     if (delay < 0){
         MMI_HILOGE("get key down duration failed.");
         return;
@@ -1131,8 +1129,6 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
     CHKPR(pref, errno);
     pref->PutInt(businessId, delay);
     int32_t ret = pref->FlushSync();
-    pref = nullptr;
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache("/data/service/el1/public/multimodalinput/Settings");
     if (ret != RET_OK) {
         MMI_HILOGE("Flush Sync failed, ret: %{public}d", ret);
         return ret;
