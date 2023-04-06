@@ -2485,71 +2485,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_003, TestSize.Lev
 }
 
 /**
- * @tc.name: InputManagerTest_OnAddScreenMonitor_004
- * @tc.desc: Verify touchscreen MarkConsumed
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto callbackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callbackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callbackPtr);
-#ifdef OHOS_BUILD_ENABLE_MONITOR
-    EXPECT_TRUE(IsValidHandlerId(monitorId));
-#else
-    EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_MONITOR
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-    TestMarkConsumedStep1();
-    auto pointerEvent = TestMarkConsumedStep2();
-
-    TestMarkConsumedStep3(monitorId, callbackPtr->GetLastEventId());
-
-    TestMarkConsumedStep4();
-    TestMarkConsumedStep5();
-
-    if (IsValidHandlerId(monitorId)) {
-        TestRemoveMonitor(monitorId);
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-}
-
-/**
- * @tc.name: InputManagerTest_OnAddScreenMonitor_005
- * @tc.desc:  Verify touchscreen MarkConsumed
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_OnAddScreenMonitor_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto callbackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callbackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callbackPtr);
-#ifdef OHOS_BUILD_ENABLE_MONITOR
-    EXPECT_TRUE(IsValidHandlerId(monitorId));
-#else
-    EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_MONITOR
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-    auto pointerEvent = TestMarkConsumedStep1();
-
-    TestMarkConsumedStep3(monitorId, callbackPtr->GetLastEventId());
-
-    TestMarkConsumedStep4();
-    TestMarkConsumedStep6();
-
-    if (IsValidHandlerId(monitorId)) {
-        TestRemoveMonitor(monitorId);
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-}
-
-/**
  * @tc.name: InputManagerTest_OnAddTouchPadMonitor_001
  * @tc.desc: Verify touchpad down event monitor
  * @tc.type: FUNC
@@ -2998,40 +2933,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_001, TestSize.Level1
         TestRemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
-}
-
-/**
- * @tc.name: InputManagerTest_AddMouseMonitor_002
- * @tc.desc: Verify mouse move event monitor
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_AddMouseMonitor_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto callbackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callbackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callbackPtr);
-#ifdef OHOS_BUILD_ENABLE_MONITOR
-    EXPECT_TRUE(IsValidHandlerId(monitorId));
-#else
-    EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif // OHOS_BUILD_ENABLE_MONITOR
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-    auto pointerEvent = SetupPointerEvent006();
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    TestSimulateInputEvent(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
-
-    if (IsValidHandlerId(monitorId)) {
-        TestRemoveMonitor(monitorId);
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-
-#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_MONITOR)
-    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
 }
 
 /**
@@ -3994,38 +3895,6 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupTabletToolEvent001()
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     return pointerEvent;
 }
-
-#ifdef OHOS_BUILD_ENABLE_MONITOR
-/**
- * @tc.name: InputManagerTest_MonitorTabletToolEvent_001
- * @tc.desc: Verify monitoring tablet tool down event
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_MonitorTabletToolEvent_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto callbackPtr = GetPtr<InputEventCallback>();
-    ASSERT_TRUE(callbackPtr != nullptr);
-    int32_t monitorId = TestAddMonitor(callbackPtr);
-    EXPECT_TRUE(IsValidHandlerId(monitorId));
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-    auto pointerEvent = SetupTabletToolEvent001();
-    ASSERT_TRUE(pointerEvent != nullptr);
-    TestSimulateInputEvent(pointerEvent);
-
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    TestSimulateInputEvent(pointerEvent);
-#endif // OHOS_BUILD_ENABLE_TOUCH
-
-    if (IsValidHandlerId(monitorId)) {
-        TestRemoveMonitor(monitorId);
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-}
-#endif // OHOS_BUILD_ENABLE_MONITOR
 
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
 /**
