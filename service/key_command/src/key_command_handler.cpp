@@ -40,6 +40,8 @@ constexpr int64_t MAX_DELAY_TIME = 1000000;
 constexpr int64_t SECONDS_SYSTEM = 1000;
 constexpr int32_t SPECIAL_KEY_DOWN_DELAY = 150;
 constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;
+constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
+constexpr int32_t ERROR_DELAY_VALUE = -1000;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
 const std::string shortKeyFileName = "/data/service/el1/public/multimodalinput/Settings.xml";
 enum SpecialType {
@@ -960,8 +962,8 @@ void KeyCommandHandler::GetKeyDownDurationFromXml(const std::string &businessId,
     CALL_DEBUG_ENTER;
     std::shared_ptr<NativePreferences::Preferences> pref = NativePreferences::PreferencesHelper::GetPreferences(shortKeyFileName, errno);
     CHKPV(pref);
-    int32_t delay = pref->GetInt(businessId, -1000);
-    if (delay < 0){
+    int32_t delay = pref->GetInt(businessId, ERROR_DELAY_VALUE);
+    if (delay < MIN_SHORT_KEY_DOWN_DURATION){
         MMI_HILOGE("get key down duration failed.");
         return;
     }
@@ -1117,7 +1119,7 @@ void KeyCommandHandler::InterruptTimers()
 int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int32_t delay)
 {
     CALL_DEBUG_ENTER;
-    if (delay < 0 || delay > MAX_SHORT_KEY_DOWN_DURATION) {
+    if (delay < MIN_SHORT_KEY_DOWN_DURATION || delay > MAX_SHORT_KEY_DOWN_DURATION) {
         MMI_HILOGE("delay must be number and bigger and equal zero and less than max short key down duration.");
         return RET_ERR;
     }
