@@ -28,7 +28,10 @@ config("inputmonitor_config") {
 ohos_shared_library("inputmonitor") {
   sources = inputmonitor_sources
 
-  configs = [ ":inputmonitor_config" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":inputmonitor_config",
+  ]
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
