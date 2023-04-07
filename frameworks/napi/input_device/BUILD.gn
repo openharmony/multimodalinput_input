@@ -29,7 +29,10 @@ config("inputdevice_config") {
 ohos_shared_library("inputdevice") {
   sources = inputdevice_sources
 
-  configs = [ ":inputdevice_config" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":inputdevice_config",
+  ]
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",

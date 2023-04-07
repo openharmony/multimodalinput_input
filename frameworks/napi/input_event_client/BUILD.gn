@@ -31,7 +31,10 @@ ohos_shared_library("inputeventclient") {
     "src/js_register_util.cpp",
   ]
 
-  configs = [ ":inputeventclient_config" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":inputeventclient_config",
+  ]
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",

@@ -130,7 +130,10 @@ ohos_source_set("patch_gen_libinput-third-mmi") {
 ohos_shared_library("libinput-third-mmi") {
   sources = []
 
-  configs = [ ":libinput-third_config" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libinput-third_config",
+  ]
 
   public_configs = [ ":libinput-third_public_config" ]
 
