@@ -30,6 +30,7 @@ declare_args() {
   input_feature_joystick = true
   input_feature_touchscreen = true
   input_feature_input_device = true
+  input_feature_coverage = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
