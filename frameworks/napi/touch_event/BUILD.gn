@@ -32,7 +32,7 @@ ohos_shared_library("touchevent") {
 
   configs = [
     "${mmi_path}:coverage_flags",
-    ":touchEvent_config"
+    ":touchEvent_config",
   ]
 
   deps = []
