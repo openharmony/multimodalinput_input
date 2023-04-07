@@ -76,7 +76,7 @@ ohos_unittest("ut-virtual-device-out") {
 
   configs = [
     "${mmi_path}:coverage_flags",
-    ":virtual_device_public_config"
+    ":virtual_device_public_config",
   ]
 
   deps = [
