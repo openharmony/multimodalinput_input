@@ -30,7 +30,10 @@ ohos_shared_library("touchevent") {
     "src/native_register_module.cpp",
   ]
 
-  configs = [ ":touchEvent_config" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":touchEvent_config",
+  ]
 
   deps = []
 

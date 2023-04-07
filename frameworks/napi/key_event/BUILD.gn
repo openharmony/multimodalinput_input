@@ -30,7 +30,10 @@ ohos_shared_library("keyevent") {
     "src/native_register_module.cpp",
   ]
 
-  configs = [ ":keyEvent_config" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":keyEvent_config",
+  ]
 
   deps = []
 
