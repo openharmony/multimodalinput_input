@@ -50,7 +50,10 @@ napi_value JsShortKeyContext::CreateInstance(napi_env env)
     JsShortKeyContext *jsContext = nullptr;
     CHKRP(napi_unwrap(env, jsInstance, (void**)&jsContext), UNWRAP);
     CHKPP(jsContext);
-    CHKRP(napi_create_reference(env, jsInstance, 1, &(jsContext->contextRef_)), CREATE_REFERENCE);
+    if (napi_create_reference(env, jsInstance, 1, &(jsContext->contextRef_)) != napi_ok) {
+        CHKRP(napi_delete_reference(env, jsContext->contextRef_), DELETE_REFERENCE);
+        return nullptr;
+    }
 
     uint32_t refCount = 0;
     CHKRP(napi_reference_ref(env, jsContext->contextRef_, &refCount), REFERENCE_REF);
