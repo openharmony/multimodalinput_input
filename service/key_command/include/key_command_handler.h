@@ -114,7 +114,7 @@ private:
     void RemoveSubscribedTimer(int32_t keyCode);
     void HandleSpecialKeys(int32_t keyCode, int32_t keyAction);
     void InterruptTimers();
-    void GetKeyDownDurationFromXml(const std::string &abilityKey, int32_t &keyDownDurationInt);
+    int32_t GetKeyDownDurationFromXml(const std::string &businessId);
     void ResetLastMatchedKey()
     {
         lastMatchedKey_.preKeys.clear();
