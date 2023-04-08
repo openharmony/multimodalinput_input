@@ -32,6 +32,8 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerImpl" };
 constexpr size_t MAX_FILTER_NUM = 4;
+constexpr int32_t MAX_DELAY = 4000;
+constexpr int32_t MIN_DELAY = 0;
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -978,6 +980,21 @@ int32_t InputManagerImpl::EnableInputDevice(bool enable)
         MMI_HILOGE("Enable input device failed, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t InputManagerImpl::SetKeyDownDuration(const std::string &businessId, int32_t delay)
+{
+    CALL_DEBUG_ENTER;
+    if (delay < MIN_DELAY || delay > MAX_DELAY) {
+        MMI_HILOGE("The param is invalid");
+        return RET_ERR;
+    }
+    int32_t ret = MultimodalInputConnMgr->SetKeyDownDuration(businessId, delay);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set Key down duration failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

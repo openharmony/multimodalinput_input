@@ -392,5 +392,11 @@ int32_t MultimodalInputConnectManager::EnableInputDevice(bool enable)
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->EnableInputDevice(enable);
 }
+
+int32_t MultimodalInputConnectManager::SetKeyDownDuration(const std::string &businessId, int32_t delay)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetKeyDownDuration(businessId, delay);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -72,6 +72,7 @@ public:
     int32_t GetWindowPid(int32_t windowId) override;
     int32_t AppendExtraData(const ExtraData& extraData) override;
     int32_t EnableInputDevice(bool enable) override;
+    int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
