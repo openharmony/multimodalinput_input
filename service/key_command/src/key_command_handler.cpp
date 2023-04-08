@@ -760,7 +760,7 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         int32_t delay = GetKeyDownDurationFromXml(shortcutKey.businessId);
         if (delay >= MIN_SHORT_KEY_DOWN_DURATION && delay <= MAX_SHORT_KEY_DOWN_DURATION) {
             MMI_HILOGD("User defined new short key down duration: %{public}d", delay);
-            ShortcutKey.keyDownDuration = delay;
+            shortcutKey.keyDownDuration = delay;
         }
         shortcutKey.Print();
         if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
