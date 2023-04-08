@@ -651,26 +651,30 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent>& 
     }
     switch (touchEvent->GetPointerAction()) {
         case PointerEvent::POINTER_ACTION_CANCEL:
-        case PointerEvent::POINTER_ACTION_UP:
+        case PointerEvent::POINTER_ACTION_UP: {
             StopTwoFingerGesture();
             break;
-        case PointerEvent::POINTER_ACTION_MOVE:
-            if (twoFingerGesture_.timerId != -1) {
-                auto id = touchEvent->GetPointerId();
-                auto pos = std::find_if(std::begin(twoFingerGesture_.touches), std::end(twoFingerGesture_.touches),
-                    [id](const auto& item) { return item.id == id; });
-                if (pos == std::end(twoFingerGesture_.touches)) {
-                    break;
-                }
-                PointerEvent::PointerItem item;
-                touchEvent->GetPointerItem(id, item);
-                auto dx = std::abs(pos->x - item.GetDisplayX());
-                auto dy = std::abs(pos->y - item.GetDisplayY());
-                if (dx > TOUCH_MAX_THRESHOLD || dy > TOUCH_MAX_THRESHOLD) {
-                    StopTwoFingerGesture();
-                }
+        }
+        case PointerEvent::POINTER_ACTION_MOVE: {
+            if (twoFingerGesture_.timerId == -1) {
+                MMI_HILOGE("Two finger gesture timer id is -1.");
+                break;
+            }
+            auto id = touchEvent->GetPointerId();
+            auto pos = std::find_if(std::begin(twoFingerGesture_.touches), std::end(twoFingerGesture_.touches),
+                [id](const auto& item) { return item.id == id; });
+            if (pos == std::end(twoFingerGesture_.touches)) {
+                break;
+            }
+            PointerEvent::PointerItem item;
+            touchEvent->GetPointerItem(id, item);
+            auto dx = std::abs(pos->x - item.GetDisplayX());
+            auto dy = std::abs(pos->y - item.GetDisplayY());
+            if (dx > TOUCH_MAX_THRESHOLD || dy > TOUCH_MAX_THRESHOLD) {
+                StopTwoFingerGesture();
             }
             break;
+        }
         case PointerEvent::POINTER_ACTION_DOWN: {
             auto num = touchEvent->GetPointerIds().size();
             if (num == TwoFingerGesture::MAX_TOUCH_NUM) {
@@ -678,7 +682,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent>& 
             } else {
                 StopTwoFingerGesture();
             }
-            if (num <= TwoFingerGesture::MAX_TOUCH_NUM) {
+            if (num > 0 && num <= TwoFingerGesture::MAX_TOUCH_NUM) {
                 auto id = touchEvent->GetPointerId();
                 PointerEvent::PointerItem item;
                 touchEvent->GetPointerItem(id, item);
@@ -690,6 +694,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent>& 
         }
         default:
             // Don't care about other actions
+            MMI_HILOGE("other action not match.");
             break;
     }
 }
