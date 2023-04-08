@@ -30,7 +30,10 @@ ohos_shared_library("inputconsumer") {
     "src/js_register_util.cpp",
   ]
 
-  configs = [ ":inputconsumer_config" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":inputconsumer_config",
+  ]
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",

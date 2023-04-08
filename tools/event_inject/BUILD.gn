@@ -61,6 +61,9 @@ ohos_source_set("event-injection") {
 
 ohos_unittest("ut-event-injection-out") {
   module_out_path = module_output_path
+
+  configs = [ "${mmi_path}:coverage_flags" ]
+
   include_dirs = [
     "//drivers/peripheral/input/interfaces/include",
     "//commonlibrary/c_utils/base/include",
