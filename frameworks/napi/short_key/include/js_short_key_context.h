@@ -32,7 +32,6 @@ private:
     static napi_value CreateInstance(napi_env env);
     static JsShortKeyContext* GetInstance(napi_env env);
     static napi_value CreateJsObject(napi_env env, napi_callback_info info);
-    static napi_value EnumConstructor(napi_env env, napi_callback_info info);
     std::shared_ptr<JsShortKeyManager> mgr_ { nullptr };
     napi_ref contextRef_ { nullptr };
 };
