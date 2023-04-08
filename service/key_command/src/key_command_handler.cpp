@@ -657,7 +657,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent>& 
         }
         case PointerEvent::POINTER_ACTION_MOVE: {
             if (twoFingerGesture_.timerId == -1) {
-                MMI_HILOGE("Two finger gesture timer id is -1.");
+                MMI_HILOGW("Two finger gesture timer id is -1.");
                 break;
             }
             auto id = touchEvent->GetPointerId();
@@ -694,7 +694,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent>& 
         }
         default:
             // Don't care about other actions
-            MMI_HILOGE("other action not match.");
+            MMI_HILOGW("other action not match.");
             break;
     }
 }
