@@ -73,6 +73,19 @@ struct Sequence {
     Ability ability;
 };
 
+struct TwoFingerGesture {
+    inline static constexpr auto MAX_TOUCH_NUM = 2;
+    bool active = false;
+    int32_t timerId = -1;
+    int64_t abilityStartDelay = 0;
+    Ability ability;
+    struct {
+        int32_t id;
+        int32_t x;
+        int32_t y;
+    } touches[MAX_TOUCH_NUM];
+};
+
 class KeyCommandHandler final : public IInputEventHandler {
 public:
     KeyCommandHandler() = default;
@@ -93,6 +106,7 @@ private:
     void PrintSeq();
     bool ParseConfig();
     bool ParseJson(const std::string &configFile);
+    void LaunchAbility(const Ability &ability, int64_t delay);
     void LaunchAbility(const ShortcutKey &key);
     void LaunchAbility(const Sequence &sequence);
     bool IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key);
@@ -120,6 +134,9 @@ private:
         filterSequences_.clear();
     }
     bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
+    void OnHandleTouchEvent(const std::shared_ptr<PointerEvent>& touchEvent);
+    void StartTwoFingerGesture();
+    void StopTwoFingerGesture();
 
 private:
     ShortcutKey lastMatchedKey_;
@@ -130,6 +147,7 @@ private:
     bool isParseConfig_ { false };
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;
+    TwoFingerGesture twoFingerGesture_;
 };
 } // namespace MMI
 } // namespace OHOS
