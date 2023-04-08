@@ -86,6 +86,7 @@ public:
     int32_t GetWindowPid(int32_t windowId) override;
     int32_t AppendExtraData(const ExtraData& extraData) override;
     int32_t EnableInputDevice(bool enable) override;
+    int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay) override;
     
 #ifdef OHOS_RSS_CLIENT
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;

@@ -30,7 +30,10 @@ ohos_shared_library("keycode") {
     "src/native_register_module.cpp",
   ]
 
-  configs = [ ":keyCode_config" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":keyCode_config",
+  ]
 
   deps = [ "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client" ]
 

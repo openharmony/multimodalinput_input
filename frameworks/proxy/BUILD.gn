@@ -94,6 +94,7 @@ ohos_shared_library("libmmi-client") {
   }
 
   configs = [
+    "${mmi_path}:coverage_flags",
     ":libmmi_client_config",
     "//foundation/multimodalinput/input/util:libmmi_util_public_config",
     "//foundation/multimodalinput/input/service/filter:mmi_event_filter_config",
@@ -129,7 +130,10 @@ ohos_unittest("ut-mmi-proxy-out") {
 
   sources = [ "module_loader/test/mmi_client_test.cpp" ]
 
-  configs = [ ":libmmi_test_util" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_test_util",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -157,7 +161,10 @@ ohos_unittest("KeyEventTest") {
     "events/test/key_event_test.cpp",
   ]
 
-  configs = [ ":libmmi_test_util" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_test_util",
+  ]
 
   deps = [
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
@@ -192,7 +199,10 @@ ohos_unittest("InputManagerTest") {
     "events/test/input_manager_test.cpp",
   ]
 
-  configs = [ ":libmmi_test_util" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_test_util",
+  ]
 
   deps = [
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
@@ -218,7 +228,10 @@ ohos_unittest("InputManagerManualTest") {
 
   sources = [ "events/test/input_manager_manual_test.cpp" ]
 
-  configs = [ ":libmmi_test_util" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_test_util",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -241,7 +254,10 @@ ohos_unittest("InputManagerFilterManualTest") {
 
   sources = [ "events/test/input_manager_filter_manual_test.cpp" ]
 
-  configs = [ ":libmmi_test_util" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_test_util",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -268,7 +284,10 @@ ohos_unittest("PointerEventTest") {
     "events/test/pointer_event_test.cpp",
   ]
 
-  configs = [ ":libmmi_test_util" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_test_util",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
