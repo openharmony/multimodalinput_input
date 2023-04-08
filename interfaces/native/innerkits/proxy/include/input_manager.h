@@ -415,6 +415,15 @@ public:
      */
     int32_t EnableInputDevice(bool enable);
 
+     /**
+     * @brief 自定义设置快捷键拉起ability延迟时间
+     * @param businessId 应用在ability_launch_config.json中注册的唯一标识符.
+     * @param delay 延迟时间 0-4000ms
+     * @return 设置快捷键拉起ability延迟时间成功或失败
+     * @since 10
+     */
+    int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

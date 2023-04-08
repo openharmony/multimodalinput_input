@@ -39,7 +39,11 @@ constexpr int32_t MAX_SEQUENCEKEYS_NUM = 10;
 constexpr int64_t MAX_DELAY_TIME = 1000000;
 constexpr int64_t SECONDS_SYSTEM = 1000;
 constexpr int32_t SPECIAL_KEY_DOWN_DELAY = 150;
+constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;
+constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
+constexpr int32_t ERROR_DELAY_VALUE = -1000;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
+const std::string shortKeyFileName = "/data/service/el1/public/multimodalinput/Settings.xml";
 enum SpecialType {
     SPECIAL_ALL = 0,
     SUBSCRIBER_BEFORE_DELAY = 1,
@@ -72,6 +76,21 @@ bool IsSpecialType(int32_t keyCode, SpecialType type)
         return false;
     }
     return (it->second == SpecialType::SPECIAL_ALL || it->second == type);
+}
+
+bool GetBusinessId(const cJSON* jsonData, std::string &businessIdValue)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("jsonData is not object");
+        return false;
+    }
+    cJSON *businessId = cJSON_GetObjectItemCaseSensitive(jsonData, "businessId");
+    if (!cJSON_IsString(businessId)) {
+        MMI_HILOGE("businessId is not string");
+        return false;
+    }
+    businessIdValue = businessId->valuestring;
+    return true;
 }
 
 bool GetPreKeys(const cJSON* jsonData, ShortcutKey &shortcutKey)
@@ -266,6 +285,9 @@ bool ConvertToShortcutKey(const cJSON* jsonData, ShortcutKey &shortcutKey)
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("jsonData is not object");
         return false;
+    }
+    if (!GetBusinessId(jsonData, shortcutKey.businessId)) {
+        MMI_HILOGW("Get abilityKey failed");
     }
     if (!GetPreKeys(jsonData, shortcutKey)) {
         MMI_HILOGE("Get preKeys failed");
@@ -735,6 +757,11 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
             MMI_HILOGD("Not key matched, next");
             continue;
         }
+        int32_t delay = GetKeyDownDurationFromXml(shortcutKey.businessId);
+        if (delay >= MIN_SHORT_KEY_DOWN_DURATION && delay <= MAX_SHORT_KEY_DOWN_DURATION) {
+            MMI_HILOGD("User defined new short key down duration: %{public}d", delay);
+            shortcutKey.keyDownDuration = delay;
+        }
         shortcutKey.Print();
         if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
             return HandleKeyDown(shortcutKey);
@@ -934,6 +961,14 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     return true;
 }
 
+int32_t KeyCommandHandler::GetKeyDownDurationFromXml(const std::string &businessId)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<NativePreferences::Preferences> pref = NativePreferences::PreferencesHelper::GetPreferences(shortKeyFileName, errno);
+    CHKPR(pref, ERROR_DELAY_VALUE);
+    return pref->GetInt(businessId, ERROR_DELAY_VALUE);
+}
+
 bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey)
 {
     CALL_DEBUG_ENTER;
@@ -1077,6 +1112,28 @@ void KeyCommandHandler::InterruptTimers()
             item.timerId = -1;
         }
     }
+}
+
+int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int32_t delay)
+{
+    CALL_DEBUG_ENTER;
+    if (delay < MIN_SHORT_KEY_DOWN_DURATION || delay > MAX_SHORT_KEY_DOWN_DURATION) {
+        MMI_HILOGE("delay must be number and bigger and equal zero and less than max short key down duration.");
+        return RET_ERR;
+    }
+    if (businessId.empty()) {
+        MMI_HILOGE("businessId is empty.");
+        return RET_ERR;
+    }
+    std::shared_ptr<NativePreferences::Preferences> pref = NativePreferences::PreferencesHelper::GetPreferences(shortKeyFileName, errno);
+    CHKPR(pref, errno);
+    pref->PutInt(businessId, delay);
+    int32_t ret = pref->FlushSync();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Flush Sync failed, ret: %{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
