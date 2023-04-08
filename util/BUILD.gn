@@ -32,7 +32,7 @@ config("libmmi_util_public_config") {
 
 ohos_shared_library("libmmi-util") {
   sources = libmmi_util_sources
-
+  public_configs = [ "${mmi_path}:coverage_flags" ]
   configs = [ ":libmmi_util_public_config" ]
 
   public_deps = [
@@ -47,6 +47,7 @@ ohos_shared_library("libmmi-util") {
 }
 
 ohos_unittest("ut-mmi-util-out") {
+  configs = [ "${mmi_path}:coverage_flags" ]
   module_out_path = module_output_path
   include_dirs = [
     "//commonlibrary/c_utils/base/include",

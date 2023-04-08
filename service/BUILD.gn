@@ -125,7 +125,10 @@ ohos_shared_library("libmmi-server") {
     sources += [ "interceptor/src/event_interceptor_handler.cpp" ]
   }
 
-  configs = [ ":libmmi_server_config" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
 
   deps = [
     ":mmi_device_config.ini",
@@ -223,7 +226,10 @@ ohos_unittest("ut-mmi-service-out") {
     "window_manager/test/input_windows_manager_test.cpp",
   ]
 
-  configs = [ ":libmmi_server_config" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":libmmi_server_config",
+  ]
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
@@ -243,6 +249,8 @@ ohos_unittest("ut-mmi-service-out") {
 
 ohos_unittest("TransformPointTest") {
   module_out_path = module_output_path
+
+  configs = [ "${mmi_path}:coverage_flags" ]
   include_dirs = [
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/util/common/include",

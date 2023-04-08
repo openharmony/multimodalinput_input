@@ -15,7 +15,8 @@
       "SystemCapability.MultimodalInput.Input.Core",
       "SystemCapability.MultimodalInput.Input.InputSimulator",
       "SystemCapability.MultimodalInput.Input.InputMonitor",
-      "SystemCapability.MultimodalInput.Input.Pointer"
+      "SystemCapability.MultimodalInput.Input.Pointer",
+      "SystemCapability.MultimodalInput.Input.ShortKey"
     ],
     "features": [
       "input_feature_combination_key",
@@ -26,7 +27,8 @@
       "input_feature_mouse",
       "input_feature_pointer_drawing",
       "input_feature_switch",
-      "input_feature_touchscreen"
+      "input_feature_touchscreen",
+      "input_feature_short_key"
     ],
     "adapted_system_type": [
       "standard"

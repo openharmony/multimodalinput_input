@@ -74,7 +74,10 @@ ohos_unittest("ut-virtual-device-out") {
 
   sources = [ "test/virtual_device_test.cpp" ]
 
-  configs = [ ":virtual_device_public_config" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":virtual_device_public_config",
+  ]
 
   deps = [
     "${mmi_path}/tools/vuinput:libmmi-virtual-device",
