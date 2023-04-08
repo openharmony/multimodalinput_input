@@ -1462,6 +1462,25 @@ void InputWindowsManager::ClearExtraData()
     extraData_.pointerId = -1;
 }
 
+bool InputWindowsManager::IsWindowVisible(int32_t pid)
+{
+    CALL_DEBUG_ENTER;
+    if (pid < 0) {
+        MMI_HILOGE("pid is invalid");
+        return true;
+    }
+    std::vector<sptr<Rosen::WindowVisibilityInfo>> infos;
+    Rosen::WindowManager::GetInstance().GetVisibilityWindowInfo(infos);
+    for (const auto &it: infos) {
+        if (pid == it->pid_ && it->isVisible_) {
+            MMI_HILOGD("pid:%{public}d has visible window", pid);
+            return true;
+        }
+    }
+    MMI_HILOGD("pid:%{public}d doesn't have visible window", pid);
+    return false;
+}
+
 void InputWindowsManager::UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;

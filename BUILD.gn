@@ -14,6 +14,14 @@
 import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
+config("coverage_flags") {
+  if (input_feature_coverage) {
+    cflags = [ "--coverage" ]
+    ldflags = [ "--coverage" ]
+    cflags_cc = [ "--coverage" ]
+  }
+}
+
 ohos_prebuilt_etc("mmi_uinput.rc") {
   source = "mmi_uinput.rc"
   relative_install_dir = "init"

@@ -152,5 +152,31 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetPointerLocation_008
     int32_t y = 0;
     ASSERT_EQ(MouseEventHdr->SetPointerLocation(x, y), idNames);
 }
+
+/**
+ * @tc.name: MouseEventNormalizeTest_SetMousePrimaryButton_009
+ * @tc.desc: Test SetMousePrimaryButton
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetMousePrimaryButton_009, TestSize.Level1)
+{
+    int32_t primaryButton = 1;
+    ASSERT_TRUE(MouseEventHdr->SetMousePrimaryButton(primaryButton) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_GetMousePrimaryButton_010
+ * @tc.desc: Test GetMousePrimaryButton
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetMousePrimaryButton_010, TestSize.Level1)
+{
+    int32_t primaryButton = 1;
+    MouseEventHdr->SetMousePrimaryButton(primaryButton);
+    int32_t primaryButtonRes = 1;
+    ASSERT_TRUE(MouseEventHdr->GetMousePrimaryButton() == primaryButtonRes);
+}
 }
 }

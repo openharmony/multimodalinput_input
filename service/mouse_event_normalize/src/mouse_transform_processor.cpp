@@ -209,7 +209,8 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
     }
 
     pointerEvent_->SetButtonId(buttonId);
-    pref = nullptr;
+    NativePreferences::PreferencesHelper::
+        RemovePreferencesFromCache("/data/service/el1/public/multimodalinput/mouse_settings");
     return RET_OK;
 }
 
@@ -444,7 +445,8 @@ int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
         MMI_HILOGE("flush sync is failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    pref = nullptr;
+    NativePreferences::PreferencesHelper::
+        RemovePreferencesFromCache("/data/service/el1/public/multimodalinput/mouse_settings");
     return RET_OK;
 }
 
@@ -460,6 +462,8 @@ int32_t MouseTransformProcessor::GetMousePrimaryButton()
     }
     std::string name = "primaryButton";
     int32_t primaryButton = pref->GetInt(name, 0);
+    NativePreferences::PreferencesHelper::
+        RemovePreferencesFromCache("/data/service/el1/public/multimodalinput/mouse_settings");
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
     return primaryButton;
 }

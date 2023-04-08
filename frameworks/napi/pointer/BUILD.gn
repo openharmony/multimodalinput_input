@@ -30,7 +30,10 @@ ohos_shared_library("pointer") {
     "src/js_pointer_module.cpp",
   ]
 
-  configs = [ ":pointer_config" ]
+  configs = [
+    "${mmi_path}:coverage_flags",
+    ":pointer_config",
+  ]
 
   deps = [
     "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",

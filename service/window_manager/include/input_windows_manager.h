@@ -23,6 +23,7 @@
 #include "singleton.h"
 
 #include "window_info.h"
+#include "window_manager.h"
 #include "input_event.h"
 #include "input_display_bind_helper.h"
 #include "input_event_data_transformation.h"
@@ -93,6 +94,7 @@ public:
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t AppendExtraData(const ExtraData& extraData);
+    bool IsWindowVisible(int32_t pid);
 private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const;
