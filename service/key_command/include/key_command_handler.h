@@ -80,9 +80,9 @@ struct TwoFingerGesture {
     int64_t abilityStartDelay = 0;
     Ability ability;
     struct {
-        int32_t id;
-        int32_t x;
-        int32_t y;
+        int32_t id { 0 };
+        int32_t x { 0 };
+        int32_t y { 0 };
     } touches[MAX_TOUCH_NUM];
 };
 
