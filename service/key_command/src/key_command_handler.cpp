@@ -39,6 +39,7 @@ constexpr int32_t MAX_SEQUENCEKEYS_NUM = 10;
 constexpr int64_t MAX_DELAY_TIME = 1000000;
 constexpr int64_t SECONDS_SYSTEM = 1000;
 constexpr int32_t SPECIAL_KEY_DOWN_DELAY = 150;
+constexpr int32_t TOUCH_MAX_THRESHOLD = 15;
 constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;
 constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
 constexpr int32_t ERROR_DELAY_VALUE = -1000;
@@ -205,6 +206,9 @@ bool GetEntities(const cJSON* jsonAbility, Ability &ability)
         return false;
     }
     cJSON *entities = cJSON_GetObjectItemCaseSensitive(jsonAbility, "entities");
+    if (entities == nullptr) {
+        return true;
+    }
     if (!cJSON_IsArray(entities)) {
         MMI_HILOGE("entities must be array");
         return false;
@@ -228,6 +232,9 @@ bool GetParams(const cJSON* jsonAbility, Ability &ability)
         return false;
     }
     cJSON *params = cJSON_GetObjectItemCaseSensitive(jsonAbility, "params");
+    if (params == nullptr) {
+        return true;
+    }
     if (!cJSON_IsArray(params)) {
         MMI_HILOGE("params must be array");
         return false;
@@ -374,7 +381,7 @@ bool GetDelay(const cJSON* jsonData, int64_t &delayInt)
     return true;
 }
 
-bool GetAlibityStartDelay(const cJSON* jsonData, int64_t &abilityStartDelayInt)
+bool GetAbilityStartDelay(const cJSON* jsonData, int64_t &abilityStartDelayInt)
 {
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("jsonData is not object");
@@ -389,7 +396,7 @@ bool GetAlibityStartDelay(const cJSON* jsonData, int64_t &abilityStartDelayInt)
         MMI_HILOGE("abilityStartDelay must be number and bigger and equal zero and less than max delay time");
         return false;
     }
-    abilityStartDelayInt = abilityStartDelay->valueint * SECONDS_SYSTEM;
+    abilityStartDelayInt = abilityStartDelay->valueint;
     return true;
 }
 
@@ -492,7 +499,7 @@ bool ConvertToKeySequence(const cJSON* jsonData, Sequence &sequence)
         MMI_HILOGE("Sequence invalid");
         return false;
     }
-    if (!GetAlibityStartDelay(jsonData, sequence.abilityStartDelay)) {
+    if (!GetAbilityStartDelay(jsonData, sequence.abilityStartDelay)) {
         MMI_HILOGE("Get abilityStartDelay failed");
         return false;
     }
@@ -568,6 +575,30 @@ bool ParseSequences(const JsonParser& parser, std::vector<Sequence>& sequenceVec
     }
     return true;
 }
+
+bool ParseTwoFingerGesture(const JsonParser& parser, TwoFingerGesture& gesture)
+{
+    cJSON *jsonData = cJSON_GetObjectItemCaseSensitive(parser.json_, "TwoFingerGesture");
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("TwoFingerGesture is not object");
+        return false;
+    }
+    if (!GetAbilityStartDelay(jsonData, gesture.abilityStartDelay)) {
+        MMI_HILOGE("Get abilityStartDelay failed");
+        return false;
+    }
+    cJSON *ability = cJSON_GetObjectItemCaseSensitive(jsonData, "ability");
+    if (!cJSON_IsObject(ability)) {
+        MMI_HILOGE("ability is not object");
+        return false;
+    }
+    if (!PackageAbility(ability, gesture.ability)) {
+        MMI_HILOGE("Package ability failed");
+        return false;
+    }
+    gesture.active = true;
+    return true;
+}
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -598,9 +629,93 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
 {
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
+    OnHandleTouchEvent(pointerEvent);
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
+
+void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent>& touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+    if (!isParseConfig_) {
+        if (!ParseConfig()) {
+            MMI_HILOGE("Parse configFile failed");
+            return;
+        }
+        isParseConfig_ = true;
+    }
+
+    if (!twoFingerGesture_.active) {
+        return;
+    }
+    switch (touchEvent->GetPointerAction()) {
+        case PointerEvent::POINTER_ACTION_CANCEL:
+        case PointerEvent::POINTER_ACTION_UP: {
+            StopTwoFingerGesture();
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_MOVE: {
+            if (twoFingerGesture_.timerId == -1) {
+                MMI_HILOGW("Two finger gesture timer id is -1.");
+                break;
+            }
+            auto id = touchEvent->GetPointerId();
+            auto pos = std::find_if(std::begin(twoFingerGesture_.touches), std::end(twoFingerGesture_.touches),
+                [id](const auto& item) { return item.id == id; });
+            if (pos == std::end(twoFingerGesture_.touches)) {
+                break;
+            }
+            PointerEvent::PointerItem item;
+            touchEvent->GetPointerItem(id, item);
+            auto dx = std::abs(pos->x - item.GetDisplayX());
+            auto dy = std::abs(pos->y - item.GetDisplayY());
+            if (dx > TOUCH_MAX_THRESHOLD || dy > TOUCH_MAX_THRESHOLD) {
+                StopTwoFingerGesture();
+            }
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_DOWN: {
+            auto num = touchEvent->GetPointerIds().size();
+            if (num == TwoFingerGesture::MAX_TOUCH_NUM) {
+                StartTwoFingerGesture();
+            } else {
+                StopTwoFingerGesture();
+            }
+            if (num > 0 && num <= TwoFingerGesture::MAX_TOUCH_NUM) {
+                auto id = touchEvent->GetPointerId();
+                PointerEvent::PointerItem item;
+                touchEvent->GetPointerItem(id, item);
+                twoFingerGesture_.touches[num - 1].id = id;
+                twoFingerGesture_.touches[num - 1].x = item.GetDisplayX();
+                twoFingerGesture_.touches[num - 1].y = item.GetDisplayY();
+            }
+            break;
+        }
+        default:
+            // Don't care about other actions
+            MMI_HILOGW("other action not match.");
+            break;
+    }
+}
+
+void KeyCommandHandler::StartTwoFingerGesture()
+{
+    CALL_DEBUG_ENTER;
+    twoFingerGesture_.timerId = TimerMgr->AddTimer(twoFingerGesture_.abilityStartDelay, 1, [this]() {
+        LaunchAbility(twoFingerGesture_.ability, twoFingerGesture_.abilityStartDelay);
+        twoFingerGesture_.timerId = -1;
+    });
+}
+
+void KeyCommandHandler::StopTwoFingerGesture()
+{
+    CALL_DEBUG_ENTER;
+    if (twoFingerGesture_.timerId != -1) {
+        TimerMgr->RemoveTimer(twoFingerGesture_.timerId);
+        twoFingerGesture_.timerId = -1;
+    }
+}
 
 bool KeyCommandHandler::ParseConfig()
 {
@@ -634,7 +749,8 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
 
     bool isParseShortKeys = ParseShortcutKeys(parser, shortcutKeys_);
     bool isParseSequences = ParseSequences(parser, sequences_);
-    if (!isParseShortKeys && !isParseSequences) {
+    bool isParseTwoFingerGesture = ParseTwoFingerGesture(parser, twoFingerGesture_);
+    if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture) {
         MMI_HILOGE("Parse configFile failed");
         return false;
     }
@@ -897,7 +1013,7 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
             isLaunchAbility = true;
             return true;
         }
-        sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay/SECONDS_SYSTEM, 1, [this, sequence] () {
+        sequence.timerId = TimerMgr->AddTimer(sequence.abilityStartDelay, 1, [this, sequence] () {
             MMI_HILOGD("Timer callback");
             LaunchAbility(sequence);
         });
@@ -1009,54 +1125,41 @@ bool KeyCommandHandler::HandleKeyCancel(ShortcutKey &shortcutKey)
     return false;
 }
 
+void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
+{
+    CALL_DEBUG_ENTER;
+    AAFwk::Want want;
+    want.SetElementName(ability.deviceId, ability.bundleName, ability.abilityName);
+    want.SetAction(ability.action);
+    want.SetUri(ability.uri);
+    want.SetType(ability.uri);
+    for (const auto &entity : ability.entities) {
+        want.AddEntity(entity);
+    }
+    for (const auto &item : ability.params) {
+        want.SetParam(item.first, item.second);
+    }
+    DfxHisysevent::CalcComboStartTimes(delay);
+    DfxHisysevent::ReportComboStartTimes();
+    MMI_HILOGD("Start launch ability, bundleName:%{public}s", ability.bundleName.c_str());
+    ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+    if (err != ERR_OK) {
+        MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
+    }
+    MMI_HILOGD("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
+}
+
 void KeyCommandHandler::LaunchAbility(const ShortcutKey &key)
 {
     CALL_INFO_TRACE;
-    AAFwk::Want want;
-    want.SetElementName(key.ability.deviceId, key.ability.bundleName, key.ability.abilityName);
-    want.SetAction(key.ability.action);
-    want.SetUri(key.ability.uri);
-    want.SetType(key.ability.uri);
-    for (const auto &entity : key.ability.entities) {
-        want.AddEntity(entity);
-    }
-    for (const auto &item : key.ability.params) {
-        want.SetParam(item.first, item.second);
-    }
-    DfxHisysevent::CalcComboStartTimes(lastMatchedKey_.keyDownDuration);
-    DfxHisysevent::ReportComboStartTimes();
-    MMI_HILOGD("Start launch ability, bundleName:%{public}s", key.ability.bundleName.c_str());
-    ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
-    if (err != ERR_OK) {
-        MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", key.ability.bundleName.c_str(), err);
-    }
+    LaunchAbility(key.ability, lastMatchedKey_.keyDownDuration);
     ResetLastMatchedKey();
-    MMI_HILOGD("End launch ability, bundleName:%{public}s", key.ability.bundleName.c_str());
 }
 
 void KeyCommandHandler::LaunchAbility(const Sequence &sequence)
 {
     CALL_INFO_TRACE;
-    AAFwk::Want want;
-    want.SetElementName(sequence.ability.deviceId, sequence.ability.bundleName, sequence.ability.abilityName);
-    want.SetAction(sequence.ability.action);
-    want.SetUri(sequence.ability.uri);
-    want.SetType(sequence.ability.uri);
-    for (const auto &entity : sequence.ability.entities) {
-        want.AddEntity(entity);
-    }
-    for (const auto &item : sequence.ability.params) {
-        want.SetParam(item.first, item.second);
-    }
-    DfxHisysevent::CalcComboStartTimes(sequence.abilityStartDelay);
-    DfxHisysevent::ReportComboStartTimes();
-    MMI_HILOGD("Start launch ability, bundleName:%{public}s", sequence.ability.bundleName.c_str());
-    ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
-    if (err != ERR_OK) {
-        MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d",
-                   sequence.ability.bundleName.c_str(), err);
-    }
-    MMI_HILOGD("End launch ability, bundleName:%{public}s", sequence.ability.bundleName.c_str());
+    LaunchAbility(sequence.ability, sequence.abilityStartDelay);
 }
 
 void ShortcutKey::Print() const
