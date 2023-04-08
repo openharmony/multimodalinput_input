@@ -757,7 +757,11 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
             MMI_HILOGD("Not key matched, next");
             continue;
         }
-        GetKeyDownDurationFromXml(shortcutKey.businessId, shortcutKey.keyDownDuration);
+        int32_t delay = GetKeyDownDurationFromXml(shortcutKey.businessId);
+        if (delay >= MIN_SHORT_KEY_DOWN_DURATION && delay <= MAX_SHORT_KEY_DOWN_DURATION) {
+            MMI_HILOGD("User defined new short key down duration: %{public}d", delay);
+            ShortcutKey.keyDownDuration = delay;
+        }
         shortcutKey.Print();
         if (shortcutKey.triggerType == KeyEvent::KEY_ACTION_DOWN) {
             return HandleKeyDown(shortcutKey);
@@ -957,18 +961,12 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     return true;
 }
 
-void KeyCommandHandler::GetKeyDownDurationFromXml(const std::string &businessId, int32_t &keyDownDurationInt)
+int32_t KeyCommandHandler::GetKeyDownDurationFromXml(const std::string &businessId)
 {
     CALL_DEBUG_ENTER;
     std::shared_ptr<NativePreferences::Preferences> pref = NativePreferences::PreferencesHelper::GetPreferences(shortKeyFileName, errno);
-    CHKPV(pref);
-    int32_t delay = pref->GetInt(businessId, ERROR_DELAY_VALUE);
-    if (delay < MIN_SHORT_KEY_DOWN_DURATION){
-        MMI_HILOGE("get key down duration failed.");
-        return;
-    }
-    keyDownDurationInt = delay;
-    return;
+    CHKPR(pref, ERROR_DELAY_VALUE);
+    return pref->GetInt(businessId, ERROR_DELAY_VALUE);
 }
 
 bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey)
