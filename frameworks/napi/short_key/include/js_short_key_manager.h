@@ -45,7 +45,7 @@ struct AsyncContext : RefBase {
     napi_ref callback { nullptr };
     int32_t errorCode { -1 };
     StreamBuffer reserve;
-    AsyncContext(napi_env env) : env(env) {}
+    explicit AsyncContext(napi_env env) : env(env) {}
     ~AsyncContext();
 };
 
