@@ -164,17 +164,6 @@ napi_value JsShortKeyContext::SetKeyDownDuration(napi_env env, napi_callback_inf
     return jsShortKeyMgr->SetKeyDownDuration(env, businessId, delay, argv[2]);
 }
 
-napi_value JsShortKeyContext::EnumConstructor(napi_env env, napi_callback_info info)
-{
-    CALL_DEBUG_ENTER;
-    size_t argc = 0;
-    napi_value args[1] = { 0 };
-    napi_value ret = nullptr;
-    void *data = nullptr;
-    CHKRP(napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);
-    return ret;
-}
-
 napi_value JsShortKeyContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
