@@ -11,15 +11,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+import("../../../multimodalinput_mini.gni")
 
 config("touchEvent_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//foundation/multimodalinput/input/frameworks/napi/touch_event/include",
-    "//foundation/multimodalinput/input/util/common/include",
-    "//foundation/multimodalinput/input/util/network/include",
+    "${mmi_path}/frameworks/napi/touch_event/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/network/include",
     "//commonlibrary/c_utils/base/include",
   ]
 }

@@ -11,15 +11,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+import("../../../multimodalinput_mini.gni")
 
 config("keyCode_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//foundation/multimodalinput/input/frameworks/napi/key_code/include",
-    "//foundation/multimodalinput/input/util/common/include",
-    "//foundation/multimodalinput/input/util/network/include",
+    "${mmi_path}/frameworks/napi/key_code/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/network/include",
     "//commonlibrary/c_utils/base/include",
   ]
 }
@@ -35,7 +35,7 @@ ohos_shared_library("keycode") {
     ":keyCode_config",
   ]
 
-  deps = [ "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client" ]
+  deps = [ "${mmi_path}/frameworks/proxy:libmmi-client" ]
 
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",

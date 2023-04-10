@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+import("..//multimodalinput_mini.gni")
 
 defines = input_default_defines
 
@@ -24,9 +24,9 @@ config("libmmi_util_public_config") {
     "common/include",
     "network/include",
     "socket/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
   ]
 }
 
@@ -36,10 +36,10 @@ ohos_shared_library("libmmi-util") {
   configs = [ ":libmmi_util_public_config" ]
 
   public_deps = [
+    "${mmi_path}/frameworks/proxy:libmmi-common",
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//commonlibrary/c_utils/base:utils",
     "//foundation/arkui/napi:ace_napi",
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-common",
   ]
 
   part_name = "input"
