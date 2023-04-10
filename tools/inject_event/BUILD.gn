@@ -13,10 +13,10 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+import("../../multimodalinput_mini.gni")
 
 SUBSYSTEM_DIR = "//foundation/multimodalinput"
-SUBSYSTEM_FRAMEWORKS_DIR = "//foundation/multimodalinput/input/frameworks"
+SUBSYSTEM_FRAMEWORKS_DIR = "${mmi_path}/frameworks"
 
 ohos_source_set("input-manager") {
   sources = [ "src/input_manager_command.cpp" ]
@@ -26,12 +26,12 @@ ohos_source_set("input-manager") {
     "$SUBSYSTEM_FRAMEWORKS_DIR/test/tools/inject_event/include",
     "out/ohos-arm-release/innerkits/ohos-arm/c_utils/utils/include/string_ex.h",
     "$SUBSYSTEM_DIR/interfaces/native/innerkits/multimodalinput_proxy/include",
-    "//foundation/multimodalinput/input/util/common/include",
+    "${mmi_path}/util/common/include",
   ]
 
   deps = [
     "$SUBSYSTEM_FRAMEWORKS_DIR/proxy:libmmi-client",
-    "//foundation/multimodalinput/input/util:libmmi-util",
+    "${mmi_path}/util:libmmi-util",
   ]
 
   subsystem_name = "multimodalinput"
@@ -66,7 +66,7 @@ ohos_unittest("InjectEventTest") {
   deps = [
     "$SUBSYSTEM_DIR/input/tools/inject_event:input-manager",
     "$SUBSYSTEM_FRAMEWORKS_DIR/proxy:libmmi-client",
-    "//foundation/multimodalinput/input/util:libmmi-util",
+    "${mmi_path}/util:libmmi-util",
   ]
 
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]

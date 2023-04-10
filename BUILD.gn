@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+import("./multimodalinput_mini.gni")
 
 config("coverage_flags") {
   if (input_feature_coverage) {
@@ -42,8 +42,8 @@ ohos_executable("uinput_inject") {
   sources = uinput_inject_sources
 
   include_dirs = [
-    "//foundation/multimodalinput/input/util/common/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
   ]
 
   external_deps = [

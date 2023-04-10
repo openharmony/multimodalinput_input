@@ -12,15 +12,15 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-
+import("../../multimodalinput_mini.gni")
 ohos_executable("input_device_display_bind") {
   sources = [ "src/input_device_display_bind.cpp" ]
 
   include_dirs = []
 
   deps = [
-    "//foundation/multimodalinput/input/frameworks/proxy:libmmi-client",
-    "//foundation/multimodalinput/input/util:libmmi-util",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/util:libmmi-util",
   ]
 
   subsystem_name = "multimodalinput"

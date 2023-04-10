@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+import("../multimodalinput_mini.gni")
 
 group("patch_packages") {
   deps = [

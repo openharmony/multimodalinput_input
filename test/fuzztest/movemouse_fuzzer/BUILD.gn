@@ -14,16 +14,14 @@
 #####################hydra-fuzz###################
 import("//build/config/features.gni")
 import("//build/test.gni")
-import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+import("../../../multimodalinput_mini.gni")
 module_output_path = "multimodalinput/fuzz"
 
 ##############################fuzztest##########################################
 ohos_fuzztest("MoveMouseFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file =
-      "//foundation/multimodalinput/input/test/fuzztest/movemouse_fuzzer"
-  include_dirs =
-      [ "//foundation/multimodalinput/input/interfaces/util/common/include" ]
+  fuzz_config_file = "${mmi_path}/test/fuzztest/movemouse_fuzzer"
+  include_dirs = [ "${mmi_path}/interfaces/util/common/include" ]
   cflags = [
     "-g",
     "-O0",

@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+import("../multimodalinput_mini.gni")
 
 defines = input_default_defines
 
@@ -57,11 +57,11 @@ config("libmmi_server_config") {
     "//foundation/multimodalinput/interfaces/native/innerkits/event/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/include",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics/src",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-    "//foundation/multimodalinput/input/util/common/include",
-    "//foundation/multimodalinput/input/util/socket/include",
-    "//foundation/multimodalinput/input/util/network/include",
-    "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/socket/include",
+    "${mmi_path}/util/network/include",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
     "//third_party/cJSON",
   ]
 
@@ -133,13 +133,13 @@ ohos_shared_library("libmmi-server") {
   deps = [
     ":mmi_device_config.ini",
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
+    "${mmi_path}/etc/mouse_icon:input_mouse_icon",
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
+    "${mmi_path}/service/filter:mmi_event_filter_proxy",
+    "${mmi_path}/util:libmmi-util",
     "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
     "//foundation/graphic/graphic_2d/rosen/modules/render_service_client:librender_service_client",
-    "//foundation/multimodalinput/input/etc/mouse_icon:input_mouse_icon",
-    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
-    "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_service",
-    "//foundation/multimodalinput/input/service/filter:mmi_event_filter_proxy",
-    "//foundation/multimodalinput/input/util:libmmi-util",
     "//third_party/cJSON:cjson",
   ]
 
@@ -233,9 +233,9 @@ ohos_unittest("ut-mmi-service-out") {
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
