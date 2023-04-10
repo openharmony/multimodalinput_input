@@ -502,7 +502,7 @@ int32_t keyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items)
         return KeyEvent::INTENTION_UNKNOWN;
     }
 
-    uint64_t keyCodes = 0;
+    int64_t keyCodes = 0;
     for (const auto &item : items) {
         keyCodes = (keyCodes << 16) + item.GetKeyCode();
     }
