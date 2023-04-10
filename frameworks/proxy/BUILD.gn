@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+import("../../multimodalinput_mini.gni")
 
 defines = input_default_defines
 
@@ -23,9 +23,9 @@ config("libmmi_client_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-    "//foundation/multimodalinput/input/util/common/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
     "event_handler/include",
     "events/include",
     "module_loader/include",
@@ -35,11 +35,11 @@ config("libmmi_client_config") {
 config("libmmi_public_client_config") {
   include_dirs = [
     "//base/notification/eventhandler/interfaces/inner_api",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/multimodalinput/input/util/common/include",
+    "${mmi_path}/util/common/include",
   ]
 }
 
@@ -96,18 +96,18 @@ ohos_shared_library("libmmi-client") {
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_client_config",
-    "//foundation/multimodalinput/input/util:libmmi_util_public_config",
-    "//foundation/multimodalinput/input/service/filter:mmi_event_filter_config",
-    "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_config",
+    "${mmi_path}/util:libmmi_util_public_config",
+    "${mmi_path}/service/filter:mmi_event_filter_config",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_config",
   ]
 
   public_configs = [ ":libmmi_public_client_config" ]
 
   deps = [
     ":libmmi-common",
-    "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
-    "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
-    "//foundation/multimodalinput/input/util:libmmi-util",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_proxy",
+    "${mmi_path}/service/filter:mmi_event_filter_service",
+    "${mmi_path}/util:libmmi-util",
   ]
 
   part_name = "input"

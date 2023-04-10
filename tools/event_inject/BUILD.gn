@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+import("../../multimodalinput_mini.gni")
 module_output_path = "multimodalinput/unit_out"
 
 config("event_injection_config") {
@@ -22,8 +22,8 @@ config("event_injection_config") {
   include_dirs = [
     "include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/multimodalinput/input/util/common/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
   ]
 }
 
@@ -31,8 +31,8 @@ config("event_injection_public_config") {
   include_dirs = [
     "include",
     "//third_party/FreeBSD/sys/dev/evdev",
-    "//foundation/multimodalinput/input/util/common/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
     "//third_party/cJSON",
   ]
 }
@@ -46,10 +46,10 @@ ohos_source_set("event-injection") {
   ]
 
   deps = [
-    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
-    "//foundation/multimodalinput/input/service/connect_manager:mmi_connect_manager_proxy",
-    "//foundation/multimodalinput/input/service/filter:mmi_event_filter_service",
-    "//foundation/multimodalinput/input/util:libmmi-util",
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/service/connect_manager:mmi_connect_manager_proxy",
+    "${mmi_path}/service/filter:mmi_event_filter_service",
+    "${mmi_path}/util:libmmi-util",
     "//third_party/cJSON:cjson",
   ]
 
@@ -117,10 +117,10 @@ ohos_unittest("ut-event-injection-out") {
 
   deps = [
     "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/tools/event_inject:event-injection",
     "${mmi_path}/util:libmmi-util",
-    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
@@ -139,9 +139,9 @@ ohos_executable("mmi-event-injection") {
   configs = [ ":event_injection_public_config" ]
 
   deps = [
-    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
-    "//foundation/multimodalinput/input/tools/event_inject:event-injection",
-    "//foundation/multimodalinput/input/util:libmmi-util",
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/tools/event_inject:event-injection",
+    "${mmi_path}/util:libmmi-util",
   ]
 
   install_enable = true

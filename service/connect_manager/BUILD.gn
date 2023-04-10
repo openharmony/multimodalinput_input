@@ -12,22 +12,22 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+import("../../multimodalinput_mini.gni")
 mmi_connect_manager_path = "${mmi_path}/service/connect_manager"
 
 config("mmi_connect_manager_config") {
   include_dirs = [
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/common/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/event/include",
-    "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
-    "//foundation/multimodalinput/input/util/common/include",
-    "//foundation/multimodalinput/input/util/network/include",
-    "//foundation/multimodalinput/input/util/socket/include",
-    "//foundation/multimodalinput/input/service/delegate_task/include",
-    "//foundation/multimodalinput/input/service/filter/include",
-    "//foundation/multimodalinput/input/service/message_handle/include",
-    "//foundation/multimodalinput/input/service/permission_helper/include",
-    "//foundation/multimodalinput/input/frameworks/proxy/event_handler/include",
+    "${mmi_path}/interfaces/native/innerkits/common/include",
+    "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/network/include",
+    "${mmi_path}/util/socket/include",
+    "${mmi_path}/service/delegate_task/include",
+    "${mmi_path}/service/filter/include",
+    "${mmi_path}/service/message_handle/include",
+    "${mmi_path}/service/permission_helper/include",
+    "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_connect_manager_path}/include",
   ]
 }

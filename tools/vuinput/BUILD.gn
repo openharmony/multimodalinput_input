@@ -14,7 +14,7 @@
 # Copyright (c) Huawei Technologies Co., Ltd. 2019-2019. All rights reserved.
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+import("../../multimodalinput_mini.gni")
 config("libmmi_virtual_device_config") {
   visibility = [ ":*" ]
 
@@ -48,8 +48,8 @@ ohos_executable("vuinput") {
   configs = [ ":virtual_device_public_config" ]
 
   deps = [
-    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
-    "//foundation/multimodalinput/input/tools/vuinput:libmmi-virtual-device",
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/tools/vuinput:libmmi-virtual-device",
   ]
 
   install_enable = true
@@ -80,9 +80,9 @@ ohos_unittest("ut-virtual-device-out") {
   ]
 
   deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/tools/vuinput:libmmi-virtual-device",
     "${mmi_path}/util:libmmi-util",
-    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]

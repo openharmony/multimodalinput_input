@@ -12,11 +12,11 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+import("../../multimodalinput_mini.gni")
 
 gen_src_dir = "//third_party/libinput"
 gen_dst_dir = root_out_dir + "/diff_libinput_mmi"
-patches_root_dir = "//foundation/multimodalinput/input/patch"
+patches_root_dir = "${mmi_path}/patch"
 build_gn_dir = "$patches_root_dir/diff_libinput_mmi/libinput"
 
 action("apply_patch") {

@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
+import("../../multimodalinput_mini.gni")
 
 ohos_prebuilt_etc("drawing_pointer_image_Colorsucker") {
   source = "src/Colorsucker.png"
