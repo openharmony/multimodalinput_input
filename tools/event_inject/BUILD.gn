@@ -21,7 +21,6 @@ config("event_injection_config") {
 
   include_dirs = [
     "include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
   ]
@@ -30,10 +29,10 @@ config("event_injection_config") {
 config("event_injection_public_config") {
   include_dirs = [
     "include",
-    "//third_party/FreeBSD/sys/dev/evdev",
     "${mmi_path}/util/common/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "//third_party/cJSON",
+    "//third_party/FreeBSD/sys/dev/evdev",
   ]
 }
 
@@ -65,10 +64,6 @@ ohos_unittest("ut-event-injection-out") {
   configs = [ "${mmi_path}:coverage_flags" ]
 
   include_dirs = [
-    "//drivers/peripheral/input/interfaces/include",
-    "//commonlibrary/c_utils/base/include",
-    "//third_party/googletest/googletest/include",
-    "//third_party/cJSON",
     "${mmi_path}/frameworks/proxy/event_handler",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader",
@@ -98,6 +93,8 @@ ohos_unittest("ut-event-injection-out") {
     "${mmi_path}/tools/event_inject/include",
     "${mmi_path}/uinput",
     "$root_out_dir/diff_libinput_mmi/export_include",
+    "//third_party/cJSON",
+    "//third_party/googletest/googletest/include",
   ]
 
   sources = [

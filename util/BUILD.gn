@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("..//multimodalinput_mini.gni")
+import("../multimodalinput_mini.gni")
 
 defines = input_default_defines
 
@@ -36,10 +36,10 @@ ohos_shared_library("libmmi-util") {
   configs = [ ":libmmi_util_public_config" ]
 
   public_deps = [
+    "${common_util}/base:utils",
+    "${hilog_path}:libhilog",
     "${mmi_path}/frameworks/proxy:libmmi-common",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//commonlibrary/c_utils/base:utils",
-    "//foundation/arkui/napi:ace_napi",
+    "${napi_path}:ace_napi",
   ]
 
   part_name = "input"
@@ -50,9 +50,8 @@ ohos_unittest("ut-mmi-util-out") {
   configs = [ "${mmi_path}:coverage_flags" ]
   module_out_path = module_output_path
   include_dirs = [
-    "//commonlibrary/c_utils/base/include",
+    "${common_util}/base/include",
     "//third_party/googletest/googletest/include",
-    "//commonlibrary/c_utils/base/include",
     "${mmi_path}/frameworks/proxy/event_handler",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader",

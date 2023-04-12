@@ -17,19 +17,11 @@ import("//build/test.gni")
 import("../../multimodalinput_mini.gni")
 config("libmmi_virtual_device_config") {
   visibility = [ ":*" ]
-
-  include_dirs = [
-    "include",
-    "//commonlibrary/c_utils/base/include",
-    "//util/common/include",
-  ]
+  include_dirs = [ "include" ]
 }
 
 config("virtual_device_public_config") {
-  include_dirs = [
-    "include",
-    "//commonlibrary/c_utils/base/include",
-  ]
+  include_dirs = [ "include" ]
 }
 
 ohos_source_set("libmmi-virtual-device") {
@@ -52,6 +44,7 @@ ohos_executable("vuinput") {
     "${mmi_path}/tools/vuinput:libmmi-virtual-device",
   ]
 
+  external_deps = [ "c_utils:utils" ]
   install_enable = true
   part_name = "input"
   subsystem_name = "multimodalinput"
@@ -62,7 +55,6 @@ ohos_unittest("ut-virtual-device-out") {
   module_out_path = module_output_path
   include_dirs = [
     "${mmi_path}/tools/vuinput/include",
-    "//commonlibrary/c_utils/base/include",
     "${mmi_path}/util/common",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network",
