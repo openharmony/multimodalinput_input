@@ -53,7 +53,7 @@ bool getResult(sptr<AsyncContext> asyncContext, napi_value * results, int32_t si
     CALL_DEBUG_ENTER;
     int32_t length = 2;
     if (size < length) {
-        MMI_HILOGE(results size less than 2);
+        MMI_HILOGE("results size less than 2");
         return false;
     }
     napi_env env = asyncContext->env;
