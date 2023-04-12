@@ -66,6 +66,7 @@ napi_value JsShortKeyManager::SetKeyDownDuration(napi_env env, const std::string
     } else {
         CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
     }
+    AsyncCallbackWork(asyncContext);
     return promise;
 }
 } // namespace MMI
