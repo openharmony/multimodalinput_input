@@ -20,7 +20,7 @@ config("inputdevice_config") {
     "${mmi_path}/frameworks/napi/input_device/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
-    "//commonlibrary/c_utils/base/include",
+    "${common_util}/base/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "${mmi_path}/frameworks/proxy/module_loader/include",
   ]
