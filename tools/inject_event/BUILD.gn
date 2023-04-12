@@ -15,22 +15,16 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("../../multimodalinput_mini.gni")
 
-SUBSYSTEM_DIR = "//foundation/multimodalinput"
-SUBSYSTEM_FRAMEWORKS_DIR = "${mmi_path}/frameworks"
-
 ohos_source_set("input-manager") {
   sources = [ "src/input_manager_command.cpp" ]
 
   include_dirs = [
     "include",
-    "$SUBSYSTEM_FRAMEWORKS_DIR/test/tools/inject_event/include",
-    "out/ohos-arm-release/innerkits/ohos-arm/c_utils/utils/include/string_ex.h",
-    "$SUBSYSTEM_DIR/interfaces/native/innerkits/multimodalinput_proxy/include",
     "${mmi_path}/util/common/include",
   ]
 
   deps = [
-    "$SUBSYSTEM_FRAMEWORKS_DIR/proxy:libmmi-client",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
   ]
 
@@ -41,16 +35,10 @@ ohos_source_set("input-manager") {
 ohos_executable("uinput") {
   sources = [ "src/main.cpp" ]
   configs = [ "${mmi_path}:coverage_flags" ]
-  include_dirs = [
-    "include",
-    "$SUBSYSTEM_FRAMEWORKS_DIR/test/tools/inject_event/include",
-    "out/ohos-arm-release/innerkits/ohos-arm/c_utils/utils/include/string_ex.h",
-    "$SUBSYSTEM_DIR/interfaces/native/innerkits/multimodalinput_proxy/include",
-    "//commonlibrary/c_utils/base/include",
-  ]
+  include_dirs = [ "include" ]
 
-  deps = [ "$SUBSYSTEM_DIR/input/tools/inject_event:input-manager" ]
-
+  deps = [ "${mmi_path}/tools/inject_event:input-manager" ]
+  external_deps = [ "c_utils:utils" ]
   subsystem_name = "multimodalinput"
   part_name = "input"
 }
@@ -64,8 +52,8 @@ ohos_unittest("InjectEventTest") {
   sources = [ "test/inject_event_test.cpp" ]
 
   deps = [
-    "$SUBSYSTEM_DIR/input/tools/inject_event:input-manager",
-    "$SUBSYSTEM_FRAMEWORKS_DIR/proxy:libmmi-client",
+    "${mmi_path}/frameworks/proxy:libmmi-client",
+    "${mmi_path}/tools/inject_event:input-manager",
     "${mmi_path}/util:libmmi-util",
   ]
 
