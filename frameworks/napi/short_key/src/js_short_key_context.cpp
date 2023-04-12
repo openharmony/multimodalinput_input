@@ -136,6 +136,11 @@ napi_value JsShortKeyContext::SetKeyDownDuration(napi_env env, napi_callback_inf
     char businessId[MAX_STRING_LEN] = { 0 };
     size_t ret = 0;
     CHKRP(napi_get_value_string_utf8(env, argv[0], businessId, MAX_STRING_LEN - 1, &ret), GET_VALUE_STRING_UTF8);
+    if (ret <= 0) {
+        MMI_HILOGE("Invalid businessId");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "businessId is invalid");
+        return nullptr;
+    }
     
     // 校验参数delay的合法性
     int32_t delay = 0;
