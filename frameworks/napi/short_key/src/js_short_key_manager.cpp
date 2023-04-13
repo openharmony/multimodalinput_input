@@ -48,6 +48,100 @@ AsyncContext::~AsyncContext()
     }
 }
 
+bool getResult(sptr<AsyncContext> asyncContext, napi_value * results, int32_t size)
+{
+    CALL_DEBUG_ENTER;
+    int32_t length = 2;
+    if (size < length) {
+        MMI_HILOGE("results size less than 2");
+        return false;
+    }
+    napi_env env = asyncContext->env;
+    if (asyncContext->errorCode != RET_OK) {
+        if (asyncContext->errorCode == RET_ERR) {
+            MMI_HILOGE("Other errors");
+            return false;
+        }
+        NapiError codeMsg;
+        if (!UtilNapiError::GetApiError(asyncContext->errorCode, codeMsg)) {
+            MMI_HILOGE("ErrorCode not found, errCode:%{public}d", asyncContext->errorCode);
+            return false;
+        }
+        napi_value errCode = nullptr;
+        napi_value errMsg = nullptr;
+        napi_value businessError = nullptr;
+        CHKRF(napi_create_int32(env, asyncContext->errorCode, &errCode), CREATE_INT32);
+        CHKRF(napi_create_string_utf8(env, codeMsg.msg.c_str(),
+            NAPI_AUTO_LENGTH, &errMsg), CREATE_STRING_UTF8);
+        CHKRF(napi_create_error(env, nullptr, errMsg, &businessError), CREATE_ERROR);
+        CHKRF(napi_set_named_property(env, businessError, ERR_CODE.c_str(), errCode), SET_NAMED_PROPERTY);
+        results[0] = businessError;
+    } else {
+        CHKRF(napi_get_undefined(env, &results[0]), GET_UNDEFINED);
+    }
+
+    ReturnType resultType;
+    asyncContext->reserve >> resultType;
+    if (resultType == ReturnType::BOOL) {
+        bool temp;
+        asyncContext->reserve >> temp;
+        CHKRF(napi_get_boolean(env, temp, &results[1]), GET_BOOLEAN);
+    } else if (resultType == ReturnType::NUMBER) {
+        int32_t temp;
+        asyncContext->reserve >> temp;
+        CHKRF(napi_create_int32(env, temp, &results[1]), CREATE_INT32);
+    } else {
+        CHKRF(napi_get_undefined(env, &results[1]), GET_UNDEFINED);
+    }
+    return true;
+}
+
+void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(asyncContext);
+    CHKPV(asyncContext->env);
+    napi_env env = asyncContext->env;
+    napi_value resource = nullptr;
+    CHKRV(napi_create_string_utf8(env, "AsyncCallbackWork", NAPI_AUTO_LENGTH, &resource), CREATE_STRING_UTF8);
+    asyncContext->IncStrongRef(nullptr);
+    napi_status status = napi_create_async_work(env, nullptr, resource, [](napi_env env, void* data) {},
+        [](napi_env env, napi_status status, void* data) {
+            sptr<AsyncContext> asyncContext(static_cast<AsyncContext *>(data));
+            /**
+             * After the asynchronous task is created, the asyncCallbackInfo reference count is reduced
+             * to 0 destruction, so you need to add 1 to the asyncCallbackInfo reference count when the
+             * asynchronous task is created, and subtract 1 from the reference count after the naked
+             * pointer is converted to a pointer when the asynchronous task is executed, the reference
+             * count of the smart pointer is guaranteed to be 1.
+             */
+            asyncContext->DecStrongRef(nullptr);
+            napi_value results[2] = { 0 };
+            int32_t size = 2;
+            if (!getResult(asyncContext, results, size)) {
+                MMI_HILOGE("Failed to create napi data");
+                return;
+            }
+            if (asyncContext->deferred) {
+                if (asyncContext->errorCode == RET_OK) {
+                    CHKRV(napi_resolve_deferred(env, asyncContext->deferred, results[1]), RESOLVE_DEFERRED);
+                } else {
+                    CHKRV(napi_reject_deferred(env, asyncContext->deferred, results[0]), REJECT_DEFERRED);
+                }
+            } else {
+                napi_value callback = nullptr;
+                CHKRV(napi_get_reference_value(env, asyncContext->callback, &callback), GET_REFERENCE_VALUE);
+                napi_value callResult = nullptr;
+                CHKRV(napi_call_function(env, nullptr, callback, size, results, &callResult), CALL_FUNCTION);
+            }
+        },
+        asyncContext.GetRefPtr(), &asyncContext->work);
+    if (status != napi_ok || napi_queue_async_work(env, asyncContext->work) != napi_ok) {
+        MMI_HILOGE("Create async work failed");
+        asyncContext->DecStrongRef(nullptr);
+    }
+}
+
 napi_value JsShortKeyManager::SetKeyDownDuration(napi_env env, const std::string &businessId, int32_t delay, napi_value handle)
 {
     CALL_DEBUG_ENTER;
@@ -66,6 +160,7 @@ napi_value JsShortKeyManager::SetKeyDownDuration(napi_env env, const std::string
     } else {
         CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
     }
+    AsyncCallbackWork(asyncContext);
     return promise;
 }
 } // namespace MMI
