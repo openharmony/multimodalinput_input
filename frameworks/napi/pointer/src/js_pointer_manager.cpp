@@ -341,5 +341,46 @@ napi_value JsPointerManager::GetMousePrimaryButton(napi_env env, napi_value hand
     AsyncCallbackWork(asyncContext);
     return promise;
 }
+
+napi_value JsPointerManager::SetHoverScrollState(napi_env env, bool state, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+
+    asyncContext->errorCode = InputManager::GetInstance()->SetHoverScrollState(state);
+    asyncContext->reserve << ReturnType::VOID;
+
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::GetHoverScrollState(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+
+    bool state;
+    asyncContext->errorCode = InputManager::GetInstance()->GetHoverScrollState(state);
+    asyncContext->reserve << ReturnType::BOOL << state;
+
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
 } // namespace MMI
 } // namespace OHOS

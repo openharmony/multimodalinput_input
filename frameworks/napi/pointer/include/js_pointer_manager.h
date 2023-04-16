@@ -68,6 +68,8 @@ public:
     napi_value LeaveCaptureMode(napi_env env, int32_t windowId, napi_value handle = nullptr);
     napi_value SetMousePrimaryButton(napi_env env, int32_t primaryButton, napi_value handle = nullptr);
     napi_value GetMousePrimaryButton(napi_env env, napi_value handle = nullptr);
+    napi_value SetHoverScrollState(napi_env env, bool state, napi_value handle = nullptr);
+    napi_value GetHoverScrollState(napi_env env, napi_value handle = nullptr);
 };
 } // namespace MMI
 } // namespace OHOS

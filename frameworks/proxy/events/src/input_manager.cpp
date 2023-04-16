@@ -194,6 +194,16 @@ int32_t InputManager::GetMousePrimaryButton(int32_t &primaryButton)
     return InputMgrImpl.GetMousePrimaryButton(primaryButton);
 }
 
+int32_t InputManager::SetHoverScrollState(bool state)
+{
+    return InputMgrImpl.SetHoverScrollState(state);
+}
+
+int32_t InputManager::GetHoverScrollState(bool &state)
+{
+    return InputMgrImpl.GetHoverScrollState(state);
+}
+
 int32_t InputManager::SetPointerVisible(bool visible)
 {
     return InputMgrImpl.SetPointerVisible(visible);

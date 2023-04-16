@@ -37,6 +37,8 @@ public:
     static napi_value LeaveCaptureMode(napi_env env, napi_callback_info info);
     static napi_value SetMousePrimaryButton(napi_env env, napi_callback_info info);
     static napi_value GetMousePrimaryButton(napi_env env, napi_callback_info info);
+    static napi_value SetHoverScrollState(napi_env env, napi_callback_info info);
+    static napi_value GetHoverScrollState(napi_env env, napi_callback_info info);
 
 private:
     static napi_value CreateInstance(napi_env env);
