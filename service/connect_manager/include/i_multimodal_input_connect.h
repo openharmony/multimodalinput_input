@@ -75,6 +75,8 @@ public:
         SET_MOUSE_PRIMARY_BUTTON = 38,
         GET_MOUSE_PRIMARY_BUTTON = 39,
         SET_KEY_DOWN_DURATION = 40,
+        SET_HOVER_SCROLL_STATE = 41,
+        GET_HOVER_SCROLL_STATE = 42,
     };
 
     enum {
@@ -91,6 +93,8 @@ public:
     virtual int32_t RemoveInputEventFilter(int32_t filterId) = 0;
     virtual int32_t SetMousePrimaryButton(int32_t primaryButton) = 0;
     virtual int32_t GetMousePrimaryButton(int32_t &primaryButton) = 0;
+    virtual int32_t SetHoverScrollState(bool state) = 0;
+    virtual int32_t GetHoverScrollState(bool &state) = 0;
     virtual int32_t SetPointerVisible(bool visible) = 0;
     virtual int32_t IsPointerVisible(bool &visible) = 0;
     virtual int32_t MarkProcessed(int32_t eventType, int32_t eventId) = 0;

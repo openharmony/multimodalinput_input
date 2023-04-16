@@ -285,6 +285,24 @@ public:
     int32_t GetMousePrimaryButton(int32_t &primaryButton);
 
     /**
+     * @brief Sets whether the mouse hover scroll is enabled in inactive window.
+     * @param state Indicates whether the mouse hover scroll is enabled in inactive window. The value true
+     * indicates that the mouse hover scroll is enabled, and the value false indicates the opposite.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t SetHoverScrollState(bool state);
+
+    /**
+     * @brief Gets a status whether the mouse hover scroll is enabled in inactive window.
+     * @param state Indicates whether the mouse hover scroll is enabled in inactive window. The value true
+     * indicates that the mouse hover scroll is enabled, and the value false indicates the opposite.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t GetHoverScrollState(bool &state);
+
+    /**
      * @brief Sets whether the pointer icon is visible.
      * @param visible Indicates whether the pointer icon is visible. The value <b>true</b> indicates that
      * the pointer icon is visible, and the value <b>false</b> indicates the opposite.
