@@ -998,21 +998,6 @@ bool InputWindowsManager::GetHoverScrollState() const
     return state;
 }
 
-bool InputWindowsManager::IsEnableHoverScroll() {
-    CALL_DEBUG_ENTER;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errno);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errno: %{public}d", errno);
-        return RET_ERR;
-    }
-    std::string name = "isEnableHoverScroll";
-    bool isEnable = pref->GetBool(name, true);
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
-    MMI_HILOGD("mouse hover scroll state, isEnable:%{public}d", isEnable);
-    return isEnable;
-}
-
 int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -1056,7 +1041,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     bool isMouseAxisEvent = pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_BEGIN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END;
-    bool isEnable = IsEnableHoverScroll();
+    bool isEnable = GetHoverScrollState();
     if (displayGroupInfo_.focusWindowId != touchWindow->id && isMouseAxisEvent && !isEnable) {
         MMI_HILOGD("disable mouse hover scroll in inactive window, targetWindowId:%{public}d", touchWindow->id);
         return RET_OK;
