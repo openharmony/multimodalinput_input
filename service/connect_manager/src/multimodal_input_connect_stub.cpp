@@ -52,6 +52,8 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::RMV_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubRemoveInputEventFilter},
         {IMultimodalInputConnect::SET_MOUSE_PRIMARY_BUTTON, &MultimodalInputConnectStub::StubSetMousePrimaryButton},
         {IMultimodalInputConnect::GET_MOUSE_PRIMARY_BUTTON, &MultimodalInputConnectStub::StubGetMousePrimaryButton},
+        {IMultimodalInputConnect::SET_HOVER_SCROLL_STATE, &MultimodalInputConnectStub::StubSetHoverScrollState},
+        {IMultimodalInputConnect::GET_HOVER_SCROLL_STATE, &MultimodalInputConnectStub::StubGetHoverScrollState},
         {IMultimodalInputConnect::SET_POINTER_VISIBLE, &MultimodalInputConnectStub::StubSetPointerVisible},
         {IMultimodalInputConnect::SET_POINTER_STYLE, &MultimodalInputConnectStub::StubSetPointerStyle},
         {IMultimodalInputConnect::GET_POINTER_STYLE, &MultimodalInputConnectStub::StubGetPointerStyle},
@@ -207,6 +209,42 @@ int32_t MultimodalInputConnectStub::StubGetMousePrimaryButton(MessageParcel& dat
     }
     WRITEINT32(reply, primaryButton, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("mouse primaryButton:%{public}d,ret:%{public}d", primaryButton, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetHoverScrollState(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    bool state = true;
+    READBOOL(data, state, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetHoverScrollState(state);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetHoverScrollState failed, ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success state:%{public}d, pid:%{public}d", state, GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetHoverScrollState(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    bool state = true;
+    int32_t ret = GetHoverScrollState(state);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetHoverScrollState failed, ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEBOOL(reply, state, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("mouse hover scroll state:%{public}d, ret:%{public}d", state, ret);
     return RET_OK;
 }
 

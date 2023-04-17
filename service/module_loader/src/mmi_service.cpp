@@ -550,6 +550,41 @@ int32_t MMIService::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle
     return RET_OK;
 }
 
+int32_t MMIService::SetHoverScrollState(bool state)
+{
+    CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&InputWindowsManager::SetHoverScrollState,
+        WinMgr, state));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set mouse hover scroll state failed,return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+int32_t MMIService::ReadHoverScrollState(bool &state)
+{
+    state = WinMgr->GetHoverScrollState();
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+int32_t MMIService::GetHoverScrollState(bool &state)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadHoverScrollState, this, std::ref(state)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get mouse hover scroll state, return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
 int32_t MMIService::OnSupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke)
 {
     CALL_DEBUG_ENTER;
