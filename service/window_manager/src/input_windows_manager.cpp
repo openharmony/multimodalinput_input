@@ -1093,9 +1093,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         InitMouseDownInfo();
         MMI_HILOGD("Mouse up, clear mouse down info");
     }
-    if (action == PointerEvent::POINTER_ACTION_PULL_UP) {
-        ClearExtraData();
-    }
     MMI_HILOGD("pid:%{public}d,id:%{public}d,agentWindowId:%{public}d,"
                "logicalX:%{public}d,logicalY:%{public}d,"
                "displayX:%{public}d,displayY:%{public}d,windowX:%{public}d,windowY:%{public}d",
@@ -1241,9 +1238,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             touchItemDownInfos_.erase(iter);
             MMI_HILOGD("Clear the touch info, action is up, pointerid:%{public}d", pointerId);
         }
-    }
-    if (pointerAction == PointerEvent::POINTER_ACTION_PULL_UP) {
-        ClearExtraData();
     }
     return ERR_OK;
 }

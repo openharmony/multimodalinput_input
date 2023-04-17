@@ -97,6 +97,7 @@ public:
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t AppendExtraData(const ExtraData& extraData);
     bool IsWindowVisible(int32_t pid);
+    void ClearExtraData();
 private:
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const;
@@ -148,7 +149,6 @@ private:
     void CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void UpdateDisplayIdAndName();
     void UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent);
-    void ClearExtraData();
 private:
     UDSServer* udsServer_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_POINTER
