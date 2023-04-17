@@ -244,7 +244,7 @@ int32_t MultimodalInputConnectStub::StubGetHoverScrollState(MessageParcel& data,
         return ret;
     }
     WRITEBOOL(reply, state, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("mouse hover scroll state:%{public}d,ret:%{public}d", state, ret);
+    MMI_HILOGD("mouse hover scroll state:%{public}d, ret:%{public}d", state, ret);
     return RET_OK;
 }
 
