@@ -1,5 +1,5 @@
 {
-  "name": "@ohos/multimodalinput",
+  "name": "@ohos/input",
   "description": "Provide input capabilities",
   "version": "3.1",
   "license": "Apache License 2.0",

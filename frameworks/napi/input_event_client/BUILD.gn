@@ -21,7 +21,6 @@ config("inputeventclient_config") {
     "${mmi_path}/frameworks/napi/input_event_client/include",
     "${mmi_path}/tools/event_inject/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${common_util}/base/include",
   ]
 }
 
@@ -42,6 +41,7 @@ ohos_shared_library("inputeventclient") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
   ]
