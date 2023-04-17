@@ -26,7 +26,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerEvent" };
 constexpr double MAX_PRESSURE { 1.0 };
 constexpr size_t MAX_N_PRESSED_BUTTONS { 10 };
-constexpr size_t MAX_N_POINTER_ITEMS { 5 };
+constexpr size_t MAX_N_POINTER_ITEMS { 10 };
 } // namespace
 
 std::shared_ptr<PointerEvent> PointerEvent::from(std::shared_ptr<InputEvent> inputEvent)
