@@ -1041,14 +1041,13 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGI("mouse event send cancel, window:%{public}d, pid:%{public}d", touchWindow->id, touchWindow->pid);
     }
 
-    bool isMouseAxisEvent = pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_BEGIN ||
-        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END;
-    bool isEnable = GetHoverScrollState();
-    bool isIntercept = displayGroupInfo_.focusWindowId != touchWindow->id && isMouseAxisEvent && !isEnable;
-    if (isIntercept) {
-        MMI_HILOGD("disable mouse hover scroll in inactive window, targetWindowId:%{public}d", touchWindow->id);
-        return RET_OK;
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) {
+        if ((!GetHoverScrollState()) && (displayGroupInfo_.focusWindowId != touchWindow->id)) {
+            MMI_HILOGD("disable mouse hover scroll in inactive window, targetWindowId:%{public}d", touchWindow->id);
+            return RET_OK;
+        }
     }
 
     PointerStyle pointerStyle;
