@@ -276,7 +276,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetHoverScrollState_01
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetHoverScrollState_011, TestSize.Level1)
 {
     WinMgr->SetHoverScrollState(true);
-    ASSERT_TRUE(WinMgr->GetHoverScrollState() == true);
+    ASSERT_TRUE(WinMgr->GetHoverScrollState());
 }
 } // namespace MMI
 } // namespace OHOS
