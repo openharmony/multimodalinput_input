@@ -20,7 +20,6 @@ config("mouseEvent_config") {
     "${mmi_path}/frameworks/napi/mouse_event/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
-    "${common_util}/base/include",
   ]
 }
 
@@ -38,6 +37,7 @@ ohos_shared_library("mouseevent") {
   deps = []
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
   ]

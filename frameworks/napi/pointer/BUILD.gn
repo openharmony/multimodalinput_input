@@ -41,6 +41,7 @@ ohos_shared_library("pointer") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
   ]

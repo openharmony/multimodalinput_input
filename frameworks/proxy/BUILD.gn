@@ -119,10 +119,7 @@ ohos_shared_library("libmmi-client") {
 
 ohos_unittest("ut-mmi-proxy-out") {
   module_out_path = module_output_path
-  include_dirs = [
-    "${common_util}/base/include",
-    "$root_out_dir/diff_libinput_mmi/export_include",
-  ]
+  include_dirs = [ "$root_out_dir/diff_libinput_mmi/export_include" ]
 
   sources = [ "module_loader/test/mmi_client_test.cpp" ]
 
@@ -138,6 +135,7 @@ ohos_unittest("ut-mmi-proxy-out") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "c_utils:utils",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
@@ -146,10 +144,7 @@ ohos_unittest("ut-mmi-proxy-out") {
 
 ohos_unittest("KeyEventTest") {
   module_out_path = module_output_path
-  include_dirs = [
-    "${common_util}/base/include",
-    "$root_out_dir/diff_libinput_mmi/export_include",
-  ]
+  include_dirs = [ "$root_out_dir/diff_libinput_mmi/export_include" ]
 
   sources = [
     "${mmi_path}/test/unittest/common/src/event_util_test.cpp",
@@ -163,16 +158,17 @@ ohos_unittest("KeyEventTest") {
   ]
 
   deps = [
-    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "ability_runtime:abilitykit_native",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "window_manager:libwm",
@@ -201,16 +197,17 @@ ohos_unittest("InputManagerTest") {
   ]
 
   deps = [
-    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
     "${mmi_path}/frameworks/proxy:libmmi-client",
     "${mmi_path}/util:libmmi-util",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "ability_runtime:abilitykit_native",
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "c_utils:utils",
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
@@ -220,7 +217,6 @@ ohos_unittest("InputManagerTest") {
 
 ohos_unittest("InputManagerManualTest") {
   module_out_path = module_output_path
-  include_dirs = [ "${common_util}/base/include" ]
 
   sources = [ "events/test/input_manager_manual_test.cpp" ]
 
@@ -239,6 +235,7 @@ ohos_unittest("InputManagerManualTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
   ]
@@ -246,7 +243,6 @@ ohos_unittest("InputManagerManualTest") {
 
 ohos_unittest("InputManagerFilterManualTest") {
   module_out_path = module_output_path
-  include_dirs = [ "${common_util}/base/include" ]
 
   sources = [ "events/test/input_manager_filter_manual_test.cpp" ]
 
@@ -265,6 +261,7 @@ ohos_unittest("InputManagerFilterManualTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
   ]
@@ -296,6 +293,7 @@ ohos_unittest("PointerEventTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "window_manager:libwm",
