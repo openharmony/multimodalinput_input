@@ -28,6 +28,10 @@ ohos_source_set("input-manager") {
     "${mmi_path}/util:libmmi-util",
   ]
 
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
   subsystem_name = "multimodalinput"
   part_name = "input"
 }
@@ -38,7 +42,10 @@ ohos_executable("uinput") {
   include_dirs = [ "include" ]
 
   deps = [ "${mmi_path}/tools/inject_event:input-manager" ]
-  external_deps = [ "c_utils:utils" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
   subsystem_name = "multimodalinput"
   part_name = "input"
 }
@@ -57,7 +64,10 @@ ohos_unittest("InjectEventTest") {
     "${mmi_path}/util:libmmi-util",
   ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
 }
 
 group("inject_event") {

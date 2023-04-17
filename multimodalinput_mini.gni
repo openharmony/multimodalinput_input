@@ -14,13 +14,9 @@
 import("//build/ohos.gni")
 
 mmi_path = "//foundation/multimodalinput/input"
-ability_runtime_path = "//foundation/ability/ability_runtime"
-ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
-common_util = "//commonlibrary/c_utils"
-preferences_path = "//foundation/distributeddatamgr/preferences"
 graphics_path = "//foundation/graphic/graphic_2d/rosen/modules"
-hilog_path = "//base/hiviewdfx/hilog/interfaces/native/innerkits"
-napi_path = "//foundation/arkui/napi"
+preferences_path = "//foundation/distributeddatamgr/preferences"
+ability_runtime_path = "//foundation/ability/ability_runtime"
 
 declare_args() {
   resource_schedule_service_enabled = false

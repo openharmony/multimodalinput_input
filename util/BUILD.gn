@@ -35,12 +35,12 @@ ohos_shared_library("libmmi-util") {
   public_configs = [ "${mmi_path}:coverage_flags" ]
   configs = [ ":libmmi_util_public_config" ]
 
-  public_deps = [
-    "${common_util}/base:utils",
-    "${hilog_path}:libhilog",
-    "${mmi_path}/frameworks/proxy:libmmi-common",
-    "${napi_path}:ace_napi",
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "napi:ace_napi",
   ]
+  public_deps = [ "${mmi_path}/frameworks/proxy:libmmi-common" ]
 
   part_name = "input"
   subsystem_name = "multimodalinput"
@@ -50,7 +50,6 @@ ohos_unittest("ut-mmi-util-out") {
   configs = [ "${mmi_path}:coverage_flags" ]
   module_out_path = module_output_path
   include_dirs = [
-    "${common_util}/base/include",
     "//third_party/googletest/googletest/include",
     "${mmi_path}/frameworks/proxy/event_handler",
     "${mmi_path}/frameworks/proxy/event_handler/include",
@@ -86,5 +85,8 @@ ohos_unittest("ut-mmi-util-out") {
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
 }

@@ -52,15 +52,15 @@ config("libmmi_server_config") {
     "${mmi_service_path}/module_loader/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
-    "${preferences_path}/frameworks/native/include",
     "mouse_event_normalize/include",
-    "${graphics_path}/2d_graphics/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/socket/include",
     "${mmi_path}/util/network/include",
     "${mmi_path}/frameworks/proxy/event_handler/include",
     "//third_party/cJSON",
+    "${preferences_path}/frameworks/native/include",
+    "${graphics_path}/2d_graphics/include",
   ]
 
   if (input_feature_combination_key) {
@@ -144,8 +144,10 @@ ohos_shared_library("libmmi-server") {
   external_deps = [
     "ability_base:want",
     "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
+    "c_utils:utils",
     "config_policy:configpolicy_util",
     "hicollie_native:libhicollie",
     "hisysevent_native:libhisysevent",
@@ -209,6 +211,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/uinput",
     "$root_out_dir/diff_libinput_mmi/export_include",
+    "//third_party/node/src",
   ]
 
   sources = [

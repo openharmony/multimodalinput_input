@@ -52,7 +52,10 @@ ohos_source_set("event-injection") {
     "//third_party/cJSON:cjson",
   ]
 
-  external_deps = [ "ipc:ipc_single" ]
+  external_deps = [
+    "c_utils:utils",
+    "ipc:ipc_single",
+  ]
 
   part_name = "input"
   subsystem_name = "multimodalinput"
@@ -140,7 +143,7 @@ ohos_executable("mmi-event-injection") {
     "${mmi_path}/tools/event_inject:event-injection",
     "${mmi_path}/util:libmmi-util",
   ]
-
+  external_deps = [ "c_utils:utils" ]
   install_enable = true
   part_name = "input"
   subsystem_name = "multimodalinput"
