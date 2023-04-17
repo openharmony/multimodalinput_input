@@ -72,6 +72,10 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
 {
     CALL_DEBUG_ENTER;
     CHKPV(point);
+    if (point->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
+        MMI_HILOGD("Clear extra data");
+        WinMgr->ClearExtraData();
+    }
     auto fd = WinMgr->GetClientFd(point);
     currentTime_ = point->GetActionTime();
     if (fd < 0 && currentTime_ - eventTime_ > INTERVAL_TIME) {
