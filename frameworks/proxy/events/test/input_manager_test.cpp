@@ -3584,7 +3584,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetHoverScrollState_001, TestSize.Le
     bool state = true;
     if (InputManager::GetInstance()->SetHoverScrollState(state) == RET_OK) {
         ASSERT_TRUE(InputManager::GetInstance()->GetHoverScrollState(state) == RET_OK);
-        ASSERT_EQ(state, true);
+        ASSERT_TRUE(state);
     }
 }
 
