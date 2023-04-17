@@ -136,6 +136,18 @@ int32_t MultimodalInputConnectManager::GetMousePrimaryButton(int32_t &primaryBut
     return multimodalInputConnectService_->GetMousePrimaryButton(primaryButton);
 }
 
+int32_t MultimodalInputConnectManager::SetHoverScrollState(bool state)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetHoverScrollState(state);
+}
+
+int32_t MultimodalInputConnectManager::GetHoverScrollState(bool &state)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetHoverScrollState(state);
+}
+
 int32_t MultimodalInputConnectManager::SetPointerVisible(bool visible)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);

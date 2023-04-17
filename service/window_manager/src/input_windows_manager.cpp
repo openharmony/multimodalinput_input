@@ -23,6 +23,11 @@
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
 #include "pointer_drawing_manager.h"
+#include "preferences.h"
+#include "preferences_impl.h"
+#include "preferences_errno.h"
+#include "preferences_helper.h"
+#include "preferences_xml_utils.h"
 #include "util.h"
 #include "util_ex.h"
 #include "util_napi_error.h"
@@ -35,6 +40,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER
 const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/display_bind.cfg";
+const std::string mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
 } // namespace
 
 InputWindowsManager::InputWindowsManager() : bindInfo_(bindCfgFileName)
@@ -956,6 +962,45 @@ void InputWindowsManager::UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
     lastWindowInfo_ = touchWindow;
 }
 
+int32_t InputWindowsManager::SetHoverScrollState(bool state)
+{
+    CALL_DEBUG_ENTER;
+    MMI_HILOGD("Set mouse hover scroll state:%{public}d", state);
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
+        return RET_ERR;
+    }
+    std::string name = "isEnableHoverScroll";
+    pref->PutBool(name, state);
+    int ret = pref->FlushSync();
+    if (ret != RET_OK) {
+        MMI_HILOGE("flush sync is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
+    return RET_OK;
+}
+
+bool InputWindowsManager::GetHoverScrollState() const
+{
+    CALL_DEBUG_ENTER;
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
+        return RET_ERR;
+    }
+    std::string name = "isEnableHoverScroll";
+    bool state = pref->GetBool(name, true);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
+    MMI_HILOGD("Get mouse hover scroll state:%{public}d", state);
+    return state;
+}
+
 int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -995,6 +1040,16 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
         MMI_HILOGI("mouse event send cancel, window:%{public}d, pid:%{public}d", touchWindow->id, touchWindow->pid);
     }
+
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_BEGIN ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) {
+        if ((!GetHoverScrollState()) && (displayGroupInfo_.focusWindowId != touchWindow->id)) {
+            MMI_HILOGD("disable mouse hover scroll in inactive window, targetWindowId:%{public}d", touchWindow->id);
+            return RET_OK;
+        }
+    }
+
     PointerStyle pointerStyle;
     int32_t ret = GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
     if (ret != RET_OK) {

@@ -104,6 +104,8 @@ public:
 
     int32_t SetMousePrimaryButton(int32_t primaryButton);
     int32_t GetMousePrimaryButton(int32_t &primaryButton);
+    int32_t SetHoverScrollState(bool state);
+    int32_t GetHoverScrollState(bool &state);
 
     int32_t SetPointerVisible(bool visible);
     bool IsPointerVisible();

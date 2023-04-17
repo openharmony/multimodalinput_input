@@ -75,6 +75,8 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_POINTER
     const DisplayGroupInfo& GetDisplayGroupInfo();
+    int32_t SetHoverScrollState(bool state);
+    bool GetHoverScrollState() const;
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle);
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) const;
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
