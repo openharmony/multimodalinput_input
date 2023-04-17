@@ -223,7 +223,7 @@ int32_t MultimodalInputConnectStub::StubSetHoverScrollState(MessageParcel& data,
     READBOOL(data, state, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetHoverScrollState(state);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call SetHoverScrollState failed ret:%{public}d", ret);
+        MMI_HILOGE("Call SetHoverScrollState failed, ret:%{public}d", ret);
         return ret;
     }
     MMI_HILOGD("Success state:%{public}d,pid:%{public}d", state, GetCallingPid());
@@ -240,7 +240,7 @@ int32_t MultimodalInputConnectStub::StubGetHoverScrollState(MessageParcel& data,
     bool state = true;
     int32_t ret = GetHoverScrollState(state);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call GetHoverScrollState failed ret:%{public}d", ret);
+        MMI_HILOGE("Call GetHoverScrollState failed, ret:%{public}d", ret);
         return ret;
     }
     WRITEBOOL(reply, state, IPC_STUB_WRITE_PARCEL_ERR);
