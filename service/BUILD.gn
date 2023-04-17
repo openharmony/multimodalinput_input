@@ -211,6 +211,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/window_manager/include",
     "${mmi_path}/uinput",
     "$root_out_dir/diff_libinput_mmi/export_include",
+    "//third_party/node/src",
   ]
 
   sources = [
