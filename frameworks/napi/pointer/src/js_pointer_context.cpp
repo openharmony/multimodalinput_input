@@ -591,12 +591,12 @@ napi_value JsPointerContext::SetHoverScrollState(napi_env env, napi_callback_inf
     napi_value argv[2];
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc == 0) {
-        MMI_HILOGE("At least one parameter is required.");
+        MMI_HILOGE("At least one parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "state", "boolean");
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
-        MMI_HILOGE("state parameter type is invalid.");
+        MMI_HILOGE("state parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "state", "boolean");
         return nullptr;
     }
@@ -610,7 +610,7 @@ napi_value JsPointerContext::SetHoverScrollState(napi_env env, napi_callback_inf
         return jsPointerMgr->SetHoverScrollState(env, state);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid.");
+        MMI_HILOGE("callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
@@ -631,7 +631,7 @@ napi_value JsPointerContext::GetHoverScrollState(napi_env env, napi_callback_inf
         return jsPointerMgr->GetHoverScrollState(env);
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
-        MMI_HILOGE("callback parameter type is invalid.");
+        MMI_HILOGE("callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
