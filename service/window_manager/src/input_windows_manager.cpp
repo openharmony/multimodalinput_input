@@ -966,10 +966,11 @@ int32_t InputWindowsManager::SetHoverScrollState(bool state)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse hover scroll state:%{public}d", state);
+    int32_t errCode = RET_OK;
     std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errno);
+        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
     if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errno: %{public}d", errno);
+        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
         return RET_ERR;
     }
     std::string name = "isEnableHoverScroll";
@@ -986,10 +987,11 @@ int32_t InputWindowsManager::SetHoverScrollState(bool state)
 bool InputWindowsManager::GetHoverScrollState() const
 {
     CALL_DEBUG_ENTER;
+    int32_t errCode = RET_OK;
     std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errno);
+        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
     if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errno: %{public}d", errno);
+        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
         return RET_ERR;
     }
     std::string name = "isEnableHoverScroll";
