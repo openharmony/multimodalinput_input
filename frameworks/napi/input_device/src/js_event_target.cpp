@@ -66,20 +66,23 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
         }
         napi_value eventType = nullptr;
         CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, ADD_EVENT.c_str(), NAPI_AUTO_LENGTH, &eventType),
-                CREATE_STRING_UTF8, scope);
-        napi_value deviceId = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_int32(item->env, item->data.deviceId, &deviceId), CREATE_INT32, scope);
+            CREATE_STRING_UTF8, scope);
         napi_value object = nullptr;
         CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
         CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "type", eventType),
-                SET_NAMED_PROPERTY, scope);
-        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId),
-                SET_NAMED_PROPERTY, scope);
+            SET_NAMED_PROPERTY, scope);
         napi_value handler = nullptr;
         CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE, scope);
-        napi_value ret = nullptr;
-        CHKRV_SCOPE(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret),
+        for (const auto &devId : item->data.deviceIds) {
+            napi_value deviceId = nullptr;
+            CHKRV_SCOPE(item->env, napi_create_int32(item->env, devId, &deviceId), CREATE_INT32, scope);
+            CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId),
+                SET_NAMED_PROPERTY, scope);
+            napi_value ret = nullptr;
+            CHKRV_SCOPE(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret),
                 CALL_FUNCTION, scope);
+        }
+        item->data.deviceIds.clear();
         napi_close_handle_scope(item->env, scope);
     }
 }
@@ -113,28 +116,31 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
             MMI_HILOGE("scope is nullptr");
             return;
         }
-        napi_value eventType = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, REMOVE_EVENT.c_str(), NAPI_AUTO_LENGTH,
-             &eventType),
-             CREATE_STRING_UTF8, scope);
+        for (const auto &devId : item->data.deviceIds) {
+            napi_value eventType = nullptr;
+            CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, REMOVE_EVENT.c_str(), NAPI_AUTO_LENGTH,
+                &eventType),
+                CREATE_STRING_UTF8, scope);
 
-        napi_value deviceId = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_int32(item->env, item->data.deviceId, &deviceId),
-             CREATE_INT32, scope);
+            napi_value deviceId = nullptr;
+            CHKRV_SCOPE(item->env, napi_create_int32(item->env, devId, &deviceId),
+                CREATE_INT32, scope);
 
-        napi_value object = nullptr;
-        CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
-        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "type", eventType),
-             SET_NAMED_PROPERTY, scope);
-        CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId),
-             SET_NAMED_PROPERTY, scope);
+            napi_value object = nullptr;
+            CHKRV_SCOPE(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
+            CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "type", eventType),
+                SET_NAMED_PROPERTY, scope);
+            CHKRV_SCOPE(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId),
+                SET_NAMED_PROPERTY, scope);
 
-        napi_value handler = nullptr;
-        CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE, scope);
+            napi_value handler = nullptr;
+            CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE, scope);
 
-        napi_value ret = nullptr;
-        CHKRV_SCOPE(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret),
-             CALL_FUNCTION, scope);
+            napi_value ret = nullptr;
+            CHKRV_SCOPE(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret),
+                CALL_FUNCTION, scope);
+        }
+        item->data.deviceIds.clear();
         napi_close_handle_scope(item->env, scope);
     }
 }
@@ -156,7 +162,7 @@ void JsEventTarget::OnDeviceAdded(int32_t deviceId, const std::string &type)
         CHKRV(napi_get_uv_event_loop(item->env, &loop), GET_UV_EVENT_LOOP);
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
-        item->data.deviceId = deviceId;
+        item->data.deviceIds.push_back(deviceId);
         work->data = static_cast<void*>(&item);
         int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, EmitAddedDeviceEvent);
         if (ret != 0) {
@@ -183,7 +189,7 @@ void JsEventTarget::OnDeviceRemoved(int32_t deviceId, const std::string &type)
         CHKRV(napi_get_uv_event_loop(item->env, &loop), GET_UV_EVENT_LOOP);
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
-        item->data.deviceId = deviceId;
+        item->data.deviceIds.push_back(deviceId);
         work->data = static_cast<void*>(&item);
         int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, EmitRemoveDeviceEvent);
         if (ret != 0) {
