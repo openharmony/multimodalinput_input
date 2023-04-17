@@ -226,7 +226,7 @@ int32_t MultimodalInputConnectStub::StubSetHoverScrollState(MessageParcel& data,
         MMI_HILOGE("Call SetHoverScrollState failed, ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("Success state:%{public}d,pid:%{public}d", state, GetCallingPid());
+    MMI_HILOGD("Success state:%{public}d, pid:%{public}d", state, GetCallingPid());
     return RET_OK;
 }
 
