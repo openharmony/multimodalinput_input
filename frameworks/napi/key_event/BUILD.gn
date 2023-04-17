@@ -20,7 +20,6 @@ config("keyEvent_config") {
     "${mmi_path}/frameworks/napi/key_event/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
-    "${common_util}/base/include",
   ]
 }
 
@@ -35,9 +34,8 @@ ohos_shared_library("keyevent") {
     ":keyEvent_config",
   ]
 
-  deps = []
-
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
   ]

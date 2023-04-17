@@ -43,6 +43,7 @@ ohos_shared_library("pointer") {
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
+    "c_utils:utils"
   ]
 
   relative_install_dir = "module/multimodalinput"

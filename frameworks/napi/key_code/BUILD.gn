@@ -20,7 +20,6 @@ config("keyCode_config") {
     "${mmi_path}/frameworks/napi/key_code/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/util/network/include",
-    "${common_util}/base/include",
   ]
 }
 
@@ -38,6 +37,7 @@ ohos_shared_library("keycode") {
   deps = [ "${mmi_path}/frameworks/proxy:libmmi-client" ]
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "napi:ace_napi",
   ]
