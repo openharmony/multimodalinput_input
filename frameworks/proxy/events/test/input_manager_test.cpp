@@ -3514,6 +3514,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMousePrimaryButton_001, TestSize.
     CALL_TEST_DEBUG;
     int32_t primaryButton = 1;
     ASSERT_TRUE(InputManager::GetInstance()->SetMousePrimaryButton(primaryButton) == RET_OK);
+    primaryButton = 0;
+    ASSERT_TRUE(InputManager::GetInstance()->SetMousePrimaryButton(primaryButton) == RET_OK);
 }
 
 /**
@@ -3542,6 +3544,47 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetMousePrimaryButton_001, TestSize.
     if (InputManager::GetInstance()->SetMousePrimaryButton(primaryButton) == RET_OK) {
         ASSERT_TRUE(InputManager::GetInstance()->GetMousePrimaryButton(primaryButton) == RET_OK);
         ASSERT_EQ(primaryButton, PrimaryButton::RIGHT_BUTTON);
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_SetHoverScrollState_001
+ * @tc.desc: Sets mouse hover scroll state in inactive window
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetHoverScrollState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(InputManager::GetInstance()->SetHoverScrollState(false) == RET_OK);
+    InputManager::GetInstance()->SetHoverScrollState(true);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetHoverScrollState_002
+ * @tc.desc: Sets mouse hover scroll state in inactive window
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetHoverScrollState_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_TRUE(InputManager::GetInstance()->SetHoverScrollState(true) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetHoverScrollState_001
+ * @tc.desc: Gets mouse hover scroll state in inactive window
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetHoverScrollState_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool state = true;
+    if (InputManager::GetInstance()->SetHoverScrollState(state) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetHoverScrollState(state) == RET_OK);
+        ASSERT_TRUE(state);
     }
 }
 
