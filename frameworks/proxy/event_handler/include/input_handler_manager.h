@@ -84,7 +84,7 @@ private:
 
 private:
     std::list<Handler> interHandlers_;
-    std::map<int32_t, Handler> inputHandlers_;
+    std::map<int32_t, Handler> monitorHandlers_;
     std::map<int32_t, int32_t> processedEvents_;
     std::set<int32_t> mouseEventIds_;
     std::function<void(int32_t, int64_t)> monitorCallback_ { nullptr };
