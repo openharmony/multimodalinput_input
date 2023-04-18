@@ -74,7 +74,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
         const HandleEventType newType = GetEventType();
         if (currentType != newType) {
             deviceTags =  GetDeviceTags();
-            MMI_HILOGD("handlerType:%{public}d, newType:%{public}d, deviceTags:%{public}d, priority %{public}d",
+            MMI_HILOGD("handlerType:%{public}d, newType:%{public}d, deviceTags:%{public}d, priority:%{public}d",
                 handlerType, newType, deviceTags, priority);
             int32_t ret = AddToServer(handlerType, newType, priority, deviceTags);
             if (ret != RET_OK) {
