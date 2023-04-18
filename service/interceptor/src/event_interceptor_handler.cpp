@@ -86,8 +86,8 @@ int32_t EventInterceptorHandler::AddInputHandler(InputHandlerType handlerType,
     }
     InitSessionLostCallback();
     SessionHandler interceptor { handlerType, eventType, priority, deviceTags, session };
-    MMI_HILOGD("handlerType:%{public}d, eventType:%{public}d, deviceTags:%{public}d, priority: %{public}d",
-                handlerType, eventType, deviceTags, priority);
+    MMI_HILOGD("handlerType:%{public}d, eventType:%{public}d, deviceTags:%{public}d, priority:%{public}d",
+        handlerType, eventType, deviceTags, priority);
     return interceptors_.AddInterceptor(interceptor);
 }
 
@@ -98,8 +98,8 @@ void EventInterceptorHandler::RemoveInputHandler(InputHandlerType handlerType,
     CHKPV(session);
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         SessionHandler interceptor { handlerType, eventType, priority, deviceTags, session };
-        MMI_HILOGD("handlerType:%{public}d, eventType:%{public}d, deviceTags:%{public}d, priority: %{public}d",
-                handlerType, eventType, deviceTags, priority);
+        MMI_HILOGD("handlerType:%{public}d, eventType:%{public}d, deviceTags:%{public}d, priority:%{public}d",
+            handlerType, eventType, deviceTags, priority);
         interceptors_.RemoveInterceptor(interceptor);
     }
 }
@@ -206,7 +206,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
     uint32_t capKeyboard = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
     for (const auto &interceptor : interceptors_) {
         MMI_HILOGD("eventType_:%{public}d, deviceTags:%{public}d",
-                interceptor.eventType_, interceptor.deviceTags_);
+            interceptor.eventType_, interceptor.deviceTags_);
         if ((capKeyboard & interceptor.deviceTags_) == 0) {
             MMI_HILOGD("Interceptor cap does not have keyboard");
             continue;
