@@ -205,7 +205,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
     CHKPF(inputDevice);
     uint32_t capKeyboard = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD);
     for (const auto &interceptor : interceptors_) {
-        MMI_HILOGD("eventType_:%{public}d, deviceTags:%{public}d",
+        MMI_HILOGD("eventType:%{public}d, deviceTags:%{public}d",
             interceptor.eventType_, interceptor.deviceTags_);
         if ((capKeyboard & interceptor.deviceTags_) == 0) {
             MMI_HILOGD("Interceptor cap does not have keyboard");
@@ -246,7 +246,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
     uint32_t capPointer = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
     uint32_t capTouch = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TOUCH);
     for (const auto &interceptor : interceptors_) {
-        MMI_HILOGD("eventType_:%{public}d, deviceTags:%{public}d",
+        MMI_HILOGD("eventType:%{public}d, deviceTags:%{public}d",
             interceptor.eventType_, interceptor.deviceTags_);
         if (((capPointer | capTouch) & interceptor.deviceTags_) == 0) {
             MMI_HILOGD("Interceptor cap does not have pointer or touch");
