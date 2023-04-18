@@ -97,7 +97,7 @@ public:
     KeyCommandHandler() = default;
     DISALLOW_COPY_AND_MOVE(KeyCommandHandler);
     ~KeyCommandHandler() override = default;
-    static int32_t UpdateSettingsXml(const std::string &businessId, int32_t delay);
+    int32_t UpdateSettingsXml(const std::string &businessId, int32_t delay);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -152,6 +152,7 @@ private:
     std::vector<Sequence> sequences_;
     std::vector<Sequence> filterSequences_;
     std::vector<SequenceKey> keys_;
+    std::vector<std::string> businessIds_;
     bool isParseConfig_ { false };
     std::map<int32_t, int32_t> specialKeys_;
     std::map<int32_t, std::list<int32_t>> specialTimers_;
