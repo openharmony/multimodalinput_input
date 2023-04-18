@@ -254,5 +254,29 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetDisplayBind_009, Te
     std::string msg = "There is in InputWindowsManagerTest_GetDisplayIdNames_009";
     ASSERT_EQ(WinMgr->SetDisplayBind(-1, 1, msg), -1);
 }
+
+/**
+ * @tc.name: InputWindowsManagerTest_SetHoverScrollState_010
+ * @tc.desc: Test SetHoverScrollState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetHoverScrollState_010, TestSize.Level1)
+{
+    ASSERT_TRUE(WinMgr->SetHoverScrollState(false) == RET_OK);
+    WinMgr->SetHoverScrollState(true);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_GetHoverScrollState_011
+ * @tc.desc: Test GetHoverScrollState
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetHoverScrollState_011, TestSize.Level1)
+{
+    WinMgr->SetHoverScrollState(true);
+    ASSERT_TRUE(WinMgr->GetHoverScrollState());
+}
 } // namespace MMI
 } // namespace OHOS
