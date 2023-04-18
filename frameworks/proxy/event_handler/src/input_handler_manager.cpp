@@ -357,7 +357,7 @@ HandleEventType InputHandlerManager::GetEventType() const
     uint32_t eventType { HANDLE_EVENT_TYPE_NONE };
     if (GetHandlerType() == InputHandlerType::MONITOR) {
         if (monitorHandlers_.empty()) {
-            MMI_HILOGD("InputHandlers is empty");
+            MMI_HILOGD("monitorHandlers_ is empty");
             return HANDLE_EVENT_TYPE_NONE;
         }
         for (const auto &inputHandler : monitorHandlers_) {
