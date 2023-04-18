@@ -1229,7 +1229,9 @@ int32_t MMIService::EnableInputDevice(bool enable)
 
 int32_t MMIService::UpdateSettingsXml(const std::string &businessId, int32_t delay)
 {
-    return InputHandler->GetKeyCommandHandler()->UpdateSettingsXml(businessId, delay);
+    std::shared_ptr<KeyCommandHandler> eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
+    CHKPR(eventKeyCommandHandler, RET_ERR);
+    return eventKeyCommandHandler->UpdateSettingsXml(businessId, delay);
 }
 
 int32_t MMIService::SetKeyDownDuration(const std::string &businessId, int32_t delay)
