@@ -153,17 +153,17 @@ int32_t InputHandlerManager::AddToServer(InputHandlerType handlerType, HandleEve
 int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType handlerType)
 {
     if (handlerType == InputHandlerType::MONITOR) {
-        auto tItr = monitorHandlers_.find(handlerId);
-        if (tItr == monitorHandlers_.end()) {
+        auto iter = monitorHandlers_.find(handlerId);
+        if (iter == monitorHandlers_.end()) {
             MMI_HILOGE("No handler with specified");
             return RET_ERR;
         }
-        if (handlerType != tItr->second.handlerType_) {
+        if (handlerType != iter->second.handlerType_) {
             MMI_HILOGE("Unmatched handler type, InputHandlerType:%{public}d,FindHandlerType:%{public}d",
-                handlerType, tItr->second.handlerType_);
+                handlerType, iter->second.handlerType_);
             return RET_ERR;
         }
-        monitorHandlers_.erase(tItr);
+        monitorHandlers_.erase(iter);
     }
 
     if (handlerType == InputHandlerType::INTERCEPTOR) {
@@ -198,9 +198,9 @@ int32_t InputHandlerManager::GetNextId()
 std::shared_ptr<IInputEventConsumer> InputHandlerManager::FindHandler(int32_t handlerId)
 {
     if (GetHandlerType() == InputHandlerType::MONITOR) {
-        auto tItr = monitorHandlers_.find(handlerId);
-        if (tItr != monitorHandlers_.end()) {
-            return tItr->second.consumer_;
+        auto iter = monitorHandlers_.find(handlerId);
+        if (iter != monitorHandlers_.end()) {
+            return iter->second.consumer_;
         }
     }
     if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
