@@ -536,7 +536,7 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
     CHKPR(inputDevice, INVALID_DEVICE_ID);
     for (const auto &item : inputDevice_) {
         if (item.second.inputDeviceOrigin == inputDevice) {
-            MMI_HILOGI("Find input device id success");
+            MMI_HILOGD("Find input device id success");
             return item.first;
         }
     }
