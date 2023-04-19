@@ -49,11 +49,11 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
         eventType |= HANDLE_EVENT_TYPE_KEY;
     }
     if ((deviceTags & (CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) -
-        CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD))) != 0 ){
+        CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD))) != 0 ) {
         eventType |= HANDLE_EVENT_TYPE_POINTER;
     }
     std::lock_guard<std::mutex> guard(mtxHandlers_);
-    if ((monitorHandlers_.size() + interHandlers_.size()) >= MAX_N_INPUT_HANDLERS){
+    if ((monitorHandlers_.size() + interHandlers_.size()) >= MAX_N_INPUT_HANDLERS) {
         MMI_HILOGE("The number of handlers exceeds the maximum");
         return ERROR_EXCEED_MAX_COUNT;
     }
@@ -73,7 +73,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
         MMI_HILOGD("New handler successfully registered, report to server");
         const HandleEventType newType = GetEventType();
         if (currentType != newType) {
-            deviceTags =  GetDeviceTags();
+            deviceTags = GetDeviceTags();
             MMI_HILOGD("handlerType:%{public}d, newType:%{public}d, deviceTags:%{public}d, priority:%{public}d",
                 handlerType, newType, deviceTags, priority);
             int32_t ret = AddToServer(handlerType, newType, priority, deviceTags);
