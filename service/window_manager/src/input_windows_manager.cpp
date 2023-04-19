@@ -878,7 +878,7 @@ bool InputWindowsManager::UpdateDisplayId(int32_t& displayId)
 std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX, int32_t logicalY,
     const std::shared_ptr<PointerEvent>& pointerEvent)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     int32_t action = pointerEvent->GetPointerAction();
     if ((firstBtnDownWindowId_ == -1) ||
         ((action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) && (pointerEvent->GetPressedButtons().size() == 1)) ||
@@ -887,13 +887,13 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         for (const auto &item : displayGroupInfo_.windowsInfo) {
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
-                MMI_HILOGI("Skip the untouchable window to continue searching, "
+                MMI_HILOGD("Skip the untouchable window to continue searching, "
                            "window:%{public}d, flags:%{public}d, pid:%{public}d", item.id, item.flags, item.pid);
                 continue;
             } else if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
                 if (IsInHotArea(logicalX, logicalY, item.pointerHotAreas)) {
                     firstBtnDownWindowId_ = item.id;
-                    MMI_HILOGI("Mouse event select pull window, window:%{public}d, pid:%{public}d",
+                    MMI_HILOGD("Mouse event select pull window, window:%{public}d, pid:%{public}d",
                         firstBtnDownWindowId_, item.pid);
                     break;
                 } else {
@@ -901,13 +901,13 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
                 }
             } else if ((targetWindowId < 0) && (IsInHotArea(logicalX, logicalY, item.pointerHotAreas))) {
                 firstBtnDownWindowId_ = item.id;
-                MMI_HILOGI("Find out the dispatch window of this pointer event when the targetWindowId "
+                MMI_HILOGD("Find out the dispatch window of this pointer event when the targetWindowId "
                            "hasn't been set up yet, window:%{public}d, pid:%{public}d",
                            firstBtnDownWindowId_, item.pid);
                 break;
             } else if ((targetWindowId >= 0) && (targetWindowId == item.id)) {
                 firstBtnDownWindowId_ = targetWindowId;
-                MMI_HILOGI("Find out the dispatch window of this pointer event when the targetWindowId "
+                MMI_HILOGD("Find out the dispatch window of this pointer event when the targetWindowId "
                            "has been set up already, window:%{public}d, pid:%{public}d",
                            firstBtnDownWindowId_, item.pid);
                 break;
