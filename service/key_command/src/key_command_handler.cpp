@@ -79,7 +79,7 @@ bool IsSpecialType(int32_t keyCode, SpecialType type)
     return (it->second == SpecialType::SPECIAL_ALL || it->second == type);
 }
 
-bool GetBusinessId(const cJSON* jsonData, std::string &businessIdValue, std::vector<std::string> &businessIds_)
+bool GetBusinessId(const cJSON* jsonData, std::string &businessIdValue, std::vector<std::string> &businessIds)
 {
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("jsonData is not object");
@@ -91,7 +91,7 @@ bool GetBusinessId(const cJSON* jsonData, std::string &businessIdValue, std::vec
         return false;
     }
     businessIdValue = businessId->valuestring;
-    businessIds_.push_back(businessIdValue);
+    businessIds.push_back(businessIdValue);
     return true;
 }
 
@@ -288,13 +288,13 @@ bool PackageAbility(const cJSON* jsonAbility, Ability &ability)
     return true;
 }
 
-bool ConvertToShortcutKey(const cJSON* jsonData, ShortcutKey &shortcutKey, std::vector<std::string> &businessIds_)
+bool ConvertToShortcutKey(const cJSON* jsonData, ShortcutKey &shortcutKey, std::vector<std::string> &businessIds)
 {
     if (!cJSON_IsObject(jsonData)) {
         MMI_HILOGE("jsonData is not object");
         return false;
     }
-    if (!GetBusinessId(jsonData, shortcutKey.businessId, businessIds_)) {
+    if (!GetBusinessId(jsonData, shortcutKey.businessId, businessIds)) {
         MMI_HILOGW("Get abilityKey failed");
     }
     if (!GetPreKeys(jsonData, shortcutKey)) {
@@ -529,7 +529,7 @@ std::string GenerateKey(const ShortcutKey& key)
 }
 
 bool ParseShortcutKeys(const JsonParser& parser, std::map<std::string, ShortcutKey>& shortcutKeyMap,
-    std::vector<std::string>& businessIds_)
+    std::vector<std::string>& businessIds)
 {
     cJSON* shortkeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "Shortkeys");
     if (!cJSON_IsArray(shortkeys)) {
@@ -543,7 +543,7 @@ bool ParseShortcutKeys(const JsonParser& parser, std::map<std::string, ShortcutK
         if (!cJSON_IsObject(shortkey)) {
             continue;
         }
-        if (!ConvertToShortcutKey(shortkey, shortcutKey, businessIds_)) {
+        if (!ConvertToShortcutKey(shortkey, shortcutKey, businessIds)) {
             continue;
         }
         std::string key = GenerateKey(shortcutKey);
