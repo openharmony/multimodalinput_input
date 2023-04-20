@@ -226,7 +226,7 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint3
                 continue;
             }
             int32_t handlerId = item.first;
-            auto consumer = item.second.consumer_;
+            std::shared_ptr<IInputEventConsumer> consumer = item.second.consumer_;
             CHKPV(consumer);
             consumer->OnInputEvent(keyEvent);
             MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
@@ -238,7 +238,7 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint3
                 continue;
             }
             int32_t handlerId = item.handlerId_;
-            auto consumer = item.consumer_;
+            std::shared_ptr<IInputEventConsumer> consumer = item.consumer_;
             CHKPV(consumer);
             consumer->OnInputEvent(keyEvent);
             MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
@@ -260,7 +260,7 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
                 continue;
             }
             int32_t handlerId = item.first;
-            auto consumer = item.second.consumer_;
+            std::shared_ptr<IInputEventConsumer> consumer = item.second.consumer_;
             CHKPV(consumer);
             auto ret = consumerInfos.emplace(handlerId, consumer);
             if (!ret.second) {
@@ -276,7 +276,7 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
                 continue;
             }
             int32_t handlerId = item.handlerId_;
-            auto consumer = item.consumer_;
+            std::shared_ptr<IInputEventConsumer> consumer = item.consumer_;
             CHKPV(consumer);
             auto ret = consumerInfos.emplace(handlerId, consumer);
             if (!ret.second) {
