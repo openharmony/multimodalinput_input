@@ -44,8 +44,16 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
 {
     CALL_INFO_TRACE;
     CHKPR(consumer, INVALID_HANDLER_ID);
+    eventType = HANDLE_EVENT_TYPE_NONE;
+    if ((deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD)) != 0) {
+        eventType |= HANDLE_EVENT_TYPE_KEY;
+    }
+    if ((deviceTags & (CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) -
+        CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD))) != 0 ) {
+        eventType |= HANDLE_EVENT_TYPE_POINTER;
+    }
     std::lock_guard<std::mutex> guard(mtxHandlers_);
-    if (inputHandlers_.size() >= MAX_N_INPUT_HANDLERS) {
+    if ((monitorHandlers_.size() + interHandlers_.size()) >= MAX_N_INPUT_HANDLERS) {
         MMI_HILOGE("The number of handlers exceeds the maximum");
         return ERROR_EXCEED_MAX_COUNT;
     }
@@ -54,17 +62,20 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
         MMI_HILOGE("Exceeded limit of 32-bit maximum number of integers");
         return INVALID_HANDLER_ID;
     }
-
     if (eventType == HANDLE_EVENT_TYPE_NONE) {
         MMI_HILOGE("Invalid event type");
         return INVALID_HANDLER_ID;
     }
     const HandleEventType currentType = GetEventType();
-    MMI_HILOGD("Register new handler:%{public}d", handlerId);
+    MMI_HILOGD("Register new handler:%{public}d, currentType:%{public}d, deviceTags:%{public}d",
+        handlerId, currentType, deviceTags);
     if (RET_OK == AddLocal(handlerId, handlerType, eventType, priority, deviceTags, consumer)) {
         MMI_HILOGD("New handler successfully registered, report to server");
         const HandleEventType newType = GetEventType();
         if (currentType != newType) {
+            deviceTags = GetDeviceTags();
+            MMI_HILOGD("handlerType:%{public}d, newType:%{public}d, deviceTags:%{public}d, priority:%{public}d",
+                handlerType, newType, deviceTags, priority);
             int32_t ret = AddToServer(handlerType, newType, priority, deviceTags);
             if (ret != RET_OK) {
                 MMI_HILOGD("Handler:%{public}d permissions failed, remove the monitor", handlerId);
@@ -106,10 +117,12 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
         .deviceTags_ = deviceTags,
         .consumer_ = monitor,
     };
-    auto ret = inputHandlers_.emplace(handler.handlerId_, handler);
-    if (!ret.second) {
-        MMI_HILOGE("Duplicate handler:%{public}d", handler.handlerId_);
-        return RET_ERR;
+    if (handlerType == InputHandlerType::MONITOR) {
+        auto ret = monitorHandlers_.emplace(handler.handlerId_, handler);
+        if (!ret.second) {
+            MMI_HILOGE("Duplicate handler:%{public}d", handler.handlerId_);
+            return RET_ERR;
+        }
     }
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         auto iterIndex = interHandlers_.begin();
@@ -139,17 +152,19 @@ int32_t InputHandlerManager::AddToServer(InputHandlerType handlerType, HandleEve
 
 int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType handlerType)
 {
-    auto tItr = inputHandlers_.find(handlerId);
-    if (tItr == inputHandlers_.end()) {
-        MMI_HILOGE("No handler with specified");
-        return RET_ERR;
+    if (handlerType == InputHandlerType::MONITOR) {
+        auto iter = monitorHandlers_.find(handlerId);
+        if (iter == monitorHandlers_.end()) {
+            MMI_HILOGE("No handler with specified");
+            return RET_ERR;
+        }
+        if (handlerType != iter->second.handlerType_) {
+            MMI_HILOGE("Unmatched handler type, InputHandlerType:%{public}d,FindHandlerType:%{public}d",
+                handlerType, iter->second.handlerType_);
+            return RET_ERR;
+        }
+        monitorHandlers_.erase(iter);
     }
-    if (handlerType != tItr->second.handlerType_) {
-        MMI_HILOGE("Unmatched handler type, InputHandlerType:%{public}d,FindHandlerType:%{public}d",
-                   handlerType, tItr->second.handlerType_);
-        return RET_ERR;
-    }
-    inputHandlers_.erase(tItr);
 
     if (handlerType == InputHandlerType::INTERCEPTOR) {
         for (auto it = interHandlers_.begin(); it != interHandlers_.end(); ++it) {
@@ -182,9 +197,18 @@ int32_t InputHandlerManager::GetNextId()
 
 std::shared_ptr<IInputEventConsumer> InputHandlerManager::FindHandler(int32_t handlerId)
 {
-    auto tItr = inputHandlers_.find(handlerId);
-    if (tItr != inputHandlers_.end()) {
-        return tItr->second.consumer_;
+    if (GetHandlerType() == InputHandlerType::MONITOR) {
+        auto iter = monitorHandlers_.find(handlerId);
+        if (iter != monitorHandlers_.end()) {
+            return iter->second.consumer_;
+        }
+    }
+    if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
+        for (const auto& item : interHandlers_) {
+            if (item.handlerId_ == handlerId) {
+                return item.consumer_;
+            }
+        }
     }
     return nullptr;
 }
@@ -196,29 +220,29 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent, uint3
     CHKPV(keyEvent);
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     BytraceAdapter::StartBytrace(keyEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::KEY_INTERCEPT_EVENT);
-    if (!interHandlers_.empty()) {
-        for (const auto &item : interHandlers_) {
-            if ((item.deviceTags_ !=  deviceTags) &&
-                ((item.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY)) {
-                continue;
-            }
-            int32_t handlerId = item.handlerId_;
-            auto consumer = item.consumer_;
-            CHKPV(consumer);
-            consumer->OnInputEvent(keyEvent);
-            MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
-            break;
-        }
-    } else {
-        for (const auto &item : inputHandlers_) {
+    if (GetHandlerType() == InputHandlerType::MONITOR) {
+        for (const auto &item : monitorHandlers_) {
             if ((item.second.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
                 continue;
             }
             int32_t handlerId = item.first;
-            auto consumer = item.second.consumer_;
+            std::shared_ptr<IInputEventConsumer> consumer = item.second.consumer_;
             CHKPV(consumer);
             consumer->OnInputEvent(keyEvent);
             MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
+        }
+    }
+    if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
+        for (const auto &item : interHandlers_) {
+            if ((item.eventType_ & HANDLE_EVENT_TYPE_KEY) != HANDLE_EVENT_TYPE_KEY) {
+                continue;
+            }
+            int32_t handlerId = item.handlerId_;
+            std::shared_ptr<IInputEventConsumer> consumer = item.consumer_;
+            CHKPV(consumer);
+            consumer->OnInputEvent(keyEvent);
+            MMI_HILOGD("Key event id:%{public}d keyCode:%{public}d", handlerId, keyEvent->GetKeyCode());
+            break;
         }
     }
 }
@@ -230,14 +254,29 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
 {
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     int32_t consumerCount = 0;
-    if (!interHandlers_.empty()) {
+    if (GetHandlerType() == InputHandlerType::MONITOR) {
+        for (const auto &item : monitorHandlers_) {
+            if ((item.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
+                continue;
+            }
+            int32_t handlerId = item.first;
+            std::shared_ptr<IInputEventConsumer> consumer = item.second.consumer_;
+            CHKPV(consumer);
+            auto ret = consumerInfos.emplace(handlerId, consumer);
+            if (!ret.second) {
+                MMI_HILOGI("Duplicate handler:%{public}d", handlerId);
+                continue;
+            }
+            consumerCount++;
+        }
+    }
+    if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
         for (const auto &item : interHandlers_) {
-            if ((item.deviceTags_ !=  deviceTags) &&
-                ((item.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER)) {
+            if ((item.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
                 continue;
             }
             int32_t handlerId = item.handlerId_;
-            auto consumer = item.consumer_;
+            std::shared_ptr<IInputEventConsumer> consumer = item.consumer_;
             CHKPV(consumer);
             auto ret = consumerInfos.emplace(handlerId, consumer);
             if (!ret.second) {
@@ -246,21 +285,6 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
             }
             consumerCount++;
             break;
-        }
-    } else {
-        for (const auto &item : inputHandlers_) {
-            if ((item.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
-                continue;
-            }
-            int32_t handlerId = item.first;
-            auto consumer = item.second.consumer_;
-            CHKPV(consumer);
-            auto ret = consumerInfos.emplace(handlerId, consumer);
-            if (!ret.second) {
-                MMI_HILOGI("Duplicate handler:%{public}d", handlerId);
-                continue;
-            }
-            consumerCount++;
         }
     }
 
@@ -314,22 +338,40 @@ void InputHandlerManager::OnConnected()
 bool InputHandlerManager::HasHandler(int32_t handlerId)
 {
     std::lock_guard<std::mutex> guard(mtxHandlers_);
-    auto iter = inputHandlers_.find(handlerId);
-    return (iter != inputHandlers_.end());
+    if (GetHandlerType() == InputHandlerType::MONITOR) {
+        auto iter = monitorHandlers_.find(handlerId);
+        return (iter != monitorHandlers_.end());
+    }
+    if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
+        for (const auto& item : interHandlers_) {
+            if (item.handlerId_ == handlerId) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 HandleEventType InputHandlerManager::GetEventType() const
 {
-    if (inputHandlers_.empty()) {
-        MMI_HILOGD("InputHandlers is empty");
-        return HANDLE_EVENT_TYPE_NONE;
-    }
-    HandleEventType eventType { HANDLE_EVENT_TYPE_NONE };
-    if (!interHandlers_.empty()) {
-        eventType |= interHandlers_.front().eventType_;
-    } else {
-        for (const auto &inputHandler : inputHandlers_) {
+    uint32_t eventType { HANDLE_EVENT_TYPE_NONE };
+    if (GetHandlerType() == InputHandlerType::MONITOR) {
+        if (monitorHandlers_.empty()) {
+            MMI_HILOGD("monitorHandlers_ is empty");
+            return HANDLE_EVENT_TYPE_NONE;
+        }
+        for (const auto &inputHandler : monitorHandlers_) {
             eventType |= inputHandler.second.eventType_;
+        }
+    }
+
+    if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
+        if (interHandlers_.empty()) {
+            MMI_HILOGD("interHandlers_ is empty");
+            return HANDLE_EVENT_TYPE_NONE;
+        }
+        for (const auto &interHandler : interHandlers_) {
+            eventType |= interHandler.eventType_;
         }
     }
     return eventType;
@@ -337,26 +379,27 @@ HandleEventType InputHandlerManager::GetEventType() const
 
 int32_t InputHandlerManager::GetPriority() const
 {
-    if (inputHandlers_.empty()) {
-        MMI_HILOGD("InputHandlers is empty");
-        return DEFUALT_INTERCEPTOR_PRIORITY;
-    }
     int32_t priority { DEFUALT_INTERCEPTOR_PRIORITY };
-    if (!interHandlers_.empty()) {
-        priority = interHandlers_.front().priority_;
+    if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
+        if (!interHandlers_.empty()) {
+            priority = interHandlers_.front().priority_;
+        }
     }
     return priority;
 }
 
 uint32_t InputHandlerManager::GetDeviceTags() const
 {
-    if (inputHandlers_.empty()) {
-        MMI_HILOGD("InputHandlers is empty");
-        return DEFUALT_INTERCEPTOR_PRIORITY;
+    uint32_t deviceTags = 0;
+    if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
+        for (const auto& item : interHandlers_) {
+            deviceTags |= item.deviceTags_;
+        }
     }
-    uint32_t deviceTags { CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) };
-    if (!interHandlers_.empty()) {
-        deviceTags = interHandlers_.front().deviceTags_;
+    if (GetHandlerType() == InputHandlerType::MONITOR) {
+        for (const auto& item : monitorHandlers_) {
+            deviceTags |= item.second.deviceTags_;
+        }
     }
     return deviceTags;
 }
