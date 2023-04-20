@@ -1290,6 +1290,7 @@ enum HosKeyEventEnum {
     HOS_KEY_UWB = 2845,
     HOS_KEY_WWAN_WIMAX = 2846,
     HOS_KEY_RFKILL = 2847,
+    HOS_KEY_F26 = 2848,
 
     HOS_KEY_CHANNEL = 3001,
     HOS_KEY_BTN_0 = 3100,

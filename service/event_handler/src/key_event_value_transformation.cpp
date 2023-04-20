@@ -407,6 +407,7 @@ const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TR
     {246, {"KEY_WWAN_WIMAX", 246, 2846, HOS_KEY_WWAN_WIMAX}},
     {247, {"KEY_RFKILL", 247, 2847, HOS_KEY_RFKILL}},
     {248, {"KEY_MUTE", 248, 23, HOS_KEY_MUTE}},
+    {196, {"KEY_F26", 196, 2848, HOS_KEY_F26}},
 
     {363, {"KEY_CHANNEL", 363, 3001, HOS_KEY_CHANNEL}},
     {256, {"KEY_BTN_0", 256, 3100, HOS_KEY_BTN_0}},
