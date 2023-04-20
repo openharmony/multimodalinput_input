@@ -1227,10 +1227,17 @@ int32_t MMIService::EnableInputDevice(bool enable)
     return ret;
 }
 
+int32_t MMIService::UpdateSettingsXml(const std::string &businessId, int32_t delay)
+{
+    std::shared_ptr<KeyCommandHandler> eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
+    CHKPR(eventKeyCommandHandler, RET_ERR);
+    return eventKeyCommandHandler->UpdateSettingsXml(businessId, delay);
+}
+
 int32_t MMIService::SetKeyDownDuration(const std::string &businessId, int32_t delay)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(KeyCommandHandler::UpdateSettingsXml, businessId, delay));
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::UpdateSettingsXml, this, businessId, delay));
     if (ret != RET_OK) {
         MMI_HILOGE("Set key down duration failed: %{public}d", ret);
         return RET_ERR;

@@ -145,9 +145,15 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
 napi_value JsShortKeyManager::SetKeyDownDuration(napi_env env, const std::string &businessId, int32_t delay, napi_value handle)
 {
     CALL_DEBUG_ENTER;
+    int32_t ret = InputManager::GetInstance()->SetKeyDownDuration(businessId, delay);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Invalid param");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "param is invalid");
+        return nullptr;
+    }
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     CHKPP(asyncContext);
-    asyncContext->errorCode = InputManager::GetInstance()->SetKeyDownDuration(businessId, delay);
+    asyncContext->errorCode = ret;
     asyncContext->reserve << ReturnType::VOID;
 
     napi_value promise = nullptr;
