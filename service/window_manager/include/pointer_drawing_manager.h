@@ -37,8 +37,8 @@ class PointerDrawingManager final : public IPointerDrawingManager,
                                     public IDeviceObserver,
                                     public std::enable_shared_from_this<PointerDrawingManager> {
 public:
-    static const int32_t IMAGE_WIDTH = 64;
-    static const int32_t IMAGE_HEIGHT = 64;
+    int32_t IMAGE_WIDTH = 64;
+    int32_t IMAGE_HEIGHT = 64;
 
 public:
     PointerDrawingManager();
