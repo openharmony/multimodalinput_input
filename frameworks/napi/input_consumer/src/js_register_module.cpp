@@ -172,7 +172,7 @@ static bool MatchCombinationKeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     MMI_HILOGD("infoFinalKey:%{public}d,keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
     if (infoFinalKey != keyEventFinalKey || items.size() > PRE_KEYS_SIZE ||
         !IsMatchKeyAction(isFinalKeydown, keyEvent->GetKeyAction())) {
-        MMI_HILOGE("Param invalid");
+        MMI_HILOGD("Param invalid");
         return false;
     }
     std::set<int32_t> infoPreKeys = keyOption->GetPreKeys();

@@ -768,7 +768,7 @@ void InputManagerImpl::OnConnected()
     CALL_DEBUG_ENTER;
     ReAddInputEventFilter();
     if (displayGroupInfo_.windowsInfo.empty() || displayGroupInfo_.displaysInfo.empty()) {
-        MMI_HILOGI("The windows info or display info is empty");
+        MMI_HILOGD("The windows info or display info is empty");
         return;
     }
     SendDisplayInfo();
