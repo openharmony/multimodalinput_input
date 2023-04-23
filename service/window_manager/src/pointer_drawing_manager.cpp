@@ -319,7 +319,7 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
     imageWidth_ = displayInfo.dpi * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
     imageHeight_ = displayInfo.dpi * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
     IMAGE_WIDTH = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
-    IMAGE_WIDTH = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+    IMAGE_HEIGHT = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
 }
 
 void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo)
