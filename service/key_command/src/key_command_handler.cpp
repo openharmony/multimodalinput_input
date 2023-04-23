@@ -917,7 +917,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
     }
 
     if (!AddSequenceKey(keyEvent)) {
-        MMI_HILOGW("Add new sequence key failed");
+        MMI_HILOGD("Add new sequence key failed");
         return false;
     }
 

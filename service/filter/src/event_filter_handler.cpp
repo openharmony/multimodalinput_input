@@ -113,7 +113,7 @@ int32_t EventFilterHandler::RemoveInputEventFilter(int32_t filterId, int32_t cli
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(lockFilter_);
     if (filters_.empty()) {
-        MMI_HILOGI("Filter is empty");
+        MMI_HILOGD("Filter is empty");
         return RET_OK;
     }
     for (auto it = filters_.begin(); it != filters_.end();) {

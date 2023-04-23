@@ -181,7 +181,7 @@ bool InputDeviceManager::GetDeviceConfig(int32_t deviceId, int32_t &keyboardType
     auto deviceConfig = KeyRepeat->GetDeviceConfig();
     auto it = deviceConfig.find(deviceId);
     if (it == deviceConfig.end()) {
-        MMI_HILOGE("Failed to obtain the keyboard type of the configuration file");
+        MMI_HILOGD("Failed to obtain the keyboard type of the configuration file");
         return false;
     }
     keyboardType = it->second.keyboardType;

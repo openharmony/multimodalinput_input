@@ -262,7 +262,7 @@ void KeySubscriberHandler::ClearTimer(const std::shared_ptr<Subscriber> &subscri
     CHKPV(subscriber);
 
     if (subscriber->timerId_ < 0) {
-        MMI_HILOGW("Leave, subscribeId:%{public}d, null timerId < 0", subscriber->id_);
+        MMI_HILOGD("Leave, subscribeId:%{public}d, null timerId < 0", subscriber->id_);
         return;
     }
 

@@ -59,7 +59,7 @@ bool PermissionHelper::CheckPermission(uint32_t required)
     if (tokenType == OHOS::Security::AccessToken::TOKEN_HAP) {
         return CheckHapPermission(tokenId, required);
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE) {
-        MMI_HILOGI("Token type is native");
+        MMI_HILOGD("Token type is native");
         return true;
     } else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
         MMI_HILOGI("Token type is shell");
