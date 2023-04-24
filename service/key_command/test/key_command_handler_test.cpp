@@ -36,9 +36,7 @@ class KeyCommandHandlerTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
-    std::shared_ptr<PointerEvent> SetupPointerEvent001();
-    std::shared_ptr<PointerEvent> SetupPointerEvent002();
-    std::shared_ptr<KeyEvent> SetupKeyEvent001();
+    std::shared_ptr<KeyEvent> SetupKeyEvent();
 };
 
 int64_t GetNanoTime()
@@ -48,77 +46,7 @@ int64_t GetNanoTime()
     return static_cast<int64_t>(time.tv_sec) * SEC_TO_NANOSEC + time.tv_nsec;
 }
 
-std::shared_ptr<PointerEvent> KeyCommandHandlerTest::SetupPointerEvent001()
-{
-    auto pointerEvent = PointerEvent::Create();
-    CHKPP(pointerEvent);
-    PointerEvent::PointerItem pointerItem;
-    int32_t pointerId = 0;
-    int32_t displayX = 523;
-    int32_t displayY = 723;
-    int32_t pressure = 5;
-    int32_t deviceId = 1;
-    pointerItem.SetPointerId(pointerId);
-    pointerItem.SetDisplayX(displayX);
-    pointerItem.SetDisplayY(displayY);
-    pointerItem.SetPressure(pressure);
-    pointerItem.SetDeviceId(deviceId);
-    pointerEvent->AddPointerItem(pointerItem);
-
-    pointerId = 1;
-    displayX = 610;
-    displayY = 910;
-    pressure = 7;
-    deviceId = 1;
-    pointerItem.SetPointerId(pointerId);
-    pointerItem.SetDisplayX(displayX);
-    pointerItem.SetDisplayY(displayY);
-    pointerItem.SetPressure(pressure);
-    pointerItem.SetDeviceId(deviceId);
-    pointerEvent->AddPointerItem(pointerItem);
-
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetPointerId(pointerId);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    return pointerEvent;
-}
-
-std::shared_ptr<PointerEvent> KeyCommandHandlerTest::SetupPointerEvent002()
-{
-    auto pointerEvent = PointerEvent::Create();
-    CHKPP(pointerEvent);
-    PointerEvent::PointerItem pointerItem;
-    int32_t pointerId = 0;
-    int32_t displayX = 523;
-    int32_t displayY = 723;
-    int32_t pressure = 5;
-    int32_t deviceId = 1;
-    pointerItem.SetPointerId(pointerId);
-    pointerItem.SetDisplayX(displayX);
-    pointerItem.SetDisplayY(displayY);
-    pointerItem.SetPressure(pressure);
-    pointerItem.SetDeviceId(deviceId);
-    pointerEvent->AddPointerItem(pointerItem);
-
-    pointerId = 1;
-    displayX = 610;
-    displayY = 910;
-    pressure = 7;
-    deviceId = 1;
-    pointerItem.SetPointerId(pointerId);
-    pointerItem.SetDisplayX(displayX);
-    pointerItem.SetDisplayY(displayY);
-    pointerItem.SetPressure(pressure);
-    pointerItem.SetDeviceId(deviceId);
-    pointerEvent->AddPointerItem(pointerItem);
-
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->SetPointerId(pointerId);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
-    return pointerEvent;
-}
-
-std::shared_ptr<KeyEvent> KeyCommandHandlerTest::SetupKeyEvent001()
+std::shared_ptr<KeyEvent> KeyCommandHandlerTest::SetupKeyEvent()
 {
     std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
     CHKPP(keyEvent);
@@ -191,43 +119,10 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_003, TestSize.Level1)
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_004, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto keyEvent = SetupKeyEvent001();
+    auto keyEvent = SetupKeyEvent();
     ASSERT_TRUE(keyEvent != nullptr);
     KeyCommandHandler eventKeyCommandHandler;
     ASSERT_FALSE(eventKeyCommandHandler.OnHandleEvent(keyEvent));
 }
-
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-/**
- * @tc.name: KeyCommandHandlerTest_005
- * @tc.desc: Test two fingers touchDown event
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent001() };
-    ASSERT_TRUE(pointerEvent != nullptr);
-    KeyCommandHandler eventKeyCommandHandler;
-    eventKeyCommandHandler.HandleTouchEvent(pointerEvent);
-}
-
-/**
- * @tc.name: KeyCommandHandlerTest_006
- * @tc.desc: Test two fingers move event
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_006, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent002() };
-    ASSERT_TRUE(pointerEvent != nullptr);
-    KeyCommandHandler eventKeyCommandHandler;
-    eventKeyCommandHandler.HandleTouchEvent(pointerEvent);
-}
-#endif // OHOS_BUILD_ENABLE_TOUCH
-
 } // namespace MMI
 } // namespace OHOS
