@@ -53,22 +53,32 @@ std::shared_ptr<PointerEvent> KeyCommandHandlerTest::SetupPointerEvent001()
     auto pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
     PointerEvent::PointerItem pointerItem;
-    pointerItem.SetPointerId(0);
-    pointerItem.SetDisplayX(523);
-    pointerItem.SetDisplayY(723);
-    pointerItem.SetPressure(5);
-    pointerItem.SetDeviceId(1);
+    int32_t pointerId = 0;
+    int32_t displayX = 523;
+    int32_t displayY = 723;
+    int32_t pressure = 5;
+    int32_t deviceId = 1;
+    pointerItem.SetPointerId(pointerId);
+    pointerItem.SetDisplayX(displayX);
+    pointerItem.SetDisplayY(displayY);
+    pointerItem.SetPressure(pressure);
+    pointerItem.SetDeviceId(deviceId);
     pointerEvent->AddPointerItem(pointerItem);
 
-    pointerItem.SetPointerId(1);
-    pointerItem.SetDisplayX(610);
-    pointerItem.SetDisplayY(910);
-    pointerItem.SetPressure(7);
-    pointerItem.SetDeviceId(1);
+    pointerId = 1;
+    displayX = 610;
+    displayY = 910;
+    pressure = 7;
+    deviceId = 1;
+    pointerItem.SetPointerId(pointerId);
+    pointerItem.SetDisplayX(displayX);
+    pointerItem.SetDisplayY(displayY);
+    pointerItem.SetPressure(pressure);
+    pointerItem.SetDeviceId(deviceId);
     pointerEvent->AddPointerItem(pointerItem);
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerId(pointerId);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     return pointerEvent;
 }
@@ -78,22 +88,32 @@ std::shared_ptr<PointerEvent> KeyCommandHandlerTest::SetupPointerEvent002()
     auto pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
     PointerEvent::PointerItem pointerItem;
-    pointerItem.SetPointerId(0);
-    pointerItem.SetDisplayX(523);
-    pointerItem.SetDisplayY(723);
-    pointerItem.SetPressure(5);
-    pointerItem.SetDeviceId(1);
+    int32_t pointerId = 0;
+    int32_t displayX = 523;
+    int32_t displayY = 723;
+    int32_t pressure = 5;
+    int32_t deviceId = 1;
+    pointerItem.SetPointerId(pointerId);
+    pointerItem.SetDisplayX(displayX);
+    pointerItem.SetDisplayY(displayY);
+    pointerItem.SetPressure(pressure);
+    pointerItem.SetDeviceId(deviceId);
     pointerEvent->AddPointerItem(pointerItem);
 
-    pointerItem.SetPointerId(1);
-    pointerItem.SetDisplayX(610);
-    pointerItem.SetDisplayY(910);
-    pointerItem.SetPressure(7);
-    pointerItem.SetDeviceId(1);
+    pointerId = 1;
+    displayX = 610;
+    displayY = 910;
+    pressure = 7;
+    deviceId = 1;
+    pointerItem.SetPointerId(pointerId);
+    pointerItem.SetDisplayX(displayX);
+    pointerItem.SetDisplayY(displayY);
+    pointerItem.SetPressure(pressure);
+    pointerItem.SetDeviceId(deviceId);
     pointerEvent->AddPointerItem(pointerItem);
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerId(pointerId);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     return pointerEvent;
 }
