@@ -201,6 +201,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/dfx/include",
     "${mmi_path}/service/event_dispatch/include",
     "${mmi_path}/service/key_event_normalize/include",
+    "${mmi_path}/service/key_command/include",
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/event_dump/include",
     "${mmi_path}/service/libinput_adapter/include",
@@ -209,14 +210,17 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/service/monitor/include",
     "${mmi_path}/service/mouse_event_normalize/include",
     "${mmi_path}/service/window_manager/include",
+    "${mmi_path}/test/unittest/common/include",
     "${mmi_path}/uinput",
     "$root_out_dir/diff_libinput_mmi/export_include",
     "//third_party/node/src",
   ]
 
   sources = [
+    "${mmi_path}/test/unittest/common/src/system_info.cpp",
     "dfx/test/dfx_hisysevent_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
+    "key_command/test/key_command_handler_test.cpp",
     "module_loader/test/uds_server_test.cpp",
     "monitor/test/event_monitor_handler_test.cpp",
     "mouse_event_normalize/test/mouse_device_state_test.cpp",
