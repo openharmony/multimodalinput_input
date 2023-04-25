@@ -267,6 +267,22 @@ public:
         std::function<void(std::vector<bool>&)> callback);
 
     /**
+     * @brief Sets the number of the mouse scrolling rows.
+     * @param rows Indicates the number of the mouse scrolling rows.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t SetMouseScrollRows(int32_t rows);
+
+    /**
+     * @brief Gets the number of the mouse scrolling rows.
+     * @param rows Indicates the number of the mouse scrolling rows.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t GetMouseScrollRows(int32_t &rows);
+
+    /**
      * @brief Sets mouse primary button.
      * @param primaryButton Indicates the ID of the mouse primary button.The value 0 indicates that
      * the primary button is left button.The value 1 indicates that the primary button is right button.

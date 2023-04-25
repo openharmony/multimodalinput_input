@@ -41,6 +41,8 @@ public:
     int32_t RemoveInputEventFilter(int32_t filterId);
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
+    int32_t SetMouseScrollRows(int32_t rows);
+    int32_t GetMouseScrollRows(int32_t &rows);
     int32_t SetMousePrimaryButton(int32_t primaryButton);
     int32_t GetMousePrimaryButton(int32_t &primaryButton);
     int32_t SetHoverScrollState(bool state);
