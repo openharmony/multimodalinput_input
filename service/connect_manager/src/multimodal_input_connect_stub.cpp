@@ -50,6 +50,8 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::ALLOC_SOCKET_FD, &MultimodalInputConnectStub::StubHandleAllocSocketFd},
         {IMultimodalInputConnect::ADD_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubAddInputEventFilter},
         {IMultimodalInputConnect::RMV_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubRemoveInputEventFilter},
+        {IMultimodalInputConnect::SET_MOUSE_SCROLL_ROWS, &MultimodalInputConnectStub::StubSetMouseScrollRows},
+        {IMultimodalInputConnect::GET_MOUSE_SCROLL_ROWS, &MultimodalInputConnectStub::StubGetMouseScrollRows},
         {IMultimodalInputConnect::SET_MOUSE_PRIMARY_BUTTON, &MultimodalInputConnectStub::StubSetMousePrimaryButton},
         {IMultimodalInputConnect::GET_MOUSE_PRIMARY_BUTTON, &MultimodalInputConnectStub::StubGetMousePrimaryButton},
         {IMultimodalInputConnect::SET_HOVER_SCROLL_STATE, &MultimodalInputConnectStub::StubSetHoverScrollState},
@@ -173,6 +175,62 @@ int32_t MultimodalInputConnectStub::StubRemoveInputEventFilter(MessageParcel& da
         return ret;
     }
     MMI_HILOGD("Success pid:%{public}d", GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetMouseScrollRows(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    int32_t rows = 3; // the initial number of scrolling rows is 3.
+    READINT32(data, rows, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetMouseScrollRows(rows);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetMouseScrollRows failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success rows:%{public}d, pid:%{public}d", rows, GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetMouseScrollRows(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    int32_t rows = 3; // the initial number of scrolling rows is 3.
+    int32_t ret = GetMouseScrollRows(rows);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetMouseScrollRows failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEINT32(reply, rows, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("mouse scroll rows:%{public}d, ret:%{public}d", rows, ret);
     return RET_OK;
 }
 

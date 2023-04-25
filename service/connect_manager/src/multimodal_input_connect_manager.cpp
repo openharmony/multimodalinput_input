@@ -124,6 +124,18 @@ int32_t MultimodalInputConnectManager::RemoveInputEventFilter(int32_t filterId)
     return multimodalInputConnectService_->RemoveInputEventFilter(filterId);    
 }
 
+int32_t MultimodalInputConnectManager::SetMouseScrollRows(int32_t rows)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetMouseScrollRows(rows);
+}
+
+int32_t MultimodalInputConnectManager::GetMouseScrollRows(int32_t &rows)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetMouseScrollRows(rows);
+}
+
 int32_t MultimodalInputConnectManager::SetMousePrimaryButton(int32_t primaryButton)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);

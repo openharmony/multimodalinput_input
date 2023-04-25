@@ -218,6 +218,44 @@ napi_value JsPointerManager::GetPointerSpeed(napi_env env, napi_value handle)
     return promise;
 }
 
+napi_value JsPointerManager::SetMouseScrollRows(napi_env env, int32_t rows, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+    asyncContext->errorCode = InputManager::GetInstance()->SetMouseScrollRows(rows);
+    asyncContext->reserve << ReturnType::VOID;
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::GetMouseScrollRows(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+    int32_t rows = 3;
+    asyncContext->errorCode = InputManager::GetInstance()->GetMouseScrollRows(rows);
+    asyncContext->reserve << ReturnType::NUMBER << rows;
+    napi_value promise = nullptr;
+    uint32_t initial_refcount = 1;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, initial_refcount, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
 napi_value JsPointerManager::SetPointerStyle(napi_env env, int32_t windowid, int32_t pointerStyle, napi_value handle)
 {
     CALL_DEBUG_ENTER;

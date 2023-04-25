@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "gtest/gtest.h"
+#include <cstdio>
 
 #include <fstream>
 
@@ -265,6 +266,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_SetHoverScrollState_01
 {
     ASSERT_TRUE(WinMgr->SetHoverScrollState(false) == RET_OK);
     WinMgr->SetHoverScrollState(true);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    remove(mouseFileName);
 }
 
 /**
@@ -277,6 +280,8 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetHoverScrollState_01
 {
     WinMgr->SetHoverScrollState(true);
     ASSERT_TRUE(WinMgr->GetHoverScrollState());
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    remove(mouseFileName);
 }
 } // namespace MMI
 } // namespace OHOS
