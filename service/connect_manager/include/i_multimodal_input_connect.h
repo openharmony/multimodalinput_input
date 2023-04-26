@@ -77,8 +77,8 @@ public:
         SET_KEY_DOWN_DURATION = 40,
         SET_HOVER_SCROLL_STATE = 41,
         GET_HOVER_SCROLL_STATE = 42,
-        SET_MOUSE_SCROLL_ROWS =43,
-        GET_MOUSE_SCROLL_ROWS =44,
+        SET_MOUSE_SCROLL_ROWS = 43,
+        GET_MOUSE_SCROLL_ROWS = 44,
     };
 
     enum {
