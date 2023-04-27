@@ -1222,7 +1222,7 @@ void KeyCommandHandler::InterruptTimers()
 int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int32_t delay)
 {
     CALL_DEBUG_ENTER;
-    if (businessId.empty() || busiessIds_.empty()) {
+    if (businessId.empty() || businessIds_.empty()) {
         MMI_HILOGE(businessId or businessIds_ is empty);
         return RET_ERR;
     }
