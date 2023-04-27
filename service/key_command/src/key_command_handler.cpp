@@ -1222,12 +1222,16 @@ void KeyCommandHandler::InterruptTimers()
 int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int32_t delay)
 {
     CALL_DEBUG_ENTER;
-    if (delay < MIN_SHORT_KEY_DOWN_DURATION || delay > MAX_SHORT_KEY_DOWN_DURATION) {
-        MMI_HILOGE("delay must be number and bigger and equal zero and less than max short key down duration.");
+    if (businessId.empty() || busiessIds_.empty()) {
+        MMI_HILOGE(businessId or businessIds_ is empty);
         return RET_ERR;
     }
-    if (businessId.empty()) {
-        MMI_HILOGE("businessId is empty.");
+    if (std::find(businessIds_.begin(), businessIds_.end(), businessId) == businessIds_.end()) {
+        MMI_HILOGE("%{public}s is not in the config file", businessId.c_str());
+        return RET_ERR;
+    }
+    if (delay < MIN_SHORT_KEY_DOWN_DURATION || delay > MAX_SHORT_KEY_DOWN_DURATION) {
+        MMI_HILOGE("delay must be number and bigger and equal zero and less than max short key down duration.");
         return RET_ERR;
     }
     std::shared_ptr<NativePreferences::Preferences> pref = NativePreferences::PreferencesHelper::GetPreferences(shortKeyFileName, errno);
