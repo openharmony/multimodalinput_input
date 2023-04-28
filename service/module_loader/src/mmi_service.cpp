@@ -880,7 +880,7 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string& 
 
 int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t pid = GetCallingPid();
     int32_t ret = delegateTasks_.PostSyncTask(

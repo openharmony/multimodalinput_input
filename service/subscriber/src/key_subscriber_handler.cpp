@@ -68,7 +68,7 @@ void KeySubscriberHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> 
 int32_t KeySubscriberHandler::SubscribeKeyEvent(
     SessionPtr sess, int32_t subscribeId, std::shared_ptr<KeyOption> keyOption)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (subscribeId < 0) {
         MMI_HILOGE("Invalid subscribe");
         return RET_ERR;
