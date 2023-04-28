@@ -935,7 +935,7 @@ napi_value JsEventTarget::GreateBusinessError(napi_env env, int32_t errCode, std
 
 napi_value JsEventTarget::CreateCallbackInfo(napi_env env, napi_value handle, sptr<JsUtil::CallbackInfo> cb)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPP(cb);
     cb->env = env;
     napi_value promise = nullptr;
