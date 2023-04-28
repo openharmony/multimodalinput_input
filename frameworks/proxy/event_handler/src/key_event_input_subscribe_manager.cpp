@@ -91,7 +91,7 @@ bool KeyEventInputSubscribeManager::SubscribeKeyEventInfo::operator<(const Subsc
 int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
     std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHKPR(keyOption, INVALID_SUBSCRIBE_ID);
     CHKPR(callback, INVALID_SUBSCRIBE_ID);
     std::set<int32_t> preKeys = keyOption->GetPreKeys();
