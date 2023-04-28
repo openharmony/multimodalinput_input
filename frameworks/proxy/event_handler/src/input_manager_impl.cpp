@@ -195,7 +195,7 @@ EventHandlerPtr InputManagerImpl::GetEventHandler() const
 void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     CHKPV(inputEventConsumer);
     CHKPV(eventHandler);
@@ -211,7 +211,7 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
 int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
     std::function<void(std::shared_ptr<KeyEvent>)> callback)
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     CHK_PID_AND_TID();
     std::lock_guard<std::mutex> guard(mtx_);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -798,7 +798,7 @@ void InputManagerImpl::SendDisplayInfo()
 
 void InputManagerImpl::ReAddInputEventFilter()
 {
-    CALL_INFO_TRACE;
+    CALL_DEBUG_ENTER;
     if (eventFilterServices_.size() > MAX_FILTER_NUM) {
         MMI_HILOGE("Too many filters, size:%{public}zu", eventFilterServices_.size());
         return;

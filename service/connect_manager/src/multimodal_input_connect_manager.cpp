@@ -63,7 +63,7 @@ int32_t MultimodalInputConnectManager::AllocSocketPair(const int32_t moduleType)
         return RET_ERR;
     }
 
-    MMI_HILOGI("AllocSocketPair success. socketFd_:%{public}d tokenType_:%{public}d", socketFd_, tokenType_);
+    MMI_HILOGD("AllocSocketPair success. socketFd_:%{public}d tokenType_:%{public}d", socketFd_, tokenType_);
     return RET_OK;
 }
 

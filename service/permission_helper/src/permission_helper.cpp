@@ -99,7 +99,7 @@ bool PermissionHelper::CheckHapPermission(uint32_t tokenId, uint32_t required)
             findInfo.bundleName.c_str(), findInfo.apl, required);
         return false;
     }
-    MMI_HILOGI("Check hap permission success");
+    MMI_HILOGD("Check hap permission success");
     return true;
 }
 
@@ -111,7 +111,7 @@ bool PermissionHelper::CheckMonitorPermission(uint32_t tokenId)
         MMI_HILOGE("Check monitor permission failed ret:%{public}d", ret);
         return false;
     }
-    MMI_HILOGI("Check monitor permission success");
+    MMI_HILOGD("Check monitor permission success");
     return true;
 }
 

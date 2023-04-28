@@ -90,7 +90,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     CHKPV(session);
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
-        MMI_HILOGW("The pointer event does not report normally, application not response");
+        MMI_HILOGD("The pointer event does not report normally, application not response");
         return;
     }
     auto pointerEvent = std::make_shared<PointerEvent>(*point);
