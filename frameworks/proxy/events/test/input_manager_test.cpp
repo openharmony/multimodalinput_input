@@ -3567,8 +3567,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMousePrimaryButton_002, TestSize.
     CALL_TEST_DEBUG;
     int32_t primaryButton = -1;
     ASSERT_TRUE(InputManager::GetInstance()->SetMousePrimaryButton(primaryButton) == RET_ERR);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
