@@ -165,7 +165,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetMousePrimaryButton_
     int32_t primaryButton = 1;
     ASSERT_TRUE(MouseEventHdr->SetMousePrimaryButton(primaryButton) == RET_OK);
     const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    remove(mouseFileName);
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -181,7 +181,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetMousePrimaryButton_
     int32_t primaryButtonRes = 1;
     ASSERT_TRUE(MouseEventHdr->GetMousePrimaryButton() == primaryButtonRes);
     const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    remove(mouseFileName);
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -195,7 +195,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetMouseScrollRows_011
     int32_t rows = 1;
     ASSERT_TRUE(MouseEventHdr->SetMouseScrollRows(rows) == RET_OK);
     const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    remove(mouseFileName);
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -211,7 +211,7 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetMouseScrollRows_012
     int32_t newRows = 50;
     ASSERT_TRUE(MouseEventHdr->GetMouseScrollRows() == newRows);
     const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    remove(mouseFileName);
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 }
 }
