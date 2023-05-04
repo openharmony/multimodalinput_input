@@ -245,9 +245,9 @@ napi_value JsPointerManager::GetMouseScrollRows(napi_env env, napi_value handle)
     asyncContext->errorCode = InputManager::GetInstance()->GetMouseScrollRows(rows);
     asyncContext->reserve << ReturnType::NUMBER << rows;
     napi_value promise = nullptr;
-    uint32_t initial_refcount = 1;
+    uint32_t initialRefCount = 1;
     if (handle != nullptr) {
-        CHKRP(napi_create_reference(env, handle, initial_refcount, &asyncContext->callback), CREATE_REFERENCE);
+        CHKRP(napi_create_reference(env, handle, initialRefCount, &asyncContext->callback), CREATE_REFERENCE);
         CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
     } else {
         CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
