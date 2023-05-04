@@ -209,7 +209,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetMousePrimar
     int32_t primaryButton = 1;
     ASSERT_TRUE(processor.SetMousePrimaryButton(primaryButton) == RET_OK);
     const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    remove(mouseFileName);
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -227,7 +227,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetMousePrimar
     int32_t primaryButtonRes = 1;
     ASSERT_TRUE(processor.GetMousePrimaryButton() == primaryButtonRes);
     const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    remove(mouseFileName);
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -243,7 +243,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetMouseScroll
     int32_t rows = 1;
     ASSERT_TRUE(processor.SetMouseScrollRows(rows) == RET_OK);
     const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    remove(mouseFileName);
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -261,7 +261,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetMouseScroll
     int32_t newRows = 1;
     ASSERT_TRUE(processor.GetMouseScrollRows() == newRows);
     const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    remove(mouseFileName);
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 }
 }
