@@ -1231,7 +1231,7 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
         return RET_ERR;
     }
     if (delay < MIN_SHORT_KEY_DOWN_DURATION || delay > MAX_SHORT_KEY_DOWN_DURATION) {
-        MMI_HILOGE("delay must be number and bigger and equal zero and less than max short key down duration.");
+        MMI_HILOGE("delay is not in valid range.");
         return RET_ERR;
     }
     std::shared_ptr<NativePreferences::Preferences> pref = NativePreferences::PreferencesHelper::GetPreferences(shortKeyFileName, errno);
