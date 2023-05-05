@@ -62,6 +62,8 @@ public:
     static int32_t GetDisplayId();
     static int32_t SetMousePrimaryButton(int32_t primaryButton);
     static int32_t GetMousePrimaryButton();
+    static int32_t SetMouseScrollRows(int rows);
+    static int32_t GetMouseScrollRows();
     static int32_t SetPointerSpeed(int32_t speed);
     static int32_t GetPointerSpeed();
     bool GetSpeedGain(double vin, double &gain);

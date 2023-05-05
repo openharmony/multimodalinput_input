@@ -131,6 +131,16 @@ void MouseEventNormalize::Dump(int32_t fd, const std::vector<std::string> &args)
     processor->Dump(fd, args);
 }
 
+int32_t MouseEventNormalize::SetMouseScrollRows(int32_t rows)
+{
+    return MouseTransformProcessor::SetMouseScrollRows(rows);
+}
+
+int32_t MouseEventNormalize::GetMouseScrollRows() const
+{
+    return MouseTransformProcessor::GetMouseScrollRows();
+}
+
 int32_t MouseEventNormalize::SetMousePrimaryButton(int32_t primaryButton)
 {
     return MouseTransformProcessor::SetMousePrimaryButton(primaryButton);

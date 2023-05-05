@@ -77,6 +77,8 @@ public:
         SET_KEY_DOWN_DURATION = 40,
         SET_HOVER_SCROLL_STATE = 41,
         GET_HOVER_SCROLL_STATE = 42,
+        SET_MOUSE_SCROLL_ROWS = 43,
+        GET_MOUSE_SCROLL_ROWS = 44,
     };
 
     enum {
@@ -91,6 +93,8 @@ public:
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
         uint32_t deviceTags) = 0;
     virtual int32_t RemoveInputEventFilter(int32_t filterId) = 0;
+    virtual int32_t SetMouseScrollRows(int32_t rows) = 0;
+    virtual int32_t GetMouseScrollRows(int32_t &rows) = 0;
     virtual int32_t SetMousePrimaryButton(int32_t primaryButton) = 0;
     virtual int32_t GetMousePrimaryButton(int32_t &primaryButton) = 0;
     virtual int32_t SetHoverScrollState(bool state) = 0;

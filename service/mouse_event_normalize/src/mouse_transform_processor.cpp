@@ -43,6 +43,10 @@ constexpr double DOUBLE_ZERO = 1e-6;
 constexpr int32_t MIN_SPEED = 1;
 constexpr int32_t MAX_SPEED = 11;
 constexpr int32_t DEFAULT_SPEED = 5;
+constexpr int32_t DEFAULT_ROWS = 3;
+constexpr int32_t MIN_ROWS = 1;
+constexpr int32_t MAX_ROWS = 100;
+const std::string mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
 const std::vector<AccelerateCurve> ACCELERATE_CURVES {
     { { 8, 32, 128 }, { 0.16, 0.30, 0.56 }, { 0.0, -1.12, -9.44 } },
     { { 8, 32, 128 }, { 0.32, 0.60, 1.12 }, { 0.0, -2.24, -18.88 } },
@@ -214,6 +218,54 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
     return RET_OK;
 }
 
+int32_t MouseTransformProcessor::SetMouseScrollRows(int32_t rows)
+{
+    CALL_DEBUG_ENTER;
+    if (rows < MIN_ROWS) {
+        rows = MIN_ROWS;
+    } else if (rows > MAX_ROWS) {
+        rows = MAX_ROWS;
+    }
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
+        return RET_ERR;
+    }
+    std::string name = "rows";
+    int32_t ret = pref->PutInt(name, rows);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Put rows is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    ret = pref->FlushSync();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("Set mouse scroll rows successfully, rows:%{public}d", rows);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
+    return RET_OK;
+}
+
+int32_t MouseTransformProcessor::GetMouseScrollRows()
+{
+    CALL_DEBUG_ENTER;
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
+        return RET_ERR;
+    }
+    std::string name = "rows";
+    int32_t rows = pref->GetInt(name, DEFAULT_ROWS);
+    MMI_HILOGD("Get mouse scroll rows successfully, rows:%{public}d", rows);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
+    return rows;
+}
+
 int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* data)
 {
     CALL_DEBUG_ENTER;
@@ -248,12 +300,15 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
         MMI_HILOGD("Axis begin");
     }
 
+    const int32_t initRows = 3;
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_VERTICAL);
+        axisValue = GetMouseScrollRows() * (axisValue / initRows);
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, axisValue);
     }
     if (libinput_event_pointer_has_axis(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL)) {
         double axisValue = libinput_event_pointer_get_axis_value(data, LIBINPUT_POINTER_AXIS_SCROLL_HORIZONTAL);
+        axisValue = GetMouseScrollRows() * (axisValue / initRows);
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }
     return RET_OK;
@@ -440,7 +495,7 @@ int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
     }
     std::string name = "primaryButton";
     pref->PutInt(name, primaryButton);
-    int ret = pref->FlushSync();
+    int32_t ret = pref->FlushSync();
     if (ret != RET_OK) {
         MMI_HILOGE("flush sync is failed, ret:%{public}d", ret);
         return RET_ERR;

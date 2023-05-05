@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <cstdio>
+
 #include "event_log_helper.h"
 #include "event_util_test.h"
 #include "input_handler_type.h"
@@ -3504,6 +3506,40 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetPointerStyle_002, TestSize.Level1
 }
 
 /**
+ * @tc.name: InputManagerTest_SetMouseScrollRows_001
+ * @tc.desc: Sets mouse scroll rows
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMouseScrollRows_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rows = 1;
+    ASSERT_TRUE(InputManager::GetInstance()->SetMouseScrollRows(rows) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetMouseScrollRows_001
+ * @tc.desc: Sets mouse scroll rows
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetMouseScrollRows_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rows = 50;
+    int32_t newRows = 3;
+    if (InputManager::GetInstance()->SetMouseScrollRows(rows) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetMouseScrollRows(newRows) == RET_OK);
+        ASSERT_EQ(rows, newRows);
+    }
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
  * @tc.name: InputManagerTest_SetMousePrimaryButton_001
  * @tc.desc: Sets mouse primary button
  * @tc.type: FUNC
@@ -3516,6 +3552,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMousePrimaryButton_001, TestSize.
     ASSERT_TRUE(InputManager::GetInstance()->SetMousePrimaryButton(primaryButton) == RET_OK);
     primaryButton = 0;
     ASSERT_TRUE(InputManager::GetInstance()->SetMousePrimaryButton(primaryButton) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -3545,6 +3583,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetMousePrimaryButton_001, TestSize.
         ASSERT_TRUE(InputManager::GetInstance()->GetMousePrimaryButton(primaryButton) == RET_OK);
         ASSERT_EQ(primaryButton, PrimaryButton::RIGHT_BUTTON);
     }
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -3558,6 +3598,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetHoverScrollState_001, TestSize.Le
     CALL_TEST_DEBUG;
     ASSERT_TRUE(InputManager::GetInstance()->SetHoverScrollState(false) == RET_OK);
     InputManager::GetInstance()->SetHoverScrollState(true);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -3570,6 +3612,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetHoverScrollState_002, TestSize.Le
 {
     CALL_TEST_DEBUG;
     ASSERT_TRUE(InputManager::GetInstance()->SetHoverScrollState(true) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -3586,6 +3630,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetHoverScrollState_001, TestSize.Le
         ASSERT_TRUE(InputManager::GetInstance()->GetHoverScrollState(state) == RET_OK);
         ASSERT_TRUE(state);
     }
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <cstdio>
 #include <gtest/gtest.h>
 
 #include "libinput.h"
@@ -163,6 +164,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetMousePrimaryButton_
 {
     int32_t primaryButton = 1;
     ASSERT_TRUE(MouseEventHdr->SetMousePrimaryButton(primaryButton) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -177,6 +180,38 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetMousePrimaryButton_
     MouseEventHdr->SetMousePrimaryButton(primaryButton);
     int32_t primaryButtonRes = 1;
     ASSERT_TRUE(MouseEventHdr->GetMousePrimaryButton() == primaryButtonRes);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_SetMouseScrollRows_011
+ * @tc.desc: Test SetMouseScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetMouseScrollRows_011, TestSize.Level1)
+{
+    int32_t rows = 1;
+    ASSERT_TRUE(MouseEventHdr->SetMouseScrollRows(rows) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_GetMouseScrollRows_012
+ * @tc.desc: Test GetMouseScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetMouseScrollRows_012, TestSize.Level1)
+{
+    int32_t rows = 50;
+    MouseEventHdr->SetMouseScrollRows(rows);
+    int32_t newRows = 50;
+    ASSERT_TRUE(MouseEventHdr->GetMouseScrollRows() == newRows);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 }
 }
