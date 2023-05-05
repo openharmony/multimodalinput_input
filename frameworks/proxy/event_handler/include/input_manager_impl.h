@@ -102,6 +102,8 @@ public:
         std::function<void(std::vector<bool>&)> callback);
     int32_t GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
 
+    int32_t SetMouseScrollRows(int32_t rows);
+    int32_t GetMouseScrollRows(int32_t &rows);
     int32_t SetMousePrimaryButton(int32_t primaryButton);
     int32_t GetMousePrimaryButton(int32_t &primaryButton);
     int32_t SetHoverScrollState(bool state);

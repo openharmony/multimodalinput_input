@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <cstdio>
 #include <gtest/gtest.h>
 
 #include "libinput.h"
@@ -207,6 +208,8 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetMousePrimar
     MouseTransformProcessor processor(deviceId);
     int32_t primaryButton = 1;
     ASSERT_TRUE(processor.SetMousePrimaryButton(primaryButton) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -223,6 +226,42 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetMousePrimar
     processor.SetMousePrimaryButton(primaryButton);
     int32_t primaryButtonRes = 1;
     ASSERT_TRUE(processor.GetMousePrimaryButton() == primaryButtonRes);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_SetMouseScrollRows_012
+ * @tc.desc: Test SetMouseScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetMouseScrollRows_012, TestSize.Level1)
+{
+    int32_t deviceId = 1;
+    MouseTransformProcessor processor(deviceId);
+    int32_t rows = 1;
+    ASSERT_TRUE(processor.SetMouseScrollRows(rows) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_GetMouseScrollRows_013
+ * @tc.desc: Test GetMouseScrollRows
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetMouseScrollRows_013, TestSize.Level1)
+{
+    int32_t deviceId = 0;
+    MouseTransformProcessor processor(deviceId);
+    int32_t rows = 1;
+    processor.SetMouseScrollRows(rows);
+    int32_t newRows = 1;
+    ASSERT_TRUE(processor.GetMouseScrollRows() == newRows);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 }
 }

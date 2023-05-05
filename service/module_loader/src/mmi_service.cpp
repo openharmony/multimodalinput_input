@@ -404,6 +404,42 @@ void MMIService::OnDisconnected(SessionPtr s)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+int32_t MMIService::SetMouseScrollRows(int32_t rows)
+{
+    CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetMouseScrollRows,
+        MouseEventHdr, rows));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set the number of mouse scrolling rows failed, return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+int32_t MMIService::ReadMouseScrollRows(int32_t &rows)
+{
+    rows = MouseEventHdr->GetMouseScrollRows();
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER
+
+int32_t MMIService::GetMouseScrollRows(int32_t &rows)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadMouseScrollRows, this,
+        std::ref(rows)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the number of mouse scrolling rows failed, return %{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
 int32_t MMIService::SetMousePrimaryButton(int32_t primaryButton)
 {
     CALL_DEBUG_ENTER;

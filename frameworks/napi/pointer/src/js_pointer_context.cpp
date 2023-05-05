@@ -22,6 +22,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsPoi
 constexpr int32_t STANDARD_SPEED = 5;
 constexpr int32_t MAX_SPEED = 11;
 constexpr int32_t MIN_SPEED = 1;
+constexpr int32_t DEFAULT_ROWS = 3;
+constexpr int32_t MIN_ROWS = 1;
+constexpr int32_t MAX_ROWS = 100;
 } // namespace
 
 JsPointerContext::JsPointerContext() : mgr_(std::make_shared<JsPointerManager>()) {}
@@ -219,6 +222,64 @@ napi_value JsPointerContext::GetPointerSpeed(napi_env env, napi_callback_info in
     }
 
     return jsPointerMgr->GetPointerSpeed(env, argv[0]);
+}
+
+napi_value JsPointerContext::SetMouseScrollRows(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least 1 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "rows", "number");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("rows parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "rows", "number");
+        return nullptr;
+    }
+    int32_t rows = DEFAULT_ROWS;
+    CHKRP(napi_get_value_int32(env, argv[0], &rows), GET_VALUE_INT32);
+    if (rows < MIN_ROWS) {
+        rows = MIN_ROWS;
+    } else if (rows > MAX_ROWS) {
+        rows = MAX_ROWS;
+    }
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (argc == 1) {
+        return jsPointerMgr->SetMouseScrollRows(env, rows);
+    }
+    if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
+        MMI_HILOGE("callback parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    return jsPointerMgr->SetMouseScrollRows(env, rows, argv[1]);
+}
+
+napi_value JsPointerContext::GetMouseScrollRows(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (argc == 0) {
+        return jsPointerMgr->GetMouseScrollRows(env);
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
+        MMI_HILOGE("callback parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+
+    return jsPointerMgr->GetMouseScrollRows(env, argv[0]);
 }
 
 napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info info)
@@ -655,6 +716,8 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getPointerStyle", GetPointerStyle),
         DECLARE_NAPI_STATIC_FUNCTION("enterCaptureMode", EnterCaptureMode),
         DECLARE_NAPI_STATIC_FUNCTION("leaveCaptureMode", LeaveCaptureMode),
+        DECLARE_NAPI_STATIC_FUNCTION("setMouseScrollRows", SetMouseScrollRows),
+        DECLARE_NAPI_STATIC_FUNCTION("getMouseScrollRows", GetMouseScrollRows),
         DECLARE_NAPI_STATIC_FUNCTION("setMousePrimaryButton", SetMousePrimaryButton),
         DECLARE_NAPI_STATIC_FUNCTION("getMousePrimaryButton", GetMousePrimaryButton),
         DECLARE_NAPI_STATIC_FUNCTION("setHoverScrollState", SetHoverScrollState),

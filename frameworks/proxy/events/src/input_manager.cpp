@@ -184,6 +184,16 @@ int32_t InputManager::SupportKeys(int32_t deviceId, std::vector<int32_t> keyCode
     return InputMgrImpl.SupportKeys(deviceId, keyCodes, callback);
 }
 
+int32_t InputManager::SetMouseScrollRows(int32_t Rows)
+{
+    return InputMgrImpl.SetMouseScrollRows(Rows);
+}
+
+int32_t InputManager::GetMouseScrollRows(int32_t &Rows)
+{
+    return InputMgrImpl.GetMouseScrollRows(Rows);
+}
+
 int32_t InputManager::SetMousePrimaryButton(int32_t primaryButton)
 {
     return InputMgrImpl.SetMousePrimaryButton(primaryButton);
