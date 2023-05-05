@@ -262,8 +262,7 @@ int32_t MouseTransformProcessor::GetMouseScrollRows()
     std::string name = "rows";
     int32_t rows = pref->GetInt(name, DEFAULT_ROWS);
     MMI_HILOGD("Get mouse scroll rows successfully, rows:%{public}d", rows);
-    NativePreferences::PreferencesHelper::
-        RemovePreferencesFromCache(mouseFileName);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
     return rows;
 }
 
