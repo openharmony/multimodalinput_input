@@ -228,7 +228,10 @@ napi_value JsPointerManager::SetMouseScrollRows(napi_env env, int32_t rows, napi
     napi_value promise = nullptr;
     if (handle != nullptr) {
         CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
-        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
+        if (napi_get_undefined(env, &promise) != napi_ok) {
+            CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
+            return nullptr;
+        }
     } else {
         CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
     }
@@ -248,7 +251,10 @@ napi_value JsPointerManager::GetMouseScrollRows(napi_env env, napi_value handle)
     uint32_t initialRefCount = 1;
     if (handle != nullptr) {
         CHKRP(napi_create_reference(env, handle, initialRefCount, &asyncContext->callback), CREATE_REFERENCE);
-        CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
+        if (napi_get_undefined(env, &promise) != napi_ok) {
+            CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
+            return nullptr;
+        }
     } else {
         CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
     }
