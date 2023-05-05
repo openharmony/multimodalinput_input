@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include <cstdio>
+#include <gtest/gtest.h>
 
 #include "libinput.h"
 #include "mouse_transform_processor.h"
