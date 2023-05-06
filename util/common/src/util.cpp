@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -131,7 +131,7 @@ static size_t StringToken(std::string &str, const std::string &sep, std::string 
     return token.size();
 }
 
-size_t StringSplit(const std::string &str, const std::string &sep, std::vector<std::string>&vecList)
+size_t StringSplit(const std::string &str, const std::string &sep, std::vector<std::string> &vecList)
 {
     size_t size;
     auto strs = str;
@@ -172,7 +172,7 @@ static std::string GetFileName(const std::string &strPath)
     return strPath.substr(nPos + 1, strPath.npos);
 }
 
-const char* GetProgramName()
+const char *GetProgramName()
 {
     static char programName[PROGRAM_NAME_SIZE] = {};
     if (programName[0] != '\0') {
@@ -256,7 +256,7 @@ static int32_t GetFileSize(const std::string &filePath)
 
 static std::string ReadFile(const std::string &filePath)
 {
-    FILE* fp = fopen(filePath.c_str(), "r");
+    FILE *fp = fopen(filePath.c_str(), "r");
     CHKPS(fp);
     std::string dataStr;
     char buf[256] = {};
@@ -276,8 +276,7 @@ static bool IsValidPath(const std::string &rootDir, const std::string &filePath)
 
 static bool IsValidJsonPath(const std::string &filePath)
 {
-    return IsValidPath(DATA_PATH, filePath) ||
-        IsValidPath(INPUT_PATH, filePath);
+    return IsValidPath(DATA_PATH, filePath) || IsValidPath(INPUT_PATH, filePath);
 }
 
 static bool IsValidProPath(const std::string &filePath)
@@ -553,7 +552,8 @@ std::string StringPrintf(const char *format, ...)
     return result;
 }
 
-std::string FileVerification(std::string &filePath, const std::string &checkExtension) {
+std::string FileVerification(std::string &filePath, const std::string &checkExtension)
+{
     if (filePath.empty()) {
         MMI_HILOGE("FilePath is empty");
         return "";

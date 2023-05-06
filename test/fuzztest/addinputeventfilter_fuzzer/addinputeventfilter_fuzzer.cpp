@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,10 +25,11 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AddInputEventFilterFuzzTest" };
 } // namespace
 
-void AddInputEventFilterFuzzTest(const uint8_t* data, size_t size)
+void AddInputEventFilterFuzzTest(const uint8_t *data, size_t size)
 {
     struct TestFilter : public IInputEventFilter {
-        virtual bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {
+        virtual bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
+        {
             CHKPR(keyEvent, false);
             MMI_HILOGI("Fuzz test in TestFilter::OnInputEvent,key code:%{public}d", keyEvent->GetKeyCode());
             return false;
@@ -62,10 +63,9 @@ void AddInputEventFilterFuzzTest(const uint8_t* data, size_t size)
 } // OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
     OHOS::MMI::AddInputEventFilterFuzzTest(data, size);
     return 0;
 }
-

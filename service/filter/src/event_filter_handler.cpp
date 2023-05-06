@@ -149,7 +149,7 @@ void EventFilterHandler::Dump(int32_t fd, const std::vector<std::string> &args)
     dprintf(fd, "Filters: count=%d\n", filters_.size());
     for (const auto &item : filters_) {
         dprintf(fd, "priority:%d | filterId:%d | Pid:%d\n", item.priority, item.filterId, item.clientPid);
-    }    
+    }
 }
 
 bool EventFilterHandler::HandleKeyEventFilter(std::shared_ptr<KeyEvent> event)
