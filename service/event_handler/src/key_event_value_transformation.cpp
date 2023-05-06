@@ -503,9 +503,14 @@ int32_t keyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items)
         return KeyEvent::INTENTION_UNKNOWN;
     }
 
-    int64_t keyCodes = 0;
+    uint64_t keyCodes = 0;
     for (const auto &item : items) {
-        keyCodes = (keyCodes << 16) + item.GetKeyCode();
+        if (item.GetKeyCode() < 0) {
+            MMI_HILOGE("keycode is invalid");
+            return KeyEvent::INTENTION_UNKNOWN;
+        }
+        uint64_t keyCode = (uint64_t)item.GetKeyCode();
+        keyCodes = (keyCodes << 16) + keyCode;
     }
     auto iter = MAP_KEY_INTENTION.find(keyCodes);
     if (iter == MAP_KEY_INTENTION.end()) {
