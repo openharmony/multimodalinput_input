@@ -38,6 +38,7 @@ public:
 private:
     const std::shared_ptr<IInputEventFilter> filter_;
     static inline int32_t filterIdSeed_ = 0;
+    static inline std::mutex mutex_;
 };
 } // namespace MMI
 } // namespace OHOS
