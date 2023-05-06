@@ -339,7 +339,6 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
 
 int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event)
 {
-    LibinputAdapter::LoginfoPackagingTool(event);
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Touchscreen device does not support");
         return ERROR_UNSUPPORT;

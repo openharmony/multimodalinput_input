@@ -171,19 +171,20 @@ bool MMIService::IsRunning() const
 
 bool MMIService::InitLibinputService()
 {
-    if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1),
-        DEF_INPUT_SEAT))) {
+    if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1)))) {
         MMI_HILOGE("Libinput init, bind failed");
         return false;
     }
-    auto inputFd = libinputAdapter_.GetInputFd();
-    auto ret = AddEpoll(EPOLL_EVENT_INPUT, inputFd);
-    if (ret <  0) {
-        MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
-        EpollClose();
-        return false;
+    auto inputFds = libinputAdapter_.GetInputFds();
+    for (auto fd: inputFds) {
+        auto ret = AddEpoll(EPOLL_EVENT_INPUT, fd);
+        if (ret <  0) {
+            MMI_HILOGE("AddEpoll error ret:%{public}d", ret);
+            EpollClose();
+            return false;
+        }
+        MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, fd);
     }
-    MMI_HILOGI("AddEpoll, epollfd:%{public}d, fd:%{public}d", mmiFd_, inputFd);
     return true;
 }
 
@@ -1081,7 +1082,6 @@ void MMIService::OnThread()
 #ifdef OHOS_RSS_CLIENT
     tid_.store(tid);
 #endif
-    libinputAdapter_.RetriggerHotplugEvents();
     libinputAdapter_.ProcessPendingEvents();
     while (state_ == ServiceRunningState::STATE_RUNNING) {
         epoll_event ev[MAX_EVENT_SIZE] = {};
@@ -1092,7 +1092,7 @@ void MMIService::OnThread()
             auto mmiEd = reinterpret_cast<mmi_epoll_event*>(ev[i].data.ptr);
             CHKPC(mmiEd);
             if (mmiEd->event_type == EPOLL_EVENT_INPUT) {
-                libinputAdapter_.EventDispatch(ev[i]);
+                libinputAdapter_.EventDispatch(mmiEd->fd);
             } else if (mmiEd->event_type == EPOLL_EVENT_SOCKET) {
                 OnEpollEvent(ev[i]);
             } else if (mmiEd->event_type == EPOLL_EVENT_SIGNAL) {

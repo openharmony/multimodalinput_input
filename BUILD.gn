@@ -140,6 +140,8 @@ group("mmi_tests") {
     "frameworks/proxy:KeyEventTest",
     "frameworks/proxy:PointerEventTest",
     "frameworks/proxy:ut-mmi-proxy-out",
+    "libudev:test",
+    "service:mmi-service-tests",
     "service:ut-mmi-service-out",
     "test/fuzztest:test",
     "tools/inject_event:InjectEventTest",

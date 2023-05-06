@@ -275,3 +275,8 @@ ohos_unittest("TransformPointTest") {
     "hiviewdfx_hilog_native:libhilog",
   ]
 }
+
+group("mmi-service-tests") {
+  testonly = true
+  deps = [ "libinput_adapter/test" ]
+}
