@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,8 +22,7 @@
 
 namespace OHOS {
 namespace MMI {
-template<class T>
-size_t GetObject(const uint8_t *data, size_t size, T &object)
+template <class T> size_t GetObject(const uint8_t *data, size_t size, T &object)
 {
     size_t objectSize = sizeof(object);
     if (objectSize > size) {
@@ -48,7 +47,7 @@ size_t GetString(const uint8_t *data, size_t size, char *object, size_t objectSi
     return objectSize;
 }
 
-void UpdateHotAreas(const uint8_t* data, size_t size, WindowInfo &windowInfo)
+void UpdateHotAreas(const uint8_t *data, size_t size, WindowInfo &windowInfo)
 {
     size_t startPos = 0;
     std::vector<Rect> defaultHotAreasInfo;
@@ -71,7 +70,7 @@ void UpdateHotAreas(const uint8_t* data, size_t size, WindowInfo &windowInfo)
     windowInfo.pointerHotAreas = pointerHotAreasInfo;
 }
 
-void UpdateDisplayInfo(const uint8_t* data, size_t size, int32_t windowId)
+void UpdateDisplayInfo(const uint8_t *data, size_t size, int32_t windowId)
 {
     DisplayGroupInfo displayGroupInfo;
     size_t startPos = 0;
@@ -111,7 +110,7 @@ void UpdateDisplayInfo(const uint8_t* data, size_t size, int32_t windowId)
     InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
 }
 
-void PointerStyleFuzzTest(const uint8_t* data, size_t size)
+void PointerStyleFuzzTest(const uint8_t *data, size_t size)
 {
     int32_t windowId;
     size_t startPos = 0;
@@ -126,7 +125,7 @@ void PointerStyleFuzzTest(const uint8_t* data, size_t size)
 } // OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
     OHOS::MMI::PointerStyleFuzzTest(data, size);
