@@ -165,7 +165,7 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent003()
 
     item.SetPointerId(1);
     item.SetDisplayX(623);
-    item.SetDisplayY(823); 
+    item.SetDisplayY(823);
     item.SetPressure(0);
     item.SetDeviceId(1);
     pointerEvent->AddPointerItem(item);
