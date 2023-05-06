@@ -847,6 +847,7 @@ const int32_t KeyEvent::INTENTION_ENDCALL = 201;
 const int32_t KeyEvent::INTENTION_REJECTCALL = 202;
 
 const int32_t KeyEvent::INTENTION_CAMERA = 300;
+const int32_t maxKeysSize = 1000;
 
 KeyEvent::KeyItem::KeyItem() {}
 
@@ -1175,7 +1176,7 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
     if (keysSize < 0) {
         return false;
     }
-    if (keysSize > 1000) {
+    if (keysSize > maxKeysSize) {
         return false;
     }
     for (int32_t i = 0; i < keysSize; i++) {
