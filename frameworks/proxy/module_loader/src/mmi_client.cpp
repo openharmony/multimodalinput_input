@@ -224,7 +224,7 @@ void MMIClient::OnDisconnected()
     MMI_HILOGI("Disconnected from server, fd:%{public}d", fd_);
     isConnected_ = false;
     isListening_ = false;
-    ANRHdl->ResetAnrArray();
+    ANRHDL->ResetAnrArray();
     if (funDisconnected_) {
         funDisconnected_(*this);
     }

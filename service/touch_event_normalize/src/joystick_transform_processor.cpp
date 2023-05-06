@@ -54,7 +54,7 @@ bool JoystickTransformProcessor::OnEventJoystickButton(struct libinput_event* ev
     int64_t time = GetSysClockTime();
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetActionStartTime(time);
-    pointerEvent_->SetDeviceId(deviceId_);   
+    pointerEvent_->SetDeviceId(deviceId_);
     uint32_t button = libinput_event_joystick_button_get_key(data);
     int32_t buttonId = LibinputButtonToPointer(button);
     if (buttonId == PointerEvent::BUTTON_NONE) {
@@ -98,7 +98,7 @@ bool JoystickTransformProcessor::OnEventJoystickAxis(struct libinput_event *even
 
     for (const auto &item : joystickType) {
         if (libinput_event_get_joystick_axis_value_is_changed(data, item.first) != 0) {
-            struct libinput_event_joystick_axis_abs_info* axisInfo = 
+            struct libinput_event_joystick_axis_abs_info* axisInfo =
                 libinput_event_get_joystick_axis_abs_info(data, item.first);
             CHKPF(axisInfo);
             pointerEvent_->SetAxisValue(item.second, axisInfo->value);

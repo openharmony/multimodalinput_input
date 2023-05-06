@@ -887,13 +887,13 @@ int32_t MultimodalInputConnectStub::StubSetDisplayBind(MessageParcel& data, Mess
     int32_t inputDeviceId = -1;
     READINT32(data, inputDeviceId, ERR_INVALID_VALUE);
     int32_t displayId = -1;
-    READINT32(data, displayId, ERR_INVALID_VALUE); 
-    std::string msg;  
+    READINT32(data, displayId, ERR_INVALID_VALUE);
+    std::string msg;
     int32_t ret = SetDisplayBind(inputDeviceId, displayId, msg);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetDisplayBind failed, ret:%{public}d", ret);
     }
-    WRITESTRING(reply, msg, ERR_INVALID_VALUE);  
+    WRITESTRING(reply, msg, ERR_INVALID_VALUE);
     return ret;
 }
 
