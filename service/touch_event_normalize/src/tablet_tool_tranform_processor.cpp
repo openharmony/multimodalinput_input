@@ -148,7 +148,7 @@ bool TabletToolTransformProcessor::OnTipDown(struct libinput_event_tablet_tool* 
     double pressure = libinput_event_tablet_tool_get_pressure(event);
     int32_t toolType = GetToolType(event);
 
-    int64_t time = libinput_event_tablet_tool_get_time_usec(event);
+    uint64_t time = libinput_event_tablet_tool_get_time_usec(event);
     pointerEvent_->SetActionStartTime(time);
     pointerEvent_->SetTargetDisplayId(targetDisplayId);
     pointerEvent_->SetActionTime(time);
@@ -182,7 +182,7 @@ bool TabletToolTransformProcessor::OnTipMotion(struct libinput_event* event)
     CHKPF(event);
     auto tabletEvent = libinput_event_get_tablet_tool_event(event);
     CHKPF(tabletEvent);
-    int64_t time = libinput_event_tablet_tool_get_time_usec(tabletEvent);
+    uint64_t time = libinput_event_tablet_tool_get_time_usec(tabletEvent);
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
 
@@ -224,7 +224,7 @@ bool TabletToolTransformProcessor::OnTipUp(struct libinput_event_tablet_tool* ev
 {
     CALL_DEBUG_ENTER;
     CHKPF(event);
-    int64_t time = libinput_event_tablet_tool_get_time_usec(event);
+    uint64_t time = libinput_event_tablet_tool_get_time_usec(event);
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
 

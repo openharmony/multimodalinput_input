@@ -123,15 +123,13 @@ public:
         }
         return RET_OK;
     }
-    pid_t GetProcessPidByName(const char* proc_name) const
+    pid_t GetProcessPidByName(const char *proc_name) const
     {
         FILE *fp;
         char buf[255];
-        char cmd[200] = {'\0'};
-        pid_t pid = -1;
-        sprintf(cmd, "pidof %s", proc_name);
-        MMI_HILOGI("cmd:%{public}s", cmd);
-        if ((fp = popen(cmd, "r")) != NULL) {
+        std::string cmd = "pidof " + std::string(proc_name);
+        MMI_HILOGI("cmd:%{public}s", cmd.c_str());
+        if ((fp = popen(cmd.c_str(), "r")) != NULL) {
             if (fgets(buf, 255, fp) != NULL) {
                 pid = atoi(buf);
             }
@@ -263,7 +261,6 @@ HWTEST_F(InputManagerFilterManualTest, HandlePointerEventFilter_001, TestSize.Le
     ASSERT_EQ(GetSelfHidumperFilterNum(), 1);
 
     auto simulate  = [](int32_t x, int32_t y) {
-        //MMI_HILOGI("SimulateInputEvent prepare, x:%{public}d, y:{public}d", x, y);
         const int32_t pointerId = 0;
         PointerEvent::PointerItem item;
         item.SetPointerId(pointerId);

@@ -31,8 +31,11 @@ const std::string REMOVE_EVENT = "remove";
 JsEventTarget::JsEventTarget()
 {
     CALL_DEBUG_ENTER;
-    auto ret = devListener_.insert({ CHANGED_TYPE, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
-    CK(ret.second, VAL_NOT_EXP);
+    std::mutex mapMutex;
+    std::map<int, Data> mp;
+    std::lock_guard<std::mutex> lock (mapMutex);
+    auto ret = mp.insert ({ CHANGED_TYPE, std::vector<std::unique_ptr<JsUtil::CallbackInfo>> () });
+    CK (ret.second, VAL_NOT_EXP);
 }
 
 void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)

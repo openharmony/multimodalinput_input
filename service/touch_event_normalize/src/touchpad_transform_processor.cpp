@@ -46,7 +46,7 @@ void TouchPadTransformProcessor::OnEventTouchPadDown(struct libinput_event *even
     auto device = libinput_event_get_device(event);
     CHKPV(device);
 
-    int64_t time = libinput_event_touchpad_get_time_usec(touchpad);
+    uint64_t time = libinput_event_touchpad_get_time_usec(touchpad);
     auto pointIds = pointerEvent_->GetPointerIds();
     if (pointIds.empty()) {
         pointerEvent_->SetActionStartTime(time);
@@ -93,7 +93,7 @@ void TouchPadTransformProcessor::OnEventTouchPadMotion(struct libinput_event *ev
     CHKPV(touchpad);
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);
 
-    int64_t time = libinput_event_touchpad_get_time_usec(touchpad);
+    uint64_t time = libinput_event_touchpad_get_time_usec(touchpad);
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     PointerEvent::PointerItem item;
@@ -133,7 +133,7 @@ void TouchPadTransformProcessor::OnEventTouchPadUp(struct libinput_event *event)
     CHKPV(touchpad);
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);
 
-    int64_t time = libinput_event_touchpad_get_time_usec(touchpad);
+    uint64_t time = libinput_event_touchpad_get_time_usec(touchpad);
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
 
