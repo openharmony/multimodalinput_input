@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,16 +29,15 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MarkC
 
 class InputEventConsumerTest : public IInputEventConsumer {
 public:
-    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
-    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override{};
+    void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
     {
         MMI_HILOGD("Report pointer event success");
     };
-    virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override{};
 };
 
-template<class T>
-size_t GetObject(const uint8_t *data, size_t size, T &object)
+template <class T> size_t GetObject(const uint8_t *data, size_t size, T &object)
 {
     size_t objectSize = sizeof(object);
     if (objectSize > size) {
@@ -51,7 +50,7 @@ size_t GetObject(const uint8_t *data, size_t size, T &object)
     return objectSize;
 }
 
-void MarkConsumedFuzzTest(const uint8_t* data, size_t size)
+void MarkConsumedFuzzTest(const uint8_t *data, size_t size)
 {
     CALL_DEBUG_ENTER;
     int32_t eventId;
@@ -65,7 +64,7 @@ void MarkConsumedFuzzTest(const uint8_t* data, size_t size)
 } // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
     OHOS::MMI::MarkConsumedFuzzTest(data, size);

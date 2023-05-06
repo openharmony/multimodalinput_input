@@ -26,8 +26,7 @@
 namespace OHOS {
 namespace MMI {
 class BindInfos;
-class InputDisplayBindHelper
-{
+class InputDisplayBindHelper {
 public:
 	InputDisplayBindHelper(const std::string bindCfgFile);
 	std::string GetBindDisplayNameByInputDevice(int32_t inputDeviceId) const;

@@ -306,7 +306,7 @@ napi_value JsPointerManager::EnterCaptureMode(napi_env env, int32_t windowId, na
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    if(asyncContext == nullptr) {
+    if (asyncContext == nullptr) {
         THROWERR(env, "Create AsyncContext failed");
         return nullptr;
     }
@@ -314,7 +314,7 @@ napi_value JsPointerManager::EnterCaptureMode(napi_env env, int32_t windowId, na
     asyncContext->reserve << ReturnType::VOID;
 
     napi_value promise = nullptr;
-    if(handle != nullptr) {
+    if (handle != nullptr) {
         CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
         CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
     } else {
@@ -328,7 +328,7 @@ napi_value JsPointerManager::LeaveCaptureMode(napi_env env, int32_t windowId, na
 {
     CALL_DEBUG_ENTER;
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    if(asyncContext == nullptr) {
+    if (asyncContext == nullptr) {
         THROWERR(env, "Create AsyncContext failed");
         return nullptr;
     }
@@ -337,7 +337,7 @@ napi_value JsPointerManager::LeaveCaptureMode(napi_env env, int32_t windowId, na
     asyncContext->reserve << ReturnType::VOID;
 
     napi_value promise = nullptr;
-    if(handle != nullptr) {
+    if (handle != nullptr) {
         CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
         CHKRP(napi_get_undefined(env, &promise), GET_UNDEFINED);
     } else {
