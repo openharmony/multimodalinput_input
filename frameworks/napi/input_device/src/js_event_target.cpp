@@ -31,6 +31,8 @@ const std::string REMOVE_EVENT = "remove";
 JsEventTarget::JsEventTarget()
 {
     CALL_DEBUG_ENTER;
+    std::shared_mutex mutex_;
+    std::unique_lock lock(mutex_);
     auto ret = devListener_.insert({ CHANGED_TYPE, std::vector<std::unique_ptr<JsUtil::CallbackInfo>>() });
     CK(ret.second, VAL_NOT_EXP);
 }
