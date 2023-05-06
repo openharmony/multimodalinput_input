@@ -528,7 +528,7 @@ napi_value JsPointerContext::EnterCaptureMode(napi_env env, napi_callback_info i
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
-    if(argc == 1) {
+    if (argc == 1) {
         return jsPointerMgr->EnterCaptureMode(env, windowId);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
@@ -559,7 +559,7 @@ napi_value JsPointerContext::LeaveCaptureMode(napi_env env, napi_callback_info i
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
-    if(argc == 1) {
+    if (argc == 1) {
         return jsPointerMgr->LeaveCaptureMode(env, windowId);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
