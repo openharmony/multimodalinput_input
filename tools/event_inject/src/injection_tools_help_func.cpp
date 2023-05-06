@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -103,7 +103,7 @@ bool InjectionToolsHelpFunc::SelectOptions(int32_t argc, char **argv, int32_t &o
     if (opt == -1) {
         std::cout << "Nonstandard input parameters" << std::endl;
         return false;
-    } 
+    }
     return true;
 }
 
@@ -111,7 +111,7 @@ bool InjectionToolsHelpFunc::SendEventOption(int32_t argc, char **argv)
 {
     CALL_DEBUG_ENTER;
     if (argc != SEND_EVENT_ARGV_COUNTS) {
-        std::cout<< "Wrong number of input parameters" << std::endl;
+        std::cout << "Wrong number of input parameters" << std::endl;
         return false;
     }
     std::string deviceNode = argv[optind];
@@ -139,7 +139,7 @@ bool InjectionToolsHelpFunc::JsonOption(int32_t argc, char **argv)
 {
     CALL_DEBUG_ENTER;
     if (argc < JSON_ARGV_COUNTS) {
-        std::cout<< "Wrong number of input parameters" << std::endl;
+        std::cout << "Wrong number of input parameters" << std::endl;
         return false;
     }
     const std::string jsonFile = argv[optind];
@@ -155,7 +155,7 @@ bool InjectionToolsHelpFunc::HelpOption(int32_t argc, char **argv)
 {
     CALL_DEBUG_ENTER;
     if (argc != HELP_ARGV_COUNTS) {
-        std::cout<< "Wrong number of input parameters" << std::endl;
+        std::cout << "Wrong number of input parameters" << std::endl;
         return false;
     }
     SetArgvs(argc, argv, "help");

@@ -90,7 +90,7 @@ int32_t MultimodalInputConnectManager::SetDisplayBind(int32_t deviceId, int32_t 
         MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
-    return multimodalInputConnectService_->SetDisplayBind(deviceId, displayId, msg);    
+    return multimodalInputConnectService_->SetDisplayBind(deviceId, displayId, msg);
 }
 
 int32_t MultimodalInputConnectManager::GetWindowPid(int32_t windowId)
@@ -121,7 +121,7 @@ int32_t MultimodalInputConnectManager::RemoveInputEventFilter(int32_t filterId)
         MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
-    return multimodalInputConnectService_->RemoveInputEventFilter(filterId);    
+    return multimodalInputConnectService_->RemoveInputEventFilter(filterId);
 }
 
 int32_t MultimodalInputConnectManager::SetMouseScrollRows(int32_t rows)
