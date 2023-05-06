@@ -1175,6 +1175,9 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
     if (keysSize < 0) {
         return false;
     }
+    if (keysSize > 1000) {
+        return false;
+    }
     for (int32_t i = 0; i < keysSize; i++) {
         KeyItem val = {};
         if (!val.ReadFromParcel(in)) {
