@@ -101,7 +101,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     subKeyNames += std::to_string(finalKey);
     subKeyNames += ",";
     keyOption->SetFinalKey(finalKey);
-    MMI_HILOGD("FinalKey:%{public}d", finalKey);
+    MMI_HILOGI("FinalKey:%{public}d", finalKey);
     bool isFinalKeyDown;
     if (!GetNamedPropertyBool(env, argv[1], "isFinalKeyDown", isFinalKeyDown)) {
         MMI_HILOGE("GetNamedPropertyBool failed");
@@ -135,6 +135,7 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
             return nullptr;
         }
         CHKRP(napi_create_reference(env, argv[2], 1, &event->callback[0]), REFERENCE_REF);
+        MMI_HILOGI("event->callback[0]: %{public}p", event->callback[0]);
     } else {
         event->callback[0] = nullptr;
     }
@@ -227,6 +228,10 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
             auto monitorInfo = *infoIter;
             if (MatchCombinationKeys(monitorInfo, keyEvent)) {
                 monitorInfo->keyEvent = keyEvent;
+                auto keyOption = monitorInfo->keyOption;
+                int32_t infoFinalKey = keyOption->GetFinalKey();
+                int32_t keyEventFinalKey = keyEvent->GetKeyCode();
+                MMI_HILOGI("infoFinalKey:%{public}d,keyEventFinalKey:%{public}d", infoFinalKey, keyEventFinalKey);
                 EmitAsyncCallbackWork(monitorInfo);
             }
             ++infoIter;
@@ -343,7 +348,9 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId);
     }
     if (event->callback[0] != nullptr) {
+        MMI_HILOGI("event->callback[0]: %{public}p", event->callback[0]);
         napi_delete_reference(env, event->callback[0]);
+        MMI_HILOGI("event->callback[0]: %{public}p", event->callback[0]);
     }
     delete event;
     return nullptr;
