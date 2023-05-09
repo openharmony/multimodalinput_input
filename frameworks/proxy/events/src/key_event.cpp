@@ -1173,10 +1173,7 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
     }
     READINT32(in, keyCode_);
     const int32_t keysSize = in.ReadInt32();
-    if (keysSize < 0) {
-        return false;
-    }
-    if (keysSize > maxKeysSize) {
+    if (keysSize < 0 || keysSize > maxKeysSize) {
         return false;
     }
     for (int32_t i = 0; i < keysSize; i++) {
