@@ -39,6 +39,8 @@ public:
 HWTEST_F(DfxHisysEventTest, DfxHisysEventTest_OnDeviceConnect_001, TestSize.Level1)
 {
     // DfxHisysevent dfxHisysevent;
+    // dfxHisysevent.OnDeviceConnect(1, OHOS::HiviewDFX::HiSysEvent::EventType type);
+    
 }
 } // namespace MMI
 } // namespace OHOS

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,9 +27,11 @@
 void Help(const std::string title = {})
 {
     std::cout << title << std::endl;
-    printf("Usage\n"
-        "-q     --query                             Query input device and display infomation\n"
-        "-s     --set 'inputDeivceId displayId'     Query input device and display infomation\n");
+    printf(
+"Usage\n"
+"-q     --query                             Query input device and display infomation\n"
+"-s     --set 'inputDeivceId displayId'     Query input device and display infomation\n"
+    );
 }
 
 int main(int argc, char *argv[])
@@ -60,8 +62,7 @@ int main(int argc, char *argv[])
                     return -1;
                 }
                 std::vector<std::array<std::string, 5>> arrStrings;
-                std::array<std::string, 5> arr0 = { "No.", "Input device Id", "Input device Name", "Display id",
-                    "Display name" };
+                std::array<std::string, 5> arr0 = {"No.", "Input device Id", "Input device Name", "Display id", "Display name"};
                 arrStrings.push_back(arr0);
                 for (size_t i = 0; i < infos.size(); ++i) {
                     const auto &info = infos[i];
@@ -73,7 +74,7 @@ int main(int argc, char *argv[])
                     arr[4] = info.displayName;
                     arrStrings.push_back(arr);
                 }
-                std::array<size_t, 5> arrWidth{};
+                std::array<size_t, 5> arrWidth {};
                 for (const auto &[a, b, c, d, e] : arrStrings) {
                     arrWidth[0] = std::max(arrWidth[0], a.length());
                     arrWidth[1] = std::max(arrWidth[1], b.length());
@@ -82,17 +83,12 @@ int main(int argc, char *argv[])
                     arrWidth[4] = std::max(arrWidth[4], e.length());
                 }
                 for (const auto &[a, b, c, d, e] : arrStrings) {
-                    std::cout << "|"
-                              << " " << std::setw(arrWidth[0]) << std::setfill(' ') << std::left << a << " "
-                              << "|"
-                              << " " << std::setw(arrWidth[1]) << std::setfill(' ') << std::left << b << " "
-                              << "|"
-                              << " " << std::setw(arrWidth[2]) << std::setfill(' ') << std::left << c << " "
-                              << "|"
-                              << " " << std::setw(arrWidth[3]) << std::setfill(' ') << std::left << d << " "
-                              << "|"
-                              << " " << std::setw(arrWidth[4]) << std::setfill(' ') << std::left << e << " "
-                              << "|" << std::endl;
+                    std::cout << "|" << " " << std::setw(arrWidth[0]) << std::setfill(' ') << std::left << a << " "
+                        << "|" << " " << std::setw(arrWidth[1]) << std::setfill(' ') << std::left << b << " "
+                        << "|" << " " << std::setw(arrWidth[2]) << std::setfill(' ') << std::left << c << " "
+                        << "|" << " " << std::setw(arrWidth[3]) << std::setfill(' ') << std::left << d << " "
+                        << "|" << " " << std::setw(arrWidth[4]) << std::setfill(' ') << std::left << e << " "
+                        << "|" << std::endl;
                 }
                 return 0;
             }

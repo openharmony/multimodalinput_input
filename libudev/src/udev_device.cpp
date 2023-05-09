@@ -140,17 +140,17 @@ public:
     udev_device& operator=(udev_device&) = delete;
     udev_device& operator=(udev_device&&) = delete;
 
-    static udev_device* NewFromSyspath(const std::string& syspath)
+    static udev_device* NewFromSyspath(const std::string& syspathParam)
     {
         CALL_DEBUG_ENTER;
         // path starts in sys
-        if (!StartsWith(syspath, "/sys/") || syspath.back() == '/') {
+        if (!StartsWith(syspathParam, "/sys/") || syspathParam.back() == '/') {
             errno = EINVAL;
             return nullptr;
         }
 
         // resolve possible symlink to real path
-        std::string path = ResolveSymLink(syspath);
+        std::string path = ResolveSymLink(syspathParam);
         if (StartsWith(path, "/sys/devices/")) {
             // all "devices" require a "uevent" file
             struct stat statbuf;
@@ -398,26 +398,64 @@ private:
         return false;
     }
 
+    void CheckAndSetProp(std::string prop, const bool& flag)
+    {
+        if (flag) {
+            SetInputProperty(prop);
+            MMI_HILOGD("device has prop with %{public}s", prop.c_str());
+        }
+    }
+
+    void CheckMouseButton(const BitVector& key, bool& flag)
+    {
+        for (int button = BTN_MOUSE; button < BTN_JOYSTICK && !flag; button++) {
+            flag = key.CheckBit(button);
+        }
+    }
+
+    void UpdateProByKey(const BitVector& key, const bool& isDirect, bool& probablyTablet, bool& probablyTouchpad,
+        bool& probablyTouchscreen)
+    {
+        probablyTablet = key.CheckBit(BTN_STYLUS) || key.CheckBit(BTN_TOOL_PEN);
+        probablyTouchpad = key.CheckBit(BTN_TOOL_FINGER) && !key.CheckBit(BTN_TOOL_PEN) && !isDirect;
+        probablyTouchscreen = key.CheckBit(BTN_TOUCH) && isDirect;
+    }
+
+    bool CheckMtCoordinates(const BitVector& abs)
+    {
+        bool hasMtCoordinates = abs.CheckBit(ABS_MT_POSITION_X) && abs.CheckBit(ABS_MT_POSITION_Y);
+        /* unset hasMtCoordinates if devices claims to have all abs axis */
+        if (hasMtCoordinates && abs.CheckBit(ABS_MT_SLOT) && abs.CheckBit(ABS_MT_SLOT - 1)) {
+            hasMtCoordinates = false;
+        }
+        return hasMtCoordinates;
+    }
+
+    void UpdateProByStatus(const bool& isMouse, const bool& isTouchpad, const bool& isTouchscreen,
+        const bool& isJoystick, const bool& isTablet)
+    {
+        CheckAndSetProp("ID_INPUT_MOUSE", isMouse);
+        CheckAndSetProp("ID_INPUT_TOUCHPAD", isTouchpad);
+        CheckAndSetProp("ID_INPUT_TOUCHSCREEN", isTouchscreen);
+        CheckAndSetProp("ID_INPUT_JOYSTICK", isJoystick);
+        CheckAndSetProp("ID_INPUT_TABLET", isTablet);
+    }
+
     bool CheckPointers(const BitVector& ev, const BitVector& abs, const BitVector& key, const BitVector& rel,
         const BitVector& prop)
     {
         bool isDirect = prop.CheckBit(INPUT_PROP_DIRECT);
         bool hasAbsCoordinates = abs.CheckBit(ABS_X) && abs.CheckBit(ABS_Y);
         bool hasRelCoordinates = ev.CheckBit(EV_REL) && rel.CheckBit(REL_X) && rel.CheckBit(REL_Y);
-        bool hasMtCoordinates = abs.CheckBit(ABS_MT_POSITION_X) && abs.CheckBit(ABS_MT_POSITION_Y);
-        /* unset hasMtCoordinates if devices claims to have all abs axis */
-        if (hasMtCoordinates && abs.CheckBit(ABS_MT_SLOT) && abs.CheckBit(ABS_MT_SLOT - 1)) {
-            hasMtCoordinates = false;
-        }
+        bool hasMtCoordinates = CheckMtCoordinates(abs);
 
         bool hasMouseButton = false;
-        for (int button = BTN_MOUSE; button < BTN_JOYSTICK && !hasMouseButton; button++) {
-            hasMouseButton = key.CheckBit(button);
-        }
+        CheckMouseButton(key, hasMouseButton);
 
-        bool probablyTablet = key.CheckBit(BTN_STYLUS) || key.CheckBit(BTN_TOOL_PEN);
-        bool probablyTouchpad = key.CheckBit(BTN_TOOL_FINGER) && !key.CheckBit(BTN_TOOL_PEN) && !isDirect;
-        bool probablyTouchscreen = key.CheckBit(BTN_TOUCH) && isDirect;
+        bool probablyTablet;
+        bool probablyTouchpad;
+        bool probablyTouchscreen;
+        UpdateProByKey(key, isDirect, probablyTablet, probablyTouchpad, probablyTouchscreen);
         bool probablyJoystick = HasJoystickAxesOrButtons(abs, key);
 
         bool isTablet = false;
@@ -458,24 +496,9 @@ private:
             isMouse = true;
         }
 
-        if (isMouse) {
-            SetInputProperty("ID_INPUT_MOUSE");
-        }
-        if (isTouchpad) {
-            SetInputProperty("ID_INPUT_TOUCHPAD");
-        }
-        if (isTouchscreen) {
-            SetInputProperty("ID_INPUT_TOUCHSCREEN");
-        }
-        if (isJoystick) {
-            SetInputProperty("ID_INPUT_JOYSTICK");
-        }
-        if (isTablet) {
-            SetInputProperty("ID_INPUT_TABLET");
-        }
+        UpdateProByStatus(isMouse, isTouchpad, isTouchscreen, isJoystick, isTablet);
 
-        bool isPointingStick = CheckPointingStick(prop);
-        return isTablet || isMouse || isTouchpad || isTouchscreen || isJoystick || isPointingStick;
+        return isTablet || isMouse || isTouchpad || isTouchscreen || isJoystick || CheckPointingStick(prop);
     }
 
     bool CheckKeys(const BitVector& ev, const BitVector& key)

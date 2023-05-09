@@ -307,6 +307,7 @@ void UvQueueWorkAsyncCallback(uv_work_t *work, int32_t status)
         napi_close_handle_scope(env, scope);
         return;
     }
+    MMI_HILOGI("event->callback[0]: %{public}p", event->callback[0]);
     CHKRV_SCOPE(env, napi_get_reference_value(env, event->callback[0], &callback), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
     AsyncWorkFn(env, event, result);
@@ -338,6 +339,7 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
     dataWorker->reportEvent = reportEvent;
     work->data = static_cast<void *>(dataWorker);
 
+    MMI_HILOGI("reportEvent->callback[0]: %{public}p", reportEvent->callback[0]);
     int32_t ret = uv_queue_work(loop, work, [](uv_work_t *work) {}, UvQueueWorkAsyncCallback);
     if (ret != 0) {
         delete dataWorker;
