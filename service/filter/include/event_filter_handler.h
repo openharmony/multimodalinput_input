@@ -50,7 +50,8 @@ public:
     bool HandlePointerEventFilter(std::shared_ptr<PointerEvent> event);
 private:
     std::mutex lockFilter_;
-    struct FilterInfo {
+    struct FilterInfo
+    {
         const sptr<IEventFilter> filter;
         sptr<IRemoteObject::DeathRecipient> deathRecipient { nullptr };
         const int32_t filterId;

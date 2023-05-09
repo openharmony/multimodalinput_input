@@ -152,7 +152,7 @@ void SwitchSubscriberHandler::NotifySubscriber(std::shared_ptr<SwitchEvent> swit
     NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_SWITCH);
     InputEventDataTransformation::SwitchEventToNetPacket(switchEvent, pkt);
     if (subscriber->sess_ == nullptr) {
-        MMI_HILOGE("subscriber's sess is null");
+        MMI_HILOGE("subscriber's sess is null"); 
         return;
     }
     int32_t fd = subscriber->sess_->GetFd();

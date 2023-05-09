@@ -236,8 +236,7 @@ void InputWindowsManager::CheckZorderWindowChange(const DisplayGroupInfo &displa
         oldZorderFirstWindowPid, newZorderFirstWindowPid);
 }
 
-void InputWindowsManager::UpdateDisplayIdAndName()
-{
+void InputWindowsManager::UpdateDisplayIdAndName() {
     using IdNames = std::set<std::pair<int32_t, std::string>>;
     IdNames newInfo;
     for (const auto &item : displayGroupInfo_.displaysInfo) {
@@ -271,7 +270,7 @@ int32_t InputWindowsManager::GetDisplayBindInfo(DisplayBindInfos &infos)
 int32_t InputWindowsManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
     CALL_DEBUG_ENTER;
-    return bindInfo_.SetDisplayBind(deviceId, displayId, msg);
+    return bindInfo_.SetDisplayBind(deviceId, displayId, msg);    
 }
 
 void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
@@ -1277,7 +1276,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
                 MMI_HILOGD("Skip the untouchable window to continue searching, "
                     "window:%{public}d, flags:%{public}d", item.id, item.flags);
                 continue;
-            }
+            } 
             if (IsInHotArea(lastTouchLogicX_, lastTouchLogicY_, item.defaultHotAreas)) {
                 touchWindow = &item;
                 break;

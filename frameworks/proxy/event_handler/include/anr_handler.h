@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,7 +26,6 @@ namespace OHOS {
 namespace MMI {
 class ANRHandler {
     DECLARE_DELAYED_SINGLETON(ANRHandler);
-
 public:
     DISALLOW_COPY_AND_MOVE(ANRHandler);
 
@@ -37,9 +36,9 @@ public:
 
 private:
     struct ANREvent {
-        bool sendStatus{ false };
-        int32_t lastEventId{ -1 };
-        int32_t lastReportId{ -1 };
+        bool sendStatus { false };
+        int32_t lastEventId { -1 };
+        int32_t lastReportId { -1 };
     };
     ANREvent event_[ANR_EVENT_TYPE_NUM];
 
@@ -49,7 +48,7 @@ private:
     void SendEvent(int32_t eventType, int64_t delayTime);
 };
 
-#define ANRHDL ::OHOS::DelayedSingleton<ANRHandler>::GetInstance()
+#define ANRHdl ::OHOS::DelayedSingleton<ANRHandler>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // ANR_HANDLER_H
