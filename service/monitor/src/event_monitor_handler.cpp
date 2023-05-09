@@ -88,7 +88,7 @@ int32_t EventMonitorHandler::AddInputHandler(InputHandlerType handlerType,
 }
 
 void EventMonitorHandler::RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
-    SessionPtr session)
+                                                   SessionPtr session)
 {
     CALL_INFO_TRACE;
     if (handlerType == InputHandlerType::MONITOR) {

@@ -35,7 +35,7 @@ int32_t EventFilterService::GetNextId()
     std::lock_guard<std::mutex> guard(mutex_);
     if (filterIdSeed_ == std::numeric_limits<int32_t>::max()) {
         filterIdSeed_ = 0;
-    }
+    }    
     return filterIdSeed_++;
 }
 

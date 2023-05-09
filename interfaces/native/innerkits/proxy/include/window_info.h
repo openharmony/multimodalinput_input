@@ -271,7 +271,8 @@ struct DisplayGroupInfo {
     std::vector<DisplayInfo> displaysInfo;
 };
 
-struct DisplayBindInfo {
+struct DisplayBindInfo
+{
     int32_t inputDeviceId = -1;
     std::string inputDeviceName;
     int32_t displayId = -1;
