@@ -367,7 +367,7 @@ int32_t ServerMsgHandler::RemoveInputEventFilter(int32_t clientPid, int32_t filt
 {
     auto filterHandler = InputHandler->GetFilterHandler();
     CHKPR(filterHandler, ERROR_NULL_POINTER);
-    return filterHandler->RemoveInputEventFilter(clientPid, filterId);
+    return filterHandler->RemoveInputEventFilter(clientPid, filterId);   
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI
