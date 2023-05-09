@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,8 +35,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 
 InputHandlerManager::InputHandlerManager()
 {
-    monitorCallback_ =
-        std::bind(&InputHandlerManager::OnDispatchEventProcessed, this, std::placeholders::_1, std::placeholders::_2);
+    monitorCallback_ = std::bind(&InputHandlerManager::OnDispatchEventProcessed, this, std::placeholders::_1,
+        std::placeholders::_2);
 }
 
 int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::shared_ptr<IInputEventConsumer> consumer,
@@ -49,7 +49,7 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
         eventType |= HANDLE_EVENT_TYPE_KEY;
     }
     if ((deviceTags & (CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX) -
-        CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD))) != 0) {
+        CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD))) != 0 ) {
         eventType |= HANDLE_EVENT_TYPE_POINTER;
     }
     std::lock_guard<std::mutex> guard(mtxHandlers_);
@@ -67,8 +67,8 @@ int32_t InputHandlerManager::AddHandler(InputHandlerType handlerType, std::share
         return INVALID_HANDLER_ID;
     }
     const HandleEventType currentType = GetEventType();
-    MMI_HILOGD("Register new handler:%{public}d, currentType:%{public}d, deviceTags:%{public}d", handlerId, currentType,
-        deviceTags);
+    MMI_HILOGD("Register new handler:%{public}d, currentType:%{public}d, deviceTags:%{public}d",
+        handlerId, currentType, deviceTags);
     if (RET_OK == AddLocal(handlerId, handlerType, eventType, priority, deviceTags, consumer)) {
         MMI_HILOGD("New handler successfully registered, report to server");
         const HandleEventType newType = GetEventType();
@@ -109,7 +109,7 @@ void InputHandlerManager::RemoveHandler(int32_t handlerId, InputHandlerType hand
 int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags, std::shared_ptr<IInputEventConsumer> monitor)
 {
-    InputHandlerManager::Handler handler{
+    InputHandlerManager::Handler handler {
         .handlerId_ = handlerId,
         .handlerType_ = handlerType,
         .eventType_ = eventType,
@@ -140,8 +140,8 @@ int32_t InputHandlerManager::AddLocal(int32_t handlerId, InputHandlerType handle
     return RET_OK;
 }
 
-int32_t InputHandlerManager::AddToServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
-    uint32_t deviceTags)
+int32_t InputHandlerManager::AddToServer(InputHandlerType handlerType, HandleEventType eventType,
+    int32_t priority, uint32_t deviceTags)
 {
     int32_t ret = MultimodalInputConnMgr->AddInputHandler(handlerType, eventType, priority, deviceTags);
     if (ret != RET_OK) {
@@ -159,8 +159,8 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
             return RET_ERR;
         }
         if (handlerType != iter->second.handlerType_) {
-            MMI_HILOGE("Unmatched handler type, InputHandlerType:%{public}d,FindHandlerType:%{public}d", handlerType,
-                iter->second.handlerType_);
+            MMI_HILOGE("Unmatched handler type, InputHandlerType:%{public}d,FindHandlerType:%{public}d",
+                handlerType, iter->second.handlerType_);
             return RET_ERR;
         }
         monitorHandlers_.erase(iter);
@@ -177,8 +177,8 @@ int32_t InputHandlerManager::RemoveLocal(int32_t handlerId, InputHandlerType han
     return RET_OK;
 }
 
-void InputHandlerManager::RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
-    uint32_t deviceTags)
+void InputHandlerManager::RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType,
+    int32_t priority, uint32_t deviceTags)
 {
     int32_t ret = MultimodalInputConnMgr->RemoveInputHandler(handlerType, eventType, priority, deviceTags);
     if (ret != 0) {
@@ -204,7 +204,7 @@ std::shared_ptr<IInputEventConsumer> InputHandlerManager::FindHandler(int32_t ha
         }
     }
     if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
-        for (const auto &item : interHandlers_) {
+        for (const auto& item : interHandlers_) {
             if (item.handlerId_ == handlerId) {
                 return item.consumer_;
             }
@@ -343,7 +343,7 @@ bool InputHandlerManager::HasHandler(int32_t handlerId)
         return (iter != monitorHandlers_.end());
     }
     if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
-        for (const auto &item : interHandlers_) {
+        for (const auto& item : interHandlers_) {
             if (item.handlerId_ == handlerId) {
                 return true;
             }
@@ -354,7 +354,7 @@ bool InputHandlerManager::HasHandler(int32_t handlerId)
 
 HandleEventType InputHandlerManager::GetEventType() const
 {
-    uint32_t eventType{ HANDLE_EVENT_TYPE_NONE };
+    uint32_t eventType { HANDLE_EVENT_TYPE_NONE };
     if (GetHandlerType() == InputHandlerType::MONITOR) {
         if (monitorHandlers_.empty()) {
             MMI_HILOGD("monitorHandlers_ is empty");
@@ -379,7 +379,7 @@ HandleEventType InputHandlerManager::GetEventType() const
 
 int32_t InputHandlerManager::GetPriority() const
 {
-    int32_t priority{ DEFUALT_INTERCEPTOR_PRIORITY };
+    int32_t priority { DEFUALT_INTERCEPTOR_PRIORITY };
     if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
         if (!interHandlers_.empty()) {
             priority = interHandlers_.front().priority_;
@@ -392,12 +392,12 @@ uint32_t InputHandlerManager::GetDeviceTags() const
 {
     uint32_t deviceTags = 0;
     if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
-        for (const auto &item : interHandlers_) {
+        for (const auto& item : interHandlers_) {
             deviceTags |= item.deviceTags_;
         }
     }
     if (GetHandlerType() == InputHandlerType::MONITOR) {
-        for (const auto &item : monitorHandlers_) {
+        for (const auto& item : monitorHandlers_) {
             deviceTags |= item.second.deviceTags_;
         }
     }
@@ -426,7 +426,7 @@ void InputHandlerManager::OnDispatchEventProcessed(int32_t eventId, int64_t acti
         processedEvents_.emplace(eventId, count);
         return;
     }
-    ANRHDL->SetLastProcessedEventId(ANR_MONITOR, eventId, actionTime);
+    ANRHdl->SetLastProcessedEventId(ANR_MONITOR, eventId, actionTime);
 }
 } // namespace MMI
 } // namespace OHOS

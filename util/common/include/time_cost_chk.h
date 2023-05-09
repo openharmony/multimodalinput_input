@@ -80,7 +80,7 @@ public:
     {
         int64_t tm64Cost = std::chrono::duration_cast<std::chrono::microseconds>(
                             std::chrono::high_resolution_clock::now() - beginTime_
-                            ).count();
+                        ).count();
         return tm64Cost;
     }
 
