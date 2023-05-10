@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -70,16 +70,16 @@ PermissionDef infoManagerTestPermDef = {
 PermissionStateFull infoManagerTestState = {
     .permissionName = "ohos.permission.test",
     .isGeneral = true,
-    .resDeviceID = {"local"},
-    .grantStatus = {PermissionState::PERMISSION_GRANTED},
-    .grantFlags = {1},
+    .resDeviceID = { "local" },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 1 },
 };
 
 HapPolicyParams infoManagerTestPolicyPrams = {
     .apl = APL_SYSTEM_CORE,
     .domain = "test.domain",
-    .permList = {infoManagerTestPermDef},
-    .permStateList = {infoManagerTestState}
+    .permList = { infoManagerTestPermDef },
+    .permStateList = { infoManagerTestState }
 };
 } // namespace
 
@@ -97,6 +97,7 @@ public:
         AccessTokenKit::DeleteToken(accessID_);
         SetSelfTokenID(currentID_);
     }
+
 private:
     AccessTokenID currentID_;
     AccessTokenID accessID_ = 0;
@@ -123,7 +124,7 @@ public:
         }
         return RET_OK;
     }
-    pid_t GetProcessPidByName(const char* proc_name) const
+    pid_t GetProcessPidByName(const char *proc_name) const
     {
         FILE *fp;
         char buf[255];
@@ -181,8 +182,7 @@ public:
             }
             auto ret = info.emplace(std::make_pair(priority, filterId));
             if (!ret.second) {
-                MMI_HILOGE("Duplicate priority:%{public}s,filterId:%{public}s,",
-                    priority.c_str(), filterId.c_str());
+                MMI_HILOGE("Duplicate priority:%{public}s,filterId:%{public}s,", priority.c_str(), filterId.c_str());
             }
             info.insert(std::make_pair(priority, filterId));
         };
@@ -215,8 +215,12 @@ HWTEST_F(InputManagerFilterManualTest, HandlePointerEventFilter_001, TestSize.Le
         sem_t &sem_;
         bool &result_;
         PointerFilter(int32_t exceptX, int32_t exceptY, sem_t &sem, bool &result)
-            : exceptX_(exceptX), exceptY_(exceptY), sem_(sem), result_(result) {}
-        virtual bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override { return false; }
+            : exceptX_(exceptX), exceptY_(exceptY), sem_(sem), result_(result)
+        {}
+        virtual bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
+        {
+            return false;
+        }
         bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
         {
             MMI_HILOGD("Callback enter");
@@ -237,7 +241,8 @@ HWTEST_F(InputManagerFilterManualTest, HandlePointerEventFilter_001, TestSize.Le
                 const int32_t x = item.GetDisplayX();
                 const int32_t y = item.GetDisplayY();
                 if (x == exceptX_ && y == exceptY_) {
-                    MMI_HILOGI("The values of X and y are both 10, which meets the expectation and callbackRet is set to 1");
+                    MMI_HILOGI(
+                        "The values of X and y are both 10, which meets the expectation and callbackRet is set to 1");
                     result_ = true;
                     break;
                 }
@@ -260,8 +265,7 @@ HWTEST_F(InputManagerFilterManualTest, HandlePointerEventFilter_001, TestSize.Le
     ASSERT_NE(filterId, -1);
     ASSERT_EQ(GetSelfHidumperFilterNum(), 1);
 
-    auto simulate  = [](int32_t x, int32_t y) {
-        //MMI_HILOGI("SimulateInputEvent prepare, x:%{public}d, y:{public}d", x, y);
+    auto simulate = [](int32_t x, int32_t y) {
         const int32_t pointerId = 0;
         PointerEvent::PointerItem item;
         item.SetPointerId(pointerId);
@@ -317,10 +321,12 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_002, TestSize.Level1
         sem_t &sem_;
         bool &result_;
         KeyFilter(int32_t exceptKeyCode, sem_t &sem, bool &result)
-            : exceptKeyCode_(exceptKeyCode), sem_(sem), result_(result) {}
+            : exceptKeyCode_(exceptKeyCode), sem_(sem), result_(result)
+        {}
         bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
         {
-            MMI_HILOGI("KeyFilter::OnInputEvent enter, pid: %{public}d, exceptKeyCode:%{public}d", getpid(), exceptKeyCode_);
+            MMI_HILOGI("KeyFilter::OnInputEvent enter, pid: %{public}d, exceptKeyCode:%{public}d", getpid(),
+                exceptKeyCode_);
             do {
                 result_ = false;
                 CHKPB(keyEvent);
@@ -330,12 +336,15 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_002, TestSize.Level1
                     result_ = true;
                     break;
                 }
-            } while(0);
+            } while (0);
             int ret = sem_post(&sem_);
             EXPECT_EQ(ret, 0);
             return result_;
         }
-        bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override { return false; }
+        bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+        {
+            return false;
+        }
     };
     AccessToken accessToken;
     ASSERT_EQ(GetSelfHidumperFilterNum(), 0);
@@ -426,7 +435,10 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_003, TestSize.Level1
             MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
             return false;
         }
-        bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override { return false; }
+        bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+        {
+            return false;
+        }
     };
     AccessToken accessToken;
     auto addFilter = []() -> int32_t {
@@ -477,7 +489,10 @@ HWTEST_F(InputManagerFilterManualTest, DISABLED_HandleKeyEventFilter_004, TestSi
             MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
             return false;
         }
-        bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override { return false; }
+        bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+        {
+            return false;
+        }
     };
     AccessToken accessToken;
     auto addFilter = []() -> int32_t {
@@ -510,7 +525,10 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_005, TestSize.Level1
             MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
             return false;
         }
-        bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override { return false; }
+        bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+        {
+            return false;
+        }
     };
     AccessToken accessToken;
     auto addFilter = []() -> int32_t {
@@ -547,7 +565,10 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_006, TestSize.Level1
             MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
             return false;
         }
-        bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override { return false; }
+        bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+        {
+            return false;
+        }
     };
     AccessToken accessToken;
     auto addFilter = []() -> int32_t {
