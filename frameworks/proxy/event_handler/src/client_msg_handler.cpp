@@ -215,7 +215,7 @@ int32_t ClientMsgHandler::OnSubscribeSwitchEventCallback(const UDSClient &client
         MMI_HILOGE("Packet read fd failed");
         return PACKET_READ_FAIL;
     }
-    return SwitchEventInputSubscribeMgr.OnSubscribeSwitchEventCallback(switchEvent, subscribeId);
+    return SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.OnSubscribeSwitchEventCallback(switchEvent, subscribeId);
 }
 #endif
 
@@ -319,7 +319,7 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
 void ClientMsgHandler::OnDispatchEventProcessed(int32_t eventId, int64_t actionTime)
 {
     CALL_DEBUG_ENTER;
-    ANRHdl->SetLastProcessedEventId(ANR_DISPATCH, eventId, actionTime);
+    ANRHDL->SetLastProcessedEventId(ANR_DISPATCH, eventId, actionTime);
 }
 
 int32_t ClientMsgHandler::OnAnr(const UDSClient& client, NetPacket& pkt)

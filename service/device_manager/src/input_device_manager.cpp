@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,18 +39,13 @@ constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t SUPPORT_KEY = 1;
 const std::string UNKNOWN_SCREEN_ID = "";
 const std::string INPUT_VIRTUAL_DEVICE_NAME = "DistributedInput ";
-std::unordered_map<int32_t, std::string> axisType {
-    { ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR" },
-    { ABS_MT_TOUCH_MINOR, "TOUCH_MINOR" },
-    { ABS_MT_ORIENTATION, "ORIENTATION" },
-    { ABS_MT_POSITION_X, "POSITION_X" },
-    { ABS_MT_POSITION_Y, "POSITION_Y" },
-    { ABS_MT_PRESSURE, "PRESSURE" },
-    { ABS_MT_WIDTH_MAJOR, "WIDTH_MAJOR" },
-    { ABS_MT_WIDTH_MINOR, "WIDTH_MINOR" }
+std::unordered_map<int32_t, std::string> axisType{
+    { ABS_MT_TOUCH_MAJOR, "TOUCH_MAJOR" }, { ABS_MT_TOUCH_MINOR, "TOUCH_MINOR" }, { ABS_MT_ORIENTATION, "ORIENTATION" },
+    { ABS_MT_POSITION_X, "POSITION_X" },   { ABS_MT_POSITION_Y, "POSITION_Y" },   { ABS_MT_PRESSURE, "PRESSURE" },
+    { ABS_MT_WIDTH_MAJOR, "WIDTH_MAJOR" }, { ABS_MT_WIDTH_MINOR, "WIDTH_MINOR" }
 };
 
-std::vector<std::pair<enum libinput_device_capability, InputDeviceCapability>> devCapEnumMaps {
+std::vector<std::pair<enum libinput_device_capability, InputDeviceCapability>> devCapEnumMaps{
     { LIBINPUT_DEVICE_CAP_KEYBOARD, InputDeviceCapability::INPUT_DEV_CAP_KEYBOARD },
     { LIBINPUT_DEVICE_CAP_POINTER, InputDeviceCapability::INPUT_DEV_CAP_POINTER },
     { LIBINPUT_DEVICE_CAP_TOUCH, InputDeviceCapability::INPUT_DEV_CAP_TOUCH },
@@ -61,8 +56,8 @@ std::vector<std::pair<enum libinput_device_capability, InputDeviceCapability>> d
     { LIBINPUT_DEVICE_CAP_JOYSTICK, InputDeviceCapability::INPUT_DEV_CAP_JOYSTICK },
 };
 
-constexpr size_t EXPECTED_N_SUBMATCHES { 2 };
-constexpr size_t EXPECTED_SUBMATCH { 1 };
+constexpr size_t EXPECTED_N_SUBMATCHES{ 2 };
+constexpr size_t EXPECTED_SUBMATCH{ 1 };
 } // namespace
 
 InputDeviceManager::InputDeviceManager() {}
@@ -84,15 +79,15 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id, bool
     inputDevice->SetId(iter->first);
     struct libinput_device *inputDeviceOrigin = iter->second.inputDeviceOrigin;
     inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(inputDeviceOrigin)));
-    const char* name = libinput_device_get_name(inputDeviceOrigin);
+    const char *name = libinput_device_get_name(inputDeviceOrigin);
     inputDevice->SetName((name == nullptr) ? ("null") : (name));
     inputDevice->SetBus(libinput_device_get_id_bustype(inputDeviceOrigin));
     inputDevice->SetVersion(libinput_device_get_id_version(inputDeviceOrigin));
     inputDevice->SetProduct(libinput_device_get_id_product(inputDeviceOrigin));
     inputDevice->SetVendor(libinput_device_get_id_vendor(inputDeviceOrigin));
-    const char* phys = libinput_device_get_phys(inputDeviceOrigin);
+    const char *phys = libinput_device_get_phys(inputDeviceOrigin);
     inputDevice->SetPhys((phys == nullptr) ? ("null") : (phys));
-    const char* uniq = libinput_device_get_uniq(inputDeviceOrigin);
+    const char *uniq = libinput_device_get_uniq(inputDeviceOrigin);
     inputDevice->SetUniq((uniq == nullptr) ? ("null") : (uniq));
 
     for (const auto &[first, second] : devCapEnumMaps) {
@@ -159,7 +154,7 @@ int32_t InputDeviceManager::SupportKeys(int32_t deviceId, std::vector<int32_t> &
     return RET_OK;
 }
 
-bool InputDeviceManager::IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const
+bool InputDeviceManager::IsMatchKeys(struct libinput_device *device, const std::vector<int32_t> &keyCodes) const
 {
     CHKPF(device);
     for (const auto &key : keyCodes) {
@@ -200,7 +195,7 @@ int32_t InputDeviceManager::GetKeyboardBusMode(int32_t deviceId)
 int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId, int32_t &keyboardType)
 {
     CALL_DEBUG_ENTER;
-    std::vector <int32_t> keyCodes;
+    std::vector<int32_t> keyCodes;
     keyCodes.push_back(KeyEvent::KEYCODE_Q);
     keyCodes.push_back(KeyEvent::KEYCODE_NUMPAD_1);
     keyCodes.push_back(KeyEvent::KEYCODE_HOME);
@@ -226,8 +221,8 @@ int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId, int32_t &keybo
     } else if (determineKbType[KeyEvent::KEYCODE_Q]) {
         keyboardType = KEYBOARD_TYPE_ALPHABETICKEYBOARD;
         MMI_HILOGD("The keyboard type is standard:%{public}d", keyboardType);
-    } else if (determineKbType[KeyEvent::KEYCODE_CTRL_LEFT] && determineKbType[KeyEvent::KEYCODE_SHIFT_RIGHT]
-        && determineKbType[KeyEvent::KEYCODE_F20]) {
+    } else if (determineKbType[KeyEvent::KEYCODE_CTRL_LEFT] && determineKbType[KeyEvent::KEYCODE_SHIFT_RIGHT] &&
+        determineKbType[KeyEvent::KEYCODE_F20]) {
         keyboardType = KEYBOARD_TYPE_HANDWRITINGPEN;
         MMI_HILOGD("The keyboard type is handwriting pen:%{public}d", keyboardType);
     } else {
@@ -264,7 +259,7 @@ void InputDeviceManager::SetInputStatusChangeCallback(inputDeviceCallback callba
     devCallbacks_ = callback;
 }
 
-void InputDeviceManager::AddDevListener(SessionPtr sess, std::function<void(int32_t, const std::string&)> callback)
+void InputDeviceManager::AddDevListener(SessionPtr sess, std::function<void(int32_t, const std::string &)> callback)
 {
     CALL_DEBUG_ENTER;
     auto ret = devListener_.insert({ sess, callback });
@@ -308,12 +303,12 @@ bool InputDeviceManager::HasTouchDevice()
     return false;
 }
 
-std::string InputDeviceManager::GetInputIdentification(struct libinput_device* inputDevice)
+std::string InputDeviceManager::GetInputIdentification(struct libinput_device *inputDevice)
 {
     CALL_DEBUG_ENTER;
     int32_t deviceVendor = libinput_device_get_id_vendor(inputDevice);
     int32_t deviceProduct = libinput_device_get_id_product(inputDevice);
-    struct udev_device* udevDevice = libinput_device_get_udev_device(inputDevice);
+    struct udev_device *udevDevice = libinput_device_get_udev_device(inputDevice);
     std::string sysPath = udev_device_get_syspath(udevDevice);
     if ((deviceVendor < 0) || (deviceProduct < 0) || sysPath.empty()) {
         MMI_HILOGE("Get device identification failed");
@@ -332,7 +327,7 @@ std::string InputDeviceManager::GetInputIdentification(struct libinput_device* i
     return deviceIdentification;
 }
 
-void InputDeviceManager::NotifyDevCallback(int32_t deviceId,  struct InputDeviceInfo inDevice)
+void InputDeviceManager::NotifyDevCallback(int32_t deviceId, struct InputDeviceInfo inDevice)
 {
     if (!inDevice.isTouchableDevice || (deviceId < 0)) {
         MMI_HILOGI("The device is not touchable device already existent");
@@ -418,7 +413,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     DfxHisysevent::OnDeviceConnect(deviceId, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
 }
 
-void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info)
+void InputDeviceManager::MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo &info)
 {
     info.inputDeviceOrigin = inputDevice;
     info.isRemote = IsRemote(inputDevice);
@@ -487,16 +482,16 @@ void InputDeviceManager::ScanPointerDevice()
     }
 }
 
-bool InputDeviceManager::IsPointerDevice(struct libinput_device* device) const
+bool InputDeviceManager::IsPointerDevice(struct libinput_device *device) const
 {
     CHKPF(device);
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
     MMI_HILOGD("The current device udev tag:%{public}d", static_cast<int32_t>(udevTags));
     return (udevTags & (EVDEV_UDEV_TAG_MOUSE | EVDEV_UDEV_TAG_TRACKBALL | EVDEV_UDEV_TAG_POINTINGSTICK |
-    EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;
+        EVDEV_UDEV_TAG_TOUCHPAD | EVDEV_UDEV_TAG_TABLET_PAD)) != 0;
 }
 
-bool InputDeviceManager::IsKeyboardDevice(struct libinput_device* device) const
+bool InputDeviceManager::IsKeyboardDevice(struct libinput_device *device) const
 {
     CHKPF(device);
     enum evdev_device_udev_tags udevTags = libinput_device_get_tags(device);
@@ -504,7 +499,7 @@ bool InputDeviceManager::IsKeyboardDevice(struct libinput_device* device) const
     return udevTags & EVDEV_UDEV_TAG_KEYBOARD;
 }
 
-bool InputDeviceManager::IsTouchDevice(struct libinput_device* device) const
+bool InputDeviceManager::IsTouchDevice(struct libinput_device *device) const
 {
     CHKPF(device);
     return libinput_device_has_capability(device, LIBINPUT_DEVICE_CAP_TOUCH);
@@ -530,7 +525,7 @@ void InputDeviceManager::NotifyPointerDevice(bool hasPointerDevice, bool isVisib
     }
 }
 
-int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevice)
+int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device *inputDevice)
 {
     CALL_DEBUG_ENTER;
     CHKPR(inputDevice, INVALID_DEVICE_ID);
@@ -544,7 +539,7 @@ int32_t InputDeviceManager::FindInputDeviceId(struct libinput_device* inputDevic
     return INVALID_DEVICE_ID;
 }
 
-struct libinput_device* InputDeviceManager::GetKeyboardDevice() const
+struct libinput_device *InputDeviceManager::GetKeyboardDevice() const
 {
     CALL_DEBUG_ENTER;
     std::vector<int32_t> keyCodes;
@@ -570,11 +565,11 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first, false);
         CHKPV(inputDevice);
         mprintf(fd,
-                "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d "
-                "| product:%d | vendor:%d | phys:%s\t",
-                inputDevice->GetId(), inputDevice->GetName().c_str(), inputDevice->GetType(),
-                inputDevice->GetBus(), inputDevice->GetVersion(), inputDevice->GetProduct(),
-                inputDevice->GetVendor(), inputDevice->GetPhys().c_str());
+            "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d "
+            "| product:%d | vendor:%d | phys:%s\t",
+            inputDevice->GetId(), inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
+            inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor(),
+            inputDevice->GetPhys().c_str());
         std::vector<InputDevice::AxisInfo> axisinfo = inputDevice->GetAxisInfo();
         mprintf(fd, "axis: count=%d", axisinfo.size());
         for (const auto &axis : axisinfo) {
@@ -583,10 +578,9 @@ void InputDeviceManager::Dump(int32_t fd, const std::vector<std::string> &args)
                 MMI_HILOGE("The axisType is not found");
                 return;
             }
-            mprintf(fd,
-                    "\t axisType:%s | minimum:%d | maximum:%d | fuzz:%d | flat:%d | resolution:%d\t",
-                    iter->second.c_str(), axis.GetMinimum(), axis.GetMaximum(), axis.GetFuzz(),
-                    axis.GetFlat(), axis.GetResolution());
+            mprintf(fd, "\t axisType:%s | minimum:%d | maximum:%d | fuzz:%d | flat:%d | resolution:%d\t",
+                iter->second.c_str(), axis.GetMinimum(), axis.GetMaximum(), axis.GetFuzz(), axis.GetFlat(),
+                axis.GetResolution());
         }
     }
 }
@@ -595,15 +589,14 @@ void InputDeviceManager::DumpDeviceList(int32_t fd, const std::vector<std::strin
 {
     CALL_DEBUG_ENTER;
     std::vector<int32_t> ids = GetInputDeviceIds();
-    mprintf(fd, "Total device:%d, Device list:\t", int32_t { ids.size() });
+    mprintf(fd, "Total device:%d, Device list:\t", int32_t{ ids.size() });
     for (const auto &item : inputDevice_) {
         std::shared_ptr<InputDevice> inputDevice = GetInputDevice(item.first, false);
         CHKPV(inputDevice);
         int32_t deviceId = inputDevice->GetId();
-        mprintf(fd,
-                "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d | product:%d | vendor:%d\t",
-                deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
-                inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor());
+        mprintf(fd, "deviceId:%d | deviceName:%s | deviceType:%d | bus:%d | version:%d | product:%d | vendor:%d\t",
+            deviceId, inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
+            inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor());
     }
 }
 
@@ -611,7 +604,7 @@ bool InputDeviceManager::IsRemote(struct libinput_device *inputDevice) const
 {
     CHKPF(inputDevice);
     bool isRemote = false;
-    const char* name = libinput_device_get_name(inputDevice);
+    const char *name = libinput_device_get_name(inputDevice);
     if (name == nullptr || name[0] == '\0') {
         MMI_HILOGD("Device name is empty");
         return false;

@@ -199,7 +199,7 @@ static bool MatchCombinationKeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     }
     MMI_HILOGD("kevEventSize:%{public}d,infoSize:%{public}d", count, infoSize);
     std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
-    if (!keyItem) { 
+    if (!keyItem) {
         MMI_HILOGE("The keyItem is nullopt");
         return false;
     }

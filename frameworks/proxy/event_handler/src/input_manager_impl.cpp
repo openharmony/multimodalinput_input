@@ -242,7 +242,7 @@ int32_t InputManagerImpl::SubscribeSwitchEvent(std::function<void(std::shared_pt
     CHK_PID_AND_TID();
 #ifdef OHOS_BUILD_ENABLE_SWITCH
     CHKPR(callback, RET_ERR);
-    return SwitchEventInputSubscribeMgr.SubscribeSwitchEvent(callback);
+    return SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.SubscribeSwitchEvent(callback);
 #else
     MMI_HILOGW("switch device does not support");
     return ERROR_UNSUPPORT;
@@ -254,7 +254,7 @@ void InputManagerImpl::UnsubscribeSwitchEvent(int32_t subscriberId)
     CALL_INFO_TRACE;
     CHK_PID_AND_TID();
 #ifdef OHOS_BUILD_ENABLE_SWITCH
-    SwitchEventInputSubscribeMgr.UnsubscribeSwitchEvent(subscriberId);
+    SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.UnsubscribeSwitchEvent(subscriberId);
 #else
     MMI_HILOGW("switch device does not support");
 #endif // OHOS_BUILD_ENABLE_SWITCH

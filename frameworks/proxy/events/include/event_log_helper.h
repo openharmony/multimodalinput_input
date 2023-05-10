@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,20 +29,19 @@ class EventLogHelper final {
     static constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventLogHelper" };
 
 public:
-    template <class T>
-    static void PrintEventData(std::shared_ptr<T> event, int32_t actionType, int32_t itemNum);
-    template <class T>
-    static void PrintEventData(std::shared_ptr<T> event);
+    template <class T> static void PrintEventData(std::shared_ptr<T> event, int32_t actionType, int32_t itemNum);
+    template <class T> static void PrintEventData(std::shared_ptr<T> event);
 
 private:
     static void Print(const std::shared_ptr<KeyEvent> event)
     {
-        if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)
-            && event->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
+        if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG) &&
+            event->GetKeyCode() != KeyEvent::KEYCODE_POWER) {
             return;
         }
-        std::vector<KeyEvent::KeyItem> eventItems { event->GetKeyItems() };
-        MMI_HILOGD("KeyCode:%{public}d,KeyIntention:%{public}d,ActionTime:%{public}" PRId64 ",ActionStartTime:%{public}" PRId64
+        std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
+        MMI_HILOGD("KeyCode:%{public}d,KeyIntention:%{public}d,ActionTime:%{public}" PRId64
+            ",ActionStartTime:%{public}" PRId64
             ",EventType:%{public}s,Flag:%{public}d,KeyAction:%{public}s,NumLock:%{public}d,"
             "CapsLock:%{public}d,ScrollLock:%{public}d,EventNumber:%{public}d,keyItemsCount:%{public}zu",
             event->GetKeyCode(), event->GetKeyIntention(), event->GetActionTime(), event->GetActionStartTime(),
@@ -69,10 +68,10 @@ private:
 
     static void Print(const std::shared_ptr<PointerEvent> event)
     {
-        std::vector<int32_t> pointerIds { event->GetPointerIds() };
+        std::vector<int32_t> pointerIds{ event->GetPointerIds() };
         std::string str;
         std::vector<uint8_t> buffer = event->GetBuffer();
-        for (const auto& buff : buffer) {
+        for (const auto &buff : buffer) {
             str += std::to_string(buff);
         }
         MMI_HILOGD("EventType:%{public}s,ActionTime:%{public}" PRId64 ",Action:%{public}d,"
@@ -84,24 +83,20 @@ private:
             "Hat0xAbsValue:%{public}.2f,Hat0yAbsValue:%{public}.2f,ThrottleAbsValue:%{public}.2f,"
             "PointerId:%{public}d,PointerCount:%{public}zu,EventNumber:%{public}d,"
             "BufferCount:%{public}zu,Buffer:%{public}s",
-            InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
-            event->GetAction(), event->GetActionStartTime(), event->GetFlag(),
-            event->DumpPointerAction(), event->DumpSourceType(), event->GetButtonId(),
-            event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
+            InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(), event->GetAction(),
+            event->GetActionStartTime(), event->GetFlag(), event->DumpPointerAction(), event->DumpSourceType(),
+            event->GetButtonId(), event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
-            event->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH),
-            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_X),
-            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Y),
-            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Z),
-            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_RZ),
-            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_GAS),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_X),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Y), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_Z),
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_RZ), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_GAS),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_BRAKE),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0X),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_HAT0Y),
-            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_THROTTLE),
-            event->GetPointerId(), pointerIds.size(), event->GetId(), buffer.size(), str.c_str());
-        
-        for (const auto& pointerId : pointerIds) {
+            event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_THROTTLE), event->GetPointerId(), pointerIds.size(),
+            event->GetId(), buffer.size(), str.c_str());
+
+        for (const auto &pointerId : pointerIds) {
             PointerEvent::PointerItem item;
             if (!event->GetPointerItem(pointerId, item)) {
                 MMI_HILOGE("Invalid pointer: %{public}d.", pointerId);
@@ -113,11 +108,11 @@ private:
                 "ToolWindowX:%{public}d,ToolWindowY:%{public}d,ToolWidth:%{public}d,ToolHeight:%{public}d,"
                 "Pressure:%{public}.2f,ToolType:%{public}d,LongAxis:%{public}d,ShortAxis:%{public}d,RawDx:%{public}d,"
                 "RawDy:%{public}d",
-                pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(),
-                item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(),
-                item.GetTiltX(), item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(),
-                item.GetToolWindowX(), item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(),
-                item.GetPressure(), item.GetToolType(), item.GetLongAxis(), item.GetShortAxis(), item.GetRawDx(), item.GetRawDy());
+                pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
+                item.GetWindowX(), item.GetWindowY(), item.GetWidth(), item.GetHeight(), item.GetTiltX(),
+                item.GetTiltY(), item.GetToolDisplayX(), item.GetToolDisplayY(), item.GetToolWindowX(),
+                item.GetToolWindowY(), item.GetToolWidth(), item.GetToolHeight(), item.GetPressure(),
+                item.GetToolType(), item.GetLongAxis(), item.GetShortAxis(), item.GetRawDx(), item.GetRawDy());
         }
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
         std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
@@ -131,8 +126,7 @@ private:
     }
 };
 
-template <class T>
-void EventLogHelper::PrintEventData(std::shared_ptr<T> event, int32_t actionType, int32_t itemNum)
+template <class T> void EventLogHelper::PrintEventData(std::shared_ptr<T> event, int32_t actionType, int32_t itemNum)
 {
     CHKPV(event);
     if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
@@ -153,12 +147,11 @@ void EventLogHelper::PrintEventData(std::shared_ptr<T> event, int32_t actionType
     }
 }
 
-template <class T>
-void EventLogHelper::PrintEventData(std::shared_ptr<T> event)
+template <class T> void EventLogHelper::PrintEventData(std::shared_ptr<T> event)
 {
     CHKPV(event);
-    if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)
-        || (event->GetAction() == InputEvent::EVENT_TYPE_KEY)) {
+    if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG) ||
+        (event->GetAction() == InputEvent::EVENT_TYPE_KEY)) {
         EventLogHelper::Print(event);
     }
 }
