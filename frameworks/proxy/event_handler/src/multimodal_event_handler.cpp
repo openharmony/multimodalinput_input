@@ -40,7 +40,7 @@ void OnConnected(const IfMMIClient& client)
     KeyEventInputSubscribeMgr.OnConnected();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_SWITCH
-    SwitchEventInputSubscribeMgr.OnConnected();
+    SWITCH_EVENT_INPUT_SUBSCRIBE_MGR.OnConnected();
 #endif // OHOS_BUILD_ENABLE_SWITCH
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     IMonitorMgr->OnConnected();
