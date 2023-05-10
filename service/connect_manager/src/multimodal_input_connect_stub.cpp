@@ -434,6 +434,10 @@ int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, Message
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t size = 0;
     READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (size < 0 || size > INT32_MAX) {
+        MMI_HILOGE("Invalid size: %{public}d", size);
+        return RET_ERR;
+    }
     std::vector<int32_t> keys;
     int32_t key = 0;
     for (int32_t i = 0; i < size; ++i) {

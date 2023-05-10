@@ -847,6 +847,7 @@ const int32_t KeyEvent::INTENTION_ENDCALL = 201;
 const int32_t KeyEvent::INTENTION_REJECTCALL = 202;
 
 const int32_t KeyEvent::INTENTION_CAMERA = 300;
+const int32_t maxKeysSize = 1000;
 
 KeyEvent::KeyItem::KeyItem() {}
 
@@ -1172,7 +1173,7 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
     }
     READINT32(in, keyCode_);
     const int32_t keysSize = in.ReadInt32();
-    if (keysSize < 0) {
+    if (keysSize < 0 || keysSize > maxKeysSize) {
         return false;
     }
     for (int32_t i = 0; i < keysSize; i++) {
