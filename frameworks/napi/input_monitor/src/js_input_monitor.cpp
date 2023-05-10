@@ -779,6 +779,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
         auto status = napi_create_object(jsEnv_, &napiPointer);
         if (status != napi_ok) {
             pointerEvent->MarkProcessed();
+            napi_close_handle_scope(jsEnv_, scope);
             break;
         }
         auto ret = RET_ERR;
@@ -789,18 +790,21 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
         }
         if (ret != RET_OK || napiPointer == nullptr) {
             pointerEvent->MarkProcessed();
+            napi_close_handle_scope(jsEnv_, scope);
             break;
         }
         napi_value callback = nullptr;
         status = napi_get_reference_value(jsEnv_, receiver_, &callback);
         if (status != napi_ok) {
             pointerEvent->MarkProcessed();
+            napi_close_handle_scope(jsEnv_, scope);
             break;
         }
         napi_value result = nullptr;
         status = napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result);
         if (status != napi_ok) {
             pointerEvent->MarkProcessed();
+            napi_close_handle_scope(jsEnv_, scope);
             break;
         }
         if (typeName == "touch") {
