@@ -893,12 +893,20 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
             return HandleKeyCancel(shortcutKey);
         }
     }
-    if (currentLaunchAbilityKey_.finalKey == keyEvent->GetKeyCode() && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-        MMI_HILOGD("current shortcutKey has subscriber");
+    return HandleConsumedKeyEvent(keyEvent);
+}
+
+bool KeyCommandHandler::HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+    if (currentLaunchAbilityKey_.finalKey == keyEvent->GetKeyCode()
+        && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+        MMI_HILOGD("Handle consumed key event, cancel opration");
         auto keyEventCancel = std::make_shared<KeyEvent>(*keyEvent);
         keyEventCancel->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-        CHKPR(inputEventNormalizeHandler, false);
+        CHKPF(inputEventNormalizeHandler);
         inputEventNormalizeHandler->HandleKeyEvent(keyEventCancel);
         ResetCurrentLaunchAbilityKey();
         return true;
