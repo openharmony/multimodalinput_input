@@ -124,6 +124,7 @@ private:
     bool HandleSequence(Sequence& sequence, bool &isLaunchAbility);
     bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
+    bool HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
     bool AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent);
     void RemoveSubscribedTimer(int32_t keyCode);
     void HandleSpecialKeys(int32_t keyCode, int32_t keyAction);
