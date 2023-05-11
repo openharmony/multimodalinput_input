@@ -136,6 +136,13 @@ private:
         lastMatchedKey_.timerId = -1;
         lastMatchedKey_.keyDownDuration = 0;
     }
+    void ResetCurrentLaunchAbilityKey()
+    {
+        currentLaunchAbilityKey_.preKeys.clear();
+        currentLaunchAbilityKey_.finalKey = -1;
+        currentLaunchAbilityKey_.timerId = -1;
+        currentLaunchAbilityKey_.keyDownDuration = 0;
+    }
     void ResetSequenceKeys()
     {
         keys_.clear();
@@ -148,6 +155,7 @@ private:
 
 private:
     ShortcutKey lastMatchedKey_;
+    ShortcutKey currentLaunchAbilityKey_;
     std::map<std::string, ShortcutKey> shortcutKeys_;
     std::vector<Sequence> sequences_;
     std::vector<Sequence> filterSequences_;

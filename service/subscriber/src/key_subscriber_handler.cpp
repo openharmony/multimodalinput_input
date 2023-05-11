@@ -424,6 +424,28 @@ bool KeySubscriberHandler::HandleKeyCancel(const std::shared_ptr<KeyEvent> &keyE
     return false;
 }
 
+bool KeySubscriberHandler::IsKeyEventSubscribed(int32_t keyCode, int32_t trrigerType)
+{
+    CALL_DEBUG_ENTER;
+    for (const auto &subscriber : subscribers_) {
+        auto &keyOption = subscriber->keyOption_;
+        MMI_HILOGD("subscribeId:%{public}d, keyOption->finalKey:%{public}d,"
+            "keyOption->isFinalKeyDown:%{public}s, keyOption->finalKeyDownDuration:%{public}d",
+            subscriber->id_, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
+            keyOption->GetFinalKeyDownDuration());
+        int32_t keyAction = KeyEvent::KEY_ACTION_UP;
+        if (keyOption->IsFinalKeyDown()) {
+            MMI_HILOGD("keyOption is final key down");
+            keyAction = KeyEvent::KEY_ACTION_DOWN;
+        }
+        if (keyCode == keyOption->GetFinalKey() && trrigerType == keyAction) {
+            MMI_HILOGD("current key event is subscribed.");
+            return true;
+        }
+    }
+    return false;
+}
+
 bool KeySubscriberHandler::CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
