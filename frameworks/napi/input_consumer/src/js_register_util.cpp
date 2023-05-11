@@ -235,7 +235,7 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
     napi_value eventHandler = nullptr;
     if (event->callback[0] != nullptr) {
         CHKRR(napi_get_reference_value(env, event->callback[0], &eventHandler), GET_REFERENCE_VALUE,
-        JS_CALLBACK_EVENT_FAILED);
+            JS_CALLBACK_EVENT_FAILED);
     }
     return DelEventCallbackRef(env, info, eventHandler, subscribeId);
 }
