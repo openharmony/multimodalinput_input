@@ -903,12 +903,12 @@ bool KeyCommandHandler::HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> k
     if (currentLaunchAbilityKey_.finalKey == keyEvent->GetKeyCode()
         && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         MMI_HILOGD("Handle consumed key event, cancel opration");
+        ResetCurrentLaunchAbilityKey();
         auto keyEventCancel = std::make_shared<KeyEvent>(*keyEvent);
         keyEventCancel->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPF(inputEventNormalizeHandler);
         inputEventNormalizeHandler->HandleKeyEvent(keyEventCancel);
-        ResetCurrentLaunchAbilityKey();
         return true;
     }
     return false;
