@@ -231,10 +231,11 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
         return JS_CALLBACK_EVENT_FAILED;
     }
     auto &info = callbacks[event->eventType];
-    MMI_HILOGD("EventType:%{public}s, keyEventMonitorInfos:%{public}zu",event->eventType.c_str(), info.size());
+    MMI_HILOGD("EventType:%{public}s, keyEventMonitorInfos:%{public}zu", event->eventType.c_str(), info.size());
     napi_value eventHandler = nullptr;
     if (event->callback[0] != nullptr) {
-        CHKRR(napi_get_reference_value(env, event->callback[0], &eventHandler), GET_REFERENCE_VALUE, JS_CALLBACK_EVENT_FAILED);
+        CHKRR(napi_get_reference_value(env, event->callback[0], &eventHandler), GET_REFERENCE_VALUE,
+        JS_CALLBACK_EVENT_FAILED);
     }
     return DelEventCallbackRef(env, info, eventHandler, subscribeId);
 }
