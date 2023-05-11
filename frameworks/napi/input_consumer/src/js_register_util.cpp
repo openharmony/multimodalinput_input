@@ -131,7 +131,7 @@ int32_t GetPreSubscribeId(Callbacks &callbacks, KeyEventMonitorInfo *event)
     return it->second.front()->subscribeId;
 }
 
-int32_t DelEventCallbackRef(const napi_env &env, std::list<KeyEventMonitorInfo *>& info,
+int32_t DelEventCallbackRef(const napi_env &env, std::list<KeyEventMonitorInfo *> &info,
     napi_value handler, int32_t &subscribeId)
 {
     CALL_DEBUG_ENTER;
