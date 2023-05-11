@@ -863,6 +863,10 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         MMI_HILOGD("The same key is waiting timeout, skip");
         return true;
     }
+    if (currentLaunchAbilityKey_.timerId >= 0 && IsKeyMatch(currentLaunchAbilityKey_, keyEvent)) {
+        MMI_HILOGD("repeat, current key %{public}d has launched ability", currentLaunchAbilityKey_.finalKey);
+        return true;
+    }
     DfxHisysevent::GetComboStartTime();
     if (lastMatchedKey_.timerId >= 0) {
         MMI_HILOGD("Remove timer:%{public}d", lastMatchedKey_.timerId);
@@ -888,6 +892,24 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         } else {
             return HandleKeyCancel(shortcutKey);
         }
+    }
+    return HandleConsumedKeyEvent(keyEvent);
+}
+
+bool KeyCommandHandler::HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+    if (currentLaunchAbilityKey_.finalKey == keyEvent->GetKeyCode()
+        && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+        MMI_HILOGD("Handle consumed key event, cancel opration");
+        ResetCurrentLaunchAbilityKey();
+        auto keyEventCancel = std::make_shared<KeyEvent>(*keyEvent);
+        keyEventCancel->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+        auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+        CHKPF(inputEventNormalizeHandler);
+        inputEventNormalizeHandler->HandleKeyEvent(keyEventCancel);
+        return true;
     }
     return false;
 }
@@ -1068,6 +1090,7 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     }
     shortcutKey.timerId = TimerMgr->AddTimer(shortcutKey.keyDownDuration, 1, [this, shortcutKey] () {
         MMI_HILOGD("Timer callback");
+        currentLaunchAbilityKey_ = shortcutKey;
         LaunchAbility(shortcutKey);
     });
     if (shortcutKey.timerId < 0) {
@@ -1076,6 +1099,10 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
     }
     MMI_HILOGD("Add timer success");
     lastMatchedKey_ = shortcutKey;
+    if (InputHandler->GetSubscriberHandler()->IsKeyEventSubscribed(shortcutKey.finalKey, shortcutKey.triggerType)) {
+        MMI_HILOGD("current shortcutKey %{public}d is subSubcribed", shortcutKey.finalKey);
+        return false;
+    }
     return true;
 }
 

@@ -38,6 +38,7 @@ public:
     ~KeySubscriberHandler() = default;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
+    bool IsKeyEventSubscribed(int32_t keyCode, int32_t trrigerType);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;

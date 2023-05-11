@@ -124,6 +124,7 @@ private:
     bool HandleSequence(Sequence& sequence, bool &isLaunchAbility);
     bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
+    bool HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
     bool AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent);
     void RemoveSubscribedTimer(int32_t keyCode);
     void HandleSpecialKeys(int32_t keyCode, int32_t keyAction);
@@ -135,6 +136,13 @@ private:
         lastMatchedKey_.finalKey = -1;
         lastMatchedKey_.timerId = -1;
         lastMatchedKey_.keyDownDuration = 0;
+    }
+    void ResetCurrentLaunchAbilityKey()
+    {
+        currentLaunchAbilityKey_.preKeys.clear();
+        currentLaunchAbilityKey_.finalKey = -1;
+        currentLaunchAbilityKey_.timerId = -1;
+        currentLaunchAbilityKey_.keyDownDuration = 0;
     }
     void ResetSequenceKeys()
     {
@@ -148,6 +156,7 @@ private:
 
 private:
     ShortcutKey lastMatchedKey_;
+    ShortcutKey currentLaunchAbilityKey_;
     std::map<std::string, ShortcutKey> shortcutKeys_;
     std::vector<Sequence> sequences_;
     std::vector<Sequence> filterSequences_;
