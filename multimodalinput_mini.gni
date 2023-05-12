@@ -261,3 +261,13 @@ if (input_feature_joystick) {
 if (input_feature_short_key) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_SHORT_KEY" ]
 }
+
+if (!defined(global_parts_info) || defined(global_parts_info.security_dlp_permission_service)) {
+  dlp_permission_enable = true
+} else {
+  dlp_permission_enable = false
+}
+
+if (dlp_permission_enable) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_SECURITY_COMPONENT" ]
+}

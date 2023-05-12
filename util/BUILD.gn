@@ -42,6 +42,10 @@ ohos_shared_library("libmmi-util") {
   ]
   public_deps = [ "${mmi_path}/frameworks/proxy:libmmi-common" ]
 
+  if (dlp_permission_enable) {
+    external_deps += [ "security_component:libsecurity_component_enhance_sdk" ]
+  }
+
   part_name = "input"
   subsystem_name = "multimodalinput"
 }

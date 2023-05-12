@@ -160,6 +160,10 @@ ohos_shared_library("libmmi-server") {
     "safwk:system_ability_fwk",
   ]
 
+  if (dlp_permission_enable) {
+    external_deps += [ "security_component:libsecurity_component_enhance_sdk" ]
+  }
+
   if (resource_schedule_service_enabled) {
     external_deps += [ "resource_schedule_service:ressched_client" ]
   }

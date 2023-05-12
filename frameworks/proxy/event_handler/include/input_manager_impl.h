@@ -40,6 +40,10 @@
 #include "pointer_event.h"
 #include "pointer_style.h"
 #include "switch_event.h"
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#include "base/security/security_component/frameworks/enhance_adapter/include/sec_comp_enhance_adapter.h"
+#include "base/security/security_component_enhance/frameworks/input_enhance/include/sec_comp_input_enhance.h"
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 namespace OHOS {
 namespace MMI {
@@ -53,6 +57,9 @@ public:
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t GetWindowPid(int32_t windowId);
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    void SetEnhanceConfig(SecCompEnhanceCfgBase *cfg);
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     int32_t SubscribeKeyEvent(
         std::shared_ptr<KeyOption> keyOption,
         std::function<void(std::shared_ptr<KeyEvent>)> callback
@@ -134,8 +141,17 @@ public:
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt);
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    int32_t PackEnhanceConfig(NetPacket &pkt);
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void PrintDisplayInfo();
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    void PrintEnhanceConfig();
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void SendDisplayInfo();
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    void SendEnhanceConfig();
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void ReAddInputEventFilter();
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -157,6 +173,9 @@ private:
     std::condition_variable cv_;
     std::thread ehThread_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    Security::SecurityComponentEnhance::SecCompEnhanceCfg* secCompEnhanceCfgBase_ {};
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 };
 
 #define InputMgrImpl ::OHOS::Singleton<InputManagerImpl>::GetInstance()
