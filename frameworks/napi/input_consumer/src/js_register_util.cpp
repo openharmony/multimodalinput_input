@@ -131,6 +131,58 @@ int32_t GetPreSubscribeId(Callbacks &callbacks, KeyEventMonitorInfo *event)
     return it->second.front()->subscribeId;
 }
 
+int32_t DelEventCallbackRef(const napi_env &env, std::list<KeyEventMonitorInfo *> &info,
+    napi_value handler, int32_t &subscribeId)
+{
+    CALL_DEBUG_ENTER;
+    for (auto iter = info.begin(); iter != info.end();) {
+        if (*iter == nullptr) {
+            info.erase(iter++);
+            continue;
+        }
+        if (handler != nullptr) {
+            napi_value iterHandler = nullptr;
+            CHKRR(napi_get_reference_value(env, (*iter)->callback[0], &iterHandler),
+                GET_REFERENCE_VALUE, JS_CALLBACK_EVENT_FAILED);
+            bool isEquals = false;
+            CHKRR(napi_strict_equals(env, handler, iterHandler, &isEquals), STRICT_EQUALS, JS_CALLBACK_EVENT_FAILED);
+            if (isEquals) {
+                CHKRR(napi_delete_reference(env, (*iter)->callback[0]), DELETE_REFERENCE, JS_CALLBACK_EVENT_FAILED);
+                if ((*iter)->callback[0] != nullptr) {
+                    MMI_HILOGW("current (*iter)->callback[0] is not nullptr");
+                    (*iter)->callback[0] = nullptr;
+                }
+                KeyEventMonitorInfo *monitorInfo = *iter;
+                info.erase(iter++);
+                if (info.empty()) {
+                    subscribeId = monitorInfo->subscribeId;
+                }
+                delete monitorInfo;
+                monitorInfo = nullptr;
+                MMI_HILOGD("Callback has deleted, size:%{public}zu", info.size());
+                return JS_CALLBACK_EVENT_SUCCESS;
+            }
+            ++iter;
+            continue;
+        }
+        CHKRR(napi_delete_reference(env, (*iter)->callback[0]), DELETE_REFERENCE, JS_CALLBACK_EVENT_FAILED);
+        if ((*iter)->callback[0] != nullptr) {
+            MMI_HILOGW("(*iter)->callback[0] is not nullptr");
+            (*iter)->callback[0] = nullptr;
+        }
+        KeyEventMonitorInfo *monitorInfo = *iter;
+        info.erase(iter++);
+        if (info.empty()) {
+            subscribeId = monitorInfo->subscribeId;
+        }
+        delete monitorInfo;
+        monitorInfo = nullptr;
+        MMI_HILOGD("Callback has deleted, size:%{public}zu", info.size());
+    }
+    MMI_HILOGD("Callback size:%{public}zu", info.size());
+    return JS_CALLBACK_EVENT_SUCCESS;
+}
+
 int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMonitorInfo *event)
 {
     CALL_DEBUG_ENTER;
@@ -169,8 +221,7 @@ int32_t AddEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMoni
     return JS_CALLBACK_EVENT_SUCCESS;
 }
 
-int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
-    KeyEventMonitorInfo *event, int32_t &subscribeId)
+int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks, KeyEventMonitorInfo *event, int32_t &subscribeId)
 {
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
@@ -180,71 +231,13 @@ int32_t DelEventCallback(const napi_env &env, Callbacks &callbacks,
         return JS_CALLBACK_EVENT_FAILED;
     }
     auto &info = callbacks[event->eventType];
-    MMI_HILOGD("EventType:%{public}s, keyEventMonitorInfos:%{public}zu",
-        event->eventType.c_str(), info.size());
-    napi_value handler1 = nullptr;
-    napi_status status;
+    MMI_HILOGD("EventType:%{public}s, keyEventMonitorInfos:%{public}zu", event->eventType.c_str(), info.size());
+    napi_value eventHandler = nullptr;
     if (event->callback[0] != nullptr) {
-        status = napi_get_reference_value(env, event->callback[0], &handler1);
-        if (status != napi_ok) {
-            MMI_HILOGE("Handler1 get reference value failed");
-            return JS_CALLBACK_EVENT_FAILED;
-        }
+        CHKRR(napi_get_reference_value(env, event->callback[0], &eventHandler), GET_REFERENCE_VALUE,
+            JS_CALLBACK_EVENT_FAILED);
     }
-    for (auto iter = info.begin(); iter != info.end();) {
-        if (*iter == nullptr) {
-            info.erase(iter++);
-            continue;
-        }
-        if (handler1 != nullptr) {
-            napi_value handler2 = nullptr;
-            status = napi_get_reference_value(env, (*iter)->callback[0], &handler2);
-            if (status != napi_ok) {
-                MMI_HILOGE("Handler2 get reference value failed");
-                return JS_CALLBACK_EVENT_FAILED;
-            }
-            bool isEquals = false;
-            status = napi_strict_equals(env, handler1, handler2, &isEquals);
-            if (status != napi_ok) {
-                MMI_HILOGE("Compare two handler failed");
-                return JS_CALLBACK_EVENT_FAILED;
-            }
-            if (isEquals) {
-                status = napi_delete_reference(env, (*iter)->callback[0]);
-                if (status != napi_ok) {
-                    MMI_HILOGE("Delete reference failed");
-                    return JS_CALLBACK_EVENT_FAILED;
-                }
-                KeyEventMonitorInfo *monitorInfo = *iter;
-                info.erase(iter++);
-                if (info.empty()) {
-                    subscribeId = monitorInfo->subscribeId;
-                }
-                delete monitorInfo;
-                monitorInfo = nullptr;
-                MMI_HILOGD("Callback has deleted, size:%{public}zu", info.size());
-                return JS_CALLBACK_EVENT_SUCCESS;
-            }
-            ++iter;
-            continue;
-        }
-        status = napi_delete_reference(env, (*iter)->callback[0]);
-        if (status != napi_ok) {
-            MMI_HILOGE("Delete reference failed");
-            napi_throw_error(env, nullptr, "Delete reference failed");
-            return JS_CALLBACK_EVENT_FAILED;
-        }
-        KeyEventMonitorInfo *monitorInfo = *iter;
-        info.erase(iter++);
-        if (info.empty()) {
-            subscribeId = monitorInfo->subscribeId;
-        }
-        delete monitorInfo;
-        monitorInfo = nullptr;
-        MMI_HILOGD("Callback has deleted, size:%{public}zu", info.size());
-    }
-    MMI_HILOGD("Callback size:%{public}zu", info.size());
-    return JS_CALLBACK_EVENT_SUCCESS;
+    return DelEventCallbackRef(env, info, eventHandler, subscribeId);
 }
 
 static void AsyncWorkFn(const napi_env &env, KeyEventMonitorInfo *event, napi_value &result)

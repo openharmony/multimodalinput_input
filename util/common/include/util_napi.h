@@ -45,6 +45,14 @@ namespace MMI {
         } \
     } while (0)
 
+#define CHKRR(state, desc, ret) \
+    do { \
+        if ((state) != napi_ok) { \
+            MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
+            return ret; \
+        } \
+    } while (0)
+
 #define CHKRV_SCOPE(env, state, desc, scope) \
     do { \
         if ((state) != napi_ok) { \
