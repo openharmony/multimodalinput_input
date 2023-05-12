@@ -20,6 +20,9 @@
 #include "net_packet.h"
 #include "pointer_event.h"
 #include "switch_event.h"
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#include "base/security/security_component/interfaces/inner_api/enhance_kits/include/sec_comp_enhance_kit.h"
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 namespace OHOS {
 namespace MMI {
@@ -36,10 +39,22 @@ public:
     static int32_t DeserializeInputEvent(NetPacket &pkt, std::shared_ptr<InputEvent> event);
     static int32_t Marshalling(std::shared_ptr<PointerEvent> event, NetPacket &pkt);
     static int32_t Unmarshalling(NetPacket &pkt, std::shared_ptr<PointerEvent> event);
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    static int32_t MarshallingEnhanceData(std::shared_ptr<PointerEvent> event, NetPacket &pkt);
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 private:
     static int32_t SerializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item);
     static int32_t DeserializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item);
     static void SetAxisInfo(NetPacket &pkt, std::shared_ptr<PointerEvent> event);
+
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    static constexpr uint32_t MAX_HMAC_SIZE = 64;
+    struct SecCompPointEvent {
+        double touchX;
+        double touchY;
+        uint64_t timeStamp;
+    };
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 };
 } // namespace MMI
 } // namespace OHOS
