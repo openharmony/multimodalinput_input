@@ -134,13 +134,13 @@ void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInf
 void InputManagerImpl::SetEnhanceConfig(SecCompEnhanceCfgBase *cfg)
 {
     CALL_DEBUG_ENTER;
+    if (cfg == nullptr) {
+        MMI_HILOGE("SecCompEnhance cfg info is empty!");
+        return;
+    }
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Get mmi client is nullptr");
-        return;
-    }
-    if (cfg == nullptr) {
-        MMI_HILOGE("SecCompEnhance cfg info is empty!");
         return;
     }
     secCompEnhanceCfgBase_ = reinterpret_cast<Security::SecurityComponentEnhance::SecCompEnhanceCfg *>(cfg);
@@ -378,6 +378,10 @@ int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 int32_t InputManagerImpl::PackEnhanceConfig(NetPacket &pkt)
 {
+    if (secCompEnhanceCfgBase_ == nullptr) {
+        MMI_HILOGE("security info config failed");
+	return RET_ERR;
+    }
     pkt << secCompEnhanceCfgBase_->enable << secCompEnhanceCfgBase_->alg << secCompEnhanceCfgBase_->key.size;
     for (uint32_t i = 0; i < secCompEnhanceCfgBase_->key.size; i++) {
         pkt << *(secCompEnhanceCfgBase_->key.data + i);

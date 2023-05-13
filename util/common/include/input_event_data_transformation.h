@@ -19,10 +19,10 @@
 #include "key_event.h"
 #include "net_packet.h"
 #include "pointer_event.h"
-#include "switch_event.h"
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-#include "base/security/security_component/interfaces/inner_api/enhance_kits/include/sec_comp_enhance_kit.h"
+#include "sec_comp_enhance_kit.h"
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#include "switch_event.h"
 
 namespace OHOS {
 namespace MMI {

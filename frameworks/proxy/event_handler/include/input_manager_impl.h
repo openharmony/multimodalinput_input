@@ -39,11 +39,11 @@
 #include "key_option.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
-#include "switch_event.h"
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-#include "base/security/security_component/frameworks/enhance_adapter/include/sec_comp_enhance_adapter.h"
-#include "base/security/security_component_enhance/frameworks/input_enhance/include/sec_comp_input_enhance.h"
+#include "sec_comp_enhance_adapter.h"
+#include "sec_comp_input_enhance.h"
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#include "switch_event.h"
 
 namespace OHOS {
 namespace MMI {
@@ -141,16 +141,12 @@ public:
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt);
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    int32_t PackEnhanceConfig(NetPacket &pkt);
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void PrintDisplayInfo();
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    void PrintEnhanceConfig();
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void SendDisplayInfo();
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    int32_t PackEnhanceConfig(NetPacket &pkt);
     void SendEnhanceConfig();
+    void PrintEnhanceConfig();
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void ReAddInputEventFilter();
 

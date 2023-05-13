@@ -24,12 +24,12 @@
 #include "key_event.h"
 #include "key_event_value_transformation.h"
 #include "pointer_event.h"
-#include "uds_server.h"
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-#include "base/security/security_component/interfaces/inner_api/enhance_kits/include/sec_comp_enhance_kit.h"
-#include "base/security/security_component/frameworks/enhance_adapter/include/sec_comp_enhance_adapter.h"
-#include "base/security/security_component_enhance/frameworks/input_enhance/include/sec_comp_input_enhance.h"
+#include "sec_comp_enhance_kit.h"
+#include "sec_comp_enhance_adapter.h"
+#include "sec_comp_input_enhance.h"
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#include "uds_server.h"
 
 namespace OHOS {
 namespace MMI {
