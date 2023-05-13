@@ -361,10 +361,16 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
         free(secCompPointEvent);
         secCompPointEvent = nullptr;
         MMI_HILOGE("GetPointerEventEnhanceData failed!");
-	return RET_ERR;
+        return RET_ERR;
     }
     uint8_t realBuf[enHanceDataLen] = { 0 };
-    memcpy_s(realBuf, enHanceDataLen, enHanceData, enHanceDataLen);
+    errno_t ret = memcpy_s(realBuf, enHanceDataLen, enHanceData, enHanceDataLen);
+    if (ret != EOK) {
+        free(secCompPointEvent);
+        secCompPointEvent = nullptr;
+        MMI_HILOGE("Failed to call memcpy_sp. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        return RET_ERR;
+    }
     for (size_t i = 0; i < enHanceDataLen; i++) {
         pkt << *(realBuf + i);
     }
