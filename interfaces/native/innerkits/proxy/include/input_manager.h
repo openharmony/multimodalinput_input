@@ -34,7 +34,7 @@
 #include "pointer_style.h"
 #include "window_info.h"
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-#include "base/security/security_component/frameworks/enhance_adapter/include/sec_comp_enhance_adapter.h"
+#include "sec_comp_enhance_adapter.h"
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 namespace OHOS {

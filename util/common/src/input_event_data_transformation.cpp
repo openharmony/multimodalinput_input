@@ -358,13 +358,15 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
     int32_t result = Security::SecurityComponent::SecCompEnhanceKit::GetPointerEventEnhanceData(secCompPointEvent,
         dataLen, enHanceData, enHanceDataLen);
     if (result != 0 || enHanceDataLen >= MAX_HMAC_SIZE) {
+        free(secCompPointEvent);
+        secCompPointEvent = nullptr;
         MMI_HILOGE("GetPointerEventEnhanceData failed!");
-    } else {
-        uint8_t realBuf[enHanceDataLen] = { 0 };
-        memcpy_s(realBuf, enHanceDataLen, enHanceData, enHanceDataLen);
-        for (size_t i = 0; i < enHanceDataLen; i++) {
-            pkt << *(realBuf + i);
-        }
+	return RET_ERR;
+    }
+    uint8_t realBuf[enHanceDataLen] = { 0 };
+    memcpy_s(realBuf, enHanceDataLen, enHanceData, enHanceDataLen);
+    for (size_t i = 0; i < enHanceDataLen; i++) {
+        pkt << *(realBuf + i);
     }
     free(secCompPointEvent);
     secCompPointEvent = nullptr;

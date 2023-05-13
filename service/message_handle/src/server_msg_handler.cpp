@@ -36,9 +36,6 @@
 #include "switch_subscriber_handler.h"
 #include "time_cost_chk.h"
 
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-using namespace OHOS::Security::SecurityComponentEnhance;
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -242,7 +239,9 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
 int32_t ServerMsgHandler::OnEnhanceConfig(SessionPtr sess, NetPacket &pkt)
 {
     CHKPR(sess, ERROR_NULL_POINTER);
-    SecCompEnhanceCfg* cfg = static_cast<SecCompEnhanceCfg*>(malloc(sizeof(SecCompEnhanceCfg)));
+    size_t objectSize = sizeof(Security::SecurityComponentEnhance::SecCompEnhanceCfg);
+    Security::SecurityComponentEnhance::SecCompEnhanceCfg* cfg =
+        static_cast<Security::SecurityComponentEnhance::SecCompEnhanceCfg*>(malloc(objectSize));
     pkt >> cfg->enable >> cfg->alg;
     pkt >> cfg->key.size;
     uint32_t num = cfg->key.size;
