@@ -22,6 +22,7 @@
 #include "input_manager.h"
 #include "js_input_monitor_manager.h"
 #include "js_input_monitor_util.h"
+#include "napi_constants.h"
 
 namespace OHOS {
 namespace MMI {
