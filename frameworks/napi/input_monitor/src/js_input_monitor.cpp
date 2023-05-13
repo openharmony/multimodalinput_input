@@ -22,6 +22,7 @@
 #include "input_manager.h"
 #include "js_input_monitor_manager.h"
 #include "js_input_monitor_util.h"
+#include "napi_constants.h"
 
 namespace OHOS {
 namespace MMI {
@@ -768,20 +769,12 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
         }
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(jsEnv_, &scope);
-        if (scope == nullptr) {
-            MMI_HILOGE("scope is nullptr");
-            return;
-        }
+        CHKPV(scope);
         auto pointerEvent = evQueue_.front();
         CHKPC(pointerEvent);
         evQueue_.pop();
         napi_value napiPointer = nullptr;
-        auto status = napi_create_object(jsEnv_, &napiPointer);
-        if (status != napi_ok) {
-            pointerEvent->MarkProcessed();
-            napi_close_handle_scope(jsEnv_, scope);
-            break;
-        }
+        CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_create_object(jsEnv_, &napiPointer), CREATE_OBJECT, scope, pointerEvent);
         auto ret = RET_ERR;
         if (typeName == "touch") {
             ret = TransformPointerEvent(pointerEvent, napiPointer);
@@ -794,27 +787,15 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
             break;
         }
         napi_value callback = nullptr;
-        status = napi_get_reference_value(jsEnv_, receiver_, &callback);
-        if (status != napi_ok) {
-            pointerEvent->MarkProcessed();
-            napi_close_handle_scope(jsEnv_, scope);
-            break;
-        }
+        CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_get_reference_value(jsEnv_, receiver_, &callback),
+            GET_REFERENCE_VALUE, scope, pointerEvent);
         napi_value result = nullptr;
-        status = napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result);
-        if (status != napi_ok) {
-            pointerEvent->MarkProcessed();
-            napi_close_handle_scope(jsEnv_, scope);
-            break;
-        }
+        CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result),
+            CALL_FUNCTION, scope, pointerEvent);
         if (typeName == "touch") {
             pointerEvent->MarkProcessed();
             bool retValue = false;
-            status = napi_get_value_bool(jsEnv_, result, &retValue);
-            if (status != napi_ok) {
-                napi_close_handle_scope(jsEnv_, scope);
-                return;
-            }
+            CHKRV_SCOPE(jsEnv_, napi_get_value_bool(jsEnv_, result, &retValue), GET_VALUE_BOOL, scope);
             if (retValue) {
                 auto eventId = pointerEvent->GetId();
                 MarkConsumed(eventId);
