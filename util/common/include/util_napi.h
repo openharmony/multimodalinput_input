@@ -66,7 +66,7 @@ namespace MMI {
     do { \
         if ((state) != napi_ok) { \
             MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
-            pointerEvent->MarkProcessed();
+            pointerEvent->MarkProcessed(); \
             napi_close_handle_scope(env, scope); \
             break; \
         } \
