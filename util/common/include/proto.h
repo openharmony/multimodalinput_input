@@ -32,6 +32,7 @@ enum class MmiMessageId : int32_t {
     REPORT_POINTER_EVENT,
     ON_DEVICE_ADDED,
     ON_DEVICE_REMOVED,
+    SCINFO_CONFIG,
 };
 
 enum TokenType : int32_t {

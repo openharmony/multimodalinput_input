@@ -68,6 +68,28 @@ void EventDispatchHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> 
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+void EventDispatchHandler::FilterInvalidPointerItem(const std::shared_ptr<PointerEvent> pointerEvent, int32_t fd)
+{
+    CHKPV(pointerEvent);
+    auto udsServer = InputHandler->GetUDSServer();
+    CHKPV(udsServer);
+    auto pointerIdList = pointerEvent->GetPointerIds();
+    if (pointerIdList.size() > 1) {
+        for (const auto& id : pointerIdList) {
+            PointerEvent::PointerItem pointeritem;
+            if (!pointerEvent->GetPointerItem(id, pointeritem)) {
+                MMI_HILOGW("Can't find this pointerItem");
+                continue;
+            }
+            auto itemPid = WinMgr->GetWindowPid(pointeritem.GetTargetWindowId());
+            if ((itemPid >= 0) && (itemPid != udsServer->GetClientPid(fd))) {
+                pointerEvent->RemovePointerItem(id);
+                MMI_HILOGD("pointerIdList size:%{public}zu", pointerEvent->GetPointerIds().size());
+            }
+        }
+    }
+}
+
 void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<PointerEvent> point)
 {
     CALL_DEBUG_ENTER;
@@ -94,23 +116,12 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         return;
     }
     auto pointerEvent = std::make_shared<PointerEvent>(*point);
-    auto pointerIdList = pointerEvent->GetPointerIds();
-    if (pointerIdList.size() > 1) {
-        for (const auto& id : pointerIdList) {
-            PointerEvent::PointerItem pointeritem;
-            if (!pointerEvent->GetPointerItem(id, pointeritem)) {
-                MMI_HILOGW("Can't find this pointerItem");
-                continue;
-            }
-            auto itemPid = WinMgr->GetWindowPid(pointeritem.GetTargetWindowId());
-            if ((itemPid >= 0) && (itemPid != udsServer->GetClientPid(fd))) {
-                pointerEvent->RemovePointerItem(id);
-                MMI_HILOGD("pointerIdList size:%{public}zu", pointerEvent->GetPointerIds().size());
-            }
-        }
-    }
+    FilterInvalidPointerItem(pointerEvent, fd);
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    InputEventDataTransformation::MarshallingEnhanceData(pointerEvent, pkt);
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);

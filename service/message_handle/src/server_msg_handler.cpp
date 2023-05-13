@@ -47,6 +47,9 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     udsServer_ = &udsServer;
     MsgCallback funs[] = {
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+        {MmiMessageId::SCINFO_CONFIG, MsgCallbackBind2(&ServerMsgHandler::OnEnhanceConfig, this)},
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
@@ -231,6 +234,34 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     WinMgr->UpdateDisplayInfo(displayGroupInfo);
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+int32_t ServerMsgHandler::OnEnhanceConfig(SessionPtr sess, NetPacket &pkt)
+{
+    CHKPR(sess, ERROR_NULL_POINTER);
+    size_t objectSize = sizeof(Security::SecurityComponentEnhance::SecCompEnhanceCfg);
+    Security::SecurityComponentEnhance::SecCompEnhanceCfg* cfg =
+        static_cast<Security::SecurityComponentEnhance::SecCompEnhanceCfg*>(malloc(objectSize));
+    pkt >> cfg->enable >> cfg->alg;
+    pkt >> cfg->key.size;
+    uint32_t num = cfg->key.size;
+    uint8_t keyData[num];
+    for (uint32_t i = 0; i < num; i++) {
+        pkt >> keyData[i];
+    }
+    cfg->key.data = keyData;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read scinfo config failed");
+        return RET_ERR;
+    }
+    SecCompEnhanceCfgBase *secCompEnhanceCfgBase = reinterpret_cast<SecCompEnhanceCfgBase *>(cfg);
+    int32_t result = Security::SecurityComponent::SecCompEnhanceKit::SetEnhanceCfg(secCompEnhanceCfgBase);
+    if (result != 0) {
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 int32_t ServerMsgHandler::OnAddInputHandler(SessionPtr sess, InputHandlerType handlerType,

@@ -23,6 +23,11 @@
 #include "input_handler_type.h"
 #include "key_option.h"
 #include "msg_handler.h"
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#include "sec_comp_enhance_kit.h"
+#include "sec_comp_enhance_adapter.h"
+#include "sec_comp_input_enhance.h"
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 namespace OHOS {
 namespace MMI {
@@ -74,6 +79,9 @@ public:
 protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    int32_t OnEnhanceConfig(SessionPtr sess, NetPacket& pkt);
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 private:
 #ifdef OHOS_BUILD_ENABLE_TOUCH

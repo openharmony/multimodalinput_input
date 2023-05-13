@@ -24,6 +24,11 @@
 #include "key_event.h"
 #include "key_event_value_transformation.h"
 #include "pointer_event.h"
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#include "sec_comp_enhance_kit.h"
+#include "sec_comp_enhance_adapter.h"
+#include "sec_comp_input_enhance.h"
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 #include "uds_server.h"
 
 namespace OHOS {
@@ -57,6 +62,10 @@ public:
 private:
     int32_t eventTime_ { 0 };
     int32_t currentTime_ { 0 };
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    void FilterInvalidPointerItem(const std::shared_ptr<PointerEvent> pointEvent, int32_t fd);
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 };
 } // namespace MMI
 } // namespace OHOS

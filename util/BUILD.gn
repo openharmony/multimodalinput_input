@@ -28,6 +28,10 @@ config("libmmi_util_public_config") {
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
   ]
+
+  if (dlp_permission_enable) {
+    include_dirs += [ "${security_component_path}/security_component/interfaces/inner_api/enhance_kits/include" ]
+  }
 }
 
 ohos_shared_library("libmmi-util") {
@@ -41,6 +45,10 @@ ohos_shared_library("libmmi-util") {
     "napi:ace_napi",
   ]
   public_deps = [ "${mmi_path}/frameworks/proxy:libmmi-common" ]
+
+  if (dlp_permission_enable) {
+    external_deps += [ "security_component:libsecurity_component_enhance_sdk" ]
+  }
 
   part_name = "input"
   subsystem_name = "multimodalinput"

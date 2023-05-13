@@ -336,5 +336,52 @@ int32_t InputEventDataTransformation::DeserializePointerItem(NetPacket &pkt, Poi
     }
     return RET_OK;
 }
+
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<PointerEvent> event, NetPacket &pkt)
+{
+    CHKPR(event, ERROR_NULL_POINTER);
+    int32_t pointerId = event->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!event->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+        return RET_ERR;
+    }
+    SecCompPointEvent *secCompPointEvent = static_cast<SecCompPointEvent*>(malloc(sizeof(SecCompPointEvent)));
+    secCompPointEvent->touchX = pointerItem.GetDisplayX();
+    secCompPointEvent->touchY = pointerItem.GetDisplayY();
+    secCompPointEvent->timeStamp = event->GetActionTime();
+    uint32_t dataLen = sizeof(secCompPointEvent);
+    uint8_t outBuf[MAX_HMAC_SIZE] = { 0 };
+    uint8_t* enHanceData = reinterpret_cast<uint8_t *>(&outBuf[0]);
+    uint32_t enHanceDataLen = MAX_HMAC_SIZE;
+    int32_t result = Security::SecurityComponent::SecCompEnhanceKit::GetPointerEventEnhanceData(secCompPointEvent,
+        dataLen, enHanceData, enHanceDataLen);
+    if (result != 0 || enHanceDataLen >= MAX_HMAC_SIZE) {
+        free(secCompPointEvent);
+        secCompPointEvent = nullptr;
+        MMI_HILOGE("GetPointerEventEnhanceData failed!");
+        return RET_ERR;
+    }
+    uint8_t realBuf[enHanceDataLen] = { 0 };
+    errno_t ret = memcpy_s(realBuf, enHanceDataLen, enHanceData, enHanceDataLen);
+    if (ret != EOK) {
+        free(secCompPointEvent);
+        secCompPointEvent = nullptr;
+        MMI_HILOGE("Failed to call memcpy_sp. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
+        return RET_ERR;
+    }
+    for (size_t i = 0; i < enHanceDataLen; i++) {
+        pkt << *(realBuf + i);
+    }
+    free(secCompPointEvent);
+    secCompPointEvent = nullptr;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Marshalling enhanceData failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 } // namespace MMI
 } // namespace OHOS
