@@ -33,6 +33,9 @@
 #include "key_option.h"
 #include "pointer_style.h"
 #include "window_info.h"
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#include "sec_comp_enhance_adapter.h"
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 namespace OHOS {
 namespace MMI {
@@ -457,6 +460,16 @@ public:
      * @since 10
      */
     int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay);
+
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    /**
+     * @brief Sets the enhance config of the security component.
+     * @param cfg Indicates the security component enhance config.
+     * @return void.
+     * @since 9
+     */
+    void SetEnhanceConfig(Security::SecurityComponent::SecCompEnhanceCfgBase *cfg);
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 private:
     InputManager() = default;

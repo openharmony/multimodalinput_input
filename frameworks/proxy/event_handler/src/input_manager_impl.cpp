@@ -130,6 +130,25 @@ void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInf
     PrintDisplayInfo();
 }
 
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+void InputManagerImpl::SetEnhanceConfig(SecCompEnhanceCfgBase *cfg)
+{
+    CALL_DEBUG_ENTER;
+    if (cfg == nullptr) {
+        MMI_HILOGE("SecCompEnhance cfg info is empty!");
+        return;
+    }
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Get mmi client is nullptr");
+        return;
+    }
+    secCompEnhanceCfgBase_ = reinterpret_cast<Security::SecurityComponentEnhance::SecCompEnhanceCfg *>(cfg);
+    SendEnhanceConfig();
+    PrintEnhanceConfig();
+}
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+
 int32_t InputManagerImpl::AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority,
     uint32_t deviceTags)
 {
@@ -356,6 +375,25 @@ int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
     return PackDisplayInfo(pkt);
 }
 
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+int32_t InputManagerImpl::PackEnhanceConfig(NetPacket &pkt)
+{
+    if (secCompEnhanceCfgBase_ == nullptr) {
+        MMI_HILOGE("security info config failed");
+        return RET_ERR;
+    }
+    pkt << secCompEnhanceCfgBase_->enable << secCompEnhanceCfgBase_->alg << secCompEnhanceCfgBase_->key.size;
+    for (uint32_t i = 0; i < secCompEnhanceCfgBase_->key.size; i++) {
+        pkt << *(secCompEnhanceCfgBase_->key.data + i);
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write security info config failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+
 int32_t InputManagerImpl::PackWindowInfo(NetPacket &pkt)
 {
     uint32_t num = static_cast<uint32_t>(displayGroupInfo_.windowsInfo.size());
@@ -419,6 +457,17 @@ void InputManagerImpl::PrintDisplayInfo()
             item.uniq.c_str(), item.direction);
     }
 }
+
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+void InputManagerImpl::PrintEnhanceConfig()
+{
+    MMI_HILOGD("securityConfigInfo,enable:%{public}d,alg:%{public}d,key.size:%{public}d",
+        secCompEnhanceCfgBase_->enable, secCompEnhanceCfgBase_->alg, secCompEnhanceCfgBase_->key.size);
+    if (secCompEnhanceCfgBase_->key.data == nullptr) {
+        MMI_HILOGE("key.data is null");
+    }
+}
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 int32_t InputManagerImpl::AddMonitor(std::function<void(std::shared_ptr<KeyEvent>)> monitor)
 {
@@ -805,6 +854,10 @@ void InputManagerImpl::OnConnected()
     }
     SendDisplayInfo();
     PrintDisplayInfo();
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    SendEnhanceConfig();
+    PrintEnhanceConfig();
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (anrObservers_.empty()) {
         return;
     }
@@ -827,6 +880,21 @@ void InputManagerImpl::SendDisplayInfo()
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
     }
 }
+
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+void InputManagerImpl::SendEnhanceConfig()
+{
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
+    CHKPV(client);
+    NetPacket pkt(MmiMessageId::SCINFO_CONFIG);
+    if (PackEnhanceConfig(pkt) == RET_ERR) {
+        return;
+    }
+    if (!client->SendMessage(pkt)) {
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+    }
+}
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 void InputManagerImpl::ReAddInputEventFilter()
 {

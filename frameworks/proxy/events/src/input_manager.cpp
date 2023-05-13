@@ -293,5 +293,12 @@ int32_t InputManager::SetKeyDownDuration(const std::string& businessId, int32_t 
 {
     return InputMgrImpl.SetKeyDownDuration(businessId, delay);
 }
+
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+void InputManager::SetEnhanceConfig(SecCompEnhanceCfgBase *cfg)
+{
+    InputMgrImpl.SetEnhanceConfig(cfg);
+}
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 } // namespace MMI
 } // namespace OHOS

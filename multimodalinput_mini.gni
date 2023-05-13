@@ -17,6 +17,7 @@ mmi_path = "//foundation/multimodalinput/input"
 graphics_path = "//foundation/graphic/graphic_2d/rosen/modules"
 preferences_path = "//foundation/distributeddatamgr/preferences"
 ability_runtime_path = "//foundation/ability/ability_runtime"
+security_component_path = "//base/security"
 
 declare_args() {
   resource_schedule_service_enabled = false
@@ -260,4 +261,15 @@ if (input_feature_joystick) {
 
 if (input_feature_short_key) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_SHORT_KEY" ]
+}
+
+if (!defined(global_parts_info) ||
+    defined(global_parts_info.security_dlp_permission_service)) {
+  dlp_permission_enable = true
+} else {
+  dlp_permission_enable = false
+}
+
+if (dlp_permission_enable) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_SECURITY_COMPONENT" ]
 }
