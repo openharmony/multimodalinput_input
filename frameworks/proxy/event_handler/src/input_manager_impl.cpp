@@ -380,7 +380,7 @@ int32_t InputManagerImpl::PackEnhanceConfig(NetPacket &pkt)
 {
     if (secCompEnhanceCfgBase_ == nullptr) {
         MMI_HILOGE("security info config failed");
-	return RET_ERR;
+        return RET_ERR;
     }
     pkt << secCompEnhanceCfgBase_->enable << secCompEnhanceCfgBase_->alg << secCompEnhanceCfgBase_->key.size;
     for (uint32_t i = 0; i < secCompEnhanceCfgBase_->key.size; i++) {
