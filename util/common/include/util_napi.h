@@ -72,6 +72,15 @@ namespace MMI {
         } \
     } while (0)
 
+#define CHKNRV_SCOPE(env, cond, desc, scope) \
+    do { \
+        if ((cond) == nullptr) { \
+            MMI_HILOGE("%{public}s is nullptr, failed", std::string(desc).c_str()); \
+            napi_close_handle_scope(env, scope); \
+            return; \
+        } \
+    } while (0)
+
 #define THROWERR(env, desc) \
     do { \
         MMI_HILOGE("%{public}s", (#desc)); \
