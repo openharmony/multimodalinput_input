@@ -113,15 +113,11 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
         }
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(item->env, &scope);
-        if (scope == nullptr) {
-            MMI_HILOGE("scope is nullptr");
-            return;
-        }
+        CHKPV(scope);
         for (const auto &devId : item->data.deviceIds) {
             napi_value eventType = nullptr;
             CHKRV_SCOPE(item->env, napi_create_string_utf8(item->env, REMOVE_EVENT.c_str(), NAPI_AUTO_LENGTH,
-                &eventType),
-                CREATE_STRING_UTF8, scope);
+                &eventType), CREATE_STRING_UTF8, scope);
 
             napi_value deviceId = nullptr;
             CHKRV_SCOPE(item->env, napi_create_int32(item->env, devId, &deviceId),
@@ -135,7 +131,8 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
                 SET_NAMED_PROPERTY, scope);
 
             napi_value handler = nullptr;
-            CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE, scope);
+            CHKRV_SCOPE(item->env, napi_get_reference_value(item->env, item->ref, &handler),
+                GET_REFERENCE_VALUE, scope);
 
             napi_value ret = nullptr;
             CHKRV_SCOPE(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret),
@@ -235,6 +232,7 @@ void JsEventTarget::CallIdsAsyncWork(uv_work_t *work, int32_t status)
     CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
     CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, arr, &result), CALL_FUNCTION, scope);
+    CHKRV_SCOPE(cb->env, napi_delete_reference(cb->env, cb->ref), DELETE_REFERENCE, scope);
     napi_close_handle_scope(cb->env, scope);
 }
 
@@ -328,8 +326,8 @@ void JsEventTarget::CallDevAsyncWork(uv_work_t *work, int32_t status)
     napi_value handler = nullptr;
     CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
-    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, object, &result), CALL_FUNCTION,
-        scope);
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, object, &result), CALL_FUNCTION, scope);
+    CHKRV_SCOPE(cb->env, napi_delete_reference(cb->env, cb->ref), DELETE_REFERENCE, scope);
     napi_close_handle_scope(cb->env, scope);
 }
 
@@ -682,11 +680,7 @@ void JsEventTarget::CallDevListAsyncWork(uv_work_t *work, int32_t status)
             return;
         }
         callResult[0] = GreateBusinessError(cb->env, cb->errCode, codeMsg.msg);
-        if (callResult[0] == nullptr) {
-            MMI_HILOGE("callResult[0] is nullptr");
-            napi_close_handle_scope(cb->env, scope);
-            return;
-        }
+        CHKNRV_SCOPE(cb->env, callResult[0], "callResult[0]", scope);
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[1]), GET_UNDEFINED, scope);
     } else {
         CHKRV_SCOPE(cb->env, napi_create_array(cb->env, &callResult[1]), CREATE_ARRAY, scope);
@@ -851,8 +845,7 @@ void JsEventTarget::CallDevInfoAsyncWork(uv_work_t *work, int32_t status)
     napi_value handler = nullptr;
     CHKRV_SCOPE(cb->env, napi_get_reference_value(cb->env, cb->ref, &handler), GET_REFERENCE_VALUE, scope);
     napi_value result = nullptr;
-    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, callResult, &result), CALL_FUNCTION,
-        scope);
+    CHKRV_SCOPE(cb->env, napi_call_function(cb->env, nullptr, handler, 2, callResult, &result), CALL_FUNCTION, scope);
     CHKRV_SCOPE(cb->env, napi_delete_reference(cb->env, cb->ref), DELETE_REFERENCE, scope);
     napi_close_handle_scope(cb->env, scope);
 }
