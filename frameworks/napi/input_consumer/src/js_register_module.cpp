@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,6 +30,8 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterModule" };
 constexpr size_t EVENT_NAME_LEN = 64;
 constexpr size_t PRE_KEYS_SIZE = 4;
+constexpr size_t INPUT_PARAMETER_MIDDLE = 2;
+constexpr size_t INPUT_PARAMETER_MAX = 3;
 } // namespace
 
 static Callbacks callbacks = {};
@@ -127,14 +129,14 @@ napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonit
     keyOption->SetFinalKeyDownDuration(finalKeyDownDuration);
     event->eventType = subKeyNames;
     MMI_HILOGD("FinalKeyDownDuration:%{public}d", finalKeyDownDuration);
-    if (argc == 3) {
-        CHKRP(napi_typeof(env, argv[2], &valueType), TYPEOF);
+    if (argc == INPUT_PARAMETER_MAX) {
+        CHKRP(napi_typeof(env, argv[INPUT_PARAMETER_MIDDLE], &valueType), TYPEOF);
         if (valueType != napi_function) {
             MMI_HILOGE("the third parameter is not napi_function");
             THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
             return nullptr;
         }
-        CHKRP(napi_create_reference(env, argv[2], 1, &event->callback[0]), REFERENCE_REF);
+        CHKRP(napi_create_reference(env, argv[INPUT_PARAMETER_MIDDLE], 1, &event->callback[0]), REFERENCE_REF);
     } else {
         event->callback[0] = nullptr;
     }
@@ -241,7 +243,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     napi_value argv[3] = { 0 };
     napi_value thisArg = nullptr;
     CHKRP(napi_get_cb_info(env, info, &argc, argv, &thisArg, nullptr), GET_CB_INFO);
-    if (argc < 3) {
+    if (argc < INPUT_PARAMETER_MAX) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
     }
@@ -311,7 +313,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     size_t argc = 3;
     napi_value argv[3] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 2) {
+    if (argc < INPUT_PARAMETER_MIDDLE) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
     }

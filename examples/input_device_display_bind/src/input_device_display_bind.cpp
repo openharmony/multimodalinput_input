@@ -35,10 +35,10 @@ void Help(const std::string title = {})
 int main(int argc, char *argv[])
 {
     struct option headOptions[] = {
-        {"query", no_argument, NULL, 'q'},
-        {"set", required_argument, NULL, 's'},
-        {"help", no_argument, NULL, 'h'},
-        {NULL, 0, NULL, 0}
+        {"query", no_argument, nullptr, 'q'},
+        {"set", required_argument, nullptr, 's'},
+        {"help", no_argument, nullptr, 'h'},
+        {nullptr, 0, nullptr, 0}
     };
 
     if (argc < 2) {

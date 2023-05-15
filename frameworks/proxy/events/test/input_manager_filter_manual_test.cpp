@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2020-2020. All rights reserved.
+ */
+/*
  * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,14 +127,15 @@ public:
         }
         return RET_OK;
     }
-    pid_t GetProcessPidByName(const char *proc_name) const
+    pid_t GetProcessPidByName(const char *procName) const
     {
         FILE *fp;
-        char buf[255];
-        std::string cmd = "pidof " + std::string(proc_name);
+        int32_t buffSize = 255;
+        char buf[buffSize];
+        std::string cmd = "pidof " + std::string(procName);
         MMI_HILOGI("cmd:%{public}s", cmd.c_str());
-        if ((fp = popen(cmd.c_str(), "r")) != NULL) {
-            if (fgets(buf, 255, fp) != NULL) {
+        if ((fp = popen(cmd.c_str(), "r")) != nullptr) {
+            if (fgets(buf, buffSize, fp) != nullptr) {
                 pid = atoi(buf);
             }
         }
@@ -151,7 +155,7 @@ public:
     {
         const char *cmd = "hidumper -s 3101 -a -f";
         FILE *fp = popen(cmd, "r");
-        if (fp == NULL) {
+        if (fp == nullptr) {
             MMI_HILOGE("Call popen fail, cmd:%{public}s", cmd);
             return RET_ERR;
         }
@@ -159,9 +163,10 @@ public:
         std::string strPid = std::to_string(pid);
         MMI_HILOGE("Self pid:%{public}s", strPid.c_str());
         std::regex itemRegex("priority:(\\d+) \\| filterId:(\\d+) \\| Pid:(\\d+)\r?\n?");
-        char *buf = NULL;
+        char *buf = nullptr;
         size_t bufLen = 0;
         ssize_t nRead = 0;
+        int32_t matchSize = 4;
         while ((nRead = getline(&buf, &bufLen, fp)) != -1) {
             std::string line(buf);
             std::smatch match;
@@ -170,7 +175,7 @@ public:
                 continue;
             }
             MMI_HILOGI("Line match: %{public}s", line.c_str());
-            if (match.size() != 4) {
+            if (match.size() != matchSize) {
                 MMI_HILOGI("Check itemRegex,it is error");
                 continue;
             }

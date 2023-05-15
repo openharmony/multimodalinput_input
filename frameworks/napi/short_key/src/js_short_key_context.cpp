@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -122,7 +122,8 @@ napi_value JsShortKeyContext::SetKeyDownDuration(napi_env env, napi_callback_inf
     size_t argc = 3;
     napi_value argv[3];
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 2) {
+    size_t paramsNum = 2;
+    if (argc < paramsNum) {
         MMI_HILOGE("At least 2 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "businessId", "string");
         return nullptr;
@@ -157,7 +158,7 @@ napi_value JsShortKeyContext::SetKeyDownDuration(napi_env env, napi_callback_inf
     JsShortKeyContext *jsShortKey = JsShortKeyContext::GetInstance(env);
     CHKPP(jsShortKey);
     auto jsShortKeyMgr = jsShortKey->GetJsShortKeyMgr();
-    if (argc == 2) {
+    if (argc == paramsNum) {
         return jsShortKeyMgr->SetKeyDownDuration(env, businessId, delay);
     }
     if (!JsCommon::TypeOf(env, argv[2], napi_function)) {
