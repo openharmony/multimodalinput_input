@@ -16,7 +16,6 @@
 #ifndef KEY_OPTION_H
 #define KEY_OPTION_H
 
-#include <mutex>
 #include <set>
 #include "nocopyable.h"
 #include "parcel.h"
@@ -140,7 +139,6 @@ private:
     bool isFinalKeyDown_ { false };
     int32_t finalKeyDownDuration_ { 0 };
     int32_t finalKeyUpDelay_ { 0 };
-    mutable std::mutex preKeysMutex_;
 };
 } // namespace MMI
 } // namespace OHOS
