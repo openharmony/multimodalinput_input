@@ -363,7 +363,7 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
         MMI_HILOGE("GetPointerEventEnhanceData failed!");
         return RET_ERR;
     }
-    uint8_t realBuf[enHanceDataLen] = { 0 };
+    uint8_t realBuf[enHanceDataLen];
     errno_t ret = memcpy_s(realBuf, enHanceDataLen, enHanceData, enHanceDataLen);
     if (ret != EOK) {
         free(secCompPointEvent);
