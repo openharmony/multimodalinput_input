@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,8 +22,7 @@
 
 namespace OHOS {
 namespace MMI {
-template<class T>
-size_t GetObject(T &object, const uint8_t *data, size_t size)
+template <class T> size_t GetObject(T &object, const uint8_t *data, size_t size)
 {
     size_t objectSize = sizeof(object);
     if (objectSize > size) {
@@ -36,7 +35,7 @@ size_t GetObject(T &object, const uint8_t *data, size_t size)
     return objectSize;
 }
 
-void FunctionkeyStateFuzzTest(const uint8_t* data, size_t size)
+void FunctionkeyStateFuzzTest(const uint8_t *data, size_t size)
 {
     int32_t funcKey;
     size_t startPos = 0;
@@ -52,7 +51,7 @@ void FunctionkeyStateFuzzTest(const uint8_t* data, size_t size)
 } // OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     /* Run your code on data */
     OHOS::MMI::FunctionkeyStateFuzzTest(data, size);

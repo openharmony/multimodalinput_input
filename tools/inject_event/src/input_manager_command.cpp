@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -59,6 +59,7 @@ constexpr int32_t THREE_MORE_COMMAND = 3;
 constexpr int32_t MAX_PRESSED_COUNT = 30;
 constexpr int32_t ACTION_TIME = 3000;
 constexpr int32_t BLOCK_TIME_MS = 10;
+constexpr int32_t TIME_TRANSITION = 1000;
 constexpr int64_t MIN_TAKTTIME_MS = 1;
 constexpr int64_t MAX_TAKTTIME_MS = 15000;
 enum JoystickEvent {
@@ -78,7 +79,7 @@ struct JoystickInfo {
 
 void InputManagerCommand::SleepAndUpdateTime(int64_t &currentTimeMs)
 {
-    int64_t nowEndSysTimeMs = GetSysClockTime() / 1000;
+    int64_t nowEndSysTimeMs = GetSysClockTime() / TIME_TRANSITION;
     int64_t sleepTimeMs = BLOCK_TIME_MS - (nowEndSysTimeMs - currentTimeMs) % BLOCK_TIME_MS;
     std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMs));
     currentTimeMs = nowEndSysTimeMs + sleepTimeMs;
@@ -118,48 +119,48 @@ int32_t InputManagerCommand::NextPos(int64_t begTimeMs, int64_t curtTimeMs, int3
 int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 {
     struct option headOptions[] = {
-        {"mouse", no_argument, NULL, 'M'},
-        {"keyboard", no_argument, NULL, 'K'},
-        {"touch", no_argument, NULL, 'T'},
-        {"joystick", no_argument, NULL, 'J'},
-        {"help", no_argument, NULL, '?'},
-        {NULL, 0, NULL, 0}
+        {"mouse", no_argument, nullptr, 'M'},
+        {"keyboard", no_argument, nullptr, 'K'},
+        {"touch", no_argument, nullptr, 'T'},
+        {"joystick", no_argument, nullptr, 'J'},
+        {"help", no_argument, nullptr, '?'},
+        {nullptr, 0, nullptr, 0}
     };
 
     struct option mouseSensorOptions[] = {
-        {"move", required_argument, NULL, 'm'},
-        {"click", required_argument, NULL, 'c'},
-        {"double_click", required_argument, NULL, 'b'},
-        {"down", required_argument, NULL, 'd'},
-        {"up", required_argument, NULL, 'u'},
-        {"scroll", required_argument, NULL, 's'},
-        {"drag", required_argument, NULL, 'g'},
-        {"interval", required_argument, NULL, 'i'},
-        {NULL, 0, NULL, 0}
+        {"move", required_argument, nullptr, 'm'},
+        {"click", required_argument, nullptr, 'c'},
+        {"double_click", required_argument, nullptr, 'b'},
+        {"down", required_argument, nullptr, 'd'},
+        {"up", required_argument, nullptr, 'u'},
+        {"scroll", required_argument, nullptr, 's'},
+        {"drag", required_argument, nullptr, 'g'},
+        {"interval", required_argument, nullptr, 'i'},
+        {nullptr, 0, nullptr, 0}
     };
     struct option keyboardSensorOptions[] = {
-        {"down", required_argument, NULL, 'd'},
-        {"up", required_argument, NULL, 'u'},
-        {"long_press", required_argument, NULL, 'l'},
-        {"interval", required_argument, NULL, 'i'},
-        {NULL, 0, NULL, 0}
+        {"down", required_argument, nullptr, 'd'},
+        {"up", required_argument, nullptr, 'u'},
+        {"long_press", required_argument, nullptr, 'l'},
+        {"interval", required_argument, nullptr, 'i'},
+        {nullptr, 0, nullptr, 0}
     };
     struct option touchSensorOptions[] = {
-        {"move", required_argument, NULL, 'm'},
-        {"down", required_argument, NULL, 'd'},
-        {"up", required_argument, NULL, 'u'},
-        {"click", required_argument, NULL, 'c'},
-        {"interval", required_argument, NULL, 'i'},
-        {"drag", required_argument, NULL, 'g'},
-        {NULL, 0, NULL, 0}
+        {"move", required_argument, nullptr, 'm'},
+        {"down", required_argument, nullptr, 'd'},
+        {"up", required_argument, nullptr, 'u'},
+        {"click", required_argument, nullptr, 'c'},
+        {"interval", required_argument, nullptr, 'i'},
+        {"drag", required_argument, nullptr, 'g'},
+        {nullptr, 0, nullptr, 0}
     };
     struct option joystickSensorOptions[] = {
-        {"move", required_argument, NULL, 'm'},
-        {"down", required_argument, NULL, 'd'},
-        {"up", required_argument, NULL, 'u'},
-        {"click", required_argument, NULL, 'c'},
-        {"interval", required_argument, NULL, 'i'},
-        {NULL, 0, NULL, 0}
+        {"move", required_argument, nullptr, 'm'},
+        {"down", required_argument, nullptr, 'd'},
+        {"up", required_argument, nullptr, 'u'},
+        {"click", required_argument, nullptr, 'c'},
+        {"interval", required_argument, nullptr, 'i'},
+        {nullptr, 0, nullptr, 0}
     };
     int32_t c = 0;
     int32_t optionIndex = 0;
@@ -297,7 +298,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
                                 int64_t startTimeUs = GetSysClockTime();
-                                int64_t startTimeMs = startTimeUs / 1000;
+                                int64_t startTimeMs = startTimeUs / TIME_TRANSITION;
                                 int64_t endTimeMs = 0;
                                 if (!AddInt64(startTimeMs, totalTimeMs, endTimeMs)) {
                                     std::cout << "system time error" << std::endl;
@@ -610,7 +611,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
-                            int64_t startTimeMs = GetSysClockTime() / 1000;
+                            int64_t startTimeMs = GetSysClockTime() / TIME_TRANSITION;
                             int64_t endTimeMs = 0;
                             if (!AddInt64(startTimeMs, totalTimeMs, endTimeMs)) {
                                 std::cout << "System time error" << std::endl;
@@ -896,7 +897,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 
                             int64_t startTimeUs = pointerEvent->GetActionStartTime();
-                            int64_t startTimeMs = startTimeUs / 1000;
+                            int64_t startTimeMs = startTimeUs / TIME_TRANSITION;
                             int64_t endTimeMs = 0;
                             if (!AddInt64(startTimeMs, totalTimeMs, endTimeMs)) {
                                 std::cout << "system time error." << std::endl;
@@ -909,12 +910,12 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             while (currentTimeMs < endTimeMs) {
                                 item.SetDisplayX(NextPos(startTimeMs, currentTimeMs, totalTimeMs, px1, px2));
                                 item.SetDisplayY(NextPos(startTimeMs, currentTimeMs, totalTimeMs, py1, py2));
-                                pointerEvent->SetActionTime(currentTimeMs * 1000);
+                                pointerEvent->SetActionTime(currentTimeMs * TIME_TRANSITION);
                                 pointerEvent->UpdatePointerItem(0, item);
                                 pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                                 InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
                                 nowSysTimeUs = GetSysClockTime();
-                                nowSysTimeMs = nowSysTimeUs / 1000;
+                                nowSysTimeMs = nowSysTimeUs / TIME_TRANSITION;
                                 sleepTimeMs = (currentTimeMs + BLOCK_TIME_MS) - nowSysTimeMs;
                                 std::this_thread::sleep_for(std::chrono::milliseconds(sleepTimeMs));
                                 currentTimeMs += BLOCK_TIME_MS;
@@ -922,7 +923,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
-                            pointerEvent->SetActionTime(endTimeMs * 1000);
+                            pointerEvent->SetActionTime(endTimeMs * TIME_TRANSITION);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
@@ -930,7 +931,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
 
                             item.SetDisplayX(px2);
                             item.SetDisplayY(py2);
-                            pointerEvent->SetActionTime((endTimeMs + BLOCK_TIME_MS) * 1000);
+                            pointerEvent->SetActionTime((endTimeMs + BLOCK_TIME_MS) * TIME_TRANSITION);
                             pointerEvent->UpdatePointerItem(0, item);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
