@@ -146,7 +146,7 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         MMI_HILOGE("Failed to deserialize pointer event.");
         return RET_ERR;
     }
-    MMI_HILOGD("Pointer event dispatcher of client:");
+    MMI_HILOGI("Pointer event dispatcher of client:");
     EventLogHelper::PrintEventData(pointerEvent);
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
         MMI_HILOGI("Operation canceled.");
