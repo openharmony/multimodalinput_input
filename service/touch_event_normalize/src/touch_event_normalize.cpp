@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,19 +24,18 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "TouchEventNormalize" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL{ LOG_CORE, MMI_LOG_DOMAIN, "TouchEventNormalize" };
 } // namespace
 
 TouchEventNormalize::TouchEventNormalize() {}
 TouchEventNormalize::~TouchEventNormalize() {}
 
-std::shared_ptr<PointerEvent> TouchEventNormalize::OnLibInput(
-    struct libinput_event *event, DeviceType deviceType)
+std::shared_ptr<PointerEvent> TouchEventNormalize::OnLibInput(struct libinput_event *event, DeviceType deviceType)
 {
     CHKPP(event);
     auto device = libinput_event_get_device(event);
     CHKPP(device);
-    std::shared_ptr<TransformProcessor> processor { nullptr };
+    std::shared_ptr<TransformProcessor> processor{ nullptr };
     auto deviceId = InputDevMgr->FindInputDeviceId(device);
     if (auto it = processors_.find(deviceId); it != processors_.end()) {
         processor = it->second;
@@ -51,10 +50,10 @@ std::shared_ptr<PointerEvent> TouchEventNormalize::OnLibInput(
     return processor->OnEvent(event);
 }
 
-std::shared_ptr<TransformProcessor> TouchEventNormalize::MakeTransformProcessor(
-    int32_t deviceId, DeviceType deviceType) const
+std::shared_ptr<TransformProcessor> TouchEventNormalize::MakeTransformProcessor(int32_t deviceId,
+    DeviceType deviceType) const
 {
-    std::shared_ptr<TransformProcessor> processor { nullptr };
+    std::shared_ptr<TransformProcessor> processor{ nullptr };
     switch (deviceType) {
 #ifdef OHOS_BUILD_ENABLE_TOUCH
         case DeviceType::TOUCH: {
@@ -77,7 +76,7 @@ std::shared_ptr<TransformProcessor> TouchEventNormalize::MakeTransformProcessor(
         }
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
-	    case DeviceType::JOYSTICK: {
+        case DeviceType::JOYSTICK: {
             processor = std::make_shared<JoystickTransformProcessor>(deviceId);
             break;
         }

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -46,6 +46,7 @@ constexpr int32_t DEFAULT_SPEED = 5;
 constexpr int32_t DEFAULT_ROWS = 3;
 constexpr int32_t MIN_ROWS = 1;
 constexpr int32_t MAX_ROWS = 100;
+constexpr int32_t CALCULATE_MIDDLE = 2;
 const std::string mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
 const std::vector<AccelerateCurve> ACCELERATE_CURVES {
     { { 8, 32, 128 }, { 0.16, 0.30, 0.56 }, { 0.0, -1.12, -9.44 } },
@@ -141,8 +142,8 @@ void MouseTransformProcessor::InitAbsolution()
         return;
     }
     currentDisplayId_ = displayGroupInfo.displaysInfo[0].id;
-    absolutionX_ = displayGroupInfo.displaysInfo[0].width * 1.0 / 2;
-    absolutionY_ = displayGroupInfo.displaysInfo[0].height * 1.0 / 2;
+    absolutionX_ = displayGroupInfo.displaysInfo[0].width * 1.0 / CALCULATE_MIDDLE;
+    absolutionY_ = displayGroupInfo.displaysInfo[0].height * 1.0 / CALCULATE_MIDDLE;
 }
 
 int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer* data)

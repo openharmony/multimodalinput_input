@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -86,7 +86,7 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
         { "interceptor", no_argument, 0, 'i' },
         { "filter", no_argument, 0, 'f' },
         { "mouse", no_argument, 0, 'm' },
-        { NULL, 0, 0, 0 }
+        { nullptr, 0, 0, 0 }
     };
     if (args.empty()) {
         MMI_HILOGE("size of args can't be zero");

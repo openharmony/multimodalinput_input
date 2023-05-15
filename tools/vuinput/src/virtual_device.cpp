@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -661,11 +661,11 @@ bool VirtualDevice::SelectOptions(int32_t argc, char **argv, int32_t &opt)
         return false;
     }
     struct option longOptions[] = {
-        {"list", no_argument, NULL, 'L'},
-        {"start", no_argument, NULL, 'S'},
-        {"close", no_argument, NULL, 'C'},
-        {"help", no_argument, NULL, '?'},
-        {NULL, 0, NULL, 0}
+        {"list", no_argument, nullptr, 'L'},
+        {"start", no_argument, nullptr, 'S'},
+        {"close", no_argument, nullptr, 'C'},
+        {"help", no_argument, nullptr, '?'},
+        {nullptr, 0, nullptr, 0}
     };
     std::string inputOptions = argv[optind];
     if (inputOptions.find('-') == inputOptions.npos) {

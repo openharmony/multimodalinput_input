@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -54,8 +54,8 @@ std::string DeviceConfigManagement::CombDeviceFileName(struct libinput_device *d
     uint32_t version = libinput_device_get_id_version(device);
     const char *name = libinput_device_get_name(device);
     CHKPS(name);
-    std::string fileName = std::to_string(vendor) + "_" + std::to_string(product) + "_" +
-        std::to_string(version) + "_" + name;
+    std::string fileName =
+        std::to_string(vendor) + "_" + std::to_string(product) + "_" + std::to_string(version) + "_" + name;
     RemoveSpace(fileName);
     return fileName;
 }
@@ -63,7 +63,7 @@ std::string DeviceConfigManagement::CombDeviceFileName(struct libinput_device *d
 ConfigFileItem DeviceConfigManagement::ConfigItemName2Id(const std::string &name) const
 {
     static const std::map<const std::string, ConfigFileItem> configList = {
-        {"speed", ConfigFileItem::POINTER_SPEED},
+        { "speed", ConfigFileItem::POINTER_SPEED },
     };
 
     auto iter = configList.find(name);

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -60,7 +60,7 @@ int32_t UDSSocket::EpollCtl(int32_t fd, int32_t op, struct epoll_event &event, i
     }
     int32_t ret;
     if (op == EPOLL_CTL_DEL) {
-        ret = epoll_ctl(epollFd, op, fd, NULL);
+        ret = epoll_ctl(epollFd, op, fd, nullptr);
     } else {
         ret = epoll_ctl(epollFd, op, fd, &event);
     }

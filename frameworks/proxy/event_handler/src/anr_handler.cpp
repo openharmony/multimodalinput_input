@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,6 +29,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ANRHa
 constexpr int64_t MAX_MARK_PROCESS_DELAY_TIME = 3500000;
 constexpr int64_t MIN_MARK_PROCESS_DELAY_TIME = 50000;
 constexpr int32_t INVALID_OR_PROCESSED_ID = -1;
+constexpr int32_t TIME_TRANSITION = 1000;
 } // namespace
 
 ANRHandler::ANRHandler() {}
@@ -69,9 +70,9 @@ void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, int
         } else {
             int64_t delayTime;
             if (timeoutTime >= MAX_MARK_PROCESS_DELAY_TIME) {
-                delayTime = MAX_MARK_PROCESS_DELAY_TIME / 1000;
+                delayTime = MAX_MARK_PROCESS_DELAY_TIME / TIME_TRANSITION;
             } else {
-                delayTime = timeoutTime / 1000;
+                delayTime = timeoutTime / TIME_TRANSITION;
             }
             SendEvent(eventType, delayTime);
         }

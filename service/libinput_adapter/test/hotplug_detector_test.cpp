@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,7 +36,7 @@ constexpr auto DEV_INPUT_PATH = "/dev/input/";
 
 auto SystemError()
 {
-    return std::error_code{errno, std::system_category()};
+    return std::error_code{ errno, std::system_category() };
 }
 
 class HotplugTest : public ::testing::Test {
@@ -65,7 +65,7 @@ void FakeInputDevice::Create()
 
     uinput_setup usetup{};
     usetup.id.bustype = BUS_USB;
-    usetup.id.vendor = 0x1234; /* sample vendor */
+    usetup.id.vendor = 0x1234;  /* sample vendor */
     usetup.id.product = 0x5678; /* sample product */
     std::string dev("Example device");
     std::copy(dev.begin(), dev.end(), usetup.name);
@@ -83,16 +83,16 @@ void FakeInputDevice::Destroy()
     fd_ = -1;
 }
 
-bool Exists(const std::string& path)
+bool Exists(const std::string &path)
 {
-    std::ifstream file{path};
+    std::ifstream file{ path };
     return file.good();
 }
 
-void PollEvents(const OHOS::MMI::HotplugDetector& detector)
+static void PollEvents(const OHOS::MMI::HotplugDetector &detector)
 {
     constexpr int timeout = 10; // milliseconds
-    struct pollfd buf = {detector.GetFd(), POLLIN, 0};
+    struct pollfd buf = { detector.GetFd(), POLLIN, 0 };
     while (poll(&buf, 1, timeout) > 0) {
         detector.OnEvent();
     }
@@ -181,7 +181,7 @@ HWTEST_F(HotplugTest, TestSsystemFail, TestSize.Level1)
     std::vector<DIR *> dirs;
     // Exhaust system resources
     while (true) {
-        auto* dir = opendir(DEV_INPUT_PATH);
+        auto *dir = opendir(DEV_INPUT_PATH);
         if (dir == nullptr) {
             break;
         }
