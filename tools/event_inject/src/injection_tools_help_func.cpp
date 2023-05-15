@@ -79,10 +79,10 @@ bool InjectionToolsHelpFunc::SelectOptions(int32_t argc, char **argv, int32_t &o
         return false;
     }
     struct option longOptions[] = {
-        {"sendevent", no_argument, NULL, 'S'},
-        {"json", no_argument, NULL, 'J'},
-        {"help", no_argument, NULL, '?'},
-        {NULL, 0, NULL, 0}
+        {"sendevent", no_argument, nullptr, 'S'},
+        {"json", no_argument, nullptr, 'J'},
+        {"help", no_argument, nullptr, '?'},
+        {nullptr, 0, nullptr, 0}
     };
     std::string inputOptions = argv[optind];
     if (inputOptions.find('-') == inputOptions.npos) {

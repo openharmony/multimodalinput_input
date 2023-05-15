@@ -28,7 +28,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AddIn
 void AddInputEventFilterFuzzTest(const uint8_t *data, size_t size)
 {
     struct TestFilter : public IInputEventFilter {
-        virtual bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
+        bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
         {
             CHKPR(keyEvent, false);
             MMI_HILOGI("Fuzz test in TestFilter::OnInputEvent,key code:%{public}d", keyEvent->GetKeyCode());

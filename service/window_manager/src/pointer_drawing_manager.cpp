@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,6 +33,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerDrawingManager" };
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
 constexpr int32_t BASELINE_DENSITY = 160;
+constexpr int32_t CALCULATE_MIDDLE = 2;
 constexpr int32_t DEVICE_INDEPENDENT_PIXELS = 40;
 constexpr int32_t POINTER_WINDOW_INIT_SIZE = 64;
 } // namespace
@@ -139,8 +140,8 @@ void PointerDrawingManager::AdjustMouseFocus(ICON_TYPE iconType, int32_t &physic
             break;
         }
         case ANGLE_CENTER: {
-            physicalX -= imageWidth_ / 2;
-            physicalY -= imageHeight_ / 2;
+            physicalX -= imageWidth_ / CALCULATE_MIDDLE;
+            physicalY -= imageHeight_ / CALCULATE_MIDDLE;
             break;
         }
         case ANGLE_NW:
@@ -333,8 +334,8 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupIn
         }
     }
     UpdateDisplayInfo(displayGroupInfo.displaysInfo[0]);
-    lastPhysicalX_ = displayGroupInfo.displaysInfo[0].width / 2;
-    lastPhysicalY_ = displayGroupInfo.displaysInfo[0].height / 2;
+    lastPhysicalX_ = displayGroupInfo.displaysInfo[0].width / CALCULATE_MIDDLE;
+    lastPhysicalY_ = displayGroupInfo.displaysInfo[0].height / CALCULATE_MIDDLE;
     MouseEventHdr->OnDisplayLost(displayInfo_.id);
     if (pointerWindow_ != nullptr) {
         pointerWindow_->Destroy();
@@ -375,7 +376,8 @@ void PointerDrawingManager::DrawManager()
             return;
         }
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
-            DrawPointer(displayInfo_.id, displayInfo_.width / 2, displayInfo_.height / 2, MOUSE_ICON(pointerStyle.id));
+            DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
+                MOUSE_ICON(pointerStyle.id));
             MMI_HILOGD("Draw manager, mouseStyle:%{public}d, last physical is initial value", pointerStyle.id);
             return;
         }
@@ -550,7 +552,8 @@ void PointerDrawingManager::DrawPointerStyle()
             return;
         }
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
-            DrawPointer(displayInfo_.id, displayInfo_.width / 2, displayInfo_.height / 2, MOUSE_ICON(pointerStyle.id));
+            DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
+                MOUSE_ICON(pointerStyle.id));
             MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", pointerStyle.id);
             return;
         }

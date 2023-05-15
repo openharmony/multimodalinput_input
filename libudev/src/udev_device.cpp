@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,7 +35,7 @@
 using namespace std::literals;
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "MmiLibudev"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "MmiLibudev" };
 
 constexpr int UTIL_PATH_SIZE = 1024;
 constexpr int UTIL_LINE_SIZE = 16384;
@@ -45,7 +45,7 @@ bool StartsWith(std::string_view str, std::string_view prefix)
     return str.size() >= prefix.size() && str.substr(0, prefix.size()) == prefix;
 }
 
-bool ChopTail(std::string_view& str, char sep)
+bool ChopTail(std::string_view &str, char sep)
 {
     auto pos = str.rfind(sep);
     if (pos == std::string_view::npos) {
@@ -55,7 +55,7 @@ bool ChopTail(std::string_view& str, char sep)
     return true;
 }
 
-std::string ResolveSymLink(const std::string& syspath)
+std::string ResolveSymLink(const std::string &syspath)
 {
     constexpr auto backStr = "../"sv;
     char linkTarget[UTIL_PATH_SIZE];
@@ -65,7 +65,7 @@ std::string ResolveSymLink(const std::string& syspath)
         return syspath;
     }
 
-    std::string_view tail{linkTarget, len};
+    std::string_view tail{ linkTarget, len };
     int back = 0;
     for (; StartsWith(tail, backStr); back++) {
         tail.remove_prefix(backStr.size());
@@ -78,10 +78,10 @@ std::string ResolveSymLink(const std::string& syspath)
         }
     }
 
-    return std::string{base}.append("/").append(tail);
+    return std::string{ base }.append("/").append(tail);
 }
 
-std::optional<std::string> GetLinkValue(const std::string& slink, const std::string& syspath)
+std::optional<std::string> GetLinkValue(const std::string &slink, const std::string &syspath)
 {
     auto path = syspath + "/" + slink;
 
@@ -91,12 +91,12 @@ std::optional<std::string> GetLinkValue(const std::string& slink, const std::str
         return std::nullopt;
     }
 
-    std::string_view result{target, len};
+    std::string_view result{ target, len };
     auto pos = result.rfind('/');
     if (pos == std::string_view::npos) {
         return std::nullopt;
     }
-    return std::string{result.substr(pos + 1)};
+    return std::string{ result.substr(pos + 1) };
 }
 
 class BitVector {
@@ -105,9 +105,9 @@ public:
     using val_t = unsigned long;
 
     // Input string is hexadecimal 64-bit numbers separated by spaces with high bit number first
-    explicit BitVector(const std::string& str)
+    explicit BitVector(const std::string &str)
     {
-        std::istringstream ss{str};
+        std::istringstream ss{ str };
         ss >> std::hex;
         std::copy(std::istream_iterator<val_t>(ss), std::istream_iterator<val_t>(), std::back_inserter(bits_));
         // Since numbers in string starts with high number we need to reverse vector to count numbers from low to high
@@ -129,18 +129,17 @@ private:
 };
 } // namespace
 
-struct udev {
-};
+struct udev {};
 
 struct udev_device {
 public:
     // Not copyable and not movable
-    udev_device(udev_device&) = delete;
-    udev_device(udev_device&&) = delete;
-    udev_device& operator=(udev_device&) = delete;
-    udev_device& operator=(udev_device&&) = delete;
+    udev_device(udev_device &) = delete;
+    udev_device(udev_device &&) = delete;
+    udev_device &operator = (udev_device &) = delete;
+    udev_device &operator = (udev_device &&) = delete;
 
-    static udev_device* NewFromSyspath(const std::string& syspathParam)
+    static udev_device *NewFromSyspath(const std::string &syspathParam)
     {
         CALL_DEBUG_ENTER;
         // path starts in sys
@@ -162,16 +161,16 @@ public:
             return nullptr;
         }
 
-        auto* inst = new udev_device;
+        auto *inst = new udev_device;
         inst->SetSyspath(std::move(path));
 
         return inst;
     }
 
-    static udev_device* NewFromDevnum(char type, dev_t devnum)
+    static udev_device *NewFromDevnum(char type, dev_t devnum)
     {
         CALL_DEBUG_ENTER;
-        const char* typeStr = nullptr;
+        const char *typeStr = nullptr;
 
         if (type == 'b') {
             typeStr = "block";
@@ -200,7 +199,7 @@ public:
         }
     }
 
-    udev_device* GetParent()
+    udev_device *GetParent()
     {
         if (!parentDevice_.has_value()) {
             parentDevice_ = NewFromChild(this);
@@ -208,17 +207,17 @@ public:
         return *parentDevice_;
     }
 
-    const std::string& GetSyspath() const
+    const std::string &GetSyspath() const
     {
         return syspath;
     }
 
-    const std::string& GetSysname() const
+    const std::string &GetSysname() const
     {
         return sysname;
     }
 
-    const std::string& GetDevnode()
+    const std::string &GetDevnode()
     {
         return GetProperty("DEVNAME");
     }
@@ -231,10 +230,10 @@ public:
         return ueventLoaded;
     }
 
-    udev_device* GetParentWithSubsystem(const std::string& subsystem)
+    udev_device *GetParentWithSubsystem(const std::string &subsystem)
     {
         CALL_DEBUG_ENTER;
-        udev_device* parent = GetParent();
+        udev_device *parent = GetParent();
         while (parent != nullptr) {
             auto parentSubsystem = parent->GetSubsystem();
             if (parentSubsystem.has_value() && parentSubsystem.value() == subsystem) {
@@ -249,7 +248,7 @@ public:
         return parent;
     }
 
-    bool HasProperty(const std::string& key)
+    bool HasProperty(const std::string &key)
     {
         if (!ueventLoaded) {
             ReadUeventFile();
@@ -257,7 +256,7 @@ public:
         return property_.find(key) != property_.end();
     }
 
-    const std::string& GetProperty(const std::string& key)
+    const std::string &GetProperty(const std::string &key)
     {
         if (!ueventLoaded) {
             ReadUeventFile();
@@ -275,7 +274,7 @@ private:
         }
     }
 
-    static udev_device* NewFromChild(udev_device* child)
+    static udev_device *NewFromChild(udev_device *child)
     {
         CALL_DEBUG_ENTER;
         std::string_view path = child->GetSyspath();
@@ -284,7 +283,7 @@ private:
             if (!ChopTail(path, '/')) {
                 break;
             }
-            udev_device* parent = NewFromSyspath(std::string{path});
+            udev_device *parent = NewFromSyspath(std::string{ path });
             if (parent != nullptr) {
                 return parent;
             }
@@ -307,14 +306,14 @@ private:
         sysname = syspath.substr(pos + 1);
 
         // some devices have '!' in their name, change that to '/'
-        for (char& c : sysname) {
+        for (char &c : sysname) {
             if (c == '!') {
                 c = '/';
             }
         }
     }
 
-    void AddPropertyFromString(const std::string& line)
+    void AddPropertyFromString(const std::string &line)
     {
         auto pos = line.find('=');
         if (pos == std::string::npos) {
@@ -351,7 +350,7 @@ private:
         CheckInputProperties();
     }
 
-    bool CheckAccel(const BitVector& ev, const BitVector& abs, const BitVector& prop)
+    bool CheckAccel(const BitVector &ev, const BitVector &abs, const BitVector &prop)
     {
         bool hasKeys = ev.CheckBit(EV_KEY);
         bool has3dCoordinates = abs.CheckBit(ABS_X) && abs.CheckBit(ABS_Y) && abs.CheckBit(ABS_Z);
@@ -367,7 +366,7 @@ private:
         return isAccelerometer;
     }
 
-    bool HasJoystickAxesOrButtons(const BitVector& abs, const BitVector& key)
+    bool HasJoystickAxesOrButtons(const BitVector &abs, const BitVector &key)
     {
         bool hasJoystickAxesOrButtons = false;
         // Some mouses have so much buttons that they overflow in joystick range, ignore them
@@ -376,7 +375,7 @@ private:
                 hasJoystickAxesOrButtons = key.CheckBit(button);
             }
             for (int button = BTN_TRIGGER_HAPPY1; button <= BTN_TRIGGER_HAPPY40 && !hasJoystickAxesOrButtons;
-                 button++) {
+                button++) {
                 hasJoystickAxesOrButtons = key.CheckBit(button);
             }
             for (int button = BTN_DPAD_UP; button <= BTN_DPAD_RIGHT && !hasJoystickAxesOrButtons; button++) {
@@ -389,7 +388,7 @@ private:
         return hasJoystickAxesOrButtons;
     }
 
-    bool CheckPointingStick(const BitVector& prop)
+    bool CheckPointingStick(const BitVector &prop)
     {
         if (prop.CheckBit(INPUT_PROP_POINTING_STICK)) {
             SetInputProperty("ID_INPUT_POINTINGSTICK");
@@ -398,7 +397,7 @@ private:
         return false;
     }
 
-    void CheckAndSetProp(std::string prop, const bool& flag)
+    void CheckAndSetProp(std::string prop, const bool &flag)
     {
         if (flag) {
             SetInputProperty(prop);
@@ -406,22 +405,22 @@ private:
         }
     }
 
-    void CheckMouseButton(const BitVector& key, bool& flag)
+    void CheckMouseButton(const BitVector &key, bool &flag)
     {
         for (int button = BTN_MOUSE; button < BTN_JOYSTICK && !flag; button++) {
             flag = key.CheckBit(button);
         }
     }
 
-    void UpdateProByKey(const BitVector& key, const bool& isDirect, bool& probablyTablet, bool& probablyTouchpad,
-        bool& probablyTouchscreen)
+    void UpdateProByKey(const BitVector &key, const bool &isDirect, bool &probablyTablet, bool &probablyTouchpad,
+        bool &probablyTouchscreen)
     {
         probablyTablet = key.CheckBit(BTN_STYLUS) || key.CheckBit(BTN_TOOL_PEN);
         probablyTouchpad = key.CheckBit(BTN_TOOL_FINGER) && !key.CheckBit(BTN_TOOL_PEN) && !isDirect;
         probablyTouchscreen = key.CheckBit(BTN_TOUCH) && isDirect;
     }
 
-    bool CheckMtCoordinates(const BitVector& abs)
+    bool CheckMtCoordinates(const BitVector &abs)
     {
         bool hasMtCoordinates = abs.CheckBit(ABS_MT_POSITION_X) && abs.CheckBit(ABS_MT_POSITION_Y);
         /* unset hasMtCoordinates if devices claims to have all abs axis */
@@ -431,8 +430,8 @@ private:
         return hasMtCoordinates;
     }
 
-    void UpdateProByStatus(const bool& isMouse, const bool& isTouchpad, const bool& isTouchscreen,
-        const bool& isJoystick, const bool& isTablet)
+    void UpdateProByStatus(const bool &isMouse, const bool &isTouchpad, const bool &isTouchscreen,
+        const bool &isJoystick, const bool &isTablet)
     {
         CheckAndSetProp("ID_INPUT_MOUSE", isMouse);
         CheckAndSetProp("ID_INPUT_TOUCHPAD", isTouchpad);
@@ -441,8 +440,8 @@ private:
         CheckAndSetProp("ID_INPUT_TABLET", isTablet);
     }
 
-    bool CheckPointers(const BitVector& ev, const BitVector& abs, const BitVector& key, const BitVector& rel,
-        const BitVector& prop)
+    bool CheckPointers(const BitVector &ev, const BitVector &abs, const BitVector &key, const BitVector &rel,
+        const BitVector &prop)
     {
         bool isDirect = prop.CheckBit(INPUT_PROP_DIRECT);
         bool hasAbsCoordinates = abs.CheckBit(ABS_X) && abs.CheckBit(ABS_Y);
@@ -501,7 +500,7 @@ private:
         return isTablet || isMouse || isTouchpad || isTouchscreen || isJoystick || CheckPointingStick(prop);
     }
 
-    bool CheckKeys(const BitVector& ev, const BitVector& key)
+    bool CheckKeys(const BitVector &ev, const BitVector &key)
     {
         if (!ev.CheckBit(EV_KEY)) {
             return false;
@@ -546,11 +545,11 @@ private:
     void CheckInputProperties()
     {
         CALL_DEBUG_ENTER;
-        BitVector ev{GetProperty("EV")};
-        BitVector abs{GetProperty("ABS")};
-        BitVector key{GetProperty("KEY")};
-        BitVector rel{GetProperty("REL")};
-        BitVector prop{GetProperty("PROP")};
+        BitVector ev{ GetProperty("EV") };
+        BitVector abs{ GetProperty("ABS") };
+        BitVector key{ GetProperty("KEY") };
+        BitVector rel{ GetProperty("REL") };
+        BitVector prop{ GetProperty("PROP") };
 
         bool isPointer = CheckAccel(ev, abs, prop) || CheckPointers(ev, abs, key, rel, prop);
         bool isKey = CheckKeys(ev, key);
@@ -602,7 +601,7 @@ private:
     std::string syspath;
     std::string sysname;
 
-    std::optional<udev_device*> parentDevice_;
+    std::optional<udev_device *> parentDevice_;
     std::optional<std::string> subsystem_;
 
     bool ueventLoaded = false;
@@ -611,18 +610,18 @@ private:
 
 // C-style interface
 
-udev* udev_new(void)
+udev *udev_new(void)
 {
     static udev instance{};
     return &instance;
 }
 
-udev* udev_unref([[maybe_unused]] udev* udev)
+udev *udev_unref([[maybe_unused]] udev *udev)
 {
     return nullptr;
 }
 
-udev_device* udev_device_ref(udev_device* device)
+udev_device *udev_device_ref(udev_device *device)
 {
     if (device == nullptr) {
         return nullptr;
@@ -631,7 +630,7 @@ udev_device* udev_device_ref(udev_device* device)
     return device;
 }
 
-udev_device* udev_device_unref(udev_device* device)
+udev_device *udev_device_unref(udev_device *device)
 {
     if (device == nullptr) {
         return nullptr;
@@ -640,7 +639,7 @@ udev_device* udev_device_unref(udev_device* device)
     return nullptr;
 }
 
-udev* udev_device_get_udev(udev_device* device)
+udev *udev_device_get_udev(udev_device *device)
 {
     if (device == nullptr) {
         return nullptr;
@@ -648,7 +647,7 @@ udev* udev_device_get_udev(udev_device* device)
     return udev_new();
 }
 
-udev_device* udev_device_new_from_syspath(udev* udev, const char* syspath)
+udev_device *udev_device_new_from_syspath(udev *udev, const char *syspath)
 {
     if (udev == nullptr || syspath == nullptr) {
         errno = EINVAL;
@@ -657,7 +656,7 @@ udev_device* udev_device_new_from_syspath(udev* udev, const char* syspath)
     return udev_device::NewFromSyspath(syspath);
 }
 
-udev_device* udev_device_new_from_devnum(udev* udev, char type, dev_t devnum)
+udev_device *udev_device_new_from_devnum(udev *udev, char type, dev_t devnum)
 {
     if (udev == nullptr) {
         errno = EINVAL;
@@ -666,7 +665,7 @@ udev_device* udev_device_new_from_devnum(udev* udev, char type, dev_t devnum)
     return udev_device::NewFromDevnum(type, devnum);
 }
 
-udev_device* udev_device_get_parent(udev_device* device)
+udev_device *udev_device_get_parent(udev_device *device)
 {
     if (device == nullptr) {
         errno = EINVAL;
@@ -675,8 +674,8 @@ udev_device* udev_device_get_parent(udev_device* device)
     return device->GetParent();
 }
 
-udev_device* udev_device_get_parent_with_subsystem_devtype(udev_device* device, const char* subsystem,
-    const char* devtype)
+udev_device *udev_device_get_parent_with_subsystem_devtype(udev_device *device, const char *subsystem,
+    const char *devtype)
 {
     if (device == nullptr) {
         return nullptr;
@@ -692,7 +691,7 @@ udev_device* udev_device_get_parent_with_subsystem_devtype(udev_device* device, 
     return device->GetParentWithSubsystem(subsystem);
 }
 
-const char* udev_device_get_syspath(udev_device* device)
+const char *udev_device_get_syspath(udev_device *device)
 {
     if (device == nullptr) {
         return nullptr;
@@ -700,7 +699,7 @@ const char* udev_device_get_syspath(udev_device* device)
     return device->GetSyspath().c_str();
 }
 
-const char* udev_device_get_sysname(udev_device* device)
+const char *udev_device_get_sysname(udev_device *device)
 {
     if (device == nullptr) {
         return nullptr;
@@ -708,7 +707,7 @@ const char* udev_device_get_sysname(udev_device* device)
     return device->GetSysname().c_str();
 }
 
-const char* udev_device_get_devnode(udev_device* device)
+const char *udev_device_get_devnode(udev_device *device)
 {
     if (device == nullptr) {
         return nullptr;
@@ -716,17 +715,17 @@ const char* udev_device_get_devnode(udev_device* device)
     return device->GetDevnode().c_str();
 }
 
-int udev_device_get_is_initialized(udev_device* device)
+int udev_device_get_is_initialized(udev_device *device)
 {
     return (device != nullptr) ? static_cast<int>(device->IsInitialized()) : -1;
 }
 
-const char* udev_device_get_property_value(udev_device* device, const char* key)
+const char *udev_device_get_property_value(udev_device *device, const char *key)
 {
     if (device == nullptr || key == nullptr) {
         return nullptr;
     }
-    std::string skey{key};
+    std::string skey{ key };
     if (!device->HasProperty(key)) {
         return nullptr;
     }

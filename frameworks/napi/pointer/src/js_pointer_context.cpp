@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,6 +25,7 @@ constexpr int32_t MIN_SPEED = 1;
 constexpr int32_t DEFAULT_ROWS = 3;
 constexpr int32_t MIN_ROWS = 1;
 constexpr int32_t MAX_ROWS = 100;
+constexpr size_t INPUT_PARAMETER = 2;
 } // namespace
 
 JsPointerContext::JsPointerContext() : mgr_(std::make_shared<JsPointerManager>()) {}
@@ -288,7 +289,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
     size_t argc = 3;
     napi_value argv[3];
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 2) {
+    if (argc < INPUT_PARAMETER) {
         MMI_HILOGE("At least 2 parameter is required");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
         return nullptr;
@@ -319,15 +320,15 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
     }
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
-    if (argc == 2) {
+    if (argc == INPUT_PARAMETER) {
         return jsPointerMgr->SetPointerStyle(env, windowid, pointerStyle);
     }
-    if (!JsCommon::TypeOf(env, argv[2], napi_function)) {
+    if (!JsCommon::TypeOf(env, argv[INPUT_PARAMETER], napi_function)) {
         MMI_HILOGE("callback parameter type is invalid");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
         return nullptr;
     }
-    return jsPointerMgr->SetPointerStyle(env, windowid, pointerStyle, argv[2]);
+    return jsPointerMgr->SetPointerStyle(env, windowid, pointerStyle, argv[INPUT_PARAMETER]);
 }
 
 napi_value JsPointerContext::GetPointerStyle(napi_env env, napi_callback_info info)
@@ -514,7 +515,7 @@ napi_value JsPointerContext::EnterCaptureMode(napi_env env, napi_callback_info i
     size_t argc = 2;
     napi_value argv[2];
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 1 || argc > 2) {
+    if (argc < 1 || argc > INPUT_PARAMETER) {
         THROWERR(env, "The number of parameters is not as expected");
         return nullptr;
     }
@@ -544,7 +545,7 @@ napi_value JsPointerContext::LeaveCaptureMode(napi_env env, napi_callback_info i
     size_t argc = 2;
     napi_value argv[2];
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 1 || argc > 2) {
+    if (argc < 1 || argc > INPUT_PARAMETER) {
         THROWERR(env, "The number of parameters is not as expected");
         return nullptr;
     }
