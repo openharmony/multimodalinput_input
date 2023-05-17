@@ -360,7 +360,7 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
     if (result != 0 || enHanceDataLen >= MAX_HMAC_SIZE) {
         free(secCompPointEvent);
         secCompPointEvent = nullptr;
-        MMI_HILOGE("GetPointerEventEnhanceData failed!");
+        MMI_HILOGD("GetPointerEventEnhanceData failed!");
         return RET_ERR;
     }
     uint8_t realBuf[enHanceDataLen];
