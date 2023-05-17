@@ -242,6 +242,10 @@ int32_t ServerMsgHandler::OnEnhanceConfig(SessionPtr sess, NetPacket &pkt)
     size_t objectSize = sizeof(Security::SecurityComponentEnhance::SecCompEnhanceCfg);
     Security::SecurityComponentEnhance::SecCompEnhanceCfg* cfg =
         static_cast<Security::SecurityComponentEnhance::SecCompEnhanceCfg*>(malloc(objectSize));
+    if (cfg == NULL) {
+        MMI_HILOGE("Malloc failed");
+        return RET_ERR;
+    }
     pkt >> cfg->enable >> cfg->alg;
     pkt >> cfg->key.size;
     uint32_t num = cfg->key.size;
