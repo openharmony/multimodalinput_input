@@ -348,6 +348,10 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
         return RET_ERR;
     }
     SecCompPointEvent *secCompPointEvent = static_cast<SecCompPointEvent*>(malloc(sizeof(SecCompPointEvent)));
+    if (secCompPointEvent == NULL) {
+        MMI_HILOGE("Malloc failed");
+        return RET_ERR;
+    }
     secCompPointEvent->touchX = pointerItem.GetDisplayX();
     secCompPointEvent->touchY = pointerItem.GetDisplayY();
     secCompPointEvent->timeStamp = event->GetActionTime();
