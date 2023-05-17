@@ -461,6 +461,10 @@ void InputManagerImpl::PrintDisplayInfo()
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 void InputManagerImpl::PrintEnhanceConfig()
 {
+    if (secCompEnhanceCfgBase_ == nullptr) {
+        MMI_HILOGD("SecCompEnhanceCfgBase is null");
+        return;
+    }
     MMI_HILOGD("securityConfigInfo,enable:%{public}d,alg:%{public}d,key.size:%{public}d",
         secCompEnhanceCfgBase_->enable, secCompEnhanceCfgBase_->alg, secCompEnhanceCfgBase_->key.size);
     if (secCompEnhanceCfgBase_->key.data == nullptr) {
