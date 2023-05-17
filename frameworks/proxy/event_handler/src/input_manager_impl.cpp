@@ -462,7 +462,7 @@ void InputManagerImpl::PrintDisplayInfo()
 void InputManagerImpl::PrintEnhanceConfig()
 {
     if (secCompEnhanceCfgBase_ == nullptr) {
-        MMI_HILOGD("SecCompEnhanceCfgBase is null");
+        MMI_HILOGE("SecCompEnhanceCfgBase is null");
         return;
     }
     MMI_HILOGD("securityConfigInfo,enable:%{public}d,alg:%{public}d,key.size:%{public}d",
