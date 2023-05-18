@@ -39,6 +39,7 @@ enum NapiErrorCode : int32_t {
     OTHER_ERROR = -1,
     COMMON_PERMISSION_CHECK_ERROR = 201,
     COMMON_PARAMETER_ERROR = 401,
+    COMMON_USE_SYSAPI_ERROR = 202,
 };
 
 const std::map<int32_t, NapiError> NAPI_ERRORS = {
