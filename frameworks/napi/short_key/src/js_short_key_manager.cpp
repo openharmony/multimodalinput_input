@@ -146,7 +146,11 @@ napi_value JsShortKeyManager::SetKeyDownDuration(napi_env env, const std::string
 {
     CALL_DEBUG_ENTER;
     int32_t ret = InputManager::GetInstance()->SetKeyDownDuration(businessId, delay);
-    if (ret != RET_OK) {
+    if (ret == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    } else if (ret == COMMON_PARAMETER_ERROR) {
         MMI_HILOGE("Invalid param");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "param is invalid");
         return nullptr;

@@ -207,7 +207,7 @@ int32_t MultimodalInputConnectProxy::GetMouseScrollRows(int32_t &rows)
     int32_t ret = remote->SendRequest(GET_MOUSE_SCROLL_ROWS, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     READINT32(reply, rows, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
@@ -251,7 +251,7 @@ int32_t MultimodalInputConnectProxy::GetMousePrimaryButton(int32_t &primaryButto
     int32_t ret = remote->SendRequest(GET_MOUSE_PRIMARY_BUTTON, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     READINT32(reply, primaryButton, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
@@ -295,7 +295,7 @@ int32_t MultimodalInputConnectProxy::GetHoverScrollState(bool &state)
     int32_t ret = remote->SendRequest(GET_HOVER_SCROLL_STATE, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     READBOOL(reply, state, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
@@ -1094,7 +1094,7 @@ int32_t MultimodalInputConnectProxy::SetKeyDownDuration(const std::string &busin
     int32_t ret = remote->SendRequest(SET_KEY_DOWN_DURATION, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }

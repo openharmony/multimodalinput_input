@@ -43,6 +43,7 @@ constexpr int32_t TOUCH_MAX_THRESHOLD = 15;
 constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;
 constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
 constexpr int32_t ERROR_DELAY_VALUE = -1000;
+constexpr int32_t COMMON_PARAMETER_ERROR = 401;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
 const std::string shortKeyFileName = "/data/service/el1/public/multimodalinput/Settings.xml";
 enum SpecialType {
@@ -1251,17 +1252,18 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
     CALL_DEBUG_ENTER;
     if (businessId.empty() || businessIds_.empty()) {
         MMI_HILOGE("businessId or businessIds_ is empty");
-        return RET_ERR;
+        return COMMON_PARAMETER_ERROR;
     }
     if (std::find(businessIds_.begin(), businessIds_.end(), businessId) == businessIds_.end()) {
         MMI_HILOGE("%{public}s not in the config file", businessId.c_str());
-        return RET_ERR;
+        return COMMON_PARAMETER_ERROR;
     }
     if (delay < MIN_SHORT_KEY_DOWN_DURATION || delay > MAX_SHORT_KEY_DOWN_DURATION) {
         MMI_HILOGE("delay is not in valid range.");
-        return RET_ERR;
+        return COMMON_PARAMETER_ERROR;
     }
-    std::shared_ptr<NativePreferences::Preferences> pref = NativePreferences::PreferencesHelper::GetPreferences(shortKeyFileName, errno);
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(shortKeyFileName, errno);
     CHKPR(pref, errno);
     pref->PutInt(businessId, delay);
     int32_t ret = pref->FlushSync();
