@@ -224,6 +224,11 @@ napi_value JsPointerManager::SetMouseScrollRows(napi_env env, int32_t rows, napi
     sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
     CHKPP(asyncContext);
     asyncContext->errorCode = InputManager::GetInstance()->SetMouseScrollRows(rows);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
     asyncContext->reserve << ReturnType::VOID;
     napi_value promise = nullptr;
     if (handle != nullptr) {
@@ -246,6 +251,11 @@ napi_value JsPointerManager::GetMouseScrollRows(napi_env env, napi_value handle)
     CHKPP(asyncContext);
     int32_t rows = 3;
     asyncContext->errorCode = InputManager::GetInstance()->GetMouseScrollRows(rows);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
     asyncContext->reserve << ReturnType::NUMBER << rows;
     napi_value promise = nullptr;
     uint32_t initialRefCount = 1;
@@ -354,6 +364,11 @@ napi_value JsPointerManager::SetMousePrimaryButton(napi_env env, int32_t primary
     CHKPP(asyncContext);
 
     asyncContext->errorCode = InputManager::GetInstance()->SetMousePrimaryButton(primaryButton);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
     asyncContext->reserve << ReturnType::VOID;
 
     napi_value promise = nullptr;
@@ -374,6 +389,11 @@ napi_value JsPointerManager::GetMousePrimaryButton(napi_env env, napi_value hand
     CHKPP(asyncContext);
     int32_t primaryButton;
     asyncContext->errorCode = InputManager::GetInstance()->GetMousePrimaryButton(primaryButton);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
     asyncContext->reserve << ReturnType::NUMBER << primaryButton;
     napi_value promise = nullptr;
     if (handle != nullptr) {
@@ -393,6 +413,11 @@ napi_value JsPointerManager::SetHoverScrollState(napi_env env, bool state, napi_
     CHKPP(asyncContext);
 
     asyncContext->errorCode = InputManager::GetInstance()->SetHoverScrollState(state);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
     asyncContext->reserve << ReturnType::VOID;
 
     napi_value promise = nullptr;
@@ -414,6 +439,11 @@ napi_value JsPointerManager::GetHoverScrollState(napi_env env, napi_value handle
 
     bool state;
     asyncContext->errorCode = InputManager::GetInstance()->GetHoverScrollState(state);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
     asyncContext->reserve << ReturnType::BOOL << state;
 
     napi_value promise = nullptr;

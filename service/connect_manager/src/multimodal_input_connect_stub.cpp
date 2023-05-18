@@ -237,6 +237,11 @@ int32_t MultimodalInputConnectStub::StubGetMouseScrollRows(MessageParcel& data, 
 int32_t MultimodalInputConnectStub::StubSetMousePrimaryButton(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
@@ -255,6 +260,11 @@ int32_t MultimodalInputConnectStub::StubSetMousePrimaryButton(MessageParcel& dat
 int32_t MultimodalInputConnectStub::StubGetMousePrimaryButton(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
@@ -273,6 +283,11 @@ int32_t MultimodalInputConnectStub::StubGetMousePrimaryButton(MessageParcel& dat
 int32_t MultimodalInputConnectStub::StubSetHoverScrollState(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
@@ -291,6 +306,11 @@ int32_t MultimodalInputConnectStub::StubSetHoverScrollState(MessageParcel& data,
 int32_t MultimodalInputConnectStub::StubGetHoverScrollState(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
@@ -1056,6 +1076,11 @@ int32_t MultimodalInputConnectStub::StubEnableInputDevice(MessageParcel& data, M
 int32_t MultimodalInputConnectStub::StubSetKeyDownDuration(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
         MMI_HILOGE("Permission check failed");
         return CHECK_PERMISSION_FAIL;
@@ -1071,7 +1096,7 @@ int32_t MultimodalInputConnectStub::StubSetKeyDownDuration(MessageParcel& data, 
     int32_t ret = SetKeyDownDuration(businessId, delay);
     if (ret != RET_OK) {
         MMI_HILOGE("Set key down duration failed ret:%{public}d", ret);
-        return RET_ERR;
+        return ret;
     }
     return RET_OK;
 }
