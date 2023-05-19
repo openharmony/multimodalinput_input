@@ -454,7 +454,7 @@ int32_t MultimodalInputConnectStub::StubSupportKeys(MessageParcel& data, Message
     READINT32(data, deviceId, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t size = 0;
     READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
-    if (size < 0 || size > INT32_MAX) {
+    if (size < 0 || size > ExtraData::MAX_BUFFER_SIZE) {
         MMI_HILOGE("Invalid size: %{public}d", size);
         return RET_ERR;
     }
