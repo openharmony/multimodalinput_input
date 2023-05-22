@@ -204,7 +204,9 @@ bool MMIService::InitService()
         EpollClose();
         return false;
     }
+    state_ = ServiceRunningState::STATE_RUNNING;
     if (!(Publish(this))) {
+        state_ = ServiceRunningState::STATE_NOT_START;
         MMI_HILOGE("Service initialization failed");
         return false;
     }
@@ -280,7 +282,6 @@ void MMIService::OnStart()
         MMI_HILOGE("Init mmi_service failed");
         return;
     }
-    state_ = ServiceRunningState::STATE_RUNNING;
     MMI_HILOGD("Started successfully");
     AddReloadDeviceTimer();
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
