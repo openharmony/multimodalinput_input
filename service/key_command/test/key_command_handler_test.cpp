@@ -31,6 +31,7 @@ using namespace testing::ext;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandlerTest" };
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t SEC_TO_NANOSEC = 1000000000;
+constexpr int32_t COMMON_PARAMETER_ERROR = 401;
 } // namespace
 class KeyCommandHandlerTest : public testing::Test {
 public:
@@ -73,11 +74,11 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_001, TestSize.Level1)
     KeyCommandHandler eventKeyCommandHandler;
     std::string businessId = "aaa";
     int32_t delay = 0;
-    ASSERT_EQ(RET_ERR, eventKeyCommandHandler.UpdateSettingsXml(businessId, delay));
+    ASSERT_EQ(COMMON_PARAMETER_ERROR, eventKeyCommandHandler.UpdateSettingsXml(businessId, delay));
     delay = 100;
-    ASSERT_EQ(RET_ERR, eventKeyCommandHandler.UpdateSettingsXml(businessId, delay));
+    ASSERT_EQ(COMMON_PARAMETER_ERROR, eventKeyCommandHandler.UpdateSettingsXml(businessId, delay));
     delay = 4000;
-    ASSERT_EQ(RET_ERR, eventKeyCommandHandler.UpdateSettingsXml(businessId, delay));
+    ASSERT_EQ(COMMON_PARAMETER_ERROR, eventKeyCommandHandler.UpdateSettingsXml(businessId, delay));
 }
 
 /**
@@ -91,9 +92,9 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_002, TestSize.Level1)
     KeyCommandHandler eventKeyCommandHandler;
     std::string businessId = "com.ohos.camera";
     int32_t delay = -1;
-    ASSERT_EQ(RET_ERR, eventKeyCommandHandler.UpdateSettingsXml(businessId, delay));
+    ASSERT_EQ(COMMON_PARAMETER_ERROR, eventKeyCommandHandler.UpdateSettingsXml(businessId, delay));
     delay = 4001;
-    ASSERT_EQ(RET_ERR, eventKeyCommandHandler.UpdateSettingsXml(businessId, delay));
+    ASSERT_EQ(COMMON_PARAMETER_ERROR, eventKeyCommandHandler.UpdateSettingsXml(businessId, delay));
 }
 
 /**
@@ -107,7 +108,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_003, TestSize.Level1)
     KeyCommandHandler eventKeyCommandHandler;
     std::string businessId = "";
     int32_t delay = 100;
-    ASSERT_EQ(RET_ERR, eventKeyCommandHandler.UpdateSettingsXml(businessId, delay));
+    ASSERT_EQ(COMMON_PARAMETER_ERROR, eventKeyCommandHandler.UpdateSettingsXml(businessId, delay));
 }
 
 /**
