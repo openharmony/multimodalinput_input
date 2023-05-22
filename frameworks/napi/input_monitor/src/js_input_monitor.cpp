@@ -771,7 +771,11 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName)
         napi_open_handle_scope(jsEnv_, &scope);
         CHKPV(scope);
         auto pointerEvent = evQueue_.front();
-        CHKPC(pointerEvent);
+        if (pointerEvent == nullptr) {
+            MMI_HILOGE("scope is nullptr");
+            napi_close_handle_scope(jsEnv_, scope);
+            continue;
+        }
         evQueue_.pop();
         napi_value napiPointer = nullptr;
         CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_create_object(jsEnv_, &napiPointer), CREATE_OBJECT, scope, pointerEvent);
