@@ -60,9 +60,14 @@
         "hiviewdfx_hilog_native",
         "ability_base",
         "samgr",
-        "common"
+        "common",
+        "config_policy",
+        "hicollie_native",
+        "init",
+        "preferences"
       ],
       "third_party": [
+        "cJSON",
         "node",
         "libuv",
         "json"
