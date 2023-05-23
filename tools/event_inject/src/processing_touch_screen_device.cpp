@@ -104,16 +104,16 @@ void ProcessingTouchScreenDevice::AnalysisSingleTouchScreenDate(const std::vecto
 void ProcessingTouchScreenDevice::AnalysisTouchScreenPressData(InputEventArray &inputEventArray,
                                                                const TouchScreenInputEvent &touchScreenInputEvent)
 {
-    int32_t xPos = 0;
     int32_t yPos = 0;
+    int32_t xPos = 0;
     for (uint32_t i = 0; i < touchScreenInputEvent.groupNumber; i++) {
-        xPos = touchScreenInputEvent.events[i].xPos;
         yPos = touchScreenInputEvent.events[i].yPos;
-        SetPositionX(inputEventArray, 0, xPos);
-        SetPositionY(inputEventArray, 0, yPos);
+        xPos = touchScreenInputEvent.events[i].xPos;
         SetTrackingId(inputEventArray, 0, static_cast<int32_t>(i + 1));
-        SetBtnTouch(inputEventArray, 0, 1);
         SetSynMtReport(inputEventArray, 0);
+        SetPositionY(inputEventArray, 0, yPos);
+        SetPositionX(inputEventArray, 0, xPos);
+        SetBtnTouch(inputEventArray, 0, 1);
     }
     SetSynReport(inputEventArray);
 }

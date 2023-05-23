@@ -81,7 +81,7 @@ int32_t CpuInfo::GetTaskPidFile(const std::string &process_name)
         while (std::getline(file, strLine)) {
             if ((strLine.find("Pid")) != std::string::npos) {
                 if (::sscanf_s(strLine.c_str(), "%*s%d", &pid, sizeof(pid)) != 1) {
-                    MMI_HILOGE("Failed to cut out the pid");
+                    MMI_HILOGE("Failed to delete the pid");
                 }
                 break;
             }
@@ -90,7 +90,7 @@ int32_t CpuInfo::GetTaskPidFile(const std::string &process_name)
         break;
     }
     if (::closedir(dir) != 0) {
-        MMI_HILOGE("Failed to closedir");
+        MMI_HILOGE("Failed to close dir");
     }
 
     return pid;
@@ -143,11 +143,11 @@ int32_t CpuInfo::GetProcOccupy(int32_t pid)
     }
     file.close();
 
-    int pos = 1;
+    int position = 1;
     std::istringstream ss(strLine);
     while (ss >> strLine) {
-        pos++;
-        if (pos >= LOCATION) {
+        position++;
+        if (position >= LOCATION) {
             break;
         }
     }
