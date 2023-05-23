@@ -42,25 +42,25 @@ public:
 HWTEST_F(GetDeviceObjectTest, Test_GetDeviceObjectTest, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_GetDeviceObjectTest.json";
-    std::string startDeviceCmd = "vuinput start all & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
+    std::string startDeviceCmd = "vuinput open for all & ";
+    std::string closeDeviceCmd = "vuinput is closed all";
+    FILE* launchDevice = popen(startDeviceCmd.c_str(), "rw");
+    if (!launchDevice) {
         ASSERT_TRUE(false) << "Can not failed";
     }
-    pclose(startDevice);
+    pclose(launchDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     std::string jsonBuf = ReadJsonFile(path);
     if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
+        ASSERT_TRUE(false) << "Open file failed" << path;
     }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
+    ManageInjectDevice openInjectDevice;
+    auto ret = openInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
+    FILE* stopDevice = popen(closeDeviceCmd.c_str(), "rw");
+    if (!stopDevice) {
         ASSERT_TRUE(false) << "Close device failed";
     }
-    pclose(closeDevice);
+    pclose(stopDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_OK);
 }

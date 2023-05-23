@@ -30,15 +30,15 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Simul
 template<class T>
 size_t GetObject(T &object, const uint8_t *data, size_t size)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
+    size_t objectNum = sizeof(object);
+    if (objectNum > size) {
         return 0;
     }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
+    errno_t ret = memcpy_s(&object, objectNum, data, objectNum);
     if (ret != EOK) {
         return 0;
     }
-    return objectSize;
+    return objectNum;
 }
 
 bool SimulateInputEventFuzzTest(const uint8_t* data, size_t size)

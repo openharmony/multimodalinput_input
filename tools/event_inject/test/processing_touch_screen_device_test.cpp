@@ -41,25 +41,25 @@ public:
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformTouchScreenJsonDataToInputData.json";
-    std::string startDeviceCmd = "vuinput start touchscreen & ";
+    std::string launchDeviceCmd = "vuinput launch touchscreen & ";
     std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
+    FILE* startDevice = popen(launchDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "Start device failed";
     }
     pclose(startDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
+    std::string jsonBuffer = ReadJsonFile(path);
+    if (jsonBuffer.empty()) {
         ASSERT_TRUE(false) << "Read file failed" << path;
     }
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuffer, false));
+    FILE* closeDeviceCom = popen(closeDeviceCmd.c_str(), "rw");
+    if (!closeDeviceCom) {
         ASSERT_TRUE(false) << "Close device failed";
     }
-    pclose(closeDevice);
+    pclose(closeDeviceCom);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_OK);
 }
@@ -73,25 +73,25 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputData, Tes
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformJsonDataToInputDataEventsIsEmpty.json";
-    std::string startDeviceCmd = "vuinput start touchscreen & ";
+    std::string launchDeviceCmd = "vuinput start touchscreen & ";
     std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
+    FILE* launchDevice = popen(launchDeviceCmd.c_str(), "rw");
+    if (!launchDevice) {
         ASSERT_TRUE(false) << "Start device failed";
     }
-    pclose(startDevice);
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
+    pclose(launchDevice);
+    std::string jsonBuff = ReadJsonFile(path);
+    if (jsonBuff.empty()) {
         ASSERT_TRUE(false) << "Read file failed" << path;
     }
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuff, false));
 
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
+    FILE* offDevice = popen(closeDeviceCmd.c_str(), "rw");
+    if (!offDevice) {
         ASSERT_TRUE(false) << "Close device failed";
     }
-    pclose(closeDevice);
+    pclose(offDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_ERR);
 }
@@ -105,25 +105,25 @@ HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataEvent
 HWTEST_F(ProcessingTouchScreenDeviceTest, Test_TransformJsonDataToInputDataSingleEventsIsEmpty, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformJsonDataToInputDataSingleEventsIsEmpty.json";
-    std::string startDeviceCmd = "vuinput start touchscreen & ";
+    std::string beginDeviceCmd = "vuinput start touchscreen & ";
     std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
+    FILE* beginDevice = popen(beginDeviceCmd.c_str(), "rw");
+    if (!beginDevice) {
         ASSERT_TRUE(false) << "Start device failed";
     }
-    pclose(startDevice);
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
+    pclose(beginDevice);
+    std::string jsonSize = ReadJsonFile(path);
+    if (jsonSize.empty()) {
         ASSERT_TRUE(false) << "Read file failed" << path;
     }
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonSize, false));
+    FILE* closeDeviceCommand = popen(closeDeviceCmd.c_str(), "rw");
+    if (!closeDeviceCommand) {
         ASSERT_TRUE(false) << "Close device failed";
     }
-    pclose(closeDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    pclose(closeDeviceCommand);
+    std::this_thread::sleep_for(std::chrono::seconds(2));
     EXPECT_EQ(ret, RET_ERR);
 }
 } // namespace MMI

@@ -46,9 +46,9 @@ void GetJsonData(cJSON *json, const std::string& key, std::string& val)
         return;
     }
     if (cJSON_HasObjectItem(json, key.c_str())) {
-        cJSON* rawVal = cJSON_GetObjectItem(json, key.c_str());
-        if (cJSON_IsString(rawVal)) {
-            val = rawVal->valuestring;
+        cJSON* rawValue = cJSON_GetObjectItem(json, key.c_str());
+        if (cJSON_IsString(rawValue)) {
+            val = rawValue->valuestring;
         }
     }
     return;
@@ -62,9 +62,9 @@ void GetJsonData(cJSON *json, const std::string& key, T& val)
         return;
     }
     if (cJSON_HasObjectItem(json, key.c_str())) {
-        cJSON* rawVal = cJSON_GetObjectItem(json, key.c_str());
-        if (cJSON_IsNumber(rawVal)) {
-            val = rawVal->valueint;
+        cJSON* rawNum = cJSON_GetObjectItem(json, key.c_str());
+        if (cJSON_IsNumber(rawNum)) {
+            val = rawNum->valueint;
         }
     }
     return;

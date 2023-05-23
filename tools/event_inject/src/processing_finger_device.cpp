@@ -66,11 +66,11 @@ void ProcessingFingerDevice::AnalysisTouchPadFingerDate(const std::vector<Device
 void ProcessingFingerDevice::AnalysisTouchPadFingerPressData(InputEventArray &inputEventArray,
                                                              const TouchPadInputEvent &touchPadInputEvent)
 {
-    int32_t xPos = 0;
     int32_t yPos = 0;
+    int32_t xPos = 0;
     for (uint64_t i = 0; i < static_cast<uint64_t>(touchPadInputEvent.groupNumber); i++) {
-        xPos = touchPadInputEvent.events[i].xPos;
         yPos = touchPadInputEvent.events[i].yPos;
+        xPos = touchPadInputEvent.events[i].xPos;
         if (touchPadInputEvent.groupNumber > 1) {
             SetMtSlot(inputEventArray, FINGER_BLOCK_TIME, static_cast<int32_t>(i));
         }

@@ -165,12 +165,12 @@ int32_t ProcessingPenDevice::AnalysisPenApproachPadEvent(const DeviceEvent& even
         MMI_HILOGE("Enter the correct event type in the configuration file.");
         return RET_ERR;
     }
-    penEvent.xPos = event.xPos;
+    penEvent.distance = event.distance;
     penEvent.yPos = event.yPos;
     penEvent.tiltX = event.tiltX;
     penEvent.tiltY = event.tiltY;
     penEvent.pressure = event.pressure;
-    penEvent.distance = event.distance;
+    penEvent.xPos = event.xPos;
     penEventArray.push_back(penEvent);
 
     return RET_OK;
@@ -184,12 +184,12 @@ int32_t ProcessingPenDevice::AnalysisPenSlidePadEvent(const DeviceEvent& event, 
         penEvent.keyValue = event.keyValue;
         penEvent.keyStatus = event.keyStatus;
     } else if ((penEvent.eventType == "PEN_TOUCH") || (penEvent.eventType == "RUBBER_TOUCH")) {
-        penEvent.xPos = event.xPos;
         penEvent.yPos = event.yPos;
-        penEvent.tiltX = event.tiltX;
+        penEvent.xPos = event.xPos;
         penEvent.tiltY = event.tiltY;
-        penEvent.pressure = event.pressure;
+        penEvent.tiltX = event.tiltX;
         penEvent.distance = event.distance;
+        penEvent.pressure = event.pressure;
     } else {
         MMI_HILOGW("Unknown eventType type");
     }
@@ -206,12 +206,12 @@ int32_t ProcessingPenDevice::AnalysisPenLeavePadEvent(const DeviceEvent& event, 
         MMI_HILOGE("Enter the correct event type in the configuration file.");
         return RET_ERR;
     }
-    penEvent.xPos = event.xPos;
     penEvent.yPos = event.yPos;
-    penEvent.tiltX = event.tiltX;
     penEvent.tiltY = event.tiltY;
-    penEvent.pressure = event.pressure;
+    penEvent.xPos = event.xPos;
+    penEvent.tiltX = event.tiltX;
     penEvent.distance = event.distance;
+    penEvent.pressure = event.pressure;
     penEventArray.push_back(penEvent);
 
     return RET_OK;

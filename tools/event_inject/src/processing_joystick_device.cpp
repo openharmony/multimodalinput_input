@@ -29,12 +29,12 @@ int32_t ProcessingJoystickDevice::TransformJsonDataToInputData(const DeviceItem&
 {
     CALL_DEBUG_ENTER;
     if (originalEvent.events.empty()) {
-        MMI_HILOGE("Manage joystick array failed, inputData is empty");
+        MMI_HILOGE("Handle joystick array failed, inputData is empty");
         return RET_ERR;
     }
     std::vector<DeviceEvent> inputData = originalEvent.events;
     if (inputData.empty()) {
-        MMI_HILOGE("Manage finger array failed, inputData is empty");
+        MMI_HILOGE("Handle finger array failed, inputData is empty");
         return RET_ERR;
     }
     TransformPadEventToInputEvent(inputData, inputEventArray);
@@ -51,14 +51,14 @@ void ProcessingJoystickDevice::TransformPadEventToInputEvent(const std::vector<D
         }
         if (item.eventType == "KEY_EVENT_PRESS") {
             TransformKeyPressEvent(item, inputEventArray);
+        } else if (item.eventType == "ROCKER_1") {
+            TransformRocker1Event(item, inputEventArray);
         } else if (item.eventType == "KEY_EVENT_RELEASE") {
             TransformKeyReleaseEvent(item, inputEventArray);
         } else if (item.eventType == "KEY_EVENT_CLICK") {
             TransformKeyClickEvent(item, inputEventArray);
         } else if (item.eventType == "DIRECTION_KEY") {
             TransformDirectionKeyEvent(item, inputEventArray);
-        } else if (item.eventType == "ROCKER_1") {
-            TransformRocker1Event(item, inputEventArray);
         } else if (item.eventType == "THROTTLE") {
             TransformThrottle1Event(item, inputEventArray);
         } else {
