@@ -29,6 +29,10 @@ ohos_shared_library("keycode") {
     "src/native_register_module.cpp",
   ]
 
+  sanitize = {
+    integer_overflow = true
+  }
+
   configs = [
     "${mmi_path}:coverage_flags",
     ":keyCode_config",
