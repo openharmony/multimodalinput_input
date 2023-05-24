@@ -260,6 +260,8 @@ int32_t ServerMsgHandler::OnEnhanceConfig(SessionPtr sess, NetPacket &pkt)
     }
     SecCompEnhanceCfgBase *secCompEnhanceCfgBase = reinterpret_cast<SecCompEnhanceCfgBase *>(cfg);
     int32_t result = Security::SecurityComponent::SecCompEnhanceKit::SetEnhanceCfg(secCompEnhanceCfgBase);
+    free(cfg);
+    cfg = nullptr;
     if (result != 0) {
         return RET_ERR;
     }
