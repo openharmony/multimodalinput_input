@@ -39,22 +39,22 @@ public:
 private:
     struct Total_Cpu_Occupy {
         char name[20] { 0 };
-        int32_t user { 0 };
-        int32_t nice { 0 };
+        int32_t guest_nice { 0 };
         int32_t system { 0 };
         int32_t idle { 0 };
+        int32_t nice { 0 };
         int32_t lowait { 0 };
-        int32_t irq { 0 };
-        int32_t softirq { 0 };
         int32_t steal { 0 };
+        int32_t softirq { 0 };
+        int32_t user { 0 };
+        int32_t irq { 0 };
         int32_t guest { 0 };
-        int32_t guest_nice { 0 };
     };
     struct Proc_Cpu_Occupy {
-        int32_t utime { 0 };
-        int32_t stime { 0 };
         int32_t cutime { 0 };
         int32_t cstime { 0 };
+        int32_t stime { 0 };
+        int32_t utime { 0 };
     };
     int32_t GetTaskPidFile(const std::string &process_name);
     int32_t GetTaskPidCmd(const std::string &process_name, int32_t flag = 0, std::string user = "");

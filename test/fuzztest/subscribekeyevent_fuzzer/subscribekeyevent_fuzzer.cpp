@@ -29,26 +29,26 @@ constexpr int32_t DEFAULT_PREKEY_COUNT = 3;
 
 class InputEventConsumerTest : public IInputEventConsumer {
 public:
-    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
     virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
     {
         MMI_HILOGD("Report pointer event success");
     };
+    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
     virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
 };
 
 template<class T>
 size_t GetObject(T &object, const uint8_t *data, size_t size)
 {
-    size_t objectSize = sizeof(object);
-    if (objectSize > size) {
+    size_t bodySize = sizeof(object);
+    if (bodySize > size) {
         return 0;
     }
-    errno_t ret = memcpy_s(&object, objectSize, data, objectSize);
-    if (ret != EOK) {
+    errno_t retNum = memcpy_s(&object, bodySize, data, bodySize);
+    if (retNum != EOK) {
         return 0;
     }
-    return objectSize;
+    return bodySize;
 }
 
 void SubscribeKeyEventFuzzTest(const uint8_t* data, size_t size)
