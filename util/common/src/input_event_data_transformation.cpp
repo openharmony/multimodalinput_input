@@ -355,7 +355,7 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
     secCompPointEvent->touchX = pointerItem.GetDisplayX();
     secCompPointEvent->touchY = pointerItem.GetDisplayY();
     secCompPointEvent->timeStamp = event->GetActionTime();
-    uint32_t dataLen = sizeof(secCompPointEvent);
+    uint32_t dataLen = sizeof(*secCompPointEvent);
     uint8_t outBuf[MAX_HMAC_SIZE] = { 0 };
     uint8_t* enHanceData = reinterpret_cast<uint8_t *>(&outBuf[0]);
     uint32_t enHanceDataLen = MAX_HMAC_SIZE;
