@@ -53,6 +53,8 @@ void ReadProFile(const std::string &filePath, int32_t deviceId,
 void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
     std::map<int32_t, std::map<int32_t, int32_t>> &configKey);
 
+bool IsValidJsonPath(const std::string &filePath);
+
 std::string ReadJsonFile(const std::string &filePath);
 
 int32_t ReadCursorStyleFile(const std::string &filePath);
