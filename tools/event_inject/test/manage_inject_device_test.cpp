@@ -56,22 +56,22 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileIsEmpty, TestSiz
 HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileNotEmpty, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformJsonDataCheckFileNotEmpty.json";
-    std::string startDeviceCmd = "vuinput start all & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
-        ASSERT_TRUE(false) << "Start device failed";
+    std::string beginDeviceCmd = "vuinput open all & ";
+    std::string afterDeviceCmd = "vuinput is closed";
+    FILE* beginDevice = popen(beginDeviceCmd.c_str(), "rw");
+    if (!beginDevice) {
+        ASSERT_TRUE(false) << "open device failed";
     }
-    pclose(startDevice);
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
+    pclose(beginDevice);
+    std::string jsonBuffer = ReadJsonFile(path);
+    if (jsonBuffer.empty()) {
+        ASSERT_TRUE(false) << "Open file failed" << path;
     }
     ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
+    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuffer, false));
+    FILE* closeDevice = popen(afterDeviceCmd.c_str(), "rw");
     if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
+        ASSERT_TRUE(false) << "Close local device failed";
     }
     pclose(closeDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -86,21 +86,21 @@ HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataCheckFileNotEmpty, TestSi
  */
 HWTEST_F(ManageInjectDeviceTest, Test_TransformJsonDataGetDeviceNodeError, TestSize.Level1)
 {
-    const std::string path = "/data/json/Test_TransformJsonDataGetDeviceNodeError.json";
-    std::string startDeviceCmd = "vuinput start all & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
+    const std::string filePath = "/data/json/Test_TransformJsonDataGetDeviceNodeError.json";
+    std::string startDeviceMsg = "vuinput start all & ";
+    std::string closeDeviceMsg = "vuinput close all";
+    FILE* startDevice = popen(startDeviceMsg.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "Start device failed";
     }
     pclose(startDevice);
-    std::string jsonBuf = ReadJsonFile(path);
+    std::string jsonBuf = ReadJsonFile(filePath);
     if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
+        ASSERT_TRUE(false) << "Read file failed" << filePath;
     }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
+    ManageInjectDevice openInjectDevice;
+    auto ret = openInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
+    FILE* closeDevice = popen(closeDeviceMsg.c_str(), "rw");
     if (!closeDevice) {
         ASSERT_TRUE(false) << "Close device failed";
     }

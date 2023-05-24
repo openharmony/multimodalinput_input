@@ -90,11 +90,11 @@ void ProcessingGamePadDevice::TransformKeyClickEvent(const DeviceEvent& padEvent
 void ProcessingGamePadDevice::TransformRocker1Event(const DeviceEvent& padEvent, InputEventArray& inputEventArray)
 {
     if (padEvent.direction.empty()) {
-        MMI_HILOGW("Not find direction");
+        MMI_HILOGW("Direction is empty");
         return;
     }
     if (padEvent.event.empty()) {
-        MMI_HILOGW("Not find event");
+        MMI_HILOGW("Event is empty");
         return;
     }
     std::string direction = padEvent.direction;
@@ -103,12 +103,12 @@ void ProcessingGamePadDevice::TransformRocker1Event(const DeviceEvent& padEvent,
         if (direction == "left") {
             value = ~item + 1;
             SetEvAbsX(inputEventArray, 0, value);
-        } else if (direction == "right") {
-            value = item;
-            SetEvAbsX(inputEventArray, 0, value);
         } else if (direction == "up") {
             value = ~item + 1;
             SetEvAbsY(inputEventArray, 0, value);
+        } else if (direction == "right") {
+            value = item;
+            SetEvAbsX(inputEventArray, 0, value);
         } else if (direction == "down") {
             value = item;
             SetEvAbsY(inputEventArray, 0, value);

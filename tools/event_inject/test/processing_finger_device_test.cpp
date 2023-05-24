@@ -41,25 +41,25 @@ public:
 HWTEST_F(ProcessingFingerDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformFingerJsonDataToInputData.json";
-    std::string startDeviceCmd = "vuinput start touchpad & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
+    std::string beginDeviceCmd = "vuinput start touchpad & ";
+    std::string afterDeviceCmd = "vuinput close all";
+    FILE* startDevice = popen(beginDeviceCmd.c_str(), "rw");
     if (!startDevice) {
         ASSERT_TRUE(false) << "Start device failed";
     }
     pclose(startDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
+    std::string jsonBuffer = ReadJsonFile(path);
+    if (jsonBuffer.empty()) {
+        ASSERT_TRUE(false) << "Read Test_TransformFingerJsonDataToInputData failed" << path;
     }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
+    ManageInjectDevice actionInjectDevice;
+    auto ret = actionInjectDevice.TransformJsonData(DataInit(jsonBuffer, false));
+    FILE* afterDevice = popen(afterDeviceCmd.c_str(), "rw");
+    if (!afterDevice) {
+        ASSERT_TRUE(false) << "Close local device failed";
     }
-    pclose(closeDevice);
+    pclose(afterDevice);
     std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(ret, RET_OK);
 }

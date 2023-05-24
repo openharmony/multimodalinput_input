@@ -30,6 +30,53 @@ class ProcessingJoyStickDeviceTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
+    static void CheckTransformJson(const std::string path)
+    {
+        std::string startDeviceCmd = "vuinput start joystick & ";
+        std::string closeDeviceCmd = "vuinput close all";
+        FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
+        if (!startDevice) {
+            ASSERT_TRUE(false) << "Start device failed";
+        }
+        pclose(startDevice);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::string jsonBuf = ReadJsonFile(path);
+        if (jsonBuf.empty()) {
+            ASSERT_TRUE(false) << "Read file failed" << path;
+        }
+        ManageInjectDevice manageInjectDevice;
+        auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
+        FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
+        if (!closeDevice) {
+            ASSERT_TRUE(false) << "Close device failed";
+        }
+        pclose(closeDevice);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        EXPECT_EQ(ret, RET_OK);
+    }
+    static void CheckJoyStickJson(const std::string path)
+    {
+        std::string startDeviceCmd = "vuinput start joystick & ";
+        std::string closeDeviceCmd = "vuinput close all";
+        FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
+        if (!startDevice) {
+            ASSERT_TRUE(false) << "Start device failed";
+        }
+        pclose(startDevice);
+        std::string jsonBuf = ReadJsonFile(path);
+        if (jsonBuf.empty()) {
+            ASSERT_TRUE(false) << "Read file failed" << path;
+        }
+        ManageInjectDevice manageInjectDevice;
+        auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
+        FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
+        if (!closeDevice) {
+            ASSERT_TRUE(false) << "Close device failed";
+        }
+        pclose(closeDevice);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        EXPECT_EQ(ret, RET_ERR);
+    }
 };
 
 /**
@@ -41,27 +88,7 @@ public:
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJsonDataToInputData, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputData.json";
-    std::string startDeviceCmd = "vuinput start joystick & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
-        ASSERT_TRUE(false) << "Start device failed";
-    }
-    pclose(startDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
-    }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
-    }
-    pclose(closeDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    EXPECT_EQ(ret, RET_OK);
+    CheckTransformJson(path);
 }
 
 /**
@@ -73,26 +100,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJsonDataToInputData, TestSi
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindEvents, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindEvents.json";
-    std::string startDeviceCmd = "vuinput start joystick & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
-        ASSERT_TRUE(false) << "Start device failed";
-    }
-    pclose(startDevice);
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
-    }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
-    }
-    pclose(closeDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    EXPECT_EQ(ret, RET_ERR);
+    CheckJoyStickJson(path);
 }
 
 /**
@@ -104,26 +112,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataEventsIsEmpty.json";
-    std::string startDeviceCmd = "vuinput start joystick & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
-        ASSERT_TRUE(false) << "Start device failed";
-    }
-    pclose(startDevice);
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
-    }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
-    }
-    pclose(closeDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    EXPECT_EQ(ret, RET_ERR);
+    CheckJoyStickJson(path);
 }
 
 /**
@@ -135,26 +124,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindKeyValue, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindKeyValue.json";
-    std::string startDeviceCmd = "vuinput start joystick & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
-        ASSERT_TRUE(false) << "Start device failed";
-    }
-    pclose(startDevice);
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
-    }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
-    }
-    pclose(closeDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    EXPECT_EQ(ret, RET_ERR);
+    CheckJoyStickJson(path);
 }
 
 /**
@@ -166,26 +136,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindKeyValueInThro, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindKeyValueInThro.json";
-    std::string startDeviceCmd = "vuinput start joystick & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
-        ASSERT_TRUE(false) << "Start device failed";
-    }
-    pclose(startDevice);
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
-    }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
-    }
-    pclose(closeDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    EXPECT_EQ(ret, RET_ERR);
+    CheckJoyStickJson(path);
 }
 
 /**
@@ -197,26 +148,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindEventInRocker, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindEventInRocker.json";
-    std::string startDeviceCmd = "vuinput start joystick & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
-        ASSERT_TRUE(false) << "Start device failed";
-    }
-    pclose(startDevice);
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
-    }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
-    }
-    pclose(closeDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    EXPECT_EQ(ret, RET_ERR);
+    CheckJoyStickJson(path);
 }
 
 /**
@@ -229,26 +161,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
          TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInRocker.json";
-    std::string startDeviceCmd = "vuinput start joystick & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
-        ASSERT_TRUE(false) << "Start device failed";
-    }
-    pclose(startDevice);
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
-    }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
-    }
-    pclose(closeDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    EXPECT_EQ(ret, RET_ERR);
+    CheckJoyStickJson(path);
 }
 
 /**
@@ -261,26 +174,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
          TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindDirectionInDirectionKey.json";
-    std::string startDeviceCmd = "vuinput start joystick & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
-        ASSERT_TRUE(false) << "Start device failed";
-    }
-    pclose(startDevice);
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
-    }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
-    }
-    pclose(closeDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    EXPECT_EQ(ret, RET_ERR);
+    CheckJoyStickJson(path);
 }
 
 /**
@@ -292,27 +186,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataNotFindAnyEventType, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataNotFindAnyEventType.json";
-    std::string startDeviceCmd = "vuinput start joystick & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
-        ASSERT_TRUE(false) << "Start device failed";
-    }
-    pclose(startDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
-    }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
-    }
-    pclose(closeDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    EXPECT_EQ(ret, RET_OK);
+    CheckTransformJson(path);
 }
 
 /**
@@ -324,27 +198,7 @@ HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputData
 HWTEST_F(ProcessingJoyStickDeviceTest, Test_TransformJoyStickJsonDataToInputDataHasBlockTime, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformJoyStickJsonDataToInputDataHasBlockTime.json";
-    std::string startDeviceCmd = "vuinput start joystick & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
-        ASSERT_TRUE(false) << "Start device failed";
-    }
-    pclose(startDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
-    }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
-    }
-    pclose(closeDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    EXPECT_EQ(ret, RET_OK);
+    CheckTransformJson(path);
 }
 } // namespace MMI
 } // namespace OHOS

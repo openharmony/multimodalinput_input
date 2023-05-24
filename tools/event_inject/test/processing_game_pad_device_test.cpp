@@ -30,6 +30,29 @@ class ProcessingGamePadDeviceTest : public testing::Test {
 public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
+    static void CheckGamePadJson(const std::string path)
+    {
+        std::string startDeviceCmd = "vuinput start gamepad & ";
+        std::string closeDeviceCmd = "vuinput close all";
+        FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
+        if (!startDevice) {
+            ASSERT_TRUE(false) << "Start device failed";
+        }
+        pclose(startDevice);
+        std::string jsonBuf = ReadJsonFile(path);
+        if (jsonBuf.empty()) {
+            ASSERT_TRUE(false) << "Read file failed" << path;
+        }
+        ManageInjectDevice manageInjectDevice;
+        auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
+        FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
+        if (!closeDevice) {
+            ASSERT_TRUE(false) << "Close device failed";
+        }
+        pclose(closeDevice);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        EXPECT_EQ(ret, RET_ERR);
+    }
 };
 
 /**
@@ -73,26 +96,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputData, 
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNotFindEvents, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindEvents.json";
-    std::string startDeviceCmd = "vuinput start gamepad & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
-        ASSERT_TRUE(false) << "Start device failed";
-    }
-    pclose(startDevice);
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
-    }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
-    }
-    pclose(closeDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    EXPECT_EQ(ret, RET_ERR);
+    CheckGamePadJson(path);
 }
 
 /**
@@ -104,26 +108,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataEventsIsEmpty, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputDataEventsIsEmpty.json";
-    std::string startDeviceCmd = "vuinput start gamepad & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
-        ASSERT_TRUE(false) << "Start device failed";
-    }
-    pclose(startDevice);
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
-    }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
-    }
-    pclose(closeDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    EXPECT_EQ(ret, RET_ERR);
+    CheckGamePadJson(path);
 }
 
 /**
@@ -135,26 +120,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataEv
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNotFindKeyValueInPress, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindKeyValueInPress.json";
-    std::string startDeviceCmd = "vuinput start gamepad & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
-        ASSERT_TRUE(false) << "Start device failed";
-    }
-    pclose(startDevice);
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
-    }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
-    }
-    pclose(closeDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    EXPECT_EQ(ret, RET_ERR);
+    CheckGamePadJson(path);
 }
 
 /**
@@ -166,26 +132,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNotFindEventInRocker, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindEventInRocker.json";
-    std::string startDeviceCmd = "vuinput start gamepad & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
-        ASSERT_TRUE(false) << "Start device failed";
-    }
-    pclose(startDevice);
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
-    }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
-    }
-    pclose(closeDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    EXPECT_EQ(ret, RET_ERR);
+    CheckGamePadJson(path);
 }
 
 /**
@@ -197,26 +144,7 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
 HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRocker, TestSize.Level1)
 {
     const std::string path = "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRocker.json";
-    std::string startDeviceCmd = "vuinput start gamepad & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
-        ASSERT_TRUE(false) << "Start device failed";
-    }
-    pclose(startDevice);
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
-    }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
-    }
-    pclose(closeDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    EXPECT_EQ(ret, RET_ERR);
+    CheckGamePadJson(path);
 }
 
 /**
@@ -229,27 +157,8 @@ HWTEST_F(ProcessingGamePadDeviceTest, Test_TransformGamePadJsonDataToInputDataNo
          TestSize.Level1)
 {
     const std::string path =
-     "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRockerDirectionKey.json";
-    std::string startDeviceCmd = "vuinput start gamepad & ";
-    std::string closeDeviceCmd = "vuinput close all";
-    FILE* startDevice = popen(startDeviceCmd.c_str(), "rw");
-    if (!startDevice) {
-        ASSERT_TRUE(false) << "Start device failed";
-    }
-    pclose(startDevice);
-    std::string jsonBuf = ReadJsonFile(path);
-    if (jsonBuf.empty()) {
-        ASSERT_TRUE(false) << "Read file failed" << path;
-    }
-    ManageInjectDevice manageInjectDevice;
-    auto ret = manageInjectDevice.TransformJsonData(DataInit(jsonBuf, false));
-    FILE* closeDevice = popen(closeDeviceCmd.c_str(), "rw");
-    if (!closeDevice) {
-        ASSERT_TRUE(false) << "Close device failed";
-    }
-    pclose(closeDevice);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    EXPECT_EQ(ret, RET_ERR);
+        "/data/json/Test_TransformGamePadJsonDataToInputDataNotFindDirectionInRockerDirectionKey.json";
+    CheckGamePadJson(path);
 }
 } // namespace MMI
 } // namespace OHOS

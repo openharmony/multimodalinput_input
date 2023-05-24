@@ -390,10 +390,10 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchOneFingerType, TestSize.Level1)
     if (inputEventArray.events.size() <= 0) {
         return;
     }
-    EXPECT_EQ(inputEventArray.events[0].event.type, EV_KEY);
+    EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
     EXPECT_EQ(inputEventArray.events[0].event.code, BTN_TOOL_FINGER);
     EXPECT_EQ(inputEventArray.events[0].event.value, status);
-    EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
+    EXPECT_EQ(inputEventArray.events[0].event.type, EV_KEY);
 }
 
 /**
@@ -430,18 +430,18 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchThreeFingerType, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
     int64_t blockTime = 10;
-    int32_t value = 3;
     int32_t status = 1;
+    int32_t value = 3;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetMtTouchFingerType(inputEventArray, blockTime, value, status);
     EXPECT_GT(inputEventArray.events.size(), 0);
     if (inputEventArray.events.size() <= 0) {
         return;
     }
-    EXPECT_EQ(inputEventArray.events[0].event.type, EV_KEY);
     EXPECT_EQ(inputEventArray.events[0].event.code, BTN_TOOL_TRIPLETAP);
-    EXPECT_EQ(inputEventArray.events[0].event.value, status);
+    EXPECT_EQ(inputEventArray.events[0].event.type, EV_KEY);
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
+    EXPECT_EQ(inputEventArray.events[0].event.value, status);
 }
 
 /**
@@ -464,8 +464,8 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchFourFingerType, TestSize.Level1)
     }
     EXPECT_EQ(inputEventArray.events[0].event.type, EV_KEY);
     EXPECT_EQ(inputEventArray.events[0].event.code, BTN_TOOL_QUADTAP);
-    EXPECT_EQ(inputEventArray.events[0].event.value, status);
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
+    EXPECT_EQ(inputEventArray.events[0].event.value, status);
 }
 
 /**
@@ -486,8 +486,8 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchFiveFingerType, TestSize.Level1)
     if (inputEventArray.events.size() <= 0) {
         return;
     }
-    EXPECT_EQ(inputEventArray.events[0].event.type, EV_KEY);
     EXPECT_EQ(inputEventArray.events[0].event.code, BTN_TOOL_QUINTTAP);
+    EXPECT_EQ(inputEventArray.events[0].event.type, EV_KEY);
     EXPECT_EQ(inputEventArray.events[0].event.value, status);
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
@@ -501,19 +501,19 @@ HWTEST_F(DeviceBaseTest, Test_SetMtTouchFiveFingerType, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetMtTouchOtherFingerType, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int64_t blockTime = 10;
     int32_t value = 6;
     int32_t status = 1;
+    int64_t blockTime = 10;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetMtTouchFingerType(inputEventArray, blockTime, value, status);
     EXPECT_GT(inputEventArray.events.size(), 0);
     if (inputEventArray.events.size() <= 0) {
         return;
     }
-    EXPECT_EQ(inputEventArray.events[0].event.type, EV_KEY);
     EXPECT_EQ(inputEventArray.events[0].event.code, BTN_TOOL_FINGER);
     EXPECT_EQ(inputEventArray.events[0].event.value, status);
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
+    EXPECT_EQ(inputEventArray.events[0].event.type, EV_KEY);
 }
 
 /**
@@ -535,8 +535,8 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsZ, TestSize.Level1)
     }
     EXPECT_EQ(inputEventArray.events[0].event.type, EV_ABS);
     EXPECT_EQ(inputEventArray.events[0].event.code, ABS_Z);
-    EXPECT_EQ(inputEventArray.events[0].event.value, value);
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
+    EXPECT_EQ(inputEventArray.events[0].event.value, value);
 }
 
 /**
@@ -548,8 +548,8 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsZ, TestSize.Level1)
 HWTEST_F(DeviceBaseTest, Test_SetEvAbsRx, TestSize.Level1)
 {
     InputEventArray inputEventArray = {};
-    int64_t blockTime = 10;
     int32_t value = 5;
+    int64_t blockTime = 10;
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetEvAbsRx(inputEventArray, blockTime, value);
     EXPECT_GT(inputEventArray.events.size(), 0);
@@ -579,8 +579,8 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsRy, TestSize.Level1)
     if (inputEventArray.events.size() <= 0) {
         return;
     }
-    EXPECT_EQ(inputEventArray.events[0].event.type, EV_ABS);
     EXPECT_EQ(inputEventArray.events[0].event.code, ABS_RY);
+    EXPECT_EQ(inputEventArray.events[0].event.type, EV_ABS);
     EXPECT_EQ(inputEventArray.events[0].event.value, value);
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
@@ -627,8 +627,8 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsHat0Y, TestSize.Level1)
     }
     EXPECT_EQ(inputEventArray.events[0].event.type, EV_ABS);
     EXPECT_EQ(inputEventArray.events[0].event.code, ABS_HAT0Y);
-    EXPECT_EQ(inputEventArray.events[0].event.value, value);
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
+    EXPECT_EQ(inputEventArray.events[0].event.value, value);
 }
 
 /**
@@ -648,8 +648,8 @@ HWTEST_F(DeviceBaseTest, Test_SetEvAbsRz, TestSize.Level1)
     if (inputEventArray.events.size() <= 0) {
         return;
     }
-    EXPECT_EQ(inputEventArray.events[0].event.type, EV_ABS);
     EXPECT_EQ(inputEventArray.events[0].event.code, ABS_RZ);
+    EXPECT_EQ(inputEventArray.events[0].event.type, EV_ABS);
     EXPECT_EQ(inputEventArray.events[0].event.value, value);
     EXPECT_EQ(inputEventArray.events[0].blockTime, blockTime);
 }
