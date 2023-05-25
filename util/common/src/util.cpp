@@ -274,7 +274,7 @@ static bool IsValidPath(const std::string &rootDir, const std::string &filePath)
     return (filePath.compare(0, rootDir.size(), rootDir) == 0);
 }
 
-static bool IsValidJsonPath(const std::string &filePath)
+bool IsValidJsonPath(const std::string &filePath)
 {
     return IsValidPath(DATA_PATH, filePath) || IsValidPath(INPUT_PATH, filePath);
 }
