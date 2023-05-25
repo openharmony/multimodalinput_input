@@ -20,6 +20,7 @@
 #include <sstream>
 
 #include "mmi_log.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
@@ -429,10 +430,13 @@ void InputDisplayBindHelper::Store()
         MMI_HILOGE("file name is empty");
         return;
     }
-    std::filesystem::path filePath = std::filesystem::absolute(fileName_);
-    std::ofstream ofs(filePath.c_str(), std::ios::trunc | std::ios::out | std::ios_base::binary);
+    if (!IsValidJsonPath(fileName_.c_str())) {
+        MMI_HILOGE("file path is invalid");
+        return;
+    }
+    std::ofstream ofs(fileName_.c_str(), std::ios::trunc | std::ios::out | std::ios_base::binary);
     if (!ofs) {
-        MMI_HILOGE("Open file fail.%{public}s, errno:%{public}d", filePath.c_str(), errno);
+        MMI_HILOGE("Open file fail.%{public}s, errno:%{public}d", fileName_.c_str(), errno);
         return;
     }
     ofs << *infos_;
@@ -541,11 +545,14 @@ void InputDisplayBindHelper::Load()
         MMI_HILOGE("file name is empty");
         return;
     }
-    std::filesystem::path filePath = std::filesystem::absolute(fileName_);
-    std::ifstream ifs(filePath.c_str());
-    MMI_HILOGEK("Open file end:%{public}s", filePath.c_str());
+    if (!IsValidJsonPath(fileName_.c_str())) {
+        MMI_HILOGE("file path is invalid");
+        return;
+    }
+    std::ifstream ifs(fileName_.c_str());
+    MMI_HILOGEK("Open file end:%{public}s", fileName_.c_str());
     if (!ifs) {
-        MMI_HILOGE("Open file fail.%{public}s, errno:%{public}d", filePath.c_str(), errno);
+        MMI_HILOGE("Open file fail.%{public}s, errno:%{public}d", fileName_.c_str(), errno);
         return;
     }
     ifs >> *configFileInfos_;
