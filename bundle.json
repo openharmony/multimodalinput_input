@@ -64,13 +64,17 @@
         "config_policy",
         "hicollie_native",
         "init",
-        "preferences"
+        "preferences",
+        "security_component"
       ],
       "third_party": [
         "cJSON",
         "node",
         "libuv",
-        "json"
+        "json",
+        "thirdparty_libevdev",
+        "thirdparty_mtdev",
+        "cjson"
       ]
     },
     "build": {
