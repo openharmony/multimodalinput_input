@@ -138,9 +138,6 @@ ohos_shared_library("libmmi-server") {
 
   deps = [
     ":mmi_device_config.ini",
-    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
-    "${graphics_path}/2d_graphics:2d_graphics",
-    "${graphics_path}/render_service_client:librender_service_client",
     "${mmi_path}/etc/mouse_icon:input_mouse_icon",
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
@@ -149,14 +146,28 @@ ohos_shared_library("libmmi-server") {
     "//third_party/cJSON:cjson",
   ]
 
-  external_deps = [
+  external_deps = [ "c_utils:utils" ]
+  if (input_feature_pointer_drawing) {
+    external_deps += [ "window_manager:libwm" ]
+  }
+
+  if (dlp_permission_enable) {
+    external_deps += [ "security_component:libsecurity_component_enhance_sdk" ]
+  }
+
+  if (resource_schedule_service_enabled) {
+    external_deps += [ "resource_schedule_service:ressched_client" ]
+  }
+
+  external_deps += [
     "ability_base:want",
     "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
-    "c_utils:utils",
     "config_policy:configpolicy_util",
+    "graphic_standard:2d_graphics",
+    "graphic_standard:librender_service_client",
     "hicollie_native:libhicollie",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
@@ -167,18 +178,6 @@ ohos_shared_library("libmmi-server") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
   ]
-
-  if (dlp_permission_enable) {
-    external_deps += [ "security_component:libsecurity_component_enhance_sdk" ]
-  }
-
-  if (resource_schedule_service_enabled) {
-    external_deps += [ "resource_schedule_service:ressched_client" ]
-  }
-
-  if (input_feature_pointer_drawing) {
-    external_deps += [ "window_manager:libwm" ]
-  }
 
   part_name = "input"
   subsystem_name = "multimodalinput"
