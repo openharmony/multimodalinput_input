@@ -423,10 +423,10 @@ void InputDisplayBindHelper::RemoveDisplay(int32_t id)
 void InputDisplayBindHelper::Store()
 {
     CALL_DEBUG_ENTER;
-    char *canonicalPath = realpath(fileName_.c_str(), nullptr);
     if (infos_ == nullptr) {
         return;
     }
+    char *canonicalPath = realpath(fileName_.c_str(), nullptr);
     if (canonicalPath == nullptr) {
         MMI_HILOGE("file name is empty");
         return;
