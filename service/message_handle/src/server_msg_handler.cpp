@@ -256,6 +256,8 @@ int32_t ServerMsgHandler::OnEnhanceConfig(SessionPtr sess, NetPacket &pkt)
     cfg->key.data = keyData;
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read scinfo config failed");
+        free(cfg);
+        cfg = nullptr;
         return RET_ERR;
     }
     SecCompEnhanceCfgBase *secCompEnhanceCfgBase = reinterpret_cast<SecCompEnhanceCfgBase *>(cfg);
