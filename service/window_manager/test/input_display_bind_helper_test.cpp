@@ -109,8 +109,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_003, TestSize.Le
     bindInfo.AddInputDevice(1, "mouse");
     bindInfo.AddInputDevice(2, "keyboard");
     // 窗口同步信息
-    bindInfo.AddDisplay(0, "hp 223");
-    bindInfo.AddDisplay(2, "think 123");
+    bindInfo.AddDisplay(0, "think 123");
+    bindInfo.AddDisplay(2, "hp 223");
     ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>think 123\nkeyboard<=>hp 223\n"));
 }
 
@@ -175,8 +175,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindDisplayNa
     bindInfo.AddInputDevice(1, "mouse");
     bindInfo.AddInputDevice(2, "keyboard");
     // 窗口同步信息
-    bindInfo.AddDisplay(0, "hp 223");
-    bindInfo.AddDisplay(2, "think 123");
+    bindInfo.AddDisplay(0, "think 123");
+    bindInfo.AddDisplay(2, "hp 223");
     ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>think 123\nkeyboard<=>hp 223\n"));
     // 获取
     ASSERT_EQ(bindInfo.GetBindDisplayNameByInputDevice(1), std::string("think 123"));
@@ -184,8 +184,8 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetBindDisplayNa
     ASSERT_EQ(bindInfo.GetBindDisplayNameByInputDevice(3), std::string());
     // 删除display
     bindInfo.RemoveDisplay(0);
-    ASSERT_EQ(bindInfo.GetBindDisplayNameByInputDevice(1), std::string("think 123"));
-    ASSERT_EQ(bindInfo.GetBindDisplayNameByInputDevice(2), std::string());
+    ASSERT_EQ(bindInfo.GetBindDisplayNameByInputDevice(1), std::string());
+    ASSERT_EQ(bindInfo.GetBindDisplayNameByInputDevice(2), std::string("hp 223"));
     bindInfo.RemoveDisplay(2);
     ASSERT_EQ(bindInfo.GetBindDisplayNameByInputDevice(1), std::string());
     ASSERT_EQ(bindInfo.GetBindDisplayNameByInputDevice(2), std::string());
@@ -206,16 +206,17 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_IsDisplayAdd_006
     ASSERT_FALSE(bindInfo.IsDisplayAdd(0, "hp 223"));
     ASSERT_FALSE(bindInfo.IsDisplayAdd(2, "think 123"));
     ASSERT_FALSE(bindInfo.IsDisplayAdd(1, "think 123"));
-    // 窗口同步信息
-    bindInfo.AddDisplay(0, "hp 223");
-    bindInfo.AddDisplay(2, "think 123");
     ASSERT_EQ(bindInfo.Dumps(), std::string());
-    ASSERT_TRUE(bindInfo.IsDisplayAdd(0, "hp 223"));
-    ASSERT_TRUE(bindInfo.IsDisplayAdd(2, "think 123"));
-    ASSERT_FALSE(bindInfo.IsDisplayAdd(1, "think 123"));
     // 检测到触摸板设备
     bindInfo.AddInputDevice(1, "mouse");
     bindInfo.AddInputDevice(2, "keyboard");
+    // 窗口同步信息
+    bindInfo.AddDisplay(0, "think 123");
+    bindInfo.AddDisplay(2, "hp 223");
+    ASSERT_TRUE(bindInfo.IsDisplayAdd(0, "think 123"));
+    ASSERT_TRUE(bindInfo.IsDisplayAdd(2, "hp 223"));
+    ASSERT_FALSE(bindInfo.IsDisplayAdd(1, "think 123"));
+
     ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>think 123\nkeyboard<=>hp 223\n"));
 }
 
@@ -234,18 +235,20 @@ HWTEST_F(InputDisplayBindHelperTest, InputDisplayBindHelperTest_GetDisplayIdName
     bindInfo.Load();
     IdNames idNames;
     ASSERT_EQ(bindInfo.GetDisplayIdNames(), idNames);
-    // 窗口同步信息
-    bindInfo.AddDisplay(0, "hp 223");
-    idNames.insert(std::make_pair(0, "hp 223"));
+    bindInfo.AddDisplay(2, "hp 223");
+    idNames.insert(std::make_pair(2, "hp 223"));
     ASSERT_EQ(bindInfo.GetDisplayIdNames(), idNames);
-    bindInfo.AddDisplay(2, "think 123");
-    idNames.insert(std::make_pair(2, "think 123"));
-    ASSERT_EQ(bindInfo.GetDisplayIdNames(), idNames);
-    ASSERT_EQ(bindInfo.Dumps(), std::string());
+
     // 检测到触摸板设备
     bindInfo.AddInputDevice(1, "mouse");
     bindInfo.AddInputDevice(2, "keyboard");
-    idNames.insert(std::make_pair(2, "think 123"));
+
+    // 窗口同步信息
+    bindInfo.AddDisplay(0, "think 123");
+    idNames.insert(std::make_pair(0, "think 123"));
+    ASSERT_EQ(bindInfo.GetDisplayIdNames(), idNames);
+    bindInfo.AddDisplay(2, "hp 223");
+    idNames.insert(std::make_pair(2, "hp 223"));
     ASSERT_EQ(bindInfo.GetDisplayIdNames(), idNames);
     ASSERT_EQ(bindInfo.Dumps(), std::string("mouse<=>think 123\nkeyboard<=>hp 223\n"));
 }
