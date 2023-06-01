@@ -71,6 +71,7 @@ private:
     void FixCursorPosition(int32_t &physicalX, int32_t &physicalY);
     std::unique_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
     void UpdatePointerVisible();
+    void CheckMouseIconPath();
     void InitStyle();
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
 
