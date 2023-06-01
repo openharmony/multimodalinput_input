@@ -313,7 +313,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
     }
     int32_t pointerStyle = 0;
     CHKRP(napi_get_value_int32(env, argv[1], &pointerStyle), GET_VALUE_INT32);
-    if (pointerStyle < DEFAULT || pointerStyle > MIDDLE_BTN_NORTH_SOUTH_WEST_EAST) {
+    if (pointerStyle < DEFAULT || pointerStyle > CURSOR_CIRCLE) {
         MMI_HILOGE("Undefined pointer style");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Pointer style does not exist");
         return nullptr;
@@ -449,6 +449,12 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
     napi_value middle_btn_north_south_west_east = nullptr;
     CHKRP(napi_create_int32(env, MOUSE_ICON::MIDDLE_BTN_NORTH_SOUTH_WEST_EAST,
         &middle_btn_north_south_west_east), CREATE_INT32);
+    napi_value horizontal_text_cursor = nullptr;
+    CHKRP(napi_create_int32(env, MOUSE_ICON::HORIZONTAL_TEXT_CURSOR, &horizontal_text_cursor), CREATE_INT32);
+    napi_value cursor_cross = nullptr;
+    CHKRP(napi_create_int32(env, MOUSE_ICON::CURSOR_CROSS, &cursor_cross), CREATE_INT32);
+    napi_value cursor_circle = nullptr;
+    CHKRP(napi_create_int32(env, MOUSE_ICON::CURSOR_CIRCLE, &cursor_circle), CREATE_INT32);
 
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("DEFAULT", defaults),
@@ -490,6 +496,9 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
         DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_SOUTH_EAST", middle_btn_south_east),
         DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_SOUTH_WEST", middle_btn_south_west),
         DECLARE_NAPI_STATIC_PROPERTY("MIDDLE_BTN_NORTH_SOUTH_WEST_EAST", middle_btn_north_south_west_east),
+        DECLARE_NAPI_STATIC_PROPERTY("HORIZONTAL_TEXT_CURSOR", horizontal_text_cursor),
+        DECLARE_NAPI_STATIC_PROPERTY("CURSOR_CROSS", cursor_cross),
+        DECLARE_NAPI_STATIC_PROPERTY("CURSOR_CIRCLE", cursor_circle),
     };
     napi_value result = nullptr;
     CHKRP(napi_define_class(env, "PointerStyle", NAPI_AUTO_LENGTH, EnumConstructor, nullptr,
