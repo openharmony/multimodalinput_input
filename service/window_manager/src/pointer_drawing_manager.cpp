@@ -563,6 +563,17 @@ void PointerDrawingManager::DrawPointerStyle()
     }
 }
 
+void PointerDrawingManager::CheckMouseIconPath()
+{
+    for (auto iter = mouseIcons_.begin(); iter != mouseIcons_.end();) {
+        if ((ReadCursorStyleFile(iter->second.iconPath)) != RET_OK) {
+            iter = mouseIcons_.erase(iter);
+            continue;
+        }
+        ++iter;
+    }
+}
+
 void PointerDrawingManager::InitStyle()
 {
     CALL_DEBUG_ENTER;
@@ -607,14 +618,11 @@ void PointerDrawingManager::InitStyle()
         {MIDDLE_BTN_SOUTH_WEST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "MID_Btn_South_West.svg"}},
         {MIDDLE_BTN_NORTH_SOUTH_WEST_EAST, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH +
             "MID_Btn_North_South_West_East.svg"}},
+        {HORIZONTAL_TEXT_CURSOR, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Horizontal_Text_Cursor.svg"}},
+        {CURSOR_CROSS, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Cursor_Cross.svg"}},
+        {CURSOR_CIRCLE, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Cursor_Circle.png"}},
     };
-    for (auto iter = mouseIcons_.begin(); iter != mouseIcons_.end();) {
-        if ((ReadCursorStyleFile(iter->second.iconPath)) != RET_OK) {
-            iter = mouseIcons_.erase(iter);
-            continue;
-        }
-        ++iter;
-    }
+    CheckMouseIconPath();
 }
 } // namespace MMI
 } // namespace OHOS
