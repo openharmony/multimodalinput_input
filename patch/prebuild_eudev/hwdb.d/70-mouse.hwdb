@@ -756,4 +756,4 @@ mouse:usb:v3057p0001:*
  MOUSE_WHEEL_CLICK_ANGLE=23
 
 # Huawei hid-over-i2c 27C6:01E0 Mouse
- mouse:ic2:v27c6p01e0:hid-over-i2c 27C6:01E0 Mouse:
+ mouse:i2c:v27c6p01e0:hid-over-i2c 27C6:01E0 Mouse:
