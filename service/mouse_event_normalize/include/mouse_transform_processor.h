@@ -26,6 +26,15 @@
 #include "pointer_event.h"
 
 namespace OHOS {
+
+extern "C" {
+    struct Offset {
+        double dx;
+        double dy;
+    };
+    int32_t HandleMotionAccelerate(const Offset* offset, bool mode, double* abs_x, double* abs_y, int32_t speed);
+}
+
 namespace MMI {
 struct AccelerateCurve {
     std::vector<int32_t> speeds;
@@ -53,7 +62,6 @@ private:
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     int32_t HandleButtonValueInner(struct libinput_event_pointer* data);
-    int32_t HandleMotionAccelerate(struct libinput_event_pointer* data);
     void DumpInner();
     void SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, struct libinput_event_pointer* data);
 public:
@@ -66,7 +74,6 @@ public:
     static int32_t GetMouseScrollRows();
     static int32_t SetPointerSpeed(int32_t speed);
     static int32_t GetPointerSpeed();
-    bool GetSpeedGain(double vin, double &gain);
     static int32_t SetPointerLocation(int32_t x, int32_t y);
     void SetConfigPointerSpeed(int32_t speed);
     int32_t GetSpeed() const;

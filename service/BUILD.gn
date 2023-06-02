@@ -12,10 +12,11 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//build/test.gni")
 import("../multimodalinput_mini.gni")
 
 defines = input_default_defines
-
+module_output_path = "multimodalinput/unit_out"
 mmi_service_path = "${mmi_path}/service"
 
 ohos_prebuilt_etc("mmi_device_config.ini") {
@@ -80,6 +81,22 @@ config("libmmi_server_config") {
   }
 }
 
+ohos_rust_shared_ffi("mmi_rust") {
+  sources = [ "rust/src/lib.rs" ]
+  external_deps = [ "hilog_native:hilog_rust" ]
+  subsystem_name = "multimodalinput"
+  part_name = "input"
+}
+
+ohos_rust_unittest("mmi_rust_test") {
+  module_out_path = module_output_path
+  sources = [ "rust/src/lib.rs" ]
+  deps = [ ":mmi_rust" ]
+  external_deps = [ "hilog_native:hilog_rust" ]
+  subsystem_name = "multimodalinput"
+  part_name = "input"
+}
+
 ohos_shared_library("libmmi-server") {
   sources = libmmi_service_sources
 
@@ -138,6 +155,7 @@ ohos_shared_library("libmmi-server") {
 
   deps = [
     ":mmi_device_config.ini",
+    ":mmi_rust",
     "${mmi_path}/etc/mouse_icon:input_mouse_icon",
     "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service/connect_manager:mmi_connect_manager_service",
@@ -182,9 +200,6 @@ ohos_shared_library("libmmi-server") {
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
-
-import("//build/test.gni")
-module_output_path = "multimodalinput/unit_out"
 
 ohos_unittest("ut-mmi-service-out") {
   module_out_path = module_output_path
