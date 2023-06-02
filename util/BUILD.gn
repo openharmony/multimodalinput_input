@@ -49,7 +49,7 @@ ohos_shared_library("libmmi-util") {
   if (dlp_permission_enable) {
     external_deps += [ "security_component:libsecurity_component_enhance_sdk" ]
   }
-
+  innerapi_tags = [ "platformsdk" ]
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
