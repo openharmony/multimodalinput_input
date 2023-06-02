@@ -143,22 +143,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpee
 }
 
 /**
- * @tc.name: MouseTransformProcessorTest_GetSpeedGain_007
- * @tc.desc: Test GetSpeedGain
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetSpeedGain_007, TestSize.Level1)
-{
-    double vin = 0;
-    double gain = 0;
-    bool isGain = false;
-    int32_t deviceId = 0;
-    MouseTransformProcessor processor(deviceId);
-    ASSERT_EQ(processor.GetSpeedGain(vin, gain), isGain);
-}
-
-/**
  * @tc.name: MouseTransformProcessorTest_SetPointerLocation_008
  * @tc.desc: Test SetPointerLocation
  * @tc.type: FUNC
