@@ -265,7 +265,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
             MMI_HILOGD("Interceptor cap does not have pointer or touch");
             continue;
         }
-        if (CheckInputDeviceSource(pointerEvent, interceptor.deviceTags_)) {
+        if (!CheckInputDeviceSource(pointerEvent, interceptor.deviceTags_)) {
             continue;
         }
         if (!inputDevice->HasCapability(interceptor.deviceTags_)) {
