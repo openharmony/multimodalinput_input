@@ -229,10 +229,10 @@ bool EventInterceptorHandler::InterceptorCollection::CheckInputDeviceSource(
     const std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags) const
 {
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
-        (deviceTags & InputDeviceCapability::INPUT_DEV_CAP_TOUCH)) {
+        (deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TOUCH))) {
         return true;
     } else if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) &&
-        (deviceTags & InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {
+        (deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER))) {
         return true;
     }
     return false;
@@ -265,7 +265,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
             MMI_HILOGD("Interceptor cap does not have pointer or touch");
             continue;
         }
-        if (CheckInputDeviceSource(pointerEvent, interceptor.deviceTags_)) {
+        if (!CheckInputDeviceSource(pointerEvent, interceptor.deviceTags_)) {
             continue;
         }
         if (!inputDevice->HasCapability(interceptor.deviceTags_)) {
