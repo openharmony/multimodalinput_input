@@ -479,7 +479,6 @@ void PointerDrawingManager::SetPointerLocation(int32_t pid, int32_t x, int32_t y
     if (pointerWindow_ != nullptr) {
         pointerWindow_->MoveTo(x, y);
         MMI_HILOGD("Pointer window move success");
-        SetPointerVisible(pid, true);
     }
 }
 
