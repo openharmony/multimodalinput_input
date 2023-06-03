@@ -229,7 +229,7 @@ bool EventInterceptorHandler::InterceptorCollection::CheckInputDeviceSource(
     const std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags) const
 {
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
-        (deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TOUCH)) {
+        (deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TOUCH))) {
         return true;
     } else if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) &&
         (deviceTags & CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER))) {
