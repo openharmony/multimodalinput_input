@@ -81,7 +81,8 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     }
 
     Offset offset = {libinput_event_pointer_get_dx(data), libinput_event_pointer_get_dy(data)};
-    int32_t ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(), &absolutionX_, &absolutionY_, GetSpeed());
+    int32_t ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(), &absolutionX_,
+        &absolutionY_, GetSpeed());
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to handle motion correction");
         return ret;
