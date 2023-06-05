@@ -38,7 +38,7 @@ struct AccelerateCurves {
 }
 impl AccelerateCurves {
     fn get_curve_by_speed(&self, speed: usize) -> &CurveItem {
-        &self.data[speed]
+        &self.data[speed - 1]
     }
 }
 impl AccelerateCurves {
@@ -57,7 +57,7 @@ impl AccelerateCurves {
                     CurveItem {
                         speeds: vec![8, 32, 128],
                         slopes: vec![0.32, 0.60, 1.12],
-                        diff_nums: vec![0.0, -1.12, -9.44],
+                        diff_nums: vec![0.0, -2.24, -18.88],
                     },
                     CurveItem {
                         speeds: vec![8, 32, 128],
