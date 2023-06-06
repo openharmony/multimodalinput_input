@@ -292,8 +292,8 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
             if ((item.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
                 continue;
             }
-            if (((deviceTags & item.deviceTags) == item.deviceTags) &&
-                !CheckInputDeviceSource(pointerEvent, item.deviceTags)) {
+            if (((deviceTags & item.deviceTags_) == item.deviceTags_) &&
+                !CheckInputDeviceSource(pointerEvent, item.deviceTags_)) {
                 continue;
             }
             int32_t handlerId = item.handlerId_;
