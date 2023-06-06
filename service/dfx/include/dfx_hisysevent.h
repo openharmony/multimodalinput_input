@@ -65,6 +65,7 @@ public:
         int32_t oldFocusWindowPid, int32_t newFocusWindowPid);
     static void OnZorderWindowChanged(int32_t oldZorderFirstWindowId, int32_t newZorderFirstWindowId,
         int32_t oldZorderFirstWindowPid, int32_t newZorderFirstWindowPid);
+    static void OnLidSwitchChanged(int32_t lidSwitch);
     static void ApplicationBlockInput(const SessionPtr& sess);
     static void CalcKeyDispTimes();
     static void CalcPointerDispTimes();

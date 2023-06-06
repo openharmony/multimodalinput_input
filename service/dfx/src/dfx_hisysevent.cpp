@@ -280,6 +280,18 @@ void DfxHisysevent::OnZorderWindowChanged(int32_t oldZorderFirstWindowId, int32_
     }
 }
 
+void DfxHisysevent::OnLidSwitchChanged(int32_t lidSwitch)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "LID_SWITCH",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "SWITCH", lidSwitch);
+    if (ret != 0) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
 void DfxHisysevent::ApplicationBlockInput(const SessionPtr& sess)
 {
     int32_t ret = HiSysEventWrite(
