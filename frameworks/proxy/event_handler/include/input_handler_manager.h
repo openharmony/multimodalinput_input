@@ -71,13 +71,14 @@ private:
         int32_t priority, uint32_t deviceTags, std::shared_ptr<IInputEventConsumer> monitor);
     int32_t AddToServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
         uint32_t deviceTags);
-    int32_t RemoveLocal(int32_t handlerId, InputHandlerType handlerType);
+    int32_t RemoveLocal(int32_t handlerId, InputHandlerType handlerType, uint32_t &deviceTags);
     void RemoveFromServer(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
         uint32_t deviceTags);
 
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
     void OnDispatchEventProcessed(int32_t eventId, int64_t actionTime);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    bool CheckInputDeviceSource(const std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags) const;
     void GetConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags,
         std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
