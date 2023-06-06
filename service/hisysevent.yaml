@@ -182,3 +182,7 @@ INPUT_POWER_UP:
 
 INPUT_POWER_DOWN:
   __BASE: {type: STATISTIC, level: CRITICAL, desc: power input down}
+
+LID_SWITCH:
+  __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: lid switch}
+  SWITCH: {type: INT32, desc: lid switch}
