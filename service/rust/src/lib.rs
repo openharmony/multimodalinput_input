@@ -122,7 +122,7 @@ extern {
 }
 
 fn get_speed_gain(vin: f64, gain: *mut f64, speed: i32) -> bool {
-    info!(LOG_LABEL, "get_speed_gain enter");
+    info!(LOG_LABEL, "get_speed_gain enter vin is set to {} speed {} ", @public(vin), @public(speed));
     unsafe {
         if fabs(vin) < DOUBLE_ZERO {
             error!(LOG_LABEL, "{} less that the limit", DOUBLE_ZERO);
@@ -130,7 +130,7 @@ fn get_speed_gain(vin: f64, gain: *mut f64, speed: i32) -> bool {
         }
     }
     if speed < 1 {
-        error!(LOG_LABEL, "{} The speed value can't be less than 1", speed);
+        error!(LOG_LABEL, "{} The speed value can't be less than 1", @public(speed));
         return false;
     }
     let item = AccelerateCurves::get_instance().get_curve_by_speed(speed as usize);
@@ -139,11 +139,12 @@ fn get_speed_gain(vin: f64, gain: *mut f64, speed: i32) -> bool {
         for i in 0..2 {
             if num <= item.speeds[i] {
                 *gain = (item.slopes[i] * vin + item.diff_nums[i]) / vin;
-                error!(LOG_LABEL, "gain is set to {}", *gain);
+                info!(LOG_LABEL, "gain is set to {}", @public(*gain));
                 return true;
             }
         }
         *gain = (item.slopes[2] * vin + item.diff_nums[2]) / vin;
+        info!(LOG_LABEL, "gain is set to {}", @public(*gain));
     }
     info!(LOG_LABEL, "get_speed_gain leave");
     true
@@ -179,16 +180,16 @@ pub unsafe extern "C" fn HandleMotionAccelerate (
         vin = (fmax(abs(dx), abs(dy)) + fmin(abs(dx), abs(dy))) / 2.0;
         info!(
             LOG_LABEL,
-            "output the abs_x {} and abs_y {} captureMode {} dx {} dy{} gain {}",
-            *abs_x,
-            *abs_y,
-            mode,
-            dx,
-            dy,
-            gain
+            "output the abs_x {} and abs_y {} captureMode {} dx {} dy {} gain {}",
+            @public(*abs_x),
+            @public(*abs_y),
+            @public(mode),
+            @public(dx),
+            @public(dy),
+            @public(gain)
         );
         if !get_speed_gain(vin, &mut gain as *mut f64, speed) {
-            error!(LOG_LABEL, "{} getSpeedGgain failed!", speed);
+            error!(LOG_LABEL, "{} getSpeedGgain failed!", @public(speed));
             return RET_ERR;
         }
         if !mode {
@@ -197,7 +198,7 @@ pub unsafe extern "C" fn HandleMotionAccelerate (
         }
         info!(
             LOG_LABEL,
-            "output the abs_x {} and abs_y {}", *abs_x, *abs_y
+            "output the abs_x {} and abs_y {}", @public(*abs_x), @public(*abs_y)
         );
     }
     RET_OK
