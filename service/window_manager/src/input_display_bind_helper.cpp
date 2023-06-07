@@ -426,21 +426,24 @@ void InputDisplayBindHelper::Store()
     if (infos_ == nullptr) {
         return;
     }
-    if (fileName_.empty()) {
+    char *canonicalPath = realpath(fileName_.c_str(), nullptr);
+    if (canonicalPath == nullptr) {
         MMI_HILOGE("file name is empty");
         return;
     }
-    if (!IsValidJsonPath(fileName_.c_str())) {
+    if (!IsValidJsonPath(canonicalPath)) {
         MMI_HILOGE("file path is invalid");
         return;
     }
-    std::ofstream ofs(fileName_.c_str(), std::ios::trunc | std::ios::out | std::ios_base::binary);
+    std::ofstream ofs(canonicalPath, std::ios::trunc | std::ios::out | std::ios_base::binary);
     if (!ofs) {
-        MMI_HILOGE("Open file fail.%{public}s, errno:%{public}d", fileName_.c_str(), errno);
+        MMI_HILOGE("Open file fail.%{public}s, errno:%{public}d", canonicalPath, errno);
         return;
     }
     ofs << *infos_;
     ofs.close();
+    free(canonicalPath);
+    canonicalPath = nullptr;
 }
 
 int32_t InputDisplayBindHelper::GetDisplayBindInfo(DisplayBindInfos &infos)
@@ -541,22 +544,25 @@ int32_t InputDisplayBindHelper::SetDisplayBind(int32_t deviceId, int32_t display
 void InputDisplayBindHelper::Load()
 {
     CALL_DEBUG_ENTER;
-    if (fileName_.empty()) {
+    char *canonicalPath = realpath(fileName_.c_str(), nullptr);
+    if (canonicalPath == nullptr) {
         MMI_HILOGE("file name is empty");
         return;
     }
-    if (!IsValidJsonPath(fileName_.c_str())) {
+    if (!IsValidJsonPath(canonicalPath)) {
         MMI_HILOGE("file path is invalid");
         return;
     }
-    std::ifstream ifs(fileName_.c_str());
-    MMI_HILOGEK("Open file end:%{public}s", fileName_.c_str());
+    std::ifstream ifs(canonicalPath);
+    MMI_HILOGEK("Open file end:%{public}s", canonicalPath);
     if (!ifs) {
-        MMI_HILOGE("Open file fail.%{public}s, errno:%{public}d", fileName_.c_str(), errno);
+        MMI_HILOGE("Open file fail.%{public}s, errno:%{public}d", canonicalPath, errno);
         return;
     }
     ifs >> *configFileInfos_;
     ifs.close();
+    free(canonicalPath);
+    canonicalPath = nullptr;
 }
 
 std::string InputDisplayBindHelper::Dumps() const
