@@ -80,7 +80,8 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         return RET_ERR;
     }
 
-    Offset offset = {libinput_event_pointer_get_dx(data), libinput_event_pointer_get_dy(data)};
+    Offset offset = {libinput_event_pointer_get_dx_unaccelerated(data),
+        libinput_event_pointer_get_dy_unaccelerated(data)};
     int32_t ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(), &absolutionX_,
         &absolutionY_, GetSpeed());
     if (ret != RET_OK) {
