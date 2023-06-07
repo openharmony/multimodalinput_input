@@ -23,6 +23,7 @@
 #include "net_packet.h"
 #include "proto.h"
 #include "util_ex.h"
+#include "dfx_hisysevent.h"
 
 namespace OHOS {
 namespace MMI {
@@ -104,6 +105,7 @@ bool SwitchSubscriberHandler::OnSubscribeSwitchEvent(std::shared_ptr<SwitchEvent
 {
     CHKPF(switchEvent);
     MMI_HILOGD("switchValue:%{public}d", switchEvent->GetSwitchValue());
+    DfxHisysevent::OnLidSwitchChanged(switchEvent->GetSwitchValue());
 
     bool handled = false;
     for (const auto &subscriber : subscribers_) {
