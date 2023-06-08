@@ -39,10 +39,10 @@ constexpr int32_t MAX_SEQUENCEKEYS_NUM = 10;
 constexpr int64_t MAX_DELAY_TIME = 1000000;
 constexpr int64_t SECONDS_SYSTEM = 1000;
 constexpr int32_t SPECIAL_KEY_DOWN_DELAY = 150;
-constexpr int32_t TOUCH_MAX_THRESHOLD = 15;
 constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;
 constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
 constexpr int32_t ERROR_DELAY_VALUE = -1000;
+constexpr int32_t TOUCH_MAX_THRESHOLD = 15;
 constexpr int32_t COMMON_PARAMETER_ERROR = 401;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
 const std::string shortKeyFileName = "/data/service/el1/public/multimodalinput/Settings.xml";
@@ -637,6 +637,46 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
+void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent>& touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    if (twoFingerGesture_.timerId == -1) {
+        MMI_HILOGW("Two finger gesture timer id is -1.");
+        return;
+    }
+    auto id = touchEvent->GetPointerId();
+    auto pos = std::find_if(std::begin(twoFingerGesture_.touches), std::end(twoFingerGesture_.touches),
+        [id](const auto& item) { return item.id == id; });
+    if (pos == std::end(twoFingerGesture_.touches)) {
+        return;
+    }
+    PointerEvent::PointerItem item;
+    touchEvent->GetPointerItem(id, item);
+    auto dx = std::abs(pos->x - item.GetDisplayX());
+    auto dy = std::abs(pos->y - item.GetDisplayY());
+    if (dx > TOUCH_MAX_THRESHOLD || dy > TOUCH_MAX_THRESHOLD) {
+        StopTwoFingerGesture();
+    }
+}
+
+void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent>& touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    auto num = touchEvent->GetPointerIds().size();
+    if (num == TwoFingerGesture::MAX_TOUCH_NUM) {
+        StartTwoFingerGesture();
+    } else {
+        StopTwoFingerGesture();
+    }
+    if (num > 0 && num <= TwoFingerGesture::MAX_TOUCH_NUM) {
+        auto id = touchEvent->GetPointerId();
+        PointerEvent::PointerItem item;
+        touchEvent->GetPointerItem(id, item);
+        twoFingerGesture_.touches[num - 1].id = id;
+        twoFingerGesture_.touches[num - 1].x = item.GetDisplayX();
+        twoFingerGesture_.touches[num - 1].y = item.GetDisplayY();
+    }
+}
 void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent>& touchEvent)
 {
     CALL_DEBUG_ENTER;
@@ -659,40 +699,11 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent>& 
             break;
         }
         case PointerEvent::POINTER_ACTION_MOVE: {
-            if (twoFingerGesture_.timerId == -1) {
-                MMI_HILOGW("Two finger gesture timer id is -1.");
-                break;
-            }
-            auto id = touchEvent->GetPointerId();
-            auto pos = std::find_if(std::begin(twoFingerGesture_.touches), std::end(twoFingerGesture_.touches),
-                [id](const auto& item) { return item.id == id; });
-            if (pos == std::end(twoFingerGesture_.touches)) {
-                break;
-            }
-            PointerEvent::PointerItem item;
-            touchEvent->GetPointerItem(id, item);
-            auto dx = std::abs(pos->x - item.GetDisplayX());
-            auto dy = std::abs(pos->y - item.GetDisplayY());
-            if (dx > TOUCH_MAX_THRESHOLD || dy > TOUCH_MAX_THRESHOLD) {
-                StopTwoFingerGesture();
-            }
+            HandlePointerActionMoveEvent(touchEvent);
             break;
         }
         case PointerEvent::POINTER_ACTION_DOWN: {
-            auto num = touchEvent->GetPointerIds().size();
-            if (num == TwoFingerGesture::MAX_TOUCH_NUM) {
-                StartTwoFingerGesture();
-            } else {
-                StopTwoFingerGesture();
-            }
-            if (num > 0 && num <= TwoFingerGesture::MAX_TOUCH_NUM) {
-                auto id = touchEvent->GetPointerId();
-                PointerEvent::PointerItem item;
-                touchEvent->GetPointerItem(id, item);
-                twoFingerGesture_.touches[num - 1].id = id;
-                twoFingerGesture_.touches[num - 1].x = item.GetDisplayX();
-                twoFingerGesture_.touches[num - 1].y = item.GetDisplayY();
-            }
+            HandlePointerActionDownEvent(touchEvent);
             break;
         }
         default:
@@ -1110,7 +1121,8 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
 int32_t KeyCommandHandler::GetKeyDownDurationFromXml(const std::string &businessId)
 {
     CALL_DEBUG_ENTER;
-    std::shared_ptr<NativePreferences::Preferences> pref = NativePreferences::PreferencesHelper::GetPreferences(shortKeyFileName, errno);
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(shortKeyFileName, errno);
     CHKPR(pref, ERROR_DELAY_VALUE);
     return pref->GetInt(businessId, ERROR_DELAY_VALUE);
 }
