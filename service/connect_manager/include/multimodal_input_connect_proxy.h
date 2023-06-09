@@ -77,9 +77,21 @@ public:
     int32_t AppendExtraData(const ExtraData& extraData) override;
     int32_t EnableInputDevice(bool enable) override;
     int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay) override;
+    int32_t SetTouchpadScrollSwitch(bool switchFlag) override;
+    int32_t GetTouchpadScrollSwitch(bool &switchFlag) override;
+    int32_t SetTouchpadScrollDirection(bool state) override;
+    int32_t GetTouchpadScrollDirection(bool &state) override;
+    int32_t SetTouchpadTapSwitch(bool switchFlag) override;
+    int32_t GetTouchpadTapSwitch(bool &switchFlag) override;
+    int32_t SetTouchpadPointerSpeed(int32_t speed) override;
+    int32_t GetTouchpadPointerSpeed(int32_t &speed) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;
+    int32_t SetTouchpadBoolData(bool date, int32_t type);
+    int32_t GetTouchpadBoolData(bool &date, int32_t type);
+    int32_t SetTouchpadInt32Data(int32_t date, int32_t type);
+    int32_t GetTouchpadInt32Data(int32_t &date, int32_t type);
 };
 } // namespace MMI
 } // namespace OHOS

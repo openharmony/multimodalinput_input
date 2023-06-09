@@ -80,6 +80,17 @@ protected:
     int32_t StubAppendExtraData(MessageParcel& data, MessageParcel& reply);
     int32_t StubEnableInputDevice(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetKeyDownDuration(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetTouchpadScrollSwitch(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetTouchpadScrollSwitch(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetTouchpadScrollDirection(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetTouchpadScrollDirection(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetTouchpadTapSwitch(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetTouchpadTapSwitch(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetTouchpadPointerSpeed(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetTouchpadPointerSpeed(MessageParcel& data, MessageParcel& reply);
+
+private:
+    int32_t VerifyTouchPadSetting(void);
 };
 } // namespace MMI
 } // namespace OHOS

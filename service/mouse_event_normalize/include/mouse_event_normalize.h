@@ -46,6 +46,14 @@ public:
     void OnDisplayLost(int32_t displayId);
     int32_t GetDisplayId() const;
     int32_t SetPointerLocation(int32_t x, int32_t y);
+    int32_t SetTouchpadScrollSwitch(bool switchFlag) const;
+    int32_t GetTouchpadScrollSwitch(bool &switchFlag) const;
+    int32_t SetTouchpadScrollDirection(bool state) const;
+    int32_t GetTouchpadScrollDirection(bool &state) const;
+    int32_t SetTouchpadTapSwitch(bool switchFlag) const;
+    int32_t GetTouchpadTapSwitch(bool &switchFlag) const;
+    int32_t SetTouchpadPointerSpeed(int32_t speed) const;
+    int32_t GetTouchpadPointerSpeed(int32_t &speed) const;
 
 private:
     std::shared_ptr<MouseTransformProcessor> GetProcessor(int32_t deviceId) const;
