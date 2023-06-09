@@ -79,6 +79,14 @@ public:
         GET_HOVER_SCROLL_STATE = 42,
         SET_MOUSE_SCROLL_ROWS = 43,
         GET_MOUSE_SCROLL_ROWS = 44,
+        SET_TP_SCROLL_SWITCH = 45,
+        GET_TP_SCROLL_SWITCH = 46,
+        SET_TP_SCROLL_DIRECT_SWITCH = 47,
+        GET_TP_SCROLL_DIRECT_SWITCH = 48,
+        SET_TP_TAP_SWITCH = 49,
+        GET_TP_TAP_SWITCH = 50,
+        SET_TP_POINTER_SPEED = 51,
+        GET_TP_POINTER_SPEED = 52,
     };
 
     enum {
@@ -135,6 +143,14 @@ public:
     virtual int32_t AppendExtraData(const ExtraData& extraData) = 0;
     virtual int32_t EnableInputDevice(bool enable) = 0;
     virtual int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay) = 0;
+    virtual int32_t SetTouchpadScrollSwitch(bool switchFlag) = 0;
+    virtual int32_t GetTouchpadScrollSwitch(bool &switchFlag) = 0;
+    virtual int32_t SetTouchpadScrollDirection(bool state) = 0;
+    virtual int32_t GetTouchpadScrollDirection(bool &state) = 0;
+    virtual int32_t SetTouchpadTapSwitch(bool switchFlag) = 0;
+    virtual int32_t GetTouchpadTapSwitch(bool &switchFlag) = 0;
+    virtual int32_t SetTouchpadPointerSpeed(int32_t speed) = 0;
+    virtual int32_t GetTouchpadPointerSpeed(int32_t &speed) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

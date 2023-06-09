@@ -420,5 +420,53 @@ int32_t MultimodalInputConnectManager::SetKeyDownDuration(const std::string &bus
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetKeyDownDuration(businessId, delay);
 }
+
+int32_t MultimodalInputConnectManager::SetTouchpadScrollSwitch(bool switchFlag)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetTouchpadScrollSwitch(switchFlag);
+}
+
+int32_t MultimodalInputConnectManager::GetTouchpadScrollSwitch(bool &switchFlag)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetTouchpadScrollSwitch(switchFlag);
+}
+
+int32_t MultimodalInputConnectManager::SetTouchpadScrollDirection(bool state)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetTouchpadScrollDirection(state);
+}
+
+int32_t MultimodalInputConnectManager::GetTouchpadScrollDirection(bool &state)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetTouchpadScrollDirection(state);
+}
+
+int32_t MultimodalInputConnectManager::SetTouchpadTapSwitch(bool switchFlag)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetTouchpadTapSwitch(switchFlag);
+}
+
+int32_t MultimodalInputConnectManager::GetTouchpadTapSwitch(bool &switchFlag)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetTouchpadTapSwitch(switchFlag);
+}
+
+int32_t MultimodalInputConnectManager::SetTouchpadPointerSpeed(int32_t speed)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetTouchpadPointerSpeed(speed);
+}
+
+int32_t MultimodalInputConnectManager::GetTouchpadPointerSpeed(int32_t &speed)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetTouchpadPointerSpeed(speed);
+}
 } // namespace MMI
 } // namespace OHOS

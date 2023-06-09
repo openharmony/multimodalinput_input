@@ -300,5 +300,43 @@ void InputManager::SetEnhanceConfig(SecCompEnhanceCfgBase *cfg)
     InputMgrImpl.SetEnhanceConfig(cfg);
 }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+
+int32_t InputManager::SetTouchpadScrollSwitch(bool switchFlag)
+{
+    return InputMgrImpl.SetTouchpadScrollSwitch(switchFlag);
+}
+
+int32_t InputManager::GetTouchpadScrollSwitch(bool &switchFlag)
+{
+    return InputMgrImpl.GetTouchpadScrollSwitch(switchFlag);
+}
+int32_t InputManager::SetTouchpadScrollDirection(bool state)
+{
+    return InputMgrImpl.SetTouchpadScrollDirection(state);
+}
+
+int32_t InputManager::GetTouchpadScrollDirection(bool &state)
+{
+    return InputMgrImpl.GetTouchpadScrollDirection(state);
+}
+int32_t InputManager::SetTouchpadTapSwitch(bool switchFlag)
+{
+    return InputMgrImpl.SetTouchpadTapSwitch(switchFlag);
+}
+
+int32_t InputManager::GetTouchpadTapSwitch(bool &switchFlag)
+{
+    return InputMgrImpl.GetTouchpadTapSwitch(switchFlag);
+}
+
+int32_t InputManager::SetTouchpadPointerSpeed(int32_t speed)
+{
+    return InputMgrImpl.SetTouchpadPointerSpeed(speed);
+}
+
+int32_t InputManager::GetTouchpadPointerSpeed(int32_t &speed)
+{
+    return InputMgrImpl.GetTouchpadPointerSpeed(speed);
+}
 } // namespace MMI
 } // namespace OHOS

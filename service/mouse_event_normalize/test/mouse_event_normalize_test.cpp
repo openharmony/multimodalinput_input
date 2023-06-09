@@ -213,5 +213,160 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetMouseScrollRows_012
     const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
     ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
+
+/**
+ * @tc.name: MouseEventNormalizeTest_SetTouchpadScrollSwitch_013
+ * @tc.desc: Test SetTouchpadScrollSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadScrollSwitch_013, TestSize.Level1)
+{
+    bool flag = false;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadScrollSwitch(flag) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_GetTouchpadScrollSwitch_014
+ * @tc.desc: Test GetTouchpadScrollSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadScrollSwitch_014, TestSize.Level1)
+{
+    bool flag = true;
+    MouseEventHdr->SetTouchpadScrollSwitch(flag);
+    bool newFlag = true;
+    ASSERT_TRUE(MouseEventHdr->GetTouchpadScrollSwitch(flag) == RET_OK);
+    ASSERT_TRUE(flag == newFlag);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_SetTouchpadScrollDirection_015
+ * @tc.desc: Test SetTouchpadScrollDirection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadScrollDirection_015, TestSize.Level1)
+{
+    bool state = false;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadScrollDirection(state) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_GetTouchpadScrollDirection_016
+ * @tc.desc: Test GetTouchpadScrollDirection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadScrollDirection_016, TestSize.Level1)
+{
+    bool state = true;
+    MouseEventHdr->SetTouchpadScrollDirection(state);
+    bool newState = true;
+    ASSERT_TRUE(MouseEventHdr->GetTouchpadScrollDirection(state) == RET_OK);
+    ASSERT_TRUE(state == newState);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_SetTouchpadTapSwitch_017
+ * @tc.desc: Test SetTouchpadTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadTapSwitch_017, TestSize.Level1)
+{
+    bool flag = false;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadTapSwitch(flag) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_GetTouchpadTapSwitch_018
+ * @tc.desc: Test GetTouchpadTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadTapSwitch_018, TestSize.Level1)
+{
+    bool flag = true;
+    MouseEventHdr->SetTouchpadTapSwitch(flag);
+    bool newFlag = true;
+    ASSERT_TRUE(MouseEventHdr->GetTouchpadTapSwitch(flag) == RET_OK);
+    ASSERT_TRUE(flag == newFlag);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_SetTouchpadPointerSpeed_019
+ * @tc.desc: Test SetTouchpadPointerSpeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadPointerSpeed_019, TestSize.Level1)
+{
+    int32_t speed = 3;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadPointerSpeed(speed) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_GetTouchpadPointerSpeed_020
+ * @tc.desc: Test GetTouchpadPointerSpeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadPointerSpeed_020, TestSize.Level1)
+{
+    int32_t speed = 8;
+    MouseEventHdr->SetTouchpadPointerSpeed(speed);
+    int32_t newSpeed = 4;
+    ASSERT_TRUE(MouseEventHdr->GetTouchpadPointerSpeed(newSpeed) == RET_OK);
+    ASSERT_TRUE(speed == newSpeed);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_SetTouchpadPointerSpeed_021
+ * @tc.desc: Test SetTouchpadPointerSpeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadPointerSpeed_021, TestSize.Level1)
+{
+    int32_t speed = 3;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadPointerSpeed(speed) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_GetTouchpadPointerSpeed_022
+ * @tc.desc: Test GetTouchpadPointerSpeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadPointerSpeed_022, TestSize.Level1)
+{
+    int32_t speed = 8;
+    MouseEventHdr->SetTouchpadPointerSpeed(speed);
+    int32_t newSpeed = 4;
+    ASSERT_TRUE(MouseEventHdr->GetTouchpadPointerSpeed(newSpeed) == RET_OK);
+    ASSERT_TRUE(speed == newSpeed);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
 }
 }

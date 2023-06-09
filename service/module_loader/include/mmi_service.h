@@ -91,7 +91,15 @@ public:
     int32_t AppendExtraData(const ExtraData& extraData) override;
     int32_t EnableInputDevice(bool enable) override;
     int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay) override;
-    
+    int32_t SetTouchpadScrollSwitch(bool switchFlag) override;
+    int32_t GetTouchpadScrollSwitch(bool &switchFlag) override;
+    int32_t SetTouchpadScrollDirection(bool state) override;
+    int32_t GetTouchpadScrollDirection(bool &state) override;
+    int32_t SetTouchpadTapSwitch(bool switchFlag) override;
+    int32_t GetTouchpadTapSwitch(bool &switchFlag) override;
+    int32_t SetTouchpadPointerSpeed(int32_t speed) override;
+    int32_t GetTouchpadPointerSpeed(int32_t &speed) override;
+
 #ifdef OHOS_RSS_CLIENT
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 #endif
@@ -110,6 +118,10 @@ protected:
     int32_t ReadMousePrimaryButton(int32_t &primaryButton);
     int32_t ReadPointerSpeed(int32_t &speed);
     int32_t ReadHoverScrollState(bool &state);
+    int32_t ReadTouchpadScrollSwich(bool &switchFlag);
+    int32_t ReadTouchpadScrollDirection(bool &state);
+    int32_t ReadTouchpadTapSwitch(bool &switchFlag);
+    int32_t ReadTouchpadPointerSpeed(int32_t &speed);
 #endif // OHOS_BUILD_ENABLE_POINTER
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);
