@@ -461,6 +461,70 @@ public:
      */
     int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay);
 
+    /**
+     * @brief Set the switch of touchpad scroll.
+     * @param switchFlag Indicates the touchpad scroll switch state.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t SetTouchpadScrollSwitch(bool switchFlag);
+
+    /**
+     * @brief Get the switch of touchpad scroll.
+     * @param switchFlag Indicates the touchpad scroll switch state.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t GetTouchpadScrollSwitch(bool &switchFlag);
+
+    /**
+     * @brief Set the switch of touchpad scroll direction.
+     * @param state Indicates the touchpad scroll switch direction state.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t SetTouchpadScrollDirection(bool state);
+
+    /**
+     * @brief Get the switch of touchpad scroll direction.
+     * @param state Indicates the touchpad scroll switch direction state.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t GetTouchpadScrollDirection(bool &state);
+
+    /**
+     * @brief Set the switch of touchpad tap.
+     * @param switchFlag Indicates the touchpad tap switch state.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t SetTouchpadTapSwitch(bool switchFlag);
+
+    /**
+     * @brief Get the switch of touchpad tap.
+     * @param switchFlag Indicates the touchpad tap switch state.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t GetTouchpadTapSwitch(bool &switchFlag);
+
+    /**
+     * @brief Set the touchpad poniter speed.
+     * @param speed Indicates the touchpad pointer speed.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t SetTouchpadPointerSpeed(int32_t speed);
+
+    /**
+     * @brief Get the touchpad poniter speed.
+     * @param speed Indicates the touchpad pointer speed.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t GetTouchpadPointerSpeed(int32_t &speed);
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
      * @brief Sets the enhance config of the security component.

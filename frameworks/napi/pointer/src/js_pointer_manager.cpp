@@ -51,7 +51,7 @@ AsyncContext::~AsyncContext()
     }
 }
 
-bool getResult(sptr<AsyncContext> asyncContext, napi_value * results)
+bool getResult(sptr<AsyncContext> asyncContext, napi_value *results)
 {
     CALL_DEBUG_ENTER;
     napi_env env = asyncContext->env;
@@ -455,6 +455,152 @@ napi_value JsPointerManager::GetHoverScrollState(napi_env env, napi_value handle
     }
     AsyncCallbackWork(asyncContext);
     return promise;
+}
+
+napi_value JsPointerManager::SetTouchpadData(napi_env env, napi_value handle, int32_t errorCode)
+{
+    CALL_DEBUG_ENTER;
+    if (errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
+
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+
+    asyncContext->errorCode = errorCode;
+    asyncContext->reserve << ReturnType::VOID;
+
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        if (napi_get_undefined(env, &promise) != napi_ok) {
+            CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
+            return nullptr;
+        }
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::GetTouchpadBoolData(napi_env env, napi_value handle, bool data, int32_t errorCode)
+{
+    CALL_DEBUG_ENTER;
+    if (errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
+
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+
+    asyncContext->errorCode = errorCode;
+    asyncContext->reserve << ReturnType::BOOL << data;
+
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        if (napi_get_undefined(env, &promise) != napi_ok) {
+            CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
+            return nullptr;
+        }
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::GetTouchpadInt32Data(napi_env env, napi_value handle, int32_t data, int32_t errorCode)
+{
+    CALL_DEBUG_ENTER;
+    if (errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
+
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+
+    asyncContext->errorCode = errorCode;
+    asyncContext->reserve << ReturnType::NUMBER << data;
+
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        if (napi_get_undefined(env, &promise) != napi_ok) {
+            CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
+            return nullptr;
+        }
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::SetTouchpadScrollSwitch(napi_env env, bool switchFlag, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadScrollSwitch(switchFlag);
+    return SetTouchpadData(env, handle, ret);
+}
+
+napi_value JsPointerManager::GetTouchpadScrollSwitch(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    bool switchFlag = true;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadScrollSwitch(switchFlag);
+    return GetTouchpadBoolData(env, handle, switchFlag, ret);
+}
+
+napi_value JsPointerManager::SetTouchpadScrollDirection(napi_env env, bool state, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadScrollDirection(state);
+    return SetTouchpadData(env, handle, ret);
+}
+
+napi_value JsPointerManager::GetTouchpadScrollDirection(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    bool state = true;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadScrollDirection(state);
+    return GetTouchpadBoolData(env, handle, state, ret);
+}
+
+napi_value JsPointerManager::SetTouchpadTapSwitch(napi_env env, bool switchFlag, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadTapSwitch(switchFlag);
+    return SetTouchpadData(env, handle, ret);
+}
+
+napi_value JsPointerManager::GetTouchpadTapSwitch(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    bool switchFlag = true;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadTapSwitch(switchFlag);
+    return GetTouchpadBoolData(env, handle, switchFlag, ret);
+}
+napi_value JsPointerManager::SetTouchpadPointerSpeed(napi_env env, int32_t speed, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadPointerSpeed(speed);
+    return SetTouchpadData(env, handle, ret);
+}
+
+napi_value JsPointerManager::GetTouchpadPointerSpeed(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t speed;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadPointerSpeed(speed);
+    return GetTouchpadInt32Data(env, handle, speed, ret);
 }
 } // namespace MMI
 } // namespace OHOS

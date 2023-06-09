@@ -91,6 +91,16 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::APPEND_EXTRA_DATA, &MultimodalInputConnectStub::StubAppendExtraData},
         {IMultimodalInputConnect::ENABLE_INPUT_DEVICE, &MultimodalInputConnectStub::StubEnableInputDevice},
         {IMultimodalInputConnect::SET_KEY_DOWN_DURATION, &MultimodalInputConnectStub::StubSetKeyDownDuration},
+        {IMultimodalInputConnect::SET_TP_SCROLL_SWITCH, &MultimodalInputConnectStub::StubSetTouchpadScrollSwitch},
+        {IMultimodalInputConnect::GET_TP_SCROLL_SWITCH, &MultimodalInputConnectStub::StubGetTouchpadScrollSwitch},
+        {IMultimodalInputConnect::SET_TP_SCROLL_DIRECT_SWITCH,
+            &MultimodalInputConnectStub::StubSetTouchpadScrollDirection},
+        {IMultimodalInputConnect::GET_TP_SCROLL_DIRECT_SWITCH,
+            &MultimodalInputConnectStub::StubGetTouchpadScrollDirection},
+        {IMultimodalInputConnect::SET_TP_TAP_SWITCH, &MultimodalInputConnectStub::StubSetTouchpadTapSwitch},
+        {IMultimodalInputConnect::GET_TP_TAP_SWITCH, &MultimodalInputConnectStub::StubGetTouchpadTapSwitch},
+        {IMultimodalInputConnect::SET_TP_POINTER_SPEED, &MultimodalInputConnectStub::StubSetTouchpadPointerSpeed},
+        {IMultimodalInputConnect::GET_TP_POINTER_SPEED, &MultimodalInputConnectStub::StubGetTouchpadPointerSpeed},
     };
     auto it = mapConnFunc.find(code);
     if (it != mapConnFunc.end()) {
@@ -1098,6 +1108,182 @@ int32_t MultimodalInputConnectStub::StubSetKeyDownDuration(MessageParcel& data, 
         MMI_HILOGE("Set key down duration failed ret:%{public}d", ret);
         return ret;
     }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::VerifyTouchPadSetting(void)
+{
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetTouchpadScrollSwitch(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = VerifyTouchPadSetting();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Verify touchpad setting failed.");
+        return ret;
+    }
+
+    bool switchFlag = true;
+    READBOOL(data, switchFlag, IPC_PROXY_DEAD_OBJECT_ERR);
+    ret = SetTouchpadScrollSwitch(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set touch pad scroll switch failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetTouchpadScrollSwitch(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = VerifyTouchPadSetting();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Verify touchpad setting failed.");
+        return ret;
+    }
+
+    bool switchFlag = true;
+    ret = GetTouchpadScrollSwitch(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetTouchpadScrollSwitch failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEBOOL(reply, switchFlag, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("Touch pad scroll switch :%{public}d, ret:%{public}d", switchFlag, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetTouchpadScrollDirection(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = VerifyTouchPadSetting();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Verify touchpad setting failed.");
+        return ret;
+    }
+
+    bool state = true;
+    READBOOL(data, state, IPC_PROXY_DEAD_OBJECT_ERR);
+    ret = SetTouchpadScrollDirection(state);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set touch pad scroll direct switch failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetTouchpadScrollDirection(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = VerifyTouchPadSetting();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Verify touchpad setting failed.");
+        return ret;
+    }
+
+    bool state = true;
+    ret = GetTouchpadScrollDirection(state);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetTouchpadScrollDirection failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEBOOL(reply, state, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("Touch pad scroll direct switch :%{public}d, ret:%{public}d", state, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetTouchpadTapSwitch(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = VerifyTouchPadSetting();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Verify touchpad setting failed.");
+        return ret;
+    }
+
+    bool switchFlag = true;
+    READBOOL(data, switchFlag, IPC_PROXY_DEAD_OBJECT_ERR);
+    ret = SetTouchpadTapSwitch(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set touch pad tap switch failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetTouchpadTapSwitch(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = VerifyTouchPadSetting();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Verify touchpad setting failed.");
+        return ret;
+    }
+
+    bool switchFlag = true;
+    ret = GetTouchpadTapSwitch(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetTouchpadTapSwitch failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEBOOL(reply, switchFlag, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("Touch pad tap switch :%{public}d, ret:%{public}d", switchFlag, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetTouchpadPointerSpeed(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = VerifyTouchPadSetting();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Verify touchpad setting failed.");
+        return ret;
+    }
+
+    int32_t speed = true;
+    READINT32(data, speed, IPC_PROXY_DEAD_OBJECT_ERR);
+    ret = SetTouchpadPointerSpeed(speed);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set touch pad pointer speed failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetTouchpadPointerSpeed(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = VerifyTouchPadSetting();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Verify touchpad setting failed.");
+        return ret;
+    }
+
+    int32_t speed = 1;
+    ret = GetTouchpadPointerSpeed(speed);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetTouchpadPointerSpeed failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEINT32(reply, speed, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("Touch pad pointer speed :%{public}d, ret:%{public}d", speed, ret);
     return RET_OK;
 }
 } // namespace MMI

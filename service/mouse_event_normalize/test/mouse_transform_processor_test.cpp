@@ -247,5 +247,180 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetMouseScroll
     const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
     ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
+/**
+ * @tc.name: MouseTransformProcessorTest_SetTouchpadScrollSwitch_014
+ * @tc.desc: Test SetTouchpadScrollSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetTouchpadScrollSwitch_014, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    MouseTransformProcessor processor(deviceId);
+    bool flag = false;
+    ASSERT_TRUE(processor.SetTouchpadScrollSwitch(flag) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_GetTouchpadScrollSwitch_015
+ * @tc.desc: Test GetTouchpadScrollSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadScrollSwitch_015, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    MouseTransformProcessor processor(deviceId);
+    bool flag = true;
+    processor.SetTouchpadScrollSwitch(flag);
+    bool newFlag = true;
+    ASSERT_TRUE(processor.GetTouchpadScrollSwitch(flag) == RET_OK);
+    ASSERT_TRUE(flag == newFlag);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_SetTouchpadScrollSwitch_014
+ * @tc.desc: Test SetTouchpadScrollDirection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetTouchpadScrollDirection_016, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    MouseTransformProcessor processor(deviceId);
+    bool state = false;
+    ASSERT_TRUE(processor.SetTouchpadScrollDirection(state) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_GetTouchpadScrollDirection_017
+ * @tc.desc: Test GetTouchpadScrollDirection
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadScrollDirection_017, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    MouseTransformProcessor processor(deviceId);
+    bool state = true;
+    processor.SetTouchpadScrollDirection(state);
+    bool newState = true;
+    ASSERT_TRUE(processor.GetTouchpadScrollDirection(state) == RET_OK);
+    ASSERT_TRUE(state == newState);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_SetTouchpadTapSwitch_018
+ * @tc.desc: Test SetTouchpadTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetTouchpadTapSwitch_018, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    MouseTransformProcessor processor(deviceId);
+    bool flag = false;
+    ASSERT_TRUE(processor.SetTouchpadTapSwitch(flag) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_GetTouchpadTapSwitch_019
+ * @tc.desc: Test GetTouchpadTapSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadTapSwitch_019, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    MouseTransformProcessor processor(deviceId);
+    bool flag = false;
+    processor.SetTouchpadTapSwitch(flag);
+    bool newFlag = false;
+    ASSERT_TRUE(processor.GetTouchpadTapSwitch(flag) == RET_OK);
+    ASSERT_TRUE(flag == newFlag);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_SetTouchpadPointerSpeed_020
+ * @tc.desc: Test SetTouchpadPointerSpeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetTouchpadPointerSpeed_020, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    MouseTransformProcessor processor(deviceId);
+    int32_t speed = 2;
+    ASSERT_TRUE(processor.SetTouchpadPointerSpeed(speed) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_GetTouchpadPointerSpeed_021
+ * @tc.desc: Test GetTouchpadPointerSpeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadPointerSpeed_021, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    MouseTransformProcessor processor(deviceId);
+    int32_t speed = 2;
+    processor.SetTouchpadPointerSpeed(speed);
+    int32_t newSpeed = 3;
+    ASSERT_TRUE(processor.GetTouchpadPointerSpeed(newSpeed) == RET_OK);
+    ASSERT_TRUE(speed == newSpeed);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_SetTouchpadPointerSpeed_022
+ * @tc.desc: Test SetTouchpadPointerSpeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetTouchpadPointerSpeed_022, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    MouseTransformProcessor processor(deviceId);
+    int32_t speed = 8;
+    ASSERT_TRUE(processor.SetTouchpadPointerSpeed(speed) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseTransformProcessorTest_GetTouchpadPointerSpeed_023
+ * @tc.desc: Test GetTouchpadPointerSpeed
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadPointerSpeed_023, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    MouseTransformProcessor processor(deviceId);
+    int32_t speed = 8;
+    processor.SetTouchpadPointerSpeed(speed);
+    int32_t newSpeed = 7;
+    ASSERT_TRUE(processor.GetTouchpadPointerSpeed(newSpeed) == RET_OK);
+    ASSERT_TRUE(speed == newSpeed);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
 }
 }

@@ -43,6 +43,18 @@ struct AccelerateCurve {
 };
 class MouseTransformProcessor final : public std::enable_shared_from_this<MouseTransformProcessor> {
 public:
+    enum class RightMenuSwitchType {
+        TP_RIGHT_BUTTON = 1,
+        TP_LEFT_BUTTON = 2,
+        TP_TWO_FINGERS_LIGHT_TAP = 3,
+    };
+
+    enum class PointerDataSource {
+        MOUSE = 1,
+        TOUCHPAD = 2,
+    };
+
+public:
     DISALLOW_COPY_AND_MOVE(MouseTransformProcessor);
     explicit MouseTransformProcessor(int32_t deviceId);
     ~MouseTransformProcessor() = default;
@@ -53,10 +65,11 @@ public:
     bool NormalizeMoveMouse(int32_t offsetX, int32_t offsetY);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 private:
-    int32_t HandleMotionInner(struct libinput_event_pointer* data);
-    int32_t HandleButtonInner(struct libinput_event_pointer* data);
+    int32_t HandleMotionInner(struct libinput_event_pointer* data, struct libinput_event *event);
+    int32_t HandleButtonInner(struct libinput_event_pointer* data, struct libinput_event *event);
     int32_t HandleAxisInner(struct libinput_event_pointer* data);
     void HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
+    void HandleTouchPadAxisState(libinput_pointer_axis_source source, int32_t& direction, bool& tpScrollSwitch);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
@@ -64,6 +77,12 @@ private:
     int32_t HandleButtonValueInner(struct libinput_event_pointer* data);
     void DumpInner();
     void SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, struct libinput_event_pointer* data);
+    int32_t GetTouchpadSpeed(void);
+    static int32_t PutConfigDataToDatabase(std::string &key, bool value);
+    static int32_t GetConfigDataFromDatabase(std::string &key, bool &value);
+    static int32_t PutConfigDataToDatabase(std::string &key, int32_t value);
+    static int32_t GetConfigDataFromDatabase(std::string &key, int32_t &value);
+
 public:
     static void InitAbsolution();
     static void OnDisplayLost(int32_t displayId);
@@ -75,6 +94,14 @@ public:
     static int32_t SetPointerSpeed(int32_t speed);
     static int32_t GetPointerSpeed();
     static int32_t SetPointerLocation(int32_t x, int32_t y);
+    static int32_t SetTouchpadScrollSwitch(bool switchFlag);
+    static int32_t GetTouchpadScrollSwitch(bool &switchFlag);
+    static int32_t SetTouchpadScrollDirection(bool state);
+    static int32_t GetTouchpadScrollDirection(bool &state);
+    static int32_t SetTouchpadTapSwitch(bool switchFlag);
+    static int32_t GetTouchpadTapSwitch(bool &switchFlag);
+    static int32_t SetTouchpadPointerSpeed(int32_t speed);
+    static int32_t GetTouchpadPointerSpeed(int32_t &speed);
     void SetConfigPointerSpeed(int32_t speed);
     int32_t GetSpeed() const;
 

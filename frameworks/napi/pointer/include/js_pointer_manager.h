@@ -72,6 +72,19 @@ public:
     napi_value GetMousePrimaryButton(napi_env env, napi_value handle = nullptr);
     napi_value SetHoverScrollState(napi_env env, bool state, napi_value handle = nullptr);
     napi_value GetHoverScrollState(napi_env env, napi_value handle = nullptr);
+    napi_value SetTouchpadScrollSwitch(napi_env env, bool switchFlag, napi_value handle = nullptr);
+    napi_value GetTouchpadScrollSwitch(napi_env env, napi_value handle = nullptr);
+    napi_value SetTouchpadScrollDirection(napi_env env, bool state, napi_value handle = nullptr);
+    napi_value GetTouchpadScrollDirection(napi_env env, napi_value handle = nullptr);
+    napi_value SetTouchpadTapSwitch(napi_env env, bool switchFlag, napi_value handle = nullptr);
+    napi_value GetTouchpadTapSwitch(napi_env env, napi_value handle = nullptr);
+    napi_value SetTouchpadPointerSpeed(napi_env env, int32_t speed, napi_value handle = nullptr);
+    napi_value GetTouchpadPointerSpeed(napi_env env, napi_value handle = nullptr);
+
+private:
+    napi_value SetTouchpadData(napi_env env, napi_value handle, int32_t errorCode);
+    napi_value GetTouchpadBoolData(napi_env env, napi_value handle, bool data, int32_t errorCode);
+    napi_value GetTouchpadInt32Data(napi_env env, napi_value handle, int32_t data, int32_t errorCode);
 };
 } // namespace MMI
 } // namespace OHOS
