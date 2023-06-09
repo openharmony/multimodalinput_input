@@ -356,7 +356,7 @@ int32_t MultimodalInputConnectProxy::MarkProcessed(int32_t eventType, int32_t ev
     }
     WRITEINT32(data, eventType, ERR_INVALID_VALUE);
     WRITEINT32(data, eventId, ERR_INVALID_VALUE);
-    
+
     MessageParcel reply;
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
@@ -1097,6 +1097,134 @@ int32_t MultimodalInputConnectProxy::SetKeyDownDuration(const std::string &busin
         return ret;
     }
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::SetTouchpadBoolData(bool switchFlag, int32_t type)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+
+    WRITEBOOL(data, switchFlag, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(type, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::GetTouchpadBoolData(bool &switchFlag, int32_t type)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(type, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    READBOOL(reply, switchFlag, IPC_PROXY_DEAD_OBJECT_ERR);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::SetTouchpadInt32Data(int32_t value, int32_t type)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+
+    WRITEINT32(data, value, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(type, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::GetTouchpadInt32Data(int32_t &value, int32_t type)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(type, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    READINT32(reply, value, IPC_PROXY_DEAD_OBJECT_ERR);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::SetTouchpadScrollSwitch(bool switchFlag)
+{
+    return SetTouchpadBoolData(switchFlag, IMultimodalInputConnect::SET_TP_SCROLL_SWITCH);
+}
+
+int32_t MultimodalInputConnectProxy::GetTouchpadScrollSwitch(bool &switchFlag)
+{
+    return GetTouchpadBoolData(switchFlag, IMultimodalInputConnect::GET_TP_SCROLL_SWITCH);
+}
+
+int32_t MultimodalInputConnectProxy::SetTouchpadScrollDirection(bool state)
+{
+    return SetTouchpadBoolData(state, IMultimodalInputConnect::SET_TP_SCROLL_DIRECT_SWITCH);
+}
+
+int32_t MultimodalInputConnectProxy::GetTouchpadScrollDirection(bool &switchFlag)
+{
+    return GetTouchpadBoolData(switchFlag, IMultimodalInputConnect::GET_TP_SCROLL_DIRECT_SWITCH);
+}
+
+int32_t MultimodalInputConnectProxy::SetTouchpadTapSwitch(bool switchFlag)
+{
+    return SetTouchpadBoolData(switchFlag, IMultimodalInputConnect::SET_TP_TAP_SWITCH);
+}
+
+int32_t MultimodalInputConnectProxy::GetTouchpadTapSwitch(bool &switchFlag)
+{
+    return GetTouchpadBoolData(switchFlag, IMultimodalInputConnect::GET_TP_TAP_SWITCH);
+}
+
+int32_t MultimodalInputConnectProxy::SetTouchpadPointerSpeed(int32_t speed)
+{
+    return SetTouchpadInt32Data(speed, IMultimodalInputConnect::SET_TP_POINTER_SPEED);
+}
+
+int32_t MultimodalInputConnectProxy::GetTouchpadPointerSpeed(int32_t &speed)
+{
+    return GetTouchpadInt32Data(speed, IMultimodalInputConnect::GET_TP_POINTER_SPEED);
 }
 } // namespace MMI
 } // namespace OHOS

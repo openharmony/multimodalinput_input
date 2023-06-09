@@ -20,6 +20,10 @@
 namespace OHOS {
 namespace MMI {
 class JsPointerContext {
+using SetTouchpadBoolDataFunc = std::function<napi_value (napi_env env, bool data, napi_value handle)>;
+using SetTouchpadInt32DataFunc = std::function<napi_value (napi_env env, int32_t data, napi_value handle)>;
+using GetTouchpadFunc = std::function<napi_value (napi_env env, napi_value handle)>;
+
 public:
     JsPointerContext();
     DISALLOW_COPY_AND_MOVE(JsPointerContext);
@@ -41,8 +45,20 @@ public:
     static napi_value GetMousePrimaryButton(napi_env env, napi_callback_info info);
     static napi_value SetHoverScrollState(napi_env env, napi_callback_info info);
     static napi_value GetHoverScrollState(napi_env env, napi_callback_info info);
+    static napi_value SetTouchpadScrollSwitch(napi_env env, napi_callback_info info);
+    static napi_value GetTouchpadScrollSwitch(napi_env env, napi_callback_info info);
+    static napi_value SetTouchpadScrollDirection(napi_env env, napi_callback_info info);
+    static napi_value GetTouchpadScrollDirection(napi_env env, napi_callback_info info);
+    static napi_value SetTouchpadTapSwitch(napi_env env, napi_callback_info info);
+    static napi_value GetTouchpadTapSwitch(napi_env env, napi_callback_info info);
+    static napi_value SetTouchpadPointerSpeed(napi_env env, napi_callback_info info);
+    static napi_value GetTouchpadPointerSpeed(napi_env env, napi_callback_info info);
 
 private:
+    static napi_value SetTouchpadBoolData(napi_env env, napi_callback_info info, SetTouchpadBoolDataFunc func);
+    static napi_value SetTouchpadInt32Data(napi_env env, napi_callback_info info, SetTouchpadInt32DataFunc func,
+        int32_t dataMax, int32_t dataMin);
+    static napi_value GetTouchpadData(napi_env env, napi_callback_info info, GetTouchpadFunc func);
     static napi_value CreateInstance(napi_env env);
     static JsPointerContext* GetInstance(napi_env env);
     static napi_value CreateJsObject(napi_env env, napi_callback_info info);

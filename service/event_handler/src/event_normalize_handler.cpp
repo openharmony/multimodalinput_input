@@ -66,7 +66,9 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
         case LIBINPUT_EVENT_POINTER_MOTION:
         case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE:
         case LIBINPUT_EVENT_POINTER_BUTTON:
-        case LIBINPUT_EVENT_POINTER_AXIS: {
+        case LIBINPUT_EVENT_POINTER_AXIS:
+        case LIBINPUT_EVENT_POINTER_TAP:
+        case LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD: {
             HandleMouseEvent(event);
             DfxHisysevent::CalcPointerDispTimes();
             break;

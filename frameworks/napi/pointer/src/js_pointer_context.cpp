@@ -562,7 +562,7 @@ napi_value JsPointerContext::LeaveCaptureMode(napi_env env, napi_callback_info i
         THROWERR(env, "The first parameter type is invalid");
         return nullptr;
     }
-    
+
     int32_t windowId = 0;
     CHKRP(napi_get_value_int32(env, argv[0], &windowId), GET_VALUE_INT32);
 
@@ -709,6 +709,196 @@ napi_value JsPointerContext::GetHoverScrollState(napi_env env, napi_callback_inf
     return jsPointerMgr->GetHoverScrollState(env, argv[0]);
 }
 
+napi_value JsPointerContext::SetTouchpadBoolData(napi_env env, napi_callback_info info, SetTouchpadBoolDataFunc func)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least one parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "switchFlag", "boolean");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
+        MMI_HILOGE("Bool data parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "switchFlag", "boolean");
+        return nullptr;
+    }
+    bool switchFlag = true;
+    CHKRP(napi_get_value_bool(env, argv[0], &switchFlag), GET_VALUE_BOOL);
+
+    if (argc == 1) {
+        return func(env, switchFlag, nullptr);
+    }
+    if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
+        MMI_HILOGE("Callback parameter type is invalid ");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    return func(env, switchFlag, argv[1]);
+}
+
+napi_value JsPointerContext::SetTouchpadInt32Data(napi_env env, napi_callback_info info, SetTouchpadInt32DataFunc func,
+    int32_t dataMax, int32_t dataMin)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least 1 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "data", "number");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("Int32 data parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "data", "number");
+        return nullptr;
+    }
+    int32_t data = 0;
+    CHKRP(napi_get_value_int32(env, argv[0], &data), GET_VALUE_INT32);
+    if (data < dataMin) {
+        data = dataMin;
+    } else if (data > dataMax) {
+        data = dataMax;
+    }
+
+    if (argc == 1) {
+        return func(env, data, nullptr);
+    }
+    if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
+        MMI_HILOGE("Callback parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+
+    return func(env, data, argv[1]);
+}
+
+napi_value JsPointerContext::GetTouchpadData(napi_env env, napi_callback_info info, GetTouchpadFunc func)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+
+    if (argc == 0) {
+        return func(env, nullptr);
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
+        MMI_HILOGE("Callback parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+
+    return func(env, argv[0]);
+}
+
+napi_value JsPointerContext::SetTouchpadScrollSwitch(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, bool switchFlag, napi_value handle) -> napi_value {
+        return jsPointerMgr->SetTouchpadScrollSwitch(env, switchFlag, handle);
+    };
+    return SetTouchpadBoolData(env, info, func);
+}
+
+napi_value JsPointerContext::GetTouchpadScrollSwitch(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
+        return jsPointerMgr->GetTouchpadScrollSwitch(env, handle);
+    };
+    return GetTouchpadData(env, info, func);
+}
+
+napi_value JsPointerContext::SetTouchpadScrollDirection(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, bool state, napi_value handle) -> napi_value {
+        return jsPointerMgr->SetTouchpadScrollDirection(env, state, handle);
+    };
+    return SetTouchpadBoolData(env, info, func);
+}
+
+napi_value JsPointerContext::GetTouchpadScrollDirection(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
+        return jsPointerMgr->GetTouchpadScrollDirection(env, handle);
+    };
+    return GetTouchpadData(env, info, func);
+}
+
+napi_value JsPointerContext::SetTouchpadTapSwitch(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, bool switchFlag, napi_value handle) -> napi_value {
+        return jsPointerMgr->SetTouchpadTapSwitch(env, switchFlag, handle);
+    };
+    return SetTouchpadBoolData(env, info, func);
+}
+
+napi_value JsPointerContext::GetTouchpadTapSwitch(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
+        return jsPointerMgr->GetTouchpadTapSwitch(env, handle);
+    };
+    return GetTouchpadData(env, info, func);
+}
+
+napi_value JsPointerContext::SetTouchpadPointerSpeed(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, int32_t data, napi_value handle) -> napi_value {
+        return jsPointerMgr->SetTouchpadPointerSpeed(env, data, handle);
+    };
+    return SetTouchpadInt32Data(env, info, func, MAX_SPEED, MIN_SPEED);
+}
+
+napi_value JsPointerContext::GetTouchpadPointerSpeed(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
+        return jsPointerMgr->GetTouchpadPointerSpeed(env, handle);
+    };
+    return GetTouchpadData(env, info, func);
+}
+
 napi_value JsPointerContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -732,6 +922,14 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getMousePrimaryButton", GetMousePrimaryButton),
         DECLARE_NAPI_STATIC_FUNCTION("setHoverScrollState", SetHoverScrollState),
         DECLARE_NAPI_STATIC_FUNCTION("getHoverScrollState", GetHoverScrollState),
+        DECLARE_NAPI_STATIC_FUNCTION("setTouchpadScrollSwitch", SetTouchpadScrollSwitch),
+        DECLARE_NAPI_STATIC_FUNCTION("getTouchpadScrollSwitch", GetTouchpadScrollSwitch),
+        DECLARE_NAPI_STATIC_FUNCTION("setTouchpadScrollDirection", SetTouchpadScrollDirection),
+        DECLARE_NAPI_STATIC_FUNCTION("getTouchpadScrollDirection", GetTouchpadScrollDirection),
+        DECLARE_NAPI_STATIC_FUNCTION("setTouchpadTapSwitch", SetTouchpadTapSwitch),
+        DECLARE_NAPI_STATIC_FUNCTION("getTouchpadTapSwitch", GetTouchpadTapSwitch),
+        DECLARE_NAPI_STATIC_FUNCTION("setTouchpadPointerSpeed", SetTouchpadPointerSpeed),
+        DECLARE_NAPI_STATIC_FUNCTION("getTouchpadPointerSpeed", GetTouchpadPointerSpeed),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreatePointerStyle(env, exports) == nullptr) {

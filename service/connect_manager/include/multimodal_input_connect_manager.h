@@ -81,6 +81,14 @@ public:
     int32_t AppendExtraData(const ExtraData& extraData);
     int32_t EnableInputDevice(bool enable);
     int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay);
+    int32_t SetTouchpadScrollSwitch(bool switchFlag);
+    int32_t GetTouchpadScrollSwitch(bool &switchFlag);
+    int32_t SetTouchpadScrollDirection(bool state);
+    int32_t GetTouchpadScrollDirection(bool &state);
+    int32_t SetTouchpadTapSwitch(bool switchFlag);
+    int32_t GetTouchpadTapSwitch(bool &switchFlag);
+    int32_t SetTouchpadPointerSpeed(int32_t speed);
+    int32_t GetTouchpadPointerSpeed(int32_t &speed);
 
 private:
     MultimodalInputConnectManager() = default;
