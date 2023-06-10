@@ -33,6 +33,7 @@ declare_args() {
   input_feature_input_device = true
   input_feature_short_key = true
   input_feature_coverage = false
+  input_ext_feature = ""
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -272,4 +273,8 @@ if (!defined(global_parts_info) ||
 
 if (dlp_permission_enable) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_SECURITY_COMPONENT" ]
+}
+
+if (input_ext_feature != "") {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER" ]
 }

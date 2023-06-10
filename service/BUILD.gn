@@ -48,6 +48,7 @@ config("libmmi_server_config") {
     "subscriber/include",
     "timer_manager/include",
     "permission_helper/include",
+    "fingersense_wrapper/include",
     "${mmi_service_path}/connect_manager/include",
     "${mmi_service_path}/filter/include",
     "${mmi_service_path}/module_loader/include",
@@ -163,6 +164,10 @@ ohos_shared_library("libmmi-server") {
     "${mmi_path}/util:libmmi-util",
     "//third_party/cJSON:cjson",
   ]
+
+  if (input_ext_feature != "") {
+    deps += [ input_ext_feature ]
+  }
 
   external_deps = [ "c_utils:utils" ]
   if (input_feature_pointer_drawing) {
