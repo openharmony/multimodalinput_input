@@ -677,7 +677,7 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
 
-void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent>& touchEvent)
+void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> &touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
