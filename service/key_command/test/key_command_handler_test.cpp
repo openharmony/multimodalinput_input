@@ -218,7 +218,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_004, TestSize.Level1)
  * @tc.name: KeyCommandHandlerTest_TouchTest_001
  * @tc.desc: Test key event
  * @tc.type: FUNC
- * @tc.require: SR000I2QIE
+ * @tc.require:
  */
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_TouchTest_001, TestSize.Level1)
 {
@@ -239,7 +239,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_TouchTest_001, TestSize.Le
  * @tc.name: KeyCommandHandlerTest_KnuckleTest_001
  * @tc.desc: Test key event
  * @tc.type: FUNC
- * @tc.require: SR000I2QIE
+ * @tc.require:
  */
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_001, TestSize.Level1)
 {
@@ -264,7 +264,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_001, TestSize.
  * @tc.name: KeyCommandHandlerTest_KnuckleTest_002
  * @tc.desc: Test key event
  * @tc.type: FUNC
- * @tc.require: SR000I2QIE
+ * @tc.require:
  */
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_002, TestSize.Level1)
 {
@@ -287,7 +287,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_002, TestSize.
  * @tc.name: KeyCommandHandlerTest_KnuckleTest_003
  * @tc.desc: Test key event
  * @tc.type: FUNC
- * @tc.require: SR000I2QIE
+ * @tc.require:
  */
 HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_003, TestSize.Level1)
 {
