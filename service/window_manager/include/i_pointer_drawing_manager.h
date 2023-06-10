@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "pixel_map.h"
 #include "pointer_style.h"
 #include "window_info.h"
 #include "struct_multimodal.h"
@@ -62,6 +63,10 @@ public:
     virtual bool GetMouseDisplayState() const
     {
         return true;
+    }
+    virtual int32_t SetMouseIcon(int32_t windowId, void* pixelMap)
+    {
+        return 0;
     }
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };

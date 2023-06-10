@@ -183,8 +183,10 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> i
 
 int32_t InputWindowsManager::GetWindowPid(int32_t windowId) const
 {
+    CALL_DEBUG_ENTER;
     int32_t windowPid = -1;
     for (const auto &item : displayGroupInfo_.windowsInfo) {
+        MMI_HILOGD("get windowID %{public}d", item.id);
         if (item.id == windowId) {
             windowPid = item.pid;
             break;
@@ -702,7 +704,7 @@ bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
         MMI_HILOGE("TouchWindow is nullptr");
         return false;
     }
-    if (touchWindow->id == windowId) {
+    if (touchWindow->id == windowId || windowId == GLOBAL_WINDOW_ID) {
         MMI_HILOGD("Need refresh pointer style, focusWindow type:%{public}d, window type:%{public}d",
             touchWindow->id, windowId);
         return true;
@@ -735,6 +737,12 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
         MMI_HILOGD("Setting global pointer style");
         return RET_OK;
     }
+    MMI_HILOGD("start to get pid by window %{public}d", windowId);
+    // call to change window id
+    if (pid == -1) {
+        pid = GetWindowPid(windowId);
+        MMI_HILOGD("changing pid form -1 to %{public}d", pid);
+    }
     auto it = pointerStyle_.find(pid);
     if (it == pointerStyle_.end()) {
         MMI_HILOGE("The pointer style map is not include param pd:%{public}d", pid);
@@ -745,6 +753,7 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
         iter->second = pointerStyle;
         return RET_OK;
     }
+
     for (const auto& windowInfo : displayGroupInfo_.windowsInfo) {
         if (windowId == windowInfo.id && pid == windowInfo.pid) {
             auto iterator = it->second.insert(std::make_pair(windowId, pointerStyle));
@@ -776,7 +785,7 @@ int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, Poin
         pointerStyle.id = globalStyle_.id;
         return RET_OK;
     }
-    
+
     MMI_HILOGD("Window type:%{public}d get pointer style:%{public}d success", windowId, iter->second.id);
     pointerStyle = iter->second;
     return RET_OK;

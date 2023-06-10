@@ -96,5 +96,6 @@ ohos_unittest("ut-mmi-util-out") {
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
+    "multimedia_image_framework:image_native",
   ]
 }
