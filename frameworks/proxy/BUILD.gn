@@ -218,6 +218,7 @@ ohos_unittest("InputManagerTest") {
     "eventhandler:libeventhandler",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
+    "multimedia_image_framework:image_native",
     "window_manager:libwm",
   ]
 }

@@ -201,6 +201,9 @@ ohos_shared_library("libmmi-server") {
   subsystem_name = "multimodalinput"
 }
 
+import("//build/test.gni")
+module_output_path = "multimodalinput/unit_out"
+
 ohos_unittest("ut-mmi-service-out") {
   module_out_path = module_output_path
   include_dirs = [
@@ -275,6 +278,7 @@ ohos_unittest("ut-mmi-service-out") {
   external_deps = [
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
+    "multimedia_image_framework:image_native",
     "window_manager:libwm",
   ]
 }

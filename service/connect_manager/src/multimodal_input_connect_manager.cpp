@@ -128,6 +128,12 @@ int32_t MultimodalInputConnectManager::SetMouseScrollRows(int32_t rows)
     return multimodalInputConnectService_->SetMouseScrollRows(rows);
 }
 
+int32_t MultimodalInputConnectManager::SetMouseIcon(int32_t windowId, void* pixelMap)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetMouseIcon(windowId, pixelMap);
+}
+
 int32_t MultimodalInputConnectManager::GetMouseScrollRows(int32_t &rows)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);

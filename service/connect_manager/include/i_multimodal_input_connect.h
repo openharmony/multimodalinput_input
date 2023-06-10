@@ -87,6 +87,7 @@ public:
         GET_TP_TAP_SWITCH = 50,
         SET_TP_POINTER_SPEED = 51,
         GET_TP_POINTER_SPEED = 52,
+        SET_MOUSE_ICON = 53,
     };
 
     enum {
@@ -103,6 +104,7 @@ public:
     virtual int32_t RemoveInputEventFilter(int32_t filterId) = 0;
     virtual int32_t SetMouseScrollRows(int32_t rows) = 0;
     virtual int32_t GetMouseScrollRows(int32_t &rows) = 0;
+    virtual int32_t SetMouseIcon(int32_t windowId, void* pixelMap) = 0;
     virtual int32_t SetMousePrimaryButton(int32_t primaryButton) = 0;
     virtual int32_t GetMousePrimaryButton(int32_t &primaryButton) = 0;
     virtual int32_t SetHoverScrollState(bool state) = 0;
