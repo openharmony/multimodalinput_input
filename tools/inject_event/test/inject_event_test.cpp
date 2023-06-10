@@ -354,7 +354,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectTouch_005, TestSize.Level1)
  * @tc.name:InjectEvent_InjectKnuckle_001
  * @tc.desc: test inject single knuckle double click interface
  * @tc.type: FUNC
- * @tc.require:SR000I2QIE
+ * @tc.require:
  */
 HWTEST_F(InjectEventTest, InjectEvent_InjectKnuckle_001, TestSize.Level1)
 {
@@ -377,7 +377,7 @@ HWTEST_F(InjectEventTest, InjectEvent_InjectKnuckle_001, TestSize.Level1)
  * @tc.name:InjectEvent_InjectKnuckle_002
  * @tc.desc: test inject double knuckle double click interface
  * @tc.type: FUNC
- * @tc.require:SR000I2QIE
+ * @tc.require:
  */
 HWTEST_F(InjectEventTest, InjectEvent_InjectKnuckle_002, TestSize.Level1)
 {
