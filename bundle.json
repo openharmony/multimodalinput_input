@@ -10,7 +10,6 @@
     "name": "input",
     "subsystem": "multimodalinput",
     "syscap": [
-      "SystemCapability.MultimodalInput.Input",
       "SystemCapability.MultimodalInput.Input.InputConsumer",
       "SystemCapability.MultimodalInput.Input.InputDevice",
       "SystemCapability.MultimodalInput.Input.Core",
