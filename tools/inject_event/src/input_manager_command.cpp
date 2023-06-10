@@ -1442,7 +1442,7 @@ int32_t InputManagerCommand::DoubleKnuckleGestureProcesser(int32_t argc, char *a
             return EVENT_REG_FAIL;
         }
         intervalTimeMs = DEFAULT_DELAY;
-    } else if (argc == TWO_MORE_COMMAND) {
+    } else if (argc == KNUCKLE_PARAM_SIZE) {
         if ((!StrToInt(optarg, firstDownX)) || !StrToInt(argv[optind], firstDownY) ||
             !StrToInt(argv[optind + 1], secondDownX) || !StrToInt(argv[optind + TWO_MORE_COMMAND], secondDownY) ||
             !StrToInt(argv[optind + THREE_MORE_COMMAND], intervalTimeMs)) {
