@@ -14,7 +14,7 @@
  */
 
 #include "multimodal_input_connect_proxy.h"
-
+#include "pixel_map.h"
 #include "message_option.h"
 #include "mmi_log.h"
 #include "multimodal_input_connect_def_parcel.h"
@@ -185,6 +185,43 @@ int32_t MultimodalInputConnectProxy::SetMouseScrollRows(int32_t rows)
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(SET_MOUSE_SCROLL_ROWS, data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t windowId, void* pixelMap)
+{
+    CALL_DEBUG_ENTER;
+    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
+    if (pixelMapPtr->GetCapacity() == 0) {
+        MMI_HILOGE("pixelMap is empty, we dont have to pass it to the server");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    std::vector<uint8_t> buff;
+    pixelMapPtr->EncodeTlv(buff);
+    int32_t size = buff.size();
+    
+    MMI_HILOGD("image buffer size being sent is %{public}d", size);
+    WRITEINT32(data, size, ERR_INVALID_VALUE);
+    for (int i = 0; i < size; i++) {
+        WRITEUINT8(data, buff[i], ERR_INVALID_VALUE);
+    }
+    MMI_HILOGD("windowId being sent is %{public}d", windowId);
+    WRITEINT32(data, windowId, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(SET_MOUSE_ICON, data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;

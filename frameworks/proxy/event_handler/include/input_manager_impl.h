@@ -111,6 +111,7 @@ public:
 
     int32_t SetMouseScrollRows(int32_t rows);
     int32_t GetMouseScrollRows(int32_t &rows);
+    int32_t SetMouseIcon(int32_t windowId, void* pixelMap);
     int32_t SetMousePrimaryButton(int32_t primaryButton);
     int32_t GetMousePrimaryButton(int32_t &primaryButton);
     int32_t SetHoverScrollState(bool state);

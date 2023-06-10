@@ -19,11 +19,11 @@
 #include "image_source.h"
 #include "image_type.h"
 #include "image_utils.h"
-#include "pixel_map.h"
 
 #include "define_multimodal.h"
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
+#include "ipc_skeleton.h"
 #include "mmi_log.h"
 #include "util.h"
 
@@ -32,6 +32,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "PointerDrawingManager" };
 const std::string IMAGE_POINTER_DEFAULT_PATH = "/system/etc/multimodalinput/mouse_icon/";
+const std::string DefaultIconPath = IMAGE_POINTER_DEFAULT_PATH + "Default.svg";
 constexpr int32_t BASELINE_DENSITY = 160;
 constexpr int32_t CALCULATE_MIDDLE = 2;
 constexpr int32_t DEVICE_INDEPENDENT_PIXELS = 40;
@@ -263,7 +264,7 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
     OHOS::Rosen::Drawing::Canvas canvas;
     canvas.Bind(bitmap);
     canvas.Clear(OHOS::Rosen::Drawing::Color::COLOR_TRANSPARENT);
-    DrawPixelmap(canvas, mouseIcons_[mouseStyle].iconPath);
+    DrawPixelmap(canvas, mouseStyle);
     static constexpr uint32_t stride = 4;
     uint32_t addrSize = width * height * stride;
     errno_t ret = memcpy_s(addr, addrSize, bitmap.GetPixels(), addrSize);
@@ -273,18 +274,46 @@ void PointerDrawingManager::DoDraw(uint8_t *addr, uint32_t width, uint32_t heigh
     }
 }
 
-void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, const std::string& iconPath)
+void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
-    std::unique_ptr<OHOS::Media::PixelMap> pixelmap = DecodeImageToPixelMap(iconPath);
-    CHKPV(pixelmap);
     OHOS::Rosen::Drawing::Pen pen;
     pen.SetAntiAlias(true);
     pen.SetColor(OHOS::Rosen::Drawing::Color::COLOR_BLUE);
     OHOS::Rosen::Drawing::scalar penWidth = 1;
     pen.SetWidth(penWidth);
     canvas.AttachPen(pen);
-    canvas.DrawBitmap(*pixelmap, 0, 0);
+    if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+        MMI_HILOGD("set mouseicon by userIcon_");
+        canvas.DrawBitmap(*userIcon_, 0, 0);
+    } else {
+        std::unique_ptr<OHOS::Media::PixelMap> pixelmap = DecodeImageToPixelMap(mouseIcons_[mouseStyle].iconPath);
+        CHKPV(pixelmap);
+        MMI_HILOGD("set mouseicon to OHOS system");
+        canvas.DrawBitmap(*pixelmap, 0, 0);
+    }
+}
+
+int32_t PointerDrawingManager::SetMouseIcon(int32_t windowId, void* pixelMap)
+{
+    CALL_DEBUG_ENTER;
+    if (pixelMap == nullptr) {
+        MMI_HILOGE("pixelMap is null!");
+        return RET_ERR;
+    }
+    if (windowId < 0) {
+        MMI_HILOGE("get invalid windowId, %{public}d", windowId);
+        return RET_ERR;
+    }
+    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
+    userIcon_.reset(pixelMapPtr);
+    PointerStyle style;
+    style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    int32_t ret = SetPointerStyle(-1, windowId, style);
+    if (ret == RET_ERR) {
+        MMI_HILOGE("SetPointerStyle return RET_ERR here!");
+    }
+    return ret;
 }
 
 std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixelMap(const std::string &imagePath)
@@ -371,6 +400,7 @@ void PointerDrawingManager::DrawManager()
         MMI_HILOGD("Draw pointer begin");
         PointerStyle pointerStyle;
         int32_t ret = WinMgr->GetPointerStyle(pid_, windowId_, pointerStyle);
+        MMI_HILOGD("get pid %{publid}d with pointerStyle %{public}d", pid_, pointerStyle.id);
         if (ret != RET_OK) {
             MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
             return;
@@ -482,6 +512,37 @@ void PointerDrawingManager::SetPointerLocation(int32_t pid, int32_t x, int32_t y
     }
 }
 
+int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
+{
+    if (windowId != GLOBAL_WINDOW_ID) {
+        MMI_HILOGD("No need to change the default icon style");
+        return RET_OK;
+    }
+    PointerStyle style;
+    int32_t ret = WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get global pointer style failed!");
+        return RET_ERR;
+    }
+    if (pointerStyle.id != style.id) {
+        auto it = mouseIcons_.find(MOUSE_ICON(MOUSE_ICON::DEFAULT));
+        if (it == mouseIcons_.end()) {
+            MMI_HILOGE("Cannot find the default style in mouseIcons_");
+            return RET_ERR;
+        }
+        std::string newIconPath;
+        if (pointerStyle.id == MOUSE_ICON::DEFAULT) {
+            newIconPath = DefaultIconPath;
+        } else {
+            newIconPath = mouseIcons_[MOUSE_ICON(pointerStyle.id)].iconPath;
+        }
+        MMI_HILOGD("default path has changed from %{public}s to %{public}s",
+            it->second.iconPath.c_str(), newIconPath.c_str());
+        it->second.iconPath = newIconPath;
+    }
+    return RET_OK;
+}
+
 int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
@@ -490,8 +551,13 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         MMI_HILOGE("The param pointerStyle is invalid");
         return RET_ERR;
     }
+    int32_t ret = UpdateDefaultPointerStyle(pid, windowId, pointerStyle);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Update default pointer iconPath failed!");
+        return ret;
+    }
 
-    int32_t ret = WinMgr->SetPointerStyle(pid, windowId, pointerStyle);
+    ret = WinMgr->SetPointerStyle(pid, windowId, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer style failed");
         return ret;
@@ -620,6 +686,7 @@ void PointerDrawingManager::InitStyle()
         {HORIZONTAL_TEXT_CURSOR, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Horizontal_Text_Cursor.svg"}},
         {CURSOR_CROSS, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Cursor_Cross.svg"}},
         {CURSOR_CIRCLE, {ANGLE_CENTER, IMAGE_POINTER_DEFAULT_PATH + "Cursor_Circle.png"}},
+        {DEVELOPER_DEFINED_ICON, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
     };
     CheckMouseIconPath();
 }

@@ -24,6 +24,7 @@
 #include "error_multimodal.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
+#include "pixel_map.h"
 #include "time_cost_chk.h"
 
 namespace OHOS {
@@ -52,6 +53,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         {IMultimodalInputConnect::RMV_INPUT_EVENT_FILTER, &MultimodalInputConnectStub::StubRemoveInputEventFilter},
         {IMultimodalInputConnect::SET_MOUSE_SCROLL_ROWS, &MultimodalInputConnectStub::StubSetMouseScrollRows},
         {IMultimodalInputConnect::GET_MOUSE_SCROLL_ROWS, &MultimodalInputConnectStub::StubGetMouseScrollRows},
+        {IMultimodalInputConnect::SET_MOUSE_ICON, &MultimodalInputConnectStub::StubSetMouseIcon},
         {IMultimodalInputConnect::SET_MOUSE_PRIMARY_BUTTON, &MultimodalInputConnectStub::StubSetMousePrimaryButton},
         {IMultimodalInputConnect::GET_MOUSE_PRIMARY_BUTTON, &MultimodalInputConnectStub::StubGetMousePrimaryButton},
         {IMultimodalInputConnect::SET_HOVER_SCROLL_STATE, &MultimodalInputConnectStub::StubSetHoverScrollState},
@@ -213,6 +215,46 @@ int32_t MultimodalInputConnectStub::StubSetMouseScrollRows(MessageParcel& data, 
         return ret;
     }
     MMI_HILOGD("Success rows:%{public}d, pid:%{public}d", rows, GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t size = 0;
+    int32_t windowId = 0;
+    READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
+    std::vector<uint8_t> buff(size, 0);
+    MMI_HILOGD("reading size of the tlv count %{public}d", size);
+    for (int i = 0; i < size; i++) {
+        READUINT8(data, buff[i], IPC_PROXY_DEAD_OBJECT_ERR);
+    }
+    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
+    MMI_HILOGD("reading windowid the tlv count %{public}d", windowId);
+
+    OHOS::Media::PixelMap* pixelMap = OHOS::Media::PixelMap::DecodeTlv(buff);
+    if (pixelMap == nullptr) {
+        MMI_HILOGE("pixelMap is nullptr! server cannot recive the resource!");
+        return RET_ERR;
+    }
+    if (windowId <= 0) {
+        MMI_HILOGE("windowId is invalid, get value %{public}d", windowId);
+        return RET_ERR;
+    }
+    int32_t ret = SetMouseIcon(windowId, (void*)pixelMap);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetMouseIcon failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("mouse scroll pixelMap:%{public}u, ret:%{public}d", sizeof(*pixelMap), ret);
     return RET_OK;
 }
 
