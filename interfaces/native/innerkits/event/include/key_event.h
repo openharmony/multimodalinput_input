@@ -3324,8 +3324,8 @@ public:
 
     /**
      * @brief Obtains the enable status of the specified function key.
-     * @param funcKey Ind
-     * @return Reicates the function key.turns the enable status of the function key.
+     * @param funcKey Indicates the function key.
+     * @return Returns the enable status of the function key.
      * @since 9
      */
     bool GetFunctionKey(int32_t funcKey) const;
