@@ -22,14 +22,14 @@
 namespace OHOS {
 namespace MMI {
 struct TouchType {
-    int id;
+    int32_t id;
     float x, y;                     // screen coordinates (px)
     float touch_major, touch_minor; // widths (px)
     float pressure;                 // 0..1
     float orientation;              // -90..90
     float tool_major;
     float tool_minor;
-    int touch_kind;
+    int32_t touch_kind;
 };
 
 class FingersenseManager final {
