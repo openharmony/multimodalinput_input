@@ -61,16 +61,18 @@ public:
     void AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void SetMouseDisplayState(bool state) override;
     bool GetMouseDisplayState() const override;
+    int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
 private:
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY);
     sptr<OHOS::Surface> GetLayer();
     sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer) const;
     void DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT);
-    void DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, const std::string& iconPath);
+    void DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, const MOUSE_ICON mouseStyle);
     void DrawManager();
     void FixCursorPosition(int32_t &physicalX, int32_t &physicalY);
     std::unique_ptr<OHOS::Media::PixelMap> DecodeImageToPixelMap(const std::string &imagePath);
     void UpdatePointerVisible();
+    int32_t UpdateDefaultPointerStyle(int32_t pid, int32_t windowId, PointerStyle style);
     void CheckMouseIconPath();
     void InitStyle();
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
@@ -94,6 +96,7 @@ private:
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
     bool mouseDisplayState_ { false };
+    std::unique_ptr<OHOS::Media::PixelMap> userIcon_ { nullptr };
 };
 } // namespace MMI
 } // namespace OHOS
