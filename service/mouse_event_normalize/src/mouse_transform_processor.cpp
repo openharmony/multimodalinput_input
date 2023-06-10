@@ -408,7 +408,7 @@ void MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);
     pointerItem.SetPressure(0);
-    if (libinput_event_pointer_get_axis_source(data) == LIBINPUT_EVENT_POINTER_SCROLL_FINGER) {
+    if (libinput_event_pointer_get_axis_source(data) == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
         pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
         MMI_HILOGD("ToolType is touchpad");
     } else {
