@@ -4,12 +4,13 @@
   "version": "3.1",
   "license": "Apache License 2.0",
   "segment": {
-    "destPath": "foundation/multimodalinput/input/"
+    "destPath": "foundation/multimodalinput/input"
   },
   "component": {
     "name": "input",
     "subsystem": "multimodalinput",
     "syscap": [
+      "SystemCapability.MultimodalInput.Input",
       "SystemCapability.MultimodalInput.Input.InputConsumer",
       "SystemCapability.MultimodalInput.Input.InputDevice",
       "SystemCapability.MultimodalInput.Input.Core",
