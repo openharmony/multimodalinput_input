@@ -301,7 +301,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
     }
     int32_t windowid = 0;
     CHKRP(napi_get_value_int32(env, argv[0], &windowid), GET_VALUE_INT32);
-    if (windowid < 0) {
+    if (windowid < 0 && windowid != GLOBAL_WINDOW_ID) {
         MMI_HILOGE("Invalid windowid");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Windowid is invalid");
         return nullptr;
@@ -349,7 +349,7 @@ napi_value JsPointerContext::GetPointerStyle(napi_env env, napi_callback_info in
     }
     int32_t windowid = 0;
     CHKRP(napi_get_value_int32(env, argv[0], &windowid), GET_VALUE_INT32);
-    if (windowid < 0) {
+    if (windowid < 0 && windowid != GLOBAL_WINDOW_ID) {
         MMI_HILOGE("Invalid windowid");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Windowid is invalid");
         return nullptr;

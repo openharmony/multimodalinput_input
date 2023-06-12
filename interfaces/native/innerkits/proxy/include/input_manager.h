@@ -278,6 +278,15 @@ public:
     int32_t SetMouseScrollRows(int32_t rows);
 
     /**
+     * @brief Set pixelMap to override ohos mouse icon resouce.
+     * @param windowId Indicates the windowId of the window
+     * @param pixelMap Indicates the image resouce for this mouse icon. which realtype must be OHOS::Media::PixelMap*
+     * @return vint32_t
+     * @since 10
+     */
+    int32_t SetMouseIcon(int32_t windowId, void* pixelMap);
+
+    /**
      * @brief Gets the number of the mouse scrolling rows.
      * @param rows Indicates the number of the mouse scrolling rows.
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.

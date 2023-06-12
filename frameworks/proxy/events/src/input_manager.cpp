@@ -194,6 +194,11 @@ int32_t InputManager::GetMouseScrollRows(int32_t &Rows)
     return InputMgrImpl.GetMouseScrollRows(Rows);
 }
 
+int32_t InputManager::SetMouseIcon(int32_t windowId, void* pixelMap)
+{
+    return InputMgrImpl.SetMouseIcon(windowId, pixelMap);
+}
+
 int32_t InputManager::SetMousePrimaryButton(int32_t primaryButton)
 {
     return InputMgrImpl.SetMousePrimaryButton(primaryButton);
