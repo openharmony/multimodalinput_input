@@ -254,7 +254,6 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
         MMI_HILOGE("Call SetMouseIcon failed ret:%{public}d", ret);
         return ret;
     }
-    MMI_HILOGD("mouse scroll pixelMap:%{public}u, ret:%{public}d", sizeof(*pixelMap), ret);
     return RET_OK;
 }
 
