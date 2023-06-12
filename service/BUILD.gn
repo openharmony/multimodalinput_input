@@ -33,6 +33,7 @@ config("libmmi_server_config") {
     "device_scalability/include",
     "delegate_task/include",
     "event_dispatch/include",
+    "fingersense_wrapper/include",
     "key_event_normalize/include",
     "event_handler/include",
     "event_dump/include",

@@ -44,8 +44,16 @@ constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
 constexpr int32_t ERROR_DELAY_VALUE = -1000;
 constexpr int32_t TOUCH_MAX_THRESHOLD = 15;
 constexpr int32_t COMMON_PARAMETER_ERROR = 401;
+constexpr size_t SINGEL_KNUCKLE_SIZE = 1;
+constexpr size_t DOUBLE_KNUCKLE_SIZE = 2;
+constexpr int32_t NONE_CLICK_STATE = 0;
+constexpr int32_t CLICK_STATE = 1;
+constexpr int32_t DOUBLE_CLICK_INTERVAL_TIME = 260;
+
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
 const std::string shortKeyFileName = "/data/service/el1/public/multimodalinput/Settings.xml";
+const std::string SINGLE_KNUCKLE_ABILITY = "SingleKnuckleDoubleClickGesture";
+const std::string DOUBLE_KNUCKLE_ABILITY = "DoubleKnuckleDoubleClickGesture";
 enum SpecialType {
     SPECIAL_ALL = 0,
     SUBSCRIBER_BEFORE_DELAY = 1,
@@ -602,6 +610,39 @@ bool ParseTwoFingerGesture(const JsonParser& parser, TwoFingerGesture& gesture)
     gesture.active = true;
     return true;
 }
+
+bool IsPackageKnuckleGesture(const cJSON* jsonData, const std::string knuckleGesture, Ability &launchAbility)
+{
+    cJSON *knuckleGestureData = cJSON_GetObjectItemCaseSensitive(jsonData, knuckleGesture.c_str());
+    if (!cJSON_IsObject(knuckleGestureData)) {
+        MMI_HILOGE("KnuckleGestureData is not object");
+        return false;
+    }
+    cJSON *ability = cJSON_GetObjectItemCaseSensitive(knuckleGestureData, "ability");
+    if (!cJSON_IsObject(ability)) {
+        MMI_HILOGE("Ability is not object");
+        return false;
+    }
+    if (!PackageAbility(ability, launchAbility)) {
+        MMI_HILOGE("Package ability failed");
+        return false;
+    }
+    return true;
+}
+
+bool IsParseKnuckleGesture(const JsonParser &parser, const std::string ability, KnuckleGesture &knuckleGesture)
+{
+    cJSON *jsonData = cJSON_GetObjectItemCaseSensitive(parser.json_, "KnuckleGesture");
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("KnuckleGesture is not object");
+        return false;
+    }
+    if (!IsPackageKnuckleGesture(jsonData, ability, knuckleGesture.ability)) {
+        MMI_HILOGE("Package knuckle gesture failed");
+        return false;
+    }
+    return true;
+}
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -635,11 +676,72 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     OnHandleTouchEvent(pointerEvent);
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
-#endif // OHOS_BUILD_ENABLE_TOUCH
 
-void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent>& touchEvent)
+void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> &touchEvent)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+    if (!isParseConfig_) {
+        if (!ParseConfig()) {
+            MMI_HILOGE("Parse configFile failed");
+            return;
+        }
+        isParseConfig_ = true;
+    }
+
+    switch (touchEvent->GetPointerAction()) {
+        case PointerEvent::POINTER_ACTION_CANCEL:
+        case PointerEvent::POINTER_ACTION_UP: {
+            HandlePointerActionUpEvent(touchEvent);
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_MOVE: {
+            HandlePointerActionMoveEvent(touchEvent);
+            break;
+        }
+        case PointerEvent::POINTER_ACTION_DOWN: {
+            HandlePointerActionDownEvent(touchEvent);
+            break;
+        }
+        default:
+            // Don't care about other actions
+            MMI_HILOGW("other action not match.");
+            break;
+    }
+}
+
+void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent> &touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+    auto id = touchEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    touchEvent->GetPointerItem(id, item);
+    int32_t toolType = item.GetToolType();
+    MMI_HILOGD("Pointer tool type: %{public}d", toolType);
+    switch (toolType) {
+        case PointerEvent::TOOL_TYPE_FINGER: {
+            HandleFingerGestureDownEvent(touchEvent);
+            break;
+        }
+        case PointerEvent::TOOL_TYPE_KNUCKLE: {
+            HandleKnuckleGestureDownEvent(touchEvent);
+            break;
+        }
+        default: {
+            // other tool type are not processed
+            MMI_HILOGD("Current touch event tool type: %{public}d", toolType);
+            break;
+        }
+    }
+}
+
+void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent> &touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    if (!twoFingerGesture_.active) {
+        return;
+    }
     if (twoFingerGesture_.timerId == -1) {
         MMI_HILOGW("Two finger gesture timer id is -1.");
         return;
@@ -659,9 +761,38 @@ void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<Point
     }
 }
 
-void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent>& touchEvent)
+void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<PointerEvent> &touchEvent)
 {
     CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+    auto id = touchEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    touchEvent->GetPointerItem(id, item);
+    int32_t toolType = item.GetToolType();
+    switch (toolType) {
+        case PointerEvent::TOOL_TYPE_FINGER: {
+            HandleFingerGestureUpEvent(touchEvent);
+            break;
+        }
+        case PointerEvent::TOOL_TYPE_KNUCKLE: {
+            HandleKnuckleGestureUpEvent(touchEvent);
+            break;
+        }
+        default: {
+            // other tool type are not processed
+            MMI_HILOGW("Current touch event tool type: %{public}d", toolType);
+            break;
+        }
+    }
+}
+
+void KeyCommandHandler::HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> &touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    if (!twoFingerGesture_.active) {
+        MMI_HILOGD("Two finger gesture is not active");
+        return;
+    }
     auto num = touchEvent->GetPointerIds().size();
     if (num == TwoFingerGesture::MAX_TOUCH_NUM) {
         StartTwoFingerGesture();
@@ -677,39 +808,114 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
         twoFingerGesture_.touches[num - 1].y = item.GetDisplayY();
     }
 }
-void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent>& touchEvent)
+
+void KeyCommandHandler::HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> &touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    if (!isParseConfig_) {
-        if (!ParseConfig()) {
-            MMI_HILOGE("Parse configFile failed");
-            return;
-        }
-        isParseConfig_ = true;
-    }
-
     if (!twoFingerGesture_.active) {
+        MMI_HILOGD("Two finger gesture is not active");
         return;
     }
-    switch (touchEvent->GetPointerAction()) {
-        case PointerEvent::POINTER_ACTION_CANCEL:
-        case PointerEvent::POINTER_ACTION_UP: {
-            StopTwoFingerGesture();
+    StopTwoFingerGesture();
+}
+
+void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<PointerEvent> &touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+
+    auto id = touchEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    touchEvent->GetPointerItem(id, item);
+    if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE) {
+        MMI_HILOGW("Touch event tool type: %{public}d not knuckle", item.GetToolType());
+        return;
+    }
+    size_t size = touchEvent->GetPointerIds().size();
+    if (size == SINGEL_KNUCKLE_SIZE) {
+        SingleKnuckleGestureProcesser(touchEvent);
+    } else if (size == DOUBLE_KNUCKLE_SIZE) {
+        DoubleKnuckleGestureProcesser(touchEvent);
+    } else {
+        MMI_HILOGW("Other kunckle size not process, size: %{public}d", size);
+        return;
+    }
+}
+
+void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> &touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+    size_t size = touchEvent->GetPointerIds().size();
+    if (size == SINGEL_KNUCKLE_SIZE) {
+        singleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
+    } else if (size == DOUBLE_KNUCKLE_SIZE) {
+        doubleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
+    } else {
+        MMI_HILOGW("Other kunckle size not process, size: %{public}d", size);
+        return;
+    }
+}
+
+void KeyCommandHandler::SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> &touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+    KnuckleGestureProcesser(touchEvent, singleKnuckleGesture_);
+}
+
+void KeyCommandHandler::DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> &touchEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+    if (singleKnuckleGesture_.state != NONE_CLICK_STATE) {
+        MMI_HILOGD("Single knuckle gesture not process");
+        singleKnuckleGesture_.state = NONE_CLICK_STATE;
+        if (singleKnuckleGesture_.timerId != -1) {
+            TimerMgr->RemoveTimer(singleKnuckleGesture_.timerId);
+            singleKnuckleGesture_.timerId = -1;
+        }
+    }
+    KnuckleGestureProcesser(touchEvent, doubleKnuckleGesture_);
+}
+
+void KeyCommandHandler::KnuckleGestureProcesser(const std::shared_ptr<PointerEvent> &touchEvent,
+    KnuckleGesture &knuckleGesture)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(touchEvent);
+    int32_t state = knuckleGesture.state;
+    switch (state) {
+        case NONE_CLICK_STATE: {
+            MMI_HILOGD("Knuckle gesture first down event");
+            knuckleGesture.timerId = TimerMgr->AddTimer(DOUBLE_CLICK_INTERVAL_TIME, 1, [&knuckleGesture]() {
+                MMI_HILOGD("Knuckle gesture processor timer callback");
+                knuckleGesture.timerId = -1;
+                knuckleGesture.state = NONE_CLICK_STATE;
+            });
+            knuckleGesture.lastPointerDownEvent = touchEvent;
+            knuckleGesture.state = CLICK_STATE;
             break;
         }
-        case PointerEvent::POINTER_ACTION_MOVE: {
-            HandlePointerActionMoveEvent(touchEvent);
+        case CLICK_STATE: {
+            MMI_HILOGD("Knuckle gesture second down event");
+            knuckleGesture.downToPrevUpTime = touchEvent->GetActionTime() - knuckleGesture.lastPointerUpTime;
+            if (knuckleGesture.downToPrevUpTime < (static_cast<int64_t>(DOUBLE_CLICK_INTERVAL_TIME) * SECONDS_SYSTEM)) {
+                MMI_HILOGD("knuckle gesture start launch ability");
+                LaunchAbility(knuckleGesture.ability, 0);
+                if (knuckleGesture.timerId != -1) {
+                    TimerMgr->RemoveTimer(knuckleGesture.timerId);
+                    knuckleGesture.timerId = -1;
+                }
+                knuckleGesture.state = NONE_CLICK_STATE;
+            }
             break;
         }
-        case PointerEvent::POINTER_ACTION_DOWN: {
-            HandlePointerActionDownEvent(touchEvent);
+        default: {
+            MMI_HILOGW("other state: %{public}d not process", state);
             break;
         }
-        default:
-            // Don't care about other actions
-            MMI_HILOGW("other action not match.");
-            break;
     }
 }
 
@@ -730,6 +936,7 @@ void KeyCommandHandler::StopTwoFingerGesture()
         twoFingerGesture_.timerId = -1;
     }
 }
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 bool KeyCommandHandler::ParseConfig()
 {
@@ -764,7 +971,10 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseShortKeys = ParseShortcutKeys(parser, shortcutKeys_, businessIds_);
     bool isParseSequences = ParseSequences(parser, sequences_);
     bool isParseTwoFingerGesture = ParseTwoFingerGesture(parser, twoFingerGesture_);
-    if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture) {
+    bool isParseSingleKnuckleGesture = IsParseKnuckleGesture(parser, SINGLE_KNUCKLE_ABILITY, singleKnuckleGesture_);
+    bool isParseDoubleKnuckleGesture = IsParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
+    if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
+        !isParseDoubleKnuckleGesture) {
         MMI_HILOGE("Parse configFile failed");
         return false;
     }
@@ -1284,6 +1494,15 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
         return ret;
     }
     return RET_OK;
+}
+
+KnuckleGesture KeyCommandHandler::GetSingleKnuckleGesture()
+{
+    return singleKnuckleGesture_;
+}
+KnuckleGesture KeyCommandHandler::GetDoubleKnuckleGesture()
+{
+    return doubleKnuckleGesture_;
 }
 } // namespace MMI
 } // namespace OHOS
