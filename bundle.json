@@ -1,10 +1,10 @@
 {
-  "name": "@ohos/multimodalinput",
+  "name": "@ohos/input",
   "description": "Provide input capabilities",
   "version": "3.1",
   "license": "Apache License 2.0",
   "segment": {
-    "destPath": "foundation/multimodalinput/input/"
+    "destPath": "foundation/multimodalinput/input"
   },
   "component": {
     "name": "input",
@@ -65,7 +65,8 @@
         "hicollie_native",
         "init",
         "preferences",
-        "security_component"
+        "security_component",
+        "hilog_native"
       ],
       "third_party": [
         "cJSON",
@@ -74,7 +75,9 @@
         "json",
         "thirdparty_libevdev",
         "thirdparty_mtdev",
-        "cjson"
+        "cjson",
+        "libevdev",
+        "mtdev"
       ]
     },
     "build": {
