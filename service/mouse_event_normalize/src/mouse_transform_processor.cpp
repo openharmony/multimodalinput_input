@@ -266,7 +266,7 @@ void MouseTransformProcessor::HandleTouchPadAxisState(libinput_pointer_axis_sour
         MMI_HILOGE("Failed to get scroll direct switch flag, default is true.");
     }
 
-    if (scrollDirectionState == false && source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+    if (scrollDirectionState == true && source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
         direction = -1;
     }
 }
@@ -707,6 +707,10 @@ int32_t MouseTransformProcessor::GetTouchpadPointerSpeed(int32_t &speed)
     if (GetConfigDataFromDatabase(name, speed) != RET_OK) {
         MMI_HILOGE("Failed to get touch pad pointer speed from mem.");
         return RET_ERR;
+    }
+
+    if (speed == 0) {
+        speed =DEFAULT_SPEED;
     }
 
     // if speed < MIN_SPEED | speed > MAX_SPEED, touchpad would be out of action
