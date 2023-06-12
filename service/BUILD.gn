@@ -165,10 +165,6 @@ ohos_shared_library("libmmi-server") {
     "//third_party/cJSON:cjson",
   ]
 
-  if (input_ext_feature != "") {
-    deps += [ input_ext_feature ]
-  }
-
   external_deps = [ "c_utils:utils" ]
   if (input_feature_pointer_drawing) {
     external_deps += [ "window_manager:libwm" ]
