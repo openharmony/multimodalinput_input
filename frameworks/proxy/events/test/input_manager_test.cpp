@@ -19,8 +19,12 @@
 #include "event_util_test.h"
 #include "input_handler_type.h"
 #include "input_manager_impl.h"
+#include "image_source.h"
+#include "image_type.h"
+#include "image_utils.h"
 #include "mmi_log.h"
 #include "multimodal_event_handler.h"
+#include "pixel_map.h"
 #include "system_info.h"
 #include "util.h"
 
@@ -79,6 +83,7 @@ public:
     std::shared_ptr<KeyEvent> SetupKeyEvent003();
     std::shared_ptr<PointerEvent> TestMarkConsumedStep1();
     std::shared_ptr<PointerEvent> TestMarkConsumedStep2();
+    std::unique_ptr<OHOS::Media::PixelMap> SetMouseIconTest(const std::string iconPath);
     void TestMarkConsumedStep3(int32_t monitorId, int32_t eventId);
     void TestMarkConsumedStep4();
     void TestMarkConsumedStep5();
@@ -111,6 +116,31 @@ void InputManagerTest::TearDown()
 std::string InputManagerTest::GetEventDump()
 {
     return TestUtil->GetEventDump();
+}
+
+std::unique_ptr<OHOS::Media::PixelMap> InputManagerTest::SetMouseIconTest(const std::string iconPath)
+{
+    CALL_DEBUG_ENTER;
+    OHOS::Media::SourceOptions opts;
+    opts.formatHint = "image/svg+xml";
+    uint32_t ret = 0;
+    auto imageSource = OHOS::Media::ImageSource::CreateImageSource(iconPath, opts, ret);
+    CHKPP(imageSource);
+    std::set<std::string> formats;
+    ret = imageSource->GetSupportedFormats(formats);
+    MMI_HILOGD("Get supported format ret:%{public}u", ret);
+
+    OHOS::Media::DecodeOptions decodeOpts;
+    decodeOpts.desiredSize = {
+        .width = 64,
+        .height = 64
+    };
+
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
+    if (pixelMap == nullptr) {
+        MMI_HILOGE("The pixelMap is nullptr");
+    }
+    return pixelMap;
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent001()
@@ -4239,5 +4269,79 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadPointerSpeed_001, TestSiz
     const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
     ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
+
+/**
+ * @tc.name: InputManagerTest_SetMouseIcon_001
+ * @tc.desc: Set the mouse icon for linux window
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    uint32_t windowId = window->GetWindowId();
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    PointerStyle pointerStyle;
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
+    ASSERT_TRUE(pixelMap != nullptr);
+    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    if (InputManager::GetInstance()->SetMouseIcon(windowId, (void*)pixelMap.get()) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
+        ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+    } else {
+        ASSERT_TRUE(false); // errors occur
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_SetMouseIcon_002
+ * @tc.desc: Set the mouse icon for linux window
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    uint32_t windowId = window->GetWindowId();
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
+    PointerStyle pointerStyle;
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
+    ASSERT_TRUE(pixelMap != nullptr);
+    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    if (InputManager::GetInstance()->SetMouseIcon(windowId, (void*)pixelMap.get()) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
+        ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+    } else {
+        ASSERT_TRUE(false); // errors occur
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_SetMouseIcon_003
+ * @tc.desc: Set the mouse icon for linux window
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    uint32_t windowId = window->GetWindowId();
+    PointerStyle pointerStyle;
+    pointerStyle.id = MOUSE_ICON::DEFAULT;
+    int32_t ret = InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle);
+    ASSERT_TRUE(ret == RET_OK);
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
+    ASSERT_TRUE(pixelMap != nullptr);
+    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    ret = InputManager::GetInstance()->SetMouseIcon(-1, (void*)pixelMap.get());
+    ASSERT_EQ(ret, RET_ERR);
+    ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
+    ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEFAULT);
+}
+
 } // namespace MMI
 } // namespace OHOS

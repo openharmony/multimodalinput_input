@@ -28,6 +28,7 @@
 #include "input_display_bind_helper.h"
 #include "input_event_data_transformation.h"
 #include "input_event.h"
+#include "pixel_map.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
 #include "uds_server.h"
