@@ -838,7 +838,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     } else if (size == DOUBLE_KNUCKLE_SIZE) {
         DoubleKnuckleGestureProcesser(touchEvent);
     } else {
-        MMI_HILOGW("Other kunckle size not process, size: %{public}d", size);
+        MMI_HILOGW("Other kunckle size not process, size: %{public}zu", size);
         return;
     }
 }
@@ -853,7 +853,7 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
     } else if (size == DOUBLE_KNUCKLE_SIZE) {
         doubleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
     } else {
-        MMI_HILOGW("Other kunckle size not process, size: %{public}d", size);
+        MMI_HILOGW("Other kunckle size not process, size: %{public}zu", size);
         return;
     }
 }
