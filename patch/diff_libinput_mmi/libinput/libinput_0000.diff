@@ -2844,15 +2844,6 @@ diff -Naur old/src/evdev-mt-touchpad-buttons.c new/src/evdev-mt-touchpad-buttons
  static int
  tp_post_clickpadbutton_buttons(struct tp_dispatch *tp, uint64_t time)
  {
-@@ -1268,7 +1269,7 @@
- 		} else if (area & RIGHT) {
- 			button = BTN_RIGHT;
- 		} else if (area & LEFT) {
--			button = BTN_LEFT;
-+			button = BTN_RIGHT_MENUE;
- 		} else { /* main or no area (for clickfinger) is always BTN_LEFT */
- 			button = BTN_LEFT;
- 			want_left_handed = false;
 diff -Naur old/src/evdev-mt-touchpad-gestures.c new/src/evdev-mt-touchpad-gestures.c
 --- old/src/evdev-mt-touchpad-gestures.c	2021-01-01 00:00:00.000000000 +0800
 +++ new/src/evdev-mt-touchpad-gestures.c	2021-01-01 00:00:00.000000000 +0800
