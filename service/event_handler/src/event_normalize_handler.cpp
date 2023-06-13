@@ -36,6 +36,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventNormalizeHandler" };
+constexpr int32_t FINGER_NUM = 2;
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event)
@@ -289,6 +290,12 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t pointerAction = pointerEvent->GetPointerAction();
+    if (pointerEvent->GetPointerIds().size() == FINGER_NUM && (pointerAction == PointerEvent::POINTER_ACTION_DOWN ||
+        pointerAction == PointerEvent::POINTER_ACTION_UP)) {
+        MMI_HILOGD("Handle mouse axis event");
+        HandleMouseEvent(event);
+    }
     nextHandler_->HandlePointerEvent(pointerEvent);
     auto type = libinput_event_get_type(event);
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {

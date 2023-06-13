@@ -290,30 +290,34 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     if (buttonId_ == PointerEvent::BUTTON_NONE && pointerEvent_->GetButtonId() != PointerEvent::BUTTON_NONE) {
         pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
     }
-    if (TimerMgr->IsExist(timerId_)) {
+    if (libinput_event_pointer_get_axis_source(data) == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
-        TimerMgr->ResetTimer(timerId_);
-        MMI_HILOGD("Axis update");
     } else {
-        static constexpr int32_t timeout = 100;
-        std::weak_ptr<MouseTransformProcessor> weakPtr = shared_from_this();
-        timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
-            CALL_DEBUG_ENTER;
-            auto sharedPtr = weakPtr.lock();
-            CHKPV(sharedPtr);
-            MMI_HILOGD("timer:%{public}d", sharedPtr->timerId_);
-            sharedPtr->timerId_ = -1;
-            auto pointerEvent = sharedPtr->GetPointerEvent();
-            CHKPV(pointerEvent);
-            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
-            pointerEvent->UpdateId();
-            auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
-            CHKPV(inputEventNormalizeHandler);
-            inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
-        });
+        if (TimerMgr->IsExist(timerId_)) {
+            pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+            TimerMgr->ResetTimer(timerId_);
+            MMI_HILOGD("Axis update");
+        } else {
+            static constexpr int32_t timeout = 100;
+            std::weak_ptr<MouseTransformProcessor> weakPtr = shared_from_this();
+            timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
+                CALL_DEBUG_ENTER;
+                auto sharedPtr = weakPtr.lock();
+                CHKPV(sharedPtr);
+                MMI_HILOGD("timer:%{public}d", sharedPtr->timerId_);
+                sharedPtr->timerId_ = -1;
+                auto pointerEvent = sharedPtr->GetPointerEvent();
+                CHKPV(pointerEvent);
+                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+                pointerEvent->UpdateId();
+                auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
+                CHKPV(inputEventNormalizeHandler);
+                inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
+            });
 
-        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
-        MMI_HILOGD("Axis begin");
+            pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+            MMI_HILOGD("Axis begin");
+        }
     }
 
     const int32_t initRows = 3;
@@ -328,6 +332,60 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL, axisValue);
     }
     return RET_OK;
+}
+
+int32_t MouseTransformProcessor::HandleAxisBeginEndInner(struct libinput_event *event)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent_, ERROR_NULL_POINTER);
+    if (buttonId_ == PointerEvent::BUTTON_NONE && pointerEvent_->GetButtonId() != PointerEvent::BUTTON_NONE) {
+        pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
+    }
+    if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_DOWN) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+        MMI_HILOGD("Axis begin");
+    } else if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_UP) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+        MMI_HILOGD("Axis end");
+    } else {
+        MMI_HILOGE("Axis is invalid");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+void MouseTransformProcessor::HandleAxisPostInner(PointerEvent::PointerItem &pointerItem)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(pointerEvent_);
+    auto mouseInfo = WinMgr->GetMouseInfo();
+    MouseState->SetMouseCoords(mouseInfo.physicalX, mouseInfo.physicalY);
+    pointerItem.SetDisplayX(mouseInfo.physicalX);
+    pointerItem.SetDisplayY(mouseInfo.physicalY);
+    pointerItem.SetWindowX(0);
+    pointerItem.SetWindowY(0);
+    pointerItem.SetPointerId(0);
+    pointerItem.SetPressed(isPressed_);
+    int64_t time = GetSysClockTime();
+    pointerItem.SetDownTime(time);
+    pointerItem.SetWidth(0);
+    pointerItem.SetHeight(0);
+    pointerItem.SetPressure(0);
+    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+    pointerItem.SetDeviceId(deviceId_);
+    pointerItem.SetRawDx(0);
+    pointerItem.SetRawDy(0);
+    pointerEvent_->UpdateId();
+    pointerEvent_->UpdatePointerItem(pointerEvent_->GetPointerId(), pointerItem);
+    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent_->SetActionTime(time);
+    pointerEvent_->SetActionStartTime(time);
+    pointerEvent_->SetPointerId(0);
+    pointerEvent_->SetDeviceId(deviceId_);
+    pointerEvent_->SetTargetDisplayId(currentDisplayId_);
+    pointerEvent_->SetTargetWindowId(-1);
+    pointerEvent_->SetAgentWindowId(-1);
 }
 
 void MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* data,
@@ -350,7 +408,12 @@ void MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);
     pointerItem.SetPressure(0);
-    pointerItem.SetToolType(PointerEvent::TOOL_TYPE_FINGER);
+    if (libinput_event_pointer_get_axis_source(data) == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
+        pointerItem.SetToolType(PointerEvent::TOOL_TYPE_TOUCHPAD);
+        MMI_HILOGD("ToolType is touchpad");
+    } else {
+        pointerItem.SetToolType(PointerEvent::TOOL_TYPE_MOUSE);
+    }
     pointerItem.SetDeviceId(deviceId_);
     SetDxDyForDInput(pointerItem, data);
     pointerEvent_->UpdateId();
@@ -370,11 +433,13 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
     CALL_DEBUG_ENTER;
     CHKPR(event, ERROR_NULL_POINTER);
     CHKPR(pointerEvent_, ERROR_NULL_POINTER);
+    const int32_t type = libinput_event_get_type(event);
     auto data = libinput_event_get_pointer_event(event);
-    CHKPR(data, ERROR_NULL_POINTER);
+    if (type != LIBINPUT_EVENT_TOUCHPAD_DOWN && type != LIBINPUT_EVENT_TOUCHPAD_UP) {
+        CHKPR(data, ERROR_NULL_POINTER);
+    }
     pointerEvent_->ClearAxisValue();
     int32_t result;
-    const int32_t type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_POINTER_MOTION:
         case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE:
@@ -391,13 +456,22 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
             result = HandleAxisInner(data);
             break;
         }
+        case LIBINPUT_EVENT_TOUCHPAD_DOWN:
+        case LIBINPUT_EVENT_TOUCHPAD_UP: {
+            result = HandleAxisBeginEndInner(event);
+            break;
+        }
         default: {
             MMI_HILOGE("Unknown type:%{public}d", type);
             return RET_ERR;
         }
     }
     PointerEvent::PointerItem pointerItem;
-    HandlePostInner(data, pointerItem);
+    if (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_UP) {
+        HandleAxisPostInner(pointerItem);
+    } else {
+        HandlePostInner(data, pointerItem);
+    }
     WinMgr->UpdateTargetPointer(pointerEvent_);
     DumpInner();
     return result;
