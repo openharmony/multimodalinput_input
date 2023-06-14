@@ -45,28 +45,6 @@ public:
     }
 };
 
-/**
- * @tc.name:construct_001
- * @tc.desc:Verify stream buffer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(StreamBufferTest, construct_001, TestSize.Level1)
-{
-    StreamBuffer bufObj;
-}
-
-/**
- * @tc.name:construct_002
- * @tc.desc:Verify stream buffer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(StreamBufferTest, construct_002, TestSize.Level1)
-{
-    StreamBuffer bufObj;
-    StreamBuffer bufObjTmp(bufObj);
-}
 
 /**
  * @tc.name:read_Type1_001
@@ -80,6 +58,7 @@ HWTEST_F(StreamBufferTest, read_Type1_001, TestSize.Level1)
     size_t size = 4;
 
     StreamBuffer bufObj;
+    StreamBuffer bufObjTmp(bufObj);
     bool retResult = bufObj.Read(buf, size);
     EXPECT_FALSE(retResult);
 }
@@ -96,6 +75,7 @@ HWTEST_F(StreamBufferTest, read_Type1_002, TestSize.Level1)
     size_t size = 4;
 
     StreamBuffer bufObj;
+    StreamBuffer bufObjTmp(bufObj);
     bool retResult = bufObj.Read(buf, size);
     EXPECT_FALSE(retResult);
 }
@@ -111,6 +91,7 @@ HWTEST_F(StreamBufferTest,  read_Type2_001, TestSize.Level1)
     std::string buf = "";
 
     StreamBuffer bufObj;
+    StreamBuffer bufObjTmp(bufObj);
     bool retResult = bufObj.Read(buf);
     ASSERT_FALSE(retResult);
 }
@@ -126,6 +107,7 @@ HWTEST_F(StreamBufferTest, read_Type2_002, TestSize.Level1)
     std::string buf = "Stream Data";
 
     StreamBuffer bufObj;
+    StreamBuffer bufObjTmp(bufObj);
     bool retResult = bufObj.Read(buf);
     ASSERT_FALSE(retResult);
 }
@@ -141,6 +123,7 @@ HWTEST_F(StreamBufferTest,  read_Type3_001, TestSize.Level1)
     StreamBuffer buf;
 
     StreamBuffer bufObj;
+    StreamBuffer bufObjTmp(bufObj);
     bool retResult = bufObj.Read(buf);
     ASSERT_FALSE(retResult);
 }
@@ -244,7 +227,7 @@ HWTEST_F(StreamBufferTest, Data, TestSize.Level1)
 HWTEST_F(StreamBufferTest, Size_001, TestSize.Level1)
 {
     StreamBuffer streamBuffer;
-    streamBuffer.Size();
+    ASSERT_FALSE(streamBuffer.Size() != 0);
 }
 
 /**

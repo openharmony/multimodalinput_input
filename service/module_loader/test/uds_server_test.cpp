@@ -39,23 +39,10 @@ public:
     }
 };
 
-HWTEST_F(UDSServerTest, Init_001, TestSize.Level1)
-{
-    const std::string path = "./test";
-    UDSServer serObj;
-}
-
-HWTEST_F(UDSServerTest, Init_002, TestSize.Level1)
-{
-    const std::string path = "";
-    UDSServer serObj;
-}
-
 HWTEST_F(UDSServerTest, SendMsg_001, TestSize.Level1)
 {
     MmiMessageId msgId = MmiMessageId::INVALID;
     NetPacket pkt(msgId);
-
     int32_t fd = 1000;
     UDSServer serObj;
     bool retResult = serObj.SendMsg(fd, pkt);
@@ -98,7 +85,7 @@ HWTEST_F(UDSServerTest, Multicast, TestSize.Level1)
 HWTEST_F(UDSServerTest, Stop_001, TestSize.Level1)
 {
     UDSServer serObj;
-    serObj.UdsStop();
+    ASSERT_NO_FATAL_FAILURE(serObj.UdsStop());
 }
 
 HWTEST_F(UDSServerTest, GetSession_001, TestSize.Level1)
