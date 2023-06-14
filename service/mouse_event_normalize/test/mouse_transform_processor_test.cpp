@@ -58,7 +58,7 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetPointerEven
 {
     int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
-    processor.GetPointerEvent();
+    ASSERT_TRUE(processor.GetPointerEvent() != nullptr);
     processor.InitAbsolution();
     int32_t displayId = 0;
     processor.OnDisplayLost(displayId);

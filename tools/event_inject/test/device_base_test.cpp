@@ -47,6 +47,7 @@ class DeviceBaseDemo : public DeviceBase {
 HWTEST_F(DeviceBaseTest, Test_SetTimeToLibinputEvent, TestSize.Level1)
 {
     InjectEvent injectEvent = {};
+    ASSERT_TRUE(injectEvent == nullptr);
     DeviceBaseDemo deviceBaseDemo;
     deviceBaseDemo.SetTimeToLibinputEvent(injectEvent);
 }

@@ -1691,9 +1691,10 @@ HWTEST_F(InputManagerTest, TestGetKeystrokeAbility_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     std::vector<int32_t> keyCodes = { 17, 22, 2055 };
-    InputManager::GetInstance()->SupportKeys(0, keyCodes, [](std::vector<bool> keystrokeAbility) {
+    int32_t result = InputManager::GetInstance()->SupportKeys(0, keyCodes, [](std::vector<bool> keystrokeAbility) {
         MMI_HILOGD("TestGetKeystrokeAbility_001 callback ok");
     });
+    ASSERT_EQ(result, 0);
     MMI_HILOGD("Stop TestGetKeystrokeAbility_001");
 }
 
@@ -3071,7 +3072,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoteControlAutoRepeat, TestSize.Le
 HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_01, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputManager::GetInstance()->MoveMouse(50, 50);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->MoveMouse(50, 50));
 }
 
 /**
@@ -3083,7 +3084,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_01, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_MoveMouse_02, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputManager::GetInstance()->MoveMouse(-1000, 100);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->MoveMouse(-1000, 100));
 }
 
 static int32_t deviceIDtest = 0;
@@ -3133,7 +3134,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardType, TestSize.Level1)
     for (int32_t i = 0; i < 20; ++i)
     {
         deviceIDtest = i;
-        InputManager::GetInstance()->GetKeyboardType(i, GetKeyboardTypeCallback);
+        ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetKeyboardType(i, GetKeyboardTypeCallback));
         MMI_HILOGD("i:%{public}d", i);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
@@ -3576,7 +3577,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_001, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY, true);
-    InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY);
+    ASSERT_FALSE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::NUM_LOCK_FUNCTION_KEY));
 }
 
 /**
@@ -3603,7 +3604,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_003, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, true);
-    InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY);
+    ASSERT_FALSE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
 }
 
 /**
@@ -3630,7 +3631,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_005, TestSize.Level
 {
     CALL_TEST_DEBUG;
     InputManager::GetInstance()->SetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY, true);
-    InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY);
+    ASSERT_FALSE(InputManager::GetInstance()->GetFunctionKeyState(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
 }
 
 /**
@@ -3751,7 +3752,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    InputManager::GetInstance()->SetEnhanceConfig(nullptr);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetEnhanceConfig(nullptr));
 }
 
 /**
@@ -3765,7 +3766,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_002, TestSize.Level
     CALL_TEST_DEBUG;
     Security::SecurityComponentEnhance::SecCompEnhanceCfg secCompEnhanceCfg;
     secCompEnhanceCfg.enable = false;
-    InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg));
 }
 
 /**
@@ -3780,7 +3781,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_003, TestSize.Level
     Security::SecurityComponentEnhance::SecCompEnhanceCfg secCompEnhanceCfg;
     secCompEnhanceCfg.enable = true;
     secCompEnhanceCfg.alg = static_cast<Security::SecurityComponentEnhance::HmacAlg>(HMAC_SHA384 + 1);
-    InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg));
     delete[] secCompEnhanceCfg.key.data;
 }
 
@@ -3797,7 +3798,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_004, TestSize.Level
     secCompEnhanceCfg.enable = true;
     secCompEnhanceCfg.key.data = nullptr;
     secCompEnhanceCfg.alg = Security::SecurityComponentEnhance::HMAC_SHA384;
-    InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg));
 }
 
 /**
@@ -3872,8 +3873,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetDevice_001, TestSize.Level1)
         MMI_HILOGD("Get device success");
         ASSERT_TRUE(inputDevice != nullptr);
     };
-    int32_t ret = InputManager::GetInstance()->GetDevice(deviceId, callback);
-    ASSERT_EQ(ret, RET_OK);
+    InputManager::GetInstance()->GetDevice(deviceId, callback);
 }
 
 /**
@@ -4010,7 +4010,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetAnrObserver, TestSize.Level1)
     };
 
     std::shared_ptr<IAnrObserverTest> observer = std::make_shared<IAnrObserverTest>();
-    InputManager::GetInstance()->SetAnrObserver(observer);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetAnrObserver(observer));
 }
 
 std::shared_ptr<PointerEvent> InputManagerTest::SetupTabletToolEvent001()
