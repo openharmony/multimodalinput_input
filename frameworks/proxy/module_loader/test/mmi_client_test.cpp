@@ -40,7 +40,7 @@ ConnectCallback connectFun;
 HWTEST_F(MMIClientTest, RegisterConnectedFunction, TestSize.Level1)
 {
     MMIClient mmiClient;
-    mmiClient.RegisterConnectedFunction(connectFun);
+    ASSERT_NO_FATAL_FAILURE(mmiClient.RegisterConnectedFunction(connectFun));
 }
 
 /**
@@ -52,7 +52,7 @@ HWTEST_F(MMIClientTest, RegisterConnectedFunction, TestSize.Level1)
 HWTEST_F(MMIClientTest, RegisterDisconnectedFunction, TestSize.Level1)
 {
     MMIClient mmiClient;
-    mmiClient.RegisterDisconnectedFunction(connectFun);
+    ASSERT_NO_FATAL_FAILURE(mmiClient.RegisterDisconnectedFunction(connectFun));
+}
 }
 } // namespace MMI
-} // namespace OHOS

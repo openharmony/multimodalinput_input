@@ -99,7 +99,7 @@ HWTEST_F(UDSClientTest, SendMsg_type2_002, TestSize.Level1)
 HWTEST_F(UDSClientTest, Stop_001, TestSize.Level1)
 {
     UDSClientUnitTest udsClientUt;
-    udsClientUt.Stop();
+    ASSERT_NO_FATAL_FAILURE(udsClientUt.Stop());
 }
 } // namespace MMI
 } // namespace OHOS
