@@ -3783,7 +3783,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_003, TestSize.Level
     secCompEnhanceCfg.alg = static_cast<Security::SecurityComponentEnhance::HmacAlg>(HMAC_SHA384 + 1);
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg));
     delete[] secCompEnhanceCfg.key.data;
-
 }
 
 /**
