@@ -1381,20 +1381,20 @@ int32_t InputManagerCommand::SingleKnuckleGestureProcesser(int32_t argc, char *a
     int32_t firstDownY = 0;
     int32_t secondDownX = 0;
     int32_t secondDownY = 0;
+    if (optind < 0 || optind > argc) {
+        std::cout << "wrong optind pointer index" << std::endl;
+        return EVENT_REG_FAIL;
+    }
     if (argc == knuckleUinputArgc) {
-        if ((!StrToInt(optarg, firstDownX)) ||
-            !StrToInt(argv[optind], firstDownY) ||
-            !StrToInt(argv[optind + 1], secondDownX) ||
-            !StrToInt(argv[optind + TWO_MORE_COMMAND], secondDownY)) {
+        if ((!StrToInt(optarg, firstDownX)) || !StrToInt(argv[optind], firstDownY) ||
+            !StrToInt(argv[optind + 1], secondDownX) || !StrToInt(argv[optind + TWO_MORE_COMMAND], secondDownY)) {
             std::cout << "invalid coordinate value" << std::endl;
             return EVENT_REG_FAIL;
         }
         intervalTimeMs = DEFAULT_DELAY;
     } else if (argc == KNUCKLE_PARAM_SIZE) {
-        if ((!StrToInt(optarg, firstDownX)) ||
-            !StrToInt(argv[optind], firstDownY) ||
-            !StrToInt(argv[optind + 1], secondDownX) ||
-            !StrToInt(argv[optind + TWO_MORE_COMMAND], secondDownY) ||
+        if ((!StrToInt(optarg, firstDownX)) || !StrToInt(argv[optind], firstDownY) ||
+            !StrToInt(argv[optind + 1], secondDownX) || !StrToInt(argv[optind + TWO_MORE_COMMAND], secondDownY) ||
             !StrToInt(argv[optind + THREE_MORE_COMMAND], intervalTimeMs)) {
             std::cout << "input coordinate or time error" << std::endl;
             return RET_ERR;
@@ -1431,8 +1431,8 @@ int32_t InputManagerCommand::DoubleKnuckleGestureProcesser(int32_t argc, char *a
     int32_t firstDownY = 0;
     int32_t secondDownX = 0;
     int32_t secondDownY = 0;
-    if (argc < knuckleUinputArgc) {
-        std::cout << "wrong number of parameters: " << argc  << std::endl;
+    if (optind < 0 || optind > argc) {
+        std::cout << "wrong optind pointer index" << std::endl;
         return EVENT_REG_FAIL;
     }
     if (argc == knuckleUinputArgc) {
