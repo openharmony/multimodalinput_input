@@ -1474,7 +1474,7 @@ int32_t InputManagerCommand::DoubleKnuckleGestureProcesser(int32_t argc, char *a
     return ERR_OK;
 }
 
-int32_t InputManagerCommand::IsCoordinateInvalid(int32_t firstDownX, int32_t firstDownY, int32_t secondDownX,
+bool InputManagerCommand::IsCoordinateInvalid(int32_t firstDownX, int32_t firstDownY, int32_t secondDownX,
     int32_t secondDownY)
 {
     return firstDownX < 0 || firstDownY < 0 || secondDownX < 0 || secondDownY < 0;
