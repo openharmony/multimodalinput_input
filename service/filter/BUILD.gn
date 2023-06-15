@@ -19,6 +19,7 @@ config("mmi_event_filter_config") {
   include_dirs = [
     "${mmi_path}/interfaces/native/innerkits/common/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
+    "${mmi_path}/service/connect_manager/include",
     "${mmi_path}/service/device_config/include",
     "${mmi_path}/service/event_handler/include",
     "${mmi_path}/service/device_manager/include",
