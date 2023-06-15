@@ -51,9 +51,14 @@ AsyncContext::~AsyncContext()
     }
 }
 
-bool getResult(sptr<AsyncContext> asyncContext, napi_value *results)
+bool getResult(sptr<AsyncContext> asyncContext, napi_value *results, int32_t size)
 {
     CALL_DEBUG_ENTER;
+    int32_t length = 2;
+    if (size < length) {
+        MMI_HILOGE("results size less than 2");
+        return false;
+    }
     napi_env env = asyncContext->env;
     if (asyncContext->errorCode != RET_OK) {
         if (asyncContext->errorCode == RET_ERR) {
@@ -115,7 +120,8 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
              */
             asyncContext->DecStrongRef(nullptr);
             napi_value results[2] = { 0 };
-            if (!getResult(asyncContext, results)) {
+            int32_t size = 2;
+            if (!getResult(asyncContext, results, size)) {
                 MMI_HILOGE("Failed to create napi data");
                 return;
             }
@@ -129,7 +135,7 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
                 napi_value callback = nullptr;
                 CHKRV(napi_get_reference_value(env, asyncContext->callback, &callback), GET_REFERENCE_VALUE);
                 napi_value callResult = nullptr;
-                CHKRV(napi_call_function(env, nullptr, callback, 2, results, &callResult), CALL_FUNCTION);
+                CHKRV(napi_call_function(env, nullptr, callback, size, results, &callResult), CALL_FUNCTION);
             }
         },
         asyncContext.GetRefPtr(), &asyncContext->work);
