@@ -19,6 +19,7 @@
 #include "string_ex.h"
 
 #include "mmi_log.h"
+#include "multimodalinput_ipc_interface_code.h"
 
 namespace OHOS {
 namespace MMI {
@@ -50,7 +51,7 @@ bool EventFilterProxy::HandleKeyEvent(const std::shared_ptr<KeyEvent> event)
 
     sptr<IRemoteObject> remote = Remote();
     CHKPF(remote);
-    const uint32_t code = static_cast<uint32_t>(OPERATOR_TYPE::HANDLE_KEY_EVENT);
+    const uint32_t code = static_cast<uint32_t>(MultimodalinputEventInterfaceCode::HANDLE_KEY_EVENT);
     int32_t ret = remote->SendRequest(code, data, reply, option);
     if (ret != NO_ERROR) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
@@ -81,7 +82,7 @@ bool EventFilterProxy::HandlePointerEvent(const std::shared_ptr<PointerEvent> ev
 
     sptr<IRemoteObject> remote = Remote();
     CHKPF(remote);
-    const uint32_t code = static_cast<uint32_t>(OPERATOR_TYPE::HANDLE_POINTER_EVENT);
+    const uint32_t code = static_cast<uint32_t>(MultimodalinputEventInterfaceCode::HANDLE_POINTER_EVENT);
     int32_t ret = remote->SendRequest(code, data, reply, option);
     if (ret != NO_ERROR) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);

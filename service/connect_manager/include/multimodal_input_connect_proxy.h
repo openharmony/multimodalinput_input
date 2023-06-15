@@ -22,6 +22,7 @@
 #include "system_ability.h"
 
 #include "i_multimodal_input_connect.h"
+#include "multimodalinput_ipc_interface_code.h"
 
 namespace OHOS {
 namespace MMI {

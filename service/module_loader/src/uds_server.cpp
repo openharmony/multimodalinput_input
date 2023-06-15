@@ -22,6 +22,7 @@
 
 #include "dfx_hisysevent.h"
 #include "i_multimodal_input_connect.h"
+#include "multimodalinput_ipc_interface_code.h"
 #include "mmi_log.h"
 #include "util.h"
 #include "util_ex.h"
