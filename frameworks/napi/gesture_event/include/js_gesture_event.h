@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef JS_INTENTION_CODE
-#define JS_INTENTION_CODE
+#ifndef JS_GESTURE_EVENT
+#define JS_GESTURE_EVENT
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -35,4 +35,4 @@ private:
 } // namespace MMI
 } // namespace OHOS
 
-#endif // JS_INTENTION_CODE
+#endif // JS_GESTURE_EVENT
