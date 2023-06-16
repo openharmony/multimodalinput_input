@@ -25,6 +25,7 @@
 #include "net_packet.h"
 #include "proto.h"
 #include "util_ex.h"
+#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
@@ -322,11 +323,23 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyEven
 bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPF(pointerEvent);
+
+    // if is 2 finger pinch,then return false
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD &&
+       (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_BEGIN ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) &&
+        pointerEvent->GetFingerCount() == 2) {
+        MMI_HILOGD("Source type = %{public}d,  pointer action = %{public}d  finger count = %{public}d",
+        pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(), pointerEvent->GetFingerCount());
+        return false;
+    }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     UpdateConsumptionState(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     Monitor(pointerEvent);
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN ||
+        pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
         auto iter = states_.find(pointerEvent->GetDeviceId());
         return (iter != states_.end() ? iter->second.isMonitorConsumed_ : false);
     }
@@ -346,7 +359,8 @@ void EventMonitorHandler::MonitorCollection::UpdateConsumptionState(std::shared_
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
-    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+        pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD) {
         return;
     }
     auto sIter = states_.find(pointerEvent->GetDeviceId());
@@ -373,7 +387,9 @@ void EventMonitorHandler::MonitorCollection::UpdateConsumptionState(std::shared_
         MMI_HILOGD("In intermediate process");
         return;
     }
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_BEGIN ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
         MMI_HILOGD("First press down");
         state.eventIds_.clear();
         auto [tIter, isOk] = state.eventIds_.emplace(pointerEvent->GetId());
@@ -381,7 +397,9 @@ void EventMonitorHandler::MonitorCollection::UpdateConsumptionState(std::shared_
             MMI_HILOGW("Event number is duplicated");
         }
         state.isMonitorConsumed_ = false;
-    } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+    } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_END) {
         MMI_HILOGD("Last lift up");
         state.eventIds_.clear();
     }
