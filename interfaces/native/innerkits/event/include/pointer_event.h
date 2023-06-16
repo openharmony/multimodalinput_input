@@ -126,6 +126,17 @@ public:
 
     static constexpr int32_t POINTER_ACTION_PULL_OUT_WINDOW = 16;
 
+    /**
+     * Indicates that the fingers swipe up in touch pad.
+     *
+     * @since 9
+     */
+    static constexpr int32_t POINTER_ACTION_SWIPE_BEGIN = 17;
+
+    static constexpr int32_t POINTER_ACTION_SWIPE_UPDATE = 18;
+
+    static constexpr int32_t POINTER_ACTION_SWIPE_END = 19;
+
     enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.
@@ -1222,6 +1233,20 @@ public:
     void SetButtonId(int32_t buttonId);
 
     /**
+     * @brief Obtains the finger count in this event.
+     * @return Returns the finger count.
+     * @since 9
+     */
+    int32_t GetFingerCount() const;
+
+    /**
+     * @brief Sets the finger count for this event.
+     * @param fingerCount Indicates the finger count to set.
+     * @return void
+     * @since 9
+     */
+    void SetFingerCount(int32_t fingerCount);
+    /**
      * @brief Obtains the axis value.
      * @param axis Indicates the axis type.
      * @return Returns the axis value.
@@ -1352,6 +1377,7 @@ private:
     int32_t sourceType_ { SOURCE_TYPE_UNKNOWN };
     int32_t pointerAction_ { POINTER_ACTION_UNKNOWN };
     int32_t buttonId_ { -1 };
+    int32_t fingerCount_ { 0 };
     uint32_t axes_ { 0U };
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
     std::vector<int32_t> pressedKeys_;

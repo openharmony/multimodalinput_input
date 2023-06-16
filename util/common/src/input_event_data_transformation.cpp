@@ -191,7 +191,7 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
     }
 
     pkt << event->GetPointerAction() << event->GetPointerId() << event->GetSourceType() << event->GetButtonId()
-        << event->GetAxes();
+        << event->GetFingerCount() << event->GetAxes();
 
     for (int32_t i = PointerEvent::AXIS_TYPE_UNKNOWN; i < PointerEvent::AXIS_TYPE_MAX; ++i) {
         if (event->HasAxis(static_cast<PointerEvent::AxisType>(i))) {
@@ -255,6 +255,8 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
     event->SetSourceType(tField);
     pkt >> tField;
     event->SetButtonId(tField);
+    pkt >> tField;
+    event->SetFingerCount(tField);
     SetAxisInfo(pkt, event);
 
     std::set<int32_t>::size_type nPressed;

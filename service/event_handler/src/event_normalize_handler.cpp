@@ -76,18 +76,14 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
         }
         case LIBINPUT_EVENT_TOUCHPAD_DOWN:
         case LIBINPUT_EVENT_TOUCHPAD_UP:
-        case LIBINPUT_EVENT_TOUCHPAD_MOTION: {
-            HandleTouchPadEvent(event);
-            DfxHisysevent::CalcPointerDispTimes();
-            break;
-        }
+        case LIBINPUT_EVENT_TOUCHPAD_MOTION: 
         case LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN:
         case LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE:
         case LIBINPUT_EVENT_GESTURE_SWIPE_END:
         case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN:
         case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE:
         case LIBINPUT_EVENT_GESTURE_PINCH_END: {
-            HandleGestureEvent(event);
+            HandleTouchPadEvent(event);
             DfxHisysevent::CalcPointerDispTimes();
             break;
         }

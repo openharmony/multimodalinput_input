@@ -32,11 +32,21 @@ private:
     void OnEventTouchPadDown(struct libinput_event *event);
     void OnEventTouchPadMotion(struct libinput_event *event);
     void OnEventTouchPadUp(struct libinput_event *event);
+    void SetTouchPadSwipeData(struct libinput_event *event, int32_t action);
+    void SetTouchPadPinchData(struct libinput_event *event, int32_t action);
+    void OnEventTouchPadSwipeBegin(struct libinput_event *event);
+    void OnEventTouchPadSwipeUpdate(struct libinput_event *event);
+    void OnEventTouchPadSwipeEnd(struct libinput_event *event);
+    void OnEventTouchPadPinchBegin(struct libinput_event *event);
+    void OnEventTouchPadPinchUpdate(struct libinput_event *event);
+    void OnEventTouchPadPinchEnd(struct libinput_event *event);
+
     int32_t GetTouchPadToolType(struct libinput_event_touch *data, struct libinput_device *device);
     int32_t GetTouchPadToolType(struct libinput_device *device);
     void InitToolType();
 private:
     const int32_t deviceId_ { -1 };
+    const int32_t defaultPointerId { 0 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
 };
