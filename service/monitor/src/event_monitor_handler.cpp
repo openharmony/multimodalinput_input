@@ -34,6 +34,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Event
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 constexpr size_t MAX_EVENTIDS_SIZE = 1000;
 #endif // OHOS_BUILD_ENABLE_TOUCH
+constexpr int32_t SYS_PINCH_FINGER_CNT { 2 };
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -329,9 +330,9 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<Pointer
        (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_BEGIN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) &&
-        pointerEvent->GetFingerCount() == 2) {
+        pointerEvent->GetFingerCount() == SYS_PINCH_FINGER_CNT) {
         MMI_HILOGD("Source type = %{public}d,  pointer action = %{public}d  finger count = %{public}d",
-        pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(), pointerEvent->GetFingerCount());
+            pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(), pointerEvent->GetFingerCount());
         return false;
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
