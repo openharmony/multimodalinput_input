@@ -25,7 +25,6 @@
 #include "net_packet.h"
 #include "proto.h"
 #include "util_ex.h"
-#include "pointer_event.h"
 
 namespace OHOS {
 namespace MMI {
