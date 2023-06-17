@@ -76,7 +76,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
         }
         case LIBINPUT_EVENT_TOUCHPAD_DOWN:
         case LIBINPUT_EVENT_TOUCHPAD_UP:
-        case LIBINPUT_EVENT_TOUCHPAD_MOTION: 
+        case LIBINPUT_EVENT_TOUCHPAD_MOTION:
         case LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN:
         case LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE:
         case LIBINPUT_EVENT_GESTURE_SWIPE_END:
