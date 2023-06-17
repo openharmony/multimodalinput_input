@@ -171,7 +171,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
         case LIBINPUT_EVENT_TOUCHPAD_MOTION: {
             OnEventTouchPadMotion(event);
             break;
-        } 
+        }
         case LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN: {
             OnEventTouchPadSwipeBegin(event);
             break;
