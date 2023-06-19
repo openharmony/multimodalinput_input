@@ -334,7 +334,7 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
 #else
     MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
-    return RET_OK
+    return RET_OK;
 }
 
 int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event)
