@@ -36,6 +36,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventNormalizeHandler" };
+constexpr int32_t FINGER_NUM = 2;
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event)
