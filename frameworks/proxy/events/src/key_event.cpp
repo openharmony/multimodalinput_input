@@ -1300,10 +1300,10 @@ napi_status KeyEvent::WriteToJsValue(napi_env env, napi_value out)
     status = SetNameProperty(env, out, "keys", GetKeyItems());
     CHECK_RETURN(status == napi_ok, "set keys property failed", status);
 
-    status = LoadKeyStatus(env, GetPressedKeys(), out);
+    status = WriteKeyStatusToJs(env, GetPressedKeys(), out);
     CHECK_RETURN(status == napi_ok, "set pressed key property failed", status);
 
-    status = LoadFunctionKeyStatus(env, out);
+    status = WriteFunctionKeyStatusToJs(env, out);
     CHECK_RETURN(status == napi_ok, "set function key property failed", status);
 
     return napi_ok;
@@ -1335,44 +1335,44 @@ napi_status KeyEvent::ReadFromJsValue(napi_env env, napi_value in)
     return napi_ok;
 }
 
-napi_status KeyEvent::WriteKeyStatusToJs(napi_env env, const std::vector<int32_t> &pressedKeys, napi_value result)
+napi_status KeyEvent::WriteKeyStatusToJs(napi_env env, const std::vector<int32_t> &pressedKeys, napi_value out)
 {
     bool isExists = HasKeyCode(pressedKeys, KEYCODE_CTRL_LEFT)
                     || HasKeyCode(pressedKeys, KEYCODE_CTRL_RIGHT);
-    auto status = SetNameProperty(env, result, "ctrlKey", isExists);
+    auto status = SetNameProperty(env, out, "ctrlKey", isExists);
     CHECK_RETURN(status == napi_ok, "set ctrlKey property failed", status);
 
     isExists = HasKeyCode(pressedKeys, KEYCODE_ALT_LEFT)
                || HasKeyCode(pressedKeys, KEYCODE_ALT_RIGHT);
-    status = SetNameProperty(env, result, "altKey", isExists);
+    status = SetNameProperty(env, out, "altKey", isExists);
     CHECK_RETURN(status == napi_ok, "set altKey property failed", status);
 
     isExists = HasKeyCode(pressedKeys, KEYCODE_SHIFT_LEFT)
                || HasKeyCode(pressedKeys, KEYCODE_SHIFT_RIGHT);
-    status = SetNameProperty(env, result, "shiftKey", isExists);
+    status = SetNameProperty(env, out, "shiftKey", isExists);
     CHECK_RETURN(status == napi_ok, "set shiftKey property failed", status);
 
     isExists = HasKeyCode(pressedKeys, KEYCODE_META_LEFT)
                || HasKeyCode(pressedKeys, KEYCODE_META_RIGHT);
-    status = SetNameProperty(env, result, "logoKey", isExists);
+    status = SetNameProperty(env, out, "logoKey", isExists);
     CHECK_RETURN(status == napi_ok, "set logoKey property failed", status);
 
     isExists = HasKeyCode(pressedKeys, KEYCODE_FN);
-    status = SetNameProperty(env, result, "fnKey", isExists);
+    status = SetNameProperty(env, out, "fnKey", isExists);
     CHECK_RETURN(status == napi_ok, "set fnKey property failed", status);
     return napi_ok;
 }
 
-napi_status KeyEvent::WriteFunctionKeyStatusToJs(napi_env env, napi_value result)
+napi_status KeyEvent::WriteFunctionKeyStatusToJs(napi_env env, napi_value out)
 {
-    auto status = SetNameProperty(env, object, "capsLock", capsLock_);
+    auto status = SetNameProperty(env, out, "capsLock", capsLock_);
     CHECK_RETURN(status == napi_ok, "set capsLock property failed", status);
 
-    status = SetNameProperty(env, object, "numLock", numLock_);
-    CHECK_RETURN(status == napi_ok, "set capsLock property failed", status);
+    status = SetNameProperty(env, out, "numLock", numLock_);
+    CHECK_RETURN(status == napi_ok, "set numLock property failed", status);
 
-    status = SetNameProperty(env, object, "scrollLock", scrollLock_);
-    CHECK_RETURN(status == napi_ok, "set capsLock property failed", status);
+    status = SetNameProperty(env, out, "scrollLock", scrollLock_);
+    CHECK_RETURN(status == napi_ok, "set scrollLock property failed", status);
 
     return napi_ok;
 }
