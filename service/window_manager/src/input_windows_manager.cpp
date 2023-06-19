@@ -1176,7 +1176,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             continue;
         }
         if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-            extraData_.pointerId == pointerId) {
+            ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
+            pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN)) {
             if (IsInHotArea(logicalX, logicalY, item.defaultHotAreas)) {
                 touchWindow = &item;
                 break;
