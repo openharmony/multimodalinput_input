@@ -210,6 +210,7 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
         OnDisconnected(secPtr);
         DelSession(fd);
     } else {
+        MMI_HILOGE("Get session secPtr is nullptr, fd:%{public}d", fd);
         DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
     }
     if (ev.data.ptr) {
@@ -218,6 +219,8 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
     }
     if (auto it = circleBufMap_.find(fd); it != circleBufMap_.end()) {
         circleBufMap_.erase(it);
+    } else {
+        MMI_HILOGE("Can't find fd");
     }
     if (close(fd) == RET_OK) {
         DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR);
