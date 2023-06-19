@@ -16,15 +16,15 @@
 #ifndef KEY_EVENT_H
 #define KEY_EVENT_H
 
-
 #include <memory>
-#include <vector>
 #include <set>
-
-#include "nocopyable.h"
-#include "parcel.h"
+#include <vector>
 
 #include "input_event.h"
+#include "napi/native_api.h"
+#include "napi/native_node_api.h"
+#include "nocopyable.h"
+#include "parcel.h"
 
 namespace OHOS {
 namespace MMI {
@@ -3164,6 +3164,25 @@ public:
          */
         bool ReadFromParcel(Parcel &in);
 
+    public:
+        /**
+         * @brief Write data into a JS object.
+         * @param env Indicates the environment that the Node-API call is invoked under.
+         * @param out Indicates the JS object into which data will be written.
+         * @return Returns <b>napi_ok</b> if the data is successfully written; returns error status otherwise.
+         * @since 10
+         */
+        napi_value WriteToJsValue(napi_env env, napi_value out);
+
+        /**
+         * @brief Read data from a JS object.
+         * @param env Indicates the environment that the Node-API call is invoked under.
+         * @param in Indicates the object from which data will be read.
+         * @return Returns <b>napi_ok</b> if the data is successfully written; returns error status otherwise.
+         * @since 10
+         */
+        napi_status ReadFromJsValue(napi_env env, napi_value in);
+
     private:
         bool pressed_ = false;
         int32_t deviceId_ = -1;
@@ -3345,6 +3364,31 @@ public:
      * @since 9
      */
     void SetKeyIntention(int32_t keyIntention);
+
+public:
+    /**
+     * @brief Write data into a JS object.
+     * @param env Indicates the environment that the Node-API call is invoked under.
+     * @param out Indicates the JS object into which data will be written.
+     * @return Returns <b>napi_ok</b> if the data is successfully written; returns error status otherwise.
+     * @since 10
+     */
+    napi_value WriteToJsValue(napi_env env, napi_value out);
+
+    /**
+     * @brief Read data from a JS object.
+     * @param out Indicates the JS object from which data will be read.
+     * @return Returns <b>napi_ok</b> if the data is successfully written; returns error status otherwise.
+     * @since 10
+     */
+    napi_status ReadFromJsValue(napi_env env, napi_value value);
+
+private:
+    napi_status WriteKeyStatusToJs(napi_env env, const std::vector<int32_t> &pressedKeys, napi_value result);
+
+    napi_status WriteFunctionKeyStatusToJs(napi_env env, napi_value result);
+
+    bool HasKeyCode(const std::vector<int32_t> &pressedKeys, int32_t keyCode);
 
 public:
     /**
