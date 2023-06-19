@@ -923,25 +923,25 @@ bool KeyEvent::KeyItem::ReadFromParcel(Parcel &in)
     return true;
 }
 
-napi_value KeyEvent::KeyItem::WriteToJsValue(napi_env env, napi_value result)
+napi_value KeyEvent::KeyItem::WriteToJsValue(napi_env env, napi_value out)
 {
-    auto status = SetNameProperty(env, result, "code", keyCode_);
+    auto status = SetNameProperty(env, out, "code", keyCode_);
     CHECK_RETURN(status == napi_ok, "set code property failed", status);
 
-    status = SetNameProperty(env, result, "pressedTime", downTime_);
+    status = SetNameProperty(env, out, "pressedTime", downTime_);
     CHECK_RETURN(status == napi_ok, "set pressedTime property failed", status);
 
-    status = SetNameProperty(env, result, "deviceId", deviceId_);
+    status = SetNameProperty(env, out, "deviceId", deviceId_);
     CHECK_RETURN(status == napi_ok, "set deviceId property failed", status);
 
     return napi_ok;
 }
 
-napi_status KeyEvent::KeyItem::ReadFromJsValue(napi_env env, napi_value value)
+napi_status KeyEvent::KeyItem::ReadFromJsValue(napi_env env, napi_value in)
 {
-    keyCode_ = GetNamePropertyInt32(env, value, "code");
-    downTime_ = GetNamePropertyInt64(env, value, "pressedTime");
-    deviceId_ = GetNamePropertyInt32(env, value, "deviceId");
+    keyCode_ = GetNamePropertyInt32(env, in, "code");
+    downTime_ = GetNamePropertyInt64(env, in, "pressedTime");
+    deviceId_ = GetNamePropertyInt32(env, in, "deviceId");
     return napi_ok;
 }
 
@@ -1286,51 +1286,51 @@ void KeyEvent::SetKeyIntention(int32_t keyIntention)
     keyIntention_ = keyIntention;
 }
 
-napi_status KeyEvent::WriteToJsValue(napi_env env, napi_value result)
+napi_status KeyEvent::WriteToJsValue(napi_env env, napi_value out)
 {
-    auto status = SetNameProperty(env, result, "action", keyAction_ - KEY_ACTION_CANCEL);
+    auto status = SetNameProperty(env, out, "action", keyAction_ - KEY_ACTION_CANCEL);
     CHECK_RETURN(status == napi_ok, "set action property failed", status);
 
-    status = SetNameProperty(env, result, "key", GetKeyItem());
+    status = SetNameProperty(env, out, "key", GetKeyItem());
     CHECK_RETURN(status == napi_ok, "set key property failed", status);
 
-    status = SetNameProperty(env, result, "unicodeChar", GetKeyItem().GetUnicode());
+    status = SetNameProperty(env, out, "unicodeChar", GetKeyItem().GetUnicode());
     CHECK_RETURN(status == napi_ok, "set unicodeChar property failed", status);
 
-    status = SetNameProperty(env, result, "keys", GetKeyItems());
+    status = SetNameProperty(env, out, "keys", GetKeyItems());
     CHECK_RETURN(status == napi_ok, "set keys property failed", status);
 
-    status = LoadKeyStatus(env, GetPressedKeys(), result);
+    status = LoadKeyStatus(env, GetPressedKeys(), out);
     CHECK_RETURN(status == napi_ok, "set pressed key property failed", status);
 
-    status = LoadFunctionKeyStatus(env, result);
+    status = LoadFunctionKeyStatus(env, out);
     CHECK_RETURN(status == napi_ok, "set function key property failed", status);
 
     return napi_ok;
 }
 
-napi_status KeyEvent::ReadFromJsValue(napi_env env, napi_value value)
+napi_status KeyEvent::ReadFromJsValue(napi_env env, napi_value in)
 {
     napi_valuetype valueType = napi_undefined;
-    auto status = napi_typeof(env, value, &valueType);
+    auto status = napi_typeof(env, in, &valueType);
     CHECK_RETURN((status == napi_ok) && (valueType == napi_object), "object type invalid", status);
 
-    KeyItem item = GetNamePropertyKeyItem(env, value, "key");
+    KeyItem item = GetNamePropertyKeyItem(env, in, "key");
     keyCode_ = item.GetKeyCode();
 
-    uint32_t unicode = GetNamePropertyUint32(env, value, "unicodeChar");
+    uint32_t unicode = GetNamePropertyUint32(env, in, "unicodeChar");
     GetKeyItem().SetUnicode(unicode);
 
-    keyAction_ = GetNamePropertyInt32(env, value, "action");
+    keyAction_ = GetNamePropertyInt32(env, in, "action");
 
-    std::vector<KeyItem> keyItems = GetNamePropertyKeyItems(env, value, "keys");
+    std::vector<KeyItem> keyItems = GetNamePropertyKeyItems(env, in, "keys");
     for (const auto &keyItem : keyItems) {
         keys_.push_back(keyItem);
     }
 
-    capsLock_ = GetNamePropertyBool(env, value, "capsLock");
-    numLock_ = GetNamePropertyBool(env, value, "numLock");
-    scrollLock_ = GetNamePropertyBool(env, value, "scrollLock");
+    capsLock_ = GetNamePropertyBool(env, in, "capsLock");
+    numLock_ = GetNamePropertyBool(env, in, "numLock");
+    scrollLock_ = GetNamePropertyBool(env, in, "scrollLock");
 
     return napi_ok;
 }

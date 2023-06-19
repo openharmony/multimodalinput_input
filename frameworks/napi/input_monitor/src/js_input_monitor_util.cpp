@@ -279,21 +279,22 @@ KeyEvent::KeyItem GetNamePropertyKeyItem(const napi_env& env, const napi_value& 
 std::vector<KeyEvent::KeyItem> GetNamePropertyKeyItems(
     const napi_env &env, const napi_value &object, const std::string &name)
 {
-    napi_value napiKeys = {};
-    CHECK_RETURN(status != napi_ok, "get keys property failed", status);
+    napi_value napiValue = {};
+    auto status = napi_get_named_property(env, object, name.c_str(), &napiValue);
+    CHECK_RETURN(status != napi_ok, "get property failed", status);
 
     uint32_t length;
-    auto status = napi_get_array_length(env, napiKeys, &length);
-    CHECK_RETURN(status != napi_ok, "get KeyItem array length failed", status);
+    status = napi_get_array_length(env, napiValue, &length);
+    CHECK_RETURN(status != napi_ok, "get array length failed", status);
 
     std::vector<KeyEvent::KeyItem> keyItems;
     for (uint32_t i = 0; i < length; ++i) {
         napi_value element = {};
-        status = napi_get_element(env, napiKeys, i, &element);
+        status = napi_get_element(env, napiValue, i, &element);
         CHECK_RETURN((status != napi_ok) && (element != nullptr), "get element failed", status);
         KeyEvent::KeyItem keyItem;
         status = keyItem.ReadFromJsValue(env, element);
-        CHECK_RETURN(status != napi_ok, "get keyItem property failed", status);
+        CHECK_RETURN(status != napi_ok, "read keyItem property failed", status);
         keyItems.push_back(keyItem);
     }
     return keyItems;
