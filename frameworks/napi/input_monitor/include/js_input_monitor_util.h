@@ -15,6 +15,7 @@
 #ifndef JS_INPUT_MONITOR_UTIL_H
 #define JS_INPUT_MONITOR_UTIL_H
 
+#include "key_event.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
@@ -28,6 +29,9 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
 napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, double value);
 napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, int64_t value);
 napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, std::string value);
+napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, KeyEvent::KeyItem& value);
+napi_status SetNameProperty(
+    const napi_env& env, napi_value object, const std::string& name, std::vector<KeyEvent::KeyItem>& value);
 napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, napi_value value);
 
 bool GetNamePropertyBool(const napi_env& env, const napi_value& object, const std::string& name);
@@ -35,6 +39,18 @@ std::string GetNamePropertyString(const napi_env& env, const napi_value& object,
 int32_t GetNamePropertyInt32(const napi_env& env, const napi_value& object, const std::string& name);
 int64_t GetNamePropertyInt64(const napi_env& env, const napi_value& object, const std::string& name);
 uint32_t GetNamePropertyUint32(const napi_env& env, const napi_value& object, const std::string& name);
+KeyEvent::KeyItem GetNamePropertyKeyItem(const napi_env& env, const napi_value& object, const std::string& name);
+std::vector<KeyEvent::KeyItem> GetNamePropertyKeyItems(
+    const napi_env &env, const napi_value &object, const std::string &name);
+
+/* check condition, return and logging. */
+#define CHECK_RETURN(condition, message, retVal)                   \
+    do {                                                           \
+        if (!(condition)) {                                        \
+            MMI_HILOGE("test (" #condition ") failed: " message); \
+            return retVal;                                         \
+        }                                                          \
+    } while (0)
 } // namespace MMI
 } // namespace OHOS
 #endif // JS_INPUT_MONITOR_UTIL_H

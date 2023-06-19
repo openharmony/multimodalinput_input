@@ -15,8 +15,8 @@
 
 #include "key_event.h"
 
+#include "js_input_monitor_util.h"
 #include "mmi_log.h"
-
 
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
@@ -923,6 +923,28 @@ bool KeyEvent::KeyItem::ReadFromParcel(Parcel &in)
     return true;
 }
 
+napi_value KeyEvent::KeyItem::WriteToJsValue(napi_env env, napi_value result)
+{
+    auto status = SetNameProperty(env, result, "code", keyCode_);
+    CHECK_RETURN(status == napi_ok, "set code property failed", status);
+
+    status = SetNameProperty(env, result, "pressedTime", downTime_);
+    CHECK_RETURN(status == napi_ok, "set pressedTime property failed", status);
+
+    status = SetNameProperty(env, result, "deviceId", deviceId_);
+    CHECK_RETURN(status == napi_ok, "set deviceId property failed", status);
+
+    return napi_ok;
+}
+
+napi_status KeyEvent::KeyItem::ReadFromJsValue(napi_env env, napi_value value)
+{
+    keyCode_ = GetNamePropertyInt32(env, value, "code");
+    downTime_ = GetNamePropertyInt64(env, value, "pressedTime");
+    deviceId_ = GetNamePropertyInt32(env, value, "deviceId");
+    return napi_ok;
+}
+
 std::shared_ptr<KeyEvent> KeyEvent::from(std::shared_ptr<InputEvent> inputEvent)
 {
     return nullptr;
@@ -1145,7 +1167,6 @@ bool KeyEvent::IsValid() const
     return true;
 }
 
-
 bool KeyEvent::WriteToParcel(Parcel &out) const
 {
     if (!InputEvent::WriteToParcel(out)) {
@@ -1163,6 +1184,9 @@ bool KeyEvent::WriteToParcel(Parcel &out) const
     }
     WRITEINT32(out, keyAction_);
     WRITEINT32(out, keyIntention_);
+    WRITEBOOL(out, numLock_);
+    WRITEBOOL(out, capsLock_);
+    WRITEBOOL(out, scrollLock_);
     return true;
 }
 
@@ -1185,6 +1209,9 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
     }
     READINT32(in, keyAction_);
     READINT32(in, keyIntention_);
+    READBOOL(in, numLock_);
+    READBOOL(in, capsLock_);
+    READBOOL(in, scrollLock_);
     return true;
 }
 
@@ -1257,6 +1284,102 @@ int32_t KeyEvent::GetKeyIntention() const
 void KeyEvent::SetKeyIntention(int32_t keyIntention)
 {
     keyIntention_ = keyIntention;
+}
+
+napi_status KeyEvent::WriteToJsValue(napi_env env, napi_value result)
+{
+    auto status = SetNameProperty(env, result, "action", keyAction_ - KEY_ACTION_CANCEL);
+    CHECK_RETURN(status == napi_ok, "set action property failed", status);
+
+    status = SetNameProperty(env, result, "key", GetKeyItem());
+    CHECK_RETURN(status == napi_ok, "set key property failed", status);
+
+    status = SetNameProperty(env, result, "unicodeChar", GetKeyItem().GetUnicode());
+    CHECK_RETURN(status == napi_ok, "set unicodeChar property failed", status);
+
+    status = SetNameProperty(env, result, "keys", GetKeyItems());
+    CHECK_RETURN(status == napi_ok, "set keys property failed", status);
+
+    status = LoadKeyStatus(env, GetPressedKeys(), result);
+    CHECK_RETURN(status == napi_ok, "set pressed key property failed", status);
+
+    status = LoadFunctionKeyStatus(env, result);
+    CHECK_RETURN(status == napi_ok, "set function key property failed", status);
+
+    return napi_ok;
+}
+
+napi_status KeyEvent::ReadFromJsValue(napi_env env, napi_value value)
+{
+    napi_valuetype valueType = napi_undefined;
+    auto status = napi_typeof(env, value, &valueType);
+    CHECK_RETURN((status == napi_ok) && (valueType == napi_object), "object type invalid", status);
+
+    KeyItem item = GetNamePropertyKeyItem(env, value, "key");
+    keyCode_ = item.GetKeyCode();
+
+    uint32_t unicode = GetNamePropertyUint32(env, value, "unicodeChar");
+    GetKeyItem().SetUnicode(unicode);
+
+    keyAction_ = GetNamePropertyInt32(env, value, "action");
+
+    std::vector<KeyItem> keyItems = GetNamePropertyKeyItems(env, value, "keys");
+    for (const auto &keyItem : keyItems) {
+        keys_.push_back(keyItem);
+    }
+
+    capsLock_ = GetNamePropertyBool(env, value, "capsLock");
+    numLock_ = GetNamePropertyBool(env, value, "numLock");
+    scrollLock_ = GetNamePropertyBool(env, value, "scrollLock");
+
+    return napi_ok;
+}
+
+napi_status KeyEvent::WriteKeyStatusToJs(napi_env env, const std::vector<int32_t> &pressedKeys, napi_value result)
+{
+    bool isExists = HasKeyCode(pressedKeys, KEYCODE_CTRL_LEFT)
+                    || HasKeyCode(pressedKeys, KEYCODE_CTRL_RIGHT);
+    auto status = SetNameProperty(env, result, "ctrlKey", isExists);
+    CHECK_RETURN(status == napi_ok, "set ctrlKey property failed", status);
+
+    isExists = HasKeyCode(pressedKeys, KEYCODE_ALT_LEFT)
+               || HasKeyCode(pressedKeys, KEYCODE_ALT_RIGHT);
+    status = SetNameProperty(env, result, "altKey", isExists);
+    CHECK_RETURN(status == napi_ok, "set altKey property failed", status);
+
+    isExists = HasKeyCode(pressedKeys, KEYCODE_SHIFT_LEFT)
+               || HasKeyCode(pressedKeys, KEYCODE_SHIFT_RIGHT);
+    status = SetNameProperty(env, result, "shiftKey", isExists);
+    CHECK_RETURN(status == napi_ok, "set shiftKey property failed", status);
+
+    isExists = HasKeyCode(pressedKeys, KEYCODE_META_LEFT)
+               || HasKeyCode(pressedKeys, KEYCODE_META_RIGHT);
+    status = SetNameProperty(env, result, "logoKey", isExists);
+    CHECK_RETURN(status == napi_ok, "set logoKey property failed", status);
+
+    isExists = HasKeyCode(pressedKeys, KEYCODE_FN);
+    status = SetNameProperty(env, result, "fnKey", isExists);
+    CHECK_RETURN(status == napi_ok, "set fnKey property failed", status);
+    return napi_ok;
+}
+
+napi_status KeyEvent::WriteFunctionKeyStatusToJs(napi_env env, napi_value result)
+{
+    auto status = SetNameProperty(env, object, "capsLock", capsLock_);
+    CHECK_RETURN(status == napi_ok, "set capsLock property failed", status);
+
+    status = SetNameProperty(env, object, "numLock", numLock_);
+    CHECK_RETURN(status == napi_ok, "set capsLock property failed", status);
+
+    status = SetNameProperty(env, object, "scrollLock", scrollLock_);
+    CHECK_RETURN(status == napi_ok, "set capsLock property failed", status);
+
+    return napi_ok;
+}
+
+bool KeyEvent::HasKeyCode(const std::vector<int32_t> &pressedKeys, int32_t keyCode)
+{
+    return std::find(pressedKeys.begin(), pressedKeys.end(), keyCode) != pressedKeys.end();
 }
 } // namespace MMI
 } // namespace OHOS

@@ -130,6 +130,36 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     return status;
 }
 
+napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, KeyEvent::KeyItem& value)
+{
+    napi_value napiValue{};
+    auto status = value.WriteToJsValue(env, napiValue);
+    CHECK_RETURN(status != napi_ok, "create key property failed", status);
+    status = napi_set_named_property(env, object, name.c_str(), napiValue);
+    CHECK_RETURN(status != napi_ok, "set key property failed", status);
+    return napi_ok;
+}
+
+napi_status SetNameProperty(
+    const napi_env &env, napi_value object, const std::string &name, std::vector<KeyEvent::KeyItem> &value)
+{
+    napi_value keys{};
+    auto status = napi_create_array(env, &keys);
+    CHECK_RETURN(status != napi_ok, "create array failed", status);
+    uint32_t idx = 0;
+    for (const auto &keyItem : value) {
+        napi_value item{};
+        status = keyItem.WriteToJsValue(env, item);
+        CHECK_RETURN(status != napi_ok, "create key property failed", status);
+        status = napi_set_element(env, keys, idx, item);
+        CHECK_RETURN(status != napi_ok, "set element failed", status);
+        ++idx;
+    }
+    status = napi_set_named_property(env, object, "keys", keys);
+    CHECK_RETURN(status != napi_ok, "set keys property failed", status);
+    return napi_ok;
+}
+
 napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, napi_value value)
 {
     auto status = napi_set_named_property(env, object, name.c_str(), value);
