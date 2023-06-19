@@ -3381,12 +3381,12 @@ public:
      * @return Returns <b>napi_ok</b> if the data is successfully written; returns error status otherwise.
      * @since 10
      */
-    napi_status ReadFromJsValue(napi_env env, napi_value value);
+    napi_status ReadFromJsValue(napi_env env, napi_value in);
 
 private:
-    napi_status WriteKeyStatusToJs(napi_env env, const std::vector<int32_t> &pressedKeys, napi_value result);
+    napi_status WriteKeyStatusToJs(napi_env env, const std::vector<int32_t> &pressedKeys, napi_value out);
 
-    napi_status WriteFunctionKeyStatusToJs(napi_env env, napi_value result);
+    napi_status WriteFunctionKeyStatusToJs(napi_env env, napi_value out);
 
     bool HasKeyCode(const std::vector<int32_t> &pressedKeys, int32_t keyCode);
 
