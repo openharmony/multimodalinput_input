@@ -260,5 +260,43 @@ uint32_t GetNamePropertyUint32(const napi_env& env, const napi_value& object, co
     napi_get_value_uint32(env, napiValue, &value);
     return value;
 }
+
+KeyEvent::KeyItem GetNamePropertyKeyItem(const napi_env& env, const napi_value& object, const std::string& name)
+{
+    napi_value napiValue{};
+    auto status = napi_get_named_property(env, object, name.c_str(), &napiValue);
+    CHECK_RETURN(status != napi_ok, "get KeyItem property failed", status);
+    KeyEvent::KeyItem keyItem;
+    int32_t keyCode = GetNamePropertyInt32(env, napiValue, "code");
+    keyItem.SetKeyCode(keyCode);
+    int64_t pressedTime = GetNamePropertyInt64(env, napiValue, "pressedTime");
+    keyItem.SetDownTime(pressedTime);
+    int32_t deviceId = GetNamePropertyInt32(env, napiValue, "deviceId");
+    keyItem.SetDeviceId(deviceId);
+    return keyItem;
+}
+
+std::vector<KeyEvent::KeyItem> GetNamePropertyKeyItems(
+    const napi_env &env, const napi_value &object, const std::string &name)
+{
+    napi_value napiKeys = {};
+    CHECK_RETURN(status != napi_ok, "get keys property failed", status);
+
+    uint32_t length;
+    auto status = napi_get_array_length(env, napiKeys, &length);
+    CHECK_RETURN(status != napi_ok, "get KeyItem array length failed", status);
+
+    std::vector<KeyEvent::KeyItem> keyItems;
+    for (uint32_t i = 0; i < length; ++i) {
+        napi_value element = {};
+        status = napi_get_element(env, napiKeys, i, &element);
+        CHECK_RETURN((status != napi_ok) && (element != nullptr), "get element failed", status);
+        KeyEvent::KeyItem keyItem;
+        status = keyItem.ReadFromJsValue(env, element);
+        CHECK_RETURN(status != napi_ok, "get keyItem property failed", status);
+        keyItems.push_back(keyItem);
+    }
+    return keyItems;
+}
 } // namespace MMI
 } // namespace OHOS
