@@ -396,7 +396,8 @@ int32_t JsInputMonitor::TransformPinchEvent(const std::shared_ptr<PointerEvent> 
         MMI_HILOGE("Set type property failed");
         return RET_ERR;
     }
-    if (SetNameProperty(jsEnv_, result, "scale", pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH)) != napi_ok) {
+    if (SetNameProperty(jsEnv_, result, "scale",
+        pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH)) != napi_ok) {
         MMI_HILOGE("Set scale property failed");
         return RET_ERR;
     }
