@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,20 +13,18 @@
  * limitations under the License.
  */
 
-#include "js_input_monitor_util.h"
+#include "util_napi_value.h"
 
-#include <cinttypes>
-
-#include "define_multimodal.h"
-#include "napi_constants.h"
+#include "key_event_napi.h"
+#include "util_napi.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorUtil" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilNapiValue" };
 } // namespace
 
-napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, bool value)
+napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, bool value)
 {
     napi_status status;
     napi_value napiValue = nullptr;
@@ -39,7 +37,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     return status;
 }
 
-napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, uint16_t value)
+napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, uint16_t value)
 {
     napi_status status;
     napi_value napiValue = nullptr;
@@ -52,7 +50,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     return status;
 }
 
-napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, uint32_t value)
+napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, uint32_t value)
 {
     napi_status status;
     napi_value napiValue = nullptr;
@@ -65,7 +63,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     return status;
 }
 
-napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, int32_t value)
+napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, int32_t value)
 {
     napi_status status;
     napi_value napiValue = nullptr;
@@ -78,7 +76,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     return status;
 }
 
-napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, float value)
+napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, float value)
 {
     napi_status status;
     napi_value napiValue = nullptr;
@@ -91,7 +89,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     return status;
 }
 
-napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, double value)
+napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, double value)
 {
     napi_status status;
     napi_value napiValue = nullptr;
@@ -104,7 +102,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     return status;
 }
 
-napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, int64_t value)
+napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, int64_t value)
 {
     napi_status status;
     napi_value napiValue = nullptr;
@@ -117,7 +115,7 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     return status;
 }
 
-napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, std::string value)
+napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, std::string value)
 {
     napi_status status;
     napi_value napiValue = nullptr;
@@ -130,13 +128,14 @@ napi_status SetNameProperty(const napi_env& env, napi_value object, const std::s
     return status;
 }
 
-napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, KeyEvent::KeyItem& value)
+napi_status SetNameProperty(
+    const napi_env &env, napi_value object, const std::string &name, std::optional<KeyEvent::KeyItem> &value)
 {
     napi_value napiValue{};
-    auto status = value.WriteToJsValue(env, napiValue);
-    CHECK_RETURN(status == napi_ok, "create key property failed", status);
+    auto status = KeyEventNapi::CreateKeyItem(env, value, napiValue);
+    CHKRR(status, "create key property failed", status);
     status = napi_set_named_property(env, object, name.c_str(), napiValue);
-    CHECK_RETURN(status == napi_ok, "set key property failed", status);
+    CHKRR(status, "set key property failed", status);
     return napi_ok;
 }
 
@@ -145,28 +144,29 @@ napi_status SetNameProperty(
 {
     napi_value keys{};
     auto status = napi_create_array(env, &keys);
-    CHECK_RETURN(status == napi_ok, "create array failed", status);
+    CHKRR(status, "create array failed", status);
     uint32_t idx = 0;
-    for (const auto &keyItem : value) {
+    for (auto &keyItem : value) {
         napi_value item{};
-        status = keyItem.WriteToJsValue(env, item);
-        CHECK_RETURN(status == napi_ok, "create key property failed", status);
+        std::optional<KeyEvent::KeyItem> opt = std::make_optional(keyItem);
+        status = KeyEventNapi::CreateKeyItem(env, opt, item);
+        CHKRR(status, "create key property failed", status);
         status = napi_set_element(env, keys, idx, item);
-        CHECK_RETURN(status == napi_ok, "set element failed", status);
+        CHKRR(status, "set element failed", status);
         ++idx;
     }
     status = napi_set_named_property(env, object, "keys", keys);
-    CHECK_RETURN(status == napi_ok, "set keys property failed", status);
+    CHKRR(status, "set keys property failed", status);
     return napi_ok;
 }
 
-napi_status SetNameProperty(const napi_env& env, napi_value object, const std::string& name, napi_value value)
+napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, napi_value value)
 {
     auto status = napi_set_named_property(env, object, name.c_str(), value);
     return status;
 }
 
-bool GetNamePropertyBool(const napi_env& env, const napi_value& object, const std::string& name)
+bool GetNamePropertyBool(const napi_env &env, const napi_value &object, const std::string &name)
 {
     napi_value napiValue = {};
     napi_get_named_property(env, object, name.c_str(), &napiValue);
@@ -185,7 +185,7 @@ bool GetNamePropertyBool(const napi_env& env, const napi_value& object, const st
     return value;
 }
 
-std::string GetNamePropertyString(const napi_env& env, const napi_value& object, const std::string& name)
+std::string GetNamePropertyString(const napi_env &env, const napi_value &object, const std::string &name)
 {
     std::string value = "";
     napi_value napiValue = {};
@@ -207,7 +207,7 @@ std::string GetNamePropertyString(const napi_env& env, const napi_value& object,
     return value;
 }
 
-int32_t GetNamePropertyInt32(const napi_env& env, const napi_value& object, const std::string& name)
+int32_t GetNamePropertyInt32(const napi_env &env, const napi_value &object, const std::string &name)
 {
     int32_t value = 0;
     napi_value napiValue = {};
@@ -225,7 +225,7 @@ int32_t GetNamePropertyInt32(const napi_env& env, const napi_value& object, cons
     return value;
 }
 
-int64_t GetNamePropertyInt64(const napi_env& env, const napi_value& object, const std::string& name)
+int64_t GetNamePropertyInt64(const napi_env &env, const napi_value &object, const std::string &name)
 {
     int64_t value = 0;
     napi_value napiValue = {};
@@ -243,7 +243,7 @@ int64_t GetNamePropertyInt64(const napi_env& env, const napi_value& object, cons
     return value;
 }
 
-uint32_t GetNamePropertyUint32(const napi_env& env, const napi_value& object, const std::string& name)
+uint32_t GetNamePropertyUint32(const napi_env &env, const napi_value &object, const std::string &name)
 {
     uint32_t value = 0;
     napi_value napiValue = {};
@@ -261,11 +261,11 @@ uint32_t GetNamePropertyUint32(const napi_env& env, const napi_value& object, co
     return value;
 }
 
-KeyEvent::KeyItem GetNamePropertyKeyItem(const napi_env& env, const napi_value& object, const std::string& name)
+KeyEvent::KeyItem GetNamePropertyKeyItem(const napi_env &env, const napi_value &object, const std::string &name)
 {
     napi_value napiValue{};
     auto status = napi_get_named_property(env, object, name.c_str(), &napiValue);
-    CHECK_RETURN(status == napi_ok, "get KeyItem property failed", status);
+    CHKRR(status, "get KeyItem property failed", {});
     KeyEvent::KeyItem keyItem;
     int32_t keyCode = GetNamePropertyInt32(env, napiValue, "code");
     keyItem.SetKeyCode(keyCode);
@@ -281,20 +281,20 @@ std::vector<KeyEvent::KeyItem> GetNamePropertyKeyItems(
 {
     napi_value napiValue = {};
     auto status = napi_get_named_property(env, object, name.c_str(), &napiValue);
-    CHECK_RETURN(status == napi_ok, "get property failed", status);
+    CHKRR(status, "get property failed", {});
 
     uint32_t length;
     status = napi_get_array_length(env, napiValue, &length);
-    CHECK_RETURN(status == napi_ok, "get array length failed", status);
+    CHKRR(status, "get array length failed", {});
 
     std::vector<KeyEvent::KeyItem> keyItems;
     for (uint32_t i = 0; i < length; ++i) {
         napi_value element = {};
         status = napi_get_element(env, napiValue, i, &element);
-        CHECK_RETURN((status == napi_ok) && (element != nullptr), "get element failed", status);
+        CHECK_RETURN((status == napi_ok) && (element != nullptr), , {});
         KeyEvent::KeyItem keyItem;
-        status = keyItem.ReadFromJsValue(env, element);
-        CHECK_RETURN(status == napi_ok, "read keyItem property failed", status);
+        status = KeyEventNapi::GetKeyItem(env, element, keyItem);
+        CHKRR(status, "read keyItem property failed", {});
         keyItems.push_back(keyItem);
     }
     return keyItems;

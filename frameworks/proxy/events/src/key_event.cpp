@@ -15,8 +15,8 @@
 
 #include "key_event.h"
 
-#include "js_input_monitor_util.h"
 #include "mmi_log.h"
+
 
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
@@ -923,28 +923,6 @@ bool KeyEvent::KeyItem::ReadFromParcel(Parcel &in)
     return true;
 }
 
-napi_value KeyEvent::KeyItem::WriteToJsValue(napi_env env, napi_value out)
-{
-    auto status = SetNameProperty(env, out, "code", keyCode_);
-    CHECK_RETURN(status == napi_ok, "set code property failed", status);
-
-    status = SetNameProperty(env, out, "pressedTime", downTime_);
-    CHECK_RETURN(status == napi_ok, "set pressedTime property failed", status);
-
-    status = SetNameProperty(env, out, "deviceId", deviceId_);
-    CHECK_RETURN(status == napi_ok, "set deviceId property failed", status);
-
-    return napi_ok;
-}
-
-napi_status KeyEvent::KeyItem::ReadFromJsValue(napi_env env, napi_value in)
-{
-    keyCode_ = GetNamePropertyInt32(env, in, "code");
-    downTime_ = GetNamePropertyInt64(env, in, "pressedTime");
-    deviceId_ = GetNamePropertyInt32(env, in, "deviceId");
-    return napi_ok;
-}
-
 std::shared_ptr<KeyEvent> KeyEvent::from(std::shared_ptr<InputEvent> inputEvent)
 {
     return nullptr;
@@ -1284,102 +1262,6 @@ int32_t KeyEvent::GetKeyIntention() const
 void KeyEvent::SetKeyIntention(int32_t keyIntention)
 {
     keyIntention_ = keyIntention;
-}
-
-napi_status KeyEvent::WriteToJsValue(napi_env env, napi_value out)
-{
-    auto status = SetNameProperty(env, out, "action", keyAction_ - KEY_ACTION_CANCEL);
-    CHECK_RETURN(status == napi_ok, "set action property failed", status);
-
-    status = SetNameProperty(env, out, "key", GetKeyItem());
-    CHECK_RETURN(status == napi_ok, "set key property failed", status);
-
-    status = SetNameProperty(env, out, "unicodeChar", GetKeyItem().GetUnicode());
-    CHECK_RETURN(status == napi_ok, "set unicodeChar property failed", status);
-
-    status = SetNameProperty(env, out, "keys", GetKeyItems());
-    CHECK_RETURN(status == napi_ok, "set keys property failed", status);
-
-    status = WriteKeyStatusToJs(env, GetPressedKeys(), out);
-    CHECK_RETURN(status == napi_ok, "set pressed key property failed", status);
-
-    status = WriteFunctionKeyStatusToJs(env, out);
-    CHECK_RETURN(status == napi_ok, "set function key property failed", status);
-
-    return napi_ok;
-}
-
-napi_status KeyEvent::ReadFromJsValue(napi_env env, napi_value in)
-{
-    napi_valuetype valueType = napi_undefined;
-    auto status = napi_typeof(env, in, &valueType);
-    CHECK_RETURN((status == napi_ok) && (valueType == napi_object), "object type invalid", status);
-
-    KeyItem item = GetNamePropertyKeyItem(env, in, "key");
-    keyCode_ = item.GetKeyCode();
-
-    uint32_t unicode = GetNamePropertyUint32(env, in, "unicodeChar");
-    GetKeyItem().SetUnicode(unicode);
-
-    keyAction_ = GetNamePropertyInt32(env, in, "action");
-
-    std::vector<KeyItem> keyItems = GetNamePropertyKeyItems(env, in, "keys");
-    for (const auto &keyItem : keyItems) {
-        keys_.push_back(keyItem);
-    }
-
-    capsLock_ = GetNamePropertyBool(env, in, "capsLock");
-    numLock_ = GetNamePropertyBool(env, in, "numLock");
-    scrollLock_ = GetNamePropertyBool(env, in, "scrollLock");
-
-    return napi_ok;
-}
-
-napi_status KeyEvent::WriteKeyStatusToJs(napi_env env, const std::vector<int32_t> &pressedKeys, napi_value out)
-{
-    bool isExists = HasKeyCode(pressedKeys, KEYCODE_CTRL_LEFT)
-                    || HasKeyCode(pressedKeys, KEYCODE_CTRL_RIGHT);
-    auto status = SetNameProperty(env, out, "ctrlKey", isExists);
-    CHECK_RETURN(status == napi_ok, "set ctrlKey property failed", status);
-
-    isExists = HasKeyCode(pressedKeys, KEYCODE_ALT_LEFT)
-               || HasKeyCode(pressedKeys, KEYCODE_ALT_RIGHT);
-    status = SetNameProperty(env, out, "altKey", isExists);
-    CHECK_RETURN(status == napi_ok, "set altKey property failed", status);
-
-    isExists = HasKeyCode(pressedKeys, KEYCODE_SHIFT_LEFT)
-               || HasKeyCode(pressedKeys, KEYCODE_SHIFT_RIGHT);
-    status = SetNameProperty(env, out, "shiftKey", isExists);
-    CHECK_RETURN(status == napi_ok, "set shiftKey property failed", status);
-
-    isExists = HasKeyCode(pressedKeys, KEYCODE_META_LEFT)
-               || HasKeyCode(pressedKeys, KEYCODE_META_RIGHT);
-    status = SetNameProperty(env, out, "logoKey", isExists);
-    CHECK_RETURN(status == napi_ok, "set logoKey property failed", status);
-
-    isExists = HasKeyCode(pressedKeys, KEYCODE_FN);
-    status = SetNameProperty(env, out, "fnKey", isExists);
-    CHECK_RETURN(status == napi_ok, "set fnKey property failed", status);
-    return napi_ok;
-}
-
-napi_status KeyEvent::WriteFunctionKeyStatusToJs(napi_env env, napi_value out)
-{
-    auto status = SetNameProperty(env, out, "capsLock", capsLock_);
-    CHECK_RETURN(status == napi_ok, "set capsLock property failed", status);
-
-    status = SetNameProperty(env, out, "numLock", numLock_);
-    CHECK_RETURN(status == napi_ok, "set numLock property failed", status);
-
-    status = SetNameProperty(env, out, "scrollLock", scrollLock_);
-    CHECK_RETURN(status == napi_ok, "set scrollLock property failed", status);
-
-    return napi_ok;
-}
-
-bool KeyEvent::HasKeyCode(const std::vector<int32_t> &pressedKeys, int32_t keyCode)
-{
-    return std::find(pressedKeys.begin(), pressedKeys.end(), keyCode) != pressedKeys.end();
 }
 } // namespace MMI
 } // namespace OHOS
