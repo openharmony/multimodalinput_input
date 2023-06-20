@@ -288,24 +288,17 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    int32_t pointerAction = pointerEvent->GetPointerAction();
-    if (pointerEvent->GetPointerIds().size() == FINGER_NUM && (pointerAction == PointerEvent::POINTER_ACTION_DOWN ||
-        pointerAction == PointerEvent::POINTER_ACTION_UP)) {
+    auto touchpad = libinput_event_get_touchpad_event(event);
+    CHKPR(touchpad, ERROR_NULL_POINTER);
+    int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);
+    buttonIds_.insert(seatSlot);
+    auto type = libinput_event_get_type(event);
+    if (buttonIds_.size() == FINGER_NUM &&
+        (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_UP)) {
         MMI_HILOGD("Handle mouse axis event");
         HandleMouseEvent(event);
     }
-    nextHandler_->HandlePointerEvent(pointerEvent);
-    auto type = libinput_event_get_type(event);
-    if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
-        pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
-        MMI_HILOGD("This touch pad event is up remove this finger");
-        if (pointerEvent->GetPointerIds().empty()) {
-            MMI_HILOGD("This touch pad event is final finger up remove this finger");
-            pointerEvent->Reset();
-        }
-    }
+    return RET_OK;
 #else
     MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER

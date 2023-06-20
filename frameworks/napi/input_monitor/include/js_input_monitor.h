@@ -49,6 +49,9 @@ public:
     void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override;
     void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override;
     void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override;
+private:
+    bool IsGestureEvent(std::shared_ptr<PointerEvent> pointerEvent) const;
+    void SetConsumeState(std::shared_ptr<PointerEvent> pointerEvent) const;
 
 private:
     std::function<void(std::shared_ptr<PointerEvent>)> callback_;
@@ -77,9 +80,13 @@ private:
     void SetCallback(napi_value callback);
     int32_t TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     std::string GetAction(int32_t action) const;
+    int32_t GetPinchAction(int32_t action) const;
+    int32_t GetSwipeAction(int32_t action) const;
     int32_t GetJsPointerItem(const PointerEvent::PointerItem &item, napi_value value) const;
     int32_t TransformTsActionValue(int32_t pointerAction);
     int32_t TransformMousePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
+    int32_t TransformPinchEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
+    int32_t TransformSwipeEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t GetMousePointerItem(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     bool SetMouseProperty(const std::shared_ptr<PointerEvent> pointerEvent,
         const PointerEvent::PointerItem& item, napi_value result);
@@ -88,6 +95,9 @@ private:
     bool GetPressedButtons(const std::set<int32_t>& pressedButtons, napi_value result);
     bool HasKeyCode(const std::vector<int32_t>& pressedKeys, int32_t keyCode);
     bool GetPressedKey(const std::vector<int32_t>& pressedKeys, napi_value result);
+    bool IsPinch(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsThreeFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsFourFingersSwipe(std::shared_ptr<PointerEvent> pointerEvent);
     MapFun GetFuns(const std::shared_ptr<PointerEvent> pointerEvent, const PointerEvent::PointerItem& item);
 private:
     std::shared_ptr<InputMonitor> monitor_ { nullptr };
