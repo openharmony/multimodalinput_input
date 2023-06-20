@@ -187,7 +187,7 @@ ohos_shared_library("libmmi-server") {
     "config_policy:configpolicy_util",
     "graphic_standard:2d_graphics",
     "graphic_standard:librender_service_client",
-    "hicollie_native:libhicollie",
+    "hicollie:libhicollie",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hiviewdfx_hilog_native:libhilog",
