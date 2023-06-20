@@ -32,6 +32,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "LibinputAdapter" };
 constexpr int32_t WAIT_TIME_FOR_INPUT { 10 };
+constexpr int32_t MAX_RETRY_COUNT { 5 };
 
 void HiLogFunc(struct libinput* input, libinput_log_priority priority, const char* fmt, va_list args)
 {
@@ -66,7 +67,14 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
             MMI_HILOGWK("The error path is %{public}s", path);
             return RET_ERR;
         }
-        int32_t fd = open(realPath, flags);
+        int32_t fd;
+        for (int32_t i = 0; i < MAX_RETRY_COUNT; i++) {
+            fd = open(realPath, flags);
+            if (fd >= 0) {
+                break;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_TIME_FOR_INPUT));
+        }
         int32_t errNo = errno;
         MMI_HILOGWK("Libinput .open_restricted path:%{public}s,fd:%{public}d,errno:%{public}d", path, fd, errNo);
         return fd < 0 ? RET_ERR : fd;
