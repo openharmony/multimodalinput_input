@@ -62,7 +62,7 @@
         "samgr",
         "common",
         "config_policy",
-        "hicollie_native",
+        "hicollie",
         "init",
         "preferences",
         "security_component",
