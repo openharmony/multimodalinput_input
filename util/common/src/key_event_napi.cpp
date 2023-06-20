@@ -136,15 +136,13 @@ napi_status KeyEventNapi::WriteKeyStatusToJs(napi_env env, const std::vector<int
 
 napi_status KeyEventNapi::WriteFunctionKeyStatusToJs(napi_env env, const KeyEvent &in, napi_value out)
 {
-    auto status =
-        SetNameProperty(env, out, "capsLock", in.GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
+    auto status = SetNameProperty(env, out, "capsLock", in.GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
     CHKRR(status, "set capsLock property failed", status);
 
     status = SetNameProperty(env, out, "numLock", in.GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY));
     CHKRR(status, "set numLock property failed", status);
 
-    status =
-        SetNameProperty(env, out, "scrollLock", in.GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
+    status = SetNameProperty(env, out, "scrollLock", in.GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
     CHKRR(status, "set scrollLock property failed", status);
 
     return napi_ok;
