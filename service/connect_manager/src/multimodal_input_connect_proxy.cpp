@@ -207,7 +207,7 @@ int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t windowId, void* pixelM
     }
     std::vector<uint8_t> buff;
     pixelMapPtr->EncodeTlv(buff);
-    int32_t size = buff.size();
+    uint32_t size = buff.size();
 
     MMI_HILOGD("image buffer size being sent is %{public}d", size);
     WRITEINT32(data, size, ERR_INVALID_VALUE);
