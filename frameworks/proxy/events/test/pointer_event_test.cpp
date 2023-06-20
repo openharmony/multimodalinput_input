@@ -77,7 +77,7 @@ std::shared_ptr<PointerEvent> PointerEventTest::CreatePointEvent()
 HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_001, TestSize.Level1)
 {
     std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
-    ASSERT_TRUE(pointerEvent != nullptr);
+    ASSERT_NE(pointerEvent, nullptr);
     std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT };
     pointerEvent->SetPressedKeys(pressedKeys);
     TestSimulateInputEvent(pointerEvent);
