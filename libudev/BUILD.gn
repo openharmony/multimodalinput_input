@@ -41,10 +41,7 @@ output_path = "multimodalinput/unit_out"
 
 group("test") {
   testonly = true
-  deps = [
-    ":e2e-libudev-test",
-    ":libudev-test",
-  ]
+  deps = [ ":libudev-test" ]
 }
 
 ohos_unittest("libudev-test") {

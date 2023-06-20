@@ -89,7 +89,7 @@ ohos_rust_shared_ffi("mmi_rust") {
   part_name = "input"
 }
 
-ohos_rust_unittest("mmi_rust_test") {
+ohos_rust_unittest("rust_mmi_test") {
   module_out_path = module_output_path
   sources = [ "rust/src/lib.rs" ]
   deps = [ ":mmi_rust" ]

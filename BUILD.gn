@@ -144,7 +144,7 @@ group("mmi_tests") {
     "frameworks/proxy:ut-mmi-proxy-out",
     "libudev:test",
     "service:mmi-service-tests",
-    "service:mmi_rust_test",
+    "service:rust_mmi_test",
     "service:ut-mmi-service-out",
     "test/fuzztest:test",
     "tools/inject_event:InjectEventTest",
