@@ -320,26 +320,18 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::GESTURE);
-    CHKPR(pointerEvent, GESTURE_EVENT_PKG_FAIL);
-    MMI_HILOGD("GestureEvent package, eventType:%{public}d,actionTime:%{public}" PRId64 ","
-               "action:%{public}d,actionStartTime:%{public}" PRId64 ","
-               "pointerAction:%{public}d,sourceType:%{public}d,"
-               "PinchAxisValue:%{public}.2f",
-                pointerEvent->GetEventType(), pointerEvent->GetActionTime(),
-                pointerEvent->GetAction(), pointerEvent->GetActionStartTime(),
-                pointerEvent->GetPointerAction(), pointerEvent->GetSourceType(),
-                pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH));
-
-    PointerEvent::PointerItem item;
-    pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), item);
-    MMI_HILOGD("Item:DownTime:%{public}" PRId64 ",IsPressed:%{public}s,"
-               "DisplayX:%{public}d,DisplayY:%{public}d,WindowX:%{public}d,WindowY:%{public}d,"
-               "Width:%{public}d,Height:%{public}d",
-               item.GetDownTime(), (item.IsPressed() ? "true" : "false"),
-               item.GetDisplayX(), item.GetDisplayY(), item.GetWindowX(), item.GetWindowY(),
-               item.GetWidth(), item.GetHeight());
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     nextHandler_->HandlePointerEvent(pointerEvent);
+    auto type = libinput_event_get_type(event);
+    if (type == LIBINPUT_EVENT_GESTURE_SWIPE_END || type == LIBINPUT_EVENT_GESTURE_PINCH_END) {
+        pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
+        MMI_HILOGD("This touch pad event is up remove this finger");
+        if (pointerEvent->GetPointerIds().empty()) {
+            MMI_HILOGD("This touch pad event is final finger up remove this finger");
+            pointerEvent->Reset();
+        }
+    }
 #else
     MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER

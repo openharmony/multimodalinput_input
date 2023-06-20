@@ -353,7 +353,7 @@ PointerEvent::PointerEvent(int32_t eventType) : InputEvent(eventType) {}
 PointerEvent::PointerEvent(const PointerEvent& other)
     : InputEvent(other), pointerId_(other.pointerId_), pointers_(other.pointers_),
       pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
-      pointerAction_(other.pointerAction_), buttonId_(other.buttonId_),
+      pointerAction_(other.pointerAction_), buttonId_(other.buttonId_), fingerCount_(other.fingerCount_),
       axes_(other.axes_), axisValues_(other.axisValues_),
       pressedKeys_(other.pressedKeys_), buffer_(other.buffer_) {}
 
@@ -375,6 +375,7 @@ void PointerEvent::Reset()
     sourceType_ = SOURCE_TYPE_UNKNOWN;
     pointerAction_ = POINTER_ACTION_UNKNOWN;
     buttonId_ = -1;
+    fingerCount_ = 0;
     axes_ = 0U;
     axisValues_.fill(0.0);
     pressedKeys_.clear();
@@ -584,6 +585,16 @@ void PointerEvent::SetButtonId(int32_t buttonId)
     buttonId_ = buttonId;
 }
 
+int32_t PointerEvent::GetFingerCount() const
+{
+    return fingerCount_;
+}
+
+void PointerEvent::SetFingerCount(int32_t fingerCount)
+{
+    fingerCount_ = fingerCount;
+}
+
 double PointerEvent::GetAxisValue(AxisType axis) const
 {
     double axisValue {};
@@ -654,6 +665,8 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
 
     WRITEINT32(out, buttonId_);
 
+    WRITEINT32(out, fingerCount_);
+
     const uint32_t axes { GetAxes() };
     WRITEUINT32(out, axes);
 
@@ -706,6 +719,8 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     READINT32(in, pointerAction_);
 
     READINT32(in, buttonId_);
+
+    READINT32(in, fingerCount_);
 
     uint32_t axes;
     READUINT32(in, axes);
