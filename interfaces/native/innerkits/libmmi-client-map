@@ -29,6 +29,7 @@
             OHOS::MMI::PointerEvent*;
             OHOS::MMI::PointerStyle*;
             OHOS::MMI::PointerStyleColor*;
+            OHOS::MMI::UtilNapiValue*;
             OHOS::MMI::MultimodalEventHandler*;
             OHOS::MMI::MMIClient*;
             "vtable for OHOS::MMI::MMIClient";

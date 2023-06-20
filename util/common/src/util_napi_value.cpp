@@ -16,6 +16,7 @@
 #include "util_napi_value.h"
 
 #include "key_event_napi.h"
+#include "napi_constants.h"
 #include "util_napi.h"
 
 namespace OHOS {
