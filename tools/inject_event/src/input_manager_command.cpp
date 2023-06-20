@@ -1410,7 +1410,7 @@ int32_t InputManagerCommand::SingleKnuckleGestureProcesser(int32_t argc, char *a
         std::cout << "wrong number of parameters:" << argc << std::endl;
         return EVENT_REG_FAIL;
     }
-    if (firstDownX < 0 || firstDownY < 0 || secondDownX < 0 || secondDownY < 0) {
+    if (IsCoordinateInvalid(firstDownX, firstDownY, secondDownX, secondDownY)) {
         std::cout << "Coordinate value must be greater than 0" << std::endl;
         return RET_ERR;
     }
@@ -1460,7 +1460,7 @@ int32_t InputManagerCommand::DoubleKnuckleGestureProcesser(int32_t argc, char *a
         std::cout << "wrong number of parameters: " << argc << std::endl;
         return EVENT_REG_FAIL;
     }
-    if (firstDownX < 0 || firstDownY < 0 || secondDownX < 0 || secondDownY < 0) {
+    if (IsCoordinateInvalid(firstDownX, firstDownY, secondDownX, secondDownY)) {
         std::cout << "Coordinate value must be greater than 0" << std::endl;
         return RET_ERR;
     }
@@ -1472,6 +1472,12 @@ int32_t InputManagerCommand::DoubleKnuckleGestureProcesser(int32_t argc, char *a
     std::this_thread::sleep_for(std::chrono::milliseconds(intervalTimeMs));
     DoubleKnuckleClickEvent(secondDownX, secondDownY);
     return ERR_OK;
+}
+
+bool InputManagerCommand::IsCoordinateInvalid(int32_t firstDownX, int32_t firstDownY, int32_t secondDownX,
+    int32_t secondDownY)
+{
+    return firstDownX < 0 || firstDownY < 0 || secondDownX < 0 || secondDownY < 0;
 }
 
 int32_t InputManagerCommand::SingleKnuckleClickEvent(int32_t downX, int32_t downY)
