@@ -20,6 +20,7 @@
 #include "multimodal_input_connect_def_parcel.h"
 #include "multimodal_input_connect_define.h"
 #include "string_ex.h"
+#include "multimodalinput_ipc_interface_code.h"
 
 namespace OHOS {
 namespace MMI {
@@ -105,7 +106,8 @@ int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programNam
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(ALLOC_SOCKET_FD, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ALLOC_SOCKET_FD),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -140,7 +142,8 @@ int32_t MultimodalInputConnectProxy::AddInputEventFilter(sptr<IEventFilter> filt
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(ADD_INPUT_EVENT_FILTER, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        ADD_INPUT_EVENT_FILTER), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request message failed, ret:%{public}d", ret);
         return ret;
@@ -161,7 +164,8 @@ int32_t MultimodalInputConnectProxy::RemoveInputEventFilter(int32_t filterId)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(RMV_INPUT_EVENT_FILTER, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        RMV_INPUT_EVENT_FILTER), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request message failed, ret:%{public}d", ret);
         return ret;
@@ -184,7 +188,8 @@ int32_t MultimodalInputConnectProxy::SetMouseScrollRows(int32_t rows)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SET_MOUSE_SCROLL_ROWS, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOUSE_SCROLL_ROWS),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -221,7 +226,8 @@ int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t windowId, void* pixelM
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SET_MOUSE_ICON, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOUSE_ICON),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -241,7 +247,8 @@ int32_t MultimodalInputConnectProxy::GetMouseScrollRows(int32_t &rows)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(GET_MOUSE_SCROLL_ROWS, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_MOUSE_SCROLL_ROWS),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -265,7 +272,8 @@ int32_t MultimodalInputConnectProxy::SetMousePrimaryButton(int32_t primaryButton
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SET_MOUSE_PRIMARY_BUTTON, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        SET_MOUSE_PRIMARY_BUTTON), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -285,7 +293,8 @@ int32_t MultimodalInputConnectProxy::GetMousePrimaryButton(int32_t &primaryButto
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(GET_MOUSE_PRIMARY_BUTTON, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        GET_MOUSE_PRIMARY_BUTTON), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -309,7 +318,8 @@ int32_t MultimodalInputConnectProxy::SetHoverScrollState(bool state)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SET_HOVER_SCROLL_STATE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        SET_HOVER_SCROLL_STATE), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -329,7 +339,8 @@ int32_t MultimodalInputConnectProxy::GetHoverScrollState(bool &state)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(GET_HOVER_SCROLL_STATE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        GET_HOVER_SCROLL_STATE), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -353,7 +364,8 @@ int32_t MultimodalInputConnectProxy::SetPointerVisible(bool visible)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SET_POINTER_VISIBLE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_VISIBLE),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -374,7 +386,8 @@ int32_t MultimodalInputConnectProxy::IsPointerVisible(bool &visible)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(IS_POINTER_VISIBLE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::IS_POINTER_VISIBLE),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -398,7 +411,8 @@ int32_t MultimodalInputConnectProxy::MarkProcessed(int32_t eventType, int32_t ev
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(MARK_PROCESSED, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MARK_PROCESSED),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
         return ret;
@@ -419,7 +433,8 @@ int32_t MultimodalInputConnectProxy::SetPointerSpeed(int32_t speed)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SET_POINTER_SPEED, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_SPEED),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -439,7 +454,8 @@ int32_t MultimodalInputConnectProxy::GetPointerSpeed(int32_t &speed)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(GET_POINTER_SPEED, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SPEED),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -468,7 +484,8 @@ int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, PointerSt
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SET_POINTER_STYLE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_STYLE),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
         return ret;
@@ -489,7 +506,8 @@ int32_t MultimodalInputConnectProxy::GetPointerStyle(int32_t windowId, PointerSt
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(GET_POINTER_STYLE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_STYLE),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
         return ret;
@@ -514,7 +532,8 @@ int32_t MultimodalInputConnectProxy::RegisterDevListener()
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(REGISTER_DEV_MONITOR, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REGISTER_DEV_MONITOR),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -534,7 +553,8 @@ int32_t MultimodalInputConnectProxy::UnregisterDevListener()
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(UNREGISTER_DEV_MONITOR, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        UNREGISTER_DEV_MONITOR), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -561,7 +581,8 @@ int32_t MultimodalInputConnectProxy::SupportKeys(int32_t deviceId, std::vector<i
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SUPPORT_KEYS, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUPPORT_KEYS),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -586,7 +607,8 @@ int32_t MultimodalInputConnectProxy::GetDeviceIds(std::vector<int32_t> &ids)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(GET_DEVICE_IDS, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DEVICE_IDS),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -612,7 +634,8 @@ int32_t MultimodalInputConnectProxy::GetDevice(int32_t deviceId, std::shared_ptr
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(GET_DEVICE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DEVICE),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -638,7 +661,8 @@ int32_t MultimodalInputConnectProxy::GetKeyboardType(int32_t deviceId, int32_t &
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(GET_KEYBOARD_TYPE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEYBOARD_TYPE),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -664,7 +688,8 @@ int32_t MultimodalInputConnectProxy::AddInputHandler(InputHandlerType handlerTyp
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(ADD_INPUT_HANDLER, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ADD_INPUT_HANDLER),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -689,7 +714,8 @@ int32_t MultimodalInputConnectProxy::RemoveInputHandler(InputHandlerType handler
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(REMOVE_INPUT_HANDLER, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::REMOVE_INPUT_HANDLER),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -710,7 +736,8 @@ int32_t MultimodalInputConnectProxy::MarkEventConsumed(int32_t eventId)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(MARK_EVENT_CONSUMED, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MARK_EVENT_CONSUMED),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -733,7 +760,8 @@ int32_t MultimodalInputConnectProxy::MoveMouseEvent(int32_t offsetX, int32_t off
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(MOVE_MOUSE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::MOVE_MOUSE),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -758,7 +786,8 @@ int32_t MultimodalInputConnectProxy::InjectKeyEvent(const std::shared_ptr<KeyEve
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(INJECT_KEY_EVENT, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INJECT_KEY_EVENT),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -786,7 +815,8 @@ int32_t MultimodalInputConnectProxy::SubscribeKeyEvent(int32_t subscribeId, cons
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SUBSCRIBE_KEY_EVENT, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SUBSCRIBE_KEY_EVENT),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, result:%{public}d", ret);
         return ret;
@@ -808,7 +838,8 @@ int32_t MultimodalInputConnectProxy::UnsubscribeKeyEvent(int32_t subscribeId)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(UNSUBSCRIBE_KEY_EVENT, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::UNSUBSCRIBE_KEY_EVENT),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, result:%{public}d", ret);
         return ret;
@@ -830,7 +861,8 @@ int32_t MultimodalInputConnectProxy::SubscribeSwitchEvent(int32_t subscribeId)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SUBSCRIBE_SWITCH_EVENT, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        SUBSCRIBE_SWITCH_EVENT), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, result:%{public}d", ret);
     }
@@ -851,7 +883,8 @@ int32_t MultimodalInputConnectProxy::UnsubscribeSwitchEvent(int32_t subscribeId)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(UNSUBSCRIBE_SWITCH_EVENT, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        UNSUBSCRIBE_SWITCH_EVENT), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, result:%{public}d", ret);
     }
@@ -875,7 +908,8 @@ int32_t MultimodalInputConnectProxy::InjectPointerEvent(const std::shared_ptr<Po
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(INJECT_POINTER_EVENT, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::INJECT_POINTER_EVENT),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -895,7 +929,8 @@ int32_t MultimodalInputConnectProxy::SetAnrObserver()
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SET_ANR_OBSERVER, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_ANR_OBSERVER),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -915,7 +950,8 @@ int32_t MultimodalInputConnectProxy::GetDisplayBindInfo(DisplayBindInfos &infos)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(GET_DISPLAY_BIND_INFO, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DISPLAY_BIND_INFO),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -950,7 +986,8 @@ int32_t MultimodalInputConnectProxy::SetDisplayBind(int32_t deviceId, int32_t di
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SET_DISPLAY_BIND, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_DISPLAY_BIND),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, result:%{public}d", ret);
         return ret;
@@ -973,7 +1010,8 @@ int32_t MultimodalInputConnectProxy::GetWindowPid(int32_t windowId)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(GET_WINDOW_PID, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_WINDOW_PID),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, result:%{public}d", ret);
         return ret;
@@ -996,7 +1034,8 @@ int32_t MultimodalInputConnectProxy::GetFunctionKeyState(int32_t funcKey, bool &
     WRITEINT32(data, funcKey, ERR_INVALID_VALUE);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(GET_FUNCTION_KEY_STATE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        GET_FUNCTION_KEY_STATE), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -1019,7 +1058,8 @@ int32_t MultimodalInputConnectProxy::SetFunctionKeyState(int32_t funcKey, bool e
     WRITEBOOL(data, enable, ERR_INVALID_VALUE);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SET_FUNCTION_KEY_STATE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        SET_FUNCTION_KEY_STATE), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
@@ -1040,7 +1080,8 @@ int32_t MultimodalInputConnectProxy::SetPointerLocation(int32_t x, int32_t y)
     WRITEINT32(data, y, ERR_INVALID_VALUE);
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SET_POINTER_LOCATION, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_LOCATION),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
     }
@@ -1061,7 +1102,8 @@ int32_t MultimodalInputConnectProxy::SetMouseCaptureMode(int32_t windowId, bool 
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SET_CAPTURE_MODE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CAPTURE_MODE),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
@@ -1087,7 +1129,8 @@ int32_t MultimodalInputConnectProxy::AppendExtraData(const ExtraData& extraData)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(APPEND_EXTRA_DATA, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::APPEND_EXTRA_DATA),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
@@ -1107,7 +1150,8 @@ int32_t MultimodalInputConnectProxy::EnableInputDevice(bool enable)
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(ENABLE_INPUT_DEVICE, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ENABLE_INPUT_DEVICE),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);
     }
@@ -1128,7 +1172,8 @@ int32_t MultimodalInputConnectProxy::SetKeyDownDuration(const std::string &busin
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(SET_KEY_DOWN_DURATION, data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_KEY_DOWN_DURATION),
+        data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
@@ -1226,42 +1271,50 @@ int32_t MultimodalInputConnectProxy::GetTouchpadInt32Data(int32_t &value, int32_
 
 int32_t MultimodalInputConnectProxy::SetTouchpadScrollSwitch(bool switchFlag)
 {
-    return SetTouchpadBoolData(switchFlag, IMultimodalInputConnect::SET_TP_SCROLL_SWITCH);
+    return SetTouchpadBoolData(switchFlag, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        SET_TP_SCROLL_SWITCH));
 }
 
 int32_t MultimodalInputConnectProxy::GetTouchpadScrollSwitch(bool &switchFlag)
 {
-    return GetTouchpadBoolData(switchFlag, IMultimodalInputConnect::GET_TP_SCROLL_SWITCH);
+    return GetTouchpadBoolData(switchFlag, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        GET_TP_SCROLL_SWITCH));
 }
 
 int32_t MultimodalInputConnectProxy::SetTouchpadScrollDirection(bool state)
 {
-    return SetTouchpadBoolData(state, IMultimodalInputConnect::SET_TP_SCROLL_DIRECT_SWITCH);
+    return SetTouchpadBoolData(state, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        SET_TP_SCROLL_DIRECT_SWITCH));
 }
 
 int32_t MultimodalInputConnectProxy::GetTouchpadScrollDirection(bool &switchFlag)
 {
-    return GetTouchpadBoolData(switchFlag, IMultimodalInputConnect::GET_TP_SCROLL_DIRECT_SWITCH);
+    return GetTouchpadBoolData(switchFlag, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        GET_TP_SCROLL_DIRECT_SWITCH));
 }
 
 int32_t MultimodalInputConnectProxy::SetTouchpadTapSwitch(bool switchFlag)
 {
-    return SetTouchpadBoolData(switchFlag, IMultimodalInputConnect::SET_TP_TAP_SWITCH);
+    return SetTouchpadBoolData(switchFlag, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        SET_TP_TAP_SWITCH));
 }
 
 int32_t MultimodalInputConnectProxy::GetTouchpadTapSwitch(bool &switchFlag)
 {
-    return GetTouchpadBoolData(switchFlag, IMultimodalInputConnect::GET_TP_TAP_SWITCH);
+    return GetTouchpadBoolData(switchFlag, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        GET_TP_TAP_SWITCH));
 }
 
 int32_t MultimodalInputConnectProxy::SetTouchpadPointerSpeed(int32_t speed)
 {
-    return SetTouchpadInt32Data(speed, IMultimodalInputConnect::SET_TP_POINTER_SPEED);
+    return SetTouchpadInt32Data(speed, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        SET_TP_POINTER_SPEED));
 }
 
 int32_t MultimodalInputConnectProxy::GetTouchpadPointerSpeed(int32_t &speed)
 {
-    return GetTouchpadInt32Data(speed, IMultimodalInputConnect::GET_TP_POINTER_SPEED);
+    return GetTouchpadInt32Data(speed, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        GET_TP_POINTER_SPEED));
 }
 } // namespace MMI
 } // namespace OHOS
