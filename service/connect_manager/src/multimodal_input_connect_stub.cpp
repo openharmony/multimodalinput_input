@@ -33,7 +33,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectStub" };
 using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, MessageParcel& reply);
 } // namespace
-
+const int32_t MAX_BUFFER_SIZE = 30000;
 int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
     MessageParcel& reply, MessageOption& option)
 {
@@ -234,7 +234,7 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
     READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
     std::vector<uint8_t> buff(size, 0);
     MMI_HILOGD("reading size of the tlv count %{public}d", size);
-    if (size > ExtraData::MAX_BUFFER_SIZE) {
+    if (size > MAX_BUFFER_SIZE) {
         MMI_HILOGE("Append extra data failed, buffer is oversize:%{public}d", size);
         return RET_ERR;
     }
