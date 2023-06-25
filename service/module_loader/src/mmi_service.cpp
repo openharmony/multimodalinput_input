@@ -45,6 +45,7 @@
 #include "util_ex.h"
 #include "util_napi_error.h"
 #include "xcollie/watchdog.h"
+#include "key_auto_repeat.h"
 #include "key_command_handler.h"
 
 namespace OHOS {
@@ -769,6 +770,32 @@ int32_t MMIService::GetKeyboardType(int32_t deviceId, int32_t &keyboardType)
         return ret;
     }
     return ret;
+}
+
+int32_t MMIService::SetKeyboardRepeatDelay(int32_t delay)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&KeyAutoRepeat::SetKeyboardRepeatDelay, KeyRepeat, delay));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set keyboard repeat delay failed, ret:%{public}d", ret);
+        return ret;
+    }
+#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
+}
+
+int32_t MMIService::SetKeyboardRepeatRate(int32_t rate)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&KeyAutoRepeat::SetKeyboardRepeatRate, KeyRepeat, rate));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set keyboard repeat rate failed, ret:%{public}d", ret);
+        return ret;
+    }
+#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
 }
 
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)

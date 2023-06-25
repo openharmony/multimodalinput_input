@@ -37,8 +37,11 @@ public:
     void AddHandleTimer(int32_t timeout);
     void RemoveDeviceConfig(struct libinput_device *device);
     int32_t GetIntervalTime(int32_t deviceId) const;
+    int32_t GetDelayTime(int32_t deviceId) const;
     std::map<int32_t, DeviceConfig> GetDeviceConfig() const;
     void RemoveTimer();
+    int32_t SetKeyboardRepeatDelay(int32_t delay);
+    int32_t SetKeyboardRepeatRate(int32_t rate);
 private:
     std::string GetTomlFilePath(const std::string &fileName) const;
     DeviceConfig GetAutoSwitch(int32_t deviceId);
@@ -47,6 +50,10 @@ private:
     int32_t timerId_ { -1 };
     int32_t repeatKeyCode_ { -1 };
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
+    int32_t repeatDelayTime_ { 500 };
+    int32_t repeatRateTime_ { 50 };
+    bool isUserSetRepeatDelayStatus_ { false };
+    bool isUserSetRepeatRateStatus_ { false };
 };
 
 #define KeyRepeat ::OHOS::DelayedSingleton<KeyAutoRepeat>::GetInstance()

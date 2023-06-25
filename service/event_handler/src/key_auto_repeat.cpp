@@ -30,6 +30,12 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyAutoRepeat" };
 constexpr int32_t INVALID_DEVICE_ID = -1;
 constexpr int32_t OPEN_AUTO_REPEAT = 1;
+constexpr int32_t DEFAULT_KEY_REPEAT_DELAY = 500;
+constexpr int32_t MIN_KEY_REPEAT_DELAY = 300;
+constexpr int32_t MAX_KEY_REPEAT_DELAY = 1000;
+constexpr int32_t DEFAULT_KEY_REPEAT_RATE = 50;
+constexpr int32_t MIN_KEY_REPEAT_RATE = 36;
+constexpr int32_t MAX_KEY_REPEAT_RATE = 100;
 } // namespace
 
 KeyAutoRepeat::KeyAutoRepeat() {}
@@ -76,7 +82,8 @@ void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
             TimerMgr->RemoveTimer(timerId_);
             timerId_ = -1;
         }
-        AddHandleTimer(devConf.delayTime);
+        int32_t delayTime = GetDelayTime(keyEvent_->GetDeviceId());
+        AddHandleTimer(delayTime);
         repeatKeyCode_ = keyEvent_->GetKeyCode();
         MMI_HILOGI("Add a timer, keyCode:%{public}d", keyEvent_->GetKeyCode());
     }
@@ -94,7 +101,8 @@ void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
             keyEvent_->SetKeyCode(repeatKeyCode_);
             keyEvent_->SetAction(KeyEvent::KEY_ACTION_DOWN);
             keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-            AddHandleTimer(devConf.delayTime);
+            int32_t delayTime = GetDelayTime(keyEvent_->GetDeviceId());
+            AddHandleTimer(delayTime);
             MMI_HILOGD("The end keyboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
         }
     }
@@ -122,12 +130,28 @@ std::string KeyAutoRepeat::GetTomlFilePath(const std::string &fileName) const
 
 int32_t KeyAutoRepeat::GetIntervalTime(int32_t deviceId) const
 {
+    if (isUserSetRepeatRateStatus_) {
+        return repeatRateTime_;
+    }
     auto iter = deviceConfig_.find(deviceId);
-    int32_t triggertime = 100;
+    int32_t triggertime = DEFAULT_KEY_REPEAT_RATE;
     if (iter != deviceConfig_.end()) {
         triggertime = iter->second.intervalTime;
     }
     return triggertime;
+}
+
+int32_t KeyAutoRepeat::GetDelayTime(int32_t deviceId) const
+{
+    if (isUserSetRepeatDelayStatus_) {
+        return repeatDelayTime_;
+    }
+    auto iter = deviceConfig_.find(deviceId);
+    int32_t delayTime = DEFAULT_KEY_REPEAT_DELAY;
+    if (iter != deviceConfig_.end()) {
+        delayTime = iter->second.delayTime;
+    }
+    return delayTime;
 }
 
 DeviceConfig KeyAutoRepeat::GetAutoSwitch(int32_t deviceId)
@@ -157,6 +181,36 @@ void KeyAutoRepeat::RemoveTimer()
 {
     CALL_DEBUG_ENTER;
     TimerMgr->RemoveTimer(timerId_);
+}
+
+int32_t KeyAutoRepeat::SetKeyboardRepeatDelay(int32_t delay)
+{
+    CALL_DEBUG_ENTER;
+    if (delay < MIN_KEY_REPEAT_DELAY) {
+        repeatDelayTime_ = MIN_KEY_REPEAT_DELAY;
+    } else if (delay > MAX_KEY_REPEAT_DELAY) {
+        repeatDelayTime_ = MAX_KEY_REPEAT_DELAY;
+    } else {
+        repeatDelayTime_ = delay;
+    }
+    isUserSetRepeatDelayStatus_ = true;
+    MMI_HILOGD("Set keyboard repeat delay delay:%{public}d", delay);
+    return RET_OK;
+}
+
+int32_t KeyAutoRepeat::SetKeyboardRepeatRate(int32_t rate)
+{
+    CALL_DEBUG_ENTER;
+    if (rate < MIN_KEY_REPEAT_RATE) {
+        repeatRateTime_ = MIN_KEY_REPEAT_RATE;
+    } else if (rate > MAX_KEY_REPEAT_RATE) {
+        repeatRateTime_ = MAX_KEY_REPEAT_RATE;
+    } else {
+        repeatRateTime_ = rate;
+    }
+    isUserSetRepeatRateStatus_ = true;
+    MMI_HILOGD("Set keyboard repeat rate rate:%{public}d", rate);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

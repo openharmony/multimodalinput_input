@@ -299,6 +299,16 @@ int32_t InputManager::SetKeyDownDuration(const std::string& businessId, int32_t 
     return InputMgrImpl.SetKeyDownDuration(businessId, delay);
 }
 
+int32_t InputManager::SetKeyboardRepeatDelay(int32_t delay)
+{
+    return InputMgrImpl.SetKeyboardRepeatDelay(delay);
+}
+
+int32_t InputManager::SetKeyboardRepeatRate(int32_t rate)
+{
+    return InputMgrImpl.SetKeyboardRepeatRate(rate);
+}
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 void InputManager::SetEnhanceConfig(SecCompEnhanceCfgBase *cfg)
 {

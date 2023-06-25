@@ -243,6 +243,18 @@ int32_t MultimodalInputConnectManager::GetKeyboardType(int32_t deviceId, int32_t
     return multimodalInputConnectService_->GetKeyboardType(deviceId, keyboardType);
 }
 
+int32_t MultimodalInputConnectManager::SetKeyboardRepeatDelay(int32_t delay)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetKeyboardRepeatDelay(delay);
+}
+
+int32_t MultimodalInputConnectManager::SetKeyboardRepeatRate(int32_t rate)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->SetKeyboardRepeatRate(rate);
+}
+
 int32_t MultimodalInputConnectManager::AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags)
 {

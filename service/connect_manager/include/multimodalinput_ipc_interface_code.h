@@ -73,6 +73,8 @@ enum class MultimodalinputConnectInterfaceCode {
     SET_TP_POINTER_SPEED = 51,
     GET_TP_POINTER_SPEED = 52,
     SET_MOUSE_ICON = 53,
+    SET_KEYBOARD_REPEAT_DELAY = 54,
+    SET_KEYBOARD_REPEAT_RATE = 55,
 };
 
 enum class MultimodalinputEventInterfaceCode {
