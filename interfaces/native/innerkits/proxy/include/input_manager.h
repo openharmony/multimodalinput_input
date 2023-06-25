@@ -471,6 +471,22 @@ public:
     int32_t SetKeyDownDuration(const std::string &businessId, int32_t delay);
 
     /**
+     * @brief Sets the keyboard repeat delay, which ranges from 300 to 1000.
+     * @param delay Indicates the keyboard repeat delay to set.
+     * @return Returns <b>RET_OK</b> if success; returns <b>RET_ERR</b> otherwise.
+     * @since 10
+     */
+    int32_t SetKeyboardRepeatDelay(int32_t delay);
+
+    /**
+     * @brief Sets the keyboard repeat rate, which ranges from 36 to 100.
+     * @param rate Indicates the keyboard repeat rate to set.
+     * @return Returns <b>RET_OK</b> if success; returns <b>RET_ERR</b> otherwise.
+     * @since 10
+     */
+    int32_t SetKeyboardRepeatRate(int32_t rate);
+
+    /**
      * @brief Set the switch of touchpad scroll.
      * @param switchFlag Indicates the touchpad scroll switch state.
      * @return if success; returns a non-0 value otherwise.

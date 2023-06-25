@@ -177,6 +177,28 @@ int32_t InputDeviceImpl::GetKeyboardType(int32_t deviceId, FunKeyboardTypes call
     return RET_OK;
 }
 
+int32_t InputDeviceImpl::SetKeyboardRepeatDelay(int32_t delay)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->SetKeyboardRepeatDelay(delay);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetKeyboardRepeatDelay failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t InputDeviceImpl::SetKeyboardRepeatRate(int32_t rate)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->SetKeyboardRepeatRate(rate);
+    if (ret != RET_OK) {
+        MMI_HILOGE("SetKeyboardRepeatRate failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t InputDeviceImpl::GetUserData()
 {
     return userData_;
