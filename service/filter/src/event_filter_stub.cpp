@@ -22,6 +22,7 @@
 #include "string_ex.h"
 
 #include "mmi_log.h"
+#include "multimodalinput_ipc_interface_code.h"
 
 namespace OHOS {
 namespace MMI {
@@ -42,10 +43,10 @@ int32_t EventFilterStub::OnRemoteRequest(
     }
 
     switch (code) {
-        case static_cast<uint32_t>(IEventFilter::OPERATOR_TYPE::HANDLE_KEY_EVENT): {
+        case static_cast<uint32_t>(MultimodalinputEventInterfaceCode::HANDLE_KEY_EVENT): {
             return StubHandleKeyEvent(data, reply);
         }
-        case static_cast<uint32_t>(IEventFilter::OPERATOR_TYPE::HANDLE_POINTER_EVENT): {
+        case static_cast<uint32_t>(MultimodalinputEventInterfaceCode::HANDLE_POINTER_EVENT): {
             return StubHandlePointerEvent(data, reply);
         }
         default: {

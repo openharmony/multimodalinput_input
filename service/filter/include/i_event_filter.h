@@ -29,10 +29,6 @@ public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.multimodalinput.IEventFilter");
     virtual bool HandleKeyEvent(const std::shared_ptr<KeyEvent> event) = 0;
     virtual bool HandlePointerEvent(const std::shared_ptr<PointerEvent> event) = 0;
-    enum class OPERATOR_TYPE {
-        HANDLE_KEY_EVENT = 0,
-        HANDLE_POINTER_EVENT = 1,
-    };
 };
 } // namespace MMI
 } // namespace OHOS
