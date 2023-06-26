@@ -34,7 +34,7 @@ public:
      * @return Returns <b>napi_ok</b> if the data is successfully written; returns error status otherwise.
      * @since 10
      */
-    static napi_status CreateKeyEvent(napi_env env, KeyEvent &in, napi_value out);
+    static napi_status CreateKeyEvent(napi_env env, KeyEvent &in, napi_value &out);
 
     /**
      * @brief Read data from a JS object.
@@ -44,12 +44,12 @@ public:
      */
     static napi_status GetKeyEvent(napi_env env, napi_value in, KeyEvent &out);
 
-    static napi_status CreateKeyItem(napi_env env, std::optional<KeyEvent::KeyItem> &in, napi_value out);
+    static napi_status CreateKeyItem(napi_env env, std::optional<KeyEvent::KeyItem> &in, napi_value &out);
     static napi_status GetKeyItem(napi_env env, napi_value in, KeyEvent::KeyItem &out);
 
 private:
-    static napi_status WriteKeyStatusToJs(napi_env env, const std::vector<int32_t> &pressedKeys, napi_value out);
-    static napi_status WriteFunctionKeyStatusToJs(napi_env env, const KeyEvent &in, napi_value out);
+    static napi_status WriteKeyStatusToJs(napi_env env, const std::vector<int32_t> &pressedKeys, napi_value &out);
+    static napi_status WriteFunctionKeyStatusToJs(napi_env env, const KeyEvent &in, napi_value &out);
     static bool HasKeyCode(const std::vector<int32_t> &pressedKeys, int32_t keyCode);
 };
 } // namespace MMI
