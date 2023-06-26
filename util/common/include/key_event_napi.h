@@ -24,32 +24,43 @@ namespace OHOS {
 namespace MMI {
 class KeyEventNapi {
 public:
-    KeyEventNapi(){};
-    ~KeyEventNapi(){};
-
     /**
-     * @brief Write data into a JS object.
+     * @brief Write KeyEvent into a JS object.
      * @param env Indicates the environment that the Node-API call is invoked under.
      * @param out Indicates the JS object into which data will be written.
      * @return Returns <b>napi_ok</b> if the data is successfully written; returns error status otherwise.
      * @since 10
      */
-    static napi_status CreateKeyEvent(napi_env env, KeyEvent &in, napi_value &out);
+    static napi_status CreateKeyEvent(napi_env env, const std::shared_ptr<KeyEvent> &in, napi_value &out);
 
     /**
-     * @brief Read data from a JS object.
+     * @brief Read KeyEvent from a JS object.
      * @param out Indicates the JS object from which data will be read.
      * @return Returns <b>napi_ok</b> if the data is successfully written; returns error status otherwise.
      * @since 10
      */
-    static napi_status GetKeyEvent(napi_env env, napi_value in, KeyEvent &out);
+    static napi_status GetKeyEvent(napi_env env, napi_value in, std::shared_ptr<KeyEvent> &out);
 
-    static napi_status CreateKeyItem(napi_env env, std::optional<KeyEvent::KeyItem> &in, napi_value &out);
+    /**
+     * @brief Write KeyItem into a JS object.
+     * @param env Indicates the environment that the Node-API call is invoked under.
+     * @param out Indicates the JS object into which data will be written.
+     * @return Returns <b>napi_ok</b> if the data is successfully written; returns error status otherwise.
+     * @since 10
+     */
+    static napi_status CreateKeyItem(napi_env env, const std::optional<KeyEvent::KeyItem> in, napi_value &out);
+
+    /**
+     * @brief Read KeyItem from a JS object.
+     * @param out Indicates the JS object from which data will be read.
+     * @return Returns <b>napi_ok</b> if the data is successfully written; returns error status otherwise.
+     * @since 10
+     */
     static napi_status GetKeyItem(napi_env env, napi_value in, KeyEvent::KeyItem &out);
 
 private:
     static napi_status WriteKeyStatusToJs(napi_env env, const std::vector<int32_t> &pressedKeys, napi_value &out);
-    static napi_status WriteFunctionKeyStatusToJs(napi_env env, const KeyEvent &in, napi_value &out);
+    static napi_status WriteFunctionKeyStatusToJs(napi_env env, const std::shared_ptr<KeyEvent> &in, napi_value &out);
     static bool HasKeyCode(const std::vector<int32_t> &pressedKeys, int32_t keyCode);
 };
 } // namespace MMI
