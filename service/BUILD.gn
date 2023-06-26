@@ -80,6 +80,10 @@ config("libmmi_server_config") {
   if (resource_schedule_service_enabled) {
     defines += [ "OHOS_RSS_CLIENT" ]
   }
+
+  if (is_emulator) {
+    defines += [ "OHOS_BUILD_EMULATOR" ]
+  }
 }
 
 ohos_rust_shared_ffi("mmi_rust") {
