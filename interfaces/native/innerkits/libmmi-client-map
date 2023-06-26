@@ -26,12 +26,12 @@
             OHOS::MMI::KeyEvent*;
             OHOS::MMI::KeyEventInputSubscribeManager*;
             OHOS::MMI::KeyOption*;
+            OHOS::MMI::MMIClient*;
+            OHOS::MMI::MultimodalEventHandler*;
             OHOS::MMI::PointerEvent*;
             OHOS::MMI::PointerStyle*;
             OHOS::MMI::PointerStyleColor*;
             OHOS::MMI::UtilNapiValue*;
-            OHOS::MMI::MultimodalEventHandler*;
-            OHOS::MMI::MMIClient*;
             "vtable for OHOS::MMI::MMIClient";
         };
     local:
