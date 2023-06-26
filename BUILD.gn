@@ -49,7 +49,7 @@ ohos_executable("uinput_inject") {
   external_deps = [
     "c_utils:utils",
     "drivers_interface_input:libinput_proxy_1.0",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 
   part_name = "input"

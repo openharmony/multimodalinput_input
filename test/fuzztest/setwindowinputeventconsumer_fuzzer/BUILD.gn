@@ -33,7 +33,7 @@ ohos_fuzztest("SetWindowInputEventConsumerFuzzTest") {
   deps = [ "${mmi_path}/frameworks/proxy:libmmi-client" ]
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 }
 

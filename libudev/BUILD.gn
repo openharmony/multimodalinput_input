@@ -30,7 +30,7 @@ ohos_static_library("mmi_libudev") {
 
   sources = [ "src/udev_device.cpp" ]
 
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [ "hilog:libhilog" ]
 
   part_name = "input"
   subsystem_name = "multimodalinput"
