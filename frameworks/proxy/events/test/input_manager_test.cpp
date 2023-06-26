@@ -3155,6 +3155,36 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardType, TestSize.Level1)
     MMI_HILOGD("Stop InputManagerTest_GetKeyboardType");
 }
 
+/**
+ * @tc.name: InputManagerTest_SetKeyboardRepeatDelay
+ * @tc.desc: Verify Set Keyboard Repeat Delay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetKeyboardRepeatDelay, TestSize.Level1)
+{
+    MMI_HILOGD("Start InputManagerTest_SetKeyboardRepeatDelay");
+    int32_t delay = 300;
+    int32_t ret = InputManager::GetInstance()->SetKeyboardRepeatDelay(delay);
+    ASSERT_EQ(ret, RET_OK);
+    MMI_HILOGD("Stop InputManagerTest_SetKeyboardRepeatDelay");
+}
+
+/**
+ * @tc.name: InputManagerTest_SetKeyboardRepeatRate
+ * @tc.desc: Verify Set Keyboard Repeat Rate
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetKeyboardRepeatRate, TestSize.Level1)
+{
+    MMI_HILOGD("Start InputManagerTest_SetKeyboardRepeatRate");
+    int32_t rate = 50;
+    int32_t ret = InputManager::GetInstance()->SetKeyboardRepeatRate(rate);
+    ASSERT_EQ(ret, RET_OK);
+    MMI_HILOGD("Stop InputManagerTest_SetKeyboardRepeatRate");
+}
+
 HWTEST_F(InputManagerTest, InputManagerTest_GetProcCpuUsage, TestSize.Level1)
 {
     CALL_TEST_DEBUG;

@@ -25,6 +25,12 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputDeviceContext" };
 constexpr uint32_t MIN_N_SIZE = 1;
 constexpr uint32_t MAX_N_SIZE = 5;
+constexpr int32_t STANDARD_KEY_REPEAT_DELAY = 500;
+constexpr int32_t MIN_KEY_REPEAT_DELAY = 300;
+constexpr int32_t MAX_KEY_REPEAT_DELAY = 1000;
+constexpr int32_t STANDARD_KEY_REPEAT_RATE = 50;
+constexpr int32_t MIN_KEY_REPEAT_RATE = 36;
+constexpr int32_t MAX_KEY_REPEAT_RATE = 100;
 } // namespace
 
 JsInputDeviceContext::JsInputDeviceContext()
@@ -421,6 +427,80 @@ napi_value JsInputDeviceContext::GetDeviceInfo(napi_env env, napi_callback_info 
     return jsInputDeviceMgr->GetDeviceInfo(env, id, argv[1]);
 }
 
+napi_value JsInputDeviceContext::SetKeyboardRepeatDelay(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least 1 parameter is required");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        return nullptr;
+    }
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("delay parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "delay", "number");
+        return nullptr;
+    }
+    int32_t repeatDelay = STANDARD_KEY_REPEAT_DELAY;
+    CHKRP(napi_get_value_int32(env, argv[0], &repeatDelay), GET_VALUE_INT32);
+    if (repeatDelay < MIN_KEY_REPEAT_DELAY) {
+        repeatDelay = MIN_KEY_REPEAT_DELAY;
+    } else if (repeatDelay > MAX_KEY_REPEAT_DELAY) {
+        repeatDelay = MAX_KEY_REPEAT_DELAY;
+    }
+    JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
+    CHKPP(jsDev);
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    if (argc == 1) {
+        return jsInputDeviceMgr->SetKeyboardRepeatDelay(env, repeatDelay);
+    }
+    if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
+        MMI_HILOGE("callback parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    return jsInputDeviceMgr->SetKeyboardRepeatDelay(env, repeatDelay, argv[1]);
+}
+
+napi_value JsInputDeviceContext::SetKeyboardRepeatRate(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least 1 parameter is required");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        return nullptr;
+    }
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("rate parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "rate", "number");
+        return nullptr;
+    }
+    int32_t repeatRate = STANDARD_KEY_REPEAT_RATE;
+    CHKRP(napi_get_value_int32(env, argv[0], &repeatRate), GET_VALUE_INT32);
+    if (repeatRate < MIN_KEY_REPEAT_RATE) {
+        repeatRate = MIN_KEY_REPEAT_RATE;
+    } else if (repeatRate > MAX_KEY_REPEAT_RATE) {
+        repeatRate = MAX_KEY_REPEAT_RATE;
+    }
+    JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
+    CHKPP(jsDev);
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    if (argc == 1) {
+        return jsInputDeviceMgr->SetKeyboardRepeatRate(env, repeatRate);
+    }
+    if (!JsUtil::TypeOf(env, argv[1], napi_function)) {
+        MMI_HILOGE("callback parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    return jsInputDeviceMgr->SetKeyboardRepeatRate(env, repeatRate, argv[1]);
+}
+
 napi_value JsInputDeviceContext::EnumClassConstructor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -479,6 +559,8 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardType", GetKeyboardType),
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceList", GetDeviceList),
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceInfo", GetDeviceInfo),
+        DECLARE_NAPI_STATIC_FUNCTION("setKeyboardRepeatDelay", SetKeyboardRepeatDelay),
+        DECLARE_NAPI_STATIC_FUNCTION("setKeyboardRepeatRate", SetKeyboardRepeatRate),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreateEnumKeyboardType(env, exports) == nullptr) {
