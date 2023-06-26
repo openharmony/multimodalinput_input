@@ -118,8 +118,8 @@ ohos_shared_library("libmmi-client") {
   external_deps = [
     "c_utils:utils",
     "eventhandler:libeventhandler",
-    "hitrace:hitrace_meter",
     "hilog:libhilog",
+    "hitrace:hitrace_meter",
     "ipc:ipc_single",
   ]
 }
