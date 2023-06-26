@@ -24,24 +24,24 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventNapi" };
 } // namespace
 
-napi_status KeyEventNapi::CreateKeyEvent(napi_env env, KeyEvent &in, napi_value &out)
+napi_status KeyEventNapi::CreateKeyEvent(napi_env env, const std::shared_ptr<KeyEvent> &in, napi_value &out)
 {
-    auto status = SetNameProperty(env, out, "action", in.GetKeyAction() - KeyEvent::KEY_ACTION_CANCEL);
+    auto status = SetNameProperty(env, out, "action", in->GetKeyAction() - KeyEvent::KEY_ACTION_CANCEL);
     CHKRR(status, "set action property", status);
 
-    CHECK_RETURN(in.GetKeyItem(), "get key item", status);
-    auto keyItem = in.GetKeyItem();
+    CHECK_RETURN(in->GetKeyItem(), "get key item", status);
+    auto keyItem = in->GetKeyItem();
     status = SetNameProperty(env, out, "key", keyItem);
     CHKRR(status, "set key property", status);
 
-    status = SetNameProperty(env, out, "unicodeChar", in.GetKeyItem()->GetUnicode());
+    status = SetNameProperty(env, out, "unicodeChar", in->GetKeyItem()->GetUnicode());
     CHKRR(status, "set unicodeChar property", status);
 
-    auto keyItems = in.GetKeyItems();
+    auto keyItems = in->GetKeyItems();
     status = SetNameProperty(env, out, "keys", keyItems);
     CHKRR(status, "set keys property", status);
 
-    status = WriteKeyStatusToJs(env, in.GetPressedKeys(), out);
+    status = WriteKeyStatusToJs(env, in->GetPressedKeys(), out);
     CHKRR(status, "set pressed key property", status);
 
     status = WriteFunctionKeyStatusToJs(env, in, out);
@@ -50,32 +50,46 @@ napi_status KeyEventNapi::CreateKeyEvent(napi_env env, KeyEvent &in, napi_value 
     return napi_ok;
 }
 
-napi_status KeyEventNapi::GetKeyEvent(napi_env env, napi_value in, KeyEvent &out)
+napi_status KeyEventNapi::GetKeyEvent(napi_env env, napi_value in, std::shared_ptr<KeyEvent> &out)
 {
     napi_valuetype valueType = napi_undefined;
     auto status = napi_typeof(env, in, &valueType);
     CHECK_RETURN((status == napi_ok) && (valueType == napi_object), "object type invalid", status);
 
     KeyEvent::KeyItem item = GetNamePropertyKeyItem(env, in, "key");
-    out.SetKeyCode(item.GetKeyCode());
+    out->SetKeyCode(item.GetKeyCode());
 
     uint32_t unicode = GetNamePropertyUint32(env, in, "unicodeChar");
-    out.GetKeyItem()->SetUnicode(unicode);
+    out->GetKeyItem()->SetUnicode(unicode);
 
     int32_t keyAction = GetNamePropertyInt32(env, in, "action");
-    out.SetKeyAction(keyAction);
+    out->SetKeyAction(keyAction + KeyEvent::KEY_ACTION_CANCEL);
 
     std::vector<KeyEvent::KeyItem> keyItems = GetNamePropertyKeyItems(env, in, "keys");
     for (const auto &keyItem : keyItems) {
-        out.AddKeyItem(keyItem);
+        out->AddKeyItem(keyItem);
     }
 
     bool lock = GetNamePropertyBool(env, in, "capsLock");
-    out.SetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY, lock);
+    out->SetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY, lock);
     lock = GetNamePropertyBool(env, in, "numLock");
-    out.SetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY, lock);
+    out->SetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY, lock);
     lock = GetNamePropertyBool(env, in, "scrollLock");
-    out.SetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, lock);
+    out->SetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, lock);
+
+    return napi_ok;
+}
+
+napi_status KeyEventNapi::CreateKeyItem(napi_env env, const std::optional<KeyEvent::KeyItem> in, napi_value &out)
+{
+    auto status = SetNameProperty(env, out, "code", in->GetKeyCode());
+    CHKRR(status, "set code property", status);
+
+    status = SetNameProperty(env, out, "pressedTime", in->GetDownTime());
+    CHKRR(status, "set pressedTime property", status);
+
+    status = SetNameProperty(env, out, "deviceId", in->GetDeviceId());
+    CHKRR(status, "set deviceId property", status);
 
     return napi_ok;
 }
@@ -88,20 +102,6 @@ napi_status KeyEventNapi::GetKeyItem(napi_env env, napi_value in, KeyEvent::KeyI
     out.SetDownTime(downTime);
     int32_t deviceId = GetNamePropertyInt32(env, in, "deviceId");
     out.SetDeviceId(deviceId);
-    return napi_ok;
-}
-
-napi_status KeyEventNapi::CreateKeyItem(napi_env env, std::optional<KeyEvent::KeyItem> &in, napi_value &out)
-{
-    auto status = SetNameProperty(env, out, "code", in->GetKeyCode());
-    CHKRR(status, "set code property", status);
-
-    status = SetNameProperty(env, out, "pressedTime", in->GetDownTime());
-    CHKRR(status, "set pressedTime property", status);
-
-    status = SetNameProperty(env, out, "deviceId", in->GetDeviceId());
-    CHKRR(status, "set deviceId property", status);
-
     return napi_ok;
 }
 
@@ -134,15 +134,15 @@ napi_status KeyEventNapi::WriteKeyStatusToJs(napi_env env, const std::vector<int
     return napi_ok;
 }
 
-napi_status KeyEventNapi::WriteFunctionKeyStatusToJs(napi_env env, const KeyEvent &in, napi_value &out)
+napi_status KeyEventNapi::WriteFunctionKeyStatusToJs(napi_env env, const std::shared_ptr<KeyEvent> &in, napi_value &out)
 {
-    auto status = SetNameProperty(env, out, "capsLock", in.GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
+    auto status = SetNameProperty(env, out, "capsLock", in->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
     CHKRR(status, "set capsLock property", status);
 
-    status = SetNameProperty(env, out, "numLock", in.GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY));
+    status = SetNameProperty(env, out, "numLock", in->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY));
     CHKRR(status, "set numLock property", status);
 
-    status = SetNameProperty(env, out, "scrollLock", in.GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
+    status = SetNameProperty(env, out, "scrollLock", in->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
     CHKRR(status, "set scrollLock property", status);
 
     return napi_ok;
