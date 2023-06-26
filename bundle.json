@@ -42,7 +42,7 @@
       "components": [
         "window_manager",
         "hisysevent_native",
-        "startup_l2",
+        "start",
         "napi",
         "c_utils",
         "ipc",
@@ -52,15 +52,13 @@
         "multimedia_image_framework",
         "graphic_standard",
         "drivers_interface_input",
-        "multimodalinput",
         "safwk",
-        "libuv",
         "ability_runtime",
         "access_token",
         "hiviewdfx_hilog_native",
         "ability_base",
         "samgr",
-        "common",
+        "build_framework",
         "config_policy",
         "hicollie",
         "init",
@@ -72,12 +70,10 @@
         "cJSON",
         "node",
         "libuv",
-        "json",
-        "thirdparty_libevdev",
-        "thirdparty_mtdev",
-        "cjson",
         "libevdev",
-        "mtdev"
+        "mtdev",
+        "cjson",
+        "libinput"
       ]
     },
     "build": {
