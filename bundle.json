@@ -42,7 +42,7 @@
       "components": [
         "window_manager",
         "hisysevent_native",
-        "startup",
+        "start",
         "napi",
         "c_utils",
         "ipc",
