@@ -41,12 +41,12 @@
     "deps": {
       "components": [
         "window_manager",
-        "hisysevent_native",
+        "hisysevent",
         "start",
         "napi",
         "c_utils",
         "ipc",
-        "hitrace_native",
+        "hitrace",
         "resource_schedule_service",
         "eventhandler",
         "multimedia_image_framework",
@@ -55,7 +55,6 @@
         "safwk",
         "ability_runtime",
         "access_token",
-        "hiviewdfx_hilog_native",
         "ability_base",
         "samgr",
         "build_framework",
@@ -64,7 +63,7 @@
         "init",
         "preferences",
         "security_component",
-        "hilog_native"
+        "hilog"
       ],
       "third_party": [
         "cJSON",

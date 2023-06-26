@@ -88,7 +88,7 @@ config("libmmi_server_config") {
 
 ohos_rust_shared_ffi("mmi_rust") {
   sources = [ "rust/src/lib.rs" ]
-  external_deps = [ "hilog_native:hilog_rust" ]
+  external_deps = [ "hilog:hilog_rust" ]
   subsystem_name = "multimodalinput"
   part_name = "input"
 }
@@ -97,7 +97,7 @@ ohos_rust_unittest("rust_mmi_test") {
   module_out_path = module_output_path
   sources = [ "rust/src/lib.rs" ]
   deps = [ ":mmi_rust" ]
-  external_deps = [ "hilog_native:hilog_rust" ]
+  external_deps = [ "hilog:hilog_rust" ]
   subsystem_name = "multimodalinput"
   part_name = "input"
 }
@@ -192,9 +192,9 @@ ohos_shared_library("libmmi-server") {
     "graphic_standard:2d_graphics",
     "graphic_standard:librender_service_client",
     "hicollie:libhicollie",
-    "hisysevent_native:libhisysevent",
-    "hitrace_native:hitrace_meter",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
     "init:libbegetutil",
     "ipc:ipc_single",
     "multimedia_image_framework:image_native",
@@ -282,7 +282,7 @@ ohos_unittest("ut-mmi-service-out") {
 
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
     "multimedia_image_framework:image_native",
     "window_manager:libwm",
   ]
@@ -308,7 +308,7 @@ ohos_unittest("TransformPointTest") {
 
   external_deps = [
     "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
+    "hilog:libhilog",
   ]
 }
 
