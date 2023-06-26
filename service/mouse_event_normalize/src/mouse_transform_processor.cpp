@@ -95,6 +95,10 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
         MMI_HILOGE("Failed to handle motion correction");
         return ret;
     }
+#ifdef OHOS_BUILD_EMULATOR
+    absolutionX_ = offset.dx;
+    absolutionY_ = offset.dy;
+#endif
     WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
     pointerEvent_->SetTargetDisplayId(currentDisplayId_);
     MMI_HILOGD("Change coordinate: x:%{public}lf, y:%{public}lf, currentDisplayId_:%{public}d",
@@ -148,14 +152,22 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     auto state = libinput_event_pointer_get_button_state(data);
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_RELEASED);
+#ifndef OHOS_BUILD_EMULATOR
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+#else
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+#endif
         int32_t buttonId = MouseState->LibinputChangeToPointer(button);
         pointerEvent_->DeleteReleaseButton(buttonId);
         isPressed_ = false;
         buttonId_ = PointerEvent::BUTTON_NONE;
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         MouseState->MouseBtnStateCounts(button, BUTTON_STATE_PRESSED);
+#ifndef OHOS_BUILD_EMULATOR
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+#else
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+#endif
         int32_t buttonId = MouseState->LibinputChangeToPointer(button);
         pointerEvent_->SetButtonPressed(buttonId);
         isPressed_ = true;
@@ -443,28 +455,25 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
     switch (type) {
         case LIBINPUT_EVENT_POINTER_MOTION:
         case LIBINPUT_EVENT_POINTER_MOTION_ABSOLUTE:
-        case LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD: {
+        case LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD:
             result = HandleMotionInner(data, event);
             break;
-        }
         case LIBINPUT_EVENT_POINTER_TAP:
-        case LIBINPUT_EVENT_POINTER_BUTTON: {
+        case LIBINPUT_EVENT_POINTER_BUTTON:
             result = HandleButtonInner(data, event);
             break;
-        }
-        case LIBINPUT_EVENT_POINTER_AXIS: {
+#ifndef OHOS_BUILD_EMULATOR
+        case LIBINPUT_EVENT_POINTER_AXIS:
             result = HandleAxisInner(data);
             break;
-        }
+#endif
         case LIBINPUT_EVENT_TOUCHPAD_DOWN:
-        case LIBINPUT_EVENT_TOUCHPAD_UP: {
+        case LIBINPUT_EVENT_TOUCHPAD_UP:
             result = HandleAxisBeginEndInner(event);
             break;
-        }
-        default: {
+        default:
             MMI_HILOGE("Unknown type:%{public}d", type);
             return RET_ERR;
-        }
     }
     PointerEvent::PointerItem pointerItem;
     if (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_UP) {
@@ -473,6 +482,9 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
         HandlePostInner(data, pointerItem);
     }
     WinMgr->UpdateTargetPointer(pointerEvent_);
+#ifdef OHOS_BUILD_EMULATOR
+    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+#endif
     DumpInner();
     return result;
 }
