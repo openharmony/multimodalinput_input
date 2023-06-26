@@ -72,7 +72,6 @@
         "libuv",
         "libevdev",
         "mtdev",
-        "cjson",
         "libinput"
       ]
     },
