@@ -24,19 +24,19 @@
 namespace OHOS {
 namespace MMI {
 /* set property */
-napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, bool value);
-napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, uint16_t value);
-napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, int32_t value);
-napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, uint32_t value);
-napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, float value);
-napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, double value);
-napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, int64_t value);
-napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, std::string value);
+napi_status SetNameProperty(const napi_env &env, napi_value &object, const std::string &name, bool value);
+napi_status SetNameProperty(const napi_env &env, napi_value &object, const std::string &name, uint16_t value);
+napi_status SetNameProperty(const napi_env &env, napi_value &object, const std::string &name, int32_t value);
+napi_status SetNameProperty(const napi_env &env, napi_value &object, const std::string &name, uint32_t value);
+napi_status SetNameProperty(const napi_env &env, napi_value &object, const std::string &name, float value);
+napi_status SetNameProperty(const napi_env &env, napi_value &object, const std::string &name, double value);
+napi_status SetNameProperty(const napi_env &env, napi_value &object, const std::string &name, int64_t value);
+napi_status SetNameProperty(const napi_env &env, napi_value &object, const std::string &name, std::string value);
 napi_status SetNameProperty(
-    const napi_env &env, napi_value object, const std::string &name, std::optional<KeyEvent::KeyItem> &value);
+    const napi_env &env, napi_value &object, const std::string &name, std::optional<KeyEvent::KeyItem> &value);
 napi_status SetNameProperty(
-    const napi_env &env, napi_value object, const std::string &name, std::vector<KeyEvent::KeyItem> &value);
-napi_status SetNameProperty(const napi_env &env, napi_value object, const std::string &name, napi_value value);
+    const napi_env &env, napi_value &object, const std::string &name, std::vector<KeyEvent::KeyItem> &value);
+napi_status SetNameProperty(const napi_env &env, napi_value &object, const std::string &name, napi_value value);
 
 /* get property */
 bool GetNamePropertyBool(const napi_env &env, const napi_value &object, const std::string &name);
