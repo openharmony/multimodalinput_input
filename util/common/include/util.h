@@ -26,8 +26,8 @@ namespace OHOS {
 namespace MMI {
 struct DeviceConfig {
     int32_t autoSwitch { 1 };
-    int32_t delayTime { 300 };
-    int32_t intervalTime { 100 };
+    int32_t delayTime { 500 };
+    int32_t intervalTime { 50 };
     int32_t keyboardType { 0 };
 };
 

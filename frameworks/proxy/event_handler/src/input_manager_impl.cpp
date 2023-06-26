@@ -997,6 +997,28 @@ int32_t InputManagerImpl::GetKeyboardType(int32_t deviceId, std::function<void(i
     return InputDevImpl.GetKeyboardType(deviceId, callback);
 }
 
+int32_t InputManagerImpl::SetKeyboardRepeatDelay(int32_t delay)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    return InputDevImpl.SetKeyboardRepeatDelay(delay);
+}
+
+int32_t InputManagerImpl::SetKeyboardRepeatRate(int32_t rate)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    return InputDevImpl.SetKeyboardRepeatRate(rate);
+}
+
 void InputManagerImpl::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
 {
     CALL_DEBUG_ENTER;

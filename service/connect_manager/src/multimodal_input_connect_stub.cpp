@@ -205,6 +205,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_POINTER_SPEED):
             return StubGetTouchpadPointerSpeed(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_KEYBOARD_REPEAT_DELAY):
+            return StubSetKeyboardRepeatDelay(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_KEYBOARD_REPEAT_RATE):
+            return StubSetKeyboardRepeatRate(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -1430,6 +1436,40 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadPointerSpeed(MessageParcel& d
     }
     WRITEINT32(reply, speed, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("Touch pad pointer speed :%{public}d, ret:%{public}d", speed, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetKeyboardRepeatDelay(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t delay;
+    READINT32(data, delay, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetKeyboardRepeatDelay(delay);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set keyboard repeat delay failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetKeyboardRepeatRate(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t rate;
+    READINT32(data, rate, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetKeyboardRepeatRate(rate);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set keyboard repeat rate failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
     return RET_OK;
 }
 } // namespace MMI
