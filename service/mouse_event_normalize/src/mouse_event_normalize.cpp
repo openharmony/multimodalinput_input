@@ -205,5 +205,15 @@ int32_t MouseEventNormalize::GetTouchpadPointerSpeed(int32_t &speed) const
 {
     return MouseTransformProcessor::GetTouchpadPointerSpeed(speed);
 }
+
+int32_t MouseEventNormalize::SetTouchpadRightClickType(int32_t type) const
+{
+    return MouseTransformProcessor::SetTouchpadRightClickType(type);
+}
+
+int32_t MouseEventNormalize::GetTouchpadRightClickType(int32_t &type) const
+{
+    return MouseTransformProcessor::GetTouchpadRightClickType(type);
+}
 } // namespace MMI
 } // namespace OHOS

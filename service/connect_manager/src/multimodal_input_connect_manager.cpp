@@ -486,5 +486,41 @@ int32_t MultimodalInputConnectManager::GetTouchpadPointerSpeed(int32_t &speed)
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetTouchpadPointerSpeed(speed);
 }
+
+int32_t MultimodalInputConnectManager::SetTouchpadPinchSwitch(bool switchFlag)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetTouchpadPinchSwitch(switchFlag);
+}
+
+int32_t MultimodalInputConnectManager::GetTouchpadPinchSwitch(bool &switchFlag)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetTouchpadPinchSwitch(switchFlag);
+}
+
+int32_t MultimodalInputConnectManager::SetTouchpadSwipeSwitch(bool switchFlag)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetTouchpadSwipeSwitch(switchFlag);
+}
+
+int32_t MultimodalInputConnectManager::GetTouchpadSwipeSwitch(bool &switchFlag)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetTouchpadSwipeSwitch(switchFlag);
+}
+
+int32_t MultimodalInputConnectManager::SetTouchpadRightClickType(int32_t type)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetTouchpadRightClickType(type);
+}
+
+int32_t MultimodalInputConnectManager::GetTouchpadRightClickType(int32_t &type)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetTouchpadRightClickType(type);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -43,10 +43,10 @@ struct AccelerateCurve {
 };
 class MouseTransformProcessor final : public std::enable_shared_from_this<MouseTransformProcessor> {
 public:
-    enum class RightMenuSwitchType {
+    enum class RightClickType {
         TP_RIGHT_BUTTON = 1,
         TP_LEFT_BUTTON = 2,
-        TP_TWO_FINGERS_LIGHT_TAP = 3,
+        TP_TWO_FINGER_TAP = 3,
     };
 
     enum class PointerDataSource {
@@ -72,11 +72,15 @@ private:
     void HandleAxisPostInner(PointerEvent::PointerItem &pointerItem);
     void HandlePostInner(struct libinput_event_pointer* data, PointerEvent::PointerItem &pointerItem);
     void HandleTouchPadAxisState(libinput_pointer_axis_source source, int32_t& direction, bool& tpScrollSwitch);
+    void HandleTouchpadRightButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
+    void HandleTouchpadLeftButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
+    void HandleTouchpadTwoFingerButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
+    void TransTouchpadRightButton(struct libinput_event_pointer* data, const int32_t type, uint32_t &button);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    int32_t HandleButtonValueInner(struct libinput_event_pointer* data);
+    int32_t HandleButtonValueInner(struct libinput_event_pointer* data, uint32_t button);
     void DumpInner();
     void SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, struct libinput_event_pointer* data);
     int32_t GetTouchpadSpeed(void);
@@ -102,6 +106,8 @@ public:
     static int32_t GetTouchpadScrollDirection(bool &state);
     static int32_t SetTouchpadTapSwitch(bool switchFlag);
     static int32_t GetTouchpadTapSwitch(bool &switchFlag);
+    static int32_t SetTouchpadRightClickType(int32_t type);
+    static int32_t GetTouchpadRightClickType(int32_t &type);
     static int32_t SetTouchpadPointerSpeed(int32_t speed);
     static int32_t GetTouchpadPointerSpeed(int32_t &speed);
     void SetConfigPointerSpeed(int32_t speed);
