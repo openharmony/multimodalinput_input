@@ -3127,7 +3127,18 @@ diff -Naur old/src/evdev-mt-touchpad-tap.c new/src/evdev-mt-touchpad-tap.c
  	}
  	return NULL;
  }
-@@ -138,12 +139,16 @@
+@@ -125,6 +126,10 @@
+ 	      int nfingers,
+ 	      enum libinput_button_state state)
+ {
++	if (tp->tap.state == TAP_STATE_IDLE) {
++		return;
++	}
++
+ 	int32_t button;
+ 	int32_t button_map[2][3] = {
+ 		{ BTN_LEFT, BTN_RIGHT, BTN_MIDDLE },
+@@ -138,12 +143,16 @@
  
  	button = button_map[tp->tap.map][nfingers - 1];
  
@@ -3145,7 +3156,7 @@ diff -Naur old/src/evdev-mt-touchpad-tap.c new/src/evdev-mt-touchpad-tap.c
  				    time,
  				    button,
  				    state);
-@@ -264,6 +269,10 @@
+@@ -264,6 +273,10 @@
  		tp->tap.nfingers_down--;
  		t->tap.state = TAP_TOUCH_STATE_DEAD;
  		tp_tap_clear_timer(tp);
@@ -3156,7 +3167,7 @@ diff -Naur old/src/evdev-mt-touchpad-tap.c new/src/evdev-mt-touchpad-tap.c
  		break;
  	case TAP_EVENT_PALM:
  		tp->tap.state = TAP_STATE_IDLE;
-@@ -290,8 +299,48 @@
+@@ -290,8 +303,48 @@
  		tp->tap.state = TAP_STATE_IDLE;
  		break;
  	case TAP_EVENT_MOTION:
@@ -3205,7 +3216,7 @@ diff -Naur old/src/evdev-mt-touchpad-tap.c new/src/evdev-mt-touchpad-tap.c
  	case TAP_EVENT_TIMEOUT:
  		break;
  	case TAP_EVENT_BUTTON:
-@@ -309,6 +358,12 @@
+@@ -309,6 +362,12 @@
  	case TAP_EVENT_PALM_UP:
  		break;
  	}
@@ -3218,7 +3229,7 @@ diff -Naur old/src/evdev-mt-touchpad-tap.c new/src/evdev-mt-touchpad-tap.c
  }
  
  static void
-@@ -1143,6 +1198,9 @@
+@@ -1143,6 +1202,9 @@
  	case TAP_STATE_DEAD:
  		tp_tap_dead_handle_event(tp, t, event, time);
  		break;
@@ -3228,7 +3239,7 @@ diff -Naur old/src/evdev-mt-touchpad-tap.c new/src/evdev-mt-touchpad-tap.c
  	}
  
  	if (tp->tap.state == TAP_STATE_IDLE || tp->tap.state == TAP_STATE_DEAD)
-@@ -1427,23 +1485,7 @@
+@@ -1427,23 +1489,7 @@
  static enum libinput_config_tap_state
  tp_tap_default(struct evdev_device *evdev)
  {
@@ -3253,7 +3264,7 @@ diff -Naur old/src/evdev-mt-touchpad-tap.c new/src/evdev-mt-touchpad-tap.c
  }
  
  static enum libinput_config_tap_state
-@@ -1507,7 +1549,7 @@
+@@ -1507,7 +1553,7 @@
  static inline enum libinput_config_drag_state
  tp_drag_default(struct evdev_device *device)
  {
@@ -3262,7 +3273,7 @@ diff -Naur old/src/evdev-mt-touchpad-tap.c new/src/evdev-mt-touchpad-tap.c
  }
  
  static enum libinput_config_drag_state
-@@ -1669,3 +1711,63 @@
+@@ -1669,3 +1715,63 @@
  		return false;
  	}
  }
