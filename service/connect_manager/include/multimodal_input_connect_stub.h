@@ -92,6 +92,12 @@ protected:
     int32_t StubGetTouchpadTapSwitch(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetTouchpadPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetTouchpadPointerSpeed(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetTouchpadPinchSwitch(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetTouchpadPinchSwitch(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetTouchpadSwipeSwitch(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetTouchpadSwipeSwitch(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetTouchpadRightClickType(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetTouchpadRightClickType(MessageParcel& data, MessageParcel& reply);
 
 private:
     int32_t VerifyTouchPadSetting(void);

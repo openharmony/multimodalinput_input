@@ -75,6 +75,12 @@ enum class MultimodalinputConnectInterfaceCode {
     SET_MOUSE_ICON = 53,
     SET_KEYBOARD_REPEAT_DELAY = 54,
     SET_KEYBOARD_REPEAT_RATE = 55,
+    SET_TP_PINCH_SWITCH = 56,
+    GET_TP_PINCH_SWITCH = 57,
+    SET_TP_SWIPE_SWITCH = 58,
+    GET_TP_SWIPE_SWITCH = 59,
+    SET_TP_RIGHT_CLICK_TYPE = 60,
+    GET_TP_RIGHT_CLICK_TYPE = 61,
 };
 
 enum class MultimodalinputEventInterfaceCode {

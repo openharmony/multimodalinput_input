@@ -4186,7 +4186,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_EnableInputDevice_001, TestSize.Leve
 
 /**
  * @tc.name: InputManagerTest_SetTouchpadScrollSwitch_001
- * @tc.desc: Set touch pad scroll switch
+ * @tc.desc: Set touchpad scroll switch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4201,7 +4201,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadScrollSwitch_001, TestSiz
 
 /**
  * @tc.name: InputManagerTest_GetTouchpadScrollSwitch_001
- * @tc.desc: Get touch pad scroll switch
+ * @tc.desc: Get touchpad scroll switch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4219,7 +4219,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadScrollSwitch_001, TestSiz
 
 /**
  * @tc.name: InputManagerTest_SetTouchpadScrollDirection_001
- * @tc.desc: Set touch pad scroll direct switch
+ * @tc.desc: Set touchpad scroll direction switch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4234,7 +4234,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadScrollDirection_001, Test
 
 /**
  * @tc.name: InputManagerTest_GetTouchpadScrollDirection_001
- * @tc.desc: Get touch pad scroll direct switch
+ * @tc.desc: Get touchpad scroll direction switch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4252,7 +4252,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadScrollDirection_001, Test
 
 /**
  * @tc.name: InputManagerTest_SetTouchpadTapSwitch_001
- * @tc.desc: Set touch pad tap switch
+ * @tc.desc: Set touchpad tap switch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4267,7 +4267,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadTapSwitch_001, TestSize.L
 
 /**
  * @tc.name: InputManagerTest_GetTouchpadTapSwitch_001
- * @tc.desc: Get touch pad tap switch
+ * @tc.desc: Get touchpad tap switch
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4285,7 +4285,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadTapSwitch_001, TestSize.L
 
 /**
  * @tc.name: InputManagerTest_SetTouchpadPointerSpeed_001
- * @tc.desc: Set touch pad pointer speed
+ * @tc.desc: Set touchpad pointer speed
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4300,7 +4300,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadPointerSpeed_001, TestSiz
 
 /**
  * @tc.name: InputManagerTest_GetTouchpadPointerSpeed_001
- * @tc.desc: Get touch pad scroll switch
+ * @tc.desc: Get touchpad pointer speed
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -4389,5 +4389,103 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_003, TestSize.Level1)
     ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEFAULT);
 }
 
+/**
+ * @tc.name: InputManagerTest_SetTouchpadRightClickType_001
+ * @tc.desc: Set touchpad right click type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadRightClickType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t type = 1;
+    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadRightClickType(type) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetTouchpadRightClickType_001
+ * @tc.desc: Get touchpad right click type
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadRightClickType_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t type = 2;
+    InputManager::GetInstance()->SetTouchpadRightClickType(type);
+    int32_t newType = 1;
+    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadRightClickType(newType) == RET_OK);
+    ASSERT_TRUE(type == newType);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetTouchpadPinchSwitch_001
+ * @tc.desc: Set touchpad pinch switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadPinchSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool flag = false;
+    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadPinchSwitch(flag) == RET_OK);
+    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
+    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetTouchpadPinchSwitch_001
+ * @tc.desc: Get touchpad pinch switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadPinchSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool flag = true;
+    InputManager::GetInstance()->SetTouchpadPinchSwitch(flag);
+    bool newFlag = true;
+    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadPinchSwitch(newFlag) == RET_OK);
+    ASSERT_TRUE(flag == newFlag);
+    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
+    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetTouchpadSwipeSwitch_001
+ * @tc.desc: Set touchpad swipe switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetTouchpadSwipeSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool flag = false;
+    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadSwipeSwitch(flag) == RET_OK);
+    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
+    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_GetTouchpadSwipeSwitch_001
+ * @tc.desc: Get touchpad swipe switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadSwipeSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool flag = true;
+    InputManager::GetInstance()->SetTouchpadSwipeSwitch(flag);
+    bool newFlag = true;
+    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadSwipeSwitch(newFlag) == RET_OK);
+    ASSERT_TRUE(flag == newFlag);
+    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
+    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -53,6 +53,12 @@ public:
     static napi_value GetTouchpadTapSwitch(napi_env env, napi_callback_info info);
     static napi_value SetTouchpadPointerSpeed(napi_env env, napi_callback_info info);
     static napi_value GetTouchpadPointerSpeed(napi_env env, napi_callback_info info);
+    static napi_value SetTouchpadPinchSwitch(napi_env env, napi_callback_info info);
+    static napi_value GetTouchpadPinchSwitch(napi_env env, napi_callback_info info);
+    static napi_value SetTouchpadSwipeSwitch(napi_env env, napi_callback_info info);
+    static napi_value GetTouchpadSwipeSwitch(napi_env env, napi_callback_info info);
+    static napi_value SetTouchpadRightClickType(napi_env env, napi_callback_info info);
+    static napi_value GetTouchpadRightClickType(napi_env env, napi_callback_info info);
 
 private:
     static napi_value SetTouchpadBoolData(napi_env env, napi_callback_info info, SetTouchpadBoolDataFunc func);

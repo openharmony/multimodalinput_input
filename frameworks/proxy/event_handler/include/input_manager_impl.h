@@ -135,6 +135,12 @@ public:
     int32_t GetTouchpadTapSwitch(bool &switchFlag);
     int32_t SetTouchpadPointerSpeed(int32_t speed);
     int32_t GetTouchpadPointerSpeed(int32_t &speed);
+    int32_t SetTouchpadPinchSwitch(bool switchFlag);
+    int32_t GetTouchpadPinchSwitch(bool &switchFlag);
+    int32_t SetTouchpadSwipeSwitch(bool switchFlag);
+    int32_t GetTouchpadSwipeSwitch(bool &switchFlag);
+    int32_t SetTouchpadRightClickType(int32_t type);
+    int32_t GetTouchpadRightClickType(int32_t &type);
 
     void SetAnrObserver(std::shared_ptr<IAnrObserver> observer);
     void OnAnr(int32_t pid);

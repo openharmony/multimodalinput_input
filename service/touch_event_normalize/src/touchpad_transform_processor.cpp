@@ -23,6 +23,11 @@
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "mouse_device_state.h"
+#include "preferences.h"
+#include "preferences_impl.h"
+#include "preferences_errno.h"
+#include "preferences_helper.h"
+#include "preferences_xml_utils.h"
 
 namespace OHOS {
 namespace MMI {
@@ -31,6 +36,8 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "TouchPa
 constexpr int32_t MT_TOOL_NONE { -1 };
 constexpr int32_t BTN_DOWN { 1 };
 constexpr int32_t FINGER_COUNT_MAX { 5 };
+constexpr int32_t TP_SYSTEM_PINCH_FINGER_CNT { 2 };
+const std::string TOUCHPAD_FILE_NAME = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
 } // namespace
 
 TouchPadTransformProcessor::TouchPadTransformProcessor(int32_t deviceId)
@@ -244,6 +251,17 @@ int32_t TouchPadTransformProcessor::GetTouchPadToolType(struct libinput_device *
 void TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *event, int32_t action)
 {
     CALL_DEBUG_ENTER;
+
+    bool tpSwipeSwitch = true;
+    if (GetTouchpadSwipeSwitch(tpSwipeSwitch) != RET_OK) {
+        MMI_HILOGD("Failed to get touchpad swipe switch flag, default is true.");
+    }
+
+    if (!tpSwipeSwitch) {
+        MMI_HILOGD("Touchpad swipe switch is false.");
+        return;
+    }
+
     CHKPV(event);
     struct libinput_event_gesture *gesture = libinput_event_get_gesture_event(event);
     CHKPV(gesture);
@@ -304,9 +322,26 @@ void TouchPadTransformProcessor::OnEventTouchPadSwipeEnd(struct libinput_event *
 void TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *event, int32_t action)
 {
     CALL_DEBUG_ENTER;
+
+    bool tpPinchSwitch = true;
+    if (GetTouchpadPinchSwitch(tpPinchSwitch) != RET_OK) {
+        MMI_HILOGD("Failed to get touchpad pinch switch flag, default is true.");
+    }
+
     CHKPV(event);
     auto gesture = libinput_event_get_gesture_event(event);
     CHKPV(gesture);
+    int32_t fingerCount = libinput_event_gesture_get_finger_count(gesture);
+    if (fingerCount <= 0 || fingerCount > FINGER_COUNT_MAX) {
+        MMI_HILOGE("Finger count is invalid.");
+        return;
+    }
+
+    if (!tpPinchSwitch && fingerCount == TP_SYSTEM_PINCH_FINGER_CNT) {
+        MMI_HILOGD("Touchpad pinch switch is false.");
+        return;
+    }
+
     int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(gesture));
     double scale = libinput_event_gesture_get_scale(gesture);
     pointerEvent_->SetActionTime(GetSysClockTime());
@@ -324,11 +359,6 @@ void TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *eve
         pointerEvent_->SetButtonPressed(item);
     }
 
-    int32_t fingerCount = libinput_event_gesture_get_finger_count(gesture);
-    if (fingerCount <= 0 || fingerCount > FINGER_COUNT_MAX) {
-        MMI_HILOGE("Finger count is invalid.");
-        return;
-    }
     pointerEvent_->SetFingerCount(fingerCount);
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->SetTargetDisplayId(0);
@@ -365,6 +395,89 @@ void TouchPadTransformProcessor::InitToolType()
     vecToolType_.push_back(std::make_pair(BTN_TOOL_FINGER, PointerEvent::TOOL_TYPE_FINGER));
     vecToolType_.push_back(std::make_pair(BTN_TOOL_MOUSE, PointerEvent::TOOL_TYPE_MOUSE));
     vecToolType_.push_back(std::make_pair(BTN_TOOL_LENS, PointerEvent::TOOL_TYPE_LENS));
+}
+
+int32_t TouchPadTransformProcessor::SetTouchpadSwipeSwitch(bool switchFlag)
+{
+    std::string name = "touchpadSwipe";
+    if (PutConfigDataToDatabase(name, switchFlag) != RET_OK) {
+        MMI_HILOGE("Failed to set touchpad swpie switch flag to mem.");
+        return RET_ERR;
+    }
+
+    return RET_OK;
+}
+
+int32_t TouchPadTransformProcessor::GetTouchpadSwipeSwitch(bool &switchFlag)
+{
+    std::string name = "touchpadSwipe";
+    if (GetConfigDataFromDatabase(name, switchFlag) != RET_OK) {
+        MMI_HILOGE("Failed to get touchpad swpie switch flag from mem.");
+        return RET_ERR;
+    }
+
+    return RET_OK;
+}
+
+int32_t TouchPadTransformProcessor::SetTouchpadPinchSwitch(bool switchFlag)
+{
+    std::string name = "touchpadPinch";
+    if (PutConfigDataToDatabase(name, switchFlag) != RET_OK) {
+        MMI_HILOGE("Failed to set touchpad pinch switch flag to mem.");
+        return RET_ERR;
+    }
+
+    return RET_OK;
+}
+
+int32_t TouchPadTransformProcessor::GetTouchpadPinchSwitch(bool &switchFlag)
+{
+    std::string name = "touchpadPinch";
+    if (GetConfigDataFromDatabase(name, switchFlag) != RET_OK) {
+        MMI_HILOGE("Failed to get touchpad pinch switch flag from mem.");
+        return RET_ERR;
+    }
+
+    return RET_OK;
+}
+
+int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
+{
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(TOUCHPAD_FILE_NAME, errCode);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
+        return RET_ERR;
+    }
+    int32_t ret = pref->PutBool(key, value);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Put value is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    ret = pref->FlushSync();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(TOUCHPAD_FILE_NAME);
+    return RET_OK;
+}
+
+int32_t TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &value)
+{
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(TOUCHPAD_FILE_NAME, errCode);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
+        return RET_ERR;
+    }
+    value = pref->GetBool(key, true);
+
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(TOUCHPAD_FILE_NAME);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

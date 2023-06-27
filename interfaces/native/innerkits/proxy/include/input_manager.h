@@ -550,6 +550,54 @@ public:
      */
     int32_t GetTouchpadPointerSpeed(int32_t &speed);
 
+    /**
+     * @brief Set the switch of touchpad pinch.
+     * @param switchFlag Indicates the touchpad pinch switch state.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t SetTouchpadPinchSwitch(bool switchFlag);
+
+    /**
+     * @brief Get the switch of touchpad pinch.
+     * @param switchFlag Indicates the touchpad pinch switch state.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t GetTouchpadPinchSwitch(bool &switchFlag);
+
+    /**
+     * @brief Set the switch of touchpad swipe.
+     * @param switchFlag Indicates the touchpad swipe switch state.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t SetTouchpadSwipeSwitch(bool switchFlag);
+
+    /**
+     * @brief Get the switch of touchpad swipe.
+     * @param switchFlag Indicates the touchpad swipe switch state.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t GetTouchpadSwipeSwitch(bool &switchFlag);
+
+    /**
+     * @brief Set the touchpad right click type.
+     * @param type Indicates the touchpad right menu type.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t SetTouchpadRightClickType(int32_t type);
+
+    /**
+     * @brief Get the touchpad right click type.
+     * @param type Indicates the touchpad right menu type.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t GetTouchpadRightClickType(int32_t &type);
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
      * @brief Sets the enhance config of the security component.

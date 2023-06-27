@@ -89,6 +89,12 @@ public:
     int32_t GetTouchpadTapSwitch(bool &switchFlag) override;
     int32_t SetTouchpadPointerSpeed(int32_t speed) override;
     int32_t GetTouchpadPointerSpeed(int32_t &speed) override;
+    int32_t SetTouchpadPinchSwitch(bool switchFlag) override;
+    int32_t GetTouchpadPinchSwitch(bool &switchFlag) override;
+    int32_t SetTouchpadSwipeSwitch(bool switchFlag) override;
+    int32_t GetTouchpadSwipeSwitch(bool &switchFlag) override;
+    int32_t SetTouchpadRightClickType(int32_t type) override;
+    int32_t GetTouchpadRightClickType(int32_t &type) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

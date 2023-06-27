@@ -1177,7 +1177,7 @@ int32_t InputManagerImpl::SetTouchpadScrollSwitch(bool switchFlag)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MultimodalInputConnMgr->SetTouchpadScrollSwitch(switchFlag);
     if (ret != RET_OK) {
-        MMI_HILOGE("Set the touch pad scroll switch failed, ret:%{public}d", ret);
+        MMI_HILOGE("Set the touchpad scroll switch failed, ret:%{public}d", ret);
     }
     return ret;
 #else
@@ -1193,7 +1193,7 @@ int32_t InputManagerImpl::GetTouchpadScrollSwitch(bool &switchFlag)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MultimodalInputConnMgr->GetTouchpadScrollSwitch(switchFlag);
     if (ret != RET_OK) {
-        MMI_HILOGE("Get the touch pad scroll switch failed");
+        MMI_HILOGE("Get the touchpad scroll switch failed");
     }
     return ret;
 #else
@@ -1209,7 +1209,7 @@ int32_t InputManagerImpl::SetTouchpadScrollDirection(bool state)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MultimodalInputConnMgr->SetTouchpadScrollDirection(state);
     if (ret != RET_OK) {
-        MMI_HILOGE("Set the touch pad scroll direct switch failed, ret:%{public}d", ret);
+        MMI_HILOGE("Set the touchpad scroll direction switch failed, ret:%{public}d", ret);
     }
     return ret;
 #else
@@ -1225,7 +1225,7 @@ int32_t InputManagerImpl::GetTouchpadScrollDirection(bool &state)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MultimodalInputConnMgr->GetTouchpadScrollDirection(state);
     if (ret != RET_OK) {
-        MMI_HILOGE("Get the touch pad scroll direct switch failed");
+        MMI_HILOGE("Get the touchpad scroll direction switch failed");
     }
     return ret;
 #else
@@ -1241,7 +1241,7 @@ int32_t InputManagerImpl::SetTouchpadTapSwitch(bool switchFlag)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MultimodalInputConnMgr->SetTouchpadTapSwitch(switchFlag);
     if (ret != RET_OK) {
-        MMI_HILOGE("Set the touch pad tap switch failed, ret:%{public}d", ret);
+        MMI_HILOGE("Set the touchpad tap switch failed, ret:%{public}d", ret);
     }
     return ret;
 #else
@@ -1257,7 +1257,7 @@ int32_t InputManagerImpl::GetTouchpadTapSwitch(bool &switchFlag)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MultimodalInputConnMgr->GetTouchpadTapSwitch(switchFlag);
     if (ret != RET_OK) {
-        MMI_HILOGE("Get the touch pad tap switch failed");
+        MMI_HILOGE("Get the touchpad tap switch failed");
     }
     return ret;
 #else
@@ -1273,7 +1273,7 @@ int32_t InputManagerImpl::SetTouchpadPointerSpeed(int32_t speed)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MultimodalInputConnMgr->SetTouchpadPointerSpeed(speed);
     if (ret != RET_OK) {
-        MMI_HILOGE("Set the touch pad pointer speed failed, ret:%{public}d", ret);
+        MMI_HILOGE("Set the touchpad pointer speed failed, ret:%{public}d", ret);
     }
     return ret;
 #else
@@ -1289,7 +1289,103 @@ int32_t InputManagerImpl::GetTouchpadPointerSpeed(int32_t &speed)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MultimodalInputConnMgr->GetTouchpadPointerSpeed(speed);
     if (ret != RET_OK) {
-        MMI_HILOGE("Get the touch pad pointer speed failed");
+        MMI_HILOGE("Get the touchpad pointer speed failed");
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::SetTouchpadPinchSwitch(bool switchFlag)
+{
+    CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetTouchpadPinchSwitch(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set the touchpad pinch switch failed, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::GetTouchpadPinchSwitch(bool &switchFlag)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->GetTouchpadPinchSwitch(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the touchpad pinch switch failed");
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::SetTouchpadSwipeSwitch(bool switchFlag)
+{
+    CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetTouchpadSwipeSwitch(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set the touchpad swipe switch failed, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::GetTouchpadSwipeSwitch(bool &switchFlag)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->GetTouchpadSwipeSwitch(switchFlag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the touchpad swipe switch failed");
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::SetTouchpadRightClickType(int32_t type)
+{
+    CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetTouchpadRightClickType(type);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set the touchpad right click type failed, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::GetTouchpadRightClickType(int32_t &type)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->GetTouchpadRightClickType(type);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get the touchpad right click failed");
     }
     return ret;
 #else

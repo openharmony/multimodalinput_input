@@ -1360,5 +1360,41 @@ int32_t MultimodalInputConnectProxy::GetTouchpadPointerSpeed(int32_t &speed)
     return GetTouchpadInt32Data(speed, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
         GET_TP_POINTER_SPEED));
 }
+
+int32_t MultimodalInputConnectProxy::SetTouchpadPinchSwitch(bool switchFlag)
+{
+    return SetTouchpadBoolData(switchFlag, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        SET_TP_PINCH_SWITCH));
+}
+
+int32_t MultimodalInputConnectProxy::GetTouchpadPinchSwitch(bool &switchFlag)
+{
+    return GetTouchpadBoolData(switchFlag, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        GET_TP_PINCH_SWITCH));
+}
+
+int32_t MultimodalInputConnectProxy::SetTouchpadSwipeSwitch(bool switchFlag)
+{
+    return SetTouchpadBoolData(switchFlag, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        SET_TP_SWIPE_SWITCH));
+}
+
+int32_t MultimodalInputConnectProxy::GetTouchpadSwipeSwitch(bool &switchFlag)
+{
+    return GetTouchpadBoolData(switchFlag, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        GET_TP_SWIPE_SWITCH));
+}
+
+int32_t MultimodalInputConnectProxy::SetTouchpadRightClickType(int32_t type)
+{
+    return SetTouchpadInt32Data(type, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        SET_TP_RIGHT_CLICK_TYPE));
+}
+
+int32_t MultimodalInputConnectProxy::GetTouchpadRightClickType(int32_t &type)
+{
+    return GetTouchpadInt32Data(type, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        GET_TP_RIGHT_CLICK_TYPE));
+}
 } // namespace MMI
 } // namespace OHOS

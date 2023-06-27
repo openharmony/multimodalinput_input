@@ -608,5 +608,50 @@ napi_value JsPointerManager::GetTouchpadPointerSpeed(napi_env env, napi_value ha
     int32_t ret = InputManager::GetInstance()->GetTouchpadPointerSpeed(speed);
     return GetTouchpadInt32Data(env, handle, speed, ret);
 }
+
+napi_value JsPointerManager::SetTouchpadPinchSwitch(napi_env env, bool switchFlag, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadPinchSwitch(switchFlag);
+    return SetTouchpadData(env, handle, ret);
+}
+
+napi_value JsPointerManager::GetTouchpadPinchSwitch(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    bool switchFlag = true;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadPinchSwitch(switchFlag);
+    return GetTouchpadBoolData(env, handle, switchFlag, ret);
+}
+
+napi_value JsPointerManager::SetTouchpadSwipeSwitch(napi_env env, bool switchFlag, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadSwipeSwitch(switchFlag);
+    return SetTouchpadData(env, handle, ret);
+}
+
+napi_value JsPointerManager::GetTouchpadSwipeSwitch(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    bool switchFlag = true;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadSwipeSwitch(switchFlag);
+    return GetTouchpadBoolData(env, handle, switchFlag, ret);
+}
+
+napi_value JsPointerManager::SetTouchpadRightClickType(napi_env env, int32_t type, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadRightClickType(type);
+    return SetTouchpadData(env, handle, ret);
+}
+
+napi_value JsPointerManager::GetTouchpadRightClickType(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t type = 1;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadRightClickType(type);
+    return GetTouchpadInt32Data(env, handle, type, ret);
+}
 } // namespace MMI
 } // namespace OHOS
