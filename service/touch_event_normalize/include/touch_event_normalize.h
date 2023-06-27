@@ -50,6 +50,10 @@ public:
 public:
     DISALLOW_COPY_AND_MOVE(TouchEventNormalize);
     std::shared_ptr<PointerEvent> OnLibInput(struct libinput_event *event, DeviceType deviceType);
+    int32_t SetTouchpadPinchSwitch(bool switchFlag) const;
+    int32_t GetTouchpadPinchSwitch(bool &switchFlag) const;
+    int32_t SetTouchpadSwipeSwitch(bool switchFlag) const;
+    int32_t GetTouchpadSwipeSwitch(bool &switchFlag) const;
 
 private:
     std::shared_ptr<TransformProcessor> MakeTransformProcessor(

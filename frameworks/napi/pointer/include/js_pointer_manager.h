@@ -80,6 +80,12 @@ public:
     napi_value GetTouchpadTapSwitch(napi_env env, napi_value handle = nullptr);
     napi_value SetTouchpadPointerSpeed(napi_env env, int32_t speed, napi_value handle = nullptr);
     napi_value GetTouchpadPointerSpeed(napi_env env, napi_value handle = nullptr);
+    napi_value SetTouchpadPinchSwitch(napi_env env, bool switchFlag, napi_value handle = nullptr);
+    napi_value GetTouchpadPinchSwitch(napi_env env, napi_value handle = nullptr);
+    napi_value SetTouchpadSwipeSwitch(napi_env env, bool switchFlag, napi_value handle = nullptr);
+    napi_value GetTouchpadSwipeSwitch(napi_env env, napi_value handle = nullptr);
+    napi_value SetTouchpadRightClickType(napi_env env, int32_t type, napi_value handle = nullptr);
+    napi_value GetTouchpadRightClickType(napi_env env, napi_value handle = nullptr);
 
 private:
     napi_value SetTouchpadData(napi_env env, napi_value handle, int32_t errorCode);

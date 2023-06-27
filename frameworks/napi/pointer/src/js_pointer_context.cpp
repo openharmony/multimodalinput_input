@@ -899,6 +899,84 @@ napi_value JsPointerContext::GetTouchpadPointerSpeed(napi_env env, napi_callback
     return GetTouchpadData(env, info, func);
 }
 
+napi_value JsPointerContext::SetTouchpadPinchSwitch(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, bool switchFlag, napi_value handle) -> napi_value {
+        return jsPointerMgr->SetTouchpadPinchSwitch(env, switchFlag, handle);
+    };
+    return SetTouchpadBoolData(env, info, func);
+}
+
+napi_value JsPointerContext::GetTouchpadPinchSwitch(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
+        return jsPointerMgr->GetTouchpadPinchSwitch(env, handle);
+    };
+    return GetTouchpadData(env, info, func);
+}
+
+napi_value JsPointerContext::SetTouchpadSwipeSwitch(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, bool switchFlag, napi_value handle) -> napi_value {
+        return jsPointerMgr->SetTouchpadSwipeSwitch(env, switchFlag, handle);
+    };
+    return SetTouchpadBoolData(env, info, func);
+}
+
+napi_value JsPointerContext::GetTouchpadSwipeSwitch(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
+        return jsPointerMgr->GetTouchpadSwipeSwitch(env, handle);
+    };
+    return GetTouchpadData(env, info, func);
+}
+
+napi_value JsPointerContext::SetTouchpadRightClickType(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, int32_t data, napi_value handle) -> napi_value {
+        return jsPointerMgr->SetTouchpadRightClickType(env, data, handle);
+    };
+    return SetTouchpadInt32Data(env, info, func, MAX_SPEED, MIN_SPEED);
+}
+
+napi_value JsPointerContext::GetTouchpadRightClickType(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CHKPP(jsPointerMgr);
+    auto func = [jsPointerMgr] (napi_env env, napi_value handle) -> napi_value {
+        return jsPointerMgr->GetTouchpadRightClickType(env, handle);
+    };
+    return GetTouchpadData(env, info, func);
+}
+
 napi_value JsPointerContext::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
@@ -930,6 +1008,12 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getTouchpadTapSwitch", GetTouchpadTapSwitch),
         DECLARE_NAPI_STATIC_FUNCTION("setTouchpadPointerSpeed", SetTouchpadPointerSpeed),
         DECLARE_NAPI_STATIC_FUNCTION("getTouchpadPointerSpeed", GetTouchpadPointerSpeed),
+        DECLARE_NAPI_STATIC_FUNCTION("setTouchpadPinchSwitch", SetTouchpadPinchSwitch),
+        DECLARE_NAPI_STATIC_FUNCTION("getTouchpadPinchSwitch", GetTouchpadPinchSwitch),
+        DECLARE_NAPI_STATIC_FUNCTION("setTouchpadSwipeSwitch", SetTouchpadSwipeSwitch),
+        DECLARE_NAPI_STATIC_FUNCTION("getTouchpadSwipeSwitch", GetTouchpadSwipeSwitch),
+        DECLARE_NAPI_STATIC_FUNCTION("setTouchpadRightClickType", SetTouchpadRightClickType),
+        DECLARE_NAPI_STATIC_FUNCTION("getTouchpadRightClickType", GetTouchpadRightClickType),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreatePointerStyle(env, exports) == nullptr) {

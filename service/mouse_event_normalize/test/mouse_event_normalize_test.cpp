@@ -368,5 +368,36 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadPointerSpee
     const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
     ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
+
+/**
+ * @tc.name: MouseEventNormalizeTest_SetTouchpadRightClickType_023
+ * @tc.desc: Test SetTouchpadRightClickType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadRightClickType_023, TestSize.Level1)
+{
+    int32_t type = 3;
+    ASSERT_TRUE(MouseEventHdr->SetTouchpadRightClickType(type) == RET_OK);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: MouseEventNormalizeTest_GetTouchpadRightClickType_024
+ * @tc.desc: Test GetTouchpadRightClickType
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadRightClickType_024, TestSize.Level1)
+{
+    int32_t type = 1;
+    MouseEventHdr->SetTouchpadRightClickType(type);
+    int32_t newType = 2;
+    ASSERT_TRUE(MouseEventHdr->GetTouchpadRightClickType(newType) == RET_OK);
+    ASSERT_TRUE(type == newType);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
 }
 }

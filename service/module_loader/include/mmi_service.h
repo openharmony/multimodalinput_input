@@ -102,6 +102,12 @@ public:
     int32_t GetTouchpadTapSwitch(bool &switchFlag) override;
     int32_t SetTouchpadPointerSpeed(int32_t speed) override;
     int32_t GetTouchpadPointerSpeed(int32_t &speed) override;
+    int32_t SetTouchpadPinchSwitch(bool switchFlag) override;
+    int32_t GetTouchpadPinchSwitch(bool &switchFlag) override;
+    int32_t SetTouchpadSwipeSwitch(bool switchFlag) override;
+    int32_t GetTouchpadSwipeSwitch(bool &switchFlag) override;
+    int32_t SetTouchpadRightClickType(int32_t type) override;
+    int32_t GetTouchpadRightClickType(int32_t &type) override;
 
 #ifdef OHOS_RSS_CLIENT
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
@@ -125,6 +131,9 @@ protected:
     int32_t ReadTouchpadScrollDirection(bool &state);
     int32_t ReadTouchpadTapSwitch(bool &switchFlag);
     int32_t ReadTouchpadPointerSpeed(int32_t &speed);
+    int32_t ReadTouchpadPinchSwitch(bool &switchFlag);
+    int32_t ReadTouchpadSwipeSwitch(bool &switchFlag);
+    int32_t ReadTouchpadRightMenuType(int32_t &type);
 #endif // OHOS_BUILD_ENABLE_POINTER
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);

@@ -100,6 +100,12 @@ public:
     virtual int32_t GetTouchpadTapSwitch(bool &switchFlag) = 0;
     virtual int32_t SetTouchpadPointerSpeed(int32_t speed) = 0;
     virtual int32_t GetTouchpadPointerSpeed(int32_t &speed) = 0;
+    virtual int32_t SetTouchpadPinchSwitch(bool switchFlag) = 0;
+    virtual int32_t GetTouchpadPinchSwitch(bool &switchFlag) = 0;
+    virtual int32_t SetTouchpadSwipeSwitch(bool switchFlag) = 0;
+    virtual int32_t GetTouchpadSwipeSwitch(bool &switchFlag) = 0;
+    virtual int32_t SetTouchpadRightClickType(int32_t type) = 0;
+    virtual int32_t GetTouchpadRightClickType(int32_t &type) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
