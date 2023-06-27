@@ -46,6 +46,10 @@ constexpr int32_t DEFAULT_ROWS = 3;
 constexpr int32_t MIN_ROWS = 1;
 constexpr int32_t MAX_ROWS = 100;
 constexpr int32_t CALCULATE_MIDDLE = 2;
+constexpr int32_t BTN_RIGHT_MENUE_CODE = 0x118;
+constexpr int32_t RIGHT_CLICK_TYPE_MIN = 1;
+constexpr int32_t RIGHT_CLICK_TYPE_MAX = 3;
+constexpr int32_t TP_RIGHT_CLICK_FINGER_CNT = 2;
 const std::string mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
 } // namespace
 
@@ -132,18 +136,20 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
 
     uint32_t button = libinput_event_pointer_get_button(data);
     const int32_t type = libinput_event_get_type(event);
-    bool tpTaPSwitch = true;
-    if (GetTouchpadTapSwitch(tpTaPSwitch) != RET_OK) {
+    bool tpTapSwitch = true;
+    if (GetTouchpadTapSwitch(tpTapSwitch) != RET_OK) {
         MMI_HILOGD("Failed to get touch pad switch flag, default is true.");
     }
 
     // touch pad tap switch is disable
-    if (type == LIBINPUT_EVENT_POINTER_TAP && tpTaPSwitch == false) {
+    if (type == LIBINPUT_EVENT_POINTER_TAP && tpTapSwitch == false) {
         MMI_HILOGD("Touch pad is disable.");
         return RET_OK;
     }
 
-    auto ret = HandleButtonValueInner(data);
+    TransTouchpadRightButton(data, type, button);
+
+    auto ret = HandleButtonValueInner(data, button);
     if (ret != RET_OK) {
         MMI_HILOGE("The button value does not exist");
         return RET_ERR;
@@ -179,12 +185,11 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     return RET_OK;
 }
 
-int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_pointer* data)
+int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_pointer *data, uint32_t button)
 {
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
     CHKPR(pointerEvent_, ERROR_NULL_POINTER);
-    uint32_t button = libinput_event_pointer_get_button(data);
     int32_t buttonId = MouseState->LibinputChangeToPointer(button);
     if (buttonId == PointerEvent::BUTTON_NONE) {
         MMI_HILOGE("Unknown btn, btn:%{public}u", button);
@@ -651,7 +656,7 @@ int32_t MouseTransformProcessor::GetPointerSpeed()
 
 int32_t MouseTransformProcessor::GetTouchpadSpeed(void)
 {
-    int32_t speed = 0;
+    int32_t speed = DEFAULT_SPEED;
     if (GetTouchpadPointerSpeed(speed) != RET_OK) {
         // if failed to get touchpad from database, return DEFAULT_SPEED
         return DEFAULT_SPEED;
@@ -690,6 +695,126 @@ int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y)
     int32_t physicalY = WinMgr->GetMouseInfo().physicalY;
     IPointerDrawingManager::GetInstance()->SetPointerLocation(getpid(), physicalX, physicalY);
     return RET_OK;
+}
+
+void MouseTransformProcessor::HandleTouchpadRightButton(struct libinput_event_pointer *data, const int32_t evenType,
+    uint32_t &button)
+{
+    // touchpad left click 280 -> 272
+    if (button == BTN_RIGHT_MENUE_CODE) {
+        button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
+        return;
+    }
+
+    // touchpad two finger tap 273 -> 0
+    if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE &&
+        evenType == LIBINPUT_EVENT_POINTER_TAP) {
+        button = 0;
+        return;
+    }
+
+    // touchpad two finger button 272 -> 0
+    if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE &&
+        evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        int32_t fingerCount = libinput_event_pointer_get_finger_count(data);
+        if (fingerCount == TP_RIGHT_CLICK_FINGER_CNT) {
+            button = 0;
+        }
+        return;
+    }
+}
+
+void MouseTransformProcessor::HandleTouchpadLeftButton(struct libinput_event_pointer *data, const int32_t evenType,
+    uint32_t &button)
+{
+    // touchpad left click 280 -> 273
+    if (button == BTN_RIGHT_MENUE_CODE) {
+        button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE;
+        return;
+    }
+
+    // touchpad right click 273 -> 272
+    if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE &&
+        evenType != LIBINPUT_EVENT_POINTER_TAP) {
+        button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
+        return;
+    }
+
+    // touchpad two finger tap 273 -> 0
+    if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE &&
+        evenType == LIBINPUT_EVENT_POINTER_TAP) {
+        button = 0;
+        return;
+    }
+
+    // touchpad two finger button 272 -> 0
+    if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE &&
+        evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        int32_t fingerCount = libinput_event_pointer_get_finger_count(data);
+        if (fingerCount == TP_RIGHT_CLICK_FINGER_CNT) {
+            button = 0;
+        }
+        return;
+    }
+}
+
+void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_event_pointer *data, const int32_t evenType,
+    uint32_t &button)
+{
+    // touchpad right click 273 -> 272
+    if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE &&
+        evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
+        return;
+    }
+
+    // touchpad left click 280 -> 272
+    if (button == BTN_RIGHT_MENUE_CODE) {
+        button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
+        return;
+    }
+
+    // touchpad two finger button 272 -> 0
+    if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE &&
+        evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        int32_t fingerCount = libinput_event_pointer_get_finger_count(data);
+        if (fingerCount == TP_RIGHT_CLICK_FINGER_CNT) {
+            button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_RIGHT_BUTTON_CODE;
+        }
+        return;
+    }
+}
+
+void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_pointer *data, const int32_t evenType,
+    uint32_t &button)
+{
+    int32_t switchTypeData = RIGHT_CLICK_TYPE_MIN;
+    if (GetTouchpadRightClickType(switchTypeData) != RET_OK) {
+        MMI_HILOGD("Failed to get right click switch, default is TP_RIGHT_BUTTON.");
+    }
+
+    RightClickType switchType = RightClickType(switchTypeData);
+    if (evenType != LIBINPUT_EVENT_POINTER_TAP && evenType != LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        MMI_HILOGD("Event not from touchpad.");
+        return;
+    }
+
+    switch (switchType) {
+        case RightClickType::TP_RIGHT_BUTTON:
+            HandleTouchpadRightButton(data, evenType, button);
+            break;
+
+        case RightClickType::TP_LEFT_BUTTON:
+            HandleTouchpadLeftButton(data, evenType, button);
+            break;
+
+        case RightClickType::TP_TWO_FINGER_TAP:
+            HandleTouchpadTwoFingerButton(data, evenType, button);
+            break;
+        default:
+            MMI_HILOGD("Invalid type.");
+            break;
+    }
 }
 
 int32_t MouseTransformProcessor::GetSpeed() const
@@ -811,6 +936,32 @@ int32_t MouseTransformProcessor::GetTouchpadPointerSpeed(int32_t &speed)
     return RET_OK;
 }
 
+int32_t MouseTransformProcessor::SetTouchpadRightClickType(int32_t type)
+{
+    std::string name = "rightMenuSwitch";
+    if (PutConfigDataToDatabase(name, type) != RET_OK) {
+        MMI_HILOGE("Failed to set right click type to mem.");
+        return RET_ERR;
+    }
+
+    return RET_OK;
+}
+
+int32_t MouseTransformProcessor::GetTouchpadRightClickType(int32_t &type)
+{
+    std::string name = "rightMenuSwitch";
+    if (GetConfigDataFromDatabase(name, type) != RET_OK) {
+        MMI_HILOGE("Failed to get right click type from mem.");
+        type = RIGHT_CLICK_TYPE_MIN;
+        return RET_ERR;
+    }
+
+    if (type < RIGHT_CLICK_TYPE_MIN || type > RIGHT_CLICK_TYPE_MAX) {
+        type = RIGHT_CLICK_TYPE_MIN;
+    }
+
+    return RET_OK;
+}
 
 int32_t MouseTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
 {

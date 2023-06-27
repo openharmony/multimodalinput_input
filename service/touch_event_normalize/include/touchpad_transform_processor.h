@@ -28,7 +28,15 @@ public:
     ~TouchPadTransformProcessor() = default;
     std::shared_ptr<PointerEvent> OnEvent(struct libinput_event *event) override;
 
+    static int32_t SetTouchpadPinchSwitch(bool switchFlag);
+    static int32_t GetTouchpadPinchSwitch(bool &switchFlag);
+    static int32_t SetTouchpadSwipeSwitch(bool switchFlag);
+    static int32_t GetTouchpadSwipeSwitch(bool &switchFlag);
+
 private:
+    static int32_t PutConfigDataToDatabase(std::string &key, bool value);
+    static int32_t GetConfigDataFromDatabase(std::string &key, bool &value);
+
     void OnEventTouchPadDown(struct libinput_event *event);
     void OnEventTouchPadMotion(struct libinput_event *event);
     void OnEventTouchPadUp(struct libinput_event *event);

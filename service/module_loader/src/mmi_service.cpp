@@ -47,6 +47,7 @@
 #include "xcollie/watchdog.h"
 #include "key_auto_repeat.h"
 #include "key_command_handler.h"
+#include "touch_event_normalize.h"
 
 namespace OHOS {
 namespace MMI {
@@ -1332,6 +1333,25 @@ int32_t MMIService::ReadTouchpadPointerSpeed(int32_t &speed)
     MouseEventHdr->GetTouchpadPointerSpeed(speed);
     return RET_OK;
 }
+
+int32_t MMIService::ReadTouchpadPinchSwitch(bool &switchFlag)
+{
+    TouchEventHdr->GetTouchpadPinchSwitch(switchFlag);
+    return RET_OK;
+}
+
+int32_t MMIService::ReadTouchpadSwipeSwitch(bool &switchFlag)
+{
+    TouchEventHdr->GetTouchpadSwipeSwitch(switchFlag);
+    return RET_OK;
+}
+
+int32_t MMIService::ReadTouchpadRightMenuType(int32_t &type)
+{
+    MouseEventHdr->GetTouchpadRightClickType(type);
+    return RET_OK;
+}
+
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 int32_t MMIService::SetTouchpadScrollSwitch(bool switchFlag)
@@ -1341,7 +1361,7 @@ int32_t MMIService::SetTouchpadScrollSwitch(bool switchFlag)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetTouchpadScrollSwitch,
         MouseEventHdr, switchFlag));
     if (ret != RET_OK) {
-        MMI_HILOGE("Set touch pad scroll switch failed, return %{public}d", ret);
+        MMI_HILOGE("Set touchpad scroll switch failed, return %{public}d", ret);
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -1355,7 +1375,7 @@ int32_t MMIService::GetTouchpadScrollSwitch(bool &switchFlag)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadTouchpadScrollSwich, this,
         std::ref(switchFlag)));
     if (ret != RET_OK) {
-        MMI_HILOGE("Get touch pad scroll switch failed, return %{public}d", ret);
+        MMI_HILOGE("Get touchpad scroll switch failed, return %{public}d", ret);
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -1369,7 +1389,7 @@ int32_t MMIService::SetTouchpadScrollDirection(bool state)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetTouchpadScrollDirection,
         MouseEventHdr, state));
     if (ret != RET_OK) {
-        MMI_HILOGE("Set touch pad scroll switch failed, return %{public}d", ret);
+        MMI_HILOGE("Set touchpad scroll direction switch failed, return %{public}d", ret);
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -1383,7 +1403,7 @@ int32_t MMIService::GetTouchpadScrollDirection(bool &state)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadTouchpadScrollDirection, this,
         std::ref(state)));
     if (ret != RET_OK) {
-        MMI_HILOGE("Get touch pad scroll switch failed, return %{public}d", ret);
+        MMI_HILOGE("Get touchpad scroll direction switch failed, return %{public}d", ret);
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -1397,7 +1417,7 @@ int32_t MMIService::SetTouchpadTapSwitch(bool switchFlag)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetTouchpadTapSwitch,
         MouseEventHdr, switchFlag));
     if (ret != RET_OK) {
-        MMI_HILOGE("Set touch pad scroll switch failed, return %{public}d", ret);
+        MMI_HILOGE("Set touchpad tap switch failed, return %{public}d", ret);
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -1411,7 +1431,7 @@ int32_t MMIService::GetTouchpadTapSwitch(bool &switchFlag)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadTouchpadTapSwitch, this,
         std::ref(switchFlag)));
     if (ret != RET_OK) {
-        MMI_HILOGE("Get touch pad scroll switch failed, return %{public}d", ret);
+        MMI_HILOGE("Get touchpad tap switch failed, return %{public}d", ret);
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -1425,7 +1445,7 @@ int32_t MMIService::SetTouchpadPointerSpeed(int32_t speed)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetTouchpadPointerSpeed,
         MouseEventHdr, speed));
     if (ret != RET_OK) {
-        MMI_HILOGE("Set touch pad scroll switch failed, return %{public}d", ret);
+        MMI_HILOGE("Set touchpad speed failed, return %{public}d", ret);
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -1439,7 +1459,91 @@ int32_t MMIService::GetTouchpadPointerSpeed(int32_t &speed)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadTouchpadPointerSpeed, this,
         std::ref(speed)));
     if (ret != RET_OK) {
-        MMI_HILOGE("Get touch pad scroll switch failed, return %{public}d", ret);
+        MMI_HILOGE("Get touchpad speed failed, return %{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::SetTouchpadPinchSwitch(bool switchFlag)
+{
+    CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadPinchSwitch,
+        TouchEventHdr, switchFlag));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set touch pad pinch switch failed, return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::GetTouchpadPinchSwitch(bool &switchFlag)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadTouchpadPinchSwitch, this,
+        std::ref(switchFlag)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get touch pad pinch switch failed, return %{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::SetTouchpadSwipeSwitch(bool switchFlag)
+{
+    CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadSwipeSwitch,
+        TouchEventHdr, switchFlag));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set touchpad swipe switch failed, return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::GetTouchpadSwipeSwitch(bool &switchFlag)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadTouchpadSwipeSwitch, this,
+        std::ref(switchFlag)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get touchpad swipe switch failed, return %{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::SetTouchpadRightClickType(int32_t type)
+{
+    CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MouseEventNormalize::SetTouchpadRightClickType,
+        MouseEventHdr, type));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set touchpad right button menu type failed, return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::GetTouchpadRightClickType(int32_t &type)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadTouchpadRightMenuType, this,
+        std::ref(type)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get touchpad right button menu type failed, return %{public}d", ret);
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER

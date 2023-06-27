@@ -52,6 +52,8 @@ public:
     int32_t GetTouchpadScrollDirection(bool &state) const;
     int32_t SetTouchpadTapSwitch(bool switchFlag) const;
     int32_t GetTouchpadTapSwitch(bool &switchFlag) const;
+    int32_t SetTouchpadRightClickType(int32_t type) const;
+    int32_t GetTouchpadRightClickType(int32_t &type) const;
     int32_t SetTouchpadPointerSpeed(int32_t speed) const;
     int32_t GetTouchpadPointerSpeed(int32_t &speed) const;
 
