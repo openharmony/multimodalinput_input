@@ -410,6 +410,13 @@ public:
     static constexpr int32_t TOOL_TYPE_TOUCHPAD = 9;
 
     /**
+     * Indicates a palm.
+     *
+     * @since 10
+     */
+    static constexpr int32_t TOOL_TYPE_PALM = 10;
+
+    /**
      * Indicates the TL2 key on the joystick.
      *
      * @since 9
