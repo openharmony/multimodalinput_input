@@ -74,6 +74,9 @@ void TouchPadTransformProcessor::OnEventTouchPadDown(struct libinput_event *even
     double toolWidth = libinput_event_touchpad_get_tool_width(touchpad);
     double toolHeight = libinput_event_touchpad_get_tool_height(touchpad);
     int32_t toolType = GetTouchPadToolType(touchpad, device);
+    if (toolType == PointerEvent::TOOL_TYPE_PALM) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    }
 
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
@@ -101,6 +104,8 @@ void TouchPadTransformProcessor::OnEventTouchPadMotion(struct libinput_event *ev
     auto touchpad = libinput_event_get_touchpad_event(event);
     CHKPV(touchpad);
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);
+    auto device = libinput_event_get_device(event);
+    CHKPV(device);
 
     uint64_t time = libinput_event_touchpad_get_time_usec(touchpad);
     pointerEvent_->SetActionTime(time);
@@ -120,6 +125,10 @@ void TouchPadTransformProcessor::OnEventTouchPadMotion(struct libinput_event *ev
     double toolPhysicalY = libinput_event_touchpad_get_tool_y(touchpad);
     double toolWidth = libinput_event_touchpad_get_tool_width(touchpad);
     double toolHeight = libinput_event_touchpad_get_tool_height(touchpad);
+    int32_t toolType = GetTouchPadToolType(touchpad, device);
+    if (toolType == PointerEvent::TOOL_TYPE_PALM) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    }
 
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
@@ -229,6 +238,10 @@ int32_t TouchPadTransformProcessor::GetTouchPadToolType(
         }
         case MT_TOOL_PEN: {
             return PointerEvent::TOOL_TYPE_PEN;
+        }
+        case MT_TOOL_PALM: {
+            MMI_HILOGD("ToolType is MT_TOOL_PALM");
+            return PointerEvent::TOOL_TYPE_PALM;
         }
         default : {
             MMI_HILOGW("Unknown tool type, identified as finger, toolType:%{public}d", toolType);
