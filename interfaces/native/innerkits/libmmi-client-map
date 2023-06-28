@@ -17,15 +17,8 @@
         extern "C++" {
             OHOS::MMI::AxisEvent*;
             OHOS::MMI::BytraceAdapter*;
-            OHOS::MMI::CircleStreamBuffer*;
-            OHOS::MMI::GetMillisTime*;
-            OHOS::MMI::GetPid*;
-            OHOS::MMI::GetProgramName*;
-            OHOS::MMI::GetSysClockTime*;
-            OHOS::MMI::GetThisThreadId*;
             OHOS::MMI::InputDevice*;
             OHOS::MMI::InputEvent*;
-            OHOS::MMI::InputEventDataTransformation*;
             OHOS::MMI::InputInterceptorManager*;
             OHOS::MMI::InputManager*;
             OHOS::MMI::InputManagerImpl*;
@@ -33,29 +26,12 @@
             OHOS::MMI::KeyEvent*;
             OHOS::MMI::KeyEventInputSubscribeManager*;
             OHOS::MMI::KeyOption*;
-            OHOS::MMI::kMsgLog*;
-            OHOS::MMI::IsValidJsonPath*;
-            OHOS::MMI::MMIClient*;
-            OHOS::MMI::MultimodalEventHandler*;
-            OHOS::MMI::NetPacket*;
             OHOS::MMI::PointerEvent*;
             OHOS::MMI::PointerStyle*;
             OHOS::MMI::PointerStyleColor*;
-            OHOS::MMI::ReadCursorStyleFile*;
-            OHOS::MMI::ReadJsonFile*;
-            OHOS::MMI::ReadProFile*;
-            OHOS::MMI::ReadTomlFile*;
-            OHOS::MMI::SetNameProperty*;
-            OHOS::MMI::SetThreadName*;
-            OHOS::MMI::StreamBuffer*;
-            OHOS::MMI::UDSClient*;
-            OHOS::MMI::UDSSession
-            OHOS::MMI::UDSSocket*;
-            OHOS::MMI::UtilNapi*;
-            OHOS::MMI::UtilNapiError*;
-            "vtable for OHOS::MMI::CircleStreamBuffer";
+            OHOS::MMI::MultimodalEventHandler*;
+            OHOS::MMI::MMIClient*;
             "vtable for OHOS::MMI::MMIClient";
-            "vtable for OHOS::MMI::StreamBuffer";
         };
     local:
         *;
