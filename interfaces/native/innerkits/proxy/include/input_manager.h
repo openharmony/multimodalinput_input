@@ -224,6 +224,25 @@ public:
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
 
     /**
+     * @brief Simulates a key input event.
+     * This event will be sent to hmos container.
+     * @param keyEvent Indicates the key input event to simulate.
+     * @return void
+     * @since 9
+     */
+    void SimulateInputEventToHmosContainer(std::shared_ptr<KeyEvent> keyEvent);
+
+    /**
+     * @brief Simulates a touchpad input event, touchscreen input event, or mouse device input event.
+     * This event will be sent to hmos container.
+     * @param pointerEvent Indicates the touchpad input event, touchscreen input event,
+     * or mouse device input event to simulate.
+     * @return void
+     * @since 9
+     */
+    void SimulateInputEventToHmosContainer(std::shared_ptr<PointerEvent> pointerEvent);
+
+    /**
      * @brief Starts listening for an input device event.
      * @param type Indicates the type of the input device event, which is <b>change</b>.
      * @param listener Indicates the listener for the input device event.
