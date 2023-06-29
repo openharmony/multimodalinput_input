@@ -27,6 +27,7 @@ public:
     /**
      * @brief Write KeyEvent into a JS object.
      * @param env Indicates the environment that the Node-API call is invoked under.
+     * @param in Indicates the KeyEvent object from which data will be read.
      * @param out Indicates the JS object into which data will be written.
      * @return Returns <b>napi_ok</b> if the data is successfully written; returns error status otherwise.
      * @since 10
@@ -35,7 +36,9 @@ public:
 
     /**
      * @brief Read KeyEvent from a JS object.
-     * @param out Indicates the JS object from which data will be read.
+     * @param env Indicates the environment that the Node-API call is invoked under.
+     * @param in Indicates the JS object from which data will be read.
+     * @param out Indicates the KeyEvent object into which data will be written.
      * @return Returns <b>napi_ok</b> if the data is successfully written; returns error status otherwise.
      * @since 10
      */
@@ -44,6 +47,7 @@ public:
     /**
      * @brief Write KeyItem into a JS object.
      * @param env Indicates the environment that the Node-API call is invoked under.
+     * @param in Indicates the KeyItem object from which data will be read.
      * @param out Indicates the JS object into which data will be written.
      * @return Returns <b>napi_ok</b> if the data is successfully written; returns error status otherwise.
      * @since 10
@@ -52,7 +56,8 @@ public:
 
     /**
      * @brief Read KeyItem from a JS object.
-     * @param out Indicates the JS object from which data will be read.
+     * @param in Indicates the JS object from which data will be read.
+     * @param out Indicates the KeyItem object into which data will be written.
      * @return Returns <b>napi_ok</b> if the data is successfully written; returns error status otherwise.
      * @since 10
      */
