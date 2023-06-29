@@ -17,6 +17,9 @@
 
 #include "define_multimodal.h"
 #include "extra_data.h"
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#include "sec_comp_enhance_kit.h"
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 namespace OHOS {
 namespace MMI {
@@ -289,7 +292,7 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
         return RET_ERR;
     }
     event->SetPressedKeys(pressedKeys);
-    
+
     std::vector<uint8_t> buffer;
     std::vector<uint8_t>::size_type bufferSize;
     pkt >> bufferSize;
@@ -363,22 +366,18 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
     uint32_t enHanceDataLen = MAX_HMAC_SIZE;
     int32_t result = Security::SecurityComponent::SecCompEnhanceKit::GetPointerEventEnhanceData(secCompPointEvent,
         dataLen, enHanceData, enHanceDataLen);
-    if (result != 0 || enHanceDataLen >= MAX_HMAC_SIZE) {
+    if (result != 0 || enHanceDataLen > MAX_HMAC_SIZE) {
+        pkt << 0;
         free(secCompPointEvent);
         secCompPointEvent = nullptr;
         MMI_HILOGD("GetPointerEventEnhanceData failed!");
         return RET_ERR;
     }
-    uint8_t realBuf[enHanceDataLen];
-    errno_t ret = memcpy_s(realBuf, enHanceDataLen, enHanceData, enHanceDataLen);
-    if (ret != EOK) {
-        free(secCompPointEvent);
-        secCompPointEvent = nullptr;
-        MMI_HILOGE("Failed to call memcpy_sp. errCode:%{public}d", MEMCPY_SEC_FUN_FAIL);
-        return RET_ERR;
-    }
+    pkt << enHanceDataLen;
+    std::vector<uint8_t> realBuf;
     for (size_t i = 0; i < enHanceDataLen; i++) {
-        pkt << *(realBuf + i);
+        realBuf.push_back(enHanceData[i]);
+        pkt << realBuf[i];
     }
     free(secCompPointEvent);
     secCompPointEvent = nullptr;
@@ -386,6 +385,27 @@ int32_t InputEventDataTransformation::MarshallingEnhanceData(std::shared_ptr<Poi
         MMI_HILOGE("Marshalling enhanceData failed");
         return RET_ERR;
     }
+    return RET_OK;
+}
+
+int32_t InputEventDataTransformation::UnmarshallingEnhanceData(NetPacket &pkt, std::shared_ptr<PointerEvent> event)
+{
+    uint32_t enHanceDataLen;
+    pkt >> enHanceDataLen;
+    if (enHanceDataLen == 0) {
+        return RET_OK;
+    }
+    uint8_t enhanceDataBuf[enHanceDataLen];
+    std::vector<uint8_t> enhanceData;
+    for (size_t i = 0; i < enHanceDataLen; i++) {
+        pkt >> enhanceDataBuf[i];
+        enhanceData.push_back(enhanceDataBuf[i]);
+    }
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("UnmarshallingEnhanceData pointer event failed");
+        return RET_ERR;
+    }
+    event->SetEnhanceData(enhanceData);
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT

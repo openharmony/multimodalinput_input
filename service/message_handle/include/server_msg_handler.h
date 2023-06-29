@@ -25,8 +25,6 @@
 #include "msg_handler.h"
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 #include "sec_comp_enhance_kit.h"
-#include "sec_comp_enhance_adapter.h"
-#include "sec_comp_input_enhance.h"
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 namespace OHOS {

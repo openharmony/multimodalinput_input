@@ -322,9 +322,9 @@ int32_t InputManager::SetKeyboardRepeatRate(int32_t rate)
 }
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-void InputManager::SetEnhanceConfig(SecCompEnhanceCfgBase *cfg)
+void InputManager::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
 {
-    InputMgrImpl.SetEnhanceConfig(cfg);
+    InputMgrImpl.SetEnhanceConfig(cfg, cfgLen);
 }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
