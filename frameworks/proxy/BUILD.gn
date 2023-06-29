@@ -39,13 +39,6 @@ config("libmmi_public_client_config") {
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/util/common/include",
   ]
-
-  if (dlp_permission_enable) {
-    include_dirs += [
-      "${security_component_path}/security_component/frameworks/enhance_adapter/include",
-      "${security_component_path}/security_component_enhance/frameworks/input_enhance/include",
-    ]
-  }
 }
 
 config("libmmi_test_util") {

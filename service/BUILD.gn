@@ -65,14 +65,6 @@ config("libmmi_server_config") {
     "${graphics_path}/2d_graphics/include",
   ]
 
-  if (dlp_permission_enable) {
-    include_dirs += [
-      "${security_component_path}/security_component/frameworks/enhance_adapter/include",
-      "${security_component_path}/security_component/interfaces/inner_api/enhance_kits/include",
-      "${security_component_path}/security_component_enhance/frameworks/input_enhance/include",
-    ]
-  }
-
   if (input_feature_combination_key) {
     defines += [ "OHOS_BUILD_ENABLE_COMBINATION_KEY" ]
   }
@@ -174,7 +166,7 @@ ohos_shared_library("libmmi-server") {
     external_deps += [ "window_manager:libwm" ]
   }
 
-  if (dlp_permission_enable) {
+  if (security_component_enable) {
     external_deps += [ "security_component:libsecurity_component_enhance_sdk" ]
   }
 

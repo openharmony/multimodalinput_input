@@ -637,6 +637,18 @@ std::vector<int32_t> PointerEvent::GetPressedKeys() const
     return pressedKeys_;
 }
 
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+void PointerEvent::SetEnhanceData(const std::vector<uint8_t> enhanceData)
+{
+    enhanceData_ = enhanceData;
+}
+
+std::vector<uint8_t> PointerEvent::GetEnhanceData() const
+{
+    return enhanceData_;
+}
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+
 bool PointerEvent::WriteToParcel(Parcel &out) const
 {
     if (!InputEvent::WriteToParcel(out)) {
