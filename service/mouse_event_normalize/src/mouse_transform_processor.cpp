@@ -465,6 +465,7 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
             break;
         case LIBINPUT_EVENT_POINTER_TAP:
         case LIBINPUT_EVENT_POINTER_BUTTON:
+        case LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD:
             result = HandleButtonInner(data, event);
             break;
 #ifndef OHOS_BUILD_EMULATOR
