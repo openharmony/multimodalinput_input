@@ -109,11 +109,13 @@ void LibinputAdapter::EventDispatch(int32_t fd)
 {
     CALL_DEBUG_ENTER;
     if (fd == fd_) {
+        MMI_HILOGD("Start to libinput_dispatch");
         if (libinput_dispatch(input_) != 0) {
             MMI_HILOGE("Failed to dispatch libinput");
             return;
         }
         OnEventHandler();
+        MMI_HILOGD("End to OnEventHandler");
     } else if (fd == hotplugDetector_.GetFd()) {
         hotplugDetector_.OnEvent();
     } else {
