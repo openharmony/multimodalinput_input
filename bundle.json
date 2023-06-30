@@ -117,6 +117,16 @@
             "header_base": "//foundation/multimodalinput/input/interfaces/native/innerkits"
           },
           "type": "so"
+        },
+        {
+          "name": "//foundation/multimodalinput/input/util:libmmi-util",
+          "header": {
+            "header_files": [
+              "key_event_napi.h"
+            ],
+            "header_base": "//foundation/multimodalinput/input/util/common/include"
+          },
+          "type": "so"
         }
       ],
       "test": [

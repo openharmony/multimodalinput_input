@@ -21,8 +21,8 @@
 #include "error_multimodal.h"
 #include "input_manager.h"
 #include "js_input_monitor_manager.h"
-#include "js_input_monitor_util.h"
 #include "napi_constants.h"
+#include "util_napi_value.h"
 
 namespace OHOS {
 namespace MMI {
