@@ -1145,7 +1145,6 @@ bool KeyEvent::IsValid() const
     return true;
 }
 
-
 bool KeyEvent::WriteToParcel(Parcel &out) const
 {
     if (!InputEvent::WriteToParcel(out)) {
@@ -1163,6 +1162,9 @@ bool KeyEvent::WriteToParcel(Parcel &out) const
     }
     WRITEINT32(out, keyAction_);
     WRITEINT32(out, keyIntention_);
+    WRITEBOOL(out, numLock_);
+    WRITEBOOL(out, capsLock_);
+    WRITEBOOL(out, scrollLock_);
     return true;
 }
 
@@ -1185,6 +1187,9 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
     }
     READINT32(in, keyAction_);
     READINT32(in, keyIntention_);
+    READBOOL(in, numLock_);
+    READBOOL(in, capsLock_);
+    READBOOL(in, scrollLock_);
     return true;
 }
 
