@@ -118,7 +118,6 @@ extern {
     fn ceil(z: f64) -> f64;
     fn fmax(a: f64, b: f64) -> f64;
     fn fmin(a: f64, b: f64) -> f64;
-    fn abs(z: f64) -> f64;
 }
 
 fn get_speed_gain(vin: f64, gain: *mut f64, speed: i32) -> bool {
@@ -136,7 +135,7 @@ fn get_speed_gain(vin: f64, gain: *mut f64, speed: i32) -> bool {
     let item = AccelerateCurves::get_instance().get_curve_by_speed(speed as usize);
     unsafe {
         let num: i32 = ceil(fabs(vin)) as i32;
-        for i in 0..2 {
+        for i in 0..3 {
             if num <= item.speeds[i] {
                 *gain = (item.slopes[i] * vin + item.diff_nums[i]) / vin;
                 info!(LOG_LABEL, "gain is set to {}", @public(*gain));
@@ -177,7 +176,7 @@ pub unsafe extern "C" fn HandleMotionAccelerate (
     unsafe {
         dx = (*offset).dx;
         dy = (*offset).dy;
-        vin = (fmax(abs(dx), abs(dy)) + fmin(abs(dx), abs(dy))) / 2.0;
+        vin = (fmax(fabs(dx), fabs(dy)) + fmin(fabs(dx), fabs(dy))) / 2.0;
         info!(
             LOG_LABEL,
             "output the abs_x {} and abs_y {} captureMode {} dx {} dy {} gain {}",
