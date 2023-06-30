@@ -348,7 +348,6 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     }
     if (event->callback[0] != nullptr) {
         napi_delete_reference(env, event->callback[0]);
-        event->callback[0] = nullptr;
     }
     delete event;
     return nullptr;
