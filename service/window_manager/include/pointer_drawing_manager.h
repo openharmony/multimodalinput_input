@@ -22,7 +22,6 @@
 #include <ui/rs_surface_node.h>
 #include <transaction/rs_transaction.h>
 
-#include "display_manager.h"
 #include "draw/canvas.h"
 #include "nocopyable.h"
 #include "pixel_map.h"
