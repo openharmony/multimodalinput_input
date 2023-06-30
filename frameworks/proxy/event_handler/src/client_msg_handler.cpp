@@ -146,6 +146,12 @@ int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt
         MMI_HILOGE("Failed to deserialize pointer event.");
         return RET_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    if (InputEventDataTransformation::UnmarshallingEnhanceData(pkt, pointerEvent) != ERR_OK) {
+        MMI_HILOGE("Failed to deserialize enhance data pointer event.");
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     MMI_HILOGI("Pointer event dispatcher of client:");
     EventLogHelper::PrintEventData(pointerEvent);
     if (PointerEvent::POINTER_ACTION_CANCEL == pointerEvent->GetPointerAction()) {
@@ -293,6 +299,12 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
         MMI_HILOGE("Failed to deserialize pointer event");
         return RET_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    if (InputEventDataTransformation::UnmarshallingEnhanceData(pkt, pointerEvent) != ERR_OK) {
+        MMI_HILOGE("Failed to deserialize enhance data pointer event.");
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
     switch (handlerType) {
         case INTERCEPTOR: {

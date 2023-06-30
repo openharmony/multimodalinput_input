@@ -73,7 +73,6 @@ private:
 InputManagerImpl::InputManagerImpl() {}
 InputManagerImpl::~InputManagerImpl() {}
 
-
 int32_t InputManagerImpl::GetDisplayBindInfo(DisplayBindInfos &infos)
 {
     CALL_DEBUG_ENTER;
@@ -131,19 +130,24 @@ void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInf
 }
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-void InputManagerImpl::SetEnhanceConfig(SecCompEnhanceCfgBase *cfg)
+void InputManagerImpl::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
 {
     CALL_DEBUG_ENTER;
-    if (cfg == nullptr) {
+    if (cfg == nullptr || cfgLen == 0) {
         MMI_HILOGE("SecCompEnhance cfg info is empty!");
         return;
     }
+    enhanceCfg_ = new (std::nothrow) uint8_t[cfgLen];
+    if (memcpy_s(enhanceCfg_, cfgLen, cfg, cfgLen)) {
+        MMI_HILOGE("cfg memcpy failed!");
+        return;
+    }
+    enhanceCfgLen_ = cfgLen;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Get mmi client is nullptr");
         return;
     }
-    secCompEnhanceCfgBase_ = reinterpret_cast<Security::SecurityComponentEnhance::SecCompEnhanceCfg *>(cfg);
     SendEnhanceConfig();
     PrintEnhanceConfig();
 }
@@ -378,13 +382,13 @@ int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 int32_t InputManagerImpl::PackEnhanceConfig(NetPacket &pkt)
 {
-    if (secCompEnhanceCfgBase_ == nullptr) {
+    if (enhanceCfg_ == nullptr) {
         MMI_HILOGE("security info config failed");
         return RET_ERR;
     }
-    pkt << secCompEnhanceCfgBase_->enable << secCompEnhanceCfgBase_->alg << secCompEnhanceCfgBase_->key.size;
-    for (uint32_t i = 0; i < secCompEnhanceCfgBase_->key.size; i++) {
-        pkt << *(secCompEnhanceCfgBase_->key.data + i);
+    pkt << enhanceCfgLen_;
+    for (uint32_t i = 0; i < enhanceCfgLen_; i++) {
+        pkt << enhanceCfg_[i];
     }
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write security info config failed");
@@ -461,15 +465,11 @@ void InputManagerImpl::PrintDisplayInfo()
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 void InputManagerImpl::PrintEnhanceConfig()
 {
-    if (secCompEnhanceCfgBase_ == nullptr) {
-        MMI_HILOGE("SecCompEnhanceCfgBase is null");
+    if (enhanceCfg_ == nullptr) {
+        MMI_HILOGE("SecCompEnhanceCfg is null");
         return;
     }
-    MMI_HILOGD("securityConfigInfo,enable:%{public}d,alg:%{public}d,key.size:%{public}d",
-        secCompEnhanceCfgBase_->enable, secCompEnhanceCfgBase_->alg, secCompEnhanceCfgBase_->key.size);
-    if (secCompEnhanceCfgBase_->key.data == nullptr) {
-        MMI_HILOGE("key.data is null");
-    }
+    MMI_HILOGD("securityConfigInfo, cfg len:%{public}d", enhanceCfgLen_);
 }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 

@@ -19,9 +19,6 @@
 #include "key_event.h"
 #include "net_packet.h"
 #include "pointer_event.h"
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-#include "sec_comp_enhance_kit.h"
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 #include "switch_event.h"
 
 namespace OHOS {
@@ -41,6 +38,7 @@ public:
     static int32_t Unmarshalling(NetPacket &pkt, std::shared_ptr<PointerEvent> event);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     static int32_t MarshallingEnhanceData(std::shared_ptr<PointerEvent> event, NetPacket &pkt);
+    static int32_t UnmarshallingEnhanceData(NetPacket &pkt, std::shared_ptr<PointerEvent> event);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 private:
     static int32_t SerializePointerItem(NetPacket &pkt, PointerEvent::PointerItem &item);
