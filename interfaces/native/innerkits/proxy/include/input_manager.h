@@ -33,9 +33,6 @@
 #include "key_option.h"
 #include "pointer_style.h"
 #include "window_info.h"
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-#include "sec_comp_enhance_adapter.h"
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 namespace OHOS {
 namespace MMI {
@@ -621,10 +618,11 @@ public:
     /**
      * @brief Sets the enhance config of the security component.
      * @param cfg Indicates the security component enhance config.
+     * @param cfgLen Indicates the security component enhance config len.
      * @return void.
      * @since 9
      */
-    void SetEnhanceConfig(Security::SecurityComponent::SecCompEnhanceCfgBase *cfg);
+    void SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 private:

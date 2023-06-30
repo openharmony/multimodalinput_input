@@ -24,11 +24,6 @@
 #include "key_event.h"
 #include "key_event_value_transformation.h"
 #include "pointer_event.h"
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-#include "sec_comp_enhance_kit.h"
-#include "sec_comp_enhance_adapter.h"
-#include "sec_comp_input_enhance.h"
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 #include "uds_server.h"
 
 namespace OHOS {

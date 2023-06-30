@@ -39,10 +39,6 @@
 #include "key_option.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-#include "sec_comp_enhance_adapter.h"
-#include "sec_comp_input_enhance.h"
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 #include "switch_event.h"
 
 namespace OHOS {
@@ -58,7 +54,7 @@ public:
     int32_t GetWindowPid(int32_t windowId);
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    void SetEnhanceConfig(SecCompEnhanceCfgBase *cfg);
+    void SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     int32_t SubscribeKeyEvent(
         std::shared_ptr<KeyOption> keyOption,
@@ -188,7 +184,8 @@ private:
     std::thread ehThread_;
     std::shared_ptr<AppExecFwk::EventHandler> eventHandler_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    Security::SecurityComponentEnhance::SecCompEnhanceCfg* secCompEnhanceCfgBase_ {};
+    uint8_t* enhanceCfg_ = nullptr;
+    uint32_t enhanceCfgLen_ = 0;
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 };
 

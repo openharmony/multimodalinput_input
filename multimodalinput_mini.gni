@@ -269,12 +269,12 @@ if (input_feature_short_key) {
 }
 
 if (!defined(global_parts_info) ||
-    defined(global_parts_info.security_dlp_permission_service)) {
-  dlp_permission_enable = true
+    defined(global_parts_info.security_security_component)) {
+  security_component_enable = true
 } else {
-  dlp_permission_enable = false
+  security_component_enable = false
 }
 
-if (dlp_permission_enable) {
+if (security_component_enable) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_SECURITY_COMPONENT" ]
 }

@@ -39,15 +39,6 @@ constexpr int32_t DEFAULT_DEVICE_ID = 0;
 constexpr int32_t INDEX_FIRST = 1;
 constexpr int32_t INDEX_SECOND = 2;
 constexpr int32_t INDEX_THIRD = 3;
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-static constexpr uint32_t DATA_ARRY_LEN = 16;
-static constexpr uint32_t MAX_HMAC_SIZE = 64;
-static constexpr uint32_t SHA384_KEY_LEN = 48;
-
-enum HmacAlg : int32_t {
-    HMAC_SHA384 = 1,
-};
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 } // namespace
 
 class InputManagerTest : public testing::Test {
@@ -3796,110 +3787,8 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetEnhanceConfig(nullptr));
-}
-
-/**
- * @tc.name: InputManagerTest_SetEnhanceConfig_002
- * @tc.desc: Set Secutity component enhance config
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Security::SecurityComponentEnhance::SecCompEnhanceCfg secCompEnhanceCfg;
-    secCompEnhanceCfg.enable = false;
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg));
-}
-
-/**
- * @tc.name: InputManagerTest_SetEnhanceConfig_003
- * @tc.desc: Set Secutity component enhance config
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Security::SecurityComponentEnhance::SecCompEnhanceCfg secCompEnhanceCfg;
-    secCompEnhanceCfg.enable = true;
-    secCompEnhanceCfg.alg = static_cast<Security::SecurityComponentEnhance::HmacAlg>(HMAC_SHA384 + 1);
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg));
-    delete[] secCompEnhanceCfg.key.data;
-}
-
-/**
- * @tc.name: InputManagerTest_SetEnhanceConfig_004
- * @tc.desc: Set Secutity component enhance config
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Security::SecurityComponentEnhance::SecCompEnhanceCfg secCompEnhanceCfg;
-    secCompEnhanceCfg.enable = true;
-    secCompEnhanceCfg.key.data = nullptr;
-    secCompEnhanceCfg.alg = Security::SecurityComponentEnhance::HMAC_SHA384;
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg));
-}
-
-/**
- * @tc.name: InputManagerTest_SetEnhanceConfig_005
- * @tc.desc: Set Secutity component enhance config
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Security::SecurityComponentEnhance::SecCompEnhanceCfg secCompEnhanceCfg;
-    secCompEnhanceCfg.enable = true;
-    secCompEnhanceCfg.key.data = new (std::nothrow) uint8_t[DATA_ARRY_LEN];
-    ASSERT_NE(secCompEnhanceCfg.key.data, nullptr);
-    secCompEnhanceCfg.alg = Security::SecurityComponentEnhance::HMAC_SHA384;
-    secCompEnhanceCfg.key.size = 0;
-    InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg);
-    delete[] secCompEnhanceCfg.key.data;
-}
-
-/**
- * @tc.name: InputManagerTest_SetEnhanceConfig_006
- * @tc.desc: Set Secutity component enhance config
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_006, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Security::SecurityComponentEnhance::SecCompEnhanceCfg secCompEnhanceCfg;
-    secCompEnhanceCfg.enable = true;
-    secCompEnhanceCfg.key.data = new (std::nothrow) uint8_t[DATA_ARRY_LEN];
-    ASSERT_NE(secCompEnhanceCfg.key.data, nullptr);
-    secCompEnhanceCfg.alg = Security::SecurityComponentEnhance::HMAC_SHA384;
-    secCompEnhanceCfg.key.size = MAX_HMAC_SIZE + 1;
-    InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg);
-    delete[] secCompEnhanceCfg.key.data;
-}
-
-/**
- * @tc.name: InputManagerTest_SetEnhanceConfig_007
- * @tc.desc: Set Secutity component enhance config
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_007, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    Security::SecurityComponentEnhance::SecCompEnhanceCfg secCompEnhanceCfg;
-    secCompEnhanceCfg.enable = true;
-    secCompEnhanceCfg.key.data = new (std::nothrow) uint8_t[DATA_ARRY_LEN];
-    ASSERT_NE(secCompEnhanceCfg.key.data, nullptr);
-    secCompEnhanceCfg.alg = Security::SecurityComponentEnhance::HMAC_SHA384;
-    secCompEnhanceCfg.key.size = SHA384_KEY_LEN;
-    InputManager::GetInstance()->SetEnhanceConfig(&secCompEnhanceCfg);
-    delete[] secCompEnhanceCfg.key.data;
+    uint8_t cfgData[16] = {0};
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetEnhanceConfig(cfgData, 16));
 }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 

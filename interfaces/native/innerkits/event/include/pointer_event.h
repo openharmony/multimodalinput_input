@@ -1336,6 +1336,15 @@ public:
      * @since 9
      */
     std::vector<uint8_t> GetBuffer() const;
+
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    /**
+     * @brief Obtains the enhance data.
+     * @return Returns the enhance data.
+     * @since 10
+     */
+    std::vector<uint8_t> GetEnhanceData() const;
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 public:
     /**
      * @brief Checks whether the axes set represented by <b>axes</b> contains a specified type of axis.
@@ -1376,6 +1385,9 @@ private:
     bool IsValidCheckMouse() const;
     bool IsValidCheckTouchFunc() const;
     bool IsValidCheckTouch() const;
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    void SetEnhanceData(std::vector<uint8_t> enhanceData);
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 private:
     int32_t pointerId_ { -1 };
@@ -1389,6 +1401,9 @@ private:
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
     std::vector<int32_t> pressedKeys_;
     std::vector<uint8_t> buffer_;
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    std::vector<uint8_t> enhanceData_;
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 };
 
 inline bool PointerEvent::HasAxis(AxisType axis) const
