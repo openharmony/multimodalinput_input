@@ -57,10 +57,14 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     FixCursorPosition(physicalX, physicalY);
     lastPhysicalX_ = physicalX;
     lastPhysicalY_ = physicalY;
-    
+
     AdjustMouseFocus(ICON_TYPE(mouseIcons_[mouseStyle].alignmentWay), physicalX, physicalY);
-    if (pointerWindow_ != nullptr) {
-        pointerWindow_->MoveTo(physicalX + displayInfo_.x, physicalY + displayInfo_.y);
+    if (surfaceNode_ != nullptr) {
+        surfaceNode_->SetBounds(physicalX + displayInfo_.x,
+            physicalY + displayInfo_.y,
+            surfaceNode_->GetStagingProperties().GetBounds().z_,
+            surfaceNode_->GetStagingProperties().GetBounds().w_);
+        Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window move success");
         if (lastMouseStyle_.id == mouseStyle) {
             MMI_HILOGD("The lastMouseStyle is equal with mouseStyle");
@@ -77,9 +81,9 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
             displayId, physicalX, physicalY);
         return;
     }
-    
+
     CreatePointerWindow(displayId, physicalX, physicalY);
-    CHKPV(pointerWindow_);
+    CHKPV(surfaceNode_);
     int32_t ret = InitLayer(mouseStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Init layer failed");
@@ -93,15 +97,16 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
 int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
 {
     CALL_DEBUG_ENTER;
-    if (pointerWindow_ == nullptr) {
-        MMI_HILOGD("pointerWindow_ is nullptr");
+    if (surfaceNode_ == nullptr) {
+        MMI_HILOGD("surfaceNode_ is nullptr");
         return RET_ERR;
     }
     sptr<OHOS::Surface> layer = GetLayer();
     if (layer == nullptr) {
         MMI_HILOGE("Init layer is failed, Layer is nullptr");
-        pointerWindow_->Destroy();
-        pointerWindow_ = nullptr;
+        surfaceNode_->DetachToDisplay(screenId_);
+        surfaceNode_ = nullptr;
+        Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window destroy success");
         return RET_ERR;
     }
@@ -109,8 +114,9 @@ int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
     sptr<OHOS::SurfaceBuffer> buffer = GetSurfaceBuffer(layer);
     if (buffer == nullptr || buffer->GetVirAddr() == nullptr) {
         MMI_HILOGE("Init layer is failed, buffer or virAddr is nullptr");
-        pointerWindow_->Destroy();
-        pointerWindow_ = nullptr;
+        surfaceNode_->DetachToDisplay(screenId_);
+        surfaceNode_ = nullptr;
+        Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window destroy success");
         return RET_ERR;
     }
@@ -201,36 +207,29 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
 void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY)
 {
     CALL_INFO_TRACE;
-    sptr<OHOS::Rosen::WindowOption> option = new (std::nothrow) OHOS::Rosen::WindowOption();
-    CHKPV(option);
-    option->SetWindowType(OHOS::Rosen::WindowType::WINDOW_TYPE_POINTER);
-    option->SetWindowMode(OHOS::Rosen::WindowMode::WINDOW_MODE_FLOATING);
-    option->SetDisplayId(displayId);
-    OHOS::Rosen::Rect rect = {
-        .posX_ = physicalX,
-        .posY_ = physicalY,
-        .width_ = IMAGE_WIDTH,
-        .height_ = IMAGE_HEIGHT,
-    };
-    option->SetWindowRect(rect);
-    option->SetFocusable(false);
-    option->SetTouchable(false);
-    std::string windowName = "pointer window";
-    pointerWindow_ = OHOS::Rosen::Window::Create(windowName, option, nullptr);
+    Rosen::RSSurfaceNodeConfig surfaceNodeConfig;
+    surfaceNodeConfig.SurfaceNodeName = "pointer window";
+    Rosen::RSSurfaceNodeType surfaceNodeType = Rosen::RSSurfaceNodeType::SELF_DRAWING_WINDOW_NODE;
+    surfaceNode_ = Rosen::RSSurfaceNode::Create(surfaceNodeConfig, surfaceNodeType);
+    CHKPV(surfaceNode_);
+    surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
+    surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
+    surfaceNode_->SetBounds(physicalX, physicalY, IMAGE_WIDTH, IMAGE_HEIGHT);
+    surfaceNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
+    screenId_ = displayId;
+    std::cout << "ScreenId: " << screenId_ << std::endl;
+    surfaceNode_->AttachToDisplay(screenId_);
+    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 sptr<OHOS::Surface> PointerDrawingManager::GetLayer()
 {
     CALL_DEBUG_ENTER;
-    std::shared_ptr<OHOS::Rosen::RSSurfaceNode> surfaceNode = pointerWindow_->GetSurfaceNode();
-    if (surfaceNode == nullptr) {
+    if (surfaceNode_ == nullptr) {
         MMI_HILOGE("Draw pointer is failed, get node is nullptr");
-        pointerWindow_->Destroy();
-        pointerWindow_ = nullptr;
-        MMI_HILOGD("Pointer window destroy success");
         return nullptr;
     }
-    return surfaceNode->GetSurface();
+    return surfaceNode_->GetSurface();
 }
 
 sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Surface> layer) const
@@ -366,9 +365,10 @@ void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupIn
     lastPhysicalX_ = displayGroupInfo.displaysInfo[0].width / CALCULATE_MIDDLE;
     lastPhysicalY_ = displayGroupInfo.displaysInfo[0].height / CALCULATE_MIDDLE;
     MouseEventHdr->OnDisplayLost(displayInfo_.id);
-    if (pointerWindow_ != nullptr) {
-        pointerWindow_->Destroy();
-        pointerWindow_ = nullptr;
+    if (surfaceNode_ != nullptr) {
+        surfaceNode_->DetachToDisplay(screenId_);
+        surfaceNode_ = nullptr;
+        Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window destroy success");
     }
     MMI_HILOGD("displayId_:%{public}d, displayWidth_:%{public}d, displayHeight_:%{public}d",
@@ -396,7 +396,7 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
 
 void PointerDrawingManager::DrawManager()
 {
-    if (hasDisplay_ && hasPointerDevice_ && pointerWindow_ == nullptr) {
+    if (hasDisplay_ && hasPointerDevice_ && surfaceNode_ == nullptr) {
         MMI_HILOGD("Draw pointer begin");
         PointerStyle pointerStyle;
         int32_t ret = WinMgr->GetPointerStyle(pid_, windowId_, pointerStyle);
@@ -415,10 +415,11 @@ void PointerDrawingManager::DrawManager()
         MMI_HILOGD("Draw manager, mouseStyle:%{public}d", pointerStyle.id);
         return;
     }
-    if (!hasPointerDevice_ && pointerWindow_ != nullptr) {
+    if (!hasPointerDevice_ && surfaceNode_ != nullptr) {
         MMI_HILOGD("Pointer window destroy start");
-        pointerWindow_->Destroy();
-        pointerWindow_ = nullptr;
+        surfaceNode_->DetachToDisplay(screenId_);
+        surfaceNode_ = nullptr;
+        Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window destroy success");
     }
 }
@@ -442,14 +443,15 @@ std::shared_ptr<IPointerDrawingManager> IPointerDrawingManager::GetInstance()
 void PointerDrawingManager::UpdatePointerVisible()
 {
     CALL_DEBUG_ENTER;
-    CHKPV(pointerWindow_);
+    CHKPV(surfaceNode_);
     if (IsPointerVisible() && mouseDisplayState_) {
-        pointerWindow_->Show();
+        surfaceNode_->SetVisible(true);
         MMI_HILOGD("Pointer window show success");
     } else {
-        pointerWindow_->Hide();
+        surfaceNode_->SetVisible(false);
         MMI_HILOGD("Pointer window hide success");
     }
+    Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
 bool PointerDrawingManager::IsPointerVisible()
@@ -506,8 +508,12 @@ void PointerDrawingManager::SetPointerLocation(int32_t pid, int32_t x, int32_t y
     FixCursorPosition(x, y);
     lastPhysicalX_ = x;
     lastPhysicalY_ = y;
-    if (pointerWindow_ != nullptr) {
-        pointerWindow_->MoveTo(x, y);
+    if (surfaceNode_ != nullptr) {
+        surfaceNode_->SetBounds(x,
+            y,
+            surfaceNode_->GetStagingProperties().GetBounds().z_,
+            surfaceNode_->GetStagingProperties().GetBounds().w_);
+        Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window move success");
     }
 }
@@ -574,12 +580,16 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         return RET_OK;
     }
 
-    if (pointerWindow_ != nullptr) {
+    if (surfaceNode_ != nullptr) {
         int32_t physicalX = lastPhysicalX_;
         int32_t physicalY = lastPhysicalY_;
         AdjustMouseFocus(ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay), physicalX, physicalY);
         MMI_HILOGD("Pointer window move start");
-        pointerWindow_->MoveTo(physicalX + displayInfo_.x, physicalY + displayInfo_.y);
+        surfaceNode_->SetBounds(physicalX + displayInfo_.x,
+            physicalY + displayInfo_.y,
+            surfaceNode_->GetStagingProperties().GetBounds().z_,
+            surfaceNode_->GetStagingProperties().GetBounds().w_);
+        Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window move success");
 
         lastMouseStyle_ = pointerStyle;

@@ -20,6 +20,7 @@
 #include <list>
 
 #include <ui/rs_surface_node.h>
+#include <transaction/rs_transaction.h>
 
 #include "draw/canvas.h"
 #include "nocopyable.h"
@@ -82,7 +83,6 @@ private:
         int32_t pid { 0 };
         bool visible { false };
     };
-    sptr<OHOS::Rosen::Window> pointerWindow_ { nullptr };
     bool hasDisplay_ { false };
     DisplayInfo displayInfo_ {};
     bool hasPointerDevice_ { false };
@@ -97,6 +97,8 @@ private:
     std::list<PidInfo> pidInfos_;
     bool mouseDisplayState_ { false };
     std::unique_ptr<OHOS::Media::PixelMap> userIcon_ { nullptr };
+    uint64_t screenId_ { 0 };
+    std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_;
 };
 } // namespace MMI
 } // namespace OHOS
