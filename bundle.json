@@ -63,6 +63,7 @@
         "init",
         "preferences",
         "security_component",
+	"common",
         "hilog"
       ],
       "third_party": [
