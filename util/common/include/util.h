@@ -23,6 +23,11 @@
 #include "struct_multimodal.h"
 
 namespace OHOS {
+
+extern "C" {
+    int32_t ReadConfigInfo(const char* line, int32_t len, int32_t* element_key, int32_t* element_value);
+}
+
 namespace MMI {
 struct DeviceConfig {
     int32_t autoSwitch { 1 };

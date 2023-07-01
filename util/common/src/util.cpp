@@ -40,7 +40,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Util" };
 constexpr int32_t FILE_SIZE_MAX = 0x5000;
 constexpr int32_t MAX_PRO_FILE_SIZE = 128000;
-constexpr int32_t KEY_ELEMENT_COUNT = 4;
 constexpr int32_t INVALID_FILE_SIZE = -1;
 constexpr int32_t MIN_INTERVALTIME = 36;
 constexpr int32_t MAX_INTERVALTIME = 100;
@@ -341,32 +340,36 @@ void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
     std::string strLine;
     int32_t sysKeyValue;
     int32_t nativeKeyValue;
+    int32_t elementKey = 0;
+    int32_t elementValue = 0;
     std::map<int32_t, int32_t> tmpConfigKey;
     while (std::getline(reader, strLine)) {
-        size_t pos = strLine.find('#');
-        if (pos != strLine.npos && pos != COMMENT_SUBSCRIPT) {
-            MMI_HILOGE("The comment line format is error");
+        const char* line = strLine.c_str();
+        int32_t len = strlen(line);
+        char* realLine = (char*) malloc(len + 1);
+        if (realLine == nullptr) {
+            MMI_HILOGE("Malloc failed");
+            return;
+        }
+        if (strcpy_s(realLine, len + 1, line) != EOK) {
+            MMI_HILOGE("strcpy_s error");
+            free(realLine);
+            realLine = nullptr;
+            return;
+        }
+        *(realLine + len + 1) = '\0';
+        int32_t ret = ReadConfigInfo(realLine, len, &elementKey, &elementValue);
+        free(realLine);
+        realLine = nullptr;
+        if (ret != RET_OK) {
+            MMI_HILOGE("Failed to read from line of config info");
             reader.close();
             return;
         }
-        if (!strLine.empty() && strLine.front() != '#') {
-            std::istringstream stream(strLine);
-            std::array<std::string, KEY_ELEMENT_COUNT> keyElement;
-            stream >> keyElement[0] >> keyElement[1] >> keyElement[2] >> keyElement[3];
-            if (keyElement[0].empty() || keyElement[1].empty() || keyElement[2].empty() || keyElement[3].empty()) {
-                MMI_HILOGE("The key value data is incomplete");
-                reader.close();
-                return;
-            }
-            if (!IsNum(keyElement[1]) || !IsNum(keyElement[2])) {
-                MMI_HILOGE("Get key value is invalid");
-                reader.close();
-                return;
-            }
-            nativeKeyValue = stoi(keyElement[1]);
-            sysKeyValue = stoi(keyElement[2]);
-            tmpConfigKey.insert(std::pair<int32_t, int32_t>(nativeKeyValue, sysKeyValue));
-        }
+        nativeKeyValue = elementKey;
+        sysKeyValue = elementValue;
+        MMI_HILOGD("The nativeKeyValue is:%{public}d, sysKeyValue is:%{public}d", nativeKeyValue, sysKeyValue);
+        tmpConfigKey.insert(std::pair<int32_t, int32_t>(nativeKeyValue, sysKeyValue));
     }
     reader.close();
     auto iter = configKey.insert(std::make_pair(deviceId, tmpConfigKey));
