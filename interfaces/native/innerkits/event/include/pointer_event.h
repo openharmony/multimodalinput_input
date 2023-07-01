@@ -1339,6 +1339,12 @@ public:
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
+     * @brief Set the enhance data.
+     * @return void.
+     * @since 10
+     */
+    void SetEnhanceData(std::vector<uint8_t> enhanceData);
+    /**
      * @brief Obtains the enhance data.
      * @return Returns the enhance data.
      * @since 10
@@ -1385,9 +1391,6 @@ private:
     bool IsValidCheckMouse() const;
     bool IsValidCheckTouchFunc() const;
     bool IsValidCheckTouch() const;
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    void SetEnhanceData(std::vector<uint8_t> enhanceData);
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 private:
     int32_t pointerId_ { -1 };
