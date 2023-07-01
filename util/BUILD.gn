@@ -30,10 +30,28 @@ config("libmmi_util_public_config") {
   ]
 }
 
+ohos_rust_shared_ffi("mmi_rust_key_config") {
+  sources = [ "rust_key/src/lib.rs" ]
+  external_deps = [ "hilog:hilog_rust" ]
+  subsystem_name = "multimodalinput"
+  part_name = "input"
+}
+
+ohos_rust_unittest("mmi_rust_key_config_test") {
+  module_out_path = module_output_path
+  sources = [ "rust_key/src/lib.rs" ]
+  deps = [ ":mmi_rust_key_config" ]
+  external_deps = [ "hilog:hilog_rust" ]
+  subsystem_name = "multimodalinput"
+  part_name = "input"
+}
+
 ohos_shared_library("libmmi-util") {
   sources = libmmi_util_sources
   public_configs = [ "${mmi_path}:coverage_flags" ]
   configs = [ ":libmmi_util_public_config" ]
+
+  deps = [ ":mmi_rust_key_config" ]
 
   external_deps = [
     "c_utils:utils",
