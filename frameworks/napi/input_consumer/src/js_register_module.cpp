@@ -270,6 +270,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
+        napi_delete_reference(env, event->callback[0]);
         delete event;
         MMI_HILOGE("GetEventInfo failed");
         return nullptr;
@@ -330,6 +331,7 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (GetEventInfoAPI9(env, info, event, keyOption) == nullptr) {
+        napi_delete_reference(env, event->callback[0]);
         delete event;
         MMI_HILOGE("GetEventInfo failed");
         return nullptr;
