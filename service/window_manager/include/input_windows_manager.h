@@ -24,7 +24,6 @@
 
 #include "window_info.h"
 #include "window_manager.h"
-#include "input_event.h"
 #include "input_display_bind_helper.h"
 #include "input_event_data_transformation.h"
 #include "input_event.h"
@@ -150,6 +149,7 @@ private:
     void CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo);
     void UpdateDisplayIdAndName();
     void UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const;
 private:
     UDSServer* udsServer_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_POINTER
