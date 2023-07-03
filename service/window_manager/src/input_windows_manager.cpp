@@ -17,6 +17,7 @@
 
 #include <cstdlib>
 #include <cstdio>
+#include <linux/input.h>
 
 #include "dfx_hisysevent.h"
 #include "input_device_manager.h"
@@ -31,6 +32,7 @@
 #include "util.h"
 #include "util_ex.h"
 #include "util_napi_error.h"
+#include "input_device_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -1138,6 +1140,25 @@ bool InputWindowsManager::GetMouseIsCaptureMode() const
     return captureModeInfo_.isCaptureMode;
 }
 
+bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const
+{
+    if (pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN) {
+        std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(pointerItem.GetDeviceId());
+        if (inputDevice != nullptr) {
+            MMI_HILOGD("name:%{public}s type:%{public}d bus:%{public}d, "
+                       "version:%{public}d product:%{public}d vendor:%{public}d, "
+                       "phys:%{public}s uniq:%{public}s",
+                       inputDevice->GetName().c_str(), inputDevice->GetType(), inputDevice->GetBus(),
+                       inputDevice->GetVersion(), inputDevice->GetProduct(), inputDevice->GetVendor(),
+                       inputDevice->GetPhys().c_str(), inputDevice->GetUniq().c_str());
+        }
+        if (inputDevice != nullptr && inputDevice->GetBus() == BUS_USB) {
+            return true;
+        }
+    }
+    return false;
+}
+
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
@@ -1240,9 +1261,27 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",
                logicalX, logicalY, physicalX, physicalY, windowX, windowY, displayId,
                pointerEvent->GetTargetWindowId(), pointerEvent->GetAgentWindowId());
-    if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-        DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
-        IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+    if (IsNeedDrawPointer(pointerItem)) {
+        if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+            DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
+        }
+        PointerStyle pointerStyle;
+        int32_t ret = GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
+            return ret;
+        }
+        IPointerDrawingManager::GetInstance()->UpdateDisplayInfo(*physicDisplayInfo);
+        WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
+        IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
+        IPointerDrawingManager::GetInstance()->DrawPointer(displayId,
+            pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), MOUSE_ICON(pointerStyle.id));
+    } else {
+        if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+            DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+        }
     }
 
     int32_t pointerAction = pointerEvent->GetPointerAction();
