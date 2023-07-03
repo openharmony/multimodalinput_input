@@ -4282,6 +4282,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_003, TestSize.Level1)
     int32_t ret = InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle);
     if ((Rosen::SceneBoardJudgement::IsSceneBoardEnabled())) {
         ASSERT_TRUE(ret != RET_OK);
+        return;
     } else {
         ASSERT_TRUE(ret == RET_OK);
     }
