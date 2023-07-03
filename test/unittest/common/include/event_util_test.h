@@ -32,6 +32,7 @@
 #include "input_manager.h"
 #include "singleton.h"
 #include "window_utils_test.h"
+#include "scene_board_judgement.h"
 
 namespace OHOS {
 namespace MMI {
@@ -171,6 +172,15 @@ template<typename EventType>
 void TestSimulateInputEvent(EventType& event, const TestScene& testScene = TestScene::NORMAL_TEST)
 {
     EXPECT_TRUE((static_cast<int32_t>(testScene) ^ TestUtil->CompareDump(event)));
+}
+template<typename EventType>
+void SimulateInputEventUtilTest(EventType& event)
+{
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        TestSimulateInputEvent(event, TestScene::EXCEPTION_TEST);
+    } else {
+        TestSimulateInputEvent(event);
+    }
 }
 void DumpWindowData(const std::shared_ptr<PointerEvent>& pointerEvent);
 class AccessMonitor {
