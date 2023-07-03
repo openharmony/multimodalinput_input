@@ -4259,7 +4259,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_002, TestSize.Level1)
     if (InputManager::GetInstance()->SetMouseIcon(windowId, (void*)pixelMap.get()) == RET_OK) {
         ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
         ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
-    } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()){
+    } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         ASSERT_FALSE(false); // errors occur
     } else {
         ASSERT_TRUE(false);
