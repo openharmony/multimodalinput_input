@@ -213,6 +213,7 @@ ohos_unittest("InputManagerTest") {
     "ipc:ipc_single",
     "multimedia_image_framework:image_native",
     "window_manager:libwm",
+    "window_manager:libwsutils",
   ]
 }
 
