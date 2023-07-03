@@ -15,6 +15,7 @@
 #ifndef STRUCT_MULTIMODAL_H
 #define STRUCT_MULTIMODAL_H
 
+#include <string>
 #include "proto.h"
 
 namespace OHOS {
