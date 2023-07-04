@@ -172,6 +172,7 @@ ohos_unittest("KeyEventTest") {
     "hilog:libhilog",
     "ipc:ipc_single",
     "window_manager:libwm",
+    "window_manager:libwsutils",
   ]
 }
 
@@ -213,6 +214,7 @@ ohos_unittest("InputManagerTest") {
     "ipc:ipc_single",
     "multimedia_image_framework:image_native",
     "window_manager:libwm",
+    "window_manager:libwsutils",
   ]
 }
 
@@ -298,5 +300,6 @@ ohos_unittest("PointerEventTest") {
     "hilog:libhilog",
     "ipc:ipc_single",
     "window_manager:libwm",
+    "window_manager:libwsutils",
   ]
 }

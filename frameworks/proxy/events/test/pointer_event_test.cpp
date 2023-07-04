@@ -96,7 +96,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_002, TestSiz
     ASSERT_TRUE(pointerEvent != nullptr);
     std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_RIGHT };
     pointerEvent->SetPressedKeys(pressedKeys);
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 }
 
 /**
@@ -112,7 +112,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_003, TestSiz
     ASSERT_TRUE(pointerEvent != nullptr);
     std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT, KeyEvent::KEYCODE_CTRL_RIGHT };
     pointerEvent->SetPressedKeys(pressedKeys);
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -356,7 +356,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_006, TestSize.L
     pointerEvent->AddPointerItem(item2);
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 

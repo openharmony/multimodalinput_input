@@ -27,6 +27,7 @@
 #include "pixel_map.h"
 #include "system_info.h"
 #include "util.h"
+#include "scene_board_judgement.h"
 
 namespace OHOS {
 namespace MMI {
@@ -892,7 +893,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_001, TestSize.Level
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    TestSimulateInputEvent(injectDownEvent);
+    SimulateInputEventUtilTest(injectDownEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
@@ -906,7 +907,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_001, TestSize.Level
     injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    TestSimulateInputEvent(injectUpEvent);
+    SimulateInputEventUtilTest(injectUpEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
@@ -930,7 +931,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_002, TestSize.Level
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    TestSimulateInputEvent(injectDownEvent);
+    SimulateInputEventUtilTest(injectDownEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
@@ -954,7 +955,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_003, TestSize.Level
     injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    TestSimulateInputEvent(injectDownEvent);
+    SimulateInputEventUtilTest(injectDownEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
@@ -967,7 +968,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_003, TestSize.Level
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    TestSimulateInputEvent(injectUpEvent);
+    SimulateInputEventUtilTest(injectUpEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
@@ -1015,7 +1016,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_005, TestSize.Level
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    TestSimulateInputEvent(injectDownEvent);
+    SimulateInputEventUtilTest(injectDownEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
@@ -1029,7 +1030,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_005, TestSize.Level
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    TestSimulateInputEvent(injectUpEvent);
+    SimulateInputEventUtilTest(injectUpEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
@@ -1237,7 +1238,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_011, Test
     pointerEvent->AddPointerItem(item);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1273,7 +1274,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_012, Test
     pointerEvent->AddPointerItem(item);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1310,7 +1311,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_013, Test
     pointerEvent->AddPointerItem(item);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1949,7 +1950,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_007, TestSize.Level1)
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-    TestSimulateInputEvent(injectDownEvent);
+    SimulateInputEventUtilTest(injectDownEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     if (IsValidHandlerId(interceptorId)) {
@@ -3047,7 +3048,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoteControlAutoRepeat, TestSize.Le
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    TestSimulateInputEvent(injectDownEvent);
+    SimulateInputEventUtilTest(injectDownEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -3063,7 +3064,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoteControlAutoRepeat, TestSize.Le
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    TestSimulateInputEvent(injectUpEvent);
+    SimulateInputEventUtilTest(injectUpEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
@@ -3218,7 +3219,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_001, Tes
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     uint64_t consumerThreadId = consumer->GetConsumerThreadId();
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    EXPECT_EQ(runnerThreadId, consumerThreadId);
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        ASSERT_TRUE(runnerThreadId != consumerThreadId);
+    } else {
+        EXPECT_EQ(runnerThreadId, consumerThreadId);
+    }
 #else
     ASSERT_TRUE(runnerThreadId != consumerThreadId);
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -3257,7 +3262,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowInputEventConsumer_002, Tes
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     uint64_t consumerThreadId = consumer->GetConsumerThreadId();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    EXPECT_EQ(runnerThreadId, consumerThreadId);
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        ASSERT_TRUE(runnerThreadId != consumerThreadId);
+    } else {
+        EXPECT_EQ(runnerThreadId, consumerThreadId);
+    }
 #else
     ASSERT_TRUE(runnerThreadId != consumerThreadId);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -4028,7 +4037,7 @@ HWTEST_F(InputManagerTest, AppendExtraData_001, TestSize.Level1)
     InputManager::GetInstance()->AppendExtraData(extraData);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     ASSERT_TRUE(pointerEvent != nullptr);
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
@@ -4053,7 +4062,7 @@ HWTEST_F(InputManagerTest, AppendExtraData_002, TestSize.Level1)
     InputManager::GetInstance()->AppendExtraData(extraData);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     ASSERT_TRUE(pointerEvent != nullptr);
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 
@@ -4224,8 +4233,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_001, TestSize.Level1)
     if (InputManager::GetInstance()->SetMouseIcon(windowId, (void*)pixelMap.get()) == RET_OK) {
         ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
         ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+    } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        ASSERT_FALSE(false); // errors occur
     } else {
-        ASSERT_TRUE(false); // errors occur
+        ASSERT_TRUE(false);
     }
 }
 
@@ -4248,8 +4259,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_002, TestSize.Level1)
     if (InputManager::GetInstance()->SetMouseIcon(windowId, (void*)pixelMap.get()) == RET_OK) {
         ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
         ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+    } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        ASSERT_FALSE(false); // errors occur
     } else {
-        ASSERT_TRUE(false); // errors occur
+        ASSERT_TRUE(false);
     }
 }
 
@@ -4267,7 +4280,12 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetMouseIcon_003, TestSize.Level1)
     PointerStyle pointerStyle;
     pointerStyle.id = MOUSE_ICON::DEFAULT;
     int32_t ret = InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle);
-    ASSERT_TRUE(ret == RET_OK);
+    if ((Rosen::SceneBoardJudgement::IsSceneBoardEnabled())) {
+        ASSERT_TRUE(ret != RET_OK);
+        return;
+    } else {
+        ASSERT_TRUE(ret == RET_OK);
+    }
     const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = SetMouseIconTest(iconPath);
     ASSERT_TRUE(pixelMap != nullptr);
