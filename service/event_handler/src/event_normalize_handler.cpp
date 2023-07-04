@@ -37,6 +37,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventNormalizeHandler" };
 constexpr int32_t FINGER_NUM = 2;
+constexpr int32_t MT_TOOL_PALM = 2;
 }
 
 void EventNormalizeHandler::HandleEvent(libinput_event* event)
@@ -274,11 +275,22 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     pointerEvent->SetPressedKeys(pressedKeys);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+    HandlePalmEvent(event, pointerEvent);
     nextHandler_->HandlePointerEvent(pointerEvent);
 #else
     MMI_HILOGW("Pointer device does not support");
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
+}
+
+void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_ptr<PointerEvent> pointerEvent)
+{
+    auto touchpad = libinput_event_get_touchpad_event(event);
+    CHKPV(touchpad);
+    int32_t toolType = libinput_event_touchpad_get_tool_type(touchpad);
+    if (toolType == MT_TOOL_PALM) {
+        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    }
 }
 
 int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
