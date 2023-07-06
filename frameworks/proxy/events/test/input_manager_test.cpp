@@ -811,7 +811,7 @@ void InputManagerTest::TestInterceptorIdAndPointerEvent(int32_t interceptorId,
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
 
     if (IsValidHandlerId(interceptorId)) {
@@ -1047,7 +1047,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulatePointerEvent_001, TestSize.L
     pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
@@ -1064,7 +1064,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulatePointerEvent_002, TestSize.L
     pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
@@ -1081,7 +1081,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_003, Test
     pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
@@ -1117,7 +1117,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_005, Test
     pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1134,7 +1134,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_006, Test
     pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1151,7 +1151,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_007, Test
     pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1186,7 +1186,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_009, Test
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent009() };
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1202,7 +1202,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_010, Test
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent010() };
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1327,7 +1327,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_014, Test
     CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent016() };
     ASSERT_NE(pointerEvent, nullptr);
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
 
@@ -1343,7 +1343,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_001, TestSiz
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent014() };
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1359,7 +1359,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_002, TestSiz
     std::shared_ptr<KeyEvent> keyEvent { SetupKeyEvent002() };
     ASSERT_NE(keyEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    TestSimulateInputEvent(keyEvent);
+    SimulateInputEventUtilTest(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
@@ -1375,7 +1375,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_003, TestSiz
     std::shared_ptr<KeyEvent> keyEvent { SetupKeyEvent003() };
     ASSERT_NE(keyEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    TestSimulateInputEvent(keyEvent);
+    SimulateInputEventUtilTest(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
@@ -1391,7 +1391,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_004, TestSiz
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent015() };
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1407,7 +1407,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePencil2Event_001, Test
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent011() };
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
@@ -1423,7 +1423,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePencil2Event_002, Test
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent012() };
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
@@ -1439,7 +1439,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePencil2Event_003, Test
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent013() };
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
@@ -1911,7 +1911,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_006, TestSize.Level1)
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_INTERCEPTOR
 
     if (IsValidHandlerId(interceptorId)) {
