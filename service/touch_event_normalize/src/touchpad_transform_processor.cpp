@@ -28,6 +28,7 @@
 #include "preferences_errno.h"
 #include "preferences_helper.h"
 #include "preferences_xml_utils.h"
+#include "dfx_hisysevent.h"
 
 namespace OHOS {
 namespace MMI {
@@ -214,6 +215,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
             break;
         }
         default: {
+            DfxHisysevent::ReportTouchpadTypeFault(type);
             return nullptr;
         }
     }
@@ -312,6 +314,11 @@ void TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *eve
     pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetPointerId(defaultPointerId);
     pointerEvent_->UpdatePointerItem(defaultPointerId, pointerItem);
+
+    if (action == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
+        MMI_HILOGE("lisenhao-app go in to report POINTER_ACTION_SWIPE_BEGIN");
+        DfxHisysevent::StatisticTouchpadGesture(pointerEvent_);
+    }
 }
 
 void TouchPadTransformProcessor::OnEventTouchPadSwipeBegin(struct libinput_event *event)
@@ -378,6 +385,11 @@ void TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *eve
     pointerEvent_->SetPointerId(defaultPointerId);
     pointerEvent_->SetPointerAction(action);
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
+
+    // only three or four finger pinch need to statistic
+    if (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN && fingerCount > TP_SYSTEM_PINCH_FINGER_CNT) {
+        DfxHisysevent::StatisticTouchpadGesture(pointerEvent_);
+    }
 }
 
 void TouchPadTransformProcessor::OnEventTouchPadPinchBegin(struct libinput_event *event)
@@ -418,6 +430,8 @@ int32_t TouchPadTransformProcessor::SetTouchpadSwipeSwitch(bool switchFlag)
         return RET_ERR;
     }
 
+    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_SWIPE_SETTING,
+        switchFlag);
     return RET_OK;
 }
 
@@ -440,6 +454,8 @@ int32_t TouchPadTransformProcessor::SetTouchpadPinchSwitch(bool switchFlag)
         return RET_ERR;
     }
 
+    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_PINCH_SETTING,
+        switchFlag);
     return RET_OK;
 }
 
@@ -466,11 +482,13 @@ int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(std::string &key, bo
     int32_t ret = pref->PutBool(key, value);
     if (ret != RET_OK) {
         MMI_HILOGE("Put value is failed, ret:%{public}d", ret);
+        DfxHisysevent::ReportTouchpadSettingFault(DfxHisysevent::TOUCHPAD_SETTING_FAULT_CODE::WRITE_SETTING_ERROR);
         return RET_ERR;
     }
     ret = pref->FlushSync();
     if (ret != RET_OK) {
         MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
+        DfxHisysevent::ReportTouchpadSettingFault(DfxHisysevent::TOUCHPAD_SETTING_FAULT_CODE::SETTING_SYNC_ERROR);
         return RET_ERR;
     }
 
@@ -485,6 +503,7 @@ int32_t TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, 
         NativePreferences::PreferencesHelper::GetPreferences(TOUCHPAD_FILE_NAME, errCode);
     if (pref == nullptr) {
         MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
+        DfxHisysevent::ReportTouchpadSettingFault(DfxHisysevent::TOUCHPAD_SETTING_FAULT_CODE::READ_SETTING_ERROR);
         return RET_ERR;
     }
     value = pref->GetBool(key, true);
