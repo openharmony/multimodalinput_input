@@ -186,3 +186,47 @@ INPUT_POWER_DOWN:
 LID_SWITCH:
   __BASE: {type: BEHAVIOR, level: MINOR, tag: PowerStats, desc: lid switch}
   SWITCH: {type: INT32, desc: lid switch}
+
+TOUCHPAD_PINCH:
+  __BASE: {type: STATISTIC, level: MINOR, desc: touchpad pinch}
+  FINGER_COUNT: {type: INT32, desc: pinch statistic}
+
+TOUCHPAD_SWIPE:
+  __BASE: {type: STATISTIC, level: MINOR, desc: touchpad swipe}
+  FINGER_COUNT: {type: INT32, desc: swipe statistic}
+
+TOUCHPAD_SCROLL_SETTING:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: touchpad scroll setting}
+  SWITCH_STATE: {type: BOOL, desc: touchpad scroll setting}
+
+TOUCHPAD_SCROLL_DIR_SETTING:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: touchpad scroll direction setting}
+  SWITCH_STATE: {type: BOOL, desc: touchpad scroll direction setting}
+
+TOUCHPAD_TAP_SETTING:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: touchpad tap setting}
+  SWITCH_STATE: {type: BOOL, desc: touchpad tap setting}
+
+TOUCHPAD_SWIPE_SETTING:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: touchpad swipe setting}
+  SWITCH_STATE: {type: BOOL, desc: touchpad swipe setting}
+
+TOUCHPAD_PINCH_SETTING:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: touchpad pinch setting}
+  SWITCH_STATE: {type: BOOL, desc: touchpad pinch setting}
+
+TOUCHPAD_POINTER_SPEED_SETTING:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: touchpad pointer speed setting}
+  SWITCH_VALUE: {type: INT32, desc: touchpad pointer speed setting}
+
+TOUCHPAD_RIGHT_CLICK_SETTING:
+  __BASE: {type: BEHAVIOR, level: MINOR, desc: touchpad right click setting}
+  SWITCH_VALUE: {type: INT32, desc: touchpad right click setting}
+
+TOUCHPAD_SETTING_FAULT_CODE:
+  __BASE: {type: FAULT, level: MINOR, desc: report touchpad setting fault}
+  FAULT_CODE: {type: UINT32, desc: report touchpad setting fault code}
+
+TOUCHPAD_TYPE_FAULT_CODE:
+  __BASE: {type: FAULT, level: MINOR, desc: report touchpad type fault}
+  FAULT_CODE: {type: UINT32, desc: report touchpad type fault code}
