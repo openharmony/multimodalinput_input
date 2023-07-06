@@ -57,7 +57,6 @@ public:
         READ_SETTING_ERROR = 1,
         WRITE_SETTING_ERROR,
         SETTING_SYNC_ERROR,
-        TOUCHPAD_UNKNOW_EVNET_TYPE_ERROR,
         TOUCHPAD_ERROR
     };
 
