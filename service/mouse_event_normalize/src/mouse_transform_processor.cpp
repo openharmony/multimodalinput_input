@@ -32,6 +32,7 @@
 #include "preferences_helper.h"
 #include "preferences_xml_utils.h"
 #include "timer_manager.h"
+#include "dfx_hisysevent.h"
 #include "util_ex.h"
 #include "util.h"
 
@@ -478,6 +479,7 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
             result = HandleAxisBeginEndInner(event);
             break;
         default:
+            DfxHisysevent::ReportTouchpadTypeFault(type);
             MMI_HILOGE("Unknown type:%{public}d", type);
             return RET_ERR;
     }
@@ -843,6 +845,8 @@ int32_t MouseTransformProcessor::SetTouchpadScrollSwitch(bool switchFlag)
         MMI_HILOGE("Failed to set scroll switch flag to mem.");
         return RET_ERR;
     }
+    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_SCROLL_SETTING,
+        switchFlag);
 
     return RET_OK;
 }
@@ -866,6 +870,9 @@ int32_t MouseTransformProcessor::SetTouchpadScrollDirection(bool state)
         return RET_ERR;
     }
 
+    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_SCROLL_DIR_SETTING,
+        state);
+
     return RET_OK;
 }
 
@@ -887,6 +894,9 @@ int32_t MouseTransformProcessor::SetTouchpadTapSwitch(bool switchFlag)
         MMI_HILOGE("Failed to set scroll direct switch flag to mem.");
         return RET_ERR;
     }
+
+    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_TAP_SETTING,
+        switchFlag);
 
     return RET_OK;
 }
@@ -910,6 +920,9 @@ int32_t MouseTransformProcessor::SetTouchpadPointerSpeed(int32_t speed)
         return RET_ERR;
     }
 
+    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_POINTER_SPEED_SETTING,
+        speed);
+
     return RET_OK;
 }
 
@@ -922,7 +935,7 @@ int32_t MouseTransformProcessor::GetTouchpadPointerSpeed(int32_t &speed)
     }
 
     if (speed == 0) {
-        speed =DEFAULT_SPEED;
+        speed = DEFAULT_SPEED;
     }
 
     // if speed < MIN_SPEED | speed > MAX_SPEED, touchpad would be out of action
@@ -944,7 +957,8 @@ int32_t MouseTransformProcessor::SetTouchpadRightClickType(int32_t type)
         MMI_HILOGE("Failed to set right click type to mem.");
         return RET_ERR;
     }
-
+    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_RIGHT_CLICK_SETTING,
+        type);
     return RET_OK;
 }
 
@@ -976,11 +990,13 @@ int32_t MouseTransformProcessor::PutConfigDataToDatabase(std::string &key, bool 
     int32_t ret = pref->PutBool(key, value);
     if (ret != RET_OK) {
         MMI_HILOGE("Put value is failed, ret:%{public}d", ret);
+        DfxHisysevent::ReportTouchpadSettingFault(DfxHisysevent::TOUCHPAD_SETTING_FAULT_CODE::WRITE_SETTING_ERROR);
         return RET_ERR;
     }
     ret = pref->FlushSync();
     if (ret != RET_OK) {
         MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
+        DfxHisysevent::ReportTouchpadSettingFault(DfxHisysevent::TOUCHPAD_SETTING_FAULT_CODE::SETTING_SYNC_ERROR);
         return RET_ERR;
     }
 
@@ -995,6 +1011,7 @@ int32_t MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, boo
         NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
     if (pref == nullptr) {
         MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
+        DfxHisysevent::ReportTouchpadSettingFault(DfxHisysevent::TOUCHPAD_SETTING_FAULT_CODE::READ_SETTING_ERROR);
         return RET_ERR;
     }
     value = pref->GetBool(key, true);
@@ -1015,11 +1032,13 @@ int32_t MouseTransformProcessor::PutConfigDataToDatabase(std::string &key, int32
     int32_t ret = pref->PutInt(key, value);
     if (ret != RET_OK) {
         MMI_HILOGE("Put value is failed, ret:%{public}d", ret);
+        DfxHisysevent::ReportTouchpadSettingFault(DfxHisysevent::TOUCHPAD_SETTING_FAULT_CODE::WRITE_SETTING_ERROR);
         return RET_ERR;
     }
     ret = pref->FlushSync();
     if (ret != RET_OK) {
         MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
+        DfxHisysevent::ReportTouchpadSettingFault(DfxHisysevent::TOUCHPAD_SETTING_FAULT_CODE::SETTING_SYNC_ERROR);
         return RET_ERR;
     }
 
@@ -1034,6 +1053,7 @@ int32_t MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, int
         NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
     if (pref == nullptr) {
         MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
+        DfxHisysevent::ReportTouchpadSettingFault(DfxHisysevent::TOUCHPAD_SETTING_FAULT_CODE::READ_SETTING_ERROR);
         return RET_ERR;
     }
     value = pref->GetInt(key, 0);
