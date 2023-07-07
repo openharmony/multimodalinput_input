@@ -129,8 +129,8 @@ ohos_unittest("ut-event-injection-out") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "image_framework:image_native",
     "ipc:ipc_single",
-    "multimedia_image_framework:image_native",
   ]
 }
 
