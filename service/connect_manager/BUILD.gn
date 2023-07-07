@@ -45,8 +45,8 @@ ohos_source_set("mmi_connect_manager_service") {
   external_deps = [
     "access_token:libaccesstoken_sdk",
     "hilog:libhilog",
+    "image_framework:image_native",
     "ipc:ipc_single",
-    "multimedia_image_framework:image_native",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
@@ -66,8 +66,8 @@ ohos_source_set("mmi_connect_manager_proxy") {
 
   external_deps = [
     "hilog:libhilog",
+    "image_framework:image_native",
     "ipc:ipc_single",
-    "multimedia_image_framework:image_native",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

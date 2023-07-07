@@ -211,8 +211,8 @@ ohos_unittest("InputManagerTest") {
     "c_utils:utils",
     "eventhandler:libeventhandler",
     "hilog:libhilog",
+    "image_framework:image_native",
     "ipc:ipc_single",
-    "multimedia_image_framework:image_native",
     "window_manager:libwm",
     "window_manager:libwsutils",
   ]
