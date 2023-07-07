@@ -799,6 +799,34 @@ int32_t MMIService::SetKeyboardRepeatRate(int32_t rate)
     return RET_OK;
 }
 
+int32_t MMIService::GetKeyboardRepeatDelay(int32_t &delay)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t ret =
+        delegateTasks_.PostSyncTask(std::bind(&KeyAutoRepeat::GetKeyboardRepeatDelay, KeyRepeat, std::ref(delay)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get keyboard repeat delay failed, ret:%{public}d", ret);
+        return ret;
+    }
+#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
+}
+
+int32_t MMIService::GetKeyboardRepeatRate(int32_t &rate)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t ret =
+        delegateTasks_.PostSyncTask(std::bind(&KeyAutoRepeat::GetKeyboardRepeatRate, KeyRepeat, std::ref(rate)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get keyboard repeat rate failed, ret:%{public}d", ret);
+        return ret;
+    }
+#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
+}
+
 #if defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR)
 int32_t MMIService::CheckAddInput(int32_t pid, InputHandlerType handlerType, HandleEventType eventType,
     int32_t priority, uint32_t deviceTags)
