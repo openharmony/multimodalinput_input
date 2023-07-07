@@ -1019,6 +1019,28 @@ int32_t InputManagerImpl::SetKeyboardRepeatRate(int32_t rate)
     return InputDevImpl.SetKeyboardRepeatRate(rate);
 }
 
+int32_t InputManagerImpl::GetKeyboardRepeatDelay(std::function<void(int32_t)> callback)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    return InputDevImpl.GetKeyboardRepeatDelay(callback);
+}
+
+int32_t InputManagerImpl::GetKeyboardRepeatRate(std::function<void(int32_t)> callback)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Client init failed");
+        return RET_ERR;
+    }
+    return InputDevImpl.GetKeyboardRepeatRate(callback);
+}
+
 void InputManagerImpl::SetAnrObserver(std::shared_ptr<IAnrObserver> observer)
 {
     CALL_DEBUG_ENTER;

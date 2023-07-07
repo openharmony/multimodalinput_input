@@ -229,6 +229,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_RIGHT_CLICK_TYPE):
             return StubGetTouchpadRightClickType(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEYBOARD_REPEAT_DELAY):
+            return StubGetKeyboardRepeatDelay(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEYBOARD_REPEAT_RATE):
+            return StubGetKeyboardRepeatRate(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -1464,6 +1470,14 @@ int32_t MultimodalInputConnectStub::StubSetKeyboardRepeatDelay(MessageParcel& da
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
     int32_t delay;
     READINT32(data, delay, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetKeyboardRepeatDelay(delay);
@@ -1481,6 +1495,14 @@ int32_t MultimodalInputConnectStub::StubSetKeyboardRepeatRate(MessageParcel& dat
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
     int32_t rate;
     READINT32(data, rate, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetKeyboardRepeatRate(rate);
@@ -1488,6 +1510,56 @@ int32_t MultimodalInputConnectStub::StubSetKeyboardRepeatRate(MessageParcel& dat
         MMI_HILOGE("Set keyboard repeat rate failed ret:%{public}d", ret);
         return RET_ERR;
     }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetKeyboardRepeatDelay(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    int32_t delay;
+    int32_t ret = GetKeyboardRepeatDelay(delay);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get keyboard repeat delay failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    WRITEINT32(reply, delay, IPC_STUB_WRITE_PARCEL_ERR);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetKeyboardRepeatRate(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("Verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    int32_t rate;
+    int32_t ret = GetKeyboardRepeatRate(rate);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get keyboard repeat rate failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    WRITEINT32(reply, rate, IPC_STUB_WRITE_PARCEL_ERR);
     return RET_OK;
 }
 

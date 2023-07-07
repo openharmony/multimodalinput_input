@@ -503,6 +503,22 @@ public:
     int32_t SetKeyboardRepeatRate(int32_t rate);
 
     /**
+     * @brief Gets the keyboard repeat delay.
+     * @param callback Callback used to return the keyboard repeat delay.
+     * @return Returns <b>RET_OK</b> if success; returns <b>RET_ERR</b> otherwise.
+     * @since 10
+     */
+    int32_t GetKeyboardRepeatDelay(std::function<void(int32_t)> callback);
+
+    /**
+     * @brief Gets the keyboard repeat rate.
+     * @param callback Callback used to return the keyboard repeat rate.
+     * @return Returns <b>RET_OK</b> if success; returns <b>RET_ERR</b> otherwise.
+     * @since 10
+     */
+    int32_t GetKeyboardRepeatRate(std::function<void(int32_t)> callback);
+
+    /**
      * @brief Set the switch of touchpad scroll.
      * @param switchFlag Indicates the touchpad scroll switch state.
      * @return if success; returns a non-0 value otherwise.
