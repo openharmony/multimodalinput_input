@@ -111,16 +111,16 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
         auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
         if (iter != touchItemDownInfos_.end()) {
-            MMI_HILOGD("touchscreen occurs, update the old pid:%{public}d to new pid:%{public}d", pid, iter->second.pid);
-            pid = iter->second.pid;
+            pid = GetWindowPid(iter->second.agentWindowId);
+            MMI_HILOGD("touchscreen occurs, new pid:%{public}d", pid);
             touchItemDownInfos_.erase(iter);
         }
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         if (mouseDownInfo_.pid != -1) {
-            MMI_HILOGD("mouseevent occurs, update the old pid:%{public}d to new pid:%{public}d", pid, mouseDownInfo_.pid);
-            pid = mouseDownInfo_.pid;
+            pid = GetWindowPid(mouseDownInfo_.agentWindowId);
+            MMI_HILOGD("mouseevent occurs, update the pid:%{public}d", pid);
             InitMouseDownInfo();
         }
     }
