@@ -38,8 +38,8 @@ public:
     static void EmitJsDev(sptr<JsUtil::CallbackInfo> cb, std::shared_ptr<InputDevice> device);
     static void EmitSupportKeys(sptr<JsUtil::CallbackInfo> cb, std::vector<bool> &keystrokeAbility);
     static void EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t keyboardType);
-    static void EmitJsKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb);
-    static void EmitJsKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb);
+    static void EmitJsKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int32_t delay);
+    static void EmitJsKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int32_t rate);
     void AddListener(napi_env env, const std::string &type, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);
     napi_value CreateCallbackInfo(napi_env, napi_value handle, sptr<JsUtil::CallbackInfo> cb);

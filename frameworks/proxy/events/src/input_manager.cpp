@@ -321,6 +321,16 @@ int32_t InputManager::SetKeyboardRepeatRate(int32_t rate)
     return InputMgrImpl.SetKeyboardRepeatRate(rate);
 }
 
+int32_t InputManager::GetKeyboardRepeatDelay(std::function<void(int32_t)> callback)
+{
+    return InputMgrImpl.GetKeyboardRepeatDelay(callback);
+}
+
+int32_t InputManager::GetKeyboardRepeatRate(std::function<void(int32_t)> callback)
+{
+    return InputMgrImpl.GetKeyboardRepeatRate(callback);
+}
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 void InputManager::SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen)
 {
