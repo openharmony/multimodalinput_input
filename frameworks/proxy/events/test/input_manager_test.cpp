@@ -504,7 +504,6 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent015()
     pointerEvent->AddPointerItem(item);
     return pointerEvent;
 }
-
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent016()
 {
@@ -4439,6 +4438,24 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadSwipeSwitch_001, TestSize
     ASSERT_TRUE(flag == newFlag);
     const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
     ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_SensorInputTime_001
+ * @tc.desc: Test SensorTime
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SensorInputTime_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSensorInputTime(2000);
+    ASSERT_TRUE(pointerEvent->GetSensorInputTime() == 2000);
 }
 } // namespace MMI
 } // namespace OHOS

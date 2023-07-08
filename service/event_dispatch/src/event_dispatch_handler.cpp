@@ -116,6 +116,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         return;
     }
     auto pointerEvent = std::make_shared<PointerEvent>(*point);
+    pointerEvent->SetSensorInputTime(point->GetSensorInputTime());
     FilterInvalidPointerItem(pointerEvent, fd);
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
