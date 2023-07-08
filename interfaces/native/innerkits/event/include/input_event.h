@@ -175,6 +175,21 @@ public:
     void SetActionTime(int64_t actionTime);
 
     /**
+     * @brief Get the time when sensor perceive the event.
+     * @param sensorTime Indicates the time when sensor event occurs.
+     * @return void
+     * @since 9
+     */
+    void SetSensorInputTime(uint64_t sensorTime);
+
+    /**
+     * @brief Set the time for sensor when the action for this input event occurs.
+     * @return Returns the time when sensor perceive the event.
+     * @since 9
+     */
+    uint64_t GetSensorInputTime();
+
+    /**
      * @brief Obtains the action for this input event.
      * @return Returns the action for this input event.
      * @since 9
@@ -346,6 +361,7 @@ private:
     int32_t eventType_;
     int32_t id_;
     int64_t actionTime_;
+    uint64_t sensorInputTime_ { 0 };
     int32_t action_;
     int64_t actionStartTime_;
     int32_t deviceId_;

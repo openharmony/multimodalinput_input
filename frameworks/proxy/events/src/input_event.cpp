@@ -115,6 +115,16 @@ void InputEvent::SetActionTime(int64_t actionTime)
     actionTime_ = actionTime;
 }
 
+void InputEvent::SetSensorInputTime(uint64_t sensorInputTime)
+{
+    sensorInputTime_ = sensorInputTime;
+}
+
+uint64_t InputEvent::GetSensorInputTime()
+{
+    return sensorInputTime_;
+}
+
 int32_t InputEvent::GetAction() const
 {
     return action_;
@@ -220,6 +230,7 @@ bool InputEvent::WriteToParcel(Parcel &out) const
     WRITEINT32(out, eventType_);
     WRITEINT32(out, id_);
     WRITEINT64(out, actionTime_);
+    WRITEUINT64(out, sensorInputTime_);
     WRITEINT32(out, action_);
     WRITEINT64(out, actionStartTime_);
     WRITEINT32(out, deviceId_);
@@ -235,6 +246,7 @@ bool InputEvent::ReadFromParcel(Parcel &in)
     READINT32(in, eventType_);
     READINT32(in, id_);
     READINT64(in, actionTime_);
+    READUINT64(in, sensorInputTime_);
     READINT32(in, action_);
     READINT64(in, actionStartTime_);
     READINT32(in, deviceId_);
