@@ -74,8 +74,8 @@ private:
         for (const auto &buff : buffer) {
             str += std::to_string(buff);
         }
-        MMI_HILOGD("EventType:%{public}s,ActionTime:%{public}" PRId64 ",Action:%{public}d,"
-            "ActionStartTime:%{public}" PRId64 ",Flag:%{public}d,PointerAction:%{public}s,"
+        MMI_HILOGD("EventType:%{public}s,ActionTime:%{public}" PRId64 ",SensorInputTime:%{public}" PRIu64
+            ",Action:%{public}d,ActionStartTime:%{public}" PRId64 ",Flag:%{public}d,PointerAction:%{public}s,"
             "SourceType:%{public}s,ButtonId:%{public}d,VerticalAxisValue:%{public}.2f,"
             "HorizontalAxisValue:%{public}.2f,PinchAxisValue:%{public}.2f,"
             "XAbsValue:%{public}.2f,YAbsValue:%{public}.2f,ZAbsValue:%{public}.2f,"
@@ -83,8 +83,9 @@ private:
             "Hat0xAbsValue:%{public}.2f,Hat0yAbsValue:%{public}.2f,ThrottleAbsValue:%{public}.2f,"
             "PointerId:%{public}d,PointerCount:%{public}zu,EventNumber:%{public}d,"
             "BufferCount:%{public}zu,Buffer:%{public}s",
-            InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(), event->GetAction(),
-            event->GetActionStartTime(), event->GetFlag(), event->DumpPointerAction(), event->DumpSourceType(),
+            InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(), event->GetSensorInputTime(),
+            event->GetAction(), event->GetActionStartTime(), event->GetFlag(),
+            event->DumpPointerAction(), event->DumpSourceType(),
             event->GetButtonId(), event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_HORIZONTAL),
             event->GetAxisValue(PointerEvent::AXIS_TYPE_PINCH), event->GetAxisValue(PointerEvent::AXIS_TYPE_ABS_X),

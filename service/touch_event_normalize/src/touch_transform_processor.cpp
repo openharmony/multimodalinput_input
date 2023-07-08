@@ -157,6 +157,8 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
         CHKPP(pointerEvent_);
     }
     auto type = libinput_event_get_type(event);
+    uint64_t sensorTime = libinput_event_get_sensortime(event);
+    pointerEvent_->SetSensorInputTime(sensorTime);
     switch (type) {
         case LIBINPUT_EVENT_TOUCH_DOWN: {
             if (!OnEventTouchDown(event)) {
