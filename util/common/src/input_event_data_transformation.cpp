@@ -143,7 +143,7 @@ int32_t InputEventDataTransformation::SerializeInputEvent(std::shared_ptr<InputE
 {
     CHKPR(event, ERROR_NULL_POINTER);
     pkt << event->GetEventType() << event->GetId() << event->GetActionTime()
-        << event->GetAction() << event->GetActionStartTime() << event->GetDeviceId()
+        << event->GetAction() << event->GetActionStartTime() << event->GetSensorInputTime() << event->GetDeviceId()
         << event->GetTargetDisplayId() << event->GetTargetWindowId()
         << event->GetAgentWindowId() << event->GetFlag();
     if (pkt.ChkRWError()) {
@@ -167,6 +167,9 @@ int32_t InputEventDataTransformation::DeserializeInputEvent(NetPacket &pkt, std:
     event->SetAction(tField);
     pkt >> rField;
     event->SetActionStartTime(rField);
+    uint64_t sensorTime;
+    pkt >> sensorTime;
+    event->SetSensorInputTime(sensorTime);
     pkt >> tField;
     event->SetDeviceId(tField);
     pkt >> tField;
