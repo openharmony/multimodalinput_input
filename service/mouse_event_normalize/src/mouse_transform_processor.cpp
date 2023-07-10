@@ -483,6 +483,9 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
             MMI_HILOGE("Unknown type:%{public}d", type);
             return RET_ERR;
     }
+    if (result == RET_ERR) {
+        return result;
+    }
     PointerEvent::PointerItem pointerItem;
     if (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_UP) {
         HandleAxisPostInner(pointerItem);
@@ -777,7 +780,7 @@ void MouseTransformProcessor::HandleTouchpadTwoFingerButton(struct libinput_even
         return;
     }
 
-    // touchpad two finger button 272 -> 0
+    // touchpad two finger button 272 -> 273
     if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE &&
         evenType == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
         int32_t fingerCount = libinput_event_pointer_get_finger_count(data);
