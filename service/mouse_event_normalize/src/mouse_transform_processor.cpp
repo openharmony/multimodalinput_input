@@ -484,7 +484,6 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
             return RET_ERR;
     }
     if (result == RET_ERR) {
-        MMI_HILOGE("mouse normalize is failed");
         return result;
     }
     PointerEvent::PointerItem pointerItem;
