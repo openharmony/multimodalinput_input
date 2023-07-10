@@ -264,7 +264,10 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-    MouseEventHdr->OnEvent(event);
+    if (MouseEventHdr->OnEvent(event) == RET_ERR) {
+        MMI_HILOGE("OnEvent is failed");
+        return RET_ERR;
+    }
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
