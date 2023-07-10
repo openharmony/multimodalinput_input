@@ -1,0 +1,15 @@
+diff -Naur old/src/core.c new/src/core.c
+--- old/src/core.c	2021-01-01 00:00:00.000000000 +0800
++++ new/src/core.c	2021-01-01 00:00:00.000000000 +0800
+@@ -297,7 +297,11 @@ static void apply_typeA_changes(struct mtdev_state *state,
+ 		foreach_bit(slot, state->used) {
+ 			if (state->data[slot].tracking_id != id)
+ 				continue;
++#ifdef DISABLE_FILTER
++			(void)filter_data;
++#else
+ 			filter_data(state, dev, &data[i], prop[i], slot);
++#endif
+ 			push_slot_changes(state, &data[i], prop[i], slot, syn);
+ 			SETBIT(used, slot);
+ 			id = MT_ID_NULL;
