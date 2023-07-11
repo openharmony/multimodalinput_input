@@ -96,7 +96,6 @@
           "//third_party/eudev:udev_conf",
           "//third_party/eudev:udev_touchscreen_rule",
           "//third_party/eudev:udev_vk_rule",
-          "//third_party/mtdev:libmtdev",
           "//third_party/libevdev:libevdev",
           "//foundation/multimodalinput/input:uinput_inject",
           "//foundation/multimodalinput/input:mmi_uinput.rc",

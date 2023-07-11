@@ -17,6 +17,7 @@ import("../multimodalinput_mini.gni")
 group("patch_packages") {
   deps = [
     "diff_libinput_mmi:libinput-third-mmi",
+    "diff_libmtdev_mmi:libmtdev-third-mmi",
     "prebuild_eudev:prebuild_eudev",
     "prebuild_libinput:prebuild_libinput",
     "//third_party/eudev:libudev",
