@@ -16,7 +16,7 @@ import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
 gen_src_dir = "//third_party/mtdev"
 gen_dst_dir = root_out_dir + "/diff_libmtdev_mmi"
-patches_root_dir = "//foundation/multimodalinput/input/patch"
+patches_root_dir = "${mmi_path}/patch"
 build_gn_dir = "$patches_root_dir/diff_libmtdev_mmi/mtdev"
 
 action("apply_patch") {
