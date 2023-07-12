@@ -313,10 +313,6 @@ void EmitAsyncCallbackWork(KeyEventMonitorInfo *reportEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(reportEvent);
-    if (!reportEvent->IsValid()) {
-        MMI_HILOGE("%{public}s, module exported object is invalid.", __func__);
-        return;
-    }
     uv_loop_s *loop = nullptr;
     CHKRV(reportEvent->env, napi_get_uv_event_loop(reportEvent->env, &loop), GET_UV_LOOP);
     uv_work_t *work = new (std::nothrow) uv_work_t;
