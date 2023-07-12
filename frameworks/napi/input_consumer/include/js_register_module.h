@@ -21,7 +21,6 @@
 #include <iostream>
 #include <list>
 #include <map>
-#include <mutex>
 
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -55,18 +54,6 @@ struct KeyEventMonitorInfo {
     napi_ref callback[1]{ nullptr };
     int32_t subscribeId{ 0 };
     std::shared_ptr<KeyOption> keyOption{ nullptr };
-    bool valid{ true };
-    std::mutex refLock;
-    void SetValid(bool flag)
-    {
-        std::lock_guard<std::mutex> lock(refLock);
-        valid = flag;
-    }
-    bool IsValid()
-    {
-        std::lock_guard<std::mutex> lock(refLock);
-        return valid;
-    }
 };
 static std::mutex sCallBacksMutex_;
 typedef std::map<std::string, std::list<KeyEventMonitorInfo *>> Callbacks;
