@@ -190,6 +190,7 @@ ohos_shared_library("libmmi-server") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "multimedia_image_framework:image_native",
+    "napi:ace_napi",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
   ]
