@@ -352,10 +352,10 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
     CHKRP(env, napi_create_int32(env, MOUSE_ICON::HELP, &help), CREATE_INT32);
     napi_value move = nullptr;
     CHKRP(env, napi_create_int32(env, MOUSE_ICON::CURSOR_MOVE, &move), CREATE_INT32);
-    napi_value resize_up_down = nullptr;
-    CHKRP(env, napi_create_int32(env, MOUSE_ICON::RESIZE_LEFT_RIGHT, &resize_up_down), CREATE_INT32);
     napi_value resize_left_right = nullptr;
-    CHKRP(env, napi_create_int32(env, MOUSE_ICON::RESIZE_UP_DOWN, &resize_left_right), CREATE_INT32);
+    CHKRP(env, napi_create_int32(env, MOUSE_ICON::RESIZE_LEFT_RIGHT, &resize_left_right), CREATE_INT32);
+    napi_value resize_up_down = nullptr;
+    CHKRP(env, napi_create_int32(env, MOUSE_ICON::RESIZE_UP_DOWN, &resize_up_down), CREATE_INT32);
     napi_value screenshot_choose = nullptr;
     CHKRP(env, napi_create_int32(env, MOUSE_ICON::SCREENSHOT_CHOOSE, &screenshot_choose), CREATE_INT32);
     napi_value screenshot_cursor = nullptr;
