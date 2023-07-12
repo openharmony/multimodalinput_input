@@ -50,7 +50,7 @@
         "resource_schedule_service",
         "eventhandler",
         "multimedia_image_framework",
-        "graphic_standard",
+        "graphic_2d",
         "drivers_interface_input",
         "safwk",
         "ability_runtime",
