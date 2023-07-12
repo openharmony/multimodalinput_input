@@ -236,20 +236,9 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
     CALL_DEBUG_ENTER;
     size_t argc = 3;
     napi_value argv[3] = { 0 };
-    napi_value thisArg = nullptr;
-    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, &thisArg, nullptr), GET_CB_INFO);
+    CHKRP(env, napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc < 3) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
-        return nullptr;
-    }
-    if (thisArg == nullptr) {
-        MMI_HILOGE("%{public}s, This argument is nullptr.", __func__);
-        return nullptr;
-    }
-    napi_valuetype valueOfThis = napi_undefined;
-    CHKRP(env, napi_typeof(env, thisArg, &valueOfThis), TYPEOF);
-    if (valueOfThis == napi_undefined) {
-        MMI_HILOGE("%{public}s, Wrong value of this.", __func__);
         return nullptr;
     }
     KeyEventMonitorInfo *event = new (std::nothrow) KeyEventMonitorInfo {
@@ -291,14 +280,6 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
         MMI_HILOGE("AddEventCallback failed");
         return nullptr;
     }
-    std::shared_ptr<KeyEventMonitorInfo>* cbInfo = new std::shared_ptr<KeyEventMonitorInfo>(event);
-    napi_wrap(env, thisArg, static_cast<void*>(cbInfo), [](napi_env env, void* data, void* hint) {
-        std::shared_ptr<KeyEventMonitorInfo>* cbInfo = static_cast<std::shared_ptr<KeyEventMonitorInfo>*>(data);
-        if (cbInfo != nullptr && *cbInfo != nullptr) {
-            (*cbInfo)->SetValid(false);
-            delete cbInfo;
-        }
-    }, nullptr, nullptr);
     return nullptr;
 }
 
