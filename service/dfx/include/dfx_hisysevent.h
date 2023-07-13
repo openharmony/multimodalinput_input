@@ -52,6 +52,24 @@ public:
         std::string programName;
         int32_t serverFd { -1 };
     };
+
+    enum TOUCHPAD_SETTING_FAULT_CODE {
+        READ_SETTING_ERROR = 1,
+        WRITE_SETTING_ERROR,
+        SETTING_SYNC_ERROR,
+        TOUCHPAD_ERROR
+    };
+
+    enum TOUCHPAD_SETTING_CODE {
+        TOUCHPAD_SCROLL_SETTING = 1,
+        TOUCHPAD_SCROLL_DIR_SETTING,
+        TOUCHPAD_TAP_SETTING,
+        TOUCHPAD_SWIPE_SETTING,
+        TOUCHPAD_PINCH_SETTING,
+        TOUCHPAD_POINTER_SPEED_SETTING,
+        TOUCHPAD_RIGHT_CLICK_SETTING
+    };
+
     static void OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type);
     static void OnDeviceDisconnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type);
     static void OnClientConnect(const ClientConnectData &data, OHOS::HiviewDFX::HiSysEvent::EventType type);
@@ -81,6 +99,12 @@ public:
     {
         dispatchStartTime_ = GetSysClockTime();
     }
+    static void ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode, bool flag);
+    static void ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode, int32_t value);
+    static void StatisticTouchpadGesture(std::shared_ptr<PointerEvent> pointerEvent);
+    static void ReportTouchpadSettingFault(uint32_t settingFaultCode);
+    static void ReportTouchpadTypeFault(uint32_t typeFaultCode);
+
 private:
     static inline int64_t dispatchStartTime_ { 0 };
     static inline int64_t comboStartTime_ { 0 };

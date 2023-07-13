@@ -869,11 +869,12 @@ void JsEventTarget::CallDevInfoAsyncWork(uv_work_t *work, int32_t status)
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::EmitJsKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb)
+void JsEventTarget::EmitJsKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int32_t delay)
 {
     CALL_DEBUG_ENTER;
     CHKPV(cb);
     CHKPV(cb->env);
+    cb->data.keyboardRepeatDelay = delay;
     cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
@@ -935,7 +936,8 @@ void JsEventTarget::CallKeyboardRepeatDelayAsync(uv_work_t *work, int32_t status
         }
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[1]), GET_UNDEFINED, scope);
     } else {
-        CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &callResult[1]), CREATE_INT32, scope);
+        CHKRV_SCOPE(
+            cb->env, napi_create_int32(cb->env, cb->data.keyboardRepeatDelay, &callResult[1]), CREATE_INT32, scope);
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[0]), GET_UNDEFINED, scope);
     }
     napi_value handler = nullptr;
@@ -987,17 +989,19 @@ void JsEventTarget::CallKeyboardRepeatDelayPromise(uv_work_t *work, int32_t stat
         }
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
     } else {
-        CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &callResult), CREATE_INT32, scope);
+        CHKRV_SCOPE(
+            cb->env, napi_create_int32(cb->env, cb->data.keyboardRepeatDelay, &callResult), CREATE_INT32, scope);
         CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, callResult), RESOLVE_DEFERRED, scope);
     }
     napi_close_handle_scope(cb->env, scope);
 }
 
-void JsEventTarget::EmitJsKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb)
+void JsEventTarget::EmitJsKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int32_t rate)
 {
     CALL_DEBUG_ENTER;
     CHKPV(cb);
     CHKPV(cb->env);
+    cb->data.keyboardRepeatRate = rate;
     cb->errCode = RET_OK;
     uv_loop_s *loop = nullptr;
     CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
@@ -1059,7 +1063,8 @@ void JsEventTarget::CallKeyboardRepeatRateAsync(uv_work_t *work, int32_t status)
         }
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[1]), GET_UNDEFINED, scope);
     } else {
-        CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &callResult[1]), CREATE_INT32, scope);
+        CHKRV_SCOPE(
+            cb->env, napi_create_int32(cb->env, cb->data.keyboardRepeatRate, &callResult[1]), CREATE_INT32, scope);
         CHKRV_SCOPE(cb->env, napi_get_undefined(cb->env, &callResult[0]), GET_UNDEFINED, scope);
     }
     napi_value handler = nullptr;
@@ -1111,7 +1116,8 @@ void JsEventTarget::CallKeyboardRepeatRatePromise(uv_work_t *work, int32_t statu
         }
         CHKRV_SCOPE(cb->env, napi_reject_deferred(cb->env, cb->deferred, callResult), REJECT_DEFERRED, scope);
     } else {
-        CHKRV_SCOPE(cb->env, napi_create_int32(cb->env, cb->data.keyboardType, &callResult), CREATE_INT32, scope);
+        CHKRV_SCOPE(
+            cb->env, napi_create_int32(cb->env, cb->data.keyboardRepeatRate, &callResult), CREATE_INT32, scope);
         CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, callResult), RESOLVE_DEFERRED, scope);
     }
     napi_close_handle_scope(cb->env, scope);

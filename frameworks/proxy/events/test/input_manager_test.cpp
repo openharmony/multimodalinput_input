@@ -40,6 +40,8 @@ constexpr int32_t DEFAULT_DEVICE_ID = 0;
 constexpr int32_t INDEX_FIRST = 1;
 constexpr int32_t INDEX_SECOND = 2;
 constexpr int32_t INDEX_THIRD = 3;
+constexpr int32_t KEY_REPEAT_DELAY = 350;
+constexpr int32_t KEY_REPEAT_RATE = 60;
 } // namespace
 
 class InputManagerTest : public testing::Test {
@@ -502,7 +504,6 @@ std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent015()
     pointerEvent->AddPointerItem(item);
     return pointerEvent;
 }
-
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
 std::shared_ptr<PointerEvent> InputManagerTest::SetupPointerEvent016()
 {
@@ -811,7 +812,7 @@ void InputManagerTest::TestInterceptorIdAndPointerEvent(int32_t interceptorId,
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
 
     if (IsValidHandlerId(interceptorId)) {
@@ -1047,7 +1048,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulatePointerEvent_001, TestSize.L
     pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
@@ -1064,7 +1065,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulatePointerEvent_002, TestSize.L
     pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
@@ -1081,7 +1082,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_003, Test
     pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
@@ -1117,7 +1118,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_005, Test
     pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1134,7 +1135,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_006, Test
     pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1151,7 +1152,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_007, Test
     pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1186,7 +1187,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_009, Test
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent009() };
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1202,7 +1203,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_010, Test
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent010() };
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1327,7 +1328,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePointerEvent_014, Test
     CALL_TEST_DEBUG;
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent016() };
     ASSERT_NE(pointerEvent, nullptr);
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 }
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
 
@@ -1343,7 +1344,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_001, TestSiz
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent014() };
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1359,7 +1360,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_002, TestSiz
     std::shared_ptr<KeyEvent> keyEvent { SetupKeyEvent002() };
     ASSERT_NE(keyEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    TestSimulateInputEvent(keyEvent);
+    SimulateInputEventUtilTest(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
@@ -1375,7 +1376,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_003, TestSiz
     std::shared_ptr<KeyEvent> keyEvent { SetupKeyEvent003() };
     ASSERT_NE(keyEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    TestSimulateInputEvent(keyEvent);
+    SimulateInputEventUtilTest(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
@@ -1391,7 +1392,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_004, TestSiz
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent015() };
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
@@ -1407,7 +1408,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePencil2Event_001, Test
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent011() };
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
@@ -1423,7 +1424,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePencil2Event_002, Test
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent012() };
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
@@ -1439,7 +1440,7 @@ HWTEST_F(InputManagerTest, MultimodalEventHandler_SimulatePencil2Event_003, Test
     std::shared_ptr<PointerEvent> pointerEvent { SetupPointerEvent013() };
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
@@ -1911,7 +1912,7 @@ HWTEST_F(InputManagerTest, TestInputEventInterceptor_006, TestSize.Level1)
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_INTERCEPTOR
 
     if (IsValidHandlerId(interceptorId)) {
@@ -3156,9 +3157,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardType, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_SetKeyboardRepeatDelay, TestSize.Level1)
 {
     MMI_HILOGD("Start InputManagerTest_SetKeyboardRepeatDelay");
-    int32_t delay = 300;
-    int32_t ret = InputManager::GetInstance()->SetKeyboardRepeatDelay(delay);
+    int32_t ret = InputManager::GetInstance()->SetKeyboardRepeatDelay(KEY_REPEAT_DELAY);
     ASSERT_EQ(ret, RET_OK);
+    const char *keyboardFileName = "/data/service/el1/public/multimodalinput/keyboard_settings.xml";
+    ASSERT_TRUE(remove(keyboardFileName) == RET_OK);
     MMI_HILOGD("Stop InputManagerTest_SetKeyboardRepeatDelay");
 }
 
@@ -3171,10 +3173,53 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetKeyboardRepeatDelay, TestSize.Lev
 HWTEST_F(InputManagerTest, InputManagerTest_SetKeyboardRepeatRate, TestSize.Level1)
 {
     MMI_HILOGD("Start InputManagerTest_SetKeyboardRepeatRate");
-    int32_t rate = 50;
-    int32_t ret = InputManager::GetInstance()->SetKeyboardRepeatRate(rate);
+    int32_t ret = InputManager::GetInstance()->SetKeyboardRepeatRate(KEY_REPEAT_RATE);
     ASSERT_EQ(ret, RET_OK);
+    const char *keyboardFileName = "/data/service/el1/public/multimodalinput/keyboard_settings.xml";
+    ASSERT_TRUE(remove(keyboardFileName) == RET_OK);
     MMI_HILOGD("Stop InputManagerTest_SetKeyboardRepeatRate");
+}
+
+/**
+ * @tc.name: InputManagerTest_GetKeyboardRepeatDelay
+ * @tc.desc: Verify Get Keyboard Repeat Delay
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardRepeatDelay, TestSize.Level1)
+{
+    MMI_HILOGD("Start InputManagerTest_GetKeyboardRepeatDelay");
+    auto callback = [](int32_t delay) {
+        ASSERT_TRUE(delay == KEY_REPEAT_DELAY);
+        MMI_HILOGD("Get keyboard repeat delay success");
+    };
+    if (InputManager::GetInstance()->SetKeyboardRepeatDelay(KEY_REPEAT_DELAY) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetKeyboardRepeatDelay(callback) == RET_OK);
+    }
+    const char *keyboardFileName = "/data/service/el1/public/multimodalinput/keyboard_settings.xml";
+    ASSERT_TRUE(remove(keyboardFileName) == RET_OK);
+    MMI_HILOGD("Stop InputManagerTest_GetKeyboardRepeatDelay");
+}
+
+/**
+ * @tc.name: InputManagerTest_GetKeyboardRepeatRate
+ * @tc.desc: Verify Get Keyboard Repeat Rate
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardRepeatRate, TestSize.Level1)
+{
+    MMI_HILOGD("Start InputManagerTest_GetKeyboardRepeatRate");
+    auto callback = [](int32_t rate) {
+        ASSERT_TRUE(rate == KEY_REPEAT_RATE);
+        MMI_HILOGD("Get keyboard repeat rate success");
+    };
+    if (InputManager::GetInstance()->SetKeyboardRepeatRate(KEY_REPEAT_RATE) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetKeyboardRepeatRate(callback) == RET_OK);
+    }
+    const char *keyboardFileName = "/data/service/el1/public/multimodalinput/keyboard_settings.xml";
+    ASSERT_TRUE(remove(keyboardFileName) == RET_OK);
+    MMI_HILOGD("Stop InputManagerTest_GetKeyboardRepeatRate");
 }
 
 HWTEST_F(InputManagerTest, InputManagerTest_GetProcCpuUsage, TestSize.Level1)
@@ -4393,6 +4438,24 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetTouchpadSwipeSwitch_001, TestSize
     ASSERT_TRUE(flag == newFlag);
     const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
     ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_SensorInputTime_001
+ * @tc.desc: Test SensorTime
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SensorInputTime_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSensorInputTime(2000);
+    ASSERT_TRUE(pointerEvent->GetSensorInputTime() == 2000);
 }
 } // namespace MMI
 } // namespace OHOS

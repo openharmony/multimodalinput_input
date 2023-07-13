@@ -150,6 +150,14 @@ declare_args() {
     root_out_dir + "/diff_libinput_mmi/src/util-strings.c",
   ]
 
+  patch_gen_libmtdev_third_mmi_sources = [
+    root_out_dir + "/diff_libmtdev_mmi/src/caps.c",
+    root_out_dir + "/diff_libmtdev_mmi/src/core.c",
+    root_out_dir + "/diff_libmtdev_mmi/src/iobuf.c",
+    root_out_dir + "/diff_libmtdev_mmi/src/match.c",
+    root_out_dir + "/diff_libmtdev_mmi/src/match_four.c",
+  ]
+
   event_injection_sources = [
     "src/device_base.cpp",
     "src/get_device_node.cpp",

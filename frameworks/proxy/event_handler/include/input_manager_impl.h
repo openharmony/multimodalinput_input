@@ -106,6 +106,8 @@ public:
     int32_t GetKeyboardType(int32_t deviceId, std::function<void(int32_t)> callback);
     int32_t SetKeyboardRepeatDelay(int32_t delay);
     int32_t SetKeyboardRepeatRate(int32_t rate);
+    int32_t GetKeyboardRepeatDelay(std::function<void(int32_t)> callback);
+    int32_t GetKeyboardRepeatRate(std::function<void(int32_t)> callback);
 
     int32_t SetMouseScrollRows(int32_t rows);
     int32_t GetMouseScrollRows(int32_t &rows);

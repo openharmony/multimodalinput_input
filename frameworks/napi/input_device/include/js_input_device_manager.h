@@ -39,6 +39,8 @@ public:
     napi_value GetDeviceInfo(napi_env env, int32_t id, napi_value handle = nullptr);
     napi_value SetKeyboardRepeatDelay(napi_env env, int32_t delay, napi_value handle = nullptr);
     napi_value SetKeyboardRepeatRate(napi_env env, int32_t rate, napi_value handle = nullptr);
+    napi_value GetKeyboardRepeatDelay(napi_env env, napi_value handle = nullptr);
+    napi_value GetKeyboardRepeatRate(napi_env env, napi_value handle = nullptr);
 };
 } // namespace MMI
 } // namespace OHOS

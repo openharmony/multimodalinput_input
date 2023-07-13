@@ -69,6 +69,8 @@ public:
     virtual int32_t GetKeyboardType(int32_t deviceId, int32_t &keyboardType) = 0;
     virtual int32_t SetKeyboardRepeatDelay(int32_t delay) = 0;
     virtual int32_t SetKeyboardRepeatRate(int32_t rate) = 0;
+    virtual int32_t GetKeyboardRepeatDelay(int32_t &delay) = 0;
+    virtual int32_t GetKeyboardRepeatRate(int32_t &rate) = 0;
     virtual int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType,
         int32_t priority, uint32_t deviceTags) = 0;
     virtual int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType,
