@@ -37,7 +37,7 @@ ohos_rust_shared_ffi("mmi_rust_key_config") {
   part_name = "input"
 }
 
-ohos_rust_unittest("mmi_rust_key_config_test") {
+ohos_rust_unittest("rust_mmi_key_config_test") {
   module_out_path = module_output_path
   sources = [ "rust_key/src/lib.rs" ]
   deps = [ ":mmi_rust_key_config" ]
