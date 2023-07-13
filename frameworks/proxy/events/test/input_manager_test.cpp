@@ -4457,5 +4457,169 @@ HWTEST_F(InputManagerTest, InputManagerTest_SensorInputTime_001, TestSize.Level1
     pointerEvent->SetSensorInputTime(2000);
     ASSERT_TRUE(pointerEvent->GetSensorInputTime() == 2000);
 }
+
+/**
+ * @tc.name: InputManagerTest_GetDisplayBindInfo_001
+ * @tc.desc: Get diaplay bind information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetDisplayBindInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    OHOS::MMI::DisplayBindInfos infos;
+    int32_t ret = InputManager::GetInstance()->GetDisplayBindInfo(infos);
+    ASSERT_TRUE(ret == RET_OK);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetDisplayBindInfo failed, ret:%{public}d", ret);
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_SetDisplayBind_001
+ * @tc.desc: Set diaplay bind information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetDisplayBind_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t deviceId = DEFAULT_DEVICE_ID;
+    int32_t displayId = -1;
+    std::string msg;
+    int32_t ret = InputManager::GetInstance()->SetDisplayBind(deviceId, displayId, msg);
+    ASSERT_TRUE(ret == RET_OK);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetDisplayBind failed, ret:%{public}d", ret);
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_MarkConsumed_001
+ * @tc.desc: Mark Cosumer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_MarkConsumed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = GetPtr<InputEventConsumer>();
+    ASSERT_TRUE(consumer != nullptr);
+    int32_t monitorId = InputManager::GetInstance()->AddMonitor(consumer);
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    auto eventId = pointerEvent->GetId();
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->MarkConsumed(monitorId, eventId));
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateInputEventToHmosContainer_001
+ * @tc.desc: Simulate input event to HmosContainer
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventToHmosContainer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_TRUE(pointerEvent != nullptr);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SimulateInputEventToHmosContainer(pointerEvent));
+}
+
+/**
+ * @tc.name: InputManagerTest_SetPointerLocation_001
+ * @tc.desc: Sets the absolute coordinate of mouse.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetPointerLocation_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t x = 0;
+    int32_t y = 0;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetPointerLocation(x, y));
+}
+
+/**
+ * @tc.name: InputManagerTest_EnterCaptureMode_001
+ * @tc.desc: Entering capture mode.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_EnterCaptureMode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    uint32_t windowId = window->GetWindowId();
+    int32_t ret = InputManager::GetInstance()->EnterCaptureMode(windowId);
+    ASSERT_TRUE(ret == RET_OK);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call EnterCaptureMode failed, ret:%{public}d", ret);
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_LeaveCaptureMode_001
+ * @tc.desc: Leaving capture mode.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_LeaveCaptureMode_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    uint32_t windowId = window->GetWindowId();
+    int32_t ret = InputManager::GetInstance()->LeaveCaptureMode(windowId);
+    ASSERT_TRUE(ret == RET_OK);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call LeaveCaptureMode failed, ret:%{public}d", ret);
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_GetWindowPid_001
+ * @tc.desc: Get window pid.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetWindowPid_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    uint32_t windowId = window->GetWindowId();
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetWindowPid(windowId));
+    int32_t ret = InputManager::GetInstance()->GetWindowPid(windowId);
+    if (ret == RET_ERR) {
+        MMI_HILOGE("Call GetWindowPid failed, ret:%{public}d", ret);
+    }
+}
+
+/**
+ * @tc.name: InputManagerTest_SetKeyDownDuration_001
+ * @tc.desc: Customize the delay time for starting the ability by using the shortcut key.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetKeyDownDuration_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t parameterError = 401;
+    std::string businessId = "";
+    int32_t delay = 300;
+    ASSERT_EQ(parameterError, InputManager::GetInstance()->SetKeyDownDuration(businessId, delay));
+}
+
+/**
+ * @tc.name: InputManagerTest_UnsubscribeSwitchEvent_001
+ * @tc.desc: Unsubscribes from a switch input event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeSwitchEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t subscriberId = -1;
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribeSwitchEvent(subscriberId));
+}
 } // namespace MMI
 } // namespace OHOS
