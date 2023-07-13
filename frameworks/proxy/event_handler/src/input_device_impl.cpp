@@ -199,6 +199,33 @@ int32_t InputDeviceImpl::SetKeyboardRepeatRate(int32_t rate)
     return RET_OK;
 }
 
+int32_t InputDeviceImpl::GetKeyboardRepeatDelay(std::function<void(int32_t)> callback)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(callback, RET_ERR);
+    int32_t repeatDelay = 0;
+    int32_t ret = MultimodalInputConnMgr->GetKeyboardRepeatDelay(repeatDelay);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetKeyboardRepeatDelay failed");
+        return RET_ERR;
+    }
+    callback(repeatDelay);
+    return RET_OK;
+}
+
+int32_t InputDeviceImpl::GetKeyboardRepeatRate(std::function<void(int32_t)> callback)
+{
+    CALL_DEBUG_ENTER;
+    int32_t repeatRate = 0;
+    int32_t ret = MultimodalInputConnMgr->GetKeyboardRepeatRate(repeatRate);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetKeyboardRepeatRate failed");
+        return RET_ERR;
+    }
+    callback(repeatRate);
+    return RET_OK;
+}
+
 int32_t InputDeviceImpl::GetUserData()
 {
     return userData_;

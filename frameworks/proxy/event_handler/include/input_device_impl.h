@@ -50,6 +50,8 @@ public:
     int32_t GetKeyboardType(int32_t deviceId, FunKeyboardTypes callback);
     int32_t SetKeyboardRepeatDelay(int32_t delay);
     int32_t SetKeyboardRepeatRate(int32_t rate);
+    int32_t GetKeyboardRepeatDelay(std::function<void(int32_t)> callback);
+    int32_t GetKeyboardRepeatRate(std::function<void(int32_t)> callback);
     void OnInputDevice(int32_t userData, std::shared_ptr<InputDevice> devData);
     void OnInputDeviceIds(int32_t userData, std::vector<int32_t> &ids);
     void OnSupportKeys(int32_t userData, std::vector<bool> &keystrokeAbility);

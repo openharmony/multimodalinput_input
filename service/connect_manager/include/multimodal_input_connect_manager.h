@@ -64,6 +64,8 @@ public:
     int32_t GetKeyboardType(int32_t deviceId, int32_t &keyboardType);
     int32_t SetKeyboardRepeatDelay(int32_t delay);
     int32_t SetKeyboardRepeatRate(int32_t rate);
+    int32_t GetKeyboardRepeatDelay(int32_t &delay);
+    int32_t GetKeyboardRepeatRate(int32_t &rate);
     int32_t AddInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,
         uint32_t deviceTags);
     int32_t RemoveInputHandler(InputHandlerType handlerType, HandleEventType eventType, int32_t priority,

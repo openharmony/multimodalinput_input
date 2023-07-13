@@ -264,7 +264,10 @@ int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
     const auto &keyEvent = KeyEventHdr->GetKeyEvent();
     CHKPR(keyEvent, ERROR_NULL_POINTER);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
-    MouseEventHdr->OnEvent(event);
+    if (MouseEventHdr->OnEvent(event) == RET_ERR) {
+        MMI_HILOGE("OnEvent is failed");
+        return RET_ERR;
+    }
     auto pointerEvent = MouseEventHdr->GetPointerEvent();
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -289,6 +292,7 @@ void EventNormalizeHandler::HandlePalmEvent(libinput_event* event, std::shared_p
     CHKPV(touchpad);
     int32_t toolType = libinput_event_touchpad_get_tool_type(touchpad);
     if (toolType == MT_TOOL_PALM) {
+        MMI_HILOGD("ToolType is MT_TOOL_PALM");
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
     }
 }

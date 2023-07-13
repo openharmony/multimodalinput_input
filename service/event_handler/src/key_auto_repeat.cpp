@@ -36,6 +36,7 @@ constexpr int32_t MAX_KEY_REPEAT_DELAY = 1000;
 constexpr int32_t DEFAULT_KEY_REPEAT_RATE = 50;
 constexpr int32_t MIN_KEY_REPEAT_RATE = 36;
 constexpr int32_t MAX_KEY_REPEAT_RATE = 100;
+const std::string KEYBOARD_FILE_NAME = "/data/service/el1/public/multimodalinput/keyboard_settings.xml";
 } // namespace
 
 KeyAutoRepeat::KeyAutoRepeat() {}
@@ -82,7 +83,7 @@ void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
             TimerMgr->RemoveTimer(timerId_);
             timerId_ = -1;
         }
-        int32_t delayTime = GetDelayTime(keyEvent_->GetDeviceId());
+        int32_t delayTime = GetDelayTime();
         AddHandleTimer(delayTime);
         repeatKeyCode_ = keyEvent_->GetKeyCode();
         MMI_HILOGI("Add a timer, keyCode:%{public}d", keyEvent_->GetKeyCode());
@@ -101,7 +102,7 @@ void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
             keyEvent_->SetKeyCode(repeatKeyCode_);
             keyEvent_->SetAction(KeyEvent::KEY_ACTION_DOWN);
             keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-            int32_t delayTime = GetDelayTime(keyEvent_->GetDeviceId());
+            int32_t delayTime = GetDelayTime();
             AddHandleTimer(delayTime);
             MMI_HILOGD("The end keyboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
         }
@@ -128,30 +129,29 @@ std::string KeyAutoRepeat::GetTomlFilePath(const std::string &fileName) const
     return "/vendor/etc/keymap/" + fileName + ".TOML";
 }
 
-int32_t KeyAutoRepeat::GetIntervalTime(int32_t deviceId) const
+int32_t KeyAutoRepeat::GetIntervalTime(int32_t deviceId)
 {
-    if (isUserSetRepeatRateStatus_) {
-        return repeatRateTime_;
-    }
-    auto iter = deviceConfig_.find(deviceId);
     int32_t triggertime = DEFAULT_KEY_REPEAT_RATE;
-    if (iter != deviceConfig_.end()) {
-        triggertime = iter->second.intervalTime;
-    }
+    GetKeyboardRepeatRate(triggertime);
     return triggertime;
 }
 
-int32_t KeyAutoRepeat::GetDelayTime(int32_t deviceId) const
+int32_t KeyAutoRepeat::GetDelayTime()
 {
-    if (isUserSetRepeatDelayStatus_) {
-        return repeatDelayTime_;
-    }
+    int32_t delaytime = DEFAULT_KEY_REPEAT_DELAY;
+    GetKeyboardRepeatDelay(delaytime);
+    return delaytime;
+}
+
+int32_t KeyAutoRepeat::GetKeyboardRepeatTime(int32_t deviceId, bool isDelay)
+{
+    CALL_DEBUG_ENTER;
     auto iter = deviceConfig_.find(deviceId);
-    int32_t delayTime = DEFAULT_KEY_REPEAT_DELAY;
+    int32_t repeatTime = isDelay ? DEFAULT_KEY_REPEAT_DELAY : DEFAULT_KEY_REPEAT_RATE;
     if (iter != deviceConfig_.end()) {
-        delayTime = iter->second.delayTime;
+        repeatTime = isDelay ? iter->second.delayTime : iter->second.intervalTime;
     }
-    return delayTime;
+    return repeatTime;
 }
 
 DeviceConfig KeyAutoRepeat::GetAutoSwitch(int32_t deviceId)
@@ -186,30 +186,111 @@ void KeyAutoRepeat::RemoveTimer()
 int32_t KeyAutoRepeat::SetKeyboardRepeatDelay(int32_t delay)
 {
     CALL_DEBUG_ENTER;
+    int32_t repeatDelayTime = delay;
     if (delay < MIN_KEY_REPEAT_DELAY) {
-        repeatDelayTime_ = MIN_KEY_REPEAT_DELAY;
-    } else if (delay > MAX_KEY_REPEAT_DELAY) {
-        repeatDelayTime_ = MAX_KEY_REPEAT_DELAY;
-    } else {
-        repeatDelayTime_ = delay;
+        repeatDelayTime = MIN_KEY_REPEAT_DELAY;
     }
-    isUserSetRepeatDelayStatus_ = true;
-    MMI_HILOGD("Set keyboard repeat delay delay:%{public}d", delay);
+    if (delay > MAX_KEY_REPEAT_DELAY) {
+        repeatDelayTime = MAX_KEY_REPEAT_DELAY;
+    }
+    std::string name = "keyboardRepeatDelay";
+    if (PutConfigDataToDatabase(name, repeatDelayTime) != RET_OK) {
+        MMI_HILOGE("Failed to set keyboard repeat delay.");
+        return RET_ERR;
+    }
+    MMI_HILOGD("Set keyboard repeat delay delay:%{public}d", repeatDelayTime);
     return RET_OK;
 }
 
 int32_t KeyAutoRepeat::SetKeyboardRepeatRate(int32_t rate)
 {
     CALL_DEBUG_ENTER;
+    int32_t repeatRateTime = rate;
     if (rate < MIN_KEY_REPEAT_RATE) {
-        repeatRateTime_ = MIN_KEY_REPEAT_RATE;
-    } else if (rate > MAX_KEY_REPEAT_RATE) {
-        repeatRateTime_ = MAX_KEY_REPEAT_RATE;
-    } else {
-        repeatRateTime_ = rate;
+        repeatRateTime = MIN_KEY_REPEAT_RATE;
     }
-    isUserSetRepeatRateStatus_ = true;
-    MMI_HILOGD("Set keyboard repeat rate rate:%{public}d", rate);
+    if (rate > MAX_KEY_REPEAT_RATE) {
+        repeatRateTime = MAX_KEY_REPEAT_RATE;
+    }
+    std::string name = "keyboardRepeatRate";
+    if (PutConfigDataToDatabase(name, repeatRateTime) != RET_OK) {
+        MMI_HILOGE("Failed to set keyboard repeat rate.");
+        return RET_ERR;
+    }
+    MMI_HILOGD("Set keyboard repeat rate rate:%{public}d", repeatRateTime);
+    return RET_OK;
+}
+
+int32_t KeyAutoRepeat::GetKeyboardRepeatDelay(int32_t &delay)
+{
+    CALL_DEBUG_ENTER;
+    std::string name = "keyboardRepeatDelay";
+    if (GetConfigDataFromDatabase(name, delay) != RET_OK) {
+        MMI_HILOGE("Failed to get keyboard repeat delay.");
+        return RET_ERR;
+    }
+    if (delay == 0) {
+        delay = DEFAULT_KEY_REPEAT_DELAY;
+        if (keyEvent_ != nullptr) {
+            delay = GetKeyboardRepeatTime(keyEvent_->GetDeviceId(), true);
+        }
+    }
+    MMI_HILOGD("Get keyboard repeat delay delay:%{public}d", delay);
+    return RET_OK;
+}
+
+int32_t KeyAutoRepeat::GetKeyboardRepeatRate(int32_t &rate)
+{
+    CALL_DEBUG_ENTER;
+    std::string name = "keyboardRepeatRate";
+    if (GetConfigDataFromDatabase(name, rate) != RET_OK) {
+        MMI_HILOGE("Failed to get keyboard repeat rate.");
+        return RET_ERR;
+    }
+    if (rate == 0) {
+        rate = DEFAULT_KEY_REPEAT_RATE;
+        if (keyEvent_ != nullptr) {
+            rate = GetKeyboardRepeatTime(keyEvent_->GetDeviceId(), false);
+        }
+    }
+    MMI_HILOGD("Get keyboard repeat rate rate:%{public}d", rate);
+    return RET_OK;
+}
+
+int32_t KeyAutoRepeat::PutConfigDataToDatabase(std::string &key, int32_t value)
+{
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(KEYBOARD_FILE_NAME, errCode);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
+        return RET_ERR;
+    }
+    int32_t ret = pref->PutInt(key, value);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Put value is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    ret = pref->FlushSync();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(KEYBOARD_FILE_NAME);
+    return RET_OK;
+}
+
+int32_t KeyAutoRepeat::GetConfigDataFromDatabase(std::string &key, int32_t &value)
+{
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(KEYBOARD_FILE_NAME, errCode);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
+        return RET_ERR;
+    }
+    value = pref->GetInt(key, 0);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(KEYBOARD_FILE_NAME);
     return RET_OK;
 }
 } // namespace MMI

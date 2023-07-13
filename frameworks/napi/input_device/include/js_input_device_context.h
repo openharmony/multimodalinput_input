@@ -36,6 +36,8 @@ public:
     static napi_value GetKeyboardType(napi_env env, napi_callback_info info);
     static napi_value SetKeyboardRepeatDelay(napi_env env, napi_callback_info info);
     static napi_value SetKeyboardRepeatRate(napi_env env, napi_callback_info info);
+    static napi_value GetKeyboardRepeatDelay(napi_env env, napi_callback_info info);
+    static napi_value GetKeyboardRepeatRate(napi_env env, napi_callback_info info);
     std::shared_ptr<JsInputDeviceManager> GetJsInputDeviceMgr() const;
 
 private:

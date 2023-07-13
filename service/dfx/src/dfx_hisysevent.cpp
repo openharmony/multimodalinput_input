@@ -435,6 +435,110 @@ void DfxHisysevent::ReportPowerInfo(std::shared_ptr<KeyEvent> key, OHOS::HiviewD
         MMI_HILOGW("press power key is error");
     }
 }
+
+void DfxHisysevent::StatisticTouchpadGesture(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPV(pointerEvent);
+    int32_t pointerAction = pointerEvent->GetPointerAction();
+    int32_t fingerCount = pointerEvent->GetFingerCount();
+
+    if (pointerAction == PointerEvent::POINTER_ACTION_AXIS_BEGIN) {
+        int32_t ret = HiSysEventWrite(
+            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+            "TOUCHPAD_PINCH",
+            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+            "FINGER_COUNT", fingerCount);
+        if (ret != RET_OK) {
+            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+        }
+    } else if (pointerAction == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
+        int32_t ret = HiSysEventWrite(
+            OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+            "TOUCHPAD_SWIPE",
+            OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+            "FINGER_COUNT", fingerCount);
+        if (ret != RET_OK) {
+            MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+        }
+    } else {
+        MMI_HILOGW("HiviewDFX Statistic touchpad gesture is error, pointer action is invalid.");
+    }
+}
+
+void DfxHisysevent::ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode, bool flag)
+{
+    const std::map<uint32_t, std::string> mapSettingCodeToSettingType = {
+        { TOUCHPAD_SCROLL_SETTING, "TOUCHPAD_SCROLL_SETTING" },
+        { TOUCHPAD_SCROLL_DIR_SETTING, "TOUCHPAD_SCROLL_DIR_SETTING" },
+        { TOUCHPAD_TAP_SETTING, "TOUCHPAD_TAP_SETTING" },
+        { TOUCHPAD_SWIPE_SETTING, "TOUCHPAD_SWIPE_SETTING" },
+        { TOUCHPAD_PINCH_SETTING, "TOUCHPAD_PINCH_SETTING" },
+    };
+
+    auto it = mapSettingCodeToSettingType.find(settingCode);
+    if (it == mapSettingCodeToSettingType.end()) {
+        MMI_HILOGE("HiviewDFX Report touchpad setting state is error, setting code is invalid.");
+        return;
+    }
+    std::string name = it->second;
+
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        name,
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "SWITCH_STATE", flag);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode, int32_t value)
+{
+    const std::map<uint32_t, std::string> mapSettingCodeToSettingType = {
+        { TOUCHPAD_POINTER_SPEED_SETTING, "TOUCHPAD_POINTER_SPEED_SETTING" },
+        { TOUCHPAD_RIGHT_CLICK_SETTING, "TOUCHPAD_RIGHT_CLICK_SETTING" },
+    };
+
+    auto it = mapSettingCodeToSettingType.find(settingCode);
+    if (it == mapSettingCodeToSettingType.end()) {
+        MMI_HILOGW("HiviewDFX Report touchpad setting state is error, setting code is invalid.");
+        return;
+    }
+    std::string name = it->second;
+
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        name,
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "SWITCH_VALUE", value);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportTouchpadSettingFault(uint32_t settingFaultCode)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "TOUCHPAD_SETTING_FAULT_CODE",
+        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+        "FAULT_CODE", settingFaultCode);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportTouchpadTypeFault(uint32_t typeFaultCode)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "TOUCHPAD_TYPE_FAULT_CODE",
+        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
+        "FAULT_CODE", typeFaultCode);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
 }
 }
 
