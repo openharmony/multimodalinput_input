@@ -148,7 +148,7 @@ group("mmi_tests") {
     "service:ut-mmi-service-out",
     "test/fuzztest:test",
     "tools/inject_event:InjectEventTest",
-    "util:mmi_rust_key_config_test",
+    "util:rust_mmi_key_config_test",
     "util:ut-mmi-util-out",
   ]
 }

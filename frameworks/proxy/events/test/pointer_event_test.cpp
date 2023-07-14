@@ -575,5 +575,35 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckTouchInputEvent_001, TestSize.L
     inputEvent->HasFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
     inputEvent->ClearFlag();
 }
+
+/**
+ * @tc.name: PointerEventTest_SetEnhanceData_001
+ * @tc.desc: Set the enhance data.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetEnhanceData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    pointerEvent->SetButtonId(PointerEvent::BUTTON_NONE);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(-1);
+    pointerEvent->AddPointerItem(item);
+    uint32_t enHanceDataLen = 3;
+    uint8_t enhanceDataBuf[enHanceDataLen];
+    std::vector<uint8_t> enhanceData;
+    for (uint32_t i = 0; i < enHanceDataLen; i++) {
+        enhanceData.push_back(enhanceDataBuf[i]);
+    }
+    #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->SetEnhanceData(enhanceData));
+    ASSERT_EQ(pointerEvent->GetEnhanceData(), enhanceData);
+    #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+}
 } // namespace MMI
 } // namespace OHOS
