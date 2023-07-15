@@ -167,7 +167,6 @@ HWTEST_F(StreamBufferTest, write_Type1_002, TestSize.Level1)
 HWTEST_F(StreamBufferTest, write_Type2_001, TestSize.Level1)
 {
     StreamBuffer buf;
-
     StreamBuffer streamBuffer;
     bool retResult = streamBuffer.Write(buf);
     ASSERT_FALSE(retResult);
@@ -239,7 +238,10 @@ HWTEST_F(StreamBufferTest, Size_001, TestSize.Level1)
 HWTEST_F(StreamBufferTest, operatorLeft, TestSize.Level1)
 {
     int32_t val = 111;
+    StreamBuffer buf;
     StreamBuffer streamBufferSrc;
+    bool retResult = streamBufferSrc.Write(buf);
+    ASSERT_FALSE(retResult);
     streamBufferSrc << val;
 }
 
@@ -252,7 +254,10 @@ HWTEST_F(StreamBufferTest, operatorLeft, TestSize.Level1)
 HWTEST_F(StreamBufferTest, operatorRight, TestSize.Level1)
 {
     int32_t val = 111;
+    StreamBuffer buf;
     StreamBuffer streamBufferSrc;
+    bool retResult = streamBufferSrc.Write(buf);
+    ASSERT_FALSE(retResult);
     streamBufferSrc << val;
     streamBufferSrc >> val;
 }

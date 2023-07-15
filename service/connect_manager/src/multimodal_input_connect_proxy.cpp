@@ -216,7 +216,7 @@ int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t windowId, void* pixelM
 
     MMI_HILOGD("image buffer size being sent is %{public}d", size);
     WRITEINT32(data, size, ERR_INVALID_VALUE);
-    for (int i = 0; i < size; i++) {
+    for (uint32_t i = 0; i < size; i++) {
         WRITEUINT8(data, buff[i], ERR_INVALID_VALUE);
     }
     MMI_HILOGD("windowId being sent is %{public}d", windowId);
