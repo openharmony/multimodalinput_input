@@ -145,7 +145,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     // touch pad tap switch is disable
     if (type == LIBINPUT_EVENT_POINTER_TAP && tpTapSwitch == false) {
         MMI_HILOGD("Touch pad is disable.");
-        return RET_OK;
+        return RET_ERR;
     }
 
     TransTouchpadRightButton(data, type, button);
@@ -302,7 +302,7 @@ int32_t MouseTransformProcessor::HandleAxisInner(struct libinput_event_pointer* 
     HandleTouchPadAxisState(source, tpScrollDirection, tpScrollSwitch);
     if (tpScrollSwitch == false && source == LIBINPUT_POINTER_AXIS_SOURCE_FINGER) {
         MMI_HILOGD("TouchPad axis event is disable.");
-        return RET_OK;
+        return RET_ERR;
     }
 
     if (buttonId_ == PointerEvent::BUTTON_NONE && pointerEvent_->GetButtonId() != PointerEvent::BUTTON_NONE) {

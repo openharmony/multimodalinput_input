@@ -47,14 +47,14 @@ TouchPadTransformProcessor::TouchPadTransformProcessor(int32_t deviceId)
     InitToolType();
 }
 
-void TouchPadTransformProcessor::OnEventTouchPadDown(struct libinput_event *event)
+int32_t TouchPadTransformProcessor::OnEventTouchPadDown(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(event);
+    CHKPR(event, RET_ERR);
     auto touchpad = libinput_event_get_touchpad_event(event);
-    CHKPV(touchpad);
+    CHKPR(touchpad, RET_ERR);
     auto device = libinput_event_get_device(event);
-    CHKPV(device);
+    CHKPR(device, RET_ERR);
 
     uint64_t time = libinput_event_touchpad_get_time_usec(touchpad);
     auto pointIds = pointerEvent_->GetPointerIds();
@@ -96,17 +96,19 @@ void TouchPadTransformProcessor::OnEventTouchPadDown(struct libinput_event *even
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
+
+    return RET_OK;
 }
 
-void TouchPadTransformProcessor::OnEventTouchPadMotion(struct libinput_event *event)
+int32_t TouchPadTransformProcessor::OnEventTouchPadMotion(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(event);
+    CHKPR(event, RET_ERR);
     auto touchpad = libinput_event_get_touchpad_event(event);
-    CHKPV(touchpad);
+    CHKPR(touchpad, RET_ERR);
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);
     auto device = libinput_event_get_device(event);
-    CHKPV(device);
+    CHKPR(device, RET_ERR);
 
     uint64_t time = libinput_event_touchpad_get_time_usec(touchpad);
     pointerEvent_->SetActionTime(time);
@@ -115,7 +117,7 @@ void TouchPadTransformProcessor::OnEventTouchPadMotion(struct libinput_event *ev
     if (!pointerEvent_->GetPointerItem(seatSlot, item)) {
         MMI_HILOGE("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d",
                    seatSlot, PARAM_INPUT_FAIL);
-        return;
+        return RET_ERR;
     }
     int32_t longAxis = libinput_event_touchpad_get_touch_contact_long_axis(touchpad);
     int32_t shortAxis = libinput_event_touchpad_get_touch_contact_short_axis(touchpad);
@@ -142,14 +144,16 @@ void TouchPadTransformProcessor::OnEventTouchPadMotion(struct libinput_event *ev
     item.SetToolHeight(static_cast<int32_t>(toolHeight));
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
+
+    return RET_OK;
 }
 
-void TouchPadTransformProcessor::OnEventTouchPadUp(struct libinput_event *event)
+int32_t TouchPadTransformProcessor::OnEventTouchPadUp(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
-    CHKPV(event);
+    CHKPR(event, RET_ERR);
     auto touchpad = libinput_event_get_touchpad_event(event);
-    CHKPV(touchpad);
+    CHKPR(touchpad, RET_ERR);
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);
 
     uint64_t time = libinput_event_touchpad_get_time_usec(touchpad);
@@ -160,11 +164,13 @@ void TouchPadTransformProcessor::OnEventTouchPadUp(struct libinput_event *event)
     if (!pointerEvent_->GetPointerItem(seatSlot, item)) {
         MMI_HILOGE("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d",
                    seatSlot, PARAM_INPUT_FAIL);
-        return;
+        return RET_ERR;
     }
     item.SetPressed(false);
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
+
+    return RET_OK;
 }
 
 std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinput_event *event)
@@ -175,49 +181,55 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
         pointerEvent_ = PointerEvent::Create();
         CHKPP(pointerEvent_);
     }
+
+    int32_t ret = RET_OK;
     int32_t type = libinput_event_get_type(event);
     switch (type) {
         case LIBINPUT_EVENT_TOUCHPAD_DOWN: {
-            OnEventTouchPadDown(event);
+            ret = OnEventTouchPadDown(event);
             break;
         }
         case LIBINPUT_EVENT_TOUCHPAD_UP: {
-            OnEventTouchPadUp(event);
+            ret = OnEventTouchPadUp(event);
             break;
         }
         case LIBINPUT_EVENT_TOUCHPAD_MOTION: {
-            OnEventTouchPadMotion(event);
+            ret = OnEventTouchPadMotion(event);
             break;
         }
         case LIBINPUT_EVENT_GESTURE_SWIPE_BEGIN: {
-            OnEventTouchPadSwipeBegin(event);
+            ret = OnEventTouchPadSwipeBegin(event);
             break;
         }
         case LIBINPUT_EVENT_GESTURE_SWIPE_UPDATE: {
-            OnEventTouchPadSwipeUpdate(event);
+            ret = OnEventTouchPadSwipeUpdate(event);
             break;
         }
         case LIBINPUT_EVENT_GESTURE_SWIPE_END: {
-            OnEventTouchPadSwipeEnd(event);
+            ret = OnEventTouchPadSwipeEnd(event);
             break;
         }
 
         case LIBINPUT_EVENT_GESTURE_PINCH_BEGIN: {
-            OnEventTouchPadPinchBegin(event);
+            ret = OnEventTouchPadPinchBegin(event);
             break;
         }
         case LIBINPUT_EVENT_GESTURE_PINCH_UPDATE: {
-            OnEventTouchPadPinchUpdate(event);
+            ret = OnEventTouchPadPinchUpdate(event);
             break;
         }
         case LIBINPUT_EVENT_GESTURE_PINCH_END: {
-            OnEventTouchPadPinchEnd(event);
+            ret = OnEventTouchPadPinchEnd(event);
             break;
         }
         default: {
             DfxHisysevent::ReportTouchpadTypeFault(type);
             return nullptr;
         }
+    }
+
+    if (ret != RET_OK) {
+        return nullptr;
     }
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
     pointerEvent_->UpdateId();
@@ -263,7 +275,7 @@ int32_t TouchPadTransformProcessor::GetTouchPadToolType(struct libinput_device *
     return PointerEvent::TOOL_TYPE_FINGER;
 }
 
-void TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *event, int32_t action)
+int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *event, int32_t action)
 {
     CALL_DEBUG_ENTER;
 
@@ -274,12 +286,12 @@ void TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *eve
 
     if (!tpSwipeSwitch) {
         MMI_HILOGD("Touchpad swipe switch is false.");
-        return;
+        return RET_ERR;
     }
 
-    CHKPV(event);
+    CHKPR(event, RET_ERR);
     struct libinput_event_gesture *gesture = libinput_event_get_gesture_event(event);
-    CHKPV(gesture);
+    CHKPR(gesture, RET_ERR);
 
     int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(gesture));
     pointerEvent_->SetActionTime(GetSysClockTime());
@@ -289,13 +301,13 @@ void TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *eve
     int32_t fingerCount = libinput_event_gesture_get_finger_count(gesture);
     if (fingerCount < 0 || fingerCount > FINGER_COUNT_MAX) {
         MMI_HILOGE("Finger count is invalid.");
-        return;
+        return RET_ERR;
     }
     pointerEvent_->SetFingerCount(fingerCount);
 
     if (fingerCount == 0) {
         MMI_HILOGD("There is no finger in swipe action %{public}d.", action);
-        return;
+        return RET_ERR;
     }
 
     int32_t sumX = 0;
@@ -319,27 +331,29 @@ void TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *eve
         MMI_HILOGE("lisenhao-app go in to report POINTER_ACTION_SWIPE_BEGIN");
         DfxHisysevent::StatisticTouchpadGesture(pointerEvent_);
     }
+
+    return RET_OK;
 }
 
-void TouchPadTransformProcessor::OnEventTouchPadSwipeBegin(struct libinput_event *event)
+int32_t TouchPadTransformProcessor::OnEventTouchPadSwipeBegin(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
-    SetTouchPadSwipeData(event, PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
+    return SetTouchPadSwipeData(event, PointerEvent::POINTER_ACTION_SWIPE_BEGIN);
 }
 
-void TouchPadTransformProcessor::OnEventTouchPadSwipeUpdate(struct libinput_event *event)
+int32_t TouchPadTransformProcessor::OnEventTouchPadSwipeUpdate(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
-    SetTouchPadSwipeData(event, PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
+    return SetTouchPadSwipeData(event, PointerEvent::POINTER_ACTION_SWIPE_UPDATE);
 }
 
-void TouchPadTransformProcessor::OnEventTouchPadSwipeEnd(struct libinput_event *event)
+int32_t TouchPadTransformProcessor::OnEventTouchPadSwipeEnd(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
-    SetTouchPadSwipeData(event, PointerEvent::POINTER_ACTION_SWIPE_END);
+    return SetTouchPadSwipeData(event, PointerEvent::POINTER_ACTION_SWIPE_END);
 }
 
-void TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *event, int32_t action)
+int32_t TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *event, int32_t action)
 {
     CALL_DEBUG_ENTER;
 
@@ -348,18 +362,18 @@ void TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *eve
         MMI_HILOGD("Failed to get touchpad pinch switch flag, default is true.");
     }
 
-    CHKPV(event);
+    CHKPR(event, RET_ERR);
     auto gesture = libinput_event_get_gesture_event(event);
-    CHKPV(gesture);
+    CHKPR(gesture, RET_ERR);
     int32_t fingerCount = libinput_event_gesture_get_finger_count(gesture);
     if (fingerCount <= 0 || fingerCount > FINGER_COUNT_MAX) {
         MMI_HILOGE("Finger count is invalid.");
-        return;
+        return RET_ERR;
     }
 
     if (!tpPinchSwitch && fingerCount == TP_SYSTEM_PINCH_FINGER_CNT) {
         MMI_HILOGD("Touchpad pinch switch is false.");
-        return;
+        return RET_ERR;
     }
 
     int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(gesture));
@@ -390,24 +404,26 @@ void TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *eve
     if (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN && fingerCount > TP_SYSTEM_PINCH_FINGER_CNT) {
         DfxHisysevent::StatisticTouchpadGesture(pointerEvent_);
     }
+
+    return RET_OK;
 }
 
-void TouchPadTransformProcessor::OnEventTouchPadPinchBegin(struct libinput_event *event)
+int32_t TouchPadTransformProcessor::OnEventTouchPadPinchBegin(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
-    SetTouchPadPinchData(event, PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+    return SetTouchPadPinchData(event, PointerEvent::POINTER_ACTION_AXIS_BEGIN);
 }
 
-void TouchPadTransformProcessor::OnEventTouchPadPinchUpdate(struct libinput_event *event)
+int32_t TouchPadTransformProcessor::OnEventTouchPadPinchUpdate(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
-    SetTouchPadPinchData(event, PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+    return SetTouchPadPinchData(event, PointerEvent::POINTER_ACTION_AXIS_UPDATE);
 }
 
-void TouchPadTransformProcessor::OnEventTouchPadPinchEnd(struct libinput_event *event)
+int32_t TouchPadTransformProcessor::OnEventTouchPadPinchEnd(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;
-    SetTouchPadPinchData(event, PointerEvent::POINTER_ACTION_AXIS_END);
+    return SetTouchPadPinchData(event, PointerEvent::POINTER_ACTION_AXIS_END);
 }
 
 void TouchPadTransformProcessor::InitToolType()
