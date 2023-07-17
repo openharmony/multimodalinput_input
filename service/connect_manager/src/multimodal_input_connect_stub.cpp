@@ -363,12 +363,12 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
     int32_t size = 0;
     int32_t windowId = 0;
     READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
-    std::vector<uint8_t> buff(size, 0);
     MMI_HILOGD("reading size of the tlv count %{public}d", size);
     if (size > MAX_BUFFER_SIZE) {
         MMI_HILOGE("Append extra data failed, buffer is oversize:%{public}d", size);
         return RET_ERR;
     }
+    std::vector<uint8_t> buff(size, 0);
     for (int i = 0; i < size; i++) {
         READUINT8(data, buff[i], IPC_PROXY_DEAD_OBJECT_ERR);
     }
