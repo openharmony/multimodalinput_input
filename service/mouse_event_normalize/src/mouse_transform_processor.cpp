@@ -421,7 +421,7 @@ void MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerItem.SetPointerId(0);
     pointerItem.SetPressed(isPressed_);
 
-    uint64_t time = libinput_event_pointer_get_time_usec(data);
+    uint64_t time = GetSysClockTime();
     pointerItem.SetDownTime(time);
     pointerItem.SetWidth(0);
     pointerItem.SetHeight(0);
