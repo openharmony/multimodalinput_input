@@ -164,7 +164,7 @@ int32_t TouchPadTransformProcessor::OnEventTouchPadUp(struct libinput_event *eve
     if (!pointerEvent_->GetPointerItem(seatSlot, item)) {
         MMI_HILOGE("Can't find the pointer item data, seatSlot:%{public}d, errCode:%{public}d",
                    seatSlot, PARAM_INPUT_FAIL);
-         return RET_ERR;
+        return RET_ERR;
     }
     item.SetPressed(false);
     pointerEvent_->UpdatePointerItem(seatSlot, item);
