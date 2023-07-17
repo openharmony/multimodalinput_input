@@ -37,17 +37,17 @@ private:
     static int32_t PutConfigDataToDatabase(std::string &key, bool value);
     static int32_t GetConfigDataFromDatabase(std::string &key, bool &value);
 
-    void OnEventTouchPadDown(struct libinput_event *event);
-    void OnEventTouchPadMotion(struct libinput_event *event);
-    void OnEventTouchPadUp(struct libinput_event *event);
-    void SetTouchPadSwipeData(struct libinput_event *event, int32_t action);
-    void SetTouchPadPinchData(struct libinput_event *event, int32_t action);
-    void OnEventTouchPadSwipeBegin(struct libinput_event *event);
-    void OnEventTouchPadSwipeUpdate(struct libinput_event *event);
-    void OnEventTouchPadSwipeEnd(struct libinput_event *event);
-    void OnEventTouchPadPinchBegin(struct libinput_event *event);
-    void OnEventTouchPadPinchUpdate(struct libinput_event *event);
-    void OnEventTouchPadPinchEnd(struct libinput_event *event);
+    int32_t OnEventTouchPadDown(struct libinput_event *event);
+    int32_t OnEventTouchPadMotion(struct libinput_event *event);
+    int32_t OnEventTouchPadUp(struct libinput_event *event);
+    int32_t SetTouchPadSwipeData(struct libinput_event *event, int32_t action);
+    int32_t SetTouchPadPinchData(struct libinput_event *event, int32_t action);
+    int32_t OnEventTouchPadSwipeBegin(struct libinput_event *event);
+    int32_t OnEventTouchPadSwipeUpdate(struct libinput_event *event);
+    int32_t OnEventTouchPadSwipeEnd(struct libinput_event *event);
+    int32_t OnEventTouchPadPinchBegin(struct libinput_event *event);
+    int32_t OnEventTouchPadPinchUpdate(struct libinput_event *event);
+    int32_t OnEventTouchPadPinchEnd(struct libinput_event *event);
 
     int32_t GetTouchPadToolType(struct libinput_event_touch *data, struct libinput_device *device);
     int32_t GetTouchPadToolType(struct libinput_device *device);
