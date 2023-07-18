@@ -507,6 +507,28 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
     return exports;
 }
 
+napi_value JsPointerContext::CreateTouchpadRightClickType(napi_env env, napi_value exports)
+{
+    CALL_DEBUG_ENTER;
+    napi_value touchpad_right_button = nullptr;
+    CHKRP(napi_create_int32(env, RightClickType::TOUCHPAD_RIGHT_BUTTON, &touchpad_right_button), CREATE_INT32);
+    napi_value touchpad_left_button = nullptr;
+    CHKRP(napi_create_int32(env, RightClickType::TOUCHPAD_LEFT_BUTTON, &touchpad_left_button), CREATE_INT32);
+    napi_value touchpad_two_finger_tap = nullptr;
+    CHKRP(napi_create_int32(env, RightClickType::TOUCHPAD_TWO_FINGER_TAP, &touchpad_two_finger_tap), CREATE_INT32);
+
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("TOUCHPAD_RIGHT_BUTTON", touchpad_right_button),
+        DECLARE_NAPI_STATIC_PROPERTY("TOUCHPAD_LEFT_BUTTON", touchpad_left_button),
+        DECLARE_NAPI_STATIC_PROPERTY("TOUCHPAD_TWO_FINGER_TAP", touchpad_two_finger_tap),
+    };
+    napi_value result = nullptr;
+    CHKRP(napi_define_class(env, "RightClickType", NAPI_AUTO_LENGTH, EnumConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
+    CHKRP(napi_set_named_property(env, exports, "RightClickType", result), SET_NAMED_PROPERTY);
+    return exports;
+}
+
 napi_value JsPointerContext::EnumConstructor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -1022,6 +1044,10 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
     }
     if (CreateMousePrimaryButton(env, exports) == nullptr) {
         THROWERR(env, "Failed to create mouse primary button");
+        return nullptr;
+    }
+    if (CreateTouchpadRightClickType(env, exports) == nullptr) {
+        THROWERR(env, "Failed to create touchpad right click type");
         return nullptr;
     }
     return exports;
