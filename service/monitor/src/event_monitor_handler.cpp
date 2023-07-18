@@ -325,7 +325,7 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<Pointer
     CHKPF(pointerEvent);
 
     // if is 2 finger pinch,then return false
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD &&
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE &&
        (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_BEGIN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) &&
