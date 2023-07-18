@@ -231,7 +231,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
     if (ret != RET_OK) {
         return nullptr;
     }
-    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+
     pointerEvent_->UpdateId();
     MMI_HILOGD("Pointer event dispatcher of server:");
     EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
@@ -326,6 +326,7 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
     pointerItem.SetDeviceId(deviceId_);
     pointerItem.SetPointerId(defaultPointerId);
     pointerEvent_->UpdatePointerItem(defaultPointerId, pointerItem);
+    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
 
     if (action == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
         MMI_HILOGE("lisenhao-app go in to report POINTER_ACTION_SWIPE_BEGIN");
@@ -384,6 +385,12 @@ int32_t TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetDownTime(time);
     pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
+    pointerItem.SetPointerId(defaultPointerId);
+    pointerItem.SetWindowX(0);
+    pointerItem.SetWindowY(0);
+    auto mouseInfo = WinMgr->GetMouseInfo();
+    pointerItem.SetDisplayX(mouseInfo.physicalX);
+    pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerEvent_->UpdatePointerItem(defaultPointerId, pointerItem);
 
     pointerEvent_->ClearButtonPressed();
@@ -396,9 +403,19 @@ int32_t TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *
     pointerEvent_->SetFingerCount(fingerCount);
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->SetTargetDisplayId(0);
+    pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetPointerId(defaultPointerId);
     pointerEvent_->SetPointerAction(action);
     pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
+
+    if (fingerCount == TP_SYSTEM_PINCH_FINGER_CNT) {
+        pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+        pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
+        WinMgr->UpdateTargetPointer(pointerEvent_);
+    } else {
+        pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+        pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
+    }
 
     // only three or four finger pinch need to statistic
     if (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN && fingerCount > TP_SYSTEM_PINCH_FINGER_CNT) {
