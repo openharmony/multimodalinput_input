@@ -464,7 +464,6 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
     }
     int pid = lastWindowInfo_.pid;
     if (pointerAction == PointerEvent::POINTER_ACTION_LEAVE_WINDOW) {
-        pid = GetWindowPid(lastWindowInfo_.id);
         pointerEvent->SetAgentWindowId(lastWindowInfo_.id);
     }
     auto fd = udsServer_->GetClientFd(pid);
