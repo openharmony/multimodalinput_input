@@ -187,9 +187,9 @@ ohos_shared_library("libmmi-server") {
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
+    "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_single",
-    "multimedia_image_framework:image_native",
     "napi:ace_napi",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
@@ -278,7 +278,7 @@ ohos_unittest("ut-mmi-service-out") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "multimedia_image_framework:image_native",
+    "image_framework:image_native",
     "window_manager:libwm",
   ]
 }

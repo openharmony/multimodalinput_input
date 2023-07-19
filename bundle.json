@@ -49,7 +49,7 @@
         "hitrace",
         "resource_schedule_service",
         "eventhandler",
-        "multimedia_image_framework",
+        "image_framework",
         "graphic_2d",
         "drivers_interface_input",
         "safwk",
