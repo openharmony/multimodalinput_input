@@ -31,7 +31,7 @@ ohos_source_set("input-manager") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "multimedia_image_framework:image_native",
+    "image_framework:image_native",
   ]
   subsystem_name = "multimodalinput"
   part_name = "input"
@@ -68,7 +68,7 @@ ohos_unittest("InjectEventTest") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
-    "multimedia_image_framework:image_native",
+    "image_framework:image_native",
   ]
 }
 
