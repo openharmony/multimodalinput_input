@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "getdeviceIds_fuzzer.h"
+#include "getdeviceids_fuzzer.h"
 
 #include "input_manager.h"
 #include "mmi_log.h"

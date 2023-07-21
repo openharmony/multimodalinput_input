@@ -16,6 +16,6 @@
 #ifndef GETDEVICEIDS_FUZZER_H
 #define GETDEVICEIDS_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "getdeviceIds_fuzzer"
+#define FUZZ_PROJECT_NAME "getdeviceids_fuzzer"
 
 #endif // GETDEVICEIDS_FUZZER_H

@@ -20,7 +20,7 @@ module_output_path = "multimodalinput/fuzz"
 ##############################fuzztest##########################################
 ohos_fuzztest("GetDisplayBindInfoFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "${mmi_path}/test/fuzztest/getdisplaybindInfo_fuzzer"
+  fuzz_config_file = "${mmi_path}/test/fuzztest/getdisplaybindinfo_fuzzer"
   include_dirs = [ "${mmi_path}/interfaces/util/common/include" ]
   cflags = [
     "-g",
@@ -28,7 +28,7 @@ ohos_fuzztest("GetDisplayBindInfoFuzzTest") {
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
   ]
-  sources = [ "getdisplaybindInfo_fuzzer.cpp" ]
+  sources = [ "getdisplaybindinfo_fuzzer.cpp" ]
   deps = [ "${mmi_path}/frameworks/proxy:libmmi-client" ]
   external_deps = [
     "c_utils:utils",
