@@ -16,6 +16,6 @@
 #ifndef GETDISPLAYBINDINFO_FUZZER_H
 #define GETDISPLAYBINDINFO_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "getdisplaybindInfo_fuzzer"
+#define FUZZ_PROJECT_NAME "getdisplaybindinfo_fuzzer"
 
 #endif // GETDISPLAYBINDINFO_FUZZER_H
