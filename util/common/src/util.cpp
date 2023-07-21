@@ -346,7 +346,7 @@ void ReadProConfigFile(const std::string &realPath, int32_t deviceId,
     while (std::getline(reader, strLine)) {
         const char* line = strLine.c_str();
         int32_t len = strlen(line);
-        char* realLine = (char*) malloc(len + 1);
+        char* realLine = static_cast<char*>(malloc(len + 1));
         if (realLine == nullptr) {
             MMI_HILOGE("Malloc failed");
             return;
