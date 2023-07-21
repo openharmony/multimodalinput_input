@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "getdisplaybindInfo_fuzzer.h"
+#include "getdisplaybindinfo_fuzzer.h"
 
 #include "securec.h"
 
