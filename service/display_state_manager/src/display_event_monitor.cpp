@@ -27,7 +27,9 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "DisplayEventMonitor" };
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 } // namespace
 
 DisplayEventMonitor::DisplayEventMonitor() {}
