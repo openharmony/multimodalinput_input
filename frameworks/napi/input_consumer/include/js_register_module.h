@@ -61,7 +61,6 @@ struct KeyEventMonitorInfo {
         }
     }
 };
-static std::mutex sCallBacksMutex_;
 typedef std::map<std::string, std::list<KeyEventMonitorInfo *>> Callbacks;
 } // namespace MMI
 } // namespace OHOS

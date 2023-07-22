@@ -35,6 +35,7 @@ constexpr size_t INPUT_PARAMETER_MAX = 3;
 } // namespace
 
 static Callbacks callbacks = {};
+static std::mutex sCallBacksMutex;
 
 napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
     std::shared_ptr<KeyOption> keyOption)
@@ -218,7 +219,7 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
-    std::lock_guard guard(sCallBacksMutex_);
+    std::lock_guard guard(sCallBacksMutex);
     auto iter = callbacks.begin();
     while (iter != callbacks.end()) {
         auto &list = iter->second;
@@ -239,6 +240,7 @@ static void SubKeyEventCallback(std::shared_ptr<KeyEvent> keyEvent)
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard guard(sCallBacksMutex);
     size_t argc = 3;
     napi_value argv[3] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
@@ -292,6 +294,7 @@ static napi_value JsOn(napi_env env, napi_callback_info info)
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard guard(sCallBacksMutex);
     size_t argc = 3;
     napi_value argv[3] = { 0 };
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
