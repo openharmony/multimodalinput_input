@@ -15,12 +15,13 @@
 
 #include "display_event_monitor.h"
 
-#include "mmi_log.h"
 #include "common_event_data.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "define_multimodal.h"
 #include "fingersense_manager.h"
 #include "fingersense_wrapper.h"
+#include "mmi_log.h"
 #include "want.h"
 
 namespace OHOS {
