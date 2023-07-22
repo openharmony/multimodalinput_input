@@ -674,6 +674,10 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     CHKPV(pointerEvent);
     CHKPV(nextHandler_);
     OnHandleTouchEvent(pointerEvent);
+    if (isKnuckleState_) {
+        MMI_HILOGD("current pointer event is knuckle");
+        return;
+    }
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
 
@@ -721,6 +725,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
     MMI_HILOGD("Pointer tool type: %{public}d", toolType);
     switch (toolType) {
         case PointerEvent::TOOL_TYPE_FINGER: {
+            isKnuckleState_ = false;
             HandleFingerGestureDownEvent(touchEvent);
             break;
         }
@@ -730,6 +735,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
         }
         default: {
             // other tool type are not processed
+            isKnuckleState_ = false;
             MMI_HILOGD("Current touch event tool type: %{public}d", toolType);
             break;
         }
@@ -896,6 +902,7 @@ void KeyCommandHandler::KnuckleGestureProcesser(const std::shared_ptr<PointerEve
             });
             knuckleGesture.lastPointerDownEvent = touchEvent;
             knuckleGesture.state = CLICK_STATE;
+            isKnuckleState_ = true;
             break;
         }
         case CLICK_STATE: {
@@ -909,6 +916,7 @@ void KeyCommandHandler::KnuckleGestureProcesser(const std::shared_ptr<PointerEve
                     knuckleGesture.timerId = -1;
                 }
                 knuckleGesture.state = NONE_CLICK_STATE;
+                isKnuckleState_ = true;
             }
             break;
         }

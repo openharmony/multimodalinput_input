@@ -48,6 +48,8 @@
 #include "key_auto_repeat.h"
 #include "key_command_handler.h"
 #include "touch_event_normalize.h"
+#include "display_event_monitor.h"
+#include "fingersense_wrapper.h"
 
 namespace OHOS {
 namespace MMI {
@@ -241,6 +243,10 @@ int32_t MMIService::Init()
     MMI_HILOGD("ANRManager Init");
     ANRMgr->Init(*this);
     MMI_HILOGD("PointerDrawingManager Init");
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    FINGERSENSE_WRAPPER->InitFingerSenseWrapper();
+    DISPLAY_MONITOR->InitCommonEventSubscriber();
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if (!IPointerDrawingManager::GetInstance()->Init()) {
         MMI_HILOGE("Pointer draw init failed");

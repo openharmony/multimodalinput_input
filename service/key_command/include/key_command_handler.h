@@ -191,6 +191,7 @@ private:
     TwoFingerGesture twoFingerGesture_;
     KnuckleGesture singleKnuckleGesture_;
     KnuckleGesture doubleKnuckleGesture_;
+    bool isKnuckleState_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

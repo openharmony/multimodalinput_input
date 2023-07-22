@@ -64,7 +64,9 @@
         "preferences",
         "security_component",
 	"common",
-        "hilog"
+        "hilog",
+        "common_event_service",
+        "display_manager"
       ],
       "third_party": [
         "cJSON",
