@@ -19,6 +19,7 @@
 
 #include "event_log_helper.h"
 #include "input_windows_manager.h"
+#include "fingersense_wrapper.h"
 #include "mmi_log.h"
 
 namespace OHOS {
@@ -57,7 +58,6 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     }
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-
     PointerEvent::PointerItem item;
     double pressure = libinput_event_touch_get_pressure(touch);
     int32_t seatSlot = libinput_event_touch_get_seat_slot(touch);
@@ -66,18 +66,16 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     item.SetPressure(pressure);
     item.SetLongAxis(longAxis);
     item.SetShortAxis(shortAxis);
-    int32_t toolType = GetTouchToolType(touch, device);
-    item.SetToolType(toolType);
     item.SetPointerId(seatSlot);
     item.SetDownTime(time);
     item.SetPressed(true);
-    item.SetDisplayX(touchInfo.point.x);
-    item.SetDisplayY(touchInfo.point.y);
-    item.SetToolDisplayX(touchInfo.toolRect.point.x);
-    item.SetToolDisplayY(touchInfo.toolRect.point.y);
-    item.SetToolWidth(touchInfo.toolRect.width);
-    item.SetToolHeight(touchInfo.toolRect.height);
+    UpdatePointerItemProperties(item, touchInfo);
     item.SetDeviceId(deviceId_);
+    int32_t toolType = GetTouchToolType(touch, device);
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    NotifyFingersenseProcess(item, toolType);
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    item.SetToolType(toolType);
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
@@ -85,6 +83,37 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
         pointerEvent_->GetPointerIds().size());
     return true;
 }
+
+void TouchTransformProcessor::UpdatePointerItemProperties(PointerEvent::PointerItem &item, EventTouch &touchInfo)
+{
+    CALL_DEBUG_ENTER;
+    item.SetDisplayX(touchInfo.point.x);
+    item.SetDisplayY(touchInfo.point.y);
+    item.SetToolDisplayX(touchInfo.toolRect.point.x);
+    item.SetToolDisplayY(touchInfo.toolRect.point.y);
+    item.SetToolWidth(touchInfo.toolRect.width);
+    item.SetToolHeight(touchInfo.toolRect.height);
+}
+
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+void TouchTransformProcessor::NotifyFingersenseProcess(PointerEvent::PointerItem &pointerItem, int32_t &toolType)
+{
+    CALL_DEBUG_ENTER;
+    TransformTouchProperties(rawTouch_, pointerItem);
+    if (FINGERSENSE_WRAPPER->setCurrentToolType_) {
+        MMI_HILOGD("fingersense start classify touch down event");
+        FINGERSENSE_WRAPPER->setCurrentToolType_(rawTouch_, toolType);
+    }
+}
+void TouchTransformProcessor::TransformTouchProperties(TouchType &rawTouch, PointerEvent::PointerItem &pointerItem)
+{
+    CALL_DEBUG_ENTER;
+    rawTouch.id = pointerItem.GetPointerId();
+    rawTouch.pressure = pointerItem.GetPressure();
+    rawTouch.x = pointerItem.GetDisplayX();
+    rawTouch.y = pointerItem.GetDisplayY();
+}
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 
 bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
 {
@@ -143,6 +172,13 @@ bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
         return false;
     }
     item.SetPressed(false);
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    TransformTouchProperties(rawTouch_, item);
+    if (FINGERSENSE_WRAPPER->notifyTouchUp_) {
+        MMI_HILOGD("notify fingersense touch up event");
+        FINGERSENSE_WRAPPER->notifyTouchUp_(&rawTouch_);
+    }
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
     return true;
