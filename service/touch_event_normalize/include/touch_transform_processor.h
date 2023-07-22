@@ -17,6 +17,8 @@
 #define TOUCH_TRANSFORM_PROCESSOR_H
 #include "nocopyable.h"
 #include "transform_processor.h"
+#include "fingersense_manager.h"
+#include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
@@ -33,11 +35,17 @@ private:
     bool OnEventTouchUp(struct libinput_event *event);
     int32_t GetTouchToolType(struct libinput_event_touch *data, struct libinput_device *device);
     int32_t GetTouchToolType(struct libinput_device *device);
+    void TransformTouchProperties(TouchType &rawTouch, PointerEvent::PointerItem &pointerItem);
+    void NotifyFingersenseProcess(PointerEvent::PointerItem &pointerItem, int32_t &toolType);
+    void UpdatePointerItemProperties(PointerEvent::PointerItem &item, EventTouch &touchInfo);
     void InitToolTypes();
 private:
     const int32_t deviceId_ { -1 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::vector<std::pair<int32_t, int32_t>> vecToolType_;
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    TouchType rawTouch_;
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 };
 } // namespace MMI
 } // namespace OHOS
