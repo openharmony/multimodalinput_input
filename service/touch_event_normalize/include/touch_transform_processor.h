@@ -18,6 +18,7 @@
 #include "nocopyable.h"
 #include "transform_processor.h"
 #include "fingersense_manager.h"
+#include "struct_multimodal.h"
 
 namespace OHOS {
 namespace MMI {
