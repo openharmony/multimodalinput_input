@@ -1091,6 +1091,9 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     pointerItem.SetWindowX(windowX);
     pointerItem.SetWindowY(windowY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
+#ifdef OHOS_BUILD_EMULATOR
+    extraData_.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+#endif
     if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE) {
         pointerEvent->SetBuffer(extraData_.buffer);
         UpdatePointerAction(pointerEvent);
