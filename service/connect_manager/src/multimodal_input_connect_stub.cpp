@@ -1299,11 +1299,6 @@ int32_t MultimodalInputConnectStub::VerifyTouchPadSetting(void)
         return ERROR_NOT_SYSAPI;
     }
 
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
-
     return RET_OK;
 }
 
@@ -1474,10 +1469,6 @@ int32_t MultimodalInputConnectStub::StubSetKeyboardRepeatDelay(MessageParcel& da
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
     int32_t delay;
     READINT32(data, delay, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetKeyboardRepeatDelay(delay);
@@ -1498,10 +1489,6 @@ int32_t MultimodalInputConnectStub::StubSetKeyboardRepeatRate(MessageParcel& dat
     if (!PerHelper->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
-    }
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
     }
     int32_t rate;
     READINT32(data, rate, IPC_PROXY_DEAD_OBJECT_ERR);
@@ -1524,10 +1511,6 @@ int32_t MultimodalInputConnectStub::StubGetKeyboardRepeatDelay(MessageParcel& da
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
     int32_t delay;
     int32_t ret = GetKeyboardRepeatDelay(delay);
     if (ret != RET_OK) {
@@ -1548,10 +1531,6 @@ int32_t MultimodalInputConnectStub::StubGetKeyboardRepeatRate(MessageParcel& dat
     if (!PerHelper->VerifySystemApp()) {
         MMI_HILOGE("Verify system APP failed");
         return ERROR_NOT_SYSAPI;
-    }
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
     }
     int32_t rate;
     int32_t ret = GetKeyboardRepeatRate(rate);
