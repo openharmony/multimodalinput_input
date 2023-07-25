@@ -790,10 +790,11 @@ bool PointerEvent::IsValidCheckMouseFunc() const
     }
 
     int32_t pointAction = GetPointerAction();
-    if (pointAction != POINTER_ACTION_CANCEL && pointAction != POINTER_ACTION_MOVE &&
+    bool checkFlag = pointAction != POINTER_ACTION_CANCEL && pointAction != POINTER_ACTION_MOVE &&
         pointAction != POINTER_ACTION_AXIS_BEGIN && pointAction != POINTER_ACTION_AXIS_UPDATE &&
         pointAction != POINTER_ACTION_AXIS_END && pointAction != POINTER_ACTION_BUTTON_DOWN &&
-        pointAction != POINTER_ACTION_BUTTON_UP) {
+        pointAction != POINTER_ACTION_BUTTON_UP;
+    if (checkFlag) {
         MMI_HILOGE("PointAction is invalid");
         return false;
     }
