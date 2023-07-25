@@ -57,6 +57,7 @@ void ChkConfig(int32_t fd)
 
 void EventDump::CheckCount(int32_t fd, const std::vector<std::string> &args, size_t &count)
 {
+    CALL_DEBUG_ENTER;
     for (const auto &str : args) {
         if (str.find("--") == 0) {
             ++count;
