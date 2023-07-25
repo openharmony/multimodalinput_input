@@ -78,23 +78,7 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id, bool
     std::shared_ptr<InputDevice> inputDevice = std::make_shared<InputDevice>();
     inputDevice->SetId(iter->first);
     struct libinput_device *inputDeviceOrigin = iter->second.inputDeviceOrigin;
-    inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(inputDeviceOrigin)));
-    const char *name = libinput_device_get_name(inputDeviceOrigin);
-    inputDevice->SetName((name == nullptr) ? ("null") : (name));
-    inputDevice->SetBus(libinput_device_get_id_bustype(inputDeviceOrigin));
-    inputDevice->SetVersion(libinput_device_get_id_version(inputDeviceOrigin));
-    inputDevice->SetProduct(libinput_device_get_id_product(inputDeviceOrigin));
-    inputDevice->SetVendor(libinput_device_get_id_vendor(inputDeviceOrigin));
-    const char *phys = libinput_device_get_phys(inputDeviceOrigin);
-    inputDevice->SetPhys((phys == nullptr) ? ("null") : (phys));
-    const char *uniq = libinput_device_get_uniq(inputDeviceOrigin);
-    inputDevice->SetUniq((uniq == nullptr) ? ("null") : (uniq));
-
-    for (const auto &[first, second] : devCapEnumMaps) {
-        if (libinput_device_has_capability(inputDeviceOrigin, first)) {
-            inputDevice->AddCapability(second);
-        }
-    }
+    FillInputDevice(inputDevice, inputDeviceOrigin);
 
     InputDevice::AxisInfo axis;
     for (const auto &item : axisType) {
@@ -117,6 +101,27 @@ std::shared_ptr<InputDevice> InputDeviceManager::GetInputDevice(int32_t id, bool
         inputDevice->AddAxisInfo(axis);
     }
     return inputDevice;
+}
+
+void InputDeviceManager::FillInputDevice(std::shared_ptr<InputDevice> inputDevice, libinput_device *deviceOrigin) const
+{
+    inputDevice->SetType(static_cast<int32_t>(libinput_device_get_tags(deviceOrigin)));
+    const char *name = libinput_device_get_name(deviceOrigin);
+    inputDevice->SetName((name == nullptr) ? ("null") : (name));
+    inputDevice->SetBus(libinput_device_get_id_bustype(deviceOrigin));
+    inputDevice->SetVersion(libinput_device_get_id_version(deviceOrigin));
+    inputDevice->SetProduct(libinput_device_get_id_product(deviceOrigin));
+    inputDevice->SetVendor(libinput_device_get_id_vendor(deviceOrigin));
+    const char *phys = libinput_device_get_phys(deviceOrigin);
+    inputDevice->SetPhys((phys == nullptr) ? ("null") : (phys));
+    const char *uniq = libinput_device_get_uniq(deviceOrigin);
+    inputDevice->SetUniq((uniq == nullptr) ? ("null") : (uniq));
+
+    for (const auto &[first, second] : devCapEnumMaps) {
+        if (libinput_device_has_capability(deviceOrigin, first)) {
+            inputDevice->AddCapability(second);
+        }
+    }
 }
 
 std::vector<int32_t> InputDeviceManager::GetInputDeviceIds() const

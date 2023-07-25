@@ -84,6 +84,7 @@ private:
     void MakeDeviceInfo(struct libinput_device *inputDevice, struct InputDeviceInfo& info);
     bool IsMatchKeys(struct libinput_device* device, const std::vector<int32_t> &keyCodes) const;
     void ScanPointerDevice();
+    void FillInputDevice(std::shared_ptr<InputDevice> inputDevice, libinput_device *deviceOrigin) const;
     std::string GetInputIdentification(struct libinput_device* inputDevice);
     void NotifyDevCallback(int32_t deviceId,  struct InputDeviceInfo inDevice);
 private:

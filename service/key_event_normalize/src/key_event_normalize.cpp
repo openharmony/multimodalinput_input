@@ -82,6 +82,20 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
     item.SetPressed(isKeyPressed);
     item.SetUnicode(KeyCodeToUnicode(keyCode, keyEvent));
 
+    HandleKeyAction(device, item, keyEvent);
+
+    int32_t keyIntention = keyItemsTransKeyIntention(keyEvent->GetKeyItems());
+    keyEvent->SetKeyIntention(keyIntention);
+    return RET_OK;
+}
+
+void KeyEventNormalize::HandleKeyAction(struct libinput_device* device, KeyEvent::KeyItem &item,
+    std::shared_ptr<KeyEvent> keyEvent)
+{
+    CHKPV(device);
+    CHKPV(keyEvent);
+    int32_t keyAction = keyEvent->GetAction();
+    int32_t keyCode = keyEvent->GetKeyCode();
     if (keyAction == KeyEvent::KEY_ACTION_DOWN) {
         keyEvent->AddPressedKeyItems(item);
     }
@@ -103,9 +117,6 @@ int32_t KeyEventNormalize::Normalize(struct libinput_event *event, std::shared_p
         keyEvent->RemoveReleasedKeyItems(item);
         keyEvent->AddPressedKeyItems(item);
     }
-    int32_t keyIntention = keyItemsTransKeyIntention(keyEvent->GetKeyItems());
-    keyEvent->SetKeyIntention(keyIntention);
-    return RET_OK;
 }
 
 void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
