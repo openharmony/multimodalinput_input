@@ -55,10 +55,9 @@ void ChkConfig(int32_t fd)
     mprintf(fd, "EXP_SOPATH: %s\n", DEF_EXP_SOPATH);
 }
 
-void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
+void EventDump::CheckCount(int32_t fd, const std::vector<std::string> &args, size_t &count)
 {
     CALL_DEBUG_ENTER;
-    size_t count = 0;
     for (const auto &str : args) {
         if (str.find("--") == 0) {
             ++count;
@@ -69,6 +68,13 @@ void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
             continue;
         }
     }
+}
+
+void EventDump::ParseCommand(int32_t fd, const std::vector<std::string> &args)
+{
+    CALL_DEBUG_ENTER;
+    size_t count = 0;
+    CheckCount(fd, args, count);
     if (count > MAX_COMMAND_COUNT) {
         MMI_HILOGE("cmd param number not more than 32");
         mprintf(fd, "cmd param number not more than 32\n");

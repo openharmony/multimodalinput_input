@@ -74,6 +74,7 @@ public:
     int32_t IsMatch(napi_env jsEnv);
     int32_t GetId() const;
     void OnPointerEventInJsThread(const std::string &typeName);
+    void CheckConsumed(bool retValue, std::shared_ptr<PointerEvent> pointerEvent);
     void OnPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent);
     std::string GetTypeName() const;
 private:

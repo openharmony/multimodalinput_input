@@ -896,10 +896,11 @@ std::optional<WindowInfo> InputWindowsManager::SelectWindowInfo(int32_t logicalX
 {
     CALL_DEBUG_ENTER;
     int32_t action = pointerEvent->GetPointerAction();
-    if ((firstBtnDownWindowId_ == -1) ||
+    bool checkFlag = (firstBtnDownWindowId_ == -1) ||
         ((action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) && (pointerEvent->GetPressedButtons().size() == 1)) ||
         ((action == PointerEvent::POINTER_ACTION_MOVE) && (pointerEvent->GetPressedButtons().empty())) ||
-        (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE)) {
+        (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_MOUSE);
+    if (checkFlag) {
         int32_t targetWindowId = pointerEvent->GetTargetWindowId();
         for (const auto &item : displayGroupInfo_.windowsInfo) {
             if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE) {
@@ -1057,9 +1058,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         MMI_HILOGI("mouse event send cancel, window:%{public}d, pid:%{public}d", touchWindow->id, touchWindow->pid);
     }
 
-    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
+    bool checkFlag = pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_UPDATE ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_BEGIN ||
-        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END) {
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END;
+    if (checkFlag) {
         if ((!GetHoverScrollState()) && (displayGroupInfo_.focusWindowId != touchWindow->id)) {
             MMI_HILOGD("disable mouse hover scroll in inactive window, targetWindowId:%{public}d", touchWindow->id);
             return RET_OK;
@@ -1203,9 +1205,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                        "window:%{public}d, flags:%{public}d", item.id, item.flags);
             continue;
         }
-        if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+        bool checkToolType = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
             ((pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_FINGER && extraData_.pointerId == pointerId) ||
-            pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN)) {
+            pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
+        if (checkToolType) {
             if (IsInHotArea(logicalX, logicalY, item.defaultHotAreas)) {
                 touchWindow = &item;
                 break;
@@ -1247,8 +1250,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetToolWindowY(pointerItem.GetToolDisplayY() + physicDisplayInfo->y - touchWindow->area.y);
     pointerItem.SetTargetWindowId(touchWindow->id);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-    if (extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-        extraData_.pointerId == pointerId) {
+    bool checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+        extraData_.pointerId == pointerId;
+    if (checkExtraData) {
         pointerEvent->SetBuffer(extraData_.buffer);
         UpdatePointerAction(pointerEvent);
         PullEnterLeaveEvent(logicalX, logicalY, pointerEvent, touchWindow);
