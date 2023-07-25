@@ -153,6 +153,12 @@ enum MOUSE_ICON {
     DEVELOPER_DEFINED_ICON = -100,
 };
 
+enum RightClickType {
+    TOUCHPAD_RIGHT_BUTTON = 1,
+    TOUCHPAD_LEFT_BUTTON = 2,
+    TOUCHPAD_TWO_FINGER_TAP = 3,
+};
+
 enum ICON_TYPE {
     ANGLE_E = 0,
     ANGLE_S = 1,
