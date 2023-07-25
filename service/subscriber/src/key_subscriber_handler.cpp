@@ -371,22 +371,18 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
             MMI_HILOGD("keyOption->IsFinalKeyDown()");
             continue;
         }
-
         if (keyCode != keyOption->GetFinalKey()) {
             MMI_HILOGD("keyCode != keyOption->GetFinalKey()");
             continue;
         }
-
         if (!IsPreKeysMatch(keyOption->GetPreKeys(), pressedKeys)) {
             MMI_HILOGD("PreKeysMatch failed");
             continue;
         }
-
         if (!IsNotifyPowerKeySubsciber(keyOption->GetFinalKey(), pressedKeys)) {
             MMI_HILOGD("In special case, subscriber are not notified");
             continue;
         }
-
         auto duration = keyOption->GetFinalKeyDownDuration();
         if (duration <= 0) {
             MMI_HILOGD("duration <= 0");
@@ -394,7 +390,6 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
             handled = true;
             continue;
         }
-
         std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
         if (!keyItem) {
             MMI_HILOGE("The keyItem is nullopt");

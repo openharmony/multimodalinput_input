@@ -24,14 +24,7 @@
 
 #include "input_manager.h"
 
-const int32_t INVALID_ID = -1;
-enum Option {
-    QUERY = 'q',
-    SET = 's',
-    HELP = 'h'
-};
-
-void PrintHelp(const std::string title = {})
+void Help(const std::string title = {})
 {
     std::cout << title << std::endl;
     printf("Usage\n"
@@ -39,74 +32,9 @@ void PrintHelp(const std::string title = {})
         "-s     --set 'inputDeivceId displayId'     Query input device and display infomation\n");
 }
 
-void QueryDisplayBindInfo()
+int main(int argc, char *argv[])
 {
-    printf("query\n");
-    OHOS::MMI::DisplayBindInfos infos;
-    auto ret = OHOS::MMI::InputManager::GetInstance()->GetDisplayBindInfo(infos);
-    if (ret != 0) {
-        printf("Get display bind info failed.\n");
-        return;
-    }
-    std::vector<std::array<std::string, 5>> arrStrings;
-    std::array<std::string, 5> arr0 = { "No.", "Input device Id", "Input device Name", "Display id",
-        "Display name" };
-    arrStrings.push_back(arr0);
-    for (size_t i = 0; i < infos.size(); ++i) {
-        const auto &info = infos[i];
-        std::array<std::string, 5> arr;
-        arr[0] = std::to_string(i + 1);
-        arr[1] = (info.inputDeviceId == INVALID_ID) ? "" : std::to_string(info.inputDeviceId);
-        arr[2] = info.inputDeviceName;
-        arr[3] = (info.displayId == INVALID_ID) ? "" : std::to_string(info.displayId);
-        arr[4] = info.displayName;
-        arrStrings.push_back(arr);
-    }
-    std::array<size_t, 5> arrWidth{};
-    for (const auto &[a, b, c, d, e] : arrStrings) {
-        arrWidth[0] = std::max(arrWidth[0], a.length());
-        arrWidth[1] = std::max(arrWidth[1], b.length());
-        arrWidth[2] = std::max(arrWidth[2], c.length());
-        arrWidth[3] = std::max(arrWidth[3], d.length());
-        arrWidth[4] = std::max(arrWidth[4], e.length());
-    }
-    for (const auto &[a, b, c, d, e] : arrStrings) {
-        std::cout << "|"
-                  << " " << std::setw(arrWidth[0]) << std::setfill(' ') << std::left << a << " "
-                  << "|"
-                  << " " << std::setw(arrWidth[1]) << std::setfill(' ') << std::left << b << " "
-                  << "|"
-                  << " " << std::setw(arrWidth[2]) << std::setfill(' ') << std::left << c << " "
-                  << "|"
-                  << " " << std::setw(arrWidth[3]) << std::setfill(' ') << std::left << d << " "
-                  << "|"
-                  << " " << std::setw(arrWidth[4]) << std::setfill(' ') << std::left << e << " "
-                  << "|" << std::endl;
-    }
-}
-
-void SetDisplayBind(const char* optarg)
-{
-    std::istringstream iss(optarg);
-    int32_t deviceId = INVALID_ID;
-    int32_t displayId = INVALID_ID;
-    iss >> deviceId >> displayId;
-    if (iss.fail()) {
-        PrintHelp("Arg is not right");
-        return;
-    }
-    printf("args: deviceId:%d, displayId:%d\n", deviceId, displayId);
-    std::string msg;
-    auto ret = OHOS::MMI::InputManager::GetInstance()->SetDisplayBind(deviceId, displayId, msg);
-    if (ret != 0) {
-        printf("Set display bind failed, %s\n", msg.c_str());
-        return;
-    }
-}
-
-void HandleOptions(int argc, char* argv[])
-{
-    static struct option headOptions[] = {
+    struct option headOptions[] = {
         {"query", no_argument, nullptr, 'q'},
         {"set", required_argument, nullptr, 's'},
         {"help", no_argument, nullptr, 'h'},
@@ -114,34 +42,84 @@ void HandleOptions(int argc, char* argv[])
     };
 
     if (argc < 2) {
-        PrintHelp();
-        return;
+        Help();
+        return 0;
     }
 
     int32_t optionIndex = 0;
     optind = 0;
     int32_t cases = 0;
-    while ((cases = getopt_long(argc, argv, "qs:h?", headOptions, &optionIndex)) != -1) {
+    if ((cases = getopt_long(argc, argv, "qs:h?", headOptions, &optionIndex)) != -1) {
         switch (cases) {
-            case QUERY: {
-                QueryDisplayBindInfo();
-                break;
+            case 'q': {
+                printf("query\n");
+                OHOS::MMI::DisplayBindInfos infos;
+                auto ret = OHOS::MMI::InputManager::GetInstance()->GetDisplayBindInfo(infos);
+                if (ret != 0) {
+                    printf("Get display bind info failed.\n");
+                    return -1;
+                }
+                std::vector<std::array<std::string, 5>> arrStrings;
+                std::array<std::string, 5> arr0 = { "No.", "Input device Id", "Input device Name", "Display id",
+                    "Display name" };
+                arrStrings.push_back(arr0);
+                for (size_t i = 0; i < infos.size(); ++i) {
+                    const auto &info = infos[i];
+                    std::array<std::string, 5> arr;
+                    arr[0] = std::to_string(i + 1);
+                    arr[1] = (info.inputDeviceId == -1) ? "" : std::to_string(info.inputDeviceId);
+                    arr[2] = info.inputDeviceName;
+                    arr[3] = (info.displayId == -1) ? "" : std::to_string(info.displayId);
+                    arr[4] = info.displayName;
+                    arrStrings.push_back(arr);
+                }
+                std::array<size_t, 5> arrWidth{};
+                for (const auto &[a, b, c, d, e] : arrStrings) {
+                    arrWidth[0] = std::max(arrWidth[0], a.length());
+                    arrWidth[1] = std::max(arrWidth[1], b.length());
+                    arrWidth[2] = std::max(arrWidth[2], c.length());
+                    arrWidth[3] = std::max(arrWidth[3], d.length());
+                    arrWidth[4] = std::max(arrWidth[4], e.length());
+                }
+                for (const auto &[a, b, c, d, e] : arrStrings) {
+                    std::cout << "|"
+                              << " " << std::setw(arrWidth[0]) << std::setfill(' ') << std::left << a << " "
+                              << "|"
+                              << " " << std::setw(arrWidth[1]) << std::setfill(' ') << std::left << b << " "
+                              << "|"
+                              << " " << std::setw(arrWidth[2]) << std::setfill(' ') << std::left << c << " "
+                              << "|"
+                              << " " << std::setw(arrWidth[3]) << std::setfill(' ') << std::left << d << " "
+                              << "|"
+                              << " " << std::setw(arrWidth[4]) << std::setfill(' ') << std::left << e << " "
+                              << "|" << std::endl;
+                }
+                return 0;
             }
-            case SET: {
-                SetDisplayBind(optarg);
-                break;
+            case 's': {
+                std::istringstream iss(optarg);
+                int32_t deviceId = -1;
+                int32_t displayId = -1;
+                iss >> deviceId >> displayId;
+                if (iss.fail()) {
+                    Help("Arg is not right");
+                    return -1;
+                }
+                printf("args: deviceId:%d, displayId:%d\n", deviceId, displayId);
+                std::string msg;
+                auto ret = OHOS::MMI::InputManager::GetInstance()->SetDisplayBind(deviceId, displayId, msg);
+                if (ret != 0) {
+                    printf("Set display bind failed, %s\n", msg.c_str());
+                    return -1;
+                }
+                return 0;
             }
-            case HELP:
+            case 'h':
             default: {
-                PrintHelp();
+                Help();
                 break;
             }
         }
     };
-}
-
-int main(int argc, char* argv[])
-{
-    HandleOptions(argc, argv);
     return 0;
 }
