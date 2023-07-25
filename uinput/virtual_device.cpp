@@ -37,16 +37,6 @@ bool DoIoctl(int32_t fd, int32_t request, const uint32_t value)
     }
     return true;
 }
-
-bool SetBits(int32_t fd, int32_t request, const std::vector<uint32_t>& args)
-{
-    for (const auto &item : args) {
-        if (!DoIoctl(fd, request, item)) {
-            return false;
-        }
-    }
-    return true;
-}
 } // namespace
 
 VirtualDevice::VirtualDevice(const char *deviceName, uint16_t productId)
@@ -72,21 +62,37 @@ bool VirtualDevice::SetUp()
         MMI_HILOGE("Failed to open uinput");
         return false;
     }
-    if (!SetBits(fd_, UI_SET_EVBIT, GetEventTypes())) {
-        return false;
+    for (const auto &item : GetEventTypes()) {
+        if (!DoIoctl(fd_, UI_SET_EVBIT, item)) {
+            MMI_HILOGE("Error setting event type:%{public}u", item);
+            return false;
+        }
     }
-    if (!SetBits(fd_, UI_SET_KEYBIT, GetKeys())) {
-        return false;
+    for (const auto &item : GetKeys()) {
+        if (!DoIoctl(fd_, UI_SET_KEYBIT, item)) {
+            MMI_HILOGE("Error setting key:%{public}u", item);
+            return false;
+        }
     }
-    if (!SetBits(fd_, UI_SET_PROPBIT, GetProperties())) {
-        return false;
+    for (const auto &item :  GetProperties()) {
+        if (!DoIoctl(fd_, UI_SET_PROPBIT, item)) {
+            MMI_HILOGE("Error setting property:%{public}u", item);
+            return false;
+        }
     }
-    if (!SetBits(fd_, UI_SET_ABSBIT, GetAbs())) {
-        return false;
+    for (const auto &item : GetAbs()) {
+        if (!DoIoctl(fd_, UI_SET_ABSBIT, item)) {
+            MMI_HILOGE("Error setting property:%{public}u", item);
+            return false;
+        }
     }
-    if (!SetBits(fd_, UI_SET_RELBIT, GetRelBits())) {
-        return false;
+    for (const auto &item : GetRelBits()) {
+        if (!DoIoctl(fd_, UI_SET_RELBIT, item)) {
+            MMI_HILOGE("Error setting rel:%{public}u", item);
+            return false;
+        }
     }
+
     errno_t ret = strncpy_s(dev_.name, MAX_NAME_LENGTH, deviceName_, sizeof(dev_.name));
     if (ret != EOK) {
         MMI_HILOGE("Failed to copy deviceName");

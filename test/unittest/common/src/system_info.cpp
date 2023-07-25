@@ -35,9 +35,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SYSTE
 constexpr int32_t LOCATION = 14;
 constexpr int32_t TIME_WAIT_FOR_OP = 1000;
 constexpr int32_t DEFAULT_PID = -1;
-static const std::string PROC_PATH = "/proc";
-static const std::string STATUS_FILE = "/status";
-static const std::string PID_KEY = "Pid";
 } // namespace
 
 inline double CHK_RATE(double rate)
@@ -45,74 +42,57 @@ inline double CHK_RATE(double rate)
     return (rate > CPU_USAGE_MAX ? CPU_USAGE_MAX : rate);
 }
 
-bool IsDir(struct dirent* file)
-{
-    return ((::strcmp(file->d_name, ".") != 0) && (::strcmp(file->d_name, "..") != 0) && (file->d_type == DT_DIR));
-}
-
-bool IsProcessNameMatch(struct dirent* pidFile, const std::string &process_name)
-{
-    const std::string path = PROC_PATH + "/" + pidFile->d_name + STATUS_FILE;
-
-    std::ifstream file(path);
-    if (!file.is_open()) {
-        return false;
-    }
-    std::string strLine;
-    if (!std::getline(file, strLine)) {
-        MMI_HILOGE("getline failed");
-        file.close();
-        return false;
-    }
-    if (strLine.empty()) {
-        file.close();
-        return false;
-    }
-    return (strLine == process_name);
-}
-
-int32_t GetPidFromFile(struct dirent* pidFile)
-{
-    const std::string path = PROC_PATH + "/" + pidFile->d_name + STATUS_FILE;
-
-    std::ifstream file(path);
-    if (!file.is_open()) {
-        return DEFAULT_PID;
-    }
-
-    int32_t pid = DEFAULT_PID;
-    std::string strLine;
-
-    while (std::getline(file, strLine)) {
-        if ((strLine.find(PID_KEY)) != std::string::npos) {
-            if (::sscanf_s(strLine.c_str(), "%*s%d", &pid, sizeof(pid)) != 1) {
-                MMI_HILOGE("Failed to delete the pid");
-            }
-            break;
-        }
-    }
-    file.close();
-    return pid;
-}
-
 int32_t CpuInfo::GetTaskPidFile(const std::string &process_name)
 {
     int32_t pid = DEFAULT_PID;
-    DIR* dir = ::opendir(PROC_PATH.c_str());
+    static const std::string procPath = "/proc";
+    DIR* dir = ::opendir(procPath.c_str());
     if (dir == nullptr) {
-        MMI_HILOGE("Failed to open path:%{public}s", PROC_PATH.c_str());
+        MMI_HILOGE("Failed to open path:%{public}s", procPath.c_str());
         return DEFAULT_PID;
     }
     struct dirent* pidFile;
     while ((pidFile = ::readdir(dir)) != nullptr) {
-        if (IsDir(pidFile) && IsProcessNameMatch(pidFile, process_name)) {
-            pid = GetPidFromFile(pidFile);
-            break;
+        if ((::strcmp(pidFile->d_name, ".") == 0) || (::strcmp(pidFile->d_name, "..") == 0)) {
+            continue;
         }
+        if (pidFile->d_type != DT_DIR) {
+            continue;
+        }
+        const std::string path = procPath + "/" + pidFile->d_name + "/status";
+        std::ifstream file(path);
+        if (!file.is_open()) {
+            continue;
+        }
+        std::string strLine;
+        if (!std::getline(file, strLine)) {
+            MMI_HILOGE("getline failed");
+            file.close();
+            return DEFAULT_PID;
+        }
+        if (strLine.empty()) {
+            file.close();
+            continue;
+        }
+        if ((strLine.find(process_name)) == std::string::npos) {
+            file.close();
+            continue;
+        }
+        while (std::getline(file, strLine)) {
+            if ((strLine.find("Pid")) != std::string::npos) {
+                if (::sscanf_s(strLine.c_str(), "%*s%d", &pid, sizeof(pid)) != 1) {
+                    MMI_HILOGE("Failed to delete the pid");
+                }
+                break;
+            }
+        }
+        file.close();
+        break;
     }
     if (::closedir(dir) != 0) {
         MMI_HILOGE("Failed to close dir");
     }
+
     return pid;
 }
 
