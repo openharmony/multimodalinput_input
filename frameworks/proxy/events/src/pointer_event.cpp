@@ -27,6 +27,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Point
 constexpr double MAX_PRESSURE { 1.0 };
 constexpr size_t MAX_N_PRESSED_BUTTONS { 10 };
 constexpr size_t MAX_N_POINTER_ITEMS { 10 };
+constexpr size_t MAX_N_BUFFER_SIZE { 512 };
 } // namespace
 
 std::shared_ptr<PointerEvent> PointerEvent::from(std::shared_ptr<InputEvent> inputEvent)
@@ -665,6 +666,12 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
         }
     }
 
+    WRITEINT32(out, static_cast<int32_t>(buffer_.size()));
+
+    for (const auto& buff : buffer_) {
+        WRITEUINT8(out, buff);
+    }
+
     WRITEINT32(out, static_cast<int32_t>(pressedButtons_.size()));
 
     for (const auto &item : pressedButtons_) {
@@ -712,6 +719,18 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
             return false;
         }
         AddPointerItem(item);
+    }
+
+    int32_t bufflen;
+    READINT32(in, bufflen);
+    if (bufflen > static_cast<int32_t>(MAX_N_BUFFER_SIZE)) {
+        return false;
+    }
+
+    for (int32_t i = 0; i < bufflen; ++i) {
+        uint8_t data;
+        READUINT8(in, data);
+        buffer_.push_back(data);
     }
 
     int32_t nPressedButtons;
