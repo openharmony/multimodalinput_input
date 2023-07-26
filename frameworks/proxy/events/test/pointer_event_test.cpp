@@ -80,7 +80,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_001, TestSiz
     ASSERT_NE(pointerEvent, nullptr);
     std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT };
     pointerEvent->SetPressedKeys(pressedKeys);
-    TestSimulateInputEvent(pointerEvent);
+    SimulateInputEventUtilTest(pointerEvent);
 }
 
 /**
