@@ -173,7 +173,6 @@ int32_t UDSServer::SetFdProperty(int32_t& tokenType, int32_t& serverFd, int32_t&
             return RET_ERR;
         }
     }
-    MMI_HILOGE("xixian");
     return RET_OK;
 }
 
