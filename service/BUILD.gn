@@ -195,6 +195,7 @@ ohos_shared_library("libmmi-server") {
     "napi:ace_napi",
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
+    "window_manager:libwm",
   ]
 
   part_name = "input"
