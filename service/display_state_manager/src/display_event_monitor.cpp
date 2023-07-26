@@ -38,7 +38,7 @@ DisplayEventMonitor::~DisplayEventMonitor() {}
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 class DisplyChangedReceiver : public EventFwk::CommonEventSubscriber {
 public:
-    DisplyChangedReceiver(const OHOS::EventFwk::CommonEventSubscribeInfo& subscribeInfo)
+    explicit DisplyChangedReceiver(const OHOS::EventFwk::CommonEventSubscribeInfo& subscribeInfo)
         : OHOS::EventFwk::CommonEventSubscriber(subscribeInfo)
     {
         MMI_HILOGD("DisplyChangedReceiver register");
