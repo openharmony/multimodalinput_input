@@ -53,13 +53,6 @@ public:
         int32_t serverFd { -1 };
     };
 
-    enum TOUCHPAD_SETTING_FAULT_CODE {
-        READ_SETTING_ERROR = 1,
-        WRITE_SETTING_ERROR,
-        SETTING_SYNC_ERROR,
-        TOUCHPAD_ERROR
-    };
-
     enum TOUCHPAD_SETTING_CODE {
         TOUCHPAD_SCROLL_SETTING = 1,
         TOUCHPAD_SCROLL_DIR_SETTING,
@@ -102,8 +95,6 @@ public:
     static void ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode, bool flag);
     static void ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode, int32_t value);
     static void StatisticTouchpadGesture(std::shared_ptr<PointerEvent> pointerEvent);
-    static void ReportTouchpadSettingFault(uint32_t settingFaultCode);
-    static void ReportTouchpadTypeFault(uint32_t typeFaultCode);
 
 private:
     static inline int64_t dispatchStartTime_ { 0 };

@@ -516,29 +516,6 @@ void DfxHisysevent::ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode
     }
 }
 
-void DfxHisysevent::ReportTouchpadSettingFault(uint32_t settingFaultCode)
-{
-    int32_t ret = HiSysEventWrite(
-        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-        "TOUCHPAD_SETTING_FAULT_CODE",
-        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
-        "FAULT_CODE", settingFaultCode);
-    if (ret != RET_OK) {
-        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-    }
-}
-
-void DfxHisysevent::ReportTouchpadTypeFault(uint32_t typeFaultCode)
-{
-    int32_t ret = HiSysEventWrite(
-        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
-        "TOUCHPAD_TYPE_FAULT_CODE",
-        OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
-        "FAULT_CODE", typeFaultCode);
-    if (ret != RET_OK) {
-        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
-    }
-}
 }
 }
 

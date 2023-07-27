@@ -223,7 +223,6 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
             break;
         }
         default: {
-            DfxHisysevent::ReportTouchpadTypeFault(type);
             return nullptr;
         }
     }
@@ -515,13 +514,11 @@ int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(std::string &key, bo
     int32_t ret = pref->PutBool(key, value);
     if (ret != RET_OK) {
         MMI_HILOGE("Put value is failed, ret:%{public}d", ret);
-        DfxHisysevent::ReportTouchpadSettingFault(DfxHisysevent::TOUCHPAD_SETTING_FAULT_CODE::WRITE_SETTING_ERROR);
         return RET_ERR;
     }
     ret = pref->FlushSync();
     if (ret != RET_OK) {
         MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
-        DfxHisysevent::ReportTouchpadSettingFault(DfxHisysevent::TOUCHPAD_SETTING_FAULT_CODE::SETTING_SYNC_ERROR);
         return RET_ERR;
     }
 
@@ -536,7 +533,6 @@ int32_t TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, 
         NativePreferences::PreferencesHelper::GetPreferences(TOUCHPAD_FILE_NAME, errCode);
     if (pref == nullptr) {
         MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
-        DfxHisysevent::ReportTouchpadSettingFault(DfxHisysevent::TOUCHPAD_SETTING_FAULT_CODE::READ_SETTING_ERROR);
         return RET_ERR;
     }
     value = pref->GetBool(key, true);
