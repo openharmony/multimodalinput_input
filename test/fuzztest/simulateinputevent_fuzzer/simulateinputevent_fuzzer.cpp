@@ -113,6 +113,7 @@ bool SimulatePointerEvent(const uint8_t* data, size_t size, size_t &startPos)
     pointerUpEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     MMI_HILOGD("Call InputManager::SimulatePointerEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerUpEvent);
+    return true;
 }
 
 bool SimulateInputEventFuzzTest(const uint8_t* data, size_t size)
