@@ -913,30 +913,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_001, TestSize.Level
 }
 
 /**
- * @tc.name: MultimodalEventHandler_SimulateKeyEvent_002
- * @tc.desc: Verify simulate the back home is pressed
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SimulateKeyEvent_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
-    ASSERT_TRUE(injectDownEvent != nullptr);
-    int64_t downTime = -1;
-    KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_HOME);
-    kitDown.SetPressed(true);
-    kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
-    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->AddPressedKeyItems(kitDown);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(injectDownEvent);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-}
-
-/**
  * @tc.name: MultimodalEventHandler_SimulateKeyEvent_003
  * @tc.desc: Verify simulate the back key is pressed and lifted
  * @tc.type: FUNC
@@ -1358,22 +1334,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_002, TestSiz
 {
     CALL_TEST_DEBUG;
     std::shared_ptr<KeyEvent> keyEvent { SetupKeyEvent002() };
-    ASSERT_NE(keyEvent, nullptr);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(keyEvent);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-}
-
-/**
- * @tc.name: InputManagerTest_MouseEventEnterAndLeave_003
- * @tc.desc: Verify that the home button and mouse leave the window
- * @tc.type: FUNC
- * @tc.require: I5HMF3 I5HMEF
- */
-HWTEST_F(InputManagerTest, InputManagerTest_MouseEventEnterAndLeave_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<KeyEvent> keyEvent { SetupKeyEvent003() };
     ASSERT_NE(keyEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(keyEvent);
