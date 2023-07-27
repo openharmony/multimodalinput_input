@@ -364,7 +364,7 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
     int32_t windowId = 0;
     READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
     MMI_HILOGD("reading size of the tlv count %{public}d", size);
-    if (size > MAX_BUFFER_SIZE) {
+    if (size > MAX_BUFFER_SIZE || size <= 0) {
         MMI_HILOGE("Append extra data failed, buffer is oversize:%{public}d", size);
         return RET_ERR;
     }
