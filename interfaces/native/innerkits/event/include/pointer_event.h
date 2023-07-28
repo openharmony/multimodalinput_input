@@ -1393,6 +1393,7 @@ private:
     bool IsValidCheckTouch() const;
 
 private:
+    bool ReadEnhanceDataFromParcel(Parcel &in);
     bool ReadBufferFromParcel(Parcel &in);
 
 private:
