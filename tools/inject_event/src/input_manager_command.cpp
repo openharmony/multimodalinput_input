@@ -1546,7 +1546,7 @@ int32_t InputManagerCommand::DoubleKnuckleClickEvent(int32_t downX, int32_t down
     return ERR_OK;
 }
 
-void PrintMouseUsage()
+void InputManagerCommand::PrintMouseUsage()
 {
     std::cout << "-m <dx> <dy>              --move   <dx> <dy>  -move to relative position (dx,dy),"    << std::endl;
     std::cout << "   <dx1> <dy1> <dx2> <dy2> [smooth time] --trace -dx1 dy1 to dx2 dy2 smooth movement" << std::endl;
@@ -1577,7 +1577,7 @@ void PrintMouseUsage()
     std::cout << "                                               negative values are sliding forwards"  << std::endl;
 }
 
-void PrintKeyboardUsage()
+void InputManagerCommand::PrintKeyboardUsage()
 {
     std::cout << "-d <key>                   --down   <key>     -press down a key" << std::endl;
     std::cout << "-u <key>                   --up     <key>     -release a key   " << std::endl;
@@ -1587,7 +1587,7 @@ void PrintKeyboardUsage()
     std::cout << std::endl;
 }
 
-void PrintTouchUsage()
+void InputManagerCommand::PrintTouchUsage()
 {
     std::cout << "-d <dx1> <dy1>             --down   <dx1> <dy1> -press down a position  dx1 dy1, " << std::endl;
     std::cout << "-u <dx1> <dy1>             --up     <dx1> <dy1> -release a position dx1 dy1, "     << std::endl;
@@ -1597,7 +1597,7 @@ void PrintTouchUsage()
     std::cout << "-c <dx1> <dy1> [click interval]               -touch screen click dx1 dy1"         << std::endl;
 }
 
-void PrintKnuckleUsage()
+void InputManagerCommand::PrintKnuckleUsage()
 {
     std::cout << "-s <dx1> <dy1> <dx2> <dy2> [interval time]  --single knuckle double click interval time" << std::endl;
     std::cout << "-d <dx1> <dy1> <dx2> <dy2> [interval time]  --double knuckle double click interval time" << std::endl;
