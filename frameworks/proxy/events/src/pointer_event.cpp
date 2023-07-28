@@ -27,6 +27,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Point
 constexpr double MAX_PRESSURE { 1.0 };
 constexpr size_t MAX_N_PRESSED_BUTTONS { 10 };
 constexpr size_t MAX_N_POINTER_ITEMS { 10 };
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr size_t MAX_N_BUFFER_SIZE { 512 };
 } // namespace
 
@@ -695,7 +698,12 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
             WRITEDOUBLE(out, GetAxisValue(axis));
         }
     }
-
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    WRITEINT32(out, static_cast<int32_t>(enhanceData_.size()));
+    for (int i = 0; i < enhanceData_.size(); i++) {
+        WRITEUINT32(out, enhanceData_[i]);
+    }
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     return true;
 }
 
@@ -756,9 +764,32 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
             SetAxisValue(axis, val);
         }
     }
-
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    if (!ReadEnhanceDataFromParcel(in)) {
+        return false;
+    }
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     return true;
 }
+
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+bool PointerEvent::ReadEnhanceDataFromParcel(Parcel &in)
+{
+    int32_t size = 0;
+    READINT32(in, size);
+    if (size > static_cast<int32_t>(MAX_N_ENHANCE_DATA_SIZE) || size < 0) {
+        MMI_HILOGE("enhanceData_ size is invalid");
+        return false;
+    }
+
+    for (int32_t i = 0; i < size; i++) {
+        uint32_t val;
+        READUINT32(in, val);
+        enhanceData_.emplace_back(val);
+    }
+    return true;
+}
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 bool PointerEvent::ReadBufferFromParcel(Parcel &in)
 {
