@@ -1393,6 +1393,9 @@ private:
     bool IsValidCheckTouch() const;
 
 private:
+    bool ReadBufferFromParcel(Parcel &in);
+
+private:
     int32_t pointerId_ { -1 };
     std::list<PointerItem> pointers_;
     std::set<int32_t> pressedButtons_;

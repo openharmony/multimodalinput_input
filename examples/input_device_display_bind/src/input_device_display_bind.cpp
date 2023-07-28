@@ -121,7 +121,7 @@ void HandleOptions(int argc, char* argv[])
     int32_t optionIndex = 0;
     optind = 0;
     int32_t cases = 0;
-    while ((cases = getopt_long(argc, argv, "qs:h?", headOptions, &optionIndex)) != -1) {
+    if ((cases = getopt_long(argc, argv, "qs:h?", headOptions, &optionIndex)) != -1) {
         switch (cases) {
             case QUERY: {
                 QueryDisplayBindInfo();
