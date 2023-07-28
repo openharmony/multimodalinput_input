@@ -129,7 +129,7 @@ public:
     }
     pid_t GetProcessPidByName(const char *procName) const
     {
-        pid_t pid = getpid(); 
+        pid_t pid = getpid();
         FILE *fp;
         int32_t buffSize = 255;
         char buf[buffSize];
@@ -371,17 +371,17 @@ void SimulateKeyEvent(bool &resultA, bool &resultB, const int32_t KEYCODE, bool 
     keyEventSample->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     keyEventSample->AddPressedKeyItems(kitDownA);
     if (isKeyAEvent) {
-      MMI_HILOGI("SimulateInputEvent key event KEYCODE_A(2017)");
-      InputManager::GetInstance()->SimulateInputEvent(keyEventSample);
-      WaitKeyEnd(sem);
-      ASSERT_EQ(resultA, true);
-      ASSERT_EQ(resultB, false);
+        MMI_HILOGI("SimulateInputEvent key event KEYCODE_A(2017)");
+        InputManager::GetInstance()->SimulateInputEvent(keyEventSample);
+        WaitKeyEnd(sem);
+        ASSERT_EQ(resultA, true);
+        ASSERT_EQ(resultB, false);
     } else {
-      MMI_HILOGI("SimulateInputEvent key event KEYCODE_B(2018)");
-      InputManager::GetInstance()->SimulateInputEvent(keyEventSample);
-      WaitKeyEnd(sem);
-      ASSERT_EQ(resultA, false);
-      ASSERT_EQ(resultB, true);
+        MMI_HILOGI("SimulateInputEvent key event KEYCODE_B(2018)");
+        InputManager::GetInstance()->SimulateInputEvent(keyEventSample);
+        WaitKeyEnd(sem);
+        ASSERT_EQ(resultA, false);
+        ASSERT_EQ(resultB, true);
     }
 }
 HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_002, TestSize.Level1)
