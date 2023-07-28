@@ -41,11 +41,13 @@ size_t GetObject(T &object, const uint8_t *data, size_t size)
     return objectNum;
 }
 
-bool SimulateInputEventFuzzTest(const uint8_t* data, size_t size)
+bool SimulateInjectEvent(const uint8_t* data, size_t size, size_t &startPos)
 {
+    if (startPos < 0) {
+        return false;
+    }
     auto injectDownEvent = KeyEvent::Create();
     CHKPF(injectDownEvent);
-    size_t startPos = 0;
     int32_t keyCode;
     startPos += GetObject<int32_t>(keyCode, data + startPos, size - startPos);
     injectDownEvent->SetKeyCode(keyCode);
@@ -72,7 +74,14 @@ bool SimulateInputEventFuzzTest(const uint8_t* data, size_t size)
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
     InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
+    return true;
+}
 
+bool SimulatePointerEvent(const uint8_t* data, size_t size, size_t &startPos)
+{
+    if (startPos < 0) {
+        return false;
+    }
     auto pointerDownEvent = PointerEvent::Create();
     CHKPF(pointerDownEvent);
     PointerEvent::PointerItem downitem;
@@ -111,6 +120,15 @@ bool SimulateInputEventFuzzTest(const uint8_t* data, size_t size)
     MMI_HILOGD("Call InputManager::SimulatePointerEvent");
     InputManager::GetInstance()->SimulateInputEvent(pointerUpEvent);
     return true;
+}
+
+bool SimulateInputEventFuzzTest(const uint8_t* data, size_t size)
+{
+    size_t startPos = 0;
+    if (SimulateInjectEvent(data, size, startPos) && SimulatePointerEvent(data, size, startPos)) {
+        return true;
+    }
+    return false;
 }
 } // MMI
 } // OHOS
