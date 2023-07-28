@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -276,20 +276,7 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
     std::lock_guard<std::mutex> guard(mtxHandlers_);
     int32_t consumerCount = 0;
     if (GetHandlerType() == InputHandlerType::MONITOR) {
-        for (const auto &item : monitorHandlers_) {
-            if ((item.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
-                continue;
-            }
-            int32_t handlerId = item.first;
-            std::shared_ptr<IInputEventConsumer> consumer = item.second.consumer_;
-            CHKPV(consumer);
-            auto ret = consumerInfos.emplace(handlerId, consumer);
-            if (!ret.second) {
-                MMI_HILOGI("Duplicate handler:%{public}d", handlerId);
-                continue;
-            }
-            consumerCount++;
-        }
+        consumerCount = GetMonitorConsumerInfos(pointerEvent, consumerInfos);
     }
     if (GetHandlerType() == InputHandlerType::INTERCEPTOR) {
         for (const auto &item : interHandlers_) {
@@ -321,13 +308,44 @@ void InputHandlerManager::GetConsumerInfos(std::shared_ptr<PointerEvent> pointer
     if (tokenType != TokenType::TOKEN_HAP) {
         return;
     }
+    AddMouseEventId(pointerEvent);
+    AddProcessedEventId(pointerEvent, consumerCount);
+}
+
+void InputHandlerManager::AddMouseEventId(std::shared_ptr<PointerEvent> pointerEvent)
+{
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
         mouseEventIds_.emplace(pointerEvent->GetId());
     }
+}
+
+void InputHandlerManager::AddProcessedEventId(std::shared_ptr<PointerEvent> pointerEvent, int32_t consumerCount)
+{
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN ||
         pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHPAD) {
         processedEvents_.emplace(pointerEvent->GetId(), consumerCount);
     }
+}
+
+int32_t InputHandlerManager::GetMonitorConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent,
+    std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos)
+{
+    int32_t consumerCount = 0;
+    for (const auto &item : monitorHandlers_) {
+        if ((item.second.eventType_ & HANDLE_EVENT_TYPE_POINTER) != HANDLE_EVENT_TYPE_POINTER) {
+            continue;
+        }
+        int32_t handlerId = item.first;
+        std::shared_ptr<IInputEventConsumer> consumer = item.second.consumer_;
+        CHKPR(consumer, INVALID_HANDLER_ID);
+        auto ret = consumerInfos.emplace(handlerId, consumer);
+        if (!ret.second) {
+            MMI_HILOGI("Duplicate handler:%{public}d", handlerId);
+            continue;
+        }
+        consumerCount++;
+    }
+    return consumerCount;
 }
 
 void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags)
