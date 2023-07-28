@@ -195,7 +195,6 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
         MMI_HILOGE("Serialize input event failed");
         return RET_ERR;
     }
-
     pkt << event->GetPointerAction() << event->GetPointerId() << event->GetSourceType() << event->GetButtonId()
         << event->GetFingerCount() << event->GetAxes();
 
@@ -204,13 +203,11 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
             pkt << event->GetAxisValue(static_cast<PointerEvent::AxisType>(i));
         }
     }
-
     std::set<int32_t> pressedBtns { event->GetPressedButtons() };
     pkt << pressedBtns.size();
     for (int32_t btnId : pressedBtns) {
         pkt << btnId;
     }
-
     std::vector<int32_t> pointerIds { event->GetPointerIds() };
     pkt << pointerIds.size();
     for (const auto &pointerId : pointerIds) {
@@ -224,7 +221,6 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
             return RET_ERR;
         }
     }
-
     std::vector<int32_t> pressedKeys = event->GetPressedKeys();
     pkt << pressedKeys.size();
     for (const auto &keyCode : pressedKeys) {

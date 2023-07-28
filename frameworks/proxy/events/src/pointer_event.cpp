@@ -721,16 +721,8 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         AddPointerItem(item);
     }
 
-    int32_t bufflen;
-    READINT32(in, bufflen);
-    if (bufflen > static_cast<int32_t>(MAX_N_BUFFER_SIZE)) {
+    if (!ReadBufferFromParcel(in)) {
         return false;
-    }
-
-    for (int32_t i = 0; i < bufflen; ++i) {
-        uint8_t data;
-        READUINT8(in, data);
-        buffer_.push_back(data);
     }
 
     int32_t nPressedButtons;
@@ -765,6 +757,22 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
         }
     }
 
+    return true;
+}
+
+bool PointerEvent::ReadBufferFromParcel(Parcel &in)
+{
+    int32_t bufflen;
+    READINT32(in, bufflen);
+    if (bufflen > static_cast<int32_t>(MAX_N_BUFFER_SIZE)) {
+        return false;
+    }
+
+    for (int32_t i = 0; i < bufflen; ++i) {
+        uint8_t data;
+        READUINT8(in, data);
+        buffer_.push_back(data);
+    }
     return true;
 }
 
