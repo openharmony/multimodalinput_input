@@ -377,7 +377,6 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
             hasPointer = true;
         }
     }
-
     const char *sysName = libinput_device_get_sysname(inputDevice);
     CHKPV(sysName);
     int32_t deviceId = ParseDeviceId(std::string(sysName));
@@ -385,7 +384,6 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         MMI_HILOGE("Parsing sysname failed: \'%{public}s\'", sysName);
         return;
     }
-
     struct InputDeviceInfo info;
     MakeDeviceInfo(inputDevice, info);
     inputDevice_[deviceId] = info;
@@ -396,7 +394,6 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         }
     }
     NotifyDevCallback(deviceId, info);
-
     if (!hasPointer && info.isPointerDevice) {
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
         if (HasTouchDevice()) {
