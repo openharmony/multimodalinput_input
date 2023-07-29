@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -100,6 +100,13 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
         keyItem.SetUnicode(unicode);
         key->AddKeyItem(keyItem);
     }
+    ReadFunctionKeys(pkt, key);
+    return RET_OK;
+}
+
+void InputEventDataTransformation::ReadFunctionKeys(NetPacket &pkt, std::shared_ptr<KeyEvent> key)
+{
+    CHKPV(key);
     bool state = false;
     pkt >> state;
     key->SetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY, state);
@@ -107,7 +114,7 @@ int32_t InputEventDataTransformation::NetPacketToKeyEvent(NetPacket &pkt, std::s
     key->SetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY, state);
     pkt >> state;
     key->SetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, state);
-    return RET_OK;
+
 }
 
 int32_t InputEventDataTransformation::SwitchEventToNetPacket(
@@ -258,12 +265,12 @@ int32_t InputEventDataTransformation::MarshallingBuffer(std::shared_ptr<PointerE
     return RET_OK;
 }
 
-int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_ptr<PointerEvent> event)
+int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<PointerEvent> event, NetPacket &pkt)
 {
-    if (DeserializeInputEvent(pkt, event) != RET_OK) {
-        MMI_HILOGE("Deserialize input event failed");
-        return RET_ERR;
-    }
+    CHKPR(event, ERROR_NULL_POINTER);
+
+
+
     int32_t tField;
     pkt >> tField;
     event->SetPointerAction(tField);
@@ -283,7 +290,12 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
         pkt >> tField;
         event->SetButtonPressed(tField);
     }
+    return RET_OK;
+}
 
+int32_t InputEventDataTransformation::DeserializePointerIds(std::shared_ptr<PointerEvent> event, NetPacket &pkt)
+{
+    CHKPR(event, ERROR_NULL_POINTER);
     std::vector<int32_t>::size_type pointerCnt;
     pkt >> pointerCnt;
     while (pointerCnt-- > 0) {
@@ -294,9 +306,29 @@ int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_
         }
         event->AddPointerItem(item);
     }
+    return RET_OK;
+}
+
+int32_t InputEventDataTransformation::Unmarshalling(NetPacket &pkt, std::shared_ptr<PointerEvent> event)
+{
+    if (DeserializeInputEvent(pkt, event) != RET_OK) {
+        MMI_HILOGE("Deserialize input event failed");
+        return RET_ERR;
+    }
+
+    if (DeserializePressedButtons(event, pkt) != RET_OK) {
+        MMI_HILOGE("Deserialize pressed buttons failed");
+        return RET_ERR;
+    }
+
+    if (DeserializePointerIds(event, pkt) != RET_OK) {
+        MMI_HILOGE("Deserialize pressed ids failed");
+        return RET_ERR;
+    }
 
     std::vector<int32_t> pressedKeys;
     std::vector<int32_t>::size_type pressedKeySize;
+    int32_t tField;
     pkt >> pressedKeySize;
     while (pressedKeySize-- > 0) {
         pkt >> tField;

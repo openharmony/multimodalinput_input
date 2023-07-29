@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -77,6 +77,10 @@ private:
 
     std::shared_ptr<IInputEventConsumer> FindHandler(int32_t handlerId);
     void OnDispatchEventProcessed(int32_t eventId, int64_t actionTime);
+    void AddMouseEventId(std::shared_ptr<PointerEvent> pointerEvent);
+    void AddProcessedEventId(std::shared_ptr<PointerEvent> pointerEvent, int32_t consumerCount);
+    int32_t GetMonitorConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent,
+        std::map<int32_t, std::shared_ptr<IInputEventConsumer>> &consumerInfos);
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool CheckInputDeviceSource(const std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags) const;
     void GetConsumerInfos(std::shared_ptr<PointerEvent> pointerEvent, uint32_t deviceTags,
