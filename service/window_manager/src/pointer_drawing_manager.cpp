@@ -622,6 +622,7 @@ void PointerDrawingManager::DrawPointerStyle()
     if (hasDisplay_ && hasPointerDevice_) {
         if (surfaceNode_ != nullptr) {
             surfaceNode_->AttachToDisplay(screenId_);
+            Rosen::RSTransaction::FlushImplicitTransaction();
         }
         PointerStyle pointerStyle;
         int32_t ret = WinMgr->GetPointerStyle(pid_, windowId_, pointerStyle);
