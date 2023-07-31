@@ -334,10 +334,6 @@ int32_t MultimodalInputConnectStub::StubSetMouseScrollRows(MessageParcel& data, 
         return ERROR_NOT_SYSAPI;
     }
 
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
     int32_t rows = 3; // the initial number of scrolling rows is 3.
     READINT32(data, rows, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetMouseScrollRows(rows);
@@ -405,10 +401,6 @@ int32_t MultimodalInputConnectStub::StubGetMouseScrollRows(MessageParcel& data, 
         return ERROR_NOT_SYSAPI;
     }
 
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
     int32_t rows = 3; // the initial number of scrolling rows is 3.
     int32_t ret = GetMouseScrollRows(rows);
     if (ret != RET_OK) {
@@ -428,10 +420,6 @@ int32_t MultimodalInputConnectStub::StubSetMousePrimaryButton(MessageParcel& dat
         return ERROR_NOT_SYSAPI;
     }
 
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
     int32_t primaryButton = -1;
     READINT32(data, primaryButton, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetMousePrimaryButton(primaryButton);
@@ -451,10 +439,6 @@ int32_t MultimodalInputConnectStub::StubGetMousePrimaryButton(MessageParcel& dat
         return ERROR_NOT_SYSAPI;
     }
 
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
     int32_t primaryButton = -1;
     int32_t ret = GetMousePrimaryButton(primaryButton);
     if (ret != RET_OK) {
@@ -474,10 +458,6 @@ int32_t MultimodalInputConnectStub::StubSetHoverScrollState(MessageParcel& data,
         return ERROR_NOT_SYSAPI;
     }
 
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
     bool state = true;
     READBOOL(data, state, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetHoverScrollState(state);
@@ -497,10 +477,6 @@ int32_t MultimodalInputConnectStub::StubGetHoverScrollState(MessageParcel& data,
         return ERROR_NOT_SYSAPI;
     }
 
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
     bool state = true;
     int32_t ret = GetHoverScrollState(state);
     if (ret != RET_OK) {
@@ -561,10 +537,6 @@ int32_t MultimodalInputConnectStub::StubMarkProcessed(MessageParcel& data, Messa
 int32_t MultimodalInputConnectStub::StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
     int32_t speed;
     READINT32(data, speed, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetPointerSpeed(speed);
@@ -578,10 +550,6 @@ int32_t MultimodalInputConnectStub::StubSetPointerSpeed(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
     int32_t speed;
     int32_t ret = GetPointerSpeed(speed);
     if (ret != RET_OK) {
