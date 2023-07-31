@@ -41,13 +41,15 @@ private:
     int32_t OnEventTouchPadMotion(struct libinput_event *event);
     int32_t OnEventTouchPadUp(struct libinput_event *event);
     int32_t SetTouchPadSwipeData(struct libinput_event *event, int32_t action);
-    int32_t SetTouchPadPinchData(struct libinput_event *event, int32_t action);
     int32_t OnEventTouchPadSwipeBegin(struct libinput_event *event);
     int32_t OnEventTouchPadSwipeUpdate(struct libinput_event *event);
     int32_t OnEventTouchPadSwipeEnd(struct libinput_event *event);
     int32_t OnEventTouchPadPinchBegin(struct libinput_event *event);
     int32_t OnEventTouchPadPinchUpdate(struct libinput_event *event);
     int32_t OnEventTouchPadPinchEnd(struct libinput_event *event);
+    int32_t SetTouchPadPinchData(struct libinput_event *event, int32_t action);
+    void SetPinchPointerItem(int64_t time);
+    void ProcessTouchPadPinchDataEvent(int32_t fingerCount, int32_t action, double scale);
 
     int32_t GetTouchPadToolType(struct libinput_event_touch *data, struct libinput_device *device);
     int32_t GetTouchPadToolType(struct libinput_device *device);
