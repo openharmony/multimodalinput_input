@@ -700,7 +700,7 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
     }
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     WRITEINT32(out, static_cast<int32_t>(enhanceData_.size()));
-    for (int i = 0; i < enhanceData_.size(); i++) {
+    for (uint32_t i = 0; i < enhanceData_.size(); i++) {
         WRITEUINT32(out, enhanceData_[i]);
     }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
