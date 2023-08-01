@@ -28,7 +28,7 @@ namespace {
     if ((arg0) > (size)) { \
         MMI_HILOGE("startPos is out of size range"); \
         return false; \
-    } \
+    }
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SimulateInputEventFuzzTest" };
 } // namespace
 
