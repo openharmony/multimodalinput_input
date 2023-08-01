@@ -25,10 +25,12 @@ namespace OHOS {
 namespace MMI {
 namespace {
 #define CHECKSIZE(arg0, size) \
-    if ((arg0) > (size)) { \
-        MMI_HILOGE("startPos is out of size range"); \
-        return false; \
-    }
+    do { \
+        if ((arg0) > (size)) { \
+            MMI_HILOGE("startPos is out of size range"); \
+            return false; \
+        } \
+    } while (0)
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SimulateInputEventFuzzTest" };
 } // namespace
 
