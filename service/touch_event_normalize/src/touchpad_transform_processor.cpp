@@ -378,9 +378,19 @@ int32_t TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *
 
     int64_t time = static_cast<int64_t>(libinput_event_gesture_get_time(gesture));
     double scale = libinput_event_gesture_get_scale(gesture);
+
     pointerEvent_->SetActionTime(GetSysClockTime());
     pointerEvent_->SetActionStartTime(time);
 
+    SetPinchPointerItem(time);
+
+    ProcessTouchPadPinchDataEvent(fingerCount, action, scale);
+
+    return RET_OK;
+}
+
+void TouchPadTransformProcessor::SetPinchPointerItem(int64_t time)
+{
     PointerEvent::PointerItem pointerItem;
     pointerItem.SetDownTime(time);
     pointerItem.SetPressed(MouseState->IsLeftBtnPressed());
@@ -391,7 +401,10 @@ int32_t TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *
     pointerItem.SetDisplayX(mouseInfo.physicalX);
     pointerItem.SetDisplayY(mouseInfo.physicalY);
     pointerEvent_->UpdatePointerItem(defaultPointerId, pointerItem);
+}
 
+void TouchPadTransformProcessor::ProcessTouchPadPinchDataEvent(int32_t fingerCount, int32_t action, double scale)
+{
     pointerEvent_->ClearButtonPressed();
     std::vector<int32_t> pressedButtons;
     MouseState->GetPressedButtons(pressedButtons);
@@ -410,18 +423,19 @@ int32_t TouchPadTransformProcessor::SetTouchPadPinchData(struct libinput_event *
     if (fingerCount == TP_SYSTEM_PINCH_FINGER_CNT) {
         pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
-        WinMgr->UpdateTargetPointer(pointerEvent_);
     } else {
         pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
         pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_PINCH, scale);
+    }
+
+    if (pointerEvent_->GetFingerCount() == TP_SYSTEM_PINCH_FINGER_CNT) {
+        WinMgr->UpdateTargetPointer(pointerEvent_);
     }
 
     // only three or four finger pinch need to statistic
     if (action == PointerEvent::POINTER_ACTION_AXIS_BEGIN && fingerCount > TP_SYSTEM_PINCH_FINGER_CNT) {
         DfxHisysevent::StatisticTouchpadGesture(pointerEvent_);
     }
-
-    return RET_OK;
 }
 
 int32_t TouchPadTransformProcessor::OnEventTouchPadPinchBegin(struct libinput_event *event)
