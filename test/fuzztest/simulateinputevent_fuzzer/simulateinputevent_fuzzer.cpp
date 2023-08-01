@@ -24,13 +24,14 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-#define CHECKSIZE(arg0, size) \
-    do { \
-        if ((arg0) > (size)) { \
-            MMI_HILOGE("startPos is out of size range"); \
-            return false; \
-        } \
-    } while (0)
+bool CheckSize(size_t arg0, size_t size)
+{
+    if (arg0 > size) {
+        MMI_HILOGE("startPos is out of size range");
+        return false;
+    }
+    return true;
+}
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SimulateInputEventFuzzTest" };
 } // namespace
 
@@ -56,17 +57,17 @@ bool SimulateInjectEvent(const uint8_t* data, const size_t size, size_t &startPo
     auto injectDownEvent = KeyEvent::Create();
     CHKPF(injectDownEvent);
     int32_t keyCode;
-    CHECKSIZE(startPos, size);
+    CheckSize(startPos, size);
     startPos += GetObject<int32_t>(keyCode, data + startPos, size - startPos);
     injectDownEvent->SetKeyCode(keyCode);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     int64_t downTime;
-    CHECKSIZE(startPos, size);
+    CheckSize(startPos, size);
     startPos += GetObject<int64_t>(downTime, data + startPos, size - startPos);
     KeyEvent::KeyItem kitDown;
     kitDown.SetDownTime(downTime);
     int32_t keyCodePressed;
-    CHECKSIZE(startPos, size);
+    CheckSize(startPos, size);
     startPos += GetObject<int32_t>(keyCodePressed, data + startPos, size - startPos);
     kitDown.SetKeyCode(keyCodePressed);
     kitDown.SetPressed(true);
@@ -97,15 +98,15 @@ bool SimulatePointerEvent(const uint8_t* data, const size_t size, size_t &startP
     PointerEvent::PointerItem downitem;
     downitem.SetPointerId(0);
     int32_t physicalX;
-    CHECKSIZE(startPos, size);
+    CheckSize(startPos, size);
     startPos += GetObject<int32_t>(physicalX, data + startPos, size - startPos);
     downitem.SetDisplayX(physicalX);
     int32_t physicalY;
-    CHECKSIZE(startPos, size);
+    CheckSize(startPos, size);
     startPos += GetObject<int32_t>(physicalY, data + startPos, size - startPos);
     downitem.SetDisplayY(physicalY);
     int32_t pressure;
-    CHECKSIZE(startPos, size);
+    CheckSize(startPos, size);
     startPos += GetObject<int32_t>(pressure, data + startPos, size - startPos);
     downitem.SetPressure(pressure);
     downitem.SetDeviceId(1);
