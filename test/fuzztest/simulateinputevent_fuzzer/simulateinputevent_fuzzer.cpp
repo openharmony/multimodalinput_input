@@ -24,14 +24,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-bool CheckSize(size_t arg0, size_t size)
-{
-    if (arg0 > size) {
-        MMI_HILOGE("startPos is out of size range");
-        return false;
-    }
-    return true;
-}
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SimulateInputEventFuzzTest" };
 } // namespace
 
@@ -47,6 +39,16 @@ size_t GetObject(T &object, const uint8_t *data, size_t size)
         return 0;
     }
     return objectNum;
+}
+
+
+bool CheckSize(size_t arg0, size_t size)
+{
+    if (arg0 > size) {
+        MMI_HILOGE("startPos is out of size range");
+        return false;
+    }
+    return true;
 }
 
 bool SimulateInjectEvent(const uint8_t* data, const size_t size, size_t &startPos)
