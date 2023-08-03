@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,45 +50,6 @@ public:
     void TearDown();
     static void SetUpTestCase();
     std::string GetEventDump();
-    std::shared_ptr<KeyOption> InitOption(const std::set<int32_t> &preKeys,
-        int32_t finalKey, bool isFinalKeyDown, int32_t duration);
-    std::shared_ptr<PointerEvent> SetupPointerEvent001();
-    std::shared_ptr<PointerEvent> SetupPointerEvent002();
-    std::shared_ptr<PointerEvent> SetupPointerEvent003();
-    std::shared_ptr<PointerEvent> SetupPointerEvent005();
-    std::shared_ptr<PointerEvent> SetupPointerEvent006();
-    std::shared_ptr<PointerEvent> SetupPointerEvent007();
-    std::shared_ptr<PointerEvent> SetupPointerEvent009();
-    std::shared_ptr<PointerEvent> SetupPointerEvent010();
-    std::shared_ptr<PointerEvent> SetupPointerEvent011();
-    std::shared_ptr<PointerEvent> SetupPointerEvent012();
-    std::shared_ptr<PointerEvent> SetupPointerEvent013();
-    std::shared_ptr<PointerEvent> SetupPointerEvent014();
-    std::shared_ptr<PointerEvent> SetupPointerEvent015();
-#ifdef OHOS_BUILD_ENABLE_JOYSTICK
-    std::shared_ptr<PointerEvent> SetupPointerEvent016();
-#endif // OHOS_BUILD_ENABLE_JOYSTICK
-    std::shared_ptr<PointerEvent> SetupmouseEvent001();
-    std::shared_ptr<PointerEvent> SetupmouseEvent002();
-    std::shared_ptr<PointerEvent> SetupTouchScreenEvent001();
-    std::shared_ptr<PointerEvent> SetupTouchScreenEvent002();
-    std::shared_ptr<KeyEvent> SetupKeyEvent001();
-    std::shared_ptr<KeyEvent> SetupKeyEvent002();
-    std::shared_ptr<KeyEvent> SetupKeyEvent003();
-    std::shared_ptr<PointerEvent> TestMarkConsumedStep1();
-    std::shared_ptr<PointerEvent> TestMarkConsumedStep2();
-    std::unique_ptr<OHOS::Media::PixelMap> SetMouseIconTest(const std::string iconPath);
-    void TestMarkConsumedStep3(int32_t monitorId, int32_t eventId);
-    void TestMarkConsumedStep4();
-    void TestMarkConsumedStep5();
-    void TestMarkConsumedStep6();
-    int32_t TestAddMonitor(std::shared_ptr<IInputEventConsumer> consumer);
-    void TestRemoveMonitor(int32_t monitorId);
-    void TestMarkConsumed(int32_t monitorId, int32_t eventId);
-    void TestMonitor(int32_t monitorId, std::shared_ptr<PointerEvent> pointerEvent);
-    void TestInterceptorIdAndPointerEvent(int32_t interceptorId, std::shared_ptr<PointerEvent> pointerEvent);
-    void TestInterceptorId(int32_t interceptorId1, int32_t interceptorId2);
-    std::shared_ptr<PointerEvent> SetupTabletToolEvent001();
 };
 
 void InputManagerTest::SetUpTestCase()
