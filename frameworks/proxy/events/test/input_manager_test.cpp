@@ -37,11 +37,11 @@ constexpr int32_t KEY_DOWN_DURATION = 300;
 constexpr int32_t FINAL_KEY_DOWN_DURATION_ONE = 10;
 constexpr int32_t FINAL_KEY_DOWN_DURATION_TWO = 2000;
 constexpr int32_t POINTER_SENSOR_INPUT_TIME = 2000;
-constexpr int32_t CFG_DATA_SIZE = 16;
 constexpr int32_t BUFFER_SIZE = 512;
 constexpr int32_t KEYBOARD_TYPE_SIZE = 20;
 constexpr int32_t PARAMETER_ERROR = 401;
 constexpr int32_t INVAID_VALUE = -1;
+constexpr uint32_t CFG_DATA_SIZE = 16;
 constexpr double POINTER_ITEM_PRESSURE = 5.0;
 }  // namespace
 
