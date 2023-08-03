@@ -41,7 +41,6 @@ constexpr int32_t BUFFER_SIZE = 512;
 constexpr int32_t KEYBOARD_TYPE_SIZE = 20;
 constexpr int32_t PARAMETER_ERROR = 401;
 constexpr int32_t INVAID_VALUE = -1;
-constexpr uint32_t CFG_DATA_SIZE = 16;
 constexpr double POINTER_ITEM_PRESSURE = 5.0;
 }  // namespace
 
@@ -630,10 +629,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo, TestSize.Level1)
 HWTEST_F(InputManagerTest, InputManagerTest_SetEnhanceConfig_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    uint8_t cfgData[CFG_DATA_SIZE] = {0};
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetEnhanceConfig(cfgData, CFG_DATA_SIZE));
+    uint8_t cfgData[16] = {0};
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetEnhanceConfig(cfgData, 16));
 }
-#endif  // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 /**
  * @tc.name: InputManagerTest_GetDevice_001
