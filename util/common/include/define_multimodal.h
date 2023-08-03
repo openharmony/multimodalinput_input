@@ -161,6 +161,14 @@ inline constexpr int32_t INVALID_PID { -1 };
         } \
     } while (0)
 
+#define CHECKSIZE(arg0, arg1) \
+    do { \
+        if ((arg0) > (arg1)) { \
+            MMI_HILOGE("arg0 value is out of arg1 size"); \
+            return false; \
+        } \
+    } while (0)
+
 #define CHKPS(cond) \
     do { \
         if ((cond) == nullptr) { \

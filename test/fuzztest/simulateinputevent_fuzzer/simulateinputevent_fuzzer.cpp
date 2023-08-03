@@ -41,35 +41,23 @@ size_t GetObject(T &object, const uint8_t *data, size_t size)
     return objectNum;
 }
 
-
-bool CheckSize(size_t arg0, size_t size)
-{
-    if (arg0 > size) {
-        MMI_HILOGE("startPos is out of size range");
-        return false;
-    }
-    return true;
-}
-
 bool SimulateInjectEvent(const uint8_t* data, const size_t size, size_t &startPos)
 {
-    if (startPos > size) {
-        return false;
-    }
+    CHECKSIZE(startPos, size);
     auto injectDownEvent = KeyEvent::Create();
     CHKPF(injectDownEvent);
     int32_t keyCode;
-    CheckSize(startPos, size);
+    CHECKSIZE(startPos, size);
     startPos += GetObject<int32_t>(keyCode, data + startPos, size - startPos);
     injectDownEvent->SetKeyCode(keyCode);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     int64_t downTime;
-    CheckSize(startPos, size);
+    CHECKSIZE(startPos, size);
     startPos += GetObject<int64_t>(downTime, data + startPos, size - startPos);
     KeyEvent::KeyItem kitDown;
     kitDown.SetDownTime(downTime);
     int32_t keyCodePressed;
-    CheckSize(startPos, size);
+    CHECKSIZE(startPos, size);
     startPos += GetObject<int32_t>(keyCodePressed, data + startPos, size - startPos);
     kitDown.SetKeyCode(keyCodePressed);
     kitDown.SetPressed(true);
@@ -78,6 +66,7 @@ bool SimulateInjectEvent(const uint8_t* data, const size_t size, size_t &startPo
 
     auto injectUpEvent = KeyEvent::Create();
     CHKPF(injectUpEvent);
+    CHECKSIZE(startPos, size);
     startPos += GetObject<int64_t>(downTime, data + startPos, size - startPos);
     KeyEvent::KeyItem kitUp;
     kitUp.SetDownTime(downTime);
@@ -92,23 +81,21 @@ bool SimulateInjectEvent(const uint8_t* data, const size_t size, size_t &startPo
 
 bool SimulatePointerEvent(const uint8_t* data, const size_t size, size_t &startPos)
 {
-    if (startPos > size) {
-        return false;
-    }
+    CHECKSIZE(startPos, size);
     auto pointerDownEvent = PointerEvent::Create();
     CHKPF(pointerDownEvent);
     PointerEvent::PointerItem downitem;
     downitem.SetPointerId(0);
     int32_t physicalX;
-    CheckSize(startPos, size);
+    CHECKSIZE(startPos, size);
     startPos += GetObject<int32_t>(physicalX, data + startPos, size - startPos);
     downitem.SetDisplayX(physicalX);
     int32_t physicalY;
-    CheckSize(startPos, size);
+    CHECKSIZE(startPos, size);
     startPos += GetObject<int32_t>(physicalY, data + startPos, size - startPos);
     downitem.SetDisplayY(physicalY);
     int32_t pressure;
-    CheckSize(startPos, size);
+    CHECKSIZE(startPos, size);
     startPos += GetObject<int32_t>(pressure, data + startPos, size - startPos);
     downitem.SetPressure(pressure);
     downitem.SetDeviceId(1);
