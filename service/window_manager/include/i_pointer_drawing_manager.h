@@ -68,6 +68,10 @@ public:
     {
         return 0;
     }
+    virtual int32_t SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
+    {
+        return 0;
+    }
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };

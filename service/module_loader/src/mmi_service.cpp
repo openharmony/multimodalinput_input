@@ -437,6 +437,20 @@ int32_t MMIService::SetMouseIcon(int32_t windowId, void* pixelMap)
     return RET_OK;
 }
 
+int32_t MMIService::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
+{
+    CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetMouseHotSpot,
+        IPointerDrawingManager::GetInstance(), windowId, hotSpotX, hotSpotY)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set the mouse hot spot failed, return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
 #ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t MMIService::ReadMouseScrollRows(int32_t &rows)
 {

@@ -63,6 +63,7 @@ public:
     void SetMouseDisplayState(bool state) override;
     bool GetMouseDisplayState() const override;
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
+    int32_t SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
 private:
     void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY);
     sptr<OHOS::Surface> GetLayer();
@@ -99,6 +100,8 @@ private:
     std::unique_ptr<OHOS::Media::PixelMap> userIcon_ { nullptr };
     uint64_t screenId_ { 0 };
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_;
+    int32_t userIconHotSpotX_ { 0 };
+    int32_t userIconHotSpotY_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS

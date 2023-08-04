@@ -303,6 +303,16 @@ public:
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap);
 
     /**
+     * @brief Set mouse icon hot spot.
+     * @param windowId Indicates the windowId of the window
+     * @param hotSpotX Indicates the hot spot x for this mouse icon.
+     * @param hotSpotY Indicates the hot spot y for this mouse icon.
+     * @return vint32_t
+     * @since 10
+     */
+    int32_t SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY);
+
+    /**
      * @brief Gets the number of the mouse scrolling rows.
      * @param rows Indicates the number of the mouse scrolling rows.
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.

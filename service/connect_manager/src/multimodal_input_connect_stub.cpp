@@ -235,6 +235,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEYBOARD_REPEAT_RATE):
             return StubGetKeyboardRepeatRate(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOUSE_HOT_SPOT):
+            return StubSetMouseHotSpot(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -383,6 +386,35 @@ int32_t MultimodalInputConnectStub::StubSetMouseIcon(MessageParcel& data, Messag
     int32_t ret = SetMouseIcon(windowId, (void*)pixelMap);
     if (ret != RET_OK) {
         MMI_HILOGE("Call SetMouseIcon failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetMouseHotSpot(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t windowId = 0;
+    READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
+    if (windowId <= 0) {
+        MMI_HILOGE("windowId is invalid, get value %{public}d", windowId);
+        return RET_ERR;
+    }
+    int32_t hotSpotX = 0;
+    READINT32(data, hotSpotX, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t hotSpotY = 0;
+    READINT32(data, hotSpotY, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetMouseHotSpot failed ret:%{public}d", ret);
         return ret;
     }
     return RET_OK;
