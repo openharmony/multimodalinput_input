@@ -26,6 +26,7 @@ const LOG_LABEL: HiLogLabel = HiLogLabel {
 
 static RET_OK: i32 = 0;
 static RET_ERR: i32 = -1;
+static KEY_ELEMENT_SIZE: usize = 4;
 const NPOS: usize = usize::MAX;
 
 #[no_mangle]
@@ -52,7 +53,7 @@ extern "C" fn ReadConfigInfo(
     }
     if !line_str.is_empty() && !line_str.starts_with('#') {
         let key_element: Vec<&str> = line_str.split(' ').collect();
-        if key_element[0].is_empty() || key_element[1].is_empty() || key_element[2].is_empty() || key_element[3].is_empty() {
+        if key_element.len() != KEY_ELEMENT_SIZE {
             error!(LOG_LABEL, "The key value data is incomplete");
             return RET_ERR;
         }
