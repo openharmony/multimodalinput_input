@@ -688,6 +688,21 @@ int32_t InputManagerImpl::SetMouseIcon(int32_t windowId, void* pixelMap)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+int32_t InputManagerImpl::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
+{
+    CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = MultimodalInputConnMgr->SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set mouse hot spot failed, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
 int32_t InputManagerImpl::GetMouseScrollRows(int32_t &rows)
 {
     CALL_DEBUG_ENTER;
