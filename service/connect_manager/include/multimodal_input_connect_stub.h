@@ -44,6 +44,7 @@ protected:
     int32_t StubSetMouseScrollRows(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetMouseScrollRows(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMouseIcon(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetMouseHotSpot(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetMousePrimaryButton(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetMousePrimaryButton(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetHoverScrollState(MessageParcel& data, MessageParcel& reply);

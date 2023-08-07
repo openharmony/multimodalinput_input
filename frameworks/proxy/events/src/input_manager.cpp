@@ -211,6 +211,11 @@ int32_t InputManager::SetMouseIcon(int32_t windowId, void* pixelMap)
     return InputMgrImpl.SetMouseIcon(windowId, pixelMap);
 }
 
+int32_t InputManager::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
+{
+    return InputMgrImpl.SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
+}
+
 int32_t InputManager::SetMousePrimaryButton(int32_t primaryButton)
 {
     return InputMgrImpl.SetMousePrimaryButton(primaryButton);

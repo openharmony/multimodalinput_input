@@ -152,6 +152,11 @@ void PointerDrawingManager::AdjustMouseFocus(ICON_TYPE iconType, int32_t &physic
             break;
         }
         case ANGLE_NW:
+            if (userIcon_ != nullptr) {
+                physicalX -= userIconHotSpotX_;
+                physicalY -= userIconHotSpotY_;
+            }
+            break;
         default: {
             MMI_HILOGD("No need adjust mouse focus");
             break;
@@ -306,6 +311,8 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t windowId, void* pixelMap)
     }
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
     userIcon_.reset(pixelMapPtr);
+    userIconHotSpotX_ = 0;
+    userIconHotSpotY_ = 0;
     PointerStyle style;
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     int32_t ret = SetPointerStyle(-1, windowId, style);
@@ -313,6 +320,28 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t windowId, void* pixelMap)
         MMI_HILOGE("SetPointerStyle return RET_ERR here!");
     }
     return ret;
+}
+
+int32_t PointerDrawingManager::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
+{
+    CALL_DEBUG_ENTER;
+    if (windowId < 0) {
+        MMI_HILOGE("invalid windowId, %{public}d", windowId);
+        return RET_ERR;
+    }
+    if (hotSpotX < 0 || hotSpotY < 0 || userIcon_ == nullptr) {
+        MMI_HILOGE("invalid value");
+        return RET_ERR;
+    }
+    PointerStyle pointerStyle;
+    int32_t ret = WinMgr->GetPointerStyle(pid_, windowId, pointerStyle);
+    if (ret != RET_OK || pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+        MMI_HILOGE("Get pointer style failed, pid %{publid}d, pointerStyle %{public}d", pid_, pointerStyle.id);
+        return RET_ERR;
+    }
+    userIconHotSpotX_ = hotSpotX;
+    userIconHotSpotY_ = hotSpotY;
+    return RET_OK;
 }
 
 std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixelMap(const std::string &imagePath)
