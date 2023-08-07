@@ -254,9 +254,8 @@ int32_t MultimodalInputConnectProxy::SetMouseHotSpot(int32_t windowId, int32_t h
         data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
-        return ret;
     }
-    return RET_OK;
+    return ret;
 }
 
 int32_t MultimodalInputConnectProxy::GetMouseScrollRows(int32_t &rows)
