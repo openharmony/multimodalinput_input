@@ -333,6 +333,12 @@ int32_t PointerDrawingManager::SetMouseHotSpot(int32_t windowId, int32_t hotSpot
         MMI_HILOGE("invalid value");
         return RET_ERR;
     }
+    PointerStyle pointerStyle;
+    int32_t ret = WinMgr->GetPointerStyle(pid_, windowId, pointerStyle);
+    if (ret != RET_OK || pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+        MMI_HILOGE("Get pointer style failed, pid %{publid}d, pointerStyle %{public}d", pid_, pointerStyle.id);
+        return RET_ERR;
+    }
     userIconHotSpotX_ = hotSpotX;
     userIconHotSpotY_ = hotSpotY;
     return RET_OK;

@@ -53,6 +53,7 @@ constexpr int32_t POINTER_SPEED_FOUR = 11;
 constexpr int32_t POINTER_SPEED_FIVE = 20;
 constexpr int32_t RIGHT_CLICK_TYPE = 2;
 constexpr int32_t INVAID_VALUE = -1;
+constexpr int32_t MOUSE_ICON_HOT_SPOT = 20;
 constexpr int64_t POINTER_ITEM_DOWNTIME_ONE = 9999;
 constexpr int64_t POINTER_ITEM_DOWNTIME_TWO = 10001;
 constexpr int64_t POINTER_ITEM_DOWNTIME_THREE = 10003;
@@ -1230,6 +1231,55 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerStyle_002, T
     if (InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle) == RET_OK) {
         ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
         ASSERT_EQ(pointerStyle.id, MOUSE_ICON::CROSS);
+    }
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_SetMouseHotSpot_001
+ * @tc.desc: Set the mouse icon hot spot for linux window
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseHotSpot_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    uint32_t windowId = window->GetWindowId();
+    PointerStyle pointerStyle;
+    pointerStyle.id = MOUSE_ICON::CROSS;
+    if (InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
+        ASSERT_EQ(pointerStyle.id, MOUSE_ICON::CROSS);
+        ASSERT_FALSE(
+            InputManager::GetInstance()->SetMouseHotSpot(windowId, MOUSE_ICON_HOT_SPOT, MOUSE_ICON_HOT_SPOT) == RET_OK);
+    }
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_SetMouseHotSpot_002
+ * @tc.desc: Set the mouse icon hot spot for linux window
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseHotSpot_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    uint32_t windowId = window->GetWindowId();
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    PointerStyle pointerStyle;
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    if (InputManager::GetInstance()->SetMouseIcon(windowId, (void *)pixelMap.get()) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
+        ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+        ASSERT_TRUE(
+            InputManager::GetInstance()->SetMouseHotSpot(windowId, MOUSE_ICON_HOT_SPOT, MOUSE_ICON_HOT_SPOT) == RET_OK);
+    } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        ASSERT_FALSE(false);
+    } else {
+        ASSERT_TRUE(false);
     }
 }
 
