@@ -1119,6 +1119,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
                "displayX:%{public}d,displayY:%{public}d,windowX:%{public}d,windowY:%{public}d",
                touchWindow->pid, touchWindow->id, touchWindow->agentWindowId,
                logicalX, logicalY, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), windowX, windowY);
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
+        MMI_HILOGD("Clear extra data");
+        ClearExtraData();
+    }
     return ERR_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -1300,6 +1304,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             touchItemDownInfos_.erase(iter);
             MMI_HILOGD("Clear the touch info, action is up, pointerid:%{public}d", pointerId);
         }
+    }
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
+        MMI_HILOGD("Clear extra data");
+        ClearExtraData();
     }
     return ERR_OK;
 }
