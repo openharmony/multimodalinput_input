@@ -211,7 +211,15 @@ int32_t InputManagerImpl::RemoveInputEventFilter(int32_t filterId)
 
 EventHandlerPtr InputManagerImpl::GetEventHandler() const
 {
-    CHKPP(eventHandler_);
+    if (eventHandler_ == nullptr) {
+        MMI_HILOGD("eventHandler_ is nullptr");
+        auto MMIClient = MMIEventHdl.GetMMIClient();
+        if (MMIClient == nullptr) {
+            MMI_HILOGE("Get MMIClient is failed");
+            return nullptr;
+        }
+        return MMIClient->GetEventHandler();
+    }
     return eventHandler_;
 }
 
