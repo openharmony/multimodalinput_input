@@ -48,6 +48,7 @@ public:
     {
         return isEventHandlerChanged_;
     }
+    EventHandlerPtr GetEventHandler() const override;
 
 private:
     bool StartEventRunner();
