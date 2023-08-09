@@ -274,6 +274,12 @@ int32_t MMIClient::Socket()
     return fd_;
 }
 
+EventHandlerPtr MMIClient::GetEventHandler() const
+{
+    CHKPP(eventHandler_);
+    return eventHandler_;
+}
+
 void MMIClient::Stop()
 {
     CALL_DEBUG_ENTER;
