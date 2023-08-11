@@ -152,7 +152,7 @@ void PointerDrawingManager::AdjustMouseFocus(ICON_TYPE iconType, int32_t &physic
             break;
         }
         case ANGLE_NW:
-            if (userIcon_ != nullptr) {
+            if (userIcon_ != nullptr && lastMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
                 physicalX -= userIconHotSpotX_;
                 physicalY -= userIconHotSpotY_;
             }
@@ -163,7 +163,6 @@ void PointerDrawingManager::AdjustMouseFocus(ICON_TYPE iconType, int32_t &physic
         }
     }
 }
-
 
 void PointerDrawingManager::SetMouseDisplayState(bool state)
 {
