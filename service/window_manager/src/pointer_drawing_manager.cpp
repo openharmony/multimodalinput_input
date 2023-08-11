@@ -164,7 +164,6 @@ void PointerDrawingManager::AdjustMouseFocus(ICON_TYPE iconType, int32_t &physic
     }
 }
 
-
 void PointerDrawingManager::SetMouseDisplayState(bool state)
 {
     CALL_DEBUG_ENTER;
