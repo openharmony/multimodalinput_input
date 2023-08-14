@@ -43,7 +43,6 @@ size_t GetObject(T &object, const uint8_t *data, size_t size)
 
 bool SimulateInjectEvent(const uint8_t* data, const size_t size, size_t &startPos)
 {
-    CHECKSIZE(startPos, size);
     auto injectDownEvent = KeyEvent::Create();
     CHKPF(injectDownEvent);
     int32_t keyCode;
@@ -81,7 +80,6 @@ bool SimulateInjectEvent(const uint8_t* data, const size_t size, size_t &startPo
 
 bool SimulatePointerEvent(const uint8_t* data, const size_t size, size_t &startPos)
 {
-    CHECKSIZE(startPos, size);
     auto pointerDownEvent = PointerEvent::Create();
     CHKPF(pointerDownEvent);
     PointerEvent::PointerItem downitem;
