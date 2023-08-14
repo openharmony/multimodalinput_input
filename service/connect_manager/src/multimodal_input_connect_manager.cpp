@@ -146,6 +146,18 @@ int32_t MultimodalInputConnectManager::GetMouseScrollRows(int32_t &rows)
     return multimodalInputConnectService_->GetMouseScrollRows(rows);
 }
 
+int32_t MultimodalInputConnectManager::SetPointerSize(int32_t size)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetPointerSize(size);
+}
+
+int32_t MultimodalInputConnectManager::GetPointerSize(int32_t &size)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetPointerSize(size);
+}
+
 int32_t MultimodalInputConnectManager::SetMousePrimaryButton(int32_t primaryButton)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);

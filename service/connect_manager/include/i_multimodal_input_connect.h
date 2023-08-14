@@ -50,6 +50,8 @@ public:
     virtual int32_t SetMouseScrollRows(int32_t rows) = 0;
     virtual int32_t GetMouseScrollRows(int32_t &rows) = 0;
     virtual int32_t SetMouseIcon(int32_t windowId, void* pixelMap) = 0;
+    virtual int32_t SetPointerSize(int32_t size) = 0;
+    virtual int32_t GetPointerSize(int32_t &size) = 0;
     virtual int32_t SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) = 0;
     virtual int32_t SetMousePrimaryButton(int32_t primaryButton) = 0;
     virtual int32_t GetMousePrimaryButton(int32_t &primaryButton) = 0;

@@ -56,6 +56,8 @@ public:
     int32_t SetPointerVisible(int32_t pid, bool visible) override;
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle) override;
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) override;
+    int32_t SetPointerSize(int32_t size) override;
+    int32_t GetPointerSize() override;
     void DrawPointerStyle() override;
     bool IsPointerVisible() override;
     void SetPointerLocation(int32_t pid, int32_t x, int32_t y) override;
