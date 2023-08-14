@@ -17,7 +17,7 @@ import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 defines = input_default_defines
 
 config("mmi_libudev_public_config") {
-  include_dirs = [ "//third_party/eudev/export_include" ]
+  include_dirs = [ "include" ]
 }
 
 config("mmi_libudev_config") {
