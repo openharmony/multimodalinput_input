@@ -41,6 +41,10 @@ public:
     static napi_value LeaveCaptureMode(napi_env env, napi_callback_info info);
     static napi_value SetMouseScrollRows(napi_env env, napi_callback_info info);
     static napi_value GetMouseScrollRows(napi_env env, napi_callback_info info);
+    static napi_value SetPointerSize(napi_env env, napi_callback_info info);
+    static napi_value GetPointerSize(napi_env env, napi_callback_info info);
+    static napi_value SetPointerSizeSync(napi_env env, napi_callback_info info);
+    static napi_value GetPointerSizeSync(napi_env env, napi_callback_info info);
     static napi_value SetMousePrimaryButton(napi_env env, napi_callback_info info);
     static napi_value GetMousePrimaryButton(napi_env env, napi_callback_info info);
     static napi_value SetHoverScrollState(napi_env env, napi_callback_info info);

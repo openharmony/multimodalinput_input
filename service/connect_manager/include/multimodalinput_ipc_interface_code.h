@@ -84,6 +84,8 @@ enum class MultimodalinputConnectInterfaceCode {
     GET_KEYBOARD_REPEAT_DELAY = 62,
     GET_KEYBOARD_REPEAT_RATE = 63,
     SET_MOUSE_HOT_SPOT = 64,
+    SET_POINTER_SIZE = 65,
+    GET_POINTER_SIZE = 66,
 };
 
 enum class MultimodalinputEventInterfaceCode {

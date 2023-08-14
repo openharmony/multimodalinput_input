@@ -64,6 +64,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_MOUSE_SCROLL_ROWS):
             return StubGetMouseScrollRows(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_SIZE):
+            return StubSetPointerSize(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_SIZE):
+            return StubGetPointerSize(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOUSE_ICON):
             return StubSetMouseIcon(data, reply);
             break;
@@ -441,6 +447,54 @@ int32_t MultimodalInputConnectStub::StubGetMouseScrollRows(MessageParcel& data, 
     }
     WRITEINT32(reply, rows, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("mouse scroll rows:%{public}d, ret:%{public}d", rows, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetPointerSize(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    int32_t size = 1; // the initial pointer size is 1.
+    READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetPointerSize(size);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetPointerSize failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success size:%{public}d, pid:%{public}d", size, GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetPointerSize(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    int32_t size = 1; // the initial pointer size is 1.
+    int32_t ret = GetPointerSize(size);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetPoinerSize failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEINT32(reply, size, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("pointer size:%{public}d, ret:%{public}d", size, ret);
     return RET_OK;
 }
 

@@ -25,6 +25,11 @@
 #include "input_windows_manager.h"
 #include "ipc_skeleton.h"
 #include "mmi_log.h"
+#include "preferences.h"
+#include "preferences_impl.h"
+#include "preferences_errno.h"
+#include "preferences_helper.h"
+#include "preferences_xml_utils.h"
 #include "util.h"
 
 namespace OHOS {
@@ -37,6 +42,11 @@ constexpr int32_t BASELINE_DENSITY = 160;
 constexpr int32_t CALCULATE_MIDDLE = 2;
 constexpr int32_t DEVICE_INDEPENDENT_PIXELS = 40;
 constexpr int32_t POINTER_WINDOW_INIT_SIZE = 64;
+constexpr int32_t DEFAULT_POINTER_SIZE = 1;
+constexpr int32_t MIN_POINTER_SIZE = 1;
+constexpr int32_t MAX_POINTER_SIZE = 7;
+constexpr float INCREASE_RATIO = 1.22;
+const std::string MOUSE_FILE_NAME = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
 } // namespace
 } // namespace MMI
 } // namespace OHOS
@@ -373,10 +383,76 @@ void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
     CALL_DEBUG_ENTER;
     hasDisplay_ = true;
     displayInfo_ = displayInfo;
-    imageWidth_ = displayInfo.dpi * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
-    imageHeight_ = displayInfo.dpi * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
+    int32_t size = GetPointerSize();
+    imageWidth_ = pow(INCREASE_RATIO, size - 1) * displayInfo.dpi * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
+    imageHeight_ = pow(INCREASE_RATIO, size - 1) * displayInfo.dpi * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
     IMAGE_WIDTH = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
     IMAGE_HEIGHT = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+}
+
+int32_t PointerDrawingManager::SetPointerSize(int32_t size)
+{
+    CALL_DEBUG_ENTER;
+    if (size < MIN_POINTER_SIZE) {
+        size = MIN_POINTER_SIZE;
+    } else if (size > MAX_POINTER_SIZE) {
+        size = MAX_POINTER_SIZE;
+    }
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(MOUSE_FILE_NAME, errCode);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
+        return RET_ERR;
+    }
+    std::string name = "pointerSize";
+    int32_t ret = pref->PutInt(name, size);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Put size is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    ret = pref->FlushSync();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("Set pointer size successfully, size:%{public}d", size);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(MOUSE_FILE_NAME);
+
+    if (surfaceNode_ == nullptr) {
+        MMI_HILOGI("surfaceNode_ is nullptr");
+        return RET_OK;
+    }
+    imageWidth_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
+    imageHeight_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
+    IMAGE_WIDTH = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+    IMAGE_HEIGHT = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
+
+    CreatePointerWindow(displayInfo_.id, lastPhysicalX_, lastPhysicalY_);
+    ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Init layer failed");
+        return RET_ERR;
+    }
+    UpdatePointerVisible();
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::GetPointerSize()
+{
+    CALL_DEBUG_ENTER;
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(MOUSE_FILE_NAME, errCode);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
+        return RET_ERR;
+    }
+    std::string name = "pointerSize";
+    int32_t pointerSize = pref->GetInt(name, DEFAULT_POINTER_SIZE);
+    MMI_HILOGD("Get pointer size successfully, pointerSize:%{public}d", pointerSize);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(MOUSE_FILE_NAME);
+    return pointerSize;
 }
 
 void PointerDrawingManager::OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo)
