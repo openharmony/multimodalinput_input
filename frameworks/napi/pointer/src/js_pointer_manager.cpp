@@ -335,10 +335,8 @@ napi_value JsPointerManager::GetPointerSize(napi_env env, napi_value handle)
 napi_value JsPointerManager::SetPointerSizeSync(napi_env env, int32_t size)
 {
     CALL_DEBUG_ENTER;
-    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    CHKPP(asyncContext);
-    asyncContext->errorCode = InputManager::GetInstance()->SetPointerSize(size);
-    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+    auto errorCode = InputManager::GetInstance()->SetPointerSize(size);
+    if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
         return nullptr;
@@ -349,25 +347,21 @@ napi_value JsPointerManager::SetPointerSizeSync(napi_env env, int32_t size)
         MMI_HILOGE("Get undefined result is failed");
         return nullptr;
     }
-    asyncContext->DecStrongRef(nullptr);
     return result;
 }
 
 napi_value JsPointerManager::GetPointerSizeSync(napi_env env)
 {
     CALL_DEBUG_ENTER;
-    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
-    CHKPP(asyncContext);
     int32_t size = 1;
-    asyncContext->errorCode = InputManager::GetInstance()->GetPointerSize(size);
-    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+    auto errorCode = InputManager::GetInstance()->GetPointerSize(size);
+    if (errorCode == COMMON_USE_SYSAPI_ERROR) {
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
         return nullptr;
     }
     napi_value result = nullptr;
     NAPI_CALL(env, napi_create_int32(env, size, &result));
-    asyncContext->DecStrongRef(nullptr);
     return result;
 }
 
