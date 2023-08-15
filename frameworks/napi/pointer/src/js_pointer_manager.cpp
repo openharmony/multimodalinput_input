@@ -278,6 +278,93 @@ napi_value JsPointerManager::GetMouseScrollRows(napi_env env, napi_value handle)
     return promise;
 }
 
+napi_value JsPointerManager::SetPointerSize(napi_env env, int32_t size, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+    asyncContext->errorCode = InputManager::GetInstance()->SetPointerSize(size);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
+    asyncContext->reserve << ReturnType::VOID;
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        if (napi_get_undefined(env, &promise) != napi_ok) {
+            CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
+            return nullptr;
+        }
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::GetPointerSize(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+    int32_t size = 1;
+    asyncContext->errorCode = InputManager::GetInstance()->GetPointerSize(size);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
+    asyncContext->reserve << ReturnType::NUMBER << size;
+    napi_value promise = nullptr;
+    uint32_t initialRefCount = 1;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, initialRefCount, &asyncContext->callback), CREATE_REFERENCE);
+        if (napi_get_undefined(env, &promise) != napi_ok) {
+            CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
+            return nullptr;
+        }
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::SetPointerSizeSync(napi_env env, int32_t size)
+{
+    CALL_DEBUG_ENTER;
+    auto errorCode = InputManager::GetInstance()->SetPointerSize(size);
+    if (errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
+
+    napi_value result = nullptr;
+    if (napi_get_undefined(env, &result) != napi_ok) {
+        MMI_HILOGE("Get undefined result is failed");
+        return nullptr;
+    }
+    return result;
+}
+
+napi_value JsPointerManager::GetPointerSizeSync(napi_env env)
+{
+    CALL_DEBUG_ENTER;
+    int32_t size = 1;
+    auto errorCode = InputManager::GetInstance()->GetPointerSize(size);
+    if (errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_create_int32(env, size, &result));
+    return result;
+}
+
 napi_value JsPointerManager::SetPointerStyle(napi_env env, int32_t windowid, int32_t pointerStyle, napi_value handle)
 {
     CALL_DEBUG_ENTER;

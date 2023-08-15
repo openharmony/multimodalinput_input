@@ -72,6 +72,14 @@ public:
     {
         return 0;
     }
+    virtual int32_t SetPointerSize(int32_t size)
+    {
+        return 0;
+    }
+    virtual int32_t GetPointerSize()
+    {
+        return 0;
+    }
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };

@@ -472,6 +472,41 @@ int32_t MMIService::GetMouseScrollRows(int32_t &rows)
     return RET_OK;
 }
 
+int32_t MMIService::SetPointerSize(int32_t size)
+{
+    CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerSize,
+        IPointerDrawingManager::GetInstance(), size));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer size failed,return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    return RET_OK;
+}
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+int32_t MMIService::ReadPointerSize(int32_t &size)
+{
+    size = IPointerDrawingManager::GetInstance()->GetPointerSize();
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+
+int32_t MMIService::GetPointerSize(int32_t &size)
+{
+    CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadPointerSize, this, std::ref(size)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pointer size failed, return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    return RET_OK;
+}
+
 int32_t MMIService::SetMousePrimaryButton(int32_t primaryButton)
 {
     CALL_DEBUG_ENTER;
