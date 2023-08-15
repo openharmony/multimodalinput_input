@@ -49,6 +49,8 @@ public:
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
         uint32_t deviceTags) override;
     int32_t RemoveInputEventFilter(int32_t filterId) override;
+    int32_t SetPointerSize(int32_t size) override;
+    int32_t GetPointerSize(int32_t &size) override;
     int32_t SetMouseScrollRows(int32_t rows) override;
     int32_t GetMouseScrollRows(int32_t &rows) override;
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
@@ -127,6 +129,7 @@ protected:
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t ReadMouseScrollRows(int32_t &rows);
+    int32_t ReadPointerSize(int32_t &size);
     int32_t ReadMousePrimaryButton(int32_t &primaryButton);
     int32_t ReadPointerSpeed(int32_t &speed);
     int32_t ReadHoverScrollState(bool &state);

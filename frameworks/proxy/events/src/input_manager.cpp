@@ -211,6 +211,16 @@ int32_t InputManager::SetMouseIcon(int32_t windowId, void* pixelMap)
     return InputMgrImpl.SetMouseIcon(windowId, pixelMap);
 }
 
+int32_t InputManager::SetPointerSize(int32_t size)
+{
+    return InputMgrImpl.SetPointerSize(size);
+}
+
+int32_t InputManager::GetPointerSize(int32_t &size)
+{
+    return InputMgrImpl.GetPointerSize(size);
+}
+
 int32_t InputManager::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
 {
     return InputMgrImpl.SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
