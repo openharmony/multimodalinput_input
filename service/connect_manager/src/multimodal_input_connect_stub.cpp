@@ -115,6 +115,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEYBOARD_TYPE):
             return StubGetKeyboardType(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_COLOR):
+            return StubSetPointerColor(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_COLOR):
+            return StubGetPointerColor(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_SPEED):
             return StubSetPointerSpeed(data, reply);
             break;
@@ -620,9 +626,62 @@ int32_t MultimodalInputConnectStub::StubMarkProcessed(MessageParcel& data, Messa
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectStub::StubSetPointerColor(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    int32_t color = 0x000000; // the initial pointer color is 0x000000.
+    READINT32(data, color, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetPointerColor(color);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetPointerColor failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success color:%{public}d, pid:%{public}d", color, GetCallingPid());
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetPointerColor(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
+    int32_t color = 0x000000; // the initial pointer color is 0x000000.
+    int32_t ret = GetPointerColor(color);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetPointerColor failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEINT32(reply, color, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("pointer color:%{public}d, ret:%{public}d", color, ret);
+    return RET_OK;
+}
+
 int32_t MultimodalInputConnectStub::StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     int32_t speed;
     READINT32(data, speed, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetPointerSpeed(speed);
@@ -636,6 +695,11 @@ int32_t MultimodalInputConnectStub::StubSetPointerSpeed(MessageParcel& data, Mes
 int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+
     int32_t speed;
     int32_t ret = GetPointerSpeed(speed);
     if (ret != RET_OK) {

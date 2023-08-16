@@ -256,6 +256,17 @@ bool InputManager::IsPointerVisible()
     return InputMgrImpl.IsPointerVisible();
 }
 
+int32_t InputManager::SetPointerColor(int32_t color)
+{
+    return InputMgrImpl.SetPointerColor(color);
+}
+
+int32_t InputManager::GetPointerColor(int32_t &color)
+{
+    return InputMgrImpl.GetPointerColor(color);
+}
+
+
 int32_t InputManager::SetPointerSpeed(int32_t speed)
 {
     return InputMgrImpl.SetPointerSpeed(speed);
