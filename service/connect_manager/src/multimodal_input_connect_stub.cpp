@@ -35,6 +35,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Multi
 using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, MessageParcel& reply);
 } // namespace
 const int32_t MAX_BUFFER_SIZE = 1000000;
+const int32_t DEFAULT_POINTER_COLOR = 0x000000;
 int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
     MessageParcel& reply, MessageOption& option)
 {
@@ -639,7 +640,7 @@ int32_t MultimodalInputConnectStub::StubSetPointerColor(MessageParcel& data, Mes
         return ERROR_NOT_SYSAPI;
     }
 
-    int32_t color = 0x000000; // the initial pointer color is 0x000000.
+    int32_t color = DEFAULT_POINTER_COLOR;
     READINT32(data, color, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetPointerColor(color);
     if (ret != RET_OK) {
@@ -663,7 +664,7 @@ int32_t MultimodalInputConnectStub::StubGetPointerColor(MessageParcel& data, Mes
         return ERROR_NOT_SYSAPI;
     }
 
-    int32_t color = 0x000000; // the initial pointer color is 0x000000.
+    int32_t color = DEFAULT_POINTER_COLOR;
     int32_t ret = GetPointerColor(color);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetPointerColor failed ret:%{public}d", ret);
