@@ -45,6 +45,14 @@ public:
     {
         return 0;
     }
+    virtual int32_t SetPointerColor(int32_t color)
+    {
+        return 0;
+    }
+    virtual int32_t GetPointerColor()
+    {
+        return 0;
+    }
     virtual int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
     {
         return 0;
