@@ -200,6 +200,18 @@ int32_t MultimodalInputConnectManager::MarkProcessed(int32_t eventType, int32_t 
     return multimodalInputConnectService_->MarkProcessed(eventType, eventId);
 }
 
+int32_t MultimodalInputConnectManager::SetPointerColor(int32_t color)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetPointerColor(color);
+}
+
+int32_t MultimodalInputConnectManager::GetPointerColor(int32_t &color)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetPointerColor(color);
+}
+
 int32_t MultimodalInputConnectManager::SetPointerSpeed(int32_t speed)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);
