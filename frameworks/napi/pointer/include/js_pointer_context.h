@@ -34,6 +34,10 @@ public:
     static napi_value SetPointerStyle(napi_env env, napi_callback_info info);
     static napi_value GetPointerStyle(napi_env env, napi_callback_info info);
     std::shared_ptr<JsPointerManager> GetJsPointerMgr() const;
+    static napi_value SetPointerColor(napi_env env, napi_callback_info info);
+    static napi_value GetPointerColor(napi_env env, napi_callback_info info);
+    static napi_value SetPointerColorSync(napi_env env, napi_callback_info info);
+    static napi_value GetPointerColorSync(napi_env env, napi_callback_info info);
     static napi_value SetPointerSpeed(napi_env env, napi_callback_info info);
     static napi_value GetPointerSpeed(napi_env env, napi_callback_info info);
     static napi_value SetPointerLocation(napi_env env, napi_callback_info info);

@@ -407,6 +407,22 @@ public:
     int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle);
 
     /**
+     * @brief Sets pointer color.
+     * @param color Indicates pointer color.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t SetPointerColor(int32_t color);
+
+    /**
+     * @brief Gets pointer color.
+     * @param color Indicates pointer color.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t GetPointerColor(int32_t &color);
+
+    /**
      * @brief Sets the mouse pointer speed, which ranges from 1 to 11.
      * @param speed Indicates the mouse pointer speed to set.
      * @return Returns <b>RET_OK</b> if success; returns <b>RET_ERR</b> otherwise.

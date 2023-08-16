@@ -46,6 +46,8 @@ constexpr int32_t DEFAULT_POINTER_SIZE = 1;
 constexpr int32_t MIN_POINTER_SIZE = 1;
 constexpr int32_t MAX_POINTER_SIZE = 7;
 constexpr float INCREASE_RATIO = 1.22;
+constexpr int32_t MIN_POINTER_COLOR = 0x000000;
+constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
 const std::string MOUSE_FILE_NAME = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
 } // namespace
 } // namespace MMI
@@ -371,11 +373,71 @@ std::unique_ptr<OHOS::Media::PixelMap> PointerDrawingManager::DecodeImageToPixel
         .height = imageHeight_
     };
 
+    decodeOpts.SVGOpts.fillColor = {
+        .isValidColor = true,
+        .color = GetPointerColor()
+    };
+
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = imageSource->CreatePixelMap(decodeOpts, ret);
     if (pixelMap == nullptr) {
         MMI_HILOGE("The pixelMap is nullptr");
     }
     return pixelMap;
+}
+
+int32_t PointerDrawingManager::SetPointerColor(int32_t color)
+{
+    CALL_DEBUG_ENTER;
+    if (color < MIN_POINTER_COLOR) {
+        color = MIN_POINTER_COLOR;
+    } else if (color > MAX_POINTER_COLOR) {
+        color = MAX_POINTER_COLOR;
+    }
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(MOUSE_FILE_NAME, errCode);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
+        return RET_ERR;
+    }
+    std::string name = "pointerColor";
+    int32_t ret = pref->PutInt(name, color);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Put color is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    ret = pref->FlushSync();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("Set pointer color successfully, color:%{public}d", color);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(MOUSE_FILE_NAME);
+
+    ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Init layer failed");
+        return RET_ERR;
+    }
+    UpdatePointerVisible();
+    return RET_OK;
+}
+
+int32_t PointerDrawingManager::GetPointerColor()
+{
+    CALL_DEBUG_ENTER;
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(MOUSE_FILE_NAME, errCode);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
+        return RET_ERR;
+    }
+    std::string name = "pointerColor";
+    int32_t pointerColor = pref->GetInt(name, MIN_POINTER_COLOR);
+    MMI_HILOGD("Get pointer color successfully, pointerColor:%{public}d", pointerColor);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(MOUSE_FILE_NAME);
+    return pointerColor;
 }
 
 void PointerDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
