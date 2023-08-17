@@ -1513,5 +1513,75 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadRightClickT
     const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
     ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
+
+/**
+ * @tc.name: InputManagerPointerTest_SetPointerSize_001
+ * @tc.desc: Sets pointer size
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerSize_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t setSize = 3;
+    ASSERT_TRUE(InputManager::GetInstance()->SetPointerSize(setSize) == RET_OK);
+    setSize = 1;
+    InputManager::GetInstance()->SetPointerSize(setSize);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_GetPointerSize_001
+ * @tc.desc: Gets pointer size
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetPointerSize_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t setSize = 1;
+    ASSERT_TRUE(InputManager::GetInstance()->SetPointerSize(setSize) == RET_OK);
+    int32_t getSize = 3;
+    ASSERT_TRUE(InputManager::GetInstance()->GetPointerSize(getSize) == RET_OK);
+    ASSERT_TRUE(setSize == getSize);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_SetPointerColor_001
+ * @tc.desc: Sets pointer color
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerColor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t setColor = 0xA946F1;
+    ASSERT_TRUE(InputManager::GetInstance()->SetPointerColor(setColor) == RET_OK);
+    setColor = 0x000000;
+    InputManager::GetInstance()->SetPointerColor(setColor);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_GetPointerColor_001
+ * @tc.desc: Gets pointer color
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetPointerColor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t setColor = 0x000000;
+    ASSERT_TRUE(InputManager::GetInstance()->SetPointerColor(setColor) == RET_OK);
+    int32_t getColor = 3;
+    ASSERT_TRUE(InputManager::GetInstance()->GetPointerColor(getColor) == RET_OK);
+    ASSERT_TRUE(setColor == getColor);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+}
 }  // namespace MMI
 }  // namespace OHOS
