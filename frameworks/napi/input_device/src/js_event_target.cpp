@@ -163,10 +163,10 @@ void JsEventTarget::OnDeviceAdded(int32_t deviceId, const std::string &type)
         CHKPV(work);
         item->data.deviceIds.push_back(deviceId);
         work->data = static_cast<void *>(&item);
-        int32_t ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, EmitAddedDeviceEvent);
+        int32_t ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, EmitAddedDeviceEvent, uv_qos_user_initiated);
         if (ret != 0) {
-            MMI_HILOGE("uv_queue_work failed");
+            MMI_HILOGE("uv_queue_work_with_qos failed");
             JsUtil::DeletePtr<uv_work_t *>(work);
             return;
         }
@@ -191,10 +191,10 @@ void JsEventTarget::OnDeviceRemoved(int32_t deviceId, const std::string &type)
         CHKPV(work);
         item->data.deviceIds.push_back(deviceId);
         work->data = static_cast<void *>(&item);
-        int32_t ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, EmitRemoveDeviceEvent);
+        int32_t ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, EmitRemoveDeviceEvent, uv_qos_user_initiated);
         if (ret != 0) {
-            MMI_HILOGE("uv_queue_work failed");
+            MMI_HILOGE("uv_queue_work_with_qos failed");
             JsUtil::DeletePtr<uv_work_t *>(work);
             return;
         }
@@ -288,23 +288,23 @@ void JsEventTarget::EmitJsIds(sptr<JsUtil::CallbackInfo> cb, std::vector<int32_t
     int32_t ret;
     if (cb->isApi9) {
         if (cb->ref == nullptr) {
-            ret = uv_queue_work(
-                loop, work, [](uv_work_t *work) {}, CallDevListPromiseWork);
+            ret = uv_queue_work_with_qos(
+                loop, work, [](uv_work_t *work) {}, CallDevListPromiseWork, uv_qos_user_initiated);
         } else {
-            ret = uv_queue_work(
-                loop, work, [](uv_work_t *work) {}, CallDevListAsyncWork);
+            ret = uv_queue_work_with_qos(
+                loop, work, [](uv_work_t *work) {}, CallDevListAsyncWork, uv_qos_user_initiated);
         }
     } else {
         if (cb->ref == nullptr) {
-            ret = uv_queue_work(
-                loop, work, [](uv_work_t *work) {}, CallIdsPromiseWork);
+            ret = uv_queue_work_with_qos(
+                loop, work, [](uv_work_t *work) {}, CallIdsPromiseWork, uv_qos_user_initiated);
         } else {
-            ret = uv_queue_work(
-                loop, work, [](uv_work_t *work) {}, CallIdsAsyncWork);
+            ret = uv_queue_work_with_qos(
+                loop, work, [](uv_work_t *work) {}, CallIdsAsyncWork, uv_qos_user_initiated);
         }
     }
     if (ret != 0) {
-        MMI_HILOGE("uv_queue_work failed");
+        MMI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t *>(work);
     }
 }
@@ -386,23 +386,23 @@ void JsEventTarget::EmitJsDev(sptr<JsUtil::CallbackInfo> cb, std::shared_ptr<Inp
     int32_t ret;
     if (cb->isApi9) {
         if (cb->ref == nullptr) {
-            ret = uv_queue_work(
-                loop, work, [](uv_work_t *work) {}, CallDevInfoPromiseWork);
+            ret = uv_queue_work_with_qos(
+                loop, work, [](uv_work_t *work) {}, CallDevInfoPromiseWork, uv_qos_user_initiated);
         } else {
-            ret = uv_queue_work(
-                loop, work, [](uv_work_t *work) {}, CallDevInfoAsyncWork);
+            ret = uv_queue_work_with_qos(
+                loop, work, [](uv_work_t *work) {}, CallDevInfoAsyncWork, uv_qos_user_initiated);
         }
     } else {
         if (cb->ref == nullptr) {
-            ret = uv_queue_work(
-                loop, work, [](uv_work_t *work) {}, CallDevPromiseWork);
+            ret = uv_queue_work_with_qos(
+                loop, work, [](uv_work_t *work) {}, CallDevPromiseWork, uv_qos_user_initiated);
         } else {
-            ret = uv_queue_work(
-                loop, work, [](uv_work_t *work) {}, CallDevAsyncWork);
+            ret = uv_queue_work_with_qos(
+                loop, work, [](uv_work_t *work) {}, CallDevAsyncWork, uv_qos_user_initiated);
         }
     }
     if (ret != 0) {
-        MMI_HILOGE("uv_queue_work failed");
+        MMI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t *>(work);
     }
 }
@@ -531,14 +531,14 @@ void JsEventTarget::EmitSupportKeys(sptr<JsUtil::CallbackInfo> cb, std::vector<b
     work->data = cb.GetRefPtr();
     int32_t ret;
     if (cb->ref == nullptr) {
-        ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, CallKeystrokeAbilityPromise);
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeystrokeAbilityPromise, uv_qos_user_initiated);
     } else {
-        ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, CallKeystrokeAbilityAsync);
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeystrokeAbilityAsync, uv_qos_user_initiated);
     }
     if (ret != 0) {
-        MMI_HILOGE("uv_queue_work failed");
+        MMI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t *>(work);
     }
 }
@@ -559,14 +559,14 @@ void JsEventTarget::EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t ke
     work->data = cb.GetRefPtr();
     int32_t ret;
     if (cb->ref == nullptr) {
-        ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardTypePromise);
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardTypePromise, uv_qos_user_initiated);
     } else {
-        ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardTypeAsync);
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardTypeAsync, uv_qos_user_initiated);
     }
     if (ret != 0) {
-        MMI_HILOGE("uv_queue_work failed");
+        MMI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t *>(work);
     }
 }
@@ -885,14 +885,14 @@ void JsEventTarget::EmitJsKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int
     work->data = cb.GetRefPtr();
     int32_t ret;
     if (cb->ref == nullptr) {
-        ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayPromise);
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayPromise, uv_qos_user_initiated);
     } else {
-        ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayAsync);
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayAsync, uv_qos_user_initiated);
     }
     if (ret != 0) {
-        MMI_HILOGE("uv_queue_work failed");
+        MMI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t *>(work);
     }
 }
@@ -1012,14 +1012,14 @@ void JsEventTarget::EmitJsKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int3
     work->data = cb.GetRefPtr();
     int32_t ret;
     if (cb->ref == nullptr) {
-        ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRatePromise);
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRatePromise, uv_qos_user_initiated);
     } else {
-        ret = uv_queue_work(
-            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRateAsync);
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRateAsync, uv_qos_user_initiated);
     }
     if (ret != 0) {
-        MMI_HILOGE("uv_queue_work failed");
+        MMI_HILOGE("uv_queue_work_with_qos failed");
         JsUtil::DeletePtr<uv_work_t *>(work);
     }
 }
