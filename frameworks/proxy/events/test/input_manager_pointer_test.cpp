@@ -1213,9 +1213,9 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseHotSpot_001, T
     if (InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle) == RET_OK) {
         ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
         ASSERT_EQ(pointerStyle.id, MOUSE_ICON::CROSS);
-        ASSERT_FALSE(
-            InputManager::GetInstance()->SetMouseHotSpot(windowId, MOUSE_ICON_HOT_SPOT, MOUSE_ICON_HOT_SPOT) == RET_OK);
     }
+    ASSERT_FALSE(
+        InputManager::GetInstance()->SetMouseHotSpot(windowId, MOUSE_ICON_HOT_SPOT, MOUSE_ICON_HOT_SPOT) == RET_OK);
 }
 
 /**
@@ -1239,10 +1239,9 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseHotSpot_002, T
         ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
         ASSERT_TRUE(
             InputManager::GetInstance()->SetMouseHotSpot(windowId, MOUSE_ICON_HOT_SPOT, MOUSE_ICON_HOT_SPOT) == RET_OK);
-    } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        ASSERT_FALSE(false);
     } else {
-        ASSERT_TRUE(false);
+        ASSERT_FALSE(
+            InputManager::GetInstance()->SetMouseHotSpot(windowId, MOUSE_ICON_HOT_SPOT, MOUSE_ICON_HOT_SPOT) == RET_OK);
     }
 }
 
