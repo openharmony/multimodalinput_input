@@ -126,10 +126,10 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_001
     KeyEvent::KeyItem kitDown;
     kitDown.SetDownTime(downTime);
     kitDown.SetPressed(true);
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_A);
     injectDownEvent->AddPressedKeyItems(kitDown);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_A);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectDownEvent);
 #endif  // OHOS_BUILD_ENABLE_KEYBOARD
@@ -139,10 +139,10 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_001
     downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     KeyEvent::KeyItem kitUp;
     kitUp.SetPressed(false);
-    kitUp.SetKeyCode(KeyEvent::KEYCODE_BACK);
+    kitUp.SetKeyCode(KeyEvent::KEYCODE_A);
     kitUp.SetDownTime(downTime);
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectUpEvent);
@@ -162,10 +162,10 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_002
     ASSERT_TRUE(injectDownEvent != nullptr);
     int64_t downTime = INVAID_VALUE;
     KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_HOME);
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_A);
     kitDown.SetPressed(true);
     kitDown.SetDownTime(downTime);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -188,9 +188,9 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_003
     KeyEvent::KeyItem kitDown;
     kitDown.SetPressed(true);
     kitDown.SetDownTime(downTime);
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_A);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectDownEvent);
@@ -199,12 +199,12 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_003
     std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
     ASSERT_TRUE(injectUpEvent != nullptr);
     KeyEvent::KeyItem kitUp;
-    kitUp.SetKeyCode(KeyEvent::KEYCODE_BACK);
+    kitUp.SetKeyCode(KeyEvent::KEYCODE_A);
     kitUp.SetDownTime(downTime);
     kitUp.SetPressed(false);
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_A);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectUpEvent);
 #endif  // OHOS_BUILD_ENABLE_KEYBOARD
@@ -873,11 +873,11 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_007, TestSize.Level
     ASSERT_TRUE(injectDownEvent != nullptr);
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_A);
     kitDown.SetDownTime(downTime);
     kitDown.SetPressed(true);
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     injectDownEvent->AddPressedKeyItems(kitDown);
 
     auto interceptor = GetPtr<InputEventCallback>();
