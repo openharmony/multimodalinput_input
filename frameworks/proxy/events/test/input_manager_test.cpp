@@ -989,6 +989,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_EnterCaptureMode_001, TestSize.Level
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     int32_t ret = InputManager::GetInstance()->EnterCaptureMode(windowId);
     ASSERT_TRUE(ret == RET_OK);
@@ -1007,6 +1008,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_LeaveCaptureMode_001, TestSize.Level
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     int32_t ret = InputManager::GetInstance()->LeaveCaptureMode(windowId);
     ASSERT_TRUE(ret == RET_OK);
@@ -1025,6 +1027,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetWindowPid_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetWindowPid(windowId));
     int32_t ret = InputManager::GetInstance()->GetWindowPid(windowId);

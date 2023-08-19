@@ -170,7 +170,10 @@ std::string EventUtilTest::GetEventDump()
 bool EventUtilTest::Init()
 {
     CALL_DEBUG_ENTER;
-    if (!WindowUtilsTest::GetInstance()->DrawTestWindow()) {
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        MMI_HILOGD("IsSceneBoardEnabled no need to Init");
+        return true;
+    } else if (!WindowUtilsTest::GetInstance()->DrawTestWindow()) {
         return false;
     }
     sptr<Rosen::Window> window_ = WindowUtilsTest::GetInstance()->GetWindow();
