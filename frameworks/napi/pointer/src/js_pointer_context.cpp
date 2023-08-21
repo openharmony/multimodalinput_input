@@ -700,7 +700,7 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
         DECLARE_NAPI_STATIC_PROPERTY("HORIZONTAL_TEXT_CURSOR", horizontal_text_cursor),
         DECLARE_NAPI_STATIC_PROPERTY("CURSOR_CROSS", cursor_cross),
         DECLARE_NAPI_STATIC_PROPERTY("CURSOR_CIRCLE", cursor_circle),
-        ECLARE_NAPI_STATIC_PROPERTY("LOADING", loading),
+        DECLARE_NAPI_STATIC_PROPERTY("LOADING", loading),
         DECLARE_NAPI_STATIC_PROPERTY("RUNNING", running),
     };
     napi_value result = nullptr;
