@@ -683,6 +683,11 @@ public:
     void SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
+#ifdef OHOS_BUILD_ENABLE_CONTAINER
+    void SimulateInputEventExt(std::shared_ptr<KeyEvent> keyEvent);
+    void SimulateInputEventExt(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_CONTAINER
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);

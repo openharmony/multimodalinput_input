@@ -66,6 +66,10 @@ config("libmmi_server_config") {
     "${graphics_path}/2d_graphics/include",
   ]
 
+  if (input_ext_feature) {
+    include_dirs += [ "${mmi_ext_path}/container_ipc_manager/include" ]
+  }
+
   if (input_feature_combination_key) {
     defines += [ "OHOS_BUILD_ENABLE_COMBINATION_KEY" ]
   }
