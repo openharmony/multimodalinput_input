@@ -652,6 +652,10 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
     CHKRP(napi_create_int32(env, MOUSE_ICON::CURSOR_CROSS, &cursor_cross), CREATE_INT32);
     napi_value cursor_circle = nullptr;
     CHKRP(napi_create_int32(env, MOUSE_ICON::CURSOR_CIRCLE, &cursor_circle), CREATE_INT32);
+    napi_value loading = nullptr;
+    CHKRP(napi_create_int32(env, MOUSE_ICON::LOADING, &loading), CREATE_INT32);
+    napi_value running = nullptr;
+    CHKRP(napi_create_int32(env, MOUSE_ICON::RUNNING, &running), CREATE_INT32);
 
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("DEFAULT", defaults),
@@ -696,6 +700,8 @@ napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports
         DECLARE_NAPI_STATIC_PROPERTY("HORIZONTAL_TEXT_CURSOR", horizontal_text_cursor),
         DECLARE_NAPI_STATIC_PROPERTY("CURSOR_CROSS", cursor_cross),
         DECLARE_NAPI_STATIC_PROPERTY("CURSOR_CIRCLE", cursor_circle),
+        DECLARE_NAPI_STATIC_PROPERTY("LOADING", loading),
+        DECLARE_NAPI_STATIC_PROPERTY("RUNNING", running),
     };
     napi_value result = nullptr;
     CHKRP(napi_define_class(env, "PointerStyle", NAPI_AUTO_LENGTH, EnumConstructor, nullptr,
