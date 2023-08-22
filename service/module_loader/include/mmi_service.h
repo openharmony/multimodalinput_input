@@ -120,6 +120,13 @@ public:
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
 #endif
 
+#ifdef OHOS_BUILD_ENABLE_CONTAINER
+    void InitContainer();
+    void StopContainer();
+    int32_t InjectKeyEventExt(const std::shared_ptr<KeyEvent> keyEvent);
+    int32_t InjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_CONTAINER
+
 protected:
     void OnConnected(SessionPtr s) override;
     void OnDisconnected(SessionPtr s) override;
