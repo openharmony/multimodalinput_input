@@ -291,5 +291,15 @@ if (security_component_enable) {
 }
 
 if (input_ext_feature) {
-  input_default_defines += [ "OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER" ]
+  mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
+  input_default_defines += [
+    "OHOS_BUILD_ENABLE_CONTAINER",
+    "OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER",
+  ]
+  libmmi_client_sources +=
+      [ "${mmi_ext_path}/container_ipc_manager/src/input_manager_ext.cpp" ]
+  libmmi_service_sources += [
+    "${mmi_ext_path}/container_ipc_manager/src/container_ipc_manager.cpp",
+    "${mmi_ext_path}/container_ipc_manager/src/mmi_service_ext.cpp",
+  ]
 }
