@@ -299,7 +299,9 @@ void MMIService::OnStart()
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Add system ability listener success");
 #endif
-
+#ifdef OHOS_BUILD_ENABLE_CONTAINER
+    InitContainer();
+#endif // OHOS_BUILD_ENABLE_CONTAINER
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGD("Set thread status flag to true");
         threadStatusFlag_ = true;
@@ -329,6 +331,9 @@ void MMIService::OnStop()
     RemoveSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Remove system ability listener success");
 #endif
+#ifdef OHOS_BUILD_ENABLE_CONTAINER
+    StopContainer();
+#endif // OHOS_BUILD_ENABLE_CONTAINER
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd,
@@ -1010,7 +1015,12 @@ int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent));
+    int32_t ret;
+#ifdef OHOS_BUILD_ENABLE_CONTAINER
+    ret = InjectKeyEventExt(keyEvent);
+#else
+    ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent));
+#endif // OHOS_BUILD_ENABLE_CONTAINER
     if (ret != RET_OK) {
         MMI_HILOGE("Inject key event failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -1039,7 +1049,12 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
 {
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
+    int32_t ret;
+#ifdef OHOS_BUILD_ENABLE_CONTAINER
+    ret = InjectPointerEventExt(pointerEvent);
+#else
+    ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
+#endif // OHOS_BUILD_ENABLE_CONTAINER
     if (ret != RET_OK) {
         MMI_HILOGE("Inject pointer event failed, ret:%{public}d", ret);
         return RET_ERR;
