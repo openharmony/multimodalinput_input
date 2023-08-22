@@ -592,9 +592,9 @@ std::shared_ptr<KeyEvent> InputManagerUtil::SetupKeyEvent001()
     KeyEvent::KeyItem kitDown;
     kitDown.SetPressed(true);
     kitDown.SetDownTime(downTime);
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->AddPressedKeyItems(kitDown);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
 
     return keyEvent;
@@ -606,10 +606,10 @@ std::shared_ptr<KeyEvent> InputManagerUtil::SetupKeyEvent002()
     CHKPP(keyEvent);
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_BACK);
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_A);
     kitDown.SetPressed(true);
     kitDown.SetDownTime(downTime);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     keyEvent->AddPressedKeyItems(kitDown);
 
@@ -622,11 +622,11 @@ std::shared_ptr<KeyEvent> InputManagerUtil::SetupKeyEvent003()
     CHKPP(keyEvent);
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     KeyEvent::KeyItem kitDown;
-    kitDown.SetKeyCode(KeyEvent::KEYCODE_HOME);
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_A);
     kitDown.SetDownTime(downTime);
     kitDown.SetPressed(true);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    keyEvent->SetKeyCode(KeyEvent::KEYCODE_HOME);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
     keyEvent->AddPressedKeyItems(kitDown);
 
     return keyEvent;
