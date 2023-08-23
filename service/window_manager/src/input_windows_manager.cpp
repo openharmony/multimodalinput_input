@@ -1254,8 +1254,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     pointerItem.SetToolWindowY(pointerItem.GetToolDisplayY() + physicDisplayInfo->y - touchWindow->area.y);
     pointerItem.SetTargetWindowId(touchWindow->id);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
-    bool checkExtraData = extraData_.appended && extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-        extraData_.pointerId == pointerId;
+    bool checkExtraData = extraData_.appended && ((extraData_.sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+        extraData_.pointerId == pointerId) || pointerItem.GetToolType() == PointerEvent::TOOL_TYPE_PEN);
     if (checkExtraData) {
         pointerEvent->SetBuffer(extraData_.buffer);
         UpdatePointerAction(pointerEvent);
