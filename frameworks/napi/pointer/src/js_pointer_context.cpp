@@ -510,7 +510,7 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
     }
     int32_t pointerStyle = 0;
     CHKRP(napi_get_value_int32(env, argv[1], &pointerStyle), GET_VALUE_INT32);
-    if (pointerStyle < DEFAULT || pointerStyle > CURSOR_CIRCLE) {
+    if (pointerStyle < DEFAULT || pointerStyle > RUNNING) {
         MMI_HILOGE("Undefined pointer style");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Pointer style does not exist");
         return nullptr;
