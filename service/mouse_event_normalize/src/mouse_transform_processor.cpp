@@ -43,6 +43,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Mouse
 constexpr int32_t MIN_SPEED = 1;
 constexpr int32_t MAX_SPEED = 11;
 constexpr int32_t DEFAULT_SPEED = 5;
+constexpr int32_t DEFAULT_TOUCHPAD_SPEED = 9;
 constexpr int32_t DEFAULT_ROWS = 3;
 constexpr int32_t MIN_ROWS = 1;
 constexpr int32_t MAX_ROWS = 100;
@@ -661,10 +662,10 @@ int32_t MouseTransformProcessor::GetPointerSpeed()
 
 int32_t MouseTransformProcessor::GetTouchpadSpeed(void)
 {
-    int32_t speed = DEFAULT_SPEED;
+    int32_t speed = DEFAULT_TOUCHPAD_SPEED;
     if (GetTouchpadPointerSpeed(speed) != RET_OK) {
-        // if failed to get touchpad from database, return DEFAULT_SPEED
-        return DEFAULT_SPEED;
+        // if failed to get touchpad from database, return DEFAULT_TOUCHPAD_SPEED
+        return DEFAULT_TOUCHPAD_SPEED;
     }
 
     return speed;
@@ -937,7 +938,7 @@ int32_t MouseTransformProcessor::GetTouchpadPointerSpeed(int32_t &speed)
     }
 
     if (speed == 0) {
-        speed = DEFAULT_SPEED;
+        speed = DEFAULT_TOUCHPAD_SPEED;
     }
 
     // if speed < MIN_SPEED | speed > MAX_SPEED, touchpad would be out of action
