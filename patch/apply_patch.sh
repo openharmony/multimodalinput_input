@@ -54,6 +54,14 @@ mkdir -p $out_dir
 echo "cp $source_dir/* to $out_dir/"
 cp -fra $source_dir/* $out_dir
 
+if [ -e $out_dir/install.sh ]; then
+    cd $out_dir
+    tar xvf mtdev-1.1.6.tar.bz2
+    cp -rf mtdev-1.1.6/* ./
+    ./configure
+    exit 0
+fi
+
 ls -l $path_file_dir/*.diff
 if [ $? -ne 0 ]; then
     echo "WARNING: no patch."
