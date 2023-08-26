@@ -230,6 +230,12 @@ int32_t MultimodalInputConnectManager::SetPointerStyle(int32_t windowId, Pointer
     return multimodalInputConnectService_->SetPointerStyle(windowId, pointerStyle);
 }
 
+int32_t MultimodalInputConnectManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->ClearWindowPointerStyle(pid, windowId);
+}
+
 int32_t MultimodalInputConnectManager::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
 {
     CHKPR(multimodalInputConnectService_, RET_ERR);

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <unistd.h>
 #include "multimodal_input_connect_proxy.h"
 #include "pixel_map.h"
 #include "message_option.h"
@@ -21,6 +22,7 @@
 #include "multimodal_input_connect_define.h"
 #include "string_ex.h"
 #include "multimodalinput_ipc_interface_code.h"
+#include "input_scene_board_judgement.h"
 
 namespace OHOS {
 namespace MMI {
@@ -600,6 +602,31 @@ int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, PointerSt
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_STYLE),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return RET_ERR;
+    }
+
+    WRITEINT32(data, pid, RET_ERR);
+    WRITEINT32(data, windowId, RET_ERR);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::CLEAN_WIDNOW_STYLE),
         data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request fail, ret:%{public}d", ret);

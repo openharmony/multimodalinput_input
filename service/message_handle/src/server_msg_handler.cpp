@@ -47,9 +47,11 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     udsServer_ = &udsServer;
     MsgCallback funs[] = {
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
+        {MmiMessageId::WINDOW_AREA_INFO, MsgCallbackBind2(&ServerMsgHandler::OnWindowAreaInfo, this)},
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
         {MmiMessageId::SCINFO_CONFIG, MsgCallbackBind2(&ServerMsgHandler::OnEnhanceConfig, this)},
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+
     };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {
@@ -232,6 +234,23 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
         return RET_ERR;
     }
     WinMgr->UpdateDisplayInfo(displayGroupInfo);
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnWindowAreaInfo(SessionPtr sess, NetPacket &pkt)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    int32_t temp;
+    int32_t pid;
+    int32_t windowId;
+    pkt >> temp >> pid >> windowId;
+    WindowArea area = static_cast<WindowArea>(temp);
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read display info failed");
+        return RET_ERR;
+    }
+    WinMgr->SetWindowPointerStyle(area, pid, windowId);
     return RET_OK;
 }
 

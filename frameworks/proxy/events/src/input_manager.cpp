@@ -431,5 +431,18 @@ int32_t InputManager::GetTouchpadRightClickType(int32_t &type)
 {
     return InputMgrImpl.GetTouchpadRightClickType(type);
 }
+void InputManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
+{
+    InputMgrImpl.SetWindowPointerStyle(area, pid, windowId);
+}
+void InputManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
+{
+    InputMgrImpl.ClearWindowPointerStyle(pid, windowId);
+}
+void InputManager::SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker)
+{
+    CHKPV(windowChecker);
+    InputMgrImpl.SetWindowCheckerHandler(windowChecker);
+}
 } // namespace MMI
 } // namespace OHOS

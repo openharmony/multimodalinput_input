@@ -47,7 +47,7 @@ public:
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
     ~PointerDrawingManager() override = default;
     void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
-        const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT) override;
+        const PointerStyle pointerStyle) override;
     void UpdateDisplayInfo(const DisplayInfo& displayInfo) override;
     void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo) override;
     void OnWindowInfo(const WinInfo &info) override;
@@ -58,10 +58,11 @@ public:
     void DeletePointerVisible(int32_t pid) override;
     int32_t SetPointerVisible(int32_t pid, bool visible) override;
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle) override;
+    int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) override;
     int32_t SetPointerSize(int32_t size) override;
     int32_t GetPointerSize() override;
-    void DrawPointerStyle() override;
+    void DrawPointerStyle(const PointerStyle& pointerStyle) override;
     bool IsPointerVisible() override;
     void SetPointerLocation(int32_t pid, int32_t x, int32_t y) override;
     void AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
@@ -69,6 +70,7 @@ public:
     bool GetMouseDisplayState() const override;
     int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
     int32_t SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
+    PointerStyle GetLastMouseStyle() override;
 private:
     void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
     void DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle);

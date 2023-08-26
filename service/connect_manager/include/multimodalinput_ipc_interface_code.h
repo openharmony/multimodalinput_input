@@ -88,6 +88,7 @@ enum class MultimodalinputConnectInterfaceCode {
     GET_POINTER_SIZE = 66,
     SET_POINTER_COLOR = 67,
     GET_POINTER_COLOR = 68,
+    CLEAN_WIDNOW_STYLE = 69,
 };
 
 enum class MultimodalinputEventInterfaceCode {

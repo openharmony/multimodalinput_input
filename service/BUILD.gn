@@ -200,6 +200,7 @@ ohos_shared_library("libmmi-server") {
     "preferences:native_preferences",
     "safwk:system_ability_fwk",
     "window_manager:libwm",
+    "window_manager:libwsutils",
   ]
 
   part_name = "input"
