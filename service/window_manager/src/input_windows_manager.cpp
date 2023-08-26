@@ -381,7 +381,7 @@ void InputWindowsManager::GetPointerStyleByArea(WindowArea area, int32_t pid, in
             pointerStyle.id = MOUSE_ICON::NORTH_WEST;
             break;
         case WindowArea::FOCUS_ON_INNER:
-            int32_t ret = GetPointerStyle(pid, windowId, pointerStyle);
+            int32_t ret = GetPointerStyle(pid, winId, pointerStyle);
             CHKNOKRV(ret, "Get pointer style failed, pointerStyleInfo is nullptr");
             break;
     }
