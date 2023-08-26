@@ -346,6 +346,7 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
 {
     CALL_DEBUG_ENTER;
     PointerStyle pointerStyle;
+
     switch(area) {
         case WindowArea::ENTER:
         case WindowArea::EXIT:
@@ -410,7 +411,6 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
 #ifdef OHOS_BUILD_ENABLE_POINTER
 void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
 {
-    CALL_DEBUG_ENTER;
     CALL_INFO_TRACE;
     CHKPV(udsServer_);
     auto pointerEvent = PointerEvent::Create();
@@ -419,8 +419,7 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     MouseLocation mouseLocation = GetMouseInfo();
     lastLogicX_ = mouseLocation.physicalX;
     lastLogicY_ = mouseLocation.physicalY;
-    if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW || Rosen::SceneBoardJudgement::IsSceneBoardEnabled())
-    {
+    if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW || Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         auto touchWindow = GetWindowInfo(lastLogicX_, lastLogicY_);
         if (!touchWindow) {
             MMI_HILOGE("TouchWindow is nullptr");
@@ -458,7 +457,6 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     } else {
         pointerEvent->ClearBuffer();
     }
-    MMI_HILOGD("last window id is set to %{public}d", lastWindowInfo_.pid);
     auto fd = udsServer_->GetClientFd(lastWindowInfo_.pid);
     auto sess = udsServer_->GetSession(fd);
     if (sess == nullptr) {
@@ -850,15 +848,14 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
     auto sceneIter = pointerStyle_.find(scenePid);
     if (sceneIter == pointerStyle_.end() || sceneIter->second.find(sceneWinId) == sceneIter->second.end()) {
         pointerStyle_[scenePid] = {};
-        pointerStyle_[scenePid][sceneWinId] = pointerStyle;
-        MMI_HILOGE("SceneBoardPid %{public}d or windowId:%{public}d  does not exist on pointerStyle_", scenePid, sceneWinId);
-    } else {
-         pointerStyle_[scenePid][sceneWinId] = pointerStyle;
+        MMI_HILOGE("SceneBoardPid %{public}d or windowId:%{public}d  does not exist on pointerStyle_",
+            scenePid, sceneWinId);
     }
-
-    MMI_HILOGD("Sceneboard pid:%{public}d windowId:%{public}d is set to %{public}d", scenePid, sceneWinId, pointerStyle.id);
+    pointerStyle_[scenePid][sceneWinId] = pointerStyle;
+    MMI_HILOGD("Sceneboard pid:%{public}d windowId:%{public}d is set to %{public}d",
+        scenePid, sceneWinId, pointerStyle.id);
     auto it = pointerStyle_.find(pid);
-    // add new pid for mmi
+
     if (it == pointerStyle_.end()) {
         MMI_HILOGE("Pid:%{public}d does not exist in mmi,", pid);
         std::map<int32_t, PointerStyle> tmpPointerStyle = {{windowId, pointerStyle}};
@@ -866,14 +863,13 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
         if (!res.second) return RET_ERR;
         return RET_OK;
     }
-    // add new window for pid
+
     auto iter = it->second.find(windowId);
     if (iter == it->second.end()) {
         auto res = it->second.insert(std::make_pair(windowId, pointerStyle));
         if (!res.second) return RET_ERR;
         return RET_OK;
     }
-    // update the style for <pid, window>
     iter->second = pointerStyle;
     return RET_OK;
 }
@@ -1223,7 +1219,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
         }
         pointerStyle = IPointerDrawingManager::GetInstance()->GetLastMouseStyle();
-        MMI_HILOGD("showing the lastMouseStyle %{public}d, lastPointerStyle %{public}d", pointerStyle.id, lastPointerStyle_.id);
+        MMI_HILOGD("showing the lastMouseStyle %{public}d, lastPointerStyle %{public}d",
+            pointerStyle.id, lastPointerStyle_.id);
     } else {
         int32_t ret = GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
         if (ret != RET_OK) {
@@ -1239,7 +1236,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     }
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
-    pointerItem.GetDisplayY(), pointerStyle);
+        pointerItem.GetDisplayY(), pointerStyle);
 
     if (captureModeInfo_.isCaptureMode && (touchWindow->id != captureModeInfo_.windowId)) {
         captureModeInfo_.isCaptureMode = false;
