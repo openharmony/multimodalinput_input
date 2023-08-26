@@ -32,7 +32,7 @@ public:
 
     static std::shared_ptr<IPointerDrawingManager> GetInstance();
     virtual void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
-        const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT) {}
+        const PointerStyle pointerStyle) {}
     virtual void UpdateDisplayInfo(const DisplayInfo& displayInfo) {}
     virtual void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo) {}
     virtual void OnWindowInfo(const WinInfo &info) {}
@@ -57,11 +57,15 @@ public:
     {
         return 0;
     }
+    virtual int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId)
+    {
+        return 0;
+    }
     virtual int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle)
     {
         return 0;
     }
-    virtual void DrawPointerStyle() {}
+    virtual void DrawPointerStyle(const PointerStyle& pointerStyle) {}
     virtual bool IsPointerVisible()
     {
         return false;
@@ -87,6 +91,10 @@ public:
     virtual int32_t GetPointerSize()
     {
         return 0;
+    }
+    virtual PointerStyle GetLastMouseStyle()
+    {
+        return {};
     }
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
