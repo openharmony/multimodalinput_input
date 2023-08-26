@@ -295,8 +295,8 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
 #ifdef OHOS_BUILD_ENABLE_POINTER
     InitPointerStyle();
 #endif // OHOS_BUILD_ENABLE_POINTER
-    if (!displayGroupInfo.displaysInfo.empty()) {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    if (!displayGroupInfo.displaysInfo.empty()) {
         IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
         if (InputDevMgr->HasPointerDevice()) {
             MouseLocation mouseLocation = GetMouseInfo();
@@ -316,38 +316,26 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
             } else {
                 windowInfo = SelectWindowInfo(logicX, logicY, lastPointerEvent_);
             }
-            if (!windowInfo) {
-                MMI_HILOGE("The windowInfo is nullptr");
-                return;
-            }
+            CHKFRV(windowInfo, "The windowInfo is nullptr");
             int32_t windowPid = GetWindowPid(windowInfo->id);
             WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
             IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
             PointerStyle pointerStyle;
             int32_t ret = WinMgr->GetPointerStyle(info.windowPid, info.windowPid, pointerStyle);
-            if (ret != RET_OK) {
-                MMI_HILOGE("Draw pointer style failed, pointerStyleInfo is nullptr");
-                return;
-            }
+            CHKNOKRV(ret, "Draw pointer style failed, pointerStyleInfo is nullptr");
             IPointerDrawingManager::GetInstance()->DrawPointerStyle(pointerStyle);
         }
-#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     }
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (InputDevMgr->HasPointerDevice()) {
-#ifdef OHOS_BUILD_ENABLE_POINTER
         NotifyPointerToWindow();
-#endif // OHOS_BUILD_ENABLE_POINTER
     }
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
-void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
+void InputWindowsManager::GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle)
 {
     CALL_DEBUG_ENTER;
-    PointerStyle pointerStyle;
-
-    switch(area) {
+    switch (area) {
         case WindowArea::ENTER:
         case WindowArea::EXIT:
             MMI_HILOGD("SetPointerStyle for Enter or exit! No need to deal with it now");
@@ -394,12 +382,16 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
             break;
         case WindowArea::FOCUS_ON_INNER:
             int32_t ret = GetPointerStyle(pid, windowId, pointerStyle);
-            if (ret != RET_OK) {
-                MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
-                return;
-            }
+            CHKNOKRV(ret, "Get pointer style failed, pointerStyleInfo is nullptr");
             break;
     }
+}
+
+void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+    PointerStyle pointerStyle;
+    GetPointerStyleByArea(area, pid, windowId, pointerStyle);
     if (lastPointerStyle_.id == pointerStyle.id) {
         MMI_HILOGE("Tha lastPointerStyle is  totally equal with this, no need to change it");
         return;
@@ -419,7 +411,8 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     MouseLocation mouseLocation = GetMouseInfo();
     lastLogicX_ = mouseLocation.physicalX;
     lastLogicY_ = mouseLocation.physicalY;
-    if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW || Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+    if (pointerAction == PointerEvent::POINTER_ACTION_ENTER_WINDOW ||
+        Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         auto touchWindow = GetWindowInfo(lastLogicX_, lastLogicY_);
         if (!touchWindow) {
             MMI_HILOGE("TouchWindow is nullptr");
@@ -459,10 +452,7 @@ void InputWindowsManager::SendPointerEvent(int32_t pointerAction)
     }
     auto fd = udsServer_->GetClientFd(lastWindowInfo_.pid);
     auto sess = udsServer_->GetSession(fd);
-    if (sess == nullptr) {
-        MMI_HILOGI("The last window has disappeared");
-        return;
-    }
+    CHKPRV(sess, "The last window has disappeared");
     NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
     InputEventDataTransformation::Marshalling(pointerEvent, pkt);
     if (!sess->SendMsg(pkt)) {
@@ -855,7 +845,6 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
     MMI_HILOGD("Sceneboard pid:%{public}d windowId:%{public}d is set to %{public}d",
         scenePid, sceneWinId, pointerStyle.id);
     auto it = pointerStyle_.find(pid);
-
     if (it == pointerStyle_.end()) {
         MMI_HILOGE("Pid:%{public}d does not exist in mmi,", pid);
         std::map<int32_t, PointerStyle> tmpPointerStyle = {{windowId, pointerStyle}};
@@ -863,7 +852,6 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
         if (!res.second) return RET_ERR;
         return RET_OK;
     }
-
     auto iter = it->second.find(windowId);
     if (iter == it->second.end()) {
         auto res = it->second.insert(std::make_pair(windowId, pointerStyle));
@@ -907,7 +895,7 @@ int32_t InputWindowsManager::ClearWindowPointerStyle(int32_t pid, int32_t window
         MMI_HILOGE("windowId %{public}d does not exist in pid%{public}d", windowId, pid);
         return RET_OK;
     }
-    // Task1：补充判断现在的windowId是否处于显示之中，避免误调
+
     it->second.erase(windowIt);
     return RET_OK;
 }
@@ -915,7 +903,6 @@ int32_t InputWindowsManager::ClearWindowPointerStyle(int32_t pid, int32_t window
 int32_t InputWindowsManager::GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) const
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("lipengyuan, getPointerStyle, pid: %{public}d, windowId: %{public}d", pid, windowId);
     if (windowId == GLOBAL_WINDOW_ID) {
         MMI_HILOGD("Getting global pointer style");
         pointerStyle.id = globalStyle_.id;
@@ -1211,7 +1198,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             return RET_OK;
         }
     }
-    MMI_HILOGD("yuanxinying pointer visible %{public}d", IPointerDrawingManager::GetInstance()->IsPointerVisible());
     PointerStyle pointerStyle;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
