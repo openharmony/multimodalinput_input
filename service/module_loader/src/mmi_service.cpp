@@ -678,6 +678,20 @@ int32_t MMIService::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle)
     return RET_OK;
 }
 
+int32_t MMIService::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::ClearWindowPointerStyle,
+        IPointerDrawingManager::GetInstance(), pid, windowId));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer style failed,return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
 int32_t MMIService::GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle)
 {
     CALL_DEBUG_ENTER;

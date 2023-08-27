@@ -94,6 +94,7 @@ public:
     virtual int32_t GetFunctionKeyState(int32_t funckey, bool &state) = 0;
     virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) = 0;
     virtual int32_t SetPointerLocation(int32_t x, int32_t y) = 0;
+    virtual int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) = 0;
     virtual int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode) = 0;
     virtual int32_t GetWindowPid(int32_t windowId) = 0;
     virtual int32_t AppendExtraData(const ExtraData& extraData) = 0;

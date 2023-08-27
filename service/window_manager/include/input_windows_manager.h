@@ -52,6 +52,8 @@ public:
     int32_t UpdateTarget(std::shared_ptr<InputEvent> inputEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
+    int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     MouseLocation GetMouseInfo();
     void UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y);
@@ -89,6 +91,7 @@ public:
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void DispatchPointer(int32_t pointerAction);
     void SendPointerEvent(int32_t pointerAction);
+    PointerStyle GetLastPointerStyle() const;
 #endif // OHOS_BUILD_ENABLE_POINTER
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
     bool GetMouseIsCaptureMode() const;
@@ -104,12 +107,15 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
     void PrintDisplayInfo();
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    void GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle);
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent, const WindowInfo& touchWindow);
     void NotifyPointerToWindow();
     void OnSessionLost(SessionPtr session);
-    void UpdatePointerStyle();
+    void InitPointerStyle();
+    int32_t UpdatePoinerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle);
+    int32_t UpdateSceneBoardPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle);
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
     int32_t UpdateJoystickTarget(std::shared_ptr<PointerEvent> pointerEvent);
@@ -169,6 +175,7 @@ private:
     std::shared_ptr<PointerEvent> lastTouchEvent_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_POINTER
     DisplayGroupInfo displayGroupInfo_;
+    PointerStyle lastPointerStyle_ {.id = -1};
     MouseLocation mouseLocation_ = { -1, -1 };
     std::map<int32_t, WindowInfo> touchItemDownInfos_;
     InputDisplayBindHelper bindInfo_;

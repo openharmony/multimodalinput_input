@@ -16,6 +16,7 @@
 #include "input_manager_impl.h"
 
 #include <cinttypes>
+#include <unistd.h>
 
 #include "define_multimodal.h"
 #include "error_multimodal.h"
@@ -25,6 +26,7 @@
 #include "mmi_client.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "input_scene_board_judgement.h"
 #include "switch_event_input_subscribe_manager.h"
 
 namespace OHOS {
@@ -98,7 +100,13 @@ int32_t InputManagerImpl::SetDisplayBind(int32_t deviceId, int32_t displayId, st
 
 int32_t InputManagerImpl::GetWindowPid(int32_t windowId)
 {
+    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
+    if (MMISceneBoardJudgement::IsSceneBoardEnabled()) {
+        MMI_HILOGD("GetWindowPid successful! %{public}d", windowId);
+        CHKPR(winChecker_, -1);
+        return winChecker_->CheckWindowId(windowId);
+    }
     return MultimodalInputConnMgr->GetWindowPid(windowId);
 }
 
@@ -931,6 +939,15 @@ int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, const PointerStyle& 
         MMI_HILOGE("The param is invalid");
         return RET_ERR;
     }
+
+    if (MMISceneBoardJudgement::IsSceneBoardEnabled()) {
+        int32_t pid = getpid();
+        int32_t windowPid = GetWindowPid(windowId);
+        if (windowPid != pid) {
+            MMI_HILOGE("windowPid is %{public}d, while pid:%{public}d", windowPid, pid);
+            return RET_ERR;
+        }
+    }
     int32_t ret = MultimodalInputConnMgr->SetPointerStyle(windowId, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer style failed, ret:%{public}d", ret);
@@ -1501,6 +1518,63 @@ int32_t InputManagerImpl::GetTouchpadRightClickType(int32_t &type)
     MMI_HILOGW("Pointer device does not support");
     return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_POINTER
+}
+void InputManagerImpl::SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker)
+{
+    #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+        CALL_DEBUG_ENTER;
+        CHKPV(windowChecker);
+        MMI_HILOGD("winChecker_ is not null in  %{public}d", getpid());
+        winChecker_ = windowChecker;
+    #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    return;
+}
+void InputManagerImpl::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
+{
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Get mmi client is nullptr");
+        return;
+    }
+    SendWindowAreaInfo(area, pid, windowId);
+    return;
+#else
+    MMI_HILOGW("Pointer device or pointer drawing module does not support");
+    return;
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+}
+
+void InputManagerImpl::SendWindowAreaInfo(WindowArea area, int32_t pid, int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+    MMIClientPtr client = MMIEventHdl.GetMMIClient();
+    CHKPV(client);
+    NetPacket pkt(MmiMessageId::WINDOW_AREA_INFO);
+    pkt << area << pid << windowId;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write logical data failed");
+        return;
+    }
+    if (!client->SendMessage(pkt)) {
+        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+    }
+}
+
+void InputManagerImpl::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    if (!MMIEventHdl.InitClient()) {
+        MMI_HILOGE("Get mmi client is nullptr");
+        return;
+    }
+    int32_t ret = MultimodalInputConnMgr->ClearWindowPointerStyle(pid, windowId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("ClearWindowPointerStyle failed, ret:%{public}d", ret);
+        return;
+    }
 }
 } // namespace MMI
 } // namespace OHOS

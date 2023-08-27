@@ -36,6 +36,7 @@
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
 #include "i_anr_observer.h"
+#include "i_window_checker.h"
 #include "key_option.h"
 #include "pointer_event.h"
 #include "pointer_style.h"
@@ -53,6 +54,7 @@ public:
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t GetWindowPid(int32_t windowId);
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -68,6 +70,8 @@ public:
 
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
+    void ClearWindowPointerStyle(int32_t pid, int32_t windowId);
+    void SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
@@ -164,6 +168,7 @@ private:
     int32_t PackDisplayInfo(NetPacket &pkt);
     void PrintDisplayInfo();
     void SendDisplayInfo();
+    void SendWindowAreaInfo(WindowArea area, int32_t pid, int32_t windowId);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     int32_t PackEnhanceConfig(NetPacket &pkt);
     void SendEnhanceConfig();
@@ -183,7 +188,7 @@ private:
     std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t, uint32_t>> eventFilterServices_;
     std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
-
+    std::shared_ptr<IWindowChecker> winChecker_ { nullptr };
     DisplayGroupInfo displayGroupInfo_ {};
     std::mutex mtx_;
     std::mutex handleMtx_;
