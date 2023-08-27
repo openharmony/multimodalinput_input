@@ -29,6 +29,7 @@
 #include "i_input_device_listener.h"
 #include "i_input_event_consumer.h"
 #include "i_input_event_filter.h"
+#include "i_window_checker.h"
 #include "input_device.h"
 #include "key_option.h"
 #include "pointer_style.h"
@@ -671,6 +672,31 @@ public:
      * @since 9
      */
     int32_t GetTouchpadRightClickType(int32_t &type);
+     /**
+     * @brief SetWindowPointerStyle.
+     * @param area Indicates area.
+     * @param pid Indicates pid.
+     * @param windowId Indicates windowId.
+     * @return void.
+     * @since 9
+     */
+    void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
+
+    /**
+     * @brief ClearWindowPointerStyle.
+     * @param pid Indicates pid.
+     * @param windowId Indicates windowId.
+     * @return void.
+     * @since 9
+     */
+    void ClearWindowPointerStyle(int32_t pid, int32_t windowId);
+
+    /**
+     * @brief Sets a window input event consumer that runs on the specified thread.
+     * @param inputEventConsumer Indicates the consumer to set.
+     * @since 9
+     */
+    void SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker);
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**

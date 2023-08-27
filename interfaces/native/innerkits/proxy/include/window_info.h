@@ -277,6 +277,28 @@ struct DisplayBindInfo {
     int32_t displayId = -1;
     std::string displayName;
 };
+enum class WindowArea: int32_t {
+    ENTER = 0,
+    EXIT,
+    FOCUS_ON_INNER,
+    FOCUS_ON_TOP,
+    FOCUS_ON_BOTTOM,
+    FOCUS_ON_LEFT,
+    FOCUS_ON_RIGHT,
+    FOCUS_ON_TOP_LEFT,
+    FOCUS_ON_TOP_RIGHT,
+    FOCUS_ON_BOTTOM_LEFT,
+    FOCUS_ON_BOTTOM_RIGHT,
+    TOP_LEFT_LIMIT,
+    TOP_RIGHT_LIMIT,
+    TOP_LIMIT,
+    LEFT_LIMIT,
+    RIGHT_LIMIT,
+    BOTTOM_LEFT_LIMIT,
+    BOTTOM_LIMIT,
+    BOTTOM_RIGHT_LIMIT
+};
+
 using DisplayBindInfos = std::vector<DisplayBindInfo>;
 } // namespace MMI
 } // namespace OHOS

@@ -92,6 +92,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_STYLE):
             return StubSetPointerStyle(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::CLEAN_WIDNOW_STYLE):
+            return StubClearWindowPointerStyle(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_POINTER_STYLE):
             return StubGetPointerStyle(data, reply);
             break;
@@ -729,6 +732,21 @@ int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, Mes
         return ret;
     }
     MMI_HILOGD("Successfully set window:%{public}d, icon:%{public}d", windowId, pointerStyle.id);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubClearWindowPointerStyle(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid, windowId;
+    READINT32(data, pid, RET_ERR);
+    READINT32(data, windowId, RET_ERR);
+    int32_t ret = ClearWindowPointerStyle(pid, windowId);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetPointerStyle failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Successfully clean pointerStyle for window:%{public}d, pid:%{public}d", windowId, pid);
     return RET_OK;
 }
 

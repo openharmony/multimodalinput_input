@@ -201,6 +201,30 @@ inline constexpr int32_t INVALID_PID { -1 };
         } \
     } while (0)
 
+#define CHKPRV(cond, msg) \
+    do { \
+        if ((cond) == nullptr) { \
+            MMI_HILOGE("CHKPRV(%{public}s) is null, msg %{public}s", #cond, msg); \
+            return; \
+        } \
+    } while (0)
+
+#define CHKNOKRV(cond, msg) \
+    do { \
+        if ((cond) != RET_OK) { \
+            MMI_HILOGE("CHKNOKRV(%{public}s) is not RET_OK, hint is %{public}s", #cond, msg); \
+            return; \
+        } \
+    } while (0)
+
+#define CHKFRV(cond, msg) \
+    do { \
+        if (!(cond)) { \
+            MMI_HILOGE("CHKFRV(%{public}s) is null, hint is %{public}s", #cond, msg); \
+            return; \
+        } \
+    } while (0)
+
 #define CHKPP(cond) \
     do { \
         if ((cond) == nullptr) { \
