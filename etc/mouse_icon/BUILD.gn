@@ -387,6 +387,9 @@ group("input_mouse_icon") {
     ":drawing_pointer_image_West_East",
     ":drawing_pointer_image_Zoom_In",
     ":drawing_pointer_image_Zoom_Out",
+    ":drawing_pointer_image_Loading",
+    ":drawing_pointer_image_Running_Left",
+    ":drawing_pointer_image_Running_Right",
     ":multimodalinput.para.dac",
     ":multimodalinput_config_ability.json",
   ]
