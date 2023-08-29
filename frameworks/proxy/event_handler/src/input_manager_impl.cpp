@@ -943,7 +943,7 @@ int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, const PointerStyle& 
     if (MMISceneBoardJudgement::IsSceneBoardEnabled()) {
         int32_t pid = getpid();
         int32_t windowPid = GetWindowPid(windowId);
-        if (windowPid != pid) {
+        if (windowPid != pid && windowPid != GLOBAL_WINDOW_ID) {
             MMI_HILOGE("windowPid is %{public}d, while pid:%{public}d", windowPid, pid);
             return RET_ERR;
         }
