@@ -45,54 +45,12 @@ public:
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
     void Init(UDSServer& udsServer);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t UpdateTarget(std::shared_ptr<InputEvent> inputEvent);
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
-#ifdef OHOS_BUILD_ENABLE_POINTER
-    MouseLocation GetMouseInfo();
-    void UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y);
-#endif //OHOS_BUILD_ENABLE_POINTER
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-    void AdjustDisplayCoordinate(const DisplayInfo& displayInfo, int32_t& physicalX, int32_t& physicalY) const;
-#endif // OHOS_BUILD_ENABLE_TOUCH
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    bool UpdateDisplayId(int32_t& displayId);
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-    bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
-        EventTouch& touchInfo, int32_t& targetDisplayId);
-    void RotateTouchScreen(DisplayInfo info, LogicalCoordinate& coord) const;
-    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord, int32_t& displayId) const;
-    bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
-        int32_t& targetDisplayId, LogicalCoordinate& coord) const;
-#endif // OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_POINTER
-    const DisplayGroupInfo& GetDisplayGroupInfo();
-    int32_t SetHoverScrollState(bool state);
-    bool GetHoverScrollState() const;
-    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle);
-    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) const;
-#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
-    bool IsNeedRefreshLayer(int32_t windowId);
-#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-#endif // OHOS_BUILD_ENABLE_POINTER
     void Dump(int32_t fd, const std::vector<std::string> &args);
     int32_t GetWindowPid(int32_t windowId, const DisplayGroupInfo& displayGroupInfo) const;
     int32_t GetWindowPid(int32_t windowId) const;
-#ifdef OHOS_BUILD_ENABLE_POINTER
-    void DispatchPointer(int32_t pointerAction);
-    void SendPointerEvent(int32_t pointerAction);
-    PointerStyle GetLastPointerStyle() const;
-#endif // OHOS_BUILD_ENABLE_POINTER
     int32_t SetMouseCaptureMode(int32_t windowId, bool isCaptureMode);
     bool GetMouseIsCaptureMode() const;
     void DeviceStatusChanged(int32_t deviceId, const std::string &sysUid, const std::string devStatus);
@@ -101,11 +59,53 @@ public:
     int32_t AppendExtraData(const ExtraData& extraData);
     bool IsWindowVisible(int32_t pid);
     void ClearExtraData();
-private:
+
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent);
+    int32_t UpdateTarget(std::shared_ptr<InputEvent> inputEvent);
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    MouseLocation GetMouseInfo();
+    void UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y);
+    const DisplayGroupInfo& GetDisplayGroupInfo();
+    int32_t SetHoverScrollState(bool state);
+    bool GetHoverScrollState() const;
+    int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle);
+    int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) const;
+    void DispatchPointer(int32_t pointerAction);
+    void SendPointerEvent(int32_t pointerAction);
+    PointerStyle GetLastPointerStyle() const;
+#ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
+    bool IsNeedRefreshLayer(int32_t windowId);
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#endif //OHOS_BUILD_ENABLE_POINTER
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    void AdjustDisplayCoordinate(const DisplayInfo& displayInfo, int32_t& physicalX, int32_t& physicalY) const;
+    bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
+        EventTouch& touchInfo, int32_t& targetDisplayId);
+    void RotateTouchScreen(DisplayInfo info, LogicalCoordinate& coord) const;
+    bool TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord, int32_t& displayId) const;
+    bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
+        int32_t& targetDisplayId, LogicalCoordinate& coord) const;
+#endif // OHOS_BUILD_ENABLE_TOUCH
+
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const;
+    bool UpdateDisplayId(int32_t& displayId);
+    int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
+    const DisplayInfo* GetPhysicalDisplay(int32_t id) const;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+private:
+    int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     void PrintDisplayInfo();
+    void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
+    void CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo);
+    void UpdateDisplayIdAndName();
+    void UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent);
+    bool IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const;
+
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle);
     int32_t UpdateMouseTarget(std::shared_ptr<PointerEvent> pointerEvent);
@@ -116,46 +116,34 @@ private:
     void InitPointerStyle();
     int32_t UpdatePoinerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle);
     int32_t UpdateSceneBoardPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle);
-#endif // OHOS_BUILD_ENABLE_POINTER
-#ifdef OHOS_BUILD_ENABLE_JOYSTICK
-    int32_t UpdateJoystickTarget(std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_JOYSTICK
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-    int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
-    void PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
-        const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
-    void DispatchTouch(int32_t pointerAction);
-#endif // OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_POINTER
     int32_t UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent);
-#endif // OHOS_BUILD_ENABLE_POINTER
-#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-    const DisplayInfo* GetPhysicalDisplay(int32_t id) const;
-#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-    const DisplayInfo* FindPhysicalDisplayInfo(const std::string& uniq) const;
-#endif // OHOS_BUILD_ENABLE_TOUCH
-    int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
-#ifdef OHOS_BUILD_ENABLE_POINTER
     std::optional<WindowInfo> SelectWindowInfo(int32_t logicalX, int32_t logicalY,
         const std::shared_ptr<PointerEvent>& pointerEvent);
     std::optional<WindowInfo> GetWindowInfo(int32_t logicalX, int32_t logicalY);
-#endif // OHOS_BUILD_ENABLE_POINTER
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-    void GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
-        const DisplayInfo& info, EventTouch& touchInfo);
-#endif // OHOS_BUILD_ENABLE_TOUCH
-#ifdef OHOS_BUILD_ENABLE_POINTER
     bool IsInsideDisplay(const DisplayInfo& displayInfo, int32_t physicalX, int32_t physicalY);
     void FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& physicalX,
         int32_t& physicalY, int32_t& displayId);
     void InitMouseDownInfo();
 #endif // OHOS_BUILD_ENABLE_POINTER
-    void CheckFocusWindowChange(const DisplayGroupInfo &displayGroupInfo);
-    void CheckZorderWindowChange(const DisplayGroupInfo &displayGroupInfo);
-    void UpdateDisplayIdAndName();
-    void UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent);
-    bool IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const;
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    int32_t UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent);
+    void PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY,
+        const std::shared_ptr<PointerEvent> pointerEvent, const WindowInfo* touchWindow);
+    void DispatchTouch(int32_t pointerAction);
+    const DisplayInfo* FindPhysicalDisplayInfo(const std::string& uniq) const;
+    void GetPhysicalDisplayCoord(struct libinput_event_touch* touch,
+        const DisplayInfo& info, EventTouch& touchInfo);
+#endif // OHOS_BUILD_ENABLE_TOUCH
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
+    bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects) const;
+#endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_JOYSTICK
+    int32_t UpdateJoystickTarget(std::shared_ptr<PointerEvent> pointerEvent);
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
+
 private:
     UDSServer* udsServer_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_POINTER
