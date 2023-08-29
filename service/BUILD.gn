@@ -172,7 +172,8 @@ ohos_shared_library("libmmi-server") {
   }
 
   if (security_component_enable) {
-    external_deps += [ "security_component:libsecurity_component_enhance_sdk" ]
+    external_deps +=
+        [ "security_component_manager:libsecurity_component_enhance_sdk" ]
   }
 
   if (resource_schedule_service_enabled) {
