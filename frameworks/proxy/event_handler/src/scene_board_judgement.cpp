@@ -41,7 +41,7 @@ void MMISceneBoardJudgement::InitWithConfigFile(const char* filePath, bool& enab
 {
     std::ifstream configFile(filePath);
     std::string line;
-    if (!(configFile.is_open() && SafeGetLine(configFile, line) && line == "DISABLED")) {
+    if (configFile.is_open() && SafeGetLine(configFile, line) && line == "ENABLED") {
         enabled = true;
     }
     configFile.close();
