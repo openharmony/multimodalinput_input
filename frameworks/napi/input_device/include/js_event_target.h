@@ -40,6 +40,8 @@ public:
     static void EmitJsKeyboardType(sptr<JsUtil::CallbackInfo> cb, int32_t keyboardType);
     static void EmitJsKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int32_t delay);
     static void EmitJsKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int32_t rate);
+    static void EmitJsSetKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int32_t errCode);
+    static void EmitJsSetKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int32_t errCode);
     void AddListener(napi_env env, const std::string &type, napi_value handle);
     void RemoveListener(napi_env env, const std::string &type, napi_value handle);
     napi_value CreateCallbackInfo(napi_env, napi_value handle, sptr<JsUtil::CallbackInfo> cb);

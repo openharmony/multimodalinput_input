@@ -869,6 +869,34 @@ void JsEventTarget::CallDevInfoAsyncWork(uv_work_t *work, int32_t status)
     napi_close_handle_scope(cb->env, scope);
 }
 
+void JsEventTarget::EmitJsSetKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int32_t errCode)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    cb->data.keyboardRepeatDelay = 0;
+    cb->errCode = errCode;
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret;
+    if (cb->ref == nullptr) {
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayPromise, uv_qos_user_initiated);
+    } else {
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatDelayAsync, uv_qos_user_initiated);
+    }
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        JsUtil::DeletePtr<uv_work_t *>(work);
+    }
+}
+
 void JsEventTarget::EmitJsKeyboardRepeatDelay(sptr<JsUtil::CallbackInfo> cb, int32_t delay)
 {
     CALL_DEBUG_ENTER;
@@ -994,6 +1022,34 @@ void JsEventTarget::CallKeyboardRepeatDelayPromise(uv_work_t *work, int32_t stat
         CHKRV_SCOPE(cb->env, napi_resolve_deferred(cb->env, cb->deferred, callResult), RESOLVE_DEFERRED, scope);
     }
     napi_close_handle_scope(cb->env, scope);
+}
+
+void JsEventTarget::EmitJsSetKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int32_t errCode)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(cb);
+    CHKPV(cb->env);
+    cb->data.keyboardRepeatRate = 0;
+    cb->errCode = errCode;
+    uv_loop_s *loop = nullptr;
+    CHKRV(napi_get_uv_event_loop(cb->env, &loop), GET_UV_EVENT_LOOP);
+
+    uv_work_t *work = new (std::nothrow) uv_work_t;
+    CHKPV(work);
+    cb->IncStrongRef(nullptr);
+    work->data = cb.GetRefPtr();
+    int32_t ret;
+    if (cb->ref == nullptr) {
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRatePromise, uv_qos_user_initiated);
+    } else {
+        ret = uv_queue_work_with_qos(
+            loop, work, [](uv_work_t *work) {}, CallKeyboardRepeatRateAsync, uv_qos_user_initiated);
+    }
+    if (ret != 0) {
+        MMI_HILOGE("uv_queue_work_with_qos failed");
+        JsUtil::DeletePtr<uv_work_t *>(work);
+    }
 }
 
 void JsEventTarget::EmitJsKeyboardRepeatRate(sptr<JsUtil::CallbackInfo> cb, int32_t rate)
