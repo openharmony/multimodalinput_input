@@ -118,8 +118,8 @@ napi_value JsInputDeviceManager::SetKeyboardRepeatDelay(napi_env env, int32_t de
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
-    EmitJsKeyboardRepeatDelay(cb, 0);
     int32_t napiCode = InputManager::GetInstance()->SetKeyboardRepeatDelay(delay);
+    EmitJsSetKeyboardRepeatDelay(cb, napiCode);
     if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
     }
@@ -132,8 +132,8 @@ napi_value JsInputDeviceManager::SetKeyboardRepeatRate(napi_env env, int32_t rat
     sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
     CHKPP(cb);
     napi_value ret = CreateCallbackInfo(env, handle, cb);
-    EmitJsKeyboardRepeatRate(cb, 0);
     int32_t napiCode = InputManager::GetInstance()->SetKeyboardRepeatRate(rate);
+    EmitJsSetKeyboardRepeatRate(cb, napiCode);
     if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
     }
