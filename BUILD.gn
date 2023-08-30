@@ -114,7 +114,6 @@ group("mmi_debug_tools") {
     "patch/diff_libinput_mmi:libinput-tablet-mmi",
     "tools/event_inject:mmi-event-injection",
     "tools/vuinput:vuinput",
-    "//third_party/eudev:udevadm",
   ]
 }
 
