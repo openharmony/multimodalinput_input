@@ -18,6 +18,7 @@
 #include "input_manager_util.h"
 #include "multimodal_event_handler.h"
 #include "system_info.h"
+#include "input_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -51,6 +52,16 @@ public:
     static void SetUpTestCase();
     std::string GetEventDump();
 };
+
+class MMIWindowChecker : public MMI::IWindowChecker {
+public:
+    virtual int32_t CheckWindowId(int32_t windowId) const override;
+};
+
+int32_t MMIWindowChecker::CheckWindowId(int32_t windowId) const
+{
+    return getpid();
+}
 
 void InputManagerTest::SetUpTestCase()
 {
@@ -1061,6 +1072,30 @@ HWTEST_F(InputManagerTest, InputManagerTest_UnsubscribeSwitchEvent_001, TestSize
     CALL_TEST_DEBUG;
     int32_t subscriberId = INVAID_VALUE;
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UnsubscribeSwitchEvent(subscriberId));
+}
+
+/**
+ * @tc.name: InputManagerTest_ClearWindowPointerStyle_001
+ * @tc.desc: Verify invalid parameter.
+ * @tc.type: FUNC
+ * @tc.require:SR000GGQL4  AR000GJNGN
+ * @tc.author: yangguang
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_ClearWindowPointerStyle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto mmichecker = std::make_shared<MMIWindowChecker>();
+    InputManager::GetInstance()->SetWindowCheckerHandler(mmichecker);
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
+    uint32_t windowId = window->GetWindowId();
+    PointerStyle pointerStyle;
+    pointerStyle.id = MOUSE_ICON::CROSS;
+    int32_t ret = InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle);
+    InputManager::GetInstance()->ClearWindowPointerStyle(getpid(), windowId);
+    PointerStyle style;
+    ret = InputManager::GetInstance()->GetPointerStyle(windowId, style);
+    EXPECT_TRUE(ret == RET_OK);
 }
 }  // namespace MMI
 }  // namespace OHOS
