@@ -82,7 +82,7 @@ void WindowUtilsTest::CreateSmoothWindow()
             .width_ = IMAGE_WIDTH,
             .height_ = IMAGE_HEIGHT,
         },
-        .type = Rosen::WindowType::WINDOW_TYPE_KEYGUARD,
+        .type = Rosen::WindowType::WINDOW_TYPE_SCREENSHOT,
         .mode = Rosen::WindowMode::WINDOW_MODE_FULLSCREEN,
         .needAvoid = false,
         .parentLimit = false,
