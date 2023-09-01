@@ -40,9 +40,9 @@ public:
     int32_t GetMouseScrollRows(int32_t &rows) override;
     int32_t SetPointerSize(int32_t size) override;
     int32_t GetPointerSize(int32_t &size) override;
-    int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
+    int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
-    int32_t SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
+    int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     int32_t SetMousePrimaryButton(int32_t primaryButton) override;
     int32_t GetMousePrimaryButton(int32_t &primaryButton) override;
     int32_t SetHoverScrollState(bool state) override;
