@@ -53,7 +53,6 @@ constexpr float LOADING_CENTER_RATIO = 0.5f;
 constexpr float RUNNING_X_RATIO = 0.3f;
 constexpr float RUNNING_Y_RATIO = 0.675f;
 constexpr float INCREASE_RATIO = 1.22;
-constexpr int32_t LINUX_PID = 0;
 constexpr int32_t MIN_POINTER_COLOR = 0x000000;
 constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
 const std::string MOUSE_FILE_NAME = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
@@ -91,7 +90,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
             surfaceNode_->GetStagingProperties().GetBounds().w_);
         Rosen::RSTransaction::FlushImplicitTransaction();
         MMI_HILOGD("Pointer window move success");
-        if (lastMouseStyle_ == pointerStyle) {
+        if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_) {
             MMI_HILOGD("The lastpointerStyle is equal with pointerStyle,id %{public}d size:%{public}d",
                 pointerStyle.id, pointerStyle.size);
             return;
@@ -99,10 +98,12 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
         lastMouseStyle_ = pointerStyle;
         int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
         if (ret != RET_OK) {
+            mouseIconUpdate_ = false;
             MMI_HILOGE("Init layer failed");
             return;
         }
         UpdatePointerVisible();
+        mouseIconUpdate_ = false;
         MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
             displayId, physicalX, physicalY);
         return;
@@ -411,9 +412,13 @@ void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, c
     }
 }
 
-int32_t PointerDrawingManager::SetMouseIcon(int32_t windowId, void* pixelMap)
+int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
 {
     CALL_DEBUG_ENTER;
+    if (pid == -1) {
+        MMI_HILOGE("pid is invalid return -1");
+        return RET_ERR;
+    }
     if (pixelMap == nullptr) {
         MMI_HILOGE("pixelMap is null!");
         return RET_ERR;
@@ -424,20 +429,25 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t windowId, void* pixelMap)
     }
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
     userIcon_.reset(pixelMapPtr);
+    mouseIconUpdate_ = true;
     userIconHotSpotX_ = 0;
     userIconHotSpotY_ = 0;
     PointerStyle style;
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
-    int32_t ret = SetPointerStyle(LINUX_PID, windowId, style);
+    int32_t ret = SetPointerStyle(pid, windowId, style);
     if (ret == RET_ERR) {
         MMI_HILOGE("SetPointerStyle return RET_ERR here!");
     }
     return ret;
 }
 
-int32_t PointerDrawingManager::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
+int32_t PointerDrawingManager::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
 {
     CALL_DEBUG_ENTER;
+    if (pid == -1) {
+        MMI_HILOGE("pid is invalid return -1");
+        return RET_ERR;
+    }
     if (windowId < 0) {
         MMI_HILOGE("invalid windowId, %{public}d", windowId);
         return RET_ERR;
@@ -447,9 +457,9 @@ int32_t PointerDrawingManager::SetMouseHotSpot(int32_t windowId, int32_t hotSpot
         return RET_ERR;
     }
     PointerStyle pointerStyle;
-    int32_t ret = WinMgr->GetPointerStyle(pid_, windowId, pointerStyle);
+    int32_t ret = WinMgr->GetPointerStyle(pid, windowId, pointerStyle);
     if (ret != RET_OK || pointerStyle.id != MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
-        MMI_HILOGE("Get pointer style failed, pid %{publid}d, pointerStyle %{public}d", pid_, pointerStyle.id);
+        MMI_HILOGE("Get pointer style failed, pid %{publid}d, pointerStyle %{public}d", pid, pointerStyle.id);
         return RET_ERR;
     }
     userIconHotSpotX_ = hotSpotX;

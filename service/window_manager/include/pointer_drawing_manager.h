@@ -68,8 +68,8 @@ public:
     void AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void SetMouseDisplayState(bool state) override;
     bool GetMouseDisplayState() const override;
-    int32_t SetMouseIcon(int32_t windowId, void* pixelMap) override;
-    int32_t SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
+    int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override;
+    int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     PointerStyle GetLastMouseStyle() override;
 private:
     void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
@@ -106,6 +106,7 @@ private:
     std::map<MOUSE_ICON, IconStyle> mouseIcons_;
     std::list<PidInfo> pidInfos_;
     bool mouseDisplayState_ { false };
+    bool mouseIconUpdate_ { false };
     std::unique_ptr<OHOS::Media::PixelMap> userIcon_ { nullptr };
     uint64_t screenId_ { 0 };
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_;
