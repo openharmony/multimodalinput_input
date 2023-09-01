@@ -1203,12 +1203,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseIcon_003, Test
     PointerStyle pointerStyle;
     pointerStyle.id = MOUSE_ICON::DEFAULT;
     int32_t ret = InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle);
-    if ((Rosen::SceneBoardJudgement::IsSceneBoardEnabled())) {
-        ASSERT_TRUE(ret != RET_OK);
-        return;
-    } else {
-        ASSERT_TRUE(ret == RET_OK);
-    }
+    ASSERT_TRUE(ret == RET_OK);
     const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
     ASSERT_TRUE(pixelMap != nullptr);
