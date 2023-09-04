@@ -693,7 +693,12 @@ int32_t InputManagerImpl::SetMouseIcon(int32_t windowId, void* pixelMap)
 {
     CALL_DEBUG_ENTER;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = MultimodalInputConnMgr->SetMouseIcon(windowId, pixelMap);
+    int32_t winPid = GetWindowPid(windowId);
+    if (winPid == -1) {
+        MMI_HILOGE("winPid is invalid return -1");
+        return RET_ERR;
+    }
+    int32_t ret = MultimodalInputConnMgr->SetMouseIcon(winPid, windowId, pixelMap);
     if (ret != RET_OK) {
         MMI_HILOGE("Set the number of mouse scrolling rows failed, ret:%{public}d", ret);
     }
@@ -708,7 +713,12 @@ int32_t InputManagerImpl::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, in
 {
     CALL_DEBUG_ENTER;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = MultimodalInputConnMgr->SetMouseHotSpot(windowId, hotSpotX, hotSpotY);
+    int32_t winPid = GetWindowPid(windowId);
+    if (winPid == -1) {
+        MMI_HILOGE("winPid is invalid return -1");
+        return RET_ERR;
+    }
+    int32_t ret = MultimodalInputConnMgr->SetMouseHotSpot(winPid, windowId, hotSpotX, hotSpotY);
     if (ret != RET_OK) {
         MMI_HILOGE("Set mouse hot spot failed, ret:%{public}d", ret);
     }
