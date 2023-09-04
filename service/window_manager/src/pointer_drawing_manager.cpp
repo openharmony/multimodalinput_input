@@ -48,6 +48,8 @@ constexpr int32_t MIN_POINTER_SIZE = 1;
 constexpr int32_t MAX_POINTER_SIZE = 7;
 constexpr int32_t DEFAULT_VALUE = -1;
 constexpr int32_t ANIMATION_DURATION = 500;
+constexpr int32_t DEFAULT_POINTER_STYLE = 0;
+constexpr int32_t CURSOR_CIRCLE_STYLE = 41;
 constexpr float ROTATION_ANGLE = 360.f;
 constexpr float LOADING_CENTER_RATIO = 0.5f;
 constexpr float RUNNING_X_RATIO = 0.3f;
@@ -110,6 +112,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     }
     CreatePointerWindow(displayId, physicalX, physicalY);
     CHKPV(surfaceNode_);
+    UpdateMouseStyle();
     int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
     if (ret != RET_OK) {
         MMI_HILOGE("Init layer failed");
@@ -118,6 +121,25 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     UpdatePointerVisible();
     MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
         displayId, physicalX, physicalY);
+}
+
+void PointerDrawingManager::UpdateMouseStyle()
+{
+    CALL_DEBUG_ENTER;
+    PointerStyle curPointerStyle;
+    int result = GetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
+    if (result != RET_OK) {
+        MMI_HILOGE("Get current pointer style failed");
+        return;
+    }
+    if (curPointerStyle.id == CURSOR_CIRCLE_STYLE) {
+        lastMouseStyle_.id = curPointerStyle.id;
+        int ret = SetPointerStyle(pid_, GLOBAL_WINDOW_ID, curPointerStyle);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Set pointer style failed");
+        }
+        return;
+    }
 }
 
 int32_t PointerDrawingManager::InitLayer(const MOUSE_ICON mouseStyle)
@@ -833,9 +855,42 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
     return RET_OK;
 }
 
+int32_t PointerDrawingManager::SetPointerStylePreference(PointerStyle pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(MOUSE_FILE_NAME, errCode);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
+        return RET_ERR;
+    }
+    std::string name = "pointerStyle";
+    int32_t ret = pref->PutInt(name, pointerStyle.id);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Put style is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    ret = pref->FlushSync();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("Set pointer style successfully, style:%{public}d", pointerStyle.id);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(MOUSE_FILE_NAME);
+    return RET_OK;
+}
+
 int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
+    if (windowId == GLOBAL_WINDOW_ID) {
+        int32_t ret = SetPointerStylePreference(pointerStyle);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Set style preference is failed, ret:%{public}d", ret);
+            return RET_ERR;
+        }
+    }
     auto it = mouseIcons_.find(MOUSE_ICON(pointerStyle.id));
     if (it == mouseIcons_.end()) {
         MMI_HILOGE("The param pointerStyle is invalid");
@@ -871,6 +926,24 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
 int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle)
 {
     CALL_DEBUG_ENTER;
+    if (windowId == GLOBAL_WINDOW_ID) {
+        int32_t errCode = RET_OK;
+        std::shared_ptr<NativePreferences::Preferences> pref =
+            NativePreferences::PreferencesHelper::GetPreferences(MOUSE_FILE_NAME, errCode);
+        if (pref == nullptr) {
+            MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
+            return RET_ERR;
+        }
+        std::string name = "pointerStyle";
+        int32_t style = pref->GetInt(name, DEFAULT_POINTER_STYLE);
+        MMI_HILOGD("Get pointer style successfully, pointerStyle:%{public}d", style);
+        if (style == CURSOR_CIRCLE_STYLE) {
+            pointerStyle.id = style;
+            NativePreferences::PreferencesHelper::RemovePreferencesFromCache(MOUSE_FILE_NAME);
+            return RET_OK;
+        }
+        NativePreferences::PreferencesHelper::RemovePreferencesFromCache(MOUSE_FILE_NAME);
+    }
     int32_t ret = WinMgr->GetPointerStyle(pid, windowId, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");

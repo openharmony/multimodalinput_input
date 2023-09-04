@@ -87,6 +87,8 @@ private:
     void CheckMouseIconPath();
     void InitStyle();
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
+    int32_t SetPointerStylePreference(PointerStyle pointerStyle);
+    void UpdateMouseStyle();
 
 private:
     struct PidInfo {
