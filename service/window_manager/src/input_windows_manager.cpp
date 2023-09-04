@@ -871,11 +871,6 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
         return RET_OK;
     }
     MMI_HILOGD("start to get pid by window %{public}d", windowId);
-    // call to change window id
-    if (pid == 0) {
-        pid = GetWindowPid(windowId);
-        MMI_HILOGD("changing pid form 0 to %{public}d", pid);
-    }
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         return UpdatePoinerStyle(pid, windowId, pointerStyle);
     }

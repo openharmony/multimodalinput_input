@@ -46,8 +46,8 @@ public:
     int32_t GetMouseScrollRows(int32_t &rows);
     int32_t SetPointerSize(int32_t size);
     int32_t GetPointerSize(int32_t &size);
-    int32_t SetMouseIcon(int32_t windowId, void* pixelMap);
-    int32_t SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY);
+    int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap);
+    int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY);
     int32_t SetMousePrimaryButton(int32_t primaryButton);
     int32_t GetMousePrimaryButton(int32_t &primaryButton);
     int32_t SetHoverScrollState(bool state);
