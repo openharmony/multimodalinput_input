@@ -76,11 +76,11 @@ public:
     {
         return true;
     }
-    virtual int32_t SetMouseIcon(int32_t windowId, void* pixelMap)
+    virtual int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
     {
         return 0;
     }
-    virtual int32_t SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
+    virtual int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
     {
         return 0;
     }
