@@ -199,7 +199,7 @@ int32_t MultimodalInputConnectProxy::SetMouseScrollRows(int32_t rows)
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t windowId, void* pixelMap)
+int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
 {
     CALL_DEBUG_ENTER;
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
@@ -221,6 +221,7 @@ int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t windowId, void* pixelM
     for (uint32_t i = 0; i < size; i++) {
         WRITEUINT8(data, buff[i], ERR_INVALID_VALUE);
     }
+    WRITEINT32(data, pid, ERR_INVALID_VALUE);
     MMI_HILOGD("windowId being sent is %{public}d", windowId);
     WRITEINT32(data, windowId, ERR_INVALID_VALUE);
 
@@ -237,7 +238,7 @@ int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t windowId, void* pixelM
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
+int32_t MultimodalInputConnectProxy::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -245,6 +246,7 @@ int32_t MultimodalInputConnectProxy::SetMouseHotSpot(int32_t windowId, int32_t h
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
+    WRITEINT32(data, pid, ERR_INVALID_VALUE);
     WRITEINT32(data, windowId, ERR_INVALID_VALUE);
     WRITEINT32(data, hotSpotX, ERR_INVALID_VALUE);
     WRITEINT32(data, hotSpotY, ERR_INVALID_VALUE);

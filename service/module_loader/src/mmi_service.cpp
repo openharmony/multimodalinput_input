@@ -428,12 +428,12 @@ int32_t MMIService::SetMouseScrollRows(int32_t rows)
     return RET_OK;
 }
 
-int32_t MMIService::SetMouseIcon(int32_t windowId, void* pixelMap)
+int32_t MMIService::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
 {
     CALL_DEBUG_ENTER;
 #if defined OHOS_BUILD_ENABLE_POINTER
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetMouseIcon,
-        IPointerDrawingManager::GetInstance(), windowId, pixelMap)));
+        IPointerDrawingManager::GetInstance(), pid, windowId, pixelMap)));
     if (ret != RET_OK) {
         MMI_HILOGE("Set the mouse icon failed, return %{public}d", ret);
         return ret;
@@ -442,12 +442,12 @@ int32_t MMIService::SetMouseIcon(int32_t windowId, void* pixelMap)
     return RET_OK;
 }
 
-int32_t MMIService::SetMouseHotSpot(int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
+int32_t MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY)
 {
     CALL_DEBUG_ENTER;
 #if defined OHOS_BUILD_ENABLE_POINTER
-    int32_t ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetMouseHotSpot,
-        IPointerDrawingManager::GetInstance(), windowId, hotSpotX, hotSpotY)));
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetMouseHotSpot,
+        IPointerDrawingManager::GetInstance(), pid, windowId, hotSpotX, hotSpotY));
     if (ret != RET_OK) {
         MMI_HILOGE("Set the mouse hot spot failed, return %{public}d", ret);
         return ret;

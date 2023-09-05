@@ -61,7 +61,8 @@ ohos_shared_library("libmmi-util") {
   public_deps = [ "${mmi_path}/frameworks/proxy:libmmi-common" ]
 
   if (security_component_enable) {
-    external_deps += [ "security_component:libsecurity_component_enhance_sdk" ]
+    external_deps +=
+        [ "security_component_manager:libsecurity_component_enhance_sdk" ]
   }
   innerapi_tags = [ "platformsdk" ]
   part_name = "input"
