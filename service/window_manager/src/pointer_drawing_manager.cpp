@@ -25,13 +25,17 @@
 #include "input_windows_manager.h"
 #include "ipc_skeleton.h"
 #include "mmi_log.h"
-#include "pipeline/rs_recording_canvas.h"
 #include "preferences.h"
 #include "preferences_impl.h"
 #include "preferences_errno.h"
 #include "preferences_helper.h"
 #include "preferences_xml_utils.h"
 #include "util.h"
+#ifndef USE_ROSEN_DRAWING
+#include "pipeline/rs_recording_canvas.h"
+#else
+#include "recording/recording_canvas.h"
+#endif
 
 namespace OHOS {
 namespace MMI {
@@ -241,8 +245,16 @@ void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyl
         DecodeImageToPixelMap(mouseIcons_[MOUSE_ICON::RUNNING_RIGHT].iconPath);
     CHKPV(pixelmap);
     MMI_HILOGD("set mouseicon to OHOS system");
+    
+#ifndef USE_ROSEN_DRAWING
     auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->BeginRecording(imageWidth_, imageHeight_));
     canvas->DrawPixelMap(pixelmap, 0, 0, SkSamplingOptions(), nullptr);
+#else
+    auto canvas =
+        static_cast<Rosen::Drawing::RecordingCanvas *>(canvasNode_->BeginRecording(imageWidth_, imageHeight_));
+    canvas->DrawPixelMap(pixelmap, {}, {});
+#endif
+    
     canvasNode_->FinishRecording();
 
     Rosen::RSAnimationTimingProtocol protocol;
@@ -341,7 +353,12 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     surfaceNode_->SetFrameGravity(Rosen::Gravity::RESIZE_ASPECT_FILL);
     surfaceNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     surfaceNode_->SetBounds(physicalX, physicalY, IMAGE_WIDTH, IMAGE_HEIGHT);
+#ifndef USE_ROSEN_DRAWING
     surfaceNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
+#else
+    surfaceNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
+#endif
+    
     screenId_ = static_cast<uint64_t>(displayId);
     std::cout << "ScreenId: " << screenId_ << std::endl;
     surfaceNode_->AttachToDisplay(screenId_);
@@ -350,6 +367,11 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     canvasNode_ = Rosen::RSCanvasNode::Create();
     canvasNode_->SetBounds(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
     canvasNode_->SetFrame(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
+#ifndef USE_ROSEN_DRAWING
+    surfaceNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
+#else
+    surfaceNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
+#endif
     canvasNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
     canvasNode_->SetCornerRadius(1);
     canvasNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
