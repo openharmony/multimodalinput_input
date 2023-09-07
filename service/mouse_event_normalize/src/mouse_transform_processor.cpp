@@ -601,9 +601,8 @@ int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
-    std::string file = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
     std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(file, errno);
+        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errno);
     if (pref == nullptr) {
         MMI_HILOGE("pref is nullptr,  errno: %{public}d", errno);
         return RET_ERR;
@@ -615,25 +614,22 @@ int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
         MMI_HILOGE("flush sync is failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    NativePreferences::PreferencesHelper::
-        RemovePreferencesFromCache("/data/service/el1/public/multimodalinput/mouse_settings");
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
     return RET_OK;
 }
 
 int32_t MouseTransformProcessor::GetMousePrimaryButton()
 {
     CALL_DEBUG_ENTER;
-    std::string file = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
     std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(file, errno);
+        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errno);
     if (pref == nullptr) {
         MMI_HILOGE("pref is nullptr,  errno: %{public}d", errno);
         return RET_ERR;
     }
     std::string name = "primaryButton";
     int32_t primaryButton = pref->GetInt(name, 0);
-    NativePreferences::PreferencesHelper::
-        RemovePreferencesFromCache("/data/service/el1/public/multimodalinput/mouse_settings");
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
     return primaryButton;
 }
