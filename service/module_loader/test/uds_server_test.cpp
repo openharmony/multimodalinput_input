@@ -76,7 +76,7 @@ HWTEST_F(UDSServerTest, Multicast, TestSize.Level1)
     MmiMessageId msgId = MmiMessageId::INVALID;
     NetPacket pkt(msgId);
     std::vector<int32_t> fds;
-    fds.push_back(1);
+    ASSERT_NO_FATAL_FAILURE(fds.push_back(1));
 
     UDSServer serObj;
     serObj.Multicast(fds, pkt);
