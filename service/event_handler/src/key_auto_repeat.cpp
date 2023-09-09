@@ -67,7 +67,7 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
     return RET_OK;
 }
 
-void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
+void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
@@ -116,7 +116,7 @@ void KeyAutoRepeat::AddHandleTimer(int32_t timeout)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
         CHKPV(inputEventNormalizeHandler);
-        inputEventNormalizeHandler->HandleRepeatKeyEvent(this->keyEvent_);
+        inputEventNormalizeHandler->HandleKeyEvent(this->keyEvent_);
         this->keyEvent_->UpdateId();
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
         int32_t triggertime = KeyRepeat->GetIntervalTime(keyEvent_->GetDeviceId());
