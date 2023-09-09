@@ -152,25 +152,6 @@ int32_t EventNormalizeHandler::OnEventDeviceRemoved(libinput_event *event)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
 void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 {
-    CALL_DEBUG_ENTER;
-    if (nextHandler_ == nullptr) {
-        MMI_HILOGW("Keyboard device does not support");
-        return;
-    }
-    DfxHisysevent::GetDispStartTime();
-    CHKPV(keyEvent);
-    EventLogHelper::PrintEventData(keyEvent);
-    nextHandler_->HandleKeyEvent(keyEvent);
-    KeyRepeat->SelectAutoRepeat(keyEvent);
-    DfxHisysevent::CalcKeyDispTimes();
-    DfxHisysevent::ReportDispTimes();
-}
-#endif // OHOS_BUILD_ENABLE_KEYBOARD
-
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-void EventNormalizeHandler::HandleRepeatKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
-{
-    CALL_DEBUG_ENTER;
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Keyboard device does not support");
         return;
