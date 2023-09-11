@@ -75,34 +75,5 @@ int32_t GetNamedPropertyInt32(const napi_env& env, const napi_value& object, con
     }
     return RET_OK;
 }
-
-int32_t GetNamedPropertyInt64(const napi_env& env, const napi_value& object, const std::string& name, int64_t& ret)
-{
-    napi_value napiValue = {};
-    if (napi_get_named_property(env, object, name.c_str(), &napiValue) != napi_ok) {
-        MMI_HILOGE("Call napi_get_named_property failed");
-        return RET_ERR;
-    }
-    if (napiValue == nullptr) {
-        MMI_HILOGE("The value is null");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid KeyEvent");
-        return RET_ERR;
-    }
-    napi_valuetype tmpType = napi_undefined;
-    if (napi_typeof(env, napiValue, &tmpType) != napi_ok) {
-        MMI_HILOGE("Call napi_typeof failed");
-        return RET_ERR;
-    }
-    if (tmpType != napi_number) {
-        MMI_HILOGE("The value is not int64_t");
-        THROWERR_API9(env, COMMON_PARAMETER_ERROR, name.c_str(), "int");
-        return RET_ERR;
-    }
-    if (napi_get_value_int64(env, napiValue, &ret) != napi_ok) {
-        MMI_HILOGE("NapiElement get int64 value failed");
-        return RET_ERR;
-    }
-    return RET_OK;
-}
 } // namespace MMI
 } // namespace OHOS
