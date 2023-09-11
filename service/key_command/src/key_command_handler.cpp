@@ -1146,15 +1146,21 @@ bool KeyCommandHandler::HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> k
 
 bool KeyCommandHandler::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
 {
-    for (size_t i = keys_.size(); i > 0; --i) {
-        if (keys_[i-1].keyCode == sequenceKey.keyCode) {
-            if (keys_[i-1].keyAction == sequenceKey.keyAction) {
-                MMI_HILOGD("Is repeat key, keyCode:%{public}d", sequenceKey.keyCode);
+    for (auto iter = keys_.begin(); iter != keys_.end();) {
+        if ((*iter).keyCode == sequenceKey.keyCode) {
+            if ((*iter).keyAction == sequenceKey.keyAction) {
+                MMI_HILOGD("Is repeat key, keyCode: %{public}d", sequenceKey.keyCode);
                 return true;
+            } else if (sequenceKey.keyAction == KeyEvent::KEY_ACTION_UP) {
+                MMI_HILOGD("current sequenceKey event action: %{public}d", sequenceKey.keyAction);
+                keys_.erase(iter++);
+                return true;
+            } else {
+                MMI_HILOGD("sequenceKey event add to keys_");
+                return false;
             }
-            MMI_HILOGD("Is not repeat key");
-            return false;
         }
+        ++iter;
     }
     return false;
 }
@@ -1179,7 +1185,7 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
 
     bool isLaunchAbility = false;
     std::vector<Sequence> tempSeqs;
-    for (Sequence& item : filterSequences_) {
+    for (Sequence& item : sequences_) {
         if (HandleSequence(item, isLaunchAbility)) {
             tempSeqs.push_back(item);
         }
