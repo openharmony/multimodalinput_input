@@ -33,7 +33,7 @@ class KeyAutoRepeat final {
 public:
     DISALLOW_COPY_AND_MOVE(KeyAutoRepeat);
     int32_t AddDeviceConfig(struct libinput_device *device);
-    void SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent);
+    void SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent);
     void AddHandleTimer(int32_t timeout);
     void RemoveDeviceConfig(struct libinput_device *device);
     int32_t GetIntervalTime(int32_t deviceId);
