@@ -1148,7 +1148,7 @@ bool KeyCommandHandler::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
 {
     for (auto iter = keys_.begin(); iter != keys_.end();) {
         if ((*iter).keyCode == sequenceKey.keyCode) {
-            if (*iter.keyAction == sequenceKey.keyAction) {
+            if ((*iter).keyAction == sequenceKey.keyAction) {
                 MMI_HILOGD("Is repeat key, keyCode: %{public}d", sequenceKey.keyCode);
                 return true;
             } else if (sequenceKey.keyAction == KeyEvent::KEY_ACTION_UP) {
