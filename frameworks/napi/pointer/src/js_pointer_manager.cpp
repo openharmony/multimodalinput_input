@@ -165,7 +165,7 @@ napi_value JsPointerManager::SetPointerVisible(napi_env env, bool visible, napi_
     return promise;
 }
 
-napi_value JsPointerManager::SetPointerVisibleSync(napi_env env, int32_t visible)
+napi_value JsPointerManager::SetPointerVisibleSync(napi_env env, bool visible)
 {
     CALL_DEBUG_ENTER;
     InputManager::GetInstance()->SetPointerVisible(visible);
@@ -513,7 +513,7 @@ napi_value JsPointerManager::GetPointerStyle(napi_env env, int32_t windowid, nap
     return promise;
 }
 
-napi_value JsPointerManager::GetPointerStyleSync(napi_env env, int32_t windowid, napi_value handle)
+napi_value JsPointerManager::GetPointerStyleSync(napi_env env, int32_t windowid)
 {
     CALL_DEBUG_ENTER;
     PointerStyle pointerStyle;
