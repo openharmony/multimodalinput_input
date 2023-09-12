@@ -30,7 +30,7 @@ public:
     ~JsPointerContext() = default;
     static napi_value Export(napi_env env, napi_value exports);
     static napi_value SetPointerVisible(napi_env env, napi_callback_info info);
-    static napi_value SetPointerVisibleSync(napi_env env, napi_callback_info info)
+    static napi_value SetPointerVisibleSync(napi_env env, napi_callback_info info);
     static napi_value IsPointerVisible(napi_env env, napi_callback_info info);
     static napi_value IsPointerVisibleSync(napi_env env, napi_callback_info info);
     static napi_value SetPointerStyle(napi_env env, napi_callback_info info);
