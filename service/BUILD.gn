@@ -289,6 +289,7 @@ ohos_unittest("ut-mmi-service-out") {
     "hilog:libhilog",
     "image_framework:image_native",
     "window_manager:libwm",
+    "window_manager:libwsutils",
   ]
 }
 
