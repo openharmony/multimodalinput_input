@@ -517,7 +517,7 @@ napi_value JsPointerManager::GetPointerStyleSync(napi_env env, int32_t windowid,
 {
     CALL_DEBUG_ENTER;
     PointerStyle pointerStyle;
-    InputManager::GetInstance()->GetPointerStyleSync(windowid, pointerStyle);
+    InputManager::GetInstance()->GetPointerStyle(windowid, pointerStyle);
     napi_value result = nullptr;
     NAPI_CALL(env, napi_create_int32(env, pointerStyle.id, &result));
     return result;
