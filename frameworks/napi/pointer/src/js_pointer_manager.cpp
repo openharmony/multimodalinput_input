@@ -165,7 +165,7 @@ napi_value JsPointerManager::SetPointerVisible(napi_env env, bool visible, napi_
     return promise;
 }
 
-napi_value JsPointerManager::SetPointerVisibleSync(napi_env env, int32_t color)
+napi_value JsPointerManager::SetPointerVisibleSync(napi_env env, int32_t visible)
 {
     CALL_DEBUG_ENTER;
     InputManager::GetInstance()->SetPointerVisible(visible);
