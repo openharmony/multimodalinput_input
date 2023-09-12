@@ -67,7 +67,7 @@ int32_t KeyAutoRepeat::AddDeviceConfig(struct libinput_device *device)
     return RET_OK;
 }
 
-void KeyAutoRepeat::SelectAutoRepeat(std::shared_ptr<KeyEvent>& keyEvent)
+void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);

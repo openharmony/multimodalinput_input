@@ -32,6 +32,8 @@ enum class Action : int32_t {
     AXIS_BEGIN = 4,
     AXIS_UPDATE = 5,
     AXIS_END = 6,
+    ACTION_DOWN = 7,
+    ACTION_UP = 8,
 };
 
 enum class Button : int32_t {
@@ -49,6 +51,14 @@ enum class Axis : int32_t {
     SCROLL_VERTICAL = 0,
     SCROLL_HORIZONTAL = 1,
     PINCH = 2,
+};
+
+enum class ToolType : int32_t {
+    UNKNOWN = 0,
+    MOUSE = 1,
+    TOUCHSCREEN = 2,
+    TOUCHPAD = 3,
+    JOYSTICK = 4
 };
 } // namespace
 
@@ -74,6 +84,18 @@ napi_value JsMouseEvent::EnumClassConstructor(napi_env env, napi_callback_info i
 napi_value JsMouseEvent::Export(napi_env env, napi_value exports)
 {
     CALL_DEBUG_ENTER;
+    napi_property_descriptor toolTypeArr[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("UNKNOWN", GetNapiInt32(env, static_cast<int32_t>(ToolType::UNKNOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("MOUSE", GetNapiInt32(env, static_cast<int32_t>(ToolType::MOUSE))),
+        DECLARE_NAPI_STATIC_PROPERTY("TOUCHSCREEN", GetNapiInt32(env, static_cast<int32_t>(ToolType::TOUCHSCREEN))),
+        DECLARE_NAPI_STATIC_PROPERTY("TOUCHPAD", GetNapiInt32(env, static_cast<int32_t>(ToolType::TOUCHPAD))),
+        DECLARE_NAPI_STATIC_PROPERTY("JOYSTICK", GetNapiInt32(env, static_cast<int32_t>(ToolType::JOYSTICK))),
+    };
+    napi_value toolType = nullptr;
+    CHKRP(napi_define_class(env, "ToolType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(toolTypeArr) / sizeof(*toolTypeArr), toolTypeArr, &toolType), DEFINE_CLASS);
+    CHKRP(napi_set_named_property(env, exports, "ToolType", toolType), SET_NAMED_PROPERTY);
+
     napi_property_descriptor actionArr[] = {
         DECLARE_NAPI_STATIC_PROPERTY("CANCEL", GetNapiInt32(env, static_cast<int32_t>(Action::CANCEL))),
         DECLARE_NAPI_STATIC_PROPERTY("MOVE", GetNapiInt32(env, static_cast<int32_t>(Action::MOVE))),
@@ -82,6 +104,8 @@ napi_value JsMouseEvent::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_PROPERTY("AXIS_BEGIN", GetNapiInt32(env, static_cast<int32_t>(Action::AXIS_BEGIN))),
         DECLARE_NAPI_STATIC_PROPERTY("AXIS_UPDATE", GetNapiInt32(env, static_cast<int32_t>(Action::AXIS_UPDATE))),
         DECLARE_NAPI_STATIC_PROPERTY("AXIS_END", GetNapiInt32(env, static_cast<int32_t>(Action::AXIS_END))),
+        DECLARE_NAPI_STATIC_PROPERTY("ACTION_DOWN", GetNapiInt32(env, static_cast<int32_t>(Action::ACTION_DOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("ACTION_UP", GetNapiInt32(env, static_cast<int32_t>(Action::ACTION_UP))),
     };
     napi_value action = nullptr;
     CHKRP(napi_define_class(env, "Action", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
