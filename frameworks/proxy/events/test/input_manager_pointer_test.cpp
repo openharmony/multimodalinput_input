@@ -887,6 +887,8 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointSpeed_001, Tes
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(MOVE_MOUSE_OFFSET_ELEVEN, MOVE_MOUSE_OFFSET_TWELVE);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -916,6 +918,8 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointSpeed_002, Tes
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(MOVE_MOUSE_OFFSET_ELEVEN, MOVE_MOUSE_OFFSET_TWELVE);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -945,6 +949,8 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointSpeed_003, Tes
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(MOVE_MOUSE_OFFSET_ELEVEN, MOVE_MOUSE_OFFSET_TWELVE);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -974,6 +980,8 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointSpeed_004, Tes
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(MOVE_MOUSE_OFFSET_ELEVEN, MOVE_MOUSE_OFFSET_TWELVE);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1003,6 +1011,8 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointSpeed_005, Tes
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(MOVE_MOUSE_OFFSET_ELEVEN, MOVE_MOUSE_OFFSET_TWELVE);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**

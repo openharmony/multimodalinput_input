@@ -124,6 +124,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetPointerSpeed_006, T
     int32_t idNames = 0;
     int32_t speed = 2;
     ASSERT_EQ(MouseEventHdr->SetPointerSpeed(speed), idNames);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -138,6 +140,8 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerSpeed_007, T
     MouseEventHdr->SetPointerSpeed(speed);
     int32_t idNames = 2;
     ASSERT_EQ(MouseEventHdr->GetPointerSpeed(), idNames);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
