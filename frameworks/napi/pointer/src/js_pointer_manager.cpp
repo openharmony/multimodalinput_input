@@ -203,7 +203,7 @@ napi_value JsPointerManager::IsPointerVisibleSync(napi_env env)
     CALL_DEBUG_ENTER;
     bool visible = InputManager::GetInstance()->IsPointerVisible();
     napi_value result = nullptr;
-    NAPI_CALL(env, napi_create_int32(env, visible, &result));
+    NAPI_CALL(env, napi_get_boolean(env, visible, &result));
     return result;
 }
 
