@@ -59,11 +59,12 @@ double MouseTransformProcessor::absolutionX_ = -1.0;
 double MouseTransformProcessor::absolutionY_ = -1.0;
 int32_t MouseTransformProcessor::currentDisplayId_ = -1;
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
-bool MouseTransformProcessor::isUserSetSpeedStatus_ = false;
 
 MouseTransformProcessor::MouseTransformProcessor(int32_t deviceId)
     : pointerEvent_(PointerEvent::Create()), deviceId_(deviceId)
-{}
+{
+    globalPointerSpeed_ = GetPointerSpeed();
+}
 
 std::shared_ptr<PointerEvent> MouseTransformProcessor::GetPointerEvent() const
 {
@@ -95,7 +96,7 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
             &absolutionY_, GetTouchpadSpeed());
     } else {
         ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(), &absolutionX_,
-            &absolutionY_, GetSpeed());
+            &absolutionY_, globalPointerSpeed_);
     }
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to handle motion correction");
@@ -638,22 +639,49 @@ int32_t MouseTransformProcessor::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;
     if (speed < MIN_SPEED) {
-        globalPointerSpeed_ = MIN_SPEED;
+        speed = MIN_SPEED;
     } else if (speed > MAX_SPEED) {
-        globalPointerSpeed_ = MAX_SPEED;
-    } else {
-        globalPointerSpeed_ = speed;
+        speed = MAX_SPEED;
     }
-    isUserSetSpeedStatus_ = true;
-    MMI_HILOGD("Set pointer speed:%{public}d", globalPointerSpeed_);
+    globalPointerSpeed_ = speed;
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
+        return RET_ERR;
+    }
+    std::string name = "speed";
+    int32_t ret = pref->PutInt(name, speed);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Put speed is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    ret = pref->FlushSync();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    MMI_HILOGD("Set pointer speed successfully, speed:%{public}d", speed);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
     return RET_OK;
 }
 
 int32_t MouseTransformProcessor::GetPointerSpeed()
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Get pointer speed:%{public}d", globalPointerSpeed_);
-    return globalPointerSpeed_;
+    int32_t errCode = RET_OK;
+    std::shared_ptr<NativePreferences::Preferences> pref =
+        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
+    if (pref == nullptr) {
+        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
+        return RET_ERR;
+    }
+    std::string name = "speed";
+    int32_t speed = pref->GetInt(name, DEFAULT_SPEED);
+    MMI_HILOGD("Get pointer speed successfully, speed:%{public}d", speed);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
+    return speed;
 }
 
 int32_t MouseTransformProcessor::GetTouchpadSpeed(void)
@@ -819,24 +847,6 @@ void MouseTransformProcessor::TransTouchpadRightButton(struct libinput_event_poi
     }
 }
 
-int32_t MouseTransformProcessor::GetSpeed() const
-{
-    if ((vendorConfigPointerSpeed_ == -1) || isUserSetSpeedStatus_) {
-        return globalPointerSpeed_;
-    }
-    return vendorConfigPointerSpeed_;
-}
-
-void MouseTransformProcessor::SetConfigPointerSpeed(int32_t speed)
-{
-    if (speed < MIN_SPEED) {
-        vendorConfigPointerSpeed_ = MIN_SPEED;
-    } else if (speed > MAX_SPEED) {
-        vendorConfigPointerSpeed_ = MAX_SPEED;
-    } else {
-        vendorConfigPointerSpeed_ = speed;
-    }
-}
 int32_t MouseTransformProcessor::SetTouchpadScrollSwitch(bool switchFlag)
 {
     std::string name = "scrollSwitch";
