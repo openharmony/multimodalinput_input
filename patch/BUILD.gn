@@ -20,9 +20,5 @@ group("patch_packages") {
     "diff_libmtdev_mmi:libmtdev-third-mmi",
     "prebuild_eudev:prebuild_eudev",
     "prebuild_libinput:prebuild_libinput",
-    "//third_party/eudev:libudev",
-    "//third_party/eudev:udev_conf",
-    "//third_party/eudev:udevd",
-    "//third_party/eudev:udevd.rc",
   ]
 }
