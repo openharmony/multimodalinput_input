@@ -340,6 +340,35 @@ napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info in
     return jsPointerMgr->SetPointerSpeed(env, pointerSpeed, argv[1]);
 }
 
+napi_value JsPointerContext::SetPointerSpeedSync(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least 1 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "speed", "number");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("speed parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "speed", "number");
+        return nullptr;
+    }
+    int32_t pointerSpeed = STANDARD_SPEED;
+    CHKRP(napi_get_value_int32(env, argv[0], &pointerSpeed), GET_VALUE_INT32);
+    if (pointerSpeed < MIN_SPEED) {
+        pointerSpeed = MIN_SPEED;
+    } else if (pointerSpeed > MAX_SPEED) {
+        pointerSpeed = MAX_SPEED;
+    }
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    return jsPointerMgr->SetPointerSpeedSync(env, pointerSpeed);
+}
+
 napi_value JsPointerContext::GetPointerSpeed(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -358,6 +387,15 @@ napi_value JsPointerContext::GetPointerSpeed(napi_env env, napi_callback_info in
     }
 
     return jsPointerMgr->GetPointerSpeed(env, argv[0]);
+}
+
+napi_value JsPointerContext::GetPointerSpeedSync(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    return jsPointerMgr->GetPointerSpeedSync(env);
 }
 
 napi_value JsPointerContext::SetMouseScrollRows(napi_env env, napi_callback_info info)
@@ -560,6 +598,47 @@ napi_value JsPointerContext::SetPointerStyle(napi_env env, napi_callback_info in
         return nullptr;
     }
     return jsPointerMgr->SetPointerStyle(env, windowid, pointerStyle, argv[INPUT_PARAMETER]);
+}
+
+napi_value JsPointerContext::SetPointerStyleSync(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < INPUT_PARAMETER) {
+        MMI_HILOGE("At least 2 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("windowId parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
+        return nullptr;
+    }
+    int32_t windowid = 0;
+    CHKRP(napi_get_value_int32(env, argv[0], &windowid), GET_VALUE_INT32);
+    if (windowid < 0 && windowid != GLOBAL_WINDOW_ID) {
+        MMI_HILOGE("Invalid windowid");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Windowid is invalid");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[1], napi_number)) {
+        MMI_HILOGE("pointerStyle parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "pointerStyle", "number");
+        return nullptr;
+    }
+    int32_t pointerStyle = 0;
+    CHKRP(napi_get_value_int32(env, argv[1], &pointerStyle), GET_VALUE_INT32);
+    if (pointerStyle < DEFAULT || pointerStyle > RUNNING) {
+        MMI_HILOGE("Undefined pointer style");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Pointer style does not exist");
+        return nullptr;
+    }
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    return jsPointerMgr->SetPointerStyleSync(env, windowid, pointerStyle);
 }
 
 napi_value JsPointerContext::GetPointerStyle(napi_env env, napi_callback_info info)
@@ -1283,8 +1362,11 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("setPointerColorSync", SetPointerColorSync),
         DECLARE_NAPI_STATIC_FUNCTION("getPointerColorSync", GetPointerColorSync),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerSpeed", SetPointerSpeed),
+        DECLARE_NAPI_STATIC_FUNCTION("setPointerSpeedSync", SetPointerSpeedSync),
         DECLARE_NAPI_STATIC_FUNCTION("getPointerSpeed", GetPointerSpeed),
+        DECLARE_NAPI_STATIC_FUNCTION("getPointerSpeedSync", GetPointerSpeedSync),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerStyle", SetPointerStyle),
+        DECLARE_NAPI_STATIC_FUNCTION("setPointerStyleSync", SetPointerStyleSync),
         DECLARE_NAPI_STATIC_FUNCTION("getPointerStyle", GetPointerStyle),
         DECLARE_NAPI_STATIC_FUNCTION("getPointerStyleSync", GetPointerStyleSync),
         DECLARE_NAPI_STATIC_FUNCTION("enterCaptureMode", EnterCaptureMode),
