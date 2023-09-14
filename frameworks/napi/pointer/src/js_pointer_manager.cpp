@@ -312,6 +312,18 @@ napi_value JsPointerManager::SetPointerSpeed(napi_env env, int32_t pointerSpeed,
     return promise;
 }
 
+napi_value JsPointerManager::SetPointerSpeedSync(napi_env env, int32_t pointerSpeed)
+{
+    CALL_DEBUG_ENTER;
+    InputManager::GetInstance()->SetPointerSpeed(pointerSpeed);
+    napi_value result = nullptr;
+    if (napi_get_undefined(env, &result) != napi_ok) {
+        MMI_HILOGE("Get undefined result is failed");
+        return nullptr;
+    }
+    return result;
+}
+
 napi_value JsPointerManager::GetPointerSpeed(napi_env env, napi_value handle)
 {
     CALL_DEBUG_ENTER;
@@ -330,6 +342,16 @@ napi_value JsPointerManager::GetPointerSpeed(napi_env env, napi_value handle)
     }
     AsyncCallbackWork(asyncContext);
     return promise;
+}
+
+napi_value JsPointerManager::GetPointerSpeedSync(napi_env env)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pointerSpeed = 0;
+    InputManager::GetInstance()->GetPointerSpeed(pointerSpeed);
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_create_int32(env, pointerSpeed, &result));
+    return result;
 }
 
 napi_value JsPointerManager::SetMouseScrollRows(napi_env env, int32_t rows, napi_value handle)
@@ -492,6 +514,20 @@ napi_value JsPointerManager::SetPointerStyle(napi_env env, int32_t windowid, int
     }
     AsyncCallbackWork(asyncContext);
     return promise;
+}
+
+napi_value JsPointerManager::SetPointerStyleSync(napi_env env, int32_t windowid, int32_t pointerStyle)
+{
+    CALL_DEBUG_ENTER;
+    PointerStyle style;
+    style.id = pointerStyle;
+    InputManager::GetInstance()->SetPointerStyle(windowid, style);
+    napi_value result = nullptr;
+    if (napi_get_undefined(env, &result) != napi_ok) {
+        MMI_HILOGE("Get undefined result is failed");
+        return nullptr;
+    }
+    return result;
 }
 
 napi_value JsPointerManager::GetPointerStyle(napi_env env, int32_t windowid, napi_value handle)
