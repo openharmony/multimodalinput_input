@@ -34,6 +34,7 @@ public:
     static napi_value IsPointerVisible(napi_env env, napi_callback_info info);
     static napi_value IsPointerVisibleSync(napi_env env, napi_callback_info info);
     static napi_value SetPointerStyle(napi_env env, napi_callback_info info);
+    static napi_value SetPointerStyleSync(napi_env env, napi_callback_info info);
     static napi_value GetPointerStyle(napi_env env, napi_callback_info info);
     static napi_value GetPointerStyleSync(napi_env env, napi_callback_info info);
     std::shared_ptr<JsPointerManager> GetJsPointerMgr() const;
@@ -42,7 +43,9 @@ public:
     static napi_value SetPointerColorSync(napi_env env, napi_callback_info info);
     static napi_value GetPointerColorSync(napi_env env, napi_callback_info info);
     static napi_value SetPointerSpeed(napi_env env, napi_callback_info info);
+    static napi_value SetPointerSpeedSync(napi_env env, napi_callback_info info);
     static napi_value GetPointerSpeed(napi_env env, napi_callback_info info);
+    static napi_value GetPointerSpeedSync(napi_env env, napi_callback_info info);
     static napi_value SetPointerLocation(napi_env env, napi_callback_info info);
     static napi_value EnterCaptureMode(napi_env env, napi_callback_info info);
     static napi_value LeaveCaptureMode(napi_env env, napi_callback_info info);
