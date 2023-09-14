@@ -272,9 +272,11 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
         if (!CheckInputDeviceSource(pointerEvent, interceptor.deviceTags_)) {
             continue;
         }
+#ifndef OHOS_BUILD_EMULATOR
         if (!inputDevice->HasCapability(interceptor.deviceTags_)) {
             continue;
         }
+#endif // OHOS_BUILD_EMULATOR
         if ((interceptor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
             interceptor.SendToClient(pointerEvent);
             MMI_HILOGD("Pointer event was intercepted");
