@@ -32,11 +32,18 @@ public:
     napi_value GetDevice(napi_env env, int32_t id, napi_value handle = nullptr);
     napi_value SupportKeys(napi_env env, int32_t id, std::vector<int32_t> &keyCodes,
                                    napi_value handle = nullptr);
+    napi_value SupportKeysSync(napi_env env, int32_t id, std::vector<int32_t> &keyCodes);
+    static void SupportKeysSyncCallback(napi_env env, napi_value* result, std::vector<bool> &isSupported);
     napi_value GetKeyboardType(napi_env env, int32_t id, napi_value handle = nullptr);
+    napi_value GetKeyboardTypeSync(napi_env env, int32_t id);
+    static void GetKeyboardTypeSyncCallback(napi_env env, napi_value* result, int32_t keyboardType);
     void RegisterDevListener(napi_env env, const std::string &type, napi_value handle);
     void UnregisterDevListener(napi_env env, const std::string &type, napi_value handle = nullptr);
     napi_value GetDeviceList(napi_env env, napi_value handle = nullptr);
     napi_value GetDeviceInfo(napi_env env, int32_t id, napi_value handle = nullptr);
+    napi_value GetDeviceInfoSync(napi_env env, int32_t id, napi_value handle = nullptr);
+    static void GetDeviceInfoSyncCallback(napi_env env, napi_value* result, sptr<JsUtil::CallbackInfo> cb,
+        std::shared_ptr<InputDevice> inputDevice);
     napi_value SetKeyboardRepeatDelay(napi_env env, int32_t delay, napi_value handle = nullptr);
     napi_value SetKeyboardRepeatRate(napi_env env, int32_t rate, napi_value handle = nullptr);
     napi_value GetKeyboardRepeatDelay(napi_env env, napi_value handle = nullptr);
