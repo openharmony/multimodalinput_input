@@ -338,6 +338,64 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
     return jsInputDeviceMgr->SupportKeys(env, deviceId, keyCodes, argv[2]);
 }
 
+napi_value JsInputDeviceContext::SupportKeysSync(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 0;
+    napi_value argv[3];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc != 2) {
+        MMI_HILOGE("Require two parameters");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        return nullptr;
+    }
+
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("First parameter type error");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceId", "number");
+        return nullptr;
+    }
+    int32_t deviceId = 0;
+    CHKRP(napi_get_value_int32(env, argv[0], &deviceId), GET_VALUE_INT32);
+
+    if (!JsUtil::TypeOf(env, argv[1], napi_object)) {
+        MMI_HILOGE("Second parameter type error");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keys", "array");
+        return nullptr;
+    }
+    uint32_t size = 0;
+    CHKRP(napi_get_array_length(env, argv[1], &size), GET_ARRAY_LENGTH);
+    if (size < MIN_N_SIZE || size > MAX_N_SIZE) {
+        MMI_HILOGE("Size range error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "size range error");
+        return nullptr;
+    }
+
+    int32_t data = 0;
+    std::vector<int32_t> keyCodes;
+    for (uint32_t i = 0; i < size; ++i) {
+        napi_value keyValue = nullptr;
+        CHKRP(napi_get_element(env, argv[1], i, &keyValue), GET_ELEMENT);
+        if (!JsUtil::TypeOf(env, keyValue, napi_number)) {
+            MMI_HILOGE("Second parameter type error");
+            THROWERR_API9(env, COMMON_PARAMETER_ERROR, "KeyCode", "number");
+            return nullptr;
+        }
+        CHKRP(napi_get_value_int32(env, keyValue, &data), GET_VALUE_INT32);
+        keyCodes.push_back(data);
+    }
+
+    JsInputDeviceContext *jsContext = JsInputDeviceContext::GetInstance(env);
+    if (jsContext == nullptr) {
+        MMI_HILOGE("jsContext is empty");
+        return nullptr;
+    }
+
+    auto jsInputDeviceMgr = jsContext->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
+    return jsInputDeviceMgr->SupportKeysSync(env, deviceId, keyCodes);
+}
+
 napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -371,6 +429,34 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
         return nullptr;
     }
     return jsInputDeviceMgr->GetKeyboardType(env, id, argv[1]);
+}
+
+napi_value JsInputDeviceContext::GetKeyboardTypeSync(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 0;
+    napi_value argv[2];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc != 1) {
+        MMI_HILOGE("Require one parameters");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        return nullptr;
+    }
+
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("First parameter type error");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceId", "number");
+        return nullptr;
+    }
+    int32_t id = 0;
+    CHKRP(napi_get_value_int32(env, argv[0], &id), GET_VALUE_INT32);
+
+    JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
+    CHKPP(jsDev);
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+    CHKPP(jsInputDeviceMgr);
+
+    return jsInputDeviceMgr->GetKeyboardTypeSync(env, id);
 }
 
 napi_value JsInputDeviceContext::GetDeviceList(napi_env env, napi_callback_info info)
@@ -425,6 +511,32 @@ napi_value JsInputDeviceContext::GetDeviceInfo(napi_env env, napi_callback_info 
         return nullptr;
     }
     return jsInputDeviceMgr->GetDeviceInfo(env, id, argv[1]);
+}
+
+napi_value JsInputDeviceContext::GetDeviceInfoSync(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 0;
+    napi_value argv[2];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc != 1) {
+        MMI_HILOGE("Require one parameters");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
+        return nullptr;
+    }
+    if (!JsUtil::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("First parameter type error");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "deviceId", "number");
+        return nullptr;
+    }
+    int32_t id = 0;
+    CHKRP(napi_get_value_int32(env, argv[0], &id), GET_VALUE_INT32);
+
+    JsInputDeviceContext *jsDev = JsInputDeviceContext::GetInstance(env);
+    CHKPP(jsDev);
+    auto jsInputDeviceMgr = jsDev->GetJsInputDeviceMgr();
+
+    return jsInputDeviceMgr->GetDeviceInfoSync(env, id);
 }
 
 napi_value JsInputDeviceContext::SetKeyboardRepeatDelay(napi_env env, napi_callback_info info)
@@ -596,9 +708,12 @@ napi_value JsInputDeviceContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getDevice", GetDevice),
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceIds", GetDeviceIds),
         DECLARE_NAPI_STATIC_FUNCTION("supportKeys", SupportKeys),
+        DECLARE_NAPI_STATIC_FUNCTION("supportKeysSync", SupportKeysSync),
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardType", GetKeyboardType),
+        DECLARE_NAPI_STATIC_FUNCTION("getKeyboardTypeSync", GetKeyboardTypeSync),
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceList", GetDeviceList),
         DECLARE_NAPI_STATIC_FUNCTION("getDeviceInfo", GetDeviceInfo),
+        DECLARE_NAPI_STATIC_FUNCTION("getDeviceInfoSync", GetDeviceInfoSync),
         DECLARE_NAPI_STATIC_FUNCTION("setKeyboardRepeatDelay", SetKeyboardRepeatDelay),
         DECLARE_NAPI_STATIC_FUNCTION("setKeyboardRepeatRate", SetKeyboardRepeatRate),
         DECLARE_NAPI_STATIC_FUNCTION("getKeyboardRepeatDelay", GetKeyboardRepeatDelay),
