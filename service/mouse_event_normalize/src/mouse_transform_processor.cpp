@@ -152,6 +152,11 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
 
     TransTouchpadRightButton(data, type, button);
 
+    if (button == MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_MIDDLE_BUTTON_CODE && 
+        type == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
+    }
+
     auto ret = HandleButtonValueInner(data, button);
     if (ret != RET_OK) {
         MMI_HILOGE("The button value does not exist");
