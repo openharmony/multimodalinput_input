@@ -165,6 +165,18 @@ napi_value JsPointerManager::SetPointerVisible(napi_env env, bool visible, napi_
     return promise;
 }
 
+napi_value JsPointerManager::SetPointerVisibleSync(napi_env env, bool visible)
+{
+    CALL_DEBUG_ENTER;
+    InputManager::GetInstance()->SetPointerVisible(visible);
+    napi_value result = nullptr;
+    if (napi_get_undefined(env, &result) != napi_ok) {
+        MMI_HILOGE("Get undefined result is failed");
+        return nullptr;
+    }
+    return result;
+}
+
 napi_value JsPointerManager::IsPointerVisible(napi_env env, napi_value handle)
 {
     CALL_DEBUG_ENTER;
@@ -184,6 +196,15 @@ napi_value JsPointerManager::IsPointerVisible(napi_env env, napi_value handle)
     }
     AsyncCallbackWork(asyncContext);
     return promise;
+}
+
+napi_value JsPointerManager::IsPointerVisibleSync(napi_env env)
+{
+    CALL_DEBUG_ENTER;
+    bool visible = InputManager::GetInstance()->IsPointerVisible();
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_get_boolean(env, visible, &result));
+    return result;
 }
 
 napi_value JsPointerManager::SetPointerSpeed(napi_env env, int32_t pointerSpeed, napi_value handle)
@@ -403,6 +424,16 @@ napi_value JsPointerManager::GetPointerStyle(napi_env env, int32_t windowid, nap
     }
     AsyncCallbackWork(asyncContext);
     return promise;
+}
+
+napi_value JsPointerManager::GetPointerStyleSync(napi_env env, int32_t windowid)
+{
+    CALL_DEBUG_ENTER;
+    PointerStyle pointerStyle;
+    InputManager::GetInstance()->GetPointerStyle(windowid, pointerStyle);
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_create_int32(env, pointerStyle.id, &result));
+    return result;
 }
 
 napi_value JsPointerManager::EnterCaptureMode(napi_env env, int32_t windowId, napi_value handle)
