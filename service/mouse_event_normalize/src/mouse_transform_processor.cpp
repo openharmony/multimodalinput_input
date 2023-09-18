@@ -367,10 +367,10 @@ int32_t MouseTransformProcessor::HandleAxisBeginEndInner(struct libinput_event *
     if (buttonId_ == PointerEvent::BUTTON_NONE && pointerEvent_->GetButtonId() != PointerEvent::BUTTON_NONE) {
         pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
     }
-    if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_DOWN) {
+    if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_DOWN && !isPressed_) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
         MMI_HILOGD("Axis begin");
-    } else if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_UP) {
+    } else if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_UP && !isPressed_) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
         MMI_HILOGD("Axis end");
     } else {
