@@ -136,7 +136,7 @@ bool MMIClient::AddFdListener(int32_t fd)
     }
     CHKPF(eventHandler_);
     auto fdListener = std::make_shared<MMIFdListener>(GetSharedPtr());
-    auto errCode = eventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener);
+    auto errCode = eventHandler_->AddFileDescriptorListener(fd, FILE_DESCRIPTOR_INPUT_EVENT, fdListener, "MMITask");
     if (errCode != ERR_OK) {
         MMI_HILOGE("Add fd listener failed,fd:%{public}d code:%{public}u str:%{public}s", fd, errCode,
             GetErrorStr(errCode).c_str());
