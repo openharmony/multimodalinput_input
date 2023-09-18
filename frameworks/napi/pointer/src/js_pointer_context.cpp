@@ -153,6 +153,31 @@ napi_value JsPointerContext::SetPointerVisible(napi_env env, napi_callback_info 
     return jsPointerMgr->SetPointerVisible(env, visible, argv[1]);
 }
 
+napi_value JsPointerContext::SetPointerVisibleSync(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least one parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible", "boolean");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_boolean)) {
+        MMI_HILOGE("visible parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "visible", "boolean");
+        return nullptr;
+    }
+    bool visible = true;
+    CHKRP(napi_get_value_bool(env, argv[0], &visible), GET_VALUE_BOOL);
+
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    return jsPointerMgr->SetPointerVisibleSync(env, visible);
+}
+
 napi_value JsPointerContext::IsPointerVisible(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -268,6 +293,13 @@ napi_value JsPointerContext::GetPointerColorSync(napi_env env, napi_callback_inf
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     return jsPointerMgr->GetPointerColorSync(env);
+napi_value JsPointerContext::IsPointerVisibleSync(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    return jsPointerMgr->IsPointerVisibleSync(env);
 }
 
 napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info info)
@@ -562,6 +594,35 @@ napi_value JsPointerContext::GetPointerStyle(napi_env env, napi_callback_info in
         return nullptr;
     }
     return jsPointerMgr->GetPointerStyle(env, windowid, argv[1]);
+}
+
+napi_value JsPointerContext::GetPointerStyleSync(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least 1 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("windowId parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
+        return nullptr;
+    }
+    int32_t windowId = 0;
+    CHKRP(napi_get_value_int32(env, argv[0], &windowId), GET_VALUE_INT32);
+    if (windowId < 0 && windowId != GLOBAL_WINDOW_ID) {
+        MMI_HILOGE("Invalid windowId");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "WindowId is invalid");
+        return nullptr;
+    }
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    return jsPointerMgr->GetPointerStyleSync(env, windowId);
 }
 
 napi_value JsPointerContext::CreatePointerStyle(napi_env env, napi_value exports)
@@ -1206,15 +1267,18 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
     }
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_FUNCTION("setPointerVisible", SetPointerVisible),
+        DECLARE_NAPI_STATIC_FUNCTION("setPointerVisibleSync", SetPointerVisibleSync),
         DECLARE_NAPI_STATIC_FUNCTION("isPointerVisible", IsPointerVisible),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerColor", SetPointerColor),
         DECLARE_NAPI_STATIC_FUNCTION("getPointerColor", GetPointerColor),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerColorSync", SetPointerColorSync),
         DECLARE_NAPI_STATIC_FUNCTION("getPointerColorSync", GetPointerColorSync),
+        DECLARE_NAPI_STATIC_FUNCTION("isPointerVisibleSync", IsPointerVisibleSync),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerSpeed", SetPointerSpeed),
         DECLARE_NAPI_STATIC_FUNCTION("getPointerSpeed", GetPointerSpeed),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerStyle", SetPointerStyle),
         DECLARE_NAPI_STATIC_FUNCTION("getPointerStyle", GetPointerStyle),
+        DECLARE_NAPI_STATIC_FUNCTION("getPointerStyleSync", GetPointerStyleSync),
         DECLARE_NAPI_STATIC_FUNCTION("enterCaptureMode", EnterCaptureMode),
         DECLARE_NAPI_STATIC_FUNCTION("leaveCaptureMode", LeaveCaptureMode),
         DECLARE_NAPI_STATIC_FUNCTION("setMouseScrollRows", SetMouseScrollRows),
