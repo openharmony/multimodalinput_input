@@ -590,6 +590,41 @@ int32_t MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
     return RET_OK;
 }
 
+int32_t MMIService::SetPointerColor(int32_t color)
+{
+    CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&IPointerDrawingManager::SetPointerColor,
+        IPointerDrawingManager::GetInstance(), color));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer color failed,return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    return RET_OK;
+}
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+int32_t MMIService::ReadPointerColor(int32_t &color)
+{
+    color = IPointerDrawingManager::GetInstance()->GetPointerColor();
+    return RET_OK;
+}
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+
+int32_t MMIService::GetPointerColor(int32_t &color)
+{
+    CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadPointerColor, this, std::ref(color)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pointer color failed, return %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+    return RET_OK;
+}
+
 int32_t MMIService::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;

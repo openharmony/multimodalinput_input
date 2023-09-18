@@ -860,6 +860,38 @@ bool InputManagerImpl::IsPointerVisible()
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
+int32_t InputManagerImpl::SetPointerColor(int32_t color)
+{
+    CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetPointerColor(color);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set pointer color failed, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
+int32_t InputManagerImpl::GetPointerColor(int32_t &color)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->GetPointerColor(color);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pointer color failed");
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
 int32_t InputManagerImpl::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;
