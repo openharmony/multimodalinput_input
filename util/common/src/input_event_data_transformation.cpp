@@ -233,22 +233,6 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
     for (const auto &keyCode : pressedKeys) {
         pkt << keyCode;
     }
-    if (MarshallingBuffer(event, pkt) != RET_OK) {
-        MMI_HILOGE("Marshalling buffer failed");
-        return RET_ERR;
-    }
-#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    if (MarshallingEnhanceData(event, pkt) != RET_OK) {
-        MMI_HILOGE("Marshalling enhance data failed");
-        return RET_ERR;
-    }
-#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
-    return RET_OK;
-}
-
-int32_t InputEventDataTransformation::MarshallingBuffer(std::shared_ptr<PointerEvent> event, NetPacket &pkt)
-{
-    CHKPR(event, ERROR_NULL_POINTER);
     std::vector<uint8_t> buffer = event->GetBuffer();
     if (buffer.size() > ExtraData::MAX_BUFFER_SIZE) {
         MMI_HILOGE("buffer is oversize:%{public}zu", buffer.size());
