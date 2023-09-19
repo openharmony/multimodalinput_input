@@ -31,6 +31,7 @@ constexpr int32_t MAX_KEY_REPEAT_DELAY = 1000;
 constexpr int32_t STANDARD_KEY_REPEAT_RATE = 50;
 constexpr int32_t MIN_KEY_REPEAT_RATE = 36;
 constexpr int32_t MAX_KEY_REPEAT_RATE = 100;
+constexpr int32_t ARGC_NUM = 2;
 } // namespace
 
 JsInputDeviceContext::JsInputDeviceContext()
@@ -341,10 +342,10 @@ napi_value JsInputDeviceContext::SupportKeys(napi_env env, napi_callback_info in
 napi_value JsInputDeviceContext::SupportKeysSync(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    size_t argc = 0;
-    napi_value argv[3];
+    size_t argc = ARGC_NUM;
+    napi_value argv[ARGC_NUM];
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc != 2) {
+    if (argc != ARGC_NUM) {
         MMI_HILOGE("Require two parameters");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Parameter count error");
         return nullptr;
@@ -434,8 +435,8 @@ napi_value JsInputDeviceContext::GetKeyboardType(napi_env env, napi_callback_inf
 napi_value JsInputDeviceContext::GetKeyboardTypeSync(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    size_t argc = 0;
-    napi_value argv[2];
+    size_t argc = 1;
+    napi_value argv[1];
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc != 1) {
         MMI_HILOGE("Require one parameters");
@@ -516,8 +517,8 @@ napi_value JsInputDeviceContext::GetDeviceInfo(napi_env env, napi_callback_info 
 napi_value JsInputDeviceContext::GetDeviceInfoSync(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    size_t argc = 0;
-    napi_value argv[2];
+    size_t argc = 1;
+    napi_value argv[1];
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
     if (argc != 1) {
         MMI_HILOGE("Require one parameters");
