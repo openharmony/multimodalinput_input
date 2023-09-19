@@ -308,6 +308,27 @@ ohos_prebuilt_etc("drawing_pointer_image_Cursor_Circle") {
   relative_install_dir = "multimodalinput/mouse_icon"
 }
 
+ohos_prebuilt_etc("drawing_pointer_image_Loading") {
+  source = "src/Loading.svg"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_Running_Left") {
+  source = "src/Loading_Left.svg"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
+ohos_prebuilt_etc("drawing_pointer_image_Running_Right") {
+  source = "src/Loading_Right.svg"
+  part_name = "input"
+  subsystem_name = "multimodalinput"
+  relative_install_dir = "multimodalinput/mouse_icon"
+}
+
 ohos_prebuilt_etc("multimodalinput_config_ability.json") {
   source = "${mmi_path}/etc/ability_launch_config.json"
   part_name = "input"
@@ -337,6 +358,7 @@ group("input_mouse_icon") {
     ":drawing_pointer_image_Hand_Pointing",
     ":drawing_pointer_image_Help",
     ":drawing_pointer_image_Horizontal_Text_Cursor",
+    ":drawing_pointer_image_Loading",
     ":drawing_pointer_image_MID_Btn_East",
     ":drawing_pointer_image_MID_Btn_North",
     ":drawing_pointer_image_MID_Btn_North_East",
@@ -356,6 +378,8 @@ group("input_mouse_icon") {
     ":drawing_pointer_image_North_West_South_East",
     ":drawing_pointer_image_Resize_Left_Right",
     ":drawing_pointer_image_Resize_Up_Down",
+    ":drawing_pointer_image_Running_Left",
+    ":drawing_pointer_image_Running_Right",
     ":drawing_pointer_image_Screenshot_Cross",
     ":drawing_pointer_image_Screenshot_Cursor",
     ":drawing_pointer_image_South",
