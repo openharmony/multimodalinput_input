@@ -60,6 +60,10 @@ public:
     napi_value SetPointerVisible(napi_env env, bool visible, napi_value handle = nullptr);
     napi_value SetPointerVisibleSync(napi_env env, bool visible);
     napi_value IsPointerVisible(napi_env env, napi_value handle = nullptr);
+    napi_value SetPointerColor(napi_env env, int32_t color, napi_value handle = nullptr);
+    napi_value GetPointerColor(napi_env env, napi_value handle = nullptr);
+    napi_value SetPointerColorSync(napi_env env, int32_t color);
+    napi_value GetPointerColorSync(napi_env env);
     napi_value IsPointerVisibleSync(napi_env env);
     napi_value SetPointerSpeed(napi_env env, int32_t pointerSpeed, napi_value handle = nullptr);
     napi_value GetPointerSpeed(napi_env env, napi_value handle = nullptr);

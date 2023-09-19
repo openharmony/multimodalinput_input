@@ -79,6 +79,8 @@ protected:
     int32_t StubSetAnrListener(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetDisplayBindInfo(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetDisplayBind(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetPointerColor(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetPointerColor(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerSpeed(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetFunctionKeyState(MessageParcel &data, MessageParcel &reply);

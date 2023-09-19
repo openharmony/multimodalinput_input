@@ -55,6 +55,8 @@ public:
     int32_t SetPointerVisible(bool visible);
     int32_t IsPointerVisible(bool &visible);
     int32_t MarkProcessed(int32_t eventType, int32_t eventId);
+    int32_t SetPointerColor(int32_t color);
+    int32_t GetPointerColor(int32_t &color);
     int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed(int32_t &speed);
     int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle);

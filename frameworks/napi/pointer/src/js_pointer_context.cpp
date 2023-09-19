@@ -29,6 +29,8 @@ constexpr size_t INPUT_PARAMETER = 2;
 constexpr int32_t DEFAULT_POINTER_SIZE = 1;
 constexpr int32_t MIN_POINTER_SIZE = 1;
 constexpr int32_t MAX_POINTER_SIZE = 7;
+constexpr int32_t MIN_POINTER_COLOR = 0x000000;
+constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
 } // namespace
 
 JsPointerContext::JsPointerContext() : mgr_(std::make_shared<JsPointerManager>()) {}
@@ -204,6 +206,102 @@ napi_value JsPointerContext::IsPointerVisibleSync(napi_env env, napi_callback_in
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     return jsPointerMgr->IsPointerVisibleSync(env);
+}
+
+napi_value JsPointerContext::SetPointerColor(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least 1 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "color", "number");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("color parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "color", "number");
+        return nullptr;
+    }
+    int32_t color = MIN_POINTER_COLOR;
+    CHKRP(napi_get_value_int32(env, argv[0], &color), GET_VALUE_INT32);
+    if (color < MIN_POINTER_COLOR) {
+        color = MIN_POINTER_COLOR;
+    } else if (color > MAX_POINTER_COLOR) {
+        color = MAX_POINTER_COLOR;
+    }
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (argc == 1) {
+        return jsPointerMgr->SetPointerColor(env, color);
+    }
+    if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
+        MMI_HILOGE("callback parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    return jsPointerMgr->SetPointerColor(env, color, argv[1]);
+}
+
+napi_value JsPointerContext::GetPointerColor(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (argc == 0) {
+        return jsPointerMgr->GetPointerColor(env);
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_function)) {
+        MMI_HILOGE("callback parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+
+    return jsPointerMgr->GetPointerColor(env, argv[0]);
+}
+
+napi_value JsPointerContext::SetPointerColorSync(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least 1 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "color", "number");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("color parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "color", "number");
+        return nullptr;
+    }
+    int32_t color = MIN_POINTER_COLOR;
+    CHKRP(napi_get_value_int32(env, argv[0], &color), GET_VALUE_INT32);
+    if (color < MIN_POINTER_COLOR) {
+        color = MIN_POINTER_COLOR;
+    } else if (color > MAX_POINTER_COLOR) {
+        color = MAX_POINTER_COLOR;
+    }
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    return jsPointerMgr->SetPointerColorSync(env, color);
+}
+
+napi_value JsPointerContext::GetPointerColorSync(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    return jsPointerMgr->GetPointerColorSync(env);
 }
 
 napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info info)
@@ -404,7 +502,7 @@ napi_value JsPointerContext::SetPointerSizeSync(napi_env env, napi_callback_info
     JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
-    return jsPointerMgr->SetPointerSize(env, size);
+    return jsPointerMgr->SetPointerSizeSync(env, size);
 }
 
 napi_value JsPointerContext::GetPointerSizeSync(napi_env env, napi_callback_info info)
@@ -1173,6 +1271,10 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("setPointerVisible", SetPointerVisible),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerVisibleSync", SetPointerVisibleSync),
         DECLARE_NAPI_STATIC_FUNCTION("isPointerVisible", IsPointerVisible),
+        DECLARE_NAPI_STATIC_FUNCTION("setPointerColor", SetPointerColor),
+        DECLARE_NAPI_STATIC_FUNCTION("getPointerColor", GetPointerColor),
+        DECLARE_NAPI_STATIC_FUNCTION("setPointerColorSync", SetPointerColorSync),
+        DECLARE_NAPI_STATIC_FUNCTION("getPointerColorSync", GetPointerColorSync),
         DECLARE_NAPI_STATIC_FUNCTION("isPointerVisibleSync", IsPointerVisibleSync),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerSpeed", SetPointerSpeed),
         DECLARE_NAPI_STATIC_FUNCTION("getPointerSpeed", GetPointerSpeed),
