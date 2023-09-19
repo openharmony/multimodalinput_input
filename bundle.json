@@ -62,7 +62,7 @@
         "hicollie",
         "init",
         "preferences",
-        "security_component",
+        "security_component_manager",
         "hilog",
         "common",
         "common_event_service"
