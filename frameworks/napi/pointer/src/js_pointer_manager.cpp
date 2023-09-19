@@ -198,6 +198,15 @@ napi_value JsPointerManager::IsPointerVisible(napi_env env, napi_value handle)
     return promise;
 }
 
+napi_value JsPointerManager::IsPointerVisibleSync(napi_env env)
+{
+    CALL_DEBUG_ENTER;
+    bool visible = InputManager::GetInstance()->IsPointerVisible();
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_get_boolean(env, visible, &result));
+    return result;
+}
+
 napi_value JsPointerManager::SetPointerColor(napi_env env, int32_t color, napi_value handle)
 {
     CALL_DEBUG_ENTER;
@@ -282,12 +291,6 @@ napi_value JsPointerManager::GetPointerColorSync(napi_env env)
     }
     napi_value result = nullptr;
     NAPI_CALL(env, napi_create_int32(env, color, &result));
-napi_value JsPointerManager::IsPointerVisibleSync(napi_env env)
-{
-    CALL_DEBUG_ENTER;
-    bool visible = InputManager::GetInstance()->IsPointerVisible();
-    napi_value result = nullptr;
-    NAPI_CALL(env, napi_get_boolean(env, visible, &result));
     return result;
 }
 
