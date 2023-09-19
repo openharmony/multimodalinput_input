@@ -32,8 +32,11 @@ public:
     static napi_value GetDevice(napi_env env, napi_callback_info info);
     static napi_value GetDeviceList(napi_env env, napi_callback_info info);
     static napi_value GetDeviceInfo(napi_env env, napi_callback_info info);
+    static napi_value GetDeviceInfoSync(napi_env env, napi_callback_info info);
     static napi_value SupportKeys(napi_env env, napi_callback_info info);
+    static napi_value SupportKeysSync(napi_env env, napi_callback_info info);
     static napi_value GetKeyboardType(napi_env env, napi_callback_info info);
+    static napi_value GetKeyboardTypeSync(napi_env env, napi_callback_info info);
     static napi_value SetKeyboardRepeatDelay(napi_env env, napi_callback_info info);
     static napi_value SetKeyboardRepeatRate(napi_env env, napi_callback_info info);
     static napi_value GetKeyboardRepeatDelay(napi_env env, napi_callback_info info);

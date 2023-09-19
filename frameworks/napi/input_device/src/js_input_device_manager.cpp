@@ -73,6 +73,29 @@ napi_value JsInputDeviceManager::SupportKeys(napi_env env, int32_t id, std::vect
     return ret;
 }
 
+void JsInputDeviceManager::SupportKeysSyncCallback(napi_env env, napi_value* result, std::vector<bool> &isSupported)
+{
+    CALL_DEBUG_ENTER;
+    napi_create_array(env, &(*result));
+    for (uint i = 0; i < isSupported.size(); i++) {
+        napi_value value;
+        napi_get_boolean(env, isSupported[i], &value);
+        napi_set_element(env, *result, i, value);
+    }
+}
+
+napi_value JsInputDeviceManager::SupportKeysSync(napi_env env, int32_t id, std::vector<int32_t> &keyCodes)
+{
+    CALL_DEBUG_ENTER;
+    napi_value result = nullptr;
+    auto callback = std::bind(SupportKeysSyncCallback, env, &result, std::placeholders::_1);
+    int32_t napiCode = InputManager::GetInstance()->SupportKeys(id, keyCodes, callback);
+    if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
+    }
+    return result;
+}
+
 napi_value JsInputDeviceManager::GetKeyboardType(napi_env env, int32_t id, napi_value handle)
 {
     CALL_DEBUG_ENTER;
@@ -85,6 +108,27 @@ napi_value JsInputDeviceManager::GetKeyboardType(napi_env env, int32_t id, napi_
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
     }
     return ret;
+}
+
+void JsInputDeviceManager::GetKeyboardTypeSyncCallback(napi_env env, napi_value* result, int32_t keyboardType)
+{
+    CALL_DEBUG_ENTER;
+    auto status = napi_create_int32(env, keyboardType, &(*result));
+    if (status != napi_ok) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Get keyboard type fail");
+    }
+}
+
+napi_value JsInputDeviceManager::GetKeyboardTypeSync(napi_env env, int32_t id)
+{
+    CALL_DEBUG_ENTER;
+    napi_value result = nullptr;
+    auto callback = std::bind(GetKeyboardTypeSyncCallback, env, &result, std::placeholders::_1);
+    int32_t napiCode = InputManager::GetInstance()->GetKeyboardType(id, callback);
+    if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
+    }
+    return result;
 }
 
 napi_value JsInputDeviceManager::GetDeviceList(napi_env env, napi_value handle)
@@ -110,6 +154,38 @@ napi_value JsInputDeviceManager::GetDeviceInfo(napi_env env, int32_t id, napi_va
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
     }
     return ret;
+}
+
+void JsInputDeviceManager::GetDeviceInfoSyncCallback(napi_env env, napi_value* result, sptr<JsUtil::CallbackInfo> cb,
+    std::shared_ptr<InputDevice> inputDevice)
+{
+    CALL_DEBUG_ENTER;
+    auto status = napi_create_object(env, &(*result));
+    if (status != napi_ok) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "create object fail");
+    }
+
+    cb->env = env;
+    cb->data.device = inputDevice;
+    *result = JsUtil::GetDeviceInfo(cb);
+    if (*result == nullptr) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "GetDeviceInfo fail");
+    }
+}
+
+napi_value JsInputDeviceManager::GetDeviceInfoSync(napi_env env, int32_t id, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<JsUtil::CallbackInfo> cb = new (std::nothrow) JsUtil::CallbackInfo();
+    CHKPP(cb);
+    CreateCallbackInfo(env, handle, cb);
+    napi_value result = nullptr;
+    auto callback = std::bind(GetDeviceInfoSyncCallback, env, &result, cb, std::placeholders::_1);
+    int32_t napiCode = InputManager::GetInstance()->GetDevice(id, callback);
+    if (napiCode != OTHER_ERROR && napiCode != RET_OK) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid input device id");
+    }
+    return result;
 }
 
 napi_value JsInputDeviceManager::SetKeyboardRepeatDelay(napi_env env, int32_t delay, napi_value handle)
