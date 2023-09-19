@@ -199,6 +199,15 @@ napi_value JsPointerContext::IsPointerVisible(napi_env env, napi_callback_info i
     return jsPointerMgr->IsPointerVisible(env, argv[0]);
 }
 
+napi_value JsPointerContext::IsPointerVisibleSync(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    return jsPointerMgr->IsPointerVisibleSync(env);
+}
+
 napi_value JsPointerContext::SetPointerColor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -293,13 +302,6 @@ napi_value JsPointerContext::GetPointerColorSync(napi_env env, napi_callback_inf
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     return jsPointerMgr->GetPointerColorSync(env);
-napi_value JsPointerContext::IsPointerVisibleSync(napi_env env, napi_callback_info info)
-{
-    CALL_DEBUG_ENTER;
-    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
-    CHKPP(jsPointer);
-    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
-    return jsPointerMgr->IsPointerVisibleSync(env);
 }
 
 napi_value JsPointerContext::SetPointerSpeed(napi_env env, napi_callback_info info)
