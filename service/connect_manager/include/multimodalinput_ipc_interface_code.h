@@ -86,6 +86,8 @@ enum class MultimodalinputConnectInterfaceCode {
     SET_MOUSE_HOT_SPOT = 64,
     SET_POINTER_SIZE = 65,
     GET_POINTER_SIZE = 66,
+    SET_POINTER_COLOR = 67,
+    GET_POINTER_COLOR = 68,
 };
 
 enum class MultimodalinputEventInterfaceCode {

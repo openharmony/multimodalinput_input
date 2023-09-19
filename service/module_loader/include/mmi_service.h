@@ -62,6 +62,8 @@ public:
     int32_t SetPointerVisible(bool visible) override;
     int32_t IsPointerVisible(bool &visible) override;
     int32_t MarkProcessed(int32_t eventType, int32_t eventId) override;
+    int32_t SetPointerColor(int32_t color) override;
+    int32_t GetPointerColor(int32_t &color) override;
     int32_t SetPointerSpeed(int32_t speed) override;
     int32_t GetPointerSpeed(int32_t &speed) override;
     int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle) override;
@@ -133,6 +135,7 @@ protected:
     int32_t ReadMousePrimaryButton(int32_t &primaryButton);
     int32_t ReadPointerSpeed(int32_t &speed);
     int32_t ReadHoverScrollState(bool &state);
+    int32_t ReadPointerColor(int32_t &color);
     int32_t ReadTouchpadScrollSwich(bool &switchFlag);
     int32_t ReadTouchpadScrollDirection(bool &state);
     int32_t ReadTouchpadTapSwitch(bool &switchFlag);

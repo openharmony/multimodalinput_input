@@ -52,6 +52,8 @@ public:
     void OnWindowInfo(const WinInfo &info) override;
     void UpdatePointerDevice(bool hasPointerDevice, bool isPointerVisible) override;
     bool Init() override;
+    int32_t SetPointerColor(int32_t color) override;
+    int32_t GetPointerColor() override;
     void DeletePointerVisible(int32_t pid) override;
     int32_t SetPointerVisible(int32_t pid, bool visible) override;
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle) override;
