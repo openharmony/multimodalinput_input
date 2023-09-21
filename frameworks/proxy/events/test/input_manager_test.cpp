@@ -1097,5 +1097,74 @@ HWTEST_F(InputManagerTest, InputManagerTest_ClearWindowPointerStyle_001, TestSiz
     ret = InputManager::GetInstance()->GetPointerStyle(windowId, style);
     EXPECT_TRUE(ret == RET_OK);
 }
+
+/**
+ * @tc.name: InputManagerTest_GetPointerColor_001
+ * @tc.desc: Obtains the mouse color.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_GetPointerColor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t setColor = 0x000000;
+    InputManager::GetInstance()->SetPointerColor(setColor);
+    int32_t getColor = 3;
+    ASSERT_TRUE(InputManager::GetInstance()->GetPointerColor(getColor) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateInputEventExt_001
+ * @tc.desc: Obtains the mouse color.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventExt_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
+    item.SetPressure(POINTER_ITEM_PRESSURE);
+    item.SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddPointerItem(item);
+    
+#ifdef OHOS_BUILD_ENABLE_CONTAINER
+    InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
+    InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
+#endif  // OHOS_BUILD_ENABLE_CONTAINER
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateInputEventExt_002
+ * @tc.desc: Obtains the mouse color.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventExt_002, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_TRUE(injectDownEvent != nullptr);
+    int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(downTime);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_VOLUME_DOWN);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+
+#ifdef OHOS_BUILD_ENABLE_CONTAINER
+    InputManager::GetInstance()->SimulateInputEventExt(injectDownEvent);
+    ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
+#endif  // OHOS_BUILD_ENABLE_CONTAINER
+}
 }  // namespace MMI
 }  // namespace OHOS
