@@ -605,5 +605,311 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetEnhanceData_001, TestSize.Level1)
     ASSERT_EQ(pointerEvent->GetEnhanceData(), enhanceData);
     #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 }
+
+/**
+ * @tc.name: PointerEventTest_SetToolDisplayX_001
+ * @tc.desc: Set Tool Display Coordinates.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetToolDisplayX_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t displayX = 90;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(1);
+    item.SetDownTime(0);
+    ASSERT_NO_FATAL_FAILURE(item.SetToolDisplayX(displayX));
+    ASSERT_EQ(item.GetToolDisplayX(), displayX);
+    pointerEvent->AddPointerItem(item);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetToolDisplayY_001
+ * @tc.desc: Set Tool Display Coordinates.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetToolDisplayY_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    int32_t displayY = 70;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(2);
+    item.SetDownTime(1);
+    ASSERT_NO_FATAL_FAILURE(item.SetToolDisplayY(displayY));
+    ASSERT_EQ(item.GetToolDisplayY(), displayY);
+    pointerEvent->AddPointerItem(item);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetToolWidth_001
+ * @tc.desc: Set Tool Display Width.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetToolWidth_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t toolWidth = 30;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(3);
+    item.SetDownTime(0);
+    ASSERT_NO_FATAL_FAILURE(item.SetToolWidth(toolWidth));
+    ASSERT_EQ(item.GetToolWidth(), toolWidth);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetToolHeight_001
+ * @tc.desc: Set Tool Display Height.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetToolHeight_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t toolHeight = 40;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(4);
+    item.SetDownTime(1);
+    ASSERT_NO_FATAL_FAILURE(item.SetToolHeight(toolHeight));
+    ASSERT_EQ(item.GetToolHeight(), toolHeight);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetLongAxis_001
+ * @tc.desc: Sets the long axis of the touch point area.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetLongAxis_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t longAxis = 50;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(5);
+    item.SetDownTime(0);
+    ASSERT_NO_FATAL_FAILURE(item.SetLongAxis(longAxis));
+    ASSERT_EQ(item.GetLongAxis(), longAxis);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetShortAxis_001
+ * @tc.desc: Sets the short axis of the touch point area.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetShortAxis_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t shortAxis = 45;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(6);
+    item.SetDownTime(1);
+    ASSERT_NO_FATAL_FAILURE(item.SetShortAxis(shortAxis));
+    ASSERT_EQ(item.GetShortAxis(), shortAxis);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetRawDx_001
+ * @tc.desc: Sets the raw X coordinate.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetRawDx_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rawDx = 55;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(7);
+    item.SetDownTime(0);
+    ASSERT_NO_FATAL_FAILURE(item.SetRawDx(rawDx));
+    ASSERT_EQ(item.GetRawDx(), rawDx);
+}
+
+/**
+ * @tc.name: PointerEventTest_SetRawDy_001
+ * @tc.desc: Sets the raw Y coordinate.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetRawDy_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t rawDy = 60;
+    PointerEvent::PointerItem item;
+    item.SetPointerId(8);
+    item.SetDownTime(1);
+    ASSERT_NO_FATAL_FAILURE(item.SetRawDy(rawDy));
+    ASSERT_EQ(item.GetRawDy(), rawDy);
+}
+
+/**
+ * @tc.name: PointerEventTest_ClearFlag_001
+ * @tc.desc: Clears all flags of an input event.
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ClearFlag_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    inputEvent->SetTargetDisplayId(0);
+    inputEvent->SetDeviceId(0);
+    inputEvent->EventTypeToString(InputEvent::EVENT_TYPE_POINTER);
+    inputEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    ASSERT_NO_FATAL_FAILURE(inputEvent->ClearFlag());
+    ASSERT_EQ(inputEvent->GetFlag(), InputEvent::EVENT_FLAG_NONE);
+}
+
+/**
+ * @tc.name: PointerEventTest_From_001
+ * @tc.desc: Convert InputEvent to nullptr.
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_From_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto inputEvent = InputEvent::Create();
+    ASSERT_NE(inputEvent, nullptr);
+    inputEvent->SetDeviceId(2);
+    inputEvent->SetTargetWindowId(2);
+    inputEvent->SetAgentWindowId(2);
+    auto event = PointerEvent::from(inputEvent);
+    ASSERT_EQ(event, nullptr);
+}
+
+/**
+ * @tc.name: PointerEventTest_Reset_001
+ * @tc.desc: Reset pointer event.
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_Reset_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerId(1);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->Reset());
+    ASSERT_EQ(pointerEvent->GetSourceType(), PointerEvent::SOURCE_TYPE_UNKNOWN);
+    ASSERT_EQ(pointerEvent->GetPointerId(), -1);
+    ASSERT_EQ(pointerEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_UNKNOWN);
+}
+
+/**
+ * @tc.name: PointerEventTest_IsButtonPressed_001
+ * @tc.desc: Determine whether the button is pressed.
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_IsButtonPressed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    pointerEvent->SetButtonId(PointerEvent::BUTTON_NONE);
+    pointerEvent->SetButtonPressed(0);
+    ASSERT_TRUE(pointerEvent->IsButtonPressed(0));
+}
+
+/**
+ * @tc.name: PointerEventTest_DeleteReleaseButton_001
+ * @tc.desc: Deletes a released button.
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_DeleteReleaseButton_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    pointerEvent->SetButtonId(PointerEvent::BUTTON_NONE);
+    pointerEvent->SetButtonPressed(0);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->DeleteReleaseButton(0));
+    std::set<int32_t> pressButtons = pointerEvent->GetPressedButtons();
+    ASSERT_EQ(pressButtons.size(), 0);
+}
+
+/**
+ * @tc.name: PointerEventTest_ClearButtonPressed_001
+ * @tc.desc: Clears the button in the pressed state.
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ClearButtonPressed_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+    pointerEvent->SetButtonId(PointerEvent::BUTTON_NONE);
+    pointerEvent->SetButtonPressed(0);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->ClearButtonPressed());
+    std::set<int32_t> pressButtons = pointerEvent->GetPressedButtons();
+    ASSERT_EQ(pressButtons.size(), 0);
+}
+
+/**
+ * @tc.name: PointerEventTest_ClearAxisValue_001
+ * @tc.desc: Clears the button in the pressed state.
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisValue_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL, 30.0);
+    double axisValue = pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL);
+    ASSERT_EQ(axisValue, 30.0);
+    ASSERT_NO_FATAL_FAILURE(pointerEvent->ClearAxisValue());
+    ASSERT_EQ(pointerEvent->GetAxisValue(PointerEvent::AXIS_TYPE_SCROLL_VERTICAL), 0);
+}
+
+/**
+ * @tc.name: PointerEventTest_IsValid_001
+ * @tc.desc: Checks whether this input event is valid.
+ * @tc.type: FUNC
+ * @tc.require: 
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_IsValid_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    ASSERT_FALSE(pointerEvent->IsValid());
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    ASSERT_FALSE(pointerEvent->IsValid());
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetButtonId(PointerEvent::BUTTON_NONE);
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDownTime(0);
+    item.SetPressed(false);
+    pointerEvent->AddPointerItem(item);
+    ASSERT_TRUE(pointerEvent->IsValid());
+}
 } // namespace MMI
 } // namespace OHOS
