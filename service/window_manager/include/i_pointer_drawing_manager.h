@@ -96,6 +96,10 @@ public:
     {
         return {};
     }
+    virtual std::map<MOUSE_ICON, IconStyle> GetMouseIconPath()
+    {
+        return {};
+    }
 public:
     static inline std::shared_ptr<IPointerDrawingManager> iPointDrawMgr_ { nullptr };
 };
