@@ -117,12 +117,7 @@ void ANRHandler::SendEvent(int32_t eventType, int64_t delayTime)
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Event type:%{public}d, delayTime:%{public}" PRId64, eventType, delayTime);
     SetLastProcessedEventStatus(eventType, true);
-    auto eventHandler = InputMgrImpl.GetEventHandler();
-    CHKPV(eventHandler);
-    std::function<void()> eventFunc = std::bind(&ANRHandler::MarkProcessed, this, eventType);
-    if (!eventHandler->PostHighPriorityTask(eventFunc, delayTime)) {
-        MMI_HILOGE("Send dispatch event failed");
-    }
+    MarkProcessed(eventType);
 }
 
 void ANRHandler::ResetAnrArray()
