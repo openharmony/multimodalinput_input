@@ -28,15 +28,10 @@ using namespace testing::ext;
 } // namespace
 class PointerEventTest : public testing::Test {
 public:
-    static void SetUpTestCase(void);
+    static void SetUpTestCase(void) {};
     static void TearDownTestCase(void) {}
     static std::shared_ptr<PointerEvent> CreatePointEvent();
 };
-
-void PointerEventTest::SetUpTestCase()
-{
-    ASSERT_TRUE(TestUtil->Init());
-}
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
 std::shared_ptr<PointerEvent> PointerEventTest::CreatePointEvent()
@@ -752,7 +747,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_SetRawDy_001, TestSize.Level1)
  * @tc.name: PointerEventTest_ClearFlag_001
  * @tc.desc: Clears all flags of an input event.
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(PointerEventTest, PointerEventTest_ClearFlag_001, TestSize.Level1)
 {
@@ -771,7 +766,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearFlag_001, TestSize.Level1)
  * @tc.name: PointerEventTest_From_001
  * @tc.desc: Convert InputEvent to nullptr.
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(PointerEventTest, PointerEventTest_From_001, TestSize.Level1)
 {
@@ -789,7 +784,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_From_001, TestSize.Level1)
  * @tc.name: PointerEventTest_Reset_001
  * @tc.desc: Reset pointer event.
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(PointerEventTest, PointerEventTest_Reset_001, TestSize.Level1)
 {
@@ -809,7 +804,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_Reset_001, TestSize.Level1)
  * @tc.name: PointerEventTest_IsButtonPressed_001
  * @tc.desc: Determine whether the button is pressed.
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(PointerEventTest, PointerEventTest_IsButtonPressed_001, TestSize.Level1)
 {
@@ -828,7 +823,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_IsButtonPressed_001, TestSize.Level1
  * @tc.name: PointerEventTest_DeleteReleaseButton_001
  * @tc.desc: Deletes a released button.
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(PointerEventTest, PointerEventTest_DeleteReleaseButton_001, TestSize.Level1)
 {
@@ -849,7 +844,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_DeleteReleaseButton_001, TestSize.Le
  * @tc.name: PointerEventTest_ClearButtonPressed_001
  * @tc.desc: Clears the button in the pressed state.
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(PointerEventTest, PointerEventTest_ClearButtonPressed_001, TestSize.Level1)
 {
@@ -870,7 +865,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearButtonPressed_001, TestSize.Lev
  * @tc.name: PointerEventTest_ClearAxisValue_001
  * @tc.desc: Clears the button in the pressed state.
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisValue_001, TestSize.Level1)
 {
@@ -889,7 +884,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisValue_001, TestSize.Level1)
  * @tc.name: PointerEventTest_IsValid_001
  * @tc.desc: Checks whether this input event is valid.
  * @tc.type: FUNC
- * @tc.require: 
+ * @tc.require:
  */
 HWTEST_F(PointerEventTest, PointerEventTest_IsValid_001, TestSize.Level1)
 {
