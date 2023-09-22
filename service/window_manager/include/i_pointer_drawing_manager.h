@@ -16,6 +16,7 @@
 #ifndef I_POINTER_DRAWING_MANAGER_H
 #define I_POINTER_DRAWING_MANAGER_H
 
+#include <map>
 #include <memory>
 
 #include "pixel_map.h"
