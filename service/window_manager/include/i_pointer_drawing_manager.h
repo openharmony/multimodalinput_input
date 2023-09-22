@@ -16,6 +16,7 @@
 #ifndef I_POINTER_DRAWING_MANAGER_H
 #define I_POINTER_DRAWING_MANAGER_H
 
+#include <map>
 #include <memory>
 
 #include "pixel_map.h"
@@ -93,6 +94,10 @@ public:
         return 0;
     }
     virtual PointerStyle GetLastMouseStyle()
+    {
+        return {};
+    }
+    virtual std::map<MOUSE_ICON, IconStyle> GetMouseIconPath()
     {
         return {};
     }

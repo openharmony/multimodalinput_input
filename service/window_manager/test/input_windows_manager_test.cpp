@@ -20,6 +20,7 @@
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "uds_server.h"
+#include "scene_board_judgement.h"
 
 namespace OHOS {
 namespace MMI {
@@ -200,9 +201,15 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_006
 {
     UDSServer udsServer;
     WinMgr->Init(udsServer);
-    ASSERT_EQ(WinMgr->IsNeedRefreshLayer(-1), false);
-    ASSERT_EQ(WinMgr->IsNeedRefreshLayer(0), false);
-    ASSERT_EQ(WinMgr->IsNeedRefreshLayer(1), false);
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        ASSERT_EQ(WinMgr->IsNeedRefreshLayer(-1), true);
+        ASSERT_EQ(WinMgr->IsNeedRefreshLayer(0), true);
+        ASSERT_EQ(WinMgr->IsNeedRefreshLayer(1), true);
+    } else {
+        ASSERT_EQ(WinMgr->IsNeedRefreshLayer(-1), false);
+        ASSERT_EQ(WinMgr->IsNeedRefreshLayer(0), false);
+        ASSERT_EQ(WinMgr->IsNeedRefreshLayer(1), false);
+    }
 }
 
 /**

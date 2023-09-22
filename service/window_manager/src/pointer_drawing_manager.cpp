@@ -877,6 +877,12 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
     return RET_OK;
 }
 
+std::map<MOUSE_ICON, IconStyle> PointerDrawingManager::GetMouseIconPath()
+{
+    CALL_DEBUG_ENTER;
+    return mouseIcons_;
+}
+
 int32_t PointerDrawingManager::SetPointerStylePreference(PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
@@ -939,6 +945,16 @@ int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, Po
         MMI_HILOGD("Not need refresh layer, window type:%{public}d, pointer style:%{public}d",
             windowId, pointerStyle.id);
         return RET_OK;
+    }
+    if (windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
+        mouseIcons_[MOUSE_ICON(pointerStyle.id)].iconPath != DefaultIconPath)) {
+        PointerStyle style;
+        int32_t ret = WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Get global pointer style failed!");
+            return RET_ERR;
+        }
+        pointerStyle = style;
     }
     DrawPointerStyle(pointerStyle);
     MMI_HILOGD("Window id:%{public}d set pointer style:%{public}d success", windowId, pointerStyle.id);

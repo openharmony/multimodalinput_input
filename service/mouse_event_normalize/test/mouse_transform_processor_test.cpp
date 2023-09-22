@@ -124,6 +124,8 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpee
     MouseTransformProcessor processor(deviceId);
     int32_t speed = 5;
     ASSERT_EQ(processor.SetPointerSpeed(speed), idNames);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -140,6 +142,8 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpee
     int32_t speed = 5;
     processor.SetPointerSpeed(speed);
     ASSERT_EQ(processor.GetPointerSpeed(), idNames);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -159,25 +163,21 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerLoca
 }
 
 /**
- * @tc.name: MouseTransformProcessorTest_GetSpeed_009
- * @tc.desc: Test GetSpeed
+ * @tc.name: MouseTransformProcessorTest_SetPointerSpeed_009
+ * @tc.desc: Test GetPointerSpeed
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetSpeed_009, TestSize.Level1)
+HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpeed_009, TestSize.Level1)
 {
-    int32_t idNames = 5;
-    int32_t deviceId = 1;
+    int32_t idNames = 1;
+    int32_t deviceId = 0;
     MouseTransformProcessor processor(deviceId);
-    ASSERT_EQ(processor.GetSpeed(), idNames);
-
     int32_t speed = 0;
-    processor.SetConfigPointerSpeed(speed);
-    speed = 6;
-    processor.SetConfigPointerSpeed(speed);
-    speed = 15;
-    processor.SetConfigPointerSpeed(speed);
-    ASSERT_EQ(processor.GetSpeed(), idNames);
+    processor.SetPointerSpeed(speed);
+    ASSERT_EQ(processor.GetPointerSpeed(), idNames);
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**

@@ -44,6 +44,7 @@ constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER
 const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/display_bind.cfg";
 const std::string mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+const std::string defaultIconPath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
 } // namespace
 
 InputWindowsManager::InputWindowsManager() : bindInfo_(bindCfgFileName)
@@ -397,6 +398,17 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
         return;
     }
     lastPointerStyle_.id = pointerStyle.id;
+    std::map<MOUSE_ICON, IconStyle> mouseIcons = IPointerDrawingManager::GetInstance()->GetMouseIconPath();
+    if (windowId != GLOBAL_WINDOW_ID && (pointerStyle.id == MOUSE_ICON::DEFAULT &&
+        mouseIcons[MOUSE_ICON(pointerStyle.id)].iconPath != defaultIconPath)) {
+        PointerStyle style;
+        int32_t ret = WinMgr->GetPointerStyle(pid, GLOBAL_WINDOW_ID, style);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Get global pointer style failed!");
+            return;
+        }
+        lastPointerStyle_ = style;
+    }
     IPointerDrawingManager::GetInstance()->DrawPointerStyle(lastPointerStyle_);
 }
 
