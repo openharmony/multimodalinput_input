@@ -35,7 +35,6 @@ public:
     static int32_t SerializeInputEvent(std::shared_ptr<InputEvent> event, NetPacket &pkt);
     static int32_t DeserializeInputEvent(NetPacket &pkt, std::shared_ptr<InputEvent> event);
     static int32_t Marshalling(std::shared_ptr<PointerEvent> event, NetPacket &pkt);
-    static int32_t MarshallingBuffer(std::shared_ptr<PointerEvent> event, NetPacket &pkt);
     static int32_t Unmarshalling(NetPacket &pkt, std::shared_ptr<PointerEvent> event);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     static int32_t MarshallingEnhanceData(std::shared_ptr<PointerEvent> event, NetPacket &pkt);

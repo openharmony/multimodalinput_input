@@ -92,10 +92,6 @@ int32_t MouseEventNormalize::OnEvent(struct libinput_event *event)
         processor = it->second;
     } else {
         processor = std::make_shared<MouseTransformProcessor>(deviceId);
-        auto vendorConfig = InputDevMgr->GetVendorConfig(deviceId);
-        if (vendorConfig.pointerSpeed != -1) {
-            processor->SetConfigPointerSpeed(vendorConfig.pointerSpeed);
-        }
         auto [tIter, isOk] = processors_.emplace(deviceId, processor);
         if (!isOk) {
             MMI_HILOGE("Duplicate device record:%{public}d", deviceId);
