@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef AMS_APPDEBUG_LISTENER_H
-#define AMS_APPDEBUG_LISTENER_H
+#ifndef APP_DEBUG_LISTENER_H
+#define APP_DEBUG_LISTENER_H
 
 #include "app_debug_info.h"
 #include "app_debug_listener_interface.h"
@@ -22,10 +22,10 @@
 namespace OHOS {
 namespace MMI {
 
-class AmsAppDebugListener : public AppExecFwk::IAppDebugListener {
+class AppDebugListener : public AppExecFwk::IAppDebugListener {
 public:
-    static AmsAppDebugListener *GetInstance();
-    ~AmsAppDebugListener() = default;
+    static AppDebugListener *GetInstance();
+    ~AppDebugListener() = default;
 
     /**
      * @brief Notification of application information registered in listening and debugging mode.
@@ -44,9 +44,9 @@ public:
     bool isDebugMode();
 
 private:
-    static AmsAppDebugListener *instance_;
+    static AppDebugListener *instance_;
     bool isDebugMode_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // AMS_APPDEBUG_LISTENER_H
+#endif // APP_DEBUG_LISTENER_H

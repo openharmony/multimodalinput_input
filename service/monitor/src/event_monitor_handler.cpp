@@ -15,8 +15,8 @@
 
 #include "event_monitor_handler.h"
 
-#include "ams_appdebug_listener.h"
 #include "anr_manager.h"
+#include "app_debug_listener.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "input_event_data_transformation.h"
@@ -203,7 +203,7 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
         return;
     }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-        !AmsAppDebugListener::GetInstance()->isDebugMode()) {
+        !AppDebugListener::GetInstance()->isDebugMode()) {
         ANRMgr->AddTimer(ANR_MONITOR, pointerEvent->GetId(), currentTime, session_);
     }
 }

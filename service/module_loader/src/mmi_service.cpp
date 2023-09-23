@@ -23,8 +23,9 @@
 #include <unordered_map>
 #endif
 
-#include "ams_appdebug_listener.h"
+#include "ability_manager_client.h"
 #include "anr_manager.h"
+#include "app_debug_listener.h"
 #include "dfx_hisysevent.h"
 #include "event_dump.h"
 #include "input_device_manager.h"
@@ -342,7 +343,7 @@ void MMIService::OnStop()
 void MMIService::AddAppDebugListener()
 {
     auto errCode =
-        AppFwk::AbilityManagerClient::GetInstance()->RegisterAppDebugListener(AmsAppDebugListener::GetInstance());
+        AppFwk::AbilityManagerClient::GetInstance()->RegisterAppDebugListener(AppDebugListener::GetInstance());
     if (errCode != RET_OK) {
         MMI_HILOGE("Call RegisterAppDebugListener failed, errCode: %{public}d", errCode);
     }
@@ -351,7 +352,7 @@ void MMIService::AddAppDebugListener()
 void MMIService::RemoveAppDebugListener()
 {
     auto errCode =
-        AppFwk::AbilityManagerClient::GetInstance()->UnregisterAppDebugListener(AmsAppDebugListener::GetInstance());
+        AppFwk::AbilityManagerClient::GetInstance()->UnregisterAppDebugListener(AppDebugListener::GetInstance());
     if (errCode != RET_OK) {
         MMI_HILOGE("Call UnregisterAppDebugListener failed, errCode: %{public}d", errCode);
     }
