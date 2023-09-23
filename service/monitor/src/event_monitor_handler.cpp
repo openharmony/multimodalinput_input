@@ -15,6 +15,7 @@
 
 #include "event_monitor_handler.h"
 
+#include "ams_appdebug_listener.h"
 #include "anr_manager.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
@@ -201,7 +202,8 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
-    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+    if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
+        !AmsAppDebugListener::GetInstance()->isDebugMode()) {
         ANRMgr->AddTimer(ANR_MONITOR, pointerEvent->GetId(), currentTime, session_);
     }
 }

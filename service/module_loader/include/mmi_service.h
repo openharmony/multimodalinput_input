@@ -184,6 +184,8 @@ protected:
 
     void AddReloadDeviceTimer();
     int32_t UpdateSettingsXml(const std::string &businessId, int32_t delay);
+    void AddAppDebugListener();
+    void RemoveAppDebugListener();
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
