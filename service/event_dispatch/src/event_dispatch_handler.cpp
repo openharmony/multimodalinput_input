@@ -20,6 +20,7 @@
 #include "dfx_hisysevent.h"
 #include "hitrace_meter.h"
 
+#include "ams_appdebug_listener.h"
 #include "anr_manager.h"
 #include "bytrace_adapter.h"
 #include "error_multimodal.h"
@@ -124,7 +125,9 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
-    ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, session);
+    if (!AmsAppDebugListener::GetInstance()->isDebugMode()) {
+        ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, session);
+    }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_POINTER
 
@@ -163,7 +166,9 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
         MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-    ANRMgr->AddTimer(ANR_DISPATCH, key->GetId(), currentTime, session);
+    if (!AmsAppDebugListener::GetInstance()->isDebugMode()) {
+        ANRMgr->AddTimer(ANR_DISPATCH, key->GetId(), currentTime, session);
+    }
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

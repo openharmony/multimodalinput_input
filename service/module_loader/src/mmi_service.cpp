@@ -23,6 +23,7 @@
 #include <unordered_map>
 #endif
 
+#include "ams_appdebug_listener.h"
 #include "anr_manager.h"
 #include "dfx_hisysevent.h"
 #include "event_dump.h"
@@ -299,6 +300,7 @@ void MMIService::OnStart()
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Add system ability listener success");
 #endif
+    AddAppDebugListener();
 #ifdef OHOS_BUILD_ENABLE_CONTAINER
     InitContainer();
 #endif // OHOS_BUILD_ENABLE_CONTAINER
@@ -331,9 +333,28 @@ void MMIService::OnStop()
     RemoveSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Remove system ability listener success");
 #endif
+    RemoveAppDebugListener();
 #ifdef OHOS_BUILD_ENABLE_CONTAINER
     StopContainer();
 #endif // OHOS_BUILD_ENABLE_CONTAINER
+}
+
+void MMIService::AddAppDebugListener()
+{
+    auto errCode =
+        AppFwk::AbilityManagerClient::GetInstance()->RegisterAppDebugListener(AmsAppDebugListener::GetInstance());
+    if (errCode != RET_OK) {
+        MMI_HILOGE("Call RegisterAppDebugListener failed, errCode: %{public}d", errCode);
+    }
+}
+
+void MMIService::RemoveAppDebugListener()
+{
+    auto errCode =
+        AppFwk::AbilityManagerClient::GetInstance()->UnregisterAppDebugListener(AmsAppDebugListener::GetInstance());
+    if (errCode != RET_OK) {
+        MMI_HILOGE("Call UnregisterAppDebugListener failed, errCode: %{public}d", errCode);
+    }
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd,
