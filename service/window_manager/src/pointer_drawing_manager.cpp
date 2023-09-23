@@ -648,8 +648,10 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     imageHeight_ = pow(INCREASE_RATIO, size - 1) * displayInfo_.dpi * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
     IMAGE_WIDTH = (imageWidth_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
     IMAGE_HEIGHT = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
-
-    CreatePointerWindow(displayInfo_.id, lastPhysicalX_, lastPhysicalY_);
+    int32_t physicalX = lastPhysicalX_;
+    int32_t physicalY = lastPhysicalY_;
+    AdjustMouseFocus(ICON_TYPE(mouseIcons_[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay), physicalX, physicalY);
+    CreatePointerWindow(displayInfo_.id, physicalX, physicalY);
     ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
     if (ret != RET_OK) {
         MMI_HILOGE("Init layer failed");
