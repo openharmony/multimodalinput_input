@@ -13,22 +13,22 @@
  * limitations under the License.
  */
 
-#include "ams_appdebug_listener.h"
+#include "app_debug_listener.h"
 #include "mmi_log.h"
 
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "AmsAppDebugListener"};
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "AppDebugListener"};
 } // namespace
 
-AmsAppDebugListener *AmsAppDebugListener::instance_ = new (std::nothrow) AmsAppDebugListener();
-AmsAppDebugListener *AmsAppDebugListener::GetInstance()
+AppDebugListener *AppDebugListener::instance_ = new (std::nothrow) AppDebugListener();
+AppDebugListener *AppDebugListener::GetInstance()
 {
     return instance_;
 }
 
-void AmsAppDebugListener::OnAppDebugStarted(const std::vector<AppExecFwk::AppDebugInfo> &debugInfos)
+void AppDebugListener::OnAppDebugStarted(const std::vector<AppExecFwk::AppDebugInfo> &debugInfos)
 {
     CALL_DEBUG_ENTER;
     for (auto &debugInfo : debugInfos) {
@@ -38,7 +38,7 @@ void AmsAppDebugListener::OnAppDebugStarted(const std::vector<AppExecFwk::AppDeb
     }
 }
 
-void AmsAppDebugListener::OnAppDebugStoped(const std::vector<AppExecFwk::AppDebugInfo> &debugInfos)
+void AppDebugListener::OnAppDebugStoped(const std::vector<AppExecFwk::AppDebugInfo> &debugInfos)
 {
     CALL_DEBUG_ENTER;
     for (auto &debugInfo : debugInfos) {
@@ -48,12 +48,12 @@ void AmsAppDebugListener::OnAppDebugStoped(const std::vector<AppExecFwk::AppDebu
     }
 }
 
-sptr<IRemoteObject> AmsAppDebugListener::AsObject()
+sptr<IRemoteObject> AppDebugListener::AsObject()
 {
     return nullptr;
 }
 
-bool AmsAppDebugListener::isDebugMode()
+bool AppDebugListener::isDebugMode()
 {
     MMI_HILOGD("isDebugMode_ : %{public}d", isDebugMode_);
     return isDebugMode_;
