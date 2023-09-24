@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "define_multimodal.h"
 #include "event_util_test.h"
 #include "input_manager_util.h"
 #include "pixel_map.h"
@@ -106,6 +107,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMonitor_001, TestSi
 #else
     ASSERT_EQ(monitorId, ERROR_UNSUPPORT);
 #endif  // OHOS_BUILD_ENABLE_MONITOR ||  OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
 /**
@@ -124,6 +126,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMonitor_002, TestSi
 #else
     ASSERT_EQ(monitorId, ERROR_UNSUPPORT);
 #endif  // OHOS_BUILD_ENABLE_KEYBOARD || OHOS_BUILD_ENABLE_MONITOR
+    InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
 /**
@@ -149,6 +152,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_001
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
+    InputManagerUtil::TestRemoveMonitor(monitorId);
 }
 
 /**
@@ -193,6 +197,10 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_002
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
+
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; i++) {
+        InputManagerUtil::TestRemoveMonitor(ids[i]);
+    }
 }
 
 /**
@@ -225,6 +233,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_003
         InputManagerUtil::TestRemoveMonitor(monitorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
+    InputManagerUtil::TestRemoveMonitor(monitorId);
 }
 
 /**
@@ -261,6 +270,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
+    InputManagerUtil::TestRemoveMonitor(monitorId);
 }
 
 /**
@@ -297,6 +307,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
+    InputManagerUtil::TestRemoveMonitor(monitorId);
 }
 
 /**
@@ -333,6 +344,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
+    InputManagerUtil::TestRemoveMonitor(monitorId);
 }
 
 /**
@@ -388,6 +400,10 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
+
+    for (std::vector<int32_t>::size_type i = 0; i < N_TEST_CASES; ++i) {
+        InputManagerUtil::TestRemoveMonitor(ids[i]);
+    }
 }
 
 /**
@@ -424,6 +440,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
+    InputManagerUtil::TestRemoveMonitor(monitorId);
 }
 
 /**
@@ -447,6 +464,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMouseMonitor_001, T
 
     auto pointerEvent = InputManagerUtil::SetupPointerEvent005();
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
+    InputManagerUtil::TestRemoveMonitor(monitorId);
 }
 
 /**
@@ -471,6 +489,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMouseMonitor_003, T
     auto pointerEvent = InputManagerUtil::SetupPointerEvent007();
     ASSERT_TRUE(pointerEvent != nullptr);
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
+    InputManagerUtil::TestRemoveMonitor(monitorId);
 }
 
 /**
@@ -1125,6 +1144,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseIcon_001, Test
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
     PointerStyle pointerStyle;
@@ -1151,6 +1171,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseIcon_002, Test
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
     PointerStyle pointerStyle;
@@ -1177,6 +1198,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseIcon_003, Test
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     PointerStyle pointerStyle;
     pointerStyle.id = MOUSE_ICON::DEFAULT;
@@ -1207,6 +1229,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseHotSpot_001, T
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     PointerStyle pointerStyle;
     pointerStyle.id = MOUSE_ICON::CROSS;
@@ -1228,6 +1251,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseHotSpot_002, T
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
     PointerStyle pointerStyle;
@@ -1256,6 +1280,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerStyle_001, T
 {
     CALL_TEST_DEBUG;
     auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
     uint32_t windowId = window->GetWindowId();
     PointerStyle pointerStyle;
     pointerStyle.id = MOUSE_ICON::CROSS;
