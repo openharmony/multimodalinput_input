@@ -92,6 +92,70 @@ std::string InputManagerPointerTest::GetEventDump()
 }
 
 /**
+ * @tc.name: InputManagerPointerTest_MouseEventEnterAndLeave_001
+ * @tc.desc: Verify that the mouse moves away from the window
+ * @tc.type: FUNC
+ * @tc.require: I5HMF3 I5HMEF
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeave_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent{InputManagerUtil::SetupPointerEvent014()};
+    ASSERT_NE(pointerEvent, nullptr);
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    SimulateInputEventUtilTest(pointerEvent);
+#endif  // OHOS_BUILD_ENABLE_POINTER
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_MouseEventEnterAndLeave_002
+ * @tc.desc: Verify return mouse away from the window
+ * @tc.type: FUNC
+ * @tc.require: I5HMF3 I5HMEF
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeave_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent{InputManagerUtil::SetupKeyEvent002()};
+    ASSERT_NE(keyEvent, nullptr);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    SimulateInputEventUtilTest(keyEvent);
+#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_MouseEventEnterAndLeave_003
+ * @tc.desc: Verify that the home button and mouse leave the window
+ * @tc.type: FUNC
+ * @tc.require: I5HMF3 I5HMEF
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeave_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<KeyEvent> keyEvent{InputManagerUtil::SetupKeyEvent003()};
+    ASSERT_NE(keyEvent, nullptr);
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    SimulateInputEventUtilTest(keyEvent);
+#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_MouseEventEnterAndLeave_004
+ * @tc.desc: Verify that the mouse moves to the navigation bar to leave the window
+ * @tc.type: FUNC
+ * @tc.require: I5HMF3 I5HMEF
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeave_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::shared_ptr<PointerEvent> pointerEvent{InputManagerUtil::SetupPointerEvent015()};
+    ASSERT_NE(pointerEvent, nullptr);
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    SimulateInputEventUtilTest(pointerEvent);
+#endif  // OHOS_BUILD_ENABLE_POINTER
+}
+
+/**
  * @tc.name: InputManagerPointerTest_AddMonitor_001
  * @tc.desc: Verify pointerevent monitor
  * @tc.type: FUNC
@@ -698,70 +762,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetWindowInputEventCon
 #else
     ASSERT_TRUE(runnerThreadId != consumerThreadId);
 #endif  // OHOS_BUILD_ENABLE_KEYBOARD
-}
-
-/**
- * @tc.name: InputManagerPointerTest_MouseEventEnterAndLeave_001
- * @tc.desc: Verify that the mouse moves away from the window
- * @tc.type: FUNC
- * @tc.require: I5HMF3 I5HMEF
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeave_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerEvent> pointerEvent{InputManagerUtil::SetupPointerEvent014()};
-    ASSERT_NE(pointerEvent, nullptr);
-#ifdef OHOS_BUILD_ENABLE_POINTER
-    SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_POINTER
-}
-
-/**
- * @tc.name: InputManagerPointerTest_MouseEventEnterAndLeave_002
- * @tc.desc: Verify return mouse away from the window
- * @tc.type: FUNC
- * @tc.require: I5HMF3 I5HMEF
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeave_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<KeyEvent> keyEvent{InputManagerUtil::SetupKeyEvent002()};
-    ASSERT_NE(keyEvent, nullptr);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(keyEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
-}
-
-/**
- * @tc.name: InputManagerPointerTest_MouseEventEnterAndLeave_003
- * @tc.desc: Verify that the home button and mouse leave the window
- * @tc.type: FUNC
- * @tc.require: I5HMF3 I5HMEF
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeave_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<KeyEvent> keyEvent{InputManagerUtil::SetupKeyEvent003()};
-    ASSERT_NE(keyEvent, nullptr);
-#ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    SimulateInputEventUtilTest(keyEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
-}
-
-/**
- * @tc.name: InputManagerPointerTest_MouseEventEnterAndLeave_004
- * @tc.desc: Verify that the mouse moves to the navigation bar to leave the window
- * @tc.type: FUNC
- * @tc.require: I5HMF3 I5HMEF
- */
-HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeave_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::shared_ptr<PointerEvent> pointerEvent{InputManagerUtil::SetupPointerEvent015()};
-    ASSERT_NE(pointerEvent, nullptr);
-#ifdef OHOS_BUILD_ENABLE_POINTER
-    SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_POINTER
 }
 
 /**
