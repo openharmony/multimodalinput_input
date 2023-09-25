@@ -1165,6 +1165,7 @@ bool KeyEvent::WriteToParcel(Parcel &out) const
     WRITEBOOL(out, numLock_);
     WRITEBOOL(out, capsLock_);
     WRITEBOOL(out, scrollLock_);
+    WRITEBOOL(out, repeat_);
     return true;
 }
 
@@ -1190,6 +1191,7 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
     READBOOL(in, numLock_);
     READBOOL(in, capsLock_);
     READBOOL(in, scrollLock_);
+    READBOOL(in, repeat_);
     return true;
 }
 
@@ -1262,6 +1264,16 @@ int32_t KeyEvent::GetKeyIntention() const
 void KeyEvent::SetKeyIntention(int32_t keyIntention)
 {
     keyIntention_ = keyIntention;
+}
+
+bool KeyEvent::IsRepeat() const
+{
+    return repeat_;
+}
+
+void KeyEvent::SetRepeat(bool repeat)
+{
+    repeat_ = repeat;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -3346,6 +3346,21 @@ public:
      */
     void SetKeyIntention(int32_t keyIntention);
 
+    /**
+     * @brief Gets the automatic keystroke repeat status.
+     * @return bool
+     * @since 10
+     */
+    bool IsRepeat() const;
+
+    /**
+     * @brief Sets the injection key to repeat automatically.
+     * @param repeat Key injection automatic repeat identification.
+     * @return void
+     * @since 10
+     */
+    void SetRepeat(bool repeat);
+
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.
@@ -3382,6 +3397,7 @@ private:
     bool numLock_ { false };
     bool capsLock_ { false };
     bool scrollLock_ { false };
+    bool repeat_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
