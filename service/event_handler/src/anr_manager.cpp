@@ -32,6 +32,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ANRManager" };
 const std::string FOUNDATION = "foundation";
 constexpr int32_t MAX_ANR_TIMER_COUNT = 50;
+constexpr int32_t TIME_CONVERT_RATIO = 1000;
 } // namespace
 
 ANRManager::ANRManager() {}
@@ -93,7 +94,7 @@ void ANRManager::AddTimer(int32_t type, int32_t id, int64_t currentTime, Session
         MMI_HILOGD("Add anr timer failed, anrtimer count reached the maximum number:%{public}d", MAX_ANR_TIMER_COUNT);
         return;
     }
-    int32_t timerId = TimerMgr->AddTimer(INPUT_UI_TIMEOUT_TIME, 1, [this, id, type, sess]() {
+    int32_t timerId = TimerMgr->AddTimer(INPUT_UI_TIMEOUT_TIME / TIME_CONVERT_RATIO, 1, [this, id, type, sess]() {
         CHKPV(sess);
         if (type == ANR_MONITOR || WinMgr->IsWindowVisible(sess->GetPid())) {
             sess->SetAnrStatus(type, true);
