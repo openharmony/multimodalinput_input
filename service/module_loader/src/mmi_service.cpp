@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +23,9 @@
 #include <unordered_map>
 #endif
 
+#include "ability_manager_client.h"
 #include "anr_manager.h"
+#include "app_debug_listener.h"
 #include "dfx_hisysevent.h"
 #include "event_dump.h"
 #include "input_device_manager.h"
@@ -299,6 +301,7 @@ void MMIService::OnStart()
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Add system ability listener success");
 #endif
+    AddAppDebugListener();
 #ifdef OHOS_BUILD_ENABLE_CONTAINER
     InitContainer();
 #endif // OHOS_BUILD_ENABLE_CONTAINER
@@ -331,9 +334,32 @@ void MMIService::OnStop()
     RemoveSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Remove system ability listener success");
 #endif
+    RemoveAppDebugListener();
 #ifdef OHOS_BUILD_ENABLE_CONTAINER
     StopContainer();
 #endif // OHOS_BUILD_ENABLE_CONTAINER
+}
+
+void MMIService::AddAppDebugListener()
+{
+    CALL_DEBUG_ENTER;
+    appDebugListener_ = AppDebugListener::GetInstance();
+    auto errCode =
+        AAFwk::AbilityManagerClient::GetInstance()->RegisterAppDebugListener(appDebugListener_);
+    if (errCode != RET_OK) {
+        MMI_HILOGE("Call RegisterAppDebugListener failed, errCode: %{public}d", errCode);
+    }
+}
+
+void MMIService::RemoveAppDebugListener()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(appDebugListener_);
+    auto errCode =
+        AAFwk::AbilityManagerClient::GetInstance()->UnregisterAppDebugListener(appDebugListener_);
+    if (errCode != RET_OK) {
+        MMI_HILOGE("Call UnregisterAppDebugListener failed, errCode: %{public}d", errCode);
+    }
 }
 
 int32_t MMIService::AllocSocketFd(const std::string &programName, const int32_t moduleType, int32_t &toReturnClientFd,
