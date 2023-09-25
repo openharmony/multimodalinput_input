@@ -17,35 +17,24 @@
 #define APP_DEBUG_LISTENER_H
 
 #include "app_debug_info.h"
-#include "app_debug_listener_interface.h"
+#include "app_debug_listener_stub.h"
 
 namespace OHOS {
 namespace MMI {
 
-class AppDebugListener : public AppExecFwk::IAppDebugListener {
+class AppDebugListener : public AppExecFwk::AppDebugListenerStub {
 public:
     static AppDebugListener *GetInstance();
     ~AppDebugListener() = default;
 
-    /**
-     * @brief Notification of application information registered in listening and debugging mode.
-     * @param tokens The app info of app running record.
-     */
     void OnAppDebugStarted(const std::vector<AppExecFwk::AppDebugInfo> &debugInfos) override;
-
-    /**
-     * @brief Notification of application information registered in listening and remove debug mode.
-     * @param tokens The app info of app running record.
-     */
     void OnAppDebugStoped(const std::vector<AppExecFwk::AppDebugInfo> &debugInfos) override;
 
-    sptr<IRemoteObject> AsObject() override;
-
-    bool isDebugMode();
+    int32_t GetAppDebugPid();
 
 private:
     static AppDebugListener *instance_;
-    bool isDebugMode_ { false };
+    int32_t appDebugPid_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS

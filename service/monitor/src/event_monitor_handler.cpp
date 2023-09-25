@@ -203,7 +203,7 @@ void EventMonitorHandler::SessionHandler::SendToClient(std::shared_ptr<PointerEv
         return;
     }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN &&
-        !AppDebugListener::GetInstance()->isDebugMode()) {
+        session_->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid()) {
         ANRMgr->AddTimer(ANR_MONITOR, pointerEvent->GetId(), currentTime, session_);
     }
 }

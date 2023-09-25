@@ -125,7 +125,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
-    if (!AppDebugListener::GetInstance()->isDebugMode()) {
+    if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid()) {
         ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, session);
     }
 }
@@ -166,7 +166,7 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
         MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-    if (!AppDebugListener::GetInstance()->isDebugMode()) {
+    if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid()) {
         ANRMgr->AddTimer(ANR_DISPATCH, key->GetId(), currentTime, session);
     }
     return RET_OK;
