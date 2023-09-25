@@ -1555,7 +1555,32 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
 int32_t InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    return RET_ERR;
+    int32_t pointerAction =  pointerEvent->GetPointerAction();
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    switch (pointerAction) {
+        case PointerEvent::POINTER_ACTION_BUTTON_DOWN:
+        case PointerEvent::POINTER_ACTION_BUTTON_UP:
+        case PointerEvent::POINTER_ACTION_MOVE: {
+            return UpdateMouseTarget(pointerEvent);
+        }
+        case PointerEvent::POINTER_ACTION_DOWN: {
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+            pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+            pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+            return UpdateMouseTarget(pointerEvent);
+        }
+        case PointerEvent::POINTER_ACTION_UP: {
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+            pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+            pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+            return UpdateMouseTarget(pointerEvent);
+        }
+        default: {
+            MMI_HILOGE("pointer action is unknown, pointerAction:%{public}d", pointerAction);
+            return RET_ERR;
+        }
+    }
+    return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 

@@ -1099,6 +1099,223 @@ HWTEST_F(InputManagerTest, InputManagerTest_ClearWindowPointerStyle_001, TestSiz
 }
 
 /**
+ * @tc.name: InputManager_InjectMouseEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_InjectMouseEvent_002
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_InjectMouseEvent_003
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_InjectMouseEvent_004
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_InjectMouseEvent_005
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectMouseEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetButtonId(PointerEvent::MOUSE_BUTTON_LEFT);
+    pointerEvent->SetButtonPressed(PointerEvent::MOUSE_BUTTON_LEFT);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_InjectTouchEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectTouchEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_InjectTouchEvent_002
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectTouchEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetPointerId(0);
+    item.SetDisplayX(200);
+    item.SetDisplayY(200);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_InjectEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+
+    KeyEvent::KeyItem item;
+    keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    item.SetKeyCode(2017);
+    item.SetPressed(true);
+    item.SetDownTime(500);
+    keyEvent->AddKeyItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+}
+
+/**
+ * @tc.name: InputManager_InjectEvent_002
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    std::vector<int32_t> downKey;
+    downKey.push_back(2072);
+    downKey.push_back(2017);
+
+    KeyEvent::KeyItem item[downKey.size()];
+    for (size_t i = 0; i < downKey.size(); i++) {
+        keyEvent->SetKeyCode(2072);
+        keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+        item[i].SetKeyCode(downKey[i]);
+        item[i].SetPressed(true);
+        item[i].SetDownTime(0);
+        keyEvent->AddKeyItem(item[i]);
+    }
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+}
+
+/**
  * @tc.name: InputManagerTest_GetPointerColor_001
  * @tc.desc: Obtains the mouse color.
  * @tc.type: FUNC
