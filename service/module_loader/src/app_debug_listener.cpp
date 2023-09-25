@@ -41,8 +41,10 @@ void AppDebugListener::OnAppDebugStoped(const std::vector<AppExecFwk::AppDebugIn
 {
     CALL_DEBUG_ENTER;
     for (auto &debugInfo : debugInfos) {
-        appDebugPid_ = -1;
-        MMI_HILOGD("appDebugPid_ : %{public}d", appDebugPid_);
+        if (appDebugPid_ == debugInfo.pid) {
+            appDebugPid_ = -1;
+            MMI_HILOGD("appDebugPid_ : %{public}d", appDebugPid_);
+        }
     }
 }
 
