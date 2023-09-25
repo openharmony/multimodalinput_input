@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@
 #include "singleton.h"
 #include "system_ability.h"
 
+#include "app_debug_listener.h"
 #include "delegate_tasks.h"
 #include "input_event_handler.h"
 #include "libinput_adapter.h"
@@ -184,6 +185,8 @@ protected:
 
     void AddReloadDeviceTimer();
     int32_t UpdateSettingsXml(const std::string &businessId, int32_t delay);
+    void AddAppDebugListener();
+    void RemoveAppDebugListener();
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
@@ -197,6 +200,7 @@ private:
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
+    sptr<AppDebugListener> appDebugListener_;
 
     std::atomic_bool threadStatusFlag_ { false };
 };

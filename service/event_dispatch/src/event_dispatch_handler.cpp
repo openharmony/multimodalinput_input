@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,7 @@
 #include "hitrace_meter.h"
 
 #include "anr_manager.h"
+#include "app_debug_listener.h"
 #include "bytrace_adapter.h"
 #include "error_multimodal.h"
 #include "input_event_data_transformation.h"
@@ -124,7 +125,10 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return;
     }
-    ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, session);
+    if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid()) {
+        MMI_HILOGD("session pid : %{public}d", session->GetPid());
+        ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, session);
+    }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_POINTER
 
@@ -163,7 +167,10 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
         MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
     }
-    ANRMgr->AddTimer(ANR_DISPATCH, key->GetId(), currentTime, session);
+    if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid()) {
+        MMI_HILOGD("session pid : %{public}d", session->GetPid());
+        ANRMgr->AddTimer(ANR_DISPATCH, key->GetId(), currentTime, session);
+    }
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
