@@ -24,6 +24,7 @@
 #include "singleton.h"
 #include "system_ability.h"
 
+#include "app_debug_listener.h"
 #include "delegate_tasks.h"
 #include "input_event_handler.h"
 #include "libinput_adapter.h"
@@ -199,6 +200,7 @@ private:
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
+    sptr<AppDebugListener> appDebugListener_;
 
     std::atomic_bool threadStatusFlag_ { false };
 };

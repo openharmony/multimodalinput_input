@@ -342,8 +342,10 @@ void MMIService::OnStop()
 
 void MMIService::AddAppDebugListener()
 {
+    CALL_DEBUG_ENTER;
+    appDebugListener_ = AppDebugListener::GetInstance();
     auto errCode =
-        AppFwk::AbilityManagerClient::GetInstance()->RegisterAppDebugListener(AppDebugListener::GetInstance());
+        AppFwk::AbilityManagerClient::GetInstance()->RegisterAppDebugListener(appDebugListener_);
     if (errCode != RET_OK) {
         MMI_HILOGE("Call RegisterAppDebugListener failed, errCode: %{public}d", errCode);
     }
@@ -351,8 +353,10 @@ void MMIService::AddAppDebugListener()
 
 void MMIService::RemoveAppDebugListener()
 {
+    CALL_DEBUG_ENTER;
+    CHKPV(appDebugListener_);
     auto errCode =
-        AppFwk::AbilityManagerClient::GetInstance()->UnregisterAppDebugListener(AppDebugListener::GetInstance());
+        AppFwk::AbilityManagerClient::GetInstance()->UnregisterAppDebugListener(appDebugListener_);
     if (errCode != RET_OK) {
         MMI_HILOGE("Call UnregisterAppDebugListener failed, errCode: %{public}d", errCode);
     }

@@ -32,8 +32,8 @@ void AppDebugListener::OnAppDebugStarted(const std::vector<AppExecFwk::AppDebugI
 {
     CALL_DEBUG_ENTER;
     for (auto &debugInfo : debugInfos) {
-        if (debugInfo.bundleName == "mmi-service") {
-            isDebugMode_ = debugInfo.isDebugStart;
+        if (debugInfo.isDebugStart) {
+            appDebugPid_ = debugInfo.pid;
         }
     }
 }
@@ -42,21 +42,16 @@ void AppDebugListener::OnAppDebugStoped(const std::vector<AppExecFwk::AppDebugIn
 {
     CALL_DEBUG_ENTER;
     for (auto &debugInfo : debugInfos) {
-        if (debugInfo.bundleName == "mmi-service") {
-            isDebugMode_ = debugInfo.isDebugStart;
+        if (appDebugPid_ == debugInfo.pid) {
+            appDebugPid_ = -1;
         }
     }
 }
 
-sptr<IRemoteObject> AppDebugListener::AsObject()
+int32_t AppDebugListener::GetAppDebugPid()
 {
-    return nullptr;
-}
-
-bool AppDebugListener::isDebugMode()
-{
-    MMI_HILOGD("isDebugMode_ : %{public}d", isDebugMode_);
-    return isDebugMode_;
+    MMI_HILOGD("appDebugPid_ : %{public}d", appDebugPid_);
+    return appDebugPid_;
 }
 } // namespace MMI
 } // namespace OHOS
