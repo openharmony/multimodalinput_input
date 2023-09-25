@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -126,6 +126,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
         return;
     }
     if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid()) {
+        MMI_HILOGD("session pid : %{public}d", session->GetPid());
         ANRMgr->AddTimer(ANR_DISPATCH, point->GetId(), currentTime, session);
     }
 }
@@ -167,6 +168,7 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
         return MSG_SEND_FAIL;
     }
     if (session->GetPid() != AppDebugListener::GetInstance()->GetAppDebugPid()) {
+        MMI_HILOGD("session pid : %{public}d", session->GetPid());
         ANRMgr->AddTimer(ANR_DISPATCH, key->GetId(), currentTime, session);
     }
     return RET_OK;
