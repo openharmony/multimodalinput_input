@@ -37,7 +37,7 @@ public:
         std::vector<int32_t> ids;
         std::shared_ptr<InputDevice> device { nullptr };
         std::vector<bool> keystrokeAbility;
-        std::vector<int32_t> deviceIds;
+        int32_t deviceId { 0 };
         int32_t keyboardType { 0 };
         int32_t keyboardRepeatDelay { 0 };
         int32_t keyboardRepeatRate { 0 };
