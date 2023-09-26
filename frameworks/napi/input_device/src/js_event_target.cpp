@@ -75,21 +75,21 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
         }
         napi_value eventType = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_create_string_utf8(item->env, ADD_EVENT.c_str(), NAPI_AUTO_LENGTH, &eventType),
-            CREATE_STRING_UTF8, scope, &temp);
+            CREATE_STRING_UTF8, scope, temp);
         napi_value object = nullptr;
-        CHKRV_SCOPE_DEL(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope, &temp);
+        CHKRV_SCOPE_DEL(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope, temp);
         CHKRV_SCOPE_DEL(item->env, napi_set_named_property(item->env, object, "type", eventType), SET_NAMED_PROPERTY,
-            scope, &temp);
+            scope, temp);
         napi_value handler = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE,
-            scope, &temp);
+            scope, temp);
         napi_value deviceId = nullptr;
-        CHKRV_SCOPE_DEL(item->env, napi_create_int32(item->env, temp->deviceId, &deviceId), CREATE_INT32, scope, &temp);
+        CHKRV_SCOPE_DEL(item->env, napi_create_int32(item->env, temp->deviceId, &deviceId), CREATE_INT32, scope, temp);
         CHKRV_SCOPE_DEL(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY,
-            scope, &temp);
+            scope, temp);
         napi_value ret = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION,
-            scope, &temp);
+            scope, temp);
         napi_close_handle_scope(item->env, scope);
     }
     delete temp;
@@ -127,21 +127,21 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
         }
         napi_value eventType = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_create_string_utf8(item->env, REMOVE_EVENT.c_str(), NAPI_AUTO_LENGTH,
-            &eventType), CREATE_STRING_UTF8, scope, &temp);
+            &eventType), CREATE_STRING_UTF8, scope, temp);
         napi_value deviceId = nullptr;
-        CHKRV_SCOPE_DEL(item->env, napi_create_int32(item->env, temp->deviceId, &deviceId), CREATE_INT32, scope, &temp);
+        CHKRV_SCOPE_DEL(item->env, napi_create_int32(item->env, temp->deviceId, &deviceId), CREATE_INT32, scope, temp);
         napi_value object = nullptr;
-        CHKRV_SCOPE_DEL(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope, &temp);
+        CHKRV_SCOPE_DEL(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope, temp);
         CHKRV_SCOPE_DEL(item->env, napi_set_named_property(item->env, object, "type", eventType), SET_NAMED_PROPERTY,
-            scope, &temp);
+            scope, temp);
         CHKRV_SCOPE_DEL(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY,
-            scope, &temp);
+            scope, temp);
         napi_value handler = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE,
-            scope, &temp);
+            scope, temp);
         napi_value ret = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION,
-            scope, &temp);
+            scope, temp);
         napi_close_handle_scope(item->env, scope);
     }
     delete temp;
