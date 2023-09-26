@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,7 +41,7 @@ constexpr int32_t AXIS_UPDATE = 5;
 constexpr int32_t AXIS_END = 6;
 constexpr int32_t MIDDLE = 1;
 constexpr int32_t RIGHT = 2;
-constexpr int32_t MOUSE_FLOW = 15;
+constexpr int32_t MOUSE_FLOW = 10;
 constexpr int32_t THREE_FINGERS = 3;
 constexpr int32_t FOUR_FINGERS = 4;
 constexpr int32_t GESTURE_BEGIN = 1;
@@ -102,12 +102,11 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
     }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE
         && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
-        static int32_t count = MOUSE_FLOW;
-        if (++count < MOUSE_FLOW) {
+        if (++flowCtrl_ < MOUSE_FLOW) {
             pointerEvent->MarkProcessed();
             return;
         } else {
-            count = 0;
+            flowCtrl_ = 0;
         }
     }
     std::function<void(std::shared_ptr<PointerEvent>)> callback;

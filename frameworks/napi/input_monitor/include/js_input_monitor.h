@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -59,6 +59,7 @@ private:
     int32_t monitorId_ { -1 };
     mutable bool consumed_ { false };
     mutable std::mutex mutex_;
+    mutable int32_t flowCtrl_ { 0 };
 };
 
 class JsInputMonitor final {
