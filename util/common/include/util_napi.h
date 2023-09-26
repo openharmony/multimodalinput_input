@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -66,6 +66,16 @@ namespace MMI {
         if ((state) != napi_ok) { \
             MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
             napi_close_handle_scope(env, scope); \
+            return; \
+        } \
+    } while (0)
+
+#define CHKRV_SCOPE_DEL(env, state, desc, scope, pointer) \
+    do { \
+        if ((state) != napi_ok) { \
+            MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
+            napi_close_handle_scope(env, scope); \
+            delete pointer; \
             return; \
         } \
     } while (0)
