@@ -70,6 +70,16 @@ namespace MMI {
         } \
     } while (0)
 
+#define CHKRV_SCOPE_DEL(env, state, desc, scope, pointer) \
+    do { \
+        if ((state) != napi_ok) { \
+            MMI_HILOGE("%{public}s failed", std::string(desc).c_str()); \
+            napi_close_handle_scope(env, scope); \
+            delete pointer; \
+            return; \
+        } \
+    } while (0)
+
 #define CHECK_SCOPE_BEFORE_BREAK(env, state, desc, scope, pointerEvent) \
     do { \
         if ((state) != napi_ok) { \
