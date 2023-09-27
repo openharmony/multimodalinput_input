@@ -33,6 +33,32 @@ public:
     template <class T> static void PrintEventData(std::shared_ptr<T> event);
 
 private:
+    static void PrintInfoLog(const std::shared_ptr<KeyEvent> event)
+    {
+        std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
+        MMI_HILOGI("KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",EventType:%{public}s,KeyAction:%{public}s,"
+            "NumLock:%{public}d,CapsLock:%{public}d,ScrollLock:%{public}d,EventNumber:%{public}d,"
+            "keyItemsCount:%{public}zu",
+            event->GetKeyCode(), event->GetActionTime(), InputEvent::EventTypeToString(event->GetEventType()),
+            KeyEvent::ActionToString(event->GetKeyAction()), event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
+            event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
+            event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY),
+            event->GetId(), eventItems.size());
+        for (const auto &item : eventItems) {
+            MMI_HILOGI("DeviceNumber:%{public}d,KeyCode:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,",
+            item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed());
+        }
+        std::vector<int32_t> pressedKeys = event->GetPressedKeys();
+        std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
+        if (cItr != pressedKeys.cend()) {
+            std::string tmpStr = "Pressed keyCode: [" + std::to_string(*(cItr++));
+            for (; cItr != pressedKeys.cend(); ++cItr) {
+                tmpStr += ("," + std::to_string(*cItr));
+            }
+            MMI_HILOGI("%{public}s]", tmpStr.c_str());
+        }
+    }
+
     static void Print(const std::shared_ptr<KeyEvent> event)
     {
         if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG) &&
@@ -54,6 +80,38 @@ private:
             MMI_HILOGI("DeviceNumber:%{public}d,KeyCode:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,"
                 "GetUnicode:%{public}d", item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed(),
                 item.GetUnicode());
+        }
+        std::vector<int32_t> pressedKeys = event->GetPressedKeys();
+        std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
+        if (cItr != pressedKeys.cend()) {
+            std::string tmpStr = "Pressed keyCode: [" + std::to_string(*(cItr++));
+            for (; cItr != pressedKeys.cend(); ++cItr) {
+                tmpStr += ("," + std::to_string(*cItr));
+            }
+            MMI_HILOGI("%{public}s]", tmpStr.c_str());
+        }
+    }
+
+    static void PrintInfoLog(const std::shared_ptr<PointerEvent> event)
+    {
+        if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
+            return;
+        }
+        std::vector<int32_t> pointerIds{ event->GetPointerIds() };
+        MMI_HILOGI("EventType:%{public}s,ActionTime:%{public}" PRId64 ",PointerAction:%{public}s,"
+            "SourceType:%{public}s,EventNumber:%{public}d",
+            InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
+            event->DumpPointerAction(), event->DumpSourceType(), event->GetId());
+        for (const auto &pointerId : pointerIds) {
+            PointerEvent::PointerItem item;
+            if (!event->GetPointerItem(pointerId, item)) {
+                MMI_HILOGE("Invalid pointer: %{public}d.", pointerId);
+                return;
+            }
+            MMI_HILOGI("pointerId:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,DisplayX:%{public}d,"
+                "DisplayY:%{public}d,Pressure:%{public}.2f,LongAxis:%{public}d,ShortAxis:%{public}d",
+                pointerId, item.GetDownTime(), item.IsPressed(), item.GetDisplayX(), item.GetDisplayY(),
+                item.GetPressure(), item.GetLongAxis(), item.GetShortAxis());
         }
         std::vector<int32_t> pressedKeys = event->GetPressedKeys();
         std::vector<int32_t>::const_iterator cItr = pressedKeys.cbegin();
@@ -130,6 +188,7 @@ private:
 template <class T> void EventLogHelper::PrintEventData(std::shared_ptr<T> event, int32_t actionType, int32_t itemNum)
 {
     CHKPV(event);
+    PrintInfoLog(event);
     if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
         static int64_t nowTimeUSec = 0;
         static int32_t dropped = 0;
@@ -151,6 +210,7 @@ template <class T> void EventLogHelper::PrintEventData(std::shared_ptr<T> event,
 template <class T> void EventLogHelper::PrintEventData(std::shared_ptr<T> event)
 {
     CHKPV(event);
+    PrintInfoLog(event);
     if (HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG) ||
         (event->GetAction() == InputEvent::EVENT_TYPE_KEY)) {
         EventLogHelper::Print(event);
