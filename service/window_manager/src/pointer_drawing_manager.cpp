@@ -974,7 +974,11 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, Po
             MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
             return RET_ERR;
         }
-        std::string name = "pointerStyle";
+        std::string name = "pointerColor";
+        pointerStyle.color = pref->GetInt(name, DEFAULT_VALUE);
+        name = "pointerSize";
+        pointerStyle.size = pref->GetInt(name, DEFAULT_POINTER_SIZE);
+        name = "pointerStyle";
         int32_t style = pref->GetInt(name, DEFAULT_POINTER_STYLE);
         MMI_HILOGD("Get pointer style successfully, pointerStyle:%{public}d", style);
         if (style == CURSOR_CIRCLE_STYLE) {
