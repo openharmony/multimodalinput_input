@@ -776,10 +776,10 @@ void PointerDrawingManager::UpdatePointerVisible()
     CHKPV(surfaceNode_);
     if (IsPointerVisible() && mouseDisplayState_) {
         surfaceNode_->SetVisible(true);
-        MMI_HILOGD("Pointer window show success");
+        MMI_HILOGI("Pointer window show success");
     } else {
         surfaceNode_->SetVisible(false);
-        MMI_HILOGD("Pointer window hide success");
+        MMI_HILOGI("Pointer window hide success");
     }
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
