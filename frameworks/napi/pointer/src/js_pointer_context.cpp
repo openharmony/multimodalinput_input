@@ -456,6 +456,55 @@ napi_value JsPointerContext::GetMouseScrollRows(napi_env env, napi_callback_info
     return jsPointerMgr->GetMouseScrollRows(env, argv[0]);
 }
 
+napi_value JsPointerContext::SetPointerLocation(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 3;
+    napi_value argv[3];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < INPUT_PARAMETER) {
+        MMI_HILOGE("At least 2 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "x", "number");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("x parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "x", "number");
+        return nullptr;
+    }
+    int32_t x = 0;
+    CHKRP(napi_get_value_int32(env, argv[0], &x), GET_VALUE_INT32);
+    if (x < 0) {
+        MMI_HILOGE("Invalid x");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "x is invalid");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[1], napi_number)) {
+        MMI_HILOGE("y parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "y", "number");
+        return nullptr;
+    }
+    int32_t y = 0;
+    CHKRP(napi_get_value_int32(env, argv[1], &y), GET_VALUE_INT32);
+    if (y < 0) {
+        MMI_HILOGE("Invalid y");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "y is invalid");
+        return nullptr;
+    }
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    if (argc == INPUT_PARAMETER) {
+        return jsPointerMgr->SetPointerLocation(env, x, y);
+    }
+    if (!JsCommon::TypeOf(env, argv[INPUT_PARAMETER], napi_function)) {
+        MMI_HILOGE("callback parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "callback", "function");
+        return nullptr;
+    }
+    return jsPointerMgr->SetPointerLocation(env, x, y, argv[INPUT_PARAMETER]);
+}
+
 napi_value JsPointerContext::SetPointerSize(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -1395,6 +1444,7 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("getTouchpadSwipeSwitch", GetTouchpadSwipeSwitch),
         DECLARE_NAPI_STATIC_FUNCTION("setTouchpadRightClickType", SetTouchpadRightClickType),
         DECLARE_NAPI_STATIC_FUNCTION("getTouchpadRightClickType", GetTouchpadRightClickType),
+        DECLARE_NAPI_STATIC_FUNCTION("setPointerLocation", SetPointerLocation),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreatePointerStyle(env, exports) == nullptr) {

@@ -728,7 +728,7 @@ int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y)
     WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
     int32_t physicalX = WinMgr->GetMouseInfo().physicalX;
     int32_t physicalY = WinMgr->GetMouseInfo().physicalY;
-    IPointerDrawingManager::GetInstance()->SetPointerLocation(getpid(), physicalX, physicalY);
+    IPointerDrawingManager::GetInstance()->SetPointerLocation(physicalX, physicalY);
     return RET_OK;
 }
 

@@ -832,7 +832,7 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
     return RET_OK;
 }
 
-void PointerDrawingManager::SetPointerLocation(int32_t pid, int32_t x, int32_t y)
+void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y)
 {
     CALL_DEBUG_ENTER;
     FixCursorPosition(x, y);

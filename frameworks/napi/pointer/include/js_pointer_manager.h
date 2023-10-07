@@ -73,7 +73,7 @@ public:
     napi_value SetPointerStyleSync(napi_env env, int32_t windowid, int32_t pointerStyle);
     napi_value GetPointerStyle(napi_env env, int32_t windowid, napi_value handle = nullptr);
     napi_value GetPointerStyleSync(napi_env env, int32_t windowid);
-    napi_value SetPointerLocation(napi_env env, napi_value handle, int32_t x, int32_t y);
+    napi_value SetPointerLocation(napi_env env, int32_t x, int32_t y, napi_value handle = nullptr);
     napi_value EnterCaptureMode(napi_env env, int32_t windowId, napi_value handle = nullptr);
     napi_value LeaveCaptureMode(napi_env env, int32_t windowId, napi_value handle = nullptr);
     napi_value SetMouseScrollRows(napi_env env, int32_t rows, napi_value handle = nullptr);
