@@ -38,6 +38,8 @@ void MouseEventNormalizeTest::SetUpTestCase(void)
 
 void MouseEventNormalizeTest::TearDownTestCase(void)
 {
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 void MouseEventNormalizeTest::SetUp()
@@ -124,8 +126,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetPointerSpeed_006, T
     int32_t idNames = 0;
     int32_t speed = 2;
     ASSERT_EQ(MouseEventHdr->SetPointerSpeed(speed), idNames);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -140,8 +140,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetPointerSpeed_007, T
     MouseEventHdr->SetPointerSpeed(speed);
     int32_t idNames = 2;
     ASSERT_EQ(MouseEventHdr->GetPointerSpeed(), idNames);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -168,8 +166,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetMousePrimaryButton_
 {
     int32_t primaryButton = 1;
     ASSERT_TRUE(MouseEventHdr->SetMousePrimaryButton(primaryButton) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -184,8 +180,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetMousePrimaryButton_
     MouseEventHdr->SetMousePrimaryButton(primaryButton);
     int32_t primaryButtonRes = 1;
     ASSERT_TRUE(MouseEventHdr->GetMousePrimaryButton() == primaryButtonRes);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -198,8 +192,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetMouseScrollRows_011
 {
     int32_t rows = 1;
     ASSERT_TRUE(MouseEventHdr->SetMouseScrollRows(rows) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -214,8 +206,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetMouseScrollRows_012
     MouseEventHdr->SetMouseScrollRows(rows);
     int32_t newRows = 50;
     ASSERT_TRUE(MouseEventHdr->GetMouseScrollRows() == newRows);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -228,8 +218,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadScrollSwitc
 {
     bool flag = false;
     ASSERT_TRUE(MouseEventHdr->SetTouchpadScrollSwitch(flag) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -245,8 +233,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadScrollSwitc
     bool newFlag = true;
     ASSERT_TRUE(MouseEventHdr->GetTouchpadScrollSwitch(flag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -259,8 +245,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadScrollDirec
 {
     bool state = false;
     ASSERT_TRUE(MouseEventHdr->SetTouchpadScrollDirection(state) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -276,8 +260,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadScrollDirec
     bool newState = true;
     ASSERT_TRUE(MouseEventHdr->GetTouchpadScrollDirection(state) == RET_OK);
     ASSERT_TRUE(state == newState);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -290,8 +272,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadTapSwitch_0
 {
     bool flag = false;
     ASSERT_TRUE(MouseEventHdr->SetTouchpadTapSwitch(flag) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -307,8 +287,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadTapSwitch_0
     bool newFlag = true;
     ASSERT_TRUE(MouseEventHdr->GetTouchpadTapSwitch(flag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -321,8 +299,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadPointerSpee
 {
     int32_t speed = 3;
     ASSERT_TRUE(MouseEventHdr->SetTouchpadPointerSpeed(speed) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -338,8 +314,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadPointerSpee
     int32_t newSpeed = 4;
     ASSERT_TRUE(MouseEventHdr->GetTouchpadPointerSpeed(newSpeed) == RET_OK);
     ASSERT_TRUE(speed == newSpeed);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -352,8 +326,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadPointerSpee
 {
     int32_t speed = 3;
     ASSERT_TRUE(MouseEventHdr->SetTouchpadPointerSpeed(speed) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -369,8 +341,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadPointerSpee
     int32_t newSpeed = 4;
     ASSERT_TRUE(MouseEventHdr->GetTouchpadPointerSpeed(newSpeed) == RET_OK);
     ASSERT_TRUE(speed == newSpeed);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -383,8 +353,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_SetTouchpadRightClickT
 {
     int32_t type = 3;
     ASSERT_TRUE(MouseEventHdr->SetTouchpadRightClickType(type) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -400,8 +368,6 @@ HWTEST_F(MouseEventNormalizeTest, MouseEventNormalizeTest_GetTouchpadRightClickT
     int32_t newType = 2;
     ASSERT_TRUE(MouseEventHdr->GetTouchpadRightClickType(newType) == RET_OK);
     ASSERT_TRUE(type == newType);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 }
 }
