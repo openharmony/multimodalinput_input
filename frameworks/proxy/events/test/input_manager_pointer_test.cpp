@@ -67,12 +67,21 @@ public:
     void SetUp();
     void TearDown();
     static void SetUpTestCase();
+    static void TearDownTestCase();
     std::string GetEventDump();
 };
 
 void InputManagerPointerTest::SetUpTestCase()
 {
     ASSERT_TRUE(TestUtil->Init());
+}
+
+void InputManagerPointerTest::TearDownTestCase(void)
+{
+    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
+    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
+    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 void InputManagerPointerTest::SetUp()
@@ -887,8 +896,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointSpeed_001, Tes
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(MOVE_MOUSE_OFFSET_ELEVEN, MOVE_MOUSE_OFFSET_TWELVE);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -918,8 +925,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointSpeed_002, Tes
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(MOVE_MOUSE_OFFSET_ELEVEN, MOVE_MOUSE_OFFSET_TWELVE);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -949,8 +954,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointSpeed_003, Tes
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(MOVE_MOUSE_OFFSET_ELEVEN, MOVE_MOUSE_OFFSET_TWELVE);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -980,8 +983,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointSpeed_004, Tes
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(MOVE_MOUSE_OFFSET_ELEVEN, MOVE_MOUSE_OFFSET_TWELVE);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1011,8 +1012,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointSpeed_005, Tes
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManager::GetInstance()->MoveMouse(MOVE_MOUSE_OFFSET_ELEVEN, MOVE_MOUSE_OFFSET_TWELVE);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1026,8 +1025,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetHoverScrollState_00
     CALL_TEST_DEBUG;
     ASSERT_TRUE(InputManager::GetInstance()->SetHoverScrollState(false) == RET_OK);
     InputManager::GetInstance()->SetHoverScrollState(true);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1040,8 +1037,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetHoverScrollState_00
 {
     CALL_TEST_DEBUG;
     ASSERT_TRUE(InputManager::GetInstance()->SetHoverScrollState(true) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1058,8 +1053,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetHoverScrollState_00
         ASSERT_TRUE(InputManager::GetInstance()->GetHoverScrollState(state) == RET_OK);
         ASSERT_TRUE(state);
     }
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1075,8 +1068,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMousePrimaryButton_
     ASSERT_TRUE(InputManager::GetInstance()->SetMousePrimaryButton(primaryButton) == RET_OK);
     primaryButton = 0;
     ASSERT_TRUE(InputManager::GetInstance()->SetMousePrimaryButton(primaryButton) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1106,8 +1097,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetMousePrimaryButton_
         ASSERT_TRUE(InputManager::GetInstance()->GetMousePrimaryButton(primaryButton) == RET_OK);
         ASSERT_EQ(primaryButton, PrimaryButton::RIGHT_BUTTON);
     }
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1121,8 +1110,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetMouseScrollRows_001
     CALL_TEST_DEBUG;
     int32_t rows = 1;
     ASSERT_TRUE(InputManager::GetInstance()->SetMouseScrollRows(rows) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1140,8 +1127,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetMouseScrollRows_001
         ASSERT_TRUE(InputManager::GetInstance()->GetMouseScrollRows(newRows) == RET_OK);
         ASSERT_EQ(rows, newRows);
     }
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1323,8 +1308,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadScrollSwitc
     CALL_TEST_DEBUG;
     bool flag = false;
     ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadScrollSwitch(flag) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1341,8 +1324,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadScrollSwitc
     bool newFlag = true;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadScrollSwitch(newFlag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1356,8 +1337,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadScrollDirec
     CALL_TEST_DEBUG;
     bool state = false;
     ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadScrollDirection(state) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1374,8 +1353,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadScrollDirec
     bool newState = true;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadScrollDirection(newState) == RET_OK);
     ASSERT_TRUE(state == newState);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1389,8 +1366,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadTapSwitch_0
     CALL_TEST_DEBUG;
     bool flag = false;
     ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadTapSwitch(flag) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1407,8 +1382,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadTapSwitch_0
     bool newFlag = true;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadTapSwitch(newFlag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1422,8 +1395,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadPointerSpee
     CALL_TEST_DEBUG;
     int32_t speed = POINTER_SPEED_ONE;
     ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadPointerSpeed(speed) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1440,8 +1411,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadPointerSpee
     int32_t newSpeed = POINTER_SPEED_THREE;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadPointerSpeed(newSpeed) == RET_OK);
     ASSERT_TRUE(speed == newSpeed);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1455,8 +1424,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadPinchSwitch
     CALL_TEST_DEBUG;
     bool flag = false;
     ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadPinchSwitch(flag) == RET_OK);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -1473,8 +1440,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadPinchSwitch
     bool newFlag = true;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadPinchSwitch(newFlag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -1488,8 +1453,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadSwipeSwitch
     CALL_TEST_DEBUG;
     bool flag = false;
     ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadSwipeSwitch(flag) == RET_OK);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -1506,8 +1469,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadSwipeSwitch
     bool newFlag = true;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadSwipeSwitch(newFlag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -1521,8 +1482,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadRightClickT
     CALL_TEST_DEBUG;
     int32_t type = 1;
     ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadRightClickType(type) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1539,8 +1498,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadRightClickT
     int32_t newType = 1;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadRightClickType(newType) == RET_OK);
     ASSERT_TRUE(type == newType);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1556,8 +1513,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerSize_001, Te
     ASSERT_TRUE(InputManager::GetInstance()->SetPointerSize(setSize) == RET_OK);
     setSize = 1;
     InputManager::GetInstance()->SetPointerSize(setSize);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1574,8 +1529,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetPointerSize_001, Te
     int32_t getSize = 3;
     ASSERT_TRUE(InputManager::GetInstance()->GetPointerSize(getSize) == RET_OK);
     ASSERT_TRUE(setSize == getSize);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1591,8 +1544,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerColor_001, T
     ASSERT_TRUE(InputManager::GetInstance()->SetPointerColor(setColor) == RET_OK);
     setColor = 0x000000;
     InputManager::GetInstance()->SetPointerColor(setColor);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -1609,8 +1560,6 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetPointerColor_001, T
     int32_t getColor = 3;
     ASSERT_TRUE(InputManager::GetInstance()->GetPointerColor(getColor) == RET_OK);
     ASSERT_TRUE(setColor == getColor);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 }  // namespace MMI
 }  // namespace OHOS
