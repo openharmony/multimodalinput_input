@@ -408,6 +408,27 @@ napi_value JsPointerManager::GetMouseScrollRows(napi_env env, napi_value handle)
     return promise;
 }
 
+napi_value JsPointerManager::SetPointerLocation(napi_env env, int32_t x, int32_t y, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+    InputManager::GetInstance()->SetPointerLocation(x, y);
+    asyncContext->reserve << ReturnType::VOID;
+    napi_value promise = nullptr;
+    if (handle != nullptr) {
+        CHKRP(napi_create_reference(env, handle, 1, &asyncContext->callback), CREATE_REFERENCE);
+        if (napi_get_undefined(env, &promise) != napi_ok) {
+            CHKRP(napi_delete_reference(env, asyncContext->callback), DELETE_REFERENCE);
+            return nullptr;
+        }
+    } else {
+        CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    }
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
 napi_value JsPointerManager::SetPointerSize(napi_env env, int32_t size, napi_value handle)
 {
     CALL_DEBUG_ENTER;
