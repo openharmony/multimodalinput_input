@@ -36,7 +36,8 @@
     "rom": "5120KB",
     "ram": "5120KB",
     "hisysevent_config":[
-      "//foundation/multimodalinput/input/service/hisysevent.yaml"
+      "//foundation/multimodalinput/input/service/hisysevent.yaml",
+      "//foundation/multimodalinput/input/service/hisysevent_input_ue.yaml"
     ],
     "deps": {
       "components": [
