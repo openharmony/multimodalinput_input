@@ -681,7 +681,7 @@ void KeyCommandHandler::HandleTouchEvent(const std::shared_ptr<PointerEvent> poi
     nextHandler_->HandleTouchEvent(pointerEvent);
 }
 
-void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> &touchEvent)
+void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
@@ -714,7 +714,7 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> &
     }
 }
 
-void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent> &touchEvent)
+void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
@@ -730,6 +730,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
             break;
         }
         case PointerEvent::TOOL_TYPE_KNUCKLE: {
+            DfxHisysevent::ReportKnuckleClickEvent();
             HandleKnuckleGestureDownEvent(touchEvent);
             break;
         }
@@ -742,7 +743,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
     }
 }
 
-void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent> &touchEvent)
+void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     if (!twoFingerGesture_.active) {
@@ -767,7 +768,7 @@ void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<Point
     }
 }
 
-void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<PointerEvent> &touchEvent)
+void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
@@ -792,7 +793,7 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
     }
 }
 
-void KeyCommandHandler::HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> &touchEvent)
+void KeyCommandHandler::HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     if (!twoFingerGesture_.active) {
@@ -815,7 +816,7 @@ void KeyCommandHandler::HandleFingerGestureDownEvent(const std::shared_ptr<Point
     }
 }
 
-void KeyCommandHandler::HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> &touchEvent)
+void KeyCommandHandler::HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
@@ -826,7 +827,7 @@ void KeyCommandHandler::HandleFingerGestureUpEvent(const std::shared_ptr<Pointer
     StopTwoFingerGesture();
 }
 
-void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<PointerEvent> &touchEvent)
+void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
@@ -849,7 +850,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     }
 }
 
-void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> &touchEvent)
+void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
@@ -864,14 +865,14 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
     }
 }
 
-void KeyCommandHandler::SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> &touchEvent)
+void KeyCommandHandler::SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
     KnuckleGestureProcesser(touchEvent, singleKnuckleGesture_);
 }
 
-void KeyCommandHandler::DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> &touchEvent)
+void KeyCommandHandler::DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
@@ -886,7 +887,7 @@ void KeyCommandHandler::DoubleKnuckleGestureProcesser(const std::shared_ptr<Poin
     KnuckleGestureProcesser(touchEvent, doubleKnuckleGesture_);
 }
 
-void KeyCommandHandler::KnuckleGestureProcesser(const std::shared_ptr<PointerEvent> &touchEvent,
+void KeyCommandHandler::KnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent,
     KnuckleGesture &knuckleGesture)
 {
     CALL_DEBUG_ENTER;
@@ -908,8 +909,10 @@ void KeyCommandHandler::KnuckleGestureProcesser(const std::shared_ptr<PointerEve
         case CLICK_STATE: {
             MMI_HILOGD("Knuckle gesture second down event");
             knuckleGesture.downToPrevUpTime = touchEvent->GetActionTime() - knuckleGesture.lastPointerUpTime;
+            ReportKnuckleDoubleClickEvent(touchEvent, knuckleGesture);
             if (knuckleGesture.downToPrevUpTime < (static_cast<int64_t>(DOUBLE_CLICK_INTERVAL_TIME) * SECONDS_SYSTEM)) {
                 MMI_HILOGD("knuckle gesture start launch ability");
+                ReportKnuckleScreenCapture(touchEvent);
                 LaunchAbility(knuckleGesture.ability, 0);
                 if (knuckleGesture.timerId != -1) {
                     TimerMgr->RemoveTimer(knuckleGesture.timerId);
@@ -924,6 +927,29 @@ void KeyCommandHandler::KnuckleGestureProcesser(const std::shared_ptr<PointerEve
             MMI_HILOGW("other state: %{public}d not process", state);
             break;
         }
+    }
+}
+
+void KeyCommandHandler::ReportKnuckleDoubleClickEvent(const std::shared_ptr<PointerEvent> touchEvent,
+    KnuckleGesture &knuckleGesture)
+{
+    CHKPV(touchEvent);
+    size_t size = touchEvent->GetPointerIds().size();
+    if (size == SINGEL_KNUCKLE_SIZE) {
+        DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(knuckleGesture.downToPrevUpTime);
+    } else {
+        MMI_HILOGW("current touch event size: %{public}zu", size);
+    }
+}
+
+void KeyCommandHandler::ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent)
+{
+    CHKPV(touchEvent);
+    size_t size = touchEvent->GetPointerIds().size();
+    if (size == SINGEL_KNUCKLE_SIZE) {
+        DfxHisysevent::ReportScreenCaptureGesture();
+    } else {
+        MMI_HILOGW("current touch event size: %{public}zu", size);
     }
 }
 
