@@ -30,6 +30,9 @@ constexpr int32_t TIMES_LEVEL1 = 10;
 constexpr int32_t TIMES_LEVEL2 = 25;
 constexpr int32_t TIMES_LEVEL3 = 30;
 constexpr int32_t TIMES_LEVEL4 = 50;
+constexpr int32_t FINGERSENSE_EVENT_TIMES = 1;
+constexpr size_t SINGLE_KNUCKLE_SIZE = 1;
+const std::string EMPTY_STRING { "" };
 } // namespace
 
 void DfxHisysevent::OnDeviceConnect(int32_t id, OHOS::HiviewDFX::HiSysEvent::EventType type)
@@ -516,6 +519,64 @@ void DfxHisysevent::ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode
     }
 }
 
+void DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(int32_t intervalTime)
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "SK_S_T", FINGERSENSE_EVENT_TIMES,
+        "SKS_T_I", intervalTime);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportFailIfInvalidTime(const std::shared_ptr<PointerEvent> touchEvent, int32_t intervalTime)
+{
+    CHKPV(touchEvent);
+    size_t size = touchEvent->GetPointerIds().size();
+    if (size != SINGLE_KNUCKLE_SIZE) {
+        MMI_HILOGE("current event is not single knuckle");
+        return;
+    }
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "FSF_T_C", FINGERSENSE_EVENT_TIMES,
+        "SKF_T_I", intervalTime,
+        "SK_F_T", FINGERSENSE_EVENT_TIMES);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportKnuckleClickEvent()
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::INPUT_UE,
+        "KNUCKLE_CLICK",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "PNAMEID", EMPTY_STRING,
+        "PVERSIONID", EMPTY_STRING);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportScreenCaptureGesture()
+{
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::INPUT_UE,
+        "SINGLE_KNUCKLE_DOUBLE_CLICK",
+        OHOS::HiviewDFX::HiSysEvent::EventType::BEHAVIOR,
+        "PNAMEID", EMPTY_STRING,
+        "PVERSIONID", EMPTY_STRING);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
 }
 }
 

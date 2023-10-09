@@ -94,6 +94,7 @@ struct TwoFingerGesture {
 
 struct KnuckleGesture {
     std::shared_ptr<PointerEvent> lastPointerDownEvent { nullptr };
+    size_t size { 0 };
     int32_t state { 0 };
     int64_t lastPointerUpTime { 0 };
     int64_t downToPrevUpTime { 0 };
@@ -117,9 +118,9 @@ public:
 #endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     void HandleTouchEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
-    void HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent> &touchEvent);
-    void HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent> &touchEvent);
-    void HandlePointerActionUpEvent(const std::shared_ptr<PointerEvent> &touchEvent);
+    void HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    void HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    void HandlePointerActionUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
 private:
@@ -164,17 +165,19 @@ private:
         filterSequences_.clear();
     }
     bool SkipFinalKey(const int32_t keyCode, const std::shared_ptr<KeyEvent> &key);
-    void OnHandleTouchEvent(const std::shared_ptr<PointerEvent>& touchEvent);
+    void OnHandleTouchEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void StartTwoFingerGesture();
     void StopTwoFingerGesture();
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> &touchEvent);
-    void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> &touchEvent);
-    void HandleKnuckleGestureDownEvent(const std::shared_ptr<PointerEvent> &touchEvent);
-    void HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> &touchEvent);
-    void KnuckleGestureProcesser(const std::shared_ptr<PointerEvent> &touchEvent, KnuckleGesture &knuckleGesture);
-    void SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> &touchEvent);
-    void DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> &touchEvent);
+    void HandleFingerGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    void HandleKnuckleGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    void HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    void KnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
+    void SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
+    void DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
+    void ReportKnuckleDoubleClickEvent(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
+    void ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 private:

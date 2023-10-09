@@ -95,6 +95,10 @@ public:
     static void ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode, bool flag);
     static void ReportTouchpadSettingState(TOUCHPAD_SETTING_CODE settingCode, int32_t value);
     static void StatisticTouchpadGesture(std::shared_ptr<PointerEvent> pointerEvent);
+    static void ReportKnuckleClickEvent();
+    static void ReportScreenCaptureGesture();
+    static void ReportSingleKnuckleDoubleClickEvent(int32_t intervalTime);
+    static void ReportFailIfInvalidTime(const std::shared_ptr<PointerEvent> touchEvent, int32_t intervalTime);
 
 private:
     static inline int64_t dispatchStartTime_ { 0 };
