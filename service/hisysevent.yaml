@@ -1,4 +1,4 @@
-#  Copyright (c) 2021 Huawei Device Co., Ltd.
+#  Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
@@ -70,6 +70,42 @@ INPUT_DEV_DISCONNECTION_SUCCESS:
   DEVICE_NAME: {type: STRING, desc: device name}
   DEVICE_TYPE: {type: INT32, desc: device type}
   MSG: {type: STRING, desc: message}
+
+FINGERSENSE_KNOCK_EVENT_INFO:
+  __BASE: {type: STATISTIC, level: MINOR, desc: report fingersense knuckle knock event info}
+  DKF_D_I: {type: INT32, desc: fs dk fail time interval}
+  DKF_T_I: {type: INT32, desc: fs Double knuckle double knock fail time interval}
+  DKS_D_I: {type: INT32, desc: fs Single knuckle double knock  succ distance interval}
+  DKS_T_I: {type: INT32, desc: fs Double knuckle double knock succ time interval}
+  DK_F_T: {type: INT32, desc: Double knuckle double knock fail times}
+  DK_S_T: {type: INT32, desc: Double knuckle double knock succ times}
+  FSF_1S_2F_C: {type: INT32, desc: fs 1 knock succ 2 knock fail times}
+  FSF_C_C: {type: INT32, desc: fs consecutive knock count fail times}
+  FSF_D_C: {type: INT32, desc: fs knock distance interval fail times}
+  FSF_T_C: {type: INT32, desc: fs knock time interval fail times}
+  FS_K_PN: {type: STRING, desc: Fingersense knuckle application package name}
+  FS_S_A_I: {type: INT32, desc: fs sensitivity adjust info}
+  LCD_INFO: {type: STRING, desc: lcd vendor information}
+  LG_F_T: {type: INT32, desc: Letter or region gesture detected fail times}
+  LG_S_T: {type: INT32, desc: Letter gesture detected succ times}
+  L_C_S_T: {type: INT32, desc: fs letter c gesture succ times}
+  L_E_S_T: {type: INT32, desc: fs letter e gesture succ times}
+  L_L_S_T: {type: INT32, desc: fs draw line succ times}
+  L_M_S_T: {type: INT32, desc: fs letter m gesture succ times}
+  L_S_S_T: {type: INT32, desc: fs letter s gesture succ times}
+  L_W_S_T: {type: INT32, desc: fs letter w gesture succ times}
+  RG_F_S_TIME_DIFF: {type: INT32, desc: region gesture fail then success time diff}
+  RG_S_F_TIME_DIFF: {type: STRING, desc: region gesture success then fail time diff}
+  RG_S_T: {type: INT32, desc: Region gesture succ times}
+  RG_TRACK_LENGTH: {type: INT32, desc: region gesture track length}
+  RG_TRACK_TIME: {type: INT32, desc: region gesture track time}
+  SCR_ORIENTATION: {type: INT32, desc: screen orientation portrait or landscape}
+  SKF_T_I: {type: INT32, desc: fs Single knuckle double knock fail time interval}
+  SKS_T_I: {type: INT32, desc: fs Single knuckle double knock succ time interval ms}
+  SK_F_T: {type: INT32, desc: Single knuckle double knock fail times}
+  SK_S_T: {type: INT32, desc: Single knuckle double knock succ times}
+  S_INFO: {type: STRING, desc: sensor information}
+  TP_INFO: {type: STRING, desc: touch information}
 
 INPUT_DEV_DISCONNECTION_FAILURE:
   __BASE: {type: FAULT, level: MINOR, tag: PowerStats, desc: input device disconnection failure}
