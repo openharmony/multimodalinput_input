@@ -44,7 +44,7 @@ constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
 constexpr int32_t ERROR_DELAY_VALUE = -1000;
 constexpr int32_t TOUCH_MAX_THRESHOLD = 15;
 constexpr int32_t COMMON_PARAMETER_ERROR = 401;
-constexpr size_t SINGEL_KNUCKLE_SIZE = 1;
+constexpr size_t SINGLE_KNUCKLE_SIZE = 1;
 constexpr size_t DOUBLE_KNUCKLE_SIZE = 2;
 constexpr int32_t NONE_CLICK_STATE = 0;
 constexpr int32_t CLICK_STATE = 1;
@@ -840,7 +840,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
         return;
     }
     size_t size = touchEvent->GetPointerIds().size();
-    if (size == SINGEL_KNUCKLE_SIZE) {
+    if (size == SINGLE_KNUCKLE_SIZE) {
         SingleKnuckleGestureProcesser(touchEvent);
     } else if (size == DOUBLE_KNUCKLE_SIZE) {
         DoubleKnuckleGestureProcesser(touchEvent);
@@ -855,7 +855,7 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
     size_t size = touchEvent->GetPointerIds().size();
-    if (size == SINGEL_KNUCKLE_SIZE) {
+    if (size == SINGLE_KNUCKLE_SIZE) {
         singleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
     } else if (size == DOUBLE_KNUCKLE_SIZE) {
         doubleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
@@ -935,22 +935,22 @@ void KeyCommandHandler::ReportKnuckleDoubleClickEvent(const std::shared_ptr<Poin
 {
     CHKPV(touchEvent);
     size_t size = touchEvent->GetPointerIds().size();
-    if (size == SINGEL_KNUCKLE_SIZE) {
+    if (size == SINGLE_KNUCKLE_SIZE) {
         DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(knuckleGesture.downToPrevUpTime);
-    } else {
-        MMI_HILOGW("current touch event size: %{public}zu", size);
+        return;
     }
+    MMI_HILOGW("current touch event size: %{public}zu", size);
 }
 
 void KeyCommandHandler::ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CHKPV(touchEvent);
     size_t size = touchEvent->GetPointerIds().size();
-    if (size == SINGEL_KNUCKLE_SIZE) {
+    if (size == SINGLE_KNUCKLE_SIZE) {
         DfxHisysevent::ReportScreenCaptureGesture();
-    } else {
-        MMI_HILOGW("current touch event size: %{public}zu", size);
+        return;
     }
+    MMI_HILOGW("current touch event size: %{public}zu", size);
 }
 
 void KeyCommandHandler::StartTwoFingerGesture()
