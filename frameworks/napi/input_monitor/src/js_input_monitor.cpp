@@ -363,7 +363,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
         }
         ++index;
     }
-    CHKRR(SetNameProperty(jsEnv_, result, "touches", pointers), "Set touches", RET_ERR)
+    CHKRR(SetNameProperty(jsEnv_, result, "touches", pointers), "Set touches", RET_ERR);
     return RET_OK;
 }
 
