@@ -77,6 +77,10 @@ public:
     {
         return true;
     }
+    virtual int32_t SetCustomCursor(void* pixelMap, int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY)
+    {
+        return 0;
+    }
     virtual int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
     {
         return 0;
