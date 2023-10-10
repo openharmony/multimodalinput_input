@@ -689,6 +689,26 @@ int32_t InputManagerImpl::SetMouseScrollRows(int32_t rows)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+int32_t InputManagerImpl::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap)
+{
+    CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t winPid = GetWindowPid(windowId);
+    if (winPid == -1) {
+        MMI_HILOGE("winPid is invalid");
+        return RET_ERR;
+    }
+    int32_t ret = MultimodalInputConnMgr->SetCustomCursor(winPid, windowId, focusX, focusY, pixelMap);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set custom cursor failed, ret:%{public}d", ret);
+    }
+    return ret;
+#else
+    MMI_HILOGW("Pointer device module does not support");
+    return ERROR_UNSUPPORT;
+#endif // OHOS_BUILD_ENABLE_POINTER
+}
+
 int32_t InputManagerImpl::SetMouseIcon(int32_t windowId, void* pixelMap)
 {
     CALL_DEBUG_ENTER;

@@ -199,6 +199,49 @@ int32_t MultimodalInputConnectProxy::SetMouseScrollRows(int32_t rows)
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY,
+    void* pixelMap)
+{
+    CALL_DEBUG_ENTER;
+    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
+    if (pixelMapPtr->GetCapacity() == 0) {
+        MMI_HILOGE("pixelMap is empty");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    std::vector<uint8_t> buff;
+    pixelMapPtr->EncodeTlv(buff);
+    uint32_t size = buff.size();
+    
+    MMI_HILOGD("Image buffer size: %{public}d", size);
+    WRITEINT32(data, size, ERR_INVALID_VALUE);
+    for (uint32_t i = 0; i < size; i++) {
+        WRITEUINT8(data, buff[i], ERR_INVALID_VALUE);
+    }
+    WRITEINT32(data, pid, ERR_INVALID_VALUE);
+    MMI_HILOGD("windowId: %{public}d", windowId);
+    WRITEINT32(data, windowId, ERR_INVALID_VALUE);
+
+    WRITEINT32(data, focusX, ERR_INVALID_VALUE);
+    WRITEINT32(data, focusY, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_CUSTOM_CURSOR),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
 int32_t MultimodalInputConnectProxy::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
 {
     CALL_DEBUG_ENTER;

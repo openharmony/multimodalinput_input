@@ -456,6 +456,38 @@ void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, c
     }
 }
 
+int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int32_t windowId, int32_t focusX,
+    int32_t focusY)
+{
+    CALL_DEBUG_ENTER;
+    if (pid == -1) {
+        MMI_HILOGE("pid is invalid");
+        return RET_ERR;
+    }
+    if (pixelMap == nullptr) {
+        MMI_HILOGE("pixelMap is null!");
+        return RET_ERR;
+    }
+    if (windowId < 0) {
+        MMI_HILOGE("windowId is invalid, windowId: %{public}d", windowId);
+        return RET_ERR;
+    }
+    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
+    userIcon_.reset(pixelMapPtr);
+    mouseIconUpdate_ = true;
+    userIconHotSpotX_ = focusX;
+    userIconHotSpotY_ = focusY;
+    PointerStyle style;
+    style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    lastMouseStyle_ = style;
+
+    int32_t ret = SetPointerStyle(pid, windowId, style);
+    if (ret == RET_ERR) {
+        MMI_HILOGE("SetPointerStyle is failed");
+    }
+    return ret;
+}
+
 int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
 {
     CALL_DEBUG_ENTER;
