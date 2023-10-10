@@ -56,9 +56,8 @@ enum class Axis : int32_t {
 enum class ToolType : int32_t {
     UNKNOWN = 0,
     MOUSE = 1,
-    TOUCHSCREEN = 2,
-    TOUCHPAD = 3,
-    JOYSTICK = 4
+    JOYSTICK = 2,
+    TOUCHPAD = 3
 };
 } // namespace
 
@@ -87,9 +86,8 @@ napi_value JsMouseEvent::Export(napi_env env, napi_value exports)
     napi_property_descriptor toolTypeArr[] = {
         DECLARE_NAPI_STATIC_PROPERTY("UNKNOWN", GetNapiInt32(env, static_cast<int32_t>(ToolType::UNKNOWN))),
         DECLARE_NAPI_STATIC_PROPERTY("MOUSE", GetNapiInt32(env, static_cast<int32_t>(ToolType::MOUSE))),
-        DECLARE_NAPI_STATIC_PROPERTY("TOUCHSCREEN", GetNapiInt32(env, static_cast<int32_t>(ToolType::TOUCHSCREEN))),
-        DECLARE_NAPI_STATIC_PROPERTY("TOUCHPAD", GetNapiInt32(env, static_cast<int32_t>(ToolType::TOUCHPAD))),
         DECLARE_NAPI_STATIC_PROPERTY("JOYSTICK", GetNapiInt32(env, static_cast<int32_t>(ToolType::JOYSTICK))),
+        DECLARE_NAPI_STATIC_PROPERTY("TOUCHPAD", GetNapiInt32(env, static_cast<int32_t>(ToolType::TOUCHPAD))),
     };
     napi_value toolType = nullptr;
     CHKRP(napi_define_class(env, "ToolType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
