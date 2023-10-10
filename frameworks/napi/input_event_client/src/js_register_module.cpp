@@ -29,6 +29,53 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterModule" };
 } // namespace
 
+static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value keyHandle)
+{
+    keyEvent->SetRepeat(true);
+    bool isPressed = false;
+    int32_t ret = GetNamedPropertyBool(env, keyHandle, "isPressed", isPressed);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get isPressed failed");
+    }
+    bool isIntercepted = false;
+    ret = GetNamedPropertyBool(env, keyHandle, "isIntercepted", isIntercepted);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get isIntercepted failed");
+    }
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    int32_t keyDownDuration;
+    ret = GetNamedPropertyInt32(env, keyHandle, "keyDownDuration", keyDownDuration);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get keyDownDuration failed");
+    }
+    if (keyDownDuration < 0) {
+        MMI_HILOGE("keyDownDuration:%{public}d is less 0, can not process", keyDownDuration);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyDownDuration must be greater than or equal to 0");
+    }
+    int32_t keyCode;
+    ret = GetNamedPropertyInt32(env, keyHandle, "keyCode", keyCode);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get keyCode failed");
+    }
+    if (keyCode < 0) {
+        MMI_HILOGE("keyCode:%{public}d is less 0, can not process", keyCode);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyCode must be greater than or equal to 0");
+    }
+    keyEvent->SetKeyCode(keyCode);
+    if (isPressed) {
+        keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    } else {
+        keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    }
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(keyCode);
+    item.SetPressed(isPressed);
+    item.SetDownTime(static_cast<int64_t>(keyDownDuration));
+    keyEvent->AddKeyItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+    std::this_thread::sleep_for(std::chrono::milliseconds(keyDownDuration));
+}
+
 static napi_value InjectEvent(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -63,97 +110,86 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     }
     auto keyEvent = KeyEvent::Create();
     CHKPP(keyEvent);
-
-    keyEvent->SetRepeat(true);
-    bool isPressed = false;
-    int32_t ret = GetNamedPropertyBool(env, keyHandle, "isPressed", isPressed);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get isPressed failed");
-        return nullptr;
-    }
-
-    bool isIntercepted = false;
-    ret = GetNamedPropertyBool(env, keyHandle, "isIntercepted", isIntercepted);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get isIntercepted failed");
-        return nullptr;
-    }
-    MMI_HILOGD("isIntercepted:%{public}d", isIntercepted);
-    keyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
-
-    int32_t keyDownDuration;
-    ret = GetNamedPropertyInt32(env, keyHandle, "keyDownDuration", keyDownDuration);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get keyDownDuration failed");
-        return nullptr;
-    }
-    if (keyDownDuration < 0) {
-        MMI_HILOGE("keyDownDuration:%{public}d is less 0, can not process", keyDownDuration);
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyDownDuration must be greater than or equal to 0");
-        return nullptr;
-    }
-
-    napi_value keyCodes;
-    CHKRP(napi_get_named_property(env, keyHandle, "keyCodes", &keyCodes), GET_NAMED_PROPERTY);
-    if (keyCodes == nullptr) {
-        MMI_HILOGE("The keyCodes is null");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyCodes not found");
-        return nullptr;
-    }
-
-    napi_valuetype Type = napi_undefined;
-    CHKRP(napi_typeof(env, keyCodes, &Type), TYPEOF);
-    std::vector<int32_t> downKey;
-    int32_t keyCode = 0;
-    if (Type == napi_object) {
-        uint32_t size = 0;
-        CHKRP(napi_get_array_length(env, keyCodes, &size), GET_ARRAY_LENGTH);
-        for (uint32_t i = 0; i < size; ++i) {
-            napi_value keyValue = nullptr;
-            CHKRP(napi_get_element(env, keyCodes, i, &keyValue), GET_ELEMENT);
-            napi_valuetype valuetype;
-            CHKRP(napi_typeof(env, keyValue, &valuetype), TYPEOF);
-            if (valuetype != napi_number) {
-                MMI_HILOGE("keyCodes parameter type error");
-                return nullptr;
-            }
-            CHKRP(napi_get_value_int32(env, keyValue, &keyCode), GET_VALUE_INT32);
-            downKey.push_back(keyCode);
-        }
-    } else if (Type == napi_undefined) {
-        ret = GetNamedPropertyInt32(env, keyHandle, "keyCode", keyCode);
-        if (ret != RET_OK) {
-            MMI_HILOGE("Get keyCode failed");
-            return nullptr;
-        }
-        if (keyCode < 0) {
-            MMI_HILOGE("keyCode:%{public}d is less 0, can not process", keyCode);
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyCode must be greater than or equal to 0");
-            return nullptr;
-        }
-        downKey.push_back(keyCode);
-    } else {
-        MMI_HILOGE("The keyCode type is error");
-        return nullptr;
-    }
-    
-    KeyEvent::KeyItem item[downKey.size()];
-    for (size_t i = 0; i < downKey.size(); i++) {
-        keyEvent->SetKeyCode(keyCode);
-        if (isPressed) {
-            keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-        } else {
-            keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-        }
-        item[i].SetKeyCode(downKey[i]);
-        item[i].SetPressed(isPressed);
-        item[i].SetDownTime(static_cast<int64_t>(keyDownDuration));
-        keyEvent->AddKeyItem(item[i]);
-    }
-    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
-    std::this_thread::sleep_for(std::chrono::milliseconds(keyDownDuration));
+    GetInjectionEventData(env, keyEvent, keyHandle);
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
+}
+
+static void HandleMouseAction(napi_env env, napi_value mouseHandle,
+    std::shared_ptr<PointerEvent> pointerEvent, PointerEvent::PointerItem &item)
+{
+    int32_t action;
+    int32_t ret = GetNamedPropertyInt32(env, mouseHandle, "action", action);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get action failed");
+    }
+    switch (action) {
+        case JS_CALLBACK_MOUSE_ACTION_MOVE:
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+            break;
+        case JS_CALLBACK_MOUSE_ACTION_BUTTON_DOWN:
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+            item.SetPressed(true);
+            break;
+        case JS_CALLBACK_MOUSE_ACTION_BUTTON_UP:
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+            item.SetPressed(false);
+            break;
+        case JS_CALLBACK_POINTER_ACTION_DOWN:
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+            item.SetPressed(true);
+            break;
+        case JS_CALLBACK_POINTER_ACTION_UP:
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+            item.SetPressed(false);
+            break;
+        default:
+            MMI_HILOGE("action is unknown");
+            break;
+    }
+    if (action == JS_CALLBACK_MOUSE_ACTION_BUTTON_DOWN || action == JS_CALLBACK_MOUSE_ACTION_BUTTON_UP) {
+        int32_t button;
+        ret = GetNamedPropertyInt32(env, mouseHandle, "button", button);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Get button failed");
+        }
+        if (button < 0) {
+            MMI_HILOGE("button:%{public}d is less 0, can not process", button);
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "button must be greater than or equal to 0");
+        }
+        pointerEvent->SetButtonId(button);
+        pointerEvent->SetButtonPressed(button);
+    }
+}
+
+static void HandleMousePropertyInt32(napi_env env, napi_value mouseHandle,
+    std::shared_ptr<PointerEvent> pointerEvent, PointerEvent::PointerItem &item)
+{
+    int32_t screenX;
+    int32_t ret = GetNamedPropertyInt32(env, mouseHandle, "screenX", screenX);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get screenX failed");
+    }
+    int32_t screenY;
+    ret = GetNamedPropertyInt32(env, mouseHandle, "screenY", screenY);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get screenY failed");
+    }
+    int32_t toolType;
+    ret = GetNamedPropertyInt32(env, mouseHandle, "toolType", toolType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get toolType failed");
+    }
+    if (toolType < 0) {
+        MMI_HILOGE("toolType:%{public}d is less 0, can not process", toolType);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "toolType must be greater than or equal to 0");
+    }
+    pointerEvent->SetSourceType(toolType);
+    item.SetPointerId(0);
+    item.SetDisplayX(screenX);
+    item.SetDisplayY(screenY);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
 }
 
 static napi_value InjectMouseEvent(napi_env env, napi_callback_info info)
@@ -192,93 +228,103 @@ static napi_value InjectMouseEvent(napi_env env, napi_callback_info info)
     PointerEvent::PointerItem item;
     CHKPP(pointerEvent);
 
-    int32_t action;
-    int32_t ret = GetNamedPropertyInt32(env, mouseHandle, "action", action);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get action failed");
-        return nullptr;
-    }
-    switch (action) {
-        case JS_CALLBACK_MOUSE_ACTION_MOVE : {
-            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-            break;
-        }
-        case JS_CALLBACK_MOUSE_ACTION_BUTTON_DOWN: {
-            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
-            item.SetPressed(true);
-            break;
-        }
-        case JS_CALLBACK_MOUSE_ACTION_BUTTON_UP: {
-            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
-            item.SetPressed(false);
-            break;
-        }
-        case JS_CALLBACK_POINTER_ACTION_DOWN : {
-            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-            item.SetPressed(true);
-            break;
-        }
-        case JS_CALLBACK_POINTER_ACTION_UP: {
-            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-            item.SetPressed(false);
-            break;
-        }
-        default: {
-            MMI_HILOGE("action is unknown");
-            break;
-        }
-    }
-
-    if(action == JS_CALLBACK_MOUSE_ACTION_BUTTON_DOWN || action == JS_CALLBACK_MOUSE_ACTION_BUTTON_UP) {
-        int32_t button;
-        ret = GetNamedPropertyInt32(env, mouseHandle, "button", button);
-        if (ret != RET_OK) {
-            MMI_HILOGE("Get button failed");
-            return nullptr;
-        }
-        if (button < 0) {
-            MMI_HILOGE("button:%{public}d is less 0, can not process", button);
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "button must be greater than or equal to 0");
-            return nullptr;
-        }
-        pointerEvent->SetButtonId(button);
-        pointerEvent->SetButtonPressed(button);
-    }
-
-    int32_t screenX;
-    ret = GetNamedPropertyInt32(env, mouseHandle, "screenX", screenX);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get screenX failed");
-        return nullptr;
-    }
-
-    int32_t screenY;
-    ret = GetNamedPropertyInt32(env, mouseHandle, "screenY", screenY);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get screenY failed");
-        return nullptr;
-    }
-
-    int32_t toolType;
-    ret = GetNamedPropertyInt32(env, mouseHandle, "toolType", toolType);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get toolType failed");
-        return nullptr;
-    }
-    if (toolType < 0) {
-        MMI_HILOGE("toolType:%{public}d is less 0, can not process", toolType);
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "toolType must be greater than or equal to 0");
-        return nullptr;
-    }
-    pointerEvent->SetSourceType(toolType);
-    item.SetPointerId(0);
-    item.SetDisplayX(screenX);
-    item.SetDisplayY(screenY);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
+    HandleMouseAction(env, mouseHandle, pointerEvent, item);
+    HandleMousePropertyInt32(env, mouseHandle, pointerEvent, item);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
+}
+
+static int32_t HandleTouchAction(napi_env env, napi_value touchHandle,
+    std::shared_ptr<PointerEvent> pointerEvent, PointerEvent::PointerItem &item)
+{
+    int32_t action;
+    int32_t ret = GetNamedPropertyInt32(env, touchHandle, "action", action);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get action failed");
+    }
+    switch (action) {
+        case JS_CALLBACK_TOUCH_ACTION_DOWN:
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+            item.SetPressed(true);
+            break;
+        case JS_CALLBACK_TOUCH_ACTION_MOVE:
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
+            break;
+        case JS_CALLBACK_TOUCH_ACTION_UP:
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+            item.SetPressed(false);
+            break;
+        default:
+            MMI_HILOGE("action is unknown");
+            break;
+    }
+    return action;
+}
+
+static napi_value HandleTouchProperty(napi_env env, napi_value touchHandle)
+{
+    napi_value touchProperty = nullptr;
+    int32_t ret = napi_get_named_property(env, touchHandle, "touch", &touchProperty);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get touch failed");
+    }
+    if (touchProperty == nullptr) {
+        MMI_HILOGE("Touch value is null");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid touch");
+    }
+    napi_valuetype tmpType = napi_undefined;
+    if (napi_typeof(env, touchProperty, &tmpType) != napi_ok) {
+        MMI_HILOGE("Call napi_typeof failed");
+    }
+    if (tmpType != napi_object) {
+        MMI_HILOGE("touch is not napi_object");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "touch", "object");
+    }
+    return touchProperty;
+}
+
+static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
+    std::shared_ptr<PointerEvent> pointerEvent, PointerEvent::PointerItem &item, int32_t action)
+{
+    napi_value touchProperty = HandleTouchProperty(env, touchHandle);
+    int32_t sourceType;
+    int32_t ret = GetNamedPropertyInt32(env, touchHandle, "sourceType", sourceType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get sourceType failed");
+    }
+    if (sourceType < 0) {
+        MMI_HILOGE("sourceType:%{public}d is less 0, can not process", sourceType);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "sourceType must be greater than or equal to 0");
+    }
+    if (sourceType == TOUCH_SCREEN) {
+        sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    }
+    int32_t screenX;
+    ret = GetNamedPropertyInt32(env, touchProperty, "screenX", screenX);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get screenX failed");
+    }
+    int32_t screenY;
+    ret = GetNamedPropertyInt32(env, touchProperty, "screenY", screenY);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get screenY failed");
+    }
+    int64_t pressedTime;
+    ret = GetNamedPropertyInt64(env, touchProperty, "pressedTime", pressedTime);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pressed time failed");
+    }
+    item.SetDisplayX(screenX);
+    item.SetDisplayY(screenY);
+    item.SetPointerId(0);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetSourceType(sourceType);
+    pointerEvent->SetActionTime(pressedTime);
+    if ((action == JS_CALLBACK_TOUCH_ACTION_MOVE) || (action == JS_CALLBACK_TOUCH_ACTION_UP)) {
+        pointerEvent->UpdatePointerItem(0, item);
+    }
 }
 
 static napi_value InjectTouchEvent(napi_env env, napi_callback_info info)
@@ -314,81 +360,11 @@ static napi_value InjectTouchEvent(napi_env env, napi_callback_info info)
         return nullptr;
     }
     auto pointerEvent = PointerEvent::Create();
+    PointerEvent::PointerItem item;
     CHKPP(pointerEvent);
 
-    int32_t action;
-    PointerEvent::PointerItem item;
-    int32_t ret = GetNamedPropertyInt32(env, touchHandle, "action", action);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get action failed");
-        return nullptr;
-    }
-    switch (action) {
-        case JS_CALLBACK_TOUCH_ACTION_DOWN: {
-            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
-            item.SetPressed(true);
-            break;
-        }
-        case JS_CALLBACK_TOUCH_ACTION_MOVE: {
-            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-            break;
-        }
-        case JS_CALLBACK_TOUCH_ACTION_UP: {
-            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-            item.SetPressed(false);
-            break;
-        }
-        default: {
-            MMI_HILOGE("action is unknown");
-            break;
-        }
-    }
-
-    int32_t sourceType;
-    ret = GetNamedPropertyInt32(env, touchHandle, "sourceType", sourceType);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get sourceType failed");
-        return nullptr;
-    }
-    if (sourceType < 0) {
-        MMI_HILOGE("sourceType:%{public}d is less 0, can not process", sourceType);
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "sourceType must be greater than or equal to 0");
-        return nullptr;
-    }
-    if (sourceType == TOUCH_SCREEN) {
-        sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
-    }
-
-    int32_t screenX;
-    ret = GetNamedPropertyInt32(env, touchHandle, "screenX", screenX);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get screenX failed");
-        return nullptr;
-    }
-
-    int32_t screenY;
-    ret = GetNamedPropertyInt32(env, touchHandle, "screenY", screenY);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get screenY failed");
-        return nullptr;
-    }
-
-    int64_t pressedTime;
-    ret = GetNamedPropertyInt64(env, touchHandle, "pressedTime", pressedTime);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get pressed time failed");
-        return nullptr;
-    }
-    item.SetDisplayX(screenX);
-    item.SetDisplayY(screenY);
-    item.SetPointerId(0);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetSourceType(sourceType);
-    pointerEvent->SetActionTime(pressedTime);
-    if ((action == JS_CALLBACK_TOUCH_ACTION_MOVE) || (action == JS_CALLBACK_TOUCH_ACTION_UP)) {
-        pointerEvent->UpdatePointerItem(0, item);
-    }
+    int32_t action = HandleTouchAction(env, touchHandle, pointerEvent, item);
+    HandleTouchPropertyInt32(env, touchHandle, pointerEvent, item, action);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
     return result;
