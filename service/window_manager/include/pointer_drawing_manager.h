@@ -68,6 +68,7 @@ public:
     void AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void SetMouseDisplayState(bool state) override;
     bool GetMouseDisplayState() const override;
+    int32_t SetCustomCursor(void* pixelMap, int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY) override;
     int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override;
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
     PointerStyle GetLastMouseStyle() override;

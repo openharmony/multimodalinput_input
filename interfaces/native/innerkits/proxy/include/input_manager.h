@@ -297,6 +297,17 @@ public:
     /**
      * @brief Set pixelMap to override ohos mouse icon resouce.
      * @param windowId Indicates the windowId of the window
+     * @param focusX Indicates focus x
+     * @param focusX Indicates focus y
+     * @param pixelMap Indicates the image resouce for this mouse icon. which realtype must be OHOS::Media::PixelMap*
+     * @return vint32_t
+     * @since 9
+     */
+    int32_t SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap);
+
+    /**
+     * @brief Set pixelMap to override ohos mouse icon resouce.
+     * @param windowId Indicates the windowId of the window
      * @param pixelMap Indicates the image resouce for this mouse icon. which realtype must be OHOS::Media::PixelMap*
      * @return vint32_t
      * @since 10

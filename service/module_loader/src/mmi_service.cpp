@@ -454,6 +454,20 @@ int32_t MMIService::SetMouseScrollRows(int32_t rows)
     return RET_OK;
 }
 
+int32_t MMIService::SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap)
+{
+    CALL_DEBUG_ENTER;
+#if defined OHOS_BUILD_ENABLE_POINTER
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(std::bind(&IPointerDrawingManager::SetCustomCursor,
+        IPointerDrawingManager::GetInstance(), pixelMap, pid, windowId, focusX, focusY)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set the custom cursor failed, ret: %{public}d", ret);
+        return ret;
+    }
+#endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
 int32_t MMIService::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)
 {
     CALL_DEBUG_ENTER;
