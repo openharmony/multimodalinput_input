@@ -24,29 +24,6 @@ namespace OHOS {
 namespace MMI {
 class JsTouchEvent final {
 public:
-    enum class Action : int32_t {
-        CANCEL = 0,
-        DOWN = 1,
-        MOVE = 2,
-        UP = 3,
-    };
-
-    enum class ToolType : int32_t {
-        FINGER = 0,
-        PEN = 1,
-        RUBBER = 2,
-        BRUSH = 3,
-        PENCIL = 4,
-        AIRBRUSH = 5,
-        MOUSE = 6,
-        LENS = 7,
-    };
-
-    enum class SourceType : int32_t {
-        TOUCH_SCREEN = 0,
-        PEN = 1,
-        TOUCH_PAD = 2,
-    };
     JsTouchEvent() = default;
     ~JsTouchEvent() = default;
     DISALLOW_COPY_AND_MOVE(JsTouchEvent);
