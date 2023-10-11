@@ -36,6 +36,24 @@ public:
     std::shared_ptr<PointerEvent> onEventConsume(std::shared_ptr<PointerEvent> pointerEvent, int64_t frameTime, bool &deferred, ErrCode &status);
     std::shared_ptr<PointerEvent> getPointerEvent();
 
+    // Microseconds per milliseconds.
+    static constexpr int64_t US_PER_MS = 1000;
+
+    // Latency added during resampling.  A few milliseconds doesn't hurt much but
+    // reduces the impact of mispredicted touch positions.
+    static constexpr int64_t RESAMPLE_LATENCY = 5 * US_PER_MS;
+
+    // Minimum time difference between consecutive samples before attempting to resample.
+    static constexpr int64_t RESAMPLE_MIN_DELTA = 2 * US_PER_MS;
+
+    // Maximum time difference between consecutive samples before attempting to resample
+    // by extrapolation.
+    static constexpr int64_t RESAMPLE_MAX_DELTA = 20 * US_PER_MS;
+
+    // Maximum time to predict forward from the last known state, to avoid predicting too
+    // far into the future.  This time is further bounded by 50% of the last time delta.
+    static constexpr int64_t RESAMPLE_MAX_PREDICTION = 4 * US_PER_MS;
+
 private:
 
     struct Pointer {
