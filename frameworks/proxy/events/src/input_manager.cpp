@@ -206,6 +206,11 @@ int32_t InputManager::GetMouseScrollRows(int32_t &Rows)
     return InputMgrImpl.GetMouseScrollRows(Rows);
 }
 
+int32_t InputManager::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap)
+{
+    return InputMgrImpl.SetCustomCursor(windowId, focusX, focusY, pixelMap);
+}
+
 int32_t InputManager::SetMouseIcon(int32_t windowId, void* pixelMap)
 {
     return InputMgrImpl.SetMouseIcon(windowId, pixelMap);
