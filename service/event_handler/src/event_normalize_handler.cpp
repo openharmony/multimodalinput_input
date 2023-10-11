@@ -160,7 +160,7 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     CHKPV(keyEvent);
     EventLogHelper::PrintEventData(keyEvent);
     nextHandler_->HandleKeyEvent(keyEvent);
-    if(keyEvent->IsRepeat()) {
+    if (keyEvent->IsRepeat()) {
         KeyRepeat->SelectAutoRepeat(keyEvent);
         keyEvent->SetRepeat(false);
     }
