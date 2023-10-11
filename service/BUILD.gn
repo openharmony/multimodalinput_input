@@ -307,6 +307,38 @@ ohos_unittest("ut-mmi-service-out") {
   ]
 }
 
+ohos_unittest("event_resample_test") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "${mmi_path}/service/event_resample/include",
+    "//base/customization/config_policy/interfaces/inner_api/include",
+    "//commonlibrary/c_utils/base/include"
+  ]
+
+  sources = [
+    "event_resample/src/event_resample.cpp",
+    "event_resample/test/event_resample_test.cpp",
+  ]
+
+  configs = [ ":libmmi_server_config" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+    "//third_party/cJSON:cjson",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "config_policy:configpolicy_util",
+    "preferences:native_preferences"
+  ]
+}
+
 ohos_unittest("TransformPointTest") {
   module_out_path = module_output_path
 
