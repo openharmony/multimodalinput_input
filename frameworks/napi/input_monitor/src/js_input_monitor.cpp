@@ -259,6 +259,27 @@ int32_t JsInputMonitor::IsMatch(napi_env jsEnv)
     return RET_ERR;
 }
 
+MapFun JsInputMonitor::GetInputEventFunc(const std::shared_ptr<InputEvent> inputEvent)
+{
+    MapFun mapFunc;
+    mapFunc["id"] = std::bind(InputEvent::GetId, inputEvent);
+    mapFunc["deviceId"] = std::bind(InputEvent::GetDeviceId, inputEvent);
+    mapFunc["actionTime"] = std::bind(InputEvent::GetActionTime, inputEvent);
+    mapFunc["screenId"] = std::bind(InputEvent::GetTargetDisplayId, inputEvent);
+    mapFunc["windowId"] = std::bind(InputEvent::GetTargetWindowId, inputEvent);
+    return mapFunc;
+}
+
+int32_t JsInputMonitor::SetInputEventProperty(const std::shared_ptr<InputEvent> inputEvent, napi_value result)
+{
+    auto mapFun = GetInputEventFunc(inputEvent);
+    for (const auto &it : mapFun) {
+        auto setProperty = "Set" + it.first;
+        CHKRR(SetNameProperty(jsEnv_, result, it.first, it.second()), setProperty, RET_ERR);
+    }
+    return RET_OK;
+}
+
 int32_t JsInputMonitor::GetAction(int32_t action) const
 {
     switch (action) {
