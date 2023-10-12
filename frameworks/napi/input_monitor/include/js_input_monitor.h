@@ -81,6 +81,8 @@ public:
     std::string GetTypeName() const;
 private:
     void SetCallback(napi_value callback);
+    MapFun GetInputEventFunc(const std::shared_ptr<InputEvent> inputEvent);
+    int32_t SetInputEventProperty(const std::shared_ptr<InputEvent> inputEvent, napi_value result);
     int32_t TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t GetAction(int32_t action) const;
     int32_t GetSourceType(int32_t sourceType) const;
