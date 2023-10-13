@@ -355,10 +355,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
         return RET_ERR;
     }
     napi_value pointers = nullptr;
-    if (napi_create_array(jsEnv_, &pointers) != napi_ok) {
-        MMI_HILOGE("napi_create_array is failed");
-        return RET_ERR;
-    }
+    CHKRR(napi_create_array(jsEnv_, &pointers), "napi_create_array is", RET_ERR);
     std::vector<PointerEvent::PointerItem> pointerItems;
     for (const auto &item : pointerEvent->GetPointerIds()) {
         PointerEvent::PointerItem pointerItem;
@@ -371,19 +368,12 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
     uint32_t index = 0;
     for (const auto &it : pointerItems) {
         napi_value element = nullptr;
-        if (napi_create_object(jsEnv_, &element) != napi_ok) {
-            MMI_HILOGE("napi_create_object is failed");
-            return RET_ERR;
-        }
+        CHKRR(napi_create_object(jsEnv_, &element), "napi_create_object is", RET_ERR);
         if (GetJsPointerItem(it, element) != RET_OK) {
             MMI_HILOGE("Transform pointerItem failed");
             return RET_ERR;
         }
-        status = napi_set_element(jsEnv_, pointers, index, element);
-        if (status != napi_ok) {
-            MMI_HILOGE("napi_set_element is failed");
-            return RET_ERR;
-        }
+        CHKRR(napi_set_element(jsEnv_, pointers, index, element), "napi_set_element is", RET_ERR);
         ++index;
     }
     CHKRR(SetNameProperty(jsEnv_, result, "touches", pointers), "Set touches", RET_ERR);
