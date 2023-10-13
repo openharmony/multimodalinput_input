@@ -80,20 +80,8 @@ napi_value JsMouseEvent::EnumClassConstructor(napi_env env, napi_callback_info i
     return ret;
 }
 
-napi_value JsMouseEvent::Export(napi_env env, napi_value exports)
+napi_value JsMouseEvent::HandleActionPropertyArr(napi_env env, napi_value exports)
 {
-    CALL_DEBUG_ENTER;
-    napi_property_descriptor toolTypeArr[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("UNKNOWN", GetNapiInt32(env, static_cast<int32_t>(ToolType::UNKNOWN))),
-        DECLARE_NAPI_STATIC_PROPERTY("MOUSE", GetNapiInt32(env, static_cast<int32_t>(ToolType::MOUSE))),
-        DECLARE_NAPI_STATIC_PROPERTY("JOYSTICK", GetNapiInt32(env, static_cast<int32_t>(ToolType::JOYSTICK))),
-        DECLARE_NAPI_STATIC_PROPERTY("TOUCHPAD", GetNapiInt32(env, static_cast<int32_t>(ToolType::TOUCHPAD))),
-    };
-    napi_value toolType = nullptr;
-    CHKRP(napi_define_class(env, "ToolType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
-        sizeof(toolTypeArr) / sizeof(*toolTypeArr), toolTypeArr, &toolType), DEFINE_CLASS);
-    CHKRP(napi_set_named_property(env, exports, "ToolType", toolType), SET_NAMED_PROPERTY);
-
     napi_property_descriptor actionArr[] = {
         DECLARE_NAPI_STATIC_PROPERTY("CANCEL", GetNapiInt32(env, static_cast<int32_t>(Action::CANCEL))),
         DECLARE_NAPI_STATIC_PROPERTY("MOVE", GetNapiInt32(env, static_cast<int32_t>(Action::MOVE))),
@@ -109,6 +97,24 @@ napi_value JsMouseEvent::Export(napi_env env, napi_value exports)
     CHKRP(napi_define_class(env, "Action", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
         sizeof(actionArr) / sizeof(*actionArr), actionArr, &action), DEFINE_CLASS);
     CHKRP(napi_set_named_property(env, exports, "Action", action), SET_NAMED_PROPERTY);
+    return action;
+}
+
+napi_value JsMouseEvent::Export(napi_env env, napi_value exports)
+{
+    CALL_DEBUG_ENTER;
+    napi_property_descriptor toolTypeArr[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("UNKNOWN", GetNapiInt32(env, static_cast<int32_t>(ToolType::UNKNOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("MOUSE", GetNapiInt32(env, static_cast<int32_t>(ToolType::MOUSE))),
+        DECLARE_NAPI_STATIC_PROPERTY("JOYSTICK", GetNapiInt32(env, static_cast<int32_t>(ToolType::JOYSTICK))),
+        DECLARE_NAPI_STATIC_PROPERTY("TOUCHPAD", GetNapiInt32(env, static_cast<int32_t>(ToolType::TOUCHPAD))),
+    };
+    napi_value toolType = nullptr;
+    CHKRP(napi_define_class(env, "ToolType", NAPI_AUTO_LENGTH, EnumClassConstructor, nullptr,
+        sizeof(toolTypeArr) / sizeof(*toolTypeArr), toolTypeArr, &toolType), DEFINE_CLASS);
+    CHKRP(napi_set_named_property(env, exports, "ToolType", toolType), SET_NAMED_PROPERTY);
+
+    HandleActionPropertyArr(env, exports);
 
     napi_property_descriptor buttonArr[] = {
         DECLARE_NAPI_STATIC_PROPERTY("LEFT", GetNapiInt32(env, static_cast<int32_t>(Button::LEFT))),
