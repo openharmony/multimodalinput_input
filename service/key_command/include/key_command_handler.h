@@ -151,7 +151,12 @@ public:
 #endif // OHOS_BUILD_ENABLE_TOUCH
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
     bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent);
+
+#ifdef UNIT_TEST
+public:
+#else
 private:
+#endif
     void Print();
     void PrintSeq();
     bool ParseConfig();
