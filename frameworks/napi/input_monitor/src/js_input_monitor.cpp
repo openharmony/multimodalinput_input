@@ -342,6 +342,10 @@ int32_t JsInputMonitor::GetJsPointerItem(const PointerEvent::PointerItem &item, 
 int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (SetInputEventProperty(pointerEvent, result) != RET_OK) {
+        MMI_HILOGE("Set inputEvent property failed");
+        return RET_ERR;
+    }
     if (SetNameProperty(jsEnv_, result, "action", GetAction(pointerEvent->GetPointerAction())) != napi_ok) {
         MMI_HILOGE("Set action property failed");
         return RET_ERR;
@@ -351,8 +355,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
         return RET_ERR;
     }
     napi_value pointers = nullptr;
-    auto status = napi_create_array(jsEnv_, &pointers);
-    if (status != napi_ok) {
+    if (napi_create_array(jsEnv_, &pointers) != napi_ok) {
         MMI_HILOGE("napi_create_array is failed");
         return RET_ERR;
     }
@@ -368,8 +371,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
     uint32_t index = 0;
     for (const auto &it : pointerItems) {
         napi_value element = nullptr;
-        status = napi_create_object(jsEnv_, &element);
-        if (status != napi_ok) {
+        if (napi_create_object(jsEnv_, &element) != napi_ok) {
             MMI_HILOGE("napi_create_object is failed");
             return RET_ERR;
         }
