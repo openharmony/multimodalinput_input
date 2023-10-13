@@ -369,6 +369,41 @@ ohos_unittest("event_resample_test") {
   ]
 }
 
+ohos_unittest("TwoFingerLongTouchTest") {
+  module_out_path = module_output_path
+  include_dirs = [
+    "${mmi_path}/service/key_command/test",
+    "//base/customization/config_policy/interfaces/inner_api/include",
+    "//commonlibrary/c_utils/base/include"
+  ]
+
+  cflags = [ "-DUNIT_TEST" ]
+
+  sources = [
+    "key_command/src/key_command_handler.cpp",
+    "key_command/test/two_finger_long_touch_test.cpp",
+    "key_command/test/ability_manager_client_stub.cpp"
+  ]
+
+  configs = [ ":libmmi_server_config" ]
+
+  deps = [
+    "${mmi_path}/service:libmmi-server",
+    "${mmi_path}/util:libmmi-util",
+    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+    "//third_party/cJSON:cjson",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "config_policy:configpolicy_util",
+    "preferences:native_preferences"
+  ]
+}
+
 ohos_unittest("TransformPointTest") {
   module_out_path = module_output_path
 
