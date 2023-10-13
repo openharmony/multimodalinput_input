@@ -262,11 +262,11 @@ int32_t JsInputMonitor::IsMatch(napi_env jsEnv)
 MapFun JsInputMonitor::GetInputEventFunc(const std::shared_ptr<InputEvent> inputEvent)
 {
     MapFun mapFunc;
-    mapFunc["id"] = std::bind(InputEvent::GetId, inputEvent);
-    mapFunc["deviceId"] = std::bind(InputEvent::GetDeviceId, inputEvent);
-    mapFunc["actionTime"] = std::bind(InputEvent::GetActionTime, inputEvent);
-    mapFunc["screenId"] = std::bind(InputEvent::GetTargetDisplayId, inputEvent);
-    mapFunc["windowId"] = std::bind(InputEvent::GetTargetWindowId, inputEvent);
+    mapFunc["id"] = std::bind(&InputEvent::GetId, inputEvent);
+    mapFunc["deviceId"] = std::bind(&InputEvent::GetDeviceId, inputEvent);
+    mapFunc["actionTime"] = std::bind(&InputEvent::GetActionTime, inputEvent);
+    mapFunc["screenId"] = std::bind(&InputEvent::GetTargetDisplayId, inputEvent);
+    mapFunc["windowId"] = std::bind(&InputEvent::GetTargetWindowId, inputEvent);
     return mapFunc;
 }
 
