@@ -315,9 +315,21 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     if (ret != RET_OK) {
         MMI_HILOGE("Get pressed time failed");
     }
+    int32_t toolType;
+    ret = GetNamedPropertyInt32(env, touchProperty, "toolType", toolType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get toolType failed");
+    }
+    double pressure;
+    ret = GetNamedPropertyDouble(env, touchProperty, "pressure", pressure);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pressure failed");
+    }
     item.SetDisplayX(screenX);
     item.SetDisplayY(screenY);
     item.SetPointerId(0);
+    item.SetToolType(toolType);
+    item.SetPressure(pressure);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetSourceType(sourceType);
