@@ -206,7 +206,7 @@ int32_t InputManager::GetMouseScrollRows(int32_t &Rows)
     return InputMgrImpl.GetMouseScrollRows(Rows);
 }
 
-int32_t InputManager::SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap)
+int32_t InputManager::SetCustomCursor(int32_t windowId, void* pixelMap, int32_t focusX, int32_t focusY)
 {
     return InputMgrImpl.SetCustomCursor(windowId, focusX, focusY, pixelMap);
 }
@@ -312,9 +312,9 @@ int32_t InputManager::SetFunctionKeyState(int32_t funcKey, bool enable)
     return InputMgrImpl.SetFunctionKeyState(funcKey, enable);
 }
 
-void InputManager::SetPointerLocation(int32_t x, int32_t y)
+int32_t InputManager::SetPointerLocation(int32_t x, int32_t y)
 {
-    InputMgrImpl.SetPointerLocation(x, y);
+    return InputMgrImpl.SetPointerLocation(x, y);
 }
 
 int32_t InputManager::EnterCaptureMode(int32_t windowId)
