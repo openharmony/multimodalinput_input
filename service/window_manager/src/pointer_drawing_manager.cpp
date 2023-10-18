@@ -485,6 +485,8 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
     if (ret == RET_ERR) {
         MMI_HILOGE("SetPointerStyle is failed");
     }
+    MMI_HILOGD("style.id: %{public}d, userIconHotSpotX_: %{public}d, userIconHotSpotY_: %{public}d",
+        style.id, userIconHotSpotX_, userIconHotSpotY_);
     return ret;
 }
 
@@ -870,6 +872,7 @@ void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y)
     FixCursorPosition(x, y);
     lastPhysicalX_ = x;
     lastPhysicalY_ = y;
+    MMI_HILOGD("Pointer window move, x:%{public}d, y:%{public}d", lastPhysicalX_, lastPhysicalY_);
     if (surfaceNode_ != nullptr) {
         surfaceNode_->SetBounds(x,
             y,
