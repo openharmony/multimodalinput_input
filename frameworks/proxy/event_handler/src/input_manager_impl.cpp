@@ -1242,7 +1242,7 @@ int32_t InputManagerImpl::SetFunctionKeyState(int32_t funcKey, bool enable)
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
-void InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
+int32_t InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
 {
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
@@ -1250,8 +1250,10 @@ void InputManagerImpl::SetPointerLocation(int32_t x, int32_t y)
     if (ret != RET_OK) {
         MMI_HILOGE("Set Pointer Location failed, ret:%{public}d", ret);
     }
+    return ret;
 #else
     MMI_HILOGW("Pointer device or pointer drawing module does not support");
+    return ERROR_UNSUPPORT;
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
