@@ -842,6 +842,20 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerLocation_001
 }
 
 /**
+ * @tc.name: InputManagerPointerTest_SetPointerLocation_002
+ * @tc.desc: Sets the absolute coordinate of mouse.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerLocation_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t x = 300;
+    int32_t y = 300;
+    ASSERT_TRUE(InputManager::GetInstance()->SetPointerLocation(x, y) == RET_OK);
+}
+
+/**
  * @tc.name: InputManagerPointerTest_SetPointerVisible_001
  * @tc.desc: Sets whether the pointer icon is visible
  * @tc.type: FUNC
@@ -1560,6 +1574,86 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetPointerColor_001, T
     int32_t getColor = 3;
     ASSERT_TRUE(InputManager::GetInstance()->GetPointerColor(getColor) == RET_OK);
     ASSERT_TRUE(setColor == getColor);
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_SetCustomCursor_001
+ * @tc.desc: Set the mouse custom cursor
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
+    uint32_t windowId = window->GetWindowId();
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/North_South.svg";
+    PointerStyle pointerStyle;
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    if (InputManager::GetInstance()->SetCustomCursor(windowId, (void *)pixelMap.get(), 32, 32) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
+        ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+    } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        ASSERT_FALSE(false);  // errors occur
+    } else {
+        ASSERT_TRUE(false);
+    }
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_SetCustomCursor_002
+ * @tc.desc: Set the mouse custom cursor
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
+    uint32_t windowId = window->GetWindowId();
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
+    PointerStyle pointerStyle;
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    if (InputManager::GetInstance()->SetCustomCursor(windowId, (void *)pixelMap.get(), 64, 64) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
+        ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+    } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        ASSERT_FALSE(false);  // errors occur
+    } else {
+        ASSERT_TRUE(false);
+    }
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_SetCustomCursor_003
+ * @tc.desc: Set the mouse custom cursor
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
+    uint32_t windowId = window->GetWindowId();
+    PointerStyle pointerStyle;
+    pointerStyle.id = MOUSE_ICON::DEFAULT;
+    int32_t ret = InputManager::GetInstance()->SetPointerStyle(windowId, pointerStyle);
+    ASSERT_TRUE(ret == RET_OK);
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
+    ASSERT_TRUE(pixelMap != nullptr);
+    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    ret = InputManager::GetInstance()->SetCustomCursor(INVAID_VALUE, (void *)pixelMap.get(), 0, 0);
+    ASSERT_EQ(ret, RET_ERR);
+    ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
+    ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEFAULT);
 }
 }  // namespace MMI
 }  // namespace OHOS

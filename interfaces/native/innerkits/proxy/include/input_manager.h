@@ -297,13 +297,13 @@ public:
     /**
      * @brief Set pixelMap to override ohos mouse icon resouce.
      * @param windowId Indicates the windowId of the window
-     * @param focusX Indicates focus x
-     * @param focusX Indicates focus y
      * @param pixelMap Indicates the image resouce for this mouse icon. which realtype must be OHOS::Media::PixelMap*
-     * @return vint32_t
+     * @param focusX Indicates focus x
+     * @param focusY Indicates focus y
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 9
      */
-    int32_t SetCustomCursor(int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap);
+    int32_t SetCustomCursor(int32_t windowId, void* pixelMap, int32_t focusX = 0, int32_t focusY = 0);
 
     /**
      * @brief Set pixelMap to override ohos mouse icon resouce.
@@ -493,9 +493,10 @@ public:
      * @brief Sets the absolute coordinate of mouse.
      * @param x Specifies the x coordinate of the mouse to be set.
      * @param y Specifies the y coordinate of the mouse to be set.
-     * @return void
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
      */
-    void SetPointerLocation(int32_t x, int32_t y);
+    int32_t SetPointerLocation(int32_t x, int32_t y);
 
     /**
      * @brief 进入捕获模式
