@@ -99,7 +99,7 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     currentTime_ = point->GetActionTime();
     if (fd < 0 && currentTime_ - eventTime_ > INTERVAL_TIME) {
         eventTime_ = currentTime_;
-        MMI_HILOGE("The fd less than 0, fd:%{public}d", fd);
+        MMI_HILOGE("InputTracking id:%{public}d The fd less than 0, fd:%{public}d", point->GetId(), fd);
         DfxHisysevent::OnUpdateTargetPointer(point, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
         return;
     }
@@ -109,7 +109,8 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     CHKPV(session);
     auto currentTime = GetSysClockTime();
     if (ANRMgr->TriggerANR(ANR_DISPATCH, currentTime, session)) {
-        MMI_HILOGD("The pointer event does not report normally, application not response");
+        MMI_HILOGW("InputTracking id:%{public}d, The pointer event does not report normally,"
+            "application not response", point->GetId());
         return;
     }
     auto pointerEvent = std::make_shared<PointerEvent>(*point);
@@ -121,6 +122,10 @@ void EventDispatchHandler::HandlePointerEventInner(const std::shared_ptr<Pointer
     InputEventDataTransformation::MarshallingEnhanceData(pointerEvent, pkt);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     BytraceAdapter::StartBytrace(point, BytraceAdapter::TRACE_STOP);
+    if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_MOVE) {
+        MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
+            pointerEvent->GetId(), session->GetProgramName().c_str(), session->GetPid());
+    }
     if (!udsServer->SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventTouch failed! errCode:%{public}d", MSG_SEND_FAIL);
         return;
@@ -163,6 +168,8 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
         MMI_HILOGE("Packet write structure of EventKeyboard failed");
         return RET_ERR;
     }
+    MMI_HILOGI("InputTracking id:%{public}d, SendMsg to %{public}s:pid:%{public}d",
+        key->GetId(), session->GetProgramName().c_str(), session->GetPid());
     if (!udsServer.SendMsg(fd, pkt)) {
         MMI_HILOGE("Sending structure of EventKeyboard failed! errCode:%{public}d", MSG_SEND_FAIL);
         return MSG_SEND_FAIL;
