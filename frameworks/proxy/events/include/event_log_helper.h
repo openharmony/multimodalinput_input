@@ -36,14 +36,14 @@ private:
     static void PrintInfoLog(const std::shared_ptr<KeyEvent> event)
     {
         std::vector<KeyEvent::KeyItem> eventItems{ event->GetKeyItems() };
-        MMI_HILOGI("KeyCode:%{public}d,ActionTime:%{public}" PRId64 ",EventType:%{public}s,KeyAction:%{public}s,"
-            "NumLock:%{public}d,CapsLock:%{public}d,ScrollLock:%{public}d,EventNumber:%{public}d,"
-            "keyItemsCount:%{public}zu",
-            event->GetKeyCode(), event->GetActionTime(), InputEvent::EventTypeToString(event->GetEventType()),
+        MMI_HILOGI("InputTracking id:%{public}d, KeyCode:%{public}d,ActionTime:%{public}" PRId64
+            ",EventType:%{public}s,KeyAction:%{public}s,"
+            "NumLock:%{public}d,CapsLock:%{public}d,ScrollLock:%{public}d,keyItemsCount:%{public}zu",
+            event->GetId(), event->GetKeyCode(), event->GetActionTime(),
+            InputEvent::EventTypeToString(event->GetEventType()),
             KeyEvent::ActionToString(event->GetKeyAction()), event->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY),
             event->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY),
-            event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY),
-            event->GetId(), eventItems.size());
+            event->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY), eventItems.size());
         for (const auto &item : eventItems) {
             MMI_HILOGI("DeviceNumber:%{public}d,KeyCode:%{public}d,DownTime:%{public}" PRId64 ",IsPressed:%{public}d,",
             item.GetDeviceId(), item.GetKeyCode(), item.GetDownTime(), item.IsPressed());
@@ -98,10 +98,10 @@ private:
             return;
         }
         std::vector<int32_t> pointerIds{ event->GetPointerIds() };
-        MMI_HILOGI("EventType:%{public}s,ActionTime:%{public}" PRId64 ",PointerAction:%{public}s,"
-            "SourceType:%{public}s,EventNumber:%{public}d",
-            InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
-            event->DumpPointerAction(), event->DumpSourceType(), event->GetId());
+        MMI_HILOGI("InputTracking id:%{public}d, EventType:%{public}s,ActionTime:%{public}" PRId64
+            ",PointerAction:%{public}s, SourceType:%{public}s",
+            event->GetId(), InputEvent::EventTypeToString(event->GetEventType()), event->GetActionTime(),
+            event->DumpPointerAction(), event->DumpSourceType());
         for (const auto &pointerId : pointerIds) {
             PointerEvent::PointerItem item;
             if (!event->GetPointerItem(pointerId, item)) {
