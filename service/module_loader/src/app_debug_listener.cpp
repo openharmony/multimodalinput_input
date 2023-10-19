@@ -31,7 +31,7 @@ AppDebugListener *AppDebugListener::GetInstance()
 void AppDebugListener::OnAppDebugStarted(const std::vector<AppExecFwk::AppDebugInfo> &debugInfos)
 {
     CALL_DEBUG_ENTER;
-    for (auto &debugInfo : debugInfos) {
+    for (const auto &debugInfo : debugInfos) {
         appDebugPid_ = debugInfo.pid;
         MMI_HILOGD("appDebugPid_ : %{public}d", appDebugPid_);
     }
@@ -40,7 +40,7 @@ void AppDebugListener::OnAppDebugStarted(const std::vector<AppExecFwk::AppDebugI
 void AppDebugListener::OnAppDebugStoped(const std::vector<AppExecFwk::AppDebugInfo> &debugInfos)
 {
     CALL_DEBUG_ENTER;
-    for (auto &debugInfo : debugInfos) {
+    for (const auto &debugInfo : debugInfos) {
         if (appDebugPid_ == debugInfo.pid) {
             appDebugPid_ = -1;
         }
