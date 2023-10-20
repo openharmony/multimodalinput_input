@@ -88,6 +88,8 @@ private:
     bool callbackInitialized_ { false };
     bool hasEventExecuting_ { false };
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
+    int32_t subscribePowerKeyId_ { -1 };
+    bool subscribePowerKeyState_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
