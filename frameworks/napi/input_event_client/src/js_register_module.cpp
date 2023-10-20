@@ -122,6 +122,7 @@ static void HandleMouseAction(napi_env env, napi_value mouseHandle,
     int32_t ret = GetNamedPropertyInt32(env, mouseHandle, "action", action);
     if (ret != RET_OK) {
         MMI_HILOGE("Get action failed");
+        return;
     }
     switch (action) {
         case JS_CALLBACK_MOUSE_ACTION_MOVE:
@@ -242,6 +243,7 @@ static int32_t HandleTouchAction(napi_env env, napi_value touchHandle,
     int32_t ret = GetNamedPropertyInt32(env, touchHandle, "action", action);
     if (ret != RET_OK) {
         MMI_HILOGE("Get action failed");
+        return RET_ERR;
     }
     switch (action) {
         case JS_CALLBACK_TOUCH_ACTION_DOWN:
@@ -268,18 +270,22 @@ static napi_value HandleTouchProperty(napi_env env, napi_value touchHandle)
     int32_t ret = napi_get_named_property(env, touchHandle, "touch", &touchProperty);
     if (ret != RET_OK) {
         MMI_HILOGE("Get touch failed");
+        return nullptr;
     }
     if (touchProperty == nullptr) {
         MMI_HILOGE("Touch value is null");
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Invalid touch");
+        return nullptr;
     }
     napi_valuetype tmpType = napi_undefined;
     if (napi_typeof(env, touchProperty, &tmpType) != napi_ok) {
         MMI_HILOGE("Call napi_typeof failed");
+        return nullptr;
     }
     if (tmpType != napi_object) {
         MMI_HILOGE("touch is not napi_object");
         THROWERR_API9(env, COMMON_PARAMETER_ERROR, "touch", "object");
+        return nullptr;
     }
     return touchProperty;
 }
@@ -287,7 +293,6 @@ static napi_value HandleTouchProperty(napi_env env, napi_value touchHandle)
 static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     std::shared_ptr<PointerEvent> pointerEvent, PointerEvent::PointerItem &item, int32_t action)
 {
-    napi_value touchProperty = HandleTouchProperty(env, touchHandle);
     int32_t sourceType;
     int32_t ret = GetNamedPropertyInt32(env, touchHandle, "sourceType", sourceType);
     if (ret != RET_OK) {
@@ -300,6 +305,8 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     if (sourceType == TOUCH_SCREEN) {
         sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     }
+    napi_value touchProperty = HandleTouchProperty(env, touchHandle);
+    CHKPV(touchProperty);
     int32_t screenX;
     ret = GetNamedPropertyInt32(env, touchProperty, "screenX", screenX);
     if (ret != RET_OK) {
@@ -315,9 +322,21 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
     if (ret != RET_OK) {
         MMI_HILOGE("Get pressed time failed");
     }
+    int32_t toolType;
+    ret = GetNamedPropertyInt32(env, touchProperty, "toolType", toolType);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get toolType failed");
+    }
+    double pressure;
+    ret = GetNamedPropertyDouble(env, touchProperty, "pressure", pressure);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pressure failed");
+    }
     item.SetDisplayX(screenX);
     item.SetDisplayY(screenY);
     item.SetPointerId(0);
+    item.SetToolType(toolType);
+    item.SetPressure(pressure);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
     pointerEvent->SetSourceType(sourceType);
