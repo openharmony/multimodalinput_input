@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace MMI {
-typedef std::function<void(void *event)> FunInputEvent;
+typedef std::function<void(void *event, int64_t frameTime)> FunInputEvent;
 class LibinputAdapter final {
 public:
     static int32_t DeviceLedUpdate(struct libinput_device *device, int32_t funcKey, bool isEnable);
