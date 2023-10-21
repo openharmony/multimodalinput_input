@@ -29,6 +29,7 @@
 #include "i_input_device_listener.h"
 #include "i_input_event_consumer.h"
 #include "i_input_event_filter.h"
+#include "i_event_observer.h"
 #include "i_window_checker.h"
 #include "input_device.h"
 #include "key_option.h"
@@ -60,6 +61,24 @@ public:
     int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);
 
+    /**
+     * @brief Updates the process info to other server.
+     * @param observer Indicates the progess info.
+     * @return the observer setting successed or not.
+     * @since 10
+     */
+    int32_t AddInputEventObserver(std::shared_ptr<IEventObserver> observer);
+
+    /**
+     * @brief Set the process info to mmi server.
+     * @param pid Indicates pid.
+     * @param
+     * @return the observer setting successed or not.
+     * @since 10
+     */
+    void SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus);
+
+    int32_t GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
     /**
      * @brief Sets a consumer for the window input event of the current process.
      * @param inputEventConsumer Indicates the consumer to set. The window input event of the current process

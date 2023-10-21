@@ -37,6 +37,11 @@ int32_t InputManager::GetDisplayBindInfo(DisplayBindInfos &infos)
     return InputMgrImpl.GetDisplayBindInfo(infos);
 }
 
+int32_t InputManager::GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
+{
+    return InputMgrImpl.GetAllNapStatusData(datas);
+}
+
 int32_t InputManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
     return InputMgrImpl.SetDisplayBind(deviceId, displayId, msg);
@@ -61,6 +66,11 @@ int32_t InputManager::AddInputEventFilter(std::shared_ptr<IInputEventFilter> fil
 int32_t InputManager::RemoveInputEventFilter(int32_t filterId)
 {
     return InputMgrImpl.RemoveInputEventFilter(filterId);
+}
+
+int32_t InputManager::AddInputEventObserver(std::shared_ptr<IEventObserver> observer)
+{
+    return InputMgrImpl.AddInputEventObserver(observer);
 }
 
 void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)
@@ -448,6 +458,11 @@ void InputManager::SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windo
 {
     CHKPV(windowChecker);
     InputMgrImpl.SetWindowCheckerHandler(windowChecker);
+}
+
+void InputManager::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus)
+{
+    InputMgrImpl.SetNapStatus(pid, uid, bundleName, napStatus);
 }
 } // namespace MMI
 } // namespace OHOS

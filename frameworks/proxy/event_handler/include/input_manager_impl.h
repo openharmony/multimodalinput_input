@@ -24,6 +24,7 @@
 #include "net_packet.h"
 
 #include "window_info.h"
+#include "nap_process.h"
 #include "event_filter_service.h"
 #include "event_handler.h"
 #include "extra_data.h"
@@ -36,6 +37,7 @@
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
 #include "i_anr_observer.h"
+#include "i_event_observer.h"
 #include "i_window_checker.h"
 #include "key_option.h"
 #include "pointer_event.h"
@@ -51,6 +53,7 @@ public:
     DISALLOW_MOVE(InputManagerImpl);
 
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
+    int32_t GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t GetWindowPid(int32_t windowId);
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
@@ -67,11 +70,14 @@ public:
     void UnsubscribeSwitchEvent(int32_t subscriberId);
     int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);
-
+    int32_t AddInputEventObserver(std::shared_ptr<IEventObserver> observer);
+    int32_t NotifyNapOnline();
+    void NotifyBundleName(int32_t pid, int32_t uid, std::string bundleName);
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     void SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker);
+    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
@@ -187,6 +193,7 @@ private:
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 private:
     std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t, uint32_t>> eventFilterServices_;
+    std::shared_ptr<IEventObserver> eventObserver_ { nullptr };
     std::shared_ptr<IInputEventConsumer> consumer_ { nullptr };
     std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
     std::shared_ptr<IWindowChecker> winChecker_ { nullptr };

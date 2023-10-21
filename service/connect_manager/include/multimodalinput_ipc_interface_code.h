@@ -90,6 +90,13 @@ enum class MultimodalinputConnectInterfaceCode {
     GET_POINTER_COLOR = 68,
     CLEAN_WIDNOW_STYLE = 69,
     SET_CUSTOM_CURSOR = 70,
+    NOTIFY_NAP_ONLINE = 71,
+    SET_NAP_STATUS = 72,
+    GET_ALL_NAPSTATUS_DATA = 73,
+};
+
+enum class MultimodalinputEventObserverCode {
+    NOTIFY_BUNDLE_NAME = 0,
 };
 
 enum class MultimodalinputEventInterfaceCode {
