@@ -65,6 +65,7 @@ void ClientMsgHandler::Init()
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || \
     defined(OHOS_BUILD_ENABLE_MONITOR))
         { MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this) },
+        { MmiMessageId::NOTIFY_BUNDLE_NAME, MsgCallbackBind2(&ClientMsgHandler::NotifyBundleName, this) },
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
     (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR))
@@ -136,6 +137,17 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     return RET_OK;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
+
+int32_t ClientMsgHandler::NotifyBundleName(const UDSClient& client, NetPacket& pkt)
+{
+    CALL_DEBUG_ENTER;
+    int32_t pid, uid;
+    std::string bundleName;
+    pkt >> pid >> uid >> bundleName;
+    InputMgrImpl.NotifyBundleName(pid, uid, bundleName);
+    MMI_HILOGD("client info in NotifyBundleName is : %{public}d, %{public}d, %{public}s", pid, uid, bundleName.c_str());
+    return RET_OK;
+}
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t ClientMsgHandler::OnPointerEvent(const UDSClient& client, NetPacket& pkt)

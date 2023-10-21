@@ -21,6 +21,7 @@
 #include "nocopyable.h"
 
 #include "i_multimodal_input_connect.h"
+#include "i_event_observer.h"
 #include "mmi_log.h"
 #include "multimodalinput_ipc_interface_code.h"
 #include "multimodal_input_connect_define.h"
@@ -54,6 +55,8 @@ protected:
     int32_t StubGetHoverScrollState(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerStyle(MessageParcel& data, MessageParcel& reply);
+    int32_t StubNotifyNapOnline(MessageParcel& data, MessageParcel& reply);
+    int32_t StubSetNapStatus(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerStyle(MessageParcel& data, MessageParcel& reply);
     int32_t StubIsPointerVisible(MessageParcel& data, MessageParcel& reply);
     int32_t StubMarkProcessed(MessageParcel& data, MessageParcel& reply);
@@ -79,6 +82,7 @@ protected:
     int32_t StubInjectPointerEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetAnrListener(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetDisplayBindInfo(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetAllNapStatusData(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetDisplayBind(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerColor(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerColor(MessageParcel& data, MessageParcel& reply);
