@@ -42,8 +42,8 @@ ohos_executable("uinput_inject") {
   sources = uinput_inject_sources
 
   include_dirs = [
-    "${mmi_path}/util/common/include",
     "${mmi_path}/service/nap_process/include",
+    "${mmi_path}/util/common/include",
     "${mmi_path}/interfaces/native/innerkits/common/include",
   ]
 
