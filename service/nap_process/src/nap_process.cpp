@@ -67,11 +67,11 @@ int32_t NapProcess::SetNapStatus(int32_t pid, int32_t uid, std::string bundleNam
     if (napStatus == true) {
         napMap_.emplace(napData, napStatus);
         MMI_HILOGD("Set NapStatus to napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
-            pid, uid, bundleName);
+            pid, uid, bundleName.c_str());
     } else {
         napMap_.erase(napData);
         MMI_HILOGD("Remove NapStatus from napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
-            pid, uid, bundleName);
+            pid, uid, bundleName.c_str());
     }
     return RET_OK;
 }
