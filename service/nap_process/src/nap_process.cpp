@@ -91,7 +91,7 @@ int32_t NapProcess::GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t,
     for (const auto& map : napMap_) {
         int pid = map.first.pid;
         int uid = map.first.uid;
-        std::string name=  map.first.bundleName;
+        std::string name = map.first.bundleName;
         std::tuple<int32_t, int32_t, std::string> tuple(pid, uid, name);
         datas.push_back(tuple);
     }
