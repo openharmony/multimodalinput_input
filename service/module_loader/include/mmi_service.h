@@ -194,15 +194,6 @@ protected:
     void RemoveAppDebugListener();
 
 private:
-    // struct NapStatusData
-    // {
-    //     int32_t pid;
-    //     int32_t uid;
-    //     std::string bundleName;
-    //     bool operator==(const NapStatusData b) const { return pid == b.pid && uid == b.uid && bundleName == b.bundleName; }
-    //     bool operator<(const NapStatusData b) const { return pid < b.pid ? true : false; }
-    // };
-    // std::map<NapStatusData, bool> napMap_;
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
     std::mutex mu_;
@@ -210,14 +201,11 @@ private:
 #ifdef OHOS_RSS_CLIENT
     std::atomic<uint64_t> tid_ = 0;
 #endif
-
-    // UDSServer* udsServer_ { nullptr };
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
     sptr<AppDebugListener> appDebugListener_;
 
-    // int32_t napClientPid_ { -1 };
     std::atomic_bool threadStatusFlag_ { false };
 };
 } // namespace MMI
