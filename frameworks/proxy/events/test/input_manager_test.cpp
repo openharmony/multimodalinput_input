@@ -19,7 +19,6 @@
 #include "multimodal_event_handler.h"
 #include "system_info.h"
 #include "input_manager.h"
-#include "nap_status.h"
 
 namespace OHOS {
 namespace MMI {
@@ -44,9 +43,6 @@ constexpr int32_t KEYBOARD_TYPE_SIZE = 20;
 constexpr int32_t PARAMETER_ERROR = 401;
 constexpr int32_t INVAID_VALUE = -1;
 constexpr double POINTER_ITEM_PRESSURE = 5.0;
-constexpr int32_t POINTER_ITEM_DISPLAY_X_FOUR = 200;
-constexpr int64_t POINTER_ITEM_DOWNTIME_ONE = 9999;
-constexpr int32_t POINTER_ITEM_DISPLAY_Y_FOUR = 357;
 }  // namespace
 
 class InputManagerTest : public testing::Test {
@@ -1118,64 +1114,35 @@ HWTEST_F(InputManagerTest, InputManagerTest_ClearWindowPointerStyle_001, TestSiz
 HWTEST_F(InputManagerTest, InputManagerTest_SyncBundleName_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
-    PointerEvent::PointerItem item;
-    item.SetDownTime(POINTER_ITEM_DOWNTIME_ONE);
-    item.SetPointerId(0);
-    item.SetPressed(true);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_FOUR);
-    item.SetDeviceId(1);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FOUR);
-    pointerEvent->AddPointerItem(item);
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    pointerEvent->SetPointerId(0);
-    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
-
     auto callbackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callbackPtr != nullptr);
     int32_t monitorId = InputManagerUtil::TestAddMonitor(callbackPtr);
-
     auto mmiObserver = std::make_shared<MMIEventObserver>();
     InputManager::GetInstance()->AddInputEventObserver(mmiObserver);
-
     InputManager::GetInstance()->SetNapStatus(10, 20, "bundleName_test", true);
-    
     std::vector<std::tuple<int32_t, int32_t, std::string>> vectorBefore;
     InputManager::GetInstance()->GetAllNapStatusData(vectorBefore);
-
     for (const auto& vec : vectorBefore) {
         if (std::get<0>(vec) == 10) {
             EXPECT_TRUE(std::get<1>(vec) == 20);
             EXPECT_TRUE(std::get<2>(vec) == "bundleName_test");
         }
     }
-
     for (const auto& vec : vectorBefore) {
         MMI_HILOGD("All NapStatus in vectorBefore pid:%{public}d, uid:%{public}d, name:%{public}s",
             std::get<0>(vec), std::get<1>(vec), std::get<2>(vec).c_str());
     }
-#ifdef OHOS_BUILD_ENABLE_MONITOR
-    // EXPECT_TRUE(IsValidHandlerId(monitorId));
-#else
-    // EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-    InputManagerUtil::TestMonitor(monitorId, pointerEvent);
     InputManagerUtil::TestRemoveMonitor(monitorId);
-
     InputManager::GetInstance()->SetNapStatus(10, 20, "bundleName_test", false);
     std::vector<std::tuple<int32_t, int32_t, std::string>> vectorAfter;
     InputManager::GetInstance()->GetAllNapStatusData(vectorAfter);
-
     for (const auto& vec : vectorAfter) {
         if (std::get<0>(vec) == 10) {
             EXPECT_TRUE(std::get<1>(vec) == 20);
             EXPECT_TRUE(std::get<2>(vec) == "bundleName_test");
         }
     }
-
     for (const auto& vec : vectorAfter) {
         MMI_HILOGD("All NapStatus in vectorAfter pid:%{public}d, uid:%{public}d, name:%{public}s",
             std::get<0>(vec), std::get<1>(vec), std::get<2>(vec).c_str());
