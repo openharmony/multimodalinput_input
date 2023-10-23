@@ -39,12 +39,14 @@ struct NapStatusData {
     int32_t pid;
     int32_t uid;
     std::string bundleName;
-    bool operator==(const NapStatusData b) const { return pid == b.pid && uid == b.uid &&
-        bundleName == b.bundleName; }
-    bool operator<(const NapStatusData b) const { return pid < b.pid ? true : false; }
+    bool operator==(const NapStatusData b) const {
+        return pid == b.pid && uid == b.uid && bundleName == b.bundleName;
+    }
+    bool operator<(const NapStatusData b) const {
+        return pid < b.pid ? true : false;
+    }
 };
 using NapStatusDatas = std::vector<NapStatusData>;
-
     std::map<NapStatusData, bool> napMap_;
     int32_t NotifyBundleName(NapStatusData data);
     std::map<NapStatusData, bool>& GetNapMap();
