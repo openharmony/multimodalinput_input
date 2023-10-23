@@ -373,8 +373,8 @@ int32_t MultimodalInputConnectProxy::SetNapStatus(int32_t pid, int32_t uid, std:
     MessageOption option;
     sptr<IRemoteObject> remote = Remote();
     CHKPR(remote, RET_ERR);
-    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_NAP_STATUS),
-        data, reply, option);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        SET_NAP_STATUS), data, reply, option);
     if (ret != RET_OK) {
         MMI_HILOGE("Send request failed, ret:%{public}d", ret);
         return ret;
