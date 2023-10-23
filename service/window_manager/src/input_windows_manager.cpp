@@ -1437,8 +1437,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerStyle);
     } else {
         if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
-            DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
-            IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+            if (!checkExtraData) {
+               DispatchPointer(PointerEvent::POINTER_ACTION_LEAVE_WINDOW);
+               IPointerDrawingManager::GetInstance()->SetMouseDisplayState(false);
+            }
         }
     }
 
