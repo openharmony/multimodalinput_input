@@ -45,7 +45,7 @@ struct NapStatusData {
     }
     bool operator<(const NapStatusData b) const
     {
-        return pid < b.pid ? true : false;
+        return bundleName < b.bundleName ? true : false;
     }
 };
 using NapStatusDatas = std::vector<NapStatusData>;
