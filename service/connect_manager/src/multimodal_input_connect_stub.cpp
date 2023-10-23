@@ -35,6 +35,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectStub" };
 using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, MessageParcel& reply);
 } // namespace
+const int32_t TUPLE_PID = 0;
+const int32_t TUPLE_UID = 1;
+const int32_t TUPLE_NAME = 2;
 const int32_t MAX_BUFFER_SIZE = 1000000;
 const int32_t DEFAULT_POINTER_COLOR = 0x000000;
 int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
@@ -1319,9 +1322,9 @@ int32_t MultimodalInputConnectStub::StubGetAllNapStatusData(MessageParcel& data,
     WRITEINT32(reply, size, ERR_INVALID_VALUE);
     datas.reserve(size);
     for (const auto &data : datas) {
-        WRITEINT32(reply, std::get<0>(data), ERR_INVALID_VALUE);
-        WRITEINT32(reply, std::get<1>(data), ERR_INVALID_VALUE);
-        WRITESTRING(reply, std::get<2>(data), ERR_INVALID_VALUE);
+        WRITEINT32(reply, std::get<TUPLE_PID>(data), ERR_INVALID_VALUE);
+        WRITEINT32(reply, std::get<TUPLE_UID>(data), ERR_INVALID_VALUE);
+        WRITESTRING(reply, std::get<TUPLE_NAME>(data), ERR_INVALID_VALUE);
     }
     return RET_OK;
 }
