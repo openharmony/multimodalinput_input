@@ -39,10 +39,12 @@ struct NapStatusData {
     int32_t pid;
     int32_t uid;
     std::string bundleName;
-    bool operator==(const NapStatusData b) const {
+    bool operator==(const NapStatusData b) const
+    {
         return pid == b.pid && uid == b.uid && bundleName == b.bundleName;
     }
-    bool operator<(const NapStatusData b) const {
+    bool operator<(const NapStatusData b) const
+    {
         return pid < b.pid ? true : false;
     }
 };
