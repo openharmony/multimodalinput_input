@@ -37,7 +37,7 @@ using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, Me
 } // namespace
 const int32_t TUPLE_PID = 0;
 const int32_t TUPLE_UID = 1;
-const std::string TUPLE_NAME = 2;
+const int32_t TUPLE_NAME = 2;
 const int32_t MAX_BUFFER_SIZE = 1000000;
 const int32_t DEFAULT_POINTER_COLOR = 0x000000;
 int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
