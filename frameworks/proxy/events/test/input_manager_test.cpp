@@ -60,7 +60,7 @@ public:
 
 class MMIEventObserver : public MMI::IEventObserver {
 public:
-    virtual void SyncBundleName(int32_t pid, int32_t uid, std::string bundleName) override;
+    void SyncBundleName(int32_t pid, int32_t uid, std::string bundleName) override;
 };
 
 void MMIEventObserver::SyncBundleName(int32_t pid, int32_t uid, std::string bundleName)
