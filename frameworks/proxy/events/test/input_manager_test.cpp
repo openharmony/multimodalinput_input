@@ -24,6 +24,9 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest"};
+constexpr int32_t TUPLE_PID = 0;
+constexpr int32_t TUPLE_UID = 0;
+constexpr int32_t TUPLE_NAME = 0;
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t SLEEP_MILLISECONDS = 1000;
@@ -1123,14 +1126,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_SyncBundleName_001, TestSize.Level1)
     std::vector<std::tuple<int32_t, int32_t, std::string>> vectorBefore;
     InputManager::GetInstance()->GetAllNapStatusData(vectorBefore);
     for (const auto& vec : vectorBefore) {
-        if (std::get<0>(vec) == 10) {
-            EXPECT_TRUE(std::get<1>(vec) == 20);
-            EXPECT_TRUE(std::get<2>(vec) == "bundleName_test");
+        if (std::get<TUPLE_PID>(vec) == 10) {
+            EXPECT_TRUE(std::get<TUPLE_UID>(vec) == 20);
+            EXPECT_TRUE(std::get<TUPLE_NAME>(vec) == "bundleName_test");
         }
     }
     for (const auto& vec : vectorBefore) {
         MMI_HILOGD("All NapStatus in vectorBefore pid:%{public}d, uid:%{public}d, name:%{public}s",
-            std::get<0>(vec), std::get<1>(vec), std::get<2>(vec).c_str());
+            std::get<TUPLE_PID>(vec), std::get<TUPLE_UID>(vec), std::get<TUPLE_NAME>(vec).c_str());
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManagerUtil::TestRemoveMonitor(monitorId);
@@ -1138,14 +1141,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_SyncBundleName_001, TestSize.Level1)
     std::vector<std::tuple<int32_t, int32_t, std::string>> vectorAfter;
     InputManager::GetInstance()->GetAllNapStatusData(vectorAfter);
     for (const auto& vec : vectorAfter) {
-        if (std::get<0>(vec) == 10) {
-            EXPECT_TRUE(std::get<1>(vec) == 20);
-            EXPECT_TRUE(std::get<2>(vec) == "bundleName_test");
+        if (std::get<TUPLE_PID>(vec) == 10) {
+            EXPECT_TRUE(std::get<TUPLE_UID>(vec) == 20);
+            EXPECT_TRUE(std::get<TUPLE_NAME>(vec) == "bundleName_test");
         }
     }
     for (const auto& vec : vectorAfter) {
         MMI_HILOGD("All NapStatus in vectorAfter pid:%{public}d, uid:%{public}d, name:%{public}s",
-            std::get<0>(vec), std::get<1>(vec), std::get<2>(vec).c_str());
+            std::get<TUPLE_PID>(vec), std::get<TUPLE_UID>(vec), std::get<TUPLE_NAME>(vec).c_str());
     }
 }
 
