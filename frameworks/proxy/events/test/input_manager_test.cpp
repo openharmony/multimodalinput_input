@@ -26,7 +26,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = {LOG_CORE, MMI_LOG_DOMAIN, "InputManagerTest"};
 constexpr int32_t TUPLE_PID = 0;
 constexpr int32_t TUPLE_UID = 0;
-constexpr int32_t TUPLE_NAME = 0;
+constexpr std::string TUPLE_NAME = 0;
 constexpr int32_t TIME_WAIT_FOR_OP = 100;
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t SLEEP_MILLISECONDS = 1000;
