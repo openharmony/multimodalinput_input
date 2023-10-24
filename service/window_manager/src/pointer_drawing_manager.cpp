@@ -946,7 +946,7 @@ int32_t PointerDrawingManager::SetPointerStylePreference(PointerStyle pointerSty
     return RET_OK;
 }
 
-int32_t PointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
+int32_t PointerDrawingManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle
 {
     CALL_DEBUG_ENTER;
     if (windowId == GLOBAL_WINDOW_ID) {
