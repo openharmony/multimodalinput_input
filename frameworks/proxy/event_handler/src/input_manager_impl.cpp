@@ -87,6 +87,18 @@ int32_t InputManagerImpl::GetDisplayBindInfo(DisplayBindInfos &infos)
     return RET_OK;
 }
 
+int32_t InputManagerImpl::GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->GetAllNapStatusData(datas);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetDisplayBindInfo failed, ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
 int32_t InputManagerImpl::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)
 {
     std::lock_guard<std::mutex> guard(mtx_);
@@ -180,11 +192,29 @@ int32_t InputManagerImpl::AddInputEventFilter(std::shared_ptr<IInputEventFilter>
         service = nullptr;
         return RET_ERR;
     }
-    auto it =  eventFilterServices_.emplace(filterId, std::make_tuple(service, priority, deviceTags));
+    auto it = eventFilterServices_.emplace(filterId, std::make_tuple(service, priority, deviceTags));
     if (!it.second) {
         MMI_HILOGW("Filter id duplicate");
     }
     return filterId;
+}
+
+int32_t InputManagerImpl::AddInputEventObserver(std::shared_ptr<IEventObserver> observer)
+{
+    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
+    std::lock_guard<std::mutex> guard(mtx_);
+    CHKPR(observer, RET_ERR);
+    eventObserver_ = observer;
+    NotifyNapOnline();
+    return RET_OK;
+}
+
+int32_t InputManagerImpl::NotifyNapOnline()
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->NotifyNapOnline();
+    return ret;
 }
 
 int32_t InputManagerImpl::RemoveInputEventFilter(int32_t filterId)
@@ -1565,6 +1595,28 @@ void InputManagerImpl::SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> w
     #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return;
 }
+
+int32_t InputManagerImpl::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetNapStatus(pid, uid, bundleName, napStatus);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set napStatus failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+void InputManagerImpl::NotifyBundleName(int32_t pid, int32_t uid, std::string bundleName)
+{
+    CALL_DEBUG_ENTER;
+    if (eventObserver_ == nullptr) {
+        MMI_HILOGE("eventObserver_ is nullptr");
+        return;
+    }
+    eventObserver_->SyncBundleName(pid, uid, bundleName);
+}
+
 void InputManagerImpl::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
 {
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)

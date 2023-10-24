@@ -497,6 +497,13 @@ int32_t MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSp
     return RET_OK;
 }
 
+int32_t MMIService::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus)
+{
+    CALL_DEBUG_ENTER;
+    NapProcess::GetInstance()->SetNapStatus(pid, uid, bundleName, napStatus);
+    return RET_OK;
+}
+
 #ifdef OHOS_BUILD_ENABLE_POINTER
 int32_t MMIService::ReadMouseScrollRows(int32_t &rows)
 {
@@ -702,6 +709,13 @@ int32_t MMIService::GetPointerSpeed(int32_t &speed)
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
+    return RET_OK;
+}
+
+int32_t MMIService::NotifyNapOnline()
+{
+    CALL_DEBUG_ENTER;
+    NapProcess::GetInstance()->NotifyNapOnline();
     return RET_OK;
 }
 
@@ -999,6 +1013,16 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
         MMI_HILOGE("Add input handler failed, ret:%{public}d", ret);
         return RET_ERR;
     }
+    OHOS::MMI::NapProcess::NapStatusData napData;
+    napData.pid = GetCallingPid();
+    napData.uid = GetCallingUid();
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    napData.bundleName = sess->GetProgramName();
+    MMI_HILOGD("AddInputHandler info to nap : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        napData.pid, napData.uid, napData.bundleName.c_str());
+    NapProcess::GetInstance()->napMap_.emplace(napData, true);
+    NapProcess::GetInstance()->NotifyBundleName(napData);
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
 }
@@ -1146,6 +1170,16 @@ int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr
         MMI_HILOGE("The subscribe key event processed failed, ret:%{public}d", ret);
         return RET_ERR;
     }
+    OHOS::MMI::NapProcess::NapStatusData napData;
+    napData.pid = GetCallingPid();
+    napData.uid = GetCallingUid();
+    auto sess = GetSessionByPid(pid);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    napData.bundleName = sess->GetProgramName();
+    MMI_HILOGD("AddInputHandler info to nap : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        napData.pid, napData.uid, napData.bundleName.c_str());
+    NapProcess::GetInstance()->napMap_.emplace(napData, true);
+    NapProcess::GetInstance()->NotifyBundleName(napData);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
 }
@@ -1216,6 +1250,13 @@ int32_t MMIService::GetDisplayBindInfo(DisplayBindInfos &infos)
         MMI_HILOGE("GetDisplayBindInfo pid failed, ret:%{public}d", ret);
         return RET_ERR;
     }
+    return RET_OK;
+}
+
+int32_t MMIService::GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
+{
+    CALL_DEBUG_ENTER;
+    NapProcess::GetInstance()->GetAllNapStatusData(datas);
     return RET_OK;
 }
 

@@ -16,6 +16,7 @@
 #include "key_command_handler.h"
 
 #include "ability_manager_client.h"
+#include "nap_process.h"
 #include "bytrace_adapter.h"
 #include "cJSON.h"
 #include "config_policy_utils.h"
@@ -30,6 +31,7 @@
 #include "proto.h"
 #include "timer_manager.h"
 #include "util_ex.h"
+#include "nap_process.h"
 
 namespace OHOS {
 namespace MMI {
@@ -1438,6 +1440,12 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
     if (err != ERR_OK) {
         MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
     }
+    OHOS::MMI::NapProcess::NapStatusData napData;
+    napData.pid = -1;
+    napData.uid = -1;
+    napData.bundleName = ability.bundleName;
+    NapProcess::GetInstance()->napMap_.emplace(napData, true);
+    NapProcess::GetInstance()->NotifyBundleName(napData);
     MMI_HILOGD("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
 }
 

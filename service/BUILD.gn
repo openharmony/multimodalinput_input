@@ -54,6 +54,7 @@ config("libmmi_server_config") {
     "${mmi_service_path}/event_resample/include",
     "${mmi_service_path}/filter/include",
     "${mmi_service_path}/module_loader/include",
+    "${mmi_service_path}/nap_process/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "mouse_event_normalize/include",

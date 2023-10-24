@@ -21,6 +21,7 @@
 #include "extra_data.h"
 #include "i_event_filter.h"
 #include "i_input_event_filter.h"
+#include "i_event_observer.h"
 #include "input_device.h"
 #include "input_handler_type.h"
 #include "key_event.h"
@@ -29,6 +30,7 @@
 #include "pointer_style.h"
 #include "system_ability_definition.h"
 #include "window_info.h"
+#include "nap_process.h"
 #include "multimodalinput_ipc_interface_code.h"
 
 namespace OHOS {
@@ -46,12 +48,14 @@ public:
         int32_t &socketFd, int32_t &tokenType) = 0;
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
         uint32_t deviceTags) = 0;
+    virtual int32_t NotifyNapOnline() = 0;
     virtual int32_t RemoveInputEventFilter(int32_t filterId) = 0;
     virtual int32_t SetMouseScrollRows(int32_t rows) = 0;
     virtual int32_t GetMouseScrollRows(int32_t &rows) = 0;
     virtual int32_t SetCustomCursor(int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY, void* pixelMap) = 0;
     virtual int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) = 0;
     virtual int32_t SetPointerSize(int32_t size) = 0;
+    virtual int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus) = 0;
     virtual int32_t GetPointerSize(int32_t &size) = 0;
     virtual int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) = 0;
     virtual int32_t SetMousePrimaryButton(int32_t primaryButton) = 0;
@@ -91,6 +95,7 @@ public:
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t SetAnrObserver() = 0;
     virtual int32_t GetDisplayBindInfo(DisplayBindInfos &infos) = 0;
+    virtual int32_t GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas) = 0;
     virtual int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
     virtual int32_t GetFunctionKeyState(int32_t funckey, bool &state) = 0;
     virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) = 0;
