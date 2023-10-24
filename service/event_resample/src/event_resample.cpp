@@ -112,15 +112,15 @@ void EventResample::CheckAndInit(std::shared_ptr<PointerEvent> pointerEvent, int
                 status = ERR_WOULD_BLOCK;
                 return;
         }
-        inputEvent_.reset();
-        inputEvent_.initializeFrom(pointerEvent);
+        inputEvent_.Reset();
+        inputEvent_.InitializeFrom(pointerEvent);
 
         for (auto &it : inputEvent_.pointers) {
             MMI_HILOGD("Input event: %{public}d %{public}d %{public}" PRId64 " %{public}" PRId64,
 		       it.second.coordX, it.second.coordY, inputEvent_.actionTime, frameTime_);
         }
     } else {
-        inputEvent_.reset();
+        inputEvent_.Reset();
     }
     return;
 }
@@ -138,7 +138,7 @@ ErrCode EventResample::UpdateEventToPatch(bool &deferred, ErrCode& result, Motio
         } else if (PointerEvent::POINTER_ACTION_UP == inputEvent_.pointerAction) {
             MMI_HILOGD("Deferred event: %{public}d %{public}d %{public}d", inputEvent_.deviceId,
                 inputEvent_.sourceType, inputEvent_.pointerAction);
-            deferredEvent_.initializeFrom(inputEvent_);
+            deferredEvent_.InitializeFrom(inputEvent_);
             msgDeferred_ = true;
             deferred = true;
             result = ConsumeSamples(batch, batch.samples.size(), outEvent);
@@ -183,7 +183,7 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
 ErrCode EventResample::ConsumeBatch(int64_t frameTime, MotionEvent** outEvent)
 {
     int32_t result;
-    for (size_t i = batches_.size(); i > 0; ) {
+    for (size_t i = batches_.size(); i > 0;) {
         i--;
         Batch& batch = batches_.at(i);
         if (frameTime < 0) {
@@ -220,7 +220,7 @@ ErrCode EventResample::ConsumeBatch(int64_t frameTime, MotionEvent** outEvent)
 
 ErrCode EventResample::ConsumeSamples(Batch& batch, size_t count, MotionEvent** outEvent)
 {
-    outputEvent_.reset();
+    outputEvent_.Reset();
 
     for (size_t i = 0; i < count; i++) {
         MotionEvent& event = batch.samples.at(i);
@@ -228,7 +228,7 @@ ErrCode EventResample::ConsumeSamples(Batch& batch, size_t count, MotionEvent** 
         if (i > 0) {
             AddSample(&outputEvent_, &event);
         } else {
-            outputEvent_.initializeFrom(event);
+            outputEvent_.InitializeFrom(event);
         }
     }
     batch.samples.erase(batch.samples.begin(), batch.samples.begin() + count);
@@ -260,15 +260,15 @@ void EventResample::UpdateTouchState(MotionEvent &event)
                 idx = touchStates_.size() - 1;
             }
             TouchState& touchState = touchStates_.at(idx);
-            touchState.initialize(deviceId, source);
-            touchState.addHistory(event);
+            touchState.Initialize(deviceId, source);
+            touchState.AddHistory(event);
             break;
         }
         case PointerEvent::POINTER_ACTION_MOVE: {
             ssize_t idx = FindTouchState(deviceId, source);
             if (idx >= 0) {
                 TouchState& touchState = touchStates_.at(idx);
-                touchState.addHistory(event);
+                touchState.AddHistory(event);
                 RewriteMessage(touchState, event);
             }
             break;
@@ -312,9 +312,9 @@ void EventResample::ResampleTouchState(int64_t sampleTime, MotionEvent* event, c
     }
 
     // Ensure that the current sample has all of the pointers that need to be reported.
-    const History* current = touchState.getHistory(0);
+    const History* current = touchState.GetHistory(0);
     for (auto &it : event->pointers) {
-        if (!current->hasPointerId(it.first)) {
+        if (!current->HasPointerId(it.first)) {
             return;
         }
     }
@@ -326,7 +326,7 @@ void EventResample::ResampleTouchState(int64_t sampleTime, MotionEvent* event, c
     if (next) {
         // Interpolate between current sample and future sample.
         // So current->actionTime <= sampleTime <= future.actionTime.
-        future.initializeFrom(*next);
+        future.InitializeFrom(*next);
         other = &future;
         int64_t delta = future.actionTime - current->actionTime;
         if (delta < RESAMPLE_MIN_DELTA) {
@@ -336,7 +336,7 @@ void EventResample::ResampleTouchState(int64_t sampleTime, MotionEvent* event, c
     } else if (touchState.historySize >= MIN_HISTORY_SIZE) {
         // Extrapolate future sample using current sample and past sample.
         // So other->actionTime <= current->actionTime <= sampleTime.
-        other = touchState.getHistory(1);
+        other = touchState.GetHistory(1);
         int64_t delta = current->actionTime - other->actionTime;
         if (delta < RESAMPLE_MIN_DELTA) {
             return;
@@ -359,12 +359,12 @@ void EventResample::ReampleTouchCoords(float alpha, int64_t sampleTime, MotionEv
 {
     // Resample touch coordinates.
     History oldLastResample;
-    oldLastResample.initializeFrom(touchState.lastResample);
+    oldLastResample.InitializeFrom(touchState.lastResample);
     touchState.lastResample.actionTime = sampleTime;
 
     for (auto &it : event->pointers) {
         uint32_t id = it.first;
-        if (oldLastResample.hasPointerId(id) && touchState.recentCoordinatesAreIdentical(id)) {
+        if (oldLastResample.HasPointerId(id) && touchState.recentCoordinatesAreIdentical(id)) {
             auto lastItem = touchState.lastResample.pointers.find(id);
             if (lastItem != touchState.lastResample.pointers.end()) {
                 auto oldLastItem = oldLastResample.pointers.find(id);
@@ -374,16 +374,16 @@ void EventResample::ReampleTouchCoords(float alpha, int64_t sampleTime, MotionEv
         }
 
         Pointer resampledCoords;
-        const Pointer& currentCoords = current->getPointerById(id);
+        const Pointer& currentCoords = current->GetPointerById(id);
         resampledCoords.copyFrom(currentCoords);
         auto item = event->pointers.find(id);
         if (item == event->pointers.end()) {
             return;
         }
-        if (other->hasPointerId(id) && ShouldResampleTool(item->second.toolType)) {
-            const Pointer& otherCoords = other->getPointerById(id);
-            resampledCoords.coordX = calcCoord(currentCoords.coordX, otherCoords.coordX, alpha);
-            resampledCoords.coordY = calcCoord(currentCoords.coordY, otherCoords.coordY, alpha);
+        if (other->HasPointerId(id) && ShouldResampleTool(item->second.toolType)) {
+            const Pointer& otherCoords = other->GetPointerById(id);
+            resampledCoords.coordX = CalcCoord(currentCoords.coordX, otherCoords.coordX, alpha);
+            resampledCoords.coordY = CalcCoord(currentCoords.coordY, otherCoords.coordY, alpha);
         }
         item->second.copyFrom(resampledCoords);
         event->actionTime = sampleTime;
@@ -429,10 +429,10 @@ void EventResample::RewriteMessage(TouchState& state, MotionEvent &event)
 {
     for (auto &it : event.pointers) {
         uint32_t id = it.first;
-        if (state.lastResample.hasPointerId(id)) {
+        if (state.lastResample.HasPointerId(id)) {
             if ((event.actionTime < state.lastResample.actionTime) || state.recentCoordinatesAreIdentical(id)) {
                 Pointer& msgCoords = it.second;
-                const Pointer& resampleCoords = state.lastResample.getPointerById(id);
+                const Pointer& resampleCoords = state.lastResample.GetPointerById(id);
                 msgCoords.copyFrom(resampleCoords);
             } else {
                 state.lastResample.pointers.erase(id);

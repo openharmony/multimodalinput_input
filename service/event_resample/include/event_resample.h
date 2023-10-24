@@ -74,7 +74,7 @@ private:
             id = other.id;
         }
 
-        void reset()
+        void Reset()
         {
             coordX = 0;
             coordY = 0;
@@ -91,7 +91,7 @@ private:
         int32_t pointerAction { PointerEvent::POINTER_ACTION_UNKNOWN };
         int32_t deviceId { 0 };
 
-        void reset()
+        void Reset()
         {
             pointers.clear();
             actionTime = 0;
@@ -101,7 +101,7 @@ private:
             deviceId = 0;
         }
 
-        void initializeFrom(MotionEvent& other)
+        void InitializeFrom(MotionEvent& other)
         {
             for (auto &it : other.pointers) {
                 pointers[it.first] = it.second;
@@ -113,7 +113,7 @@ private:
             pointerAction = other.pointerAction;
         }
 
-        void initializeFrom(std::shared_ptr<PointerEvent> event)
+        void InitializeFrom(std::shared_ptr<PointerEvent> event)
         {
             actionTime = event->GetActionTime();
             deviceId = event->GetDeviceId();
@@ -146,7 +146,7 @@ private:
         std::map<uint32_t, Pointer> pointers;
         int64_t actionTime { 0 };
 
-        void initializeFrom(const MotionEvent &event)
+        void InitializeFrom(const MotionEvent &event)
         {
             actionTime = event.actionTime;
             for (auto &it : event.pointers) {
@@ -154,22 +154,22 @@ private:
             }
         }
 
-        void initializeFrom(const History &other)
-       {
+        void InitializeFrom(const History &other)
+        {
             actionTime = other.actionTime;
             for (auto &it : other.pointers) {
                 pointers[it.first] = it.second;
             }
         }
 
-        const Pointer& getPointerById(uint32_t id) const
-	{
+        const Pointer& GetPointerById(uint32_t id) const
+	    {
             auto item = pointers.find(id);
             return item->second;
         }
 
-        bool hasPointerId(uint32_t id) const
-	{
+        bool HasPointerId(uint32_t id) const
+	    {
             auto item = pointers.find(id);
             if (item != pointers.end()) {
                 return true;
@@ -187,7 +187,7 @@ private:
         History history[2];
         History lastResample;
 
-        void initialize(int32_t deviceId, int32_t source)
+        void Initialize(int32_t deviceId, int32_t source)
         {
             this->deviceId = deviceId;
             this->source = source;
@@ -196,16 +196,16 @@ private:
             lastResample.actionTime = 0;
         }
 
-        void addHistory(const MotionEvent &event)
+        void AddHistory(const MotionEvent &event)
         {
             historyCurrent ^= 1;
             if (historySize < MIN_HISTORY_SIZE) {
                 historySize += 1;
             }
-            history[historyCurrent].initializeFrom(event);
+            history[historyCurrent].InitializeFrom(event);
         }
 
-        const History* getHistory(size_t idx) const
+        const History* GetHistory(size_t idx) const
         {
             return &history[(historyCurrent + idx) & 1];
         }
@@ -216,13 +216,13 @@ private:
             if (historySize < MIN_HISTORY_SIZE) {
                 return false;
             }
-            if (!getHistory(0)->hasPointerId(id) || !getHistory(1)->hasPointerId(id)) {
+            if (!GetHistory(0)->HasPointerId(id) || !GetHistory(1)->HasPointerId(id)) {
                 return false;
             }
-            float currentX = getHistory(0)->getPointerById(id).coordX;
-            float currentY = getHistory(0)->getPointerById(id).coordY;
-            float previousX = getHistory(1)->getPointerById(id).coordX;
-            float previousY = getHistory(1)->getPointerById(id).coordY;
+            float currentX = GetHistory(0)->GetPointerById(id).coordX;
+            float currentY = GetHistory(0)->GetPointerById(id).coordY;
+            float previousX = GetHistory(1)->GetPointerById(id).coordX;
+            float previousY = GetHistory(1)->GetPointerById(id).coordY;
             if (currentX == previousX && currentY == previousY) {
                 return true;
             }
@@ -257,7 +257,7 @@ private:
         const History* current, const History* other);
 };
 
-inline static float calcCoord(float a, float b, float alpha)
+inline static float CalcCoord(float a, float b, float alpha)
 {
     return a + alpha * (b - a);
 }

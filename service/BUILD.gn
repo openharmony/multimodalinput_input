@@ -51,9 +51,9 @@ config("libmmi_server_config") {
     "timer_manager/include",
     "permission_helper/include",
     "${mmi_service_path}/connect_manager/include",
+    "${mmi_service_path}/event_resample/include",
     "${mmi_service_path}/filter/include",
     "${mmi_service_path}/module_loader/include",
-    "${mmi_service_path}/event_resample/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "mouse_event_normalize/include",
@@ -136,9 +136,9 @@ ohos_shared_library("libmmi-server") {
     }
     if (input_feature_touchscreen) {
       sources += [
+        "event_resample/src/event_resample.cpp",
         "touch_event_normalize/src/tablet_tool_tranform_processor.cpp",
         "touch_event_normalize/src/touch_transform_processor.cpp",
-        "event_resample/src/event_resample.cpp",
       ]
     }
   }
@@ -314,7 +314,6 @@ ohos_unittest("event_resample_test") {
     "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//third_party/cJSON:cjson",
   ]
 
   external_deps = [
