@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,6 +31,7 @@
 #include "time_cost_chk.h"
 #include "timer_manager.h"
 #include "touch_event_normalize.h"
+#include "event_resample.h"
 
 namespace OHOS {
 namespace MMI {
@@ -40,9 +41,24 @@ constexpr int32_t FINGER_NUM = 2;
 constexpr int32_t MT_TOOL_PALM = 2;
 }
 
-void EventNormalizeHandler::HandleEvent(libinput_event* event)
+void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime)
 {
     CALL_DEBUG_ENTER;
+
+    if (event == nullptr) {
+        std::shared_ptr<PointerEvent> pointerEvent = EventResampleHdr->GetPointerEvent();
+        if (pointerEvent != nullptr) {
+            switch (pointerEvent->GetSourceType()) {
+                case PointerEvent::SOURCE_TYPE_TOUCHSCREEN:
+                    HandleTouchEvent(event, frameTime);
+                    break;
+                default:
+                    return;
+            }
+        }
+        return;
+    }
+
     CHKPV(event);
     DfxHisysevent::GetDispStartTime();
     auto type = libinput_event_get_type(event);
@@ -96,7 +112,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
         case LIBINPUT_EVENT_TOUCH_DOWN:
         case LIBINPUT_EVENT_TOUCH_UP:
         case LIBINPUT_EVENT_TOUCH_MOTION: {
-            HandleTouchEvent(event);
+            HandleTouchEvent(event, frameTime);
             DfxHisysevent::CalcPointerDispTimes();
             break;
         }
@@ -352,19 +368,51 @@ int32_t EventNormalizeHandler::HandleGestureEvent(libinput_event* event)
     return RET_OK;
 }
 
-int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event)
+int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t frameTime)
 {
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("Touchscreen device does not support");
         return ERROR_UNSUPPORT;
     }
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-    CHKPR(event, ERROR_NULL_POINTER);
-    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH);
-    CHKPR(pointerEvent, ERROR_NULL_POINTER);
-    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-    nextHandler_->HandleTouchEvent(pointerEvent);
-    ResetTouchUpEvent(pointerEvent, event);
+    std::shared_ptr<PointerEvent> pointerEvent = nullptr;
+    if (event != nullptr) {
+        CHKPR(event, ERROR_NULL_POINTER);
+        pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH);
+        CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    }
+
+    bool deferred = false;
+    ErrCode status = RET_OK;
+    std::shared_ptr<PointerEvent> outputEvent =
+        EventResampleHdr->OnEventConsume(pointerEvent, frameTime, deferred, status);
+    if ((outputEvent == nullptr) && (deferred == false)) {
+        MMI_HILOGD("NULL output event received: %{public}d %{public}d", deferred, status);
+        return RET_OK;
+    } else {
+        MMI_HILOGD("Output event received: %{public}d %{public}d %{public}d %{public}d",
+            outputEvent->GetSourceType(), outputEvent->GetPointerAction(), deferred, status);
+        pointerEvent = outputEvent;
+    }
+
+    if (pointerEvent != nullptr) {
+        BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+        nextHandler_->HandleTouchEvent(pointerEvent);
+    }
+
+    if (deferred == true) {
+        pointerEvent = EventResampleHdr->OnEventConsume(NULL, frameTime, deferred, status);
+        if (pointerEvent != nullptr) {
+            MMI_HILOGD("Deferred event received: %{public}d %{public}d %{public}d %{public}d",
+                pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(), deferred, status);
+            BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
+            nextHandler_->HandleTouchEvent(pointerEvent);
+        }
+    }
+
+    if (pointerEvent != nullptr) {
+        ResetTouchUpEvent(pointerEvent, event);
+    }
 #else
     MMI_HILOGW("Touchscreen device does not support");
 #endif // OHOS_BUILD_ENABLE_TOUCH

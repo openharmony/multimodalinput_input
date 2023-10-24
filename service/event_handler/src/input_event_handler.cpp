@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,8 +48,14 @@ void InputEventHandler::Init(UDSServer& udsServer)
     BuildInputHandlerChain();
 }
 
-void InputEventHandler::OnEvent(void *event)
+void InputEventHandler::OnEvent(void *event, int64_t frameTime)
 {
+    CHKPV(eventNormalizeHandler_);
+    if (event == nullptr) {
+        eventNormalizeHandler_->HandleEvent(nullptr, frameTime);
+        return;
+    }
+
     CHKPV(event);
     idSeed_ += 1;
     const uint64_t maxUInt64 = (std::numeric_limits<uint64_t>::max)() - 1;
@@ -64,8 +70,7 @@ void InputEventHandler::OnEvent(void *event)
     int64_t beginTime = GetSysClockTime();
     MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
                "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType, beginTime);
-    CHKPV(eventNormalizeHandler_);
-    eventNormalizeHandler_->HandleEvent(lpEvent);
+    eventNormalizeHandler_->HandleEvent(lpEvent, frameTime);
     int64_t endTime = GetSysClockTime();
     int64_t lostTime = endTime - beginTime;
     MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
