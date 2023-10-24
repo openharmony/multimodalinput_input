@@ -142,6 +142,7 @@ group("mmi_tests") {
     "frameworks/proxy:PointerEventTest",
     "frameworks/proxy:ut-mmi-proxy-out",
     "libudev:test",
+    "service:event_resample_test",
     "service:mmi-service-tests",
     "service:rust_mmi_test",
     "service:ut-mmi-service-out",
