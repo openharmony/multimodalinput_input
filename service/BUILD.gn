@@ -320,7 +320,7 @@ ohos_unittest("event_resample_test") {
     "c_utils:utils",
     "config_policy:configpolicy_util",
     "hilog:libhilog",
-    "preferences:native_preferences"
+    "preferences:native_preferences",
   ]
 }
 
