@@ -275,7 +275,6 @@ void InputManagerImpl::SetWindowInputEventConsumer(std::shared_ptr<IInputEventCo
     }
     consumer_ = inputEventConsumer;
     eventHandler_ = eventHandler;
-    // send NAP_SERVERCIE_ONLINE to server
 }
 
 int32_t InputManagerImpl::SubscribeKeyEvent(std::shared_ptr<KeyOption> keyOption,
