@@ -31,6 +31,7 @@
 #include "multimodal_input_connect_stub.h"
 #include "server_msg_handler.h"
 #include "uds_server.h"
+#include "nap_process.h"
 
 namespace OHOS {
 namespace MMI {
@@ -58,6 +59,7 @@ public:
     int32_t SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
     int32_t SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSpotX, int32_t hotSpotY) override;
+    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napState) override;
     int32_t SetMousePrimaryButton(int32_t primaryButton) override;
     int32_t GetMousePrimaryButton(int32_t &primaryButton) override;
     int32_t SetHoverScrollState(bool state) override;
@@ -70,6 +72,7 @@ public:
     int32_t SetPointerSpeed(int32_t speed) override;
     int32_t GetPointerSpeed(int32_t &speed) override;
     int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle) override;
+    int32_t NotifyNapOnline() override;
     int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle) override;
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke) override;
     int32_t GetDeviceIds(std::vector<int32_t> &ids) override;
@@ -95,6 +98,7 @@ public:
     int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) override;
     int32_t SetAnrObserver() override;
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos) override;
+    int32_t GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas) override;
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) override;
     int32_t GetFunctionKeyState(int32_t funcKey, bool &state) override;
     int32_t SetFunctionKeyState(int32_t funcKey, bool enable) override;
@@ -197,7 +201,6 @@ private:
 #ifdef OHOS_RSS_CLIENT
     std::atomic<uint64_t> tid_ = 0;
 #endif
-
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;

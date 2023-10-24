@@ -27,6 +27,7 @@
 #include "permission_helper.h"
 #include "pixel_map.h"
 #include "time_cost_chk.h"
+#include "nap_process.h"
 
 namespace OHOS {
 namespace MMI {
@@ -34,6 +35,9 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectStub" };
 using ConnFunc = int32_t (MultimodalInputConnectStub::*)(MessageParcel& data, MessageParcel& reply);
 } // namespace
+const int32_t TUPLE_PID = 0;
+const int32_t TUPLE_UID = 1;
+const int32_t TUPLE_NAME = 2;
 const int32_t MAX_BUFFER_SIZE = 1000000;
 const int32_t DEFAULT_POINTER_COLOR = 0x000000;
 int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel& data,
@@ -94,6 +98,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_POINTER_STYLE):
             return StubSetPointerStyle(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NOTIFY_NAP_ONLINE):
+            return StubNotifyNapOnline(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_NAP_STATUS):
+            return StubSetNapStatus(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::CLEAN_WIDNOW_STYLE):
             return StubClearWindowPointerStyle(data, reply);
@@ -172,6 +182,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_DISPLAY_BIND_INFO):
             return StubGetDisplayBindInfo(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_ALL_NAPSTATUS_DATA):
+            return StubGetAllNapStatusData(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_DISPLAY_BIND):
             return StubSetDisplayBind(data, reply);
@@ -529,6 +542,31 @@ int32_t MultimodalInputConnectStub::StubSetPointerSize(MessageParcel& data, Mess
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectStub::StubSetNapStatus(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    int32_t napPid = -1;
+    int32_t napUid = -1;
+    std::string napBundleName;
+    bool napStatus = false;
+    READINT32(data, napPid, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, napUid, IPC_PROXY_DEAD_OBJECT_ERR);
+    READSTRING(data, napBundleName, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, napStatus, IPC_PROXY_DEAD_OBJECT_ERR);
+
+    int32_t ret = SetNapStatus(napPid, napUid, napBundleName, napStatus);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call StubSetNapStatus failed ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success set napStatus:%{public}d, pid:%{public}d", napStatus, GetCallingPid());
+    return RET_OK;
+}
+
 int32_t MultimodalInputConnectStub::StubGetPointerSize(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
@@ -758,6 +796,13 @@ int32_t MultimodalInputConnectStub::StubGetPointerSpeed(MessageParcel& data, Mes
     WRITEINT32(reply, speed, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("Pointer speed:%{public}d,ret:%{public}d", speed, ret);
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubNotifyNapOnline(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = NotifyNapOnline();
+    return ret;
 }
 
 int32_t MultimodalInputConnectStub::StubSetPointerStyle(MessageParcel& data, MessageParcel& reply)
@@ -1252,6 +1297,34 @@ int32_t MultimodalInputConnectStub::StubGetDisplayBindInfo(MessageParcel& data, 
         WRITESTRING(reply, info.inputDeviceName, ERR_INVALID_VALUE);
         WRITEINT32(reply, info.displayId, ERR_INVALID_VALUE);
         WRITESTRING(reply, info.displayName, ERR_INVALID_VALUE);
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetAllNapStatusData(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
+        MMI_HILOGE("Permission check failed");
+        return CHECK_PERMISSION_FAIL;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    std::vector<std::tuple<int32_t, int32_t, std::string>> datas;
+    int32_t ret = GetAllNapStatusData(datas);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetDisplayBindInfo failed, ret:%{public}d", ret);
+        return ret;
+    }
+    int32_t size = static_cast<int32_t>(datas.size());
+    WRITEINT32(reply, size, ERR_INVALID_VALUE);
+    datas.reserve(size);
+    for (const auto &data : datas) {
+        WRITEINT32(reply, std::get<TUPLE_PID>(data), ERR_INVALID_VALUE);
+        WRITEINT32(reply, std::get<TUPLE_UID>(data), ERR_INVALID_VALUE);
+        WRITESTRING(reply, std::get<TUPLE_NAME>(data), ERR_INVALID_VALUE);
     }
     return RET_OK;
 }
