@@ -72,13 +72,21 @@ public:
     /**
      * @brief Set the process info to mmi server.
      * @param pid Indicates pid.
-     * @param
-     * @return the observer setting successed or not.
+     * @param uid Indicates uid.
+     * @param bundleName Indicates bundleName.
+     * @param napStatus Indicates napStatus.
      * @since 10
      */
     void SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus);
 
+    /**
+     * @brief Get the process info datas to other server.
+     * @param callback Indicates the callback used to receive the reported data.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 10
+     */
     int32_t GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
+    
     /**
      * @brief Sets a consumer for the window input event of the current process.
      * @param inputEventConsumer Indicates the consumer to set. The window input event of the current process
