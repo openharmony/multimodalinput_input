@@ -175,8 +175,7 @@ bool MMIService::IsRunning() const
 
 bool MMIService::InitLibinputService()
 {
-    if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler,
-        std::placeholders::_1, std::placeholders::_2)))) {
+    if (!(libinputAdapter_.Init(std::bind(&InputEventHandler::OnEvent, InputHandler, std::placeholders::_1)))) {
         MMI_HILOGE("Libinput init, bind failed");
         return false;
     }
