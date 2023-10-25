@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,7 @@ class EventNormalizeHandler : public IInputEventHandler {
 public:
     EventNormalizeHandler() = default;
     ~EventNormalizeHandler() = default;
-    void HandleEvent(libinput_event* event, int64_t frameTime);
+    void HandleEvent(libinput_event* event);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -45,7 +45,7 @@ private:
     int32_t HandleTouchPadEvent(libinput_event* event);
     int32_t HandleGestureEvent(libinput_event* event);
     int32_t HandleMouseEvent(libinput_event* event);
-    int32_t HandleTouchEvent(libinput_event* event, int64_t frameTime);
+    int32_t HandleTouchEvent(libinput_event* event);
     int32_t HandleSwitchInputEvent(libinput_event* event);
     int32_t HandleTableToolEvent(libinput_event* event);
     int32_t HandleJoystickEvent(libinput_event* event);
