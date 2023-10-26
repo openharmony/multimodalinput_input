@@ -373,11 +373,10 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     canvasNode_->SetBounds(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
     canvasNode_->SetFrame(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
 #ifndef USE_ROSEN_DRAWING
-    surfaceNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
-#else
-    surfaceNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
-#endif
     canvasNode_->SetBackgroundColor(SK_ColorTRANSPARENT);
+#else
+    canvasNode_->SetBackgroundColor(Rosen::Drawing::Color::COLOR_TRANSPARENT);
+#endif
     canvasNode_->SetCornerRadius(1);
     canvasNode_->SetPositionZ(Rosen::RSSurfaceNode::POINTER_WINDOW_POSITION_Z);
     canvasNode_->SetRotation(0);
