@@ -206,6 +206,10 @@ ohos_shared_library("libmmi-server") {
     "window_manager:libwsutils",
   ]
 
+  if (defined(use_rosen_drawing) && use_rosen_drawing) {
+    defines += [ "USE_ROSEN_DRAWING" ]
+  }
+
   part_name = "input"
   subsystem_name = "multimodalinput"
 }
