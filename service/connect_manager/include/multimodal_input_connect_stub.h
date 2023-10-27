@@ -21,7 +21,7 @@
 #include "nocopyable.h"
 
 #include "i_multimodal_input_connect.h"
-#include "i_event_observer.h"
+#include "mmi_event_observer.h"
 #include "mmi_log.h"
 #include "multimodalinput_ipc_interface_code.h"
 #include "multimodal_input_connect_define.h"
@@ -56,6 +56,7 @@ protected:
     int32_t StubSetPointerVisible(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerStyle(MessageParcel& data, MessageParcel& reply);
     int32_t StubNotifyNapOnline(MessageParcel& data, MessageParcel& reply);
+    int32_t StubRemoveInputEventObserver(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetNapStatus(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerStyle(MessageParcel& data, MessageParcel& reply);
     int32_t StubIsPointerVisible(MessageParcel& data, MessageParcel& reply);

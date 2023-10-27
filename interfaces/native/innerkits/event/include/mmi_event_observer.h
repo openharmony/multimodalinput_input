@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef I_EVENT_OBSERVER_H
-#define I_EVENT_OBSERVER_H
+#ifndef MMI_EVENT_OBSERVER_H
+#define MMI_EVENT_OBSERVER_H
 
 #include "iremote_broker.h"
 
@@ -23,13 +23,13 @@
 
 namespace OHOS {
 namespace MMI {
-class IEventObserver {
+class MMIEventObserver {
 public:
-    IEventObserver() = default;
-    virtual ~IEventObserver() = default;
+    MMIEventObserver() = default;
+    virtual ~MMIEventObserver() = default;
 
     virtual void SyncBundleName(int32_t pid, int32_t uid, std::string bundleName) = 0;
 };
 } // namespace MMI
 } // namespace OHOS
-#endif // I_EVENT_OBSERVER_H
+#endif // MMI_EVENT_OBSERVER_H

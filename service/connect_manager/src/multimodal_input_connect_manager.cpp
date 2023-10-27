@@ -133,6 +133,16 @@ int32_t MultimodalInputConnectManager::NotifyNapOnline()
     return multimodalInputConnectService_->NotifyNapOnline();
 }
 
+int32_t MultimodalInputConnectManager::RemoveInputEventObserver()
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    if (multimodalInputConnectService_ == nullptr) {
+        MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
+        return RET_ERR;
+    }
+    return multimodalInputConnectService_->RemoveInputEventObserver();
+}
+
 int32_t MultimodalInputConnectManager::RemoveInputEventFilter(int32_t filterId)
 {
     std::lock_guard<std::mutex> guard(lock_);

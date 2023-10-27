@@ -102,6 +102,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::NOTIFY_NAP_ONLINE):
             return StubNotifyNapOnline(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::RMV_INPUT_EVENT_OBSERVER):
+            return StubRemoveInputEventObserver(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_NAP_STATUS):
             return StubSetNapStatus(data, reply);
             break;
@@ -802,6 +805,13 @@ int32_t MultimodalInputConnectStub::StubNotifyNapOnline(MessageParcel& data, Mes
 {
     CALL_DEBUG_ENTER;
     int32_t ret = NotifyNapOnline();
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubRemoveInputEventObserver(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = RemoveInputEventObserver();
     return ret;
 }
 
