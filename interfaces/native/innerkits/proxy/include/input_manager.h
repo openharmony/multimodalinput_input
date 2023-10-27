@@ -29,7 +29,7 @@
 #include "i_input_device_listener.h"
 #include "i_input_event_consumer.h"
 #include "i_input_event_filter.h"
-#include "i_event_observer.h"
+#include "mmi_event_observer.h"
 #include "i_window_checker.h"
 #include "input_device.h"
 #include "key_option.h"
@@ -67,7 +67,15 @@ public:
      * @return the observer setting successed or not.
      * @since 10
      */
-    int32_t AddInputEventObserver(std::shared_ptr<IEventObserver> observer);
+    int32_t AddInputEventObserver(std::shared_ptr<MMIEventObserver> observer);
+
+    /**
+     * @brief Callback interface of the remove module.
+     * @param observer Indicates the progess info.
+     * @return EC_OK if unsubscribe successfully, else return other errcodes.
+     * @since 10
+     */
+    int32_t RemoveInputEventObserver(std::shared_ptr<MMIEventObserver> observer = nullptr);
 
     /**
      * @brief Set the process info to mmi server.

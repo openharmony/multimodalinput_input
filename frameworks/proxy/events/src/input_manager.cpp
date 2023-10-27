@@ -68,9 +68,14 @@ int32_t InputManager::RemoveInputEventFilter(int32_t filterId)
     return InputMgrImpl.RemoveInputEventFilter(filterId);
 }
 
-int32_t InputManager::AddInputEventObserver(std::shared_ptr<IEventObserver> observer)
+int32_t InputManager::AddInputEventObserver(std::shared_ptr<MMIEventObserver> observer)
 {
     return InputMgrImpl.AddInputEventObserver(observer);
+}
+
+int32_t InputManager::RemoveInputEventObserver(std::shared_ptr<MMIEventObserver> observer)
+{
+    return InputMgrImpl.RemoveInputEventObserver(observer);
 }
 
 void InputManager::SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer)

@@ -61,12 +61,12 @@ public:
     virtual int32_t CheckWindowId(int32_t windowId) const override;
 };
 
-class MMIEventObserver : public MMI::IEventObserver {
+class IEventObserver : public MMI::MMIEventObserver {
 public:
     void SyncBundleName(int32_t pid, int32_t uid, std::string bundleName) override;
 };
 
-void MMIEventObserver::SyncBundleName(int32_t pid, int32_t uid, std::string bundleName)
+void IEventObserver::SyncBundleName(int32_t pid, int32_t uid, std::string bundleName)
 {
     int32_t getPid = pid;
     int32_t getUid = uid;
@@ -1117,11 +1117,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_ClearWindowPointerStyle_001, TestSiz
 HWTEST_F(InputManagerTest, InputManagerTest_SyncBundleName_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    auto mmiObserver = std::make_shared<IEventObserver>();
+    InputManager::GetInstance()->AddInputEventObserver(mmiObserver);
     auto callbackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callbackPtr != nullptr);
     int32_t monitorId = InputManagerUtil::TestAddMonitor(callbackPtr);
-    auto mmiObserver = std::make_shared<MMIEventObserver>();
-    InputManager::GetInstance()->AddInputEventObserver(mmiObserver);
     InputManager::GetInstance()->SetNapStatus(10, 20, "bundleName_test", true);
     std::vector<std::tuple<int32_t, int32_t, std::string>> vectorBefore;
     InputManager::GetInstance()->GetAllNapStatusData(vectorBefore);
