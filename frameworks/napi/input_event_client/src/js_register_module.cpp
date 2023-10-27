@@ -302,7 +302,7 @@ static void HandleTouchPropertyInt32(napi_env env, napi_value touchHandle,
         MMI_HILOGE("sourceType:%{public}d is less 0, can not process", sourceType);
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "sourceType must be greater than or equal to 0");
     }
-    if (sourceType == TOUCH_SCREEN) {
+    if (sourceType == TOUCH_SCREEN || sourceType == PEN) {
         sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
     }
     napi_value touchProperty = HandleTouchProperty(env, touchHandle);
