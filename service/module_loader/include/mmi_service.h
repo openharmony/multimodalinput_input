@@ -73,6 +73,7 @@ public:
     int32_t GetPointerSpeed(int32_t &speed) override;
     int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle) override;
     int32_t NotifyNapOnline() override;
+    int32_t RemoveInputEventObserver() override;
     int32_t GetPointerStyle(int32_t windowId, PointerStyle &pointerStyle) override;
     int32_t SupportKeys(int32_t deviceId, std::vector<int32_t> &keys, std::vector<bool> &keystroke) override;
     int32_t GetDeviceIds(std::vector<int32_t> &ids) override;

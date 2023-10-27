@@ -677,6 +677,26 @@ int32_t MultimodalInputConnectProxy::NotifyNapOnline()
     return RET_OK;
 }
 
+int32_t MultimodalInputConnectProxy::RemoveInputEventObserver()
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return RET_ERR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        RMV_INPUT_EVENT_OBSERVER), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request fail, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
 int32_t MultimodalInputConnectProxy::SetPointerStyle(int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;

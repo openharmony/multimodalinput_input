@@ -93,6 +93,7 @@ enum class MultimodalinputConnectInterfaceCode {
     NOTIFY_NAP_ONLINE = 71,
     SET_NAP_STATUS = 72,
     GET_ALL_NAPSTATUS_DATA = 73,
+    RMV_INPUT_EVENT_OBSERVER = 74,
 };
 
 enum class MultimodalinputEventObserverCode {

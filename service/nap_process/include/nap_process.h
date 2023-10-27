@@ -55,13 +55,15 @@ using NapStatusDatas = std::vector<NapStatusData>;
     int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napState);
     int32_t NotifyNapOnline();
     int32_t GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
+    int32_t RemoveInputEventObserver();
+    void Init(UDSServer& udsServer);
+    int32_t napClientPid_ { -1 };
 
 private:
     UDSServer* udsServer_ { nullptr };
     NapProcess() = default;
     DISALLOW_COPY_AND_MOVE(NapProcess);
     static NapProcess *instance_;
-    int32_t napClientPid_ { -1 };
 };
 } // namespace MMI
 } // namespace OHOS

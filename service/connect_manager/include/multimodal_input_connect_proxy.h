@@ -22,7 +22,7 @@
 #include "system_ability.h"
 
 #include "i_multimodal_input_connect.h"
-#include "i_event_observer.h"
+#include "mmi_event_observer.h"
 #include "multimodalinput_ipc_interface_code.h"
 
 namespace OHOS {
@@ -37,6 +37,7 @@ public:
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
         uint32_t deviceTags) override;
     int32_t NotifyNapOnline() override;
+    int32_t RemoveInputEventObserver() override;
     int32_t RemoveInputEventFilter(int32_t filterId) override;
     int32_t SetMouseScrollRows(int32_t rows) override;
     int32_t GetMouseScrollRows(int32_t &rows) override;

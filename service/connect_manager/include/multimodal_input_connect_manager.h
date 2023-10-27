@@ -41,6 +41,7 @@ public:
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);
     int32_t NotifyNapOnline();
+    int32_t RemoveInputEventObserver();
     int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus);
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
     int32_t GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
