@@ -21,7 +21,7 @@
 #include "extra_data.h"
 #include "i_event_filter.h"
 #include "i_input_event_filter.h"
-#include "i_event_observer.h"
+#include "mmi_event_observer.h"
 #include "input_device.h"
 #include "input_handler_type.h"
 #include "key_event.h"
@@ -49,6 +49,7 @@ public:
     virtual int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
         uint32_t deviceTags) = 0;
     virtual int32_t NotifyNapOnline() = 0;
+    virtual int32_t RemoveInputEventObserver() = 0;
     virtual int32_t RemoveInputEventFilter(int32_t filterId) = 0;
     virtual int32_t SetMouseScrollRows(int32_t rows) = 0;
     virtual int32_t GetMouseScrollRows(int32_t &rows) = 0;

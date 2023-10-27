@@ -21,12 +21,19 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NapProcess" };
+constexpr int32_t REMOVE_OBSERVER = -2;
 } // namespace
 
 NapProcess *NapProcess::instance_ = new (std::nothrow) NapProcess();
 NapProcess *NapProcess::GetInstance()
 {
     return instance_;
+}
+
+void NapProcess::Init(UDSServer& udsServer)
+{
+    udsServer_ = &udsServer;
+    CHKPV(udsServer_);
 }
 
 int32_t NapProcess::NotifyBundleName(NapStatusData data)
@@ -42,10 +49,7 @@ int32_t NapProcess::NotifyBundleName(NapStatusData data)
     pkt << data.pid;
     pkt << data.uid;
     pkt << data.bundleName;
-    if (data.pid == -1) {
-        MMI_HILOGD("Invalid client pid, no need to sendMsg! errCode:%{public}d", MSG_SEND_FAIL);
-        return RET_OK;
-    }
+    CHKPR(udsServer_, RET_ERR);
     int32_t fd = udsServer_->GetClientFd(napClientPid_);
     auto udsServer = InputHandler->GetUDSServer();
     CHKPR(udsServer, RET_ERR);
@@ -82,6 +86,14 @@ int32_t NapProcess::NotifyNapOnline()
     int32_t pid = IPCSkeleton::GetCallingPid();
     napClientPid_ = pid;
     MMI_HILOGD("NotifyNapOnline pid is %{public}d", pid);
+    return RET_OK;
+}
+
+int32_t NapProcess::RemoveInputEventObserver()
+{
+    CALL_DEBUG_ENTER;
+    napMap_.clear();
+    napClientPid_ = REMOVE_OBSERVER;
     return RET_OK;
 }
 

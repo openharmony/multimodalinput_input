@@ -65,12 +65,12 @@ void ClientMsgHandler::Init()
 #if defined(OHOS_BUILD_ENABLE_KEYBOARD) && (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || \
     defined(OHOS_BUILD_ENABLE_MONITOR))
         { MmiMessageId::REPORT_KEY_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportKeyEvent, this) },
-        { MmiMessageId::NOTIFY_BUNDLE_NAME, MsgCallbackBind2(&ClientMsgHandler::NotifyBundleName, this) },
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 #if (defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)) && \
     (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR))
         { MmiMessageId::REPORT_POINTER_EVENT, MsgCallbackBind2(&ClientMsgHandler::ReportPointerEvent, this) },
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+        { MmiMessageId::NOTIFY_BUNDLE_NAME, MsgCallbackBind2(&ClientMsgHandler::NotifyBundleName, this) },
     };
     for (auto &it : funs) {
         if (!RegistrationEvent(it)) {

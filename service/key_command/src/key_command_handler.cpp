@@ -51,6 +51,7 @@ constexpr size_t DOUBLE_KNUCKLE_SIZE = 2;
 constexpr int32_t NONE_CLICK_STATE = 0;
 constexpr int32_t CLICK_STATE = 1;
 constexpr int32_t DOUBLE_CLICK_INTERVAL_TIME = 260;
+constexpr int32_t REMOVE_OBSERVER = -2;
 
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
 const std::string shortKeyFileName = "/data/service/el1/public/multimodalinput/Settings.xml";
@@ -1440,12 +1441,14 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
     if (err != ERR_OK) {
         MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
     }
-    OHOS::MMI::NapProcess::NapStatusData napData;
-    napData.pid = -1;
-    napData.uid = -1;
-    napData.bundleName = ability.bundleName;
-    NapProcess::GetInstance()->napMap_.emplace(napData, true);
-    NapProcess::GetInstance()->NotifyBundleName(napData);
+    if (NapProcess::GetInstance()->napClientPid_ != REMOVE_OBSERVER) {
+        OHOS::MMI::NapProcess::NapStatusData napData;
+        napData.pid = -1;
+        napData.uid = -1;
+        napData.bundleName = ability.bundleName;
+        NapProcess::GetInstance()->napMap_.emplace(napData, true);
+        NapProcess::GetInstance()->NotifyBundleName(napData);
+    }
     MMI_HILOGD("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
 }
 
