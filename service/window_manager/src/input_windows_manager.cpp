@@ -409,6 +409,7 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
         }
         lastPointerStyle_ = style;
     }
+    MMI_HILOGI("Window id:%{public}d set pointer style:%{public}d success", windowId, lastPointerStyle_.id);
     IPointerDrawingManager::GetInstance()->DrawPointerStyle(lastPointerStyle_);
 }
 
