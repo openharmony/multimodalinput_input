@@ -97,6 +97,13 @@ public:
      */
     static constexpr uint32_t EVENT_FLAG_HMOS = 0x10000000;
 
+    /**
+     * The multimodal input event from simulation.
+     *
+     * @since 10
+     */
+    static constexpr uint32_t EVENT_FLAG_SIMULATE = 0x00000004;
+
 public:
     /**
      * Copy constructor function for InputEvent

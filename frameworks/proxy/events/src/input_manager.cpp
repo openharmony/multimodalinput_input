@@ -164,11 +164,13 @@ void InputManager::RemoveInterceptor(int32_t interceptorId)
 
 void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     InputMgrImpl.SimulateInputEvent(keyEvent);
 }
 
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
 
