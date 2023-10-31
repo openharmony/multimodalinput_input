@@ -97,7 +97,7 @@ struct KnuckleGesture {
     bool state { false };
     int64_t lastPointerUpTime { 0 };
     int64_t downToPrevUpTime { 0 };
-    float doubleClickDistance { 0.0 };
+    float doubleClickDistance { 0.0f };
     Ability ability;
     struct {
         int32_t id { 0 };
@@ -209,7 +209,7 @@ private:
     int32_t checkAdjustIntervalTimeCount_ { 0 };
     int32_t checkAdjustDistanceCount_ { 0 };
     int64_t downToPrevUpTimeConfig_ { 0 };
-    float downToPrevDownDistanceConfig_ { 0.0 };
+    float downToPrevDownDistanceConfig_ { 0.0f };
 };
 } // namespace MMI
 } // namespace OHOS
