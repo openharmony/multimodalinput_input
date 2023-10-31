@@ -54,8 +54,10 @@ using NapStatusDatas = std::vector<NapStatusData>;
     std::map<NapStatusData, bool>& GetNapMap();
     int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napState);
     int32_t NotifyNapOnline();
-    int32_t GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
+    int32_t GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
     int32_t RemoveInputEventObserver();
+    int32_t AddMmiSubscribedEventData(const NapStatusData& napData);
+    int32_t GetNapClientPid();
     void Init(UDSServer& udsServer);
     int32_t napClientPid_ { -1 };
 

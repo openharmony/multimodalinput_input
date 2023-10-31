@@ -37,9 +37,9 @@ int32_t InputManager::GetDisplayBindInfo(DisplayBindInfos &infos)
     return InputMgrImpl.GetDisplayBindInfo(infos);
 }
 
-int32_t InputManager::GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
+int32_t InputManager::GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
 {
-    return InputMgrImpl.GetAllNapStatusData(datas);
+    return InputMgrImpl.GetAllMmiSubscribedEvents(datas);
 }
 
 int32_t InputManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)

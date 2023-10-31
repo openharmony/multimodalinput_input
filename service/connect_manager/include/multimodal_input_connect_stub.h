@@ -83,7 +83,7 @@ protected:
     int32_t StubInjectPointerEvent(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetAnrListener(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetDisplayBindInfo(MessageParcel& data, MessageParcel& reply);
-    int32_t StubGetAllNapStatusData(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetAllMmiSubscribedEvents(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetDisplayBind(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetPointerColor(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetPointerColor(MessageParcel& data, MessageParcel& reply);

@@ -53,7 +53,7 @@ public:
     DISALLOW_MOVE(InputManagerImpl);
 
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
-    int32_t GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
+    int32_t GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t GetWindowPid(int32_t windowId);
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);

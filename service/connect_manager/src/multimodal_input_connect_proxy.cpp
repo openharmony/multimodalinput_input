@@ -1312,7 +1312,8 @@ int32_t MultimodalInputConnectProxy::GetDisplayBindInfo(DisplayBindInfos &infos)
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
+int32_t MultimodalInputConnectProxy::GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t,
+    std::string>> &datas)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
