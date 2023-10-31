@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -94,12 +94,16 @@ struct TwoFingerGesture {
 
 struct KnuckleGesture {
     std::shared_ptr<PointerEvent> lastPointerDownEvent { nullptr };
-    size_t size { 0 };
-    int32_t state { 0 };
+    bool state { false };
     int64_t lastPointerUpTime { 0 };
     int64_t downToPrevUpTime { 0 };
-    int32_t timerId { -1 };
+    float doubleClickDistance { 0.0f };
     Ability ability;
+    struct {
+        int32_t id { 0 };
+        int32_t x { 0 };
+        int32_t y { 0 };
+    } lastDownPointer;
 };
 
 class KeyCommandHandler final : public IInputEventHandler {
@@ -121,6 +125,8 @@ public:
     void HandlePointerActionDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandlePointerActionMoveEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandlePointerActionUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
+    void SetKnuckleDoubleTapIntervalTime(int64_t interval);
+    void SetKnuckleDoubleTapDistance(float distance);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
 private:
@@ -173,11 +179,14 @@ private:
     void HandleFingerGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureDownEvent(const std::shared_ptr<PointerEvent> touchEvent);
     void HandleKnuckleGestureUpEvent(const std::shared_ptr<PointerEvent> touchEvent);
-    void KnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void SingleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent);
     void ReportKnuckleDoubleClickEvent(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
     void ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent);
+    void KnuckleGestureProcessor(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
+    void UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent, KnuckleGesture &knuckleGesture);
+    void AdjustTimeIntervalConfigIfNeed(int64_t intervalTime);
+    void AdjustDistanceConfigIfNeed(float distance);
 #endif // OHOS_BUILD_ENABLE_TOUCH
 
 private:
@@ -195,6 +204,12 @@ private:
     KnuckleGesture singleKnuckleGesture_;
     KnuckleGesture doubleKnuckleGesture_;
     bool isKnuckleState_ { false };
+    bool isTimeConfig_ { false };
+    bool isDistanceConfig_ { false };
+    int32_t checkAdjustIntervalTimeCount_ { 0 };
+    int32_t checkAdjustDistanceCount_ { 0 };
+    int64_t downToPrevUpTimeConfig_ { 0 };
+    float downToPrevDownDistanceConfig_ { 0.0f };
 };
 } // namespace MMI
 } // namespace OHOS

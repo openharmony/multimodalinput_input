@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,9 +48,12 @@ constexpr int32_t TOUCH_MAX_THRESHOLD = 15;
 constexpr int32_t COMMON_PARAMETER_ERROR = 401;
 constexpr size_t SINGLE_KNUCKLE_SIZE = 1;
 constexpr size_t DOUBLE_KNUCKLE_SIZE = 2;
-constexpr int32_t NONE_CLICK_STATE = 0;
-constexpr int32_t CLICK_STATE = 1;
-constexpr int32_t DOUBLE_CLICK_INTERVAL_TIME = 260;
+constexpr int32_t MAX_TIME_FOR_ADJUST_CONFIG = 5;
+constexpr int32_t POW_SQUARE = 2;
+constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
+constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
+constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0f;
+constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG = 96.0f;
 constexpr int32_t REMOVE_OBSERVER = -2;
 
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
@@ -646,6 +649,21 @@ bool IsParseKnuckleGesture(const JsonParser &parser, const std::string ability, 
     }
     return true;
 }
+
+float AbsDiff(KnuckleGesture knuckleGesture, const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CHKPR(pointerEvent, -1);
+    auto id = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    pointerEvent->GetPointerItem(id, item);
+    return (float) sqrt(pow(knuckleGesture.lastDownPointer.x - item.GetDisplayX(), POW_SQUARE) +
+        pow(knuckleGesture.lastDownPointer.y  - item.GetDisplayY(), POW_SQUARE));
+}
+
+bool IsEqual(float f1, float f2)
+{
+    return (std::fabs(f1 - f2) <= std::numeric_limits<double>::epsilon());
+}
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -695,6 +713,14 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         }
         isParseConfig_ = true;
     }
+    if (!isTimeConfig_) {
+        SetKnuckleDoubleTapIntervalTime(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
+        isTimeConfig_ = true;
+    }
+    if (!isDistanceConfig_) {
+        SetKnuckleDoubleTapDistance(DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG);
+        isDistanceConfig_ = true;
+    }
 
     switch (touchEvent->GetPointerAction()) {
         case PointerEvent::POINTER_ACTION_CANCEL:
@@ -726,6 +752,8 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
     touchEvent->GetPointerItem(id, item);
     int32_t toolType = item.GetToolType();
     MMI_HILOGD("Pointer tool type: %{public}d", toolType);
+    singleKnuckleGesture_.state = false;
+    doubleKnuckleGesture_.state = false;
     switch (toolType) {
         case PointerEvent::TOOL_TYPE_FINGER: {
             isKnuckleState_ = false;
@@ -849,7 +877,6 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
         DoubleKnuckleGestureProcesser(touchEvent);
     } else {
         MMI_HILOGW("Other kunckle size not process, size: %{public}zu", size);
-        return;
     }
 }
 
@@ -864,7 +891,6 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
         doubleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
     } else {
         MMI_HILOGW("Other kunckle size not process, size: %{public}zu", size);
-        return;
     }
 }
 
@@ -872,65 +898,121 @@ void KeyCommandHandler::SingleKnuckleGestureProcesser(const std::shared_ptr<Poin
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    KnuckleGestureProcesser(touchEvent, singleKnuckleGesture_);
+    singleKnuckleGesture_.state = false;
+    KnuckleGestureProcessor(touchEvent, singleKnuckleGesture_);
 }
 
 void KeyCommandHandler::DoubleKnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    if (singleKnuckleGesture_.state != NONE_CLICK_STATE) {
-        MMI_HILOGD("Single knuckle gesture not process");
-        singleKnuckleGesture_.state = NONE_CLICK_STATE;
-        if (singleKnuckleGesture_.timerId != -1) {
-            TimerMgr->RemoveTimer(singleKnuckleGesture_.timerId);
-            singleKnuckleGesture_.timerId = -1;
-        }
-    }
-    KnuckleGestureProcesser(touchEvent, doubleKnuckleGesture_);
+    doubleKnuckleGesture_.state = false;
+    KnuckleGestureProcessor(touchEvent, doubleKnuckleGesture_);
 }
 
-void KeyCommandHandler::KnuckleGestureProcesser(const std::shared_ptr<PointerEvent> touchEvent,
+void KeyCommandHandler::KnuckleGestureProcessor(const std::shared_ptr<PointerEvent> touchEvent,
     KnuckleGesture &knuckleGesture)
 {
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
-    int32_t state = knuckleGesture.state;
-    switch (state) {
-        case NONE_CLICK_STATE: {
-            MMI_HILOGD("Knuckle gesture first down event");
-            knuckleGesture.timerId = TimerMgr->AddTimer(DOUBLE_CLICK_INTERVAL_TIME, 1, [&knuckleGesture]() {
-                MMI_HILOGD("Knuckle gesture processor timer callback");
-                knuckleGesture.timerId = -1;
-                knuckleGesture.state = NONE_CLICK_STATE;
-            });
-            knuckleGesture.lastPointerDownEvent = touchEvent;
-            knuckleGesture.state = CLICK_STATE;
-            isKnuckleState_ = true;
-            break;
+    isKnuckleState_ = true;
+    if (knuckleGesture.lastPointerDownEvent == nullptr) {
+        MMI_HILOGI("knuckle gesture first down Event");
+        knuckleGesture.lastPointerDownEvent = touchEvent;
+        UpdateKnuckleGestureInfo(touchEvent, knuckleGesture);
+        return;
+    }
+    int64_t intervalTime = touchEvent->GetActionTime() - knuckleGesture.lastPointerUpTime;
+    bool isTimeIntervalReady = intervalTime > 0 && intervalTime <= downToPrevUpTimeConfig_;
+    float downToPrevDownDistance = AbsDiff(knuckleGesture, touchEvent);
+    bool isDistanceReady = downToPrevDownDistance < downToPrevDownDistanceConfig_;
+    knuckleGesture.downToPrevUpTime = intervalTime;
+    knuckleGesture.doubleClickDistance = downToPrevDownDistance;
+    UpdateKnuckleGestureInfo(touchEvent, knuckleGesture);
+    if (isTimeIntervalReady && isDistanceReady) {
+        MMI_HILOGD("knuckle gesture start launch ability");
+        DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime);
+        LaunchAbility(knuckleGesture.ability, 0);
+        knuckleGesture.state = true;
+        ReportKnuckleScreenCapture(touchEvent);
+    } else {
+        MMI_HILOGW("time ready: %{public}d, distance ready: %{public}d", isTimeIntervalReady, isDistanceReady);
+        if (!isTimeIntervalReady) {
+            DfxHisysevent::ReportFailIfInvalidTime(touchEvent, intervalTime);
         }
-        case CLICK_STATE: {
-            MMI_HILOGD("Knuckle gesture second down event");
-            knuckleGesture.downToPrevUpTime = touchEvent->GetActionTime() - knuckleGesture.lastPointerUpTime;
-            ReportKnuckleDoubleClickEvent(touchEvent, knuckleGesture);
-            if (knuckleGesture.downToPrevUpTime < (static_cast<int64_t>(DOUBLE_CLICK_INTERVAL_TIME) * SECONDS_SYSTEM)) {
-                MMI_HILOGD("knuckle gesture start launch ability");
-                ReportKnuckleScreenCapture(touchEvent);
-                LaunchAbility(knuckleGesture.ability, 0);
-                if (knuckleGesture.timerId != -1) {
-                    TimerMgr->RemoveTimer(knuckleGesture.timerId);
-                    knuckleGesture.timerId = -1;
-                }
-                knuckleGesture.state = NONE_CLICK_STATE;
-                isKnuckleState_ = true;
-            }
-            break;
-        }
-        default: {
-            MMI_HILOGW("other state: %{public}d not process", state);
-            break;
+        if (!isDistanceReady) {
+            DfxHisysevent::ReportFailIfInvalidDistance(touchEvent, downToPrevDownDistance);
         }
     }
+    AdjustTimeIntervalConfigIfNeed(intervalTime);
+    AdjustDistanceConfigIfNeed(downToPrevDownDistance);
+}
+
+void KeyCommandHandler::UpdateKnuckleGestureInfo(const std::shared_ptr<PointerEvent> touchEvent,
+    KnuckleGesture &knuckleGesture)
+{
+    auto id = touchEvent->GetPointerId();
+    PointerEvent::PointerItem item;
+    touchEvent->GetPointerItem(id, item);
+    knuckleGesture.lastDownPointer.x = item.GetDisplayX();
+    knuckleGesture.lastDownPointer.y = item.GetDisplayY();
+    knuckleGesture.lastDownPointer.id = touchEvent->GetId();
+}
+
+void KeyCommandHandler::AdjustTimeIntervalConfigIfNeed(int64_t intervalTime)
+{
+    CALL_DEBUG_ENTER;
+    int64_t newTimeConfig;
+    MMI_HILOGI("down to prev up interval time: %{public}" PRId64 ",config time: %{public}" PRId64"",
+        intervalTime, downToPrevUpTimeConfig_);
+    if (downToPrevUpTimeConfig_ == DOUBLE_CLICK_INTERVAL_TIME_DEFAULT) {
+        if (intervalTime < DOUBLE_CLICK_INTERVAL_TIME_DEFAULT || intervalTime > DOUBLE_CLICK_INTERVAL_TIME_SLOW) {
+            return;
+        }
+        newTimeConfig = DOUBLE_CLICK_INTERVAL_TIME_SLOW;
+    } else if (downToPrevUpTimeConfig_ == DOUBLE_CLICK_INTERVAL_TIME_SLOW) {
+        if (intervalTime > DOUBLE_CLICK_INTERVAL_TIME_DEFAULT) {
+            return;
+        }
+        newTimeConfig = DOUBLE_CLICK_INTERVAL_TIME_DEFAULT;
+    } else {
+        return;
+    }
+    checkAdjustIntervalTimeCount_++;
+    if (checkAdjustIntervalTimeCount_ < MAX_TIME_FOR_ADJUST_CONFIG) {
+        return;
+    }
+    MMI_HILOGI("adjust new double click interval time: %{public}" PRId64 "", newTimeConfig);
+    downToPrevUpTimeConfig_ = newTimeConfig;
+    checkAdjustIntervalTimeCount_ = 0;
+}
+
+void KeyCommandHandler::AdjustDistanceConfigIfNeed(float distance)
+{
+    CALL_DEBUG_ENTER;
+    float newDistanceConfig;
+    MMI_HILOGI("down to prev down distance: %{public}f, config distance: %{public}f",
+        distance, downToPrevDownDistanceConfig_);
+    if (IsEqual(downToPrevDownDistanceConfig_, DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG)) {
+        if (distance < DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG || distance > DOUBLE_CLICK_DISTANCE_LONG_CONFIG) {
+            return;
+        }
+        newDistanceConfig = DOUBLE_CLICK_DISTANCE_LONG_CONFIG;
+    } else if (IsEqual(downToPrevDownDistanceConfig_, DOUBLE_CLICK_DISTANCE_LONG_CONFIG)) {
+        if (distance > DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG) {
+            return;
+        }
+        newDistanceConfig = DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG;
+    } else {
+        return;
+    }
+    checkAdjustDistanceCount_++;
+    if (checkAdjustDistanceCount_ < MAX_TIME_FOR_ADJUST_CONFIG) {
+        return;
+    }
+    MMI_HILOGI("adjust new double click distance: %{public}f", newDistanceConfig);
+    downToPrevDownDistanceConfig_ = newDistanceConfig;
+    checkAdjustDistanceCount_ = 0;
 }
 
 void KeyCommandHandler::ReportKnuckleDoubleClickEvent(const std::shared_ptr<PointerEvent> touchEvent,
@@ -1554,6 +1636,24 @@ KnuckleGesture KeyCommandHandler::GetSingleKnuckleGesture()
 KnuckleGesture KeyCommandHandler::GetDoubleKnuckleGesture()
 {
     return doubleKnuckleGesture_;
+}
+void KeyCommandHandler::SetKnuckleDoubleTapIntervalTime(int64_t interval)
+{
+    CALL_DEBUG_ENTER;
+    if (interval < 0) {
+        MMI_HILOGE("invalid interval time: %{public}" PRId64 "", interval);
+        return;
+    }
+    downToPrevUpTimeConfig_ = interval;
+}
+void KeyCommandHandler::SetKnuckleDoubleTapDistance(float distance)
+{
+    CALL_DEBUG_ENTER;
+    if (distance <= std::numeric_limits<float>::epsilon()) {
+        MMI_HILOGE("invalid distance: %{public}f", distance);
+        return;
+    }
+    downToPrevDownDistanceConfig_ = distance;
 }
 } // namespace MMI
 } // namespace OHOS
