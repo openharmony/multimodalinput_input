@@ -32,8 +32,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCo
 constexpr int32_t NANOSECOND_TO_MILLISECOND = 1000000;
 constexpr int32_t SEC_TO_NANOSEC = 1000000000;
 constexpr int32_t COMMON_PARAMETER_ERROR = 401;
-constexpr int32_t NONE_CLICK_STATE = 0;
-constexpr int32_t CLICK_STATE = 1;
+constexpr int32_t INTERVAL_TIME = 100;
+constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
+constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0;
 } // namespace
 class KeyCommandHandlerTest : public testing::Test {
 public:
@@ -216,7 +217,7 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_004, TestSize.Level1)
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 /**
  * @tc.name: KeyCommandHandlerTest_TouchTest_001
- * @tc.desc: Test key event
+ * @tc.desc: Test double finger down event
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -231,13 +232,13 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_TouchTest_001, TestSize.Le
     keyCommandHandler.HandlePointerActionMoveEvent(pointerEvent);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     keyCommandHandler.HandlePointerActionUpEvent(pointerEvent);
-    ASSERT_EQ(NONE_CLICK_STATE, keyCommandHandler.GetSingleKnuckleGesture().state);
-    ASSERT_EQ(NONE_CLICK_STATE, keyCommandHandler.GetDoubleKnuckleGesture().state);
+    ASSERT_FALSE(keyCommandHandler.GetSingleKnuckleGesture().state);
+    ASSERT_FALSE(keyCommandHandler.GetDoubleKnuckleGesture().state);
 }
 
 /**
  * @tc.name: KeyCommandHandlerTest_KnuckleTest_001
- * @tc.desc: Test key event
+ * @tc.desc: Test single knuckle double click
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -247,22 +248,28 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_001, TestSize.
     auto pointerEvent = SetupSingleKnuckleDownEvent();
     ASSERT_TRUE(pointerEvent != nullptr);
     KeyCommandHandler keyCommandHandler;
+    keyCommandHandler.SetKnuckleDoubleTapIntervalTime(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
+    keyCommandHandler.SetKnuckleDoubleTapDistance(DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG);
+    int32_t actionTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    pointerEvent->SetActionTime(actionTime);
     keyCommandHandler.HandlePointerActionDownEvent(pointerEvent);
-    ASSERT_EQ(CLICK_STATE, keyCommandHandler.GetSingleKnuckleGesture().state);
-    ASSERT_EQ(NONE_CLICK_STATE, keyCommandHandler.GetDoubleKnuckleGesture().state);
+    ASSERT_FALSE(keyCommandHandler.GetSingleKnuckleGesture().state);
+    ASSERT_FALSE(keyCommandHandler.GetDoubleKnuckleGesture().state);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     keyCommandHandler.HandlePointerActionUpEvent(pointerEvent);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    actionTime = actionTime + INTERVAL_TIME;
+    pointerEvent->SetActionTime(actionTime);
     keyCommandHandler.HandlePointerActionDownEvent(pointerEvent);
-    ASSERT_EQ(NONE_CLICK_STATE, keyCommandHandler.GetSingleKnuckleGesture().state);
-    ASSERT_EQ(NONE_CLICK_STATE, keyCommandHandler.GetDoubleKnuckleGesture().state);
+    ASSERT_TRUE(keyCommandHandler.GetSingleKnuckleGesture().state);
+    ASSERT_FALSE(keyCommandHandler.GetDoubleKnuckleGesture().state);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     keyCommandHandler.HandlePointerActionUpEvent(pointerEvent);
 }
 
 /**
  * @tc.name: KeyCommandHandlerTest_KnuckleTest_002
- * @tc.desc: Test key event
+ * @tc.desc: Test double knuckle double click
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -271,21 +278,27 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_002, TestSize.
     CALL_DEBUG_ENTER;
     auto pointerEvent = SetupDoubleKnuckleDownEvent();
     ASSERT_TRUE(pointerEvent != nullptr);
+    int32_t actionTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
+    pointerEvent->SetActionTime(actionTime);
     KeyCommandHandler keyCommandHandler;
+    keyCommandHandler.SetKnuckleDoubleTapIntervalTime(DOUBLE_CLICK_INTERVAL_TIME_DEFAULT);
+    keyCommandHandler.SetKnuckleDoubleTapDistance(DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG);
     keyCommandHandler.HandlePointerActionDownEvent(pointerEvent);
-    ASSERT_EQ(NONE_CLICK_STATE, keyCommandHandler.GetSingleKnuckleGesture().state);
-    ASSERT_EQ(CLICK_STATE, keyCommandHandler.GetDoubleKnuckleGesture().state);
+    ASSERT_FALSE(keyCommandHandler.GetSingleKnuckleGesture().state);
+    ASSERT_FALSE(keyCommandHandler.GetDoubleKnuckleGesture().state);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     keyCommandHandler.HandlePointerActionUpEvent(pointerEvent);
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    actionTime = actionTime + INTERVAL_TIME;
+    pointerEvent->SetActionTime(actionTime);
     keyCommandHandler.HandlePointerActionDownEvent(pointerEvent);
-    ASSERT_EQ(NONE_CLICK_STATE, keyCommandHandler.GetSingleKnuckleGesture().state);
-    ASSERT_EQ(NONE_CLICK_STATE, keyCommandHandler.GetDoubleKnuckleGesture().state);
+    ASSERT_FALSE(keyCommandHandler.GetSingleKnuckleGesture().state);
+    ASSERT_TRUE(keyCommandHandler.GetDoubleKnuckleGesture().state);
 }
 
 /**
  * @tc.name: KeyCommandHandlerTest_KnuckleTest_003
- * @tc.desc: Test key event
+ * @tc.desc: Test single knuckle event to double knuckle event
  * @tc.type: FUNC
  * @tc.require:
  */
@@ -298,12 +311,11 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_KnuckleTest_003, TestSize.
     ASSERT_TRUE(pointerEvent != nullptr);
     KeyCommandHandler keyCommandHandler;
     keyCommandHandler.HandlePointerActionDownEvent(singlePointerEvent);
-    ASSERT_EQ(CLICK_STATE, keyCommandHandler.GetSingleKnuckleGesture().state);
     singlePointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     keyCommandHandler.HandlePointerActionUpEvent(singlePointerEvent);
     keyCommandHandler.HandlePointerActionDownEvent(pointerEvent);
-    ASSERT_EQ(NONE_CLICK_STATE, keyCommandHandler.GetSingleKnuckleGesture().state);
-    ASSERT_EQ(CLICK_STATE, keyCommandHandler.GetDoubleKnuckleGesture().state);
+    ASSERT_FALSE(keyCommandHandler.GetSingleKnuckleGesture().state);
+    ASSERT_FALSE(keyCommandHandler.GetDoubleKnuckleGesture().state);
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
 } // namespace MMI

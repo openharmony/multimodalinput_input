@@ -99,6 +99,7 @@ public:
     static void ReportScreenCaptureGesture();
     static void ReportSingleKnuckleDoubleClickEvent(int32_t intervalTime);
     static void ReportFailIfInvalidTime(const std::shared_ptr<PointerEvent> touchEvent, int32_t intervalTime);
+    static void ReportFailIfInvalidDistance(const std::shared_ptr<PointerEvent> touchEvent, float distance);
 
 private:
     static inline int64_t dispatchStartTime_ { 0 };
