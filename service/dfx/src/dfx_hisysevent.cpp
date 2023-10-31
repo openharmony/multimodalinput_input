@@ -32,6 +32,7 @@ constexpr int32_t TIMES_LEVEL3 = 30;
 constexpr int32_t TIMES_LEVEL4 = 50;
 constexpr int32_t FINGERSENSE_EVENT_TIMES = 1;
 constexpr size_t SINGLE_KNUCKLE_SIZE = 1;
+constexpr size_t DOUBLE_KNUCKLE_SIZE = 2;
 const std::string EMPTY_STRING { "" };
 } // namespace
 
@@ -536,17 +537,40 @@ void DfxHisysevent::ReportFailIfInvalidTime(const std::shared_ptr<PointerEvent> 
 {
     CHKPV(touchEvent);
     size_t size = touchEvent->GetPointerIds().size();
-    if (size != SINGLE_KNUCKLE_SIZE) {
-        MMI_HILOGE("current event is not single knuckle");
+    std::string knuckleFailCount;
+    std::string invalidTimeFailCount;
+    if (size == SINGLE_KNUCKLE_SIZE) {
+        knuckleFailCount = "FSF_T_C";
+        invalidTimeFailCount = "SK_F_T";
+    } else if (size == DOUBLE_KNUCKLE_SIZE) {
+        knuckleFailCount = "DKF_T_I";
+        invalidTimeFailCount = "DK_F_T";
+    } else {
+        MMI_HILOGE("HiviewDFX Report knuckle state error, knuckle size: %{public}zu.", size);
         return;
     }
     int32_t ret = HiSysEventWrite(
         OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
         "FINGERSENSE_KNOCK_EVENT_INFO",
         OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
-        "FSF_T_C", FINGERSENSE_EVENT_TIMES,
+        knuckleFailCount, FINGERSENSE_EVENT_TIMES,
         "SKF_T_I", intervalTime,
-        "SK_F_T", FINGERSENSE_EVENT_TIMES);
+        invalidTimeFailCount, FINGERSENSE_EVENT_TIMES);
+    if (ret != RET_OK) {
+        MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
+    }
+}
+
+void DfxHisysevent::ReportFailIfInvalidDistance(const std::shared_ptr<PointerEvent> touchEvent, float distance)
+{
+    CHKPV(touchEvent);
+    int32_t ret = HiSysEventWrite(
+        OHOS::HiviewDFX::HiSysEvent::Domain::MULTI_MODAL_INPUT,
+        "FINGERSENSE_KNOCK_EVENT_INFO",
+        OHOS::HiviewDFX::HiSysEvent::EventType::STATISTIC,
+        "SK_F_T", FINGERSENSE_EVENT_TIMES,
+        "DKF_D_I", distance,
+        "FSF_D_C", FINGERSENSE_EVENT_TIMES);
     if (ret != RET_OK) {
         MMI_HILOGE("HiviewDFX Write failed, ret:%{public}d", ret);
     }
