@@ -87,11 +87,11 @@ int32_t InputManagerImpl::GetDisplayBindInfo(DisplayBindInfos &infos)
     return RET_OK;
 }
 
-int32_t InputManagerImpl::GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
+int32_t InputManagerImpl::GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MultimodalInputConnMgr->GetAllNapStatusData(datas);
+    int32_t ret = MultimodalInputConnMgr->GetAllMmiSubscribedEvents(datas);
     if (ret != RET_OK) {
         MMI_HILOGE("GetDisplayBindInfo failed, ret:%{public}d", ret);
         return RET_ERR;

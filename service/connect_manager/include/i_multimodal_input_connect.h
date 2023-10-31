@@ -96,7 +96,7 @@ public:
     virtual int32_t InjectPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent) = 0;
     virtual int32_t SetAnrObserver() = 0;
     virtual int32_t GetDisplayBindInfo(DisplayBindInfos &infos) = 0;
-    virtual int32_t GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas) = 0;
+    virtual int32_t GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas) = 0;
     virtual int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg) = 0;
     virtual int32_t GetFunctionKeyState(int32_t funckey, bool &state) = 0;
     virtual int32_t SetFunctionKeyState(int32_t funcKey, bool enable) = 0;

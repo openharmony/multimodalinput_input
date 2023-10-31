@@ -1022,7 +1022,7 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
         MMI_HILOGE("Add input handler failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    if (NapProcess::GetInstance()->napClientPid_ != REMOVE_OBSERVER) {
+    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER) {
         OHOS::MMI::NapProcess::NapStatusData napData;
         napData.pid = GetCallingPid();
         napData.uid = GetCallingUid();
@@ -1031,7 +1031,7 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
         napData.bundleName = sess->GetProgramName();
         MMI_HILOGD("AddInputHandler info to nap : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
-        NapProcess::GetInstance()->napMap_.emplace(napData, true);
+        NapProcess::GetInstance()->AddMmiSubscribedEventData(napData);
         NapProcess::GetInstance()->NotifyBundleName(napData);
     }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
@@ -1181,7 +1181,7 @@ int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr
         MMI_HILOGE("The subscribe key event processed failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    if (NapProcess::GetInstance()->napClientPid_ != REMOVE_OBSERVER) {
+    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER) {
         OHOS::MMI::NapProcess::NapStatusData napData;
         napData.pid = GetCallingPid();
         napData.uid = GetCallingUid();
@@ -1190,7 +1190,7 @@ int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr
         napData.bundleName = sess->GetProgramName();
         MMI_HILOGD("AddInputHandler info to nap : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
-        NapProcess::GetInstance()->napMap_.emplace(napData, true);
+        NapProcess::GetInstance()->AddMmiSubscribedEventData(napData);
         NapProcess::GetInstance()->NotifyBundleName(napData);
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -1266,10 +1266,10 @@ int32_t MMIService::GetDisplayBindInfo(DisplayBindInfos &infos)
     return RET_OK;
 }
 
-int32_t MMIService::GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
+int32_t MMIService::GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
 {
     CALL_DEBUG_ENTER;
-    NapProcess::GetInstance()->GetAllNapStatusData(datas);
+    NapProcess::GetInstance()->GetAllMmiSubscribedEvents(datas);
     return RET_OK;
 }
 
