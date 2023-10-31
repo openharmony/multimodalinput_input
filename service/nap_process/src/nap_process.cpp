@@ -80,6 +80,18 @@ int32_t NapProcess::SetNapStatus(int32_t pid, int32_t uid, std::string bundleNam
     return RET_OK;
 }
 
+int32_t NapProcess::AddMmiSubscribedEventData(const NapStatusData& napData)
+{
+    CALL_DEBUG_ENTER;
+    napMap_.emplace(napData, true);
+    return RET_OK;
+}
+
+int32_t NapProcess::GetNapClientPid()
+{
+    return napClientPid_;
+}
+
 int32_t NapProcess::NotifyNapOnline()
 {
     CALL_DEBUG_ENTER;
@@ -97,7 +109,7 @@ int32_t NapProcess::RemoveInputEventObserver()
     return RET_OK;
 }
 
-int32_t NapProcess::GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
+int32_t NapProcess::GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
 {
     CALL_DEBUG_ENTER;
     for (const auto& map : napMap_) {
