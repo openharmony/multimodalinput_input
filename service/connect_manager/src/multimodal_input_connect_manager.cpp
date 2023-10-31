@@ -81,7 +81,7 @@ int32_t MultimodalInputConnectManager::GetDisplayBindInfo(DisplayBindInfos &info
     return multimodalInputConnectService_->GetDisplayBindInfo(infos);
 }
 
-int32_t MultimodalInputConnectManager::GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t,
+int32_t MultimodalInputConnectManager::GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t,
     std::string>> &datas)
 {
     std::lock_guard<std::mutex> guard(lock_);
@@ -89,7 +89,7 @@ int32_t MultimodalInputConnectManager::GetAllNapStatusData(std::vector<std::tupl
         MMI_HILOGE("The multimodalInputConnectService_ is nullptr");
         return RET_ERR;
     }
-    return multimodalInputConnectService_->GetAllNapStatusData(datas);
+    return multimodalInputConnectService_->GetAllMmiSubscribedEvents(datas);
 }
 
 int32_t MultimodalInputConnectManager::SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg)

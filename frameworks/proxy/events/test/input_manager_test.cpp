@@ -1124,7 +1124,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SyncBundleName_001, TestSize.Level1)
     int32_t monitorId = InputManagerUtil::TestAddMonitor(callbackPtr);
     InputManager::GetInstance()->SetNapStatus(10, 20, "bundleName_test", true);
     std::vector<std::tuple<int32_t, int32_t, std::string>> vectorBefore;
-    InputManager::GetInstance()->GetAllNapStatusData(vectorBefore);
+    InputManager::GetInstance()->GetAllMmiSubscribedEvents(vectorBefore);
     for (const auto& vec : vectorBefore) {
         if (std::get<TUPLE_PID>(vec) == 10) {
             EXPECT_TRUE(std::get<TUPLE_UID>(vec) == 20);
@@ -1139,7 +1139,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SyncBundleName_001, TestSize.Level1)
     InputManagerUtil::TestRemoveMonitor(monitorId);
     InputManager::GetInstance()->SetNapStatus(10, 20, "bundleName_test", false);
     std::vector<std::tuple<int32_t, int32_t, std::string>> vectorAfter;
-    InputManager::GetInstance()->GetAllNapStatusData(vectorAfter);
+    InputManager::GetInstance()->GetAllMmiSubscribedEvents(vectorAfter);
     for (const auto& vec : vectorAfter) {
         if (std::get<TUPLE_PID>(vec) == 10) {
             EXPECT_TRUE(std::get<TUPLE_UID>(vec) == 20);

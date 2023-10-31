@@ -93,7 +93,7 @@ public:
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 10
      */
-    int32_t GetAllNapStatusData(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
+    int32_t GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
     
     /**
      * @brief Sets a consumer for the window input event of the current process.

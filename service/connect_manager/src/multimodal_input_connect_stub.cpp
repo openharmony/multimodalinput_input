@@ -187,7 +187,7 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
             return StubGetDisplayBindInfo(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_ALL_NAPSTATUS_DATA):
-            return StubGetAllNapStatusData(data, reply);
+            return StubGetAllMmiSubscribedEvents(data, reply);
             break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_DISPLAY_BIND):
             return StubSetDisplayBind(data, reply);
@@ -1311,7 +1311,7 @@ int32_t MultimodalInputConnectStub::StubGetDisplayBindInfo(MessageParcel& data, 
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectStub::StubGetAllNapStatusData(MessageParcel& data, MessageParcel& reply)
+int32_t MultimodalInputConnectStub::StubGetAllMmiSubscribedEvents(MessageParcel& data, MessageParcel& reply)
 {
     CALL_DEBUG_ENTER;
     if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
@@ -1323,7 +1323,7 @@ int32_t MultimodalInputConnectStub::StubGetAllNapStatusData(MessageParcel& data,
         return MMISERVICE_NOT_RUNNING;
     }
     std::vector<std::tuple<int32_t, int32_t, std::string>> datas;
-    int32_t ret = GetAllNapStatusData(datas);
+    int32_t ret = GetAllMmiSubscribedEvents(datas);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetDisplayBindInfo failed, ret:%{public}d", ret);
         return ret;
