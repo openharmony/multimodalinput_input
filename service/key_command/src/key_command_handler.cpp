@@ -52,8 +52,8 @@ constexpr int32_t MAX_TIME_FOR_ADJUST_CONFIG = 5;
 constexpr int32_t POW_SQUARE = 2;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
-constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0;
-constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG = 96.0;
+constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0f;
+constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG = 96.0f;
 constexpr int32_t REMOVE_OBSERVER = -2;
 
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
@@ -936,6 +936,7 @@ void KeyCommandHandler::KnuckleGestureProcessor(const std::shared_ptr<PointerEve
         knuckleGesture.state = true;
         ReportKnuckleScreenCapture(touchEvent);
     } else {
+        MMI_HILOGW("time ready: %{public}d, distance ready: %{public}d", isTimeIntervalReady, isDistanceReady);
         if (!isTimeIntervalReady) {
             DfxHisysevent::ReportFailIfInvalidTime(touchEvent, intervalTime);
         }
@@ -962,7 +963,8 @@ void KeyCommandHandler::AdjustTimeIntervalConfigIfNeed(int64_t intervalTime)
 {
     CALL_DEBUG_ENTER;
     int64_t newTimeConfig;
-    MMI_HILOGI("down to prev up interval time: %{public}" PRId64 "", intervalTime);
+    MMI_HILOGI("down to prev up interval time: %{public}" PRId64 ",config time: %{public}" PRId64"",
+        intervalTime, downToPrevUpTimeConfig_);
     if (downToPrevUpTimeConfig_ == DOUBLE_CLICK_INTERVAL_TIME_DEFAULT) {
         if (intervalTime < DOUBLE_CLICK_INTERVAL_TIME_DEFAULT || intervalTime > DOUBLE_CLICK_INTERVAL_TIME_SLOW) {
             return;
@@ -989,7 +991,8 @@ void KeyCommandHandler::AdjustDistanceConfigIfNeed(float distance)
 {
     CALL_DEBUG_ENTER;
     float newDistanceConfig;
-    MMI_HILOGI("down to prev down distance: %{public}f", distance);
+    MMI_HILOGI("down to prev down distance: %{public}f, config distance: %{public}f",
+        distance, downToPrevDownDistanceConfig_);
     if (IsEqual(downToPrevDownDistanceConfig_, DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG)) {
         if (distance < DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG || distance > DOUBLE_CLICK_DISTANCE_LONG_CONFIG) {
             return;
