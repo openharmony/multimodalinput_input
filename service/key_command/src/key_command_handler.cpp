@@ -962,7 +962,7 @@ void KeyCommandHandler::AdjustTimeIntervalConfigIfNeed(int64_t intervalTime)
 {
     CALL_DEBUG_ENTER;
     int64_t newTimeConfig;
-    MMI_HILOGI("down to prev up interval time: %{public}zu", intervalTime);
+    MMI_HILOGI("down to prev up interval time: %{public}" PRId64 "", intervalTime);
     if (downToPrevUpTimeConfig_ == DOUBLE_CLICK_INTERVAL_TIME_DEFAULT) {
         if (intervalTime < DOUBLE_CLICK_INTERVAL_TIME_DEFAULT || intervalTime > DOUBLE_CLICK_INTERVAL_TIME_SLOW) {
             return;
@@ -980,7 +980,7 @@ void KeyCommandHandler::AdjustTimeIntervalConfigIfNeed(int64_t intervalTime)
     if (checkAdjustIntervalTimeCount_ < MAX_TIME_FOR_ADJUST_CONFIG) {
         return;
     }
-    MMI_HILOGI("adjust new double click interval time: %{public}zu", newTimeConfig);
+    MMI_HILOGI("adjust new double click interval time: %{public}" PRId64 "", newTimeConfig);
     downToPrevUpTimeConfig_ = newTimeConfig;
     checkAdjustIntervalTimeCount_ = 0;
 }
@@ -1638,7 +1638,7 @@ void KeyCommandHandler::SetKnuckleDoubleTapIntervalTime(int64_t interval)
 {
     CALL_DEBUG_ENTER;
     if (interval < 0) {
-        MMI_HILOGE("invalid interval time: %{public}zu", interval);
+        MMI_HILOGE("invalid interval time: %{public}" PRId64 "", interval);
         return;
     }
     downToPrevUpTimeConfig_ = interval;
