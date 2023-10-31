@@ -1320,6 +1320,20 @@ HWTEST_F(InputManagerTest, InputManager_InjectTouchEvent_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: InputManager_InjectEvent_003
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_InjectEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    ASSERT_NO_FATAL_FAILURE(keyEvent->SetRepeat(true));
+}
+
+/**
  * @tc.name: InputManager_InjectEvent_001
  * @tc.desc: Injection interface detection
  * @tc.type: FUNC
