@@ -1518,11 +1518,6 @@ int32_t MultimodalInputConnectStub::StubSetKeyDownDuration(MessageParcel& data, 
         MMI_HILOGE("verify system APP failed");
         return ERROR_NOT_SYSAPI;
     }
-
-    if (!PerHelper->CheckPermission(PermissionHelper::APL_SYSTEM_BASIC_CORE)) {
-        MMI_HILOGE("Permission check failed");
-        return CHECK_PERMISSION_FAIL;
-    }
     if (!IsRunning()) {
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
