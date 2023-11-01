@@ -37,6 +37,30 @@ constexpr size_t INPUT_PARAMETER_MAX = 3;
 static Callbacks callbacks = {};
 static std::mutex sCallBacksMutex;
 
+bool JsCommon::TypeOf(napi_env env, napi_value value, napi_valuetype type)
+{
+    napi_valuetype valueType = napi_undefined;
+    CHKRF(napi_typeof(env, value, &valueType), TYPEOF);
+    if (valueType != type) {
+        return false;
+    }
+    return true;
+}
+
+void JsCommon::ThrowError(napi_env env, int32_t code)
+{
+    int32_t errorCode = std::abs(code);
+    if (errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+    } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
+        MMI_HILOGE("shield api need ohos.permission.INPUT_DISPATCHING_CONTROL");
+        THROWERR_API9(env, COMMON_PERMISSION_CHECK_ERROR, "shiled API", "ohos.permission.INPUT_DISPATCHING_CONTROL");
+    } else {
+        MMI_HILOGE("dispatch control failed");
+    }
+}
+
 napi_value GetEventInfoAPI9(napi_env env, napi_callback_info info, KeyEventMonitorInfo* event,
     std::shared_ptr<KeyOption> keyOption)
 {
@@ -337,6 +361,109 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
+static napi_value SetShieldStatus(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 2;
+    napi_value argv[2];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < INPUT_PARAMETER_MIDDLE) {
+        MMI_HILOGE("At least two parameters is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "shieldMode", "number");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("shieldMode parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "shieldMode", "number");
+        return nullptr;
+    }
+    int32_t shieldMode = 0;
+    CHKRP(napi_get_value_int32(env, argv[0], &shieldMode), GET_VALUE_INT32);
+    if (shieldMode < FACTORY_MODE || shieldMode > OOBE_MODE) {
+        MMI_HILOGE("Undefined shield mode");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Shield mode does not exist");
+        return nullptr;
+    }
+
+    if (!JsCommon::TypeOf(env, argv[1], napi_boolean)) {
+        MMI_HILOGE("isShield parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "isShield", "boolean");
+        return nullptr;
+    }
+    bool isShield = true;
+    CHKRP(napi_get_value_bool(env, argv[1], &isShield), GET_VALUE_BOOL);
+
+    int32_t errCode = InputManager::GetInstance()->SetShieldStatus(shieldMode, isShield);
+    JsCommon::ThrowError(env, errCode);
+    napi_value result = nullptr;
+    if (napi_get_undefined(env, &result) != napi_ok) {
+        MMI_HILOGE("Get undefined result is failed");
+        return nullptr;
+    }
+    return result;
+}
+
+static napi_value GetShieldStatus(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 1;
+    napi_value argv[1];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc == 0) {
+        MMI_HILOGE("At least 1 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "shieldMode", "number");
+        return nullptr;
+    }
+    if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
+        MMI_HILOGE("shieldMode parameter type is invalid");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "shieldMode", "number");
+        return nullptr;
+    }
+    int32_t shieldMode = 0;
+    CHKRP(napi_get_value_int32(env, argv[0], &shieldMode), GET_VALUE_INT32);
+    if (shieldMode < FACTORY_MODE || shieldMode > OOBE_MODE) {
+        MMI_HILOGE("Undefined shield mode");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Shield mode does not exist");
+        return nullptr;
+    }
+    bool isShield { false };
+    auto errCode = InputManager::GetInstance()->GetShieldStatus(shieldMode, isShield);
+    JsCommon::ThrowError(env, errCode);
+    napi_value result = nullptr;
+    NAPI_CALL(env, napi_get_boolean(env, isShield, &result));
+    return result;
+}
+
+static napi_value EnumConstructor(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 0;
+    napi_value args[1] = { 0 };
+    napi_value ret = nullptr;
+    void *data = nullptr;
+    CHKRP(napi_get_cb_info(env, info, &argc, args, &ret, &data), GET_CB_INFO);
+    return ret;
+}
+
+static napi_value CreateShieldMode(napi_env env, napi_value exports)
+{
+    CALL_DEBUG_ENTER;
+    napi_value factory_mode = nullptr;
+    CHKRP(napi_create_int32(env, SHIELD_MODE::FACTORY_MODE, &factory_mode), CREATE_INT32);
+    napi_value oobe_mode = nullptr;
+    CHKRP(napi_create_int32(env, SHIELD_MODE::OOBE_MODE, &oobe_mode), CREATE_INT32);
+
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("FACTORY_MODE", factory_mode),
+        DECLARE_NAPI_STATIC_PROPERTY("OOBE_MODE", oobe_mode),
+    };
+    napi_value result = nullptr;
+    CHKRP(napi_define_class(env, "ShieldMode", NAPI_AUTO_LENGTH, EnumConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result), DEFINE_CLASS);
+    CHKRP(napi_set_named_property(env, exports, "ShieldMode", result), SET_NAMED_PROPERTY);
+    return exports;
+}
+
 EXTERN_C_START
 static napi_value MmiInit(napi_env env, napi_value exports)
 {
@@ -344,8 +471,14 @@ static napi_value MmiInit(napi_env env, napi_value exports)
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("on", JsOn),
         DECLARE_NAPI_FUNCTION("off", JsOff),
+        DECLARE_NAPI_FUNCTION("setShieldStatus", SetShieldStatus),
+        DECLARE_NAPI_FUNCTION("getShieldStatus", GetShieldStatus)
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    if (CreateShieldMode(env, exports) == nullptr) {
+        THROWERR(env, "Failed to create shield mode");
+        return nullptr;
+    }
     return exports;
 }
 EXTERN_C_END

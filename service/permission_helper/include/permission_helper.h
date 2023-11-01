@@ -35,12 +35,13 @@ public:
     bool CheckPermission(uint32_t required);
     bool CheckMonitor();
     int32_t GetTokenType();
-
+    bool CheckDispatchControl();
     bool VerifySystemApp();
 
 private:
     bool CheckHapPermission(uint32_t tokenId, uint32_t required);
     bool CheckMonitorPermission(uint32_t tokenId);
+    bool CheckDispatchControlPermission(uint32_t tokenId);
 };
 
 #define PerHelper ::OHOS::DelayedSingleton<PermissionHelper>::GetInstance()

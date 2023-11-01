@@ -115,6 +115,35 @@ bool PermissionHelper::CheckMonitorPermission(uint32_t tokenId)
     return true;
 }
 
+bool PermissionHelper::CheckDispatchControl()
+{
+    CALL_DEBUG_ENTER;
+    auto tokenId = IPCSkeleton::GetCallingTokenID();
+    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if ((tokenType == OHOS::Security::AccessToken::TOKEN_HAP) ||
+        (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE)) {
+        return CheckDispatchControlPermission(tokenId);
+    } else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
+        MMI_HILOGI("Token type is shell");
+        return true;
+    } else {
+        MMI_HILOGE("Unsupported token type:%{public}d", tokenType);
+        return false;
+    }
+}
+
+bool PermissionHelper::CheckDispatchControlPermission(uint32_t tokenId)
+{
+    static const std::string inputDispatchControl = "ohos.permission.INPUT_DISPATCHING_CONTROL";
+    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, inputDispatchControl);
+    if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
+        MMI_HILOGE("Check input dispatch control permission failed ret:%{public}d", ret);
+        return false;
+    }
+    MMI_HILOGD("Check input dispatch control permission success");
+    return true;
+}
+
 int32_t PermissionHelper::GetTokenType()
 {
     CALL_DEBUG_ENTER;
