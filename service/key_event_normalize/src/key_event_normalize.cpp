@@ -186,10 +186,12 @@ int32_t KeyEventNormalize::GetShieldStatus(int32_t shieldMode, bool &isShield)
     return RET_OK;
 }
 
-int32_t KeyEventNormalize::GetCurrentShieldMode() {
+int32_t KeyEventNormalize::GetCurrentShieldMode()
+{
     return lastShieldMode_;
 }
-void KeyEventNormalize::SetCurrentShieldMode(int32_t shieldMode) {
+void KeyEventNormalize::SetCurrentShieldMode(int32_t shieldMode)
+{
     lastShieldMode_ = shieldMode;
 }
 } // namespace MMI
