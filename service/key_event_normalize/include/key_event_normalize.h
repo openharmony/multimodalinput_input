@@ -31,11 +31,20 @@ public:
     std::shared_ptr<KeyEvent> GetKeyEvent();
     int32_t Normalize(libinput_event *event, std::shared_ptr<KeyEvent> keyEvent);
     void ResetKeyEvent(struct libinput_device* device);
+    int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
+    int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
+    void SetCurrentShieldMode(int32_t shieldMode);
+    int32_t GetCurrentShieldMode();
 private:
     void HandleKeyAction(struct libinput_device* device, KeyEvent::KeyItem &item, std::shared_ptr<KeyEvent> keyEvent);
 
 private:
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
+    std::map<int32_t, bool> shieldStatus_ {
+        {SHIELD_MODE::FACTORY_MODE, false},
+        {SHIELD_MODE::OOBE_MODE, false},
+    };
+    int32_t lastShieldMode_ { -1 };
 };
 #define KeyEventHdr ::OHOS::DelayedSingleton<KeyEventNormalize>::GetInstance()
 } // namespace MMI

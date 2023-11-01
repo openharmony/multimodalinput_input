@@ -51,6 +51,7 @@ public:
     std::shared_ptr<KeyCommandHandler> GetKeyCommandHandler() const;
     std::shared_ptr<EventMonitorHandler> GetMonitorHandler() const;
     std::shared_ptr<EventFilterHandler> GetFilterHandler() const;
+    std::shared_ptr<EventDispatchHandler> GetEventDispatchHandler() const;
 
 private:
     int32_t BuildInputHandlerChain();
@@ -63,6 +64,7 @@ private:
     std::shared_ptr<SwitchSubscriberHandler> switchEventSubscriberHandler_ { nullptr };
     std::shared_ptr<KeyCommandHandler> eventKeyCommandHandler_ { nullptr };
     std::shared_ptr<EventMonitorHandler> eventMonitorHandler_ { nullptr };
+    std::shared_ptr<EventDispatchHandler> eventDispatchHandler_ { nullptr };
 
     uint64_t idSeed_ { 0 };
 };
