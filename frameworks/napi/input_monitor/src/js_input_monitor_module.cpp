@@ -29,7 +29,11 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JsInputMonitorModule" };
-const std::set<std::string> ACTION_TYPE = { "touch", "mouse", "pinch", "threeFingersSwipe", "fourFingersSwipe" };
+const std::set<std::string> ACTION_TYPE = {
+    "touch", "mouse", "pinch", "threeFingersSwipe", "fourFingersSwipe", "rotate"
+};
+constexpr int32_t TWO_PARAMETERS = 2;
+constexpr int32_t THREE_PARAMETERS = 3;
 } // namespace
 
 static napi_value JsOnApi9(napi_env env, napi_callback_info info)
@@ -67,17 +71,70 @@ static napi_value JsOnApi9(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
+static napi_value AddMonitor(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 3;
+    napi_value argv[3];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    napi_valuetype valueType = napi_undefined;
+    CHKRP(napi_typeof(env, argv[0], &valueType), TYPEOF);
+    if (valueType != napi_string) {
+        MMI_HILOGE("First Parameter type error");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "EventType", "string");
+        return nullptr;
+    }
+    char typeName[MAX_STRING_LEN] = { 0 };
+    size_t len = 0;
+    CHKRP(napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_VALUE_STRING_UTF8);
+    if (ACTION_TYPE.find(typeName) == ACTION_TYPE.end()) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType is invalid");
+        return nullptr;
+    }
+
+    CHKRP(napi_typeof(env, argv[1], &valueType), TYPEOF);
+    if (valueType != napi_number) {
+        MMI_HILOGE("Second Parameter type error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
+        return nullptr;
+    }
+    int32_t fingers = 0;
+    CHKRP(napi_get_value_int32(env, argv[1], &fingers), GET_VALUE_INT32);
+    if (fingers < 0) {
+        MMI_HILOGE("Invalid fingers");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "fingers is invalid");
+        return nullptr;
+    }
+
+    CHKRP(napi_typeof(env, argv[TWO_PARAMETERS], &valueType), TYPEOF);
+    if (valueType != napi_function) {
+        MMI_HILOGE("third Parameter type error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
+        return nullptr;
+    }
+    if (!JsInputMonMgr.AddEnv(env, info)) {
+        MMI_HILOGE("AddEnv failed");
+        return nullptr;
+    }
+    JsInputMonMgr.AddMonitor(env, typeName, argv[TWO_PARAMETERS], fingers);
+    return nullptr;
+}
+
 static napi_value JsOn(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
-    size_t argc = 2;
-    napi_value argv[2];
+    size_t argc = 3;
+    napi_value argv[3];
     CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
-    if (argc < 2) {
+    if (argc < TWO_PARAMETERS) {
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
     }
-    JsOnApi9(env, info);
+    if (argc == TWO_PARAMETERS) {
+        JsOnApi9(env, info);
+    } else if (argc == THREE_PARAMETERS) {
+        AddMonitor(env, info);
+    }
     return nullptr;
 }
 
@@ -123,6 +180,59 @@ static napi_value JsOffApi9(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
+static napi_value RemoveMonitor(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 3;
+    napi_value argv[3];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    napi_valuetype valueType = napi_undefined;
+    CHKRP(napi_typeof(env, argv[0], &valueType), TYPEOF);
+    if (valueType != napi_string) {
+        MMI_HILOGE("First Parameter type error");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "EventType", "string");
+        return nullptr;
+    }
+    char typeName[MAX_STRING_LEN] = { 0 };
+    size_t len = 0;
+    CHKRP(napi_get_value_string_utf8(env, argv[0], typeName, MAX_STRING_LEN - 1, &len), GET_VALUE_STRING_UTF8);
+    if (ACTION_TYPE.find(typeName) == ACTION_TYPE.end()) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType is invalid");
+        return nullptr;
+    }
+    CHKRP(napi_typeof(env, argv[1], &valueType), TYPEOF);
+    if (valueType != napi_number) {
+        MMI_HILOGE("Second Parameter type error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
+        return nullptr;
+    }
+    int32_t fingers = 0;
+    CHKRP(napi_get_value_int32(env, argv[1], &fingers), GET_VALUE_INT32);
+    if (fingers < 0) {
+        MMI_HILOGE("Invalid fingers");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "fingers is invalid");
+        return nullptr;
+    }
+    if (argv[2] == nullptr) {
+        JsInputMonMgr.RemoveMonitor(env, typeName, fingers);
+        MMI_HILOGD("Remove all monitor");
+        return nullptr;
+    }
+    CHKRP(napi_typeof(env, argv[TWO_PARAMETERS], &valueType), TYPEOF);
+    if (valueType != napi_function) {
+        MMI_HILOGE("Second Parameter type error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
+        return nullptr;
+    }
+    if (!JsInputMonMgr.AddEnv(env, info)) {
+        JsInputMonMgr.RemoveMonitor(env, typeName, fingers);
+        return nullptr;
+    }
+
+    JsInputMonMgr.RemoveMonitor(env, typeName, argv[TWO_PARAMETERS], fingers);
+    return nullptr;
+}
+
 static napi_value JsOff(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -134,7 +244,14 @@ static napi_value JsOff(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
         return nullptr;
     }
-    JsOffApi9(env, info);
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, argv[1], &valueType);
+
+    if (argc == 1 || napi_function == valueType) {
+        JsOffApi9(env, info);
+    } else {
+        RemoveMonitor(env, info);
+    }
     return nullptr;
 }
 

@@ -50,6 +50,7 @@ private:
     int32_t HandleTableToolEvent(libinput_event* event);
     int32_t HandleJoystickEvent(libinput_event* event);
     void HandlePalmEvent(libinput_event* event, std::shared_ptr<PointerEvent> pointerEvent);
+    int32_t GestureIdentify(libinput_event* event);
 
 private:
     int32_t timerId_ { -1 };
