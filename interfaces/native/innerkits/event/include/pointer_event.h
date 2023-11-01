@@ -137,6 +137,17 @@ public:
 
     static constexpr int32_t POINTER_ACTION_SWIPE_END = 19;
 
+    /**
+     * Indicates that the fingers rotate in touch pad.
+     *
+     * @since 11
+     */
+    static constexpr int32_t POINTER_ACTION_ROTATE_BEGIN = 20;
+
+    static constexpr int32_t POINTER_ACTION_ROTATE_UPDATE = 21;
+
+    static constexpr int32_t POINTER_ACTION_ROTATE_END = 22;
+
     enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.
@@ -167,6 +178,13 @@ public:
          * @since 9
          */
         AXIS_TYPE_PINCH,
+
+        /**
+         * Indicates the rotate axis, which is used to describe a rotate gesture on the touchpad.
+         *
+         * @since 11
+         */
+        AXIS_TYPE_ROTATE,
 
         /**
          * Indicates the x axis. The status of the x axis changes when you operate the joystick.

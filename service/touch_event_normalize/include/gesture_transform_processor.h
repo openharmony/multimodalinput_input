@@ -33,6 +33,9 @@ private:
     void OnEventTouchPadPinchBegin(libinput_event_gesture *data);
     void OnEventTouchPadPinchUpdate(libinput_event_gesture *data);
     void OnEventTouchPadPinchEnd(libinput_event_gesture *data);
+    void OnEventTouchPadRotateBegin();
+    void OnEventTouchPadRotateUpdate();
+    void OnEventTouchPadRotateEnd();
 private:
     const int32_t deviceId_ { -1 };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
