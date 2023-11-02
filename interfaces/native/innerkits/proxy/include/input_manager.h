@@ -745,6 +745,27 @@ public:
      */
     void SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker);
 
+    /**
+     * @brief Sets whether shield key event interception, only support shield key event.
+     * @param shieldMode Indicates shield mode.
+     * @param isShield Indicates whether key event handler chain is shield. The value <b>true</b> indicates that
+     * the key event build chain is shield, all key events derictly dispatch to window,
+     * if the value <b>false</b> indicates not shield key event interception, handle by the chain.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 9
+     */
+    int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
+
+    /**
+    * Gets shield event interception status corresponding to shield mode
+    *
+    * @param shieldMode - Accroding the shield mode select shield status.
+    * @param isShield - shield status of shield mode param.
+    * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+    * @since 9
+    */
+    int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
      * @brief Sets the enhance config of the security component.

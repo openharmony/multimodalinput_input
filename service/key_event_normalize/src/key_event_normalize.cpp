@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -137,6 +137,62 @@ void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
             }
         }
     }
+}
+
+int32_t KeyEventNormalize::SetShieldStatus(int32_t shieldMode, bool isShield)
+{
+    MMI_HILOGD("last shield mode: %{public}d, set shield mode: %{public}d, status: %{public}d",
+        lastShieldMode_, shieldMode, isShield);
+    auto iter = shieldStatus_.find(lastShieldMode_);
+    if (isShield) {
+        if (lastShieldMode_ == shieldMode) {
+            MMI_HILOGD("last shield mode equal with shield mode");
+            return RET_OK;
+        } else if (iter != shieldStatus_.end()) {
+            iter->second = false;
+        } else {
+            MMI_HILOGD("last shield mode unset");
+        }
+        lastShieldMode_ = shieldMode;
+    } else if (lastShieldMode_ != shieldMode) {
+        MMI_HILOGD("shield mode: %{public}d is already false", shieldMode);
+        return RET_OK;
+    } else {
+        MMI_HILOGD("lastShieldMode_ unset");
+        lastShieldMode_ = SHIELD_MODE::UNSET_MODE;
+    }
+    iter = shieldStatus_.find(shieldMode);
+    if (iter == shieldStatus_.end()) {
+        MMI_HILOGE("find shieldMode: %{public}d failed", shieldMode);
+        return RET_ERR;
+    }
+    iter->second = isShield;
+    MMI_HILOGD("last shield mode: %{public}d, set shield mode: %{public}d, status: %{public}d",
+        lastShieldMode_, shieldMode, isShield);
+    return RET_OK;
+}
+
+int32_t KeyEventNormalize::GetShieldStatus(int32_t shieldMode, bool &isShield)
+{
+    CALL_DEBUG_ENTER;
+    auto iter = shieldStatus_.find(shieldMode);
+    if (iter == shieldStatus_.end()) {
+        MMI_HILOGE("find shieldMode: %{public}d failed", shieldMode);
+        return RET_ERR;
+    }
+    isShield = iter->second;
+    MMI_HILOGD("last shield mode: %{public}d, get shield mode: %{public}d, status: %{public}d",
+        lastShieldMode_, shieldMode, isShield);
+    return RET_OK;
+}
+
+int32_t KeyEventNormalize::GetCurrentShieldMode()
+{
+    return lastShieldMode_;
+}
+void KeyEventNormalize::SetCurrentShieldMode(int32_t shieldMode)
+{
+    lastShieldMode_ = shieldMode;
 }
 } // namespace MMI
 } // namespace OHOS

@@ -40,6 +40,17 @@ using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 namespace {
 using namespace testing::ext;
+PermissionDef inputDispatchControlPermDef_ = {
+    .permissionName = "ohos.permission.INPUT_DISPATCHING_CONTROL",
+    .bundleName = "accesstoken_test",
+    .grantMode = 1,
+    .label = "label",
+    .labelId = 1,
+    .description = "test input agent",
+    .descriptionId = 1,
+    .availableLevel = APL_NORMAL
+};
+
 PermissionDef infoManagerTestPermDef_ = {
     .permissionName = "ohos.permission.INPUT_MONITORING",
     .bundleName = "accesstoken_test",
@@ -59,11 +70,19 @@ PermissionStateFull infoManagerTestState_ = {
     .resDeviceID = { "local" }
 };
 
+PermissionStateFull inputDispatchControlPermState_ = {
+    .grantFlags = { 1 },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.INPUT_DISPATCHING_CONTROL",
+    .resDeviceID = { "local" }
+};
+
 HapPolicyParams infoManagerTestPolicyPrams_ = {
     .apl = APL_NORMAL,
     .domain = "test.domain",
-    .permList = { infoManagerTestPermDef_ },
-    .permStateList = { infoManagerTestState_ }
+    .permList = { infoManagerTestPermDef_, infoManagerTestPermDef_},
+    .permStateList = { infoManagerTestState_, inputDispatchControlPermState_}
 };
 
 HapInfoParams infoManagerTestInfoParms_ = {

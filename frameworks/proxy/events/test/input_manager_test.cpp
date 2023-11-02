@@ -1451,5 +1451,41 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventExt_002, TestSize.
     ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
 #endif  // OHOS_BUILD_ENABLE_CONTAINER
 }
+
+/**
+ * @tc.name: InputManagerTest_SetShieldStatus_001
+ * @tc.desc: Test set shield status
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetShieldStatus_001, TestSize.Level1)
+{
+    bool factoryModeStatus = false;
+    bool oobeModeStatus = false;
+    int32_t ret = InputManager::GetInstance()->SetShieldStatus(SHIELD_MODE::FACTORY_MODE, true);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::FACTORY_MODE, factoryModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::OOBE_MODE, oobeModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_TRUE(factoryModeStatus);
+    ASSERT_FALSE(oobeModeStatus);
+    ret = InputManager::GetInstance()->SetShieldStatus(SHIELD_MODE::OOBE_MODE, true);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::FACTORY_MODE, factoryModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::OOBE_MODE, oobeModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_FALSE(factoryModeStatus);
+    ASSERT_TRUE(oobeModeStatus);
+    ret = InputManager::GetInstance()->SetShieldStatus(SHIELD_MODE::OOBE_MODE, false);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::FACTORY_MODE, factoryModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->GetShieldStatus(SHIELD_MODE::OOBE_MODE, oobeModeStatus);
+    ASSERT_EQ(ret, RET_OK);
+    ASSERT_FALSE(factoryModeStatus);
+    ASSERT_FALSE(oobeModeStatus);
+}
 }  // namespace MMI
 }  // namespace OHOS

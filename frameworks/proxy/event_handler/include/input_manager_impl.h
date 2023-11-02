@@ -171,6 +171,8 @@ public:
 
     EventHandlerPtr GetEventHandler() const;
     void AppendExtraData(const ExtraData& extraData);
+    int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
+    int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt);

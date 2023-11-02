@@ -112,8 +112,8 @@ int32_t InputEventHandler::BuildInputHandlerChain()
     handler->SetNext(eventMonitorHandler_);
     handler = eventMonitorHandler_;
 #endif // OHOS_BUILD_ENABLE_MONITOR
-    auto dispatchHandler = std::make_shared<EventDispatchHandler>();
-    handler->SetNext(dispatchHandler);
+    eventDispatchHandler_ = std::make_shared<EventDispatchHandler>();
+    handler->SetNext(eventDispatchHandler_);
     return RET_OK;
 }
 
@@ -155,6 +155,11 @@ std::shared_ptr<EventMonitorHandler> InputEventHandler::GetMonitorHandler() cons
 std::shared_ptr<EventFilterHandler> InputEventHandler::GetFilterHandler() const
 {
     return eventFilterHandler_;
+}
+
+std::shared_ptr<EventDispatchHandler> InputEventHandler::GetEventDispatchHandler() const
+{
+    return eventDispatchHandler_;
 }
 } // namespace MMI
 } // namespace OHOS
