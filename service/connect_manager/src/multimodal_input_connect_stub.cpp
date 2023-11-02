@@ -273,6 +273,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_MOUSE_HOT_SPOT):
             return StubSetMouseHotSpot(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_SHIELD_STATUS):
+            return StubSetShieldStatus(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_SHIELD_STATUS):
+            return StubGetShieldStatus(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -1903,6 +1909,63 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadRightClickType(MessageParcel&
     }
     WRITEINT32(reply, type, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("Touchpad right button menu type :%{public}d, ret:%{public}d", type, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetShieldStatus(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PerHelper->CheckDispatchControl()) {
+        MMI_HILOGE("input dispatch control permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t shieldMode { 0 };
+    bool isShield { false };
+    READINT32(data, shieldMode, IPC_PROXY_DEAD_OBJECT_ERR);
+    READBOOL(data, isShield, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = SetShieldStatus(shieldMode, isShield);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call SetShieldStatus failed, ret:%{public}d", ret);
+        return ret;
+    }
+    MMI_HILOGD("Success shieldMode:%{public}d, isShield:%{public}d", shieldMode, isShield);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetShieldStatus(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!PerHelper->VerifySystemApp()) {
+        MMI_HILOGE("verify system APP failed");
+        return ERROR_NOT_SYSAPI;
+    }
+    if (!PerHelper->CheckDispatchControl()) {
+        MMI_HILOGE("input dispatch control permission check failed");
+        return ERROR_NO_PERMISSION;
+    }
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+
+    int32_t shieldMode { 0 };
+    bool state { false };
+    READINT32(data, shieldMode, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = GetShieldStatus(shieldMode, state);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetShieldStatus failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEBOOL(reply, state, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
 }
 } // namespace MMI

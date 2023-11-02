@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "i_input_event_handler.h"
+#include "key_event_normalize.h"
 
 namespace OHOS {
 namespace MMI {
@@ -51,9 +52,11 @@ private:
     int32_t HandleJoystickEvent(libinput_event* event);
     void HandlePalmEvent(libinput_event* event, std::shared_ptr<PointerEvent> pointerEvent);
     int32_t GestureIdentify(libinput_event* event);
+    void UpdateKeyEventHandlerChain(const std::shared_ptr<KeyEvent> keyEvent);
 
 private:
     int32_t timerId_ { -1 };
+    bool isShield_ { false };
     std::set<int32_t> buttonIds_ {};
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
 };

@@ -19,6 +19,17 @@
 #include "nocopyable.h"
 #include "singleton.h"
 
+#include "common_event_data.h"
+#include "common_event_manager.h"
+#include "common_event_support.h"
+#include "define_multimodal.h"
+#include "fingersense_manager.h"
+#include "fingersense_wrapper.h"
+#include "key_event_normalize.h"
+#include "mmi_log.h"
+#include "want.h"
+#include "util.h"
+
 namespace OHOS {
 namespace MMI {
 class DisplayEventMonitor final {
@@ -26,8 +37,11 @@ class DisplayEventMonitor final {
     public:
         DISALLOW_COPY_AND_MOVE(DisplayEventMonitor);
 
+        void UpdateShieldStatusOnScreenOn();
+        void UpdateShieldStatusOnScreenOff();
         void InitCommonEventSubscriber();
     private:
+        int32_t shieldModeBeforeSreenOff_ { -1 };
         bool hasInit_ { false };
 };
 #define DISPLAY_MONITOR ::OHOS::DelayedSingleton<DisplayEventMonitor>::GetInstance()

@@ -615,5 +615,17 @@ int32_t MultimodalInputConnectManager::GetTouchpadRightClickType(int32_t &type)
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetTouchpadRightClickType(type);
 }
+
+int32_t MultimodalInputConnectManager::SetShieldStatus(int32_t shieldMode, bool isShield)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetShieldStatus(shieldMode, isShield);
+}
+
+int32_t MultimodalInputConnectManager::GetShieldStatus(int32_t shieldMode, bool &isShield)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetShieldStatus(shieldMode, isShield);
+}
 } // namespace MMI
 } // namespace OHOS

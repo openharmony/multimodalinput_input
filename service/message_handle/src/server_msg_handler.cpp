@@ -415,5 +415,15 @@ int32_t ServerMsgHandler::RemoveInputEventFilter(int32_t clientPid, int32_t filt
     return filterHandler->RemoveInputEventFilter(clientPid, filterId);
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+int32_t ServerMsgHandler::SetShieldStatus(int32_t shieldMode, bool isShield)
+{
+    return KeyEventHdr->SetShieldStatus(shieldMode, isShield);
+}
+
+int32_t ServerMsgHandler::GetShieldStatus(int32_t shieldMode, bool &isShield)
+{
+    return KeyEventHdr->GetShieldStatus(shieldMode, isShield);
+}
 } // namespace MMI
 } // namespace OHOS
