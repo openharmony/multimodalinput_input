@@ -67,6 +67,11 @@ ohos_shared_library("libmmi-util") {
   innerapi_tags = [ "platformsdk" ]
   part_name = "input"
   subsystem_name = "multimodalinput"
+
+  if (is_ohos && is_clang && (target_cpu == "arm" || target_cpu == "arm64") &&
+      enhanced_opt) {
+    ldflags = [ "-Wl,-Bsymbolic" ]
+  }
 }
 
 ohos_unittest("ut-mmi-util-out") {
