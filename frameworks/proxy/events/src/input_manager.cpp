@@ -471,5 +471,15 @@ void InputManager::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName
 {
     InputMgrImpl.SetNapStatus(pid, uid, bundleName, napStatus);
 }
+
+int32_t InputManager::SetShieldStatus(int32_t shieldMode, bool isShield)
+{
+    return InputMgrImpl.SetShieldStatus(shieldMode, isShield);
+}
+
+int32_t InputManager::GetShieldStatus(int32_t shieldMode, bool &isShield)
+{
+    return InputMgrImpl.GetShieldStatus(shieldMode, isShield);
+}
 } // namespace MMI
 } // namespace OHOS

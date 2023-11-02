@@ -1727,5 +1727,53 @@ int32_t MultimodalInputConnectProxy::GetTouchpadRightClickType(int32_t &type)
     return GetTouchpadInt32Data(type, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
         GET_TP_RIGHT_CLICK_TYPE));
 }
+
+int32_t MultimodalInputConnectProxy::SetShieldStatus(int32_t shieldMode, bool isShield)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+
+    WRITEINT32(data, shieldMode, ERR_INVALID_VALUE);
+    WRITEBOOL(data, isShield, ERR_INVALID_VALUE);
+
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_SHIELD_STATUS),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::GetShieldStatus(int32_t shieldMode, bool &isShield)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return ERR_INVALID_VALUE;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    WRITEINT32(data, shieldMode, ERR_INVALID_VALUE);
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+        GET_SHIELD_STATUS), data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    READBOOL(reply, isShield, ERR_INVALID_VALUE);
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS

@@ -1676,5 +1676,27 @@ void InputManagerImpl::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
         return;
     }
 }
+
+int32_t InputManagerImpl::SetShieldStatus(int32_t shieldMode, bool isShield)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->SetShieldStatus(shieldMode, isShield);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set shield event interception status failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t InputManagerImpl::GetShieldStatus(int32_t shieldMode, bool &isShield)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
+    int32_t ret = MultimodalInputConnMgr->GetShieldStatus(shieldMode, isShield);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get shield event interception status failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS

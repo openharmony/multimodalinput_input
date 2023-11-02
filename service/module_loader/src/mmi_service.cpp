@@ -1791,5 +1791,27 @@ int32_t MMIService::GetTouchpadRightClickType(int32_t &type)
 #endif // OHOS_BUILD_ENABLE_POINTER
     return RET_OK;
 }
+
+int32_t MMIService::SetShieldStatus(int32_t shieldMode, bool isShield)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::SetShieldStatus, &sMsgHandler_, shieldMode, isShield));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set shield event interception state failed, return %{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MMIService::GetShieldStatus(int32_t shieldMode, bool &isShield)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(
+        std::bind(&ServerMsgHandler::GetShieldStatus, &sMsgHandler_, shieldMode, std::ref(isShield)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to set shield event interception status, ret:%{public}d", ret);
+    }
+    return ret;
+}
 } // namespace MMI
 } // namespace OHOS
