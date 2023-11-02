@@ -493,6 +493,22 @@ int32_t MouseTransformProcessor::Normalize(struct libinput_event *event)
     return result;
 }
 
+int32_t MouseTransformProcessor::NormalizeRotateEvent(struct libinput_event *event, int32_t type, double angle)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(event, ERROR_NULL_POINTER);
+    CHKPR(pointerEvent_, ERROR_NULL_POINTER);
+    auto data = libinput_event_get_pointer_event(event);
+    pointerEvent_->SetPointerAction(type);
+    pointerEvent_->ClearAxisValue();
+    pointerEvent_->SetAxisValue(PointerEvent::AXIS_TYPE_ROTATE, angle);
+    PointerEvent::PointerItem pointerItem;
+    HandlePostInner(data, pointerItem);
+    WinMgr->UpdateTargetPointer(pointerEvent_);
+    DumpInner();
+    return RET_OK;
+}
+
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
 void MouseTransformProcessor::HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY)
 {

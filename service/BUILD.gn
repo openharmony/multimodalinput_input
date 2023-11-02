@@ -267,6 +267,7 @@ ohos_unittest("ut-mmi-service-out") {
     "${mmi_path}/test/unittest/common/src/system_info.cpp",
     "dfx/test/dfx_hisysevent_test.cpp",
     "event_dispatch/test/event_dispatch_test.cpp",
+    "event_handler/test/gesture_handler_test.cpp",
     "event_handler/test/key_event_value_transformation_test.cpp",
     "key_command/test/key_command_handler_test.cpp",
     "module_loader/test/uds_server_test.cpp",
