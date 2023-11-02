@@ -159,7 +159,7 @@ void EventNormalizeHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEv
     DfxHisysevent::GetDispStartTime();
     CHKPV(keyEvent);
     EventLogHelper::PrintEventData(keyEvent);
-    nextHandler_->HandleKeyEvent(keyEvent);
+    UpdateKeyEventHandlerChain(keyEvent);
     if (keyEvent->IsRepeat()) {
         KeyRepeat->SelectAutoRepeat(keyEvent);
         keyEvent->SetRepeat(false);
@@ -248,13 +248,28 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
 
     BytraceAdapter::StartBytrace(keyEvent);
     EventLogHelper::PrintEventData(keyEvent);
-    nextHandler_->HandleKeyEvent(keyEvent);
+    UpdateKeyEventHandlerChain(keyEvent);
     KeyRepeat->SelectAutoRepeat(keyEvent);
     MMI_HILOGD("keyCode:%{public}d, action:%{public}d", keyEvent->GetKeyCode(), keyEvent->GetKeyAction());
 #else
     MMI_HILOGW("Keyboard device does not support");
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
+}
+
+void EventNormalizeHandler::UpdateKeyEventHandlerChain(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(keyEvent);
+    int32_t currentShieldMode = KeyEventHdr->GetCurrentShieldMode();
+    if (currentShieldMode == SHIELD_MODE::FACTORY_MODE) {
+        auto eventDispatchHandler = InputHandler->GetEventDispatchHandler();
+        CHKPV(eventDispatchHandler);
+        eventDispatchHandler->HandleKeyEvent(keyEvent);
+    } else {
+        CHKPV(nextHandler_);
+        nextHandler_->HandleKeyEvent(keyEvent);
+    }
 }
 
 int32_t EventNormalizeHandler::HandleMouseEvent(libinput_event* event)
@@ -454,8 +469,7 @@ int32_t EventNormalizeHandler::AddHandleTimer(int32_t timeout)
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
         auto keyEvent = KeyEventHdr->GetKeyEvent();
         CHKPV(keyEvent);
-        CHKPV(nextHandler_);
-        nextHandler_->HandleKeyEvent(keyEvent);
+        UpdateKeyEventHandlerChain(keyEvent);
         int32_t triggerTime = KeyRepeat->GetIntervalTime(keyEvent->GetDeviceId());
         this->AddHandleTimer(triggerTime);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD

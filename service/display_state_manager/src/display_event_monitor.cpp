@@ -15,15 +15,6 @@
 
 #include "display_event_monitor.h"
 
-#include "common_event_data.h"
-#include "common_event_manager.h"
-#include "common_event_support.h"
-#include "define_multimodal.h"
-#include "fingersense_manager.h"
-#include "fingersense_wrapper.h"
-#include "mmi_log.h"
-#include "want.h"
-
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -60,17 +51,40 @@ public:
                 MMI_HILOGD("start enable fingersense");
                 FINGERSENSE_WRAPPER->enableFingersense_();
             }
+            DISPLAY_MONITOR->UpdateShieldStatusOnScreenOn();
         } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_OFF) {
             MMI_HILOGD("display screen off");
             if (FINGERSENSE_WRAPPER->disableFingerSense_ != nullptr) {
                 FINGERSENSE_WRAPPER->disableFingerSense_();
             }
+            DISPLAY_MONITOR->UpdateShieldStatusOnScreenOff();
         } else {
             MMI_HILOGW("Screen changed receiver event: unknown");
             return;
         }
     }
 };
+
+void DisplayEventMonitor::UpdateShieldStatusOnScreenOn()
+{
+    CALL_DEBUG_ENTER;
+    if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE) {
+        KeyEventHdr->SetCurrentShieldMode(shieldModeBeforeSreenOff_);
+    } else {
+        MMI_HILOGD("shield mode before screen off: %{public}d", shieldModeBeforeSreenOff_);
+    }
+}
+
+void DisplayEventMonitor::UpdateShieldStatusOnScreenOff()
+{
+    CALL_DEBUG_ENTER;
+    shieldModeBeforeSreenOff_ = KeyEventHdr->GetCurrentShieldMode();
+    if (shieldModeBeforeSreenOff_ != SHIELD_MODE::UNSET_MODE) {
+        KeyEventHdr->SetCurrentShieldMode(SHIELD_MODE::UNSET_MODE);
+    } else {
+        MMI_HILOGD("shield mode before screen off: %{public}d", shieldModeBeforeSreenOff_);
+    }
+}
 
 void DisplayEventMonitor::InitCommonEventSubscriber()
 {
