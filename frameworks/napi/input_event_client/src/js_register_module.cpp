@@ -27,6 +27,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterModule" };
+constexpr int32_t JS_CALLBACK_MOUSE_BUTTON_MIDDLE = 1;
+constexpr int32_t JS_CALLBACK_MOUSE_BUTTON_RIGHT = 2;
 } // namespace
 
 static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value keyHandle)
@@ -115,6 +117,32 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     return result;
 }
 
+static void HandleMouseButton(napi_env env, napi_value mouseHandle, std::shared_ptr<PointerEvent> pointerEvent)
+{
+    int32_t button;
+    int32_t ret = GetNamedPropertyInt32(env, mouseHandle, "button", button);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get button failed");
+    }
+    if (button < 0) {
+        MMI_HILOGE("button:%{public}d is less 0, can not process", button);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "button must be greater than or equal to 0");
+    }
+
+    switch (button) {
+        case JS_CALLBACK_MOUSE_BUTTON_MIDDLE:
+            button = PointerEvent::MOUSE_BUTTON_MIDDLE;
+            break;
+        case JS_CALLBACK_MOUSE_BUTTON_RIGHT:
+            button = PointerEvent::MOUSE_BUTTON_RIGHT;
+            break;
+        default:
+            break;
+    }
+    pointerEvent->SetButtonId(button);
+    pointerEvent->SetButtonPressed(button);
+}
+
 static void HandleMouseAction(napi_env env, napi_value mouseHandle,
     std::shared_ptr<PointerEvent> pointerEvent, PointerEvent::PointerItem &item)
 {
@@ -149,17 +177,7 @@ static void HandleMouseAction(napi_env env, napi_value mouseHandle,
             break;
     }
     if (action == JS_CALLBACK_MOUSE_ACTION_BUTTON_DOWN || action == JS_CALLBACK_MOUSE_ACTION_BUTTON_UP) {
-        int32_t button;
-        ret = GetNamedPropertyInt32(env, mouseHandle, "button", button);
-        if (ret != RET_OK) {
-            MMI_HILOGE("Get button failed");
-        }
-        if (button < 0) {
-            MMI_HILOGE("button:%{public}d is less 0, can not process", button);
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "button must be greater than or equal to 0");
-        }
-        pointerEvent->SetButtonId(button);
-        pointerEvent->SetButtonPressed(button);
+        HandleMouseButton(env, mouseHandle, pointerEvent);
     }
 }
 
