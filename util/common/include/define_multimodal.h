@@ -203,11 +203,11 @@ inline constexpr int32_t INVALID_PID { -1 };
 
 #define CHK_KEY_ITEM(keyItem) \
     do { \
-        if (!keyItem) { \
+        if (!(keyItem)) { \
             MMI_HILOGE("The keyItem is nullopt"); \
             return false; \
         } \
-    } while(0)
+    } while (0)
 
 #define CHKPRV(cond, msg) \
     do { \
