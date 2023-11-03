@@ -53,7 +53,7 @@ public:
     DISALLOW_MOVE(InputManagerImpl);
 
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
-    int32_t GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
+    int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t GetWindowPid(int32_t windowId);
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
@@ -73,12 +73,12 @@ public:
     int32_t AddInputEventObserver(std::shared_ptr<MMIEventObserver> observer);
     int32_t RemoveInputEventObserver(std::shared_ptr<MMIEventObserver> observer);
     int32_t NotifyNapOnline();
-    void NotifyBundleName(int32_t pid, int32_t uid, std::string bundleName);
+    void NotifyBundleName(int32_t pid, int32_t uid, std::string bundleName, int32_t syncStatus);
     void SetWindowInputEventConsumer(std::shared_ptr<IInputEventConsumer> inputEventConsumer,
         std::shared_ptr<AppExecFwk::EventHandler> eventHandler);
     void ClearWindowPointerStyle(int32_t pid, int32_t windowId);
     void SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windowChecker);
-    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus);
+    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus);
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void OnKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
