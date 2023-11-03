@@ -355,7 +355,7 @@ int32_t MultimodalInputConnectProxy::SetPointerSize(int32_t size)
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus)
+int32_t MultimodalInputConnectProxy::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -367,7 +367,7 @@ int32_t MultimodalInputConnectProxy::SetNapStatus(int32_t pid, int32_t uid, std:
     WRITEINT32(data, pid, ERR_INVALID_VALUE);
     WRITEINT32(data, uid, ERR_INVALID_VALUE);
     WRITESTRING(data, bundleName, ERR_INVALID_VALUE);
-    WRITEBOOL(data, napStatus, ERR_INVALID_VALUE);
+    WRITEINT32(data, napStatus, ERR_INVALID_VALUE);
 
     MessageParcel reply;
     MessageOption option;
@@ -1312,8 +1312,8 @@ int32_t MultimodalInputConnectProxy::GetDisplayBindInfo(DisplayBindInfos &infos)
     return RET_OK;
 }
 
-int32_t MultimodalInputConnectProxy::GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t,
-    std::string>> &datas)
+int32_t MultimodalInputConnectProxy::GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>,
+    int32_t> &datas)
 {
     CALL_DEBUG_ENTER;
     MessageParcel data;
@@ -1333,14 +1333,14 @@ int32_t MultimodalInputConnectProxy::GetAllMmiSubscribedEvents(std::vector<std::
     }
     int32_t size = 0;
     READINT32(reply, size, ERR_INVALID_VALUE);
-    datas.reserve(size);
     for (int32_t i = 0; i < size; ++i) {
         NapProcess::NapStatusData data;
         READINT32(reply, data.pid, ERR_INVALID_VALUE);
         READINT32(reply, data.uid, ERR_INVALID_VALUE);
         READSTRING(reply, data.bundleName, ERR_INVALID_VALUE);
+        READINT32(reply, data.syncStatus, ERR_INVALID_VALUE);
         std::tuple<int32_t, int32_t, std::string> tuple(data.pid, data.uid, data.bundleName);
-        datas.push_back(tuple);
+        datas.emplace(tuple, data.syncStatus);
     }
     return RET_OK;
 }

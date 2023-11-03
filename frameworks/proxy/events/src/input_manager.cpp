@@ -37,7 +37,7 @@ int32_t InputManager::GetDisplayBindInfo(DisplayBindInfos &infos)
     return InputMgrImpl.GetDisplayBindInfo(infos);
 }
 
-int32_t InputManager::GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
+int32_t InputManager::GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas)
 {
     return InputMgrImpl.GetAllMmiSubscribedEvents(datas);
 }
@@ -467,7 +467,7 @@ void InputManager::SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> windo
     InputMgrImpl.SetWindowCheckerHandler(windowChecker);
 }
 
-void InputManager::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus)
+void InputManager::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
 {
     InputMgrImpl.SetNapStatus(pid, uid, bundleName, napStatus);
 }

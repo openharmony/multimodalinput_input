@@ -55,6 +55,7 @@ constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
 constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0f;
 constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG = 96.0f;
 constexpr int32_t REMOVE_OBSERVER = -2;
+constexpr int32_t ACTIVE_EVENT = 2;
 
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
 const std::string shortKeyFileName = "/data/service/el1/public/multimodalinput/Settings.xml";
@@ -1528,7 +1529,8 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
         napData.pid = -1;
         napData.uid = -1;
         napData.bundleName = ability.bundleName;
-        NapProcess::GetInstance()->napMap_.emplace(napData, true);
+        napData.syncStatus = ACTIVE_EVENT;
+        NapProcess::GetInstance()->AddMmiSubscribedEventData(napData);
         NapProcess::GetInstance()->NotifyBundleName(napData);
     }
     MMI_HILOGD("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());

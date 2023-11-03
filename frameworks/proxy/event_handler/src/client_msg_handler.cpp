@@ -141,11 +141,14 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
 int32_t ClientMsgHandler::NotifyBundleName(const UDSClient& client, NetPacket& pkt)
 {
     CALL_DEBUG_ENTER;
-    int32_t pid, uid;
+    int32_t pid;
+    int32_t uid;
+    int32_t syncStatus;
     std::string bundleName;
-    pkt >> pid >> uid >> bundleName;
-    InputMgrImpl.NotifyBundleName(pid, uid, bundleName);
-    MMI_HILOGD("client info in NotifyBundleName is : %{public}d, %{public}d, %{public}s", pid, uid, bundleName.c_str());
+    pkt >> pid >> uid >> bundleName >> syncStatus;
+    InputMgrImpl.NotifyBundleName(pid, uid, bundleName, syncStatus);
+    MMI_HILOGD("client info in NotifyBundleName is : %{public}d, %{public}d, %{public}s, %{public}d",
+        pid, uid, bundleName.c_str(), syncStatus);
     return RET_OK;
 }
 

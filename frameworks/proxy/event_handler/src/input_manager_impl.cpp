@@ -87,7 +87,7 @@ int32_t InputManagerImpl::GetDisplayBindInfo(DisplayBindInfos &infos)
     return RET_OK;
 }
 
-int32_t InputManagerImpl::GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
+int32_t InputManagerImpl::GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -1608,7 +1608,7 @@ void InputManagerImpl::SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> w
     return;
 }
 
-int32_t InputManagerImpl::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus)
+int32_t InputManagerImpl::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
@@ -1619,14 +1619,14 @@ int32_t InputManagerImpl::SetNapStatus(int32_t pid, int32_t uid, std::string bun
     return ret;
 }
 
-void InputManagerImpl::NotifyBundleName(int32_t pid, int32_t uid, std::string bundleName)
+void InputManagerImpl::NotifyBundleName(int32_t pid, int32_t uid, std::string bundleName, int32_t syncStatus)
 {
     CALL_DEBUG_ENTER;
     if (eventObserver_ == nullptr) {
         MMI_HILOGE("eventObserver_ is nullptr");
         return;
     }
-    eventObserver_->SyncBundleName(pid, uid, bundleName);
+    eventObserver_->SyncBundleName(pid, uid, bundleName, syncStatus);
 }
 
 void InputManagerImpl::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
