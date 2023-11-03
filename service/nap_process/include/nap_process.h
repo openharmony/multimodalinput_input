@@ -39,6 +39,7 @@ struct NapStatusData {
     int32_t pid;
     int32_t uid;
     std::string bundleName;
+    int32_t syncStatus;
     bool operator==(const NapStatusData b) const
     {
         return pid == b.pid && uid == b.uid && bundleName == b.bundleName;
@@ -48,15 +49,15 @@ struct NapStatusData {
         return bundleName < b.bundleName ? true : false;
     }
 };
-using NapStatusDatas = std::vector<NapStatusData>;
-    std::map<NapStatusData, bool> napMap_;
+    std::vector<NapStatusData> napMap_;
     int32_t NotifyBundleName(NapStatusData data);
     std::map<NapStatusData, bool>& GetNapMap();
-    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napState);
+    int32_t SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napState);
     int32_t NotifyNapOnline();
-    int32_t GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
+    int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas);
     int32_t RemoveInputEventObserver();
     int32_t AddMmiSubscribedEventData(const NapStatusData& napData);
+    int32_t RemoveMmiSubscribedEventData(const NapStatusData& napData);
     int32_t GetNapClientPid();
     void Init(UDSServer& udsServer);
     int32_t napClientPid_ { -1 };

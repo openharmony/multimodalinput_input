@@ -22,6 +22,8 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NapProcess" };
 constexpr int32_t REMOVE_OBSERVER = -2;
+constexpr int32_t NAP_EVENT = 0;
+constexpr int32_t ACTIVE_EVENT = 2;
 } // namespace
 
 NapProcess *NapProcess::instance_ = new (std::nothrow) NapProcess();
@@ -43,12 +45,13 @@ int32_t NapProcess::NotifyBundleName(NapStatusData data)
         MMI_HILOGE("Client pid is unavailable!");
         return RET_ERR;
     }
-    MMI_HILOGD("NotifyBundle info is : %{public}d, %{public}d, %{public}s",
-        data.pid, data.uid, data.bundleName.c_str());
+    MMI_HILOGD("NotifyBundle info is : %{public}d, %{public}d, %{public}s, %{public}d",
+        data.pid, data.uid, data.bundleName.c_str(), data.syncStatus);
     NetPacket pkt(MmiMessageId::NOTIFY_BUNDLE_NAME);
     pkt << data.pid;
     pkt << data.uid;
     pkt << data.bundleName;
+    pkt << data.syncStatus;
     CHKPR(udsServer_, RET_ERR);
     int32_t fd = udsServer_->GetClientFd(napClientPid_);
     auto udsServer = InputHandler->GetUDSServer();
@@ -61,20 +64,22 @@ int32_t NapProcess::NotifyBundleName(NapStatusData data)
     return RET_OK;
 }
 
-int32_t NapProcess::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus)
+int32_t NapProcess::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
 {
     CALL_DEBUG_ENTER;
     NapStatusData napData;
     napData.pid = pid;
     napData.uid = uid;
     napData.bundleName = bundleName;
-    if (napStatus == true) {
-        napMap_.emplace(napData, napStatus);
-        MMI_HILOGD("Set NapStatus to napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+    napData.syncStatus = napStatus;
+    if (napStatus == ACTIVE_EVENT) {
+        AddMmiSubscribedEventData(napData);
+        MMI_HILOGD("Add active event to napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
             pid, uid, bundleName.c_str());
-    } else {
-        napMap_.erase(napData);
-        MMI_HILOGD("Remove NapStatus from napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+    }
+    if (napStatus == NAP_EVENT) {
+        RemoveMmiSubscribedEventData(napData);
+        MMI_HILOGD("Remove nap process from napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
             pid, uid, bundleName.c_str());
     }
     return RET_OK;
@@ -83,7 +88,19 @@ int32_t NapProcess::SetNapStatus(int32_t pid, int32_t uid, std::string bundleNam
 int32_t NapProcess::AddMmiSubscribedEventData(const NapStatusData& napData)
 {
     CALL_DEBUG_ENTER;
-    napMap_.emplace(napData, true);
+    napMap_.push_back(napData);
+    return RET_OK;
+}
+
+int32_t NapProcess::RemoveMmiSubscribedEventData(const NapStatusData& napData)
+{
+    CALL_DEBUG_ENTER;
+    for (auto it = napMap_.begin(); it != napMap_.end(); ++it) {
+        if (napData.pid == it->pid) {
+            napMap_.erase(it);
+            break;
+        }
+    }
     return RET_OK;
 }
 
@@ -109,15 +126,16 @@ int32_t NapProcess::RemoveInputEventObserver()
     return RET_OK;
 }
 
-int32_t NapProcess::GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
+int32_t NapProcess::GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas)
 {
     CALL_DEBUG_ENTER;
-    for (const auto& map : napMap_) {
-        int pid = map.first.pid;
-        int uid = map.first.uid;
-        std::string name = map.first.bundleName;
-        std::tuple<int32_t, int32_t, std::string> tuple(pid, uid, name);
-        datas.push_back(tuple);
+    for (auto it = napMap_.begin(); it != napMap_.end(); ++it) {
+        int32_t getPid = it->pid;
+        int32_t getUid = it->uid;
+        std::string getName = it->bundleName;
+        int32_t getStatus = it->syncStatus;
+        std::tuple<int32_t, int32_t, std::string> tuple(getPid, getUid, getName);
+        datas.emplace(tuple, getStatus);
     }
     return RET_OK;
 }

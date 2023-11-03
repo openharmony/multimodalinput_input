@@ -34,6 +34,9 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Event
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 constexpr size_t MAX_EVENTIDS_SIZE = 1000;
 #endif // OHOS_BUILD_ENABLE_TOUCH
+constexpr int32_t ACTIVE_EVENT = 2;
+constexpr int32_t REMOVE_OBSERVER = -2;
+constexpr int32_t UNOBSERVED = -1;
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -317,6 +320,18 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyEven
             mon.SendToClient(keyEvent);
         }
     }
+    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
+        NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
+        OHOS::MMI::NapProcess::NapStatusData napData;
+        for (const auto &mon : monitors_) {
+            auto sess = mon.session_;
+            napData.pid = sess->GetPid();
+            napData.uid = sess->GetUid();
+            napData.bundleName = sess->GetProgramName();
+            napData.syncStatus = ACTIVE_EVENT;
+            NapProcess::GetInstance()->NotifyBundleName(napData);
+        }
+    }
     return false;
 }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -405,6 +420,18 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
     for (const auto &monitor : monitors_) {
         if ((monitor.eventType_ & HANDLE_EVENT_TYPE_POINTER) == HANDLE_EVENT_TYPE_POINTER) {
             monitor.SendToClient(pointerEvent);
+        }
+    }
+    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
+        NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
+        OHOS::MMI::NapProcess::NapStatusData napData;
+        for (const auto &mon : monitors_) {
+            auto sess = mon.session_;
+            napData.pid = sess->GetPid();
+            napData.uid = sess->GetUid();
+            napData.bundleName = sess->GetProgramName();
+            napData.syncStatus = ACTIVE_EVENT;
+            NapProcess::GetInstance()->NotifyBundleName(napData);
         }
     }
 }
