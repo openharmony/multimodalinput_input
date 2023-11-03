@@ -81,8 +81,8 @@ int32_t MultimodalInputConnectManager::GetDisplayBindInfo(DisplayBindInfos &info
     return multimodalInputConnectService_->GetDisplayBindInfo(infos);
 }
 
-int32_t MultimodalInputConnectManager::GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t,
-    std::string>> &datas)
+int32_t MultimodalInputConnectManager::GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>,
+    int32_t> &datas)
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ == nullptr) {
@@ -191,7 +191,7 @@ int32_t MultimodalInputConnectManager::SetPointerSize(int32_t size)
     return multimodalInputConnectService_->SetPointerSize(size);
 }
 
-int32_t MultimodalInputConnectManager::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus)
+int32_t MultimodalInputConnectManager::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->SetNapStatus(pid, uid, bundleName, napStatus);

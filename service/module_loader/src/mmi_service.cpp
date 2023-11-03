@@ -61,6 +61,9 @@ const std::string DEF_INPUT_SEAT = "seat0";
 constexpr int32_t WATCHDOG_INTERVAL_TIME = 10000;
 constexpr int32_t WATCHDOG_DELAY_TIME = 15000;
 constexpr int32_t REMOVE_OBSERVER = -2;
+constexpr int32_t UNSUBSCRIBED = -1;
+constexpr int32_t UNOBSERVED = -1;
+constexpr int32_t SUBSCRIBED = 1;
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
@@ -499,7 +502,7 @@ int32_t MMIService::SetMouseHotSpot(int32_t pid, int32_t windowId, int32_t hotSp
     return RET_OK;
 }
 
-int32_t MMIService::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus)
+int32_t MMIService::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
 {
     CALL_DEBUG_ENTER;
     NapProcess::GetInstance()->SetNapStatus(pid, uid, bundleName, napStatus);
@@ -1029,10 +1032,13 @@ int32_t MMIService::AddInputHandler(InputHandlerType handlerType, HandleEventTyp
         auto sess = GetSessionByPid(pid);
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
-        MMI_HILOGD("AddInputHandler info to nap : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        napData.syncStatus = SUBSCRIBED;
+        MMI_HILOGD("AddInputHandler info to observer : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData);
-        NapProcess::GetInstance()->NotifyBundleName(napData);
+        if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
+            NapProcess::GetInstance()->NotifyBundleName(napData);
+        }
     }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
@@ -1059,6 +1065,21 @@ int32_t MMIService::RemoveInputHandler(InputHandlerType handlerType, HandleEvent
     if (ret != RET_OK) {
         MMI_HILOGE("Remove input handler failed, ret:%{public}d", ret);
         return RET_ERR;
+    }
+    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER) {
+        OHOS::MMI::NapProcess::NapStatusData napData;
+        napData.pid = GetCallingPid();
+        napData.uid = GetCallingUid();
+        auto sess = GetSessionByPid(pid);
+        CHKPR(sess, ERROR_NULL_POINTER);
+        napData.bundleName = sess->GetProgramName();
+        napData.syncStatus = UNSUBSCRIBED;
+        MMI_HILOGD("RemoveInputHandler info to observer : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+            napData.pid, napData.uid, napData.bundleName.c_str());
+        NapProcess::GetInstance()->RemoveMmiSubscribedEventData(napData);
+        if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
+            NapProcess::GetInstance()->NotifyBundleName(napData);
+        }
     }
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR || OHOS_BUILD_ENABLE_MONITOR
     return RET_OK;
@@ -1188,10 +1209,13 @@ int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr
         auto sess = GetSessionByPid(pid);
         CHKPR(sess, ERROR_NULL_POINTER);
         napData.bundleName = sess->GetProgramName();
-        MMI_HILOGD("AddInputHandler info to nap : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        napData.syncStatus = SUBSCRIBED;
+        MMI_HILOGD("SubscribeKeyEvent info to observer : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
             napData.pid, napData.uid, napData.bundleName.c_str());
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData);
-        NapProcess::GetInstance()->NotifyBundleName(napData);
+        if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
+            NapProcess::GetInstance()->NotifyBundleName(napData);
+        }
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
@@ -1207,6 +1231,21 @@ int32_t MMIService::UnsubscribeKeyEvent(int32_t subscribeId)
     if (ret != RET_OK) {
         MMI_HILOGE("The unsubscribe key event processed failed, ret:%{public}d", ret);
         return RET_ERR;
+    }
+    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER) {
+        OHOS::MMI::NapProcess::NapStatusData napData;
+        napData.pid = GetCallingPid();
+        napData.uid = GetCallingUid();
+        auto sess = GetSessionByPid(pid);
+        CHKPR(sess, ERROR_NULL_POINTER);
+        napData.bundleName = sess->GetProgramName();
+        napData.syncStatus = UNSUBSCRIBED;
+        MMI_HILOGD("UnsubscribeKeyEvent info to observer : pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+            napData.pid, napData.uid, napData.bundleName.c_str());
+        NapProcess::GetInstance()->RemoveMmiSubscribedEventData(napData);
+        if (NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
+            NapProcess::GetInstance()->NotifyBundleName(napData);
+        }
     }
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
     return RET_OK;
@@ -1266,7 +1305,7 @@ int32_t MMIService::GetDisplayBindInfo(DisplayBindInfos &infos)
     return RET_OK;
 }
 
-int32_t MMIService::GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas)
+int32_t MMIService::GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas)
 {
     CALL_DEBUG_ENTER;
     NapProcess::GetInstance()->GetAllMmiSubscribedEvents(datas);

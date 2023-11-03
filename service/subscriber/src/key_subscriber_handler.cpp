@@ -31,6 +31,9 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeySubscriberHandler" };
 constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
+constexpr int32_t REMOVE_OBSERVER = -2;
+constexpr int32_t UNOBSERVED = -1;
+constexpr int32_t ACTIVE_EVENT = 2;
 const std::string HIGH_PRIORITY_BUNDLE = "com.ohos.sceneboard";
 } // namespace
 
@@ -337,37 +340,50 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
         for (const auto &keyCode : keyOption->GetPreKeys()) {
             MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
         }
-
         if (!keyOption->IsFinalKeyDown()) {
             MMI_HILOGD("!keyOption->IsFinalKeyDown()");
             continue;
         }
-
         if (keyCode != keyOption->GetFinalKey()) {
             ClearTimer(subscriber);
             MMI_HILOGD("keyCode != keyOption->GetFinalKey()");
             continue;
         }
-
         if (!IsPreKeysMatch(keyOption->GetPreKeys(), pressedKeys)) {
             ClearTimer(subscriber);
             MMI_HILOGD("preKeysMatch failed");
             continue;
         }
-
         if (keyOption->GetFinalKeyDownDuration() <= 0) {
             MMI_HILOGD("keyOption->GetFinalKeyDownDuration() <= 0");
             NotifySubscriber(keyEvent, subscriber);
             handled = true;
             continue;
         }
-
         if (!AddTimer(subscriber, keyEvent)) {
             MMI_HILOGE("Leave, add timer failed");
         }
     }
+    SubscriberNotify();
     MMI_HILOGD("%{public}s", handled ? "true" : "false");
     return handled;
+}
+
+void KeySubscriberHandler::SubscriberNotify()
+{
+    if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
+        NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
+        OHOS::MMI::NapProcess::NapStatusData napData;
+        for (const auto &subscriber : subscribers_) {
+            auto sess = subscriber->sess_;
+            CHKPV(sess);
+            napData.pid = sess->GetPid();
+            napData.uid = sess->GetUid();
+            napData.bundleName = sess->GetPid();
+            napData.syncStatus = ACTIVE_EVENT;
+            NapProcess::GetInstance()->NotifyBundleName(napData);
+        }
+    }
 }
 
 bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent)
@@ -406,10 +422,7 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
             continue;
         }
         std::optional<KeyEvent::KeyItem> keyItem = keyEvent->GetKeyItem();
-        if (!keyItem) {
-            MMI_HILOGE("The keyItem is nullopt");
-            return false;
-        }
+        CHK_KEY_ITEM(keyItem);
         auto upTime = keyEvent->GetActionTime();
         auto downTime = keyItem->GetDownTime();
         if (upTime - downTime >= (static_cast<int64_t>(duration) * 1000)) {
@@ -420,6 +433,7 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
         HandleKeyUpWithDelay(keyEvent, subscriber);
         handled = true;
     }
+    SubscriberNotify();
     MMI_HILOGD("%{public}s", handled ? "true" : "false");
     return handled;
 }

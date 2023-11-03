@@ -85,7 +85,7 @@ public:
      * @param napStatus Indicates napStatus.
      * @since 10
      */
-    void SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, bool napStatus);
+    void SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus);
 
     /**
      * @brief Get the process info datas to other server.
@@ -93,7 +93,7 @@ public:
      * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
      * @since 10
      */
-    int32_t GetAllMmiSubscribedEvents(std::vector<std::tuple<int32_t, int32_t, std::string>> &datas);
+    int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas);
     
     /**
      * @brief Sets a consumer for the window input event of the current process.

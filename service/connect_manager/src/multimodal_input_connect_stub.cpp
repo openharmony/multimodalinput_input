@@ -561,11 +561,11 @@ int32_t MultimodalInputConnectStub::StubSetNapStatus(MessageParcel& data, Messag
     int32_t napPid = -1;
     int32_t napUid = -1;
     std::string napBundleName;
-    bool napStatus = false;
+    int32_t napStatus = 0;
     READINT32(data, napPid, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, napUid, IPC_PROXY_DEAD_OBJECT_ERR);
     READSTRING(data, napBundleName, IPC_PROXY_DEAD_OBJECT_ERR);
-    READBOOL(data, napStatus, IPC_PROXY_DEAD_OBJECT_ERR);
+    READINT32(data, napStatus, IPC_PROXY_DEAD_OBJECT_ERR);
 
     int32_t ret = SetNapStatus(napPid, napUid, napBundleName, napStatus);
     if (ret != RET_OK) {
@@ -1328,7 +1328,7 @@ int32_t MultimodalInputConnectStub::StubGetAllMmiSubscribedEvents(MessageParcel&
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    std::vector<std::tuple<int32_t, int32_t, std::string>> datas;
+    std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> datas;
     int32_t ret = GetAllMmiSubscribedEvents(datas);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetDisplayBindInfo failed, ret:%{public}d", ret);
@@ -1336,11 +1336,11 @@ int32_t MultimodalInputConnectStub::StubGetAllMmiSubscribedEvents(MessageParcel&
     }
     int32_t size = static_cast<int32_t>(datas.size());
     WRITEINT32(reply, size, ERR_INVALID_VALUE);
-    datas.reserve(size);
     for (const auto &data : datas) {
-        WRITEINT32(reply, std::get<TUPLE_PID>(data), ERR_INVALID_VALUE);
-        WRITEINT32(reply, std::get<TUPLE_UID>(data), ERR_INVALID_VALUE);
-        WRITESTRING(reply, std::get<TUPLE_NAME>(data), ERR_INVALID_VALUE);
+        WRITEINT32(reply, std::get<TUPLE_PID>(data.first), ERR_INVALID_VALUE);
+        WRITEINT32(reply, std::get<TUPLE_UID>(data.first), ERR_INVALID_VALUE);
+        WRITESTRING(reply, std::get<TUPLE_NAME>(data.first), ERR_INVALID_VALUE);
+        WRITEINT32(reply, data.second, ERR_INVALID_VALUE);
     }
     return RET_OK;
 }

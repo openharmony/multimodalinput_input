@@ -28,7 +28,7 @@ public:
     MMIEventObserver() = default;
     virtual ~MMIEventObserver() = default;
 
-    virtual void SyncBundleName(int32_t pid, int32_t uid, std::string bundleName) = 0;
+    virtual void SyncBundleName(int32_t pid, int32_t uid, std::string bundleName, int32_t syncStatus) = 0;
 };
 } // namespace MMI
 } // namespace OHOS

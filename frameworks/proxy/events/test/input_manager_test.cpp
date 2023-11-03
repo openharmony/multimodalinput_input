@@ -63,15 +63,17 @@ public:
 
 class IEventObserver : public MMI::MMIEventObserver {
 public:
-    void SyncBundleName(int32_t pid, int32_t uid, std::string bundleName) override;
+    void SyncBundleName(int32_t pid, int32_t uid, std::string bundleName, int32_t syncStatus) override;
 };
 
-void IEventObserver::SyncBundleName(int32_t pid, int32_t uid, std::string bundleName)
+void IEventObserver::SyncBundleName(int32_t pid, int32_t uid, std::string bundleName, int32_t syncStatus)
 {
     int32_t getPid = pid;
     int32_t getUid = uid;
     std::string getName = bundleName;
-    MMI_HILOGD("SyncBundleName info is : %{public}d, %{public}d, %{public}s", getPid, getUid, getName.c_str());
+    int32_t getStatus = syncStatus;
+    MMI_HILOGD("SyncBundleName info is : %{public}d, %{public}d, %{public}s, %{public}d",
+        getPid, getUid, getName.c_str(), getStatus);
 }
 
 int32_t MMIWindowChecker::CheckWindowId(int32_t windowId) const
@@ -1122,34 +1124,37 @@ HWTEST_F(InputManagerTest, InputManagerTest_SyncBundleName_001, TestSize.Level1)
     auto callbackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callbackPtr != nullptr);
     int32_t monitorId = InputManagerUtil::TestAddMonitor(callbackPtr);
-    InputManager::GetInstance()->SetNapStatus(10, 20, "bundleName_test", true);
-    std::vector<std::tuple<int32_t, int32_t, std::string>> vectorBefore;
-    InputManager::GetInstance()->GetAllMmiSubscribedEvents(vectorBefore);
-    for (const auto& vec : vectorBefore) {
-        if (std::get<TUPLE_PID>(vec) == 10) {
-            EXPECT_TRUE(std::get<TUPLE_UID>(vec) == 20);
-            EXPECT_TRUE(std::get<TUPLE_NAME>(vec) == "bundleName_test");
+    InputManager::GetInstance()->SetNapStatus(10, 20, "bundleName_test", 2);
+    std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> mapBefore;
+    InputManager::GetInstance()->GetAllMmiSubscribedEvents(mapBefore);
+    for (auto map = mapBefore.begin(); map != mapBefore.end(); ++map) {
+        if (std::get<TUPLE_PID>(map->first) == 10) {
+            EXPECT_TRUE(std::get<TUPLE_UID>(map->first) == 20);
+            EXPECT_TRUE(std::get<TUPLE_NAME>(map->first) == "bundleName_test");
+            EXPECT_TRUE(map->second == 2);
         }
     }
-    for (const auto& vec : vectorBefore) {
-        MMI_HILOGD("All NapStatus in vectorBefore pid:%{public}d, uid:%{public}d, name:%{public}s",
-            std::get<TUPLE_PID>(vec), std::get<TUPLE_UID>(vec), std::get<TUPLE_NAME>(vec).c_str());
+    for (const auto& map : mapBefore) {
+        MMI_HILOGD("All NapStatus in mapBefore pid:%{public}d, uid:%{public}d, name:%{public}s, status:%{public}d",
+            std::get<TUPLE_PID>(map.first), std::get<TUPLE_UID>(map.first), std::get<TUPLE_NAME>(map.first).c_str(),
+            map.second);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManagerUtil::TestRemoveMonitor(monitorId);
-    InputManager::GetInstance()->SetNapStatus(10, 20, "bundleName_test", false);
-    std::vector<std::tuple<int32_t, int32_t, std::string>> vectorAfter;
-    InputManager::GetInstance()->GetAllMmiSubscribedEvents(vectorAfter);
-    for (const auto& vec : vectorAfter) {
-        if (std::get<TUPLE_PID>(vec) == 10) {
-            EXPECT_TRUE(std::get<TUPLE_UID>(vec) == 20);
-            EXPECT_TRUE(std::get<TUPLE_NAME>(vec) == "bundleName_test");
-        }
+    InputManager::GetInstance()->SetNapStatus(10, 20, "bundleName_test", 0);
+    std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> mapAfter;
+    InputManager::GetInstance()->GetAllMmiSubscribedEvents(mapAfter);
+    for (const auto& map : mapAfter) {
+        EXPECT_FALSE(std::get<TUPLE_PID>(map.first) == 10);
+        EXPECT_FALSE(std::get<TUPLE_UID>(map.first) == 20);
+        EXPECT_FALSE(std::get<TUPLE_NAME>(map.first) == "bundleName_test");
     }
-    for (const auto& vec : vectorAfter) {
-        MMI_HILOGD("All NapStatus in vectorAfter pid:%{public}d, uid:%{public}d, name:%{public}s",
-            std::get<TUPLE_PID>(vec), std::get<TUPLE_UID>(vec), std::get<TUPLE_NAME>(vec).c_str());
+    for (const auto& map : mapAfter) {
+        MMI_HILOGD("All NapStatus in mapAfter pid:%{public}d, uid:%{public}d, name:%{public}s, status:%{public}d",
+            std::get<TUPLE_PID>(map.first), std::get<TUPLE_UID>(map.first), std::get<TUPLE_NAME>(map.first).c_str(),
+            map.second);
     }
+    InputManager::GetInstance()->RemoveInputEventObserver(mmiObserver);
 }
 
 /**
