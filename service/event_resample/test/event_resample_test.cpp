@@ -55,7 +55,8 @@ public:
         int64_t frameTime { START_TIME };
         int64_t lastFrameTime { START_TIME };
 
-        void reset(void) {
+        void Reset(void)
+        {
             lastDispX = INITIAL_COORDS;
             lastDispY = INITIAL_COORDS;
             lastTime = START_TIME;
@@ -71,7 +72,8 @@ public:
         int32_t dispY { INITIAL_COORDS };
         int32_t id { 0 };
 
-        void initialize(int32_t action, TestData &testData, Context &context) {
+        void Initialize(int32_t action, TestData &testData, Context &context)
+        {
             this->action = action;
             dispX = context.lastDispX + testData.coordsDelta;
             context.lastDispX = dispX;
@@ -88,7 +90,8 @@ public:
             }
         }
 
-        void initializeFrom(InputEvt &event) {
+        void InitializeFrom(InputEvt &event)
+        {
             action = event.action;
             actionTime = event.actionTime;
             dispX = event.dispX;
@@ -110,7 +113,8 @@ public:
         ExpectedData() {}
         ExpectedData(int32_t id) : id(id) {}
 
-        void reset(int32_t id) {
+        void Reset(int32_t id)
+        {
             this->id = id;
             actionTime = 0;
             dispX = 0;
@@ -121,7 +125,8 @@ public:
             deferred = false;
         }
 
-        void updateTouchState(InputEvt &event) {
+        void UpdateTouchState(InputEvt &event)
+        {
             if (id != event.id) {
                 return;
             }
@@ -131,7 +136,7 @@ public:
                     touchState.clear();
                     eventBatch.clear();
                     InputEvt evt;
-                    evt.initializeFrom(event);
+                    evt.InitializeFrom(event);
                     touchState.insert(touchState.begin(), std::move(evt));
                     actionTime = event.actionTime;
                     dispX = event.dispX;
@@ -151,7 +156,7 @@ public:
                         touchState.pop_back();
                     }
                     InputEvt evt;
-                    evt.initializeFrom(event);
+                    evt.InitializeFrom(event);
                     touchState.insert(touchState.begin(), std::move(evt));
                     actionTime = event.actionTime;
                     dispX = event.dispX;
@@ -161,31 +166,33 @@ public:
             }
         }
 
-        void addEvent(InputEvt &event) {
+        void AddEvent(InputEvt &event)
+        {
             if (id != event.id) {
                 return;
             }
 
             if (event.action == PointerEvent::POINTER_ACTION_MOVE) {
                 InputEvt evt;
-                evt.initializeFrom(event);
+                evt.InitializeFrom(event);
                 eventBatch.push_back(std::move(evt));
             } else {
                 if (event.action == PointerEvent::POINTER_ACTION_UP) {
                     if (!eventBatch.empty()) {
                         for (size_t i = 0; i < eventBatch.size(); i++) {
                             InputEvt& event = eventBatch.at(i);
-                            updateTouchState(event);
+                            UpdateTouchState(event);
                         }
                         eventBatch.erase(eventBatch.begin(), eventBatch.begin() + eventBatch.size() - 1);
                         deferred = true;
                     }
                 }
-                updateTouchState(event);
+                UpdateTouchState(event);
             }
         }
 
-        int32_t calculateExpected(int64_t frameTime) {
+        int32_t CalculateExpected(int64_t frameTime)
+        {
             float alpha = 0.0;
             int64_t sampleTime = frameTime - EventResample::RESAMPLE_LATENCY;
             InputEvt current;
@@ -211,11 +218,11 @@ public:
             // Consume samples in batch
             for (size_t i = 0; i < count; i++) {
                 InputEvt& event = eventBatch.at(i);
-                updateTouchState(event);
+                UpdateTouchState(event);
             }
             eventBatch.erase(eventBatch.begin(), eventBatch.begin() + count);
 
-            current.initializeFrom(touchState[0]);
+            current.InitializeFrom(touchState[0]);
 
             if (eventBatch.empty()) {
                 // Coordinates extrapolation
@@ -223,7 +230,7 @@ public:
                 if (touchState.size() < 2) {
                     return ERR_OK;
                 }
-                other.initializeFrom(touchState[1]);
+                other.InitializeFrom(touchState[1]);
                 int64_t delta = touchState[0].actionTime - touchState[1].actionTime;
                 if (delta < EventResample::RESAMPLE_MIN_DELTA) {
                     return ERR_OK;
@@ -239,7 +246,7 @@ public:
                 // Coordinates interpolation
                 MMI_HILOGD("Interpolation");
                 InputEvt &next = eventBatch.front();
-                other.initializeFrom(next);
+                other.InitializeFrom(next);
                 int64_t delta = next.actionTime - touchState[0].actionTime;
                 if (delta < EventResample::RESAMPLE_MIN_DELTA) {
                     MMI_HILOGD("RESAMPLE_MIN_DELTA = %{public}" PRId64 ", next_x = %{public}d, ts0_x = %{public}d", delta, next.dispX, touchState[0].dispX);
@@ -248,8 +255,8 @@ public:
                 alpha = static_cast<float>(sampleTime - touchState[0].actionTime) / delta;
             }
 
-            dispX = calcCoord(current.dispX, other.dispX, alpha);
-            dispY = calcCoord(current.dispY, other.dispY, alpha);
+            dispX = CalcCoord(current.dispX, other.dispX, alpha);
+            dispY = CalcCoord(current.dispY, other.dispY, alpha);
             actionTime = sampleTime;
 
             return ERR_OK;
@@ -338,7 +345,7 @@ int32_t EventResampleTest::CheckResults(std::shared_ptr<PointerEvent> outEvent, 
             dispX = expected[it.id].dispX;
             dispY = expected[it.id].dispY;
         } else if (outEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
-            expected[it.id].calculateExpected(context.frameTime);
+            expected[it.id].CalculateExpected(context.frameTime);
             actionTime = expected[it.id].actionTime;
             dispX = expected[it.id].dispX;
             dispY = expected[it.id].dispY;
@@ -387,15 +394,15 @@ bool EventResampleTest::DoTest(TestData &testData, int32_t testId)
     MMI_HILOGD("Start test %{public}d -------------------------------------", testId);
 
     for (uint32_t idx = 0; idx < testData.fingerNum; idx++) {
-        expected[idx].reset(idx);
+        expected[idx].Reset(idx);
     }
 
     failCount_ = 0;
-    ctx.reset();
+    ctx.Reset();
 
     // Send touch down event
     InputEvt touchDown;
-    touchDown.initialize(PointerEvent::POINTER_ACTION_DOWN, testData, ctx);
+    touchDown.Initialize(PointerEvent::POINTER_ACTION_DOWN, testData, ctx);
     eventQueue_.push(std::move(touchDown));
 
     // Send touch moving events
@@ -407,20 +414,20 @@ bool EventResampleTest::DoTest(TestData &testData, int32_t testId)
 
         for (uint32_t eidx = 0; eidx < testData.evtNum; eidx++) {
             InputEvt touchMove;
-            touchMove.initialize(PointerEvent::POINTER_ACTION_MOVE, testData, ctx);
+            touchMove.Initialize(PointerEvent::POINTER_ACTION_MOVE, testData, ctx);
             eventQueue_.push(std::move(touchMove));
         }
 
         while (!eventQueue_.empty()) {
             InputEvt &event = eventQueue_.front();
-            expected[event.id].addEvent(event);
+            expected[event.id].AddEvent(event);
             SetupPointerEvent(event, testData);
 
             PointerEvent::PointerItem pointerItem;
             pointerEvent_->GetPointerItem(0, pointerItem);
             MMI_HILOGD("pointerEvent_: x = %{public}d y = %{public}d t = %{public}" PRId64, pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerEvent_->GetActionTime());
 
-            outEvent = EventResampleHdr->onEventConsume(pointerEvent_, ctx.frameTime, deferred, status);
+            outEvent = EventResampleHdr->OnEventConsume(pointerEvent_, ctx.frameTime, deferred, status);
             if (outEvent != nullptr) {
                 if (PointerEvent::POINTER_ACTION_DOWN != outEvent->GetPointerAction()) {
                     MMI_HILOGE("Unexpected pointer action: %{public}d while %{public}d expected", outEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_DOWN);
@@ -434,7 +441,7 @@ bool EventResampleTest::DoTest(TestData &testData, int32_t testId)
             eventQueue_.pop();
         }
 
-        outEvent = EventResampleHdr->onEventConsume(nullptr, ctx.frameTime, deferred, status);
+        outEvent = EventResampleHdr->OnEventConsume(nullptr, ctx.frameTime, deferred, status);
         if (outEvent != nullptr) {
             EXPECT_EQ(ERR_OK, CheckResults(outEvent, expected, ctx));
             EXPECT_EQ(ERR_OK, status);
@@ -446,10 +453,10 @@ bool EventResampleTest::DoTest(TestData &testData, int32_t testId)
 
     // Send touch up event
     InputEvt touchUp;
-    touchUp.initialize(PointerEvent::POINTER_ACTION_UP, testData, ctx);
-    expected[touchUp.id].addEvent(touchUp);
+    touchUp.Initialize(PointerEvent::POINTER_ACTION_UP, testData, ctx);
+    expected[touchUp.id].AddEvent(touchUp);
     SetupPointerEvent(touchUp, testData);
-    outEvent = EventResampleHdr->onEventConsume(pointerEvent_, ctx.frameTime, deferred, status);
+    outEvent = EventResampleHdr->OnEventConsume(pointerEvent_, ctx.frameTime, deferred, status);
     if (outEvent != nullptr) {
         MMI_HILOGD("Pointer Action: %{public}d", outEvent->GetPointerAction());
         EXPECT_EQ(ERR_OK, CheckResults(outEvent, expected, ctx));
@@ -459,7 +466,7 @@ bool EventResampleTest::DoTest(TestData &testData, int32_t testId)
     }
 
     if (deferred) {
-        outEvent = EventResampleHdr->onEventConsume(nullptr, ctx.frameTime, deferred, status);
+        outEvent = EventResampleHdr->OnEventConsume(nullptr, ctx.frameTime, deferred, status);
         if (outEvent != nullptr) {
             MMI_HILOGD("Deferred Event: %{public}d", outEvent->GetPointerAction());
             EXPECT_EQ(ERR_OK, CheckResults(outEvent, expected, ctx));
@@ -483,9 +490,9 @@ HWTEST_F(EventResampleTest, EventResampleTest_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
     TestData testData = {.framesNum = 5, .fingerNum = 1, .evtNum = 0};
-    EXPECT_EQ(EventResampleHdr->getPointerEvent(), nullptr);
+    EXPECT_EQ(EventResampleHdr->GetPointerEvent(), nullptr);
     EXPECT_TRUE(DoTest(testData, 1));
-    EXPECT_NE(EventResampleHdr->getPointerEvent(), nullptr);
+    EXPECT_NE(EventResampleHdr->GetPointerEvent(), nullptr);
 }
 
 /**

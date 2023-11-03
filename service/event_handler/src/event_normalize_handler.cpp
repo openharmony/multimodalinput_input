@@ -47,7 +47,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
     CALL_DEBUG_ENTER;
 
     if (event == nullptr) {
-        std::shared_ptr<PointerEvent> pointerEvent = EventResampleHdr->getPointerEvent();
+        std::shared_ptr<PointerEvent> pointerEvent = EventResampleHdr->GetPointerEvent();
         if (pointerEvent != nullptr) {
             switch (pointerEvent->GetSourceType()) {
                 case PointerEvent::SOURCE_TYPE_TOUCHSCREEN:
@@ -439,7 +439,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
 
     bool deferred = false;
     ErrCode status = RET_OK;
-    std::shared_ptr<PointerEvent> outputEvent = EventResampleHdr->onEventConsume(pointerEvent, frameTime, deferred, status);
+    std::shared_ptr<PointerEvent> outputEvent = EventResampleHdr->OnEventConsume(pointerEvent, frameTime, deferred, status);
     if ((outputEvent == nullptr) && (deferred == false)) {
         MMI_HILOGD("NULL output event received: %{public}d %{public}d", deferred, status);
         return RET_OK;
@@ -454,16 +454,16 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     }
 
     if (deferred == true) {
-        pointerEvent = EventResampleHdr->onEventConsume(NULL, frameTime, deferred, status);
+        pointerEvent = EventResampleHdr->OnEventConsume(NULL, frameTime, deferred, status);
         if (pointerEvent != nullptr) {
             MMI_HILOGD("Deferred event received: %{public}d %{public}d %{public}d %{public}d", pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(), deferred, status);
-            BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START); // FIXME
+            BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
             nextHandler_->HandleTouchEvent(pointerEvent);
         }
     }
 
     if (pointerEvent != nullptr) {
-        ResetTouchUpEvent(pointerEvent, event);
+        ResetTouchUpEvent(pointerEvent);
     }
 #else
     MMI_HILOGW("Touchscreen device does not support");
@@ -471,13 +471,11 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     return RET_OK;
 }
 
-void EventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent,
-    struct libinput_event *event)
+void EventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
-    CHKPV(event);
-    auto type = libinput_event_get_type(event);
-    if (type == LIBINPUT_EVENT_TOUCH_UP) {
+    auto type = pointerEvent->GetPointerAction();
+    if (type == PointerEvent::POINTER_ACTION_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
         MMI_HILOGD("This touch event is up remove this finger");
         if (pointerEvent->GetPointerIds().empty()) {

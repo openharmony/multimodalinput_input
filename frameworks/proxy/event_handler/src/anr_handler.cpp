@@ -101,6 +101,7 @@ void ANRHandler::MarkProcessed(int32_t eventType)
     CALL_DEBUG_ENTER;
     int32_t eventId = GetLastProcessedEventId(eventType);
     if (eventId == INVALID_OR_PROCESSED_ID) {
+        SetLastProcessedEventStatus(eventType, false);
         return;
     }
     MMI_HILOGD("Processed event type:%{public}d, id:%{public}d", eventType, eventId);
