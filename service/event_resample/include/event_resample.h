@@ -33,8 +33,8 @@ class EventResample final {
 
 public:
     DISALLOW_COPY_AND_MOVE(EventResample);
-    std::shared_ptr<PointerEvent> onEventConsume(std::shared_ptr<PointerEvent> pointerEvent, int64_t frameTime, bool &deferred, ErrCode &status);
-    std::shared_ptr<PointerEvent> getPointerEvent();
+    std::shared_ptr<PointerEvent> OnEventConsume(std::shared_ptr<PointerEvent> pointerEvent, int64_t frameTime, bool &deferred, ErrCode &status);
+    std::shared_ptr<PointerEvent> GetPointerEvent();
 
     // Microseconds per milliseconds.
     static constexpr int64_t US_PER_MS = 1000;
@@ -62,14 +62,16 @@ private:
         int32_t toolType;
         int32_t id;
 
-        void copyFrom(const Pointer& other) {
+        void CopyFrom(const Pointer& other)
+        {
             coordX = other.coordX;
             coordY = other.coordY;
             toolType = other.toolType;
             id = other.id;
         }
 
-        void reset() {
+        void Reset()
+        {
             coordX = 0;
             coordY = 0;
             toolType = 0;
@@ -85,7 +87,8 @@ private:
         int32_t pointerAction { PointerEvent::POINTER_ACTION_UNKNOWN };
         int32_t deviceId { 0 };
 
-        void reset() {
+        void Reset()
+        {
             pointers.clear();
             actionTime = 0;
             pointerCount = 0;
@@ -94,7 +97,8 @@ private:
             deviceId = 0;
         }
 
-        void initializeFrom(MotionEvent& other) {
+        void InitializeFrom(MotionEvent& other)
+        {
             for (auto &it : other.pointers) {
                 pointers[it.first] = it.second;
             }
@@ -105,7 +109,8 @@ private:
             pointerAction = other.pointerAction;
         }
 
-        void initializeFrom(std::shared_ptr<PointerEvent> event) {
+        void InitializeFrom(std::shared_ptr<PointerEvent> event)
+        {
             actionTime = event->GetActionTime();
             deviceId = event->GetDeviceId();
             sourceType = event->GetSourceType();
@@ -137,26 +142,30 @@ private:
         std::map<uint32_t, Pointer> pointers;
         int64_t actionTime { 0 };
 
-        void initializeFrom(const MotionEvent &event) {
+        void InitializeFrom(const MotionEvent &event)
+        {
             actionTime = event.actionTime;
             for (auto &it : event.pointers) {
                 pointers[it.first] = it.second;
             }
         }
 
-        void initializeFrom(const History &other) {
+        void InitializeFrom(const History &other)
+        {
             actionTime = other.actionTime;
             for (auto &it : other.pointers) {
                 pointers[it.first] = it.second;
             }
         }
 
-        const Pointer& getPointerById(uint32_t id) const {
+        const Pointer& GetPointerById(uint32_t id) const
+        {
             auto item = pointers.find(id);
             return item->second;
         }
 
-        bool hasPointerId(uint32_t id) const {
+        bool HasPointerId(uint32_t id) const
+        {
             auto item = pointers.find(id);
             if (item != pointers.end()) {
                 return true;
@@ -174,7 +183,8 @@ private:
         History history[2];
         History lastResample;
 
-        void initialize(int32_t deviceId, int32_t source) {
+        void Initialize(int32_t deviceId, int32_t source)
+        {
             this->deviceId = deviceId;
             this->source = source;
             historyCurrent = 0;
@@ -182,30 +192,33 @@ private:
             lastResample.actionTime = 0;
         }
 
-        void addHistory(const MotionEvent &event) {
+        void AddHistory(const MotionEvent &event)
+        {
             historyCurrent ^= 1;
             if (historySize < 2) {
                 historySize += 1;
             }
-            history[historyCurrent].initializeFrom(event);
+            history[historyCurrent].InitializeFrom(event);
         }
 
-        const History* getHistory(size_t idx) const {
+        const History* GetHistory(size_t idx) const
+        {
             return &history[(historyCurrent + idx) & 1];
         }
 
-        bool recentCoordinatesAreIdentical(uint32_t id) const {
+        bool RecentCoordinatesAreIdentical(uint32_t id) const
+        {
             // Return true if the two most recently received "raw" coordinates are identical
             if (historySize < 2) {
                 return false;
             }
-            if (!getHistory(0)->hasPointerId(id) || !getHistory(1)->hasPointerId(id)) {
+            if (!GetHistory(0)->HasPointerId(id) || !GetHistory(1)->HasPointerId(id)) {
                 return false;
             }
-            float currentX = getHistory(0)->getPointerById(id).coordX;
-            float currentY = getHistory(0)->getPointerById(id).coordY;
-            float previousX = getHistory(1)->getPointerById(id).coordX;
-            float previousY = getHistory(1)->getPointerById(id).coordY;
+            float currentX = GetHistory(0)->GetPointerById(id).coordX;
+            float currentY = GetHistory(0)->GetPointerById(id).coordY;
+            float previousX = GetHistory(1)->GetPointerById(id).coordX;
+            float previousY = GetHistory(1)->GetPointerById(id).coordY;
             if (currentX == previousX && currentY == previousY) {
                 return true;
             }
@@ -222,22 +235,22 @@ private:
     bool resampleTouch_ {true};
     std::shared_ptr<PointerEvent> pointerEvent_ {nullptr};
 
-    void updatePointerEvent(MotionEvent* outEvent);
-    ErrCode consumeBatch(int64_t frameTime, MotionEvent** outEvent);
-    ErrCode consumeSamples(Batch& batch, size_t count, MotionEvent** outEvent);
-    void addSample(MotionEvent* outEvent, const MotionEvent* event);
-    void updateTouchState(MotionEvent &event);
-    void resampleTouchState(int64_t sampleTime, MotionEvent* event, const MotionEvent* next);
-    ssize_t findBatch(int32_t deviceId, int32_t source) const;
-    ssize_t findTouchState(int32_t deviceId, int32_t source) const;
-    bool canAddSample(const Batch &batch, MotionEvent &event);
-    void rewriteMessage(TouchState& state, MotionEvent &event);
-    ssize_t findSampleNoLaterThan(const Batch& batch, int64_t time);
-    bool shouldResampleTool(int32_t toolType);
+    void UpdatePointerEvent(MotionEvent* outEvent);
+    ErrCode ConsumeBatch(int64_t frameTime, MotionEvent** outEvent);
+    ErrCode ConsumeSamples(Batch& batch, size_t count, MotionEvent** outEvent);
+    void AddSample(MotionEvent* outEvent, const MotionEvent* event);
+    void UpdateTouchState(MotionEvent &event);
+    void ResampleTouchState(int64_t sampleTime, MotionEvent* event, const MotionEvent* next);
+    ssize_t FindBatch(int32_t deviceId, int32_t source) const;
+    ssize_t FindTouchState(int32_t deviceId, int32_t source) const;
+    bool CanAddSample(const Batch &batch, MotionEvent &event);
+    void RewriteMessage(TouchState& state, MotionEvent &event);
+    ssize_t FindSampleNoLaterThan(const Batch& batch, int64_t time);
+    bool ShouldResampleTool(int32_t toolType);
 
 };
 
-inline static float calcCoord(float a, float b, float alpha) {
+inline static float CalcCoord(float a, float b, float alpha) {
     return a + alpha * (b - a);
 }
 
