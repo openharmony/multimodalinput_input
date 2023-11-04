@@ -134,7 +134,7 @@ bool PermissionHelper::CheckDispatchControl()
 
 bool PermissionHelper::CheckDispatchControlPermission(uint32_t tokenId)
 {
-    static const std::string inputDispatchControl = "ohos.permission.INPUT_DISPATCHING_CONTROL";
+    static const std::string inputDispatchControl = "ohos.permission.INPUT_CONTROL_DISPATCHING";
     int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, inputDispatchControl);
     if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
         MMI_HILOGE("Check input dispatch control permission failed ret:%{public}d", ret);
