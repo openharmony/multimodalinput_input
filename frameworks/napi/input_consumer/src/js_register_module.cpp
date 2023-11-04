@@ -54,8 +54,8 @@ void JsCommon::ThrowError(napi_env env, int32_t code)
         MMI_HILOGE("Non system applications use system API");
         THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
     } else if (errorCode == COMMON_PERMISSION_CHECK_ERROR) {
-        MMI_HILOGE("shield api need ohos.permission.INPUT_DISPATCHING_CONTROL");
-        THROWERR_API9(env, COMMON_PERMISSION_CHECK_ERROR, "shiled API", "ohos.permission.INPUT_DISPATCHING_CONTROL");
+        MMI_HILOGE("shield api need ohos.permission.INPUT_CONTROL_DISPATCHING");
+        THROWERR_API9(env, COMMON_PERMISSION_CHECK_ERROR, "shiled API", "ohos.permission.INPUT_CONTROL_DISPATCHING");
     } else {
         MMI_HILOGE("dispatch control failed");
     }
