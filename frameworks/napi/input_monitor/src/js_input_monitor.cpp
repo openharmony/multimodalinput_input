@@ -883,7 +883,10 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
     {
         std::lock_guard<std::mutex> guard(mutex_);
         if (!evQueue_.empty()) {
-            if (IsBeginAndEnd(pointerEvent)) {
+            if (pointerEvent->HasAxis(PointerEvent::AXIS_TYPE_PINCH) ||
+                pointerEvent->HasAxis(PointerEvent::AXIS_TYPE_ROTATE)) {
+                evQueue_.push(pointerEvent);
+            } else if (IsBeginAndEnd(pointerEvent)) {
                 auto markProcessedEvent = evQueue_.front();
                 CHKPV(markProcessedEvent);
                 markProcessedEvent->MarkProcessed();
@@ -923,12 +926,8 @@ bool JsInputMonitor::IsBeginAndEnd(std::shared_ptr<PointerEvent> pointerEvent)
 {
     bool res = pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP ||
-        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_BEGIN ||
-        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_END ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
-        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_END ||
-        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_ROTATE_BEGIN ||
-        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_ROTATE_END;
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_END;
     return res;
 }
 
@@ -942,6 +941,7 @@ void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status)
     auto& jsMonitor { JsInputMonMgr.GetMonitor(temp->monitorId, temp->fingers) };
     CHKPV(jsMonitor);
     jsMonitor->OnPointerEventInJsThread(jsMonitor->GetTypeName(), temp->fingers);
+    delete temp;
     temp = nullptr;
 }
 
@@ -1037,7 +1037,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result),
             CALL_FUNCTION, scope, pointerEvent);
         bool typeNameFlag = typeName == "touch" || typeName == "pinch" || typeName == "threeFingersSwipe" ||
-            typeName == "fourFingersSwipe";
+            typeName == "fourFingersSwipe" || typeName == "rotate";
         if (typeNameFlag) {
             pointerEvent->MarkProcessed();
             bool retValue = false;
