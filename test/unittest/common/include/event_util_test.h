@@ -41,7 +41,7 @@ using Security::AccessToken::AccessTokenID;
 namespace {
 using namespace testing::ext;
 PermissionDef inputDispatchControlPermDef_ = {
-    .permissionName = "ohos.permission.INPUT_DISPATCHING_CONTROL",
+    .permissionName = "ohos.permission.INPUT_CONTROL_DISPATCHING",
     .bundleName = "accesstoken_test",
     .grantMode = 1,
     .label = "label",
@@ -74,7 +74,7 @@ PermissionStateFull inputDispatchControlPermState_ = {
     .grantFlags = { 1 },
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
-    .permissionName = "ohos.permission.INPUT_DISPATCHING_CONTROL",
+    .permissionName = "ohos.permission.INPUT_CONTROL_DISPATCHING",
     .resDeviceID = { "local" }
 };
 
