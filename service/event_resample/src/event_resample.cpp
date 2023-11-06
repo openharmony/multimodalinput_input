@@ -28,50 +28,17 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL { LOG_CORE, MMI_LOG_DOMAIN, "EventRe
 EventResample::EventResample(){};
 EventResample::~EventResample(){};
 
-std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<PointerEvent> pointerEvent, int64_t frameTime, bool &deferred, ErrCode &status)
+std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<PointerEvent> pointerEvent,
+                                                            int64_t frameTime, bool &deferred, ErrCode &status)
 {
-    int32_t pointerAction = PointerEvent::POINTER_ACTION_UNKNOWN;
     MotionEvent* outEvent = nullptr;
     ErrCode result = ERR_OK;
 
-    if (pointerEvent != nullptr) {
-        pointerEvent_ = pointerEvent;
-    }
     deferred = false;
     status = ERR_OK;
-
-    if (frameTime_ <= 0) {
-        if (0 != frameTime) {
-            frameTime_ = frameTime;
-        } else if (nullptr != pointerEvent) {
-            frameTime_ = GetSysClockTime();
-        } else {
-            frameTime_ = 0;
-        }
-    }
-
-    // Check that event can be consumed and initialize motion event.
-    if (nullptr != pointerEvent) {
-        pointerAction = pointerEvent->GetPointerAction();
-        MMI_HILOGD("pointerAction:%{public}d %{public}" PRId64 " %{public}" PRId64, pointerAction, pointerEvent->GetActionTime(), frameTime);
-        switch (pointerAction) {
-            case PointerEvent::POINTER_ACTION_DOWN:
-            case PointerEvent::POINTER_ACTION_MOVE:
-            case PointerEvent::POINTER_ACTION_UP:
-            case PointerEvent::POINTER_ACTION_CANCEL:
-                break;
-            default:
-                status = ERR_WOULD_BLOCK;
-                return pointerEvent;
-        }
-        inputEvent_.Reset();
-        inputEvent_.InitializeFrom(pointerEvent);
-
-        for (auto &it : inputEvent_.pointers) {
-            MMI_HILOGD("Input event: %{public}d %{public}d %{public}" PRId64 " %{public}" PRId64, it.second.coordX, it.second.coordY, inputEvent_.actionTime, frameTime_);
-        }
-    } else {
-        inputEvent_.Reset();
+    if (ERR_OK != InitializeInputEvent(pointerEvent, frameTime)) {
+        status = ERR_WOULD_BLOCK;
+        return pointerEvent;
     }
 
     do {
@@ -97,31 +64,7 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
         }
 
         // Add event into batch
-        ssize_t batchIndex = FindBatch(inputEvent_.deviceId, inputEvent_.sourceType);
-        if (batchIndex >= 0) {
-            Batch& batch = batches_.at(batchIndex);
-            if (CanAddSample(batch, inputEvent_)) {
-                batch.samples.push_back(inputEvent_);
-                MMI_HILOGD("Event added to batch: %{public}d %{public}d %{public}d",
-                           inputEvent_.deviceId, inputEvent_.sourceType, inputEvent_.pointerAction);
-                break;
-            } else if (PointerEvent::POINTER_ACTION_UP == inputEvent_.pointerAction) {
-                MMI_HILOGD("Deferred event: %{public}d %{public}d %{public}d", inputEvent_.deviceId, inputEvent_.sourceType, inputEvent_.pointerAction);
-                deferredEvent_.InitializeFrom(inputEvent_);
-                msgDeferred_ = true;
-                deferred = true;
-                result = ConsumeSamples(batch, batch.samples.size(), &outEvent);
-                batches_.erase(batches_.begin() + batchIndex);
-                UpdateTouchState(deferredEvent_);
-                break;
-            }
-        }
-
-        // Start a new batch
-        if (PointerEvent::POINTER_ACTION_MOVE == inputEvent_.pointerAction) {
-            Batch batch;
-            batch.samples.push_back(inputEvent_);
-            batches_.push_back(std::move(batch));
+        if (UpdateBatch(&outEvent, result, deferred)) {
             break;
         }
 
@@ -145,13 +88,94 @@ std::shared_ptr<PointerEvent> EventResample::GetPointerEvent()
     return pointerEvent_;
 }
 
+ErrCode EventResample::InitializeInputEvent(std::shared_ptr<PointerEvent> pointerEvent, int64_t frameTime)
+{
+    int32_t pointerAction = PointerEvent::POINTER_ACTION_UNKNOWN;
+
+    if (pointerEvent != nullptr) {
+        pointerEvent_ = pointerEvent;
+    }
+
+    if (frameTime_ <= 0) {
+        if (0 != frameTime) {
+            frameTime_ = frameTime;
+        } else if (nullptr != pointerEvent) {
+            frameTime_ = GetSysClockTime();
+        } else {
+            frameTime_ = 0;
+        }
+    }
+
+    // Check that event can be consumed and initialize motion event.
+    if (nullptr != pointerEvent) {
+        pointerAction = pointerEvent->GetPointerAction();
+        MMI_HILOGD("pointerAction:%{public}d %{public}" PRId64 " %{public}" PRId64,
+                   pointerAction, pointerEvent->GetActionTime(), frameTime);
+        switch (pointerAction) {
+            case PointerEvent::POINTER_ACTION_DOWN:
+            case PointerEvent::POINTER_ACTION_MOVE:
+            case PointerEvent::POINTER_ACTION_UP:
+            case PointerEvent::POINTER_ACTION_CANCEL:
+                break;
+            default:
+                return ERR_WOULD_BLOCK;
+        }
+        inputEvent_.Reset();
+        inputEvent_.InitializeFrom(pointerEvent);
+
+        for (auto &it : inputEvent_.pointers) {
+            MMI_HILOGD("Input event: %{public}d %{public}d %{public}" PRId64 " %{public}" PRId64,
+                       it.second.coordX, it.second.coordY, inputEvent_.actionTime, frameTime_);
+        }
+    } else {
+        inputEvent_.Reset();
+    }
+
+    return ERR_OK;
+}
+
+bool EventResample::UpdateBatch(MotionEvent** outEvent, ErrCode &result, bool &deferred)
+{
+    ssize_t batchIndex = FindBatch(inputEvent_.deviceId, inputEvent_.sourceType);
+    if (batchIndex >= 0) {
+        Batch& batch = batches_.at(batchIndex);
+        if (CanAddSample(batch, inputEvent_)) {
+            batch.samples.push_back(inputEvent_);
+            MMI_HILOGD("Event added to batch: %{public}d %{public}d %{public}d",
+                       inputEvent_.deviceId, inputEvent_.sourceType, inputEvent_.pointerAction);
+            return true;
+        } else if (PointerEvent::POINTER_ACTION_UP == inputEvent_.pointerAction) {
+            MMI_HILOGD("Deferred event: %{public}d %{public}d %{public}d",
+                       inputEvent_.deviceId, inputEvent_.sourceType, inputEvent_.pointerAction);
+            deferredEvent_.InitializeFrom(inputEvent_);
+            msgDeferred_ = true;
+            deferred = true;
+            result = ConsumeSamples(batch, batch.samples.size(), outEvent);
+            batches_.erase(batches_.begin() + batchIndex);
+            UpdateTouchState(deferredEvent_);
+            return true;
+        }
+    }
+
+    // Start a new batch
+    if (PointerEvent::POINTER_ACTION_MOVE == inputEvent_.pointerAction) {
+        Batch batch;
+        batch.samples.push_back(inputEvent_);
+        batches_.push_back(std::move(batch));
+        return true;
+    }
+
+    return false;
+}
+
 void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
 {
     pointerEvent_->SetActionTime(outEvent->actionTime);
     pointerEvent_->SetPointerAction(outEvent->pointerAction);
     pointerEvent_->SetActionTime(outEvent->actionTime);
     for (auto &it : outEvent->pointers) {
-        MMI_HILOGD("Output event: %{public}d %{public}d %{public}" PRId64 " %{public}d", it.second.coordX, it.second.coordY, outEvent->actionTime, outEvent->pointerAction);
+        MMI_HILOGD("Output event: %{public}d %{public}d %{public}" PRId64 " %{public}d",
+                   it.second.coordX, it.second.coordY, outEvent->actionTime, outEvent->pointerAction);
         PointerEvent::PointerItem item;
         if (pointerEvent_->GetPointerItem(it.first, item)) {
             item.SetDisplayX(it.second.coordX);
@@ -294,7 +318,7 @@ void EventResample::ResampleTouchState(int64_t sampleTime, MotionEvent* event, c
         return;
     }
 
-    TouchState& touchState = touchStates_.at(idx);
+    TouchState &touchState = touchStates_.at(idx);
     if (touchState.historySize < 1) {
         return;
     }
@@ -341,6 +365,12 @@ void EventResample::ResampleTouchState(int64_t sampleTime, MotionEvent* event, c
     }
 
     // Resample touch coordinates.
+    ResampleCoordinates(sampleTime, event, touchState, current, other, alpha);
+}
+
+void EventResample::ResampleCoordinates(int64_t sampleTime, MotionEvent* event, TouchState &touchState,
+                                        const History* current, const History* other, float alpha)
+{
     History oldLastResample;
     oldLastResample.InitializeFrom(touchState.lastResample);
     touchState.lastResample.actionTime = sampleTime;
