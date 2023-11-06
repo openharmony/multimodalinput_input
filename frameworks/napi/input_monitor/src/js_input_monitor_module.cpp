@@ -92,7 +92,24 @@ static napi_value AddMonitor(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType is invalid");
         return nullptr;
     }
-    if (strcmp(typeName, "pinch") == 0) {
+    if (strcmp(typeName, "mouse") == 0) {
+        Rect hotRectAreaList[RECT_LIST_SIZE];
+        uint32_t rectArrayLength = 0;
+        CHKRP(napi_get_array_length(env, argv[1], &rectArrayLength), GET_ARRAY_LENGTH);
+        if (rectArrayLength <= 0 || rectArrayLength > RECT_LIST_SIZE) {
+            MMI_HILOGE("Hot Rect Area Parameter error");
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Hot Rect Area Parameter error");
+            return nullptr;
+        }
+        JsInputMonMgr.GetHotRectAreaList(env, argv[1], rectArrayLength, hotRectAreaList);
+        CHKRP(napi_typeof(env, argv[TWO_PARAMETERS], &valueType), TYPEOF);
+        if (valueType != napi_function) {
+            MMI_HILOGE("Third Parameter type error");
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Third Parameter type error");
+            return nullptr;
+        }
+        JsInputMonMgr.AddMonitor(env, typeName, hotRectAreaList, rectArrayLength, argv[TWO_PARAMETERS]);
+    }else {
         CHKRP(napi_typeof(env, argv[1], &valueType), TYPEOF);
         if (valueType != napi_number) {
             MMI_HILOGE("Second Parameter type error");
@@ -118,26 +135,6 @@ static napi_value AddMonitor(napi_env env, napi_callback_info info)
             return nullptr;
         }
         JsInputMonMgr.AddMonitor(env, typeName, nullptr, 0, argv[TWO_PARAMETERS], fingers);
-    }else if (strcmp(typeName, "mouse") == 0) {
-        Rect hotRectAreaList[RECT_LIST_SIZE];
-        uint32_t rectArrayLength = 0;
-        CHKRP(napi_get_array_length(env, argv[1], &rectArrayLength), GET_ARRAY_LENGTH);
-        if (rectArrayLength <= 0 || rectArrayLength > RECT_LIST_SIZE) {
-            MMI_HILOGE("Hot Rect Area Parameter error");
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Hot Rect Area Parameter error");
-            return nullptr;
-        }
-        JsInputMonMgr.GetHotRectAreaList(env, argv[1], rectArrayLength, hotRectAreaList);
-        CHKRP(napi_typeof(env, argv[TWO_PARAMETERS], &valueType), TYPEOF);
-        if (valueType != napi_function) {
-            MMI_HILOGE("Third Parameter type error");
-            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Third Parameter type error");
-            return nullptr;
-        }
-        JsInputMonMgr.AddMonitor(env, typeName, hotRectAreaList, rectArrayLength, argv[TWO_PARAMETERS]);
-    }else {
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType is invalid");
-        return nullptr;
     }
     return nullptr;
 }
