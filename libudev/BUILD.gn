@@ -37,7 +37,7 @@ ohos_static_library("mmi_libudev") {
 }
 
 import("//build/test.gni")
-output_path = "multimodalinput/unit_out"
+output_path = "multimodalinput/mmi_unit_out"
 
 group("test") {
   testonly = true

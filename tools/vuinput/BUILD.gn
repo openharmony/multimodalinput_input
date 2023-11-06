@@ -50,7 +50,7 @@ ohos_executable("vuinput") {
   subsystem_name = "multimodalinput"
 }
 
-module_output_path = "multimodalinput/unit_out"
+module_output_path = "multimodalinput/mmi_unit_out"
 ohos_unittest("ut-virtual-device-out") {
   module_out_path = module_output_path
   include_dirs = [
