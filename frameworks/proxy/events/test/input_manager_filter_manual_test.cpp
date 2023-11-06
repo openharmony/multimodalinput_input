@@ -479,6 +479,12 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_003, TestSize.Level1
 }
 
 /**
+ * @tc.name: HandlePointerEventFilter_004
+ * @tc.desc: Add filter but not remove filter, depend on process dead auto kill
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+/**
  * HWTEST_F(InputManagerFilterManualTest, DISABLED_HandleKeyEventFilter_004, TestSize.Level1)
  * {
  *     CALL_DEBUG_ENTER;
