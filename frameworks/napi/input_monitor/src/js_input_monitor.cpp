@@ -1066,11 +1066,11 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_get_reference_value(jsEnv_, receiver_, &callback),
             GET_REFERENCE_VALUE, scope, pointerEvent);
         napi_value result = nullptr;
-		if (monitor_->GetRectTotal() == 0
+        if (monitor_->GetRectTotal() == 0
             || IsLocaledWithinRect(jsEnv_, napiPointer, monitor_->GetRectTotal(), monitor_->GetHotRectAreas())) {
-			CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result),
-            	CALL_FUNCTION, scope, pointerEvent);
-		}
+            CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result),
+                CALL_FUNCTION, scope, pointerEvent);
+        }
 
         bool typeNameFlag = typeName == "touch" || typeName == "pinch" || typeName == "threeFingersSwipe" ||
             typeName == "fourFingersSwipe" || typeName == "rotate";
