@@ -267,8 +267,10 @@ bool EventUtilTest::CompareDump(const std::shared_ptr<PointerEvent>& pointerEven
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::string after = GetEventDump();
     MMI_HILOGD("after:%{public}s", after.c_str());
-
-    return before == after;
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    std::string result = DumpInputEvent(pointerEvent);
+    MMI_HILOGD("result:%{public}s", result.c_str());
+    return result == after;
 }
 
 bool EventUtilTest::CompareDump(const std::shared_ptr<KeyEvent>& keyEvent)
@@ -279,8 +281,10 @@ bool EventUtilTest::CompareDump(const std::shared_ptr<KeyEvent>& keyEvent)
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     std::string after = GetEventDump();
     MMI_HILOGD("after:%{public}s", after.c_str());
-
-    return before == after;
+    keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    std::string result = DumpInputEvent(keyEvent);
+    MMI_HILOGD("result:%{public}s", result.c_str());
+    return result == after;
 }
 
 int64_t GetNanoTime()
