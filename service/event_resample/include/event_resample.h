@@ -33,7 +33,8 @@ class EventResample final {
 
 public:
     DISALLOW_COPY_AND_MOVE(EventResample);
-    std::shared_ptr<PointerEvent> OnEventConsume(std::shared_ptr<PointerEvent> pointerEvent, int64_t frameTime, bool &deferred, ErrCode &status);
+    std::shared_ptr<PointerEvent> OnEventConsume(std::shared_ptr<PointerEvent> pointerEvent,
+                                                 int64_t frameTime, bool &deferred, ErrCode &status);
     std::shared_ptr<PointerEvent> GetPointerEvent();
 
     // Microseconds per milliseconds.
@@ -235,12 +236,16 @@ private:
     bool resampleTouch_ {true};
     std::shared_ptr<PointerEvent> pointerEvent_ {nullptr};
 
+    ErrCode InitializeInputEvent(std::shared_ptr<PointerEvent> pointerEvent, int64_t frameTime);
+    bool UpdateBatch(MotionEvent** outEvent, ErrCode &result, bool &deferred);
     void UpdatePointerEvent(MotionEvent* outEvent);
     ErrCode ConsumeBatch(int64_t frameTime, MotionEvent** outEvent);
     ErrCode ConsumeSamples(Batch& batch, size_t count, MotionEvent** outEvent);
     void AddSample(MotionEvent* outEvent, const MotionEvent* event);
     void UpdateTouchState(MotionEvent &event);
     void ResampleTouchState(int64_t sampleTime, MotionEvent* event, const MotionEvent* next);
+    void ResampleCoordinates(int64_t sampleTime, MotionEvent* event, TouchState &touchState,
+                             const History* current, const History* other, float alpha);
     ssize_t FindBatch(int32_t deviceId, int32_t source) const;
     ssize_t FindTouchState(int32_t deviceId, int32_t source) const;
     bool CanAddSample(const Batch &batch, MotionEvent &event);
