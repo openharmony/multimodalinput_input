@@ -89,6 +89,16 @@ ohos_shared_library("libmmi-client") {
     sources += [ "event_handler/src/switch_event_input_subscribe_manager.cpp" ]
   }
 
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    debug = false
+  }
+
+  stack_protector_ret = true
+
   configs = [
     "${mmi_path}:coverage_flags",
     ":libmmi_client_config",

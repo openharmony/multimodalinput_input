@@ -28,6 +28,16 @@ config("inputdevice_config") {
 ohos_shared_library("inputdevice") {
   sources = inputdevice_sources
 
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    debug = false
+  }
+
+  stack_protector_ret = true
+
   configs = [
     "${mmi_path}:coverage_flags",
     ":inputdevice_config",
