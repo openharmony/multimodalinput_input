@@ -72,6 +72,32 @@ static napi_value JsOnApi9(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
+static void AddMouseMonitor(napi_env env, napi_callback_info info, napi_value napiRect, napi_value napiCallback)
+{
+    Rect hotRectAreaList[RECT_LIST_SIZE];
+    uint32_t rectArrayLength = 0;
+    CHKRV(napi_get_array_length(env, napiRect, &rectArrayLength), GET_ARRAY_LENGTH);
+    if (rectArrayLength <= 0 || rectArrayLength > RECT_LIST_SIZE) {
+        MMI_HILOGE("Hot Rect Area Parameter error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Hot Rect Area Parameter error");
+        return;
+    }
+    JsInputMonMgr.GetHotRectAreaList(env, napiRect, rectArrayLength, hotRectAreaList);
+    napi_valuetype valueType = napi_undefined;
+    CHKRV(napi_typeof(env, napiCallback, &valueType), TYPEOF);
+    if (valueType != napi_function) {
+        MMI_HILOGE("Third Parameter type error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Third Parameter type error");
+        return;
+    }
+    if (!JsInputMonMgr.AddEnv(env, info)) {
+        MMI_HILOGE("AddEnv failed");
+        return;
+    }
+    JsInputMonMgr.AddMonitor(env, "mouse", hotRectAreaList, rectArrayLength, napiCallback);
+    return;
+}
+
 static napi_value AddMonitor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -93,7 +119,7 @@ static napi_value AddMonitor(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (strcmp(typeName, "mouse") == 0) {
-        AddMouseMonitor(env, info);
+       AddMouseMonitor(env, info, argv[1], argv[2]);
     } else {
         CHKRP(napi_typeof(env, argv[1], &valueType), TYPEOF);
         if (valueType != napi_number) {
@@ -121,27 +147,6 @@ static napi_value AddMonitor(napi_env env, napi_callback_info info)
         }
         JsInputMonMgr.AddMonitor(env, typeName, nullptr, 0, argv[TWO_PARAMETERS], fingers);
     }
-    return nullptr;
-}
-
-static napi_value AddMouseMonitor(napi_env env, napi_callback_info info)
-{
-    Rect hotRectAreaList[RECT_LIST_SIZE];
-    uint32_t rectArrayLength = 0;
-    CHKRP(napi_get_array_length(env, argv[1], &rectArrayLength), GET_ARRAY_LENGTH);
-    if (rectArrayLength <= 0 || rectArrayLength > RECT_LIST_SIZE) {
-        MMI_HILOGE("Hot Rect Area Parameter error");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Hot Rect Area Parameter error");
-        return nullptr;
-    }
-    JsInputMonMgr.GetHotRectAreaList(env, argv[1], rectArrayLength, hotRectAreaList);
-    CHKRP(napi_typeof(env, argv[TWO_PARAMETERS], &valueType), TYPEOF);
-    if (valueType != napi_function) {
-        MMI_HILOGE("Third Parameter type error");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Third Parameter type error");
-        return nullptr;
-    }
-    JsInputMonMgr.AddMonitor(env, typeName, hotRectAreaList, rectArrayLength, argv[TWO_PARAMETERS]);
     return nullptr;
 }
 
