@@ -210,6 +210,8 @@ private:
     int32_t checkAdjustDistanceCount_ { 0 };
     int64_t downToPrevUpTimeConfig_ { 0 };
     float downToPrevDownDistanceConfig_ { 0.0f };
+    float distanceDefaultConfig_ { 0.0f };
+    float distanceLongConfig_ { 0.0f };
 };
 } // namespace MMI
 } // namespace OHOS
