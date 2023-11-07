@@ -185,12 +185,7 @@ void InputMonitor::SetHotRectArea(std::vector<Rect> hotRectArea)
     hotRectArea_ = hotRectArea;
 }
 
-Rect InputMonitor::GetHotRectArea(int32_t index)
-{
-    return hotRectArea_.at(index);
-}
-
-std::vector<Rect> InputMonitor::GetHotRectAreas()
+std::vector<Rect> InputMonitor::GetHotRectArea()
 {
     return hotRectArea_;
 }
@@ -1085,7 +1080,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
             GET_REFERENCE_VALUE, scope, pointerEvent);
         napi_value result = nullptr;
         if (monitor_->GetRectTotal() == 0
-            || IsLocaledWithinRect(jsEnv_, napiPointer, monitor_->GetRectTotal(), monitor_->GetHotRectAreas())) {
+            || IsLocaledWithinRect(jsEnv_, napiPointer, monitor_->GetRectTotal(), monitor_->GetHotRectArea())) {
             CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result),
                 CALL_FUNCTION, scope, pointerEvent);
         }
