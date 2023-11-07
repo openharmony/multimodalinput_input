@@ -22,6 +22,7 @@
 #include <ui/rs_canvas_node.h>
 #include <ui/rs_surface_node.h>
 #include <transaction/rs_transaction.h>
+#include <transaction/rs_interfaces.h>
 
 #include "draw/canvas.h"
 #include "nocopyable.h"
