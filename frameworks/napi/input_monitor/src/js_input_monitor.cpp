@@ -48,7 +48,6 @@ constexpr int32_t FOUR_FINGERS = 4;
 constexpr int32_t GESTURE_BEGIN = 1;
 constexpr int32_t GESTURE_UPDATE = 2;
 constexpr int32_t GESTURE_END = 3;
-constexpr int32_t RECT_LIST_SIZE = 2;
 enum TypeName : int32_t {
     TOUCH = 0,
     MOUSE = 1,
@@ -181,17 +180,17 @@ void InputMonitor::SetFingers(int32_t fingers)
     fingers_ = fingers;
 }
 
-void InputMonitor::SetHotRectArea(Rect hotRectArea[])
+void InputMonitor::SetHotRectArea(std::vector<Rect> hotRectArea)
 {
-    memcpy_s(hotRectArea_, sizeof(Rect) * RECT_LIST_SIZE, hotRectArea, sizeof(Rect) * RECT_LIST_SIZE);
+    hotRectArea_ = hotRectArea;
 }
 
 Rect InputMonitor::GetHotRectArea(int32_t index)
 {
-    return hotRectArea_[index];
+    return hotRectArea_.at(index);
 }
 
-Rect* InputMonitor::GetHotRectAreas()
+std::vector<Rect> InputMonitor::GetHotRectAreas()
 {
     return hotRectArea_;
 }
@@ -225,7 +224,7 @@ void InputMonitor::MarkConsumed(int32_t eventId)
     consumed_ = true;
 }
 
-JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, Rect rectParam[],
+JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, std::vector<Rect> rectParam,
     int32_t rectTotal, napi_value callback, int32_t id, int32_t fingers)
     : monitor_(std::make_shared<InputMonitor>()), jsEnv_(jsEnv), typeName_(typeName), monitorId_(id),
     fingers_(fingers)
@@ -246,6 +245,25 @@ JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, Rect
         monitor_->SetHotRectArea(rectParam);
         monitor_->SetRectTotal(rectTotal);
     }
+}
+
+JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName,
+    napi_value callback, int32_t id, int32_t fingers)
+    : monitor_(std::make_shared<InputMonitor>()), jsEnv_(jsEnv), typeName_(typeName), monitorId_(id),
+    fingers_(fingers)
+{
+    SetCallback(callback);
+    if (monitor_ == nullptr) {
+        MMI_HILOGE("The monitor is null");
+        return;
+    }
+    monitor_->SetCallback([jsId = id, jsFingers = fingers](std::shared_ptr<PointerEvent> pointerEvent) {
+        auto& jsMonitor { JsInputMonMgr.GetMonitor(jsId, jsFingers) };
+        CHKPV(jsMonitor);
+        jsMonitor->OnPointerEvent(pointerEvent);
+    });
+    monitor_->SetId(monitorId_);
+    monitor_->SetFingers(fingers_);
 }
 
 void JsInputMonitor::SetCallback(napi_value callback)
@@ -1084,7 +1102,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
     }
 }
 
-bool JsInputMonitor::IsLocaledWithinRect(napi_env env, napi_value napiPointer, uint32_t rectTotal, Rect* hotRectArea)
+bool JsInputMonitor::IsLocaledWithinRect(napi_env env, napi_value napiPointer, uint32_t rectTotal, std::vector<Rect> hotRectArea)
 {
     napi_value xProperty;
     CHKRF(napi_get_named_property(env, napiPointer, "screenX", &xProperty), GET_NAMED_PROPERTY);
@@ -1105,10 +1123,10 @@ bool JsInputMonitor::IsLocaledWithinRect(napi_env env, napi_value napiPointer, u
     CHKRF(napi_get_value_int32(env, yProperty, &yInt), GET_VALUE_INT32);
 
     for (uint32_t i = 0; i < rectTotal; i++) {
-        int32_t hotAreaX = (hotRectArea + i)->x;
-        int32_t hotAreaY = (hotRectArea + i)->y;
-        int32_t hotAreaWidth = (hotRectArea + i)->width;
-        int32_t hotAreaHeight = (hotRectArea + i)->height;
+        int32_t hotAreaX = hotRectArea.at(i).x;
+        int32_t hotAreaY = hotRectArea.at(i).y;
+        int32_t hotAreaWidth = hotRectArea.at(i).width;
+        int32_t hotAreaHeight = hotRectArea.at(i).height;
                 
         if ((xInt >= hotAreaX) && (xInt <= hotAreaX + hotAreaWidth)
             && (yInt >= hotAreaY) && (yInt <= hotAreaY + hotAreaHeight)) {

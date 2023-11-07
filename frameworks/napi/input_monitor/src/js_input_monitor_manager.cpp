@@ -37,7 +37,7 @@ JsInputMonitorManager& JsInputMonitorManager::GetInstance()
 }
 
 void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeName,
-    Rect hotRectArea[], int32_t rectTotal, napi_value callback, const int32_t fingers)
+    std::vector<Rect> hotRectArea, int32_t rectTotal, napi_value callback, const int32_t fingers)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mutex_);
@@ -47,8 +47,28 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
             return;
         }
     }
-    auto monitor = std::make_shared<JsInputMonitor>(jsEnv, typeName, hotRectArea, rectTotal,
-        callback, nextId_++, fingers);
+    auto monitor = std::make_shared<JsInputMonitor>(jsEnv, typeName, hotRectArea, rectTotal, callback, nextId_++, fingers);
+    int32_t ret = monitor->Start();
+    if (ret < 0) {
+        MMI_HILOGE("js monitor startup failed");
+        ThrowError(jsEnv, ret);
+        return;
+    }
+    monitors_.push_back(monitor);
+}
+
+void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeName,
+    napi_value callback, const int32_t fingers)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
+    for (const auto &item : monitors_) {
+        if ((item != nullptr) && (item->IsMatch(jsEnv, callback) != RET_ERR)) {
+            MMI_HILOGW("Add js monitor failed");
+            return;
+        }
+    }
+    auto monitor = std::make_shared<JsInputMonitor>(jsEnv, typeName, callback, nextId_++, fingers);
     int32_t ret = monitor->Start();
     if (ret < 0) {
         MMI_HILOGE("js monitor startup failed");
@@ -254,56 +274,56 @@ void JsInputMonitorManager::ThrowError(napi_env env, int32_t code)
     }
 }
 
-void JsInputMonitorManager::GetHotRectAreaList(napi_env env, napi_value rectNapiValue,
-    uint32_t rectListLength, Rect* hotRectAreaListPtr)
+std::vector<Rect> JsInputMonitorManager::GetHotRectAreaList(napi_env env, napi_value rectNapiValue, uint32_t rectListLength)
 {
     CALL_DEBUG_ENTER;
+    std::vector<Rect> hotRectAreaList;
     for (uint32_t i = 0; i < rectListLength; i++) {
         napi_value napiElement;
-        CHKRV(napi_get_element(env, rectNapiValue, i, &napiElement), GET_ELEMENT);
+        CHKRR(napi_get_element(env, rectNapiValue, i, &napiElement), GET_ELEMENT, hotRectAreaList);
         Rect rectItem;
         napi_value napiX = nullptr;
-        CHKRV(napi_get_named_property(env, napiElement, "left", &napiX), GET_NAMED_PROPERTY);
+        CHKRR(napi_get_named_property(env, napiElement, "left", &napiX), GET_NAMED_PROPERTY, hotRectAreaList);
         if (napiX == nullptr) {
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "left not found");
-            return;
+            return hotRectAreaList;
         }
         int32_t rectX = -1;
-        CHKRV(napi_get_value_int32(env, napiX, &rectX), GET_VALUE_INT32);
+        CHKRR(napi_get_value_int32(env, napiX, &rectX), GET_VALUE_INT32, hotRectAreaList);
         rectItem.x = rectX;
 
         napi_value napiY = nullptr;
-        CHKRV(napi_get_named_property(env, napiElement, "top", &napiY), GET_NAMED_PROPERTY);
+        CHKRR(napi_get_named_property(env, napiElement, "top", &napiY), GET_NAMED_PROPERTY, hotRectAreaList);
         if (napiY == nullptr) {
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "top not found");
-            return;
+            return hotRectAreaList;
         }
         int32_t rectY = -1;
-        CHKRV(napi_get_value_int32(env, napiY, &rectY), GET_VALUE_INT32);
+        CHKRR(napi_get_value_int32(env, napiY, &rectY), GET_VALUE_INT32, hotRectAreaList);
         rectItem.y = rectY;
 
         napi_value napiWidth = nullptr;
-        CHKRV(napi_get_named_property(env, napiElement, "width", &napiWidth), GET_NAMED_PROPERTY);
+        CHKRR(napi_get_named_property(env, napiElement, "width", &napiWidth), GET_NAMED_PROPERTY, hotRectAreaList);
         if (napiWidth == nullptr) {
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "width not found");
-            return;
+            return hotRectAreaList;
         }
         int32_t rectWidth = -1;
-        CHKRV(napi_get_value_int32(env, napiWidth, &rectWidth), GET_VALUE_INT32);
+        CHKRR(napi_get_value_int32(env, napiWidth, &rectWidth), GET_VALUE_INT32, hotRectAreaList);
         rectItem.width = rectWidth;
 
         napi_value napiHeight = nullptr;
-        CHKRV(napi_get_named_property(env, napiElement, "height", &napiHeight), GET_NAMED_PROPERTY);
+        CHKRR(napi_get_named_property(env, napiElement, "height", &napiHeight), GET_NAMED_PROPERTY, hotRectAreaList);
         if (napiHeight == nullptr) {
             THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "height not found");
-            return;
+            return hotRectAreaList;
         }
         int32_t rectHeight = -1;
-        CHKRV(napi_get_value_int32(env, napiHeight, &rectHeight), GET_VALUE_INT32);
+        CHKRR(napi_get_value_int32(env, napiHeight, &rectHeight), GET_VALUE_INT32, hotRectAreaList);
         rectItem.height = rectHeight;
-        *(hotRectAreaListPtr + i) = rectItem;
+        hotRectAreaList.push_back(rectItem);
     }
-    return;
+    return hotRectAreaList;
 }
 } // namespace MMI
 } // namespace OHOS
