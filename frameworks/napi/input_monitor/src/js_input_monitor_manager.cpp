@@ -47,7 +47,8 @@ void JsInputMonitorManager::AddMonitor(napi_env jsEnv, const std::string &typeNa
             return;
         }
     }
-    auto monitor = std::make_shared<JsInputMonitor>(jsEnv, typeName, hotRectArea, rectTotal, callback, nextId_++, fingers);
+    auto monitor = std::make_shared<JsInputMonitor>(jsEnv, typeName, hotRectArea,
+        rectTotal, callback, nextId_++, fingers);
     int32_t ret = monitor->Start();
     if (ret < 0) {
         MMI_HILOGE("js monitor startup failed");
@@ -274,7 +275,8 @@ void JsInputMonitorManager::ThrowError(napi_env env, int32_t code)
     }
 }
 
-std::vector<Rect> JsInputMonitorManager::GetHotRectAreaList(napi_env env, napi_value rectNapiValue, uint32_t rectListLength)
+std::vector<Rect> JsInputMonitorManager::GetHotRectAreaList(napi_env env,
+    napi_value rectNapiValue, uint32_t rectListLength)
 {
     CALL_DEBUG_ENTER;
     std::vector<Rect> hotRectAreaList;

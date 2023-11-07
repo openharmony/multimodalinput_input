@@ -1102,7 +1102,8 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
     }
 }
 
-bool JsInputMonitor::IsLocaledWithinRect(napi_env env, napi_value napiPointer, uint32_t rectTotal, std::vector<Rect> hotRectArea)
+bool JsInputMonitor::IsLocaledWithinRect(napi_env env, napi_value napiPointer,
+    uint32_t rectTotal, std::vector<Rect> hotRectArea)
 {
     napi_value xProperty;
     CHKRF(napi_get_named_property(env, napiPointer, "screenX", &xProperty), GET_NAMED_PROPERTY);
@@ -1127,7 +1128,6 @@ bool JsInputMonitor::IsLocaledWithinRect(napi_env env, napi_value napiPointer, u
         int32_t hotAreaY = hotRectArea.at(i).y;
         int32_t hotAreaWidth = hotRectArea.at(i).width;
         int32_t hotAreaHeight = hotRectArea.at(i).height;
-                
         if ((xInt >= hotAreaX) && (xInt <= hotAreaX + hotAreaWidth)
             && (yInt >= hotAreaY) && (yInt <= hotAreaY + hotAreaHeight)) {
             return true;
