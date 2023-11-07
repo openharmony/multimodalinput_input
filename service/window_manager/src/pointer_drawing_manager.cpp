@@ -847,13 +847,12 @@ bool PointerDrawingManager::IsPointerVisible()
 void PointerDrawingManager::DeletePointerVisible(int32_t pid)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("isRsRemoteDied:%{public}d",isRsRemoteDied ? 1 : 0);
-    if(isRsRemoteDied && surfaceNode_ != nullptr)
-    {
-       isRsRemoteDied = false;
-       surfaceNode_->DetachToDisplay(screenId_);
-       surfaceNode_ =nullptr;
-       Rosen::RSTransaction::FlushImplicitTransaction();
+    MMI_HILOGI("isRsRemoteDied:%{public}d", isRsRemoteDied ? 1 : 0);
+    if (isRsRemoteDied && surfaceNode_ != nullptr){
+        isRsRemoteDied = false;
+        surfaceNode_->DetachToDisplay(screenId_);
+        surfaceNode_ =nullptr;
+        Rosen::RSTransaction::FlushImplicitTransaction();
     }
     auto it = pidInfos_.begin();
     for (; it != pidInfos_.end(); ++it) {
