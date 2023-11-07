@@ -54,6 +54,7 @@ constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
 constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0f;
 constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG = 96.0f;
+constexpr float VPR_CONFIG = 3.25f;
 constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t ACTIVE_EVENT = 2;
 
@@ -719,7 +720,9 @@ void KeyCommandHandler::OnHandleTouchEvent(const std::shared_ptr<PointerEvent> t
         isTimeConfig_ = true;
     }
     if (!isDistanceConfig_) {
-        SetKnuckleDoubleTapDistance(DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG);
+        distanceDefaultConfig_ = DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG * VPR_CONFIG;
+        distanceLongConfig_ = DOUBLE_CLICK_DISTANCE_LONG_CONFIG * VPR_CONFIG;
+        SetKnuckleDoubleTapDistance(distanceDefaultConfig_);
         isDistanceConfig_ = true;
     }
 
@@ -994,16 +997,16 @@ void KeyCommandHandler::AdjustDistanceConfigIfNeed(float distance)
     float newDistanceConfig;
     MMI_HILOGI("down to prev down distance: %{public}f, config distance: %{public}f",
         distance, downToPrevDownDistanceConfig_);
-    if (IsEqual(downToPrevDownDistanceConfig_, DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG)) {
-        if (distance < DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG || distance > DOUBLE_CLICK_DISTANCE_LONG_CONFIG) {
+    if (IsEqual(downToPrevDownDistanceConfig_, distanceDefaultConfig_)) {
+        if (distance < distanceDefaultConfig_ || distance > distanceLongConfig_) {
             return;
         }
-        newDistanceConfig = DOUBLE_CLICK_DISTANCE_LONG_CONFIG;
-    } else if (IsEqual(downToPrevDownDistanceConfig_, DOUBLE_CLICK_DISTANCE_LONG_CONFIG)) {
-        if (distance > DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG) {
+        newDistanceConfig = distanceLongConfig_;
+    } else if (IsEqual(downToPrevDownDistanceConfig_, distanceLongConfig_)) {
+        if (distance > distanceDefaultConfig_) {
             return;
         }
-        newDistanceConfig = DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG;
+        newDistanceConfig = distanceDefaultConfig_;
     } else {
         return;
     }
