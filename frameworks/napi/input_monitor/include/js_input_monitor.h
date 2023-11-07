@@ -50,8 +50,7 @@ public:
     void SetId(int32_t id);
     void SetFingers(int32_t fingers);
     void SetHotRectArea(std::vector<Rect> hotRectArea);
-    Rect GetHotRectArea(int32_t index);
-    std::vector<Rect> GetHotRectAreas();
+    std::vector<Rect> GetHotRectArea();
     void SetRectTotal(uint32_t rectTotal);
     uint32_t GetRectTotal();
     void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override;
