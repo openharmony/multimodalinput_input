@@ -119,7 +119,7 @@ static napi_value AddMonitor(napi_env env, napi_callback_info info)
         return nullptr;
     }
     if (strcmp(typeName, "mouse") == 0) {
-       AddMouseMonitor(env, info, argv[1], argv[2]);
+        AddMouseMonitor(env, info, argv[1], argv[TWO_PARAMETERS]);
     } else {
         CHKRP(napi_typeof(env, argv[1], &valueType), TYPEOF);
         if (valueType != napi_number) {
