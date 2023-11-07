@@ -345,7 +345,7 @@ void EventResample::ResampleTouchState(int64_t sampleTime, MotionEvent* event, c
             return;
         }
         alpha = static_cast<float>(sampleTime - current->actionTime) / delta;
-    } else if (touchState.historySize >= 2) {
+    } else if (touchState.historySize >= HISTORY_SIZE_MAX) {
         // Extrapolate future sample using current sample and past sample.
         // So other->actionTime <= current->actionTime <= sampleTime.
         other = touchState.GetHistory(1);

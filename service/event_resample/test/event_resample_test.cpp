@@ -177,15 +177,13 @@ public:
                 evt.InitializeFrom(event);
                 eventBatch.push_back(std::move(evt));
             } else {
-                if (event.action == PointerEvent::POINTER_ACTION_UP) {
-                    if (!eventBatch.empty()) {
-                        for (size_t i = 0; i < eventBatch.size(); i++) {
-                            InputEvt& event = eventBatch.at(i);
-                            UpdateTouchState(event);
-                        }
-                        eventBatch.erase(eventBatch.begin(), eventBatch.begin() + eventBatch.size() - 1);
-                        deferred = true;
+                if ( (event.action == PointerEvent::POINTER_ACTION_UP) && (!eventBatch.empty())) {
+                    for (size_t i = 0; i < eventBatch.size(); i++) {
+                        InputEvt& event = eventBatch.at(i);
+                        UpdateTouchState(event);
                     }
+                    eventBatch.erase(eventBatch.begin(), eventBatch.begin() + eventBatch.size() - 1);
+                    deferred = true;
                 }
                 UpdateTouchState(event);
             }
@@ -227,7 +225,7 @@ public:
             if (eventBatch.empty()) {
                 // Coordinates extrapolation
                 MMI_HILOGD("Extrapolation");
-                if (touchState.size() < 2) {
+                if (touchState.size() < EventResample::HISTORY_SIZE_MAX) {
                     return ERR_OK;
                 }
                 other.InitializeFrom(touchState[1]);
@@ -434,16 +432,14 @@ bool EventResampleTest::DoTest(TestData &testData, int32_t testId)
                        pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerEvent_->GetActionTime());
 
             outEvent = EventResampleHdr->OnEventConsume(pointerEvent_, ctx.frameTime, deferred, status);
-            if (outEvent != nullptr) {
-                if (PointerEvent::POINTER_ACTION_DOWN != outEvent->GetPointerAction()) {
-                    MMI_HILOGE("Unexpected pointer action: %{public}d while %{public}d expected",
-                               outEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_DOWN);
-                    failCount_++;
-                } else {
-                    EXPECT_EQ(ERR_OK, CheckResults(outEvent, expected, ctx));
-                    EXPECT_EQ(ERR_OK, status);
-                    EXPECT_FALSE(deferred);
-                }
+            if ((outEvent != nullptr) && (PointerEvent::POINTER_ACTION_DOWN != outEvent->GetPointerAction())) {
+                MMI_HILOGE("Unexpected pointer action: %{public}d while %{public}d expected",
+                           outEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_DOWN);
+                failCount_++;
+            } else if (outEvent != nullptr) {
+                EXPECT_EQ(ERR_OK, CheckResults(outEvent, expected, ctx));
+                EXPECT_EQ(ERR_OK, status);
+                EXPECT_FALSE(deferred);
             }
             eventQueue_.pop();
         }

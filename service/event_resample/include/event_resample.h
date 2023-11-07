@@ -55,6 +55,9 @@ public:
     // far into the future.  This time is further bounded by 50% of the last time delta.
     static constexpr int64_t RESAMPLE_MAX_PREDICTION = 4 * US_PER_MS;
 
+    // Maximum history size to store samples
+    static constexpr size_t HISTORY_SIZE_MAX = 2;
+
 private:
 
     struct Pointer {
@@ -181,7 +184,7 @@ private:
         int32_t source;
         size_t historyCurrent;
         size_t historySize;
-        History history[2];
+        History history[HISTORY_SIZE_MAX];
         History lastResample;
 
         void Initialize(int32_t deviceId, int32_t source)
@@ -196,7 +199,7 @@ private:
         void AddHistory(const MotionEvent &event)
         {
             historyCurrent ^= 1;
-            if (historySize < 2) {
+            if (historySize < HISTORY_SIZE_MAX) {
                 historySize += 1;
             }
             history[historyCurrent].InitializeFrom(event);
@@ -210,7 +213,7 @@ private:
         bool RecentCoordinatesAreIdentical(uint32_t id) const
         {
             // Return true if the two most recently received "raw" coordinates are identical
-            if (historySize < 2) {
+            if (historySize < HISTORY_SIZE_MAX) {
                 return false;
             }
             if (!GetHistory(0)->HasPointerId(id) || !GetHistory(1)->HasPointerId(id)) {
@@ -252,10 +255,10 @@ private:
     void RewriteMessage(TouchState& state, MotionEvent &event);
     ssize_t FindSampleNoLaterThan(const Batch& batch, int64_t time);
     bool ShouldResampleTool(int32_t toolType);
-
 };
 
-inline static float CalcCoord(float a, float b, float alpha) {
+inline static float CalcCoord(float a, float b, float alpha)
+{
     return a + alpha * (b - a);
 }
 
