@@ -30,6 +30,16 @@ ohos_shared_library("inputeventclient") {
     "src/js_register_util.cpp",
   ]
 
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    debug = false
+  }
+
+  stack_protector_ret = true
+
   configs = [
     "${mmi_path}:coverage_flags",
     ":inputeventclient_config",
