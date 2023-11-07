@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("//build/test.gni")
 import("../../multimodalinput_mini.gni")
-module_output_path = "multimodalinput/unit_out"
+module_output_path = "multimodalinput/mmi_unit_out"
 
 config("event_injection_config") {
   visibility = [ ":*" ]
