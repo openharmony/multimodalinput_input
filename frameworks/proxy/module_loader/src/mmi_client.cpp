@@ -31,7 +31,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIClient" };
-const std::string THREAD_NAME = "mmi_EventHdr";
+const std::string THREAD_NAME = "os_mmi_EventHdr";
 } // namespace
 
 using namespace AppExecFwk;
