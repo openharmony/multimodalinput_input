@@ -69,6 +69,7 @@ public:
     int32_t MarkProcessed(int32_t eventType, int32_t eventId) override;
     int32_t SetPointerColor(int32_t color) override;
     int32_t GetPointerColor(int32_t &color) override;
+    int32_t EnableCombineKey(bool enable) override;
     int32_t SetPointerSpeed(int32_t speed) override;
     int32_t GetPointerSpeed(int32_t &speed) override;
     int32_t SetPointerStyle(int32_t windowId, PointerStyle pointerStyle) override;
@@ -195,6 +196,7 @@ protected:
     int32_t UpdateSettingsXml(const std::string &businessId, int32_t delay);
     void AddAppDebugListener();
     void RemoveAppDebugListener();
+    int32_t UpdateCombineKeyState(bool enable);
 
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;

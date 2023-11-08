@@ -171,6 +171,61 @@ HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: KeyCommandHandlerTest_EnableCombineKey_001
+ * @tc.desc: Test enable combineKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_EnableCombineKey_001, TestSize.Level1)
+{
+    KeyCommandHandler eventKeyCommandHandler;
+    ASSERT_EQ(eventKeyCommandHandler.EnableCombineKey(true), RET_OK);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_IsEnableCombineKey_001
+ * @tc.desc: Test IsEnableCombineKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey_001, TestSize.Level1)
+{
+    KeyCommandHandler eventKeyCommandHandler;
+    eventKeyCommandHandler.EnableCombineKey(false);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    CHKPV(keyEvent);
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    ASSERT_EQ(eventKeyCommandHandler.OnHandleEvent(keyEvent), false);
+    eventKeyCommandHandler.EnableCombineKey(true);
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_IsEnableCombineKey_002
+ * @tc.desc: Test IsEnableCombineKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_IsEnableCombineKey_002, TestSize.Level1)
+{
+    KeyCommandHandler eventKeyCommandHandler;
+    eventKeyCommandHandler.EnableCombineKey(false);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    CHKPV(keyEvent);
+    KeyEvent::KeyItem item1;
+    item1.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+    keyEvent->AddKeyItem(item1);
+    KeyEvent::KeyItem item2;
+    item2.SetKeyCode(KeyEvent::KEYCODE_L);
+    keyEvent->AddKeyItem(item2);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_L);
+    ASSERT_EQ(eventKeyCommandHandler.OnHandleEvent(keyEvent), false);
+    eventKeyCommandHandler.EnableCombineKey(true);
+}
+
+/**
  * @tc.name: KeyCommandHandlerTest_002
  * @tc.desc: Test update key down duration -1 and 4001
  * @tc.type: FUNC

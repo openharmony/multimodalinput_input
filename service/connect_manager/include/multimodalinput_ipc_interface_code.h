@@ -96,6 +96,7 @@ enum class MultimodalinputConnectInterfaceCode {
     RMV_INPUT_EVENT_OBSERVER = 74,
     SET_SHIELD_STATUS = 75,
     GET_SHIELD_STATUS = 76,
+    ENABLE_COMBINE_KEY = 77,
 };
 
 enum class MultimodalinputEventObserverCode {
