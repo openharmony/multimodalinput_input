@@ -88,6 +88,7 @@ int32_t NapProcess::SetNapStatus(int32_t pid, int32_t uid, std::string bundleNam
 int32_t NapProcess::AddMmiSubscribedEventData(const NapStatusData& napData)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard guard(mapMtx_);
     napMap_.push_back(napData);
     return RET_OK;
 }
@@ -95,6 +96,7 @@ int32_t NapProcess::AddMmiSubscribedEventData(const NapStatusData& napData)
 int32_t NapProcess::RemoveMmiSubscribedEventData(const NapStatusData& napData)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard guard(mapMtx_);
     for (auto it = napMap_.begin(); it != napMap_.end(); ++it) {
         if (napData.pid == it->pid) {
             napMap_.erase(it);
@@ -121,6 +123,7 @@ int32_t NapProcess::NotifyNapOnline()
 int32_t NapProcess::RemoveInputEventObserver()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard guard(mapMtx_);
     napMap_.clear();
     napClientPid_ = REMOVE_OBSERVER;
     return RET_OK;
@@ -129,6 +132,7 @@ int32_t NapProcess::RemoveInputEventObserver()
 int32_t NapProcess::GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard guard(mapMtx_);
     for (auto it = napMap_.begin(); it != napMap_.end(); ++it) {
         int32_t getPid = it->pid;
         int32_t getUid = it->uid;
