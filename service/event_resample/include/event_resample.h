@@ -90,6 +90,7 @@ private:
         int32_t sourceType { PointerEvent::SOURCE_TYPE_UNKNOWN };
         int32_t pointerAction { PointerEvent::POINTER_ACTION_UNKNOWN };
         int32_t deviceId { 0 };
+        int32_t eventId { 0 };
 
         void Reset()
         {
@@ -99,6 +100,7 @@ private:
             sourceType = PointerEvent::SOURCE_TYPE_UNKNOWN;
             pointerAction = PointerEvent::POINTER_ACTION_UNKNOWN;
             deviceId = 0;
+            eventId = 0;
         }
 
         void InitializeFrom(MotionEvent& other)
@@ -111,6 +113,7 @@ private:
             deviceId = other.deviceId;
             sourceType = other.sourceType;
             pointerAction = other.pointerAction;
+            eventId = other.eventId;
         }
 
         void InitializeFrom(std::shared_ptr<PointerEvent> event)
@@ -119,6 +122,7 @@ private:
             deviceId = event->GetDeviceId();
             sourceType = event->GetSourceType();
             pointerAction = event->GetPointerAction();
+            eventId = event->GetId();
 
             std::vector<int32_t> pointerIds = event->GetPointerIds();
             pointerCount = 0;

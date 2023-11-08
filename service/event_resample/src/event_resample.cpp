@@ -173,6 +173,8 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
     pointerEvent_->SetActionTime(outEvent->actionTime);
     pointerEvent_->SetPointerAction(outEvent->pointerAction);
     pointerEvent_->SetActionTime(outEvent->actionTime);
+    pointerEvent_->SetId(outEvent->eventId);
+
     for (auto &it : outEvent->pointers) {
         MMI_HILOGD("Output event: %{public}d %{public}d %{public}" PRId64 " %{public}d",
                    it.second.coordX, it.second.coordY, outEvent->actionTime, outEvent->pointerAction);
