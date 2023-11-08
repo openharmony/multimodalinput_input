@@ -602,6 +602,30 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_007, TestSize.Level
 }
 
 /**
+ * @tc.name: InputManagerTest_EnableCombineKey_001
+ * @tc.desc: Enable combine key
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_EnableCombineKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_EQ(InputManager::GetInstance()->EnableCombineKey(false), RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_EnableCombineKey_002
+ * @tc.desc: Enable combine key
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_EnableCombineKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_EQ(InputManager::GetInstance()->EnableCombineKey(true), RET_OK);
+}
+
+/**
  * @tc.name: InputManagerTest_TouchScreenHotArea_001
  * @tc.desc: Touch event Search window by defaultHotAreas
  * @tc.type: FUNC
