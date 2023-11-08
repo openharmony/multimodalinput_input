@@ -309,9 +309,7 @@ ohos_unittest("ut-mmi-service-out") {
 
 ohos_unittest("event_resample_test") {
   module_out_path = module_output_path
-  include_dirs = [
-    "${mmi_path}/service/event_resample/include",
-  ]
+  include_dirs = [ "${mmi_path}/service/event_resample/include" ]
 
   sources = [
     "event_resample/src/event_resample.cpp",
@@ -321,9 +319,9 @@ ohos_unittest("event_resample_test") {
   configs = [ ":libmmi_server_config" ]
 
   deps = [
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
     "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
