@@ -279,7 +279,7 @@ public:
     int32_t CheckResults(std::shared_ptr<PointerEvent> outEvent,
                          std::vector<ExpectedData> &expected, Context &context);
     bool DoTest(TestData &testData, int32_t testId);
-    void ReadQueue(TestData &testData, Context &ctx,std::vector<ExpectedData> &expected);
+    void ReadQueue(TestData &testData, Context &ctx, std::vector<ExpectedData> &expected);
     void SendTouchUp(TestData &testData, Context &ctx, std::vector<ExpectedData> &expected);
 
     std::shared_ptr<PointerEvent> pointerEvent_ = nullptr;

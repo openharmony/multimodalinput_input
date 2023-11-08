@@ -137,9 +137,9 @@ ohos_shared_library("libmmi-server") {
     }
     if (input_feature_touchscreen) {
       sources += [
+        "event_resample/src/event_resample.cpp",
         "touch_event_normalize/src/tablet_tool_tranform_processor.cpp",
         "touch_event_normalize/src/touch_transform_processor.cpp",
-        "event_resample/src/event_resample.cpp",
       ]
     }
   }
@@ -311,8 +311,6 @@ ohos_unittest("event_resample_test") {
   module_out_path = module_output_path
   include_dirs = [
     "${mmi_path}/service/event_resample/include",
-    "//base/customization/config_policy/interfaces/inner_api/include",
-    "//commonlibrary/c_utils/base/include"
   ]
 
   sources = [
@@ -325,17 +323,17 @@ ohos_unittest("event_resample_test") {
   deps = [
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
-    "//foundation/multimodalinput/input/patch/diff_libinput_mmi:libinput-third-mmi",
+    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
+    "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
-    "//third_party/cJSON:cjson",
   ]
 
   external_deps = [
     "c_utils:utils",
-    "hilog:libhilog",
     "config_policy:configpolicy_util",
-    "preferences:native_preferences"
+    "hilog:libhilog",
+    "preferences:native_preferences",
   ]
 }
 
