@@ -851,7 +851,7 @@ void PointerDrawingManager::DeletePointerVisible(int32_t pid)
     if (isRsRemoteDied && surfaceNode_ != nullptr) {
         isRsRemoteDied = false;
         surfaceNode_->DetachToDisplay(screenId_);
-        surfaceNode_ =nullptr;
+        surfaceNode_ = nullptr;
         Rosen::RSTransaction::FlushImplicitTransaction();
     }
     auto it = pidInfos_.begin();
