@@ -33,7 +33,8 @@ declare_args() {
   input_feature_input_device = true
   input_feature_short_key = true
   input_feature_coverage = false
-  input_ext_feature = false
+  input_ext_feature_anco = false
+  input_ext_feature_fingersense = false
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.resourceschedule_resource_schedule_service)) {
@@ -294,12 +295,13 @@ if (security_component_enable) {
   input_default_defines += [ "OHOS_BUILD_ENABLE_SECURITY_COMPONENT" ]
 }
 
-if (input_ext_feature) {
+if (input_ext_feature_fingersense) {
+  input_default_defines += [ "OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER" ]
+}
+
+if (input_ext_feature_anco) {
   mmi_ext_path = "//vendor/huawei/foundation/multimodalinput/input_ext"
-  input_default_defines += [
-    "OHOS_BUILD_ENABLE_CONTAINER",
-    "OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER",
-  ]
+  input_default_defines += [ "OHOS_BUILD_ENABLE_ANCO" ]
   libmmi_client_sources +=
       [ "${mmi_ext_path}/container_ipc_manager/src/input_manager_ext.cpp" ]
   libmmi_service_sources += [
