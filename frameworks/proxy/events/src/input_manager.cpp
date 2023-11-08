@@ -288,6 +288,10 @@ int32_t InputManager::GetPointerColor(int32_t &color)
     return InputMgrImpl.GetPointerColor(color);
 }
 
+int32_t InputManager::EnableCombineKey(bool enable)
+{
+    return InputMgrImpl.EnableCombineKey(enable);
+}
 
 int32_t InputManager::SetPointerSpeed(int32_t speed)
 {
