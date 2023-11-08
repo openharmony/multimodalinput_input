@@ -34,6 +34,7 @@ const std::set<std::string> ACTION_TYPE = {
 };
 constexpr int32_t TWO_PARAMETERS = 2;
 constexpr int32_t THREE_PARAMETERS = 3;
+constexpr int32_t RECT_LIST_SIZE = 2;
 } // namespace
 
 static napi_value JsOnApi9(napi_env env, napi_callback_info info)
@@ -71,6 +72,32 @@ static napi_value JsOnApi9(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
+static void AddMouseMonitor(napi_env env, napi_callback_info info, napi_value napiRect, napi_value napiCallback)
+{
+    std::vector<Rect> hotRectAreaList;
+    uint32_t rectArrayLength = 0;
+    CHKRV(napi_get_array_length(env, napiRect, &rectArrayLength), GET_ARRAY_LENGTH);
+    if (rectArrayLength <= 0 || rectArrayLength > RECT_LIST_SIZE) {
+        MMI_HILOGE("Hot Rect Area Parameter error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Hot Rect Area Parameter error");
+        return;
+    }
+    hotRectAreaList = JsInputMonMgr.GetHotRectAreaList(env, napiRect, rectArrayLength);
+    napi_valuetype valueType = napi_undefined;
+    CHKRV(napi_typeof(env, napiCallback, &valueType), TYPEOF);
+    if (valueType != napi_function) {
+        MMI_HILOGE("Third Parameter type error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Third Parameter type error");
+        return;
+    }
+    if (!JsInputMonMgr.AddEnv(env, info)) {
+        MMI_HILOGE("AddEnv failed");
+        return;
+    }
+    JsInputMonMgr.AddMonitor(env, "mouse", hotRectAreaList, rectArrayLength, napiCallback);
+    return;
+}
+
 static napi_value AddMonitor(napi_env env, napi_callback_info info)
 {
     CALL_DEBUG_ENTER;
@@ -91,32 +118,32 @@ static napi_value AddMonitor(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType is invalid");
         return nullptr;
     }
+    if (strcmp(typeName, "mouse") == 0) {
+        AddMouseMonitor(env, info, argv[1], argv[TWO_PARAMETERS]);
+    } else {
+        CHKRP(napi_typeof(env, argv[1], &valueType), TYPEOF);
+        if (valueType != napi_number) {
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
+            return nullptr;
+        }
+        int32_t fingers = 0;
+        CHKRP(napi_get_value_int32(env, argv[1], &fingers), GET_VALUE_INT32);
+        if (fingers < 0) {
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "fingers is invalid");
+            return nullptr;
+        }
 
-    CHKRP(napi_typeof(env, argv[1], &valueType), TYPEOF);
-    if (valueType != napi_number) {
-        MMI_HILOGE("Second Parameter type error");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
-        return nullptr;
+        CHKRP(napi_typeof(env, argv[TWO_PARAMETERS], &valueType), TYPEOF);
+        if (valueType != napi_function) {
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Third Parameter type error");
+            return nullptr;
+        }
+        if (!JsInputMonMgr.AddEnv(env, info)) {
+            MMI_HILOGE("AddEnv failed");
+            return nullptr;
+        }
+        JsInputMonMgr.AddMonitor(env, typeName, argv[TWO_PARAMETERS], fingers);
     }
-    int32_t fingers = 0;
-    CHKRP(napi_get_value_int32(env, argv[1], &fingers), GET_VALUE_INT32);
-    if (fingers < 0) {
-        MMI_HILOGE("Invalid fingers");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "fingers is invalid");
-        return nullptr;
-    }
-
-    CHKRP(napi_typeof(env, argv[TWO_PARAMETERS], &valueType), TYPEOF);
-    if (valueType != napi_function) {
-        MMI_HILOGE("third Parameter type error");
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Second Parameter type error");
-        return nullptr;
-    }
-    if (!JsInputMonMgr.AddEnv(env, info)) {
-        MMI_HILOGE("AddEnv failed");
-        return nullptr;
-    }
-    JsInputMonMgr.AddMonitor(env, typeName, argv[TWO_PARAMETERS], fingers);
     return nullptr;
 }
 
