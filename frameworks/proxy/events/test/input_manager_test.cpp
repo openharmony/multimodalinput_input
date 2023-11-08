@@ -1019,20 +1019,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_MarkConsumed_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: InputManagerTest_SimulateInputEventToHmosContainer_001
- * @tc.desc: Simulate input event to HmosContainer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventToHmosContainer_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_TRUE(pointerEvent != nullptr);
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SimulateInputEventToHmosContainer(pointerEvent));
-}
-
-/**
  * @tc.name: InputManagerTest_EnterCaptureMode_001
  * @tc.desc: Entering capture mode.
  * @tc.type: FUNC
@@ -1449,11 +1435,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventExt_001, TestSize.
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->AddPointerItem(item);
     
-#ifdef OHOS_BUILD_ENABLE_CONTAINER
+#ifdef OHOS_BUILD_ENABLE_ANCO
     InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
     InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
     InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_CONTAINER
+#endif  // OHOS_BUILD_ENABLE_ANCO
 }
 
 /**
@@ -1475,10 +1461,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventExt_002, TestSize.
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
 
-#ifdef OHOS_BUILD_ENABLE_CONTAINER
+#ifdef OHOS_BUILD_ENABLE_ANCO
     InputManager::GetInstance()->SimulateInputEventExt(injectDownEvent);
     ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
-#endif  // OHOS_BUILD_ENABLE_CONTAINER
+#endif  // OHOS_BUILD_ENABLE_ANCO
 }
 
 /**
