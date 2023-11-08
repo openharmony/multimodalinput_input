@@ -62,13 +62,13 @@ struct NapStatusData {
     int32_t GetNapClientPid();
     void Init(UDSServer& udsServer);
     int32_t napClientPid_ { -1 };
-    std::mutex mapMtx_;
 
 private:
     UDSServer* udsServer_ { nullptr };
     NapProcess() = default;
     DISALLOW_COPY_AND_MOVE(NapProcess);
     static NapProcess *instance_;
+    std::mutex mapMtx_;
 };
 } // namespace MMI
 } // namespace OHOS
