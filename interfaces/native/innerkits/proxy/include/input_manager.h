@@ -384,6 +384,15 @@ public:
     int32_t GetPointerSize(int32_t &size);
 
     /**
+     * @brief Enable combine key
+     * @param enable Indicates whether the combine key is enabled. The value true indicates that the combine key
+     * is enabled, and the value false indicates the opposite.
+     * @return Returns <b>0</b> if success; returns a non-0 value otherwise.
+     * @since 11
+     */
+    int32_t EnableCombineKey(bool enable);
+
+    /**
      * @brief Sets mouse primary button.
      * @param primaryButton Indicates the ID of the mouse primary button.The value 0 indicates that
      * the primary button is left button.The value 1 indicates that the primary button is right button.

@@ -51,6 +51,7 @@ public:
             const std::shared_ptr<KeyOption> keyOption);
     int32_t UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId);
     void RemoveSubscriberKeyUpTimer(int32_t keyCode);
+    int32_t EnableCombineKey(bool enable);
     void Dump(int32_t fd, const std::vector<std::string> &args);
 private:
     struct Subscriber {
@@ -80,6 +81,7 @@ private:
     bool CloneKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     void RemoveKeyCode(int32_t keyCode, std::vector<int32_t> &keyCodes);
     bool IsRepeatedKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
+    bool IsEnableCombineKey(const std::shared_ptr<KeyEvent> key);
     bool IsNotifyPowerKeySubsciber(int32_t keyCode, const std::vector<int32_t> &keyCodes);
     void HandleKeyUpWithDelay(std::shared_ptr<KeyEvent> keyEvent, const std::shared_ptr<Subscriber> &subscriber);
     void PrintKeyUpLog(const std::shared_ptr<Subscriber> &subscriber);
@@ -92,6 +94,7 @@ private:
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
     int32_t subscribePowerKeyId_ { -1 };
     bool subscribePowerKeyState_ { false };
+    bool enableCombineKey_ { true };
 };
 } // namespace MMI
 } // namespace OHOS

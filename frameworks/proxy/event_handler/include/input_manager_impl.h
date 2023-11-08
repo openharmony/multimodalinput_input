@@ -139,6 +139,7 @@ public:
 
     int32_t SetPointerColor(int32_t color);
     int32_t GetPointerColor(int32_t &color);
+    int32_t EnableCombineKey(bool enable);
     int32_t SetPointerSpeed(int32_t speed);
     int32_t GetPointerSpeed(int32_t &speed);
 

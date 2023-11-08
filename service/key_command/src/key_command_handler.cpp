@@ -1139,10 +1139,46 @@ void KeyCommandHandler::PrintSeq()
     }
 }
 
+bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
+{
+    if (enableCombineKey_) {
+        return true;
+    }
+    if (key->GetKeyCode() == KeyEvent::KEYCODE_POWER && key->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+        auto items = key->GetKeyItems();
+        if (items.size() != 1) {
+            return enableCombineKey_;
+        }
+        return true;
+    }
+    if (key->GetKeyCode() == KeyEvent::KEYCODE_L) {
+        for (const auto &item : key->GetKeyItems()) {
+            int32_t keyCode = item.GetKeyCode();
+            if (keyCode != KeyEvent::KEYCODE_L && keyCode != KeyEvent::KEYCODE_META_LEFT &&
+                keyCode != KeyEvent::KEYCODE_META_RIGHT) {
+                return enableCombineKey_;
+            }
+        }
+        return true;
+    }
+    return enableCombineKey_;
+}
+
+int32_t KeyCommandHandler::EnableCombineKey(bool enable)
+{
+    enableCombineKey_ = enable;
+    MMI_HILOGI("Enable combineKey is successful in keyCommand handler, enable: %{public}d", enable);
+    return RET_OK;
+}
+
 bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
     CHKPF(key);
+    if (!IsEnableCombineKey(key)) {
+        MMI_HILOGI("Combine key is taken over in key command");
+        return false;
+    }
     if (!isParseConfig_) {
         if (!ParseConfig()) {
             MMI_HILOGE("Parse configFile failed");
@@ -1192,7 +1228,6 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         MMI_HILOGD("Add timer success");
         return true;
     }
-    
     return false;
 }
 
