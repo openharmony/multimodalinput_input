@@ -62,6 +62,7 @@ struct NapStatusData {
     int32_t GetNapClientPid();
     void Init(UDSServer& udsServer);
     int32_t napClientPid_ { -1 };
+    std::mutex mapMtx_;
 
 private:
     UDSServer* udsServer_ { nullptr };
