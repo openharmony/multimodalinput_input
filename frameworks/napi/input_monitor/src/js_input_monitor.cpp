@@ -21,8 +21,9 @@
 #include "error_multimodal.h"
 #include "input_manager.h"
 #include "js_input_monitor_manager.h"
-#include "napi_constants.h"
 #include "util_napi_value.h"
+#include "napi_constants.h"
+#include "securec.h"
 
 namespace OHOS {
 namespace MMI {
@@ -179,6 +180,26 @@ void InputMonitor::SetFingers(int32_t fingers)
     fingers_ = fingers;
 }
 
+void InputMonitor::SetHotRectArea(std::vector<Rect> hotRectArea)
+{
+    hotRectArea_ = hotRectArea;
+}
+
+std::vector<Rect> InputMonitor::GetHotRectArea()
+{
+    return hotRectArea_;
+}
+
+void InputMonitor::SetRectTotal(uint32_t rectTotal)
+{
+    rectTotal_ = rectTotal;
+}
+
+uint32_t InputMonitor::GetRectTotal()
+{
+    return rectTotal_;
+}
+
 void InputMonitor::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const {}
 
 void InputMonitor::OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const {}
@@ -198,8 +219,32 @@ void InputMonitor::MarkConsumed(int32_t eventId)
     consumed_ = true;
 }
 
-JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, int32_t id,
-    int32_t fingers) : monitor_(std::make_shared<InputMonitor>()), jsEnv_(jsEnv), typeName_(typeName), monitorId_(id),
+JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName, std::vector<Rect> rectParam,
+    int32_t rectTotal, napi_value callback, int32_t id, int32_t fingers)
+    : monitor_(std::make_shared<InputMonitor>()), jsEnv_(jsEnv), typeName_(typeName), monitorId_(id),
+    fingers_(fingers)
+{
+    SetCallback(callback);
+    if (monitor_ == nullptr) {
+        MMI_HILOGE("The monitor is null");
+        return;
+    }
+    monitor_->SetCallback([jsId = id, jsFingers = fingers](std::shared_ptr<PointerEvent> pointerEvent) {
+        auto& jsMonitor { JsInputMonMgr.GetMonitor(jsId, jsFingers) };
+        CHKPV(jsMonitor);
+        jsMonitor->OnPointerEvent(pointerEvent);
+    });
+    monitor_->SetId(monitorId_);
+    monitor_->SetFingers(fingers_);
+    if (rectTotal != 0) {
+        monitor_->SetHotRectArea(rectParam);
+        monitor_->SetRectTotal(rectTotal);
+    }
+}
+
+JsInputMonitor::JsInputMonitor(napi_env jsEnv, const std::string &typeName,
+    napi_value callback, int32_t id, int32_t fingers)
+    : monitor_(std::make_shared<InputMonitor>()), jsEnv_(jsEnv), typeName_(typeName), monitorId_(id),
     fingers_(fingers)
 {
     SetCallback(callback);
@@ -1034,8 +1079,12 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_get_reference_value(jsEnv_, receiver_, &callback),
             GET_REFERENCE_VALUE, scope, pointerEvent);
         napi_value result = nullptr;
-        CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result),
-            CALL_FUNCTION, scope, pointerEvent);
+        if (monitor_->GetRectTotal() == 0
+            || IsLocaledWithinRect(jsEnv_, napiPointer, monitor_->GetRectTotal(), monitor_->GetHotRectArea())) {
+            CHECK_SCOPE_BEFORE_BREAK(jsEnv_, napi_call_function(jsEnv_, nullptr, callback, 1, &napiPointer, &result),
+                CALL_FUNCTION, scope, pointerEvent);
+        }
+
         bool typeNameFlag = typeName == "touch" || typeName == "pinch" || typeName == "threeFingersSwipe" ||
             typeName == "fourFingersSwipe" || typeName == "rotate";
         if (typeNameFlag) {
@@ -1046,6 +1095,40 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         }
         napi_close_handle_scope(jsEnv_, scope);
     }
+}
+
+bool JsInputMonitor::IsLocaledWithinRect(napi_env env, napi_value napiPointer,
+    uint32_t rectTotal, std::vector<Rect> hotRectArea)
+{
+    napi_value xProperty;
+    CHKRF(napi_get_named_property(env, napiPointer, "screenX", &xProperty), GET_NAMED_PROPERTY);
+    if (xProperty == nullptr) {
+        MMI_HILOGE("xProperty == nullptr, return");
+        return false;
+    }
+    int32_t xInt { 0 };
+    CHKRF(napi_get_value_int32(env, xProperty, &xInt), GET_VALUE_INT32);
+
+    napi_value yProperty;
+    CHKRF(napi_get_named_property(env, napiPointer, "screenY", &yProperty), GET_NAMED_PROPERTY);
+    if (yProperty == nullptr) {
+        MMI_HILOGE("yProperty == nullptr, return");
+        return false;
+    }
+    int32_t yInt { 0 };
+    CHKRF(napi_get_value_int32(env, yProperty, &yInt), GET_VALUE_INT32);
+
+    for (uint32_t i = 0; i < rectTotal; i++) {
+        int32_t hotAreaX = hotRectArea.at(i).x;
+        int32_t hotAreaY = hotRectArea.at(i).y;
+        int32_t hotAreaWidth = hotRectArea.at(i).width;
+        int32_t hotAreaHeight = hotRectArea.at(i).height;
+        if ((xInt >= hotAreaX) && (xInt <= hotAreaX + hotAreaWidth)
+            && (yInt >= hotAreaY) && (yInt <= hotAreaY + hotAreaHeight)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void JsInputMonitor::CheckConsumed(bool retValue, std::shared_ptr<PointerEvent> pointerEvent)
