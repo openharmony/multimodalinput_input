@@ -26,8 +26,6 @@ constexpr int32_t NAP_EVENT = 0;
 constexpr int32_t ACTIVE_EVENT = 2;
 } // namespace
 
-static std::mutex mapMtx_;
-
 NapProcess *NapProcess::instance_ = new (std::nothrow) NapProcess();
 NapProcess *NapProcess::GetInstance()
 {
