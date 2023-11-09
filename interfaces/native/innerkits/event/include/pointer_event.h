@@ -148,6 +148,10 @@ public:
 
     static constexpr int32_t POINTER_ACTION_ROTATE_END = 22;
 
+    static constexpr int32_t POINTER_ACTION_TRIPTAP = 23;
+
+    static constexpr int32_t POINTER_ACTION_QUADTAP = 24;
+
     enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.
