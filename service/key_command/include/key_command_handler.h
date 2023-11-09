@@ -106,6 +106,10 @@ struct KnuckleGesture {
     } lastDownPointer;
 };
 
+struct MultiFingersTap {
+    Ability ability;
+};
+
 class KeyCommandHandler final : public IInputEventHandler {
 public:
     KeyCommandHandler() = default;
@@ -130,6 +134,7 @@ public:
     void SetKnuckleDoubleTapDistance(float distance);
 #endif // OHOS_BUILD_ENABLE_TOUCH
     bool OnHandleEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    bool OnHandleEvent(const std::shared_ptr<PointerEvent> pointerEvent);
 private:
     void Print();
     void PrintSeq();
@@ -147,6 +152,7 @@ private:
     bool HandleSequences(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> keyEvent);
+    bool HandleMulFingersTap(const std::shared_ptr<PointerEvent> pointerEvent);
     bool AddSequenceKey(const std::shared_ptr<KeyEvent> keyEvent);
     bool IsEnableCombineKey(const std::shared_ptr<KeyEvent> key);
     void RemoveSubscribedTimer(int32_t keyCode);
@@ -205,6 +211,7 @@ private:
     TwoFingerGesture twoFingerGesture_;
     KnuckleGesture singleKnuckleGesture_;
     KnuckleGesture doubleKnuckleGesture_;
+    MultiFingersTap threeFingersTap_;
     bool isKnuckleState_ { false };
     bool isTimeConfig_ { false };
     bool isDistanceConfig_ { false };

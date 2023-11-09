@@ -41,6 +41,8 @@ public:
     static void SetUpTestCase(void) {}
     static void TearDownTestCase(void) {}
     std::shared_ptr<KeyEvent> SetupKeyEvent();
+    std::shared_ptr<PointerEvent> SetupThreeFingerTapEvent();
+    std::shared_ptr<PointerEvent> SetupFourFingerTapEvent();
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     std::shared_ptr<PointerEvent> SetupDoubleFingerDownEvent();
     std::shared_ptr<PointerEvent> SetupSingleKnuckleDownEvent();
@@ -151,6 +153,138 @@ std::shared_ptr<PointerEvent> KeyCommandHandlerTest::SetupDoubleKnuckleDownEvent
     return pointerEvent;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
+
+std::shared_ptr<PointerEvent> KeyCommandHandlerTest::SetupThreeFingerTapEvent()
+{
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    PointerEvent::PointerItem item1;
+    PointerEvent::PointerItem item2;
+    PointerEvent::PointerItem item3;
+
+    int32_t id0 = 0;
+    item1.SetPointerId(id0);
+    int32_t downX1 = 100;
+    int32_t downY1 = 200;
+    int64_t actionTime1 = 1000000;
+    item1.SetDisplayX(downX1);
+    item1.SetDisplayY(downY1);
+    item1.SetDownTime(actionTime1);
+    pointerEvent->SetPointerId(id0);
+    pointerEvent->AddPointerItem(item1);
+
+    int32_t id1 = 1;
+    item2.SetPointerId(id1);
+    int32_t downX2 = 200;
+    int32_t downY2 = 300;
+    int64_t actionTime2 = 1000100;
+    item2.SetDisplayX(downX2);
+    item2.SetDisplayY(downY2);
+    item2.SetDownTime(actionTime2);
+    pointerEvent->SetPointerId(id1);
+    pointerEvent->AddPointerItem(item2);
+
+    int32_t id2 = 2;
+    item3.SetPointerId(id2);
+    int32_t downX3 = 100;
+    int32_t downY3 = 200;
+    int64_t actionTime3 = 1000200;
+    item3.SetDisplayX(downX3);
+    item3.SetDisplayY(downY3);
+    item3.SetDownTime(actionTime3);
+    pointerEvent->SetPointerId(id2);
+    pointerEvent->AddPointerItem(item3);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_TRIPTAP);
+    return pointerEvent;
+}
+
+std::shared_ptr<PointerEvent> KeyCommandHandlerTest::SetupFourFingerTapEvent()
+{
+    std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+    PointerEvent::PointerItem item1;
+    PointerEvent::PointerItem item2;
+    PointerEvent::PointerItem item3;
+    PointerEvent::PointerItem item4;
+
+    int32_t id0 = 0;
+    item1.SetPointerId(id0);
+    int32_t downX1 = 100;
+    int32_t downY1 = 200;
+    int64_t actionTime1 = 1000000;
+    item1.SetDisplayX(downX1);
+    item1.SetDisplayY(downY1);
+    item1.SetDownTime(actionTime1);
+    pointerEvent->SetPointerId(id0);
+    pointerEvent->AddPointerItem(item1);
+
+    int32_t id1 = 1;
+    item2.SetPointerId(id1);
+    int32_t downX2 = 200;
+    int32_t downY2 = 300;
+    int64_t actionTime2 = 1000100;
+    item2.SetDisplayX(downX2);
+    item2.SetDisplayY(downY2);
+    item2.SetDownTime(actionTime2);
+    pointerEvent->SetPointerId(id1);
+    pointerEvent->AddPointerItem(item2);
+
+    int32_t id2 = 2;
+    item3.SetPointerId(id2);
+    int32_t downX3 = 100;
+    int32_t downY3 = 200;
+    int64_t actionTime3 = 1000200;
+    item3.SetDisplayX(downX3);
+    item3.SetDisplayY(downY3);
+    item3.SetDownTime(actionTime3);
+    pointerEvent->SetPointerId(id2);
+    pointerEvent->AddPointerItem(item3);
+
+    int32_t id3 = 3;
+    item4.SetPointerId(id3);
+    int32_t downX4 = 400;
+    int32_t downY4 = 280;
+    int64_t actionTime4 = 1000300;
+    item4.SetDisplayX(downX4);
+    item4.SetDisplayY(downY4);
+    item4.SetDownTime(actionTime4);
+    pointerEvent->SetPointerId(id3);
+    pointerEvent->AddPointerItem(item4);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_QUADTAP);
+    return pointerEvent;
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleMultiTapTest__001
+ * @tc.desc: Test three fingers tap event launch ability
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleMultiTapTest__001, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto threeFingerTap = SetupThreeFingerTapEvent();
+    ASSERT_TRUE(threeFingerTap != nullptr);
+    KeyCommandHandler keyCommandHandler;
+    ASSERT_TRUE(keyCommandHandler.OnHandleEvent(threeFingerTap));
+}
+
+/**
+ * @tc.name: KeyCommandHandlerTest_HandleMultiTapTest__002
+ * @tc.desc: Test four fingers tap event launch ability
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyCommandHandlerTest, KeyCommandHandlerTest_HandleMultiTapTest__002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    auto fourFingerTap = SetupFourFingerTapEvent();
+    ASSERT_TRUE(fourFingerTap != nullptr);
+    KeyCommandHandler keyCommandHandler;
+    ASSERT_FALSE(keyCommandHandler.OnHandleEvent(fourFingerTap));
+}
 
 /**
  * @tc.name: KeyCommandHandlerTest_001

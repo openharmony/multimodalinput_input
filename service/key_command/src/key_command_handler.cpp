@@ -62,6 +62,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCo
 const std::string shortKeyFileName = "/data/service/el1/public/multimodalinput/Settings.xml";
 const std::string SINGLE_KNUCKLE_ABILITY = "SingleKnuckleDoubleClickGesture";
 const std::string DOUBLE_KNUCKLE_ABILITY = "DoubleKnuckleDoubleClickGesture";
+const std::string TOUCHPAD_TRIP_TAP_ABILITY = "ThreeFingersTap";
 enum SpecialType {
     SPECIAL_ALL = 0,
     SUBSCRIBER_BEFORE_DELAY = 1,
@@ -666,6 +667,20 @@ bool IsEqual(float f1, float f2)
 {
     return (std::fabs(f1 - f2) <= std::numeric_limits<double>::epsilon());
 }
+
+bool ParseMultiFingersTap(const JsonParser &parser, const std::string ability, MultiFingersTap &mulFingersTap)
+{
+    cJSON *jsonData = cJSON_GetObjectItemCaseSensitive(parser.json_, "TouchPadMultiFingersTap");
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("MultiFingersTap is not object");
+        return false;
+    }
+    if (!IsPackageKnuckleGesture(jsonData, ability, mulFingersTap.ability)) {
+        MMI_HILOGE("Package mulFingersTap gesture failed");
+        return false;
+    }
+    return true;
+}
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -686,6 +701,10 @@ void KeyCommandHandler::HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
 void KeyCommandHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPV(pointerEvent);
+    if (OnHandleEvent(pointerEvent)) {
+        MMI_HILOGD("The pointerEvent start launch an ability, pointAction: %{public}s",
+            pointerEvent->DumpPointerAction());
+    }
     CHKPV(nextHandler_);
     nextHandler_->HandlePointerEvent(pointerEvent);
 }
@@ -1096,8 +1115,9 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseTwoFingerGesture = ParseTwoFingerGesture(parser, twoFingerGesture_);
     bool isParseSingleKnuckleGesture = IsParseKnuckleGesture(parser, SINGLE_KNUCKLE_ABILITY, singleKnuckleGesture_);
     bool isParseDoubleKnuckleGesture = IsParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
+    bool isParseMultiFingersTap = ParseMultiFingersTap(parser, TOUCHPAD_TRIP_TAP_ABILITY, threeFingersTap_);
     if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
-        !isParseDoubleKnuckleGesture) {
+        !isParseDoubleKnuckleGesture && !isParseMultiFingersTap) {
         MMI_HILOGE("Parse configFile failed");
         return false;
     }
@@ -1226,6 +1246,24 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
             it->second.push_back(timerId);
         }
         MMI_HILOGD("Add timer success");
+        return true;
+    }
+    return false;
+}
+
+bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointer)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(pointer);
+    if (!isParseConfig_) {
+        if (!ParseConfig()) {
+            MMI_HILOGE("Parse configFile failed");
+            return false;
+        }
+        isParseConfig_ = true;
+    }
+    bool isHandled = HandleMulFingersTap(pointer);
+    if (isHandled) {
         return true;
     }
     return false;
@@ -1435,6 +1473,18 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
         isLaunchAbility = true;
     }
     return true;
+}
+
+bool KeyCommandHandler::HandleMulFingersTap(const std::shared_ptr<PointerEvent> pointerEvent)
+{
+    CALL_DEBUG_ENTER;
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_TRIPTAP) {
+        LaunchAbility(threeFingersTap_.ability, 0);
+        return true;
+    } else {
+        MMI_HILOGE("The event is not a multi tap gesture");
+        return false;
+    }
 }
 
 bool KeyCommandHandler::IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key)
