@@ -55,6 +55,7 @@ enum TypeName : int32_t {
     THREE_FINGERS_SWIPE = 3,
     FOUR_FINGERS_SWIPE = 4,
     ROTATE = 5,
+    THREE_FINGERS_TAP = 6,
 };
 std::map<std::string, int32_t> TO_GESTURE_TYPE = {
     { "touch", TOUCH },
@@ -62,7 +63,8 @@ std::map<std::string, int32_t> TO_GESTURE_TYPE = {
     { "pinch", PINCH },
     { "threeFingersSwipe", THREE_FINGERS_SWIPE },
     { "fourFingersSwipe", FOUR_FINGERS_SWIPE },
-    { "rotate", ROTATE }
+    { "rotate", ROTATE },
+    { "threeFingersTap", THREE_FINGERS_TAP }
 };
 struct MonitorInfo {
     int32_t monitorId;
@@ -158,7 +160,8 @@ bool InputMonitor::IsGestureEvent(std::shared_ptr<PointerEvent> pointerEvent) co
 {
     if (JsInputMonMgr.GetMonitor(id_, fingers_)->GetTypeName() != "pinch" &&
         JsInputMonMgr.GetMonitor(id_, fingers_)->GetTypeName() != "threeFingersSwipe" &&
-        JsInputMonMgr.GetMonitor(id_, fingers_)->GetTypeName() != "fourFingersSwipe") {
+        JsInputMonMgr.GetMonitor(id_, fingers_)->GetTypeName() != "fourFingersSwipe" &&
+        JsInputMonMgr.GetMonitor(id_, fingers_)->GetTypeName() != "threeFingersTap") {
         return false;
     }
     if (pointerEvent->GetPointerIds().size() == 1) {
@@ -558,6 +561,34 @@ int32_t JsInputMonitor::GetSwipeAction(int32_t action) const
         }
         default: {
             MMI_HILOGE("Abnormal pointer action in swipe event");
+            return RET_ERR;
+        }
+    }
+}
+
+int32_t JsInputMonitor::TransformMultiTapEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
+{
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t actionValue = GetMultiTapAction(pointerEvent->GetPointerAction());
+    if (actionValue == RET_ERR) {
+        MMI_HILOGE("Get action Value failed");
+        return RET_ERR;
+    }
+    if (SetNameProperty(jsEnv_, result, "type", actionValue) != napi_ok) {
+        MMI_HILOGE("Set type property failed");
+        return RET_ERR;
+    }
+    return RET_OK;
+}
+
+int32_t JsInputMonitor::GetMultiTapAction(int32_t action) const
+{
+    switch (action) {
+        case PointerEvent::POINTER_ACTION_TRIPTAP: {
+            return GESTURE_END;
+        }
+        default: {
+            MMI_HILOGE("Abnormal pointer action in multi tap event");
             return RET_ERR;
         }
     }
@@ -1064,6 +1095,13 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
                 ret = TransformSwipeEvent(pointerEvent, napiPointer);
                 break;
             }
+            case TypeName::THREE_FINGERS_TAP: {
+                if (!IsThreeFingersTap(pointerEvent)) {
+                    MMI_HILOGE("the event is not threeFingersTapEvent");
+                }
+                ret = TransformMultiTapEvent(pointerEvent, napiPointer);
+                break;
+            }
             default: {
                 MMI_HILOGE("This event is invalid");
                 break;
@@ -1086,7 +1124,7 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         }
 
         bool typeNameFlag = typeName == "touch" || typeName == "pinch" || typeName == "threeFingersSwipe" ||
-            typeName == "fourFingersSwipe" || typeName == "rotate";
+            typeName == "fourFingersSwipe" || typeName == "rotate" || typeName == "threeFingersTap";
         if (typeNameFlag) {
             pointerEvent->MarkProcessed();
             bool retValue = false;
@@ -1188,6 +1226,16 @@ bool JsInputMonitor::IsFourFingersSwipe(std::shared_ptr<PointerEvent> pointerEve
         (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_BEGIN &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_UPDATE &&
         pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_SWIPE_END)) {
+        return false;
+    }
+    return true;
+}
+
+bool JsInputMonitor::IsThreeFingersTap(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_TOUCHPAD ||
+        pointerEvent->GetFingerCount() != THREE_FINGERS ||
+        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_TRIPTAP)) {
         return false;
     }
     return true;
