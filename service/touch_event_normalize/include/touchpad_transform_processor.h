@@ -62,6 +62,7 @@ private:
     std::map<int32_t, std::pair<float, float>> pointerMaps;
     const uint64_t perTimeThreshold = 150 * 1e3;
     const uint64_t totalTimeThreshold = 500 * 1e3;
+    const int32_t distanceThreshold = 0.15;
 };
 #define MULTI_FINGERTAP_HDR ::OHOS::DelayedSingleton<MultiFingersTapHandler>::GetInstance()
 
