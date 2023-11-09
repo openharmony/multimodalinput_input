@@ -683,7 +683,7 @@ bool MultiFingersTapHandler::IsInvalidMulTapGesture(struct libinput_event_touch 
     auto deltaY = abs(currentY - lastY);
     auto distance = deltaX + deltaY;
     pointerMaps[seatSlot] = {currentX, currentY};
-    return ((deltaX > 0.15) || (deltaY > 0.15) || (distance > 0.15));
+    return ((deltaX > distanceThreshold) || (deltaY > distanceThreshold) || (distance > distanceThreshold));
 }
 
 bool MultiFingersTapHandler::CanUnsetPointerItem(struct libinput_event_touch *event)
