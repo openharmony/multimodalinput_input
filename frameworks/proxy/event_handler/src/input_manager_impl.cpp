@@ -976,6 +976,16 @@ int32_t InputManagerImpl::GetPointerColor(int32_t &color)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
+int32_t InputManagerImpl::EnableCombineKey(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->EnableCombineKey(enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Enable combine key failed, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
 int32_t InputManagerImpl::SetPointerSpeed(int32_t speed)
 {
     CALL_DEBUG_ENTER;

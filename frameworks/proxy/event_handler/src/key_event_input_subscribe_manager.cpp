@@ -100,12 +100,12 @@ int32_t KeyEventInputSubscribeManager::SubscribeKeyEvent(std::shared_ptr<KeyOpti
         return INVALID_SUBSCRIBE_ID;
     }
 
-    std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Client init failed");
         return INVALID_SUBSCRIBE_ID;
     }
 
+    std::lock_guard<std::mutex> guard(mtx_);
     auto [tIter, isOk] = subscribeInfos_.emplace(keyOption, callback);
     if (!isOk) {
         MMI_HILOGW("Subscription is duplicated");
@@ -186,6 +186,7 @@ int32_t KeyEventInputSubscribeManager::OnSubscribeKeyEventCallback(std::shared_p
 void KeyEventInputSubscribeManager::OnConnected()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mtx_);
     if (subscribeInfos_.empty()) {
         MMI_HILOGD("Leave, subscribeInfos_ is empty");
         return;

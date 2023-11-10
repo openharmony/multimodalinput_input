@@ -91,13 +91,6 @@ public:
     static constexpr uint32_t EVENT_FLAG_NO_MONITOR = 0x00000002;
 
     /**
-     * The multimodal input service send event to hmos container.
-     *
-     * @since 10
-     */
-    static constexpr uint32_t EVENT_FLAG_HMOS = 0x10000000;
-
-    /**
      * The multimodal input event from simulation.
      *
      * @since 10
