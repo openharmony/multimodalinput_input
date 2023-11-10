@@ -602,6 +602,30 @@ HWTEST_F(InputManagerTest, InputManagerTest_FunctionKeyState_007, TestSize.Level
 }
 
 /**
+ * @tc.name: InputManagerTest_EnableCombineKey_001
+ * @tc.desc: Enable combine key
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_EnableCombineKey_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_EQ(InputManager::GetInstance()->EnableCombineKey(false), RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_EnableCombineKey_002
+ * @tc.desc: Enable combine key
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_EnableCombineKey_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    ASSERT_EQ(InputManager::GetInstance()->EnableCombineKey(true), RET_OK);
+}
+
+/**
  * @tc.name: InputManagerTest_TouchScreenHotArea_001
  * @tc.desc: Touch event Search window by defaultHotAreas
  * @tc.type: FUNC
@@ -992,20 +1016,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_MarkConsumed_001, TestSize.Level1)
     ASSERT_TRUE(pointerEvent != nullptr);
     auto eventId = pointerEvent->GetId();
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->MarkConsumed(monitorId, eventId));
-}
-
-/**
- * @tc.name: InputManagerTest_SimulateInputEventToHmosContainer_001
- * @tc.desc: Simulate input event to HmosContainer
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventToHmosContainer_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_TRUE(pointerEvent != nullptr);
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SimulateInputEventToHmosContainer(pointerEvent));
 }
 
 /**
@@ -1425,11 +1435,11 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventExt_001, TestSize.
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent->AddPointerItem(item);
     
-#ifdef OHOS_BUILD_ENABLE_CONTAINER
+#ifdef OHOS_BUILD_ENABLE_ANCO
     InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
     InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
     InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_CONTAINER
+#endif  // OHOS_BUILD_ENABLE_ANCO
 }
 
 /**
@@ -1451,10 +1461,10 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventExt_002, TestSize.
     injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
     injectDownEvent->AddPressedKeyItems(kitDown);
 
-#ifdef OHOS_BUILD_ENABLE_CONTAINER
+#ifdef OHOS_BUILD_ENABLE_ANCO
     InputManager::GetInstance()->SimulateInputEventExt(injectDownEvent);
     ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
-#endif  // OHOS_BUILD_ENABLE_CONTAINER
+#endif  // OHOS_BUILD_ENABLE_ANCO
 }
 
 /**

@@ -26,6 +26,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandlerTest" };
 } // namespace
 
 class KeySubscriberHandlerTest : public testing::Test {
@@ -59,6 +60,60 @@ HWTEST_F(KeySubscriberHandlerTest, InputWindowsManagerTest_UnsubscribeKeyEvent_0
     SessionPtr sessPtr = nullptr;
     ASSERT_EQ(keySubscriberHandler.UnsubscribeKeyEvent(sessPtr, -1), -1);
     ASSERT_EQ(keySubscriberHandler.UnsubscribeKeyEvent(sess, 1), -1);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsEnableCombineKey_001
+ * @tc.desc: Test IsEnableCombineKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEnableCombineKey_001, TestSize.Level1)
+{
+    KeySubscriberHandler keySubscriberHandler;
+    keySubscriberHandler.EnableCombineKey(false);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    CHKPV(keyEvent);
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keyEvent->AddKeyItem(item);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_POWER);
+    keySubscriberHandler.HandleKeyEvent(keyEvent);
+    ASSERT_EQ(keySubscriberHandler.EnableCombineKey(true), RET_OK);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_IsEnableCombineKey_002
+ * @tc.desc: Test IsEnableCombineKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_IsEnableCombineKey_002, TestSize.Level1)
+{
+    KeySubscriberHandler keySubscriberHandler;
+    keySubscriberHandler.EnableCombineKey(false);
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    CHKPV(keyEvent);
+    KeyEvent::KeyItem item1;
+    item1.SetKeyCode(KeyEvent::KEYCODE_META_LEFT);
+    keyEvent->AddKeyItem(item1);
+    KeyEvent::KeyItem item2;
+    item2.SetKeyCode(KeyEvent::KEYCODE_L);
+    keyEvent->AddKeyItem(item2);
+    keyEvent->SetKeyCode(KeyEvent::KEYCODE_L);
+    ASSERT_EQ(keySubscriberHandler.EnableCombineKey(true), RET_OK);
+}
+
+/**
+ * @tc.name: KeySubscriberHandlerTest_EnableCombineKey_001
+ * @tc.desc: Test enable combineKey
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeySubscriberHandlerTest, KeySubscriberHandlerTest_EnableCombineKey_001, TestSize.Level1)
+{
+    KeySubscriberHandler keySubscriberHandler;
+    ASSERT_EQ(keySubscriberHandler.EnableCombineKey(true), RET_OK);
 }
 } // namespace MMI
 } // namespace OHOS
