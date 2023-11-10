@@ -69,9 +69,10 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
         }
 
         // Update touch state object
-        MMI_HILOGD("updateTouchState, Pointer Action: %{public}d", inputEvent_.pointerAction);
+        EventDump("UpdateTouchState", inputEvent_);
         UpdateTouchState(inputEvent_);
-        outEvent = &inputEvent_;
+//        outEvent = &inputEvent_;
+        return pointerEvent_;
     } while (0);
 
     if ((ERR_OK == result) && (NULL != outEvent)) {
@@ -86,6 +87,17 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
 std::shared_ptr<PointerEvent> EventResample::GetPointerEvent()
 {
     return pointerEvent_;
+}
+
+void EventResample::EventDump(const char *msg, MotionEvent &event)
+{
+    MMI_HILOGI("%{public}s: a=%{public}d t=%{public}" PRId64 " c=%{public}d s=%{public}d d=%{public}d e=%{public}d",
+               msg, event.pointerAction, event.actionTime, event.pointerCount,
+               event.sourceType, event.deviceId, event.eventId);
+    for (auto &it : event.pointers) {
+        MMI_HILOGI("ID %{public}d: x=%{public}d y=%{public}d (%{public}d)",
+                   it.second.id, it.second.coordX, it.second.coordY, it.second.toolType);
+    }
 }
 
 ErrCode EventResample::InitializeInputEvent(std::shared_ptr<PointerEvent> pointerEvent, int64_t frameTime)
@@ -110,7 +122,7 @@ ErrCode EventResample::InitializeInputEvent(std::shared_ptr<PointerEvent> pointe
     if (nullptr != pointerEvent) {
         pointerAction = pointerEvent->GetPointerAction();
         MMI_HILOGD("pointerAction:%{public}d %{public}" PRId64 " %{public}" PRId64,
-                   pointerAction, pointerEvent->GetActionTime(), frameTime);
+                   pointerAction, pointerEvent->GetActionTime(), frameTime_);
         switch (pointerAction) {
             case PointerEvent::POINTER_ACTION_DOWN:
             case PointerEvent::POINTER_ACTION_MOVE:
@@ -123,10 +135,7 @@ ErrCode EventResample::InitializeInputEvent(std::shared_ptr<PointerEvent> pointe
         inputEvent_.Reset();
         inputEvent_.InitializeFrom(pointerEvent);
 
-        for (auto &it : inputEvent_.pointers) {
-            MMI_HILOGD("Input event: %{public}d %{public}d %{public}" PRId64 " %{public}" PRId64,
-                       it.second.coordX, it.second.coordY, inputEvent_.actionTime, frameTime_);
-        }
+        EventDump("Input Event", inputEvent_);
     } else {
         inputEvent_.Reset();
     }
@@ -145,15 +154,16 @@ bool EventResample::UpdateBatch(MotionEvent** outEvent, ErrCode &result, bool &d
                        inputEvent_.deviceId, inputEvent_.sourceType, inputEvent_.pointerAction);
             return true;
         } else if (PointerEvent::POINTER_ACTION_UP == inputEvent_.pointerAction) {
-            MMI_HILOGD("Deferred event: %{public}d %{public}d %{public}d",
-                       inputEvent_.deviceId, inputEvent_.sourceType, inputEvent_.pointerAction);
-            deferredEvent_.InitializeFrom(inputEvent_);
-            msgDeferred_ = true;
-            deferred = true;
-            result = ConsumeSamples(batch, batch.samples.size(), outEvent);
-            batches_.erase(batches_.begin() + batchIndex);
-            UpdateTouchState(deferredEvent_);
-            return true;
+//             MMI_HILOGD("Deferred event: %{public}d %{public}d %{public}d",
+//                        inputEvent_.deviceId, inputEvent_.sourceType, inputEvent_.pointerAction);
+//             deferredEvent_.InitializeFrom(inputEvent_);
+//             msgDeferred_ = true;
+//             deferred = true;
+//             result = ConsumeSamples(batch, batch.samples.size(), outEvent);
+//             batches_.erase(batches_.begin() + batchIndex);
+//             UpdateTouchState(deferredEvent_);
+//             return true;
+            return false;
         }
     }
 
@@ -170,14 +180,13 @@ bool EventResample::UpdateBatch(MotionEvent** outEvent, ErrCode &result, bool &d
 
 void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
 {
+    EventDump("Output Event", *outEvent);
     pointerEvent_->SetActionTime(outEvent->actionTime);
     pointerEvent_->SetPointerAction(outEvent->pointerAction);
     pointerEvent_->SetActionTime(outEvent->actionTime);
     pointerEvent_->SetId(outEvent->eventId);
 
     for (auto &it : outEvent->pointers) {
-        MMI_HILOGD("Output event: %{public}d %{public}d %{public}" PRId64 " %{public}d",
-                   it.second.coordX, it.second.coordY, outEvent->actionTime, outEvent->pointerAction);
         PointerEvent::PointerItem item;
         if (pointerEvent_->GetPointerItem(it.first, item)) {
             item.SetDisplayX(it.second.coordX);
@@ -187,7 +196,7 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
             } else if (PointerEvent::POINTER_ACTION_UP == outEvent->pointerAction) {
                 item.SetPressed(false);
             } else {
-                MMI_HILOGD("Output event: Wrong pointer action: %{public}d", outEvent->pointerAction);
+//                MMI_HILOGD("Output event: Pointer action: %{public}d", outEvent->pointerAction);
             }
             pointerEvent_->UpdatePointerItem(it.first, item);
         }
