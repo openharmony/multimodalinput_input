@@ -243,6 +243,7 @@ private:
     bool resampleTouch_ {true};
     std::shared_ptr<PointerEvent> pointerEvent_ {nullptr};
 
+    void EventDump(const char *msg, MotionEvent &event);
     ErrCode InitializeInputEvent(std::shared_ptr<PointerEvent> pointerEvent, int64_t frameTime);
     bool UpdateBatch(MotionEvent** outEvent, ErrCode &result, bool &deferred);
     void UpdatePointerEvent(MotionEvent* outEvent);
