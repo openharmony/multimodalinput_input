@@ -129,7 +129,6 @@ MMIClientPtr MultimodalEventHandler::GetMMIClient()
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
 int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     EventLogHelper::PrintEventData(pointerEvent);
     int32_t ret = MultimodalInputConnMgr->InjectPointerEvent(pointerEvent);
