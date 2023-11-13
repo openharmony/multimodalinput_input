@@ -38,7 +38,12 @@ config("event_injection_public_config") {
 
 ohos_source_set("event-injection") {
   sources = event_injection_sources
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [
     ":event_injection_config",
     ":event_injection_public_config",
@@ -136,7 +141,12 @@ ohos_unittest("ut-event-injection-out") {
 
 ohos_executable("mmi-event-injection") {
   sources = [ "src/mmi_event_simulate_main.cpp" ]
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":event_injection_public_config" ]
 
   deps = [

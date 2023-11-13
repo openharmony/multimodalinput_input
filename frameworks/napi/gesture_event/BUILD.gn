@@ -28,9 +28,12 @@ ohos_shared_library("gestureevent") {
     "src/js_gesture_event.cpp",
     "src/native_register_module.cpp",
   ]
-
+  stack_protector_ret = true
   sanitize = {
     integer_overflow = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
   }
 
   configs = [

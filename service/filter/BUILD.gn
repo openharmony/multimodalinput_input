@@ -33,6 +33,12 @@ config("mmi_event_filter_config") {
 ohos_source_set("mmi_event_filter_service") {
   part_name = "input"
   subsystem_name = "multimodalinput"
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   sources = [
     "${event_filter_path}/src/event_filter_service.cpp",
     "${event_filter_path}/src/event_filter_stub.cpp",
@@ -50,6 +56,12 @@ ohos_source_set("mmi_event_filter_service") {
 ohos_source_set("mmi_event_filter_proxy") {
   part_name = "input"
   subsystem_name = "multimodalinput"
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   sources = [
     "${event_filter_path}/src/event_filter_death_recipient.cpp",
     "${event_filter_path}/src/event_filter_handler.cpp",
