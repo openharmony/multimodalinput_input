@@ -45,6 +45,12 @@ ohos_shared_library("inputconsumer") {
     "hilog:libhilog",
     "napi:ace_napi",
   ]
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
 
   relative_install_dir = "module/multimodalinput"
 

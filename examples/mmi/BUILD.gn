@@ -21,7 +21,12 @@ ohos_executable("mmi-server") {
     "${mmi_path}/service:libmmi-server",
     "${mmi_path}/util:libmmi-util",
   ]
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",

@@ -29,6 +29,12 @@ ohos_shared_library("shortkey") {
     "src/js_short_key_manager.cpp",
     "src/native_register_module.cpp",
   ]
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
 
   configs = [ ":shortKey_config" ]
 

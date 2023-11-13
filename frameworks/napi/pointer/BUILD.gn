@@ -29,7 +29,12 @@ ohos_shared_library("pointer") {
     "src/js_pointer_manager.cpp",
     "src/js_pointer_module.cpp",
   ]
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [
     "${mmi_path}:coverage_flags",
     ":pointer_config",
