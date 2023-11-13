@@ -1348,7 +1348,6 @@ int32_t InputManagerImpl::LeaveCaptureMode(int32_t windowId)
 void InputManagerImpl::AppendExtraData(const ExtraData& extraData)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(mtx_);
     if (extraData.buffer.size() > ExtraData::MAX_BUFFER_SIZE) {
         MMI_HILOGE("Append extra data failed, buffer is oversize:%{public}zu", extraData.buffer.size());
         return;
