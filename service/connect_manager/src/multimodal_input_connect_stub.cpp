@@ -213,6 +213,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ENABLE_INPUT_DEVICE):
             return StubEnableInputDevice(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::ENABLE_COMBINE_KEY):
+            return StubEnableCombineKey(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_KEY_DOWN_DURATION):
             return StubSetKeyDownDuration(data, reply);
             break;
@@ -1497,6 +1500,22 @@ int32_t MultimodalInputConnectStub::StubAppendExtraData(MessageParcel& data, Mes
     int32_t ret = AppendExtraData(extraData);
     if (ret != RET_OK) {
         MMI_HILOGE("Fail to call AppendExtraData, ret:%{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MultimodalInputConnectStub::StubEnableCombineKey(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    if (!IsRunning()) {
+        MMI_HILOGE("Service is not running");
+        return MMISERVICE_NOT_RUNNING;
+    }
+    bool enable;
+    READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
+    int32_t ret = EnableCombineKey(enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call EnableCombineKey failed, ret:%{public}d", ret);
     }
     return ret;
 }

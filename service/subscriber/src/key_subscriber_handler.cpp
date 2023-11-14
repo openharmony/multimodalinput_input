@@ -117,9 +117,45 @@ int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subsc
     return RET_ERR;
 }
 
+int32_t KeySubscriberHandler::EnableCombineKey(bool enable)
+{
+    enableCombineKey_ = enable;
+    MMI_HILOGI("Enable combineKey is successful in subscribe handler, enable: %{public}d", enable);
+    return RET_OK;
+}
+
+bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    if (enableCombineKey_) {
+        return true;
+    }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+        auto items = keyEvent->GetKeyItems();
+        if (items.size() != 1) {
+            return enableCombineKey_;
+        }
+        return true;
+    }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_L) {
+        for (const auto &item : keyEvent->GetKeyItems()) {
+            int32_t keyCode = item.GetKeyCode();
+            if (keyCode != KeyEvent::KEYCODE_L && keyCode != KeyEvent::KEYCODE_META_LEFT &&
+                keyCode != KeyEvent::KEYCODE_META_RIGHT) {
+                return enableCombineKey_;
+            }
+        }
+        return true;
+    }
+    return enableCombineKey_;
+}
+
 bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
+    if (!IsEnableCombineKey(keyEvent)) {
+        MMI_HILOGI("Combine key is taken over in subscribe keyEvent");
+        return false;
+    }
     if (IsRepeatedKeyEvent(keyEvent)) {
         MMI_HILOGD("Repeat KeyEvent, skip");
         return true;
