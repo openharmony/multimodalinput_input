@@ -191,12 +191,14 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
         if (pointerEvent_->GetPointerItem(it.first, item)) {
             item.SetDisplayX(it.second.coordX);
             item.SetDisplayY(it.second.coordY);
+            item.SetWindowX(it.second.coordX);
+            item.SetWindowY(it.second.coordY);
             if (PointerEvent::POINTER_ACTION_MOVE == outEvent->pointerAction) {
                 item.SetPressed(true);
             } else if (PointerEvent::POINTER_ACTION_UP == outEvent->pointerAction) {
                 item.SetPressed(false);
             } else {
-//                MMI_HILOGD("Output event: Pointer action: %{public}d", outEvent->pointerAction);
+                MMI_HILOGD("Output event: Pointer action: %{public}d", outEvent->pointerAction);
             }
             pointerEvent_->UpdatePointerItem(it.first, item);
         }
