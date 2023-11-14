@@ -29,8 +29,12 @@ ohos_shared_library("intentioncode") {
     "src/native_register_module.cpp",
   ]
 
+  stack_protector_ret = true
   sanitize = {
     integer_overflow = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
   }
 
   configs = [

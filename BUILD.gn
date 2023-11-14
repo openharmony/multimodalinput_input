@@ -40,6 +40,12 @@ ohos_executable("uinput_inject") {
   install_enable = true
 
   sources = uinput_inject_sources
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
 
   include_dirs = [
     "${mmi_path}/service/nap_process/include",
