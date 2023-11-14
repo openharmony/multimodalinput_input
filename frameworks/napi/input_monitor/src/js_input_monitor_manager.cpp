@@ -278,7 +278,6 @@ void JsInputMonitorManager::ThrowError(napi_env env, int32_t code)
 std::vector<Rect> JsInputMonitorManager::GetHotRectAreaList(napi_env env,
     napi_value rectNapiValue, uint32_t rectListLength)
 {
-    CALL_DEBUG_ENTER;
     std::vector<Rect> hotRectAreaList;
     for (uint32_t i = 0; i < rectListLength; i++) {
         napi_value napiElement;
@@ -293,7 +292,6 @@ std::vector<Rect> JsInputMonitorManager::GetHotRectAreaList(napi_env env,
         int32_t rectX = -1;
         CHKRR(napi_get_value_int32(env, napiX, &rectX), GET_VALUE_INT32, hotRectAreaList);
         rectItem.x = rectX;
-
         napi_value napiY = nullptr;
         CHKRR(napi_get_named_property(env, napiElement, "top", &napiY), GET_NAMED_PROPERTY, hotRectAreaList);
         if (napiY == nullptr) {
@@ -303,7 +301,6 @@ std::vector<Rect> JsInputMonitorManager::GetHotRectAreaList(napi_env env,
         int32_t rectY = -1;
         CHKRR(napi_get_value_int32(env, napiY, &rectY), GET_VALUE_INT32, hotRectAreaList);
         rectItem.y = rectY;
-
         napi_value napiWidth = nullptr;
         CHKRR(napi_get_named_property(env, napiElement, "width", &napiWidth), GET_NAMED_PROPERTY, hotRectAreaList);
         if (napiWidth == nullptr) {
@@ -313,7 +310,6 @@ std::vector<Rect> JsInputMonitorManager::GetHotRectAreaList(napi_env env,
         int32_t rectWidth = -1;
         CHKRR(napi_get_value_int32(env, napiWidth, &rectWidth), GET_VALUE_INT32, hotRectAreaList);
         rectItem.width = rectWidth;
-
         napi_value napiHeight = nullptr;
         CHKRR(napi_get_named_property(env, napiElement, "height", &napiHeight), GET_NAMED_PROPERTY, hotRectAreaList);
         if (napiHeight == nullptr) {
@@ -323,6 +319,10 @@ std::vector<Rect> JsInputMonitorManager::GetHotRectAreaList(napi_env env,
         int32_t rectHeight = -1;
         CHKRR(napi_get_value_int32(env, napiHeight, &rectHeight), GET_VALUE_INT32, hotRectAreaList);
         rectItem.height = rectHeight;
+        if (rectX < 0 || rectY < 0 || rectHeight < 0 || rectWidth < 0) {
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Rect parameter can't be negative.");
+            return hotRectAreaList;
+        }
         hotRectAreaList.push_back(rectItem);
     }
     return hotRectAreaList;
