@@ -34,6 +34,7 @@ ohos_shared_library("intentioncode") {
     ubsan = true
     boundary_sanitize = true
     cfi = true
+    cfi_cross_dso = true
     debug = false
   }
 

@@ -41,7 +41,12 @@ ohos_source_set("mmi_connect_manager_service") {
     "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",
     "${mmi_connect_manager_path}/src/multimodal_input_connect_stub.cpp",
   ]
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":mmi_connect_manager_config" ]
 
   external_deps = [
@@ -57,6 +62,12 @@ ohos_source_set("mmi_connect_manager_service") {
 ohos_source_set("mmi_connect_manager_proxy") {
   part_name = "input"
   subsystem_name = "multimodalinput"
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   sources = [
     "${mmi_connect_manager_path}/src/multimodal_input_connect_death_recipient.cpp",
     "${mmi_connect_manager_path}/src/multimodal_input_connect_def_parcel.cpp",

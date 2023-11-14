@@ -29,7 +29,12 @@ ohos_static_library("mmi_libudev") {
   configs = [ ":mmi_libudev_config" ]
 
   sources = [ "src/udev_device.cpp" ]
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   external_deps = [ "hilog:libhilog" ]
 
   part_name = "input"

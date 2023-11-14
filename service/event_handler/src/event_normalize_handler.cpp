@@ -32,6 +32,7 @@
 #include "time_cost_chk.h"
 #include "timer_manager.h"
 #include "touch_event_normalize.h"
+#include "touchpad_transform_processor.h"
 
 namespace OHOS {
 namespace MMI {
@@ -51,6 +52,14 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event)
     if (type == LIBINPUT_EVENT_TOUCH_CANCEL || type == LIBINPUT_EVENT_TOUCH_FRAME) {
         MMI_HILOGD("This touch event is canceled type:%{public}d", type);
         return;
+    }
+    if ((type == LIBINPUT_EVENT_POINTER_TAP) &&
+        (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP)) {
+        MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
+        return;
+    }
+    if ((type < LIBINPUT_EVENT_TOUCHPAD_DOWN) || (type > LIBINPUT_EVENT_TOUCHPAD_MOTION)) {
+        MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault();
     }
     switch (type) {
         case LIBINPUT_EVENT_DEVICE_ADDED: {
@@ -327,14 +336,27 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
     CHKPR(event, ERROR_NULL_POINTER);
     auto touchpad = libinput_event_get_touchpad_event(event);
     CHKPR(touchpad, ERROR_NULL_POINTER);
+    auto type = libinput_event_get_type(event);
     int32_t seatSlot = libinput_event_touchpad_get_seat_slot(touchpad);
     GestureIdentify(event);
+    MULTI_FINGERTAP_HDR->HandleMulFingersTap(touchpad, type);
+    auto pointerEvent = TouchEventHdr->OnLibInput(event, TouchEventNormalize::DeviceType::TOUCH_PAD);
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    if (MULTI_FINGERTAP_HDR->GetMultiFingersState() == MulFingersTap::TRIPLETAP) {
+        nextHandler_->HandlePointerEvent(pointerEvent);
+        MULTI_FINGERTAP_HDR->ClearPointerItems(pointerEvent);
+    }
     buttonIds_.insert(seatSlot);
-    auto type = libinput_event_get_type(event);
     if (buttonIds_.size() == FINGER_NUM &&
         (type == LIBINPUT_EVENT_TOUCHPAD_DOWN || type == LIBINPUT_EVENT_TOUCHPAD_UP)) {
         MMI_HILOGD("Handle mouse axis event");
         HandleMouseEvent(event);
+    }
+    if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
+        buttonIds_.erase(seatSlot);
+    }
+    if (buttonIds_.empty()) {
+        MULTI_FINGERTAP_HDR->SetMULTI_FINGERTAP_HDRDefault(false);
     }
     return RET_OK;
 #else

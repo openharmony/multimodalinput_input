@@ -174,18 +174,6 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
 
-void InputManager::SimulateInputEventToHmosContainer(std::shared_ptr<KeyEvent> keyEvent)
-{
-    keyEvent->AddFlag(InputEvent::EVENT_FLAG_HMOS);
-    InputMgrImpl.SimulateInputEvent(keyEvent);
-}
-
-void InputManager::SimulateInputEventToHmosContainer(std::shared_ptr<PointerEvent> pointerEvent)
-{
-    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_HMOS);
-    InputMgrImpl.SimulateInputEvent(pointerEvent);
-}
-
 int32_t InputManager::RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener)
 {
     return InputMgrImpl.RegisterDevListener(type, listener);
@@ -288,6 +276,10 @@ int32_t InputManager::GetPointerColor(int32_t &color)
     return InputMgrImpl.GetPointerColor(color);
 }
 
+int32_t InputManager::EnableCombineKey(bool enable)
+{
+    return InputMgrImpl.EnableCombineKey(enable);
+}
 
 int32_t InputManager::SetPointerSpeed(int32_t speed)
 {
