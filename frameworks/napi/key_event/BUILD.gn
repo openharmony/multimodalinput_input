@@ -29,6 +29,13 @@ ohos_shared_library("keyevent") {
     "src/native_register_module.cpp",
   ]
 
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
   configs = [
     "${mmi_path}:coverage_flags",
     ":keyEvent_config",

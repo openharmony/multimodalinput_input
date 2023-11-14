@@ -27,6 +27,12 @@ config("inputdevice_config") {
 
 ohos_shared_library("inputdevice") {
   sources = inputdevice_sources
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
 
   configs = [
     "${mmi_path}:coverage_flags",

@@ -112,7 +112,12 @@ ohos_source_set("patch_gen_libinput-third-mmi") {
   part_name = "input"
   subsystem_name = "multimodalinput"
   sources = patch_gen_libinput_third_mmi_sources
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":libinput-third_config" ]
 
   public_configs = [ ":libinput-third_public_config" ]
@@ -128,6 +133,12 @@ ohos_source_set("patch_gen_libinput-third-mmi") {
 
 ohos_shared_library("libinput-third-mmi") {
   sources = []
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
 
   configs = [
     "${mmi_path}:coverage_flags",
@@ -156,7 +167,12 @@ ohos_source_set("patch_gen_libinput-debug") {
     "$gen_dst_dir/tools/shared.c",
     "$gen_dst_dir/tools/shared.h",
   ]
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":libinput-third_config" ]
 
   public_configs = [ ":libinput-third_public_config" ]
@@ -174,7 +190,12 @@ ohos_executable("libinput-debug-mmi") {
   install_enable = true
 
   sources = []
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":libinput-third_config" ]
 
   public_configs = [ ":libinput-third_public_config" ]
@@ -202,7 +223,12 @@ ohos_source_set("patch_gen_libinput-list") {
     "$gen_dst_dir/tools/shared.c",
     "$gen_dst_dir/tools/shared.h",
   ]
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":libinput-third_config" ]
 
   public_configs = [ ":libinput-third_public_config" ]
@@ -220,7 +246,12 @@ ohos_executable("libinput-list-mmi") {
   install_enable = true
 
   sources = []
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":libinput-third_config" ]
 
   public_configs = [ ":libinput-third_public_config" ]
@@ -248,7 +279,12 @@ ohos_source_set("patch_gen_libinput-tablet") {
     "$gen_dst_dir/tools/shared.c",
     "$gen_dst_dir/tools/shared.h",
   ]
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":libinput-third_config" ]
 
   public_configs = [ ":libinput-third_public_config" ]
@@ -266,7 +302,12 @@ ohos_executable("libinput-tablet-mmi") {
   install_enable = true
 
   sources = []
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":libinput-third_config" ]
 
   public_configs = [ ":libinput-third_public_config" ]
@@ -295,7 +336,12 @@ ohos_source_set("patch_gen_libinput-record") {
     "$gen_dst_dir/tools/shared.c",
     "$gen_dst_dir/tools/shared.h",
   ]
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":libinput-third_config" ]
 
   public_configs = [ ":libinput-third_public_config" ]
@@ -313,7 +359,12 @@ ohos_executable("libinput-record-mmi") {
   install_enable = true
 
   sources = []
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":libinput-third_config" ]
 
   public_configs = [ ":libinput-third_public_config" ]
@@ -341,7 +392,12 @@ ohos_source_set("patch_gen_libinput-analyze") {
     "$gen_dst_dir/tools/shared.c",
     "$gen_dst_dir/tools/shared.h",
   ]
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":libinput-third_config" ]
 
   public_configs = [ ":libinput-third_public_config" ]
@@ -359,7 +415,12 @@ ohos_executable("libinput-analyze-mmi") {
   install_enable = true
 
   sources = []
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":libinput-third_config" ]
 
   public_configs = [ ":libinput-third_public_config" ]
@@ -387,7 +448,12 @@ ohos_source_set("patch_gen_libinput-measure") {
     "$gen_dst_dir/tools/shared.c",
     "$gen_dst_dir/tools/shared.h",
   ]
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":libinput-third_config" ]
 
   public_configs = [ ":libinput-third_public_config" ]
@@ -405,7 +471,12 @@ ohos_executable("libinput-measure-mmi") {
   install_enable = true
 
   sources = []
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":libinput-third_config" ]
 
   public_configs = [ ":libinput-third_public_config" ]
@@ -433,7 +504,12 @@ ohos_source_set("patch_gen_libinput-quirks") {
     "$gen_dst_dir/tools/shared.c",
     "$gen_dst_dir/tools/shared.h",
   ]
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":libinput-third_config" ]
 
   public_configs = [ ":libinput-third_public_config" ]
@@ -451,7 +527,12 @@ ohos_executable("libinput-quirks-mmi") {
   install_enable = true
 
   sources = []
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":libinput-third_config" ]
 
   public_configs = [ ":libinput-third_public_config" ]
