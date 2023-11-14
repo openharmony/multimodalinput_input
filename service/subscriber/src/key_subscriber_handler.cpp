@@ -88,7 +88,7 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
     for (const auto &keyCode : keyOption->GetPreKeys()) {
         MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
     }
-    MMI_HILOGD("subscribeId:%{public}d, keyOption->finalKey:%{public}d,"
+    MMI_HILOGI("subscribeId:%{public}d, keyOption->finalKey:%{public}d,"
         "keyOption->isFinalKeyDown:%{public}s, keyOption->finalKeyDownDuration:%{public}d",
         subscribeId, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
@@ -101,7 +101,7 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
 int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
 {
     CALL_INFO_TRACE;
-    MMI_HILOGD("subscribeId:%{public}d", subscribeId);
+    MMI_HILOGI("unsubscribe Id: %{public}d", subscribeId);
     if (subscribeId == subscribePowerKeyId_) {
         subscribePowerKeyId_ = -1;
         subscribePowerKeyState_ = false;
@@ -255,6 +255,7 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
     int32_t fd = subscriber->sess_->GetFd();
     pkt << fd << subscriber->id_;
+    MMI_HILOGI("Notify subscriber id: %{public}d, keycode: %{public}d", subscriber->id_, keyEvent->GetKeyCode());
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write dispatch subscriber failed");
         return;
