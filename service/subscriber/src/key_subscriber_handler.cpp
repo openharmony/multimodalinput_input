@@ -255,7 +255,7 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
     int32_t fd = subscriber->sess_->GetFd();
     pkt << fd << subscriber->id_;
-    MMI_HILOGI("Notify subscriber id: %{public}d, keycode: %{public}d", subscriber->id, keyEvent->GetKeyCode());
+    MMI_HILOGI("Notify subscriber id: %{public}d, keycode: %{public}d", subscriber->id_, keyEvent->GetKeyCode());
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write dispatch subscriber failed");
         return;
