@@ -308,9 +308,9 @@ void MMIService::OnStart()
     MMI_HILOGI("Add system ability listener success");
 #endif
     AddAppDebugListener();
-#ifdef OHOS_BUILD_ENABLE_CONTAINER
+#ifdef OHOS_BUILD_ENABLE_ANCO
     InitContainer();
-#endif // OHOS_BUILD_ENABLE_CONTAINER
+#endif // OHOS_BUILD_ENABLE_ANCO
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGD("Set thread status flag to true");
         threadStatusFlag_ = true;
@@ -341,9 +341,9 @@ void MMIService::OnStop()
     MMI_HILOGI("Remove system ability listener success");
 #endif
     RemoveAppDebugListener();
-#ifdef OHOS_BUILD_ENABLE_CONTAINER
+#ifdef OHOS_BUILD_ENABLE_ANCO
     StopContainer();
-#endif // OHOS_BUILD_ENABLE_CONTAINER
+#endif // OHOS_BUILD_ENABLE_ANCO
 }
 
 void MMIService::AddAppDebugListener()
@@ -1127,11 +1127,11 @@ int32_t MMIService::InjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent)
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     int32_t ret;
-#ifdef OHOS_BUILD_ENABLE_CONTAINER
+#ifdef OHOS_BUILD_ENABLE_ANCO
     ret = InjectKeyEventExt(keyEvent);
 #else
     ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectKeyEvent, this, keyEvent));
-#endif // OHOS_BUILD_ENABLE_CONTAINER
+#endif // OHOS_BUILD_ENABLE_ANCO
     if (ret != RET_OK) {
         MMI_HILOGE("Inject key event failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -1161,11 +1161,11 @@ int32_t MMIService::InjectPointerEvent(const std::shared_ptr<PointerEvent> point
     CALL_DEBUG_ENTER;
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     int32_t ret;
-#ifdef OHOS_BUILD_ENABLE_CONTAINER
+#ifdef OHOS_BUILD_ENABLE_ANCO
     ret = InjectPointerEventExt(pointerEvent);
 #else
     ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::CheckInjectPointerEvent, this, pointerEvent));
-#endif // OHOS_BUILD_ENABLE_CONTAINER
+#endif // OHOS_BUILD_ENABLE_ANCO
     if (ret != RET_OK) {
         MMI_HILOGE("Inject pointer event failed, ret:%{public}d", ret);
         return RET_ERR;
@@ -1570,6 +1570,35 @@ int32_t MMIService::EnableInputDevice(bool enable)
         MMI_HILOGE("OnEnableInputDevice failed:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t MMIService::UpdateCombineKeyState(bool enable)
+{
+    auto eventSubscriberHandler = InputHandler->GetSubscriberHandler();
+    CHKPR(eventSubscriberHandler, RET_ERR);
+    int32_t ret = eventSubscriberHandler->EnableCombineKey(enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("EnableCombineKey is failed in key command: %{public}d", ret);
+    }
+
+    auto eventKeyCommandHandler = InputHandler->GetKeyCommandHandler();
+    CHKPR(eventKeyCommandHandler, RET_ERR);
+    ret = eventKeyCommandHandler->EnableCombineKey(enable);
+    if (ret != RET_OK) {
+        MMI_HILOGE("EnableCombineKey is failed in key command: %{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t MMIService::EnableCombineKey(bool enable)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::UpdateCombineKeyState, this, enable));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set key down duration failed: %{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
 }
 
 int32_t MMIService::UpdateSettingsXml(const std::string &businessId, int32_t delay)

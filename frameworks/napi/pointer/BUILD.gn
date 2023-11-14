@@ -35,6 +35,7 @@ ohos_shared_library("pointer") {
     ubsan = true
     boundary_sanitize = true
     cfi = true
+    cfi_cross_dso = true
     debug = false
   }
 

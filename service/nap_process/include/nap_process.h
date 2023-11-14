@@ -18,6 +18,7 @@
 
 #include <map>
 #include <memory>
+#include <mutex>
 
 #include "event_handler.h"
 #include "nocopyable.h"
@@ -67,6 +68,7 @@ private:
     NapProcess() = default;
     DISALLOW_COPY_AND_MOVE(NapProcess);
     static NapProcess *instance_;
+    std::mutex mapMtx_;
 };
 } // namespace MMI
 } // namespace OHOS

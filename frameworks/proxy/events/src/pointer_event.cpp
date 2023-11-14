@@ -446,6 +446,9 @@ const char* PointerEvent::DumpPointerAction() const
         case PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW: {
             return "pull-out-window";
         }
+        case PointerEvent::POINTER_ACTION_TRIPTAP: {
+            return "touchpad-trip_tap";
+        }
         default: {
             break;
         }

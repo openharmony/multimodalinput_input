@@ -63,7 +63,12 @@ ohos_source_set("patch_gen_libmtdev-third-mmi") {
   part_name = "input"
   subsystem_name = "multimodalinput"
   sources = patch_gen_libmtdev_third_mmi_sources
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":libmtdev-third_config" ]
 
   public_configs = [ ":libmtdev-third_public_config" ]
@@ -75,7 +80,12 @@ ohos_source_set("patch_gen_libmtdev-third-mmi") {
 
 ohos_shared_library("libmtdev-third-mmi") {
   sources = []
-
+  stack_protector_ret = true
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   configs = [ ":libmtdev-third_config" ]
 
   public_configs = [ ":libmtdev-third_public_config" ]

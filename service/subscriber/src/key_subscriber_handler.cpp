@@ -88,7 +88,7 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
     for (const auto &keyCode : keyOption->GetPreKeys()) {
         MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
     }
-    MMI_HILOGD("subscribeId:%{public}d, keyOption->finalKey:%{public}d,"
+    MMI_HILOGI("subscribeId:%{public}d, keyOption->finalKey:%{public}d,"
         "keyOption->isFinalKeyDown:%{public}s, keyOption->finalKeyDownDuration:%{public}d",
         subscribeId, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration());
@@ -101,7 +101,7 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
 int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
 {
     CALL_INFO_TRACE;
-    MMI_HILOGD("subscribeId:%{public}d", subscribeId);
+    MMI_HILOGI("unsubscribe Id: %{public}d", subscribeId);
     if (subscribeId == subscribePowerKeyId_) {
         subscribePowerKeyId_ = -1;
         subscribePowerKeyState_ = false;
@@ -117,9 +117,45 @@ int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subsc
     return RET_ERR;
 }
 
+int32_t KeySubscriberHandler::EnableCombineKey(bool enable)
+{
+    enableCombineKey_ = enable;
+    MMI_HILOGI("Enable combineKey is successful in subscribe handler, enable: %{public}d", enable);
+    return RET_OK;
+}
+
+bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    if (enableCombineKey_) {
+        return true;
+    }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+        auto items = keyEvent->GetKeyItems();
+        if (items.size() != 1) {
+            return enableCombineKey_;
+        }
+        return true;
+    }
+    if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_L) {
+        for (const auto &item : keyEvent->GetKeyItems()) {
+            int32_t keyCode = item.GetKeyCode();
+            if (keyCode != KeyEvent::KEYCODE_L && keyCode != KeyEvent::KEYCODE_META_LEFT &&
+                keyCode != KeyEvent::KEYCODE_META_RIGHT) {
+                return enableCombineKey_;
+            }
+        }
+        return true;
+    }
+    return enableCombineKey_;
+}
+
 bool KeySubscriberHandler::OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     CHKPF(keyEvent);
+    if (!IsEnableCombineKey(keyEvent)) {
+        MMI_HILOGI("Combine key is taken over in subscribe keyEvent");
+        return false;
+    }
     if (IsRepeatedKeyEvent(keyEvent)) {
         MMI_HILOGD("Repeat KeyEvent, skip");
         return true;
@@ -219,6 +255,7 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
     int32_t fd = subscriber->sess_->GetFd();
     pkt << fd << subscriber->id_;
+    MMI_HILOGI("Notify subscriber id: %{public}d, keycode: %{public}d", subscriber->id_, keyEvent->GetKeyCode());
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write dispatch subscriber failed");
         return;

@@ -520,6 +520,12 @@ int32_t MultimodalInputConnectManager::AppendExtraData(const ExtraData &extraDat
     return multimodalInputConnectService_->AppendExtraData(extraData);
 }
 
+int32_t MultimodalInputConnectManager::EnableCombineKey(bool enable)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->EnableCombineKey(enable);
+}
+
 int32_t MultimodalInputConnectManager::EnableInputDevice(bool enable)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
