@@ -83,6 +83,10 @@ static void AddMouseMonitor(napi_env env, napi_callback_info info, napi_value na
         return;
     }
     hotRectAreaList = JsInputMonMgr.GetHotRectAreaList(env, napiRect, rectArrayLength);
+    if (hotRectAreaList.size() != rectArrayLength) {
+        MMI_HILOGE("Hot Rect Area Parameter error");
+        return;
+    }
     napi_valuetype valueType = napi_undefined;
     CHKRV(napi_typeof(env, napiCallback, &valueType), TYPEOF);
     if (valueType != napi_function) {

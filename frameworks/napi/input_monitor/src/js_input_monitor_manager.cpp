@@ -323,6 +323,10 @@ std::vector<Rect> JsInputMonitorManager::GetHotRectAreaList(napi_env env,
         int32_t rectHeight = -1;
         CHKRR(napi_get_value_int32(env, napiHeight, &rectHeight), GET_VALUE_INT32, hotRectAreaList);
         rectItem.height = rectHeight;
+        if (rectX < 0 || rectY < 0 || rectHeight < 0 || rectWidth < 0) {
+            THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Rect parameter can't be negative.");
+            return hotRectAreaList;
+        }
         hotRectAreaList.push_back(rectItem);
     }
     return hotRectAreaList;
