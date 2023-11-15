@@ -49,6 +49,9 @@ public:
     static void StartBytrace(std::shared_ptr<KeyEvent> keyEvent, TraceBtn traceBtn, HandlerType handlerType);
     static void StartBytrace(std::shared_ptr<PointerEvent> pointerEvent, TraceBtn traceBtn, HandlerType handlerType);
     static void StartBytrace(TraceBtn traceBtn, EventType eventType);
+    static bool GetPointerItems(std::shared_ptr<PointerEvent> pointerEvent,
+        std::vector<PointerEvent::PointerItem> &pointerItems);
+    static std::string GetTraceString(const std::vector<PointerEvent::PointerItem> &pointerItems);
 };
 } // namespace MMI
 } // namespace OHOS
