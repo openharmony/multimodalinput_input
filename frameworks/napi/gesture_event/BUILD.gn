@@ -38,8 +38,6 @@ ohos_shared_library("gestureevent") {
     debug = false
   }
 
-  stack_protector_ret = true
-
   configs = [
     "${mmi_path}:coverage_flags",
     ":gestureEvent_config",
