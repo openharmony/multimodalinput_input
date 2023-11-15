@@ -50,6 +50,32 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent)
     HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "service report keyId=" + std::to_string(keyId));
 }
 
+std::string BytraceAdapter::GetTouchTraceString(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    std::vector<PointerEvent::PointerItem> pointerItems;
+    std::vector<int32_t> pointerIds{ pointerEvent->GetPointerIds() };
+    for (const auto &pointerId : pointerIds) {
+        PointerEvent::PointerItem item;
+        if (!pointerEvent->GetPointerItem(pointerId, item)) {
+            MMI_HILOGE("Invalid pointer: %{public}d.", pointerId);
+            return "";
+        }
+        pointerItems.emplace_back(item);
+    }
+    std::string traceStr;
+    for (const auto &item : pointerItems) {
+        auto id = item.GetPointerId();
+        auto displayX = item.GetDisplayX();
+        auto displayY = item.GetDisplayY();
+        traceStr += " [";
+        traceStr += "id: " + std::to_string(id);
+        traceStr += ", x:" + std::to_string(displayX);
+        traceStr += ", y:" + std::to_string(displayY);
+        traceStr += "]";
+    }
+    return traceStr;
+}
+
 void BytraceAdapter::StartBytrace(std::shared_ptr<PointerEvent> pointerEvent, TraceBtn traceBtn)
 {
     CHKPV(pointerEvent);
@@ -60,7 +86,8 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<PointerEvent> pointerEvent, Tr
             HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "service report pointerId:" + std::to_string(eventId));
         } else {
             StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, onTouchEvent, eventId);
-            HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "service report touchId:" + std::to_string(eventId));
+            HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "service report touchId:" + std::to_string(eventId) +
+                + ", type: " + pointerEvent->DumpPointerAction() + GetTouchTraceString(pointerEvent));
         }
     } else {
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
