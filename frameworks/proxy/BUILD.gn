@@ -67,7 +67,6 @@ ohos_source_set("libmmi-common") {
     cfi_cross_dso = true
     debug = false
   }
-  stack_protector_ret = true
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
@@ -90,7 +89,6 @@ ohos_shared_library("libmmi-client") {
     cfi_cross_dso = true
     debug = false
   }
-  stack_protector_ret = true
 
   if (input_feature_interceptor) {
     sources += [ "event_handler/src/input_interceptor_manager.cpp" ]
