@@ -164,6 +164,10 @@ int32_t EventDispatchHandler::DispatchKeyEventPid(UDSServer& udsServer, std::sha
     InputEventDataTransformation::KeyEventToNetPacket(key, pkt);
     BytraceAdapter::StartBytrace(key, BytraceAdapter::KEY_DISPATCH_EVENT);
     pkt << fd;
+
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    InputEventDataTransformation::MarshallingEnhanceData(key, pkt);
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write structure of EventKeyboard failed");
         return RET_ERR;
