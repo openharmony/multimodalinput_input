@@ -30,10 +30,14 @@ ohos_shared_library("inputmonitor") {
   sources = inputmonitor_sources
   stack_protector_ret = true
   sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
   }
+
   configs = [
     "${mmi_path}:coverage_flags",
     ":inputmonitor_config",
