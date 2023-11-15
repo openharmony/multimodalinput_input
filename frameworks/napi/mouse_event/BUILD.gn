@@ -28,7 +28,7 @@ ohos_shared_library("mouseevent") {
     "src/js_mouse_event.cpp",
     "src/native_register_module.cpp",
   ]
-
+  stack_protector_ret = true
   sanitize = {
     integer_overflow = true
     ubsan = true
@@ -37,8 +37,6 @@ ohos_shared_library("mouseevent") {
     cfi_cross_dso = true
     debug = false
   }
-
-  stack_protector_ret = true
 
   configs = [
     "${mmi_path}:coverage_flags",
