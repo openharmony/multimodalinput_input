@@ -31,20 +31,13 @@ ohos_shared_library("shortkey") {
   ]
   stack_protector_ret = true
   sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
-
-  sanitize = {
     integer_overflow = true
     ubsan = true
     boundary_sanitize = true
     cfi = true
+    cfi_cross_dso = true
     debug = false
   }
-
-  stack_protector_ret = true
 
   configs = [ ":shortKey_config" ]
 
