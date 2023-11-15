@@ -60,10 +60,14 @@ ohos_source_set("libmmi-common") {
   visibility = [ "${mmi_path}/*" ]
   stack_protector_ret = true
   sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
   }
+  stack_protector_ret = true
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
@@ -79,10 +83,14 @@ ohos_shared_library("libmmi-client") {
   innerapi_tags = [ "platformsdk" ]
   stack_protector_ret = true
   sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
   }
+  stack_protector_ret = true
 
   if (input_feature_interceptor) {
     sources += [ "event_handler/src/input_interceptor_manager.cpp" ]
@@ -99,16 +107,6 @@ ohos_shared_library("libmmi-client") {
   if (input_feature_switch) {
     sources += [ "event_handler/src/switch_event_input_subscribe_manager.cpp" ]
   }
-
-  sanitize = {
-    integer_overflow = true
-    ubsan = true
-    boundary_sanitize = true
-    cfi = true
-    debug = false
-  }
-
-  stack_protector_ret = true
 
   configs = [
     "${mmi_path}:coverage_flags",
