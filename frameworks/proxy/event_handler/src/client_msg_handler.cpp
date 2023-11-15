@@ -123,6 +123,12 @@ int32_t ClientMsgHandler::OnKeyEvent(const UDSClient& client, NetPacket& pkt)
     }
     int32_t fd = 0;
     pkt >> fd;
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    if (InputEventDataTransformation::UnmarshallingEnhanceData(pkt, key) != ERR_OK) {
+        MMI_HILOGE("Failed to deserialize enhance data key event.");
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read fd failed");
         return PACKET_READ_FAIL;

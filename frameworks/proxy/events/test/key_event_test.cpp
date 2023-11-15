@@ -206,7 +206,7 @@ HWTEST_F(KeyEventTest, KeyEventTest_OnCheckKeyEvent_006, TestSize.Level1)
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_BACK);
     keyEvent->SetActionTime(100);
     keyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-    
+
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     keyEvent->ActionToString(KeyEvent::KEY_ACTION_DOWN);
     keyEvent->KeyCodeToString(KeyEvent::KEYCODE_BACK);
@@ -457,5 +457,28 @@ HWTEST_F(KeyEventTest, KeyEventTest_ReadFromParcel_003, TestSize.Level1)
     ret = keyOption->ReadFromParcel(data);
     ASSERT_TRUE(ret);
 }
+
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+/**
+ * @tc.name: KeyEventTest_SetEnhanceData_001
+ * @tc.desc: Set the enhance data.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_SetEnhanceData_001, TestSize.Level1)
+{
+    auto KeyEvent = KeyEvent::Create();
+    ASSERT_NE(KeyEvent, nullptr);
+    uint32_t enHanceDataLen = 3;
+    uint8_t enhanceDataBuf[enHanceDataLen];
+    std::vector<uint8_t> enhanceData;
+    for (uint32_t i = 0; i < enHanceDataLen; i++) {
+        enhanceData.push_back(enhanceDataBuf[i]);
+    }
+
+    ASSERT_NO_FATAL_FAILURE(KeyEvent->SetEnhanceData(enhanceData));
+    ASSERT_EQ(KeyEvent->GetEnhanceData(), enhanceData);
+}
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 } // namespace MMI
 } // namespace OHOS

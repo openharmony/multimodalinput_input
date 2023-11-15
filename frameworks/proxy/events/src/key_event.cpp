@@ -849,6 +849,10 @@ const int32_t KeyEvent::INTENTION_REJECTCALL = 202;
 const int32_t KeyEvent::INTENTION_CAMERA = 300;
 const int32_t maxKeysSize = 1000;
 
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+constexpr size_t MAX_N_ENHANCE_DATA_SIZE { 64 };
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+
 KeyEvent::KeyItem::KeyItem() {}
 
 KeyEvent::KeyItem::~KeyItem() {}
@@ -1166,6 +1170,12 @@ bool KeyEvent::WriteToParcel(Parcel &out) const
     WRITEBOOL(out, capsLock_);
     WRITEBOOL(out, scrollLock_);
     WRITEBOOL(out, repeat_);
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    WRITEINT32(out, static_cast<int32_t>(enhanceData_.size()));
+    for (uint32_t i = 0; i < enhanceData_.size(); i++) {
+        WRITEUINT32(out, enhanceData_[i]);
+    }
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     return true;
 }
 
@@ -1192,8 +1202,32 @@ bool KeyEvent::ReadFromParcel(Parcel &in)
     READBOOL(in, capsLock_);
     READBOOL(in, scrollLock_);
     READBOOL(in, repeat_);
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    if (!ReadEnhanceDataFromParcel(in)) {
+        return false;
+    }
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     return true;
 }
+
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+bool KeyEvent::ReadEnhanceDataFromParcel(Parcel &in)
+{
+    int32_t size = 0;
+    READINT32(in, size);
+    if (size > static_cast<int32_t>(MAX_N_ENHANCE_DATA_SIZE) || size < 0) {
+        MMI_HILOGE("key event enhanceData_ size is invalid");
+        return false;
+    }
+
+    for (int32_t i = 0; i < size; i++) {
+        uint32_t val;
+        READUINT32(in, val);
+        enhanceData_.emplace_back(val);
+    }
+    return true;
+}
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 
 int32_t KeyEvent::TransitionFunctionKey(int32_t keyCode)
 {
@@ -1275,5 +1309,17 @@ void KeyEvent::SetRepeat(bool repeat)
 {
     repeat_ = repeat;
 }
+
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+void KeyEvent::SetEnhanceData(const std::vector<uint8_t> enhanceData)
+{
+    enhanceData_ = enhanceData;
+}
+
+std::vector<uint8_t> KeyEvent::GetEnhanceData() const
+{
+    return enhanceData_;
+}
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 } // namespace MMI
 } // namespace OHOS

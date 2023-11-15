@@ -2937,35 +2937,35 @@ public:
      * @since 9
      */
     static const int32_t INTENTION_MENU;
-    
+
     /**
      * Home intention
      *
      * @since 9
      */
     static const int32_t INTENTION_HOME;
-    
+
     /**
      * Page Up intention
      *
      * @since 9
      */
     static const int32_t INTENTION_PAGE_UP;
-    
+
     /**
      * Page down intention
      *
      * @since 9
      */
     static const int32_t INTENTION_PAGE_DOWN;
-    
+
     /**
      * Zoom out intention
      *
      * @since 9
      */
     static const int32_t INTENTION_ZOOM_OUT;
-    
+
     /**
      * Zoom in intention
      *
@@ -2979,42 +2979,42 @@ public:
      * @since 9
      */
     static const int32_t INTENTION_MEDIA_PLAY_PAUSE;
-    
+
     /**
      * Media fast forward intention
      *
      * @since 9
      */
     static const int32_t INTENTION_MEDIA_FAST_FORWARD;
-    
+
     /**
      * Media fast rewind intention
      *
      * @since 9
      */
     static const int32_t INTENTION_MEDIA_FAST_REWIND;
-    
+
     /**
      * Media fast playback intention
      *
      * @since 9
      */
     static const int32_t INTENTION_MEDIA_FAST_PLAYBACK;
-    
+
     /**
      * Media next intention
      *
      * @since 9
      */
     static const int32_t INTENTION_MEDIA_NEXT;
-    
+
     /**
      * Media previous intention
      *
      * @since 9
      */
     static const int32_t INTENTION_MEDIA_PREVIOUS;
-    
+
     /**
      * Media mute intention
      *
@@ -3028,7 +3028,7 @@ public:
      * @since 9
      */
     static const int32_t INTENTION_VOLUTE_UP;
-    
+
     /**
      * Volume down intention
      *
@@ -3042,14 +3042,14 @@ public:
      * @since 9
      */
     static const int32_t INTENTION_CALL;
-    
+
     /**
      * End call intention
      *
      * @since 9
      */
     static const int32_t INTENTION_ENDCALL;
-    
+
     /**
      * Reject call intention
      *
@@ -3361,6 +3361,20 @@ public:
      */
     void SetRepeat(bool repeat);
 
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    /**
+     * @brief Set the enhance data.
+     * @return void.
+     * @since 11
+     */
+    void SetEnhanceData(std::vector<uint8_t> enhanceData);
+    /**
+     * @brief Obtains the enhance data.
+     * @return Returns the enhance data.
+     * @since 11
+     */
+    std::vector<uint8_t> GetEnhanceData() const;
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 public:
     /**
      * @brief Writes data to a <b>Parcel</b> object.
@@ -3387,6 +3401,9 @@ protected:
     explicit KeyEvent(int32_t eventType);
 
 private:
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    bool ReadEnhanceDataFromParcel(Parcel &in);
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     bool IsValidKeyItem() const;
 
 private:
@@ -3398,6 +3415,9 @@ private:
     bool capsLock_ { false };
     bool scrollLock_ { false };
     bool repeat_ { false };
+#ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+    std::vector<uint8_t> enhanceData_;
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 };
 } // namespace MMI
 } // namespace OHOS
