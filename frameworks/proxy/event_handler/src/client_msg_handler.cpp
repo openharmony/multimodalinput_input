@@ -309,7 +309,6 @@ int32_t ClientMsgHandler::ReportKeyEvent(const UDSClient& client, NetPacket& pkt
     (defined(OHOS_BUILD_ENABLE_INTERCEPTOR) || defined(OHOS_BUILD_ENABLE_MONITOR))
 int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket& pkt)
 {
-    CALL_DEBUG_ENTER;
     InputHandlerType handlerType;
     uint32_t deviceTags;
     pkt >> handlerType >> deviceTags;
