@@ -30,16 +30,6 @@ ohos_shared_library("inputconsumer") {
     "src/js_register_util.cpp",
   ]
 
-  sanitize = {
-    integer_overflow = true
-    ubsan = true
-    boundary_sanitize = true
-    cfi = true
-    debug = false
-  }
-
-  stack_protector_ret = true
-
   configs = [
     "${mmi_path}:coverage_flags",
     ":inputconsumer_config",
@@ -57,6 +47,9 @@ ohos_shared_library("inputconsumer") {
   ]
   stack_protector_ret = true
   sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
