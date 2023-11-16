@@ -487,8 +487,8 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         }
     }
 
-    if (pointerEvent != nullptr) {
-        ResetTouchUpEvent(pointerEvent);
+    if ((pointerEvent != nullptr) && (event != nullptr)) {
+        ResetTouchUpEvent(pointerEvent, event);
     }
 #else
     MMI_HILOGW("Touchscreen device does not support");
@@ -496,11 +496,13 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
     return RET_OK;
 }
 
-void EventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent)
+void EventNormalizeHandler::ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent,
+    struct libinput_event *event)
 {
     CHKPV(pointerEvent);
-    auto type = pointerEvent->GetPointerAction();
-    if (type == PointerEvent::POINTER_ACTION_UP) {
+    CHKPV(event);
+    auto type = libinput_event_get_type(event);
+    if (type == LIBINPUT_EVENT_TOUCH_UP) {
         pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
         MMI_HILOGD("This touch event is up remove this finger");
         if (pointerEvent->GetPointerIds().empty()) {
