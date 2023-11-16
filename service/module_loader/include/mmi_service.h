@@ -132,8 +132,8 @@ public:
 #endif
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    void InitContainer();
-    void StopContainer();
+    void InitAncoUds();
+    void StopAncoUds();
     int32_t InjectKeyEventExt(const std::shared_ptr<KeyEvent> keyEvent);
     int32_t InjectPointerEventExt(const std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_ANCO
