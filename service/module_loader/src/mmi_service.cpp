@@ -289,9 +289,7 @@ int32_t MMIService::Init()
 
 void MMIService::OnStart()
 {
-    int sleepSeconds = 3;
     std::string name = "mmi-service";
-    sleep(sleepSeconds);
     CHK_PID_AND_TID();
     int32_t ret = Init();
     if (RET_OK != ret) {
