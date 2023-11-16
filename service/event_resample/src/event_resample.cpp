@@ -72,7 +72,6 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
         EventDump("UpdateTouchState", inputEvent_);
         EventLogHelper::PrintEventData(pointerEvent_);
         UpdateTouchState(inputEvent_);
-//        outEvent = &inputEvent_;
         return pointerEvent_;
     } while (0);
 
@@ -159,17 +158,6 @@ bool EventResample::UpdateBatch(MotionEvent** outEvent, ErrCode &result, bool &d
             MMI_HILOGD("Event added to batch: %{public}d %{public}d %{public}d",
                        inputEvent_.deviceId, inputEvent_.sourceType, inputEvent_.pointerAction);
             return true;
-        } else if (PointerEvent::POINTER_ACTION_UP == inputEvent_.pointerAction) {
-//             MMI_HILOGD("Deferred event: %{public}d %{public}d %{public}d",
-//                        inputEvent_.deviceId, inputEvent_.sourceType, inputEvent_.pointerAction);
-//             deferredEvent_.InitializeFrom(inputEvent_);
-//             msgDeferred_ = true;
-//             deferred = true;
-//             result = ConsumeSamples(batch, batch.samples.size(), outEvent);
-//             batches_.erase(batches_.begin() + batchIndex);
-//             UpdateTouchState(deferredEvent_);
-//             return true;
-            return false;
         }
     }
 
