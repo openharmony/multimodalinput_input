@@ -29,6 +29,7 @@
 #include "mmi_log.h"
 #include "net_packet.h"
 #include "proto.h"
+#include "setting_datashare.h"
 #include "timer_manager.h"
 #include "util_ex.h"
 #include "nap_process.h"
@@ -36,6 +37,7 @@
 namespace OHOS {
 namespace MMI {
 namespace {
+constexpr int32_t MULTIMODAL_INPUT_DOMAIN_ID = 3101;
 constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr int32_t MAX_SEQUENCEKEYS_NUM = 10;
 constexpr int64_t MAX_DELAY_TIME = 1000000;
@@ -400,6 +402,25 @@ bool GetDelay(const cJSON* jsonData, int64_t &delayInt)
     return true;
 }
 
+bool GetRepeatTimes(const cJSON* jsonData, int32_t &repeatTimesInt)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("GetRepeatTimes jsonData is not object");
+        return false;
+    }
+    cJSON *repeatTimes = cJSON_GetObjectItemCaseSensitive(jsonData, "times");
+    if (!cJSON_IsNumber(repeatTimes)) {
+        MMI_HILOGE("repeatTimes is not number");
+        return false;
+    }
+    if (repeatTimes->valueint < 0) {
+        MMI_HILOGE("repeatTimes must be number and bigger and equal zero");
+        return false;
+    }
+    repeatTimesInt = repeatTimes->valueint;
+    return true;
+}
+
 bool GetAbilityStartDelay(const cJSON* jsonData, int64_t &abilityStartDelayInt)
 {
     if (!cJSON_IsObject(jsonData)) {
@@ -534,6 +555,42 @@ bool ConvertToKeySequence(const cJSON* jsonData, Sequence &sequence)
     return true;
 }
 
+bool ConvertToKeyRepeat(const cJSON* jsonData, RepeatKey &repeatKey)
+{
+    if (!cJSON_IsObject(jsonData)) {
+        MMI_HILOGE("jsonData is not object");
+        return false;
+    }
+
+    if (!GetKeyCode(jsonData, repeatKey.keyCode)) {
+        MMI_HILOGE("Get keyCode failed");
+        return false;
+    }
+
+    if (!GetRepeatTimes(jsonData, repeatKey.times)) {
+        MMI_HILOGE("Get repeatTimes failed");
+        return false;
+    }
+
+    if (!GetDelay(jsonData, repeatKey.delay)) {
+        MMI_HILOGE("Get delay failed");
+        return false;
+    }
+
+    GetKeyVal(jsonData, "statusConfig", repeatKey.statusConfig);
+
+    cJSON *ability = cJSON_GetObjectItemCaseSensitive(jsonData, "ability");
+    if (!cJSON_IsObject(ability)) {
+        MMI_HILOGE("ability is not object");
+        return false;
+    }
+    if (!PackageAbility(ability, repeatKey.ability)) {
+        MMI_HILOGE("Package ability failed");
+        return false;
+    }
+    return true;
+}
+
 std::string GenerateKey(const ShortcutKey& key)
 {
     std::set<int32_t> preKeys = key.preKeys;
@@ -593,6 +650,29 @@ bool ParseSequences(const JsonParser& parser, std::vector<Sequence>& sequenceVec
         }
         sequenceVec.push_back(seq);
     }
+    return true;
+}
+
+bool ParseRepeatKeys(const JsonParser& parser, std::vector<RepeatKey>& repeatKeyVec)
+{
+    cJSON* repeatKeys = cJSON_GetObjectItemCaseSensitive(parser.json_, "RepeatKeys");
+    if (!cJSON_IsArray(repeatKeys)) {
+        MMI_HILOGE("repeatKeys is not array");
+        return false;
+    }
+    int32_t repeatKeysSize = cJSON_GetArraySize(repeatKeys);
+    for (int32_t i = 0; i < repeatKeysSize; i++) {
+        RepeatKey rep;
+        cJSON *repeatKey = cJSON_GetArrayItem(repeatKeys, i);
+        if (!cJSON_IsObject(repeatKey)) {
+            continue;
+        }
+        if (!ConvertToKeyRepeat(repeatKey, rep)) {
+            continue;
+        }
+        repeatKeyVec.push_back(rep);
+    }
+
     return true;
 }
 
@@ -1095,6 +1175,20 @@ bool KeyCommandHandler::ParseConfig()
     return ParseJson(customConfig) || ParseJson(defaultConfig);
 }
 
+void KeyCommandHandler::ParseRepeatKeyMaxCount()
+{
+    if (repeatKeys_.empty()) {
+        maxCount_ = 0;
+    }
+    int32_t tempCount = 0;
+    for (RepeatKey& item : repeatKeys_) {
+        if (item.times > tempCount) {
+            tempCount = item.times;
+        }
+    }
+    maxCount_ = tempCount;
+}
+
 bool KeyCommandHandler::ParseJson(const std::string &configFile)
 {
     CALL_DEBUG_ENTER;
@@ -1116,8 +1210,9 @@ bool KeyCommandHandler::ParseJson(const std::string &configFile)
     bool isParseSingleKnuckleGesture = IsParseKnuckleGesture(parser, SINGLE_KNUCKLE_ABILITY, singleKnuckleGesture_);
     bool isParseDoubleKnuckleGesture = IsParseKnuckleGesture(parser, DOUBLE_KNUCKLE_ABILITY, doubleKnuckleGesture_);
     bool isParseMultiFingersTap = ParseMultiFingersTap(parser, TOUCHPAD_TRIP_TAP_ABILITY, threeFingersTap_);
+    bool isParseRepeatKeys = ParseRepeatKeys(parser, repeatKeys_);
     if (!isParseShortKeys && !isParseSequences && !isParseTwoFingerGesture && !isParseSingleKnuckleGesture &&
-        !isParseDoubleKnuckleGesture && !isParseMultiFingersTap) {
+        !isParseDoubleKnuckleGesture && !isParseMultiFingersTap && !isParseRepeatKeys) {
         MMI_HILOGE("Parse configFile failed");
         return false;
     }
@@ -1191,7 +1286,49 @@ int32_t KeyCommandHandler::EnableCombineKey(bool enable)
     return RET_OK;
 }
 
-bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
+void KeyCommandHandler::CreateStatusConfigObserver()
+{
+    CALL_DEBUG_ENTER;
+    for (RepeatKey& item : repeatKeys_) {
+        if (item.statusConfig.empty()) {
+            return;
+        }
+
+        SettingObserver::UpdateFunc updateFunc = [&](const std::string& key) {
+            bool statusValue = true;
+            auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_DOMAIN_ID)
+                .GetBoolValue(item.statusConfig, statusValue);
+            if (ret != RET_OK) {
+                MMI_HILOGE("Get value from setting date fail");
+                return;
+            }
+            item.statusConfigValue = statusValue;
+        };
+        sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_DOMAIN_ID)
+            .CreateObserver(item.statusConfig, updateFunc);
+        ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_DOMAIN_ID).RegisterObserver(statusObserver);
+        if (ret != ERR_OK) {
+            MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
+            statusObserver = nullptr;
+        }
+    }
+}
+
+std::shared_ptr<KeyEvent> KeyCommandHandler::CreateKeyEvent(int32_t keyCode, int32_t keyAction, bool isPressed)
+{
+    CALL_DEBUG_ENTER;
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    CHKPP(keyEvent);
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(keyCode);
+    item.SetPressed(isPressed);
+    keyEvent->SetKeyCode(keyCode);
+    keyEvent->SetKeyAction(keyAction);
+    keyEvent->AddPressedKeyItems(item);
+    return keyEvent;
+}
+
+bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
 {
     CALL_DEBUG_ENTER;
     CHKPF(key);
@@ -1207,9 +1344,40 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
         isParseConfig_ = true;
     }
 
+    if (!isParseMaxCount_) {
+        ParseRepeatKeyMaxCount();
+        isParseMaxCount_ = true;
+    }
+
+    if (!isParseStatusConfig_) {
+        CreateStatusConfigObserver();
+        isParseStatusConfig_ = true;
+    }
+
     bool isHandled = HandleShortKeys(key);
     isHandled = HandleSequences(key) || isHandled;
     if (isHandled) {
+        isHandleSequence_ = true;
+        return true;
+    }
+
+    bool isRepeatKeyHandle = HandleRepeatKeys(key);
+    if (isRepeatKeyHandle) {
+        return true;
+    }
+    count_ = 0;
+    isRepeatKeyState_ = false;
+    isHandleSequence_ = false;
+    return false;
+}
+
+bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<KeyEvent> key)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(key);
+
+    bool handleEventStatus = HandleEvent(key);
+    if (handleEventStatus) {
         return true;
     }
 
@@ -1267,6 +1435,129 @@ bool KeyCommandHandler::OnHandleEvent(const std::shared_ptr<PointerEvent> pointe
         return true;
     }
     return false;
+}
+
+bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+    if (repeatKeys_.empty()) {
+        MMI_HILOGD("No sequences configuration data");
+        return false;
+    }
+
+    if (count_ > maxCount_) {
+        return false;
+    }
+
+    bool isLaunched = false;
+    bool waitRepeatKey = false;
+
+    for (RepeatKey& item : repeatKeys_) {
+        if (HandleRepeatKeyCount(item, keyEvent)) {
+            break;
+        }
+    }
+
+    for (RepeatKey& item : repeatKeys_) {
+        if (item.statusConfigValue == false) {
+            continue;
+        }
+        bool isRepeatKey = HandleRepeatKey(item, isLaunched, keyEvent);
+        if (isRepeatKey) {
+            waitRepeatKey = true;
+        }
+    }
+
+    if (isLaunched) {
+        isRepeatKeyState_ = true;
+    }
+
+    return isLaunched || waitRepeatKey;
+}
+
+bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
+    const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+
+    if (keyEvent->GetKeyCode() != item.keyCode) {
+        return false;
+    }
+    if (count_ == item.times) {
+        LaunchAbility(item.ability, 0);
+        launchAbilityCount_ = count_;
+        isLaunched = true;
+        isRepeatKeyState_ = true;
+    }
+    return true;
+}
+
+bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+
+    if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+        if (repeatKey_.keyCode != item.keyCode) {
+            count_ = 1;
+            repeatKey_.keyCode = item.keyCode;
+        } else {
+            count_++;
+        }
+
+        if (repeatKeys_.size() > 0) {
+            intervalTime_ = repeatKeys_[0].delay;
+        }
+
+        upActionTime_ = keyEvent->GetActionTime();
+        repeatTimerId_ = TimerMgr->AddTimer(intervalTime_ / SECONDS_SYSTEM, 1, [this] () {
+            SendKeyEvent();
+        });
+        if (repeatTimerId_ < 0) {
+            MMI_HILOGE("Add timer failed");
+            return false;
+        }
+        repeatKey_.keyCode = item.keyCode;
+        return true;
+    }
+
+    if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+        int64_t durationTime = keyEvent->GetActionTime() - upActionTime_;
+        if (durationTime < intervalTime_) {
+            if (repeatTimerId_ >= 0) {
+                TimerMgr->RemoveTimer(repeatTimerId_);
+            }
+        }
+        return true;
+    }
+    return false;
+}
+
+void KeyCommandHandler::SendKeyEvent()
+{
+    CALL_DEBUG_ENTER;
+    if (!isHandleSequence_) {
+        for (int32_t i = launchAbilityCount_; i < count_; i++) {
+            int32_t keycode = repeatKey_.keyCode;
+            if (IsSpecialType(keycode, SpecialType::KEY_DOWN_ACTION)) {
+                HandleSpecialKeys(keycode, KeyEvent::KEY_ACTION_DOWN);
+            }
+
+            auto keyEventDown = CreateKeyEvent(keycode, KeyEvent::KEY_ACTION_DOWN, true);
+            CHKPV(keyEventDown);
+            InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventDown);
+
+            auto keyEventUp = CreateKeyEvent(keycode, KeyEvent::KEY_ACTION_UP, false);
+            CHKPV(keyEventUp);
+            InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventUp);
+        }
+    }
+    count_ = 0;
+    isRepeatKeyState_ = false;
+    isHandleSequence_ = false;
+    launchAbilityCount_ = 0;
 }
 
 bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent)
