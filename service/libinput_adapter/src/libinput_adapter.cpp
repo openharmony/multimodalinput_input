@@ -147,9 +147,13 @@ void LibinputAdapter::OnEventHandler()
     CALL_DEBUG_ENTER;
     CHKPV(funInputEvent_);
     libinput_event *event = nullptr;
+    int64_t frameTime = GetSysClockTime();
     while ((event = libinput_get_event(input_))) {
-        funInputEvent_(event);
+        funInputEvent_(event, frameTime);
         libinput_event_destroy(event);
+    }
+    if (event == nullptr) {
+        funInputEvent_(nullptr, 0);
     }
 }
 

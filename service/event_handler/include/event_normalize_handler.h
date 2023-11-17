@@ -27,7 +27,7 @@ class EventNormalizeHandler : public IInputEventHandler {
 public:
     EventNormalizeHandler() = default;
     ~EventNormalizeHandler() = default;
-    void HandleEvent(libinput_event* event);
+    void HandleEvent(libinput_event* event, int64_t frameTime);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     void HandleKeyEvent(const std::shared_ptr<KeyEvent> keyEvent) override;
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -46,7 +46,7 @@ private:
     int32_t HandleTouchPadEvent(libinput_event* event);
     int32_t HandleGestureEvent(libinput_event* event);
     int32_t HandleMouseEvent(libinput_event* event);
-    int32_t HandleTouchEvent(libinput_event* event);
+    int32_t HandleTouchEvent(libinput_event* event, int64_t frameTime);
     int32_t HandleSwitchInputEvent(libinput_event* event);
     int32_t HandleTableToolEvent(libinput_event* event);
     int32_t HandleJoystickEvent(libinput_event* event);
