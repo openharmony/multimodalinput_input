@@ -308,7 +308,7 @@ void MMIService::OnStart()
 #endif
     AddAppDebugListener();
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    InitContainer();
+    InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGD("Set thread status flag to true");
@@ -341,7 +341,7 @@ void MMIService::OnStop()
 #endif
     RemoveAppDebugListener();
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    StopContainer();
+    StopAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
 }
 
