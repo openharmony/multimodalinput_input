@@ -41,7 +41,7 @@ class InputEventHandler final {
 public:
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
     void Init(UDSServer& udsServer);
-    void OnEvent(void *event);
+    void OnEvent(void *event, int64_t frameTime);
     UDSServer *GetUDSServer() const;
 
     std::shared_ptr<EventNormalizeHandler> GetEventNormalizeHandler() const;
