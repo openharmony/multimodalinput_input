@@ -1033,7 +1033,7 @@ void KeyCommandHandler::KnuckleGestureProcessor(const std::shared_ptr<PointerEve
     knuckleGesture.doubleClickDistance = downToPrevDownDistance;
     UpdateKnuckleGestureInfo(touchEvent, knuckleGesture);
     if (isTimeIntervalReady && isDistanceReady) {
-        MMI_HILOGD("knuckle gesture start launch ability");
+        MMI_HILOGI("knuckle gesture start launch ability");
         DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(intervalTime);
         LaunchAbility(knuckleGesture.ability, 0);
         knuckleGesture.state = true;
@@ -1625,21 +1625,15 @@ bool KeyCommandHandler::HandleConsumedKeyEvent(const std::shared_ptr<KeyEvent> k
 
 bool KeyCommandHandler::IsRepeatKeyEvent(const SequenceKey &sequenceKey)
 {
-    for (auto iter = keys_.begin(); iter != keys_.end();) {
-        if ((*iter).keyCode == sequenceKey.keyCode) {
-            if ((*iter).keyAction == sequenceKey.keyAction) {
-                MMI_HILOGD("Is repeat key, keyCode: %{public}d", sequenceKey.keyCode);
+    for (size_t i = keys_.size(); i > 0; --i) {
+        if (keys_[i-1].keyCode == sequenceKey.keyCode) {
+            if (keys_[i-1].keyAction == sequenceKey.keyAction) {
+                MMI_HILOGD("Is repeat key, keyCode:%{public}d", sequenceKey.keyCode);
                 return true;
-            } else if (sequenceKey.keyAction == KeyEvent::KEY_ACTION_UP) {
-                MMI_HILOGD("current sequenceKey event action: %{public}d", sequenceKey.keyAction);
-                keys_.erase(iter++);
-                return true;
-            } else {
-                MMI_HILOGD("sequenceKey event add to keys_");
-                return false;
             }
+            MMI_HILOGD("Is not repeat key");
+            return false;
         }
-        ++iter;
     }
     return false;
 }
@@ -1663,11 +1657,18 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
     }
 
     bool isLaunchAbility = false;
-    std::vector<Sequence> tempSeqs;
-    for (Sequence& item : sequences_) {
-        if (HandleSequence(item, isLaunchAbility)) {
-            tempSeqs.push_back(item);
+    for (auto iter = filterSequences_.begin(); iter != filterSequences_.end();) {
+        if (!HandleSequence((*iter), isLaunchAbility)) {
+            filterSequences_.erase(iter);
+            continue;
         }
+        ++iter;
+    }
+
+    if (filterSequences_.empty()) {
+        MMI_HILOGW("no sequences matched");
+        keys_.clear();
+        return false;
     }
 
     if (isLaunchAbility) {
@@ -1678,12 +1679,6 @@ bool KeyCommandHandler::HandleSequences(const std::shared_ptr<KeyEvent> keyEvent
             InputHandler->GetSubscriberHandler()->RemoveSubscriberKeyUpTimer(item.keyCode);
             RemoveSubscribedTimer(item.keyCode);
         }
-    }
-
-    if (tempSeqs.empty()) {
-        MMI_HILOGD("No matching sequence found");
-    } else {
-        filterSequences_ = tempSeqs;
     }
     return isLaunchAbility;
 }
