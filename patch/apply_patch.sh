@@ -59,7 +59,7 @@ if [ -e "$out_dir/install.sh" ]; then
     tar xvf mtdev-1.1.6.tar.bz2
     cp -rf mtdev-1.1.6/* ./
     ./configure
-    exit 0
+    cd -
 fi
 
 ls -l $path_file_dir/*.diff
