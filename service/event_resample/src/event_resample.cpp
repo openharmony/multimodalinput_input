@@ -183,10 +183,13 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
     for (auto &it : outEvent->pointers) {
         PointerEvent::PointerItem item;
         if (pointerEvent_->GetPointerItem(it.first, item)) {
+            int32_t toolWindowX = item.GetToolWindowX();
+            int32_t toolWindowY = item.GetToolWindowY();
+            MMI_HILOGD("Output event: toolWindowX = %{public}d toolWindowY = %{public}d", toolWindowX, toolWindowY);
             item.SetDisplayX(it.second.coordX);
             item.SetDisplayY(it.second.coordY);
-            item.SetWindowX(it.second.coordX);
-            item.SetWindowY(it.second.coordY);
+            item.SetWindowX(it.second.coordX + toolWindowX);
+            item.SetWindowY(it.second.coordY + toolWindowY);
             if (PointerEvent::POINTER_ACTION_MOVE == outEvent->pointerAction) {
                 item.SetPressed(true);
             } else if (PointerEvent::POINTER_ACTION_UP == outEvent->pointerAction) {
