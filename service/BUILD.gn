@@ -54,7 +54,6 @@ config("libmmi_server_config") {
     "${mmi_service_path}/filter/include",
     "${mmi_service_path}/module_loader/include",
     "${mmi_service_path}/nap_process/include",
-    "${mmi_service_path}/event_resample/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
     "${mmi_path}/interfaces/native/innerkits/event/include",
     "mouse_event_normalize/include",
@@ -143,7 +142,6 @@ ohos_shared_library("libmmi-server") {
     }
     if (input_feature_touchscreen) {
       sources += [
-        "event_resample/src/event_resample.cpp",
         "touch_event_normalize/src/tablet_tool_tranform_processor.cpp",
         "touch_event_normalize/src/touch_transform_processor.cpp",
       ]
@@ -310,34 +308,6 @@ ohos_unittest("ut-mmi-service-out") {
     "image_framework:image_native",
     "window_manager:libwm",
     "window_manager:libwsutils",
-  ]
-}
-
-ohos_unittest("event_resample_test") {
-  module_out_path = module_output_path
-  include_dirs = [ "${mmi_path}/service/event_resample/include" ]
-
-  sources = [
-    "event_resample/src/event_resample.cpp",
-    "event_resample/test/event_resample_test.cpp",
-  ]
-
-  configs = [ ":libmmi_server_config" ]
-
-  deps = [
-    "${mmi_path}/patch/diff_libinput_mmi:libinput-third-mmi",
-    "${mmi_path}/service:libmmi-server",
-    "${mmi_path}/util:libmmi-util",
-    "//third_party/cJSON:cjson",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
-
-  external_deps = [
-    "c_utils:utils",
-    "config_policy:configpolicy_util",
-    "hilog:libhilog",
-    "preferences:native_preferences",
   ]
 }
 
