@@ -69,7 +69,7 @@ config("libmmi_server_config") {
   ]
 
   if (input_ext_feature_anco) {
-    include_dirs += [ "${mmi_ext_path}/container_ipc_manager/include" ]
+    include_dirs += [ "${mmi_ext_path}/anco_uds_manager/include" ]
   }
 
   if (input_feature_combination_key) {

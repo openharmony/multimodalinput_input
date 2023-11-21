@@ -244,7 +244,7 @@ static napi_value RemoveMonitor(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "fingers is invalid");
         return nullptr;
     }
-    if (argv[2] == nullptr) {
+    if (argv[TWO_PARAMETERS] == nullptr) {
         JsInputMonMgr.RemoveMonitor(env, typeName, fingers);
         MMI_HILOGD("Remove all monitor");
         return nullptr;
