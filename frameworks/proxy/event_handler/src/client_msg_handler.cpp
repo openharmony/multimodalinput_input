@@ -323,7 +323,6 @@ int32_t ClientMsgHandler::ReportPointerEvent(const UDSClient& client, NetPacket&
         MMI_HILOGE("Failed to deserialize pointer event");
         return RET_ERR;
     }
-    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START, BytraceAdapter::POINT_INTERCEPT_EVENT);
     switch (handlerType) {
         case INTERCEPTOR: {
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR

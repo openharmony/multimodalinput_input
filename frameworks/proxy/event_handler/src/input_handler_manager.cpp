@@ -352,7 +352,6 @@ void InputHandlerManager::OnInputEvent(std::shared_ptr<PointerEvent> pointerEven
 {
     CHK_PID_AND_TID();
     CHKPV(pointerEvent);
-    BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_INTERCEPT_EVENT);
     std::map<int32_t, std::shared_ptr<IInputEventConsumer>> consumerInfos;
     GetConsumerInfos(pointerEvent, deviceTags, consumerInfos);
     for (const auto &iter : consumerInfos) {
