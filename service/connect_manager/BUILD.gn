@@ -57,6 +57,24 @@ ohos_source_set("mmi_connect_manager_service") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  if (is_ohos && is_clang && (target_cpu == "arm" || target_cpu == "arm64") &&
+      enhanced_opt) {
+    cflags = []
+    if (input_feature_enable_pgo && input_feature_product != "default") {
+      cflags += [
+        "-fprofile-use=" +
+            rebase_path("${input_feature_pgo_path}/libmmi-server.profdata",
+                        root_build_dir),
+        "-Wno-error=backend-plugin",
+        "-Wno-profile-instr-out-of-date",
+        "-Wno-profile-instr-unprofiled",
+      ]
+    }
+    if (input_feature_product == "pc" && target_cpu == "arm64") {
+      cflags += [ "-moutline-atomics" ]
+    }
+  }
 }
 
 ohos_source_set("mmi_connect_manager_proxy") {
