@@ -152,6 +152,7 @@ private:
     bool ParseConfig();
     bool ParseJson(const std::string &configFile);
     void ParseRepeatKeyMaxCount();
+    void LaunchAbility(const Ability &ability);
     void LaunchAbility(const Ability &ability, int64_t delay);
     void LaunchAbility(const ShortcutKey &key);
     void LaunchAbility(const Sequence &sequence);
