@@ -45,7 +45,7 @@ public:
     }
 
     virtual ~DisplyChangedReceiver() = default;
-
+    __attribute__((no_sanitize("cfi")))
     void OnReceiveEvent(const EventFwk::CommonEventData &eventData)
     {
         CALL_DEBUG_ENTER;
