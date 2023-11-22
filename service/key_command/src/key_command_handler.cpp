@@ -1486,7 +1486,7 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
         return false;
     }
     if (count_ == item.times) {
-        LaunchAbility(item.ability, 0);
+        LaunchAbility(item.ability);
         launchAbilityCount_ = count_;
         isLaunched = true;
         isRepeatKeyState_ = true;
@@ -1906,6 +1906,29 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
         napData.syncStatus = ACTIVE_EVENT;
         NapProcess::GetInstance()->AddMmiSubscribedEventData(napData);
         NapProcess::GetInstance()->NotifyBundleName(napData);
+    }
+    MMI_HILOGD("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
+}
+
+void KeyCommandHandler::LaunchAbility(const Ability &ability)
+{
+    CALL_DEBUG_ENTER;
+    AAFwk::Want want;
+    want.SetElementName(ability.deviceId, ability.bundleName, ability.abilityName);
+    want.SetAction(ability.action);
+    want.SetUri(ability.uri);
+    want.SetType(ability.uri);
+    for (const auto &entity : ability.entities) {
+        want.AddEntity(entity);
+    }
+    for (const auto &item : ability.params) {
+        want.SetParam(item.first, item.second);
+    }
+
+    MMI_HILOGD("Start launch ability, bundleName:%{public}s", ability.bundleName.c_str());
+    ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(want, nullptr);
+    if (err != ERR_OK) {
+        MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
     }
     MMI_HILOGD("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
 }
