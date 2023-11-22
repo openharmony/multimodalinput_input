@@ -59,6 +59,7 @@ constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG = 96.0f;
 constexpr float VPR_CONFIG = 3.25f;
 constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t ACTIVE_EVENT = 2;
+const std::string EXTENSION_ABILITY = "extensionAbility";
 
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
 const std::string shortKeyFileName = "/data/service/el1/public/multimodalinput/Settings.xml";
@@ -297,6 +298,7 @@ bool PackageAbility(const cJSON* jsonAbility, Ability &ability)
     GetKeyVal(jsonAbility, "type", ability.type);
     GetKeyVal(jsonAbility, "deviceId", ability.deviceId);
     GetKeyVal(jsonAbility, "uri", ability.uri);
+    GetKeyVal(jsonAbility, "abilityType", ability.abilityType);
     if (!GetEntities(jsonAbility, ability)) {
         MMI_HILOGE("Get centities failed");
         return false;
@@ -1926,10 +1928,19 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
     }
 
     MMI_HILOGD("Start launch ability, bundleName:%{public}s", ability.bundleName.c_str());
-    ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(want, nullptr);
-    if (err != ERR_OK) {
-        MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
+    if (ability.abilityType == EXTENSION_ABILITY) {
+        ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartExtensionAbility(want, nullptr);
+        if (err != ERR_OK) {
+            MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
+        }
+        return;
+    } else {
+        ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+        if (err != ERR_OK) {
+            MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
+        }
     }
+
     MMI_HILOGD("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
 }
 
