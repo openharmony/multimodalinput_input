@@ -48,14 +48,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
 {
     CALL_DEBUG_ENTER;
 
-    std::shared_ptr<PointerEvent> pointerEvent = EventResampleHdr->GetPointerEvent();
-    if ((event == nullptr) && (pointerEvent != nullptr) && Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        int32_t sourceType = pointerEvent->GetSourceType();
-        if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-            HandleTouchEvent(event, frameTime);
-        } else {
-            return;
-        }
+    if (ProcessNullEvent(event, frameTime)) {
         return;
     }
 
@@ -146,6 +139,21 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         }
     }
     DfxHisysevent::ReportDispTimes();
+}
+
+bool EventNormalizeHandler::ProcessNullEvent(libinput_event *event, int64_t frameTime)
+{
+    std::shared_ptr<PointerEvent> pointerEvent = EventResampleHdr->GetPointerEvent();
+    if ((event == nullptr) && (pointerEvent != nullptr) && Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        int32_t sourceType = pointerEvent->GetSourceType();
+        if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+            HandleTouchEvent(event, frameTime);
+        } else {
+            return true;
+        }
+        return true;
+    }
+    return false;
 }
 
 int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
