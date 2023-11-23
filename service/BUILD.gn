@@ -109,7 +109,7 @@ ohos_shared_library("libmmi-server") {
     cfi_cross_dso = true
     debug = false
   }
-
+  ldflags = []
   if (input_feature_keyboard) {
     sources += [
       "key_event_normalize/src/key_event_normalize.cpp",
@@ -226,13 +226,13 @@ ohos_shared_library("libmmi-server") {
     defines += [ "USE_ROSEN_DRAWING" ]
   }
 
-  part_name = "input"
-  subsystem_name = "multimodalinput"
-
   if (is_ohos && is_clang && (target_cpu == "arm" || target_cpu == "arm64") &&
       enhanced_opt) {
-    ldflags = [ "-Wl,-Bsymbolic" ]
+    ldflags += [ "-Wl,-Bsymbolic" ]
   }
+
+  part_name = "input"
+  subsystem_name = "multimodalinput"
 }
 
 import("//build/test.gni")
