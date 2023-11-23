@@ -96,7 +96,8 @@ private:
 
     static void PrintInfoLog(const std::shared_ptr<PointerEvent> event)
     {
-        if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
+        if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE ||
+            event->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_MOVE) {
             return;
         }
         std::vector<int32_t> pointerIds{ event->GetPointerIds() };
