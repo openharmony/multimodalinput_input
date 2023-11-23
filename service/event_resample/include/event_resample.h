@@ -34,7 +34,7 @@ class EventResample final {
 public:
     DISALLOW_COPY_AND_MOVE(EventResample);
     std::shared_ptr<PointerEvent> OnEventConsume(std::shared_ptr<PointerEvent> pointerEvent,
-                                                 int64_t frameTime, bool &deferred, ErrCode &status);
+                                                 int64_t frameTime, ErrCode &status);
     std::shared_ptr<PointerEvent> GetPointerEvent();
 
     // Microseconds per milliseconds.
@@ -237,15 +237,13 @@ private:
 
     MotionEvent inputEvent_;
     MotionEvent outputEvent_;
-    MotionEvent deferredEvent_;
     int64_t frameTime_ {-1};
-    bool msgDeferred_ {false};
     bool resampleTouch_ {true};
     std::shared_ptr<PointerEvent> pointerEvent_ {nullptr};
 
     void EventDump(const char *msg, MotionEvent &event);
     ErrCode InitializeInputEvent(std::shared_ptr<PointerEvent> pointerEvent, int64_t frameTime);
-    bool UpdateBatch(MotionEvent** outEvent, ErrCode &result, bool &deferred);
+    bool UpdateBatch(MotionEvent** outEvent, ErrCode &result);
     void UpdatePointerEvent(MotionEvent* outEvent);
     ErrCode ConsumeBatch(int64_t frameTime, MotionEvent** outEvent);
     ErrCode ConsumeSamples(Batch& batch, size_t count, MotionEvent** outEvent);
