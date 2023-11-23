@@ -96,6 +96,7 @@ void TouchTransformProcessor::UpdatePointerItemProperties(PointerEvent::PointerI
 }
 
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+__attribute__((no_sanitize("cfi")))
 void TouchTransformProcessor::NotifyFingersenseProcess(PointerEvent::PointerItem &pointerItem, int32_t &toolType)
 {
     CALL_DEBUG_ENTER;
@@ -154,7 +155,7 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
         pointerEvent_->GetPointerIds().size());
     return true;
 }
-
+__attribute__((no_sanitize("cfi")))
 bool TouchTransformProcessor::OnEventTouchUp(struct libinput_event *event)
 {
     CALL_DEBUG_ENTER;

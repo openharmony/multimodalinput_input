@@ -241,7 +241,7 @@ bool MMIService::InitDelegateTasks()
     MMI_HILOGI("AddEpoll, epollfd:%{public}d,fd:%{public}d", mmiFd_, delegateTasks_.GetReadFd());
     return true;
 }
-
+__attribute__((no_sanitize("cfi")))
 int32_t MMIService::Init()
 {
     CheckDefine();
