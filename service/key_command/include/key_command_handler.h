@@ -46,6 +46,7 @@ struct Ability {
     std::string type;
     std::string deviceId;
     std::string uri;
+    std::string abilityType;
     std::vector<std::string> entities;
     std::map<std::string, std::string> params;
 };
