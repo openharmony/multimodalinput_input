@@ -56,7 +56,6 @@ ohos_shared_library("libmmi-util") {
     cfi_cross_dso = true
     debug = false
   }
-  ldflags = []
   deps = [ ":mmi_rust_key_config" ]
 
   external_deps = [
@@ -71,13 +70,13 @@ ohos_shared_library("libmmi-util") {
         [ "security_component_manager:libsecurity_component_enhance_sdk" ]
   }
   innerapi_tags = [ "platformsdk" ]
-
-  if (is_ohos && is_clang && (target_cpu == "arm" || target_cpu == "arm64") &&
-      enhanced_opt) {
-    ldflags += [ "-Wl,-Bsymbolic" ]
-  }
   part_name = "input"
   subsystem_name = "multimodalinput"
+
+  if (!input_feature_coverage && is_ohos && is_clang && (target_cpu == "arm" || target_cpu == "arm64") &&
+      enhanced_opt) {
+    ldflags = [ "-Wl,-Bsymbolic" ]
+  }
 }
 
 ohos_unittest("ut-mmi-util-out") {
