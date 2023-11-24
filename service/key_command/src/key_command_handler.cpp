@@ -52,6 +52,7 @@ constexpr size_t SINGLE_KNUCKLE_SIZE = 1;
 constexpr size_t DOUBLE_KNUCKLE_SIZE = 2;
 constexpr int32_t MAX_TIME_FOR_ADJUST_CONFIG = 5;
 constexpr int32_t POW_SQUARE = 2;
+constexpr int64_t LONG_PRESS_DOWN_TIME = 500000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
 constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0f;
@@ -1502,6 +1503,10 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
     CHKPF(keyEvent);
 
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+        int64_t downDurationTime = keyEvent->GetActionTime() - downActionTime_;
+        if (count_ == 0 && downDurationTime > LONG_PRESS_DOWN_TIME) {
+            return false;
+        }
         if (repeatKey_.keyCode != item.keyCode) {
             count_ = 1;
             repeatKey_.keyCode = item.keyCode;
@@ -1526,7 +1531,8 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
     }
 
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
-        int64_t durationTime = keyEvent->GetActionTime() - upActionTime_;
+        downActionTime_ = keyEvent->GetActionTime();
+        int64_t durationTime = downActionTime_ - upActionTime_;
         if (durationTime < intervalTime_) {
             if (repeatTimerId_ >= 0) {
                 TimerMgr->RemoveTimer(repeatTimerId_);
@@ -1933,7 +1939,6 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability)
         if (err != ERR_OK) {
             MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
         }
-        return;
     } else {
         ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
         if (err != ERR_OK) {
