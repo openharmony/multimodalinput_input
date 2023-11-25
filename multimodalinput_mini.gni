@@ -100,6 +100,7 @@ declare_args() {
     "message_handle/src/server_msg_handler.cpp",
     "module_loader/src/app_debug_listener.cpp",
     "module_loader/src/mmi_service.cpp",
+    "module_loader/src/multimodal_input_preferences_manager.cpp",
     "module_loader/src/uds_server.cpp",
     "nap_process/src/nap_process.cpp",
     "permission_helper/src/permission_helper.cpp",

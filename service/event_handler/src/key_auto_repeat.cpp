@@ -23,6 +23,7 @@
 #include "input_event_handler.h"
 #include "mmi_log.h"
 #include "timer_manager.h"
+#include "multimodal_input_preferences_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -259,38 +260,12 @@ int32_t KeyAutoRepeat::GetKeyboardRepeatRate(int32_t &rate)
 
 int32_t KeyAutoRepeat::PutConfigDataToDatabase(std::string &key, int32_t value)
 {
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(KEYBOARD_FILE_NAME, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
-    int32_t ret = pref->PutInt(key, value);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Put value is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    ret = pref->FlushSync();
-    if (ret != RET_OK) {
-        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(KEYBOARD_FILE_NAME);
-    return RET_OK;
+    return PREFERENCES_MANAGER->SetIntValue(key, value);
 }
 
 int32_t KeyAutoRepeat::GetConfigDataFromDatabase(std::string &key, int32_t &value)
 {
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(KEYBOARD_FILE_NAME, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
-    value = pref->GetInt(key, 0);
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(KEYBOARD_FILE_NAME);
+    value = PREFERENCES_MANAGER->GetIntValue(key, value);
     return RET_OK;
 }
 } // namespace MMI

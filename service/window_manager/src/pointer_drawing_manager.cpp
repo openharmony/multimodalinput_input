@@ -30,6 +30,7 @@
 #include "preferences_errno.h"
 #include "preferences_helper.h"
 #include "preferences_xml_utils.h"
+#include "multimodal_input_preferences_manager.h"
 #include "util.h"
 #ifndef USE_ROSEN_DRAWING
 #include "pipeline/rs_recording_canvas.h"
@@ -596,26 +597,11 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
     } else if (color > MAX_POINTER_COLOR) {
         color = MAX_POINTER_COLOR;
     }
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(MOUSE_FILE_NAME, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
     std::string name = "pointerColor";
-    int32_t ret = pref->PutInt(name, color);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Put color is failed, ret:%{public}d", ret);
-        return RET_ERR;
+    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, color);
+    if (ret == RET_OK) {
+        MMI_HILOGD("Set pointer color successfully, color:%{public}d", color);
     }
-    ret = pref->FlushSync();
-    if (ret != RET_OK) {
-        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    MMI_HILOGD("Set pointer color successfully, color:%{public}d", color);
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(MOUSE_FILE_NAME);
 
     ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
     if (ret != RET_OK) {
@@ -629,21 +615,13 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
 int32_t PointerDrawingManager::GetPointerColor()
 {
     CALL_DEBUG_ENTER;
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(MOUSE_FILE_NAME, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
     std::string name = "pointerColor";
-    int32_t pointerColor = pref->GetInt(name, DEFAULT_VALUE);
+    int32_t pointerColor = PREFERENCES_MANAGER->GetIntValue(name, DEFAULT_VALUE);
     tempPointerColor_ = pointerColor;
     if (pointerColor == DEFAULT_VALUE) {
         pointerColor = MIN_POINTER_COLOR;
     }
     MMI_HILOGD("Get pointer color successfully, pointerColor:%{public}d", pointerColor);
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(MOUSE_FILE_NAME);
     return pointerColor;
 }
 
@@ -667,26 +645,11 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     } else if (size > MAX_POINTER_SIZE) {
         size = MAX_POINTER_SIZE;
     }
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(MOUSE_FILE_NAME, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
     std::string name = "pointerSize";
-    int32_t ret = pref->PutInt(name, size);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Put size is failed, ret:%{public}d", ret);
-        return RET_ERR;
+    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, size);
+    if (ret == RET_OK) {
+        MMI_HILOGD("Set pointer size successfully, size:%{public}d", size);
     }
-    ret = pref->FlushSync();
-    if (ret != RET_OK) {
-        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    MMI_HILOGD("Set pointer size successfully, size:%{public}d", size);
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(MOUSE_FILE_NAME);
 
     if (surfaceNode_ == nullptr) {
         MMI_HILOGI("surfaceNode_ is nullptr");
@@ -712,17 +675,9 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
 int32_t PointerDrawingManager::GetPointerSize()
 {
     CALL_DEBUG_ENTER;
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(MOUSE_FILE_NAME, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
     std::string name = "pointerSize";
-    int32_t pointerSize = pref->GetInt(name, DEFAULT_POINTER_SIZE);
+    int32_t pointerSize = PREFERENCES_MANAGER->GetIntValue(name, DEFAULT_POINTER_SIZE);
     MMI_HILOGD("Get pointer size successfully, pointerSize:%{public}d", pointerSize);
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(MOUSE_FILE_NAME);
     return pointerSize;
 }
 
@@ -944,26 +899,11 @@ std::map<MOUSE_ICON, IconStyle> PointerDrawingManager::GetMouseIconPath()
 int32_t PointerDrawingManager::SetPointerStylePreference(PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(MOUSE_FILE_NAME, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
     std::string name = "pointerStyle";
-    int32_t ret = pref->PutInt(name, pointerStyle.id);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Put style is failed, ret:%{public}d", ret);
-        return RET_ERR;
+    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, pointerStyle.id);
+    if (ret == RET_OK) {
+        MMI_HILOGD("Set pointer style successfully, style:%{public}d", pointerStyle.id);
     }
-    ret = pref->FlushSync();
-    if (ret != RET_OK) {
-        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    MMI_HILOGD("Set pointer style successfully, style:%{public}d", pointerStyle.id);
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(MOUSE_FILE_NAME);
     return RET_OK;
 }
 
@@ -1023,26 +963,17 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, Po
 {
     CALL_DEBUG_ENTER;
     if (windowId == GLOBAL_WINDOW_ID) {
-        int32_t errCode = RET_OK;
-        std::shared_ptr<NativePreferences::Preferences> pref =
-            NativePreferences::PreferencesHelper::GetPreferences(MOUSE_FILE_NAME, errCode);
-        if (pref == nullptr) {
-            MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
-            return RET_ERR;
-        }
         std::string name = "pointerColor";
-        pointerStyle.color = pref->GetInt(name, DEFAULT_VALUE);
+        pointerStyle.color = PREFERENCES_MANAGER->GetIntValue(name, DEFAULT_VALUE);
         name = "pointerSize";
-        pointerStyle.size = pref->GetInt(name, DEFAULT_POINTER_SIZE);
+        pointerStyle.size = PREFERENCES_MANAGER->GetIntValue(name, DEFAULT_POINTER_SIZE);
         name = "pointerStyle";
-        int32_t style = pref->GetInt(name, DEFAULT_POINTER_STYLE);
+        int32_t style = PREFERENCES_MANAGER->GetIntValue(name, DEFAULT_POINTER_STYLE);
         MMI_HILOGD("Get pointer style successfully, pointerStyle:%{public}d", style);
         if (style == CURSOR_CIRCLE_STYLE) {
             pointerStyle.id = style;
-            NativePreferences::PreferencesHelper::RemovePreferencesFromCache(MOUSE_FILE_NAME);
             return RET_OK;
         }
-        NativePreferences::PreferencesHelper::RemovePreferencesFromCache(MOUSE_FILE_NAME);
     }
     int32_t ret = WinMgr->GetPointerStyle(pid, windowId, pointerStyle);
     if (ret != RET_OK) {
