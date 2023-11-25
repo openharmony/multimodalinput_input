@@ -29,6 +29,7 @@
 #include "preferences_helper.h"
 #include "preferences_xml_utils.h"
 #include "dfx_hisysevent.h"
+#include "multimodal_input_preferences_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -535,40 +536,12 @@ int32_t TouchPadTransformProcessor::GetTouchpadPinchSwitch(bool &switchFlag)
 
 int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
 {
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(TOUCHPAD_FILE_NAME, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
-    int32_t ret = pref->PutBool(key, value);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Put value is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    ret = pref->FlushSync();
-    if (ret != RET_OK) {
-        MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(TOUCHPAD_FILE_NAME);
-    return RET_OK;
+    return PREFERENCES_MANAGER->SetBoolValue(key, value);
 }
 
 int32_t TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &value)
 {
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(TOUCHPAD_FILE_NAME, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr, errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
-    value = pref->GetBool(key, true);
-
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(TOUCHPAD_FILE_NAME);
+    value = PREFERENCES_MANAGER->GetBoolValue(key, true);
     return RET_OK;
 }
 
