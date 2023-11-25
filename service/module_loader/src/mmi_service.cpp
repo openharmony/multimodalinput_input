@@ -52,6 +52,7 @@
 #include "touch_event_normalize.h"
 #include "display_event_monitor.h"
 #include "fingersense_wrapper.h"
+#include "multimodal_input_preferences_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -268,6 +269,7 @@ int32_t MMIService::Init()
         return EPOLL_CREATE_FAIL;
     }
     MMI_HILOGD("Input msg handler init");
+    PREFERENCES_MANAGER->InitPreferences();
     InputHandler->Init(*this);
     if (!InitLibinputService()) {
         MMI_HILOGE("Libinput init failed");

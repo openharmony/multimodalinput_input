@@ -34,6 +34,7 @@
 #include "util_napi_error.h"
 #include "input_device_manager.h"
 #include "scene_board_judgement.h"
+#include "multimodal_input_preferences_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -1124,37 +1125,15 @@ int32_t InputWindowsManager::SetHoverScrollState(bool state)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse hover scroll state:%{public}d", state);
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
     std::string name = "isEnableHoverScroll";
-    pref->PutBool(name, state);
-    int ret = pref->FlushSync();
-    if (ret != RET_OK) {
-        MMI_HILOGE("flush sync is failed, ret:%{public}d", ret);
-        return RET_ERR;
-    }
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
-    return RET_OK;
+    return PREFERENCES_MANAGER->SetBoolValue(name, state);
 }
 
 bool InputWindowsManager::GetHoverScrollState() const
 {
     CALL_DEBUG_ENTER;
-    int32_t errCode = RET_OK;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(mouseFileName, errCode);
-    if (pref == nullptr) {
-        MMI_HILOGE("pref is nullptr,  errCode: %{public}d", errCode);
-        return RET_ERR;
-    }
     std::string name = "isEnableHoverScroll";
-    bool state = pref->GetBool(name, true);
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(mouseFileName);
+    bool state = PREFERENCES_MANAGER->GetBoolValue(name, true);
     MMI_HILOGD("Get mouse hover scroll state:%{public}d", state);
     return state;
 }
