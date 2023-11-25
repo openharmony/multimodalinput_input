@@ -33,6 +33,7 @@
 #include "timer_manager.h"
 #include "util_ex.h"
 #include "nap_process.h"
+#include "multimodal_input_preferences_manager.h"
 
 namespace OHOS {
 namespace MMI {
@@ -45,7 +46,6 @@ constexpr int64_t SECONDS_SYSTEM = 1000;
 constexpr int32_t SPECIAL_KEY_DOWN_DELAY = 150;
 constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;
 constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
-constexpr int32_t ERROR_DELAY_VALUE = -1000;
 constexpr int32_t TOUCH_MAX_THRESHOLD = 15;
 constexpr int32_t COMMON_PARAMETER_ERROR = 401;
 constexpr size_t SINGLE_KNUCKLE_SIZE = 1;
@@ -1839,10 +1839,7 @@ bool KeyCommandHandler::HandleKeyDown(ShortcutKey &shortcutKey)
 int32_t KeyCommandHandler::GetKeyDownDurationFromXml(const std::string &businessId)
 {
     CALL_DEBUG_ENTER;
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(shortKeyFileName, errno);
-    CHKPR(pref, ERROR_DELAY_VALUE);
-    return pref->GetInt(businessId, ERROR_DELAY_VALUE);
+    return PREFERENCES_MANAGER->GetShortKeyDuration(businessId);
 }
 
 bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, const ShortcutKey &shortcutKey)
@@ -2032,16 +2029,7 @@ int32_t KeyCommandHandler::UpdateSettingsXml(const std::string &businessId, int3
         MMI_HILOGE("delay is not in valid range.");
         return COMMON_PARAMETER_ERROR;
     }
-    std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(shortKeyFileName, errno);
-    CHKPR(pref, errno);
-    pref->PutInt(businessId, delay);
-    int32_t ret = pref->FlushSync();
-    if (ret != RET_OK) {
-        MMI_HILOGE("Flush Sync failed, ret: %{public}d", ret);
-        return ret;
-    }
-    return RET_OK;
+    return PREFERENCES_MANAGER->SetShortKeyDuration(businessId, delay);
 }
 
 KnuckleGesture KeyCommandHandler::GetSingleKnuckleGesture()
