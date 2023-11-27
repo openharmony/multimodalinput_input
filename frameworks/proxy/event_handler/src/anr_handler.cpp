@@ -21,6 +21,7 @@
 
 #include "input_manager_impl.h"
 #include "multimodal_input_connect_manager.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace MMI {
@@ -118,7 +119,10 @@ void ANRHandler::SendEvent(int32_t eventType, int64_t delayTime)
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Event type:%{public}d, delayTime:%{public}" PRId64, eventType, delayTime);
     SetLastProcessedEventStatus(eventType, true);
-    MarkProcessed(eventType);
+    auto task = [this, eventType] {
+        MarkProcessed(eventType);
+    }
+    ffrt::submit(task, {}, {});
 }
 
 void ANRHandler::ResetAnrArray()

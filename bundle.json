@@ -67,7 +67,8 @@
         "hilog",
         "common_event_service",
         "data_share",
-        "relational_store"
+        "relational_store",
+        "ffrt"
       ],
       "third_party": [
         "cJSON",
