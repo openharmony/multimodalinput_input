@@ -121,7 +121,7 @@ void ANRHandler::SendEvent(int32_t eventType, int64_t delayTime)
     SetLastProcessedEventStatus(eventType, true);
     auto task = [this, eventType] {
         MarkProcessed(eventType);
-    }
+    };
     ffrt::submit(task, {}, {});
 }
 
