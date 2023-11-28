@@ -959,20 +959,15 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
     {
         std::lock_guard<std::mutex> guard(mutex_);
         if (!evQueue_.empty()) {
-            if (pointerEvent->HasAxis(PointerEvent::AXIS_TYPE_PINCH) ||
-                pointerEvent->HasAxis(PointerEvent::AXIS_TYPE_ROTATE)) {
-                evQueue_.push(pointerEvent);
-            } else if (IsBeginAndEnd(pointerEvent)) {
+            if (IsBeginAndEnd(pointerEvent)) {
                 auto markProcessedEvent = evQueue_.front();
                 CHKPV(markProcessedEvent);
                 markProcessedEvent->MarkProcessed();
                 std::queue<std::shared_ptr<PointerEvent>> tmp;
                 std::swap(evQueue_, tmp);
-                evQueue_.push(pointerEvent);
             }
-        } else {
-            evQueue_.push(pointerEvent);
         }
+        evQueue_.push(pointerEvent);
         jsTaskNum_ = 1;
     }
 
