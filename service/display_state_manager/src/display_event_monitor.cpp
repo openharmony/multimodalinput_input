@@ -100,6 +100,11 @@ void DisplayEventMonitor::InitCommonEventSubscriber()
     hasInit_ = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(
         std::make_shared<DisplyChangedReceiver>(commonEventSubscribeInfo));
 }
+
+bool DisplayEventMonitor::IsCommonEventSubscriberInit()
+{
+    return hasInit_;
+}
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 } // namespace AppExecFwk
 } // namespace OHOS

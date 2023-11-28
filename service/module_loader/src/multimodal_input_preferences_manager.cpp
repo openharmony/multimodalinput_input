@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2023-2023. All rights reserved.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,7 +27,7 @@ constexpr int32_t PRIMARY_BUTTON = 0;
 constexpr int32_t POINTER_SPEED = 5;
 constexpr int32_t TOUCHPAD_POINTER_SPEED = 9;
 constexpr int32_t RIGHT_CLICK_TYPE = 1;
-constexpr int32_t POINTER_COLOR = 0;
+constexpr int32_t POINTER_COLOR = -1;
 constexpr int32_t POINTER_SIZE = 1;
 constexpr int32_t POINTER_STYLE = 0;
 constexpr int32_t ERROR_DELAY_VALUE = -1000;
