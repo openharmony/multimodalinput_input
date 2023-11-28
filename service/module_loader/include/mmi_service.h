@@ -127,9 +127,7 @@ public:
     int32_t GetTouchpadRightClickType(int32_t &type) override;
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield) override;
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override;
-#ifdef OHOS_RSS_CLIENT
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
-#endif
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     void InitAncoUds();
@@ -201,6 +199,7 @@ protected:
 private:
     std::atomic<ServiceRunningState> state_ = ServiceRunningState::STATE_NOT_START;
     int32_t mmiFd_ { -1 };
+    bool isCesStart_ { false };
     std::mutex mu_;
     std::thread t_;
 #ifdef OHOS_RSS_CLIENT

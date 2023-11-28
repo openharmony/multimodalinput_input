@@ -40,6 +40,7 @@ class DisplayEventMonitor final {
         void UpdateShieldStatusOnScreenOn();
         void UpdateShieldStatusOnScreenOff();
         void InitCommonEventSubscriber();
+        bool IsCommonEventSubscriberInit();
     private:
         int32_t shieldModeBeforeSreenOff_ { -1 };
         bool hasInit_ { false };
