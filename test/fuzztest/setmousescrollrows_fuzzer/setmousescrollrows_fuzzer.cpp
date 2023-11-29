@@ -70,7 +70,11 @@ void GetAllMmiSubscribedEventsFuzzTest(const uint8_t* data, size_t size)
 
 void SetNapStatusFuzzTest(const uint8_t* data, size_t size)
 {
-    InputManager::GetInstance()->SetNapStatus(10,20,"name",2);
+    int32_t pid = 10;
+    int32_t uid = 20;
+    std::string bundleName = "name";
+    int32_t state = 2;
+    InputManager::GetInstance()->SetNapStatus(pid, uid, bundleName, state);
 }
 
 void SetHoverScrollStateFuzzTest(const uint8_t* data, size_t size)
@@ -93,7 +97,9 @@ void PointerColorFuzzTest(const uint8_t* data, size_t size)
 
 void ClearWindowPointerStyleFuzzTest(const uint8_t* data, size_t size)
 {
-    InputManager::GetInstance()->ClearWindowPointerStyle(0,0);
+    int32_t pid = 0;
+    int32_t uid = 0;
+    InputManager::GetInstance()->ClearWindowPointerStyle(pid, uid);
 }
 
 void SetKeyboardRepeatDelayFuzzTest(const uint8_t* data, size_t size)
