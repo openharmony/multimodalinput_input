@@ -40,6 +40,7 @@ group("test") {
     "setdisplaybind_fuzzer:fuzztest",
     "setkeydownduration_fuzzer:fuzztest",
     "setmouseprimarybutton_fuzzer:fuzztest",
+    "setmousescrollrows_fuzzer:fuzztest",
     "setpointerlocation_fuzzer:fuzztest",
     "setpointervisible_fuzzer:fuzztest",
     "setwindowinputeventconsumer_fuzzer:fuzztest",
