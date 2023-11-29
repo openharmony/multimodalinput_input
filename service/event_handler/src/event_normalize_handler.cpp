@@ -32,6 +32,7 @@
 #include "time_cost_chk.h"
 #include "timer_manager.h"
 #include "touch_event_normalize.h"
+#include "scene_board_judgement.h"
 #include "event_resample.h"
 #include "touchpad_transform_processor.h"
 
@@ -47,17 +48,7 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
 {
     CALL_DEBUG_ENTER;
 
-    if (event == nullptr) {
-        std::shared_ptr<PointerEvent> pointerEvent = EventResampleHdr->GetPointerEvent();
-        if (pointerEvent != nullptr) {
-            switch (pointerEvent->GetSourceType()) {
-                case PointerEvent::SOURCE_TYPE_TOUCHSCREEN:
-                    HandleTouchEvent(event, frameTime);
-                    break;
-                default:
-                    return;
-            }
-        }
+    if (ProcessNullEvent(event, frameTime)) {
         return;
     }
 
@@ -148,6 +139,21 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
         }
     }
     DfxHisysevent::ReportDispTimes();
+}
+
+bool EventNormalizeHandler::ProcessNullEvent(libinput_event *event, int64_t frameTime)
+{
+    std::shared_ptr<PointerEvent> pointerEvent = EventResampleHdr->GetPointerEvent();
+    if ((event == nullptr) && (pointerEvent != nullptr) && Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        int32_t sourceType = pointerEvent->GetSourceType();
+        if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
+            HandleTouchEvent(event, frameTime);
+        } else {
+            return true;
+        }
+        return true;
+    }
+    return false;
 }
 
 int32_t EventNormalizeHandler::OnEventDeviceAdded(libinput_event *event)
@@ -459,32 +465,22 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
     }
 
-    bool deferred = false;
-    ErrCode status = RET_OK;
-    std::shared_ptr<PointerEvent> outputEvent = EventResampleHdr->OnEventConsume(pointerEvent, frameTime,
-                                                                                 deferred, status);
-    if ((outputEvent == nullptr) && (deferred == false)) {
-        MMI_HILOGD("NULL output event received: %{public}d %{public}d", deferred, status);
-        return RET_OK;
-    } else {
-        MMI_HILOGD("Output event received: %{public}d %{public}d %{public}d %{public}d",
-                   outputEvent->GetSourceType(), outputEvent->GetPointerAction(), deferred, status);
-        pointerEvent = outputEvent;
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        ErrCode status = RET_OK;
+        std::shared_ptr<PointerEvent> outputEvent = EventResampleHdr->OnEventConsume(pointerEvent, frameTime, status);
+        if (outputEvent == nullptr) {
+            MMI_HILOGD("NULL output event received: %{public}d", status);
+            return RET_OK;
+        } else {
+            MMI_HILOGD("Output event received: %{public}d %{public}d %{public}d",
+                       outputEvent->GetSourceType(), outputEvent->GetPointerAction(), status);
+            pointerEvent = outputEvent;
+        }
     }
 
     if (pointerEvent != nullptr) {
         BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
         nextHandler_->HandleTouchEvent(pointerEvent);
-    }
-
-    if (deferred == true) {
-        pointerEvent = EventResampleHdr->OnEventConsume(NULL, frameTime, deferred, status);
-        if (pointerEvent != nullptr) {
-            MMI_HILOGD("Deferred event received: %{public}d %{public}d %{public}d %{public}d",
-                       pointerEvent->GetSourceType(), pointerEvent->GetPointerAction(), deferred, status);
-            BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_START);
-            nextHandler_->HandleTouchEvent(pointerEvent);
-        }
     }
 
     if ((pointerEvent != nullptr) && (event != nullptr)) {
