@@ -26,11 +26,6 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SetMouseScrollRowsFuzzTest" };
 } // namespace
 
-// class IEventObserver : public MMI::MMIEventObserver {
-// public:
-//     void SyncBundleName(int32_t pid, int32_t uid, std::string bundleName, int32_t syncStatus) override;
-// };
-
 template<class T>
 size_t GetObject(T &object, const uint8_t *data, size_t size)
 {
@@ -56,22 +51,6 @@ void SetMouseScrollRowsFuzzTest(const uint8_t* data, size_t size)
     InputManager::GetInstance()->GetMouseScrollRows(rowsAfter);
 }
 
-// void SetCustomCursorFuzzTest(const uint8_t* data, size_t size)
-// {
-//     size_t startPos = 0;
-//     int32_t focusX;
-//     startPos += GetObject<int32_t>(focusX, data + startPos, size - startPos);
-//     int32_t focusY;
-//     startPos += GetObject<int32_t>(focusY, data + startPos, size - startPos);
-//     auto window = WindowUtilsTest::GetInstance()->GetWindow();
-//     CHKPV(window);
-//     uint32_t windowId = window->GetWindowId();
-//     std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
-//     ASSERT_NE(pixelMap, nullptr);
-//     InputManager::GetInstance()->SetMouseHotSpot(windowId, focusX, focusY);
-//     InputManager::GetInstance()->SetCustomCursor(windowId, (void *)pixelMap.get(), focusX, focusY);
-// }
-
 void SetPointerSizeFuzzTest(const uint8_t* data, size_t size)
 {
     size_t startPos = 0;
@@ -88,14 +67,6 @@ void GetAllMmiSubscribedEventsFuzzTest(const uint8_t* data, size_t size)
     MMI_HILOGD("GetAllMmiSubscribedEventsFuzzTest start");
     InputManager::GetInstance()->GetAllMmiSubscribedEvents(map);
 }
-
-// void NotifyNapOnlineFuzzTest(const uint8_t* data, size_t size)
-// {
-//     auto mmiObserver = std::make_shared<IEventObserver>();
-//     MMI_HILOGD("NotifyNapOnlineFuzzTest start");
-//     InputManager::GetInstance()->AddInputEventObserver(mmiObserver);
-//     InputManager::GetInstance()->RemoveInputEventObserver(mmiObserver);
-// }
 
 void SetNapStatusFuzzTest(const uint8_t* data, size_t size)
 {
@@ -138,10 +109,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     /* Run your code on data */
     OHOS::MMI::SetMouseScrollRowsFuzzTest(data, size);
-    // OHOS::MMI::SetCustomCursorFuzzTest(data, size);
     OHOS::MMI::SetPointerSizeFuzzTest(data, size);
     OHOS::MMI::GetAllMmiSubscribedEventsFuzzTest(data, size);
-    // OHOS::MMI::NotifyNapOnlineFuzzTest(data, size);
     OHOS::MMI::SetNapStatusFuzzTest(data, size);
     OHOS::MMI::SetHoverScrollStateFuzzTest(data, size);
     OHOS::MMI::PointerColorFuzzTest(data, size);
