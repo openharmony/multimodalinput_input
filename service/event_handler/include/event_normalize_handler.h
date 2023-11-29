@@ -59,6 +59,7 @@ private:
     bool isShield_ { false };
     std::set<int32_t> buttonIds_ {};
     void ResetTouchUpEvent(std::shared_ptr<PointerEvent> pointerEvent, struct libinput_event *event);
+    bool ProcessNullEvent(libinput_event *event, int64_t frameTime);
 };
 } // namespace MMI
 } // namespace OHOS

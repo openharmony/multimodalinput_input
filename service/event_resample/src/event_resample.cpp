@@ -29,12 +29,11 @@ EventResample::EventResample(){};
 EventResample::~EventResample(){};
 
 std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<PointerEvent> pointerEvent,
-                                                            int64_t frameTime, bool &deferred, ErrCode &status)
+                                                            int64_t frameTime, ErrCode &status)
 {
     MotionEvent* outEvent = nullptr;
     ErrCode result = ERR_OK;
 
-    deferred = false;
     status = ERR_OK;
     if (ERR_OK != InitializeInputEvent(pointerEvent, frameTime)) {
         status = ERR_WOULD_BLOCK;
@@ -44,14 +43,6 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
     do {
         // All events are dispathed so consume batches
         if (PointerEvent::POINTER_ACTION_UNKNOWN == inputEvent_.pointerAction) {
-            if (msgDeferred_ == true) {
-                msgDeferred_ = false;
-                deferred = false;
-                frameTime_ = 0;
-                outEvent = &deferredEvent_;
-                result = ERR_OK;
-                break;
-            }
             result = ConsumeBatch(frameTime_, &outEvent);
             frameTime_ = 0;
             if ((ERR_OK == result) && (NULL != outEvent)) {
@@ -64,7 +55,7 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
         }
 
         // Add event into batch
-        if (UpdateBatch(&outEvent, result, deferred)) {
+        if (UpdateBatch(&outEvent, result)) {
             break;
         }
 
@@ -148,7 +139,7 @@ ErrCode EventResample::InitializeInputEvent(std::shared_ptr<PointerEvent> pointe
     return ERR_OK;
 }
 
-bool EventResample::UpdateBatch(MotionEvent** outEvent, ErrCode &result, bool &deferred)
+bool EventResample::UpdateBatch(MotionEvent** outEvent, ErrCode &result)
 {
     ssize_t batchIndex = FindBatch(inputEvent_.deviceId, inputEvent_.sourceType);
     if (batchIndex >= 0) {

@@ -108,7 +108,6 @@ public:
         int32_t touchUpX { 0 };
         int32_t touchUpY { 0 };
         int32_t id { 0 };
-        bool deferred { false };
 
         ExpectedData() {}
 
@@ -121,7 +120,6 @@ public:
             touchUpTime = 0;
             touchUpX = 0;
             touchUpY = 0;
-            deferred = false;
         }
 
         void UpdateTouchState(InputEvt &event)
@@ -182,7 +180,6 @@ public:
                         UpdateTouchState(event);
                     }
                     eventBatch.erase(eventBatch.begin(), eventBatch.begin() + eventBatch.size() - 1);
-                    deferred = true;
                 }
                 UpdateTouchState(event);
             }
@@ -440,7 +437,6 @@ bool EventResampleTest::DoTest(TestData &testData, int32_t testId)
 void EventResampleTest::ReadQueue(TestData &testData, Context &ctx, std::vector<ExpectedData> &expected)
 {
     std::shared_ptr<PointerEvent> outEvent = nullptr;
-    bool deferred = false;
     ErrCode status = RET_OK;
 
     while (!eventQueue_.empty()) {
@@ -453,7 +449,7 @@ void EventResampleTest::ReadQueue(TestData &testData, Context &ctx, std::vector<
         MMI_HILOGD("pointerEvent_: x = %{public}d y = %{public}d t = %{public}" PRId64,
                    pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerEvent_->GetActionTime());
 
-        outEvent = EventResampleHdr->OnEventConsume(pointerEvent_, ctx.frameTime, deferred, status);
+        outEvent = EventResampleHdr->OnEventConsume(pointerEvent_, ctx.frameTime, status);
         if ((outEvent != nullptr) && (PointerEvent::POINTER_ACTION_DOWN != outEvent->GetPointerAction())) {
             MMI_HILOGE("Unexpected pointer action: %{public}d while %{public}d expected",
                        outEvent->GetPointerAction(), PointerEvent::POINTER_ACTION_DOWN);
@@ -461,16 +457,14 @@ void EventResampleTest::ReadQueue(TestData &testData, Context &ctx, std::vector<
         } else if (outEvent != nullptr) {
             EXPECT_EQ(ERR_OK, CheckResults(outEvent, expected, ctx));
             EXPECT_EQ(ERR_OK, status);
-            EXPECT_FALSE(deferred);
         }
         eventQueue_.pop();
     }
 
-    outEvent = EventResampleHdr->OnEventConsume(nullptr, ctx.frameTime, deferred, status);
+    outEvent = EventResampleHdr->OnEventConsume(nullptr, ctx.frameTime, status);
     if (outEvent != nullptr) {
         EXPECT_EQ(ERR_OK, CheckResults(outEvent, expected, ctx));
         EXPECT_EQ(ERR_OK, status);
-        EXPECT_FALSE(deferred);
     } else {
         MMI_HILOGD("NULL Event_: status = %{public}d", status);
     }
@@ -479,32 +473,19 @@ void EventResampleTest::ReadQueue(TestData &testData, Context &ctx, std::vector<
 void EventResampleTest::SendTouchUp(TestData &testData, Context &ctx, std::vector<ExpectedData> &expected)
 {
     std::shared_ptr<PointerEvent> outEvent = nullptr;
-    bool deferred = false;
     ErrCode status = RET_OK;
     InputEvt touchUp;
 
     touchUp.Initialize(PointerEvent::POINTER_ACTION_UP, testData, ctx);
     expected[touchUp.id].AddEvent(touchUp);
     SetupPointerEvent(touchUp, testData);
-    outEvent = EventResampleHdr->OnEventConsume(pointerEvent_, ctx.frameTime, deferred, status);
+    outEvent = EventResampleHdr->OnEventConsume(pointerEvent_, ctx.frameTime, status);
     if (outEvent != nullptr) {
         MMI_HILOGD("Pointer Action: %{public}d", outEvent->GetPointerAction());
         EXPECT_EQ(ERR_OK, CheckResults(outEvent, expected, ctx));
         EXPECT_EQ(ERR_OK, status);
     } else {
         MMI_HILOGD("NULL Event_: status = %{public}d", status);
-    }
-
-    if (deferred) {
-        outEvent = EventResampleHdr->OnEventConsume(nullptr, ctx.frameTime, deferred, status);
-        if (outEvent != nullptr) {
-            MMI_HILOGD("Deferred Event: %{public}d", outEvent->GetPointerAction());
-            EXPECT_EQ(ERR_OK, CheckResults(outEvent, expected, ctx));
-            EXPECT_EQ(ERR_OK, status);
-        } else {
-            MMI_HILOGE("Deferred event not received");
-            failCount_++;
-        }
     }
 }
 
