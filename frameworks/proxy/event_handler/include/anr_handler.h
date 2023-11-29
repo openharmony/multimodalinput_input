@@ -31,7 +31,7 @@ public:
     DISALLOW_COPY_AND_MOVE(ANRHandler);
 
     void SetLastProcessedEventId(int32_t eventType, int32_t eventId, int64_t actionTime);
-    void MarkProcessed(int32_t eventType);
+    void MarkProcessed(int32_t eventType, int32_t eventId);
     void ResetAnrArray();
     std::mutex anrMtx_;
 
@@ -43,10 +43,7 @@ private:
     };
     ANREvent event_[ANR_EVENT_TYPE_NUM];
 
-    void UpdateLastProcessedEventId(int32_t eventType, int32_t eventId);
-    void SetLastProcessedEventStatus(int32_t eventType, bool status);
-    int32_t GetLastProcessedEventId(int32_t eventType);
-    void SendEvent(int32_t eventType, int64_t delayTime);
+    void SendEvent(int32_t eventType, int32_t eventId);
 };
 
 #define ANRHDL ::OHOS::DelayedSingleton<ANRHandler>::GetInstance()
