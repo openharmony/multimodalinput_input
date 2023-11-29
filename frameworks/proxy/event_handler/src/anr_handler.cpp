@@ -37,90 +37,29 @@ ANRHandler::ANRHandler() {}
 
 ANRHandler::~ANRHandler() {}
 
-void ANRHandler::SetLastProcessedEventStatus(int32_t eventType, bool status)
-{
-    std::lock_guard<std::mutex> guard(anrMtx_);
-    event_[eventType].sendStatus = status;
-}
-
-void ANRHandler::UpdateLastProcessedEventId(int32_t eventType, int32_t eventId)
-{
-    std::lock_guard<std::mutex> guard(anrMtx_);
-    event_[eventType].lastEventId = eventId;
-}
-
 void ANRHandler::SetLastProcessedEventId(int32_t eventType, int32_t eventId, int64_t actionTime)
 {
     CALL_DEBUG_ENTER;
-    if (event_[eventType].lastEventId > eventId) {
-        MMI_HILOGE("Event InputTracking id:%{public}d, type:%{public}d, less then last processed "
-            "lastEventId %{public}d", eventId, eventType, event_[eventType].lastEventId);
-        return;
-    }
-    UpdateLastProcessedEventId(eventType, eventId);
-
-    int64_t currentTime = GetSysClockTime();
-    int64_t timeoutTime = INPUT_UI_TIMEOUT_TIME - (currentTime - actionTime);
-    MMI_HILOGD("Processed event type:%{public}d, id:%{public}d, actionTime:%{public}" PRId64 ", "
-        "currentTime:%{public}" PRId64 ", timeoutTime:%{public}" PRId64,
-        eventType, eventId, actionTime, currentTime, timeoutTime);
-
-    if (!event_[eventType].sendStatus) {
-        if (timeoutTime < MIN_MARK_PROCESS_DELAY_TIME) {
-            SendEvent(eventType, 0);
-        } else {
-            int64_t delayTime;
-            if (timeoutTime >= MAX_MARK_PROCESS_DELAY_TIME) {
-                delayTime = MAX_MARK_PROCESS_DELAY_TIME / TIME_TRANSITION;
-            } else {
-                delayTime = timeoutTime / TIME_TRANSITION;
-            }
-            SendEvent(eventType, delayTime);
-        }
-    }
+    MMI_HILOGD("Processed event type:%{public}d, id:%{public}d, actionTime:%{public}" PRId64, eventType, eventId,
+        actionTime);
+    SendEvent(eventType, eventId);
 }
 
-int32_t ANRHandler::GetLastProcessedEventId(int32_t eventType)
+void ANRHandler::MarkProcessed(int32_t eventType, int32_t eventId)
 {
     CALL_DEBUG_ENTER;
-    std::lock_guard<std::mutex> guard(anrMtx_);
-    if (event_[eventType].lastEventId == INVALID_OR_PROCESSED_ID
-        || event_[eventType].lastEventId <= event_[eventType].lastReportId) {
-        MMI_HILOGD("Invalid or processed event type:%{public}d, lastEventId:%{public}d, lastReportId:%{public}d",
-            eventType, event_[eventType].lastEventId, event_[eventType].lastReportId);
-        return INVALID_OR_PROCESSED_ID;
-    }
-
-    event_[eventType].lastReportId = event_[eventType].lastEventId;
-    MMI_HILOGD("Processed event type:%{public}d, lastEventId:%{public}d, lastReportId:%{public}d",
-        eventType, event_[eventType].lastEventId, event_[eventType].lastReportId);
-    return event_[eventType].lastEventId;
-}
-
-void ANRHandler::MarkProcessed(int32_t eventType)
-{
-    CALL_DEBUG_ENTER;
-    int32_t eventId = GetLastProcessedEventId(eventType);
-    if (eventId == INVALID_OR_PROCESSED_ID) {
-        SetLastProcessedEventStatus(eventType, false);
-        return;
-    }
     MMI_HILOGD("Processed event type:%{public}d, id:%{public}d", eventType, eventId);
     int32_t ret = MultimodalInputConnMgr->MarkProcessed(eventType, eventId);
     if (ret != 0) {
         MMI_HILOGE("Send to server failed, ret:%{public}d", ret);
     }
-    SetLastProcessedEventStatus(eventType, false);
 }
 
-
-void ANRHandler::SendEvent(int32_t eventType, int64_t delayTime)
+void ANRHandler::SendEvent(int32_t eventType, int32_t eventId)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("Event type:%{public}d, delayTime:%{public}" PRId64, eventType, delayTime);
-    SetLastProcessedEventStatus(eventType, true);
-    auto task = [this, eventType] {
-        MarkProcessed(eventType);
+    auto task = [this, eventType, eventId] {
+        MarkProcessed(eventType, eventId);
     };
     ffrt::submit(task, {}, {});
 }
