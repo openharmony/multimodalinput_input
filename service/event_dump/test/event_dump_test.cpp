@@ -23,8 +23,8 @@
 #include "system_info.h"
 #include "input_manager.h"
 #include <fcntl.h>
-#include <stdio.h>
-#include <errno.h>
+#include <cstdio>
+#include <cerrno>
 
 namespace OHOS {
 namespace MMI {
@@ -35,11 +35,13 @@ const char *testFileName = "/data/log.log";
 
 class EventDumpTest : public testing::Test {
 public:
-void SetUp() override {
+void SetUp() override
+{
     fd_ = open(testFileName, O_WRONLY);
 }
 
-void TearDown() override {
+void TearDown() override
+{
     close(fd_);
 }
 
