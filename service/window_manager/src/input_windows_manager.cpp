@@ -281,16 +281,21 @@ int32_t InputWindowsManager::SetDisplayBind(int32_t deviceId, int32_t displayId,
     return bindInfo_.SetDisplayBind(deviceId, displayId, msg);
 }
 
-void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
+void InputWindowsManager::UpdateCaptureMode(const DisplayGroupInfo &displayGroupInfo)
 {
-    CALL_DEBUG_ENTER;
-    CheckFocusWindowChange(displayGroupInfo);
-    CheckZorderWindowChange(displayGroupInfo);
     if (captureModeInfo_.isCaptureMode &&
         ((displayGroupInfo_.focusWindowId != displayGroupInfo.focusWindowId) ||
         (displayGroupInfo_.windowsInfo[0].id != displayGroupInfo.windowsInfo[0].id))) {
         captureModeInfo_.isCaptureMode = false;
     }
+}
+
+void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
+{
+    CALL_DEBUG_ENTER;
+    CheckFocusWindowChange(displayGroupInfo);
+    CheckZorderWindowChange(displayGroupInfo);
+    UpdateCaptureMode(displayGroupInfo);
     displayGroupInfo_ = displayGroupInfo;
     PrintDisplayInfo();
     UpdateDisplayIdAndName();
@@ -323,7 +328,9 @@ void InputWindowsManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroup
             WinInfo info = { .windowPid = windowPid, .windowId = windowInfo->id };
             IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
             PointerStyle pointerStyle;
-            int32_t ret = WinMgr->GetPointerStyle(info.windowPid, info.windowPid, pointerStyle);
+            int32_t ret = WinMgr->GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
+            MMI_HILOGD("get pointer style, pid: %{public}d, windowid: %{public}d, style: %{public}d",
+                info.windowPid, info.windowId, pointerStyle.id);
             CHKNOKRV(ret, "Draw pointer style failed, pointerStyleInfo is nullptr");
             IPointerDrawingManager::GetInstance()->DrawPointerStyle(pointerStyle);
         }
