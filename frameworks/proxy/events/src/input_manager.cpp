@@ -473,5 +473,9 @@ int32_t InputManager::GetShieldStatus(int32_t shieldMode, bool &isShield)
 {
     return InputMgrImpl.GetShieldStatus(shieldMode, isShield);
 }
+EventHandlerPtr InputManager::GetEventHandler()
+{
+    return InputMgrImpl.GetEventHandler();
+}
 } // namespace MMI
 } // namespace OHOS
