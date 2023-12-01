@@ -45,6 +45,7 @@ public:
     DISALLOW_COPY_AND_MOVE(InputWindowsManager);
     void Init(UDSServer& udsServer);
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent);
+    void UpdateCaptureMode(const DisplayGroupInfo &displayGroupInfo);
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
     void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId);
