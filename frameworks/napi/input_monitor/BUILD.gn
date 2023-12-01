@@ -50,9 +50,9 @@ ohos_shared_library("inputmonitor") {
 
   external_deps = [
     "c_utils:utils",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
     "napi:ace_napi",
-    "eventhandler:libeventhandler",
   ]
 
   relative_install_dir = "module/multimodalinput"
