@@ -114,7 +114,8 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
             if ((*it)->id_ == subscribeId && (*it)->sess_ == sess) {
                 ClearTimer(*it);
                 subscribers.erase(it);
-                MMI_HILOGI("subscribers size: %{public}" PRId64 ", subscribeId: %{public}d", subscribers.size(), subscribeId);
+                MMI_HILOGI("subscribers size: %{public}" PRId64 ", subscribeId: %{public}d",
+                    subscribers.size(), subscribeId);
                 return RET_OK;
             }
         }
