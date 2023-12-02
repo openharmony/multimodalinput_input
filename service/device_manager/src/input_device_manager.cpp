@@ -401,7 +401,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
         }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
         NotifyPointerDevice(true, true);
-        OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "true");
+        OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "true");
         MMI_HILOGI("Set para input.pointer.device true");
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -479,7 +479,7 @@ void InputDeviceManager::ScanPointerDevice()
     }
     if (!hasPointerDevice) {
         NotifyPointerDevice(false, false);
-        OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "false");
+        OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "false");
         MMI_HILOGI("Set para input.pointer.device false");
     }
 }

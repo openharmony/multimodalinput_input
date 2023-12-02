@@ -26,6 +26,7 @@
 #include "ability_manager_client.h"
 #include "anr_manager.h"
 #include "app_debug_listener.h"
+#include "app_state_observer.h"
 #include "dfx_hisysevent.h"
 #include "event_dump.h"
 #include "input_device_manager.h"
@@ -279,7 +280,7 @@ int32_t MMIService::Init()
     }
     SetRecvFun(std::bind(&ServerMsgHandler::OnMsgHandler, &sMsgHandler_, std::placeholders::_1, std::placeholders::_2));
     KeyMapMgr->GetConfigKeyValue("default_keymap", KeyMapMgr->GetDefaultKeyId());
-    OHOS::system::SetParameter(INPUT_POINTER_DEVICE, "false");
+    OHOS::system::SetParameter(INPUT_POINTER_DEVICES, "false");
     if (!InitService()) {
         MMI_HILOGE("Saservice init failed");
         return SASERVICE_INIT_FAIL;
@@ -311,6 +312,7 @@ void MMIService::OnStart()
     AddSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
     MMI_HILOGI("Add system ability listener success");
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    APP_OBSERVER_MGR->InitAppStateObserver();
     AddAppDebugListener();
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();

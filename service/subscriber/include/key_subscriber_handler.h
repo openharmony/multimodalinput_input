@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -85,16 +85,34 @@ private:
     bool IsNotifyPowerKeySubsciber(int32_t keyCode, const std::vector<int32_t> &keyCodes);
     void HandleKeyUpWithDelay(std::shared_ptr<KeyEvent> keyEvent, const std::shared_ptr<Subscriber> &subscriber);
     void PrintKeyUpLog(const std::shared_ptr<Subscriber> &subscriber);
-    void SubscriberNotify();
+    void SubscriberNotifyNap(const std::shared_ptr<Subscriber> subscriber);
+    bool IsEqualKeyOption(std::shared_ptr<KeyOption> newOption, std::shared_ptr<KeyOption> oldOption);
+    bool IsEqualPreKeys(const std::set<int32_t> &preKeys, const std::set<int32_t> &pressedKeys);
+    void AddSubscriber(std::shared_ptr<Subscriber> subscriber, std::shared_ptr<KeyOption> option);
+    int32_t RemoveSubscriber(SessionPtr sess, int32_t subscribeId);
+    bool IsMatchForegroundPid(std::list<std::shared_ptr<Subscriber>> subs, std::set<int32_t> foregroundPids);
+    void NotifyKeyDownSubscriber(const std::shared_ptr<KeyEvent> &keyEvent, std::shared_ptr<KeyOption> keyOption,
+        std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
+    void NotifyKeyDownRightNow(const std::shared_ptr<KeyEvent> &keyEvent,
+        std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
+    void NotifyKeyDownDelay(const std::shared_ptr<KeyEvent> &keyEvent,
+        std::list<std::shared_ptr<Subscriber>> &subscribers, bool &handled);
+    void NotifyKeyUpSubscriber(const std::shared_ptr<KeyEvent> &keyEvent,
+        std::list<std::shared_ptr<Subscriber>> subscribers, bool &handled);
+    void PrintKeyOption(const std::shared_ptr<KeyOption> keyOption);
+    void ClearSubscriberTimer(std::list<std::shared_ptr<Subscriber>> subscribers);
+    void GetForegroundPids(std::set<int32_t> &pidList);
 
 private:
-    std::list<std::shared_ptr<Subscriber>> subscribers_ {};
+    std::map<std::shared_ptr<KeyOption>, std::list<std::shared_ptr<Subscriber>>> subscriberMap_;
     bool callbackInitialized_ { false };
     bool hasEventExecuting_ { false };
     std::shared_ptr<KeyEvent> keyEvent_ { nullptr };
     int32_t subscribePowerKeyId_ { -1 };
     bool subscribePowerKeyState_ { false };
     bool enableCombineKey_ { true };
+    std::set<int32_t> foregroundPids_ {};
+    bool isForegroundExits_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
