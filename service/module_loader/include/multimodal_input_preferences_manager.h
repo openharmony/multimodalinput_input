@@ -36,8 +36,8 @@ public:
     int32_t InitPreferencesMap();
     int32_t GetIntValue(const std::string &key, int32_t defaultValue);
     bool GetBoolValue(const std::string &key, bool defaultValue);
-    int32_t SetIntValue(const std::string &key, int32_t setValue);
-    int32_t SetBoolValue(const std::string &key, bool setValue);
+    int32_t SetIntValue(const std::string &key, const std::string &setFile, int32_t setValue);
+    int32_t SetBoolValue(const std::string &key, const std::string &setFile, bool setValue);
     int32_t GetShortKeyDuration(const std::string &key);
     int32_t SetShortKeyDuration(const std::string &key, int32_t setValue);
 
