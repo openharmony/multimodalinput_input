@@ -70,7 +70,7 @@ int32_t ApplicationStateObserver::GetForegroundApplicationInfo(std::vector<AppEx
 std::vector<AppExecFwk::AppStateData> AppObserverManager::GetForegroundAppData()
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("foregroundAppData_.size(): %{public}" PRId64, foregroundAppData_.size());
+    MMI_HILOGD("foregroundAppData_.size(): %{public}zu", foregroundAppData_.size());
     return foregroundAppData_;
 }
 
@@ -78,7 +78,7 @@ void AppObserverManager::SetForegroundAppData(std::vector<AppExecFwk::AppStateDa
 {
     CALL_DEBUG_ENTER;
     foregroundAppData_ = list;
-    MMI_HILOGD("foregroundAppData_.size(): %{public}" PRId64, foregroundAppData_.size());
+    MMI_HILOGD("foregroundAppData_.size(): %{public}zu", foregroundAppData_.size());
 }
 
 void AppObserverManager::InitAppStateObserver()
