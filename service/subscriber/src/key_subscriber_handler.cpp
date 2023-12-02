@@ -15,6 +15,7 @@
 
 #include "key_subscriber_handler.h"
 
+#include "app_state_observer.h"
 #include "bytrace_adapter.h"
 #include "define_multimodal.h"
 #include "dfx_hisysevent.h"
