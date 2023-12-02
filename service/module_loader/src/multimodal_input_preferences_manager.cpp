@@ -45,6 +45,7 @@ MultiModalInputPreferencesManager::~MultiModalInputPreferencesManager() {}
 
 int32_t MultiModalInputPreferencesManager::InitPreferences()
 {
+    CALL_DEBUG_ENTER;
     int32_t ret = GetPreferencesSettings();
     if (ret != RET_OK) {
         MMI_HILOGE("Get multimodal input preferences settings failed");
@@ -133,20 +134,27 @@ bool MultiModalInputPreferencesManager::GetBoolValue(const std::string &key, boo
     return static_cast<bool>(value);
 }
 
-int32_t MultiModalInputPreferencesManager::SetIntValue(const std::string &key, int32_t setValue)
+int32_t MultiModalInputPreferencesManager::SetIntValue(const std::string &key, const std::string &setFile,
+    int32_t setValue)
 {
     auto iter = preferencesMap.find(key);
-    auto [fileName, value] = iter->second;
-    if (iter != preferencesMap.end()) {
+    std::string filePath = "";
+    if (iter == preferencesMap.end()) {
+        preferencesMap[key] = {setFile, setValue};
+        filePath = path + setFile;
+    } else {
+        auto [fileName, value] = iter->second;
         if (value == setValue) {
-            MMI_HILOGD("The set value is samle");
+            MMI_HILOGD("The set value is same");
             return RET_OK;
         }
+        filePath = path + fileName;
+        preferencesMap[key].second = setValue;
     }
 
     int32_t errCode = RET_OK;
     std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(path + fileName, errCode);
+        NativePreferences::PreferencesHelper::GetPreferences(filePath, errCode);
     CHKPR(pref, errno);
     int32_t ret = pref->PutInt(key, setValue);
     if (ret != RET_OK) {
@@ -158,26 +166,31 @@ int32_t MultiModalInputPreferencesManager::SetIntValue(const std::string &key, i
         MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(path + fileName);
-    preferencesMap[key].second = setValue;
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(filePath);
     return RET_OK;
 }
 
-int32_t MultiModalInputPreferencesManager::SetBoolValue(const std::string &key, bool setValue)
+int32_t MultiModalInputPreferencesManager::SetBoolValue(const std::string &key, const std::string &setFile,
+    bool setValue)
 {
     auto iter = preferencesMap.find(key);
-    auto [fileName, value] = iter->second;
-    bool preValue = static_cast<bool>(value);
-    if (iter != preferencesMap.end()) {
-        if (preValue == setValue) {
-            MMI_HILOGD("The set value is samle");
+    std::string filePath = "";
+    if (iter == preferencesMap.end()) {
+        preferencesMap[key] = {setFile, static_cast<int32_t>(setValue)};
+        filePath = path + setFile;
+    } else {
+        auto [fileName, value] = iter->second;
+        if (static_cast<bool>(value) == setValue) {
+            MMI_HILOGD("The set value is same");
             return RET_OK;
         }
+        filePath = path + fileName;
+        preferencesMap[key].second = setValue;
     }
 
     int32_t errCode = RET_OK;
     std::shared_ptr<NativePreferences::Preferences> pref =
-        NativePreferences::PreferencesHelper::GetPreferences(path + fileName, errCode);
+        NativePreferences::PreferencesHelper::GetPreferences(filePath, errCode);
     CHKPR(pref, errno);
     int32_t ret = pref->PutBool(key, setValue);
     if (ret != RET_OK) {
@@ -189,8 +202,7 @@ int32_t MultiModalInputPreferencesManager::SetBoolValue(const std::string &key, 
         MMI_HILOGE("Flush sync is failed, ret:%{public}d", ret);
         return RET_ERR;
     }
-    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(path + fileName);
-    preferencesMap[key].second = static_cast<int32_t>(setValue);
+    NativePreferences::PreferencesHelper::RemovePreferencesFromCache(filePath);
     return RET_OK;
 }
 
@@ -213,10 +225,11 @@ int32_t MultiModalInputPreferencesManager::SetShortKeyDuration(const std::string
 {
     auto iter = g_shortcutKeyMap.find(key);
     if (iter != g_shortcutKeyMap.end() && iter->second == setValue) {
-        MMI_HILOGD("The set value is samle");
+        MMI_HILOGD("The set value is same");
         return RET_OK;
     }
 
+    g_shortcutKeyMap[key] = setValue;
     int32_t errCode = RET_OK;
     std::shared_ptr<NativePreferences::Preferences> pref =
         NativePreferences::PreferencesHelper::GetPreferences(path + shortKeyFileName, errCode);
@@ -232,7 +245,6 @@ int32_t MultiModalInputPreferencesManager::SetShortKeyDuration(const std::string
         return RET_ERR;
     }
     NativePreferences::PreferencesHelper::RemovePreferencesFromCache(path + shortKeyFileName);
-    g_shortcutKeyMap[key] = setValue;
     return RET_OK;
 }
 } // namespace MMI

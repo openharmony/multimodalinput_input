@@ -63,7 +63,7 @@ constexpr float RUNNING_Y_RATIO = 0.675f;
 constexpr float INCREASE_RATIO = 1.22;
 constexpr int32_t MIN_POINTER_COLOR = 0x000000;
 constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
-const std::string MOUSE_FILE_NAME = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
 bool isRsRemoteDied = false;
 } // namespace
 } // namespace MMI
@@ -598,7 +598,7 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
         color = MAX_POINTER_COLOR;
     }
     std::string name = "pointerColor";
-    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, color);
+    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, MOUSE_FILE_NAME, color);
     if (ret == RET_OK) {
         MMI_HILOGD("Set pointer color successfully, color:%{public}d", color);
     }
@@ -646,7 +646,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
         size = MAX_POINTER_SIZE;
     }
     std::string name = "pointerSize";
-    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, size);
+    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, MOUSE_FILE_NAME, size);
     if (ret == RET_OK) {
         MMI_HILOGD("Set pointer size successfully, size:%{public}d", size);
     }
@@ -900,7 +900,7 @@ int32_t PointerDrawingManager::SetPointerStylePreference(PointerStyle pointerSty
 {
     CALL_DEBUG_ENTER;
     std::string name = "pointerStyle";
-    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, pointerStyle.id);
+    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, MOUSE_FILE_NAME, pointerStyle.id);
     if (ret == RET_OK) {
         MMI_HILOGD("Set pointer style successfully, style:%{public}d", pointerStyle.id);
     }
