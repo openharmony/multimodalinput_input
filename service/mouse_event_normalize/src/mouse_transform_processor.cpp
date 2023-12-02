@@ -223,7 +223,7 @@ int32_t MouseTransformProcessor::SetMouseScrollRows(int32_t rows)
         rows = MAX_ROWS;
     }
     std::string name = "rows";
-    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, rows);
+    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, mouseFileName, rows);
     MMI_HILOGD("Set mouse scroll rows successfully, rows:%{public}d", rows);
     return ret;
 }
@@ -578,7 +578,7 @@ int32_t MouseTransformProcessor::SetMousePrimaryButton(int32_t primaryButton)
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
     std::string name = "primaryButton";
-    PREFERENCES_MANAGER->SetIntValue(name, primaryButton);
+    PREFERENCES_MANAGER->SetIntValue(name, mouseFileName, primaryButton);
     return RET_OK;
 }
 
@@ -601,7 +601,7 @@ int32_t MouseTransformProcessor::SetPointerSpeed(int32_t speed)
     }
     globalPointerSpeed_ = speed;
     std::string name = "speed";
-    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, speed);
+    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, mouseFileName, speed);
     MMI_HILOGD("Set pointer speed successfully, speed:%{public}d", speed);
     return ret;
 }
