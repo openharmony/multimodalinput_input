@@ -586,7 +586,6 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
     RemoveKeyCode(keyCode, pressedKeys);
     std::set<int32_t> pids;
     GetForegroundPids(pids);
-    MMI_HILOGD("foreground pid size: %{public}zu", pids.size());
     for (auto &iter : subscriberMap_) {
         auto keyOption = iter.first;
         auto subscribers = iter.second;
@@ -622,7 +621,6 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
             MMI_HILOGE("upTime - downTime >= duration");
             continue;
         }
-        MMI_HILOGD("upTime - downTime < duration");
         NotifyKeyUpSubscriber(keyEvent, subscribers, handled);
     }
     MMI_HILOGD("Handle key up: %{public}s", handled ? "true" : "false");

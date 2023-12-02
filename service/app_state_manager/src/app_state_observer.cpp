@@ -95,7 +95,9 @@ void AppObserverManager::InitAppStateObserver()
         return;
     }
     OHOS::sptr<OHOS::IRemoteObject> object = systemAbilityManager->GetSystemAbility(OHOS::APP_MGR_SERVICE_ID);
+    CHKPV(object);
     sptr<AppExecFwk::IAppMgr> appMgr = OHOS::iface_cast<OHOS::AppExecFwk::IAppMgr>(object);
+    CHKPV(appMgr);
     int32_t ret = appMgr->RegisterApplicationStateObserver(new ApplicationStateObserver());
     if (ret == RET_OK) {
         hasInit_ = true;
