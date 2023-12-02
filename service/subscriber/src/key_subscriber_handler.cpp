@@ -114,8 +114,7 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
             if ((*it)->id_ == subscribeId && (*it)->sess_ == sess) {
                 ClearTimer(*it);
                 subscribers.erase(it);
-                MMI_HILOGI("subscribers size: %{public}" PRId64 ", subscribeId: %{public}d",
-                    subscribers.size(), subscribeId);
+                MMI_HILOGI("subscribers size: %{public}zu, subscribeId: %{public}d", subscribers.size(), subscribeId);
                 return RET_OK;
             }
         }
@@ -134,7 +133,7 @@ void KeySubscriberHandler::AddSubscriber(std::shared_ptr<Subscriber> subscriber,
         if (IsEqualKeyOption(option, iter.first)) {
             MMI_HILOGI("add subscriber Id: %{public}d", subscriber->id_);
             iter.second.push_back(std::move(subscriber));
-            MMI_HILOGI("subscriber size: %{public}" PRId64, iter.second.size());
+            MMI_HILOGI("subscriber size: %{public}zu", iter.second.size());
             return;
         }
     }
@@ -318,7 +317,7 @@ bool KeySubscriberHandler::IsMatchForegroundPid(std::list<std::shared_ptr<Subscr
             isForegroundExits_ = true;
         }
     }
-    MMI_HILOGD("isForegroundExits_: %{public}d, foregroundPids: %{public}" PRId64,
+    MMI_HILOGD("isForegroundExits_: %{public}d, foregroundPids: %{public}zu",
         isForegroundExits_, foregroundPids_.size());
     return isForegroundExits_;
 }
@@ -329,7 +328,7 @@ void KeySubscriberHandler::NotifyKeyDownSubscriber(const std::shared_ptr<KeyEven
     CALL_DEBUG_ENTER;
     CHKPV(keyEvent);
     CHKPV(keyOption);
-    MMI_HILOGI("notify key down subscribers size: %{public}" PRId64, subscribers.size());
+    MMI_HILOGI("notify key down subscribers size: %{public}zu", subscribers.size());
     if (keyOption->GetFinalKeyDownDuration() <= 0) {
         NotifyKeyDownRightNow(keyEvent, subscribers, handled);
     } else {
@@ -377,7 +376,7 @@ void KeySubscriberHandler::NotifyKeyUpSubscriber(const std::shared_ptr<KeyEvent>
     std::list<std::shared_ptr<Subscriber>> subscribers, bool &handled)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("subscribers size: %{public}" PRId64, subscribers.size());
+    MMI_HILOGD("subscribers size: %{public}zu", subscribers.size());
     for (auto &subscriber : subscribers) {
         CHKPC(subscriber);
         auto sess = subscriber->sess_;
@@ -464,7 +463,7 @@ bool KeySubscriberHandler::AddTimer(const std::shared_ptr<Subscriber> &subscribe
 void KeySubscriberHandler::ClearSubscriberTimer(std::list<std::shared_ptr<Subscriber>> subscribers)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGD("clear subscriber timer size: %{public}" PRId64, subscribers.size());
+    MMI_HILOGD("clear subscriber timer size: %{public}zu", subscribers.size());
     for (auto &subscriber : subscribers) {
         CHKPC(subscriber);
         ClearTimer(subscriber);
@@ -530,7 +529,7 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
     RemoveKeyCode(keyCode, pressedKeys);
     std::set<int32_t> pids;
     GetForegroundPids(pids);
-    MMI_HILOGE("foreground pid size: %{public}" PRId64, pids.size());
+    MMI_HILOGE("foreground pid size: %{public}zu", pids.size());
     for (auto &iter : subscriberMap_) {
         auto keyOption = iter.first;
         auto subscribers = iter.second;
@@ -586,7 +585,7 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
     RemoveKeyCode(keyCode, pressedKeys);
     std::set<int32_t> pids;
     GetForegroundPids(pids);
-    MMI_HILOGD("foreground pid size: %{public}" PRId64, pids.size());
+    MMI_HILOGD("foreground pid size: %{public}zu", pids.size());
     for (auto &iter : subscriberMap_) {
         auto keyOption = iter.first;
         auto subscribers = iter.second;
