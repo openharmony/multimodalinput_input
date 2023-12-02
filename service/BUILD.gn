@@ -28,6 +28,7 @@ ohos_prebuilt_etc("mmi_device_config.ini") {
 
 config("libmmi_server_config") {
   include_dirs = [
+    "app_state_manager/include",
     "device_config/include",
     "device_manager/include",
     "device_scalability/include",
