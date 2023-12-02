@@ -37,7 +37,7 @@ constexpr int32_t MAX_KEY_REPEAT_DELAY = 1000;
 constexpr int32_t DEFAULT_KEY_REPEAT_RATE = 50;
 constexpr int32_t MIN_KEY_REPEAT_RATE = 36;
 constexpr int32_t MAX_KEY_REPEAT_RATE = 100;
-const std::string KEYBOARD_FILE_NAME = "/data/service/el1/public/multimodalinput/keyboard_settings.xml";
+const std::string KEYBOARD_FILE_NAME = "keyboard_settings.xml";
 } // namespace
 
 KeyAutoRepeat::KeyAutoRepeat() {}
@@ -260,7 +260,7 @@ int32_t KeyAutoRepeat::GetKeyboardRepeatRate(int32_t &rate)
 
 int32_t KeyAutoRepeat::PutConfigDataToDatabase(std::string &key, int32_t value)
 {
-    return PREFERENCES_MANAGER->SetIntValue(key, value);
+    return PREFERENCES_MANAGER->SetIntValue(key, KEYBOARD_FILE_NAME, value);
 }
 
 int32_t KeyAutoRepeat::GetConfigDataFromDatabase(std::string &key, int32_t &value)
