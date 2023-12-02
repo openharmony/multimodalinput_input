@@ -30,6 +30,7 @@
 #include "net_packet.h"
 #include "proto.h"
 #include "setting_datashare.h"
+#include "system_ability_definition.h"
 #include "timer_manager.h"
 #include "util_ex.h"
 #include "nap_process.h"
@@ -38,7 +39,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t MULTIMODAL_INPUT_DOMAIN_ID = 3101;
 constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr int32_t MAX_SEQUENCEKEYS_NUM = 10;
 constexpr int64_t MAX_DELAY_TIME = 1000000;
@@ -1289,31 +1289,52 @@ int32_t KeyCommandHandler::EnableCombineKey(bool enable)
     return RET_OK;
 }
 
-void KeyCommandHandler::CreateStatusConfigObserver()
+void KeyCommandHandler::ParseStatusConfigObserver()
 {
     CALL_DEBUG_ENTER;
     for (RepeatKey& item : repeatKeys_) {
         if (item.statusConfig.empty()) {
+            continue;
+        }
+        CreateStatusConfigObserver<RepeatKey>(item);
+    }
+
+    for (Sequence& item : sequences_) {
+        if (item.statusConfig.empty()) {
+            continue;
+        }
+        CreateStatusConfigObserver<Sequence>(item);
+    }
+
+    for (auto& item : shortcutKeys_) {
+        ShortcutKey &shortcutKey = item.second;
+        if (shortcutKey.statusConfig.empty()) {
+            continue;
+        }
+        CreateStatusConfigObserver<ShortcutKey>(shortcutKey);
+    }
+}
+
+template <class T>
+void KeyCommandHandler::CreateStatusConfigObserver(T item)
+{
+    CALL_DEBUG_ENTER;
+    SettingObserver::UpdateFunc updateFunc = [&](const std::string& key) {
+        bool statusValue = true;
+        auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+            .GetBoolValue(item.statusConfig, statusValue);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Get value from setting date fail");
             return;
         }
-
-        SettingObserver::UpdateFunc updateFunc = [&](const std::string& key) {
-            bool statusValue = true;
-            auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_DOMAIN_ID)
-                .GetBoolValue(item.statusConfig, statusValue);
-            if (ret != RET_OK) {
-                MMI_HILOGE("Get value from setting date fail");
-                return;
-            }
-            item.statusConfigValue = statusValue;
-        };
-        sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_DOMAIN_ID)
-            .CreateObserver(item.statusConfig, updateFunc);
-        ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_DOMAIN_ID).RegisterObserver(statusObserver);
-        if (ret != ERR_OK) {
-            MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
-            statusObserver = nullptr;
-        }
+        item.statusConfigValue = statusValue;
+    };
+    sptr<SettingObserver> statusObserver = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+        .CreateObserver(item.statusConfig, updateFunc);
+    ErrCode ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID).RegisterObserver(statusObserver);
+    if (ret != ERR_OK) {
+        MMI_HILOGE("register setting observer failed, ret=%{public}d", ret);
+        statusObserver = nullptr;
     }
 }
 
@@ -1353,7 +1374,7 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     }
 
     if (!isParseStatusConfig_) {
-        CreateStatusConfigObserver();
+        ParseStatusConfigObserver();
         isParseStatusConfig_ = true;
     }
 
@@ -1592,6 +1613,9 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
     ResetLastMatchedKey();
     for (auto &item : shortcutKeys_) {
         ShortcutKey &shortcutKey = item.second;
+        if (!shortcutKey.statusConfigValue) {
+            continue;
+        }
         if (!IsKeyMatch(shortcutKey, keyEvent)) {
             MMI_HILOGD("Not key matched, next");
             continue;
@@ -1731,6 +1755,11 @@ bool KeyCommandHandler::HandleSequence(Sequence &sequence, bool &isLaunchAbility
     CALL_DEBUG_ENTER;
     size_t keysSize = keys_.size();
     size_t sequenceKeysSize = sequence.sequenceKeys.size();
+
+    if (!sequence.statusConfigValue) {
+        return false;
+    }
+
     if (keysSize > sequenceKeysSize) {
         MMI_HILOGD("The save sequence not matching ability sequence");
         return false;
