@@ -24,7 +24,6 @@
 #include <set>
 #include <thread>
 
-#include "app_state_observer.h"
 #include "i_input_event_handler.h"
 #include "key_event.h"
 #include "key_option.h"
