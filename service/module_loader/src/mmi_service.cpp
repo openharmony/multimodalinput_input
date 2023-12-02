@@ -312,6 +312,8 @@ void MMIService::OnStart()
     AddSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
     MMI_HILOGI("Add system ability listener success");
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    MMI_HILOGI("Add app manager service listener start");
+    AddSystemAbilityListener(APP_MGR_SERVICE_ID);
     APP_OBSERVER_MGR->InitAppStateObserver();
     AddAppDebugListener();
 #ifdef OHOS_BUILD_ENABLE_ANCO
@@ -350,6 +352,7 @@ void MMIService::OnStop()
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     RemoveSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    RemoveSystemAbilityListener(APP_MGR_SERVICE_ID);
     RemoveAppDebugListener();
 #ifdef OHOS_BUILD_ENABLE_ANCO
     StopAncoUds();
@@ -1205,6 +1208,10 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
         MMI_HILOGD("Common event service started");
     }
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    if (systemAbilityId == APP_MGR_SERVICE_ID) {
+        MMI_HILOGI("Init app state observer start");
+        APP_OBSERVER_MGR->InitAppStateObserver();
+    }
 }
 
 int32_t MMIService::SubscribeKeyEvent(int32_t subscribeId, const std::shared_ptr<KeyOption> option)
