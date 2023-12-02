@@ -80,6 +80,7 @@ declare_args() {
 
   libmmi_service_sources = [
     "$mmi_path/frameworks/proxy/event_handler/src/bytrace_adapter.cpp",
+    "app_state_manager/src/app_state_observer.cpp",
     "delegate_task/src/delegate_tasks.cpp",
     "device_config/src/device_config_file_parser.cpp",
     "device_manager/src/input_device_manager.cpp",
