@@ -41,7 +41,7 @@ constexpr int32_t FINGER_COUNT_MAX { 5 };
 constexpr int32_t FINGER_TAP_MIN { 3 };
 constexpr int32_t FINGER_MOTION_MAX { 9 };
 constexpr int32_t TP_SYSTEM_PINCH_FINGER_CNT { 2 };
-const std::string TOUCHPAD_FILE_NAME = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
+const std::string TOUCHPAD_FILE_NAME = "touchpad_settings.xml";
 } // namespace
 
 TouchPadTransformProcessor::TouchPadTransformProcessor(int32_t deviceId)
@@ -536,7 +536,7 @@ int32_t TouchPadTransformProcessor::GetTouchpadPinchSwitch(bool &switchFlag)
 
 int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
 {
-    return PREFERENCES_MANAGER->SetBoolValue(key, value);
+    return PREFERENCES_MANAGER->SetBoolValue(key, TOUCHPAD_FILE_NAME, value);
 }
 
 int32_t TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &value)

@@ -268,7 +268,6 @@ int32_t MMIService::Init()
         return EPOLL_CREATE_FAIL;
     }
     MMI_HILOGD("Input msg handler init");
-    PREFERENCES_MANAGER->InitPreferences();
     InputHandler->Init(*this);
     if (!InitLibinputService()) {
         MMI_HILOGE("Libinput init failed");
@@ -316,6 +315,7 @@ void MMIService::OnStart()
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
+    PREFERENCES_MANAGER->InitPreferences();
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGD("Set thread status flag to true");
         threadStatusFlag_ = true;

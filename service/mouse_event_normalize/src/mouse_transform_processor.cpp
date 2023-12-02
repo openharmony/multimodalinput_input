@@ -53,7 +53,7 @@ constexpr int32_t BTN_RIGHT_MENUE_CODE = 0x118;
 constexpr int32_t RIGHT_CLICK_TYPE_MIN = 1;
 constexpr int32_t RIGHT_CLICK_TYPE_MAX = 3;
 constexpr int32_t TP_RIGHT_CLICK_FINGER_CNT = 2;
-const std::string mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
+const std::string mouseFileName = "mouse_settings.xml";
 } // namespace
 
 double MouseTransformProcessor::absolutionX_ = -1.0;
@@ -211,8 +211,6 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
     }
 
     pointerEvent_->SetButtonId(buttonId);
-    NativePreferences::PreferencesHelper::
-        RemovePreferencesFromCache("/data/service/el1/public/multimodalinput/mouse_settings");
     return RET_OK;
 }
 
@@ -914,7 +912,7 @@ int32_t MouseTransformProcessor::GetTouchpadRightClickType(int32_t &type)
 
 int32_t MouseTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
 {
-    return PREFERENCES_MANAGER->SetBoolValue(key, value);
+    return PREFERENCES_MANAGER->SetBoolValue(key, mouseFileName, value);
 }
 
 int32_t MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &value)
@@ -925,7 +923,7 @@ int32_t MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, boo
 
 int32_t MouseTransformProcessor::PutConfigDataToDatabase(std::string &key, int32_t value)
 {
-    return PREFERENCES_MANAGER->SetIntValue(key, value);
+    return PREFERENCES_MANAGER->SetIntValue(key, mouseFileName, value);
 }
 
 int32_t MouseTransformProcessor::GetConfigDataFromDatabase(std::string &key, int32_t &value)
