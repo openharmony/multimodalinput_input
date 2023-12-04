@@ -47,7 +47,6 @@ public:
      */
     static InputManager *GetInstance();
     virtual ~InputManager() = default;
-    using EventHandlerPtr = std::shared_ptr<AppExecFwk::EventHandler>;
 
     int32_t GetDisplayBindInfo(DisplayBindInfos &infos);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
@@ -756,14 +755,6 @@ public:
     * @since 9
     */
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
-
-    /**
-    * Get EventHandler for MMI
-    *
-    * @return Returns EventHandlerPtr.
-    * @since 11
-    */
-    EventHandlerPtr GetEventHandler();
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
