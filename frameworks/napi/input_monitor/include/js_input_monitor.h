@@ -74,6 +74,7 @@ private:
 
 class JsInputMonitor final {
 public:
+    static void JsCallback(uv_work_t *work, int32_t status);
     JsInputMonitor(napi_env jsEnv, const std::string &typeName, std::vector<Rect> hotRectArea,
         int32_t rectTotal, napi_value callback, int32_t id, int32_t fingers);
     JsInputMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, int32_t id, int32_t fingers);
