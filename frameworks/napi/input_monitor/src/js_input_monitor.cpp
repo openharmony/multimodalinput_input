@@ -972,17 +972,24 @@ void JsInputMonitor::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
     }
 
     if (!evQueue_.empty()) {
+        uv_work_t *work = new (std::nothrow) uv_work_t;
+        CHKPV(work);
         MonitorInfo *monitorInfo = new MonitorInfo();
         monitorInfo->monitorId = monitorId_;
         monitorInfo->fingers = fingers_;
-        auto& jsMonitor { JsInputMonMgr.GetMonitor(monitorInfo->monitorId, monitorInfo->fingers) };
-        CHKPV(jsMonitor);
-        auto func = [jsMonitor] {
-            jsMonitor -> OnPointerEventInJsThread(jsMonitor->GetTypeName(), jsMonitor-> GetFingers());
-        };
-        MMI_HILOGD("PostHighPriorityTask OnPointerEventInJsThread.");
-        InputManager::EventHandlerPtr eventHandlerPtr = OHOS::MMI::InputManager::GetInstance()->GetEventHandler();
-        eventHandlerPtr -> PostHighPriorityTask(func);
+        work->data = monitorInfo;
+        uv_loop_s *loop = nullptr;
+        auto status = napi_get_uv_event_loop(jsEnv_, &loop);
+        if (status != napi_ok) {
+            THROWERR(jsEnv_, "napi_get_uv_event_loop is failed");
+            delete work;
+            {
+                std::lock_guard<std::mutex> guard(mutex_);
+                jsTaskNum_ = 0;
+            }
+            return;
+        }
+        uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, &JsInputMonitor::JsCallback, uv_qos_user_initiated);
     }
 }
 
@@ -993,6 +1000,20 @@ bool JsInputMonitor::IsBeginAndEnd(std::shared_ptr<PointerEvent> pointerEvent)
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_BEGIN ||
         pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_SWIPE_END;
     return res;
+}
+
+void JsInputMonitor::JsCallback(uv_work_t *work, int32_t status)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(work);
+    auto temp = static_cast<MonitorInfo*>(work->data);
+    delete work;
+    work = nullptr;
+    auto& jsMonitor { JsInputMonMgr.GetMonitor(temp->monitorId, temp->fingers) };
+    CHKPV(jsMonitor);
+    jsMonitor->OnPointerEventInJsThread(jsMonitor->GetTypeName(), temp->fingers);
+    delete temp;
+    temp = nullptr;
 }
 
 void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32_t fingers)
