@@ -27,6 +27,23 @@ ohos_prebuilt_etc("mmi_device_config.ini") {
 }
 
 config("libmmi_server_config") {
+  if (is_ohos && is_clang && (target_cpu == "arm" || target_cpu == "arm64") &&
+      enhanced_opt) {
+    cflags = []
+    if (input_feature_enable_pgo && input_feature_product != "default") {
+      cflags += [
+        "-fprofile-use=" +
+            rebase_path("${input_feature_pgo_path}/libmmi-server.profdata",
+                        root_build_dir),
+        "-Wno-error=backend-plugin",
+        "-Wno-profile-instr-out-of-date",
+        "-Wno-profile-instr-unprofiled",
+      ]
+    }
+    if (input_feature_product == "pc" && target_cpu == "arm64") {
+      cflags += [ "-moutline-atomics" ]
+    }
+  }
   include_dirs = [
     "app_state_manager/include",
     "device_config/include",
