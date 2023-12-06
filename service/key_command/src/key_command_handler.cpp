@@ -335,6 +335,9 @@ bool ConvertToShortcutKey(const cJSON* jsonData, ShortcutKey &shortcutKey, std::
         MMI_HILOGE("Get downDuration failed");
         return false;
     }
+
+    GetKeyVal(jsonData, "statusConfig", shortcutKey.statusConfig);
+
     cJSON *ability = cJSON_GetObjectItemCaseSensitive(jsonData, "ability");
     if (!cJSON_IsObject(ability)) {
         MMI_HILOGE("ability is not object");
@@ -545,6 +548,9 @@ bool ConvertToKeySequence(const cJSON* jsonData, Sequence &sequence)
         MMI_HILOGE("Get abilityStartDelay failed");
         return false;
     }
+
+    GetKeyVal(jsonData, "statusConfig", sequence.statusConfig);
+    
     cJSON *ability = cJSON_GetObjectItemCaseSensitive(jsonData, "ability");
     if (!cJSON_IsObject(ability)) {
         MMI_HILOGE("ability is not object");
