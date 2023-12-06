@@ -326,17 +326,30 @@ int32_t MouseTransformProcessor::HandleAxisBeginEndInner(struct libinput_event *
     if (buttonId_ == PointerEvent::BUTTON_NONE && pointerEvent_->GetButtonId() != PointerEvent::BUTTON_NONE) {
         pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
     }
-    if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_DOWN && !isPressed_) {
-        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
-        MMI_HILOGD("Axis begin");
-    } else if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_UP && !isPressed_) {
-        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
-        MMI_HILOGD("Axis end");
-    } else {
+    if (!isAxisBegin_ && isPressed_) {
         MMI_HILOGE("Axis is invalid");
         return RET_ERR;
     }
-    return RET_OK;
+    if (isAxisBegin_ && isPressed_) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+        isAxisBegin_ = false;
+        MMI_HILOGD("Axis end due to a pressed event");
+        return RET_OK;
+    }
+    if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_DOWN && !isPressed_) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_BEGIN);
+        isAxisBegin_ = true;
+        MMI_HILOGD("Axis begin");
+        return RET_OK;
+    }
+    if (libinput_event_get_type(event) == LIBINPUT_EVENT_TOUCHPAD_UP && !isPressed_) {
+        pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_END);
+        isAxisBegin_ = false;
+        MMI_HILOGD("Axis end");
+        return RET_OK;
+    }
+    MMI_HILOGE("Axis is invalid");
+    return RET_ERR;
 }
 
 void MouseTransformProcessor::HandleAxisPostInner(PointerEvent::PointerItem &pointerItem)
