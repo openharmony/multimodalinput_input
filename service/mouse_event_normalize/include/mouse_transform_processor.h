@@ -123,6 +123,7 @@ private:
     int32_t buttonId_ { -1 };
     bool isPressed_ { false };
     int32_t deviceId_ { -1 };
+    bool isAxisBegin_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
