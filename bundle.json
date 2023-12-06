@@ -19,6 +19,9 @@
       "SystemCapability.MultimodalInput.Input.ShortKey"
     ],
     "features": [
+      "input_feature_product",
+      "input_feature_enable_pgo",
+      "input_feature_pgo_path",
       "input_feature_combination_key",
       "input_feature_input_device",
       "input_feature_interceptor",
