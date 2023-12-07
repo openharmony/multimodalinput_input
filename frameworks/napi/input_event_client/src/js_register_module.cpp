@@ -117,6 +117,45 @@ static napi_value InjectEvent(napi_env env, napi_callback_info info)
     return result;
 }
 
+static napi_value InjectKeyEvent(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    napi_value result = nullptr;
+    size_t argc = 1;
+    napi_value argv[1] = { 0 };
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 1) {
+        MMI_HILOGE("Parameter number error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
+        return nullptr;
+    }
+    napi_valuetype tmpType = napi_undefined;
+    CHKRP(napi_typeof(env, argv[0], &tmpType), TYPEOF);
+    if (tmpType != napi_object) {
+        MMI_HILOGE("keyEvent is not napi_object");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyEvent", "object");
+        return nullptr;
+    }
+    napi_value keyHandle = nullptr;
+    CHKRP(napi_get_named_property(env, argv[0], "keyEvent", &keyHandle), GET_NAMED_PROPERTY);
+    if (keyHandle == nullptr) {
+        MMI_HILOGE("keyEvent is nullptr");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "keyEvent not found");
+        return nullptr;
+    }
+    CHKRP(napi_typeof(env, keyHandle, &tmpType), TYPEOF);
+    if (tmpType != napi_object) {
+        MMI_HILOGE("keyEvent is not napi_object");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "keyEvent", "object");
+        return nullptr;
+    }
+    auto keyEvent = KeyEvent::Create();
+    CHKPP(keyEvent);
+    GetInjectionEventData(env, keyEvent, keyHandle);
+    CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
+    return result;
+}
+
 static void HandleMouseButton(napi_env env, napi_value mouseHandle, std::shared_ptr<PointerEvent> pointerEvent)
 {
     int32_t button;
@@ -412,6 +451,7 @@ static napi_value MmiInit(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("injectEvent", InjectEvent),
+        DECLARE_NAPI_FUNCTION("injectKeyEvent", InjectKeyEvent),
         DECLARE_NAPI_FUNCTION("injectMouseEvent", InjectMouseEvent),
         DECLARE_NAPI_FUNCTION("injectTouchEvent", InjectTouchEvent),
     };
