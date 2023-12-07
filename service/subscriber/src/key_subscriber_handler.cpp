@@ -191,6 +191,7 @@ int32_t KeySubscriberHandler::EnableCombineKey(bool enable)
 
 bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> keyEvent)
 {
+    CHKPF(keyEvent);
     if (enableCombineKey_) {
         return true;
     }
