@@ -1264,6 +1264,7 @@ void KeyCommandHandler::PrintSeq()
 
 bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
 {
+    CHKPF(key);
     if (enableCombineKey_) {
         return true;
     }
