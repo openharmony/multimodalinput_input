@@ -36,8 +36,10 @@ bool PermissionHelper::VerifySystemApp()
     auto callerToken = IPCSkeleton::GetCallingTokenID();
     auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callerToken);
     MMI_HILOGD("token type is %{public}d", static_cast<int32_t>(tokenType));
+    int32_t callingUid = IPCSkeleton::GetCallingUid();
     if (tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE
-        || tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
+        || tokenType == OHOS::Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL
+        || callingUid == ROOT_UID) {
         MMI_HILOGD("called tokenType is native, verify success");
         return true;
     }
@@ -85,23 +87,6 @@ bool PermissionHelper::CheckMonitor()
     }
 }
 
-bool PermissionHelper::CheckInterceptor()
-{
-    CALL_DEBUG_ENTER;
-    auto tokenId = IPCSkeleton::GetCallingTokenID();
-    auto tokenType = OHOS::Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
-    if ((tokenType == OHOS::Security::AccessToken::TOKEN_HAP) ||
-        (tokenType == OHOS::Security::AccessToken::TOKEN_NATIVE)) {
-        return CheckInterceptorPermission(tokenId);
-    } else if (tokenType == OHOS::Security::AccessToken::TOKEN_SHELL) {
-        MMI_HILOGI("Token type is shell");
-        return true;
-    } else {
-        MMI_HILOGE("Unsupported token type:%{public}d", tokenType);
-        return false;
-    }
-}
-
 bool PermissionHelper::CheckHapPermission(uint32_t tokenId, uint32_t required)
 {
     OHOS::Security::AccessToken::HapTokenInfo findInfo;
@@ -127,18 +112,6 @@ bool PermissionHelper::CheckMonitorPermission(uint32_t tokenId)
         return false;
     }
     MMI_HILOGD("Check monitor permission success");
-    return true;
-}
-
-bool PermissionHelper::CheckInterceptorPermission(uint32_t tokenId)
-{
-    static const std::string inputInterceptor = "ohos.permission.INTERCEPT_INPUT_EVENT";
-    int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, inputInterceptor);
-    if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
-        MMI_HILOGE("Check interceptor permission failed ret:%{public}d", ret);
-        return false;
-    }
-    MMI_HILOGD("Check interceptor permission success");
     return true;
 }
 
