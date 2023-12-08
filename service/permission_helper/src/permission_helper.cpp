@@ -132,7 +132,7 @@ bool PermissionHelper::CheckMonitorPermission(uint32_t tokenId)
 
 bool PermissionHelper::CheckInterceptorPermission(uint32_t tokenId)
 {
-    static const std::string inputInterceptor = "ohos.permission.INPUT_INTERCEPTORING";
+    static const std::string inputInterceptor = "ohos.permission.INPUT_INTERCEPTOR";
     int32_t ret = OHOS::Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenId, inputInterceptor);
     if (ret != OHOS::Security::AccessToken::PERMISSION_GRANTED) {
         MMI_HILOGE("Check interceptor permission failed ret:%{public}d", ret);
