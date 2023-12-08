@@ -33,6 +33,11 @@ enum {
 };
 
 enum {
+    // APL鉴权失败
+    CHECK_PERMISSION_FAIL = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_CLIENT),
+};
+
+enum {
     // 文件打开失败
     FILE_OPEN_FAIL = ErrCodeOffset(SUBSYS_MULTIMODAINPUT, MODULE_EVENT_SIMULATE),
     // 流缓冲读取失败
