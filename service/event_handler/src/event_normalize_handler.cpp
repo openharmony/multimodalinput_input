@@ -375,6 +375,12 @@ int32_t EventNormalizeHandler::HandleTouchPadEvent(libinput_event* event)
         HandleMouseEvent(event);
     }
     if (type == LIBINPUT_EVENT_TOUCHPAD_UP) {
+        pointerEvent->RemovePointerItem(pointerEvent->GetPointerId());
+        MMI_HILOGD("This event is up remove this finger");
+        if (pointerEvent->GetPointerIds().empty()) {
+            MMI_HILOGD("This event is final up");
+            pointerEvent->Reset();
+        }
         buttonIds_.erase(seatSlot);
     }
     if (buttonIds_.empty()) {
