@@ -400,6 +400,8 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
 {
     CALL_DEBUG_ENTER;
     PointerStyle pointerStyle;
+    auto visible = IPointerDrawingManager::GetInstance()->GetPointerVisible(pid);
+    IPointerDrawingManager::GetInstance()->SetPointerVisible(pid, visible);
     GetPointerStyleByArea(area, pid, windowId, pointerStyle);
     if (lastPointerStyle_.id == pointerStyle.id) {
         MMI_HILOGE("Tha lastPointerStyle is  totally equal with this, no need to change it");
