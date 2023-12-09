@@ -58,6 +58,7 @@ public:
     int32_t GetPointerColor() override;
     void DeletePointerVisible(int32_t pid) override;
     int32_t SetPointerVisible(int32_t pid, bool visible) override;
+    bool GetPointerVisible(int32_t pid) override;
     int32_t SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle) override;
     int32_t ClearWindowPointerStyle(int32_t pid, int32_t windowId) override;
     int32_t GetPointerStyle(int32_t pid, int32_t windowId, PointerStyle &pointerStyle) override;
