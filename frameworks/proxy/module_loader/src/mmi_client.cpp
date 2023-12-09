@@ -26,6 +26,7 @@
 #include "mmi_fd_listener.h"
 #include "multimodal_event_handler.h"
 #include "multimodal_input_connect_manager.h"
+#include "xcollie/watchdog.h"
 
 namespace OHOS {
 namespace MMI {
@@ -107,6 +108,10 @@ bool MMIClient::StartEventRunner()
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
         MMI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
+    }
+    int32_t ret = HiviewDFX::Watchdog::GetInstance().AddThread(THREAD_NAME, eventHandler_);
+    if (ret != 0) {
+        MMI_HILOGW("Add watchdog thread failed, ret: %{public}d", ret);
     }
 
     if (isConnected_ && fd_ >= 0) {
