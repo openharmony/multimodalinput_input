@@ -42,6 +42,7 @@ namespace {
 constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr int32_t MAX_SEQUENCEKEYS_NUM = 10;
 constexpr int64_t MAX_DELAY_TIME = 1000000;
+constexpr int64_t LONG_PRESS_FOR_POWER_OFF = 3000;
 constexpr int64_t SECONDS_SYSTEM = 1000;
 constexpr int32_t SPECIAL_KEY_DOWN_DELAY = 150;
 constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;
@@ -1377,6 +1378,9 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     if (!isParseMaxCount_) {
         ParseRepeatKeyMaxCount();
         isParseMaxCount_ = true;
+        if (repeatKeys_.size() > 0) {
+            intervalTime_ = repeatKeys_[0].delay;
+        }
     }
 
     if (!isParseStatusConfig_) {
@@ -1484,7 +1488,7 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
     bool waitRepeatKey = false;
 
     for (RepeatKey& item : repeatKeys_) {
-        if (HandleRepeatKeyCount(item, keyEvent)) {
+        if (HandleRepeatKeyCount(item, keyEvent) || HandleKeyUpCancel(item, keyEvent)) {
             break;
         }
     }
@@ -1524,12 +1528,29 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
     return true;
 }
 
+bool KeyCommandHandler::HandleKeyUpCancel(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPF(keyEvent);
+    if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_CANCEL) {
+        if (downTimerId_ >= 0) {
+            TimerMgr->RemoveTimer(downTimerId_);
+        }
+        return true;
+    }
+    return false;
+}
+
 bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
 
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
+        if (downTimerId_ >= 0) {
+            TimerMgr->RemoveTimer(downTimerId_);
+        }
+
         int64_t downDurationTime = keyEvent->GetActionTime() - downActionTime_;
         if (count_ == 0 && downDurationTime > LONG_PRESS_DOWN_TIME) {
             return false;
@@ -1541,16 +1562,11 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
             count_++;
         }
 
-        if (repeatKeys_.size() > 0) {
-            intervalTime_ = repeatKeys_[0].delay;
-        }
-
         upActionTime_ = keyEvent->GetActionTime();
         repeatTimerId_ = TimerMgr->AddTimer(intervalTime_ / SECONDS_SYSTEM, 1, [this] () {
             SendKeyEvent();
         });
         if (repeatTimerId_ < 0) {
-            MMI_HILOGE("Add timer failed");
             return false;
         }
         repeatKey_.keyCode = item.keyCode;
@@ -1558,9 +1574,17 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
     }
 
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+        if (downTimerId_ >= 0) {
+            TimerMgr->RemoveTimer(downTimerId_);
+        }
+        downTimerId_ = TimerMgr->AddTimer(LONG_PRESS_FOR_POWER_OFF, 1, [this, keyEvent] () {
+            InputHandler->GetSubscriberHandler()->HandlePowerLongPressDown(keyEvent);
+        });
+        if (downTimerId_ < 0) {
+            return false;
+        }
         downActionTime_ = keyEvent->GetActionTime();
-        int64_t durationTime = downActionTime_ - upActionTime_;
-        if (durationTime < intervalTime_) {
+        if ((downActionTime_ - upActionTime_) < intervalTime_) {
             if (repeatTimerId_ >= 0) {
                 TimerMgr->RemoveTimer(repeatTimerId_);
             }
