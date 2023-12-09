@@ -46,6 +46,10 @@ public:
     {
         return 0;
     }
+    virtual bool GetPointerVisible(int32_t pid)
+    {
+        return true;
+    }
     virtual int32_t SetPointerColor(int32_t color)
     {
         return 0;
