@@ -521,6 +521,38 @@ bool KeySubscriberHandler::InitSessionDeleteCallback()
     return true;
 }
 
+void KeySubscriberHandler::HandlePowerLongPressDown(std::shared_ptr<KeyEvent> keyEvent)
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(keyEvent);
+    bool handled = false;
+    auto keyCode = keyEvent->GetKeyCode();
+    std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+    for (auto &iter : subscriberMap_) {
+        auto keyOption = iter.first;
+        auto subscribers = iter.second;
+        uint32_t preKeySize = keyOption->GetPreKeys().size();
+        if (preKeySize != 0) {
+            MMI_HILOGD("preKey is not empty");
+            continue;
+        }
+        if (!keyOption->IsFinalKeyDown()) {
+            MMI_HILOGD("!keyOption->IsFinalKeyDown()");
+            continue;
+        }
+        if (keyCode != keyOption->GetFinalKey()) {
+            ClearSubscriberTimer(subscribers);
+            MMI_HILOGD("keyCode != keyOption->GetFinalKey()");
+            continue;
+        }
+        if (keyOption->GetFinalKeyDownDuration() > 0) {
+            MMI_HILOGD("keyOption->GetFinalKeyDownDuration() <= 0");
+            NotifyKeyDownSubscriber(keyEvent, keyOption, subscribers, handled);
+            continue;
+        }
+    }
+}
+
 bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent)
 {
     CALL_DEBUG_ENTER;
