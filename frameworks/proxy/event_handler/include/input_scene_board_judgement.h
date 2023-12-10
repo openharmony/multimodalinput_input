@@ -23,6 +23,7 @@ namespace MMI {
 class MMISceneBoardJudgement final {
 public:
     static bool IsSceneBoardEnabled();
+    static bool IsResampleEnabled();
 private:
     // Dealing with Windows type end of line "\r\n".
     static std::ifstream& SafeGetLine(std::ifstream& configFile, std::string& line);

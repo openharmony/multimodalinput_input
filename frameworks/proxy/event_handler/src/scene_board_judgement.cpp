@@ -13,10 +13,16 @@
  * limitations under the License.
  */
 
+#include "mmi_log.h"
+#include "parameters.h"
 #include "input_scene_board_judgement.h"
 
 namespace OHOS {
 namespace MMI {
+namespace {
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMISceneBoardJudgement" };
+} // namespace
+
 bool MMISceneBoardJudgement::IsSceneBoardEnabled()
 {
     static bool isSceneBoardEnabled = false;
@@ -28,6 +34,19 @@ bool MMISceneBoardJudgement::IsSceneBoardEnabled()
     return isSceneBoardEnabled;
 }
 
+bool MMISceneBoardJudgement::IsResampleEnabled()
+{
+    static bool isResampleEnabled = false;
+    static bool resampleInited = false;
+    if (!resampleInited) {
+        MMI_HILOGD("resample algorithm switch is not inited!");
+        isResampleEnabled =
+        (std::atoi((OHOS::system::GetParameter("persist.sys.input.resampleEnabled", "0")).c_str()) != 0);
+        MMI_HILOGD("isResampleEnabled is set to %{public}d", isResampleEnabled);
+        resampleInited = true;
+    }
+    return isResampleEnabled;
+}
 std::ifstream& MMISceneBoardJudgement::SafeGetLine(std::ifstream& configFile, std::string& line)
 {
     std::getline(configFile, line);
