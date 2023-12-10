@@ -168,6 +168,7 @@ private:
     bool HandleKeyDown(ShortcutKey &shortcutKey);
     bool HandleKeyCancel(ShortcutKey &shortcutKey);
     bool HandleEvent(const std::shared_ptr<KeyEvent> key);
+    bool HandleKeyUpCancel(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeyCount(const RepeatKey &item, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKey(const RepeatKey& item, bool &isLaunchAbility, const std::shared_ptr<KeyEvent> keyEvent);
     bool HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEvent);
@@ -254,7 +255,8 @@ private:
     RepeatKey repeatKey_;
     int32_t maxCount_ { 0 };
     int32_t count_ { 0 };
-    int32_t repeatTimerId_ { 0 };
+    int32_t repeatTimerId_ { -1 };
+    int32_t downTimerId_ { -1 };
     int32_t downActionTime_ { 0 };
     int64_t upActionTime_ { 0 };
     int32_t launchAbilityCount_ { 0 };

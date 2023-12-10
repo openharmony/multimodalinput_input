@@ -65,6 +65,9 @@ private:
     };
     void InsertSubScriber(std::shared_ptr<Subscriber> subs);
 
+public:
+    void HandlePowerLongPressDown(std::shared_ptr<KeyEvent> keyEvent);
+
 private:
     bool OnSubscribeKeyEvent(std::shared_ptr<KeyEvent> keyEvent);
     bool HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEvent);
