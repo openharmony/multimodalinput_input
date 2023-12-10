@@ -134,6 +134,7 @@ ohos_shared_library("libmmi-client") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
+    "init:libbegetutil",
   ]
 }
 
