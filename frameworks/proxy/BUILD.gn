@@ -133,8 +133,8 @@ ohos_shared_library("libmmi-client") {
     "hicollie:libhicollie",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
-    "ipc:ipc_single",
     "init:libbegetutil",
+    "ipc:ipc_single",
   ]
 }
 
