@@ -24,6 +24,7 @@
 #include "gesture_handler.h"
 #include "input_device_manager.h"
 #include "input_event_handler.h"
+#include "input_scene_board_judgement.h"
 #include "key_auto_repeat.h"
 #include "key_event_normalize.h"
 #include "key_event_value_transformation.h"
@@ -32,7 +33,6 @@
 #include "time_cost_chk.h"
 #include "timer_manager.h"
 #include "touch_event_normalize.h"
-#include "scene_board_judgement.h"
 #include "event_resample.h"
 #include "touchpad_transform_processor.h"
 
@@ -144,7 +144,8 @@ void EventNormalizeHandler::HandleEvent(libinput_event* event, int64_t frameTime
 bool EventNormalizeHandler::ProcessNullEvent(libinput_event *event, int64_t frameTime)
 {
     std::shared_ptr<PointerEvent> pointerEvent = EventResampleHdr->GetPointerEvent();
-    if ((event == nullptr) && (pointerEvent != nullptr) && Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+    if ((event == nullptr) && (pointerEvent != nullptr) && MMISceneBoardJudgement::IsSceneBoardEnabled()
+        && MMISceneBoardJudgement::IsResampleEnabled()) {
         int32_t sourceType = pointerEvent->GetSourceType();
         if (sourceType == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
             HandleTouchEvent(event, frameTime);
@@ -471,7 +472,7 @@ int32_t EventNormalizeHandler::HandleTouchEvent(libinput_event* event, int64_t f
         CHKPR(pointerEvent, ERROR_NULL_POINTER);
     }
 
-    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+    if (MMISceneBoardJudgement::IsSceneBoardEnabled() && MMISceneBoardJudgement::IsResampleEnabled()) {
         ErrCode status = RET_OK;
         std::shared_ptr<PointerEvent> outputEvent = EventResampleHdr->OnEventConsume(pointerEvent, frameTime, status);
         if (outputEvent == nullptr) {
