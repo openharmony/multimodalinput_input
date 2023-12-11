@@ -1391,7 +1391,12 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
     bool isHandled = HandleShortKeys(key);
     isHandled = HandleSequences(key) || isHandled;
     if (isHandled) {
-        isHandleSequence_ = true;
+        if (isKeyCancel_) {
+            isHandleSequence_ = false;
+            isKeyCancel_ = false;
+        } else {
+            isHandleSequence_ = true;
+        }
         return true;
     }
 
@@ -1533,6 +1538,7 @@ bool KeyCommandHandler::HandleKeyUpCancel(const RepeatKey &item, const std::shar
     CALL_DEBUG_ENTER;
     CHKPF(keyEvent);
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_CANCEL) {
+        isKeyCancel_ = true;
         if (downTimerId_ >= 0) {
             TimerMgr->RemoveTimer(downTimerId_);
         }
