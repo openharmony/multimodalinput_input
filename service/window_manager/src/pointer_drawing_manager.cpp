@@ -475,20 +475,21 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
     int32_t focusY)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(pixelMap, RET_ERR);
     if (pid == -1) {
         MMI_HILOGE("pid is invalid");
-        return RET_ERR;
-    }
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("pixelMap is null!");
         return RET_ERR;
     }
     if (windowId < 0) {
         MMI_HILOGE("windowId is invalid, windowId: %{public}d", windowId);
         return RET_ERR;
     }
-    OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
-    userIcon_.reset(pixelMapPtr);
+
+    int32_t ret = UpdateCursorProperty(pixelMap);
+    if (ret != RET_OK) {
+        MMI_HILOGE("UpdateCursorProperty is failed");
+        return ret;
+    }
     mouseIconUpdate_ = true;
     userIconHotSpotX_ = focusX;
     userIconHotSpotY_ = focusY;
@@ -496,13 +497,33 @@ int32_t PointerDrawingManager::SetCustomCursor(void* pixelMap, int32_t pid, int3
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     lastMouseStyle_ = style;
 
-    int32_t ret = SetPointerStyle(pid, windowId, style);
+    ret = SetPointerStyle(pid, windowId, style);
     if (ret == RET_ERR) {
         MMI_HILOGE("SetPointerStyle is failed");
     }
     MMI_HILOGD("style.id: %{public}d, userIconHotSpotX_: %{public}d, userIconHotSpotY_: %{public}d",
         style.id, userIconHotSpotX_, userIconHotSpotY_);
     return ret;
+}
+
+int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap)
+{
+    CHKPR(pixelMap, RET_ERR);
+    Media::PixelMap* newPixelMap = static_cast<Media::PixelMap*>(pixelMap);
+    CHKPR(newPixelMap, RET_ERR);
+    Media::ImageInfo imageInfo;
+    newPixelMap->GetImageInfo(imageInfo);
+    int32_t cursorSize = GetPointerSize();
+    int32_t cursorWidth =
+        pow(INCREASE_RATIO, cursorSize - 1) * displayInfo_.dpi * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
+    int32_t cursorHeight =
+        pow(INCREASE_RATIO, cursorSize - 1) * displayInfo_.dpi * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
+    float xAxis = (float)cursorWidth / (float)imageInfo.size.width;
+    float yAxis = (float)cursorHeight / (float)imageInfo.size.height;
+    newPixelMap->scale(xAxis, yAxis, Media::AntiAliasingOption::LOW);
+    userIcon_.reset(newPixelMap);
+    MMI_HILOGI("cursorWidth: %{public}d, cursorHeight: %{public}d", cursorWidth, cursorHeight);
+    return RET_OK;
 }
 
 int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void* pixelMap)

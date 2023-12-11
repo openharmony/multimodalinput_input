@@ -399,35 +399,22 @@ int32_t MultimodalInputConnectStub::StubSetCustomCursor(MessageParcel& data, Mes
         MMI_HILOGE("Service is not running");
         return MMISERVICE_NOT_RUNNING;
     }
-    int32_t size = 0;
     int32_t windowId = 0;
     int32_t windowPid = -1;
     int32_t focusX = 0;
     int32_t focusY = 0;
-    READINT32(data, size, IPC_PROXY_DEAD_OBJECT_ERR);
-    MMI_HILOGD("reading size of the tlv count, size: %{public}d", size);
-    if (size > MAX_BUFFER_SIZE || size <= 0) {
-        MMI_HILOGE("Append extra data failed, buffer is oversize, size: %{public}d", size);
-        return RET_ERR;
-    }
-    std::vector<uint8_t> buff(size, 0);
-    for (int i = 0; i < size; i++) {
-        READUINT8(data, buff[i], IPC_PROXY_DEAD_OBJECT_ERR);
-    }
     READINT32(data, windowPid, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, windowId, IPC_PROXY_DEAD_OBJECT_ERR);
-    MMI_HILOGD("reading windowid the tlv count, windowId: %{public}d", windowId);
-
     READINT32(data, focusX, IPC_PROXY_DEAD_OBJECT_ERR);
     READINT32(data, focusY, IPC_PROXY_DEAD_OBJECT_ERR);
 
-    OHOS::Media::PixelMap* pixelMap = OHOS::Media::PixelMap::DecodeTlv(buff);
-    if (pixelMap == nullptr) {
-        MMI_HILOGE("pixelMap is nullptr");
-        return RET_ERR;
-    }
+    OHOS::Media::PixelMap* pixelMap = Media::PixelMap::Unmarshalling(data);
     if (windowId <= 0) {
         MMI_HILOGE("windowId is invalid, windowId: %{public}d", windowId);
+        return RET_ERR;
+    }
+    if (pixelMap == nullptr) {
+        MMI_HILOGE("pixelMap is nullptr");
         return RET_ERR;
     }
     int32_t ret = SetCustomCursor(windowPid, windowId, focusX, focusY, (void*)pixelMap);

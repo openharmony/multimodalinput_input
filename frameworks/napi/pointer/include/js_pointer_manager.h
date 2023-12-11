@@ -78,6 +78,8 @@ public:
     napi_value LeaveCaptureMode(napi_env env, int32_t windowId, napi_value handle = nullptr);
     napi_value SetMouseScrollRows(napi_env env, int32_t rows, napi_value handle = nullptr);
     napi_value GetMouseScrollRows(napi_env env, napi_value handle = nullptr);
+    napi_value SetCustomCursor(napi_env env, int32_t windowId, void* pixelMap, CursorFocus focus);
+    napi_value SetCustomCursorSync(napi_env env, int32_t windowId, void* pixelMap, CursorFocus focus);
     napi_value SetPointerSize(napi_env env, int32_t size, napi_value handle = nullptr);
     napi_value GetPointerSize(napi_env env, napi_value handle = nullptr);
     napi_value SetPointerSizeSync(napi_env env, int32_t size);

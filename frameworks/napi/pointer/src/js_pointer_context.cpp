@@ -14,6 +14,8 @@
  */
 
 #include "js_pointer_context.h"
+#include "pixel_map.h"
+#include "pixel_map_napi.h"
 
 namespace OHOS {
 namespace MMI {
@@ -31,6 +33,8 @@ constexpr int32_t MIN_POINTER_SIZE = 1;
 constexpr int32_t MAX_POINTER_SIZE = 7;
 constexpr int32_t MIN_POINTER_COLOR = 0x000000;
 constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
+constexpr int32_t THREE_PARAMETERS = 3;
+constexpr int32_t INVALID_VALUE = -2;
 } // namespace
 
 JsPointerContext::JsPointerContext() : mgr_(std::make_shared<JsPointerManager>()) {}
@@ -503,6 +507,149 @@ napi_value JsPointerContext::SetPointerLocation(napi_env env, napi_callback_info
         return nullptr;
     }
     return jsPointerMgr->SetPointerLocation(env, x, y, argv[INPUT_PARAMETER]);
+}
+
+napi_value JsPointerContext::SetCustomCursor(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 4;
+    napi_value argv[4];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < INPUT_PARAMETER) {
+        MMI_HILOGE("At least 2 parameter is required.");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
+        return nullptr;
+    }
+
+    int32_t windowId = GetWindowId(env, argv[0]);
+    if (windowId == INVALID_VALUE) {
+        return nullptr;
+    }
+
+    if (!JsCommon::TypeOf(env, argv[1], napi_object)) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "pixelMap", "napi_object");
+        return nullptr;
+    }
+    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMapNapi::GetPixelMap(env, argv[1]);
+    if (pixelMap == nullptr) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "pixelMap is invalid.");
+        return nullptr;
+    }
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CursorFocus cursorFocus;
+    if (argc == INPUT_PARAMETER) {
+        return jsPointerMgr->SetCustomCursor(env, windowId, (void *)pixelMap.get(), cursorFocus);
+    }
+
+    cursorFocus.x = GetCursorFocusX(env, argv[INPUT_PARAMETER]);
+    if (cursorFocus.x == INVALID_VALUE) {
+        return nullptr;
+    }
+    if (argc == THREE_PARAMETERS) {
+        return jsPointerMgr->SetCustomCursor(env, windowId, (void *)pixelMap.get(), cursorFocus);
+    }
+
+    cursorFocus.y = GetCursorFocusY(env, argv[THREE_PARAMETERS]);
+    if (cursorFocus.y == INVALID_VALUE) {
+        return nullptr;
+    }
+    return jsPointerMgr->SetCustomCursor(env, windowId, (void *)pixelMap.get(), cursorFocus);
+}
+
+napi_value JsPointerContext::SetCustomCursorSync(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    size_t argc = 4;
+    napi_value argv[4];
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < INPUT_PARAMETER) {
+        MMI_HILOGE("At least 2 parameter is required");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
+        return nullptr;
+    }
+
+    int32_t windowId = GetWindowId(env, argv[0]);
+    if (windowId == INVALID_VALUE) {
+        return nullptr;
+    }
+
+    if (!JsCommon::TypeOf(env, argv[1], napi_object)) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "pixelMap", "napi_object");
+        return nullptr;
+    }
+    std::shared_ptr<Media::PixelMap> pixelMap = Media::PixelMapNapi::GetPixelMap(env, argv[1]);
+    if (pixelMap == nullptr) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "pixelMap is invalid");
+        return nullptr;
+    }
+    JsPointerContext *jsPointer = JsPointerContext::GetInstance(env);
+    CHKPP(jsPointer);
+    auto jsPointerMgr = jsPointer->GetJsPointerMgr();
+    CursorFocus cursorFocus;
+    if (argc == INPUT_PARAMETER) {
+        return jsPointerMgr->SetCustomCursorSync(env, windowId, (void *)pixelMap.get(), cursorFocus);
+    }
+
+    cursorFocus.x = GetCursorFocusX(env, argv[INPUT_PARAMETER]);
+    if (cursorFocus.x == INVALID_VALUE) {
+        return nullptr;
+    }
+    if (argc == THREE_PARAMETERS) {
+        return jsPointerMgr->SetCustomCursorSync(env, windowId, (void *)pixelMap.get(), cursorFocus);
+    }
+
+    cursorFocus.y = GetCursorFocusY(env, argv[THREE_PARAMETERS]);
+    if (cursorFocus.y == INVALID_VALUE) {
+        return nullptr;
+    }
+    return jsPointerMgr->SetCustomCursorSync(env, windowId, (void *)pixelMap.get(), cursorFocus);
+}
+
+int32_t JsPointerContext::GetWindowId(napi_env env, napi_value value)
+{
+    if (!JsCommon::TypeOf(env, value, napi_number)) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "windowId", "number");
+        return INVALID_VALUE;
+    }
+    int32_t windowId = 0;
+    CHKRR(napi_get_value_int32(env, value, &windowId), GET_VALUE_INT32, INVALID_VALUE);
+    if (windowId < 0 && windowId != GLOBAL_WINDOW_ID) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "Windowid is invalid");
+        return INVALID_VALUE;
+    }
+    return windowId;
+}
+
+int32_t JsPointerContext::GetCursorFocusX(napi_env env, napi_value value)
+{
+    if (!JsCommon::TypeOf(env, value, napi_number)) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "focusX", "number");
+        return INVALID_VALUE;
+    }
+    int32_t focusX = 0;
+    CHKRR(napi_get_value_int32(env, value, &focusX), GET_VALUE_INT32, INVALID_VALUE);
+    if (focusX < 0) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "focusX is invalid");
+        return INVALID_VALUE;
+    }
+    return focusX;
+}
+
+int32_t JsPointerContext::GetCursorFocusY(napi_env env, napi_value value)
+{
+    if (!JsCommon::TypeOf(env, value, napi_number)) {
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "focusY", "number");
+        return INVALID_VALUE;
+    }
+    int32_t focusY = 0;
+    CHKRR(napi_get_value_int32(env, value, &focusY), GET_VALUE_INT32, INVALID_VALUE);
+    if (focusY < 0) {
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "focusY is invalid");
+        return INVALID_VALUE;
+    }
+    return focusY;
 }
 
 napi_value JsPointerContext::SetPointerSize(napi_env env, napi_callback_info info)
@@ -1445,6 +1592,8 @@ napi_value JsPointerContext::Export(napi_env env, napi_value exports)
         DECLARE_NAPI_STATIC_FUNCTION("setTouchpadRightClickType", SetTouchpadRightClickType),
         DECLARE_NAPI_STATIC_FUNCTION("getTouchpadRightClickType", GetTouchpadRightClickType),
         DECLARE_NAPI_STATIC_FUNCTION("setPointerLocation", SetPointerLocation),
+        DECLARE_NAPI_STATIC_FUNCTION("setCustomCursor", SetCustomCursor),
+        DECLARE_NAPI_STATIC_FUNCTION("setCustomCursorSync", SetCustomCursorSync),
     };
     CHKRP(napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc), DEFINE_PROPERTIES);
     if (CreatePointerStyle(env, exports) == nullptr) {
