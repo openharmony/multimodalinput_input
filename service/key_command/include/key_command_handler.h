@@ -261,6 +261,7 @@ private:
     int64_t upActionTime_ { 0 };
     int32_t launchAbilityCount_ { 0 };
     int64_t intervalTime_ { 120000 };
+    bool isKeyCancel_ { false };
     bool isHandleSequence_ { false };
     bool isParseMaxCount_ { false };
     bool isRepeatKeyState_ { false };
