@@ -73,6 +73,8 @@ public:
     static napi_value GetTouchpadSwipeSwitch(napi_env env, napi_callback_info info);
     static napi_value SetTouchpadRightClickType(napi_env env, napi_callback_info info);
     static napi_value GetTouchpadRightClickType(napi_env env, napi_callback_info info);
+    static napi_value SetCustomCursor(napi_env env, napi_callback_info info);
+    static napi_value SetCustomCursorSync(napi_env env, napi_callback_info info);
 
 private:
     static napi_value SetTouchpadBoolData(napi_env env, napi_callback_info info, SetTouchpadBoolDataFunc func);
@@ -86,6 +88,9 @@ private:
     static napi_value CreatePointerStyle(napi_env env, napi_value exports);
     static napi_value CreateMousePrimaryButton(napi_env env, napi_value exports);
     static napi_value CreateTouchpadRightClickType(napi_env env, napi_value exports);
+    static int32_t GetWindowId(napi_env env, napi_value value);
+    static int32_t GetCursorFocusX(napi_env env, napi_value value);
+    static int32_t GetCursorFocusY(napi_env env, napi_value value);
     std::shared_ptr<JsPointerManager> mgr_ { nullptr };
     napi_ref contextRef_ { nullptr };
 };

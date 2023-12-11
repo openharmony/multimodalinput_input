@@ -429,6 +429,36 @@ napi_value JsPointerManager::SetPointerLocation(napi_env env, int32_t x, int32_t
     return promise;
 }
 
+napi_value JsPointerManager::SetCustomCursor(napi_env env, int32_t windowId, void* pixelMap, CursorFocus focus)
+{
+    CALL_DEBUG_ENTER;
+    sptr<AsyncContext> asyncContext = new (std::nothrow) AsyncContext(env);
+    CHKPP(asyncContext);
+    asyncContext->errorCode = InputManager::GetInstance()->SetCustomCursor(windowId, pixelMap, focus.x, focus.y);
+    if (asyncContext->errorCode == COMMON_USE_SYSAPI_ERROR) {
+        MMI_HILOGE("Non system applications use system API");
+        THROWERR_CUSTOM(env, COMMON_USE_SYSAPI_ERROR, "Non system applications use system API");
+        return nullptr;
+    }
+    asyncContext->reserve << ReturnType::VOID;
+    napi_value promise = nullptr;
+    CHKRP(napi_create_promise(env, &asyncContext->deferred, &promise), CREATE_PROMISE);
+    AsyncCallbackWork(asyncContext);
+    return promise;
+}
+
+napi_value JsPointerManager::SetCustomCursorSync(napi_env env, int32_t windowId, void* pixelMap, CursorFocus focus)
+{
+    CALL_DEBUG_ENTER;
+    InputManager::GetInstance()->SetCustomCursor(windowId, pixelMap, focus.x, focus.y);
+    napi_value result = nullptr;
+    if (napi_get_undefined(env, &result) != napi_ok) {
+        MMI_HILOGE("Get undefined result is failed");
+        return nullptr;
+    }
+    return result;
+}
+
 napi_value JsPointerManager::SetPointerSize(napi_env env, int32_t size, napi_value handle)
 {
     CALL_DEBUG_ENTER;
