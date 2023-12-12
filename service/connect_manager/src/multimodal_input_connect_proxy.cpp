@@ -217,21 +217,11 @@ int32_t MultimodalInputConnectProxy::SetCustomCursor(int32_t pid, int32_t window
         MMI_HILOGE("Failed to write descriptor");
         return ERR_INVALID_VALUE;
     }
-    std::vector<uint8_t> buff;
-    pixelMapPtr->EncodeTlv(buff);
-    uint32_t size = buff.size();
-    
-    MMI_HILOGD("Image buffer size: %{public}d", size);
-    WRITEINT32(data, size, ERR_INVALID_VALUE);
-    for (uint32_t i = 0; i < size; i++) {
-        WRITEUINT8(data, buff[i], ERR_INVALID_VALUE);
-    }
     WRITEINT32(data, pid, ERR_INVALID_VALUE);
-    MMI_HILOGD("windowId: %{public}d", windowId);
     WRITEINT32(data, windowId, ERR_INVALID_VALUE);
-
     WRITEINT32(data, focusX, ERR_INVALID_VALUE);
     WRITEINT32(data, focusY, ERR_INVALID_VALUE);
+    pixelMapPtr->Marshalling(data);
 
     MessageParcel reply;
     MessageOption option;
