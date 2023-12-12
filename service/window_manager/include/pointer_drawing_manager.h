@@ -93,6 +93,7 @@ private:
     int32_t InitLayer(const MOUSE_ICON mouseStyle);
     int32_t SetPointerStylePreference(PointerStyle pointerStyle);
     void UpdateMouseStyle();
+    int32_t UpdateCursorProperty(void* pixelMap);
 
 private:
     struct PidInfo {

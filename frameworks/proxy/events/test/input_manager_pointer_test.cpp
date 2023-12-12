@@ -1658,6 +1658,61 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_003, T
 }
 
 /**
+ * @tc.name: InputManagerPointerTest_SetCustomCursor_004
+ * @tc.desc: Set the mouse custom cursor
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
+    uint32_t windowId = window->GetWindowId();
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
+    PointerStyle pointerStyle;
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    if (InputManager::GetInstance()->SetCustomCursor(windowId, (void *)pixelMap.get()) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
+        ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+    } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        ASSERT_FALSE(false);  // errors occur
+    } else {
+        ASSERT_TRUE(false);
+    }
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_SetCustomCursor_005
+ * @tc.desc: Set the mouse custom cursor
+ * @tc.type: FUNC
+ * @tc.require: I530XS
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
+    uint32_t windowId = window->GetWindowId();
+    const std::string iconPath = "/system/etc/multimodalinput/mouse_icon/Zoom_Out.svg";
+    PointerStyle pointerStyle;
+    std::unique_ptr<OHOS::Media::PixelMap> pixelMap = InputManagerUtil::SetMouseIconTest(iconPath);
+    ASSERT_NE(pixelMap, nullptr);
+    pointerStyle.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
+    int32_t focusX = 64;
+    if (InputManager::GetInstance()->SetCustomCursor(windowId, (void *)pixelMap.get(), focusX) == RET_OK) {
+        ASSERT_TRUE(InputManager::GetInstance()->GetPointerStyle(windowId, pointerStyle) == RET_OK);
+        ASSERT_EQ(pointerStyle.id, MOUSE_ICON::DEVELOPER_DEFINED_ICON);
+    } else if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        ASSERT_FALSE(false);  // errors occur
+    } else {
+        ASSERT_TRUE(false);
+    }
+}
+
+/**
  * @tc.name: InputManagerPointerTest_PointerEventDisplay_001
  * @tc.desc: Verify that the pointerEvent can be dispatched to the target dispaly
  * @tc.type: FUNC
