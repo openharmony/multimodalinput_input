@@ -253,9 +253,14 @@ void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyl
     auto canvas = static_cast<Rosen::RSRecordingCanvas *>(canvasNode_->BeginRecording(imageWidth_, imageHeight_));
     canvas->DrawPixelMap(pixelmap, 0, 0, SkSamplingOptions(), nullptr);
 #else
+    Rosen::Drawing::Brush brush;
+    Rosen::Drawing::Rect src = Rosen::Drawing::Rect(0, 0, pixelmap->GetWidth(), pixelmap->GetHeight());
+    Rosen::Drawing::Rect dst = Rosen::Drawing::Rect(src);
     auto canvas =
-        static_cast<Rosen::Drawing::RecordingCanvas *>(canvasNode_->BeginRecording(imageWidth_, imageHeight_));
-    canvas->DrawPixelMap(pixelmap, {}, {});
+        static_cast<Rosen::ExtendRecordingCanvas *>(canvasNode_->BeginRecording(imageWidth_, imageHeight_));
+    canvas->AttachBrush(brush);
+    canvas->DrawPixelMapRect(pixelmap, src, dst, Rosen::Drawing::SamplingOptions());
+    canvas->DetachBrush();
 #endif
     
     canvasNode_->FinishRecording();
