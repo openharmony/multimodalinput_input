@@ -24,7 +24,7 @@ namespace MMI {
 #define DEF_MMI_VIRTUAL_DEVICE_MANAGER "/system/bin/mmi-virtual-device-manager"
 #define DEF_MMI_DATA_ROOT "/data/mmi/"
 #define DEF_EXP_CONFIG "/system/etc/mmi_device_config.ini"
-#ifdef __aarch64__
+#if defined(__aarch64__) || (defined(__riscv) && __riscv_xlen == 64)
     #define DEF_EXP_SOPATH "/system/lib64/"
 #else
     #define DEF_EXP_SOPATH "/system/lib/"
