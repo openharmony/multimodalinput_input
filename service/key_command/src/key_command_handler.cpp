@@ -1323,13 +1323,13 @@ void KeyCommandHandler::ParseStatusConfigObserver()
 }
 
 template <class T>
-void KeyCommandHandler::CreateStatusConfigObserver(T item)
+void KeyCommandHandler::CreateStatusConfigObserver(T& item)
 {
     CALL_DEBUG_ENTER;
-    SettingObserver::UpdateFunc updateFunc = [&](const std::string& key) {
+    SettingObserver::UpdateFunc updateFunc = [&item](const std::string& key) {
         bool statusValue = true;
         auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
-            .GetBoolValue(item.statusConfig, statusValue);
+            .GetBoolValue(key, statusValue);
         if (ret != RET_OK) {
             MMI_HILOGE("Get value from setting date fail");
             return;
