@@ -186,7 +186,7 @@ private:
     int32_t GetKeyDownDurationFromXml(const std::string &businessId);
     void SendKeyEvent();
     template <class T>
-    void CreateStatusConfigObserver(T item);
+    void CreateStatusConfigObserver(T& item);
     void ResetLastMatchedKey()
     {
         lastMatchedKey_.preKeys.clear();
