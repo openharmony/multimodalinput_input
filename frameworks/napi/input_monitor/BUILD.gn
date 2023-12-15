@@ -20,6 +20,7 @@ config("inputmonitor_config") {
     "//foundation/multimodalinput/input/frameworks/napi/input_monitor/include",
     "//foundation/multimodalinput/input/util/common/include",
     "//foundation/multimodalinput/input/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/frameworks/napi/touch_event/include",
   ]
 
   defines = []
