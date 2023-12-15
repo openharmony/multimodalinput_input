@@ -28,6 +28,7 @@
 #include "util_napi.h"
 
 #include "i_input_event_consumer.h"
+#include "js_touch_event.h"
 
 namespace OHOS {
 namespace MMI {
@@ -76,8 +77,11 @@ public:
     std::string GetTypeName() const;
 private:
     void SetCallback(napi_value callback);
+    MapFun GetInputEventFunc(const std::shared_ptr<InputEvent> inputEvent);
+    int32_t SetInputEventProperty(const std::shared_ptr<InputEvent> inputEvent, napi_value result);
     int32_t TransformPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
-    std::string GetAction(int32_t action) const;
+    int32_t GetAction(int32_t action) const;
+    int32_t GetSourceType(int32_t sourceType) const;
     int32_t GetJsPointerItem(const PointerEvent::PointerItem &item, napi_value value) const;
     int32_t TransformTsActionValue(int32_t pointerAction);
     int32_t TransformMousePointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
