@@ -868,17 +868,6 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
     return RET_OK;
 }
 
-bool PointerDrawingManager::GetPointerVisible(int32_t pid)
-{
-    CALL_DEBUG_ENTER;
-    for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
-        if (it->pid == pid) {
-            return it->visible;
-        }
-    }
-    return true;
-}
-
 void PointerDrawingManager::SetPointerLocation(int32_t x, int32_t y)
 {
     CALL_DEBUG_ENTER;
