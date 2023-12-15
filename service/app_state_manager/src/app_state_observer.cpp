@@ -19,6 +19,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AppStateObserver" };
+std::mutex mutex_;
 } // namespace
 AppObserverManager::AppObserverManager() {}
 AppObserverManager::~AppObserverManager() {}
@@ -26,6 +27,7 @@ AppObserverManager::~AppObserverManager() {}
 void ApplicationStateObserver::OnForegroundApplicationChanged(const AppExecFwk::AppStateData &appStateData)
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     MMI_HILOGD("change app name = %{public}s, uid = %{public}d, state = %{public}d ",
         appStateData.bundleName.c_str(),
         appStateData.uid,
@@ -70,6 +72,7 @@ int32_t ApplicationStateObserver::GetForegroundApplicationInfo(std::vector<AppEx
 std::vector<AppExecFwk::AppStateData> AppObserverManager::GetForegroundAppData()
 {
     CALL_DEBUG_ENTER;
+    std::lock_guard<std::mutex> guard(mutex_);
     MMI_HILOGD("foregroundAppData_.size(): %{public}zu", foregroundAppData_.size());
     return foregroundAppData_;
 }
