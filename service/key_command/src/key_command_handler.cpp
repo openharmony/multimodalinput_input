@@ -61,6 +61,8 @@ constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG = 96.0f;
 constexpr float VPR_CONFIG = 3.25f;
 constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t ACTIVE_EVENT = 2;
+constexpr int32_t KEYCODE_VOLUME_DOWN = 17;
+constexpr int32_t KEYCODE_POWER = 18;
 const std::string EXTENSION_ABILITY = "extensionAbility";
 
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
@@ -770,6 +772,20 @@ bool ParseMultiFingersTap(const JsonParser &parser, const std::string ability, M
     }
     return true;
 }
+
+bool IsPowerSequence(const std::shared_ptr<KeyEvent> key)
+{
+    CHKPF(key);
+    if (key->GetAction() == KeyEvent::KEY_ACTION_UP) {
+        std::vector<int32_t> pressedKeys = key->GetPressedKeys();
+        for (const auto& pressedKey: pressedKeys) {
+            if (pressedKey == KEYCODE_VOLUME_DOWN || pressedKey == KEYCODE_POWER) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -1397,6 +1413,10 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         } else {
             isHandleSequence_ = true;
         }
+        return true;
+    }
+
+    if (IsPowerSequence(key)) {
         return true;
     }
 
