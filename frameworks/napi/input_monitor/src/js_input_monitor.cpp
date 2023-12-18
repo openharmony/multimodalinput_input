@@ -331,7 +331,6 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
             MMI_HILOGE("Transform pointerItem failed");
             return RET_ERR;
         }
-        status = napi_set_element(jsEnv_, pointers, index, element);
         CHKRR(napi_set_element(jsEnv_, pointers, index, element), "napi_set_element is", RET_ERR);
         ++index;
     }
