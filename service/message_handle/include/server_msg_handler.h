@@ -80,6 +80,7 @@ protected:
     int32_t OnRegisterMsgHandler(SessionPtr sess, NetPacket& pkt);
     int32_t OnDisplayInfo(SessionPtr sess, NetPacket& pkt);
     int32_t OnWindowAreaInfo(SessionPtr sess, NetPacket& pkt);
+    int32_t OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     int32_t OnEnhanceConfig(SessionPtr sess, NetPacket& pkt);
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT

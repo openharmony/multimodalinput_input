@@ -51,6 +51,7 @@ void ServerMsgHandler::Init(UDSServer& udsServer)
     MsgCallback funs[] = {
         {MmiMessageId::DISPLAY_INFO, MsgCallbackBind2(&ServerMsgHandler::OnDisplayInfo, this)},
         {MmiMessageId::WINDOW_AREA_INFO, MsgCallbackBind2(&ServerMsgHandler::OnWindowAreaInfo, this)},
+        {MmiMessageId::WINDOW_INFO, MsgCallbackBind2(&ServerMsgHandler::OnWindowGroupInfo, this)},
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
         {MmiMessageId::SCINFO_CONFIG, MsgCallbackBind2(&ServerMsgHandler::OnEnhanceConfig, this)},
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
@@ -214,7 +215,8 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     for (uint32_t i = 0; i < num; i++) {
         WindowInfo info;
         pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
-            >> info.pointerHotAreas >> info.agentWindowId >> info.flags;
+            >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
+            >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform;
         displayGroupInfo.windowsInfo.push_back(info);
         if (pkt.ChkRWError()) {
             MMI_HILOGE("Packet read display info failed");
@@ -225,7 +227,7 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
         pkt >> info.id >> info.x >> info.y >> info.width >> info.height
-            >> info.dpi >> info.name >> info.uniq >> info.direction;
+            >> info.dpi >> info.name >> info.uniq >> info.direction >> info.displayMode;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read display info failed");
@@ -254,6 +256,34 @@ int32_t ServerMsgHandler::OnWindowAreaInfo(SessionPtr sess, NetPacket &pkt)
         return RET_ERR;
     }
     WinMgr->SetWindowPointerStyle(area, pid, windowId);
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::OnWindowGroupInfo(SessionPtr sess, NetPacket &pkt)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    WindowGroupInfo windowGroupInfo;
+    pkt >> windowGroupInfo.focusWindowId >> windowGroupInfo.displayId;
+    uint32_t num = 0;
+    pkt >> num;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet read window group info failed");
+        return RET_ERR;
+    }
+    for (uint32_t i = 0; i < num; i++) {
+        WindowInfo info;
+        pkt >> info.id >> info.pid >> info.uid >> info.area >> info.defaultHotAreas
+            >> info.pointerHotAreas >> info.agentWindowId >> info.flags >> info.action
+            >> info.displayId >> info.zOrder >> info.pointerChangeAreas >> info.transform;
+        windowGroupInfo.windowsInfo.push_back(info);
+        if (pkt.ChkRWError()) {
+            MMI_HILOGE("Packet read display info failed");
+            return RET_ERR;
+        }
+    }
+    
+    WinMgr->UpdateWindowInfo(windowGroupInfo);
     return RET_OK;
 }
 

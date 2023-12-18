@@ -19,6 +19,7 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <vector>
 
 #include "event_handler.h"
 #include "nocopyable.h"
@@ -57,6 +58,13 @@ public:
      * @since 9
      */
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+
+    /**
+     * @brief Updates the windows information.
+     * @param windowGroupInfo Indicates the window group information.
+     * @since 9
+     */
+    void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
 
     int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);
@@ -255,6 +263,17 @@ public:
      * @since 9
      */
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
+
+    /**
+     * @brief Simulates a touchpad input event, touchscreen input event, or mouse device input event.
+     * This event will be distributed and processed in the same way as the event reported by the input device.
+     * @param pointerEvent Indicates the touchpad input event, touchscreen input event,
+     * or mouse device input event to simulate.
+     * @param zOrder Indicates the point event will inject to the window whose index value is less than the zOrder
+     * @return void
+     * @since 9
+     */
+    void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder);
 
     /**
      * @brief Starts listening for an input device event.
