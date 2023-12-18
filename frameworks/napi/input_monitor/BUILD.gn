@@ -20,6 +20,7 @@ config("inputmonitor_config") {
     "${mmi_path}/frameworks/napi/input_monitor/include",
     "${mmi_path}/util/common/include",
     "${mmi_path}/interfaces/native/innerkits/proxy/include",
+    "${mmi_path}/frameworks/napi/touch_event/include",
   ]
 
   defines = input_default_defines
