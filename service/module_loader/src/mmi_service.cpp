@@ -652,6 +652,7 @@ int32_t MMIService::IsPointerVisible(bool &visible)
 int32_t MMIService::MarkProcessed(int32_t eventType, int32_t eventId)
 {
     CALL_DEBUG_ENTER;
+    CHKPR(ANRMgr, RET_ERR);
     int32_t ret =
         delegateTasks_.PostSyncTask(std::bind(&ANRManager::MarkProcessed, ANRMgr, GetCallingPid(), eventType, eventId));
     if (ret != RET_OK) {
