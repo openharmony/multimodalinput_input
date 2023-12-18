@@ -30,6 +30,10 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+
+private:
+    bool prePinchSwitch_ { true };
+    bool preSwipeSwitch_ { true };
 };
 
 void TouchEventNormalizeTest::SetUpTestCase(void)
@@ -42,10 +46,14 @@ void TouchEventNormalizeTest::TearDownTestCase(void)
 
 void TouchEventNormalizeTest::SetUp()
 {
+    TouchEventHdr->GetTouchpadPinchSwitch(prePinchSwitch_);
+    TouchEventHdr->GetTouchpadSwipeSwitch(preSwipeSwitch_);
 }
 
 void TouchEventNormalizeTest::TearDown()
 {
+    TouchEventHdr->SetTouchpadPinchSwitch(prePinchSwitch_);
+    TouchEventHdr->SetTouchpadSwipeSwitch(preSwipeSwitch_);
 }
 
 /**
@@ -58,8 +66,6 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadPinchSwitch
 {
     bool flag = false;
     ASSERT_TRUE(TouchEventHdr->SetTouchpadPinchSwitch(flag) == RET_OK);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -75,8 +81,6 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadPinchSwitch
     bool newFlag = true;
     ASSERT_TRUE(TouchEventHdr->GetTouchpadPinchSwitch(flag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -89,8 +93,6 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadSwipeSwitch
 {
     bool flag = false;
     ASSERT_TRUE(TouchEventHdr->SetTouchpadSwipeSwitch(flag) == RET_OK);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -106,8 +108,6 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadSwipeSwitch
     bool newFlag = true;
     ASSERT_TRUE(TouchEventHdr->GetTouchpadSwipeSwitch(flag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 }
 }
