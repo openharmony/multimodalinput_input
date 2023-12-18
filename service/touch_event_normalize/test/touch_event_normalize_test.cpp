@@ -32,8 +32,8 @@ public:
     void TearDown();
 
 private:
-    bool prePinchSwitch { true };
-    bool preSwipeSwitch { true };
+    bool prePinchSwitch_ { true };
+    bool preSwipeSwitch_ { true };
 };
 
 void TouchEventNormalizeTest::SetUpTestCase(void)
@@ -46,14 +46,14 @@ void TouchEventNormalizeTest::TearDownTestCase(void)
 
 void TouchEventNormalizeTest::SetUp()
 {
-    TouchEventHdr->GetTouchpadPinchSwitch(prePinchSwitch);
-    TouchEventHdr->GetTouchpadSwipeSwitch(preSwipeSwitch);
+    TouchEventHdr->GetTouchpadPinchSwitch(prePinchSwitch_);
+    TouchEventHdr->GetTouchpadSwipeSwitch(preSwipeSwitch_);
 }
 
 void TouchEventNormalizeTest::TearDown()
 {
-    TouchEventHdr->SetTouchpadPinchSwitch(prePinchSwitch);
-    TouchEventHdr->SetTouchpadSwipeSwitch(preSwipeSwitch);
+    TouchEventHdr->SetTouchpadPinchSwitch(prePinchSwitch_);
+    TouchEventHdr->SetTouchpadSwipeSwitch(preSwipeSwitch_);
 }
 
 /**
