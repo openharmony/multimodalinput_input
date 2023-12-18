@@ -70,6 +70,21 @@ public:
     static void SetUpTestCase();
     static void TearDownTestCase();
     std::string GetEventDump();
+
+private:
+    int32_t prePointerSpeed { 5 };
+    int32_t prePrimaryButton { 0 };
+    int32_t preScrollRows { 3 };
+    int32_t preTouchpadPointerSpeed { 9 };
+    int32_t preRightClickType { 1 };
+    int32_t prePointerSize { 1 };
+    int32_t prePointerColor { -1 };
+    bool preHoverScrollState { true };
+    bool preScrollSwitch { true };
+    bool preScrollDirection { true };
+    bool preTapSwitch { true };
+    bool prePinchSwitch { true };
+    bool preSwipeSwitch { true };
 };
 
 void InputManagerPointerTest::SetUpTestCase()
@@ -79,21 +94,43 @@ void InputManagerPointerTest::SetUpTestCase()
 
 void InputManagerPointerTest::TearDownTestCase(void)
 {
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 void InputManagerPointerTest::SetUp()
 {
     TestUtil->SetRecvFlag(RECV_FLAG::RECV_FOCUS);
+    InputManager::GetInstance()->GetPointerSpeed(prePointerSpeed);
+    InputManager::GetInstance()->GetMousePrimaryButton(prePrimaryButton);
+    InputManager::GetInstance()->GetHoverScrollState(preHoverScrollState);
+    InputManager::GetInstance()->GetMouseScrollRows(preScrollRows);
+    InputManager::GetInstance()->GetTouchpadScrollSwitch(preScrollSwitch);
+    InputManager::GetInstance()->GetTouchpadScrollDirection(preScrollDirection);
+    InputManager::GetInstance()->GetTouchpadTapSwitch(preTapSwitch);
+    InputManager::GetInstance()->GetTouchpadPointerSpeed(preTouchpadPointerSpeed);
+    InputManager::GetInstance()->GetTouchpadPinchSwitch(prePinchSwitch);
+    InputManager::GetInstance()->GetTouchpadSwipeSwitch(preSwipeSwitch);
+    InputManager::GetInstance()->GetTouchpadRightClickType(preRightClickType);
+    InputManager::GetInstance()->GetPointerSize(prePointerSize);
+    InputManager::GetInstance()->GetPointerColor(prePointerColor);
 }
 
 void InputManagerPointerTest::TearDown()
 {
     TestUtil->AddEventDump("");
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    InputManager::GetInstance()->SetPointerSpeed(prePointerSpeed);
+    InputManager::GetInstance()->SetMousePrimaryButton(prePrimaryButton);
+    InputManager::GetInstance()->SetHoverScrollState(preHoverScrollState);
+    InputManager::GetInstance()->SetMouseScrollRows(preScrollRows);
+    InputManager::GetInstance()->SetTouchpadScrollSwitch(preScrollSwitch);
+    InputManager::GetInstance()->SetTouchpadScrollDirection(preScrollDirection);
+    InputManager::GetInstance()->SetTouchpadTapSwitch(preTapSwitch);
+    InputManager::GetInstance()->SetTouchpadPointerSpeed(preTouchpadPointerSpeed);
+    InputManager::GetInstance()->SetTouchpadPinchSwitch(prePinchSwitch);
+    InputManager::GetInstance()->SetTouchpadSwipeSwitch(preSwipeSwitch);
+    InputManager::GetInstance()->SetTouchpadRightClickType(preRightClickType);
+    InputManager::GetInstance()->SetPointerSize(prePointerSize);
+    InputManager::GetInstance()->SetPointerColor(prePointerColor);
 }
 
 std::string InputManagerPointerTest::GetEventDump()

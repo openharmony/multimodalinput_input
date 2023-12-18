@@ -30,6 +30,17 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+
+private:
+    MouseTransformProcessor g_processor { 0 };
+    int32_t prePointerSpeed { 5 };
+    int32_t prePrimaryButton { 0 };
+    int32_t preScrollRows { 3 };
+    int32_t preTouchpadPointerSpeed { 9 };
+    int32_t preRightClickType { 1 };
+    bool preScrollSwitch { true };
+    bool preScrollDirection { true };
+    bool preTapSwitch { true };
 };
 
 void MouseTransformProcessorTest::SetUpTestCase(void)
@@ -42,10 +53,26 @@ void MouseTransformProcessorTest::TearDownTestCase(void)
 
 void MouseTransformProcessorTest::SetUp()
 {
+    prePointerSpeed = g_processor.GetPointerSpeed();
+    prePrimaryButton = g_processor.GetMousePrimaryButton();
+    preScrollRows = g_processor.GetMouseScrollRows();
+    g_processor.GetTouchpadPointerSpeed(preTouchpadPointerSpeed);
+    g_processor.GetTouchpadRightClickType(preRightClickType);
+    g_processor.GetTouchpadScrollSwitch(preScrollSwitch);
+    g_processor.GetTouchpadScrollDirection(preScrollDirection);
+    g_processor.GetTouchpadTapSwitch(preTapSwitch);
 }
 
 void MouseTransformProcessorTest::TearDown()
 {
+    g_processor.SetPointerSpeed(prePointerSpeed);
+    g_processor.SetMousePrimaryButton(prePrimaryButton);
+    g_processor.SetMouseScrollRows(preScrollRows);
+    g_processor.SetTouchpadPointerSpeed(preTouchpadPointerSpeed);
+    g_processor.SetTouchpadRightClickType(preRightClickType);
+    g_processor.SetTouchpadScrollSwitch(preScrollSwitch);
+    g_processor.SetTouchpadScrollDirection(preScrollDirection);
+    g_processor.SetTouchpadTapSwitch(preTapSwitch);
 }
 
 /**
@@ -124,8 +151,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpee
     MouseTransformProcessor processor(deviceId);
     int32_t speed = 5;
     ASSERT_EQ(processor.SetPointerSpeed(speed), idNames);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -142,8 +167,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpee
     int32_t speed = 5;
     processor.SetPointerSpeed(speed);
     ASSERT_EQ(processor.GetPointerSpeed(), idNames);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -176,8 +199,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetPointerSpee
     int32_t speed = 0;
     processor.SetPointerSpeed(speed);
     ASSERT_EQ(processor.GetPointerSpeed(), idNames);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -192,8 +213,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetMousePrimar
     MouseTransformProcessor processor(deviceId);
     int32_t primaryButton = 1;
     ASSERT_TRUE(processor.SetMousePrimaryButton(primaryButton) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -210,8 +229,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetMousePrimar
     processor.SetMousePrimaryButton(primaryButton);
     int32_t primaryButtonRes = 1;
     ASSERT_TRUE(processor.GetMousePrimaryButton() == primaryButtonRes);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -226,8 +243,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetMouseScroll
     MouseTransformProcessor processor(deviceId);
     int32_t rows = 1;
     ASSERT_TRUE(processor.SetMouseScrollRows(rows) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -244,8 +259,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetMouseScroll
     processor.SetMouseScrollRows(rows);
     int32_t newRows = 1;
     ASSERT_TRUE(processor.GetMouseScrollRows() == newRows);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 /**
  * @tc.name: MouseTransformProcessorTest_SetTouchpadScrollSwitch_014
@@ -259,8 +272,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetTouchpadScr
     MouseTransformProcessor processor(deviceId);
     bool flag = false;
     ASSERT_TRUE(processor.SetTouchpadScrollSwitch(flag) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -278,8 +289,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadScr
     bool newFlag = true;
     ASSERT_TRUE(processor.GetTouchpadScrollSwitch(flag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -294,8 +303,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetTouchpadScr
     MouseTransformProcessor processor(deviceId);
     bool state = false;
     ASSERT_TRUE(processor.SetTouchpadScrollDirection(state) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -313,8 +320,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadScr
     bool newState = true;
     ASSERT_TRUE(processor.GetTouchpadScrollDirection(state) == RET_OK);
     ASSERT_TRUE(state == newState);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -329,8 +334,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetTouchpadTap
     MouseTransformProcessor processor(deviceId);
     bool flag = false;
     ASSERT_TRUE(processor.SetTouchpadTapSwitch(flag) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -348,8 +351,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadTap
     bool newFlag = false;
     ASSERT_TRUE(processor.GetTouchpadTapSwitch(flag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -364,8 +365,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetTouchpadPoi
     MouseTransformProcessor processor(deviceId);
     int32_t speed = 2;
     ASSERT_TRUE(processor.SetTouchpadPointerSpeed(speed) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -383,9 +382,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadPoi
     int32_t newSpeed = 3;
     ASSERT_TRUE(processor.GetTouchpadPointerSpeed(newSpeed) == RET_OK);
     ASSERT_TRUE(speed == newSpeed);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -400,8 +396,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetTouchpadPoi
     MouseTransformProcessor processor(deviceId);
     int32_t speed = 8;
     ASSERT_TRUE(processor.SetTouchpadPointerSpeed(speed) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -419,8 +413,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadPoi
     int32_t newSpeed = 7;
     ASSERT_TRUE(processor.GetTouchpadPointerSpeed(newSpeed) == RET_OK);
     ASSERT_TRUE(speed == newSpeed);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -435,8 +427,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_SetTouchpadRig
     MouseTransformProcessor processor(deviceId);
     int32_t type = 2;
     ASSERT_TRUE(processor.SetTouchpadRightClickType(type) == RET_OK);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 /**
@@ -454,8 +444,6 @@ HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetTouchpadRig
     int32_t newType = 3;
     ASSERT_TRUE(processor.GetTouchpadRightClickType(newType) == RET_OK);
     ASSERT_TRUE(type == newType);
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 }
 }
