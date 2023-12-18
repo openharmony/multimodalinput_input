@@ -32,14 +32,14 @@ public:
     void TearDown();
 
 private:
-    int32_t prePointerSpeed { 5 };
-    int32_t prePrimaryButton { 0 };
-    int32_t preScrollRows { 3 };
-    int32_t preTouchpadPointerSpeed { 9 };
-    int32_t preRightClickType { 1 };
-    bool preScrollSwitch { true };
-    bool preScrollDirection { true };
-    bool preTapSwitch { true };
+    int32_t prePointerSpeed_ { 5 };
+    int32_t prePrimaryButton_ { 0 };
+    int32_t preScrollRows_ { 3 };
+    int32_t preTouchpadPointerSpeed_ { 9 };
+    int32_t preRightClickType_ { 1 };
+    bool preScrollSwitch_ { true };
+    bool preScrollDirection_ { true };
+    bool preTapSwitch_ { true };
 };
 
 void MouseEventNormalizeTest::SetUpTestCase(void)
@@ -52,26 +52,26 @@ void MouseEventNormalizeTest::TearDownTestCase(void)
 
 void MouseEventNormalizeTest::SetUp()
 {
-    prePointerSpeed = MouseEventHdr->GetPointerSpeed();
-    prePrimaryButton = MouseEventHdr->GetMousePrimaryButton();
-    preScrollRows = MouseEventHdr->GetMouseScrollRows();
-    MouseEventHdr->GetTouchpadPointerSpeed(preTouchpadPointerSpeed);
-    MouseEventHdr->GetTouchpadRightClickType(preRightClickType);
-    MouseEventHdr->GetTouchpadScrollSwitch(preScrollSwitch);
-    MouseEventHdr->GetTouchpadScrollDirection(preScrollDirection);
-    MouseEventHdr->GetTouchpadTapSwitch(preTapSwitch);
+    prePointerSpeed_ = MouseEventHdr->GetPointerSpeed();
+    prePrimaryButton_ = MouseEventHdr->GetMousePrimaryButton();
+    preScrollRows_ = MouseEventHdr->GetMouseScrollRows();
+    MouseEventHdr->GetTouchpadPointerSpeed(preTouchpadPointerSpeed_);
+    MouseEventHdr->GetTouchpadRightClickType(preRightClickType_);
+    MouseEventHdr->GetTouchpadScrollSwitch(preScrollSwitch_);
+    MouseEventHdr->GetTouchpadScrollDirection(preScrollDirection_);
+    MouseEventHdr->GetTouchpadTapSwitch(preTapSwitch_);
 }
 
 void MouseEventNormalizeTest::TearDown()
 {
-    MouseEventHdr->SetPointerSpeed(prePointerSpeed);
-    MouseEventHdr->SetMousePrimaryButton(prePrimaryButton);
-    MouseEventHdr->SetMouseScrollRows(preScrollRows);
-    MouseEventHdr->SetTouchpadPointerSpeed(preTouchpadPointerSpeed);
-    MouseEventHdr->SetTouchpadRightClickType(preRightClickType);
-    MouseEventHdr->SetTouchpadScrollSwitch(preScrollSwitch);
-    MouseEventHdr->SetTouchpadScrollDirection(preScrollDirection);
-    MouseEventHdr->SetTouchpadTapSwitch(preTapSwitch);
+    MouseEventHdr->SetPointerSpeed(prePointerSpeed_);
+    MouseEventHdr->SetMousePrimaryButton(prePrimaryButton_);
+    MouseEventHdr->SetMouseScrollRows(preScrollRows_);
+    MouseEventHdr->SetTouchpadPointerSpeed(preTouchpadPointerSpeed_);
+    MouseEventHdr->SetTouchpadRightClickType(preRightClickType_);
+    MouseEventHdr->SetTouchpadScrollSwitch(preScrollSwitch_);
+    MouseEventHdr->SetTouchpadScrollDirection(preScrollDirection_);
+    MouseEventHdr->SetTouchpadTapSwitch(preTapSwitch_);
 }
 
 /**
