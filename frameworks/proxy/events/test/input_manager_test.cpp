@@ -56,8 +56,8 @@ public:
     std::string GetEventDump();
 
 private:
-    int32_t g_keyboardRepeatRate { 50 };
-    int32_t g_keyboardRepeatDelay { 500 };
+    int32_t g_keyboardRepeatRate_ { 50 };
+    int32_t g_keyboardRepeatDelay_ { 500 };
 };
 
 class MMIWindowChecker : public MMI::IWindowChecker {
@@ -99,8 +99,8 @@ void InputManagerTest::TearDown()
 {
     TestUtil->AddEventDump("");
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    InputManager::GetInstance()->SetKeyboardRepeatDelay(g_keyboardRepeatDelay);
-    InputManager::GetInstance()->SetKeyboardRepeatRate(g_keyboardRepeatRate);
+    InputManager::GetInstance()->SetKeyboardRepeatDelay(g_keyboardRepeatDelay_);
+    InputManager::GetInstance()->SetKeyboardRepeatRate(g_keyboardRepeatRate_);
 }
 
 std::string InputManagerTest::GetEventDump()
