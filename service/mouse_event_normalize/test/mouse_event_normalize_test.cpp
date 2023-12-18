@@ -30,6 +30,16 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+
+private:
+    int32_t prePointerSpeed { 5 };
+    int32_t prePrimaryButton { 0 };
+    int32_t preScrollRows { 3 };
+    int32_t preTouchpadPointerSpeed { 9 };
+    int32_t preRightClickType { 1 };
+    bool preScrollSwitch { true };
+    bool preScrollDirection { true };
+    bool preTapSwitch { true };
 };
 
 void MouseEventNormalizeTest::SetUpTestCase(void)
@@ -38,16 +48,30 @@ void MouseEventNormalizeTest::SetUpTestCase(void)
 
 void MouseEventNormalizeTest::TearDownTestCase(void)
 {
-    const char *mouseFileName = "/data/service/el1/public/multimodalinput/mouse_settings.xml";
-    ASSERT_TRUE(remove(mouseFileName) == RET_OK);
 }
 
 void MouseEventNormalizeTest::SetUp()
 {
+    prePointerSpeed = MouseEventHdr->GetPointerSpeed();
+    prePrimaryButton = MouseEventHdr->GetMousePrimaryButton();
+    preScrollRows = MouseEventHdr->GetMouseScrollRows();
+    MouseEventHdr->GetTouchpadPointerSpeed(preTouchpadPointerSpeed);
+    MouseEventHdr->GetTouchpadRightClickType(preRightClickType);
+    MouseEventHdr->GetTouchpadScrollSwitch(preScrollSwitch);
+    MouseEventHdr->GetTouchpadScrollDirection(preScrollDirection);
+    MouseEventHdr->GetTouchpadTapSwitch(preTapSwitch);
 }
 
 void MouseEventNormalizeTest::TearDown()
 {
+    MouseEventHdr->SetPointerSpeed(prePointerSpeed);
+    MouseEventHdr->SetMousePrimaryButton(prePrimaryButton);
+    MouseEventHdr->SetMouseScrollRows(preScrollRows);
+    MouseEventHdr->SetTouchpadPointerSpeed(preTouchpadPointerSpeed);
+    MouseEventHdr->SetTouchpadRightClickType(preRightClickType);
+    MouseEventHdr->SetTouchpadScrollSwitch(preScrollSwitch);
+    MouseEventHdr->SetTouchpadScrollDirection(preScrollDirection);
+    MouseEventHdr->SetTouchpadTapSwitch(preTapSwitch);
 }
 
 /**
