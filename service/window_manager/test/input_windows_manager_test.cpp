@@ -66,16 +66,16 @@ public:
             displayGroupInfo.displaysInfo.push_back(info);
         }
         WinMgr->UpdateDisplayInfo(displayGroupInfo);
-        preHoverScrollState = WinMgr->GetHoverScrollState();
+        preHoverScrollState_ = WinMgr->GetHoverScrollState();
     } // void SetUp(void)
 
     void TearDown(void)
     {
-        WinMgr->SetHoverScrollState(preHoverScrollState);
+        WinMgr->SetHoverScrollState(preHoverScrollState_);
     }
 
 private:
-    bool preHoverScrollState { true };
+    bool preHoverScrollState_ { true };
 };
 
 
