@@ -35,6 +35,7 @@ enum class MmiMessageId : int32_t {
     SCINFO_CONFIG,
     WINDOW_AREA_INFO,
     NOTIFY_BUNDLE_NAME,
+    WINDOW_INFO,
 };
 
 enum TokenType : int32_t {

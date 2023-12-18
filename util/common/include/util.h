@@ -100,6 +100,52 @@ inline bool AddInt64(int64_t op1, int64_t op2, int64_t &res)
 {
     return AddInt(op1, op2, INT64_MIN, INT64_MAX, res);
 }
+
+template<typename T>
+inline constexpr bool MMI_EQ(const T& x, const T& y)
+{
+    if constexpr (std::is_floating_point<T>::value) {
+        return (std::abs((x) - (y)) <= (std::numeric_limits<T>::epsilon()));
+    } else {
+        return x == y;
+    }
+}
+
+template<typename T>
+inline bool MMI_EQ(T x, T y, T epsilon)
+{
+    return (std::abs((x) - (y)) <= (epsilon));
+}
+
+template<typename T>
+inline bool MMI_EQ(const std::weak_ptr<T>& x, const std::weak_ptr<T>& y)
+{
+    return !(x.owner_before(y) || y.owner_before(x));
+}
+
+inline bool MMI_LNE(float left, float right) //less not equal
+{
+    constexpr float epsilon = -0.001f;
+    return (left - right) < epsilon;
+}
+
+inline bool MMI_GNE(float left, float right) //great not equal
+{
+    constexpr float epsilon = 0.001f;
+    return (left - right) > epsilon;
+}
+
+inline bool MMI_GE(float left, float right) //great or equal
+{
+    constexpr float epsilon = -0.001f;
+    return (left - right) > epsilon;
+}
+
+inline bool MMI_LE(float left, float right) //less or equal
+{
+    constexpr float epsilon = 0.001f;
+    return (left - right) < epsilon;
+}
 } // namespace MMI
 } // namespace OHOS
 #endif // UTIL_H

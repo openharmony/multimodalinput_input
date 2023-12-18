@@ -323,6 +323,14 @@ inline constexpr int32_t INVALID_PID { -1 };
         } \
     } while (0)
 
+#define WRITEFLOAT(parcel, data, ...) \
+    do { \
+        if (!(parcel).WriteFloat(data)) { \
+            MMI_HILOGE("WriteFloat "#data" failed"); \
+            return DEFRET(false, ##__VA_ARGS__); \
+        } \
+    } while (0)
+
 #define WRITESTRING(parcel, data, ...) \
     do { \
         if (!(parcel).WriteString(data)) { \
@@ -383,6 +391,14 @@ inline constexpr int32_t INVALID_PID { -1 };
     do { \
         if (!(parcel).ReadDouble(data)) { \
             MMI_HILOGE("ReadDouble "#data" failed"); \
+            return DEFRET(false, ##__VA_ARGS__); \
+        } \
+    } while (0)
+
+#define READFLOAT(parcel, data, ...) \
+    do { \
+        if (!(parcel).ReadFloat(data)) { \
+            MMI_HILOGE("ReadFloat "#data" failed"); \
             return DEFRET(false, ##__VA_ARGS__); \
         } \
     } while (0)
