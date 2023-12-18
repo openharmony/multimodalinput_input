@@ -113,7 +113,7 @@ template<typename T>
 Matrix3<T>::Matrix3(std::vector<T> matrix)
 {
     if (matrix.size() != MATRIX3_SIZE) {
-        Matrix3(1, 0, 0, 0, 1, 0, 0, 0, 1);
+        Matrix3();
     } else {
         for (size_t i = 0; i < MATRIX3_SIZE; i++) {
             data_[i] = matrix[i];
