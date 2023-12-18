@@ -144,6 +144,7 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayId_004, T
         info.area = {1, 1, 1, 1};
         info.defaultHotAreas = { info.area };
         info.pointerHotAreas = { info.area };
+        info.pointerChangeAreas = {1, 2, 1, 2};
         info.agentWindowId = 1;
         info.flags = 1;
         displayGroupInfo.windowsInfo.push_back(info);
@@ -175,6 +176,64 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayId_004, T
     displayId= -1;
     WinMgr->UpdateAndAdjustMouseLocation(displayId, x, y);
     ASSERT_EQ(WinMgr->UpdateDisplayId(displayId), true);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateWindow_001
+ * @tc.desc: Test UpdateWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindow_001, TestSize.Level1)
+{
+    WindowInfo window;
+    window.id = 11;
+    window.pid = 1221;
+    window.uid = 1;
+    window.area = {1, 1, 1, 1};
+    window.defaultHotAreas = { window.area };
+    window.pointerHotAreas = { window.area };
+    window.pointerChangeAreas = {1, 2, 1, 2};
+    window.displayId = 0;
+    window.agentWindowId = 1;
+    window.flags = 1;
+    window.action = WINDOW_UPDATE_ACTION::ADD;
+    window.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    WinMgr->UpdateWindowInfo({0, 11, {window}});
+    ASSERT_EQ(WinMgr->GetWindowPid(11), 1221);
+
+    window.action = WINDOW_UPDATE_ACTION::CHANGE;
+    window.pid = 1222;
+    WinMgr->UpdateWindowInfo({0, 11, {window}});
+    ASSERT_EQ(WinMgr->GetWindowPid(11), 1222);
+
+    window.action = WINDOW_UPDATE_ACTION::DEL;
+    WinMgr->UpdateWindowInfo({0, 11, {window}});
+    ASSERT_EQ(WinMgr->GetWindowPid(11), -1);
+}
+
+/**
+ * @tc.name: InputWindowsManagerTest_UpdateWindow_002
+ * @tc.desc: Test UpdateWindow
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindow_002, TestSize.Level1)
+{
+    WindowInfo window;
+    window.id = 11;
+    window.pid = 1221;
+    window.uid = 1;
+    window.area = {1, 1, 1, 1};
+    window.defaultHotAreas = { window.area };
+    window.pointerHotAreas = { window.area };
+    window.pointerChangeAreas = {1, 2, 1, 2};
+    window.displayId = 0;
+    window.agentWindowId = 1;
+    window.flags = 1;
+    window.action = WINDOW_UPDATE_ACTION::UNKNOWN;
+    WinMgr->UpdateWindowInfo({0, 11, {window}});
+    ASSERT_EQ(WinMgr->GetWindowPid(11), -1);
 }
 
 /**

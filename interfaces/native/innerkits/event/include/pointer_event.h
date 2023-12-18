@@ -1275,6 +1275,22 @@ public:
      * @since 9
      */
     void SetFingerCount(int32_t fingerCount);
+
+    /**
+     * @brief Obtains the zOrder in this event, inject to windows whose zOrder less than the target zOrder.
+     * @return Returns the zOrder.
+     * @since 9
+     */
+    float GetZOrder() const;
+
+    /**
+     * @brief Sets the zOrder for this event, inject to windows whose zOrder less than the target zOrder.
+     * @param fingerCount Indicates the zOrder to set.
+     * @return void
+     * @since 9
+     */
+    void SetZOrder(float zOrder);
+
     /**
      * @brief Obtains the axis value.
      * @param axis Indicates the axis type.
@@ -1427,6 +1443,7 @@ private:
     int32_t buttonId_ { -1 };
     int32_t fingerCount_ { 0 };
     uint32_t axes_ { 0U };
+    float zOrder_{ -1.0f};
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
     std::vector<int32_t> pressedKeys_;
     std::vector<uint8_t> buffer_;
