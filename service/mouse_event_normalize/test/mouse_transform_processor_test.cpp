@@ -32,15 +32,15 @@ public:
     void TearDown();
 
 private:
-    MouseTransformProcessor g_processor { 0 };
-    int32_t prePointerSpeed { 5 };
-    int32_t prePrimaryButton { 0 };
-    int32_t preScrollRows { 3 };
-    int32_t preTouchpadPointerSpeed { 9 };
-    int32_t preRightClickType { 1 };
-    bool preScrollSwitch { true };
-    bool preScrollDirection { true };
-    bool preTapSwitch { true };
+    MouseTransformProcessor g_processor_ { 0 };
+    int32_t prePointerSpeed_ { 5 };
+    int32_t prePrimaryButton_ { 0 };
+    int32_t preScrollRows_ { 3 };
+    int32_t preTouchpadPointerSpeed_ { 9 };
+    int32_t preRightClickType_ { 1 };
+    bool preScrollSwitch_ { true };
+    bool preScrollDirection_ { true };
+    bool preTapSwitch_ { true };
 };
 
 void MouseTransformProcessorTest::SetUpTestCase(void)
@@ -53,26 +53,26 @@ void MouseTransformProcessorTest::TearDownTestCase(void)
 
 void MouseTransformProcessorTest::SetUp()
 {
-    prePointerSpeed = g_processor.GetPointerSpeed();
-    prePrimaryButton = g_processor.GetMousePrimaryButton();
-    preScrollRows = g_processor.GetMouseScrollRows();
-    g_processor.GetTouchpadPointerSpeed(preTouchpadPointerSpeed);
-    g_processor.GetTouchpadRightClickType(preRightClickType);
-    g_processor.GetTouchpadScrollSwitch(preScrollSwitch);
-    g_processor.GetTouchpadScrollDirection(preScrollDirection);
-    g_processor.GetTouchpadTapSwitch(preTapSwitch);
+    prePointerSpeed_ = g_processor_.GetPointerSpeed();
+    prePrimaryButton_ = g_processor_.GetMousePrimaryButton();
+    preScrollRows_ = g_processor_.GetMouseScrollRows();
+    g_processor_.GetTouchpadPointerSpeed(preTouchpadPointerSpeed_);
+    g_processor_.GetTouchpadRightClickType(preRightClickType_);
+    g_processor_.GetTouchpadScrollSwitch(preScrollSwitch_);
+    g_processor_.GetTouchpadScrollDirection(preScrollDirection_);
+    g_processor_.GetTouchpadTapSwitch(preTapSwitch_);
 }
 
 void MouseTransformProcessorTest::TearDown()
 {
-    g_processor.SetPointerSpeed(prePointerSpeed);
-    g_processor.SetMousePrimaryButton(prePrimaryButton);
-    g_processor.SetMouseScrollRows(preScrollRows);
-    g_processor.SetTouchpadPointerSpeed(preTouchpadPointerSpeed);
-    g_processor.SetTouchpadRightClickType(preRightClickType);
-    g_processor.SetTouchpadScrollSwitch(preScrollSwitch);
-    g_processor.SetTouchpadScrollDirection(preScrollDirection);
-    g_processor.SetTouchpadTapSwitch(preTapSwitch);
+    g_processor_.SetPointerSpeed(prePointerSpeed_);
+    g_processor_.SetMousePrimaryButton(prePrimaryButton_);
+    g_processor_.SetMouseScrollRows(preScrollRows_);
+    g_processor_.SetTouchpadPointerSpeed(preTouchpadPointerSpeed_);
+    g_processor_.SetTouchpadRightClickType(preRightClickType_);
+    g_processor_.SetTouchpadScrollSwitch(preScrollSwitch_);
+    g_processor_.SetTouchpadScrollDirection(preScrollDirection_);
+    g_processor_.SetTouchpadTapSwitch(preTapSwitch_);
 }
 
 /**
