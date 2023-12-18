@@ -2004,7 +2004,7 @@ std::pair<int32_t, int32_t> InputWindowsManager::TransformWindowXY(const WindowI
     int32_t logicX, int32_t logicY) const
 {
     Matrix3f transform(window.transform);
-    if (transform.IsIdentity()) {
+    if (window.transform.size() != MATRIX3_SIZE || transform.IsIdentity()) {
         return {logicX, logicY};
     }
     Vector3f logicXY(logicX, logicY, 1.0);
