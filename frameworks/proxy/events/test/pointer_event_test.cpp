@@ -881,6 +881,23 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearAxisValue_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: PointerEventTest_SetZorderValue_001
+ * @tc.desc: Sets the zOrder for this event, inject to windows whose zOrder less than the target zOrder.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_SetZorderValue_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetZOrder(30.0);
+    float zOrder = pointerEvent->GetZOrder();
+    ASSERT_EQ(zOrder, 30.0);
+}
+
+/**
  * @tc.name: PointerEventTest_IsValid_001
  * @tc.desc: Checks whether this input event is valid.
  * @tc.type: FUNC
