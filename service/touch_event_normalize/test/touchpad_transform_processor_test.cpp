@@ -33,9 +33,9 @@ public:
     void TearDown();
 
 private:
-    TouchPadTransformProcessor g_processor { 0 };
-    bool prePinchSwitch { true };
-    bool preSwipeSwitch { true };
+    TouchPadTransformProcessor g_processor_ { 0 };
+    bool prePinchSwitch_ { true };
+    bool preSwipeSwitch_ { true };
 };
 
 void TouchPadTransformProcessorTest::SetUpTestCase(void)
@@ -48,14 +48,14 @@ void TouchPadTransformProcessorTest::TearDownTestCase(void)
 
 void TouchPadTransformProcessorTest::SetUp()
 {
-    g_processor.GetTouchpadPinchSwitch(prePinchSwitch);
-    g_processor.GetTouchpadSwipeSwitch(preSwipeSwitch);
+    g_processor_.GetTouchpadPinchSwitch(prePinchSwitch_);
+    g_processor_.GetTouchpadSwipeSwitch(preSwipeSwitch_);
 }
 
 void TouchPadTransformProcessorTest::TearDown()
 {
-    g_processor.SetTouchpadPinchSwitch(prePinchSwitch);
-    g_processor.SetTouchpadSwipeSwitch(preSwipeSwitch);
+    g_processor_.SetTouchpadPinchSwitch(prePinchSwitch_);
+    g_processor_.SetTouchpadSwipeSwitch(preSwipeSwitch_);
 }
 
 /**
