@@ -311,6 +311,7 @@ int32_t JsInputMonitor::TransformPointerEvent(const std::shared_ptr<PointerEvent
     }
     if (SetNameProperty(jsEnv_, result, "sourceType", GetSourceType(pointerEvent->GetSourceType())) != napi_ok) {
         MMI_HILOGE("Set sourceType property failed");
+        return RET_ERR;
     }
     napi_value pointers = nullptr;
     CHKRR(napi_create_array(jsEnv_, &pointers), "napi_create_array is", RET_ERR);
