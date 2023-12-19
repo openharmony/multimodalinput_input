@@ -322,19 +322,19 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
     UpdateDisplayInfo(displayGroupInfo);
 }
 
-void InputWindowsManager::UpdateDisplayInfoByIncrementalInfo(const WindowInfo item,
+void InputWindowsManager::UpdateDisplayInfoByIncrementalInfo(const WindowInfo &window,
     DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
-    switch (item.action) {
+    switch (window.action) {
         case WINDOW_UPDATE_ACTION::ADD: {
-            displayGroupInfo.windowsInfo.emplace_back(item);
+            displayGroupInfo.windowsInfo.emplace_back(window);
             break;
         }
         case WINDOW_UPDATE_ACTION::DEL: {
             auto oldWindow = displayGroupInfo.windowsInfo.begin();
             while (oldWindow != displayGroupInfo.windowsInfo.end()) {
-                if (oldWindow->id == item.id) {
+                if (oldWindow->id == window.id) {
                     oldWindow = displayGroupInfo.windowsInfo.erase(oldWindow);
                 } else {
                     oldWindow++;
@@ -344,14 +344,14 @@ void InputWindowsManager::UpdateDisplayInfoByIncrementalInfo(const WindowInfo it
         }
         case WINDOW_UPDATE_ACTION::CHANGE: {
             for (size_t idx = 0; idx < displayGroupInfo.windowsInfo.size(); idx++) {
-                if (item.id == displayGroupInfo.windowsInfo[idx].id) {
-                    displayGroupInfo.windowsInfo[idx] = item;
+                if (window.id == displayGroupInfo.windowsInfo[idx].id) {
+                    displayGroupInfo.windowsInfo[idx] = window;
                 }
             }
             break;
         }
         default: {
-            MMI_HILOGI("WINDOW_UPDATE_ACTION is action:%{public}d", item.action);
+            MMI_HILOGI("WINDOW_UPDATE_ACTION is action:%{public}d", window.action);
             break;
         }
     }
@@ -1366,9 +1366,13 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
-    auto windowXY = TransformWindowXY(*touchWindow, logicalX, logicalY);
-    auto windowX = windowXY.first;
-    auto windowY = windowXY.second;
+    auto windowX = logicalX - touchWindow->area.x;
+    auto windowY = logicalY - touchWindow->area.y;
+    if (!(touchWindow->transform.empty())) {
+        auto windowXY = TransformWindowXY(*touchWindow, logicalX, logicalY);
+        windowX = windowXY.first;
+        windowY = windowXY.second;
+    }
     pointerItem.SetWindowX(windowX);
     pointerItem.SetWindowY(windowY);
     pointerEvent->UpdatePointerItem(pointerId, pointerItem);
@@ -1528,9 +1532,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
         MMI_HILOGD("touch event send cancel, window:%{public}d", touchWindow->id);
     }
-    auto windowXY = TransformWindowXY(*touchWindow, logicalX, logicalY);
-    auto windowX = windowXY.first;
-    auto windowY = windowXY.second;
+    auto windowX = logicalX - touchWindow->area.x;
+    auto windowY = logicalY - touchWindow->area.y;
+    if (!(touchWindow->transform.empty())) {
+        auto windowXY = TransformWindowXY(*touchWindow, logicalX, logicalY);
+        windowX = windowXY.first;
+        windowY = windowXY.second;
+    }
     MMI_HILOGE("touch event send to window:%{public}d", touchWindow->id);
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
