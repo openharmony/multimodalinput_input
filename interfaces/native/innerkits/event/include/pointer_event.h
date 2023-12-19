@@ -1442,8 +1442,8 @@ private:
     int32_t pointerAction_ { POINTER_ACTION_UNKNOWN };
     int32_t buttonId_ { -1 };
     int32_t fingerCount_ { 0 };
-    uint32_t axes_ { 0U };
     float zOrder_{ -1.0f};
+    uint32_t axes_ { 0U };
     std::array<double, AXIS_TYPE_MAX> axisValues_ {};
     std::vector<int32_t> pressedKeys_;
     std::vector<uint8_t> buffer_;

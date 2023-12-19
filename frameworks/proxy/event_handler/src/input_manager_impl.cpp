@@ -164,13 +164,12 @@ bool InputManagerImpl::IsValiadWindowAreas(const std::vector<WindowInfo> &window
         if (window.action == WINDOW_UPDATE_ACTION::DEL) {
             continue;
         }
-        if ((window.defaultHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
+        if (window.defaultHotAreas.empty() || window.pointerHotAreas.empty() ||
+            (window.defaultHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
             (window.pointerHotAreas.size() > WindowInfo::MAX_HOTAREA_COUNT) ||
-            !(window.pointerChangeAreas.size() == WindowInfo::POINTER_CHANGEAREA_COUNT ||
-            window.pointerChangeAreas.empty()) ||
-            !(window.transform.size() == WindowInfo::WINDOW_TRANSFORM_SIZE ||
-            window.transform.empty()) ||
-            window.defaultHotAreas.empty() || window.pointerHotAreas.empty()) {
+            (!window.pointerChangeAreas.empty() &&
+            window.pointerChangeAreas.size() != WindowInfo::POINTER_CHANGEAREA_COUNT) ||
+            (!window.transform.empty() && window.transform.size() != WindowInfo::WINDOW_TRANSFORM_SIZE)) {
             MMI_HILOGE("Hot areas check failed! defaultHotAreas:size:%{public}zu,"
                 "pointerHotAreas:size:%{public}zu, pointerChangeAreas:size:%{public}zu,"
                 "transform:size:%{public}zu", window.defaultHotAreas.size(),
