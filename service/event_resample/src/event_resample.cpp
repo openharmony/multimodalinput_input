@@ -204,6 +204,9 @@ std::pair<int32_t, int32_t> EventResample::TransformSampleWindowXY(std::shared_p
     PointerEvent::PointerItem &item, int32_t logicX, int32_t logicY)
 {
     CALL_DEBUG_ENTER;
+    if (pointerEvent == nullptr) {
+        return {logicX + item.GetToolWindowX(), logicY + item.GetToolWindowY()};
+    }
     auto windows = WinMgr->GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (const auto window : windows) {
         if (pointerEvent->GetTargetWindowId() == window.id) {

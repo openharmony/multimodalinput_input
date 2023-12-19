@@ -328,7 +328,14 @@ void InputWindowsManager::UpdateDisplayInfoByIncrementalInfo(const WindowInfo &w
     CALL_DEBUG_ENTER;
     switch (window.action) {
         case WINDOW_UPDATE_ACTION::ADD: {
-            displayGroupInfo.windowsInfo.emplace_back(window);
+            auto id = window.id;
+            auto pos = std::find_if(std::begin(displayGroupInfo.windowsInfo), std::end(displayGroupInfo.windowsInfo),
+                [id](const auto& item) { return item.id == id; });
+            if (pos == std::end(displayGroupInfo.windowsInfo)) {
+                displayGroupInfo.windowsInfo.emplace_back(window);
+            } else {
+                *pos = window;
+            }
             break;
         }
         case WINDOW_UPDATE_ACTION::DEL: {
@@ -343,10 +350,11 @@ void InputWindowsManager::UpdateDisplayInfoByIncrementalInfo(const WindowInfo &w
             break;
         }
         case WINDOW_UPDATE_ACTION::CHANGE: {
-            for (size_t idx = 0; idx < displayGroupInfo.windowsInfo.size(); idx++) {
-                if (window.id == displayGroupInfo.windowsInfo[idx].id) {
-                    displayGroupInfo.windowsInfo[idx] = window;
-                }
+            auto id = window.id;
+            auto pos = std::find_if(std::begin(displayGroupInfo.windowsInfo), std::end(displayGroupInfo.windowsInfo),
+                [id](const auto& item) { return item.id == id; });
+            if (pos != std::end(displayGroupInfo.windowsInfo)) {
+                *pos = window;
             }
             break;
         }
@@ -415,6 +423,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
 
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     IPointerDrawingManager::GetInstance()->OnDisplayInfo(displayGroupInfo);
@@ -448,6 +457,7 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         IPointerDrawingManager::GetInstance()->DrawPointerStyle(pointerStyle);
     }
 }
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 void InputWindowsManager::GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle)
 {
@@ -2023,6 +2033,7 @@ std::pair<int32_t, int32_t> InputWindowsManager::TransformWindowXY(const WindowI
 bool InputWindowsManager::IsValidZorderWindow(const WindowInfo &window,
     const std::shared_ptr<PointerEvent>& pointerEvent)
 {
+    CHKPR(pointerEvent, false);
     if (!(pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) || MMI_LE(pointerEvent->GetZOrder(), 0.0f)) {
         return true;
     }
