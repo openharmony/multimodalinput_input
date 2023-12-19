@@ -789,13 +789,11 @@ std::unique_ptr<OHOS::Media::PixelMap> InputManagerUtil::SetMouseIconTest(const 
 
 int32_t InputManagerUtil::TestAddMonitor(std::shared_ptr<IInputEventConsumer> consumer)
 {
-    AccessMonitor monitor;
     return InputManager::GetInstance()->AddMonitor(consumer);
 }
 
 void InputManagerUtil::TestRemoveMonitor(int32_t monitorId)
 {
-    AccessMonitor monitor;
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
