@@ -63,6 +63,7 @@ constexpr float RUNNING_Y_RATIO = 0.675f;
 constexpr float INCREASE_RATIO = 1.22;
 constexpr int32_t MIN_POINTER_COLOR = 0x000000;
 constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
+constexpr int32_t MIN_CURSOR_SIZE = 64;
 const std::string MOUSE_FILE_NAME = "mouse_settings.xml";
 bool isRsRemoteDied = false;
 } // namespace
@@ -530,6 +531,8 @@ int32_t PointerDrawingManager::UpdateCursorProperty(void* pixelMap)
         pow(INCREASE_RATIO, cursorSize - 1) * displayInfo_.dpi * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
     int32_t cursorHeight =
         pow(INCREASE_RATIO, cursorSize - 1) * displayInfo_.dpi * DEVICE_INDEPENDENT_PIXELS / BASELINE_DENSITY;
+    cursorWidth = cursorWidth < MIN_CURSOR_SIZE ? MIN_CURSOR_SIZE : cursorWidth;
+    cursorHeight = cursorHeight < MIN_CURSOR_SIZE ? MIN_CURSOR_SIZE : cursorHeight;
     float xAxis = (float)cursorWidth / (float)imageInfo.size.width;
     float yAxis = (float)cursorHeight / (float)imageInfo.size.height;
     newPixelMap->scale(xAxis, yAxis, Media::AntiAliasingOption::LOW);
