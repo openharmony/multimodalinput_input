@@ -184,7 +184,7 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
             item.SetDisplayX(logicX);
             item.SetDisplayY(logicY);
             
-            auto windowXY = TransformSampleWindowXY(pointerEvent_, logicX, logicY);
+            auto windowXY = TransformSampleWindowXY(pointerEvent_, item, logicX, logicY);
             item.SetWindowX(windowXY.first);
             item.SetWindowY(windowXY.second);
 
@@ -201,13 +201,16 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
 }
 
 std::pair<int32_t, int32_t> EventResample::TransformSampleWindowXY(std::shared_ptr<PointerEvent> pointerEvent,
-    int32_t logicX, int32_t logicY)
+    PointerEvent::PointerItem &item, int32_t logicX, int32_t logicY)
 {
     CALL_DEBUG_ENTER;
     auto windows = WinMgr->GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
-    for (const auto item : windows) {
-        if (pointerEvent->GetTargetWindowId() == item.id) {
-            auto windowXY = WinMgr->TransformWindowXY(item, logicX, logicY);
+    for (const auto window : windows) {
+        if (pointerEvent->GetTargetWindowId() == window.id) {
+            if (window.transform.empty()) {
+                return {logicX + item.GetToolWindowX(), logicY + item.GetToolWindowY()};
+            }
+            auto windowXY = WinMgr->TransformWindowXY(window, logicX, logicY);
             auto windowX = windowXY.first;
             auto windowY = windowXY.second;
             return {windowX, windowY};
