@@ -111,7 +111,7 @@ private:
     void UpdateDisplayIdAndName();
     void UpdatePointerAction(std::shared_ptr<PointerEvent> pointerEvent);
     bool IsNeedDrawPointer(PointerEvent::PointerItem &pointerItem) const;
-    void UpdateDisplayInfoByIncrementalInfo(const WindowInfo item, DisplayGroupInfo &displayGroupInfo);
+    void UpdateDisplayInfoByIncrementalInfo(const WindowInfo &window, DisplayGroupInfo &displayGroupInfo);
     void UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &displayGroupInfo);
     std::pair<int32_t, int32_t> TransformSampleWindowXY(int32_t logicX, int32_t logicY) const;
     bool IsValidZorderWindow(const WindowInfo &window, const std::shared_ptr<PointerEvent>& pointerEvent);
