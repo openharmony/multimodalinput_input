@@ -56,6 +56,7 @@ constexpr int32_t ANIMATION_DURATION = 500;
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 constexpr int32_t CURSOR_CIRCLE_STYLE = 41;
 constexpr int32_t MOUSE_ICON_BAIS = 5;
+constexpr int32_t VISIBLE_LIST_MAX_SIZE = 100;
 constexpr float ROTATION_ANGLE = 360.f;
 constexpr float LOADING_CENTER_RATIO = 0.5f;
 constexpr float RUNNING_X_RATIO = 0.3f;
@@ -860,6 +861,16 @@ void PointerDrawingManager::DeletePointerVisible(int32_t pid)
     }
 }
 
+bool PointerDrawingManager::GetPointerVisible(int32_t pid)
+{
+    for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
+        if (it->pid == pid) {
+            return it->visible;
+        }
+    }
+    return true;
+}
+
 int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
 {
     CALL_DEBUG_ENTER;
@@ -871,8 +882,8 @@ int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
     }
     PidInfo info = { .pid = pid, .visible = visible };
     pidInfos_.push_back(info);
-    if (visible) {
-        InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+    if (pidInfos_.size() > VISIBLE_LIST_MAX_SIZE) {
+        pidInfos_.pop_front();
     }
     UpdatePointerVisible();
     return RET_OK;

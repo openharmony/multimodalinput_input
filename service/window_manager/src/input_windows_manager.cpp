@@ -401,6 +401,7 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
     CALL_DEBUG_ENTER;
     PointerStyle pointerStyle;
     GetPointerStyleByArea(area, pid, windowId, pointerStyle);
+    UpdateWindowPointerVisible(pid);
     if (lastPointerStyle_.id == pointerStyle.id) {
         MMI_HILOGE("Tha lastPointerStyle is  totally equal with this, no need to change it");
         return;
@@ -419,6 +420,12 @@ void InputWindowsManager::SetWindowPointerStyle(WindowArea area, int32_t pid, in
     }
     MMI_HILOGI("Window id:%{public}d set pointer style:%{public}d success", windowId, lastPointerStyle_.id);
     IPointerDrawingManager::GetInstance()->DrawPointerStyle(lastPointerStyle_);
+}
+
+void InputWindowsManager::UpdateWindowPointerVisible(int32_t pid)
+{
+    bool visible = IPointerDrawingManager::GetInstance()->GetPointerVisible(pid);
+    IPointerDrawingManager::GetInstance()->SetPointerVisible(pid, visible);
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
