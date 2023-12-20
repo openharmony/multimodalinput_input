@@ -455,7 +455,6 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         }
     } else {
         inputConsumer->OnInputEvent(pointerEvent);
-        MMI_HILOGI("Pointer event report pointerId:%{public}d", pointerEvent->GetPointerId());
     }
     MMI_HILOGD("Pointer event pointerId:%{public}d", pointerEvent->GetPointerId());
 }
