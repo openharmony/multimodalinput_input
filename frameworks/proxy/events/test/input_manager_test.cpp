@@ -670,6 +670,25 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo, TestSize.Level1)
     ASSERT_TRUE(displayGroupInfo.displaysInfo.empty());
 }
 
+/**
+ * @tc.name: InputManagerTest_UpdateDisplayInfo
+ * @tc.desc: Update window information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UpdateWindowGroupInfo_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo window;
+    window.id = 1;
+    window.action = WINDOW_UPDATE_ACTION::ADD;
+    WindowGroupInfo windowGroupInfo;
+    windowGroupInfo.displayId = 0;
+    windowGroupInfo.focusWindowId = 1;
+    windowGroupInfo.windowsInfo = {window};
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateWindowInfo(windowGroupInfo));
+}
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 /**
  * @tc.name: InputManagerTest_SetEnhanceConfig_001
@@ -1463,6 +1482,32 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventExt_002, TestSize.
     InputManager::GetInstance()->SimulateInputEventExt(injectDownEvent);
     ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
 #endif  // OHOS_BUILD_ENABLE_ANCO
+}
+
+/**
+ * @tc.name: InputManagerTest_SimulateInputEventZorder_001
+ * @tc.desc: Simulate input evnet with zOrder.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventZorder_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+
+    PointerEvent::PointerItem item;
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
+    item.SetPressure(POINTER_ITEM_PRESSURE);
+    item.SetPointerId(0);
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_DOWN);
+    pointerEvent->SetPointerId(0);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    pointerEvent->AddPointerItem(item);
+    pointerEvent->SetZOrder(10.0);
+    
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent, 10.0);
 }
 
 /**

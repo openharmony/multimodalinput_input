@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,6 +22,79 @@
 namespace OHOS {
 namespace MMI {
 inline constexpr int32_t GLOBAL_WINDOW_ID = -1;
+
+inline constexpr int32_t DEFAULT_DISPLAY_ID = -1;
+
+/**
+ * @brief Enumerates the fold display mode.
+ */
+enum class DisplayMode: uint32_t {
+    /**
+     * The default display mode
+     *
+     * @since 9
+     */
+    UNKNOWN = 0,
+
+    /**
+     * The full display mode
+     *
+     * @since 9
+     */
+    FULL = 1,
+
+    /**
+     * The main display mode
+     *
+     * @since 9
+     */
+    MAIN = 2,
+
+    /**
+     * The sub display mode
+     *
+     * @since 9
+     */
+    SUB = 3,
+
+    /**
+     * The coordination display mode
+     *
+     * @since 9
+     */
+    COORDINATION = 4,
+};
+
+enum class WINDOW_UPDATE_ACTION: uint32_t {
+    /**
+     * The default window update action
+     *
+     * @since 9
+     */
+    UNKNOWN = 0,
+
+    /**
+     * Add the window action
+     *
+     * @since 9
+     */
+    ADD = 1,
+
+    /**
+     * Delete the window action
+     *
+     * @since 9
+     */
+    DEL = 2,
+
+     /**
+     * Change the window action
+     *
+     * @since 9
+     */
+    CHANGE = 3,
+};
+
 enum Direction {
     /**
      * Rotating the display clockwise by 0 degree
@@ -92,6 +165,20 @@ struct WindowInfo {
     static constexpr int32_t MAX_HOTAREA_COUNT = 10;
 
     /**
+     * The number of pointer change areas
+     *
+     * @since 9
+     */
+    static constexpr int32_t POINTER_CHANGEAREA_COUNT = 8;
+
+    /**
+     * The size of window transform, which create a 3*3 matrix
+     *
+     * @since 9
+     */
+    static constexpr int32_t WINDOW_TRANSFORM_SIZE = 9;
+
+    /**
      * Untouchable window
      *
      * @since 9
@@ -155,6 +242,42 @@ struct WindowInfo {
      * @since 9
      */
     uint32_t flags;
+
+    /**
+     * Agent window ID
+     *
+     * @since 9
+     */
+    WINDOW_UPDATE_ACTION action { WINDOW_UPDATE_ACTION::UNKNOWN };
+
+    /**
+     * Window display ID
+     *
+     * @since 9
+     */
+    int32_t displayId { DEFAULT_DISPLAY_ID };
+
+    /**
+     * Window order in Z-index
+     *
+     * @since 9
+     */
+    float zOrder { 0.0f };
+
+    /**
+     * Number of mouse style change areas in the window. The value must be POINTER_CHANGEAREA_COUNT.
+     *
+     * @since 9
+     */
+    std::vector<int32_t> pointerChangeAreas;
+
+    /**
+     * Number of transform in the window which is used to calculate the window x and window y by logic x and window y.
+     * The value must be POINTER_CHANGEAREA_COUNT.
+     *
+     * @since 9
+     */
+    std::vector<float> transform;
 };
 
 /**
@@ -227,6 +350,13 @@ struct DisplayInfo {
      * @since 9
      */
     Direction direction;
+
+    /**
+     * DisplayMode of the display
+     *
+     * @since 9
+     */
+    DisplayMode displayMode { DisplayMode::UNKNOWN };
 };
 
 /**
@@ -269,6 +399,29 @@ struct DisplayGroupInfo {
      * @since 9
      */
     std::vector<DisplayInfo> displaysInfo;
+};
+
+struct WindowGroupInfo {
+    /**
+     * ID of the focus window
+     *
+     * @since 9
+     */
+    int32_t focusWindowId { GLOBAL_WINDOW_ID };
+
+    /**
+     * Window display ID
+     *
+     * @since 9
+     */
+    int32_t displayId { DEFAULT_DISPLAY_ID };
+
+    /**
+     * List of window information of the logical display arranged in Z order, with the top window at the top
+     *
+     * @since 9
+     */
+    std::vector<WindowInfo> windowsInfo;
 };
 
 struct DisplayBindInfo {

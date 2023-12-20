@@ -16,6 +16,7 @@
 #include "event_resample.h"
 
 #include "event_log_helper.h"
+#include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "util.h"
 
@@ -31,6 +32,7 @@ EventResample::~EventResample(){};
 std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<PointerEvent> pointerEvent,
                                                             int64_t frameTime, ErrCode &status)
 {
+    CALL_DEBUG_ENTER;
     MotionEvent* outEvent = nullptr;
     ErrCode result = ERR_OK;
 
@@ -177,10 +179,15 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
             int32_t toolWindowX = item.GetToolWindowX();
             int32_t toolWindowY = item.GetToolWindowY();
             MMI_HILOGD("Output event: toolWindowX = %{public}d toolWindowY = %{public}d", toolWindowX, toolWindowY);
-            item.SetDisplayX(it.second.coordX);
-            item.SetDisplayY(it.second.coordY);
-            item.SetWindowX(it.second.coordX + toolWindowX);
-            item.SetWindowY(it.second.coordY + toolWindowY);
+            auto logicX = it.second.coordX;
+            auto logicY = it.second.coordY;
+            item.SetDisplayX(logicX);
+            item.SetDisplayY(logicY);
+            
+            auto windowXY = TransformSampleWindowXY(pointerEvent_, item, logicX, logicY);
+            item.SetWindowX(windowXY.first);
+            item.SetWindowY(windowXY.second);
+
             if (PointerEvent::POINTER_ACTION_MOVE == outEvent->pointerAction) {
                 item.SetPressed(true);
             } else if (PointerEvent::POINTER_ACTION_UP == outEvent->pointerAction) {
@@ -191,6 +198,28 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
             pointerEvent_->UpdatePointerItem(it.first, item);
         }
     }
+}
+
+std::pair<int32_t, int32_t> EventResample::TransformSampleWindowXY(std::shared_ptr<PointerEvent> pointerEvent,
+    PointerEvent::PointerItem &item, int32_t logicX, int32_t logicY)
+{
+    CALL_DEBUG_ENTER;
+    if (pointerEvent == nullptr) {
+        return {logicX + item.GetToolWindowX(), logicY + item.GetToolWindowY()};
+    }
+    auto windows = WinMgr->GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
+    for (const auto window : windows) {
+        if (pointerEvent->GetTargetWindowId() == window.id) {
+            if (window.transform.empty()) {
+                return {logicX + item.GetToolWindowX(), logicY + item.GetToolWindowY()};
+            }
+            auto windowXY = WinMgr->TransformWindowXY(window, logicX, logicY);
+            auto windowX = windowXY.first;
+            auto windowY = windowXY.second;
+            return {windowX, windowY};
+        }
+    }
+    return {logicX, logicY};
 }
 
 ErrCode EventResample::ConsumeBatch(int64_t frameTime, MotionEvent** outEvent)

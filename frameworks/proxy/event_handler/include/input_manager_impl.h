@@ -57,6 +57,7 @@ public:
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t GetWindowPid(int32_t windowId);
     void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
     void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen);
@@ -176,10 +177,15 @@ public:
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
+    int32_t PackWindowGroupInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt);
+    void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();
+    void PrintWindowGroupInfo();
     void SendDisplayInfo();
+    void SendWindowInfo();
     void SendWindowAreaInfo(WindowArea area, int32_t pid, int32_t windowId);
+    bool IsValiadWindowAreas(const std::vector<WindowInfo> &windows);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     int32_t PackEnhanceConfig(NetPacket &pkt);
     void SendEnhanceConfig();
@@ -202,6 +208,7 @@ private:
     std::vector<std::shared_ptr<IAnrObserver>> anrObservers_;
     std::shared_ptr<IWindowChecker> winChecker_ { nullptr };
     DisplayGroupInfo displayGroupInfo_ {};
+    WindowGroupInfo windowGroupInfo_ {};
     std::mutex mtx_;
     std::mutex handleMtx_;
     std::condition_variable cv_;

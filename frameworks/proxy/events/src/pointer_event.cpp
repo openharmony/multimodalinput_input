@@ -358,7 +358,7 @@ PointerEvent::PointerEvent(const PointerEvent& other)
     : InputEvent(other), pointerId_(other.pointerId_), pointers_(other.pointers_),
       pressedButtons_(other.pressedButtons_), sourceType_(other.sourceType_),
       pointerAction_(other.pointerAction_), buttonId_(other.buttonId_), fingerCount_(other.fingerCount_),
-      axes_(other.axes_), axisValues_(other.axisValues_),
+      zOrder_(other.zOrder_), axes_(other.axes_), axisValues_(other.axisValues_),
       pressedKeys_(other.pressedKeys_), buffer_(other.buffer_) {}
 
 PointerEvent::~PointerEvent() {}
@@ -380,6 +380,7 @@ void PointerEvent::Reset()
     pointerAction_ = POINTER_ACTION_UNKNOWN;
     buttonId_ = -1;
     fingerCount_ = 0;
+    zOrder_ = -1.0f;
     axes_ = 0U;
     axisValues_.fill(0.0);
     pressedKeys_.clear();
@@ -602,6 +603,16 @@ void PointerEvent::SetFingerCount(int32_t fingerCount)
     fingerCount_ = fingerCount;
 }
 
+float  PointerEvent::GetZOrder() const
+{
+    return zOrder_;
+}
+
+void  PointerEvent::SetZOrder(float zOrder)
+{
+    zOrder_ = zOrder;
+}
+
 double PointerEvent::GetAxisValue(AxisType axis) const
 {
     double axisValue {};
@@ -692,6 +703,8 @@ bool PointerEvent::WriteToParcel(Parcel &out) const
 
     WRITEINT32(out, fingerCount_);
 
+    WRITEFLOAT(out, zOrder_);
+
     const uint32_t axes { GetAxes() };
     WRITEUINT32(out, axes);
 
@@ -756,6 +769,8 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
 
     READINT32(in, fingerCount_);
 
+    READFLOAT(in, zOrder_);
+
     uint32_t axes;
     READUINT32(in, axes);
 
@@ -767,6 +782,7 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
             SetAxisValue(axis, val);
         }
     }
+
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     if (!ReadEnhanceDataFromParcel(in)) {
         return false;

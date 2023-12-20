@@ -57,6 +57,11 @@ void InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
     InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
 }
 
+void InputManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo)
+{
+    InputMgrImpl.UpdateWindowInfo(windowGroupInfo);
+}
+
 int32_t InputManager::AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority,
     uint32_t deviceTags)
 {
@@ -171,6 +176,14 @@ void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    InputMgrImpl.SimulateInputEvent(pointerEvent);
+}
+
+void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder)
+{
+    CHKPV(pointerEvent);
+    pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
+    pointerEvent->SetZOrder(zOrder);
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
 
