@@ -72,6 +72,10 @@ bool UDSSession::SendMsg(const char *buf, size_t size) const
                 MMI_HILOGW("Continue for errno EAGAIN|EINTR|EWOULDBLOCK, errno:%{public}d", errno);
                 continue;
             }
+            if (errno == ENOTSOCK) {
+                MMI_HILOGE("Got ENOTSOCK error, turn the socket to invalid");
+                invalidSocket_ = true;
+            }
             MMI_HILOGE("Send return failed,error:%{public}d fd:%{public}d", errno, fd_);
             return false;
         }

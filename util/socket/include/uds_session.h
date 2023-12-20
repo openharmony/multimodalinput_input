@@ -96,6 +96,10 @@ public:
         return tokenType_;
     }
 
+    bool IsSocketValid()
+    {
+        return !invalidSocket_;
+    }
     void UpdateDescript();
     void SaveANREvent(int32_t type, int32_t id, int64_t time, int32_t timerId);
     std::vector<int32_t> GetTimerIds(int32_t type);
@@ -118,6 +122,7 @@ protected:
     const int32_t uid_ { -1 };
     const int32_t pid_ { -1 };
     int32_t tokenType_ { TokenType::TOKEN_INVALID };
+    mutable bool invalidSocket_ { false };
 };
 } // namespace MMI
 } // namespace OHOS
