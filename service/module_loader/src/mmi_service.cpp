@@ -904,6 +904,10 @@ int32_t MMIService::OnRegisterDevListener(int32_t pid)
         }
         if (!sess->SendMsg(pkt)) {
             MMI_HILOGE("Sending failed");
+            if (!sess->IsSocketValid()) {
+                MMI_HILOGE("sess fd:%{public}d pid:%{public}d is ENOSOCKET, delete it!", sess->GetFd(), sess->GetPid());
+                InputDevMgr->RemoveDevListener(sess);
+            }
             return;
         }
     });
