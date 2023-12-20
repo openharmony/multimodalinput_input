@@ -282,6 +282,7 @@ void InputDeviceManager::RemoveDevListener(SessionPtr sess)
         MMI_HILOGE("Session does not exist");
         return;
     }
+    MMI_HILOGI("sess with fd%{public}d with pid %{public}d has been deleted", sess->GetFd(), sess->GetPid());
     devListener_.erase(iter);
 }
 
