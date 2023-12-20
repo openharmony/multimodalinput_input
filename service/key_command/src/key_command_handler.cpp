@@ -42,7 +42,6 @@ namespace {
 constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr int32_t MAX_SEQUENCEKEYS_NUM = 10;
 constexpr int64_t MAX_DELAY_TIME = 1000000;
-constexpr int64_t LONG_PRESS_FOR_POWER_OFF = 3000;
 constexpr int64_t SECONDS_SYSTEM = 1000;
 constexpr int32_t SPECIAL_KEY_DOWN_DELAY = 150;
 constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;
@@ -53,7 +52,6 @@ constexpr size_t SINGLE_KNUCKLE_SIZE = 1;
 constexpr size_t DOUBLE_KNUCKLE_SIZE = 2;
 constexpr int32_t MAX_TIME_FOR_ADJUST_CONFIG = 5;
 constexpr int32_t POW_SQUARE = 2;
-constexpr int64_t LONG_PRESS_DOWN_TIME = 500000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_DEFAULT = 250000;
 constexpr int64_t DOUBLE_CLICK_INTERVAL_TIME_SLOW = 450000;
 constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0f;
@@ -61,8 +59,6 @@ constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG = 96.0f;
 constexpr float VPR_CONFIG = 3.25f;
 constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t ACTIVE_EVENT = 2;
-constexpr int32_t KEYCODE_VOLUME_DOWN = 17;
-constexpr int32_t KEYCODE_POWER = 18;
 const std::string EXTENSION_ABILITY = "extensionAbility";
 
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyCommandHandler" };
@@ -772,20 +768,6 @@ bool ParseMultiFingersTap(const JsonParser &parser, const std::string ability, M
     }
     return true;
 }
-
-bool IsPowerSequence(const std::shared_ptr<KeyEvent> key)
-{
-    CHKPF(key);
-    if (key->GetAction() == KeyEvent::KEY_ACTION_UP) {
-        std::vector<int32_t> pressedKeys = key->GetPressedKeys();
-        for (const auto& pressedKey: pressedKeys) {
-            if (pressedKey == KEYCODE_VOLUME_DOWN || pressedKey == KEYCODE_POWER) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -1416,17 +1398,19 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
         return true;
     }
 
-    if (IsPowerSequence(key)) {
-        return true;
+    if (!isDownStart_) {
+        HandleRepeatKeys(key);
+        return false;
+    } else {
+        bool isRepeatKeyHandle = HandleRepeatKeys(key);
+        if (isRepeatKeyHandle) {
+            return true;
+        }
     }
 
-    bool isRepeatKeyHandle = HandleRepeatKeys(key);
-    if (isRepeatKeyHandle) {
-        return true;
-    }
     count_ = 0;
+    isDownStart_ = false;
     isRepeatKeyState_ = false;
-    isHandleSequence_ = false;
     return false;
 }
 
@@ -1513,7 +1497,10 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
     bool waitRepeatKey = false;
 
     for (RepeatKey& item : repeatKeys_) {
-        if (HandleRepeatKeyCount(item, keyEvent) || HandleKeyUpCancel(item, keyEvent)) {
+        if (HandleKeyUpCancel(item, keyEvent)) {
+            return false;
+        }
+        if (HandleRepeatKeyCount(item, keyEvent)) {
             break;
         }
     }
@@ -1548,7 +1535,11 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
         LaunchAbility(item.ability);
         launchAbilityCount_ = count_;
         isLaunched = true;
+        isDownStart_ = false;
         isRepeatKeyState_ = true;
+        auto keyEventCancel = std::make_shared<KeyEvent>(*keyEvent);
+        keyEventCancel->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
+        InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventCancel);
     }
     return true;
 }
@@ -1559,6 +1550,7 @@ bool KeyCommandHandler::HandleKeyUpCancel(const RepeatKey &item, const std::shar
     CHKPF(keyEvent);
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_CANCEL) {
         isKeyCancel_ = true;
+        isDownStart_ = false;
         if (downTimerId_ >= 0) {
             TimerMgr->RemoveTimer(downTimerId_);
         }
@@ -1577,12 +1569,14 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
             TimerMgr->RemoveTimer(downTimerId_);
         }
 
-        int64_t downDurationTime = keyEvent->GetActionTime() - downActionTime_;
-        if (count_ == 0 && downDurationTime > LONG_PRESS_DOWN_TIME) {
-            return false;
-        }
         if (repeatKey_.keyCode != item.keyCode) {
-            count_ = 1;
+            std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
+
+            if (pressedKeys.size() == 0) {
+                count_ = 1;
+            } else {
+                count_ = 0;
+            }
             repeatKey_.keyCode = item.keyCode;
         } else {
             count_++;
@@ -1600,15 +1594,11 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
     }
 
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+        isDownStart_ = true;
         if (downTimerId_ >= 0) {
             TimerMgr->RemoveTimer(downTimerId_);
         }
-        downTimerId_ = TimerMgr->AddTimer(LONG_PRESS_FOR_POWER_OFF, 1, [this, keyEvent] () {
-            InputHandler->GetSubscriberHandler()->HandlePowerLongPressDown(keyEvent);
-        });
-        if (downTimerId_ < 0) {
-            return false;
-        }
+
         downActionTime_ = keyEvent->GetActionTime();
         if ((downActionTime_ - upActionTime_) < intervalTime_) {
             if (repeatTimerId_ >= 0) {
@@ -1627,12 +1617,13 @@ void KeyCommandHandler::SendKeyEvent()
         for (int32_t i = launchAbilityCount_; i < count_; i++) {
             int32_t keycode = repeatKey_.keyCode;
             if (IsSpecialType(keycode, SpecialType::KEY_DOWN_ACTION)) {
-                HandleSpecialKeys(keycode, KeyEvent::KEY_ACTION_DOWN);
+                HandleSpecialKeys(keycode, KeyEvent::KEY_ACTION_UP);
             }
-
-            auto keyEventDown = CreateKeyEvent(keycode, KeyEvent::KEY_ACTION_DOWN, true);
-            CHKPV(keyEventDown);
-            InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventDown);
+            if (i != 0) {
+                auto keyEventDown = CreateKeyEvent(keycode, KeyEvent::KEY_ACTION_DOWN, true);
+                CHKPV(keyEventDown);
+                InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventDown);
+            }
 
             auto keyEventUp = CreateKeyEvent(keycode, KeyEvent::KEY_ACTION_UP, false);
             CHKPV(keyEventUp);
@@ -1640,6 +1631,7 @@ void KeyCommandHandler::SendKeyEvent()
         }
     }
     count_ = 0;
+    isDownStart_ = false;
     isRepeatKeyState_ = false;
     isHandleSequence_ = false;
     launchAbilityCount_ = 0;
