@@ -286,7 +286,6 @@ HWTEST_F(InputManagerFilterManualTest, HandlePointerEventFilter_001, TestSize.Le
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("enter HandlePointerEventFilter_001");
-    AccessToken accessToken;
     sem_t sem;
     int ret = sem_init(&sem, 0, 0);
     ASSERT_EQ(ret, 0);
@@ -388,7 +387,6 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_002, TestSize.Level1
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGI("enter HandlePointerEventFilter_002");
-    AccessToken accessToken;
     ASSERT_EQ(GetSelfHidumperFilterNum(), 0);
 
     sem_t semA;
@@ -445,7 +443,6 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_003, TestSize.Level1
             return false;
         }
     };
-    AccessToken accessToken;
     auto addFilter = []() -> int32_t {
         auto filter = std::make_shared<KeyFilter>();
         uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
@@ -537,7 +534,6 @@ HWTEST_F(InputManagerFilterManualTest, HandleKeyEventFilter_005, TestSize.Level1
             return false;
         }
     };
-    AccessToken accessToken;
     auto addFilter = []() -> int32_t {
         auto filter = std::make_shared<KeyFilter>();
         uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
