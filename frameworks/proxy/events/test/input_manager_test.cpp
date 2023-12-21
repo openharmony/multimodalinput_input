@@ -54,6 +54,10 @@ public:
     void TearDown();
     static void SetUpTestCase();
     std::string GetEventDump();
+
+private:
+    int32_t g_keyboardRepeatRate_ { 50 };
+    int32_t g_keyboardRepeatDelay_ { 500 };
 };
 
 class MMIWindowChecker : public MMI::IWindowChecker {
@@ -95,6 +99,8 @@ void InputManagerTest::TearDown()
 {
     TestUtil->AddEventDump("");
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    InputManager::GetInstance()->SetKeyboardRepeatDelay(g_keyboardRepeatDelay_);
+    InputManager::GetInstance()->SetKeyboardRepeatRate(g_keyboardRepeatRate_);
 }
 
 std::string InputManagerTest::GetEventDump()
@@ -429,8 +435,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetKeyboardRepeatDelay, TestSize.Lev
     MMI_HILOGD("Start InputManagerTest_SetKeyboardRepeatDelay");
     int32_t ret = InputManager::GetInstance()->SetKeyboardRepeatDelay(KEY_REPEAT_DELAY);
     ASSERT_EQ(ret, RET_OK);
-    const char *keyboardFileName = "/data/service/el1/public/multimodalinput/keyboard_settings.xml";
-    ASSERT_TRUE(remove(keyboardFileName) == RET_OK);
     MMI_HILOGD("Stop InputManagerTest_SetKeyboardRepeatDelay");
 }
 
@@ -445,8 +449,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetKeyboardRepeatRate, TestSize.Leve
     MMI_HILOGD("Start InputManagerTest_SetKeyboardRepeatRate");
     int32_t ret = InputManager::GetInstance()->SetKeyboardRepeatRate(KEY_REPEAT_RATE);
     ASSERT_EQ(ret, RET_OK);
-    const char *keyboardFileName = "/data/service/el1/public/multimodalinput/keyboard_settings.xml";
-    ASSERT_TRUE(remove(keyboardFileName) == RET_OK);
     MMI_HILOGD("Stop InputManagerTest_SetKeyboardRepeatRate");
 }
 
@@ -466,8 +468,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardRepeatDelay, TestSize.Lev
     if (InputManager::GetInstance()->SetKeyboardRepeatDelay(KEY_REPEAT_DELAY) == RET_OK) {
         ASSERT_TRUE(InputManager::GetInstance()->GetKeyboardRepeatDelay(callback) == RET_OK);
     }
-    const char *keyboardFileName = "/data/service/el1/public/multimodalinput/keyboard_settings.xml";
-    ASSERT_TRUE(remove(keyboardFileName) == RET_OK);
     MMI_HILOGD("Stop InputManagerTest_GetKeyboardRepeatDelay");
 }
 
@@ -487,8 +487,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardRepeatRate, TestSize.Leve
     if (InputManager::GetInstance()->SetKeyboardRepeatRate(KEY_REPEAT_RATE) == RET_OK) {
         ASSERT_TRUE(InputManager::GetInstance()->GetKeyboardRepeatRate(callback) == RET_OK);
     }
-    const char *keyboardFileName = "/data/service/el1/public/multimodalinput/keyboard_settings.xml";
-    ASSERT_TRUE(remove(keyboardFileName) == RET_OK);
     MMI_HILOGD("Stop InputManagerTest_GetKeyboardRepeatRate");
 }
 

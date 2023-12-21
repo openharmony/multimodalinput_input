@@ -31,6 +31,11 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+
+private:
+    TouchPadTransformProcessor g_processor_ { 0 };
+    bool prePinchSwitch_ { true };
+    bool preSwipeSwitch_ { true };
 };
 
 void TouchPadTransformProcessorTest::SetUpTestCase(void)
@@ -43,10 +48,14 @@ void TouchPadTransformProcessorTest::TearDownTestCase(void)
 
 void TouchPadTransformProcessorTest::SetUp()
 {
+    g_processor_.GetTouchpadPinchSwitch(prePinchSwitch_);
+    g_processor_.GetTouchpadSwipeSwitch(preSwipeSwitch_);
 }
 
 void TouchPadTransformProcessorTest::TearDown()
 {
+    g_processor_.SetTouchpadPinchSwitch(prePinchSwitch_);
+    g_processor_.SetTouchpadSwipeSwitch(preSwipeSwitch_);
 }
 
 /**
@@ -61,8 +70,6 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouch
     TouchPadTransformProcessor processor(deviceId);
     bool flag = false;
     ASSERT_TRUE(processor.SetTouchpadPinchSwitch(flag) == RET_OK);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -80,8 +87,6 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
     bool newFlag = false;
     ASSERT_TRUE(processor.GetTouchpadPinchSwitch(flag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -96,8 +101,6 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouch
     TouchPadTransformProcessor processor(deviceId);
     bool flag = false;
     ASSERT_TRUE(processor.SetTouchpadSwipeSwitch(flag) == RET_OK);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 
 /**
@@ -115,8 +118,6 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
     bool newFlag = false;
     ASSERT_TRUE(processor.GetTouchpadSwipeSwitch(flag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
-    const char *touchpadFileName = "/data/service/el1/public/multimodalinput/touchpad_settings.xml";
-    ASSERT_TRUE(remove(touchpadFileName) == RET_OK);
 }
 }
 }
