@@ -226,6 +226,7 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->UpdateId();
     WinMgr->UpdateTargetPointer(pointerEvent_);
+    WinMgr->DrawTouchGraphic(pointerEvent_);
     return pointerEvent_;
 }
 

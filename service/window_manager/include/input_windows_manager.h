@@ -39,6 +39,11 @@ struct MouseLocation {
     int32_t physicalY { 0 };
 };
 
+struct DevMode {
+    std::string SwitchName;
+    bool isShow { false };
+};
+
 class InputWindowsManager final {
     DECLARE_DELAYED_SINGLETON(InputWindowsManager);
 public:
@@ -97,6 +102,7 @@ public:
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool UpdateDisplayId(int32_t& displayId);
+    void DrawTouchGraphic(std::shared_ptr<PointerEvent> pointerEvent);
     int32_t UpdateTargetPointer(std::shared_ptr<PointerEvent> pointerEvent);
     const DisplayInfo* GetPhysicalDisplay(int32_t id) const;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -153,6 +159,8 @@ void PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects, const WindowInfo &window) const;
+    template <class T>
+    void CreateStatusConfigObserver(T& item);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
@@ -188,6 +196,8 @@ private:
         bool isCaptureMode { false };
     } captureModeInfo_;
     ExtraData extraData_;
+    bool haveSetObserver_ { false };
+    DevMode showCursor_;
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
