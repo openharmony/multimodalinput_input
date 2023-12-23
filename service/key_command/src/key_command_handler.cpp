@@ -1594,6 +1594,7 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
     }
 
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
+        repeatKey_.keyCode = item.keyCode;
         isDownStart_ = true;
         if (downTimerId_ >= 0) {
             TimerMgr->RemoveTimer(downTimerId_);
