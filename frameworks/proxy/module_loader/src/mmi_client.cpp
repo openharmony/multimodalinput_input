@@ -108,10 +108,10 @@ bool MMIClient::StartEventRunner()
         auto runner = AppExecFwk::EventRunner::Create(THREAD_NAME);
         eventHandler_ = std::make_shared<AppExecFwk::EventHandler>(runner);
         MMI_HILOGI("Create event handler, thread name:%{public}s", runner->GetRunnerThreadName().c_str());
-    }
-    int32_t ret = HiviewDFX::Watchdog::GetInstance().AddThread(THREAD_NAME, eventHandler_);
-    if (ret != 0) {
-        MMI_HILOGW("Add watchdog thread failed, ret: %{public}d", ret);
+        int32_t ret = HiviewDFX::Watchdog::GetInstance().AddThread(THREAD_NAME, eventHandler_);
+        if (ret != 0) {
+            MMI_HILOGW("Add watchdog thread failed, ret: %{public}d", ret);
+        }
     }
 
     if (isConnected_ && fd_ >= 0) {
