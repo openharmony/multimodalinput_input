@@ -48,11 +48,25 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 #ifdef OHOS_BUILD_ENABLE_POINTER
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER
+constexpr int32_t OUTWINDOW_HOT_AREA = 20;
+constexpr int32_t DOUBLE_COUNT = 2;
 const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/display_bind.cfg";
 const std::string mouseFileName = "mouse_settings.xml";
 const std::string defaultIconPath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
 const std::string showCursorSwitchName = "settings.input.show_touch_hint";
 } // namespace
+
+enum PointerHotArea : int32_t {
+    INNER = -1,
+    TOP = 0,
+    BOTTOM = 1,
+    LEFT = 2,
+    RIGHT = 3,
+    TOP_LEFT = 4,
+    TOP_RIGHT = 5,
+    BOTTOM_LEFT = 6,
+    BOTTOM_RIGHT = 7,
+};
 
 InputWindowsManager::InputWindowsManager() : bindInfo_(bindCfgFileName)
 {
@@ -414,6 +428,9 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     displayGroupInfo_ = displayGroupInfo;
     PrintDisplayInfo();
     UpdateDisplayIdAndName();
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        UpdatePointerChangeAreas(displayGroupInfo);
+    }
 #ifdef OHOS_BUILD_ENABLE_POINTER
     InitPointerStyle();
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -1057,10 +1074,7 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
         return RET_OK;
     }
     MMI_HILOGD("start to get pid by window %{public}d", windowId);
-    if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        return UpdatePoinerStyle(pid, windowId, pointerStyle);
-    }
-    return UpdateSceneBoardPointerStyle(pid, windowId, pointerStyle);
+    return UpdatePoinerStyle(pid, windowId, pointerStyle);
 }
 
 int32_t InputWindowsManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
@@ -1155,6 +1169,58 @@ bool InputWindowsManager::IsInHotArea(int32_t x, int32_t y, const std::vector<Re
         }
     }
     return false;
+}
+
+void InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects,
+    PointerStyle &pointerStyle) const
+{
+    CALL_DEBUG_ENTER;
+    int32_t areaNum = 0;
+    pointerStyle.id = -1;
+    for (const auto &item : rects) {
+        int32_t displayMaxX = 0;
+        int32_t displayMaxY = 0;
+        if (!AddInt32(item.x, item.width, displayMaxX)) {
+            MMI_HILOGE("The addition of displayMaxX overflows");
+            return;
+        }
+        if (!AddInt32(item.y, item.height, displayMaxY)) {
+            MMI_HILOGE("The addition of displayMaxY overflows");
+            return;
+        }
+        if (((x >= item.x) && (x < displayMaxX)) &&
+            (y >= item.y) && (y < displayMaxY)) {
+            pointerStyle.id = areaNum;
+        }
+        areaNum++;
+    }
+    switch (pointerStyle.id) {
+        case PointerHotArea::TOP:
+        case PointerHotArea::BOTTOM:
+            pointerStyle.id = MOUSE_ICON::NORTH_SOUTH;
+            break;
+        case PointerHotArea::LEFT:
+        case PointerHotArea::RIGHT:
+            pointerStyle.id = MOUSE_ICON::WEST_EAST;
+            break;
+        case PointerHotArea::TOP_LEFT:
+            pointerStyle.id = MOUSE_ICON::NORTH_WEST_SOUTH_EAST;
+            break;
+        case PointerHotArea::TOP_RIGHT:
+            pointerStyle.id = MOUSE_ICON::NORTH_EAST_SOUTH_WEST;
+            break;
+        case PointerHotArea::BOTTOM_LEFT:
+            pointerStyle.id = MOUSE_ICON::NORTH_EAST_SOUTH_WEST;
+            break;
+        case PointerHotArea::BOTTOM_RIGHT:
+            pointerStyle.id = MOUSE_ICON::NORTH_WEST_SOUTH_EAST;
+            break;
+        case PointerHotArea::INNER:
+            pointerStyle.id = MOUSE_ICON::DEFAULT;
+            break;
+    }
+    MMI_HILOGD("pointerStyle after switch ID is :%{public}d", pointerStyle.id);
+    return;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
@@ -1270,6 +1336,99 @@ std::optional<WindowInfo> InputWindowsManager::GetWindowInfo(int32_t logicalX, i
     return std::nullopt;
 }
 
+void InputWindowsManager::SelectPointerChangeArea(const WindowInfo &windowInfo, PointerStyle &pointerStyle,
+    int32_t logicalX, int32_t logicalY)
+{
+    CALL_DEBUG_ENTER;
+    int32_t windowId = windowInfo.id;
+    if (windowsHotAreas_.find(windowId) != windowsHotAreas_.end()) {
+        std::vector<Rect> windowHotAreas = windowsHotAreas_[windowId];
+        MMI_HILOGD("windowHotAreas size is:%{public}zu, windowId is :%{public}d", windowHotAreas.size(), windowId);
+        InWhichHotArea(logicalX, logicalY, windowHotAreas, pointerStyle);
+    }
+}
+
+void InputWindowsManager::UpdatePointerChangeAreas(const DisplayGroupInfo &displayGroupInfo)
+{
+    CALL_DEBUG_ENTER;
+    for (const auto &windowInfo : displayGroupInfo.windowsInfo) {
+        std::vector<Rect> windowHotAreas;
+        int32_t windowId = windowInfo.id;
+        Rect windowArea = windowInfo.area;
+        std::vector<int32_t> pointerChangeAreas = windowInfo.pointerChangeAreas;
+        UpdateTopBottomArea(windowArea, pointerChangeAreas, windowHotAreas);
+        UpdateLeftRightArea(windowArea, pointerChangeAreas, windowHotAreas);
+        UpdateInnerAngleArea(windowArea, pointerChangeAreas, windowHotAreas);
+        windowsHotAreas_.emplace(windowId, windowHotAreas);
+    }
+}
+
+void InputWindowsManager::UpdateTopBottomArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
+    std::vector<Rect> &windowHotAreas)
+{
+    CALL_DEBUG_ENTER;
+    Rect newTopRect;
+    newTopRect.x = windowArea.x + pointerChangeAreas[0];
+    newTopRect.y = windowArea.y - pointerChangeAreas[0];
+    newTopRect.width = windowArea.width - DOUBLE_COUNT * pointerChangeAreas[0];
+    newTopRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[1];
+    windowHotAreas.push_back(newTopRect);
+    Rect newBottomRect;
+    newBottomRect.x = windowArea.x + pointerChangeAreas[0];
+    newBottomRect.y = windowArea.y + windowArea.height - pointerChangeAreas[1];
+    newBottomRect.width = windowArea.width - DOUBLE_COUNT * pointerChangeAreas[0];
+    newBottomRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[1];
+    windowHotAreas.push_back(newBottomRect);
+}
+
+void InputWindowsManager::UpdateLeftRightArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
+    std::vector<Rect> &windowHotAreas)
+{
+    CALL_DEBUG_ENTER;
+    Rect newLeftRect;
+    newLeftRect.x = windowArea.x - OUTWINDOW_HOT_AREA;
+    newLeftRect.y = windowArea.y + pointerChangeAreas[0];
+    newLeftRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[1];
+    newLeftRect.height = windowArea.height - DOUBLE_COUNT * pointerChangeAreas[0];
+    windowHotAreas.push_back(newLeftRect);
+    Rect newRightRect;
+    newRightRect.x = windowArea.x + windowArea.width - pointerChangeAreas[1];
+    newRightRect.y = windowArea.y + pointerChangeAreas[0];
+    newRightRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[1];
+    newRightRect.height = windowArea.height - DOUBLE_COUNT * pointerChangeAreas[0];
+    windowHotAreas.push_back(newRightRect);
+}
+
+void InputWindowsManager::UpdateInnerAngleArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
+    std::vector<Rect> &windowHotAreas)
+{
+    CALL_DEBUG_ENTER;
+    Rect newTopLeftRect;
+    newTopLeftRect.x = windowArea.x - OUTWINDOW_HOT_AREA;
+    newTopLeftRect.y = windowArea.y - OUTWINDOW_HOT_AREA;
+    newTopLeftRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[0];
+    newTopLeftRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[0];
+    windowHotAreas.push_back(newTopLeftRect);
+    Rect newTopRightRect;
+    newTopRightRect.x = windowArea.x + windowArea.width - pointerChangeAreas[0];
+    newTopRightRect.y = windowArea.y - OUTWINDOW_HOT_AREA;
+    newTopRightRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[0];
+    newTopRightRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[0];
+    windowHotAreas.push_back(newTopRightRect);
+    Rect newBottomLeftRect;
+    newBottomLeftRect.x = windowArea.x - OUTWINDOW_HOT_AREA;
+    newBottomLeftRect.y = windowArea.y + windowArea.height - pointerChangeAreas[0];
+    newBottomLeftRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[0];
+    newBottomLeftRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[0];
+    windowHotAreas.push_back(newBottomLeftRect);
+    Rect newBottomRightRect;
+    newBottomRightRect.x = windowArea.x + windowArea.width - pointerChangeAreas[0];
+    newBottomRightRect.y = windowArea.y + windowArea.height - pointerChangeAreas[0];
+    newBottomRightRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[0];
+    newBottomRightRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[0];
+    windowHotAreas.push_back(newBottomRightRect);
+}
+
 void InputWindowsManager::UpdatePointerEvent(int32_t logicalX, int32_t logicalY,
     const std::shared_ptr<PointerEvent>& pointerEvent, const WindowInfo& touchWindow)
 {
@@ -1379,6 +1538,14 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     }
+    if (!touchWindow) {
+        MMI_HILOGE("TouchWindow is nullptr");
+        return RET_ERR;
+    }
+    WindowInfo window = *touchWindow;
+    SelectPointerChangeArea(window, pointerStyle, logicalX, logicalY);
+    MMI_HILOGD("pointerStyle is :%{public}d, windowId is :%{public}d, logicalX is :%{public}d,"
+        "logicalY is :%{public}d", pointerStyle.id, window.id, logicalX, logicalY);
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
         pointerItem.GetDisplayY(), pointerStyle);
 
