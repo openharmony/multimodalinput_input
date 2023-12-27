@@ -105,7 +105,8 @@ public:
     std::shared_ptr<TestCommandHandler> eventTestCommandHandler_ { nullptr };
     std::shared_ptr<KeyCommandHandler> eventKeyCommandHandler_ { nullptr };
     void SetupKeyCommandHandler();
-    std::shared_ptr<PointerEvent> SetupPointerEvent(int32_t action, int32_t pointerId, int32_t finger_num, int32_t dispX = DEFX, int32_t dispY = DEFY);
+    std::shared_ptr<PointerEvent> SetupPointerEvent(int32_t action, int32_t pointerId, int32_t finger_num,
+                                                    int32_t dispX = DEFX, int32_t dispY = DEFY);
     bool CreateTestJson(const std::string &contentJson);
     void Delay(std::chrono::milliseconds delayMs);
     static void AbilityCallback(const AAFwk::Want &want, ErrCode err);
@@ -137,8 +138,13 @@ void TwoFingerLongTouchTest::SetupKeyCommandHandler()
     err_ = ERR_OK;
 }
 
-std::shared_ptr<PointerEvent> TwoFingerLongTouchTest::SetupPointerEvent(int32_t action, int32_t pointerId, int32_t finger_num, int32_t dispX, int32_t dispY)
+std::shared_ptr<PointerEvent> TwoFingerLongTouchTest::SetupPointerEvent(int32_t action,
+                                                                        int32_t pointerId,
+                                                                        int32_t finger_num,
+                                                                        int32_t dispX, int32_t dispY)
 {
+    constexpr int32_t TWO_FINGER = 2;
+    constexpr int32_t COORD_OFFSET = 25;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -152,11 +158,11 @@ std::shared_ptr<PointerEvent> TwoFingerLongTouchTest::SetupPointerEvent(int32_t 
     item1.SetDisplayY(dispY);
     pointerEvent->AddPointerItem(item1);
 
-    if (2 == finger_num) {
+    if (finger_num == TWO_FINGER) {
         PointerEvent::PointerItem item2;
         item2.SetPointerId(1);
-        item2.SetDisplayX(dispX + 25);
-        item2.SetDisplayY(dispY + 25);
+        item2.SetDisplayX(dispX + COORD_OFFSET);
+        item2.SetDisplayY(dispY + COORD_OFFSET);
         pointerEvent->AddPointerItem(item2);
     }
 
@@ -200,7 +206,7 @@ void TwoFingerLongTouchTest::AbilityCallback(const AAFwk::Want &want, ErrCode er
     EXPECT_EQ(want.uri_, URI);
 
     EXPECT_EQ(want.entities_.size(), ENTITY_NUM);
-    if (ENTITY_NUM == want.entities_.size()) {
+    if (want.entities_.size() == ENTITY_NUM) {
         for (unsigned i = 0; i < want.entities_.size(); ++i) {
             std::string entity = want.entities_[i];
             std::string expected = ENTITY.data() + std::to_string(i + 1);
@@ -209,7 +215,7 @@ void TwoFingerLongTouchTest::AbilityCallback(const AAFwk::Want &want, ErrCode er
     }
 
     EXPECT_EQ(want.params_.size(), PARAMETERS_NUM);
-    if (PARAMETERS_NUM == want.params_.size()) {
+    if (want.params_.size() == PARAMETERS_NUM) {
         for (unsigned i = 0; i < want.params_.size(); ++i) {
             std::string key = KEY.data() + std::to_string(i + 1);
             std::string value = VALUE.data() + std::to_string(i + 1);
@@ -330,11 +336,13 @@ HWTEST_F(TwoFingerLongTouchTest, TwoFingerLongTouchTest_004, TestSize.Level1)
     ASSERT_NE(pointerEvent2, nullptr);
     eventKeyCommandHandler_->HandleTouchEvent(pointerEvent2);
 
-    auto pointerEvent3 = SetupPointerEvent(PointerEvent::POINTER_ACTION_MOVE, 0, 2, DEFX + LESS_THEN_THRESHOLD, DEFY + LESS_THEN_THRESHOLD);
+    auto pointerEvent3 = SetupPointerEvent(PointerEvent::POINTER_ACTION_MOVE, 0, 2,
+                                           DEFX + LESS_THEN_THRESHOLD, DEFY + LESS_THEN_THRESHOLD);
     ASSERT_NE(pointerEvent3, nullptr);
     eventKeyCommandHandler_->HandleTouchEvent(pointerEvent3);
 
-    auto pointerEvent4 = SetupPointerEvent(PointerEvent::POINTER_ACTION_MOVE, 2, 1, DEFX + GREATER_THEN_THRESHOLD, DEFY + GREATER_THEN_THRESHOLD);
+    auto pointerEvent4 = SetupPointerEvent(PointerEvent::POINTER_ACTION_MOVE, 2, 1,
+                                           DEFX + GREATER_THEN_THRESHOLD, DEFY + GREATER_THEN_THRESHOLD);
     ASSERT_NE(pointerEvent4, nullptr);
     eventKeyCommandHandler_->HandleTouchEvent(pointerEvent4);
 
@@ -366,7 +374,8 @@ HWTEST_F(TwoFingerLongTouchTest, TwoFingerLongTouchTest_005, TestSize.Level1)
     ASSERT_NE(pointerEvent2, nullptr);
     eventKeyCommandHandler_->HandleTouchEvent(pointerEvent2);
 
-    auto pointerEvent3 = SetupPointerEvent(PointerEvent::POINTER_ACTION_MOVE, 0, 2, DEFX + GREATER_THEN_THRESHOLD, DEFY + GREATER_THEN_THRESHOLD);
+    auto pointerEvent3 = SetupPointerEvent(PointerEvent::POINTER_ACTION_MOVE, 0, 2,
+                                           DEFX + GREATER_THEN_THRESHOLD, DEFY + GREATER_THEN_THRESHOLD);
     ASSERT_NE(pointerEvent3, nullptr);
     eventKeyCommandHandler_->HandleTouchEvent(pointerEvent3);
 
@@ -409,20 +418,34 @@ HWTEST_F(TwoFingerLongTouchTest, TwoFingerLongTouchTest_006, TestSize.Level1)
 }
 
 const std::string TEST_JSON_1 = "";
-const std::string TEST_JSON_2 = "{ \"TwoFingerGesture\" : [] }\n";
-const std::string TEST_JSON_3 = "{ \"TwoFingerGesture\" : {} }\n";
-const std::string TEST_JSON_4 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200} }\n";
-const std::string TEST_JSON_5 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : -1} }\n";
-const std::string TEST_JSON_6 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : \"abc\"} }\n";
-const std::string TEST_JSON_7 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : []} }\n";
-const std::string TEST_JSON_8 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"bundleName\"}} }\n";
-const std::string TEST_JSON_9 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"entities\" : {}}} }\n";
-const std::string TEST_JSON_10 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"entities\" : [123]}} }\n";
-const std::string TEST_JSON_11 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"params\" : {}}} }\n";
-const std::string TEST_JSON_12 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"params\" : [[]]}} }\n";
-const std::string TEST_JSON_13 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"params\" : [{}]}} }\n";
-const std::string TEST_JSON_14 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"params\" : [{\"key\" : \"key1\"}]}} }\n";
-const std::string TEST_JSON_15 = "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {}} }\n";
+const std::string TEST_JSON_2 =
+    "{ \"TwoFingerGesture\" : [] }\n";
+const std::string TEST_JSON_3 =
+    "{ \"TwoFingerGesture\" : {} }\n";
+const std::string TEST_JSON_4 =
+    "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200} }\n";
+const std::string TEST_JSON_5 =
+    "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : -1} }\n";
+const std::string TEST_JSON_6 =
+    "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : \"abc\"} }\n";
+const std::string TEST_JSON_7 =
+    "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : []} }\n";
+const std::string TEST_JSON_8 =
+    "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"bundleName\"}} }\n";
+const std::string TEST_JSON_9 =
+    "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"entities\" : {}}} }\n";
+const std::string TEST_JSON_10 =
+    "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"entities\" : [123]}} }\n";
+const std::string TEST_JSON_11 =
+    "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"params\" : {}}} }\n";
+const std::string TEST_JSON_12 =
+    "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"params\" : [[]]}} }\n";
+const std::string TEST_JSON_13 =
+    "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"params\" : [{}]}} }\n";
+const std::string TEST_JSON_14 =
+    "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {\"params\" : [{\"key\" : \"key1\"}]}} }\n";
+const std::string TEST_JSON_15 =
+    "{ \"TwoFingerGesture\" : {\"abilityStartDelay\" : 200, \"ability\" : {}} }\n";
 
 /**
  * @tc.name: TwoFingerLongTouchTest_007

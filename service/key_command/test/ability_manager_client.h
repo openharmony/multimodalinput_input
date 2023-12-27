@@ -14,7 +14,8 @@
  */
 
 /*
- * This file is used as stub header for key_command_handler.cpp. It should re-define ability related methods for unit test.
+ * This file is used as stub header for key_command_handler.cpp.
+ * It should re-define ability related methods for unit test.
  */
 
 #ifndef ABILITY_MANAGER_CLIENT_STUB_H
