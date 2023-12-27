@@ -1410,7 +1410,6 @@ bool KeyCommandHandler::HandleEvent(const std::shared_ptr<KeyEvent> key)
 
     count_ = 0;
     isDownStart_ = false;
-    isRepeatKeyState_ = false;
     return false;
 }
 
@@ -1515,10 +1514,6 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
         }
     }
 
-    if (isLaunched) {
-        isRepeatKeyState_ = true;
-    }
-
     return isLaunched || waitRepeatKey;
 }
 
@@ -1536,7 +1531,6 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
         launchAbilityCount_ = count_;
         isLaunched = true;
         isDownStart_ = false;
-        isRepeatKeyState_ = true;
         auto keyEventCancel = std::make_shared<KeyEvent>(*keyEvent);
         keyEventCancel->SetKeyAction(KeyEvent::KEY_ACTION_CANCEL);
         InputHandler->GetSubscriberHandler()->HandleKeyEvent(keyEventCancel);
@@ -1551,9 +1545,6 @@ bool KeyCommandHandler::HandleKeyUpCancel(const RepeatKey &item, const std::shar
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_CANCEL) {
         isKeyCancel_ = true;
         isDownStart_ = false;
-        if (downTimerId_ >= 0) {
-            TimerMgr->RemoveTimer(downTimerId_);
-        }
         return true;
     }
     return false;
@@ -1565,10 +1556,6 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
     CHKPF(keyEvent);
 
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
-        if (downTimerId_ >= 0) {
-            TimerMgr->RemoveTimer(downTimerId_);
-        }
-
         if (repeatKey_.keyCode != item.keyCode) {
             std::vector<int32_t> pressedKeys = keyEvent->GetPressedKeys();
 
@@ -1596,9 +1583,6 @@ bool KeyCommandHandler::HandleRepeatKeyCount(const RepeatKey &item, const std::s
     if (keyEvent->GetKeyCode() == item.keyCode && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_DOWN) {
         repeatKey_.keyCode = item.keyCode;
         isDownStart_ = true;
-        if (downTimerId_ >= 0) {
-            TimerMgr->RemoveTimer(downTimerId_);
-        }
 
         downActionTime_ = keyEvent->GetActionTime();
         if ((downActionTime_ - upActionTime_) < intervalTime_) {
@@ -1633,7 +1617,6 @@ void KeyCommandHandler::SendKeyEvent()
     }
     count_ = 0;
     isDownStart_ = false;
-    isRepeatKeyState_ = false;
     isHandleSequence_ = false;
     launchAbilityCount_ = 0;
 }
