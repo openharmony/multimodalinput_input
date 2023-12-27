@@ -91,6 +91,14 @@ ErrCode AbilityManagerClient::StartAbility(const Want &want, int32_t requestCode
     return err_;
 }
 
+ErrCode AbilityManagerClient::StartExtensionAbility(const Want &want, void *callerToken)
+{
+    (void)want;
+    (void)callerToken;
+
+    return ERR_OK;
+}
+
 void AbilityManagerClient::SetCallback(void (*cb)(const Want &want, ErrCode err))
 {
     callback_ = cb;

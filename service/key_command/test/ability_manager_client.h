@@ -62,7 +62,9 @@ public:
     }
     virtual ~AbilityManagerClient() {}
     static std::shared_ptr<AbilityManagerClient> GetInstance();
-    ErrCode StartAbility(const Want &want, int32_t requestCode = DEFAULT_INVAL_VALUE, int32_t userId = DEFAULT_INVAL_VALUE);
+    ErrCode StartAbility(const Want &want, int32_t requestCode = DEFAULT_INVAL_VALUE,
+                         int32_t userId = DEFAULT_INVAL_VALUE);
+    ErrCode StartExtensionAbility(const Want &want, void *callerToken);
     void SetCallback(void (*cb)(const Want &want, ErrCode err));
     void SetErrCode(ErrCode err);
 
