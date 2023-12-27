@@ -122,6 +122,12 @@ private:
     void UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &displayGroupInfo);
     std::pair<int32_t, int32_t> TransformSampleWindowXY(int32_t logicX, int32_t logicY) const;
     bool IsValidZorderWindow(const WindowInfo &window, const std::shared_ptr<PointerEvent>& pointerEvent);
+    void UpdateTopBottomArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
+        std::vector<Rect> &windowHotAreas);
+    void UpdateLeftRightArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
+        std::vector<Rect> &windowHotAreas);
+    void UpdateInnerAngleArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
+        std::vector<Rect> &windowHotAreas);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle);
@@ -141,6 +147,9 @@ private:
     void FindPhysicalDisplay(const DisplayInfo& displayInfo, int32_t& physicalX,
         int32_t& physicalY, int32_t& displayId);
     void InitMouseDownInfo();
+    void SelectPointerChangeArea(const WindowInfo &windowInfo, PointerStyle &pointerStyle,
+        int32_t logicalX, int32_t logicalY);
+    void UpdatePointerChangeAreas(const DisplayGroupInfo &displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_POINTER
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
@@ -159,6 +168,7 @@ void PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool IsInHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects, const WindowInfo &window) const;
+    void InWhichHotArea(int32_t x, int32_t y, const std::vector<Rect> &rects, PointerStyle &pointerStyle) const;
     template <class T>
     void CreateStatusConfigObserver(T& item);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
@@ -190,6 +200,7 @@ private:
     PointerStyle lastPointerStyle_ {.id = -1};
     MouseLocation mouseLocation_ = { -1, -1 };
     std::map<int32_t, WindowInfo> touchItemDownInfos_;
+    std::map<int32_t, std::vector<Rect>> windowsHotAreas_;
     InputDisplayBindHelper bindInfo_;
     struct CaptureModeInfo {
         int32_t windowId { -1 };
