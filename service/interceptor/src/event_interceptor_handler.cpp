@@ -258,7 +258,7 @@ bool EventInterceptorHandler::InterceptorCollection::HandleEvent(std::shared_ptr
         MMI_HILOGE("GetPointerItem:%{public}d fail", pointerId);
         return false;
     }
-    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(pointerItem.GetDeviceId());
+    std::shared_ptr<InputDevice> inputDevice = InputDevMgr->GetInputDevice(pointerItem.GetDeviceId(), false);
     CHKPF(inputDevice);
     uint32_t capPointer = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_POINTER);
     uint32_t capTouch = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_TOUCH);
