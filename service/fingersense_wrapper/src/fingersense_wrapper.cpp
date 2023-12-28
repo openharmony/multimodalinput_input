@@ -54,6 +54,11 @@ void FingersenseWrapper::InitFingerSenseWrapper()
         MMI_HILOGE("fingersense wrapper symbol failed, error: %{public}s", dlerror());
         return;
     }
+    sendFingerSenseDisplayMode_ = (SEND_FINGERSENSE_DISPLAYMODE)dlsym(fingerSenseWrapperHandle_, "UpdateDisplayMode");
+    if (sendFingerSenseDisplayMode_ == nullptr) {
+        MMI_HILOGE("send fingersense display mode symbol failed, error: %{public}s", dlerror());
+        return;
+    }
     MMI_HILOGD("fingersense wrapper init success");
 }
 } // namespace MMI
