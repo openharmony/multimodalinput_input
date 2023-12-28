@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,8 @@
 #include <vector>
 #include <map>
 #include <errors.h>
+
+#include "iremote_object.h"
 
 namespace OHOS {
 namespace AAFwk {
@@ -65,7 +67,7 @@ public:
     static std::shared_ptr<AbilityManagerClient> GetInstance();
     ErrCode StartAbility(const Want &want, int32_t requestCode = DEFAULT_INVAL_VALUE,
                          int32_t userId = DEFAULT_INVAL_VALUE);
-    ErrCode StartExtensionAbility(const Want &want, void *callerToken);
+    ErrCode StartExtensionAbility(const Want &want, sptr<IRemoteObject> callerToken);
     void SetCallback(void (*cb)(const Want &want, ErrCode err));
     void SetErrCode(ErrCode err);
 

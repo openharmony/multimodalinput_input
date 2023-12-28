@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -143,8 +143,8 @@ std::shared_ptr<PointerEvent> TwoFingerLongTouchTest::SetupPointerEvent(int32_t 
                                                                         int32_t finger_num,
                                                                         int32_t dispX, int32_t dispY)
 {
-    constexpr int32_t TWO_FINGER = 2;
-    constexpr int32_t COORD_OFFSET = 25;
+    constexpr int32_t twoFinger = 2;
+    constexpr int32_t coordOffset = 25;
     std::shared_ptr<PointerEvent> pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
@@ -158,11 +158,11 @@ std::shared_ptr<PointerEvent> TwoFingerLongTouchTest::SetupPointerEvent(int32_t 
     item1.SetDisplayY(dispY);
     pointerEvent->AddPointerItem(item1);
 
-    if (finger_num == TWO_FINGER) {
+    if (finger_num == twoFinger) {
         PointerEvent::PointerItem item2;
         item2.SetPointerId(1);
-        item2.SetDisplayX(dispX + COORD_OFFSET);
-        item2.SetDisplayY(dispY + COORD_OFFSET);
+        item2.SetDisplayX(dispX + coordOffset);
+        item2.SetDisplayY(dispY + coordOffset);
         pointerEvent->AddPointerItem(item2);
     }
 
@@ -317,7 +317,8 @@ HWTEST_F(TwoFingerLongTouchTest, TwoFingerLongTouchTest_003, TestSize.Level1)
 
 /**
  * @tc.name: TwoFingerLongTouchTest_004
- * @tc.desc: Test two finger long touch gesture moving inside threshold (And one more unregistered event outside of threshold)
+ * @tc.desc: Test two finger long touch gesture moving inside threshold
+ *           (And one more unregistered event outside of threshold)
  * @tc.type: FUNC
  * @tc.require:
  */
