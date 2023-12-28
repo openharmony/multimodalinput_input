@@ -254,9 +254,6 @@ int32_t MMIService::Init()
     MMI_HILOGD("ANRManager Init");
     ANRMgr->Init(*this);
     MMI_HILOGD("PointerDrawingManager Init");
-#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
-    FINGERSENSE_WRAPPER->InitFingerSenseWrapper();
-#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 #ifdef OHOS_BUILD_ENABLE_POINTER
     if (!IPointerDrawingManager::GetInstance()->Init()) {
         MMI_HILOGE("Pointer draw init failed");
@@ -308,9 +305,11 @@ void MMIService::OnStart()
     MMI_HILOGI("Add system ability listener success");
 #endif
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    FINGERSENSE_WRAPPER->InitFingerSenseWrapper();
     MMI_HILOGI("Add system ability listener start");
     AddSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
     MMI_HILOGI("Add system ability listener success");
+    DISPLAY_MONITOR->InitCommonEventSubscriber();
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     MMI_HILOGI("Add app manager service listener start");
     AddSystemAbilityListener(APP_MGR_SERVICE_ID);
