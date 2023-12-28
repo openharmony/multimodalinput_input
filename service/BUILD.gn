@@ -382,8 +382,8 @@ ohos_unittest("TwoFingerLongTouchTest") {
 
   sources = [
     "key_command/src/key_command_handler.cpp",
+    "key_command/test/ability_manager_client_stub.cpp",
     "key_command/test/two_finger_long_touch_test.cpp",
-    "key_command/test/ability_manager_client_stub.cpp"
   ]
 
   deps = [
@@ -398,11 +398,11 @@ ohos_unittest("TwoFingerLongTouchTest") {
   external_deps = [
     "c_utils:utils",
     "config_policy:configpolicy_util",
+    "data_share:datashare_consumer",
     "hilog:libhilog",
     "image_framework:image_native",
     "preferences:native_preferences",
     "window_manager:libwm",
-    "data_share:datashare_consumer",
   ]
 }
 
