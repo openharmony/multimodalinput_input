@@ -21,6 +21,7 @@
 #include <linux/input.h>
 
 #include "dfx_hisysevent.h"
+#include "fingersense_wrapper.h"
 #include "input_device_manager.h"
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
@@ -438,11 +439,37 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     if (!displayGroupInfo.displaysInfo.empty()) {
         PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
     }
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    UpdateDisplayMode();
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     if (InputDevMgr->HasPointerDevice()) {
         NotifyPointerToWindow();
     }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 }
+
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+void InputWindowsManager::UpdateDisplayMode()
+{
+    CALL_DEBUG_ENTER;
+    if (displayGroupInfo_.displaysInfo.empty()) {
+        MMI_HILOGE("displaysInfo is empty");
+        return;
+    }
+    DisplayMode mode = displayGroupInfo_.displaysInfo[0].displayMode;
+    if (mode == displayMode_) {
+        MMI_HILOGD("displaymode not change, mode: %{public}d, diaplayMode_: %{public}d", mode, displayMode_);
+        return;
+    }
+    displayMode_ = mode;
+    if (FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_ == nullptr) {
+        MMI_HILOGD("send fingersense display mode is nullptr");
+        return;
+    }
+    MMI_HILOGI("update fingersense display mode, displayMode: %{public}d", displayMode_);
+    FINGERSENSE_WRAPPER->sendFingerSenseDisplayMode_(static_cast<int32_t>(displayMode_));
+}
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo)

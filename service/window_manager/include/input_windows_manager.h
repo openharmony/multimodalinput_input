@@ -177,6 +177,10 @@ void PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo
     int32_t UpdateJoystickTarget(std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
 
+#ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+    void UpdateDisplayMode();
+#endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
+
 private:
     UDSServer* udsServer_ { nullptr };
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -209,6 +213,7 @@ private:
     ExtraData extraData_;
     bool haveSetObserver_ { false };
     DevMode showCursor_;
+    DisplayMode displayMode_ { DisplayMode::UNKNOWN };
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()

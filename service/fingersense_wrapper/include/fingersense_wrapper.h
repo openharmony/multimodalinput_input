@@ -30,11 +30,13 @@ public:
     typedef void (*NOTIFY_TOUCH_UP)(struct TouchType*);
     typedef void (*ENABLE_FINGERSENSE)();
     typedef void (*DISABLE_FINGERSENSE)();
+    typedef void (*SEND_FINGERSENSE_DISPLAYMODE)(int32_t);
 
     SET_CURRENT_TOOL_TYPE setCurrentToolType_ = nullptr;
     NOTIFY_TOUCH_UP notifyTouchUp_ = nullptr;
     ENABLE_FINGERSENSE enableFingersense_ = nullptr;
     DISABLE_FINGERSENSE disableFingerSense_ = nullptr;
+    SEND_FINGERSENSE_DISPLAYMODE sendFingerSenseDisplayMode_ = nullptr;
 private:
     void* fingerSenseWrapperHandle_ = nullptr;
 };
