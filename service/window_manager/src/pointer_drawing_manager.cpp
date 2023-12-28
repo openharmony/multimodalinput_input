@@ -423,7 +423,7 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
 {
     CALL_DEBUG_ENTER;
     sptr<OHOS::SurfaceBuffer> buffer;
-    int32_t releaseFence = 0;
+    int32_t releaseFence = -1;
     OHOS::BufferRequestConfig config = {
         .width = IMAGE_WIDTH,
         .height = IMAGE_HEIGHT,
@@ -433,6 +433,7 @@ sptr<OHOS::SurfaceBuffer> PointerDrawingManager::GetSurfaceBuffer(sptr<OHOS::Sur
     };
 
     OHOS::SurfaceError ret = layer->RequestBuffer(buffer, releaseFence, config);
+    close(releaseFence);
     if (ret != OHOS::SURFACE_ERROR_OK) {
         MMI_HILOGE("Request buffer ret:%{public}s", SurfaceErrorStr(ret).c_str());
         return nullptr;
