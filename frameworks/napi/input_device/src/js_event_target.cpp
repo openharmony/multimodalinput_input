@@ -53,8 +53,7 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is nullptr");
         return;
     }
-    auto temp = static_cast<DeviceItem*>(work->data);
-    auto workItem = static_cast<std::unique_ptr<JsUtil::CallbackInfo> *>(temp->item);
+    auto temp = static_cast<napi_ref>(work->data);
     JsUtil::DeletePtr<uv_work_t *>(work);
     auto addEvent = devListener_.find(CHANGED_TYPE);
     if (addEvent == devListener_.end()) {
@@ -63,36 +62,34 @@ void JsEventTarget::EmitAddedDeviceEvent(uv_work_t *work, int32_t status)
     }
     for (const auto &item : addEvent->second) {
         CHKPC(item->env);
-        if (item->ref != (*workItem)->ref) {
+        if (item->ref != temp) {
             continue;
         }
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(item->env, &scope);
         if (scope == nullptr) {
             MMI_HILOGE("scope is nullptr");
-            delete temp;
             return;
         }
         napi_value eventType = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_create_string_utf8(item->env, ADD_EVENT.c_str(), NAPI_AUTO_LENGTH, &eventType),
-            CREATE_STRING_UTF8, scope, temp);
+            CREATE_STRING_UTF8, scope);
         napi_value object = nullptr;
-        CHKRV_SCOPE_DEL(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope, temp);
+        CHKRV_SCOPE_DEL(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
         CHKRV_SCOPE_DEL(item->env, napi_set_named_property(item->env, object, "type", eventType), SET_NAMED_PROPERTY,
-            scope, temp);
+            scope);
         napi_value handler = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE,
-            scope, temp);
+            scope);
         napi_value deviceId = nullptr;
-        CHKRV_SCOPE_DEL(item->env, napi_create_int32(item->env, temp->deviceId, &deviceId), CREATE_INT32, scope, temp);
+        CHKRV_SCOPE_DEL(item->env, napi_create_int32(item->env, item->data.deviceId, &deviceId), CREATE_INT32, scope);
         CHKRV_SCOPE_DEL(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY,
-            scope, temp);
+            scope);
         napi_value ret = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION,
-            scope, temp);
+            scope);
         napi_close_handle_scope(item->env, scope);
     }
-    delete temp;
 }
 
 void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
@@ -105,8 +102,7 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
         MMI_HILOGE("Check data is nullptr");
         return;
     }
-    auto temp = static_cast<DeviceItem*>(work->data);
-    auto workItem = static_cast<std::unique_ptr<JsUtil::CallbackInfo> *>(temp->item);
+    auto temp = static_cast<napi_ref>(work->data);
     JsUtil::DeletePtr<uv_work_t *>(work);
     auto removeEvent = devListener_.find(CHANGED_TYPE);
     if (removeEvent == devListener_.end()) {
@@ -115,36 +111,34 @@ void JsEventTarget::EmitRemoveDeviceEvent(uv_work_t *work, int32_t status)
     }
     for (const auto &item : removeEvent->second) {
         CHKPC(item->env);
-        if (item->ref != (*workItem)->ref) {
+        if (item->ref != temp) {
             continue;
         }
         napi_handle_scope scope = nullptr;
         napi_open_handle_scope(item->env, &scope);
         if (scope == nullptr) {
             MMI_HILOGE("scope is nullptr");
-            delete temp;
             return;
         }
         napi_value eventType = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_create_string_utf8(item->env, REMOVE_EVENT.c_str(), NAPI_AUTO_LENGTH,
-            &eventType), CREATE_STRING_UTF8, scope, temp);
+            &eventType), CREATE_STRING_UTF8, scope);
         napi_value deviceId = nullptr;
-        CHKRV_SCOPE_DEL(item->env, napi_create_int32(item->env, temp->deviceId, &deviceId), CREATE_INT32, scope, temp);
+        CHKRV_SCOPE_DEL(item->env, napi_create_int32(item->env, item->data.deviceId, &deviceId), CREATE_INT32, scope);
         napi_value object = nullptr;
-        CHKRV_SCOPE_DEL(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope, temp);
+        CHKRV_SCOPE_DEL(item->env, napi_create_object(item->env, &object), CREATE_OBJECT, scope);
         CHKRV_SCOPE_DEL(item->env, napi_set_named_property(item->env, object, "type", eventType), SET_NAMED_PROPERTY,
-            scope, temp);
+            scope);
         CHKRV_SCOPE_DEL(item->env, napi_set_named_property(item->env, object, "deviceId", deviceId), SET_NAMED_PROPERTY,
-            scope, temp);
+            scope);
         napi_value handler = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_get_reference_value(item->env, item->ref, &handler), GET_REFERENCE_VALUE,
-            scope, temp);
+            scope);
         napi_value ret = nullptr;
         CHKRV_SCOPE_DEL(item->env, napi_call_function(item->env, nullptr, handler, 1, &object, &ret), CALL_FUNCTION,
-            scope, temp);
+            scope);
         napi_close_handle_scope(item->env, scope);
     }
-    delete temp;
 }
 
 void JsEventTarget::OnDeviceAdded(int32_t deviceId, const std::string &type)
@@ -165,10 +159,7 @@ void JsEventTarget::OnDeviceAdded(int32_t deviceId, const std::string &type)
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
         item->data.deviceId = deviceId;
-        DeviceItem *deviceItem = new DeviceItem();
-        deviceItem->deviceId = deviceId;
-        deviceItem->item = static_cast<void *>(&item);
-        work->data = deviceItem;
+        work->data = item->ref;
         int32_t ret = uv_queue_work_with_qos(
             loop, work, [](uv_work_t *work) {}, EmitAddedDeviceEvent, uv_qos_user_initiated);
         if (ret != 0) {
@@ -196,10 +187,7 @@ void JsEventTarget::OnDeviceRemoved(int32_t deviceId, const std::string &type)
         uv_work_t *work = new (std::nothrow) uv_work_t;
         CHKPV(work);
         item->data.deviceId = deviceId;
-        DeviceItem *deviceItem = new DeviceItem();
-        deviceItem->deviceId = deviceId;
-        deviceItem->item = static_cast<void *>(&item);
-        work->data = deviceItem;
+        work->data = item->ref;
         int32_t ret = uv_queue_work_with_qos(
             loop, work, [](uv_work_t *work) {}, EmitRemoveDeviceEvent, uv_qos_user_initiated);
         if (ret != 0) {
