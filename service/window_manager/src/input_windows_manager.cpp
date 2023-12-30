@@ -51,6 +51,9 @@ constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER
 constexpr int32_t OUTWINDOW_HOT_AREA = 20;
 constexpr int32_t DOUBLE_COUNT = 2;
+constexpr int32_t SCALE_X = 0;
+constexpr int32_t SCALE_Y = 4;
+constexpr int32_t DEFAULT_COUNT_POINTER_STYLE = -1;
 const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/display_bind.cfg";
 const std::string mouseFileName = "mouse_settings.xml";
 const std::string defaultIconPath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
@@ -1203,7 +1206,9 @@ void InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
 {
     CALL_DEBUG_ENTER;
     int32_t areaNum = 0;
-    pointerStyle.id = -1;
+    if (pointerStyle.id == DEFAULT_POINTER_STYLE) {
+        pointerStyle.id = DEFAULT_COUNT_POINTER_STYLE;
+    }
     for (const auto &item : rects) {
         int32_t displayMaxX = 0;
         int32_t displayMaxY = 0;
@@ -1244,6 +1249,9 @@ void InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
             break;
         case PointerHotArea::INNER:
             pointerStyle.id = MOUSE_ICON::DEFAULT;
+            break;
+        default:
+            MMI_HILOGD("pointerStyle in default is: %{public}d", pointerStyle.id);
             break;
     }
     MMI_HILOGD("pointerStyle after switch ID is :%{public}d", pointerStyle.id);
@@ -1382,11 +1390,19 @@ void InputWindowsManager::UpdatePointerChangeAreas(const DisplayGroupInfo &displ
         std::vector<Rect> windowHotAreas;
         int32_t windowId = windowInfo.id;
         Rect windowArea = windowInfo.area;
+        windowArea.width = windowInfo.transform[SCALE_X] != 0 ? windowInfo.area.width / windowInfo.transform[SCALE_X]
+            : windowInfo.area.width;
+        windowArea.height = windowInfo.transform[SCALE_Y] != 0 ?  windowInfo.area.height / windowInfo.transform[SCALE_Y]
+            : windowInfo.area.height;
         std::vector<int32_t> pointerChangeAreas = windowInfo.pointerChangeAreas;
         UpdateTopBottomArea(windowArea, pointerChangeAreas, windowHotAreas);
         UpdateLeftRightArea(windowArea, pointerChangeAreas, windowHotAreas);
         UpdateInnerAngleArea(windowArea, pointerChangeAreas, windowHotAreas);
-        windowsHotAreas_.emplace(windowId, windowHotAreas);
+        if (windowsHotAreas_.find(windowId) == windowsHotAreas_.end()) {
+            windowsHotAreas_.emplace(windowId, windowHotAreas);
+        } else {
+            windowsHotAreas_[windowId] = windowHotAreas;
+        }
     }
 }
 
@@ -1565,6 +1581,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     }
+    GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
     if (!touchWindow) {
         MMI_HILOGE("TouchWindow is nullptr");
         return RET_ERR;
