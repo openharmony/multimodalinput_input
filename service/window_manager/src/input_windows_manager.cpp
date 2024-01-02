@@ -1061,13 +1061,8 @@ int32_t InputWindowsManager::UpdatePoinerStyle(int32_t pid, int32_t windowId, Po
 int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
-    // update the pointerStyle for sceneboard
-    if (displayGroupInfo_.windowsInfo.size() != 1) {
-        MMI_HILOGE("More than one window given in scene board scene!");
-        return RET_ERR;
-    }
-    auto scenePid = displayGroupInfo_.windowsInfo[0].pid;
-    auto sceneWinId = displayGroupInfo_.windowsInfo[0].id;
+    auto scenePid = pid;
+    auto sceneWinId = windowId;
     auto sceneIter = pointerStyle_.find(scenePid);
     if (sceneIter == pointerStyle_.end() || sceneIter->second.find(sceneWinId) == sceneIter->second.end()) {
         pointerStyle_[scenePid] = {};
@@ -1104,7 +1099,10 @@ int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, Poin
         return RET_OK;
     }
     MMI_HILOGD("start to get pid by window %{public}d", windowId);
-    return UpdatePoinerStyle(pid, windowId, pointerStyle);
+    if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        return UpdatePoinerStyle(pid, windowId, pointerStyle);
+    }
+    return UpdateSceneBoardPointerStyle(pid, windowId, pointerStyle);
 }
 
 int32_t InputWindowsManager::ClearWindowPointerStyle(int32_t pid, int32_t windowId)
