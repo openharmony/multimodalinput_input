@@ -216,8 +216,7 @@ void PointerDrawingManager::DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle)
         Rosen::RSNode::Animate(
             protocol,
             Rosen::RSAnimationTimingCurve::LINEAR,
-            [&]() { surfaceNode_->SetRotation(0); },
-            []() { MMI_HILOGE("animate callback"); });
+            [this]() { surfaceNode_->SetRotation(0); });
         MMI_HILOGD("current pointer is not loading");
         Rosen::RSTransaction::FlushImplicitTransaction();
         return;
@@ -231,8 +230,7 @@ void PointerDrawingManager::DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle)
     Rosen::RSNode::Animate(
         protocol,
         Rosen::RSAnimationTimingCurve::LINEAR,
-        [&]() { surfaceNode_->SetRotation(ROTATION_ANGLE); },
-        []() { MMI_HILOGE("animate callback"); });
+        [this]() { surfaceNode_->SetRotation(ROTATION_ANGLE); });
 
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
@@ -282,8 +280,7 @@ void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyl
     Rosen::RSNode::Animate(
         protocol,
         Rosen::RSAnimationTimingCurve::LINEAR,
-        [&]() { canvasNode_->SetRotation(ROTATION_ANGLE); },
-        []() { MMI_HILOGE("animate callback"); });
+        [this]() { canvasNode_->SetRotation(ROTATION_ANGLE); });
 
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
