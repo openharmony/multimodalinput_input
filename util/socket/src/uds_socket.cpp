@@ -101,7 +101,7 @@ void UDSSocket::OnReadPackets(CircleStreamBuffer &circBuf, UDSSocket::PacketCall
         CHKPB(buf);
         PackHead *head = reinterpret_cast<PackHead *>(buf);
         CHKPB(head);
-        if (head->size < 0 || head->size > MAX_PACKET_BUF_SIZE) {
+        if (head->size < 0 || head->size > GetMaxBuffSize()) {
             MMI_HILOGF("Packet header parsing error, and this error cannot be recovered. The buffer will be reset."
                 " head->size:%{public}d, unreadSize:%{public}d", head->size, unreadSize);
             circBuf.Reset();

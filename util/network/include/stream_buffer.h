@@ -26,6 +26,7 @@
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 #include "mmi_log.h"
+#include "util.h"
 
 namespace OHOS {
 namespace MMI {
