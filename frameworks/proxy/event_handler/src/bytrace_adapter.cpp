@@ -47,10 +47,17 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent)
     CHKPV(keyEvent);
     int32_t keyId = keyEvent->GetId();
     StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, onKeyEvent, keyId);
-    HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "service report keyId=" + std::to_string(keyId));
+    HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "service report keyId=" + std::to_string(keyId) +
+        " Action: " + GetKeyTraceString(keyEvent));
 }
 
-std::string BytraceAdapter::GetTouchTraceString(std::shared_ptr<PointerEvent> pointerEvent)
+std::string BytraceAdapter::GetKeyTraceString(std::shared_ptr<KeyEvent> keyEvent)
+{
+    std::string traceStr = KeyEvent::ActionToString(keyEvent->GetKeyAction());
+    return traceStr;
+}
+
+std::string BytraceAdapter::GetPointerTraceString(std::shared_ptr<PointerEvent> pointerEvent)
 {
     std::vector<PointerEvent::PointerItem> pointerItems;
     std::vector<int32_t> pointerIds{ pointerEvent->GetPointerIds() };
@@ -83,11 +90,12 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<PointerEvent> pointerEvent, Tr
     if (traceBtn == TRACE_START) {
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {
             StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, onPointerEvent, eventId);
-            HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "service report pointerId:" + std::to_string(eventId));
+            HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "service report pointerId:" + std::to_string(eventId) +
+                + ", type: " + pointerEvent->DumpPointerAction() + GetPointerTraceString(pointerEvent));
         } else {
             StartAsyncTrace(HITRACE_TAG_MULTIMODALINPUT, onTouchEvent, eventId);
             HITRACE_METER_NAME(HITRACE_TAG_MULTIMODALINPUT, "service report touchId:" + std::to_string(eventId) +
-                + ", type: " + pointerEvent->DumpPointerAction() + GetTouchTraceString(pointerEvent));
+                + ", type: " + pointerEvent->DumpPointerAction() + GetPointerTraceString(pointerEvent));
         }
     } else {
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE) {

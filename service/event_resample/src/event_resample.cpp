@@ -16,6 +16,7 @@
 #include "event_resample.h"
 
 #include "event_log_helper.h"
+#include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "mmi_log.h"
 #include "util.h"
@@ -64,6 +65,8 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
         // Update touch state object
         EventDump("UpdateTouchState", inputEvent_);
         EventLogHelper::PrintEventData(pointerEvent_);
+        auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
+        MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
         UpdateTouchState(inputEvent_);
         return pointerEvent_;
     } while (0);
@@ -72,6 +75,8 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
         // Update pointer event
         UpdatePointerEvent(outEvent);
         EventLogHelper::PrintEventData(pointerEvent_);
+        auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
+        MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
         return pointerEvent_;
     }
 
@@ -115,6 +120,8 @@ ErrCode EventResample::InitializeInputEvent(std::shared_ptr<PointerEvent> pointe
     // Check that event can be consumed and initialize motion event.
     if (nullptr != pointerEvent) {
         EventLogHelper::PrintEventData(pointerEvent_);
+        auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
+        MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
         pointerAction = pointerEvent->GetPointerAction();
         MMI_HILOGD("pointerAction:%{public}d %{public}" PRId64 " %{public}" PRId64,
                    pointerAction, pointerEvent->GetActionTime(), frameTime_);
