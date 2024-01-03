@@ -16,12 +16,12 @@ import("../../multimodalinput_mini.gni")
 
 gen_src_dir = "//third_party/libinput"
 gen_dst_dir = root_out_dir + "/diff_libinput_mmi"
-patches_root_dir = "${mmi_path}/patch"
+patches_root_dir = gen_src_dir + "/patch"
 build_gn_dir = "$patches_root_dir/diff_libinput_mmi/libinput"
 
 action("apply_patch") {
   visibility = [ ":*" ]
-  script = "$patches_root_dir/apply_patch.sh"
+  script = "${gen_src_dir}/patch/apply_patch.sh"
   inputs = [ "$gen_src_dir" ]
   outputs = [
     "$gen_dst_dir/src/filter.c",
