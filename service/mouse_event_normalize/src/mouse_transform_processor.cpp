@@ -569,6 +569,8 @@ bool MouseTransformProcessor::NormalizeMoveMouse(int32_t offsetX, int32_t offset
 void MouseTransformProcessor::DumpInner()
 {
     EventLogHelper::PrintEventData(pointerEvent_);
+    auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
+    MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
 }
 
 void MouseTransformProcessor::Dump(int32_t fd, const std::vector<std::string> &args)
