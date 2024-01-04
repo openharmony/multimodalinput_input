@@ -18,6 +18,7 @@
 #include <linux/input.h>
 
 #include "event_log_helper.h"
+#include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "fingersense_wrapper.h"
 #include "mmi_log.h"
@@ -79,8 +80,6 @@ bool TouchTransformProcessor::OnEventTouchDown(struct libinput_event *event)
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->AddPointerItem(item);
     pointerEvent_->SetPointerId(seatSlot);
-    EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
-        pointerEvent_->GetPointerIds().size());
     return true;
 }
 
@@ -151,8 +150,6 @@ bool TouchTransformProcessor::OnEventTouchMotion(struct libinput_event *event)
     item.SetToolHeight(touchInfo.toolRect.height);
     pointerEvent_->UpdatePointerItem(seatSlot, item);
     pointerEvent_->SetPointerId(seatSlot);
-    EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
-        pointerEvent_->GetPointerIds().size());
     return true;
 }
 __attribute__((no_sanitize("cfi")))
@@ -225,6 +222,10 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     }
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->UpdateId();
+    EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
+        pointerEvent_->GetPointerIds().size());
+    auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
+    MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
     WinMgr->UpdateTargetPointer(pointerEvent_);
     WinMgr->DrawTouchGraphic(pointerEvent_);
     return pointerEvent_;

@@ -1834,12 +1834,11 @@ bool KeyCommandHandler::HandleMulFingersTap(const std::shared_ptr<PointerEvent> 
 {
     CALL_DEBUG_ENTER;
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_TRIPTAP) {
+        MMI_HILOGI("The touchpad trip tap will launch ability");
         LaunchAbility(threeFingersTap_.ability, 0);
         return true;
-    } else {
-        MMI_HILOGE("The event is not a multi tap gesture");
-        return false;
     }
+    return false;
 }
 
 bool KeyCommandHandler::IsKeyMatch(const ShortcutKey &shortcutKey, const std::shared_ptr<KeyEvent> &key)
