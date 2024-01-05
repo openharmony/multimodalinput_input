@@ -33,6 +33,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEventHandler" };
+constexpr int32_t MT_TOOL_PALM = 2;
 } // namespace
 
 InputEventHandler::InputEventHandler()
@@ -70,11 +71,84 @@ void InputEventHandler::OnEvent(void *event, int64_t frameTime)
     int64_t beginTime = GetSysClockTime();
     MMI_HILOGD("Event reporting. id:%{public}" PRId64 ",tid:%{public}" PRId64 ",eventType:%{public}d,"
                "beginTime:%{public}" PRId64, idSeed_, GetThisThreadId(), eventType, beginTime);
+    if (IsTouchpadMistouch(lpEvent)) {
+        return;
+    }
     eventNormalizeHandler_->HandleEvent(lpEvent, frameTime);
     int64_t endTime = GetSysClockTime();
     int64_t lostTime = endTime - beginTime;
     MMI_HILOGD("Event handling completed. id:%{public}" PRId64 ",endTime:%{public}" PRId64
                ",lostTime:%{public}" PRId64, idSeed_, endTime, lostTime);
+}
+
+bool InputEventHandler::IsTouchpadMistouch(libinput_event* event)
+{
+    CHKPF(event);
+    auto touchpad = libinput_event_get_touchpad_event(event);
+    if (touchpad != nullptr) {
+        int32_t toolType = libinput_event_touchpad_get_tool_type(touchpad);
+        if (toolType == MT_TOOL_PALM) {
+            MMI_HILOGD("touchpad event is palm");
+            return false;
+        }
+    }
+
+    auto type = libinput_event_get_type(event);
+    if (type == LIBINPUT_EVENT_POINTER_BUTTON_TOUCHPAD) {
+        MMI_HILOGD("touchpad event is button");
+        return false;
+    }
+
+    if (type == LIBINPUT_EVENT_POINTER_TAP) {
+        auto isTapMistouch = IsTouchpadTapMistouch(event);
+        return isTapMistouch;
+    }
+
+    if (type == LIBINPUT_EVENT_KEYBOARD_KEY) {
+        isTyping_ = true;
+        if (TimerMgr->IsExist(timerId_)) {
+            TimerMgr->ResetTimer(timerId_);
+        } else {
+            static constexpr int32_t timeout = 500;
+            std::weak_ptr<InputEventHandler> weakPtr = shared_from_this();
+            timerId_ = TimerMgr->AddTimer(timeout, 1, [weakPtr]() {
+                CALL_DEBUG_ENTER;
+                auto sharedPtr = weakPtr.lock();
+                CHKPV(sharedPtr);
+                MMI_HILOGD("mistouch timer:%{public}d", sharedPtr->timerId_);
+                sharedPtr->timerId_ = -1;
+                sharedPtr->isTyping_ = false;
+            });
+        }
+    }
+    if (isTyping_ && (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD || type == LIBINPUT_EVENT_TOUCHPAD_MOTION)) {
+        MMI_HILOGD("The touchpad event is mistouch");
+        return true;
+    }
+    return false;
+}
+
+bool InputEventHandler::IsTouchpadTapMistouch(libinput_event* event)
+{
+    CHKPF(event);
+    auto data = libinput_event_get_pointer_event(event);
+    CHKPF(data);
+    auto state = libinput_event_pointer_get_button_state(data);
+    if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
+        if (isTyping_) {
+            isTapMistouch_ = true;
+            MMI_HILOGD("The tapPressed event is mistouch");
+            return true;
+        }
+    }
+    if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
+        if (isTapMistouch_) {
+            isTapMistouch_ = false;
+            MMI_HILOGD("The tapReleased event is mistouch");
+            return true;
+        }
+    }
+    return false;
 }
 
 int32_t InputEventHandler::BuildInputHandlerChain()

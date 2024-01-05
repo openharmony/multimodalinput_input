@@ -36,7 +36,7 @@ namespace OHOS {
 namespace MMI {
 using EventFun = std::function<int32_t(libinput_event *event)>;
 using NotifyDeviceChange = std::function<void(int32_t, int32_t, char *)>;
-class InputEventHandler final {
+class InputEventHandler final : public std::enable_shared_from_this<InputEventHandler> {
     DECLARE_DELAYED_SINGLETON(InputEventHandler);
 public:
     DISALLOW_COPY_AND_MOVE(InputEventHandler);
@@ -55,6 +55,8 @@ public:
 
 private:
     int32_t BuildInputHandlerChain();
+    bool IsTouchpadMistouch(libinput_event* event);
+    bool IsTouchpadTapMistouch(libinput_event* event);
 
     UDSServer *udsServer_ { nullptr };
     std::shared_ptr<EventNormalizeHandler> eventNormalizeHandler_ { nullptr };
@@ -67,6 +69,9 @@ private:
     std::shared_ptr<EventDispatchHandler> eventDispatchHandler_ { nullptr };
 
     uint64_t idSeed_ { 0 };
+    bool isTyping_ { false };
+    int32_t timerId_ { -1 };
+    bool isTapMistouch_ { false };
 };
 #define InputHandler ::OHOS::DelayedSingleton<InputEventHandler>::GetInstance()
 } // namespace MMI
