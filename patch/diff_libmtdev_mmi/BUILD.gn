@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -14,29 +14,7 @@
 import("//build/ohos.gni")
 import("//foundation/multimodalinput/input/multimodalinput_mini.gni")
 
-gen_src_dir = "//third_party/mtdev"
 gen_dst_dir = root_out_dir + "/diff_libmtdev_mmi"
-patches_root_dir = gen_src_dir + "/patch"
-build_gn_dir = "$patches_root_dir/diff_libmtdev_mmi/mtdev"
-
-action("apply_patch") {
-  visibility = [ ":*" ]
-  script = "${gen_src_dir}/patch/apply_patch.sh"
-  inputs = [ "$gen_src_dir" ]
-  outputs = [
-    "$gen_dst_dir/src/caps.c",
-    "$gen_dst_dir/src/core.c",
-    "$gen_dst_dir/src/iobuf.c",
-    "$gen_dst_dir/src/match.c",
-    "$gen_dst_dir/src/match_four.c",
-  ]
-
-  args = [
-    rebase_path(gen_src_dir, root_build_dir),
-    rebase_path(gen_dst_dir, root_build_dir),
-    rebase_path(build_gn_dir, root_build_dir),
-  ]
-}
 
 config("libmtdev-third_config") {
   visibility = [ ":*" ]
@@ -73,7 +51,7 @@ ohos_source_set("patch_gen_libmtdev-third-mmi") {
 
   public_configs = [ ":libmtdev-third_public_config" ]
 
-  deps = [ ":apply_patch" ]
+  deps = [ "//third_party/mtdev/patch:apply_patch" ]
 
   public_deps = []
 }
