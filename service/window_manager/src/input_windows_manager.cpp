@@ -50,9 +50,16 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
 #endif // OHOS_BUILD_ENABLE_POINTER
 constexpr int32_t OUTWINDOW_HOT_AREA = 20;
-constexpr int32_t DOUBLE_COUNT = 2;
 constexpr int32_t SCALE_X = 0;
 constexpr int32_t SCALE_Y = 4;
+constexpr int32_t TOP_LEFT_AREA = 0;
+constexpr int32_t TOP_AREA = 1;
+constexpr int32_t TOP_RIGHT_AREA = 2;
+constexpr int32_t RIGHT_AREA = 3;
+constexpr int32_t BOTTOM_RIGHT_AREA = 4;
+constexpr int32_t BOTTOM_AREA = 5;
+constexpr int32_t BOTTOM_LEFT_AREA = 6;
+constexpr int32_t LEFT_AREA = 7;
 constexpr int32_t DEFAULT_COUNT_POINTER_STYLE = -1;
 const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/display_bind.cfg";
 const std::string mouseFileName = "mouse_settings.xml";
@@ -1409,16 +1416,25 @@ void InputWindowsManager::UpdateTopBottomArea(const Rect &windowArea, std::vecto
 {
     CALL_DEBUG_ENTER;
     Rect newTopRect;
-    newTopRect.x = windowArea.x + pointerChangeAreas[0];
-    newTopRect.y = windowArea.y - pointerChangeAreas[0];
-    newTopRect.width = windowArea.width - DOUBLE_COUNT * pointerChangeAreas[0];
-    newTopRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[1];
-    windowHotAreas.push_back(newTopRect);
+    newTopRect.x = windowArea.x + pointerChangeAreas[TOP_LEFT_AREA];
+    newTopRect.y = windowArea.y - pointerChangeAreas[TOP_LEFT_AREA];
+    newTopRect.width = windowArea.width - pointerChangeAreas[TOP_LEFT_AREA] - pointerChangeAreas[TOP_RIGHT_AREA];
+    newTopRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[TOP_AREA];
     Rect newBottomRect;
-    newBottomRect.x = windowArea.x + pointerChangeAreas[0];
-    newBottomRect.y = windowArea.y + windowArea.height - pointerChangeAreas[1];
-    newBottomRect.width = windowArea.width - DOUBLE_COUNT * pointerChangeAreas[0];
-    newBottomRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[1];
+    newBottomRect.x = windowArea.x + pointerChangeAreas[BOTTOM_LEFT_AREA];
+    newBottomRect.y = windowArea.y + windowArea.height - pointerChangeAreas[BOTTOM_AREA];
+    newBottomRect.width = windowArea.width - pointerChangeAreas[BOTTOM_LEFT_AREA] -
+        pointerChangeAreas[BOTTOM_RIGHT_AREA];
+    newBottomRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[BOTTOM_AREA];
+    if (pointerChangeAreas[TOP_AREA] == 0) {
+        newTopRect.width = 0;
+        newTopRect.height = 0;
+    }
+    if (pointerChangeAreas[BOTTOM_AREA] == 0) {
+        newBottomRect.width = 0;
+        newBottomRect.height = 0;
+    }
+    windowHotAreas.push_back(newTopRect);
     windowHotAreas.push_back(newBottomRect);
 }
 
@@ -1428,15 +1444,24 @@ void InputWindowsManager::UpdateLeftRightArea(const Rect &windowArea, std::vecto
     CALL_DEBUG_ENTER;
     Rect newLeftRect;
     newLeftRect.x = windowArea.x - OUTWINDOW_HOT_AREA;
-    newLeftRect.y = windowArea.y + pointerChangeAreas[0];
-    newLeftRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[1];
-    newLeftRect.height = windowArea.height - DOUBLE_COUNT * pointerChangeAreas[0];
-    windowHotAreas.push_back(newLeftRect);
+    newLeftRect.y = windowArea.y + pointerChangeAreas[TOP_LEFT_AREA];
+    newLeftRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[LEFT_AREA];
+    newLeftRect.height = windowArea.height - pointerChangeAreas[TOP_LEFT_AREA] - pointerChangeAreas[BOTTOM_LEFT_AREA];
     Rect newRightRect;
-    newRightRect.x = windowArea.x + windowArea.width - pointerChangeAreas[1];
-    newRightRect.y = windowArea.y + pointerChangeAreas[0];
-    newRightRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[1];
-    newRightRect.height = windowArea.height - DOUBLE_COUNT * pointerChangeAreas[0];
+    newRightRect.x = windowArea.x + windowArea.width - pointerChangeAreas[RIGHT_AREA];
+    newRightRect.y = windowArea.y + pointerChangeAreas[TOP_RIGHT_AREA];
+    newRightRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[RIGHT_AREA];
+    newRightRect.height = windowArea.height - pointerChangeAreas[TOP_RIGHT_AREA] -
+        pointerChangeAreas[BOTTOM_RIGHT_AREA];
+    if (pointerChangeAreas[LEFT_AREA] == 0) {
+        newLeftRect.width = 0;
+        newLeftRect.height = 0;
+    }
+    if (pointerChangeAreas[RIGHT_AREA] == 0) {
+        newLeftRect.width = 0;
+        newLeftRect.height = 0;
+    }
+    windowHotAreas.push_back(newLeftRect);
     windowHotAreas.push_back(newRightRect);
 }
 
@@ -1447,26 +1472,43 @@ void InputWindowsManager::UpdateInnerAngleArea(const Rect &windowArea, std::vect
     Rect newTopLeftRect;
     newTopLeftRect.x = windowArea.x - OUTWINDOW_HOT_AREA;
     newTopLeftRect.y = windowArea.y - OUTWINDOW_HOT_AREA;
-    newTopLeftRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[0];
-    newTopLeftRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[0];
-    windowHotAreas.push_back(newTopLeftRect);
+    newTopLeftRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[TOP_LEFT_AREA];
+    newTopLeftRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[TOP_LEFT_AREA];
     Rect newTopRightRect;
-    newTopRightRect.x = windowArea.x + windowArea.width - pointerChangeAreas[0];
+    newTopRightRect.x = windowArea.x + windowArea.width - pointerChangeAreas[TOP_RIGHT_AREA];
     newTopRightRect.y = windowArea.y - OUTWINDOW_HOT_AREA;
-    newTopRightRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[0];
-    newTopRightRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[0];
-    windowHotAreas.push_back(newTopRightRect);
+    newTopRightRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[TOP_RIGHT_AREA];
+    newTopRightRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[TOP_RIGHT_AREA];
     Rect newBottomLeftRect;
     newBottomLeftRect.x = windowArea.x - OUTWINDOW_HOT_AREA;
-    newBottomLeftRect.y = windowArea.y + windowArea.height - pointerChangeAreas[0];
-    newBottomLeftRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[0];
-    newBottomLeftRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[0];
-    windowHotAreas.push_back(newBottomLeftRect);
+    newBottomLeftRect.y = windowArea.y + windowArea.height - pointerChangeAreas[BOTTOM_LEFT_AREA];
+    newBottomLeftRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[BOTTOM_LEFT_AREA];
+    newBottomLeftRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[BOTTOM_LEFT_AREA];
     Rect newBottomRightRect;
-    newBottomRightRect.x = windowArea.x + windowArea.width - pointerChangeAreas[0];
-    newBottomRightRect.y = windowArea.y + windowArea.height - pointerChangeAreas[0];
-    newBottomRightRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[0];
-    newBottomRightRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[0];
+    newBottomRightRect.x = windowArea.x + windowArea.width - pointerChangeAreas[BOTTOM_RIGHT_AREA];
+    newBottomRightRect.y = windowArea.y + windowArea.height - pointerChangeAreas[BOTTOM_RIGHT_AREA];
+    newBottomRightRect.width = OUTWINDOW_HOT_AREA + pointerChangeAreas[BOTTOM_RIGHT_AREA];
+    newBottomRightRect.height = OUTWINDOW_HOT_AREA + pointerChangeAreas[BOTTOM_RIGHT_AREA];
+    if (pointerChangeAreas[TOP_LEFT_AREA] == 0) {
+        newTopLeftRect.width = 0;
+        newTopLeftRect.height = 0;
+    }
+    if (pointerChangeAreas[TOP_RIGHT_AREA] == 0) {
+        newTopRightRect.width = 0;
+        newTopRightRect.height = 0;
+    }
+    if (pointerChangeAreas[BOTTOM_LEFT_AREA] == 0) {
+        newBottomLeftRect.width = 0;
+        newBottomLeftRect.height = 0;
+    }
+    if (pointerChangeAreas[BOTTOM_RIGHT_AREA] == 0) {
+        newBottomRightRect.width = 0;
+        newBottomRightRect.height = 0;
+    }
+
+    windowHotAreas.push_back(newTopLeftRect);
+    windowHotAreas.push_back(newTopRightRect);
+    windowHotAreas.push_back(newBottomLeftRect);
     windowHotAreas.push_back(newBottomRightRect);
 }
 
