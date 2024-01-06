@@ -92,13 +92,13 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     FixCursorPosition(physicalX, physicalY);
     lastPhysicalX_ = physicalX;
     lastPhysicalY_ = physicalY;
+    currentMouseStyle_ = pointerStyle;
     AdjustMouseFocus(ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay), physicalX, physicalY);
 
     if (surfaceNode_ != nullptr) {
         MMI_HILOGD("Pointer window move success");
         if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_) {
-            surfaceNode_->SetBounds(physicalX + displayInfo_.x,
-                physicalY + displayInfo_.y,
+            surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
                 surfaceNode_->GetStagingProperties().GetBounds().z_,
                 surfaceNode_->GetStagingProperties().GetBounds().w_);
             Rosen::RSTransaction::FlushImplicitTransaction();
@@ -114,8 +114,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
             MMI_HILOGE("Init layer failed");
             return;
         }
-        surfaceNode_->SetBounds(physicalX + displayInfo_.x,
-            physicalY + displayInfo_.y,
+        surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
             surfaceNode_->GetStagingProperties().GetBounds().z_,
             surfaceNode_->GetStagingProperties().GetBounds().w_);
         surfaceNode_->SetVisible(true);
@@ -135,8 +134,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
         return;
     }
     UpdatePointerVisible();
-    MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
-        displayId, physicalX, physicalY);
+    MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d", displayId, physicalX, physicalY);
 }
 
 void PointerDrawingManager::UpdateMouseStyle()
@@ -303,7 +301,7 @@ void PointerDrawingManager::AdjustMouseFocus(ICON_TYPE iconType, int32_t &physic
             [[fallthrough]];
         }
         case ANGLE_NW:
-            if (userIcon_ != nullptr && lastMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+            if (userIcon_ != nullptr && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
                 physicalX -= userIconHotSpotX_;
                 physicalY -= userIconHotSpotY_;
             }
@@ -558,8 +556,6 @@ int32_t PointerDrawingManager::SetMouseIcon(int32_t pid, int32_t windowId, void*
     OHOS::Media::PixelMap* pixelMapPtr = static_cast<OHOS::Media::PixelMap*>(pixelMap);
     userIcon_.reset(pixelMapPtr);
     mouseIconUpdate_ = true;
-    userIconHotSpotX_ = 0;
-    userIconHotSpotY_ = 0;
     PointerStyle style;
     style.id = MOUSE_ICON::DEVELOPER_DEFINED_ICON;
     int32_t ret = SetPointerStyle(pid, windowId, style);
