@@ -36,6 +36,8 @@ struct DeviceConfig {
     int32_t keyboardType { 0 };
 };
 
+size_t GetMaxBuffSize();
+
 int64_t GetSysClockTime();
  
 int64_t GetMillisTime();

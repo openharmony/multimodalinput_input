@@ -195,8 +195,30 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayId_004, T
  */
 HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindow_001, TestSize.Level1)
 {
+    WindowGroupInfo windowGroup;
+    windowGroup.displayId = 0;
+    windowGroup.focusWindowId = 1;
+    uint32_t num = 50;
+    for (uint32_t i = 0; i < num; i++) {
+        WindowInfo info;
+        info.id = i + 1;
+        info.pid = 1;
+        info.uid = 1;
+        info.area = {1, 1, 1, 1};
+        info.defaultHotAreas = { info.area };
+        info.pointerHotAreas = { info.area };
+        info.pointerChangeAreas = {16, 5, 16, 5, 16, 5, 16, 5};
+        info.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+        info.agentWindowId = 1;
+        info.flags = 1;
+        info.displayId = 0;
+        info.action = WINDOW_UPDATE_ACTION::ADD;
+        windowGroup.windowsInfo.push_back(info);
+    }
+    WinMgr->UpdateWindowInfo(windowGroup);
+
     WindowInfo window;
-    window.id = 11;
+    window.id = 1111;
     window.pid = 1221;
     window.uid = 1;
     window.area = {1, 1, 1, 1};
@@ -208,16 +230,16 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindow_001, Test
     window.flags = 1;
     window.action = WINDOW_UPDATE_ACTION::ADD;
     window.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    WinMgr->UpdateWindowInfo({0, 11, {window}});
+    WinMgr->UpdateWindowInfo({0, 1111, {window}});
     ASSERT_EQ(WinMgr->GetWindowPid(11), 1221);
 
     window.action = WINDOW_UPDATE_ACTION::CHANGE;
     window.pid = 1222;
-    WinMgr->UpdateWindowInfo({0, 11, {window}});
-    ASSERT_EQ(WinMgr->GetWindowPid(11), 1222);
+    WinMgr->UpdateWindowInfo({0, 1111, {window}});
+    ASSERT_EQ(WinMgr->GetWindowPid(1111), 1222);
 
     window.action = WINDOW_UPDATE_ACTION::DEL;
-    WinMgr->UpdateWindowInfo({0, 11, {window}});
+    WinMgr->UpdateWindowInfo({0, 1111, {window}});
     ASSERT_EQ(WinMgr->GetWindowPid(11), -1);
 }
 
