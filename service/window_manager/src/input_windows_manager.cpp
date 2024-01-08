@@ -834,8 +834,8 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
 
 void InputWindowsManager::PrintWindowGroupInfo(const WindowGroupInfo &windowGroupInfo)
 {
-    MMI_HILOGD("windowsGroupInfo,focusWindowId:%{public}d,displayId:%{public}d",
-        windowGroupInfo.focusWindowId, windowGroupInfo.displayId);
+    MMI_HILOGD("windowsGroupInfo,focusWindowId:%{public}d,displayId:%{public}d,windowsInfos,num:%{public}zu",
+        windowGroupInfo.focusWindowId, windowGroupInfo.displayId, windowGroupInfo.windowsInfo.size());
     PrintWindowInfo(windowGroupInfo.windowsInfo);
 }
 

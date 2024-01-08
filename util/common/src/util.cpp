@@ -34,6 +34,8 @@
 #include "mmi_log.h"
 #include "securec.h"
 
+#include "scene_board_judgement.h"
+
 namespace OHOS {
 namespace MMI {
 namespace {
@@ -58,6 +60,14 @@ constexpr size_t BUF_TID_SIZE = 10;
 constexpr size_t BUF_CMD_SIZE = 512;
 constexpr size_t PROGRAM_NAME_SIZE = 256;
 } // namespace
+
+size_t GetMaxBuffSize()
+{
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+        return MAX_SCENE_BOARD_PACKET_BUF_SIZE;
+    }
+    return MAX_PACKET_BUF_SIZE;
+}
 
 int64_t GetSysClockTime()
 {

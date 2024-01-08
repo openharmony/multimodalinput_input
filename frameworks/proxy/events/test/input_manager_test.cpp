@@ -666,6 +666,33 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo, TestSize.Level1)
     displayGroupInfo.focusWindowId = 0;
     displayGroupInfo.width = 0;
     displayGroupInfo.height = 0;
+    uint32_t num = 50;
+    for (uint32_t i = 0; i < num; i++) {
+        WindowInfo info;
+        info.id = i + 1;
+        info.pid = 1;
+        info.uid = 1;
+        info.area = {1, 1, 1, 1};
+        info.defaultHotAreas = { info.area };
+        info.pointerHotAreas = { info.area };
+        info.pointerChangeAreas = {16, 5, 16, 5, 16, 5, 16, 5};
+        info.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+        info.agentWindowId = 1;
+        info.flags = 1;
+        info.displayId = 0;
+        displayGroupInfo.windowsInfo.push_back(info);
+    }
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.x =1;
+    displayInfo.y = 1;
+    displayInfo.width = 2;
+    displayInfo.height = 2;
+    displayInfo.dpi = 240;
+    displayInfo.name = "pp";
+    displayInfo.uniq = "pp";
+    displayInfo.direction = DIRECTION0;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
     InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo);
     ASSERT_TRUE(displayGroupInfo.displaysInfo.empty());
 }
