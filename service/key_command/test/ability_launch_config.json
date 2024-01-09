@@ -1,0 +1,31 @@
+{
+    "Shortkeys": [
+    ],
+    "Sequences" : [
+    ],
+    "TwoFingerGesture" : {
+        "abilityStartDelay" : 20,
+        "ability" : {
+            "bundleName" : "bindle_name",
+            "abilityName" : "test_ability",
+            "action" : "some_action",
+            "type" : "some_type",
+            "deviceId" : "device_id",
+            "uri" : "uri",
+            "entities" : [
+                "entity1",
+                "entity2"
+            ],
+            "params" : [
+                {
+                    "key" : "key1",
+                    "value" : "value1"
+                },
+                {
+                    "key" : "key2",
+                    "value" : "value2"
+                }
+            ]
+        }
+    }
+}

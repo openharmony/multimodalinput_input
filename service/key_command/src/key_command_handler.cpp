@@ -1169,10 +1169,18 @@ void KeyCommandHandler::StopTwoFingerGesture()
 
 bool KeyCommandHandler::ParseConfig()
 {
+#ifndef UNIT_TEST
     const char *testPathSuffix = "/etc/multimodalinput/ability_launch_config.json";
+#else
+    const char *testPathSuffix = "/data/test/test.json";
+#endif
     char buf[MAX_PATH_LEN] = { 0 };
     char *filePath = GetOneCfgFile(testPathSuffix, buf, MAX_PATH_LEN);
+#ifndef UNIT_TEST
     std::string defaultConfig = "/system/etc/multimodalinput/ability_launch_config.json";
+#else
+    std::string defaultConfig = "/data/test/test.json";
+#endif
     if (filePath == nullptr || filePath[0] == '\0' || strlen(filePath) > MAX_PATH_LEN) {
         MMI_HILOGD("Can not get customization config file");
         return ParseJson(defaultConfig);
@@ -1949,7 +1957,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
     want.SetElementName(ability.deviceId, ability.bundleName, ability.abilityName);
     want.SetAction(ability.action);
     want.SetUri(ability.uri);
-    want.SetType(ability.uri);
+    want.SetType(ability.type);
     for (const auto &entity : ability.entities) {
         want.AddEntity(entity);
     }
