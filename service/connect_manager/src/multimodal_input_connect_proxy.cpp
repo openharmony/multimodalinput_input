@@ -1324,12 +1324,13 @@ int32_t MultimodalInputConnectProxy::GetAllMmiSubscribedEvents(std::map<std::tup
     READINT32(reply, size, ERR_INVALID_VALUE);
     for (int32_t i = 0; i < size; ++i) {
         NapProcess::NapStatusData data;
+        int32_t syncState;
         READINT32(reply, data.pid, ERR_INVALID_VALUE);
         READINT32(reply, data.uid, ERR_INVALID_VALUE);
         READSTRING(reply, data.bundleName, ERR_INVALID_VALUE);
-        READINT32(reply, data.syncStatus, ERR_INVALID_VALUE);
+        READINT32(reply, syncState, ERR_INVALID_VALUE);
         std::tuple<int32_t, int32_t, std::string> tuple(data.pid, data.uid, data.bundleName);
-        datas.emplace(tuple, data.syncStatus);
+        datas.emplace(tuple, syncState);
     }
     return RET_OK;
 }
