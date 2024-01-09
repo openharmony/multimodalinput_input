@@ -189,7 +189,7 @@ static napi_value JsOffApi9(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "EventType is invalid");
         return nullptr;
     }
-    if (argv[1] == nullptr) {
+    if (argc < TWO_PARAMETERS) {
         JsInputMonMgr.RemoveMonitor(env, typeName);
         MMI_HILOGD("Remove all monitor");
         return nullptr;
@@ -244,7 +244,7 @@ static napi_value RemoveMonitor(napi_env env, napi_callback_info info)
         THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "fingers is invalid");
         return nullptr;
     }
-    if (argv[TWO_PARAMETERS] == nullptr) {
+    if (argc < THREE_PARAMETERS) {
         JsInputMonMgr.RemoveMonitor(env, typeName, fingers);
         MMI_HILOGD("Remove all monitor");
         return nullptr;
