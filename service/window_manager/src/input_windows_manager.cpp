@@ -60,7 +60,6 @@ constexpr int32_t BOTTOM_RIGHT_AREA = 4;
 constexpr int32_t BOTTOM_AREA = 5;
 constexpr int32_t BOTTOM_LEFT_AREA = 6;
 constexpr int32_t LEFT_AREA = 7;
-constexpr int32_t DEFAULT_COUNT_POINTER_STYLE = -1;
 const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/display_bind.cfg";
 const std::string mouseFileName = "mouse_settings.xml";
 const std::string defaultIconPath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
@@ -68,7 +67,6 @@ const std::string showCursorSwitchName = "settings.input.show_touch_hint";
 } // namespace
 
 enum PointerHotArea : int32_t {
-    INNER = -1,
     TOP = 0,
     BOTTOM = 1,
     LEFT = 2,
@@ -509,6 +507,8 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
         PointerStyle pointerStyle;
         int32_t ret = WinMgr->GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
+        WindowInfo window = *windowInfo;
+        SelectPointerChangeArea(window, pointerStyle, logicX, logicY);
         MMI_HILOGD("get pointer style, pid: %{public}d, windowid: %{public}d, style: %{public}d",
             info.windowPid, info.windowId, pointerStyle.id);
         CHKNOKRV(ret, "Draw pointer style failed, pointerStyleInfo is nullptr");
@@ -1211,9 +1211,7 @@ void InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
 {
     CALL_DEBUG_ENTER;
     int32_t areaNum = 0;
-    if (pointerStyle.id == DEFAULT_POINTER_STYLE) {
-        pointerStyle.id = DEFAULT_COUNT_POINTER_STYLE;
-    }
+    bool findFlag = false;
     for (const auto &item : rects) {
         int32_t displayMaxX = 0;
         int32_t displayMaxY = 0;
@@ -1227,9 +1225,14 @@ void InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
         }
         if (((x >= item.x) && (x < displayMaxX)) &&
             (y >= item.y) && (y < displayMaxY)) {
+            findFlag = true;
             pointerStyle.id = areaNum;
         }
         areaNum++;
+    }
+    if (!findFlag) {
+        MMI_HILOGW("pointer not match any area");
+        return;
     }
     switch (pointerStyle.id) {
         case PointerHotArea::TOP:
@@ -1251,9 +1254,6 @@ void InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
             break;
         case PointerHotArea::BOTTOM_RIGHT:
             pointerStyle.id = MOUSE_ICON::NORTH_WEST_SOUTH_EAST;
-            break;
-        case PointerHotArea::INNER:
-            pointerStyle.id = MOUSE_ICON::DEFAULT;
             break;
         default:
             MMI_HILOGD("pointerStyle in default is: %{public}d", pointerStyle.id);
