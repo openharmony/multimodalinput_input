@@ -88,10 +88,10 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
     for (const auto &keyCode : keyOption->GetPreKeys()) {
         MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
     }
-    MMI_HILOGI("subscribeId:%{public}d, keyOption->finalKey:%{public}d,"
-        "keyOption->isFinalKeyDown:%{public}s, keyOption->finalKeyDownDuration:%{public}d",
+    MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{public}d,"
+        "isFinalKeyDown:%{public}s, finalKeyDownDuration:%{public}d, pid:%{public}d",
         subscribeId, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
-        keyOption->GetFinalKeyDownDuration());
+        keyOption->GetFinalKeyDownDuration(), sess->GetPid());
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
     AddSubscriber(subscriber, keyOption);
     InitSessionDeleteCallback();
@@ -101,21 +101,25 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
 int32_t KeySubscriberHandler::UnsubscribeKeyEvent(SessionPtr sess, int32_t subscribeId)
 {
     CALL_INFO_TRACE;
-    MMI_HILOGI("unsubscribe Id: %{public}d", subscribeId);
+    CHKPR(sess, ERROR_NULL_POINTER);
+    MMI_HILOGI("SubscribeId:%{public}d, pid:%{public}d", subscribeId, sess->GetPid());
     return RemoveSubscriber(sess, subscribeId);
 }
 
 int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscribeId)
 {
     CALL_DEBUG_ENTER;
-    MMI_HILOGI("subscribeId: %{public}d", subscribeId);
     for (auto iter = subscriberMap_.begin(); iter != subscriberMap_.end(); iter++) {
         auto &subscribers = iter->second;
         for (auto it = subscribers.begin(); it != subscribers.end(); it++) {
             if ((*it)->id_ == subscribeId && (*it)->sess_ == sess) {
                 ClearTimer(*it);
+                auto option = (*it)->keyOption_;
+                CHKPR(option, ERROR_NULL_POINTER);
+                MMI_HILOGI("SubscribeId: %{public}d, finalKey: %{public}d, isFinalKeyDown:%{public}s,"
+                    "finalKeyDownDuration:%{public}d, pid:%{public}d", subscribeId, option->GetFinalKey(),
+                    option->IsFinalKeyDown() ? "true" : "false", option->GetFinalKeyDownDuration(), sess->GetPid());
                 subscribers.erase(it);
-                MMI_HILOGI("subscribers size: %{public}zu, subscribeId: %{public}d", subscribers.size(), subscribeId);
                 return RET_OK;
             }
         }
@@ -404,9 +408,12 @@ void KeySubscriberHandler::NotifySubscriber(std::shared_ptr<KeyEvent> keyEvent,
     SubscriberNotifyNap(subscriber);
     NetPacket pkt(MmiMessageId::ON_SUBSCRIBE_KEY);
     InputEventDataTransformation::KeyEventToNetPacket(keyEvent, pkt);
-    int32_t fd = subscriber->sess_->GetFd();
+    auto sess = subscriber->sess_;
+    CHKPV(sess);
+    int32_t fd = sess->GetFd();
     pkt << fd << subscriber->id_;
-    MMI_HILOGI("Notify subscriber id: %{public}d, keycode: %{public}d", subscriber->id_, keyEvent->GetKeyCode());
+    MMI_HILOGI("Notify subscriber id: %{public}d, keycode: %{public}d, pid:%{public}d",
+        subscriber->id_, keyEvent->GetKeyCode(), sess->GetPid());
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write dispatch subscriber failed");
         return;
@@ -531,7 +538,7 @@ bool KeySubscriberHandler::HandleKeyDown(const std::shared_ptr<KeyEvent> &keyEve
     RemoveKeyCode(keyCode, pressedKeys);
     std::set<int32_t> pids;
     GetForegroundPids(pids);
-    MMI_HILOGE("foreground pid size: %{public}zu", pids.size());
+    MMI_HILOGI("foreground pid size: %{public}zu", pids.size());
     for (auto &iter : subscriberMap_) {
         auto keyOption = iter.first;
         auto subscribers = iter.second;
