@@ -245,6 +245,7 @@ std::shared_ptr<PointerEvent> TouchPadTransformProcessor::OnEvent(struct libinpu
     EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
         pointerEvent_->GetPointerIds().size());
     auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
+    CHKPP(device);
     MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
     return pointerEvent_;
 }

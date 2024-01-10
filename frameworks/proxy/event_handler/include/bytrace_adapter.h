@@ -49,6 +49,8 @@ public:
     static void StartBytrace(std::shared_ptr<KeyEvent> keyEvent, TraceBtn traceBtn, HandlerType handlerType);
     static void StartBytrace(std::shared_ptr<PointerEvent> pointerEvent, TraceBtn traceBtn, HandlerType handlerType);
     static void StartBytrace(TraceBtn traceBtn, EventType eventType);
+
+private:
     static std::string GetPointerTraceString(std::shared_ptr<PointerEvent> pointerEvent);
     static std::string GetKeyTraceString(std::shared_ptr<KeyEvent> keyEvent);
 };

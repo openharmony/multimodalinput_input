@@ -284,6 +284,7 @@ int32_t EventNormalizeHandler::HandleKeyboardEvent(libinput_event* event)
     BytraceAdapter::StartBytrace(keyEvent);
     EventLogHelper::PrintEventData(keyEvent);
     auto device = InputDevMgr->GetInputDevice(keyEvent->GetDeviceId());
+    CHKPR(device, RET_ERR);
     MMI_HILOGI("The id:%{public}d event created by:%{public}s", keyEvent->GetId(), device->GetName().c_str());
     UpdateKeyEventHandlerChain(keyEvent);
     KeyRepeat->SelectAutoRepeat(keyEvent);
