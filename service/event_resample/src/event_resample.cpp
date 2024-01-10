@@ -66,6 +66,7 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
         EventDump("UpdateTouchState", inputEvent_);
         EventLogHelper::PrintEventData(pointerEvent_);
         auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
+        CHKPP(device);
         MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
         UpdateTouchState(inputEvent_);
         return pointerEvent_;
@@ -76,6 +77,7 @@ std::shared_ptr<PointerEvent> EventResample::OnEventConsume(std::shared_ptr<Poin
         UpdatePointerEvent(outEvent);
         EventLogHelper::PrintEventData(pointerEvent_);
         auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
+        CHKPP(device);
         MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
         return pointerEvent_;
     }
@@ -121,6 +123,7 @@ ErrCode EventResample::InitializeInputEvent(std::shared_ptr<PointerEvent> pointe
     if (nullptr != pointerEvent) {
         EventLogHelper::PrintEventData(pointerEvent_);
         auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
+        CHKPR(device, RET_ERR);
         MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
         pointerAction = pointerEvent->GetPointerAction();
         MMI_HILOGD("pointerAction:%{public}d %{public}" PRId64 " %{public}" PRId64,

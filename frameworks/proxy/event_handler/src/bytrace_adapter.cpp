@@ -53,12 +53,14 @@ void BytraceAdapter::StartBytrace(std::shared_ptr<KeyEvent> keyEvent)
 
 std::string BytraceAdapter::GetKeyTraceString(std::shared_ptr<KeyEvent> keyEvent)
 {
+    CHKPS(keyEvent);
     std::string traceStr = KeyEvent::ActionToString(keyEvent->GetKeyAction());
     return traceStr;
 }
 
 std::string BytraceAdapter::GetPointerTraceString(std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPS(pointerEvent);
     std::vector<PointerEvent::PointerItem> pointerItems;
     std::vector<int32_t> pointerIds{ pointerEvent->GetPointerIds() };
     for (const auto &pointerId : pointerIds) {
