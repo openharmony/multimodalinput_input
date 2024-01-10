@@ -570,6 +570,7 @@ void MouseTransformProcessor::DumpInner()
 {
     EventLogHelper::PrintEventData(pointerEvent_);
     auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
+    CHKPV(device);
     MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
 }
 
