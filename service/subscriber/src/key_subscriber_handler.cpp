@@ -88,8 +88,8 @@ int32_t KeySubscriberHandler::SubscribeKeyEvent(
     for (const auto &keyCode : keyOption->GetPreKeys()) {
         MMI_HILOGD("keyOption->prekey:%{public}d", keyCode);
     }
-    MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{public}d,
-        isFinalKeyDown:%{public}s, finalKeyDownDuration:%{public}d, pid:%{public}d",
+    MMI_HILOGI("SubscribeId:%{public}d, finalKey:%{public}d,"
+        "isFinalKeyDown:%{public}s, finalKeyDownDuration:%{public}d, pid:%{public}d",
         subscribeId, keyOption->GetFinalKey(), keyOption->IsFinalKeyDown() ? "true" : "false",
         keyOption->GetFinalKeyDownDuration(), sess->GetPid());
     auto subscriber = std::make_shared<Subscriber>(subscribeId, sess, keyOption);
@@ -116,8 +116,8 @@ int32_t KeySubscriberHandler::RemoveSubscriber(SessionPtr sess, int32_t subscrib
                 ClearTimer(*it);
                 auto option = (*it)->keyOption_;
                 CHKPR(option, ERROR_NULL_POINTER);
-                MMI_HILOGI("SubscribeId: %{public}d, finalKey: %{public}d, isFinalKeyDown:%{public}s,
-                    finalKeyDownDuration:%{public}d, pid:%{public}d", subscribeId, option->GetFinalKey(),
+                MMI_HILOGI("SubscribeId: %{public}d, finalKey: %{public}d, isFinalKeyDown:%{public}s,"
+                    "finalKeyDownDuration:%{public}d, pid:%{public}d", subscribeId, option->GetFinalKey(),
                     option->IsFinalKeyDown() ? "true" : "false", option->GetFinalKeyDownDuration(), sess->GetPid());
                 subscribers.erase(it);
                 return RET_OK;
