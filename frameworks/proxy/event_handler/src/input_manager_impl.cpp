@@ -114,11 +114,6 @@ int32_t InputManagerImpl::GetWindowPid(int32_t windowId)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
-    if (MMISceneBoardJudgement::IsSceneBoardEnabled()) {
-        MMI_HILOGD("GetWindowPid successful! %{public}d", windowId);
-        CHKPR(winChecker_, -1);
-        return winChecker_->CheckWindowId(windowId);
-    }
     return MultimodalInputConnMgr->GetWindowPid(windowId);
 }
 
