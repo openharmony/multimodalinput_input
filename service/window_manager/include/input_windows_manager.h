@@ -52,6 +52,7 @@ public:
     int32_t GetClientFd(std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateCaptureMode(const DisplayGroupInfo &displayGroupInfo);
     void UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo);
+    void UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt);
     void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
     void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
     void UpdateWindowPointerVisible(int32_t pid);
@@ -70,8 +71,8 @@ public:
     const std::vector<WindowInfo>& GetWindowGroupInfoByDisplayId(int32_t displayId) const;
     std::pair<int32_t, int32_t> TransformWindowXY(const WindowInfo &window, int32_t logicX, int32_t logicY) const;
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    int32_t GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent);
-    int32_t UpdateTarget(std::shared_ptr<InputEvent> inputEvent);
+    int32_t GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
+    int32_t UpdateTarget(std::shared_ptr<KeyEvent> keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -99,6 +100,16 @@ public:
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, LogicalCoordinate& coord) const;
 #endif // OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    void UpdateWindowInfoExt(const WindowGroupInfo &windowGroupInfo, const DisplayGroupInfo &displayGroupInfo);
+    void UpdateShellWindow(const WindowInfo &window);
+    void UpdateDisplayInfoExt(const DisplayGroupInfo &displayGroupInfo);
+    bool IsInAncoWindow(const WindowInfo &window, int32_t x, int32_t y) const;
+    bool IsAncoWindow(const WindowInfo &window) const;
+    void SimulateKeyBackExt(std::shared_ptr<KeyEvent> keyEvent);
+    void DumpAncoWindows(std::string& out) const;
+#endif // OHOS_BUILD_ENABLE_ANCO
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
     bool UpdateDisplayId(int32_t& displayId);

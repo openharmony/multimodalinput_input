@@ -155,6 +155,11 @@ void InputManagerImpl::UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo)
 
 bool InputManagerImpl::IsValiadWindowAreas(const std::vector<WindowInfo> &windows)
 {
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (IsValidAncoWindow(windows)) {
+        return true;
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
     for (const auto &window : windows) {
         if (window.action == WINDOW_UPDATE_ACTION::DEL) {
             continue;
