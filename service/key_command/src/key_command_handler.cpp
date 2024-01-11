@@ -1971,15 +1971,18 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
     if (err != ERR_OK) {
         MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
     }
-    if (NapProcess::GetInstance()->napClientPid_ != REMOVE_OBSERVER) {
-        OHOS::MMI::NapProcess::NapStatusData napData;
-        napData.pid = -1;
-        napData.uid = -1;
-        napData.bundleName = ability.bundleName;
-        napData.syncStatus = ACTIVE_EVENT;
-        NapProcess::GetInstance()->AddMmiSubscribedEventData(napData);
-        NapProcess::GetInstance()->NotifyBundleName(napData);
+    int32_t state = NapProcess::GetInstance()->GetNapClientPid();
+    if (state == REMOVE_OBSERVER) {
+        MMI_HILOGW("nap client status: %{public}d", state);
+        return;
     }
+    OHOS::MMI::NapProcess::NapStatusData napData;
+    napData.pid = -1;
+    napData.uid = -1;
+    napData.bundleName = ability.bundleName;
+    int32_t syncState = ACTIVE_EVENT;
+    NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
+    NapProcess::GetInstance()->NotifyBundleName(napData, syncState);
     MMI_HILOGD("End launch ability, bundleName:%{public}s", ability.bundleName.c_str());
 }
 

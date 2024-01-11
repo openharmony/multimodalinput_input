@@ -579,9 +579,12 @@ void KeySubscriberHandler::SubscriberNotifyNap(const std::shared_ptr<Subscriber>
     OHOS::MMI::NapProcess::NapStatusData napData;
     napData.pid = sess->GetPid();
     napData.uid = sess->GetUid();
-    napData.bundleName = sess->GetPid();
-    napData.syncStatus = ACTIVE_EVENT;
-    NapProcess::GetInstance()->NotifyBundleName(napData);
+    napData.bundleName = sess->GetProgramName();
+    if (NapProcess::GetInstance()->IsNeedNotify(napData)) {
+        int32_t syncState = ACTIVE_EVENT;
+        NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
+        NapProcess::GetInstance()->NotifyBundleName(napData, syncState);
+    }
 }
 
 bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent)

@@ -322,14 +322,17 @@ bool EventMonitorHandler::MonitorCollection::HandleEvent(std::shared_ptr<KeyEven
     }
     if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
         NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
-        OHOS::MMI::NapProcess::NapStatusData napData;
         for (const auto &mon : monitors_) {
+            OHOS::MMI::NapProcess::NapStatusData napData;
             auto sess = mon.session_;
             napData.pid = sess->GetPid();
             napData.uid = sess->GetUid();
             napData.bundleName = sess->GetProgramName();
-            napData.syncStatus = ACTIVE_EVENT;
-            NapProcess::GetInstance()->NotifyBundleName(napData);
+            if (NapProcess::GetInstance()->IsNeedNotify(napData)) {
+                int32_t syncState = ACTIVE_EVENT;
+                NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
+                NapProcess::GetInstance()->NotifyBundleName(napData, syncState);
+            }
         }
     }
     return false;
@@ -424,14 +427,17 @@ void EventMonitorHandler::MonitorCollection::Monitor(std::shared_ptr<PointerEven
     }
     if (NapProcess::GetInstance()->GetNapClientPid() != REMOVE_OBSERVER &&
         NapProcess::GetInstance()->GetNapClientPid() != UNOBSERVED) {
-        OHOS::MMI::NapProcess::NapStatusData napData;
         for (const auto &mon : monitors_) {
+            OHOS::MMI::NapProcess::NapStatusData napData;
             auto sess = mon.session_;
             napData.pid = sess->GetPid();
             napData.uid = sess->GetUid();
             napData.bundleName = sess->GetProgramName();
-            napData.syncStatus = ACTIVE_EVENT;
-            NapProcess::GetInstance()->NotifyBundleName(napData);
+            if (NapProcess::GetInstance()->IsNeedNotify(napData)) {
+                int32_t syncState = ACTIVE_EVENT;
+                NapProcess::GetInstance()->AddMmiSubscribedEventData(napData, syncState);
+                NapProcess::GetInstance()->NotifyBundleName(napData, syncState);
+            }
         }
     }
 }
