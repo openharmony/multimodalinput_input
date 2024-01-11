@@ -86,13 +86,13 @@ int32_t NapProcess::SetNapStatus(int32_t pid, int32_t uid, std::string bundleNam
     napData.uid = uid;
     napData.bundleName = bundleName;
     if (napStatus == ACTIVE_EVENT) {
-        AddMmiSubscribedEventData(napData, napStatus);
-        MMI_HILOGD("Add active event to napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        RemoveMmiSubscribedEventData(napData);
+        MMI_HILOGD("Remove active event from napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
             pid, uid, bundleName.c_str());
     }
     if (napStatus == NAP_EVENT) {
-        RemoveMmiSubscribedEventData(napData);
-        MMI_HILOGD("Remove nap process from napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        AddMmiSubscribedEventData(napData, napStatus);
+        MMI_HILOGD("Add nap process to napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
             pid, uid, bundleName.c_str());
     }
     return RET_OK;
