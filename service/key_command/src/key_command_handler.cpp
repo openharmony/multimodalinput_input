@@ -58,7 +58,6 @@ constexpr float DOUBLE_CLICK_DISTANCE_DEFAULT_CONFIG = 64.0f;
 constexpr float DOUBLE_CLICK_DISTANCE_LONG_CONFIG = 96.0f;
 constexpr float VPR_CONFIG = 3.25f;
 constexpr int32_t REMOVE_OBSERVER = -2;
-constexpr int32_t UNOBSERVED = -1;
 constexpr int32_t ACTIVE_EVENT = 2;
 const std::string EXTENSION_ABILITY = "extensionAbility";
 
@@ -1973,7 +1972,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
         MMI_HILOGE("LaunchAbility failed, bundleName:%{public}s, err:%{public}d", ability.bundleName.c_str(), err);
     }
     int32_t state = NapProcess::GetInstance()->GetNapClientPid();
-    if (state == REMOVE_OBSERVER || state == UNOBSERVED) {
+    if (state == REMOVE_OBSERVER) {
         MMI_HILOGW("nap client status: %{public}d", state);
         return;
     }
