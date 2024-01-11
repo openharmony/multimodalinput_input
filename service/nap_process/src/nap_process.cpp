@@ -23,6 +23,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "NapProcess" };
 constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t NAP_EVENT = 0;
+constexpr int32_t SUBSCRIBED = 1;
 constexpr int32_t ACTIVE_EVENT = 2;
 } // namespace
 
@@ -38,7 +39,7 @@ void NapProcess::Init(UDSServer& udsServer)
     CHKPV(udsServer_);
 }
 
-int32_t NapProcess::NotifyBundleName(NapStatusData data)
+int32_t NapProcess::NotifyBundleName(NapStatusData data, int32_t syncState)
 {
     CALL_DEBUG_ENTER;
     if (napClientPid_ < 0) {
@@ -46,12 +47,12 @@ int32_t NapProcess::NotifyBundleName(NapStatusData data)
         return RET_ERR;
     }
     MMI_HILOGD("NotifyBundle info is : %{public}d, %{public}d, %{public}s, %{public}d",
-        data.pid, data.uid, data.bundleName.c_str(), data.syncStatus);
+        data.pid, data.uid, data.bundleName.c_str(), syncState);
     NetPacket pkt(MmiMessageId::NOTIFY_BUNDLE_NAME);
     pkt << data.pid;
     pkt << data.uid;
     pkt << data.bundleName;
-    pkt << data.syncStatus;
+    pkt << syncState;
     CHKPR(udsServer_, RET_ERR);
     int32_t fd = udsServer_->GetClientFd(napClientPid_);
     auto udsServer = InputHandler->GetUDSServer();
@@ -64,6 +65,19 @@ int32_t NapProcess::NotifyBundleName(NapStatusData data)
     return RET_OK;
 }
 
+bool NapProcess::IsNeedNotify(const NapStatusData& data)
+{
+    CALL_DEBUG_ENTER;
+    std::lock_guard guard(mapMtx_);
+    for (const auto& map : napMap_) {
+        if (data.pid == map.first.pid && data.uid == map.first.uid && data.bundleName == map.first.bundleName) {
+            bool IsNeedSendMessage = napMap_[data] == SUBSCRIBED || napMap_[data] == NAP_EVENT;
+            return IsNeedSendMessage;
+        }
+    }
+    return false;
+}
+
 int32_t NapProcess::SetNapStatus(int32_t pid, int32_t uid, std::string bundleName, int32_t napStatus)
 {
     CALL_DEBUG_ENTER;
@@ -71,25 +85,28 @@ int32_t NapProcess::SetNapStatus(int32_t pid, int32_t uid, std::string bundleNam
     napData.pid = pid;
     napData.uid = uid;
     napData.bundleName = bundleName;
-    napData.syncStatus = napStatus;
     if (napStatus == ACTIVE_EVENT) {
-        AddMmiSubscribedEventData(napData);
-        MMI_HILOGD("Add active event to napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        RemoveMmiSubscribedEventData(napData);
+        MMI_HILOGD("Remove active event from napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
             pid, uid, bundleName.c_str());
     }
     if (napStatus == NAP_EVENT) {
-        RemoveMmiSubscribedEventData(napData);
-        MMI_HILOGD("Remove nap process from napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
+        AddMmiSubscribedEventData(napData, napStatus);
+        MMI_HILOGD("Add nap process to napMap, pid = %{public}d, uid = %{public}d, bundleName = %{public}s",
             pid, uid, bundleName.c_str());
     }
     return RET_OK;
 }
 
-int32_t NapProcess::AddMmiSubscribedEventData(const NapStatusData& napData)
+int32_t NapProcess::AddMmiSubscribedEventData(const NapStatusData& napData, int32_t syncState)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(mapMtx_);
-    napMap_.push_back(napData);
+    if (napMap_.find(napData) == napMap_.end()) {
+        napMap_.emplace(napData, syncState);
+    } else {
+        napMap_[napData] = syncState;
+    }
     return RET_OK;
 }
 
@@ -97,10 +114,10 @@ int32_t NapProcess::RemoveMmiSubscribedEventData(const NapStatusData& napData)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(mapMtx_);
-    for (auto it = napMap_.begin(); it != napMap_.end(); ++it) {
-        if (napData.pid == it->pid) {
-            napMap_.erase(it);
-            break;
+    for (auto map : napMap_) {
+        if (napData.pid == map.first.pid && napData.uid == map.first.uid &&
+            napData.bundleName == map.first.bundleName) {
+            napMap_.erase(napData);
         }
     }
     return RET_OK;
@@ -133,11 +150,11 @@ int32_t NapProcess::GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(mapMtx_);
-    for (auto it = napMap_.begin(); it != napMap_.end(); ++it) {
-        int32_t getPid = it->pid;
-        int32_t getUid = it->uid;
-        std::string getName = it->bundleName;
-        int32_t getStatus = it->syncStatus;
+    for (auto map : napMap_) {
+        int32_t getPid = map.first.pid;
+        int32_t getUid = map.first.uid;
+        std::string getName = map.first.bundleName;
+        int32_t getStatus = map.second;
         std::tuple<int32_t, int32_t, std::string> tuple(getPid, getUid, getName);
         datas.emplace(tuple, getStatus);
     }
