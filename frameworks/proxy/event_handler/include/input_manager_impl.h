@@ -201,6 +201,10 @@ private:
     void OnPointerEventTask(std::shared_ptr<IInputEventConsumer> consumer,
         std::shared_ptr<PointerEvent> pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    bool IsValidAncoWindow(const std::vector<WindowInfo> &windows);
+#endif // OHOS_BUILD_ENABLE_ANCO
 private:
     std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t, uint32_t>> eventFilterServices_;
     std::shared_ptr<MMIEventObserver> eventObserver_ { nullptr };

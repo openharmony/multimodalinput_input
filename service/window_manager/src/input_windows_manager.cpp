@@ -60,6 +60,9 @@ constexpr int32_t BOTTOM_RIGHT_AREA = 4;
 constexpr int32_t BOTTOM_AREA = 5;
 constexpr int32_t BOTTOM_LEFT_AREA = 6;
 constexpr int32_t LEFT_AREA = 7;
+#ifdef OHOS_BUILD_ENABLE_ANCO
+constexpr int32_t SHELL_WINDOW_COUNT = 1;
+#endif // OHOS_BUILD_ENABLE_ANCO
 const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/display_bind.cfg";
 const std::string mouseFileName = "mouse_settings.xml";
 const std::string defaultIconPath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
@@ -178,11 +181,11 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t InputWindowsManager::UpdateTarget(std::shared_ptr<InputEvent> inputEvent)
+int32_t InputWindowsManager::UpdateTarget(std::shared_ptr<KeyEvent> keyEvent)
 {
-    CHKPR(inputEvent, INVALID_FD);
+    CHKPR(keyEvent, INVALID_FD);
     CALL_DEBUG_ENTER;
-    int32_t pid = GetPidAndUpdateTarget(inputEvent);
+    int32_t pid = GetPidAndUpdateTarget(keyEvent);
     if (pid <= 0) {
         MMI_HILOGE("Invalid pid");
         return INVALID_FD;
@@ -211,22 +214,29 @@ int32_t InputWindowsManager::GetDisplayId(std::shared_ptr<InputEvent> inputEvent
 }
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<InputEvent> inputEvent)
+int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> keyEvent)
 {
     CALL_DEBUG_ENTER;
-    CHKPR(inputEvent, INVALID_PID);
+    CHKPR(keyEvent, INVALID_PID);
     const int32_t focusWindowId = displayGroupInfo_.focusWindowId;
     WindowInfo* windowInfo = nullptr;
-    std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(inputEvent->GetTargetDisplayId());
+    std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(keyEvent->GetTargetDisplayId());
     for (auto &item : windowsInfo) {
         if (item.id == focusWindowId) {
             windowInfo = &item;
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (IsAncoWindow(item)) {
+        MMI_HILOGD("focusWindowId:%{public}d, pid:%{public}d is anco window.", focusWindowId, item.pid);
+        SimulateKeyBackExt(keyEvent);
+        break;
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
             break;
         }
     }
     CHKPR(windowInfo, INVALID_PID);
-    inputEvent->SetTargetWindowId(windowInfo->id);
-    inputEvent->SetAgentWindowId(windowInfo->agentWindowId);
+    keyEvent->SetTargetWindowId(windowInfo->id);
+    keyEvent->SetAgentWindowId(windowInfo->agentWindowId);
     MMI_HILOGD("focusWindowId:%{public}d, pid:%{public}d", focusWindowId, windowInfo->pid);
     return windowInfo->pid;
 }
@@ -341,12 +351,30 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
 {
     CALL_DEBUG_ENTER;
     PrintWindowGroupInfo(windowGroupInfo);
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (windowGroupInfo.windowsInfo.size() == SHELL_WINDOW_COUNT && IsAncoWindow(windowGroupInfo.windowsInfo[0])) {
+        return UpdateShellWindow(windowGroupInfo.windowsInfo[0]);
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
     DisplayGroupInfo displayGroupInfo = displayGroupInfo_;
     displayGroupInfo.focusWindowId = windowGroupInfo.focusWindowId;
-    for (const auto item : windowGroupInfo.windowsInfo) {
+    for (const auto &item : windowGroupInfo.windowsInfo) {
         UpdateDisplayInfoByIncrementalInfo(item, displayGroupInfo);
     }
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    UpdateWindowInfoExt(windowGroupInfo, displayGroupInfo);
+#endif // OHOS_BUILD_ENABLE_ANCO
+    UpdateDisplayInfoExtIfNeed(displayGroupInfo, false);
+}
+
+void InputWindowsManager::UpdateDisplayInfoExtIfNeed(DisplayGroupInfo &displayGroupInfo, bool needUpdateDisplayExt)
+{
     UpdateDisplayInfo(displayGroupInfo);
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (needUpdateDisplayExt) {
+        UpdateDisplayInfoExt(displayGroupInfo);
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
 }
 
 void InputWindowsManager::UpdateDisplayInfoByIncrementalInfo(const WindowInfo &window,
@@ -1598,6 +1626,14 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
             return RET_OK;
         }
     }
+
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY)) {
+        MMI_HILOGD("Drop event in Anco window, targetWindowId:%{public}d", touchWindow->id);
+        return RET_OK;
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
+
     PointerStyle pointerStyle;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
@@ -1762,9 +1798,9 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             MMI_HILOGE("defaultHotAreas:x:%{public}d,y:%{public}d,width:%{public}d,height:%{public}d",
                 win.x, win.y, win.width, win.height);
         }
-
-        if ((item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
-            !IsValidZorderWindow(item, pointerEvent)) {
+        bool checkWindow = (item.flags & WindowInfo::FLAG_BIT_UNTOUCHABLE) == WindowInfo::FLAG_BIT_UNTOUCHABLE ||
+            !IsValidZorderWindow(item, pointerEvent);
+        if (checkWindow) {
             MMI_HILOGD("Skip the untouchable or invalid zOrder window to continue searching, "
                        "window:%{public}d, flags:%{public}d", item.id, item.flags);
             continue;
@@ -1804,6 +1840,13 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
         MMI_HILOGD("touch event send cancel, window:%{public}d", touchWindow->id);
     }
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    bool isInAnco =  touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+    if (isInAnco) {
+        MMI_HILOGD("Drop event in Anco window, targetWindowId:%{public}d", touchWindow->id);
+        return RET_OK;
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
     auto windowX = logicalX - touchWindow->area.x;
     auto windowY = logicalY - touchWindow->area.y;
     if (!(touchWindow->transform.empty())) {
@@ -2284,8 +2327,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "Windows information:\t");
     mprintf(fd, "windowsInfos,num:%zu", displayGroupInfo_.windowsInfo.size());
     for (const auto &item : displayGroupInfo_.windowsInfo) {
-        mprintf(fd,
-                "\t windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
+        mprintf(fd, "  windowsInfos: id:%d | pid:%d | uid:%d | area.x:%d | area.y:%d "
                 "| area.width:%d | area.height:%d | defaultHotAreas.size:%zu "
                 "| pointerHotAreas.size:%zu | agentWindowId:%d | flags:%d "
                 "| action:%d | displayId:%d | zOrder:%f \t",
@@ -2293,23 +2335,21 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
                 item.area.height, item.defaultHotAreas.size(), item.pointerHotAreas.size(),
                 item.agentWindowId, item.flags, item.action, item.displayId, item.zOrder);
         for (const auto &win : item.defaultHotAreas) {
-            mprintf(fd,
-                    "\t defaultHotAreas: x:%d | y:%d | width:%d | height:%d \t",
+            mprintf(fd, "\t defaultHotAreas: x:%d | y:%d | width:%d | height:%d \t",
                     win.x, win.y, win.width, win.height);
         }
         for (const auto &pointer : item.pointerHotAreas) {
-            mprintf(fd,
-                    "\t pointerHotAreas: x:%d | y:%d | width:%d | height:%d \t",
+            mprintf(fd, "\t pointerHotAreas: x:%d | y:%d | width:%d | height:%d \t",
                     pointer.x, pointer.y, pointer.width, pointer.height);
         }
         
         std::string dump;
         dump += StringPrintf("\t pointerChangeAreas: ");
-        for (auto it : item.pointerChangeAreas) {
+        for (const auto &it : item.pointerChangeAreas) {
             dump += StringPrintf("%d | ", it);
         }
         dump += StringPrintf("\n\t transform: ");
-        for (auto it : item.transform) {
+        for (const auto &it : item.transform) {
             dump += StringPrintf("%f | ", it);
         }
         std::istringstream stream(dump);
@@ -2321,13 +2361,17 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "Displays information:\t");
     mprintf(fd, "displayInfos,num:%zu", displayGroupInfo_.displaysInfo.size());
     for (const auto &item : displayGroupInfo_.displaysInfo) {
-        mprintf(fd,
-                "\t displayInfos: id:%d | x:%d | y:%d | width:%d | height:%d | name:%s "
+        mprintf(fd, "\t displayInfos: id:%d | x:%d | y:%d | width:%d | height:%d | name:%s "
                 "| uniq:%s | direction:%d | displayMode:%d \t",
                 item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
                 item.uniq.c_str(), item.direction, item.displayMode);
     }
     mprintf(fd, "Input device and display bind info:\n%s\n", bindInfo_.Dumps().c_str());
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    std::string ancoWindows;
+    DumpAncoWindows(ancoWindows);
+    mprintf(fd, "Anco windows info:%s", ancoWindows.c_str());
+#endif // OHOS_BUILD_ENABLE_ANCO
 }
 
 std::pair<int32_t, int32_t> InputWindowsManager::TransformWindowXY(const WindowInfo &window,
