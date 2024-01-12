@@ -105,12 +105,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidAndUpdateTarget_
 {
     UDSServer udsServer;
     WinMgr->Init(udsServer);
-    auto inputEvent = InputEvent::Create();
-    ASSERT_NE(inputEvent, nullptr);
-    inputEvent->SetDeviceId(1);
-    inputEvent->SetTargetWindowId(1);
-    inputEvent->SetAgentWindowId(1);
-    ASSERT_EQ(WinMgr->GetPidAndUpdateTarget(inputEvent), 1);
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetDeviceId(1);
+    keyEvent->SetTargetWindowId(1);
+    keyEvent->SetAgentWindowId(1);
+    ASSERT_EQ(WinMgr->GetPidAndUpdateTarget(keyEvent), 1);
 }
 
 /**
@@ -123,12 +123,12 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTarget_003, Test
 {
     UDSServer udsServer;
     WinMgr->Init(udsServer);
-    auto inputEvent = InputEvent::Create();
-    ASSERT_NE(inputEvent, nullptr);
-    inputEvent->SetDeviceId(1);
-    inputEvent->SetTargetWindowId(1);
-    inputEvent->SetAgentWindowId(1);
-    ASSERT_EQ(WinMgr->UpdateTarget(inputEvent), -1);
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetDeviceId(1);
+    keyEvent->SetTargetWindowId(1);
+    keyEvent->SetAgentWindowId(1);
+    ASSERT_EQ(WinMgr->UpdateTarget(keyEvent), -1);
 }
 
 /**
