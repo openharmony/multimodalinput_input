@@ -46,7 +46,7 @@ struct NapStatusData {
     }
     bool operator<(const NapStatusData b) const
     {
-        return bundleName < b.bundleName ? true : false;
+        return pid < b.pid ? true : false;
     }
 };
     std::map<NapStatusData, int32_t> napMap_;
