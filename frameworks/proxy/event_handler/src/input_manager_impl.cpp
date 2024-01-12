@@ -1113,14 +1113,6 @@ int32_t InputManagerImpl::SetPointerStyle(int32_t windowId, const PointerStyle& 
         return RET_ERR;
     }
 
-    if (MMISceneBoardJudgement::IsSceneBoardEnabled()) {
-        int32_t pid = getpid();
-        int32_t windowPid = GetWindowPid(windowId);
-        if (windowPid != pid && windowPid != GLOBAL_WINDOW_ID) {
-            MMI_HILOGE("windowPid is %{public}d, while pid:%{public}d", windowPid, pid);
-            return RET_ERR;
-        }
-    }
     int32_t ret = MultimodalInputConnMgr->SetPointerStyle(windowId, pointerStyle);
     if (ret != RET_OK) {
         MMI_HILOGE("Set pointer style failed, ret:%{public}d", ret);
