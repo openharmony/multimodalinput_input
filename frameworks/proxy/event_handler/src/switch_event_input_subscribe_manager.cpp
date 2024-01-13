@@ -105,7 +105,7 @@ int32_t SwitchEventInputSubscribeManager::OnSubscribeSwitchEventCallback(std::sh
     }
     CHKPR(callback, ERROR_NULL_POINTER);
     callback(event);
-    MMI_HILOGD("Switch event id:%{public}d switchValue:%{public}d", subscribeId, event->GetSwitchValue());
+    MMI_HILOGI("Switch event id:%{public}d switchValue:%{public}d", subscribeId, event->GetSwitchValue());
     return RET_OK;
 }
 
