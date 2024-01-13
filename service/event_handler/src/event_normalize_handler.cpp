@@ -562,6 +562,7 @@ int32_t EventNormalizeHandler::HandleJoystickEvent(libinput_event* event)
 
 int32_t EventNormalizeHandler::HandleSwitchInputEvent(libinput_event* event)
 {
+    CALL_INFO_TRACE;
     if (nextHandler_ == nullptr) {
         MMI_HILOGW("switch device does not support");
         return ERROR_UNSUPPORT;

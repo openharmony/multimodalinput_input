@@ -32,6 +32,7 @@
 #include "input_device_manager.h"
 #include "input_windows_manager.h"
 #include "i_pointer_drawing_manager.h"
+#include "ipc_skeleton.h"
 #include "key_map_manager.h"
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
@@ -66,6 +67,7 @@ constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t UNSUBSCRIBED = -1;
 constexpr int32_t UNOBSERVED = -1;
 constexpr int32_t SUBSCRIBED = 1;
+const int32_t MAX_IPC_THREAD_NUM = 16;
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
@@ -290,6 +292,7 @@ void MMIService::OnStart()
 {
     std::string name = "mmi-service";
     CHK_PID_AND_TID();
+    IPCSkeleton::SetMaxWorkThreadNum(MAX_IPC_THREAD_NUM);
     int32_t ret = Init();
     if (RET_OK != ret) {
         MMI_HILOGE("Init mmi_service failed");
