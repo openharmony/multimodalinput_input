@@ -213,6 +213,7 @@ private:
     DisplayGroupInfo displayGroupInfo_;
     std::map<int32_t, WindowGroupInfo> windowsPerDisplay_;
     PointerStyle lastPointerStyle_ {.id = -1};
+    PointerStyle dragPointerStyle_ {.id = -1};
     MouseLocation mouseLocation_ = { -1, -1 };
     std::map<int32_t, WindowInfo> touchItemDownInfos_;
     std::map<int32_t, std::vector<Rect>> windowsHotAreas_;
@@ -223,6 +224,7 @@ private:
     } captureModeInfo_;
     ExtraData extraData_;
     bool haveSetObserver_ { false };
+    bool dragFlag_ { false };
     DevMode showCursor_;
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
 };
