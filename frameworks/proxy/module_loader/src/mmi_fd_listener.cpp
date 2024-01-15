@@ -40,19 +40,9 @@ void MMIFdListener::OnReadable(int32_t fd)
         return;
     }
     CHKPV(mmiClient_);
-    size_t bufSize = GetMaxBuffSize();
-    if ((bufSize == 0) || (bufSize > MAX_SCENE_BOARD_PACKET_BUF_SIZE)) {
-        MMI_HILOGE("fd listener buffer size out of range, buf size:%{public}zu", bufSize);
-        return;
-    }
-    char *szBuf = new char[bufSize];
-    if (szBuf == nullptr) {
-        MMI_HILOGE("szBuf is nullptr");
-        delete[] szBuf;
-        return;
-    }
+    char szBuf[MAX_PACKET_BUF_SIZE] = {};
     for (int32_t i = 0; i < MAX_RECV_LIMIT; i++) {
-        ssize_t size = recv(fd, szBuf, bufSize, MSG_DONTWAIT | MSG_NOSIGNAL);
+        ssize_t size = recv(fd, szBuf, MAX_PACKET_BUF_SIZE, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (size > 0) {
             mmiClient_->OnRecvMsg(szBuf, size);
         } else if (size < 0) {
@@ -68,11 +58,10 @@ void MMIFdListener::OnReadable(int32_t fd)
                 "errno:%{public}d", i, errno);
             break;
         }
-        if (static_cast<int32_t>(size) < static_cast<int32_t>(bufSize)) {
+        if (size < MAX_PACKET_BUF_SIZE) {
             break;
         }
     }
-    delete[] szBuf;
 }
 
 void MMIFdListener::OnShutdown(int32_t fd)
