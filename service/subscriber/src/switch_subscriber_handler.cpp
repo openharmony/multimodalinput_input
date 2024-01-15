@@ -160,7 +160,7 @@ void SwitchSubscriberHandler::NotifySubscriber(std::shared_ptr<SwitchEvent> swit
     int32_t fd = subscriber->sess_->GetFd();
     pkt << fd << subscriber->id_;
     MMI_HILOGI("Notify subscriber id:%{public}d, switchValue:%{public}d, pid:%{public}d",
-        subscriber->id_, switchEvent->GetSwitchValue(), sess->GetPid());
+        subscriber->id_, switchEvent->GetSwitchValue(), subscriber->sess_->GetPid());
     if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet write dispatch subscriber failed");
         return;
