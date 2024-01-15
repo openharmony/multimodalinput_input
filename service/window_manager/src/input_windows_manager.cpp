@@ -523,7 +523,8 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         int32_t logicY = mouseLocation.physicalY + displayInfo->y;
         std::optional<WindowInfo> windowInfo;
         CHKPV(lastPointerEvent_);
-        if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE &&
+        if ((lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE ||
+            lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) &&
             lastPointerEvent_->GetPressedButtons().empty()) {
             windowInfo = GetWindowInfo(logicX, logicY);
         } else {
@@ -535,12 +536,23 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
         PointerStyle pointerStyle;
         int32_t ret = WinMgr->GetPointerStyle(info.windowPid, info.windowId, pointerStyle);
-        WindowInfo window = *windowInfo;
-        SelectPointerChangeArea(window, pointerStyle, logicX, logicY);
         MMI_HILOGD("get pointer style, pid: %{public}d, windowid: %{public}d, style: %{public}d",
             info.windowPid, info.windowId, pointerStyle.id);
         CHKNOKRV(ret, "Draw pointer style failed, pointerStyleInfo is nullptr");
-        IPointerDrawingManager::GetInstance()->DrawPointerStyle(pointerStyle);
+        WindowInfo window = *windowInfo;
+        if (!dragFlag_) {
+            SelectPointerChangeArea(window, pointerStyle, logicX, logicY);
+            dragPointerStyle_ = pointerStyle;
+            MMI_HILOGD("not in drag SelectPointerStyle, pointerStyle is:%{public}d", dragPointerStyle_.id);
+        }
+        if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
+            dragFlag_ = true;
+            MMI_HILOGD("Is in drag scene");
+        }
+        if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
+            dragFlag_ = false;
+        }
+        IPointerDrawingManager::GetInstance()->DrawPointerStyle(dragPointerStyle_);
     }
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -1663,11 +1675,21 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         return RET_ERR;
     }
     WindowInfo window = *touchWindow;
-    SelectPointerChangeArea(window, pointerStyle, logicalX, logicalY);
-    MMI_HILOGD("pointerStyle is :%{public}d, windowId is :%{public}d, logicalX is :%{public}d,"
-        "logicalY is :%{public}d", pointerStyle.id, window.id, logicalX, logicalY);
+    if (!dragFlag_) {
+        SelectPointerChangeArea(window, pointerStyle, logicalX, logicalY);
+        dragPointerStyle_ = pointerStyle;
+        MMI_HILOGD("pointerStyle is :%{public}d, windowId is :%{public}d, logicalX is :%{public}d,"
+            "logicalY is :%{public}d", pointerStyle.id, window.id, logicalX, logicalY);
+    }
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
+        dragFlag_ = true;
+        MMI_HILOGD("Is in drag scene");
+    }
+    if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
+        dragFlag_ = false;
+    }
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
-        pointerItem.GetDisplayY(), pointerStyle);
+        pointerItem.GetDisplayY(), dragPointerStyle_);
 
     if (captureModeInfo_.isCaptureMode && (touchWindow->id != captureModeInfo_.windowId)) {
         captureModeInfo_.isCaptureMode = false;
