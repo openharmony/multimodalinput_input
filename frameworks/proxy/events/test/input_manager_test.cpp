@@ -712,7 +712,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo001, TestSize.Level
     info.flags = 0;
     info.displayId = 0;
     displayGroupInfo.windowsInfo.push_back(info);
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateWindowInfo(displayGroupInfo));
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo));
 }
 
 /**
@@ -756,7 +756,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo002, TestSize.Level
         info.zOrder = static_cast<float>(MAX_WINDOW_NUMS - i);
         displayGroupInfo.windowsInfo.push_back(info);
     }
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateWindowInfo(displayGroupInfo));
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo));
 }
 
 /**
@@ -796,7 +796,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo003, TestSize.Level
         info.displayId = i;
         displayGroupInfo.windowsInfo.push_back(info);
     }
-    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateWindowInfo(displayGroupInfo));
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo));
 }
 
 /**
