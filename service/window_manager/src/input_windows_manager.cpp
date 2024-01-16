@@ -224,13 +224,6 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> key
     for (auto &item : windowsInfo) {
         if (item.id == focusWindowId) {
             windowInfo = &item;
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    if (IsAncoWindow(item)) {
-        MMI_HILOGD("focusWindowId:%{public}d, pid:%{public}d is anco window.", focusWindowId, item.pid);
-        SimulateKeyBackExt(keyEvent);
-        break;
-    }
-#endif // OHOS_BUILD_ENABLE_ANCO
             break;
         }
     }
@@ -1641,7 +1634,8 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY)) {
-        MMI_HILOGD("Drop event in Anco window, targetWindowId:%{public}d", touchWindow->id);
+        MMI_HILOGD("Process event in Anco window, targetWindowId:%{public}d", touchWindow->id);
+        SimulateZorderPointerExt(pointerEvent);
         return RET_OK;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -1865,7 +1859,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bool isInAnco =  touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
     if (isInAnco) {
-        MMI_HILOGD("Drop event in Anco window, targetWindowId:%{public}d", touchWindow->id);
+        MMI_HILOGD("Process event in Anco window, targetWindowId:%{public}d", touchWindow->id);
+        SimulateZorderPointerExt(pointerEvent);
         return RET_OK;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -2388,11 +2383,11 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
                 item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
                 item.uniq.c_str(), item.direction, item.displayMode);
     }
-    mprintf(fd, "Input device and display bind info:\n%s\n", bindInfo_.Dumps().c_str());
+    mprintf(fd, "Input device and display bind info:\n%s", bindInfo_.Dumps().c_str());
 #ifdef OHOS_BUILD_ENABLE_ANCO
     std::string ancoWindows;
     DumpAncoWindows(ancoWindows);
-    mprintf(fd, "Anco windows info:%s", ancoWindows.c_str());
+    mprintf(fd, "%s\n", ancoWindows.c_str());
 #endif // OHOS_BUILD_ENABLE_ANCO
 }
 
