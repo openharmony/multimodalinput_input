@@ -114,11 +114,8 @@ int32_t NapProcess::RemoveMmiSubscribedEventData(const NapStatusData& napData)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard guard(mapMtx_);
-    for (auto map : napMap_) {
-        if (napData.pid == map.first.pid && napData.uid == map.first.uid &&
-            napData.bundleName == map.first.bundleName) {
-            napMap_.erase(napData);
-        }
+    if (napMap_.find(napData) != napMap_.end()) {
+        napMap_.erase(napData);
     }
     return RET_OK;
 }
