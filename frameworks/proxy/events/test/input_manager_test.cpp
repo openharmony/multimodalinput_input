@@ -1151,14 +1151,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_SyncBundleName_001, TestSize.Level1)
     auto callbackPtr = GetPtr<InputEventCallback>();
     ASSERT_TRUE(callbackPtr != nullptr);
     int32_t monitorId = InputManagerUtil::TestAddMonitor(callbackPtr);
-    InputManager::GetInstance()->SetNapStatus(10, 20, "bundleName_test", 2);
+    InputManager::GetInstance()->SetNapStatus(10, 20, "bundleName_test", 0);
     std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> mapBefore;
     InputManager::GetInstance()->GetAllMmiSubscribedEvents(mapBefore);
     for (auto map = mapBefore.begin(); map != mapBefore.end(); ++map) {
         if (std::get<TUPLE_PID>(map->first) == 10) {
             EXPECT_TRUE(std::get<TUPLE_UID>(map->first) == 20);
             EXPECT_TRUE(std::get<TUPLE_NAME>(map->first) == "bundleName_test");
-            EXPECT_TRUE(map->second == 2);
+            EXPECT_TRUE(map->second == 0);
         }
     }
     for (const auto& map : mapBefore) {
@@ -1168,7 +1168,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SyncBundleName_001, TestSize.Level1)
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     InputManagerUtil::TestRemoveMonitor(monitorId);
-    InputManager::GetInstance()->SetNapStatus(10, 20, "bundleName_test", 0);
+    InputManager::GetInstance()->SetNapStatus(10, 20, "bundleName_test", 2);
     std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> mapAfter;
     InputManager::GetInstance()->GetAllMmiSubscribedEvents(mapAfter);
     for (const auto& map : mapAfter) {

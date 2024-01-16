@@ -46,7 +46,9 @@ struct NapStatusData {
     }
     bool operator<(const NapStatusData b) const
     {
-        return pid < b.pid ? true : false;
+        if (pid != b.pid) return pid < b.pid;
+        if (uid != b.uid) return uid < b.uid;
+        return bundleName < b.bundleName;
     }
 };
     std::map<NapStatusData, int32_t> napMap_;
