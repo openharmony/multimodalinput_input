@@ -45,6 +45,11 @@ constexpr int32_t BUFFER_SIZE = 512;
 constexpr int32_t KEYBOARD_TYPE_SIZE = 20;
 constexpr int32_t PARAMETER_ERROR = 401;
 constexpr int32_t INVAID_VALUE = -1;
+constexpr uint32_t MAX_WINDOW_NUMS = 15;
+#ifdef OHOS_BUILD_ENABLE_ANCO
+constexpr uint32_t SHELL_FLAGS_VALUE = 2;
+#endif  // OHOS_BUILD_ENABLE_ANCO
+
 constexpr double POINTER_ITEM_PRESSURE = 5.0;
 }  // namespace
 
@@ -671,7 +676,131 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo, TestSize.Level1)
 }
 
 /**
- * @tc.name: InputManagerTest_UpdateDisplayInfo
+ * @tc.name: InputManagerTest_UpdateDisplayInfo for 1 display and 1 window
+ * @tc.desc: Update window information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = 1;
+    displayGroupInfo.width = 1000;
+    displayGroupInfo.height = 2000;
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.x =1;
+    displayInfo.y = 1;
+    displayInfo.width = 2;
+    displayInfo.height = 2;
+    displayInfo.dpi = 240;
+    displayInfo.name = "pp";
+    displayInfo.uniq = "pp";
+    displayInfo.direction = DIRECTION0;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    WindowInfo info;
+    info.id = 1;
+    info.pid = 1;
+    info.uid = 1;
+    info.area = {1, 1, 1, 1};
+    info.defaultHotAreas = { info.area };
+    info.pointerHotAreas = { info.area };
+    info.pointerChangeAreas = {16, 5, 16, 5, 16, 5, 16, 5};
+    info.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    info.agentWindowId = 1;
+    info.flags = 0;
+    info.displayId = 0;
+    displayGroupInfo.windowsInfo.push_back(info);
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputManagerTest_UpdateDisplayInfo for 1 display and max-windows
+ * @tc.desc: Update window information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = 0;
+    displayGroupInfo.width = 1000;
+    displayGroupInfo.height = 2000;
+    DisplayInfo displayInfo;
+    displayInfo.id = 0;
+    displayInfo.x =1;
+    displayInfo.y = 1;
+    displayInfo.width = 2;
+    displayInfo.height = 2;
+    displayInfo.dpi = 240;
+    displayInfo.name = "pp";
+    displayInfo.uniq = "pp";
+    displayInfo.direction = DIRECTION0;
+    displayInfo.displayMode = DisplayMode::FULL;
+    displayGroupInfo.displaysInfo.push_back(displayInfo);
+    for (uint32_t i = 0; i < MAX_WINDOW_NUMS; i++) {
+        WindowInfo info;
+        info.id = i + 1;
+        info.pid = 1;
+        info.uid = 1;
+        info.area = {1, 1, 1, 1};
+        info.defaultHotAreas = { info.area };
+        info.pointerHotAreas = { info.area };
+        info.pointerChangeAreas = {16, 5, 16, 5, 16, 5, 16, 5};
+        info.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+        info.agentWindowId = 1;
+        info.flags = 0;
+        info.displayId = 0;
+        info.zOrder = static_cast<float>(MAX_WINDOW_NUMS - i);
+        displayGroupInfo.windowsInfo.push_back(info);
+    }
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputManagerTest_UpdateDisplayInfo for 1 display and 1 window
+ * @tc.desc: Update window information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UpdateDisplayInfo003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    DisplayGroupInfo displayGroupInfo;
+    displayGroupInfo.focusWindowId = 1;
+    displayGroupInfo.width = 1000;
+    displayGroupInfo.height = 2000;
+    DisplayInfo displayInfo;
+    for (uint32_t i = 0; i < 2; i++) { // one is default-display and another is simulate display
+        displayInfo.id = i;
+        displayInfo.x =1;
+        displayInfo.y = 1;
+        displayInfo.width = 2;
+        displayInfo.height = 2;
+        displayInfo.dpi = 240;
+        displayInfo.name = "pp";
+        displayInfo.uniq = "pp";
+        displayInfo.direction = DIRECTION0;
+        displayGroupInfo.displaysInfo.push_back(displayInfo);
+    }
+    WindowInfo info;
+    for (uint32_t i = 0; i < 2; i++) { // 2 widnows for 2 display
+        info.id = 1;
+        info.pid = 1;
+        info.uid = 1;
+        info.defaultHotAreas = { {1, 1, 1, 1} };
+        info.agentWindowId = 1;
+        info.flags = 0;
+        info.displayId = i;
+        displayGroupInfo.windowsInfo.push_back(info);
+    }
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateDisplayInfo(displayGroupInfo));
+}
+
+/**
+ * @tc.name: InputManagerTest_UpdateWindowGroupInfo_001
  * @tc.desc: Update window information
  * @tc.type: FUNC
  * @tc.require:
@@ -685,6 +814,78 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateWindowGroupInfo_001, TestSize.
     WindowGroupInfo windowGroupInfo;
     windowGroupInfo.displayId = 0;
     windowGroupInfo.focusWindowId = 1;
+    windowGroupInfo.windowsInfo = {window};
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateWindowInfo(windowGroupInfo));
+}
+
+/**
+ * @tc.name: InputManagerTest_UpdateWindowGroupInfo_002
+ * @tc.desc: Update window information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UpdateWindowGroupInfo_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo window;
+    window.id = 1;
+    window.action = WINDOW_UPDATE_ACTION::CHANGE;
+    WindowGroupInfo windowGroupInfo;
+    windowGroupInfo.windowsInfo = {window};
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateWindowInfo(windowGroupInfo));
+}
+
+/**
+ * @tc.name: InputManagerTest_UpdateWindowGroupInfo_003
+ * @tc.desc: Update window information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UpdateWindowGroupInfo_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo window;
+    window.id = 1;
+    window.action = WINDOW_UPDATE_ACTION::DEL;
+    WindowGroupInfo windowGroupInfo;
+    windowGroupInfo.windowsInfo = {window};
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateWindowInfo(windowGroupInfo));
+}
+
+/**
+ * @tc.name: InputManagerTest_UpdateWindowGroupInfo_004
+ * @tc.desc: Update window information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UpdateWindowGroupInfo_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo window;
+    window.id = 1;
+    window.action = WINDOW_UPDATE_ACTION::UNKNOWN;
+
+    WindowGroupInfo windowGroupInfo;
+    windowGroupInfo.windowsInfo = {window};
+    ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateWindowInfo(windowGroupInfo));
+}
+
+/**
+ * @tc.name: InputManagerTest_UpdateWindowGroupInfo_005
+ * @tc.desc: Update window information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_UpdateWindowGroupInfo_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    WindowInfo window;
+    window.id = 1;
+    window.action = WINDOW_UPDATE_ACTION::CHANGE;
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    window.flags |= SHELL_FLAGS_VALUE;
+#endif  // OHOS_BUILD_ENABLE_ANCO
+    WindowGroupInfo windowGroupInfo;
     windowGroupInfo.windowsInfo = {window};
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateWindowInfo(windowGroupInfo));
 }
