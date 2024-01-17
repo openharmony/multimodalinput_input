@@ -983,8 +983,10 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     size_t size = touchEvent->GetPointerIds().size();
     if (size == SINGLE_KNUCKLE_SIZE) {
         SingleKnuckleGestureProcesser(touchEvent);
+        isDoubleClick_ = false;
     } else if (size == DOUBLE_KNUCKLE_SIZE) {
         DoubleKnuckleGestureProcesser(touchEvent);
+        isDoubleClick_ = true;
     } else {
         MMI_HILOGW("Other kunckle size not process, size: %{public}zu", size);
     }
@@ -995,7 +997,7 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
     CALL_DEBUG_ENTER;
     CHKPV(touchEvent);
     size_t size = touchEvent->GetPointerIds().size();
-    if (size == SINGLE_KNUCKLE_SIZE) {
+    if ((size == SINGLE_KNUCKLE_SIZE) && (!isDoubleClick_)) {
         singleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
     } else if (size == DOUBLE_KNUCKLE_SIZE) {
         doubleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
@@ -1953,6 +1955,10 @@ bool KeyCommandHandler::HandleKeyCancel(ShortcutKey &shortcutKey)
 void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
 {
     CALL_DEBUG_ENTER;
+    if (ability.bundleName.empty()) {
+        MMI_HILOGW("BundleName is empty");
+        return;
+    }
     AAFwk::Want want;
     want.SetElementName(ability.deviceId, ability.bundleName, ability.abilityName);
     want.SetAction(ability.action);
