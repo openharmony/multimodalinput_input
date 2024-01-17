@@ -218,7 +218,7 @@ std::pair<int32_t, int32_t> EventResample::TransformSampleWindowXY(std::shared_p
         return {logicX + item.GetToolWindowX(), logicY + item.GetToolWindowY()};
     }
     auto windows = WinMgr->GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
-    for (const auto window : windows) {
+    for (const auto &window : windows) {
         if (pointerEvent->GetTargetWindowId() == window.id) {
             if (window.transform.empty()) {
                 return {logicX + item.GetToolWindowX(), logicY + item.GetToolWindowY()};
