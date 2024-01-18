@@ -58,16 +58,18 @@ class JoystickTransformProcessor final : public TransformProcessor {
         { LIBINPUT_TR2_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TR2 },
         { LIBINPUT_TL_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TL },
         { LIBINPUT_TR_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TR },
+        { LIBINPUT_WEST_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_WEST },
         { LIBINPUT_SOUTH_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_SOUTH },
         { LIBINPUT_NORTH_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_NORTH },
-        { LIBINPUT_WEST_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_WEST },
         { LIBINPUT_EAST_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_EAST },
+        { LIBINPUT_START_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_START },
         { LIBINPUT_SELECT_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_SELECT },
         { LIBINPUT_HOMEPAGE_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_HOMEPAGE },
         { LIBINPUT_THUMBL_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_THUMBL },
         { LIBINPUT_THUMBR_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_THUMBR },
-        { LIBINPUT_THUMB2_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_THUMB2 },
+        { LIBINPUT_TRIGGER_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TRIGGER},
         { LIBINPUT_THUMB_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_THUMB },
+        { LIBINPUT_THUMB2_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_THUMB2 },
         { LIBINPUT_TOP_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TOP },
         { LIBINPUT_TOP2_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_TOP2 },
         { LIBINPUT_PINKIE_BUTTON_CODE, PointerEvent::JOYSTICK_BUTTON_PINKIE },
@@ -95,6 +97,7 @@ private:
     int32_t LibinputButtonToPointer(const uint32_t button);
 private:
     int32_t deviceId_ { 0 };
+    bool isPressed_ { false };
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
     std::vector<std::pair<enum libinput_joystick_axis_source, PointerEvent::AxisType>> joystickType;
 };
