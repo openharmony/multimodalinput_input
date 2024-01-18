@@ -228,6 +228,12 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> key
         }
     }
     CHKPR(windowInfo, INVALID_PID);
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (IsAncoWindow(*windowInfo)) {
+        MMI_HILOGD("focusWindowId:%{public}d is anco window.", focusWindowId);
+        return INVALID_PID;
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
     keyEvent->SetTargetWindowId(windowInfo->id);
     keyEvent->SetAgentWindowId(windowInfo->agentWindowId);
     MMI_HILOGD("focusWindowId:%{public}d, pid:%{public}d", focusWindowId, windowInfo->pid);
@@ -1647,14 +1653,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         }
     }
 
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    if (touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY)) {
-        MMI_HILOGD("Process event in Anco window, targetWindowId:%{public}d", touchWindow->id);
-        SimulateZorderPointerExt(pointerEvent);
-        return RET_OK;
-    }
-#endif // OHOS_BUILD_ENABLE_ANCO
-
     PointerStyle pointerStyle;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
@@ -1726,6 +1724,13 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY)) {
+        MMI_HILOGD("Process mouse event in Anco window, targetWindowId:%{public}d", touchWindow->id);
+        SimulatePointerExt(pointerEvent);
+        return RET_OK;
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
     int32_t action = pointerEvent->GetPointerAction();
     if (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
         mouseDownInfo_ = *touchWindow;
@@ -1874,8 +1879,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bool isInAnco =  touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
     if (isInAnco) {
-        MMI_HILOGD("Process event in Anco window, targetWindowId:%{public}d", touchWindow->id);
-        SimulateZorderPointerExt(pointerEvent);
+        MMI_HILOGD("Process touch screen event in Anco window, targetWindowId:%{public}d", touchWindow->id);
+        bool isCompensatePointer = pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) &&
+            MMI_GE(pointerEvent->GetZOrder(), 0.0f);
+        if (isCompensatePointer) {
+            SimulatePointerExt(pointerEvent);
+        }
         return RET_OK;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
