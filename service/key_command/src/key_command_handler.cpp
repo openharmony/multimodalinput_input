@@ -1307,13 +1307,6 @@ int32_t KeyCommandHandler::EnableCombineKey(bool enable)
 void KeyCommandHandler::ParseStatusConfigObserver()
 {
     CALL_DEBUG_ENTER;
-    for (RepeatKey& item : repeatKeys_) {
-        if (item.statusConfig.empty()) {
-            continue;
-        }
-        CreateStatusConfigObserver<RepeatKey>(item);
-    }
-
     for (Sequence& item : sequences_) {
         if (item.statusConfig.empty()) {
             continue;
@@ -1515,9 +1508,6 @@ bool KeyCommandHandler::HandleRepeatKeys(const std::shared_ptr<KeyEvent> keyEven
     }
 
     for (RepeatKey& item : repeatKeys_) {
-        if (item.statusConfigValue == false) {
-            continue;
-        }
         bool isRepeatKey = HandleRepeatKey(item, isLaunched, keyEvent);
         if (isRepeatKey) {
             waitRepeatKey = true;
@@ -1537,6 +1527,16 @@ bool KeyCommandHandler::HandleRepeatKey(const RepeatKey &item, bool &isLaunched,
         return false;
     }
     if (count_ == item.times) {
+        bool statusValue = true;
+        auto ret = SettingDataShare::GetInstance(MULTIMODAL_INPUT_SERVICE_ID)
+            .GetBoolValue(item.statusConfig, statusValue);
+        if (ret != RET_OK) {
+            MMI_HILOGE("Get value from setting date fail");
+            return false;
+        }
+        if (!statusValue) {
+            return false;
+        }
         LaunchAbility(item.ability);
         launchAbilityCount_ = count_;
         isLaunched = true;
