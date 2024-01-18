@@ -29,6 +29,18 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSRegisterModule" };
 constexpr int32_t JS_CALLBACK_MOUSE_BUTTON_MIDDLE = 1;
 constexpr int32_t JS_CALLBACK_MOUSE_BUTTON_RIGHT = 2;
+
+std::map<JsJoystickEvent::Axis, PointerEvent::AxisType> JOYSTICK_AXIS_TYPE = {
+    { JsJoystickEvent::Axis::ABS_X, PointerEvent::AXIS_TYPE_ABS_X },
+    { JsJoystickEvent::Axis::ABS_Y, PointerEvent::AXIS_TYPE_ABS_Y },
+    { JsJoystickEvent::Axis::ABS_Z, PointerEvent::AXIS_TYPE_ABS_Z },
+    { JsJoystickEvent::Axis::ABS_RZ, PointerEvent::AXIS_TYPE_ABS_RZ },
+    { JsJoystickEvent::Axis::ABS_GAS, PointerEvent::AXIS_TYPE_ABS_GAS },
+    { JsJoystickEvent::Axis::ABS_BRAKE, PointerEvent::AXIS_TYPE_ABS_BRAKE },
+    { JsJoystickEvent::Axis::ABS_HAT0X, PointerEvent::AXIS_TYPE_ABS_HAT0X },
+    { JsJoystickEvent::Axis::ABS_HAT0Y, PointerEvent::AXIS_TYPE_ABS_HAT0Y },
+    { JsJoystickEvent::Axis::ABS_THROTTLE, PointerEvent::AXIS_TYPE_ABS_THROTTLE }
+};
 } // namespace
 
 static void GetInjectionEventData(napi_env env, std::shared_ptr<KeyEvent> keyEvent, napi_value keyHandle)
@@ -446,6 +458,231 @@ static napi_value InjectTouchEvent(napi_env env, napi_callback_info info)
     return result;
 }
 
+static void HandleJoystickButton(napi_env env, napi_value joystickHandle, std::shared_ptr<PointerEvent> pointerEvent)
+{
+    int32_t button;
+    int32_t ret = GetNamedPropertyInt32(env, joystickHandle, "button", button);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get button failed");
+    }
+    if (button < 0) {
+        MMI_HILOGE("button:%{public}d is less 0, can not process", button);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "button must be greater than or equal to 0");
+    }
+
+    switch (button) {
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_TL2):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_TL2);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_TR2):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_TR2);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_TL):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_TL);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_TR):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_TR);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_WEST):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_WEST);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_SOUTH):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_SOUTH);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_NORTH):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_NORTH);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_EAST):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_EAST);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_START):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_START);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_SELECT):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_SELECT);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_THUMBL):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_THUMBL);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_THUMBR):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_THUMBR);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_TRIGGER):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_TRIGGER);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_THUMB):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_THUMB);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_THUMB2):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_THUMB2);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_TOP):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_TOP);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_TOP2):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_TOP2);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_PINKIE):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_PINKIE);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_BASE):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_BASE);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_BASE2):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_BASE2);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_BASE3):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_BASE3);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_BASE4):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_BASE4);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_BASE5):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_BASE5);
+            break;       
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_BASE6):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_BASE6);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_DEAD):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_DEAD);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_C):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_C);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_Z):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_Z);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_MODE):
+            button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_MODE);
+            break;       
+        default:
+            break;
+    }
+    pointerEvent->SetButtonId(button);
+}
+
+static void HandleJoystickAction(napi_env env, napi_value joystickHandle, std::shared_ptr<PointerEvent> pointerEvent)
+{
+    int32_t action;
+    int32_t buttonId = pointerEvent->GetButtonId();
+    int32_t ret = GetNamedPropertyInt32(env, joystickHandle, "action", action);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get action failed");
+        return;
+    }
+
+    switch (action) {
+        case static_cast<int32_t>(JsJoystickEvent::Action::BUTTON_DOWN):
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
+            pointerEvent->SetButtonPressed(buttonId);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Action::BUTTON_UP):
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
+            pointerEvent->DeleteReleaseButton(buttonId);
+            break;
+        case static_cast<int32_t>(JsJoystickEvent::Action::ABS_UPDATE):
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
+            break;
+        default:
+            MMI_HILOGE("action is unknown");
+            break;
+    }
+
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+}
+
+static int32_t HandleJoystickAxes(napi_env env, napi_value joystickHandle, std::shared_ptr<PointerEvent> pointerEvent)
+{
+    int32_t ret;
+    napi_value axesArray = {};
+    pointerEvent->ClearAxisValue();
+    if (napi_get_named_property(env, joystickHandle, "axes", &axesArray) != napi_ok) {
+        MMI_HILOGE("Call napi_get_named_property failed");
+        return RET_ERR;
+    }
+    if (axesArray == nullptr) {
+        MMI_HILOGE("The value is null");
+        return RET_ERR;
+    }
+
+    uint32_t arrayLength;
+    if (napi_get_array_length(env, axesArray, &arrayLength) != napi_ok) {
+        MMI_HILOGE("Call napi_get_array_length failed");
+        return RET_ERR;
+    }
+
+    for (uint32_t i = 0; i < arrayLength; i++) {
+        napi_value axisObject;
+        if (napi_get_element(env, axesArray, i, &axisObject)!= napi_ok) {
+          MMI_HILOGE("Call napi_get_element failed");
+          return RET_ERR;
+        }
+
+        int32_t axis;
+        ret = GetNamedPropertyInt32(env, axisObject, "axis", axis);
+        if (ret != RET_OK) {
+           MMI_HILOGE("Get axis failed");
+           return RET_ERR;
+        }
+        double axisValue;
+        ret = GetNamedPropertyDouble(env, axisObject, "value", axisValue);
+        if (ret != RET_OK) {
+           MMI_HILOGE("Get axisValue failed");
+           return RET_ERR;
+        }
+        for (const auto &item : JOYSTICK_AXIS_TYPE) {
+            if ( axis != static_cast<int32_t>(item.first)) {
+                 continue;
+            }
+            pointerEvent->SetAxisValue(item.second, axisValue);
+        }
+    }
+    return RET_OK;
+}
+
+static napi_value InjectJoystickEvent(napi_env env, napi_callback_info info)
+{
+    CALL_DEBUG_ENTER;
+    napi_value result = nullptr;
+    size_t argc = 1;
+    napi_value argv[1] = { 0 };
+    CHKRP(napi_get_cb_info(env, info, &argc, argv, nullptr, nullptr), GET_CB_INFO);
+    if (argc < 1) {
+        MMI_HILOGE("Parameter number error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "parameter number error");
+        return nullptr;
+    }
+    napi_valuetype tmpType = napi_undefined;
+    CHKRP(napi_typeof(env, argv[0], &tmpType), TYPEOF);
+    if (tmpType != napi_object) {
+        MMI_HILOGE("joystickEvent is not napi_object");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "joystickEvent", "object");
+        return nullptr;
+    }
+    napi_value joystickHandle = nullptr;
+    CHKRP(napi_get_named_property(env, argv[0], "joystickEvent", &joystickHandle), GET_NAMED_PROPERTY);
+    if (joystickHandle == nullptr) {
+        MMI_HILOGE("joystickEvent is nullptr");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "joysticEvent not found");
+        return nullptr;
+    }
+    CHKRP(napi_typeof(env, joystickHandle, &tmpType), TYPEOF);
+    if (tmpType != napi_object) {
+        MMI_HILOGE("joystickEvent is not napi_object");
+        THROWERR_API9(env, COMMON_PARAMETER_ERROR, "joystickEvent", "object");
+        return nullptr;
+    }
+    auto pointerEvent = PointerEvent::Create();
+    CHKPP(pointerEvent);
+
+    HandleJoystickButton(env,joystickHandle, pointerEvent);
+    HandleJoystickAction(env, joystickHandle, pointerEvent);
+    HandleJoystickAxes(env, joystickHandle, pointerEvent);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+    CHKRP(napi_create_int32(env, 0, &result), CREATE_INT32);
+    return result;
+}
+
 EXTERN_C_START
 static napi_value MmiInit(napi_env env, napi_value exports)
 {
@@ -454,6 +691,7 @@ static napi_value MmiInit(napi_env env, napi_value exports)
         DECLARE_NAPI_FUNCTION("injectKeyEvent", InjectKeyEvent),
         DECLARE_NAPI_FUNCTION("injectMouseEvent", InjectMouseEvent),
         DECLARE_NAPI_FUNCTION("injectTouchEvent", InjectTouchEvent),
+        DECLARE_NAPI_FUNCTION("injectJoystickEvent", InjectJoystickEvent),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;

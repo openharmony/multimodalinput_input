@@ -55,6 +55,7 @@ bool JoystickTransformProcessor::OnEventJoystickButton(struct libinput_event* ev
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetActionStartTime(time);
     pointerEvent_->SetDeviceId(deviceId_);
+    pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
     uint32_t button = libinput_event_joystick_button_get_key(data);
     int32_t buttonId = LibinputButtonToPointer(button);
     if (buttonId == PointerEvent::BUTTON_NONE) {
@@ -66,9 +67,11 @@ bool JoystickTransformProcessor::OnEventJoystickButton(struct libinput_event* ev
     if (state == LIBINPUT_BUTTON_STATE_RELEASED) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
         pointerEvent_->DeleteReleaseButton(buttonId);
+        isPressed_ = false;
     } else if (state == LIBINPUT_BUTTON_STATE_PRESSED) {
         pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
         pointerEvent_->SetButtonPressed(buttonId);
+        isPressed_ = true;
     } else {
         MMI_HILOGE("Unknown state, state:%{public}u", state);
         return false;
@@ -93,6 +96,7 @@ bool JoystickTransformProcessor::OnEventJoystickAxis(struct libinput_event *even
     pointerEvent_->SetActionTime(time);
     pointerEvent_->SetActionStartTime(time);
     pointerEvent_->SetDeviceId(deviceId_);
+    pointerEvent_->SetButtonId(PointerEvent::BUTTON_NONE);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
 
@@ -102,6 +106,7 @@ bool JoystickTransformProcessor::OnEventJoystickAxis(struct libinput_event *even
                 libinput_event_get_joystick_axis_abs_info(data, item.first);
             CHKPF(axisInfo);
             pointerEvent_->SetAxisValue(item.second, axisInfo->value);
+            MMI_HILOGD("axis:%{public}d, value:%{public}d", item.second, axisInfo->value);
         }
     }
     return true;
