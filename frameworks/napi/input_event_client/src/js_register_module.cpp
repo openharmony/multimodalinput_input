@@ -539,7 +539,7 @@ static void HandleJoystickButton(napi_env env, napi_value joystickHandle, std::s
             break;
         case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_BASE5):
             button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_BASE5);
-            break;       
+            break;
         case static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_BASE6):
             button = static_cast<int32_t>(PointerEvent::JOYSTICK_BUTTON_BASE6);
             break;
@@ -614,25 +614,25 @@ static int32_t HandleJoystickAxes(napi_env env, napi_value joystickHandle, std::
     for (uint32_t i = 0; i < arrayLength; i++) {
         napi_value axisObject;
         if (napi_get_element(env, axesArray, i, &axisObject)!= napi_ok) {
-          MMI_HILOGE("Call napi_get_element failed");
-          return RET_ERR;
+            MMI_HILOGE("Call napi_get_element failed");
+            return RET_ERR;
         }
 
         int32_t axis;
         ret = GetNamedPropertyInt32(env, axisObject, "axis", axis);
         if (ret != RET_OK) {
-           MMI_HILOGE("Get axis failed");
-           return RET_ERR;
+            MMI_HILOGE("Get axis failed");
+            return RET_ERR;
         }
         double axisValue;
         ret = GetNamedPropertyDouble(env, axisObject, "value", axisValue);
         if (ret != RET_OK) {
-           MMI_HILOGE("Get axisValue failed");
-           return RET_ERR;
+            MMI_HILOGE("Get axisValue failed");
+            return RET_ERR;
         }
         for (const auto &item : JOYSTICK_AXIS_TYPE) {
-            if ( axis != static_cast<int32_t>(item.first)) {
-                 continue;
+            if (axis != static_cast<int32_t>(item.first)) {
+                continue;
             }
             pointerEvent->SetAxisValue(item.second, axisValue);
         }
@@ -675,7 +675,7 @@ static napi_value InjectJoystickEvent(napi_env env, napi_callback_info info)
     auto pointerEvent = PointerEvent::Create();
     CHKPP(pointerEvent);
 
-    HandleJoystickButton(env,joystickHandle, pointerEvent);
+    HandleJoystickButton(env, joystickHandle, pointerEvent);
     HandleJoystickAction(env, joystickHandle, pointerEvent);
     HandleJoystickAxes(env, joystickHandle, pointerEvent);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
