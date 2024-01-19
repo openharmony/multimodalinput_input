@@ -85,6 +85,37 @@ std::map<JsJoystickEvent::Axis, PointerEvent::AxisType> JOYSTICK_AXIS_TYPE = {
     { JsJoystickEvent::Axis::ABS_THROTTLE, PointerEvent::AXIS_TYPE_ABS_THROTTLE }
 };
 
+std::map<JsJoystickEvent::Button, int32_t> JOYSTICK_BUTTON_TYPE = {
+    { JsJoystickEvent::Button::BUTTON_TL2, PointerEvent::JOYSTICK_BUTTON_TL2 },
+    { JsJoystickEvent::Button::BUTTON_TR2, PointerEvent::JOYSTICK_BUTTON_TR2 },
+    { JsJoystickEvent::Button::BUTTON_TL, PointerEvent::JOYSTICK_BUTTON_TL },
+    { JsJoystickEvent::Button::BUTTON_TR, PointerEvent::JOYSTICK_BUTTON_TR },
+    { JsJoystickEvent::Button::BUTTON_WEST, PointerEvent::JOYSTICK_BUTTON_WEST },
+    { JsJoystickEvent::Button::BUTTON_SOUTH, PointerEvent::JOYSTICK_BUTTON_SOUTH },
+    { JsJoystickEvent::Button::BUTTON_NORTH, PointerEvent::JOYSTICK_BUTTON_NORTH },
+    { JsJoystickEvent::Button::BUTTON_EAST, PointerEvent::JOYSTICK_BUTTON_EAST },
+    { JsJoystickEvent::Button::BUTTON_START, PointerEvent::JOYSTICK_BUTTON_START },
+    { JsJoystickEvent::Button::BUTTON_SELECT, PointerEvent::JOYSTICK_BUTTON_SELECT },
+    { JsJoystickEvent::Button::BUTTON_HOMEPAGE, PointerEvent::JOYSTICK_BUTTON_HOMEPAGE },
+    { JsJoystickEvent::Button::BUTTON_THUMBL, PointerEvent::JOYSTICK_BUTTON_THUMBL },
+    { JsJoystickEvent::Button::BUTTON_THUMBR, PointerEvent::JOYSTICK_BUTTON_THUMBR },
+    { JsJoystickEvent::Button::BUTTON_TRIGGER, PointerEvent::JOYSTICK_BUTTON_TRIGGER },
+    { JsJoystickEvent::Button::BUTTON_THUMB, PointerEvent::JOYSTICK_BUTTON_THUMB },
+    { JsJoystickEvent::Button::BUTTON_THUMB2, PointerEvent::JOYSTICK_BUTTON_THUMB2 },
+    { JsJoystickEvent::Button::BUTTON_TOP, PointerEvent::JOYSTICK_BUTTON_TOP },
+    { JsJoystickEvent::Button::BUTTON_TOP2, PointerEvent::JOYSTICK_BUTTON_TOP2 },
+    { JsJoystickEvent::Button::BUTTON_PINKIE, PointerEvent::JOYSTICK_BUTTON_PINKIE },
+    { JsJoystickEvent::Button::BUTTON_BASE, PointerEvent::JOYSTICK_BUTTON_BASE },
+    { JsJoystickEvent::Button::BUTTON_BASE2, PointerEvent::JOYSTICK_BUTTON_BASE2 },
+    { JsJoystickEvent::Button::BUTTON_BASE3, PointerEvent::JOYSTICK_BUTTON_BASE3 },
+    { JsJoystickEvent::Button::BUTTON_BASE4, PointerEvent::JOYSTICK_BUTTON_BASE4 },
+    { JsJoystickEvent::Button::BUTTON_BASE5, PointerEvent::JOYSTICK_BUTTON_BASE5 },
+    { JsJoystickEvent::Button::BUTTON_BASE6, PointerEvent::JOYSTICK_BUTTON_BASE6 },
+    { JsJoystickEvent::Button::BUTTON_DEAD, PointerEvent::JOYSTICK_BUTTON_DEAD },
+    { JsJoystickEvent::Button::BUTTON_C, PointerEvent::JOYSTICK_BUTTON_C },
+    { JsJoystickEvent::Button::BUTTON_Z, PointerEvent::JOYSTICK_BUTTON_Z },
+    { JsJoystickEvent::Button::BUTTON_MODE, PointerEvent::JOYSTICK_BUTTON_MODE }
+};
 } // namespace
 
 int32_t InputMonitor::Start()
@@ -712,98 +743,12 @@ int32_t JsInputMonitor::GetJoystickAction(int32_t action)
 
 int32_t JsInputMonitor::GetJoystickButton(int32_t buttonId)
 {
-    switch (buttonId) {
-        case PointerEvent::JOYSTICK_BUTTON_TL2: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_TL2);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_TR2: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_TR2);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_TL: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_TL);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_TR: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_TR);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_WEST: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_WEST);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_SOUTH: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_SOUTH);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_NORTH: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_NORTH);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_EAST: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_EAST);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_START: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_START);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_SELECT: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_SELECT);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_HOMEPAGE: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_HOMEPAGE);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_THUMBL: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_THUMBL);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_THUMBR: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_THUMBR);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_TRIGGER: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_TRIGGER);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_THUMB: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_THUMB);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_THUMB2: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_THUMB2);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_TOP: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_TOP);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_TOP2: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_TOP2);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_PINKIE: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_PINKIE);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_BASE: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_BASE);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_BASE2: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_BASE2);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_BASE3: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_BASE3);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_BASE4: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_BASE4);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_BASE5: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_BASE5);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_BASE6: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_BASE6);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_DEAD: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_DEAD);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_C: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_C);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_Z: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_Z);
-        }
-        case PointerEvent::JOYSTICK_BUTTON_MODE: {
-            return static_cast<int32_t>(JsJoystickEvent::Button::BUTTON_MODE);
-        }
-        default: {
-            return RET_ERR;
+    for (const auto &item : JOYSTICK_BUTTON_TYPE) {
+        if (buttonId == item.second) {
+            return static_cast<int32_t>(item.first);
         }
     }
+    return RET_ERR;
 }
 
 bool JsInputMonitor::GetJoystickPressedButtons(const std::set<int32_t>& pressedButtons, napi_value result)
@@ -923,12 +868,12 @@ int32_t JsInputMonitor::GetJoystickPointerItem(const std::shared_ptr<PointerEven
         }
 
         if (SetNameProperty(jsEnv_, element, "axis", axis) != napi_ok) {
-           THROWERR(jsEnv_, "Set property of axis failed");
-           return RET_ERR;
+            THROWERR(jsEnv_, "Set property of axis failed");
+            return RET_ERR;
         }
         if (SetNameProperty(jsEnv_, element, "value", axisValue) != napi_ok) {
-          THROWERR(jsEnv_, "Set property of value failed");
-          return RET_ERR;
+            THROWERR(jsEnv_, "Set property of value failed");
+            return RET_ERR;
         }
 
         status = napi_set_element(jsEnv_, axes, index, element);
@@ -1121,7 +1066,8 @@ int32_t JsInputMonitor::TransformMousePointerEvent(const std::shared_ptr<Pointer
     return RET_OK;
 }
 
-int32_t JsInputMonitor::TransformJoystickPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
+int32_t JsInputMonitor::TransformJoystickPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent,
+    napi_value result)
 {
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
