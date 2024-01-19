@@ -2253,15 +2253,8 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
         displayInfo = GetPhysicalDisplay(displayId);
         CHKPV(displayInfo);
     }
-    int32_t width = 0;
-    int32_t height = 0;
-    if (displayInfo->direction == DIRECTION0 || displayInfo->direction == DIRECTION180) {
-        width = displayInfo->width;
-        height = displayInfo->height;
-    } else {
-        height = displayInfo->width;
-        width = displayInfo->height;
-    }
+    int32_t width = displayInfo->width;
+    int32_t height = displayInfo->height;
     if (integerX < 0) {
         integerX = 0;
     }
