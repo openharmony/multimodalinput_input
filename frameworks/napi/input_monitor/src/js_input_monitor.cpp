@@ -835,7 +835,6 @@ bool JsInputMonitor::GetJoystickPressedButtons(const std::set<int32_t>& pressedB
         return false;
     }
     return true;
-
 }
 
 int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result)
@@ -910,9 +909,9 @@ int32_t JsInputMonitor::GetJoystickPointerItem(const std::shared_ptr<PointerEven
         THROWERR(jsEnv_, "Set property of id failed");
         return RET_ERR;
     }
-    
-    for (const auto &item : JOYSTICK_AXIS_TYPE) {     
-        if ( !pointerEvent->HasAxis(item.second)) {
+
+    for (const auto &item : JOYSTICK_AXIS_TYPE) {
+        if (!pointerEvent->HasAxis(item.second)) {
             continue;
         }
         axisValue = pointerEvent->GetAxisValue(item.second);
@@ -1409,7 +1408,8 @@ void JsInputMonitor::OnPointerEventInJsThread(const std::string &typeName, int32
         }
 
         bool typeNameFlag = typeName == "touch" || typeName == "pinch" || typeName == "threeFingersSwipe" ||
-            typeName == "fourFingersSwipe" || typeName == "rotate" || typeName == "threeFingersTap" || typeName == "joystick";
+            typeName == "fourFingersSwipe" || typeName == "rotate" || typeName == "threeFingersTap" ||
+            typeName == "joystick";
         if (typeNameFlag) {
             pointerEvent->MarkProcessed();
             bool retValue = false;
