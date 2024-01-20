@@ -93,20 +93,6 @@ void KeyAutoRepeat::SelectAutoRepeat(const std::shared_ptr<KeyEvent>& keyEvent)
         TimerMgr->RemoveTimer(timerId_);
         timerId_ = -1;
         MMI_HILOGI("Stop keyboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
-        if (repeatKeyCode_ != keyEvent_->GetKeyCode()) {
-            std::optional<KeyEvent::KeyItem> pressedKeyItem = keyEvent_->GetKeyItem(keyEvent_->GetKeyCode());
-            if (pressedKeyItem) {
-                keyEvent_->RemoveReleasedKeyItems(*pressedKeyItem);
-            } else {
-                MMI_HILOGW("The pressedKeyItem is nullopt");
-            }
-            keyEvent_->SetKeyCode(repeatKeyCode_);
-            keyEvent_->SetAction(KeyEvent::KEY_ACTION_DOWN);
-            keyEvent_->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
-            int32_t delayTime = GetDelayTime();
-            AddHandleTimer(delayTime);
-            MMI_HILOGD("The end keyboard autorepeat, keyCode:%{public}d", keyEvent_->GetKeyCode());
-        }
     }
 }
 
