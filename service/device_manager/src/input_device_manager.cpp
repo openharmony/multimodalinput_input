@@ -232,7 +232,7 @@ int32_t InputDeviceManager::GetDeviceSupportKey(int32_t deviceId, int32_t &keybo
         MMI_HILOGD("The keyboard type is handwriting pen:%{public}d", keyboardType);
     } else {
         keyboardType = KEYBOARD_TYPE_UNKNOWN;
-        MMI_HILOGW("Undefined keyboard type");
+        MMI_HILOGD("Undefined keyboard type");
     }
     MMI_HILOGD("Get keyboard type results by supporting keys:%{public}d", keyboardType);
     return RET_OK;
