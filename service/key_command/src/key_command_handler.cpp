@@ -891,7 +891,7 @@ void KeyCommandHandler::HandlePointerActionMoveEvent(const std::shared_ptr<Point
         return;
     }
     if (twoFingerGesture_.timerId == -1) {
-        MMI_HILOGW("Two finger gesture timer id is -1.");
+        MMI_HILOGD("Two finger gesture timer id is -1.");
         return;
     }
     auto id = touchEvent->GetPointerId();
