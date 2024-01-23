@@ -82,7 +82,7 @@ std::shared_ptr<TransformProcessor> TouchEventNormalize::MakeTransformProcessor(
         }
 #endif // OHOS_BUILD_ENABLE_JOYSTICK
         default: {
-            MMI_HILOGE("Unsupported device type: %{public}d", deviceType);
+            MMI_HILOGE("Unsupported device type:%{public}d", deviceType);
             break;
         }
     }

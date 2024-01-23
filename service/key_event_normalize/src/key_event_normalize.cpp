@@ -141,7 +141,7 @@ void KeyEventNormalize::ResetKeyEvent(struct libinput_device* device)
 
 int32_t KeyEventNormalize::SetShieldStatus(int32_t shieldMode, bool isShield)
 {
-    MMI_HILOGD("last shield mode: %{public}d, set shield mode: %{public}d, status: %{public}d",
+    MMI_HILOGD("last shield mode:%{public}d, set shield mode:%{public}d, status:%{public}d",
         lastShieldMode_, shieldMode, isShield);
     auto iter = shieldStatus_.find(lastShieldMode_);
     if (isShield) {
@@ -155,7 +155,7 @@ int32_t KeyEventNormalize::SetShieldStatus(int32_t shieldMode, bool isShield)
         }
         lastShieldMode_ = shieldMode;
     } else if (lastShieldMode_ != shieldMode) {
-        MMI_HILOGD("shield mode: %{public}d is already false", shieldMode);
+        MMI_HILOGD("shield mode:%{public}d is already false", shieldMode);
         return RET_OK;
     } else {
         MMI_HILOGD("lastShieldMode_ unset");
@@ -163,11 +163,11 @@ int32_t KeyEventNormalize::SetShieldStatus(int32_t shieldMode, bool isShield)
     }
     iter = shieldStatus_.find(shieldMode);
     if (iter == shieldStatus_.end()) {
-        MMI_HILOGE("find shieldMode: %{public}d failed", shieldMode);
+        MMI_HILOGE("find shieldMode:%{public}d failed", shieldMode);
         return RET_ERR;
     }
     iter->second = isShield;
-    MMI_HILOGD("last shield mode: %{public}d, set shield mode: %{public}d, status: %{public}d",
+    MMI_HILOGD("last shield mode:%{public}d, set shield mode:%{public}d, status:%{public}d",
         lastShieldMode_, shieldMode, isShield);
     return RET_OK;
 }
@@ -177,11 +177,11 @@ int32_t KeyEventNormalize::GetShieldStatus(int32_t shieldMode, bool &isShield)
     CALL_DEBUG_ENTER;
     auto iter = shieldStatus_.find(shieldMode);
     if (iter == shieldStatus_.end()) {
-        MMI_HILOGE("find shieldMode: %{public}d failed", shieldMode);
+        MMI_HILOGE("find shieldMode:%{public}d failed", shieldMode);
         return RET_ERR;
     }
     isShield = iter->second;
-    MMI_HILOGD("last shield mode: %{public}d, get shield mode: %{public}d, status: %{public}d",
+    MMI_HILOGD("last shield mode:%{public}d, get shield mode:%{public}d, status:%{public}d",
         lastShieldMode_, shieldMode, isShield);
     return RET_OK;
 }
