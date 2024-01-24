@@ -40,14 +40,15 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 
 HapInfoParams infoManagerTestInfoParms = {
     .userID = 1,
-    .bundleName = "accesstoken_test",
+    .bundleName = "inputManagerManualTest",
     .instIndex = 0,
-    .appIDDesc = "test"
+    .appIDDesc = "test",
+    .isSystemApp = true
 };
 
 PermissionDef infoManagerTestPermDef = {
     .permissionName = "ohos.permission.test",
-    .bundleName = "accesstoken_test",
+    .bundleName = "inputManagerManualTest",
     .grantMode = 1,
     .availableLevel = APL_SYSTEM_CORE,
     .label = "label",
@@ -78,7 +79,7 @@ public:
     {
         currentID_ = GetSelfTokenID();
         AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(infoManagerTestInfoParms, infoManagerTestPolicyPrams);
-        accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
+        accessID_ = tokenIdEx.tokenIDEx;
         SetSelfTokenID(accessID_);
     }
     ~AccessToken()
@@ -87,8 +88,8 @@ public:
         SetSelfTokenID(currentID_);
     }
 private:
-    AccessTokenID currentID_ = 0;
-    AccessTokenID accessID_ = 0;
+    uint64_t currentID_ = 0;
+    uint64_t accessID_ = 0;
 };
 
 class InputManagerManualTest : public testing::Test {
