@@ -228,6 +228,12 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> key
         }
     }
     CHKPR(windowInfo, INVALID_PID);
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (IsAncoWindow(*windowInfo)) {
+        MMI_HILOGD("focusWindowId:%{public}d is anco window.", focusWindowId);
+        return INVALID_PID;
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
     keyEvent->SetTargetWindowId(windowInfo->id);
     keyEvent->SetAgentWindowId(windowInfo->agentWindowId);
     MMI_HILOGD("focusWindowId:%{public}d, pid:%{public}d", focusWindowId, windowInfo->pid);
@@ -354,6 +360,11 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
     for (const auto &item : windowGroupInfo.windowsInfo) {
         UpdateDisplayInfoByIncrementalInfo(item, displayGroupInfo);
     }
+
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    pointerDrawFlag_ = NeedUpdatePointDrawFlag(windowGroupInfo.windowsInfo);
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
+
 #ifdef OHOS_BUILD_ENABLE_ANCO
     UpdateWindowInfoExt(windowGroupInfo, displayGroupInfo);
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -375,7 +386,8 @@ void InputWindowsManager::UpdateDisplayInfoByIncrementalInfo(const WindowInfo &w
 {
     CALL_DEBUG_ENTER;
     switch (window.action) {
-        case WINDOW_UPDATE_ACTION::ADD: {
+        case WINDOW_UPDATE_ACTION::ADD:
+        case WINDOW_UPDATE_ACTION::ADD_END: {
             auto id = window.id;
             auto pos = std::find_if(std::begin(displayGroupInfo.windowsInfo), std::end(displayGroupInfo.windowsInfo),
                 [id](const auto& item) { return item.id == id; });
@@ -448,6 +460,9 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
 void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
+#if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
+    pointerDrawFlag_ = NeedUpdatePointDrawFlag(displayGroupInfo.windowsInfo);
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     std::sort(displayGroupInfo.windowsInfo.begin(), displayGroupInfo.windowsInfo.end(),
         [](const WindowInfo &lwindow, const WindowInfo &rwindow) -> bool {
         return lwindow.zOrder > rwindow.zOrder;
@@ -465,7 +480,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     InitPointerStyle();
 #endif // OHOS_BUILD_ENABLE_POINTER
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
-    if (!displayGroupInfo.displaysInfo.empty()) {
+    if (!displayGroupInfo.displaysInfo.empty() && pointerDrawFlag_) {
         PointerDrawingManagerOnDisplayInfo(displayGroupInfo);
     }
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
@@ -547,6 +562,12 @@ void InputWindowsManager::PointerDrawingManagerOnDisplayInfo(const DisplayGroupI
         }
         IPointerDrawingManager::GetInstance()->DrawPointerStyle(dragPointerStyle_);
     }
+}
+
+bool InputWindowsManager::NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows)
+{
+    CALL_DEBUG_ENTER;
+    return !windows.empty() && windows.back().action == WINDOW_UPDATE_ACTION::ADD_END;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
@@ -1632,14 +1653,6 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         }
     }
 
-#ifdef OHOS_BUILD_ENABLE_ANCO
-    if (touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY)) {
-        MMI_HILOGD("Process event in Anco window, targetWindowId:%{public}d", touchWindow->id);
-        SimulateZorderPointerExt(pointerEvent);
-        return RET_OK;
-    }
-#endif // OHOS_BUILD_ENABLE_ANCO
-
     PointerStyle pointerStyle;
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
         if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
@@ -1711,6 +1724,13 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     UpdatePointerEvent(logicalX, logicalY, pointerEvent, *touchWindow);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
+#ifdef OHOS_BUILD_ENABLE_ANCO
+    if (touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY)) {
+        MMI_HILOGD("Process mouse event in Anco window, targetWindowId:%{public}d", touchWindow->id);
+        SimulatePointerExt(pointerEvent);
+        return RET_OK;
+    }
+#endif // OHOS_BUILD_ENABLE_ANCO
     int32_t action = pointerEvent->GetPointerAction();
     if (action == PointerEvent::POINTER_ACTION_BUTTON_DOWN) {
         mouseDownInfo_ = *touchWindow;
@@ -1859,8 +1879,12 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bool isInAnco =  touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
     if (isInAnco) {
-        MMI_HILOGD("Process event in Anco window, targetWindowId:%{public}d", touchWindow->id);
-        SimulateZorderPointerExt(pointerEvent);
+        MMI_HILOGD("Process touch screen event in Anco window, targetWindowId:%{public}d", touchWindow->id);
+        bool isCompensatePointer = pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) &&
+            MMI_GE(pointerEvent->GetZOrder(), 0.0f);
+        if (isCompensatePointer) {
+            SimulatePointerExt(pointerEvent);
+        }
         return RET_OK;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -2229,15 +2253,8 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
         displayInfo = GetPhysicalDisplay(displayId);
         CHKPV(displayInfo);
     }
-    int32_t width = 0;
-    int32_t height = 0;
-    if (displayInfo->direction == DIRECTION0 || displayInfo->direction == DIRECTION180) {
-        width = displayInfo->width;
-        height = displayInfo->height;
-    } else {
-        height = displayInfo->width;
-        width = displayInfo->height;
-    }
+    int32_t width = displayInfo->width;
+    int32_t height = displayInfo->height;
     if (integerX < 0) {
         integerX = 0;
     }

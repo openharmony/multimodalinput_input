@@ -107,7 +107,7 @@ public:
     void UpdateDisplayInfoExt(const DisplayGroupInfo &displayGroupInfo);
     bool IsInAncoWindow(const WindowInfo &window, int32_t x, int32_t y) const;
     bool IsAncoWindow(const WindowInfo &window) const;
-    void SimulateZorderPointerExt(std::shared_ptr<PointerEvent> pointerEvent);
+    void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent);
     void DumpAncoWindows(std::string& out) const;
 #endif // OHOS_BUILD_ENABLE_ANCO
 
@@ -165,6 +165,7 @@ private:
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 void PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -225,6 +226,7 @@ private:
     ExtraData extraData_;
     bool haveSetObserver_ { false };
     bool dragFlag_ { false };
+    bool pointerDrawFlag_ { false };
     DevMode showCursor_;
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
 };
