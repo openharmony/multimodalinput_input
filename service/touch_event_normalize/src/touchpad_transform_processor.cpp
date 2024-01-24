@@ -282,7 +282,7 @@ int32_t TouchPadTransformProcessor::GetTouchPadToolType(struct libinput_device *
             return item.second;
         }
     }
-    MMI_HILOGW("Unknown Btn tool type, identified as finger");
+    MMI_HILOGD("Unknown Btn tool type, identified as finger");
     return PointerEvent::TOOL_TYPE_FINGER;
 }
 

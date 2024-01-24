@@ -260,7 +260,7 @@ int32_t TouchTransformProcessor::GetTouchToolType(struct libinput_device *device
             return item.second;
         }
     }
-    MMI_HILOGW("Unknown Btn tool type, identified as finger");
+    MMI_HILOGD("Unknown Btn tool type, identified as finger");
     return PointerEvent::TOOL_TYPE_FINGER;
 }
 
