@@ -789,7 +789,7 @@ void KeyCommandHandler::HandlePointerEvent(const std::shared_ptr<PointerEvent> p
 {
     CHKPV(pointerEvent);
     if (OnHandleEvent(pointerEvent)) {
-        MMI_HILOGD("The pointerEvent start launch an ability, pointAction: %{public}s",
+        MMI_HILOGD("The pointerEvent start launch an ability, pointAction:%{public}s",
             pointerEvent->DumpPointerAction());
     }
     CHKPV(nextHandler_);
@@ -861,7 +861,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
     int32_t toolType = item.GetToolType();
-    MMI_HILOGD("Pointer tool type: %{public}d", toolType);
+    MMI_HILOGD("Pointer tool type:%{public}d", toolType);
     singleKnuckleGesture_.state = false;
     doubleKnuckleGesture_.state = false;
     switch (toolType) {
@@ -878,7 +878,7 @@ void KeyCommandHandler::HandlePointerActionDownEvent(const std::shared_ptr<Point
         default: {
             // other tool type are not processed
             isKnuckleState_ = false;
-            MMI_HILOGD("Current touch event tool type: %{public}d", toolType);
+            MMI_HILOGD("Current touch event tool type:%{public}d", toolType);
             break;
         }
     }
@@ -928,7 +928,7 @@ void KeyCommandHandler::HandlePointerActionUpEvent(const std::shared_ptr<Pointer
         }
         default: {
             // other tool type are not processed
-            MMI_HILOGW("Current touch event tool type: %{public}d", toolType);
+            MMI_HILOGW("Current touch event tool type:%{public}d", toolType);
             break;
         }
     }
@@ -977,7 +977,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
     PointerEvent::PointerItem item;
     touchEvent->GetPointerItem(id, item);
     if (item.GetToolType() != PointerEvent::TOOL_TYPE_KNUCKLE) {
-        MMI_HILOGW("Touch event tool type: %{public}d not knuckle", item.GetToolType());
+        MMI_HILOGW("Touch event tool type:%{public}d not knuckle", item.GetToolType());
         return;
     }
     size_t size = touchEvent->GetPointerIds().size();
@@ -988,7 +988,7 @@ void KeyCommandHandler::HandleKnuckleGestureDownEvent(const std::shared_ptr<Poin
         DoubleKnuckleGestureProcesser(touchEvent);
         isDoubleClick_ = true;
     } else {
-        MMI_HILOGW("Other kunckle size not process, size: %{public}zu", size);
+        MMI_HILOGW("Other kunckle size not process, size:%{public}zu", size);
     }
 }
 
@@ -1002,7 +1002,7 @@ void KeyCommandHandler::HandleKnuckleGestureUpEvent(const std::shared_ptr<Pointe
     } else if (size == DOUBLE_KNUCKLE_SIZE) {
         doubleKnuckleGesture_.lastPointerUpTime = touchEvent->GetActionTime();
     } else {
-        MMI_HILOGW("Other kunckle size not process, size: %{public}zu", size);
+        MMI_HILOGW("Other kunckle size not process, size:%{public}zu", size);
     }
 }
 
@@ -1048,7 +1048,7 @@ void KeyCommandHandler::KnuckleGestureProcessor(const std::shared_ptr<PointerEve
         knuckleGesture.state = true;
         ReportKnuckleScreenCapture(touchEvent);
     } else {
-        MMI_HILOGW("time ready: %{public}d, distance ready: %{public}d", isTimeIntervalReady, isDistanceReady);
+        MMI_HILOGW("time ready:%{public}d, distance ready:%{public}d", isTimeIntervalReady, isDistanceReady);
         if (!isTimeIntervalReady) {
             DfxHisysevent::ReportFailIfInvalidTime(touchEvent, intervalTime);
         }
@@ -1075,7 +1075,7 @@ void KeyCommandHandler::AdjustTimeIntervalConfigIfNeed(int64_t intervalTime)
 {
     CALL_DEBUG_ENTER;
     int64_t newTimeConfig;
-    MMI_HILOGI("down to prev up interval time: %{public}" PRId64 ",config time: %{public}" PRId64"",
+    MMI_HILOGI("down to prev up interval time:%{public}" PRId64 ",config time:%{public}" PRId64"",
         intervalTime, downToPrevUpTimeConfig_);
     if (downToPrevUpTimeConfig_ == DOUBLE_CLICK_INTERVAL_TIME_DEFAULT) {
         if (intervalTime < DOUBLE_CLICK_INTERVAL_TIME_DEFAULT || intervalTime > DOUBLE_CLICK_INTERVAL_TIME_SLOW) {
@@ -1094,7 +1094,7 @@ void KeyCommandHandler::AdjustTimeIntervalConfigIfNeed(int64_t intervalTime)
     if (checkAdjustIntervalTimeCount_ < MAX_TIME_FOR_ADJUST_CONFIG) {
         return;
     }
-    MMI_HILOGI("adjust new double click interval time: %{public}" PRId64 "", newTimeConfig);
+    MMI_HILOGI("adjust new double click interval time:%{public}" PRId64 "", newTimeConfig);
     downToPrevUpTimeConfig_ = newTimeConfig;
     checkAdjustIntervalTimeCount_ = 0;
 }
@@ -1103,7 +1103,7 @@ void KeyCommandHandler::AdjustDistanceConfigIfNeed(float distance)
 {
     CALL_DEBUG_ENTER;
     float newDistanceConfig;
-    MMI_HILOGI("down to prev down distance: %{public}f, config distance: %{public}f",
+    MMI_HILOGI("down to prev down distance:%{public}f, config distance:%{public}f",
         distance, downToPrevDownDistanceConfig_);
     if (IsEqual(downToPrevDownDistanceConfig_, distanceDefaultConfig_)) {
         if (distance < distanceDefaultConfig_ || distance > distanceLongConfig_) {
@@ -1122,7 +1122,7 @@ void KeyCommandHandler::AdjustDistanceConfigIfNeed(float distance)
     if (checkAdjustDistanceCount_ < MAX_TIME_FOR_ADJUST_CONFIG) {
         return;
     }
-    MMI_HILOGI("adjust new double click distance: %{public}f", newDistanceConfig);
+    MMI_HILOGI("adjust new double click distance:%{public}f", newDistanceConfig);
     downToPrevDownDistanceConfig_ = newDistanceConfig;
     checkAdjustDistanceCount_ = 0;
 }
@@ -1136,7 +1136,7 @@ void KeyCommandHandler::ReportKnuckleDoubleClickEvent(const std::shared_ptr<Poin
         DfxHisysevent::ReportSingleKnuckleDoubleClickEvent(knuckleGesture.downToPrevUpTime);
         return;
     }
-    MMI_HILOGW("current touch event size: %{public}zu", size);
+    MMI_HILOGW("current touch event size:%{public}zu", size);
 }
 
 void KeyCommandHandler::ReportKnuckleScreenCapture(const std::shared_ptr<PointerEvent> touchEvent)
@@ -1147,7 +1147,7 @@ void KeyCommandHandler::ReportKnuckleScreenCapture(const std::shared_ptr<Pointer
         DfxHisysevent::ReportScreenCaptureGesture();
         return;
     }
-    MMI_HILOGW("current touch event size: %{public}zu", size);
+    MMI_HILOGW("current touch event size:%{public}zu", size);
 }
 
 void KeyCommandHandler::StartTwoFingerGesture()
@@ -1300,7 +1300,7 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
 int32_t KeyCommandHandler::EnableCombineKey(bool enable)
 {
     enableCombineKey_ = enable;
-    MMI_HILOGI("Enable combineKey is successful in keyCommand handler, enable: %{public}d", enable);
+    MMI_HILOGI("Enable combineKey is successful in keyCommand handler, enable:%{public}d", enable);
     return RET_OK;
 }
 
@@ -1664,7 +1664,7 @@ bool KeyCommandHandler::HandleShortKeys(const std::shared_ptr<KeyEvent> keyEvent
         }
         int32_t delay = GetKeyDownDurationFromXml(shortcutKey.businessId);
         if (delay >= MIN_SHORT_KEY_DOWN_DURATION && delay <= MAX_SHORT_KEY_DOWN_DURATION) {
-            MMI_HILOGD("User defined new short key down duration: %{public}d", delay);
+            MMI_HILOGD("User defined new short key down duration:%{public}d", delay);
             shortcutKey.keyDownDuration = delay;
         }
         shortcutKey.Print();
@@ -1979,7 +1979,7 @@ void KeyCommandHandler::LaunchAbility(const Ability &ability, int64_t delay)
     }
     int32_t state = NapProcess::GetInstance()->GetNapClientPid();
     if (state == REMOVE_OBSERVER) {
-        MMI_HILOGW("nap client status: %{public}d", state);
+        MMI_HILOGW("nap client status:%{public}d", state);
         return;
     }
     OHOS::MMI::NapProcess::NapStatusData napData;
@@ -2121,7 +2121,7 @@ void KeyCommandHandler::SetKnuckleDoubleTapIntervalTime(int64_t interval)
 {
     CALL_DEBUG_ENTER;
     if (interval < 0) {
-        MMI_HILOGE("invalid interval time: %{public}" PRId64 "", interval);
+        MMI_HILOGE("invalid interval time:%{public}" PRId64 "", interval);
         return;
     }
     downToPrevUpTimeConfig_ = interval;
@@ -2130,7 +2130,7 @@ void KeyCommandHandler::SetKnuckleDoubleTapDistance(float distance)
 {
     CALL_DEBUG_ENTER;
     if (distance <= std::numeric_limits<float>::epsilon()) {
-        MMI_HILOGE("invalid distance: %{public}f", distance);
+        MMI_HILOGE("invalid distance:%{public}f", distance);
         return;
     }
     downToPrevDownDistanceConfig_ = distance;
