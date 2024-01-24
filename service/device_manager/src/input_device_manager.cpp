@@ -473,7 +473,7 @@ void InputDeviceManager::ScanPointerDevice()
 {
     bool hasPointerDevice = false;
     for (auto it = inputDevice_.begin(); it != inputDevice_.end(); ++it) {
-        if (it->second.isPointerDevice && it->second.enable) {
+        if (it->second.isPointerDevice) {
             hasPointerDevice = true;
             break;
         }
