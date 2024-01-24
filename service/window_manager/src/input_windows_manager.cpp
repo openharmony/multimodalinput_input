@@ -1976,9 +1976,8 @@ void InputWindowsManager::PullEnterLeaveEvent(int32_t logicalX, int32_t logicalY
     MMI_HILOGD("LastTouchWindowInfo:%{public}d, touchWindow:%{public}d", lastTouchWindowInfo_.id, touchWindow->id);
     if (lastTouchWindowInfo_.id != touchWindow->id) {
         if (lastTouchWindowInfo_.id != -1) {
-        DispatchTouch(PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW);
+            DispatchTouch(PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW);
         }
-
         lastTouchLogicX_ = logicalX;
         lastTouchLogicY_ = logicalY;
         lastTouchEvent_ = pointerEvent;
