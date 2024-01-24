@@ -331,6 +331,24 @@ public:
      * @since 9
      */
     void SetProcessedCallback(std::function<void(int32_t, int64_t)> callback);
+    
+    /**
+     * @brief Sets the extra data of an input event.
+     * @param data the extra data.
+     * @param length data length in bytes.
+     * @return void
+     * @since 10
+     */
+    void SetExtraData(const std::shared_ptr<const uint8_t[]> data, uint32_t length);
+
+    /**
+     * @brief Obtains the extra data of an input event.
+     * @param data the extra data.
+     * @param length data length in bytes.
+     * @return void
+     * @since 10
+     */
+    void GetExtraData(std::shared_ptr<const uint8_t[]> &data, uint32_t &length) const;
 
 public:
     /**
@@ -370,6 +388,8 @@ private:
     int32_t agentWindowId_;
     uint32_t bitwise_;
     std::function<void(int32_t, int64_t)> processedCallback_;
+    std::shared_ptr<const uint8_t[]> extraData_;
+    uint32_t extraDataLength_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
