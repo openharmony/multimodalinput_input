@@ -1026,11 +1026,11 @@ bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* t
                "PhysicalDisplay.topLeftX:%{public}d, PhysicalDisplay.topLeftY:%{public}d",
                displayInfo->width, displayInfo->height, displayInfo->x, displayInfo->y);
     displayId = displayInfo->id;
-    PhysicalCoordinate phys {
-        .x = libinput_event_tablet_tool_get_x_transformed(tip, displayInfo->width),
-        .y = libinput_event_tablet_tool_get_y_transformed(tip, displayInfo->height)
+    LogicalCoordinate phys {
+        .x = static_cast<int32_t>(libinput_event_tablet_tool_get_x_transformed(tip, displayInfo->width)),
+        .y = static_cast<int32_t>(libinput_event_tablet_tool_get_y_transformed(tip, displayInfo->height))
     };
-
+    RotateTouchScreen(displayInfo, phys);
     coord.x = static_cast<int32_t>(phys.x);
     coord.y = static_cast<int32_t>(phys.y);
     MMI_HILOGD("physicalX:%{public}f, physicalY:%{public}f, displayId:%{public}d", phys.x, phys.y, displayId);
