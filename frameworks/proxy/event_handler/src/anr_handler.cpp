@@ -61,7 +61,7 @@ void ANRHandler::SendEvent(int32_t eventType, int32_t eventId)
     auto task = [this, eventType, eventId] {
         MarkProcessed(eventType, eventId);
     };
-    ffrt::submit(task, {}, {});
+    ffrt::submit(task, {}, {}, ffrt::task_attr().qos(ffrt::qos_user_initiated));
 }
 
 void ANRHandler::ResetAnrArray()
