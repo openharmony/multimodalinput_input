@@ -339,6 +339,14 @@ inline constexpr int32_t INVALID_PID { -1 };
         } \
     } while (0)
 
+#define WRITEBUFFER(parcel, data, length, ...) \
+    do { \
+        if (!(parcel).WriteBuffer((data), length)) { \
+            MMI_HILOGE("WriteBuffer "#data" failed"); \
+            return DEFRET(false, ##__VA_ARGS__); \
+        } \
+    } while (0)
+
 #define READBOOL(parcel, data, ...) \
     do { \
         if (!(parcel).ReadBool(data)) { \
