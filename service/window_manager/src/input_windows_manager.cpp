@@ -1512,8 +1512,8 @@ void InputWindowsManager::UpdateLeftRightArea(const Rect &windowArea, std::vecto
         newLeftRect.height = 0;
     }
     if (pointerChangeAreas[RIGHT_AREA] == 0) {
-        newLeftRect.width = 0;
-        newLeftRect.height = 0;
+        newRightRect.width = 0;
+        newRightRect.height = 0;
     }
     windowHotAreas.push_back(newLeftRect);
     windowHotAreas.push_back(newRightRect);
