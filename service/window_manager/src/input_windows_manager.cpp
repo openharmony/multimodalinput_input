@@ -1882,10 +1882,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             return RET_ERR;
         }
         touchWindow = &it->second.window;
-        if (it->second.flag) {
-            if (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_UP) {
-                pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-            }
+        if (it->second.flag && pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_UP) {
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
             MMI_HILOGD("touch event send cancel, window:%{public}d", touchWindow->id);
         }
     }
