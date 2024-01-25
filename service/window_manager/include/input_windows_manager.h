@@ -44,6 +44,11 @@ struct DevMode {
     bool isShow { false };
 };
 
+struct WindowInfoEX {
+    WindowInfo window;
+    bool flag { false };
+};
+
 class InputWindowsManager final {
     DECLARE_DELAYED_SINGLETON(InputWindowsManager);
 public:
@@ -216,7 +221,7 @@ private:
     PointerStyle lastPointerStyle_ {.id = -1};
     PointerStyle dragPointerStyle_ {.id = -1};
     MouseLocation mouseLocation_ = { -1, -1 };
-    std::map<int32_t, WindowInfo> touchItemDownInfos_;
+    std::map<int32_t, WindowInfoEX> touchItemDownInfos_;
     std::map<int32_t, std::vector<Rect>> windowsHotAreas_;
     InputDisplayBindHelper bindInfo_;
     struct CaptureModeInfo {

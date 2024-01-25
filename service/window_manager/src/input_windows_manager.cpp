@@ -140,6 +140,11 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, INVALID_FD);
     const WindowInfo* windowInfo = nullptr;
+    auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
+    if (iter != touchItemDownInfos_.end() && !(iter->second.flag)) {
+        MMI_HILOGI("Drop event");
+        return INVALID_FD;
+    }
     std::vector<WindowInfo> windowsInfo = GetWindowGroupInfoByDisplayId(pointerEvent->GetTargetDisplayId());
     for (const auto &item : windowsInfo) {
         if (item.id == pointerEvent->GetTargetWindowId()) {
@@ -148,7 +153,6 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
             break;
         }
     }
-    
     CHKPR(udsServer_, INVALID_FD);
     if (windowInfo != nullptr) {
         MMI_HILOGD("get pid:%{public}d from idxPidMap", windowInfo->pid);
@@ -160,11 +164,14 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     }
     int32_t pid = -1;
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
         if (iter != touchItemDownInfos_.end()) {
-            pid = GetWindowPid(iter->second.agentWindowId);
+            pid = GetWindowPid(iter->second.window.agentWindowId);
+            if (pid == INVALID_FD) {
+                MMI_HILOGI("Cant not find pid");
+                pid = iter->second.window.pid;
+                iter->second.flag = false;
+            }
             MMI_HILOGD("touchscreen occurs, new pid:%{public}d", pid);
-            touchItemDownInfos_.erase(iter);
         }
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -1872,9 +1879,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
                 logicalX, logicalY);
             return RET_ERR;
         }
-        touchWindow = &it->second;
-        pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
-        MMI_HILOGD("touch event send cancel, window:%{public}d", touchWindow->id);
+        touchWindow = &it->second.window;
+        if (it->second.flag) {
+            pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
+            MMI_HILOGI("touch event send cancel, window:%{public}d", touchWindow->id);
+        }
     }
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bool isInAnco =  touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
@@ -1952,14 +1961,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
 
     int32_t pointerAction = pointerEvent->GetPointerAction();
     if (pointerAction == PointerEvent::POINTER_ACTION_DOWN) {
-        touchItemDownInfos_.insert(std::make_pair(pointerId, *touchWindow));
-    }
-    if (pointerAction == PointerEvent::POINTER_ACTION_UP) {
-        auto iter = touchItemDownInfos_.find(pointerId);
-        if (iter != touchItemDownInfos_.end()) {
-            touchItemDownInfos_.erase(iter);
-            MMI_HILOGD("Clear the touch info, action is up, pointerid:%{public}d", pointerId);
-        }
+        WindowInfoEX windowInfoEX;
+        windowInfoEX.window = *touchWindow;
+        windowInfoEX.flag = true;
+        touchItemDownInfos_[pointerId] = windowInfoEX;
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOGD("Clear extra data");
