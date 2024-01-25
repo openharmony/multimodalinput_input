@@ -1882,7 +1882,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             return RET_ERR;
         }
         touchWindow = &it->second.window;
-        if (it->second.flag && pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_UP) {
+        if (it->second.flag) {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_CANCEL);
             MMI_HILOGD("touch event send cancel, window:%{public}d", touchWindow->id);
         }
@@ -1966,14 +1966,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         WindowInfoEX windowInfoEX;
         windowInfoEX.window = *touchWindow;
         windowInfoEX.flag = true;
-        touchItemDownInfos_.insert(std::make_pair(pointerId, windowInfoEX));
-    }
-    if (pointerAction == PointerEvent::POINTER_ACTION_UP) {
-        auto iter = touchItemDownInfos_.find(pointerId);
-        if (iter != touchItemDownInfos_.end()) {
-            touchItemDownInfos_.erase(iter);
-            MMI_HILOGD("Clear the touch info, action is up, pointerid:%{public}d", pointerId);
-        }
+        touchItemDownInfos_[pointerId] = windowInfoEX;
     }
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_PULL_UP) {
         MMI_HILOGD("Clear extra data");
