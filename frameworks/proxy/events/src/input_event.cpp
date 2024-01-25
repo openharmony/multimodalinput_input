@@ -281,7 +281,7 @@ bool InputEvent::ReadFromParcel(Parcel &in)
     READUINT32(in, extraDataLength_);
     if (extraDataLength_ != 0) {
         const uint8_t *buffer = in.ReadBuffer(extraDataLength_);
-        std::shared_ptr<uint8_t[]> sp(new uint8_t[extraDataLength_]);
+        std::shared_ptr<uint8_t[]> sp(new uint8_t[extraDataLength_], [](uint8_t* ptr) { delete[] ptr; });
         std::copy(buffer, buffer + extraDataLength_, sp.get());
         extraData_ = sp;
     }
