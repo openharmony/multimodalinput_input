@@ -153,7 +153,6 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
             break;
         }
     }
-    
     CHKPR(udsServer_, INVALID_FD);
     if (windowInfo != nullptr) {
         MMI_HILOGD("get pid:%{public}d from idxPidMap", windowInfo->pid);
@@ -165,7 +164,6 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
     }
     int32_t pid = -1;
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
-        auto iter = touchItemDownInfos_.find(pointerEvent->GetPointerId());
         if (iter != touchItemDownInfos_.end()) {
             pid = GetWindowPid(iter->second.window.agentWindowId);
             if (pid == INVALID_FD) {
