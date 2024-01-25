@@ -1801,7 +1801,6 @@ bool InputWindowsManager::IsNeedDrawPointer(PointerEvent::PointerItem &pointerIt
 }
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
-[[clang::optnone]]
 int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
