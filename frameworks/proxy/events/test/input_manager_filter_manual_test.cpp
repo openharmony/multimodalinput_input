@@ -1,8 +1,5 @@
 /*
- * Copyright (c) Huawei Technologies Co., Ltd. 2020-2020. All rights reserved.
- */
-/*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,17 +48,31 @@ namespace {
 using namespace testing::ext;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputManagerFilterManualTest" };
 static const int SIG_KILL = 9;
+static constexpr int32_t DEFAULT_API_VERSION = 8;
 
 HapInfoParams infoManagerTestInfoParms = {
     .userID = 1,
-    .bundleName = "accesstoken_test",
+    .bundleName = "inputManagerFilterManualTest",
     .instIndex = 0,
-    .appIDDesc = "test"
+    .appIDDesc = "test",
+    .apiVersion = DEFAULT_API_VERSION,
+    .isSystemApp = true
 };
 
 PermissionDef infoManagerTestPermDef = {
     .permissionName = "ohos.permission.test",
     .bundleName = "accesstoken_test",
+    .grantMode = 1,
+    .availableLevel = APL_SYSTEM_CORE,
+    .label = "label",
+    .labelId = 1,
+    .description = "test filter",
+    .descriptionId = 1,
+};
+
+PermissionDef infoManagerTestPermDefDump = {
+    .permissionName = "ohos.permission.DUMP",
+    .bundleName = "inputManagerFilterManualTest",
     .grantMode = 1,
     .availableLevel = APL_SYSTEM_CORE,
     .label = "label",
@@ -78,11 +89,19 @@ PermissionStateFull infoManagerTestState = {
     .grantFlags = { 1 },
 };
 
+PermissionStateFull infoManagerTestStateDump = {
+    .permissionName = "ohos.permission.DUMP",
+    .isGeneral = true,
+    .resDeviceID = { "local" },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 1 },
+};
+
 HapPolicyParams infoManagerTestPolicyPrams = {
     .apl = APL_SYSTEM_CORE,
     .domain = "test.domain",
-    .permList = { infoManagerTestPermDef },
-    .permStateList = { infoManagerTestState }
+    .permList = { infoManagerTestPermDef, infoManagerTestPermDefDump },
+    .permStateList = { infoManagerTestState, infoManagerTestStateDump }
 };
 } // namespace
 
@@ -92,7 +111,7 @@ public:
     {
         currentID_ = GetSelfTokenID();
         AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(infoManagerTestInfoParms, infoManagerTestPolicyPrams);
-        accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
+        accessID_ = tokenIdEx.tokenIDEx;
         SetSelfTokenID(accessID_);
     }
     ~AccessToken()
@@ -102,8 +121,8 @@ public:
     }
 
 private:
-    AccessTokenID currentID_;
-    AccessTokenID accessID_ = 0;
+    uint64_t currentID_;
+    uint64_t accessID_ = 0;
 };
 
 class InputManagerFilterManualTest : public testing::Test {
