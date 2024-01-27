@@ -55,16 +55,40 @@ int32_t LibinputAdapter::DeviceLedUpdate(struct libinput_device *device, int32_t
     return libinput_set_led_state(device, funcKey, enable);
 }
 
-LibinputAdapter::LibinputAdapterPowerStateCallback::LibinputAdapterPowerStateCallback() :
-    PowerMgr::PowerStateCallbackStub()
-{}
+PowerMgr::PowerState LibinputAdapter::currentPowerState_ { PowerMgr::PowerState::AWAKE };
 
-LibinputAdapter::LibinputAdapterPowerStateCallback::OnPowerStateChanged(PowerMgr::PowerState state)
+void LibinputAdapter::SubscribePowerStateChangeEvents()
 {
-    SetCurrentPowerState(state);
+    sptr<PowerMgr::IPowerStateCallback> powerStateCallback;
+
+    if (powerStateCallback == nullptr) {
+        powerStateCallback = new (std::nothrow) LibinputAdapterPowerStateCallback(this);
+    }
+
+    if (powerStateCallback == nullptr) {
+        MMI_HILOGD("subscribe create power state callback Create Error");
+        return;
+    }
+
+    bool registerSuccess = OHOS::PowerMgr::PowerMgrClient::GetInstance().RegisterPowerStateCallback(powerStateCallback);
+    if (!registerSuccess) {
+        MMI_HILOGD("register power state callback failed");
+    } else {
+        MMI_HILOGI("register power state callback success");
+    }
 }
 
-bool LibinputAdapter::GetCurrentPowerState()
+LibinputAdapter::LibinputAdapterPowerStateCallback::LibinputAdapterPowerStateCallback(
+    LibinputAdapter* libinputAdapter) : PowerMgr::PowerStateCallbackStub(), libinputAdapter_(libinputAdapter)
+{}
+
+void LibinputAdapter::LibinputAdapterPowerStateCallback::OnPowerStateChanged(PowerMgr::PowerState state)
+{
+    CHKPV(libinputAdapter_);
+    libinputAdapter_->SetCurrentPowerState(state);
+}
+
+PowerMgr::PowerState LibinputAdapter::GetCurrentPowerState()
 {
     return currentPowerState_;
 }
@@ -77,8 +101,9 @@ void LibinputAdapter::SetCurrentPowerState(PowerMgr::PowerState state)
 bool LibinputAdapter::CheckIsSleeping()
 {
     bool isSleeping = false;
-    if (currentPowerState_ == PowerMgr::PowerState::SLEEP || currentPowerState_ == PowerMgr::PowerState::HIBERNATE ||
-        currentPowerState_ == PowerMgr::PowerState::SHUTDOWN) {
+    PowerMgr::PowerState currentPowerState = GetCurrentPowerState();
+    if (currentPowerState == PowerMgr::PowerState::SLEEP || currentPowerState == PowerMgr::PowerState::HIBERNATE ||
+        currentPowerState == PowerMgr::PowerState::SHUTDOWN) {
         isSleeping = true;
     }
     return isSleeping;
@@ -86,8 +111,9 @@ bool LibinputAdapter::CheckIsSleeping()
 
 constexpr static libinput_interface LIBINPUT_INTERFACE = {
     .open_restricted = [](const char *path, int32_t flags, void *user_data)->int32_t {
-        if (CheckIsSleeping()) {
-            return;
+        if (LibinputAdapter::CheckIsSleeping()) {
+            MMI_HILOGD("Device is sleeping");
+            return RET_ERR;
         }
         if (path == nullptr) {
             MMI_HILOGWK("Input device path is nullptr");
@@ -113,7 +139,7 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
     },
     .close_restricted = [](int32_t fd, void *user_data)
     {
-        if (CheckIsSleeping() || fd < 0) {
+        if (LibinputAdapter::CheckIsSleeping() || fd < 0) {
             return;
         }
         MMI_HILOGI("Libinput .close_restricted fd:%{public}d", fd);
@@ -125,8 +151,8 @@ bool LibinputAdapter::Init(FunInputEvent funInputEvent)
 {
     CALL_DEBUG_ENTER;
     CHKPF(funInputEvent);
-
     funInputEvent_ = funInputEvent;
+    SubscribePowerStateChangeEvents();
     input_ = libinput_path_create_context(&LIBINPUT_INTERFACE, nullptr);
     CHKPF(input_);
     libinput_log_set_handler(input_, &HiLogFunc);
