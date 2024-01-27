@@ -234,6 +234,7 @@ ohos_shared_library("libmmi-server") {
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "power_manager:powermgr_client",
     "preferences:native_preferences",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
