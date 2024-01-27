@@ -167,6 +167,7 @@ void InputManager::RemoveInterceptor(int32_t interceptorId)
     InputMgrImpl.RemoveInterceptor(interceptorId);
 }
 
+__attribute__((no_sanitize("cfi")))
 void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
 {
     keyEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
@@ -180,6 +181,7 @@ void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent
     InputMgrImpl.SimulateInputEvent(pointerEvent);
 }
 
+__attribute__((no_sanitize("cfi")))
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent, float zOrder)
 {
     CHKPV(pointerEvent);
