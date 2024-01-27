@@ -1889,8 +1889,8 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     bool isInAnco =  touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
     if (isInAnco) {
         MMI_HILOGD("Process touch screen event in Anco window, targetWindowId:%{public}d", touchWindow->id);
-        bool isCompensatePointer = pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE) &&
-            MMI_GE(pointerEvent->GetZOrder(), 0.0f);
+        bool isCompensatePointer = pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE); //&&
+            // MMI_GE(pointerEvent->GetZOrder(), 0.0f);
         if (isCompensatePointer) {
             SimulatePointerExt(pointerEvent);
         }
