@@ -2324,7 +2324,7 @@ bool InputWindowsManager::IsWindowVisible(int32_t pid)
     Rosen::WindowManager::GetInstance().GetVisibilityWindowInfo(infos);
     for (const auto &it: infos) {
         if (pid == it->pid_ &&
-            it->visibilityState_ < Rosen::WindowVisibilityState::WINDOW_VISIBILITY_STATE_TOTALLY_OCCUSION) {
+            it->visibilityState_ < Rosen::WindowVisibilityState::WINDOW_VISIBILITY_STATE_NO_OCCLUSION) {
             MMI_HILOGD("pid:%{public}d has visible window", pid);
             return true;
         }
