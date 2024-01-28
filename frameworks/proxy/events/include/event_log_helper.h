@@ -190,7 +190,9 @@ private:
     }
 };
 
-template <class T> void EventLogHelper::PrintEventData(std::shared_ptr<T> event, int32_t actionType, int32_t itemNum)
+template <class T>
+__attribute__((no_sanitize("cfi")))
+void EventLogHelper::PrintEventData(std::shared_ptr<T> event, int32_t actionType, int32_t itemNum)
 {
     CHKPV(event);
     PrintInfoLog(event);
