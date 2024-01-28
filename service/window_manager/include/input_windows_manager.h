@@ -235,6 +235,7 @@ private:
     bool pointerDrawFlag_ { false };
     DevMode showCursor_;
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
+    WINDOW_UPDATE_ACTION action_ { WINDOW_UPDATE_ACTION::UNKNOWN };
 };
 
 #define WinMgr ::OHOS::DelayedSingleton<InputWindowsManager>::GetInstance()
