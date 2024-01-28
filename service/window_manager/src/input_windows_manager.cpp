@@ -364,6 +364,8 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
 #endif // OHOS_BUILD_ENABLE_ANCO
     DisplayGroupInfo displayGroupInfo = displayGroupInfoTmp_;
     displayGroupInfo.focusWindowId = windowGroupInfo.focusWindowId;
+    action_ = displayGroupInfo.windowsInfo.back().action;
+    MMI_HILOGD("Current action is:%{public}d", action_);
     for (const auto &item : windowGroupInfo.windowsInfo) {
         UpdateDisplayInfoByIncrementalInfo(item, displayGroupInfo);
     }
@@ -466,8 +468,6 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
 
 void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 {
-    CALL_DEBUG_ENTER;
-    auto action = displayGroupInfo.windowsInfo.back().action;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     pointerDrawFlag_ = NeedUpdatePointDrawFlag(displayGroupInfo.windowsInfo);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -479,8 +479,9 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     CheckFocusWindowChange(displayGroupInfo);
     UpdateCaptureMode(displayGroupInfo);
     displayGroupInfoTmp_ = displayGroupInfo;
-    if (action == WINDOW_UPDATE_ACTION::ADD_END) {
+    if (action_ == WINDOW_UPDATE_ACTION::ADD_END) {
         displayGroupInfo_ = displayGroupInfoTmp_;
+        action_ = WINDOW_UPDATE_ACTION::UNKNOWN;
     }
     PrintDisplayInfo();
     UpdateDisplayIdAndName();
