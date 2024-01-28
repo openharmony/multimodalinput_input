@@ -1026,9 +1026,15 @@ bool InputWindowsManager::TransformTipPoint(struct libinput_event_tablet_tool* t
                "PhysicalDisplay.topLeftX:%{public}d, PhysicalDisplay.topLeftY:%{public}d",
                displayInfo->width, displayInfo->height, displayInfo->x, displayInfo->y);
     displayId = displayInfo->id;
+    auto width = displayInfo->width;
+    auto height = displayInfo->height;
+    if (displayInfo->direction == DIRECTION90 || displayInfo->direction == DIRECTION270) {
+        width = displayInfo->height;
+        height = displayInfo->width;
+    }
     LogicalCoordinate phys {
-        .x = static_cast<int32_t>(libinput_event_tablet_tool_get_x_transformed(tip, displayInfo->width)),
-        .y = static_cast<int32_t>(libinput_event_tablet_tool_get_y_transformed(tip, displayInfo->height))
+        .x = static_cast<int32_t>(libinput_event_tablet_tool_get_x_transformed(tip, width)),
+        .y = static_cast<int32_t>(libinput_event_tablet_tool_get_y_transformed(tip, height))
     };
     RotateTouchScreen(*displayInfo, phys);
     coord.x = static_cast<int32_t>(phys.x);
