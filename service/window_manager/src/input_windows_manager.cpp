@@ -467,6 +467,7 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
 void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
+    auto action = displayGroupInfo.windowsInfo.back().action;
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     pointerDrawFlag_ = NeedUpdatePointDrawFlag(displayGroupInfo.windowsInfo);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -478,7 +479,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     CheckFocusWindowChange(displayGroupInfo);
     UpdateCaptureMode(displayGroupInfo);
     displayGroupInfoTmp_ = displayGroupInfo;
-    if (displayGroupInfoTmp_.windowsInfo.back().action == WINDOW_UPDATE_ACTION::ADD_END) {
+    if (action == WINDOW_UPDATE_ACTION::ADD_END) {
         displayGroupInfo_ = displayGroupInfoTmp_;
     }
     PrintDisplayInfo();
