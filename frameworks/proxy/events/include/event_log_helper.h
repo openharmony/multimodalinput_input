@@ -94,6 +94,7 @@ private:
         }
     }
 
+    __attribute__((no_sanitize("cfi")))
     static void PrintInfoLog(const std::shared_ptr<PointerEvent> event)
     {
         if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE ||
@@ -189,6 +190,7 @@ private:
     }
 };
 
+__attribute__((no_sanitize("cfi")))
 template <class T> void EventLogHelper::PrintEventData(std::shared_ptr<T> event, int32_t actionType, int32_t itemNum)
 {
     CHKPV(event);
