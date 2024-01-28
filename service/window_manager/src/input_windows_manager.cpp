@@ -362,7 +362,7 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
         return UpdateShellWindow(windowGroupInfo.windowsInfo[0]);
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
-    DisplayGroupInfo displayGroupInfo = displayGroupInfo_;
+    DisplayGroupInfo displayGroupInfo = displayGroupInfoTmp_;
     displayGroupInfo.focusWindowId = windowGroupInfo.focusWindowId;
     for (const auto &item : windowGroupInfo.windowsInfo) {
         UpdateDisplayInfoByIncrementalInfo(item, displayGroupInfo);
@@ -477,7 +477,10 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     UpdateWindowsInfoPerDisplay(displayGroupInfo);
     CheckFocusWindowChange(displayGroupInfo);
     UpdateCaptureMode(displayGroupInfo);
-    displayGroupInfo_ = displayGroupInfo;
+    displayGroupInfoTmp_ = displayGroupInfo;
+    if (displayGroupInfoTmp_.windowsInfo.back().action == WINDOW_UPDATE_ACTION::ADD_END) {
+        displayGroupInfo_ = displayGroupInfoTmp_;
+    }
     PrintDisplayInfo();
     UpdateDisplayIdAndName();
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
