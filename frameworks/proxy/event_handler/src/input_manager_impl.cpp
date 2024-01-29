@@ -600,9 +600,9 @@ void InputManagerImpl::PrintDisplayInfo()
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         MMI_HILOGD("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
             "width:%{public}d,height:%{public}d,dpi:%{public}d,name:%{public}s,"
-            "uniq:%{public}s,direction:%{public}d,displayMode:%{public}d",
+            "uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d,displayMode:%{public}d",
             item.id, item.x, item.y, item.width, item.height, item.dpi, item.name.c_str(),
-            item.uniq.c_str(), item.direction, item.displayMode);
+            item.uniq.c_str(), item.direction, item.displayDirection, item.displayMode);
     }
 }
 
