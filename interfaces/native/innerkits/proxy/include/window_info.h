@@ -358,6 +358,8 @@ struct DisplayInfo {
      */
     Direction direction;
 
+    Direction displayDirection;
+
     /**
      * DisplayMode of the display
      *
