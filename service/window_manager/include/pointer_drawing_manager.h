@@ -95,6 +95,8 @@ private:
     void UpdateMouseStyle();
     int32_t UpdateCursorProperty(void* pixelMap);
     void RotateDegree(Direction direction);
+    void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+        const PointerStyle pointerStyle, Direction direction);
 
 private:
     struct PidInfo {

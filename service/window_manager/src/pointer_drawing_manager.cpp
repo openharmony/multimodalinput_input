@@ -84,6 +84,44 @@ PointerStyle PointerDrawingManager::GetLastMouseStyle()
     CALL_DEBUG_ENTER;
     return lastMouseStyle_;
 }
+
+void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+    const PointerStyle pointerStyle, Direction direction)
+{
+    MMI_HILOGD("Pointer window move success");
+    if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
+        surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
+            surfaceNode_->GetStagingProperties().GetBounds().z_,
+            surfaceNode_->GetStagingProperties().GetBounds().w_);
+        Rosen::RSTransaction::FlushImplicitTransaction();
+        MMI_HILOGD("The lastpointerStyle is equal with pointerStyle,id %{public}d size:%{public}d",
+            pointerStyle.id, pointerStyle.size);
+        return;
+    }
+    if (lastDirection_ != direction) {
+        RotateDegree(direction);
+        lastDirection_ = direction;
+    }
+    lastMouseStyle_ = pointerStyle;
+    surfaceNode_->SetVisible(false);
+    int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+    if (ret != RET_OK) {
+        mouseIconUpdate_ = false;
+        MMI_HILOGE("Init layer failed");
+        return;
+    }
+    surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
+        surfaceNode_->GetStagingProperties().GetBounds().z_,
+        surfaceNode_->GetStagingProperties().GetBounds().w_);
+    surfaceNode_->SetVisible(true);
+    Rosen::RSTransaction::FlushImplicitTransaction();
+    UpdatePointerVisible();
+    mouseIconUpdate_ = false;
+    MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
+        displayId, physicalX, physicalY);
+    return;
+}
+
 void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
     const PointerStyle pointerStyle, Direction direction)
 {
@@ -98,37 +136,7 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     AdjustMouseFocus(ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay), physicalX, physicalY);
 
     if (surfaceNode_ != nullptr) {
-        MMI_HILOGD("Pointer window move success");
-        if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
-            surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
-                surfaceNode_->GetStagingProperties().GetBounds().z_,
-                surfaceNode_->GetStagingProperties().GetBounds().w_);
-            Rosen::RSTransaction::FlushImplicitTransaction();
-            MMI_HILOGD("The lastpointerStyle is equal with pointerStyle,id %{public}d size:%{public}d",
-                pointerStyle.id, pointerStyle.size);
-            return;
-        }
-        if (lastDirection_ != direction) {
-            RotateDegree(direction);
-            lastDirection_ = direction;
-        }
-        lastMouseStyle_ = pointerStyle;
-        surfaceNode_->SetVisible(false);
-        int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-        if (ret != RET_OK) {
-            mouseIconUpdate_ = false;
-            MMI_HILOGE("Init layer failed");
-            return;
-        }
-        surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
-            surfaceNode_->GetStagingProperties().GetBounds().z_,
-            surfaceNode_->GetStagingProperties().GetBounds().w_);
-        surfaceNode_->SetVisible(true);
-        Rosen::RSTransaction::FlushImplicitTransaction();
-        UpdatePointerVisible();
-        mouseIconUpdate_ = false;
-        MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
-            displayId, physicalX, physicalY);
+        DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction);
         return;
     }
     CreatePointerWindow(displayId, physicalX, physicalY, direction);
