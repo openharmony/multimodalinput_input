@@ -1710,9 +1710,10 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     }
     Direction direction = DIRECTION0;
     if (physicalDisplayInfo->displayDirection == DIRECTION0) {
-        IPointerDrawingManager::GetInstance()->DrawPointer(displayId, static_cast<int32_t>(absolutionX_),
-            static_cast<int32_t>(absolutionY_), dragPointerStyle_, direction);
+        direction = physicalDisplayInfo->direction;
     }
+    IPointerDrawingManager::GetInstance()->DrawPointer(displayId, static_cast<int32_t>(absolutionX_),
+        static_cast<int32_t>(absolutionY_), dragPointerStyle_, direction);
 
     if (captureModeInfo_.isCaptureMode && (touchWindow->id != captureModeInfo_.windowId)) {
         captureModeInfo_.isCaptureMode = false;
@@ -2274,7 +2275,7 @@ void InputWindowsManager::CoordinateCorrection(int32_t width, int32_t height, in
 
 void InputWindowsManager::GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height)
 {
-    if (displayInfo->displayDiretion == DIRECTION0) {
+    if (displayInfo->displayDirection == DIRECTION0) {
         if (displayInfo->direction == DIRECTION0 || displayInfo->direction == DIRECTION180) {
             width = displayInfo->width;
             height = displayInfo->height;
@@ -2310,7 +2311,7 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     y = static_cast<double>(integerY) + (y - floor(y));
     absolutionX_ = x;
     absolutionY_ = y;
-    if (displayInfo->displayDiretion == DIRECTION0) {
+    if (displayInfo->displayDirection == DIRECTION0) {
         LogicalCoordinate coord {
             .x = integerX,
             .y = integerY,
