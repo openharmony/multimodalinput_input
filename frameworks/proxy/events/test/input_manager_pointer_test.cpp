@@ -150,7 +150,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeav
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 /**
@@ -166,7 +166,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeav
     ASSERT_NE(keyEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(keyEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 /**
@@ -182,7 +182,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeav
     ASSERT_NE(keyEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(keyEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 /**
@@ -198,7 +198,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeav
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 /**
@@ -216,7 +216,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMonitor_001, TestSi
     ASSERT_NE(monitorId, INVALID_HANDLER_ID);
 #else
     ASSERT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR ||  OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR ||  OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
@@ -235,7 +235,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMonitor_002, TestSi
     ASSERT_NE(monitorId, INVALID_HANDLER_ID);
 #else
     ASSERT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD || OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_KEYBOARD || OHOS_BUILD_ENABLE_MONITOR
     InputManager::GetInstance()->RemoveMonitor(monitorId);
 }
 
@@ -258,7 +258,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_001
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
@@ -287,7 +287,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_002
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
 #else
         EXPECT_EQ(ids[i], ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
@@ -301,7 +301,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_002
         ASSERT_TRUE(!sPointerEs.empty());
 #else
         ASSERT_TRUE(sPointerEs.empty());
-#endif  // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
         if (IsValidHandlerId(id)) {
             InputManagerUtil::TestRemoveMonitor(id);
         }
@@ -332,12 +332,12 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddScreenMonitor_003
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
 #if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_MONITOR)
     TestSimulateInputEvent(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_MONITOR
 
     if (IsValidHandlerId(monitorId)) {
         InputManagerUtil::TestRemoveMonitor(monitorId);
@@ -376,7 +376,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
@@ -413,7 +413,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
@@ -450,7 +450,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
@@ -491,7 +491,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
         EXPECT_TRUE(IsValidHandlerId(ids[i]));
 #else
         EXPECT_EQ(ids[i], ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 
@@ -504,7 +504,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
         ASSERT_TRUE(!sPointerEs.empty());
 #else
         ASSERT_TRUE(sPointerEs.empty());
-#endif  // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
         if (IsValidHandlerId(id)) {
             InputManagerUtil::TestRemoveMonitor(id);
         }
@@ -546,7 +546,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddTouchPadMonitor_0
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
@@ -569,7 +569,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMouseMonitor_001, T
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     auto pointerEvent = InputManagerUtil::SetupPointerEvent005();
@@ -593,7 +593,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMouseMonitor_003, T
     EXPECT_TRUE(IsValidHandlerId(monitorId));
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     auto pointerEvent = InputManagerUtil::SetupPointerEvent007();
@@ -644,7 +644,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_AddMouseMonitor_004, T
     ASSERT_EQ(maxMonitor, ids.size());
 #else
     ASSERT_EQ(maxMonitor, 0);
-#endif  // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_MONITOR
 }
 
 /**
@@ -680,7 +680,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_OnAddKeyboardMonitor_0
         ASSERT_TRUE(!sPointerEs.empty());
 #else
         ASSERT_TRUE(sPointerEs.empty());
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_MONITOR
         if (IsValidHandlerId(id)) {
             InputManagerUtil::TestRemoveMonitor(id);
         }
@@ -764,7 +764,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetWindowInputEventCon
     }
 #else
     ASSERT_TRUE(runnerThreadId != consumerThreadId);
-#endif  // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 }
 
 /**
@@ -807,7 +807,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetWindowInputEventCon
     }
 #else
     ASSERT_TRUE(runnerThreadId != consumerThreadId);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 /**
