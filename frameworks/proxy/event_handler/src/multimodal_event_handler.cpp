@@ -127,7 +127,6 @@ MMIClientPtr MultimodalEventHandler::GetMMIClient()
 }
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
-__attribute__((no_sanitize("cfi")))
 int32_t MultimodalEventHandler::InjectPointerEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
