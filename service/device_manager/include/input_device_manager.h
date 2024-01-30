@@ -92,7 +92,7 @@ private:
     std::map<std::string, std::string> inputDeviceScreens_;
     std::list<std::shared_ptr<IDeviceObserver>> observers_;
     std::map<SessionPtr, std::function<void(int32_t, const std::string&)>> devListener_;
-    inputDeviceCallback devCallbacks_ = { nullptr };
+    inputDeviceCallback devCallbacks_ { nullptr };
     std::map<int32_t, std::string> displayInputBindInfos_;
     DeviceConfigManagement configManagement_;
 };

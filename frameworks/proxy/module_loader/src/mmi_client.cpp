@@ -180,7 +180,7 @@ void MMIClient::OnPacket(NetPacket& pkt)
 void MMIClient::OnRecvMsg(const char *buf, size_t size)
 {
     CHKPV(buf);
-    if (size == 0 || size > GetMaxBuffSize()) {
+    if (size == 0 || size > MAX_PACKET_BUF_SIZE) {
         MMI_HILOGE("Invalid input param size. size:%{public}zu", size);
         return;
     }

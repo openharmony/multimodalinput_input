@@ -44,6 +44,11 @@ struct DevMode {
     bool isShow { false };
 };
 
+struct WindowInfoEX {
+    WindowInfo window;
+    bool flag { false };
+};
+
 class InputWindowsManager final {
     DECLARE_DELAYED_SINGLETON(InputWindowsManager);
 public:
@@ -95,7 +100,7 @@ public:
     void AdjustDisplayCoordinate(const DisplayInfo& displayInfo, int32_t& physicalX, int32_t& physicalY) const;
     bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
         EventTouch& touchInfo, int32_t& targetDisplayId);
-    void RotateTouchScreen(DisplayInfo info, LogicalCoordinate& coord) const;
+    void RotateScreen(const DisplayInfo& info, LogicalCoordinate& coord) const;
     bool TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord, int32_t& displayId) const;
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, LogicalCoordinate& coord) const;
@@ -107,7 +112,7 @@ public:
     void UpdateDisplayInfoExt(const DisplayGroupInfo &displayGroupInfo);
     bool IsInAncoWindow(const WindowInfo &window, int32_t x, int32_t y) const;
     bool IsAncoWindow(const WindowInfo &window) const;
-    void SimulateKeyBackExt(std::shared_ptr<KeyEvent> keyEvent);
+    void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent);
     void DumpAncoWindows(std::string& out) const;
 #endif // OHOS_BUILD_ENABLE_ANCO
 
@@ -139,6 +144,8 @@ private:
         std::vector<Rect> &windowHotAreas);
     void UpdateInnerAngleArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
         std::vector<Rect> &windowHotAreas);
+    void CoordinateCorrection(int32_t width, int32_t height, int32_t &integerX, int32_t &integerY);
+    void GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle);
@@ -165,6 +172,7 @@ private:
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
 void PointerDrawingManagerOnDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+bool NeedUpdatePointDrawFlag(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
@@ -213,8 +221,11 @@ private:
     DisplayGroupInfo displayGroupInfo_;
     std::map<int32_t, WindowGroupInfo> windowsPerDisplay_;
     PointerStyle lastPointerStyle_ {.id = -1};
+    PointerStyle dragPointerStyle_ {.id = -1};
     MouseLocation mouseLocation_ = { -1, -1 };
-    std::map<int32_t, WindowInfo> touchItemDownInfos_;
+    double absolutionX_ {};
+    double absolutionY_ {};
+    std::map<int32_t, WindowInfoEX> touchItemDownInfos_;
     std::map<int32_t, std::vector<Rect>> windowsHotAreas_;
     InputDisplayBindHelper bindInfo_;
     struct CaptureModeInfo {
@@ -223,6 +234,8 @@ private:
     } captureModeInfo_;
     ExtraData extraData_;
     bool haveSetObserver_ { false };
+    bool dragFlag_ { false };
+    bool pointerDrawFlag_ { false };
     DevMode showCursor_;
     DisplayMode displayMode_ { DisplayMode::UNKNOWN };
 };

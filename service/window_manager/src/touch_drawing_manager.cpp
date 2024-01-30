@@ -104,7 +104,6 @@ void TouchDrawingManager::StartTouchDraw(const std::shared_ptr<PointerEvent> poi
 void TouchDrawingManager::CreateTouchWindow(const int32_t displayId)
 {
     CALL_DEBUG_ENTER;
-    CALL_INFO_TRACE;
     if (surfaceNode_ != nullptr) {
         MMI_HILOGD("surfaceNode is already.");
         return;

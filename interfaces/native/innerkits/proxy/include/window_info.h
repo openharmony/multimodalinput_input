@@ -93,6 +93,13 @@ enum class WINDOW_UPDATE_ACTION: uint32_t {
      * @since 9
      */
     CHANGE = 3,
+
+    /**
+     * Add the window action end
+     *
+     * @since 9
+     */
+    ADD_END = 4,
 };
 
 enum Direction {
@@ -350,6 +357,8 @@ struct DisplayInfo {
      * @since 9
      */
     Direction direction;
+
+    Direction displayDirection;
 
     /**
      * DisplayMode of the display
