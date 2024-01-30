@@ -94,6 +94,7 @@ private:
         }
     }
 
+    __attribute__((no_sanitize("cfi")))
     static void PrintInfoLog(const std::shared_ptr<PointerEvent> event)
     {
         if (event->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE ||

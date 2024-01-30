@@ -270,6 +270,7 @@ private:
     bool isHandleSequence_ { false };
     bool isParseMaxCount_ { false };
     bool isParseStatusConfig_ { false };
+    bool isDoubleClick_ { false };
 };
 } // namespace MMI
 } // namespace OHOS

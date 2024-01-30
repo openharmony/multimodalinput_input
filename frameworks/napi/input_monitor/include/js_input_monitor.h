@@ -133,8 +133,8 @@ private:
     std::string typeName_;
     int32_t monitorId_ { 0 };
     int32_t fingers_ { 0 };
-    int32_t jsTaskNum_ = { 0 };
-    bool isMonitoring_ = { false };
+    int32_t jsTaskNum_ { 0 };
+    bool isMonitoring_ { false };
     std::mutex mutex_;
 };
 } // namespace MMI

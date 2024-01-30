@@ -225,6 +225,24 @@ void InputEvent::MarkProcessed()
     func(id_, actionTime_);
 }
 
+void InputEvent::SetExtraData(const std::shared_ptr<const uint8_t[]> data, uint32_t length)
+{
+    if (data && length != 0) {
+        extraData_ = data;
+        extraDataLength_ = length;
+    }
+}
+
+void InputEvent::GetExtraData(std::shared_ptr<const uint8_t[]> &data, uint32_t &length) const
+{
+    if (extraData_ && extraDataLength_ != 0) {
+        data = extraData_;
+        length = extraDataLength_;
+    } else {
+        length = 0;
+    }
+}
+
 bool InputEvent::WriteToParcel(Parcel &out) const
 {
     WRITEINT32(out, eventType_);
@@ -238,6 +256,12 @@ bool InputEvent::WriteToParcel(Parcel &out) const
     WRITEINT32(out, targetWindowId_);
     WRITEINT32(out, agentWindowId_);
     WRITEUINT32(out, bitwise_);
+    if (extraData_ && extraDataLength_ != 0) {
+        WRITEUINT32(out, extraDataLength_);
+        WRITEBUFFER(out, (void *)extraData_.get(), extraDataLength_);
+    } else {
+        WRITEUINT32(out, 0);
+    }
     return true;
 }
 
@@ -254,6 +278,13 @@ bool InputEvent::ReadFromParcel(Parcel &in)
     READINT32(in, targetWindowId_);
     READINT32(in, agentWindowId_);
     READUINT32(in, bitwise_);
+    READUINT32(in, extraDataLength_);
+    if (extraDataLength_ != 0) {
+        const uint8_t *buffer = in.ReadBuffer(extraDataLength_);
+        std::shared_ptr<uint8_t[]> sp(new uint8_t[extraDataLength_], [](uint8_t* ptr) { delete[] ptr; });
+        std::copy(buffer, buffer + extraDataLength_, sp.get());
+        extraData_ = sp;
+    }
     return true;
 }
 } // namespace MMI
