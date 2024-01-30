@@ -23,6 +23,7 @@
 #include "dfx_hisysevent.h"
 #include "fingersense_wrapper.h"
 #include "input_device_manager.h"
+#include "input_event_handler.h"
 #include "i_pointer_drawing_manager.h"
 #include "mouse_event_normalize.h"
 #include "pointer_drawing_manager.h"
@@ -788,31 +789,11 @@ void InputWindowsManager::DispatchPointer(int32_t pointerAction)
     } else {
         pointerEvent->ClearBuffer();
     }
-    int pid = lastWindowInfo_.pid;
     if (pointerAction == PointerEvent::POINTER_ACTION_LEAVE_WINDOW) {
         pointerEvent->SetAgentWindowId(lastWindowInfo_.id);
     }
-    auto fd = udsServer_->GetClientFd(pid);
-    if (fd == RET_ERR) {
-        auto windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
-        if (!windowInfo) {
-            MMI_HILOGE("The windowInfo is nullptr");
-            return;
-        }
-        fd = udsServer_->GetClientFd(windowInfo->pid);
-    }
-    auto sess = udsServer_->GetSession(fd);
-    if (sess == nullptr) {
-        MMI_HILOGI("The last window has disappeared");
-        return;
-    }
-
-    NetPacket pkt(MmiMessageId::ON_POINTER_EVENT);
-    InputEventDataTransformation::Marshalling(pointerEvent, pkt);
-    if (!sess->SendMsg(pkt)) {
-        MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
-        return;
-    }
+    auto filter = InputHandler->GetFilterHandler();
+    filter->HandlePointerEvent(pointerEvent);
 }
 
 void InputWindowsManager::NotifyPointerToWindow()
