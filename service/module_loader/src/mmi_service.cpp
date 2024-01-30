@@ -36,6 +36,7 @@
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
 #include "string_ex.h"
+#include "watchdog_task.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
 #include "res_type.h"
@@ -335,6 +336,9 @@ void MMIService::OnStart()
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc, WATCHDOG_INTERVAL_TIME,
         WATCHDOG_DELAY_TIME);
     MMI_HILOGI("Run periodical task success");
+    std::string description = WATCHDOG->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 1000) +
+        ", report twice instead of exiting process.";
+    WATCHDOG->SendEvent(description, "MMIService");
 }
 
 void MMIService::OnStop()
