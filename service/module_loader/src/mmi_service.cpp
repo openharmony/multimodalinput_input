@@ -333,8 +333,8 @@ void MMIService::OnStart()
             threadStatusFlag_ = false;
         } else {
             MMI_HILOGE("Watchdog happened");
-            std::string warningDesmsg = WATCHDOG->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 2000);
-            WATCHDOG->SendEvent(warningDesmsg, "SERVICE_WARNING");
+            std::string warningDescMsg = WATCHDOG->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 2000);
+            WATCHDOG->SendEvent(warningDescMsg, "SERVICE_WARNING");
             std::string blockDescMsg = WATCHDOG->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 1000);
             WATCHDOG->SendEvent(blockDescMsg, "SERVICE_BLOCK");
         }
