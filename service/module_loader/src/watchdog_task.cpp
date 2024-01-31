@@ -132,7 +132,7 @@ void WatchdogTask::SendEvent(const std::string &msg, const std::string &eventNam
     }
     uint32_t gid = getgid();
     uint32_t uid = getuid();
-    time_t curTime;
+    time_t curTime = time(nullptr);
     std::string sendMsg = std::string((ctime(&curTime) == nullptr) ? "" : ctime(&curTime)) +
         "\n" + msg + "\n";
     HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::FRAMEWORK, eventName,
