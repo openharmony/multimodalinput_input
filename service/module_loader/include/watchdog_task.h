@@ -22,20 +22,20 @@ namespace OHOS {
 namespace MMI {
 class WatchdogTask {
     DECLARE_DELAYED_SINGLETON(WatchdogTask);
-public:
 
+public:
     DISALLOW_COPY_AND_MOVE(WatchdogTask);
     bool IsProcessDebug(int32_t pid);
     std::string GetSelfProcName();
     std::string GetFirstLine(const std::string& path);
-    std::string GetProcessNameFromProCmdline(int32_t pid);
+    std::string GetProcessNameFromProcCmdline(int32_t pid);
     std::string GetBlockDescription(uint64_t interval);
     void SendEvent(const std::string &msg, const std::string &eventName);
 
     std::string name = "mmi_service";
 
 };
-#define WATCHDOG ::OHOS::DelayedSingleton<WatchdogTask>::GetInstance();
+#define WATCHDOG ::OHOS::DelayedSingleton<WatchdogTask>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // WATCHDOG_TASK_H
