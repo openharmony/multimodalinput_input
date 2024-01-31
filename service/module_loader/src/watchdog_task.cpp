@@ -83,7 +83,7 @@ bool WatchdogTask::IsProcessDebug(int32_t pid)
     char param[buffSize] = { 0 };
     std::string filter = "hiviewdfx.freeze.filter." + GetProcessNameFromProcCmdline(pid);
     GetParameter(filter.c_str(), "", param, buffSize - 1);
-    if (IsNumberic(param)) {
+    if (!IsNumberic(param)) {
         MMI_HILOGE("Parameter:%{public}s is error", param);
         return false;
     }
