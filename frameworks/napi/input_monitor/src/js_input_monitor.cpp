@@ -24,6 +24,7 @@
 #include "util_napi_value.h"
 #include "napi_constants.h"
 #include "securec.h"
+#include "util_napi_error.h"
 
 namespace OHOS {
 namespace MMI {
@@ -736,6 +737,7 @@ int32_t JsInputMonitor::GetJoystickAction(int32_t action)
             return static_cast<int32_t>(JsJoystickEvent::Action::ABS_END);
         }
         default: {
+            MMI_HILOGW("action is unknown");
             return RET_ERR;
         }
     }
@@ -743,12 +745,14 @@ int32_t JsInputMonitor::GetJoystickAction(int32_t action)
 
 int32_t JsInputMonitor::GetJoystickButton(int32_t buttonId)
 {
+    int32_t currentButtonId = -1;
     for (const auto &item : JOYSTICK_BUTTON_TYPE) {
         if (buttonId == item.second) {
-            return static_cast<int32_t>(item.first);
+            currentButtonId = static_cast<int32_t>(item.first);
+            break;
         }
     }
-    return RET_ERR;
+    return currentButtonId;
 }
 
 bool JsInputMonitor::GetJoystickPressedButtons(const std::set<int32_t>& pressedButtons, napi_value result)
@@ -757,7 +761,7 @@ bool JsInputMonitor::GetJoystickPressedButtons(const std::set<int32_t>& pressedB
     napi_value value = nullptr;
     napi_status status = napi_create_array(jsEnv_, &value);
     if (status != napi_ok || value == nullptr) {
-        THROWERR(jsEnv_, "napi_create_array is failed");
+        THROWERR_CUSTOM(jsEnv_, COMMON_PARAMETER_ERROR, "napi_create_array is failed");
         return false;
     }
     uint32_t index = 0;
@@ -765,18 +769,18 @@ bool JsInputMonitor::GetJoystickPressedButtons(const std::set<int32_t>& pressedB
         int32_t buttonId = GetJoystickButton(item);
         napi_value element = nullptr;
         if (napi_create_int32(jsEnv_, buttonId, &element) != napi_ok) {
-            THROWERR(jsEnv_, "Napi create int32 failed");
+            THROWERR_CUSTOM(jsEnv_, COMMON_PARAMETER_ERROR, "Napi create int32 failed");
             return false;
         }
         status = napi_set_element(jsEnv_, value, index, element);
         if (status != napi_ok) {
-            THROWERR(jsEnv_, "Napi set element failed");
+            THROWERR_CUSTOM(jsEnv_, COMMON_PARAMETER_ERROR, "Napi set element failed");
             return false;
         }
         ++index;
     }
     if (SetNameProperty(jsEnv_, result, "pressedButtons", value) != napi_ok) {
-        THROWERR(jsEnv_, "Set property of pressedButtons failed");
+        THROWERR_CUSTOM(jsEnv_, COMMON_PARAMETER_ERROR, "Set property of pressedButtons failed");
         return false;
     }
     return true;
@@ -814,7 +818,7 @@ int32_t JsInputMonitor::GetMousePointerItem(const std::shared_ptr<PointerEvent> 
         napi_value element = nullptr;
         if (napi_create_object(jsEnv_, &element) != napi_ok) {
             THROWERR(jsEnv_, "napi_create_object is failed");
-            return false;
+            return RET_ERR;
         }
         if (!GetAxesValue(pointerEvent, element)) {
             THROWERR(jsEnv_, "Get axesValue failed");
@@ -845,13 +849,13 @@ int32_t JsInputMonitor::GetJoystickPointerItem(const std::shared_ptr<PointerEven
     napi_value axes = nullptr;
     napi_status status = napi_create_array(jsEnv_, &axes);
     if (status != napi_ok || axes == nullptr) {
-        THROWERR(jsEnv_, "napi_create_array is failed");
+        THROWERR_CUSTOM(jsEnv_, COMMON_PARAMETER_ERROR, "napi_create_array is failed");
         return RET_ERR;
     }
 
     int32_t currentPointerId = pointerEvent->GetPointerId();
     if (SetNameProperty(jsEnv_, result, "id", currentPointerId) != napi_ok) {
-        THROWERR(jsEnv_, "Set property of id failed");
+        THROWERR_CUSTOM(jsEnv_, COMMON_PARAMETER_ERROR, "Set property of id failed");
         return RET_ERR;
     }
 
@@ -863,29 +867,29 @@ int32_t JsInputMonitor::GetJoystickPointerItem(const std::shared_ptr<PointerEven
         axis = static_cast<int32_t>(item.first);
 
         if (napi_create_object(jsEnv_, &element) != napi_ok) {
-            THROWERR(jsEnv_, "napi_create_object is failed");
+            THROWERR_CUSTOM(jsEnv_, COMMON_PARAMETER_ERROR, "napi_create_object is failed");
             return RET_ERR;
         }
 
         if (SetNameProperty(jsEnv_, element, "axis", axis) != napi_ok) {
-            THROWERR(jsEnv_, "Set property of axis failed");
+            THROWERR_CUSTOM(jsEnv_, COMMON_PARAMETER_ERROR, "Set property of axis failed");
             return RET_ERR;
         }
         if (SetNameProperty(jsEnv_, element, "value", axisValue) != napi_ok) {
-            THROWERR(jsEnv_, "Set property of value failed");
+            THROWERR_CUSTOM(jsEnv_, COMMON_PARAMETER_ERROR, "Set property of value failed");
             return RET_ERR;
         }
 
         status = napi_set_element(jsEnv_, axes, index, element);
         if (status != napi_ok) {
-            THROWERR(jsEnv_, "Napi set element in axes failed");
+            THROWERR_CUSTOM(jsEnv_, COMMON_PARAMETER_ERROR, "Napi set element in axes failed");
             return RET_ERR;
         }
         ++index;
     }
 
     if (SetNameProperty(jsEnv_, result, "axes", axes) != napi_ok) {
-        THROWERR(jsEnv_, "Set property of axes failed");
+        THROWERR_CUSTOM(jsEnv_, COMMON_PARAMETER_ERROR, "Set property of axes failed");
         return RET_ERR;
     }
 
@@ -1474,13 +1478,12 @@ bool JsInputMonitor::IsThreeFingersTap(std::shared_ptr<PointerEvent> pointerEven
 
 bool JsInputMonitor::IsJoystick(std::shared_ptr<PointerEvent> pointerEvent)
 {
-    if (pointerEvent->GetSourceType() != PointerEvent::SOURCE_TYPE_JOYSTICK ||
-        (pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_BUTTON_UP &&
-        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_BUTTON_DOWN &&
-        pointerEvent->GetPointerAction() != PointerEvent::POINTER_ACTION_AXIS_UPDATE)) {
-        return false;
-    }
-    return true;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+
+    return (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK &&
+        (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_DOWN ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_AXIS_UPDATE));
 }
 } // namespace MMI
 } // namespace OHOS
