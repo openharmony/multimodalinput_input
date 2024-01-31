@@ -330,10 +330,10 @@ void MMIService::OnStart()
             threadStatusFlag_ = false;
         } else {
             MMI_HILOGE("Watchdog happened");
-            std::string warningDescMsg = WATCHDOG->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 2000);
-            WATCHDOG->SendEvent(warningDescMsg, "SERVICE_WARNING");
-            std::string blockDescMsg = WATCHDOG->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 1000);
-            WATCHDOG->SendEvent(blockDescMsg, "SERVICE_BLOCK");
+            std::string warningDescMsg = WatchDog->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 2000);
+            WatchDog->SendEvent(warningDescMsg, "SERVICE_WARNING");
+            std::string blockDescMsg = WatchDog->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 1000);
+            WatchDog->SendEvent(blockDescMsg, "SERVICE_BLOCK");
         }
     };
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc, WATCHDOG_INTERVAL_TIME,

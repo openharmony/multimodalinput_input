@@ -25,6 +25,7 @@ class WatchdogTask {
 
 public:
     DISALLOW_COPY_AND_MOVE(WatchdogTask);
+    bool IsNumberic(const std::string &str);
     bool IsProcessDebug(int32_t pid);
     std::string GetSelfProcName();
     std::string GetFirstLine(const std::string& path);
@@ -32,7 +33,7 @@ public:
     std::string GetBlockDescription(uint64_t interval);
     void SendEvent(const std::string &msg, const std::string &eventName);
 };
-#define WATCHDOG ::OHOS::DelayedSingleton<WatchdogTask>::GetInstance()
+#define WatchDog ::OHOS::DelayedSingleton<WatchdogTask>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // WATCHDOG_TASK_H
