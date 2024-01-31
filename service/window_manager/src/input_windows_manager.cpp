@@ -2427,7 +2427,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
             mprintf(fd, "\t pointerHotAreas: x:%d | y:%d | width:%d | height:%d \t",
                     pointer.x, pointer.y, pointer.width, pointer.height);
         }
-        
+
         std::string dump;
         dump += StringPrintf("\t pointerChangeAreas: ");
         for (const auto &it : item.pointerChangeAreas) {
