@@ -37,6 +37,7 @@
 #include "multimodal_input_connect_def_parcel.h"
 #include "permission_helper.h"
 #include "string_ex.h"
+#include "watchdog_task.h"
 #ifdef OHOS_RSS_CLIENT
 #include "res_sched_client.h"
 #include "res_type.h"
@@ -61,6 +62,7 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIService" };
 const std::string DEF_INPUT_SEAT = "seat0";
+const std::string THREAD_NAME = "mmi-service";
 constexpr int32_t WATCHDOG_INTERVAL_TIME = 10000;
 constexpr int32_t WATCHDOG_DELAY_TIME = 15000;
 constexpr int32_t REMOVE_OBSERVER = -2;
@@ -290,18 +292,14 @@ int32_t MMIService::Init()
 
 void MMIService::OnStart()
 {
-    std::string name = "mmi-service";
     CHK_PID_AND_TID();
     IPCSkeleton::SetMaxWorkThreadNum(MAX_IPC_THREAD_NUM);
     int32_t ret = Init();
-    if (RET_OK != ret) {
-        MMI_HILOGE("Init mmi_service failed");
-        return;
-    }
+    CHKNOKRV(ret, "Init mmi_service failed");
     MMI_HILOGD("Started successfully");
     AddReloadDeviceTimer();
     t_ = std::thread(std::bind(&MMIService::OnThread, this));
-    pthread_setname_np(t_.native_handle(), name.c_str());
+    pthread_setname_np(t_.native_handle(), THREAD_NAME.c_str());
 #ifdef OHOS_RSS_CLIENT
     MMI_HILOGI("Add system ability listener start");
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
@@ -332,9 +330,12 @@ void MMIService::OnStart()
             threadStatusFlag_ = false;
         } else {
             MMI_HILOGE("Watchdog happened");
+            std::string warningDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 2000);
+            WATCHDOG_TASK->SendEvent(warningDescMsg, "SERVICE_WARNING");
+            std::string blockDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 1000);
+            WATCHDOG_TASK->SendEvent(blockDescMsg, "SERVICE_BLOCK");
         }
     };
-    MMI_HILOGI("Run periodical task start");
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc, WATCHDOG_INTERVAL_TIME,
         WATCHDOG_DELAY_TIME);
     MMI_HILOGI("Run periodical task success");
