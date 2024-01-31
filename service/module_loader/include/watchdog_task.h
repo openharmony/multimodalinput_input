@@ -31,9 +31,6 @@ public:
     std::string GetProcessNameFromProcCmdline(int32_t pid);
     std::string GetBlockDescription(uint64_t interval);
     void SendEvent(const std::string &msg, const std::string &eventName);
-
-    std::string name = "mmi_service";
-
 };
 #define WATCHDOG ::OHOS::DelayedSingleton<WatchdogTask>::GetInstance()
 } // namespace MMI
