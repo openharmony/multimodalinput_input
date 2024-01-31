@@ -334,7 +334,7 @@ void MMIService::OnStart()
         } else {
             MMI_HILOGE("Watchdog happened");
             std::string description = WATCHDOG->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 2000);
-            WATCHDOG->SendEvent(description, "SERVICE_WAENING");
+            WATCHDOG->SendEvent(description, "SERVICE_WARNING");
             std::string description = WATCHDOG->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 1000);
             WATCHDOG->SendEvent(description, "SERVICE_BLOCK");
         }

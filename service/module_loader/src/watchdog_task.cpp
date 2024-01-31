@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 #include "watchdog_task.h"
 
 #include <fstream>
@@ -22,7 +21,7 @@
 #include "backtrace_local.h"
 #include "hisysevent.h"
 #include "mmi_log.h"
-#include "parameter.h" 
+#include "parameter.h"
 
 namespace OHOS {
 namespace MMI {
@@ -92,7 +91,6 @@ std::string WatchdogTask::GetBlockDescription(uint64_t interval)
     return desc;
 }
 
-
 std::string WatchdogTask::GetSelfProcName()
 {
     constexpr uint16_t READ_SIZE = 128;
@@ -103,11 +101,11 @@ std::string WatchdogTask::GetSelfProcName()
         return "";
     }
     char readStr[READ_SIZE] = {'\0'};
-    fin.getline(readStr, READ_SIZE -1);
+    fin.getline(readStr, READ_SIZE - 1);
     fin.close();
 
     std::string ret = std::string(readStr);
-    ret.erase(std::remove_if(ret.begin(), ret,end(), [](unsigned char c) {
+    ret.erase(std::remove_if(ret.begin(), ret.end(), [](unsigned char c) {
         if (c >= '0' && c <= '9') {
             return false;
         }
@@ -132,7 +130,7 @@ void WatchdogTask::SendEvent(const std::string &msg, const std::string &eventNam
         MMI_HILOGI("heap dump for %{public}d, don't report", pid);
         return;
     }
-    uibt32_t gid = getgid();
+    uint32_t gid = getgid();
     uint32_t uid = getuid();
     time_t curTime = time(nullptr);
     std::string sendMsg = std::string((ctime(&curTime) == nullptr) ? "" : ctime(&curTime)) +
