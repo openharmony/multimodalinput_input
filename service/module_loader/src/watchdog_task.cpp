@@ -36,13 +36,14 @@ WatchdogTask::~WatchdogTask() {}
 
 std::string WatchdogTask::GetFirstLine(const std::string& path)
 {
-    char checkPath[PATH_MAX] = {0};
+    char checkPath[PATH_MAX] = { 0 };
     if (realpath(path.c_str(), checkPath) == nullptr) {
         MMI_HILOGE("canonicalize failed. path is %{public}s", path.c_str());
         return "";
     }
     std::ifstream inFile(checkPath);
-    if (!inFile) {
+    if (!inFile.is_open()) {
+        MMI_HILOGE("inFile.is_open() false");
         return "";
     }
     std::string firstLine;
@@ -71,12 +72,21 @@ std::string WatchdogTask::GetProcessNameFromProcCmdline(int32_t pid)
     return procCmdlineContent.substr(procNameStartPos, procNameEndPos - procNameStartPos);
 }
 
+bool WatchdogTask::IsNumberic(const std::string &str)
+{
+    return !str.empty() && std::all_of(str.begin(), str.end(), ::isdigit);
+}
+
 bool WatchdogTask::IsProcessDebug(int32_t pid)
 {
-    const int buffSize = 128;
-    char param[buffSize] = {0};
+    const int32_t buffSize = 128;
+    char param[buffSize] = { 0 };
     std::string filter = "hiviewdfx.freeze.filter." + GetProcessNameFromProcCmdline(pid);
     GetParameter(filter.c_str(), "", param, buffSize - 1);
+    if (IsNumberic(param)) {
+        MMI_HILOGE("Parameter:%{public}s is error", param);
+        return false;
+    }
     int32_t debugPid = atoi(param);
     if (debugPid == pid) {
         return true;
