@@ -27,6 +27,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "WatchdogTask" };
+const std::string THREAD_NAME = "mmi_service";
 } // namespace
 
 WatchdogTask::WatchdogTask() {}
@@ -86,7 +87,7 @@ bool WatchdogTask::IsProcessDebug(int32_t pid)
 std::string WatchdogTask::GetBlockDescription(uint64_t interval)
 {
     std::string desc = "Watchdog: thread(";
-    desc += name;
+    desc += THREAD_NAME;
     desc += ") blocked " + std::to_string(interval) + "s";
     return desc;
 }
@@ -118,8 +119,7 @@ std::string WatchdogTask::GetSelfProcName()
         if (c == '.' || c == '-' || c == '_') {
             return false;
         }
-        return true;
-    }), ret.end());
+        return true;}), ret.end());
     return ret;
 }
 
@@ -132,7 +132,7 @@ void WatchdogTask::SendEvent(const std::string &msg, const std::string &eventNam
     }
     uint32_t gid = getgid();
     uint32_t uid = getuid();
-    time_t curTime = time(nullptr);
+    time_t curTime;
     std::string sendMsg = std::string((ctime(&curTime) == nullptr) ? "" : ctime(&curTime)) +
         "\n" + msg + "\n";
     HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::FRAMEWORK, eventName,
@@ -140,7 +140,7 @@ void WatchdogTask::SendEvent(const std::string &msg, const std::string &eventNam
         "PID", pid,
         "TGID", gid,
         "UID", uid,
-        "MODULE_NAME", name,
+        "MODULE_NAME", THREAD_NAME,
         "PROCESS_NAME", GetSelfProcName(),
         "MSG", sendMsg,
         "STACK", OHOS::HiviewDFX::GetProcessStacktrace());
