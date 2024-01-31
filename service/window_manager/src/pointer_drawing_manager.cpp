@@ -944,6 +944,12 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
             it->second.iconPath.c_str(), newIconPath.c_str());
         it->second.iconPath = newIconPath;
     }
+    std::string name = "pointerColor";
+    ret = PREFERENCES_MANAGER->SetIntValue(name, MOUSE_FILE_NAME, DEFAULT_VALUE);
+    if (ret != RET_OK) {
+        MMI_HILOGD("Set default color failed");
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
