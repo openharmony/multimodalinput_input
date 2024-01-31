@@ -1884,6 +1884,20 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             // MMI_GE(pointerEvent->GetZOrder(), 0.0f);
         if (isCompensatePointer) {
             SimulatePointerExt(pointerEvent);
+        } else {
+            if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+                std::unordered_map<std::string, std::string> mapPayload;
+                mapPayload["msg"] = msg;
+                constexpr int32_t touchDownBoost = 1006;
+                OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
+                    OHOS::ResourceSchedule::ResType::RES_TYPE_ANCO_CUST, touchDownBoost, mapPayload);
+            } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+                constexpr int32_t touchUpBoost = 1007;
+                std::unordered_map<std::string, std::string> mapPayload;
+                mapPayload["msg"] = msg;
+                OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
+                    OHOS::ResourceSchedule::ResType::RES_TYPE_ANCO_CUST, touchUpBoost, mapPayload);
+            }
         }
         return RET_OK;
     }
