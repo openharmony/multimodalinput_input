@@ -490,16 +490,15 @@ static napi_value InjectTouchEvent(napi_env env, napi_callback_info info)
     return result;
 }
 
-static void HandleJoystickButton(napi_env env, napi_value joystickHandle, std::shared_ptr<PointerEvent> pointerEvent)
+static int32_t HandleJoystickButton(napi_env env, napi_value joystickHandle, std::shared_ptr<PointerEvent> pointerEvent)
 {
-    int32_t button;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
+    int32_t button = -1;
     int32_t ret = GetNamedPropertyInt32(env, joystickHandle, "button", button);
-    if (ret != RET_OK) {
-        MMI_HILOGE("Get button failed");
-    }
-    if (button < 0) {
-        MMI_HILOGE("button:%{public}d is less 0, can not process", button);
-        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "button must be greater than or equal to 0");
+    if (ret != RET_OK || button < 0) {
+        MMI_HILOGE("Get button error");
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "get button error");
+        return RET_ERR;
     }
 
     for (const auto &item : JOYSTICK_BUTTON_TYPE) {
@@ -508,51 +507,60 @@ static void HandleJoystickButton(napi_env env, napi_value joystickHandle, std::s
             break;
         }
     }
+    return RET_OK;
 }
 
-static void HandleJoystickAction(napi_env env, napi_value joystickHandle, std::shared_ptr<PointerEvent> pointerEvent)
+static int32_t HandleJoystickAction(napi_env env, napi_value joystickHandle, std::shared_ptr<PointerEvent> pointerEvent)
 {
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t action;
-    int32_t buttonId = pointerEvent->GetButtonId();
     int32_t ret = GetNamedPropertyInt32(env, joystickHandle, "action", action);
     if (ret != RET_OK) {
         MMI_HILOGE("Get action failed");
-        return;
+        return RET_ERR;
+    }
+    int32_t buttonId = pointerEvent->GetButtonId();
+    if (buttonId < 0) {
+        MMI_HILOGE("buttonId:%{public}d is less 0, can not process", buttonId);
+        THROWERR_CUSTOM(env, COMMON_PARAMETER_ERROR, "buttonId must be greater than or equal to 0");
+        return RET_ERR;
     }
 
     switch (action) {
-        case static_cast<int32_t>(JsJoystickEvent::Action::BUTTON_DOWN):
+        case static_cast<int32_t>(JsJoystickEvent::Action::BUTTON_DOWN): {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_DOWN);
             pointerEvent->SetButtonPressed(buttonId);
             break;
-        case static_cast<int32_t>(JsJoystickEvent::Action::BUTTON_UP):
+        }
+        case static_cast<int32_t>(JsJoystickEvent::Action::BUTTON_UP): {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_BUTTON_UP);
             pointerEvent->DeleteReleaseButton(buttonId);
             break;
-        case static_cast<int32_t>(JsJoystickEvent::Action::ABS_UPDATE):
+        }
+        case static_cast<int32_t>(JsJoystickEvent::Action::ABS_UPDATE): {
             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_AXIS_UPDATE);
             break;
-        default:
-            MMI_HILOGE("action is unknown");
+        }
+        default: {
+            MMI_HILOGW("action is unknown");
             break;
+        }
     }
 
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+    return RET_OK;
 }
 
 static int32_t HandleJoystickAxes(napi_env env, napi_value joystickHandle, std::shared_ptr<PointerEvent> pointerEvent)
 {
-    int32_t ret;
+    CHKPR(pointerEvent, ERROR_NULL_POINTER);
     napi_value axesArray = {};
     pointerEvent->ClearAxisValue();
     if (napi_get_named_property(env, joystickHandle, "axes", &axesArray) != napi_ok) {
         MMI_HILOGE("Call napi_get_named_property failed");
         return RET_ERR;
     }
-    if (axesArray == nullptr) {
-        MMI_HILOGE("The value is null");
-        return RET_ERR;
-    }
+    CHKPR(axesArray, RET_ERR);
 
     uint32_t arrayLength;
     if (napi_get_array_length(env, axesArray, &arrayLength) != napi_ok) {
@@ -568,7 +576,7 @@ static int32_t HandleJoystickAxes(napi_env env, napi_value joystickHandle, std::
         }
 
         int32_t axis;
-        ret = GetNamedPropertyInt32(env, axisObject, "axis", axis);
+        int32_t ret = GetNamedPropertyInt32(env, axisObject, "axis", axis);
         if (ret != RET_OK) {
             MMI_HILOGE("Get axis failed");
             return RET_ERR;
