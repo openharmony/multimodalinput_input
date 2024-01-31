@@ -13,30 +13,25 @@
  * limitations under the License.
  */
 
-
 #ifndef WATCHDOG_TASK_H
 #define WATCHDOG_TASK_H
 
-#include <functional>
-#include <string>
-#include <sys/types.h>
-
-
+#include "singleton.h"
 
 namespace OHOS {
 namespace MMI {
 class WatchdogTask {
-
+    DECLARE_DELAYED_SINGLETON(WatchdogTask);
 public:
-    WatchdogTask() = default;
-    ~WatchdogTask() = default;
 
-    bool IsFileNameFormat(char c);
+    DISALLOW_COPY_AND_MOVE(WatchdogTask);
     bool IsProcessDebug(int32_t pid);
     std::string GetSelfProcName();
     std::string GetProcessNameFromProCmdline(int32_t pid);
     std::string GetBlockDescription(uint64_t interval);
-    void SendEvent(const std::string &msg, const std::string &eventName) const;
+    void SendEvent(const std::string &msg, const std::string &eventName);
+
+    std::string name = "mmi_service";
 
 };
 #define WATCHDOG::OHOS::DelayedSingleton<WatchdogTask>::GetInstance();
