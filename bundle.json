@@ -71,6 +71,7 @@
         "common_event_service",
         "data_share",
         "relational_store",
+        "faultloggerd",
         "ffrt",
         "power_manager"
       ],
