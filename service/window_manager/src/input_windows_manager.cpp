@@ -475,13 +475,13 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
         [](const WindowInfo &lwindow, const WindowInfo &rwindow) -> bool {
         return lwindow.zOrder > rwindow.zOrder;
     });
-    UpdateWindowsInfoPerDisplay(displayGroupInfo);
     CheckFocusWindowChange(displayGroupInfo);
     UpdateCaptureMode(displayGroupInfo);
     displayGroupInfoTmp_ = displayGroupInfo;
     if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() ||
         action == WINDOW_UPDATE_ACTION::ADD_END) {
         displayGroupInfo_ = displayGroupInfoTmp_;
+        UpdateWindowsInfoPerDisplay(displayGroupInfo);
     }
     PrintDisplayInfo();
     UpdateDisplayIdAndName();
