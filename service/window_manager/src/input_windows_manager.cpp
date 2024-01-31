@@ -363,7 +363,7 @@ void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInf
         return UpdateShellWindow(windowGroupInfo.windowsInfo[0]);
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
-    DisplayGroupInfo displayGroupInfo = displayGroupInfo_;
+    DisplayGroupInfo displayGroupInfo = displayGroupInfoTmp_;
     displayGroupInfo.focusWindowId = windowGroupInfo.focusWindowId;
     for (const auto &item : windowGroupInfo.windowsInfo) {
         UpdateDisplayInfoByIncrementalInfo(item, displayGroupInfo);
@@ -467,7 +467,8 @@ void InputWindowsManager::UpdateWindowsInfoPerDisplay(const DisplayGroupInfo &di
 
 void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
 {
-    CALL_DEBUG_ENTER;
+    auto action = displayGroupInfo.windowsInfo.back().action;
+    MMI_HILOGD("Current action is:%{public}d", action);
 #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
     pointerDrawFlag_ = NeedUpdatePointDrawFlag(displayGroupInfo.windowsInfo);
 #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -475,10 +476,14 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
         [](const WindowInfo &lwindow, const WindowInfo &rwindow) -> bool {
         return lwindow.zOrder > rwindow.zOrder;
     });
-    UpdateWindowsInfoPerDisplay(displayGroupInfo);
     CheckFocusWindowChange(displayGroupInfo);
     UpdateCaptureMode(displayGroupInfo);
-    displayGroupInfo_ = displayGroupInfo;
+    displayGroupInfoTmp_ = displayGroupInfo;
+    if (!Rosen::SceneBoardJudgement::IsSceneBoardEnabled() ||
+        action == WINDOW_UPDATE_ACTION::ADD_END) {
+        displayGroupInfo_ = displayGroupInfoTmp_;
+        UpdateWindowsInfoPerDisplay(displayGroupInfo);
+    }
     PrintDisplayInfo();
     UpdateDisplayIdAndName();
     if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
