@@ -333,15 +333,16 @@ void MMIService::OnStart()
             threadStatusFlag_ = false;
         } else {
             MMI_HILOGE("Watchdog happened");
+            std::string description = WATCHDOG->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 2000);
+            WATCHDOG->SendEvent(description, "SERVICE_WAENING");
+            std::string description = WATCHDOG->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 1000);
+            WATCHDOG->SendEvent(description, "SERVICE_BLOCK");
         }
     };
     MMI_HILOGI("Run periodical task start");
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc, WATCHDOG_INTERVAL_TIME,
         WATCHDOG_DELAY_TIME);
     MMI_HILOGI("Run periodical task success");
-    std::string description = WATCHDOG->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 1000) +
-        ", report twice instead of exiting process.";
-    WATCHDOG->SendEvent(description, "MMIService");
 }
 
 void MMIService::OnStop()

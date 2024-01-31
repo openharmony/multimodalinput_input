@@ -14,7 +14,7 @@
  */
 
 
-#include "wacthdog_task.h"
+#include "watchdog_task.h"
 
 #include <fstream>
 #include <unistd.h>
@@ -51,33 +51,34 @@ std::string WatchdogTask::GetFirstLine(const std::string& path)
     return firstLine;
 }
 
-std::string WatchdogTask::GetProcessNameFromProCmdline(int32_t pid)
+std::string WatchdogTask::GetProcessNameFromProcCmdline(int32_t pid)
 {
-    std::string proCmdlinePath = "/proc/" + std::to_string(pid) + "/cmdline";
-    std::string proCmdlineContent = GetFirstLine(ProCmdLinePath);
-    if (proCmdlineContent.empty()) {
+    std::string procCmdlinePath = "/proc/" + std::to_string(pid) + "/cmdline";
+    std::string procCmdlineContent = GetFirstLine(procCmdlinePath);
+    if (procCmdlineContent.empty()) {
         return "";
     }
-    size_t proNameStartPos = 0;
-    size_t proNameEndPos = proCmdlineContent.size();
-    for (size_t i = 0; i < proCmdlineContent.size(); i++) {
-        if (proCmdlineContent[i] == '/') {
-            proNameStartPos = i + 1;
-        } else if (proCmdlineContent[i] == '\0') {
-            proNameEndPos = i;
+    size_t procNameStartPos = 0;
+    size_t procNameEndPos = procCmdlineContent.size();
+    for (size_t i = 0; i < procCmdlineContent.size(); i++) {
+        if (procCmdlineContent[i] == '/') {
+            procNameStartPos = i + 1;
+        } else if (procCmdlineContent[i] == '\0') {
+            procNameEndPos = i;
             break;
         }
     }
-    return proCmdlineContent.subStr(proNameStartPos, proNameEndPos - proNameStartPos);
+    return procCmdlineContent.substr(procNameStartPos, procNameEndPos - procNameStartPos);
 }
 
 bool WatchdogTask::IsProcessDebug(int32_t pid)
 {
     const int buffSize = 128;
-    char parm[buffSize] = {0};
-    std::string filter = "hiviewdfx.freeze.filter." + GetProcessNameFromProCmdline(pid);
-    GetParameter(filter.c_str(), "", param, buffsize - 1);
-    int32_t (debugPid == pid) {
+    char param[buffSize] = {0};
+    std::string filter = "hiviewdfx.freeze.filter." + GetProcessNameFromProcCmdline(pid);
+    GetParameter(filter.c_str(), "", param, buffSize - 1);
+    int32_t debugPid = atoi(param);
+    if (debugPid == pid) {
         return true;
     }
     return false;
@@ -116,7 +117,7 @@ std::string WatchdogTask::GetSelfProcName()
         if (c >= 'A' && c <= 'Z') {
             return false;
         }
-        if (c == '.' && c == '-' && c == '_') {
+        if (c == '.' || c == '-' || c == '_') {
             return false;
         }
         return true;
@@ -131,14 +132,14 @@ void WatchdogTask::SendEvent(const std::string &msg, const std::string &eventNam
         MMI_HILOGI("heap dump for %{public}d, don't report", pid);
         return;
     }
-    uint32_t pid = getpid();
+    uibt32_t gid = getgid();
     uint32_t uid = getuid();
     time_t curTime = time(nullptr);
     std::string sendMsg = std::string((ctime(&curTime) == nullptr) ? "" : ctime(&curTime)) +
         "\n" + msg + "\n";
-    HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::FRAMEWORK, eventName.
+    HiSysEventWrite(OHOS::HiviewDFX::HiSysEvent::Domain::FRAMEWORK, eventName,
         OHOS::HiviewDFX::HiSysEvent::EventType::FAULT,
-        "PID", pid;
+        "PID", pid,
         "TGID", gid,
         "UID", uid,
         "MODULE_NAME", name,
