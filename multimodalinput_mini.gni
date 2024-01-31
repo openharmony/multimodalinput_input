@@ -107,6 +107,7 @@ declare_args() {
     "module_loader/src/mmi_service.cpp",
     "module_loader/src/multimodal_input_preferences_manager.cpp",
     "module_loader/src/uds_server.cpp",
+    "module_loader/src/watchdog_task.cpp",
     "nap_process/src/nap_process.cpp",
     "permission_helper/src/permission_helper.cpp",
     "timer_manager/src/timer_manager.cpp",
