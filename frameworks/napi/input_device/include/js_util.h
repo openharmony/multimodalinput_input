@@ -45,7 +45,7 @@ public:
     struct ReportData : RefBase {
         napi_ref ref { nullptr };
         int32_t deviceId { 0 };
-    }
+    };
     struct CallbackInfo : RefBase {
         napi_env env { nullptr };
         napi_ref ref { nullptr };
