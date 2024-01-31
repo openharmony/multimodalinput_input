@@ -218,6 +218,7 @@ private:
     WindowInfo lastTouchWindowInfo_;
     std::shared_ptr<PointerEvent> lastTouchEvent_ { nullptr };
 #endif // OHOS_BUILD_ENABLE_POINTER
+    DisplayGroupInfo displayGroupInfoTmp_;
     DisplayGroupInfo displayGroupInfo_;
     std::map<int32_t, WindowGroupInfo> windowsPerDisplay_;
     PointerStyle lastPointerStyle_ {.id = -1};
