@@ -41,6 +41,10 @@
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
 #include "touch_drawing_manager.h"
+#ifdef OHOS_BUILD_ENABLE_ANCO
+#include "res_sched_client.h"
+#include "res_type.h"
+#endif // OHOS_BUILD_ENABLE_ANCO
 
 namespace OHOS {
 namespace MMI {
@@ -1884,6 +1888,20 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             MMI_GE(pointerEvent->GetZOrder(), 0.0f);
         if (isCompensatePointer) {
             SimulatePointerExt(pointerEvent);
+        } else {
+            if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+                std::unordered_map<std::string, std::string> mapPayload;
+                mapPayload["msg"] = "";
+                constexpr int32_t touchDownBoost = 1006;
+                OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
+                    OHOS::ResourceSchedule::ResType::RES_TYPE_ANCO_CUST, touchDownBoost, mapPayload);
+            } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+                constexpr int32_t touchUpBoost = 1007;
+                std::unordered_map<std::string, std::string> mapPayload;
+                mapPayload["msg"] = "";
+                OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
+                    OHOS::ResourceSchedule::ResType::RES_TYPE_ANCO_CUST, touchUpBoost, mapPayload);
+            }
         }
         return RET_OK;
     }
@@ -2376,7 +2394,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
             mprintf(fd, "\t pointerHotAreas: x:%d | y:%d | width:%d | height:%d \t",
                     pointer.x, pointer.y, pointer.width, pointer.height);
         }
-        
+
         std::string dump;
         dump += StringPrintf("\t pointerChangeAreas: ");
         for (const auto &it : item.pointerChangeAreas) {
