@@ -1746,5 +1746,80 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetShieldStatus_001, TestSize.Level1
     ASSERT_FALSE(factoryModeStatus);
     ASSERT_FALSE(oobeModeStatus);
 }
+
+/**
+ * @tc.name: InputManager_SimulateInputEvent_001
+ * @tc.desc: detection of not response
+ * @tc.type: FUNC
+ * @tc.require:SR000GGN6G
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateInputEvent_002
+ * @tc.desc: detection of not response
+ * @tc.type: FUNC
+ * @tc.require:SR000GGN6G
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateInputEvent_003
+ * @tc.desc: detection of not response
+ * @tc.type: FUNC
+ * @tc.require:SR000GGN6G
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateInputEvent_004
+ * @tc.desc: detection of not response
+ * @tc.type: FUNC
+ * @tc.require:SR000GGN6G
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateInputEvent_005
+ * @tc.desc: detection of not response
+ * @tc.type: FUNC
+ * @tc.require:SR000GGN6G
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
 }  // namespace MMI
 }  // namespace OHOS

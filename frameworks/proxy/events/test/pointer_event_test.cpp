@@ -942,69 +942,17 @@ HWTEST_F(PointerEventTest, PointerEventTest_GetFingerCount_001, TestSize.Level1)
     pointerEvent->SetFingerCount(-12);
     int32_t fingerCount = pointerEvent->GetFingerCount();
     ASSERT_EQ(fingerCount, -12);
-}
-
-/**
- * @tc.name: PointerEventTest_GetFingerCount_002
- * @tc.desc: Sets the fingerCount for this event.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerEventTest, PointerEventTest_GetFingerCount_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetFingerCount(-6);
-    int32_t fingerCount = pointerEvent->GetFingerCount();
+    fingerCount = pointerEvent->GetFingerCount();
     ASSERT_EQ(fingerCount, -6);
-}
-
-/**
- * @tc.name: PointerEventTest_GetFingerCount_003
- * @tc.desc: Sets the fingerCount for this event.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerEventTest, PointerEventTest_GetFingerCount_003, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetFingerCount(0);
-    int32_t fingerCount = pointerEvent->GetFingerCount();
+    fingerCount = pointerEvent->GetFingerCount();
     ASSERT_EQ(fingerCount, 0);
-}
-
-/**
- * @tc.name: PointerEventTest_GetFingerCount_004
- * @tc.desc: Sets the fingerCount for this event.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerEventTest, PointerEventTest_GetFingerCount_004, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetFingerCount(6);
-    int32_t fingerCount = pointerEvent->GetFingerCount();
+    fingerCount = pointerEvent->GetFingerCount();
     ASSERT_EQ(fingerCount, 6);
-}
-
-/**
- * @tc.name: PointerEventTest_GetFingerCount_005
- * @tc.desc: Sets the fingerCount for this event.
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(PointerEventTest, PointerEventTest_GetFingerCount_005, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto pointerEvent = PointerEvent::Create();
-    ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetFingerCount(12);
-    int32_t fingerCount = pointerEvent->GetFingerCount();
+    fingerCount = pointerEvent->GetFingerCount();
     ASSERT_EQ(fingerCount, 12);
 }
 
@@ -1022,14 +970,14 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearBuffer_001, TestSize.Level1)
     uint32_t enHanceDataLen = 3;
     uint8_t enhanceDataBuf[enHanceDataLen];
     std::vector<uint8_t> enhanceData;
-    std::vector<uint8_t> enhanceEmptyData;
     for (uint32_t i = 0; i < enHanceDataLen; i++) {
         enhanceData.push_back(enhanceDataBuf[i]);
     }
     pointerEvent->SetBuffer(enhanceData);
-    ASSERT_FALSE(enhanceData == enhanceEmptyData);
+    std::vector<uint8_t> buffer = pointerEvent->GetBuffer();
+    ASSERT_NE(buffer.size(), 0);
     pointerEvent->ClearBuffer();
-    ASSERT_TRUE(enhanceData == enhanceEmptyData);
+    ASSERT_EQ(buffer.size(), 0);
 }
 } // namespace MMI
 } // namespace OHOS
