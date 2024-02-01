@@ -173,7 +173,6 @@ void InputManager::SimulateInputEvent(std::shared_ptr<KeyEvent> keyEvent)
     InputMgrImpl.SimulateInputEvent(keyEvent);
 }
 
-__attribute__((no_sanitize("cfi")))
 void InputManager::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent)
 {
     pointerEvent->AddFlag(InputEvent::EVENT_FLAG_SIMULATE);
