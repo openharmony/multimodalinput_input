@@ -480,5 +480,35 @@ HWTEST_F(KeyEventTest, KeyEventTest_SetEnhanceData_001, TestSize.Level1)
     ASSERT_EQ(KeyEvent->GetEnhanceData(), enhanceData);
 }
 #endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
+
+/**
+ * @tc.name: KeyEventTest_IsRepeat_001
+ * @tc.desc: Set repeat_ to false
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_IsRepeat_001, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetRepeat(false);
+    bool result = keyEvent->IsRepeat();
+    ASSERT_FALSE(result);
+}
+
+/**
+ * @tc.name: KeyEventTest_IsRepeat_002
+ * @tc.desc: Set repeat_ to true
+ * @tc.type: FUNC
+ * @tc.require: I5HMCX
+ */
+HWTEST_F(KeyEventTest, KeyEventTest_IsRepeat_002, TestSize.Level1)
+{
+    std::shared_ptr<KeyEvent> keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    keyEvent->SetRepeat(true);
+    bool result = keyEvent->IsRepeat();
+    ASSERT_TRUE(result);
+}
 } // namespace MMI
 } // namespace OHOS
