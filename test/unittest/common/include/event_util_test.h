@@ -48,7 +48,7 @@ PermissionDef inputDispatchControlPermDef_ = {
     .labelId = 1,
     .description = "test input agent",
     .descriptionId = 1,
-    .availableLevel = APL_NORMAL
+    .availableLevel = APL_SYSTEM_CORE
 };
 
 PermissionDef infoManagerTestPermDef_ = {
@@ -59,7 +59,7 @@ PermissionDef infoManagerTestPermDef_ = {
     .labelId = 1,
     .description = "test input agent",
     .descriptionId = 1,
-    .availableLevel = APL_NORMAL
+    .availableLevel = APL_SYSTEM_CORE
 };
 
 PermissionStateFull infoManagerTestState_ = {
@@ -79,7 +79,7 @@ PermissionStateFull inputDispatchControlPermState_ = {
 };
 
 HapPolicyParams infoManagerTestPolicyPrams_ = {
-    .apl = APL_NORMAL,
+    .apl = APL_SYSTEM_CORE,
     .domain = "test.domain",
     .permList = { infoManagerTestPermDef_, infoManagerTestPermDef_},
     .permStateList = { infoManagerTestState_, inputDispatchControlPermState_}
@@ -89,7 +89,8 @@ HapInfoParams infoManagerTestInfoParms_ = {
     .bundleName = "inputManager_test",
     .userID = 1,
     .instIndex = 0,
-    .appIDDesc = "InputManagerTest"
+    .appIDDesc = "InputManagerTest",
+    .isSystemApp = true
 };
 } // namespace
 enum class TestScene : int32_t {
@@ -195,11 +196,7 @@ void TestSimulateInputEvent(EventType& event, const TestScene& testScene = TestS
 template<typename EventType>
 void SimulateInputEventUtilTest(EventType& event)
 {
-    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        TestSimulateInputEvent(event, TestScene::EXCEPTION_TEST);
-    } else {
-        TestSimulateInputEvent(event);
-    }
+    TestSimulateInputEvent(event);
 }
 void DumpWindowData(const std::shared_ptr<PointerEvent>& pointerEvent);
 class AccessMonitor {
@@ -209,7 +206,7 @@ public:
         currentId_ = GetSelfTokenID();
         AccessTokenIDEx tokenIdEx = { 0 };
         tokenIdEx = AccessTokenKit::AllocHapToken(infoManagerTestInfoParms_, infoManagerTestPolicyPrams_);
-        monitorId_ = tokenIdEx.tokenIdExStruct.tokenID;
+        monitorId_ = tokenIdEx.tokenIDEx;
         SetSelfTokenID(monitorId_);
     }
     ~AccessMonitor()
@@ -218,8 +215,8 @@ public:
         SetSelfTokenID(currentId_);
     }
 private:
-    AccessTokenID currentId_ { 0 };
-    AccessTokenID monitorId_ { 0 };
+    uint64_t currentId_ { 0 };
+    uint64_t monitorId_ { 0 };
 };
 } // namespace MMI
 } // namespace OHOS
