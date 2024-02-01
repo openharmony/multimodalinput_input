@@ -165,6 +165,96 @@ HWTEST_F(InputManagerTest, InputManager_NotResponse_002, TestSize.Level1)
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
 }
 
+#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
+/**
+ * @tc.name: InputManagerTest_InterceptTabletToolEvent_001
+ * @tc.desc: Verify intercepting tablet tool event
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_InterceptTabletToolEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto interceptor = GetPtr<InputEventCallback>();
+    int32_t interceptorId{InputManager::GetInstance()->AddInterceptor(interceptor)};
+    EXPECT_TRUE(IsValidHandlerId(interceptorId));
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+    auto pointerEvent = InputManagerUtil::SetupTabletToolEvent001();
+    ASSERT_NE(pointerEvent, nullptr);
+    TestSimulateInputEvent(pointerEvent);
+
+    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
+    TestSimulateInputEvent(pointerEvent);
+#endif  // OHOS_BUILD_ENABLE_TOUCH
+
+    if (IsValidHandlerId(interceptorId)) {
+        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
+        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    }
+}
+#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
+
+#ifdef OHOS_BUILD_ENABLE_TOUCH
+HWTEST_F(InputManagerTest, AppendExtraData_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto consumer = GetPtr<InputEventConsumer>();
+    ASSERT_TRUE(consumer != nullptr);
+    const std::string threadTest = "EventUtilTest";
+    auto runner = AppExecFwk::EventRunner::Create(threadTest);
+    ASSERT_TRUE(runner != nullptr);
+    auto eventHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
+    MMI::InputManager::GetInstance()->SetWindowInputEventConsumer(consumer, eventHandler);
+    std::vector<uint8_t> buffer(BUFFER_SIZE, 1);
+    ExtraData extraData;
+    extraData.appended = true;
+    extraData.buffer = buffer;
+    extraData.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
+    extraData.pointerId = 1;
+    InputManager::GetInstance()->AppendExtraData(extraData);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    auto pointerEvent = InputManagerUtil::SetupPointerEvent001();
+    pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
+
+    extraData.appended = false;
+    extraData.buffer.clear();
+    extraData.pointerId = INVAID_VALUE;
+    InputManager::GetInstance()->AppendExtraData(extraData);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    ASSERT_TRUE(pointerEvent != nullptr);
+    SimulateInputEventUtilTest(pointerEvent);
+}
+#endif  // OHOS_BUILD_ENABLE_TOUCH
+
+#ifdef OHOS_BUILD_ENABLE_POINTER
+HWTEST_F(InputManagerTest, AppendExtraData_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    std::vector<uint8_t> buffer(BUFFER_SIZE, 1);
+    ExtraData extraData;
+    extraData.appended = true;
+    extraData.buffer = buffer;
+    extraData.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
+    InputManager::GetInstance()->AppendExtraData(extraData);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    auto pointerEvent = InputManagerUtil::SetupPointerEvent006();
+    pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
+    ASSERT_TRUE(pointerEvent != nullptr);
+    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
+
+    extraData.appended = false;
+    extraData.buffer.clear();
+    InputManager::GetInstance()->AppendExtraData(extraData);
+    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
+    ASSERT_TRUE(pointerEvent != nullptr);
+    SimulateInputEventUtilTest(pointerEvent);
+}
+#endif  // OHOS_BUILD_ENABLE_POINTER
+
 /**
  * @tc.name: InputManagerTest_SubscribeKeyEvent_001
  * @tc.desc: Verify invalid parameter.
@@ -1058,96 +1148,6 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetAnrObserver, TestSize.Level1)
     std::shared_ptr<IAnrObserverTest> observer = std::make_shared<IAnrObserverTest>();
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->SetAnrObserver(observer));
 }
-
-#ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
-/**
- * @tc.name: InputManagerTest_InterceptTabletToolEvent_001
- * @tc.desc: Verify intercepting tablet tool event
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputManagerTest, InputManagerTest_InterceptTabletToolEvent_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto interceptor = GetPtr<InputEventCallback>();
-    int32_t interceptorId{InputManager::GetInstance()->AddInterceptor(interceptor)};
-    EXPECT_TRUE(IsValidHandlerId(interceptorId));
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-    auto pointerEvent = InputManagerUtil::SetupTabletToolEvent001();
-    ASSERT_NE(pointerEvent, nullptr);
-    TestSimulateInputEvent(pointerEvent);
-
-    pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
-    TestSimulateInputEvent(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_TOUCH
-
-    if (IsValidHandlerId(interceptorId)) {
-        InputManager::GetInstance()->RemoveInterceptor(interceptorId);
-        std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    }
-}
-#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
-
-#ifdef OHOS_BUILD_ENABLE_TOUCH
-HWTEST_F(InputManagerTest, AppendExtraData_001, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    auto consumer = GetPtr<InputEventConsumer>();
-    ASSERT_TRUE(consumer != nullptr);
-    const std::string threadTest = "EventUtilTest";
-    auto runner = AppExecFwk::EventRunner::Create(threadTest);
-    ASSERT_TRUE(runner != nullptr);
-    auto eventHandler = std::make_shared<AppExecFwk::EventHandler>(runner);
-    MMI::InputManager::GetInstance()->SetWindowInputEventConsumer(consumer, eventHandler);
-    std::vector<uint8_t> buffer(BUFFER_SIZE, 1);
-    ExtraData extraData;
-    extraData.appended = true;
-    extraData.buffer = buffer;
-    extraData.sourceType = PointerEvent::SOURCE_TYPE_TOUCHSCREEN;
-    extraData.pointerId = 1;
-    InputManager::GetInstance()->AppendExtraData(extraData);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    auto pointerEvent = InputManagerUtil::SetupPointerEvent001();
-    pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
-    ASSERT_TRUE(pointerEvent != nullptr);
-    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
-
-    extraData.appended = false;
-    extraData.buffer.clear();
-    extraData.pointerId = INVAID_VALUE;
-    InputManager::GetInstance()->AppendExtraData(extraData);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    ASSERT_TRUE(pointerEvent != nullptr);
-    SimulateInputEventUtilTest(pointerEvent);
-}
-#endif  // OHOS_BUILD_ENABLE_TOUCH
-
-#ifdef OHOS_BUILD_ENABLE_POINTER
-HWTEST_F(InputManagerTest, AppendExtraData_002, TestSize.Level1)
-{
-    CALL_TEST_DEBUG;
-    std::vector<uint8_t> buffer(BUFFER_SIZE, 1);
-    ExtraData extraData;
-    extraData.appended = true;
-    extraData.buffer = buffer;
-    extraData.sourceType = PointerEvent::SOURCE_TYPE_MOUSE;
-    InputManager::GetInstance()->AppendExtraData(extraData);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    auto pointerEvent = InputManagerUtil::SetupPointerEvent006();
-    pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
-    ASSERT_TRUE(pointerEvent != nullptr);
-    TestSimulateInputEvent(pointerEvent, TestScene::EXCEPTION_TEST);
-
-    extraData.appended = false;
-    extraData.buffer.clear();
-    InputManager::GetInstance()->AppendExtraData(extraData);
-    std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    ASSERT_TRUE(pointerEvent != nullptr);
-    SimulateInputEventUtilTest(pointerEvent);
-}
-#endif  // OHOS_BUILD_ENABLE_POINTER
 
 /**
  * @tc.name: InputManagerTest_EnableInputDevice_001
