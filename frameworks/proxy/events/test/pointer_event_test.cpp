@@ -927,5 +927,86 @@ HWTEST_F(PointerEventTest, PointerEventTest_IsValid_001, TestSize.Level1)
     pointerEvent->AddPointerItem(item);
     ASSERT_TRUE(pointerEvent->IsValid());
 }
+
+
+/**
+ * @tc.name: PointerEventTest_GetFingerCount_001
+ * @tc.desc: Sets the fingerCount for this event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetFingerCount_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetFingerCount(-12);
+    int32_t fingerCount = pointerEvent->GetFingerCount();
+    ASSERT_EQ(fingerCount, -12);
+}
+
+/**
+ * @tc.name: PointerEventTest_GetFingerCount_002
+ * @tc.desc: Sets the fingerCount for this event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetFingerCount_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetFingerCount(-6);
+    int32_t fingerCount = pointerEvent->GetFingerCount();
+    ASSERT_EQ(fingerCount, -6);
+}
+
+/**
+ * @tc.name: PointerEventTest_GetFingerCount_003
+ * @tc.desc: Sets the fingerCount for this event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetFingerCount_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetFingerCount(0);
+    int32_t fingerCount = pointerEvent->GetFingerCount();
+    ASSERT_EQ(fingerCount, 0);
+}
+
+/**
+ * @tc.name: PointerEventTest_GetFingerCount_004
+ * @tc.desc: Sets the fingerCount for this event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetFingerCount_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetFingerCount(6);
+    int32_t fingerCount = pointerEvent->GetFingerCount();
+    ASSERT_EQ(fingerCount, 6);
+}
+
+/**
+ * @tc.name: PointerEventTest_GetFingerCount_005
+ * @tc.desc: Sets the fingerCount for this event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetFingerCount_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetFingerCount(12);
+    int32_t fingerCount = pointerEvent->GetFingerCount();
+    ASSERT_EQ(fingerCount, 12);
+}
 } // namespace MMI
 } // namespace OHOS
