@@ -63,13 +63,13 @@ public:
     std::string GetEventDump();
 
 private:
-    int32_t g_keyboardRepeatRate_ { 50 };
-    int32_t g_keyboardRepeatDelay_ { 500 };
+    int32_t keyboardRepeatRate_ { 50 };
+    int32_t keyboardRepeatDelay_ { 500 };
 };
 
 class MMIWindowChecker : public MMI::IWindowChecker {
 public:
-    virtual int32_t CheckWindowId(int32_t windowId) const override;
+    int32_t CheckWindowId(int32_t windowId) const override;
 };
 
 class IEventObserver : public MMI::MMIEventObserver {
@@ -377,7 +377,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoteControlAutoRepeat, TestSize.Le
 #endif  // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
-static int32_t deviceIDtest = 0;
+static int32_t g_deviceIDtest = 0;
 static void GetKeyboardTypeCallback(int32_t keyboardType)
 {
     switch (keyboardType) {
