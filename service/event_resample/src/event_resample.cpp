@@ -152,7 +152,7 @@ bool EventResample::UpdateBatch(MotionEvent** outEvent, ErrCode &result)
         Batch& batch = batches_.at(batchIndex);
         if (CanAddSample(batch, inputEvent_)) {
             batch.samples.push_back(inputEvent_);
-            MMI_HILOGD("Event added to batch: %{public}d %{public}d %{public}d",
+            MMI_HILOGD("Event added to batch:%{public}d %{public}d %{public}d",
                        inputEvent_.deviceId, inputEvent_.sourceType, inputEvent_.pointerAction);
             return true;
         }
@@ -197,7 +197,7 @@ void EventResample::UpdatePointerEvent(MotionEvent* outEvent)
             } else if (PointerEvent::POINTER_ACTION_UP == outEvent->pointerAction) {
                 item.SetPressed(false);
             } else {
-                MMI_HILOGD("Output event: Pointer action: %{public}d", outEvent->pointerAction);
+                MMI_HILOGD("Output event:Pointer action:%{public}d", outEvent->pointerAction);
             }
             pointerEvent_->UpdatePointerItem(it.first, item);
         }
@@ -504,6 +504,16 @@ bool EventResample::ShouldResampleTool(int32_t toolType)
         default:
             return false;
     }
+}
+
+void EventResample::PrintfDeviceName()
+{
+    auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId);
+    if(device == nullptr){
+        MMI_HILOGW("The device is not found");
+        return;
+    }
+    MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
 }
 
 } // namespace MMI
