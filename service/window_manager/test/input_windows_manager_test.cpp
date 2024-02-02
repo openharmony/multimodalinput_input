@@ -50,6 +50,8 @@ public:
             info.pointerHotAreas = { info.area };
             info.agentWindowId = 1;
             info.flags = 1;
+            info.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+            info.pointerHotAreas = {1, 2, 1, 2};
             displayGroupInfo.windowsInfo.push_back(info);
         }
         for (uint32_t i = 0; i < num; i++) {
@@ -63,6 +65,7 @@ public:
             info.name = "pp";
             info.uniq = "pp";
             info.direction = DIRECTION0;
+            info.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
             displayGroupInfo.displaysInfo.push_back(info);
         }
         WinMgr->UpdateDisplayInfo(displayGroupInfo);
