@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <semaphore.h>
+
 #include "event_log_helper.h"
 #include "event_util_test.h"
 #include "input_manager_util.h"
@@ -1854,6 +1856,96 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetWindowPointerStyle_001, TestSize.
     InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::FOCUS_ON_BOTTOM_LEFT, getpid(), windowId);
     InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::TOP_LIMIT, getpid(), windowId);
     InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::BOTTOM_RIGHT_LIMIT, getpid(), windowId);
+}
+
+/**
+ * @tc.name: InputManagerTest_RemoveInputEventFilter_001
+ * @tc.desc: When eventFilterService is empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_RemoveInputEventFilter_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = InputManager::GetInstance()->RemoveInputEventFilter(-1);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->RemoveInputEventFilter(0);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->RemoveInputEventFilter(1);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_RemoveInputEventFilter_002
+ * @tc.desc: When the eventFilterService is full
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_RemoveInputEventFilter_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    struct KeyFilter : public IInputEventFilter {
+        bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
+        {
+            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
+            return false;
+        }
+        bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+        {
+            return false;
+        }
+    };
+    auto addFilter = []() -> int32_t {
+        auto filter = std::make_shared<KeyFilter>();
+        uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+        const int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, 220, touchTags);
+        return filterId;
+    };
+    const size_t singleClientSuportMaxNum = 4;
+    for (size_t i = 0; i < singleClientSuportMaxNum; ++i) {
+        int32_t filterId = addFilter();
+        ASSERT_NE(filterId, RET_ERR);
+    }
+    int32_t filterId = addFilter();
+    ASSERT_EQ(filterId, RET_ERR);
+    auto ret = InputManager::GetInstance()->RemoveInputEventFilter(RET_ERR);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_RemoveInputEventFilter_003
+ * @tc.desc: Verify valid parameter.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_RemoveInputEventFilter_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    struct KeyFilter : public IInputEventFilter {
+        bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
+        {
+            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
+            return false;
+        }
+        bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+        {
+            return false;
+        }
+    };
+    auto addFilter = []() -> int32_t {
+        auto filter = std::make_shared<KeyFilter>();
+        uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+        int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, 220, touchTags);
+        return filterId;
+    };
+    int32_t filterId = addFilter();
+    ASSERT_NE(filterId, RET_ERR);
+    auto ret = InputManager::GetInstance()->RemoveInputEventFilter(filterId);
+    ASSERT_EQ(ret, RET_OK);
+    filterId = addFilter();
+    ASSERT_NE(filterId, RET_ERR);
+    ret = InputManager::GetInstance()->RemoveInputEventFilter(filterId);
+    ASSERT_EQ(ret, RET_OK);
 }
 }  // namespace MMI
 }  // namespace OHOS

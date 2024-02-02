@@ -977,6 +977,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_ClearBuffer_001, TestSize.Level1)
     std::vector<uint8_t> buffer = pointerEvent->GetBuffer();
     ASSERT_NE(buffer.size(), 0);
     pointerEvent->ClearBuffer();
+    buffer = pointerEvent->GetBuffer();
     ASSERT_EQ(buffer.size(), 0);
 }
 } // namespace MMI
