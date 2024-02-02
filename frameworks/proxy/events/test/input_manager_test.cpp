@@ -1749,7 +1749,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetShieldStatus_001, TestSize.Level1
 
 /**
  * @tc.name: InputManager_SimulateInputEvent_001
- * @tc.desc: detection of not response
+ * @tc.desc: Set SourceType to SOURCE_TYPE_MOUSE
  * @tc.type: FUNC
  * @tc.require:SR000GGN6G
  */
@@ -1764,7 +1764,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_001, TestSize.Level1)
 
 /**
  * @tc.name: InputManager_SimulateInputEvent_002
- * @tc.desc: detection of not response
+ * @tc.desc: Set SourceType to SOURCE_TYPE_TOUCHPAD
  * @tc.type: FUNC
  * @tc.require:SR000GGN6G
  */
@@ -1779,7 +1779,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_002, TestSize.Level1)
 
 /**
  * @tc.name: InputManager_SimulateInputEvent_003
- * @tc.desc: detection of not response
+ * @tc.desc: Set SourceType to SOURCE_TYPE_TOUCHSCREEN
  * @tc.type: FUNC
  * @tc.require:SR000GGN6G
  */
@@ -1794,7 +1794,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_003, TestSize.Level1)
 
 /**
  * @tc.name: InputManager_SimulateInputEvent_004
- * @tc.desc: detection of not response
+ * @tc.desc: Set SourceType to SOURCE_TYPE_JOYSTICK
  * @tc.type: FUNC
  * @tc.require:SR000GGN6G
  */
@@ -1809,7 +1809,7 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_004, TestSize.Level1)
 
 /**
  * @tc.name: InputManager_SimulateInputEvent_005
- * @tc.desc: detection of not response
+ * @tc.desc: Set SourceType to invalid
  * @tc.type: FUNC
  * @tc.require:SR000GGN6G
  */
@@ -1820,6 +1820,20 @@ HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_005, TestSize.Level1)
     ASSERT_NE(pointerEvent, nullptr);
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateInputEvent_001
+ * @tc.desc: SimulateInputEvent interface detection
+ * @tc.type: FUNC
+ * @tc.require:SR000GGN6G
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateInputKeyEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
 }
 }  // namespace MMI
 }  // namespace OHOS
