@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include <semaphore.h>
+
 #include "event_log_helper.h"
 #include "event_util_test.h"
 #include "input_manager_util.h"
@@ -61,13 +63,13 @@ public:
     std::string GetEventDump();
 
 private:
-    int32_t g_keyboardRepeatRate_ { 50 };
-    int32_t g_keyboardRepeatDelay_ { 500 };
+    int32_t keyboardRepeatRate_ { 50 };
+    int32_t keyboardRepeatDelay_ { 500 };
 };
 
 class MMIWindowChecker : public MMI::IWindowChecker {
 public:
-    virtual int32_t CheckWindowId(int32_t windowId) const override;
+    int32_t CheckWindowId(int32_t windowId) const override;
 };
 
 class IEventObserver : public MMI::MMIEventObserver {
@@ -104,8 +106,8 @@ void InputManagerTest::TearDown()
 {
     TestUtil->AddEventDump("");
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-    InputManager::GetInstance()->SetKeyboardRepeatDelay(g_keyboardRepeatDelay_);
-    InputManager::GetInstance()->SetKeyboardRepeatRate(g_keyboardRepeatRate_);
+    InputManager::GetInstance()->SetKeyboardRepeatDelay(keyboardRepeatDelay_);
+    InputManager::GetInstance()->SetKeyboardRepeatRate(keyboardRepeatRate_);
 }
 
 std::string InputManagerTest::GetEventDump()
@@ -375,32 +377,32 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoteControlAutoRepeat, TestSize.Le
 #endif  // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
-static int32_t deviceIDtest = 0;
+static int32_t g_deviceIDtest = 0;
 static void GetKeyboardTypeCallback(int32_t keyboardType)
 {
     switch (keyboardType) {
         case KEYBOARD_TYPE_NONE: {
-            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType:%{public}s", deviceIDtest, "None");
+            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "None");
             break;
         }
         case KEYBOARD_TYPE_UNKNOWN: {
-            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType:%{public}s", deviceIDtest, "unknown");
+            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "unknown");
             break;
         }
         case KEYBOARD_TYPE_ALPHABETICKEYBOARD: {
-            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType:%{public}s", deviceIDtest, "alphabetickeyboard");
+            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "alphabetickeyboard");
             break;
         }
         case KEYBOARD_TYPE_DIGITALKEYBOARD: {
-            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType:%{public}s", deviceIDtest, "digitalkeyboard");
+            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "digitalkeyboard");
             break;
         }
         case KEYBOARD_TYPE_HANDWRITINGPEN: {
-            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType:%{public}s", deviceIDtest, "handwritingpen");
+            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "handwritingpen");
             break;
         }
         case KEYBOARD_TYPE_REMOTECONTROL: {
-            MMI_HILOGD("deviceIDtest:%{public}d-->KeyboardType:%{public}s", deviceIDtest, "remotecontrol");
+            MMI_HILOGD("g_deviceIDtest:%{public}d-->KeyboardType:%{public}s", g_deviceIDtest, "remotecontrol");
             break;
         }
         default: {
@@ -420,7 +422,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_GetKeyboardType, TestSize.Level1)
 {
     MMI_HILOGD("Start InputManagerTest_GetKeyboardType");
     for (int32_t i = 0; i < KEYBOARD_TYPE_SIZE; ++i) {
-        deviceIDtest = i;
+        g_deviceIDtest = i;
         ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->GetKeyboardType(i, GetKeyboardTypeCallback));
         MMI_HILOGD("i:%{public}d", i);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -1745,6 +1747,205 @@ HWTEST_F(InputManagerTest, InputManagerTest_SetShieldStatus_001, TestSize.Level1
     ASSERT_EQ(ret, RET_OK);
     ASSERT_FALSE(factoryModeStatus);
     ASSERT_FALSE(oobeModeStatus);
+}
+
+/**
+ * @tc.name: InputManager_SimulateInputEvent_001
+ * @tc.desc: Set SourceType to SOURCE_TYPE_MOUSE
+ * @tc.type: FUNC
+ * @tc.require:SR000GGN6G
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateInputEvent_002
+ * @tc.desc: Set SourceType to SOURCE_TYPE_TOUCHPAD
+ * @tc.type: FUNC
+ * @tc.require:SR000GGN6G
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_002, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateInputEvent_003
+ * @tc.desc: Set SourceType to SOURCE_TYPE_TOUCHSCREEN
+ * @tc.type: FUNC
+ * @tc.require:SR000GGN6G
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_003, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateInputEvent_004
+ * @tc.desc: Set SourceType to SOURCE_TYPE_JOYSTICK
+ * @tc.type: FUNC
+ * @tc.require:SR000GGN6G
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_004, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_JOYSTICK);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateInputEvent_005
+ * @tc.desc: Set SourceType to invalid
+ * @tc.type: FUNC
+ * @tc.require:SR000GGN6G
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateInputEvent_005, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_UNKNOWN);
+    InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
+}
+
+/**
+ * @tc.name: InputManager_SimulateInputEvent_001
+ * @tc.desc: SimulateInputEvent interface detection
+ * @tc.type: FUNC
+ * @tc.require:SR000GGN6G
+ */
+HWTEST_F(InputManagerTest, InputManager_SimulateInputKeyEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto keyEvent = KeyEvent::Create();
+    ASSERT_NE(keyEvent, nullptr);
+    InputManager::GetInstance()->SimulateInputEvent(keyEvent);
+}
+
+/**
+ * @tc.name: InputManagerTest_SetWindowPointerStyle_001
+ * @tc.desc: Verify valid parameter.
+ * @tc.type: FUNC
+ * @tc.require:SR000GGQL4  AR000GJNGN
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_SetWindowPointerStyle_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto window = WindowUtilsTest::GetInstance()->GetWindow();
+    CHKPV(window);
+    uint32_t windowId = window->GetWindowId();
+    InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::ENTER, getpid(), windowId);
+    InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::FOCUS_ON_TOP, getpid(), windowId);
+    InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::FOCUS_ON_RIGHT, getpid(), windowId);
+    InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::FOCUS_ON_BOTTOM_LEFT, getpid(), windowId);
+    InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::TOP_LIMIT, getpid(), windowId);
+    InputManager::GetInstance()->SetWindowPointerStyle(WindowArea::BOTTOM_RIGHT_LIMIT, getpid(), windowId);
+}
+
+/**
+ * @tc.name: InputManagerTest_RemoveInputEventFilter_001
+ * @tc.desc: When eventFilterService is empty
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_RemoveInputEventFilter_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    int32_t ret = InputManager::GetInstance()->RemoveInputEventFilter(-1);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->RemoveInputEventFilter(0);
+    ASSERT_EQ(ret, RET_OK);
+    ret = InputManager::GetInstance()->RemoveInputEventFilter(1);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_RemoveInputEventFilter_002
+ * @tc.desc: When the eventFilterService is full
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_RemoveInputEventFilter_002, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    struct KeyFilter : public IInputEventFilter {
+        bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
+        {
+            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
+            return false;
+        }
+        bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+        {
+            return false;
+        }
+    };
+    auto addFilter = []() -> int32_t {
+        auto filter = std::make_shared<KeyFilter>();
+        uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+        const int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, 220, touchTags);
+        return filterId;
+    };
+    const size_t singleClientSuportMaxNum = 4;
+    for (size_t i = 0; i < singleClientSuportMaxNum; ++i) {
+        int32_t filterId = addFilter();
+        ASSERT_NE(filterId, RET_ERR);
+    }
+    int32_t filterId = addFilter();
+    ASSERT_EQ(filterId, RET_ERR);
+    auto ret = InputManager::GetInstance()->RemoveInputEventFilter(RET_ERR);
+    ASSERT_EQ(ret, RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerTest_RemoveInputEventFilter_003
+ * @tc.desc: Verify valid parameter.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_RemoveInputEventFilter_003, TestSize.Level1)
+{
+    CALL_DEBUG_ENTER;
+    struct KeyFilter : public IInputEventFilter {
+        bool OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override
+        {
+            MMI_HILOGI("KeyFilter::OnInputEvent enter,pid: %{public}d", getpid());
+            return false;
+        }
+        bool OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+        {
+            return false;
+        }
+    };
+    auto addFilter = []() -> int32_t {
+        auto filter = std::make_shared<KeyFilter>();
+        uint32_t touchTags = CapabilityToTags(InputDeviceCapability::INPUT_DEV_CAP_MAX);
+        int32_t filterId = InputManager::GetInstance()->AddInputEventFilter(filter, 220, touchTags);
+        return filterId;
+    };
+    int32_t filterId = addFilter();
+    ASSERT_NE(filterId, RET_ERR);
+    auto ret = InputManager::GetInstance()->RemoveInputEventFilter(filterId);
+    ASSERT_EQ(ret, RET_OK);
+    filterId = addFilter();
+    ASSERT_NE(filterId, RET_ERR);
+    ret = InputManager::GetInstance()->RemoveInputEventFilter(filterId);
+    ASSERT_EQ(ret, RET_OK);
 }
 }  // namespace MMI
 }  // namespace OHOS
