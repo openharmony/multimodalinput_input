@@ -224,6 +224,7 @@ ohos_shared_library("libmmi-server") {
     "common_event_service:cesfwk_innerkits",
     "config_policy:configpolicy_util",
     "data_share:datashare_consumer",
+    "faultloggerd:libbacktrace_local",
     "graphic_2d:2d_graphics",
     "graphic_2d:librender_service_client",
     "hicollie:libhicollie",

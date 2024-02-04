@@ -927,5 +927,58 @@ HWTEST_F(PointerEventTest, PointerEventTest_IsValid_001, TestSize.Level1)
     pointerEvent->AddPointerItem(item);
     ASSERT_TRUE(pointerEvent->IsValid());
 }
+
+/**
+ * @tc.name: PointerEventTest_GetFingerCount_001
+ * @tc.desc: Sets the fingerCount for this event.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_GetFingerCount_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    pointerEvent->SetFingerCount(-12);
+    int32_t fingerCount = pointerEvent->GetFingerCount();
+    ASSERT_EQ(fingerCount, -12);
+    pointerEvent->SetFingerCount(-6);
+    fingerCount = pointerEvent->GetFingerCount();
+    ASSERT_EQ(fingerCount, -6);
+    pointerEvent->SetFingerCount(0);
+    fingerCount = pointerEvent->GetFingerCount();
+    ASSERT_EQ(fingerCount, 0);
+    pointerEvent->SetFingerCount(6);
+    fingerCount = pointerEvent->GetFingerCount();
+    ASSERT_EQ(fingerCount, 6);
+    pointerEvent->SetFingerCount(12);
+    fingerCount = pointerEvent->GetFingerCount();
+    ASSERT_EQ(fingerCount, 12);
+}
+
+/**
+ * @tc.name: PointerEventTest_ClearBuffer_001
+ * @tc.desc: Clear the buffer data.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(PointerEventTest, PointerEventTest_ClearBuffer_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto pointerEvent = PointerEvent::Create();
+    ASSERT_NE(pointerEvent, nullptr);
+    uint32_t enHanceDataLen = 3;
+    uint8_t enhanceDataBuf[enHanceDataLen];
+    std::vector<uint8_t> enhanceData;
+    for (uint32_t i = 0; i < enHanceDataLen; i++) {
+        enhanceData.push_back(enhanceDataBuf[i]);
+    }
+    pointerEvent->SetBuffer(enhanceData);
+    std::vector<uint8_t> buffer = pointerEvent->GetBuffer();
+    ASSERT_NE(buffer.size(), 0);
+    pointerEvent->ClearBuffer();
+    buffer = pointerEvent->GetBuffer();
+    ASSERT_EQ(buffer.size(), 0);
+}
 } // namespace MMI
 } // namespace OHOS

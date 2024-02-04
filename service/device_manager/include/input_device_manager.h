@@ -59,7 +59,7 @@ public:
     void Attach(std::shared_ptr<IDeviceObserver> observer);
     void Detach(std::shared_ptr<IDeviceObserver> observer);
     void NotifyPointerDevice(bool hasPointerDevice, bool isVisible);
-    void AddDevListener(SessionPtr sess, std::function<void(int32_t, const std::string&)> callback);
+    void AddDevListener(SessionPtr sess);
     void RemoveDevListener(SessionPtr sess);
     void Dump(int32_t fd, const std::vector<std::string> &args);
     void DumpDeviceList(int32_t fd, const std::vector<std::string> &args);
@@ -87,14 +87,18 @@ private:
     void FillInputDevice(std::shared_ptr<InputDevice> inputDevice, libinput_device *deviceOrigin) const;
     std::string GetInputIdentification(struct libinput_device* inputDevice);
     void NotifyDevCallback(int32_t deviceId,  struct InputDeviceInfo inDevice);
+    int32_t NotifyMessage(SessionPtr sess, int32_t id, const std::string &type);
+    void InitSessionLostCallback();
+    void OnSessionLost(SessionPtr session);
 private:
     std::map<int32_t, struct InputDeviceInfo> inputDevice_;
     std::map<std::string, std::string> inputDeviceScreens_;
     std::list<std::shared_ptr<IDeviceObserver>> observers_;
-    std::map<SessionPtr, std::function<void(int32_t, const std::string&)>> devListener_;
+    std::list<SessionPtr> devListener_;
     inputDeviceCallback devCallbacks_ { nullptr };
     std::map<int32_t, std::string> displayInputBindInfos_;
     DeviceConfigManagement configManagement_;
+    bool sessionLostCallbackInitialized_ { false };
 };
 
 #define InputDevMgr ::OHOS::DelayedSingleton<InputDeviceManager>::GetInstance()
