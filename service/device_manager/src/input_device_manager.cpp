@@ -22,12 +22,15 @@
 
 #include "dfx_hisysevent.h"
 #include "event_dispatch_handler.h"
+#include "input_event_handler.h"
 #include "input_windows_manager.h"
 #include "key_auto_repeat.h"
 #include "key_event_normalize.h"
 #include "key_event_value_transformation.h"
 #include "key_map_manager.h"
+#include "net_packet.h"
 #include "pointer_drawing_manager.h"
+#include "proto.h"
 #include "util_ex.h"
 #include "util_napi_error.h"
 
@@ -264,26 +267,18 @@ void InputDeviceManager::SetInputStatusChangeCallback(inputDeviceCallback callba
     devCallbacks_ = callback;
 }
 
-void InputDeviceManager::AddDevListener(SessionPtr sess, std::function<void(int32_t, const std::string &)> callback)
+void InputDeviceManager::AddDevListener(SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
-    auto ret = devListener_.insert({ sess, callback });
-    if (!ret.second) {
-        MMI_HILOGE("Session is duplicated");
-        return;
-    }
+    InitSessionLostCallback();
+    devListener_.push_back(sess);
 }
 
 void InputDeviceManager::RemoveDevListener(SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
-    auto iter = devListener_.find(sess);
-    if (iter == devListener_.end()) {
-        MMI_HILOGE("Session does not exist");
-        return;
-    }
+    devListener_.remove(sess);
     MMI_HILOGI("sess with fd%{public}d with pid %{public}d has been deleted", sess->GetFd(), sess->GetPid());
-    devListener_.erase(iter);
 }
 
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
@@ -389,9 +384,9 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     MakeDeviceInfo(inputDevice, info);
     inputDevice_[deviceId] = info;
     if (info.enable) {
-        for (const auto &item : devListener_) {
-            CHKPC(item.first);
-            item.second(deviceId, "add");
+        for (const auto& item : devListener_) {
+            CHKPV(item);
+            NotifyMessage(item, deviceId, "add");
         }
     }
     NotifyDevCallback(deviceId, info);
@@ -458,9 +453,9 @@ void InputDeviceManager::OnInputDeviceRemoved(struct libinput_device *inputDevic
     }
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
     if (enable) {
-        for (const auto &item : devListener_) {
-            CHKPC(item.first);
-            item.second(deviceId, "remove");
+        for (const auto& item : devListener_) {
+            CHKPV(item);
+            NotifyMessage(item, deviceId, "remove");
         }
     }
     ScanPointerDevice();
@@ -660,13 +655,49 @@ int32_t InputDeviceManager::OnEnableInputDevice(bool enable)
             if (keyboardType != KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
                 continue;
             }
-            for (const auto &listener : devListener_) {
-                CHKPC(listener.first);
-                listener.second(item.first, enable ? "add" : "remove");
+            for (const auto& listener : devListener_) {
+                CHKPR(listener, ERROR_NULL_POINTER);
+                NotifyMessage(listener, item.first, enable ? "add" : "remove");
             }
         }
     }
     return RET_OK;
+}
+
+int32_t InputDeviceManager::NotifyMessage(SessionPtr sess, int32_t id, const std::string &type)
+{
+    CALL_DEBUG_ENTER;
+    CHKPR(sess, ERROR_NULL_POINTER);
+    NetPacket pkt(MmiMessageId::ADD_INPUT_DEVICE_LISTENER);
+    pkt << type << id;
+    if (pkt.ChkRWError()) {
+        MMI_HILOGE("Packet write data failed");
+        return RET_ERR;
+    }
+    if (!sess->SendMsg(pkt)) {
+        MMI_HILOGE("Sending failed");
+    }
+    return RET_OK;
+}
+
+void InputDeviceManager::InitSessionLostCallback()
+{
+    if (sessionLostCallbackInitialized_)  {
+        MMI_HILOGE("Init session is failed");
+        return;
+    }
+    auto udsServerPtr = InputHandler->GetUDSServer();
+    CHKPV(udsServerPtr);
+    udsServerPtr->AddSessionDeletedCallback(std::bind(
+        &InputDeviceManager::OnSessionLost, this, std::placeholders::_1));
+    sessionLostCallbackInitialized_ = true;
+    MMI_HILOGD("The callback on session deleted is registered successfully");
+}
+
+void InputDeviceManager::OnSessionLost(SessionPtr session)
+{
+    CALL_DEBUG_ENTER;
+    devListener_.remove(session);
 }
 } // namespace MMI
 } // namespace OHOS
