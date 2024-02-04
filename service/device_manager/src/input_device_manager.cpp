@@ -22,6 +22,7 @@
 
 #include "dfx_hisysevent.h"
 #include "event_dispatch_handler.h"
+#include "input_event_handler.h"
 #include "input_windows_manager.h"
 #include "key_auto_repeat.h"
 #include "key_event_normalize.h"
@@ -674,12 +675,28 @@ int32_t InputDeviceManager::NotifyMessage(SessionPtr sess, int32_t id, const std
     }
     if (!sess->SendMsg(pkt)) {
         MMI_HILOGE("Sending failed");
-        if (!sess->IsSocketValid()) {
-            MMI_HILOGE("sess fd:%{public}d pid:%{public}d is ENOSOCKET, delete it!", sess->GetFd(), sess->GetPid());
-            RemoveDevListener(sess);
-        }
     }
     return RET_OK;
+}
+
+void InputDeviceManager::InitSessionLostCallback()
+{
+    if (sessionLostCallbackInitialized_)  {
+        MMI_HILOGE("Init session is failed");
+        return;
+    }
+    auto udsServerPtr = InputHandler->GetUDSServer();
+    CHKPV(udsServerPtr);
+    udsServerPtr->AddSessionDeletedCallback(std::bind(
+        &InputDeviceManager::OnSessionLost, this, std::placeholders::_1));
+    sessionLostCallbackInitialized_ = true;
+    MMI_HILOGD("The callback on session deleted is registered successfully");
+}
+
+void InputDeviceManager::OnSessionLost(SessionPtr session)
+{
+    CALL_DEBUG_ENTER;
+    devListener_.remove(session);
 }
 } // namespace MMI
 } // namespace OHOS
