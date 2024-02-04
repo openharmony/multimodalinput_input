@@ -266,7 +266,7 @@ void InputDeviceManager::SetInputStatusChangeCallback(inputDeviceCallback callba
     devCallbacks_ = callback;
 }
 
-void InputDeviceManager::AddDevListener(SessionPtr sess, std::function<void(int32_t, const std::string &)> callback)
+void InputDeviceManager::AddDevListener(SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
     devListener_.push_back(sess);
@@ -652,10 +652,6 @@ int32_t InputDeviceManager::OnEnableInputDevice(bool enable)
             }
             if (keyboardType != KEYBOARD_TYPE_ALPHABETICKEYBOARD) {
                 continue;
-            }
-            for (const auto &listener : devListener_) {
-                CHKPC(listener.first);
-                listener.second(item.first, enable ? "add" : "remove");
             }
             for (const auto& listener : devListener_) {
                 CHKPR(listener, ERROR_NULL_POINTER);
