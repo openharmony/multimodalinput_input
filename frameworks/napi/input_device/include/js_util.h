@@ -42,6 +42,10 @@ public:
         int32_t keyboardRepeatDelay { 0 };
         int32_t keyboardRepeatRate { 0 };
     };
+    struct ReportData : RefBase {
+        napi_ref ref { nullptr };
+        int32_t deviceId { 0 };
+    };
     struct CallbackInfo : RefBase {
         napi_env env { nullptr };
         napi_ref ref { nullptr };
