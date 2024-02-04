@@ -168,6 +168,11 @@ void LibinputAdapter::ReloadDevice()
 void LibinputAdapter::OnDeviceAdded(std::string path)
 {
     CALL_DEBUG_ENTER;
+    auto pos = devices_.find(path);
+    if (pos != devices_.end()) {
+        MMI_HILOGD("Path is found");
+        return;
+    }
     libinput_device* device = libinput_path_add_device(input_, path.c_str());
     if (device != nullptr) {
         devices_[std::move(path)] = libinput_device_ref(device);
