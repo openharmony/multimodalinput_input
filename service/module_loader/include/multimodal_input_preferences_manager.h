@@ -78,7 +78,7 @@ private:
     const std::string pointerStyle = "pointerStyle";
 };
 
-#define PREFERENCES_MANAGER ::OHOS::DelayedSingleton<MultiModalInputPreferencesManager>::GetInstance()
+#define PreferencesMgr ::OHOS::DelayedSingleton<MultiModalInputPreferencesManager>::GetInstance()
 } // namespace MMI
 } // namespace OHOS
 #endif // MULTIMODAL_INPUT_PREFERENCES_MANAGER_H
