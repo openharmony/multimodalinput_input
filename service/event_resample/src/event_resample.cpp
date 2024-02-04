@@ -508,8 +508,8 @@ bool EventResample::ShouldResampleTool(int32_t toolType)
 
 void EventResample::PrintfDeviceName()
 {
-    auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId);
-    if(device == nullptr) {
+    auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
+    if (device == nullptr) {
         MMI_HILOGW("The device is not found");
         return;
     }
