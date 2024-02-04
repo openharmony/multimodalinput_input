@@ -270,6 +270,7 @@ void InputDeviceManager::SetInputStatusChangeCallback(inputDeviceCallback callba
 void InputDeviceManager::AddDevListener(SessionPtr sess)
 {
     CALL_DEBUG_ENTER;
+    InitSessionLostCallback();
     devListener_.push_back(sess);
 }
 
