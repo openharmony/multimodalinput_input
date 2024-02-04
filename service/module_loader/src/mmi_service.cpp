@@ -896,24 +896,7 @@ int32_t MMIService::OnRegisterDevListener(int32_t pid)
 {
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
-    InputDevMgr->AddDevListener(sess, [sess](int32_t id, const std::string &type) {
-        CALL_DEBUG_ENTER;
-        CHKPV(sess);
-        NetPacket pkt(MmiMessageId::ADD_INPUT_DEVICE_LISTENER);
-        pkt << type << id;
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet write data failed");
-            return;
-        }
-        if (!sess->SendMsg(pkt)) {
-            MMI_HILOGE("Sending failed");
-            if (!sess->IsSocketValid()) {
-                MMI_HILOGE("sess fd:%{public}d pid:%{public}d is ENOSOCKET, delete it!", sess->GetFd(), sess->GetPid());
-                InputDevMgr->RemoveDevListener(sess);
-            }
-            return;
-        }
-    });
+    InputDevMgr->AddDevListener(sess);
     return RET_OK;
 }
 
