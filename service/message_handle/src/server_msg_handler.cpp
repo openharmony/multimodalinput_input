@@ -226,8 +226,8 @@ int32_t ServerMsgHandler::OnDisplayInfo(SessionPtr sess, NetPacket &pkt)
     pkt >> num;
     for (uint32_t i = 0; i < num; i++) {
         DisplayInfo info;
-        pkt >> info.id >> info.x >> info.y >> info.width >> info.height
-            >> info.dpi >> info.name >> info.uniq >> info.direction >> info.displayMode;
+        pkt >> info.id >> info.x >> info.y >> info.width >> info.height >> info.dpi >> info.name
+            >> info.uniq >> info.direction >> info.displayDirection >> info.displayMode;
         displayGroupInfo.displaysInfo.push_back(info);
         if (pkt.ChkRWError()) {
         MMI_HILOGE("Packet read display info failed");
