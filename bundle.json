@@ -71,8 +71,7 @@
         "common_event_service",
         "data_share",
         "relational_store",
-        "ffrt",
-        "power_manager"
+        "ffrt"
       ],
       "third_party": [
         "cJSON",

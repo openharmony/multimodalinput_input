@@ -23,8 +23,6 @@
 #include "hotplug_detector.h"
 #include "libinput.h"
 #include "nocopyable.h"
-#include "power_mgr_client.h"
-#include "power_state_callback_stub.h"
 
 namespace OHOS {
 namespace MMI {
@@ -46,29 +44,13 @@ public:
         return std::array{fd_, hotplugDetector_.GetFd()};
     }
 
-    static bool CheckIsSleeping();
-
-private:
-    class LibinputAdapterPowerStateCallback : public PowerMgr::PowerStateCallbackStub {
-    public:
-        LibinputAdapterPowerStateCallback(LibinputAdapter* libinputAdapter_);
-        void OnPowerStateChanged(PowerMgr::PowerState state) override;
-
-    private:
-        LibinputAdapter* libinputAdapter_;
-    };
-
 private:
     void OnEventHandler();
     void OnDeviceAdded(std::string path);
     void OnDeviceRemoved(std::string path);
-    void SetCurrentPowerState(PowerMgr::PowerState state);
-    static PowerMgr::PowerState GetCurrentPowerState();
-    void SubscribePowerStateChangeEvents();
 
     int32_t fd_ { -1 };
     libinput *input_ { nullptr };
-    static PowerMgr::PowerState currentPowerState_;
 
     FunInputEvent funInputEvent_;
 
