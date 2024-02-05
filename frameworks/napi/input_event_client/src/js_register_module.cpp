@@ -30,7 +30,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "JSReg
 constexpr int32_t JS_CALLBACK_MOUSE_BUTTON_MIDDLE = 1;
 constexpr int32_t JS_CALLBACK_MOUSE_BUTTON_RIGHT = 2;
 
-std::map<JsJoystickEvent::Axis, PointerEvent::AxisType> JOYSTICK_AXIS_TYPE = {
+std::map<JsJoystickEvent::Axis, PointerEvent::AxisType> g_joystickAxisType = {
     { JsJoystickEvent::Axis::ABS_X, PointerEvent::AXIS_TYPE_ABS_X },
     { JsJoystickEvent::Axis::ABS_Y, PointerEvent::AXIS_TYPE_ABS_Y },
     { JsJoystickEvent::Axis::ABS_Z, PointerEvent::AXIS_TYPE_ABS_Z },
@@ -42,7 +42,7 @@ std::map<JsJoystickEvent::Axis, PointerEvent::AxisType> JOYSTICK_AXIS_TYPE = {
     { JsJoystickEvent::Axis::ABS_THROTTLE, PointerEvent::AXIS_TYPE_ABS_THROTTLE }
 };
 
-std::map<JsJoystickEvent::Button, int32_t> JOYSTICK_BUTTON_TYPE = {
+std::map<JsJoystickEvent::Button, int32_t> g_joystickButtonType = {
     { JsJoystickEvent::Button::BUTTON_TL2, PointerEvent::JOYSTICK_BUTTON_TL2 },
     { JsJoystickEvent::Button::BUTTON_TR2, PointerEvent::JOYSTICK_BUTTON_TR2 },
     { JsJoystickEvent::Button::BUTTON_TL, PointerEvent::JOYSTICK_BUTTON_TL },
@@ -501,7 +501,7 @@ static int32_t HandleJoystickButton(napi_env env, napi_value joystickHandle, std
         return RET_ERR;
     }
 
-    for (const auto &item : JOYSTICK_BUTTON_TYPE) {
+    for (const auto &item : g_joystickButtonType) {
         if (button == static_cast<int32_t>(item.first)) {
             pointerEvent->SetButtonId(item.second);
             break;
@@ -542,7 +542,7 @@ static int32_t HandleJoystickAction(napi_env env, napi_value joystickHandle, std
             break;
         }
         default: {
-            MMI_HILOGW("action is unknown");
+            MMI_HILOGW("action:%{public}d is unknown", action);
             break;
         }
     }
@@ -587,7 +587,7 @@ static int32_t HandleJoystickAxes(napi_env env, napi_value joystickHandle, std::
             MMI_HILOGE("Get axisValue failed");
             return RET_ERR;
         }
-        for (const auto &item : JOYSTICK_AXIS_TYPE) {
+        for (const auto &item : g_joystickAxisType) {
             if (axis == static_cast<int32_t>(item.first)) {
                 pointerEvent->SetAxisValue(item.second, axisValue);
             }
