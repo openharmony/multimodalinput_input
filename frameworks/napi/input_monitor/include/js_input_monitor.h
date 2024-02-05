@@ -113,7 +113,7 @@ private:
     int32_t TransformMultiTapEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t TransformJoystickPointerEvent(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     int32_t GetMousePointerItem(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
-    int32_t GetJoystickAction(int32_t action);
+    std::optional<int32_t> GetJoystickAction(int32_t action);
     int32_t GetJoystickButton(int32_t button);
     int32_t GetJoystickPointerItem(const std::shared_ptr<PointerEvent> pointerEvent, napi_value result);
     bool SetMouseProperty(const std::shared_ptr<PointerEvent> pointerEvent,
