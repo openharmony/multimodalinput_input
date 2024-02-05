@@ -83,7 +83,6 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
     {
         if (fd < 0) {
             return;
-
         }
         MMI_HILOGI("Libinput .close_restricted fd:%{public}d", fd);
         close(fd);
