@@ -152,6 +152,17 @@ public:
 
     static constexpr int32_t POINTER_ACTION_QUADTAP = 24;
 
+    /**
+     * Indicates that the hover action.
+     *
+     * @since 11
+     */
+    static constexpr int32_t POINTER_ACTION_HOVER_MOVE = 25;
+
+    static constexpr int32_t POINTER_ACTION_HOVER_ENTER = 26;
+
+    static constexpr int32_t POINTER_ACTION_HOVER_EXIT = 27;
+
     enum AxisType {
         /**
          * Indicates an unknown axis type. It is generally used as the initial value.
