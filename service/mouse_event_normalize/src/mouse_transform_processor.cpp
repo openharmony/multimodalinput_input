@@ -16,6 +16,7 @@
 #include "mouse_transform_processor.h"
 
 #include <cinttypes>
+#include <functional>
 
 #include "input-event-codes.h"
 
@@ -90,6 +91,11 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
 
     Offset offset = {libinput_event_pointer_get_dx_unaccelerated(data),
         libinput_event_pointer_get_dy_unaccelerated(data)};
+    auto displayInfo = WinMgr->GetPhysicalDisplay(currentDisplayId_);
+    CHKPR(displayInfo, ERROR_NULL_POINTER);
+    if (displayInfo->displayDirection == DIRECTION0) {
+        CalculateOffset(displayInfo->direction, offset);
+    }
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
@@ -112,6 +118,23 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     MMI_HILOGD("Change coordinate: x:%{public}lf, y:%{public}lf, currentDisplayId_:%{public}d",
         absolutionX_, absolutionY_, currentDisplayId_);
     return RET_OK;
+}
+
+void MouseTransformProcessor::CalculateOffset(Direction direction, Offset &offset)
+{
+    std::negate<double> neg;
+    if (direction == DIRECTION90) {
+        double tmp = offset.dx;
+        offset.dx = offset.dy;
+        offset.dy = neg(tmp);
+    } else if (direction == DIRECTION180) {
+        offset.dx = neg(offset.dx);
+        offset.dy = neg(offset.dy);
+    } else if (direction == DIRECTION270) {
+        double tmp = offset.dx;
+        offset.dx = neg(offset.dy);
+        offset.dy = tmp;
+    }
 }
 
 void MouseTransformProcessor::InitAbsolution()

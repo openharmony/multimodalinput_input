@@ -24,6 +24,7 @@
 #include "define_multimodal.h"
 
 #include "pointer_event.h"
+#include "window_info.h"
 
 namespace OHOS {
 
@@ -77,6 +78,7 @@ private:
     void HandleTouchpadLeftButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void HandleTouchpadTwoFingerButton(struct libinput_event_pointer* data, const int32_t evenType, uint32_t &button);
     void TransTouchpadRightButton(struct libinput_event_pointer* data, const int32_t type, uint32_t &button);
+    void CalculateOffset(Direction direction, Offset &offset);
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
