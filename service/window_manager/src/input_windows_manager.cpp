@@ -148,7 +148,6 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
             break;
         }
     }
-
     CHKPR(udsServer_, INVALID_FD);
     if (windowInfo != nullptr) {
         MMI_HILOGD("get pid:%{public}d from idxPidMap", windowInfo->pid);
@@ -2379,7 +2378,6 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
             mprintf(fd, "\t pointerHotAreas: x:%d | y:%d | width:%d | height:%d \t",
                     pointer.x, pointer.y, pointer.width, pointer.height);
         }
-
         std::string dump;
         dump += StringPrintf("\t pointerChangeAreas: ");
         for (const auto &it : item.pointerChangeAreas) {
