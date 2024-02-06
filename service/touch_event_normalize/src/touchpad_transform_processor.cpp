@@ -308,6 +308,7 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
     pointerEvent_->SetActionTime(GetSysClockTime());
     pointerEvent_->SetActionStartTime(time);
     pointerEvent_->SetPointerAction(action);
+    pointerEvent_->SetDeviceId(deviceId_);
 
     int32_t fingerCount = libinput_event_gesture_get_finger_count(gesture);
     if (fingerCount < 0 || fingerCount > FINGER_COUNT_MAX) {
@@ -340,7 +341,7 @@ int32_t TouchPadTransformProcessor::SetTouchPadSwipeData(struct libinput_event *
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHPAD);
 
     if (action == PointerEvent::POINTER_ACTION_SWIPE_BEGIN) {
-        MMI_HILOGE("lisenhao-app go in to report POINTER_ACTION_SWIPE_BEGIN");
+        MMI_HILOGE("Start report for POINTER_ACTION_SWIPE_BEGIN");
         DfxHisysevent::StatisticTouchpadGesture(pointerEvent_);
     }
 
@@ -539,12 +540,12 @@ int32_t TouchPadTransformProcessor::GetTouchpadPinchSwitch(bool &switchFlag)
 
 int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
 {
-    return PREFERENCES_MANAGER->SetBoolValue(key, TOUCHPAD_FILE_NAME, value);
+    return PreferencesMgr->SetBoolValue(key, TOUCHPAD_FILE_NAME, value);
 }
 
 int32_t TouchPadTransformProcessor::GetConfigDataFromDatabase(std::string &key, bool &value)
 {
-    value = PREFERENCES_MANAGER->GetBoolValue(key, true);
+    value = PreferencesMgr->GetBoolValue(key, true);
     return RET_OK;
 }
 

@@ -59,14 +59,6 @@ ohos_source_set("libmmi-common") {
   public_configs = [ ":libmmi_client_config" ]
   visibility = [ "${mmi_path}/*" ]
   stack_protector_ret = true
-  sanitize = {
-    integer_overflow = true
-    ubsan = true
-    boundary_sanitize = true
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
   external_deps = [
     "c_utils:utils",
     "ffrt:libffrt",
@@ -82,14 +74,6 @@ ohos_shared_library("libmmi-client") {
   version_script = "${mmi_path}/interfaces/native/innerkits/libmmi-client-map"
   innerapi_tags = [ "platformsdk" ]
   stack_protector_ret = true
-  sanitize = {
-    integer_overflow = true
-    ubsan = true
-    boundary_sanitize = true
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
 
   if (input_feature_interceptor) {
     sources += [ "event_handler/src/input_interceptor_manager.cpp" ]

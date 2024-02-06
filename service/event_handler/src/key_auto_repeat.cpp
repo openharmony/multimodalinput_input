@@ -246,12 +246,12 @@ int32_t KeyAutoRepeat::GetKeyboardRepeatRate(int32_t &rate)
 
 int32_t KeyAutoRepeat::PutConfigDataToDatabase(std::string &key, int32_t value)
 {
-    return PREFERENCES_MANAGER->SetIntValue(key, KEYBOARD_FILE_NAME, value);
+    return PreferencesMgr->SetIntValue(key, KEYBOARD_FILE_NAME, value);
 }
 
 int32_t KeyAutoRepeat::GetConfigDataFromDatabase(std::string &key, int32_t &value)
 {
-    value = PREFERENCES_MANAGER->GetIntValue(key, value);
+    value = PreferencesMgr->GetIntValue(key, value);
     return RET_OK;
 }
 } // namespace MMI

@@ -41,6 +41,10 @@
 #include "setting_datashare.h"
 #include "system_ability_definition.h"
 #include "touch_drawing_manager.h"
+#ifdef OHOS_BUILD_ENABLE_ANCO
+#include "res_sched_client.h"
+#include "res_type.h"
+#endif // OHOS_BUILD_ENABLE_ANCO
 
 namespace OHOS {
 namespace MMI {
@@ -1594,14 +1598,14 @@ int32_t InputWindowsManager::SetHoverScrollState(bool state)
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse hover scroll state:%{public}d", state);
     std::string name = "isEnableHoverScroll";
-    return PREFERENCES_MANAGER->SetBoolValue(name, mouseFileName, state);
+    return PreferencesMgr->SetBoolValue(name, mouseFileName, state);
 }
 
 bool InputWindowsManager::GetHoverScrollState() const
 {
     CALL_DEBUG_ENTER;
     std::string name = "isEnableHoverScroll";
-    bool state = PREFERENCES_MANAGER->GetBoolValue(name, true);
+    bool state = PreferencesMgr->GetBoolValue(name, true);
     MMI_HILOGD("Get mouse hover scroll state:%{public}d", state);
     return state;
 }
@@ -1887,6 +1891,20 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
             MMI_GE(pointerEvent->GetZOrder(), 0.0f);
         if (isCompensatePointer) {
             SimulatePointerExt(pointerEvent);
+        } else {
+            if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN) {
+                std::unordered_map<std::string, std::string> mapPayload;
+                mapPayload["msg"] = "";
+                constexpr int32_t touchDownBoost = 1006;
+                OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
+                    OHOS::ResourceSchedule::ResType::RES_TYPE_ANCO_CUST, touchDownBoost, mapPayload);
+            } else if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_UP) {
+                constexpr int32_t touchUpBoost = 1007;
+                std::unordered_map<std::string, std::string> mapPayload;
+                mapPayload["msg"] = "";
+                OHOS::ResourceSchedule::ResSchedClient::GetInstance().ReportData(
+                    OHOS::ResourceSchedule::ResType::RES_TYPE_ANCO_CUST, touchUpBoost, mapPayload);
+            }
         }
         return RET_OK;
     }
@@ -2320,7 +2338,7 @@ bool InputWindowsManager::IsWindowVisible(int32_t pid)
     Rosen::WindowManager::GetInstance().GetVisibilityWindowInfo(infos);
     for (const auto &it: infos) {
         if (pid == it->pid_ &&
-            it->visibilityState_ < Rosen::WindowVisibilityState::WINDOW_VISIBILITY_STATE_NO_OCCLUSION) {
+            it->visibilityState_ < Rosen::WindowVisibilityState::WINDOW_VISIBILITY_STATE_TOTALLY_OCCUSION) {
             MMI_HILOGD("pid:%{public}d has visible window", pid);
             return true;
         }
@@ -2379,6 +2397,7 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
             mprintf(fd, "\t pointerHotAreas: x:%d | y:%d | width:%d | height:%d \t",
                     pointer.x, pointer.y, pointer.width, pointer.height);
         }
+
         std::string dump;
         dump += StringPrintf("\t pointerChangeAreas: ");
         for (const auto &it : item.pointerChangeAreas) {
