@@ -396,63 +396,41 @@ void PointerEvent::SetPointerAction(int32_t pointerAction)
     pointerAction_ = pointerAction;
 }
 
+static const std::unordered_map<int32_t, std::string> pointerActionMap = {
+    { PointerEvent::POINTER_ACTION_CANCEL, "cancel" },
+    { PointerEvent::POINTER_ACTION_DOWN, "down" },
+    { PointerEvent::POINTER_ACTION_MOVE, "move" },
+    { PointerEvent::POINTER_ACTION_UP, "up" },
+    { PointerEvent::POINTER_ACTION_AXIS_BEGIN, "axis-begin" },
+    { PointerEvent::POINTER_ACTION_AXIS_UPDATE, "axis-update" },
+    { PointerEvent::POINTER_ACTION_AXIS_END, "axis-end" },
+    { PointerEvent::POINTER_ACTION_BUTTON_DOWN, "button-down" },
+    { PointerEvent::POINTER_ACTION_BUTTON_UP, "button-up" },
+    { PointerEvent::POINTER_ACTION_ENTER_WINDOW, "enter-window" },
+    { PointerEvent::POINTER_ACTION_LEAVE_WINDOW, "leave-window" },
+    { PointerEvent::POINTER_ACTION_PULL_DOWN, "pull-down" },
+    { PointerEvent::POINTER_ACTION_PULL_MOVE, "pull-move" },
+    { PointerEvent::POINTER_ACTION_PULL_UP, "pull-up" },
+    { PointerEvent::POINTER_ACTION_PULL_IN_WINDOW, "pull-in-window" },
+    { PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW, "pull-out-window" },
+    { PointerEvent::POINTER_ACTION_SWIPE_BEGIN, "swipe-begin" },
+    { PointerEvent::POINTER_ACTION_SWIPE_UPDATE, "swipe-update" },
+    { PointerEvent::POINTER_ACTION_SWIPE_END, "swipe-end" },
+    { PointerEvent::POINTER_ACTION_ROTATE_BEGIN, "rotate-begin" },
+    { PointerEvent::POINTER_ACTION_ROTATE_UPDATE, "rotate-update" },
+    { PointerEvent::POINTER_ACTION_ROTATE_END, "rotate-end" },
+    { PointerEvent::POINTER_ACTION_TRIPTAP, "touchpad-triptap" },
+    { PointerEvent::POINTER_ACTION_QUADTAP, "quadtap" },
+    { PointerEvent::POINTER_ACTION_HOVER_MOVE, "hover-move" },
+    { PointerEvent::POINTER_ACTION_HOVER_ENTER, "hover-enter" },
+    { PointerEvent::POINTER_ACTION_HOVER_EXIT, "hover-exit" }
+};
+
 const char* PointerEvent::DumpPointerAction() const
 {
-    switch (pointerAction_) {
-        case PointerEvent::POINTER_ACTION_CANCEL: {
-            return "cancel";
-        }
-        case PointerEvent::POINTER_ACTION_DOWN: {
-            return "down";
-        }
-        case PointerEvent::POINTER_ACTION_MOVE: {
-            return "move";
-        }
-        case PointerEvent::POINTER_ACTION_UP: {
-            return "up";
-        }
-        case PointerEvent::POINTER_ACTION_AXIS_BEGIN: {
-            return "axis-begin";
-        }
-        case PointerEvent::POINTER_ACTION_AXIS_UPDATE: {
-            return "axis-update";
-        }
-        case PointerEvent::POINTER_ACTION_AXIS_END: {
-            return "axis-end";
-        }
-        case PointerEvent::POINTER_ACTION_BUTTON_DOWN: {
-            return "button-down";
-        }
-        case PointerEvent::POINTER_ACTION_BUTTON_UP: {
-            return "button-up";
-        }
-        case PointerEvent::POINTER_ACTION_ENTER_WINDOW: {
-            return "enter-window";
-        }
-        case PointerEvent::POINTER_ACTION_LEAVE_WINDOW: {
-            return "leave-window";
-        }
-        case PointerEvent::POINTER_ACTION_PULL_DOWN: {
-            return "pull-down";
-        }
-        case PointerEvent::POINTER_ACTION_PULL_MOVE: {
-            return "pull-move";
-        }
-        case PointerEvent::POINTER_ACTION_PULL_UP: {
-            return "pull-up";
-        }
-        case PointerEvent::POINTER_ACTION_PULL_IN_WINDOW: {
-            return "pull-in-window";
-        }
-        case PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW: {
-            return "pull-out-window";
-        }
-        case PointerEvent::POINTER_ACTION_TRIPTAP: {
-            return "touchpad-trip_tap";
-        }
-        default: {
-            break;
-        }
+    auto it = pointerActionMap.find(pointerAction_);
+    if (it != pointerActionMap.end()) {
+        return it->second.c_str();
     }
     return "unknown";
 }
