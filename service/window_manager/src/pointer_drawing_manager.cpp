@@ -354,7 +354,7 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
         physicalY = 0;
     }
     const int32_t cursorUnit = 16;
-    if (displayInfo_->displayDirection == DIRECTION0) {
+    if (displayInfo_.displayDirection == DIRECTION0) {
         if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
             if (physicalX > (displayInfo_.width - imageWidth_ / cursorUnit)) {
                 physicalX = displayInfo_.width - imageWidth_ / cursorUnit;
@@ -793,7 +793,7 @@ void PointerDrawingManager::DrawManager()
             return;
         }
         Direction direction = DIRECTION0;
-        if (displayInfo_->displayDirection == DIRECTION0) {
+        if (displayInfo_.displayDirection == DIRECTION0) {
             direction = displayInfo_.direction;
         }
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
@@ -1075,7 +1075,7 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
         Direction direction = DIRECTION0;
-        if (displayInfo_->displayDirection == DIRECTION0) {
+        if (displayInfo_.displayDirection == DIRECTION0) {
             direction = displayInfo_.direction;
         }
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
