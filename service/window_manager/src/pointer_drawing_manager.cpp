@@ -354,19 +354,28 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
         physicalY = 0;
     }
     const int32_t cursorUnit = 16;
-    if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
+    if (displayInfo_->displayDirection == DIRECTION0) {
+        if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
+            if (physicalX > (displayInfo_.width - imageWidth_ / cursorUnit)) {
+                physicalX = displayInfo_.width - imageWidth_ / cursorUnit;
+            }
+            if (physicalY > (displayInfo_.height - imageHeight_ / cursorUnit)) {
+                physicalY = displayInfo_.height - imageHeight_ / cursorUnit;
+            }
+        } else {
+            if (physicalX > (displayInfo_.height - imageHeight_ / cursorUnit)) {
+                physicalX = displayInfo_.height - imageHeight_ / cursorUnit;
+            }
+            if (physicalY > (displayInfo_.width - imageWidth_ / cursorUnit)) {
+                physicalY = displayInfo_.width - imageWidth_ / cursorUnit;
+            }
+        }
+    } else {
         if (physicalX > (displayInfo_.width - imageWidth_ / cursorUnit)) {
             physicalX = displayInfo_.width - imageWidth_ / cursorUnit;
         }
         if (physicalY > (displayInfo_.height - imageHeight_ / cursorUnit)) {
             physicalY = displayInfo_.height - imageHeight_ / cursorUnit;
-        }
-    } else {
-        if (physicalX > (displayInfo_.height - imageHeight_ / cursorUnit)) {
-            physicalX = displayInfo_.height - imageHeight_ / cursorUnit;
-        }
-        if (physicalY > (displayInfo_.width - imageWidth_ / cursorUnit)) {
-            physicalY = displayInfo_.width - imageWidth_ / cursorUnit;
         }
     }
 }
@@ -783,14 +792,18 @@ void PointerDrawingManager::DrawManager()
             MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
             return;
         }
+        Direction direction = DIRECTION0;
+        if (displayInfo_->displayDirection == DIRECTION0) {
+            direction = displayInfo_.direction;
+        }
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
-                pointerStyle, displayInfo_.direction);
+                pointerStyle, direction);
             WinMgr->SendPointerEvent(PointerEvent::POINTER_ACTION_MOVE);
             MMI_HILOGD("Draw manager, mouseStyle:%{public}d, last physical is initial value", pointerStyle.id);
             return;
         }
-        DrawPointer(displayInfo_.id, lastPhysicalX_, lastPhysicalY_, pointerStyle, displayInfo_.direction);
+        DrawPointer(displayInfo_.id, lastPhysicalX_, lastPhysicalY_, pointerStyle, direction);
         WinMgr->SendPointerEvent(PointerEvent::POINTER_ACTION_MOVE);
         MMI_HILOGD("Draw manager, mouseStyle:%{public}d", pointerStyle.id);
         return;
@@ -1061,14 +1074,18 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
             surfaceNode_->AttachToDisplay(screenId_);
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
+        Direction direction = DIRECTION0;
+        if (displayInfo_->displayDirection == DIRECTION0) {
+            direction = displayInfo_.direction;
+        }
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
-                pointerStyle, displayInfo_.direction);
+                pointerStyle, direction);
             MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", pointerStyle.id);
             return;
         }
 
-        DrawPointer(displayInfo_.id, lastPhysicalX_, lastPhysicalY_, pointerStyle, displayInfo_.direction);
+        DrawPointer(displayInfo_.id, lastPhysicalX_, lastPhysicalY_, pointerStyle, direction);
         MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", pointerStyle.id);
     }
 }
