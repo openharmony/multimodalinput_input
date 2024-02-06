@@ -20,6 +20,7 @@
 #include <list>
 #include <memory>
 #include <set>
+#include <unordered_map>
 #include <vector>
 
 #include "nocopyable.h"
