@@ -321,6 +321,7 @@ void PointerDrawingManager::SetMouseDisplayState(bool state)
         if (mouseDisplayState_) {
             InitLayer(MOUSE_ICON(lastMouseStyle_.id));
         }
+        MMI_HILOGI("state:%{public}s", state ? "true" : "false");
         UpdatePointerVisible();
     }
 }
@@ -808,6 +809,7 @@ void PointerDrawingManager::UpdatePointerVisible()
 {
     CALL_DEBUG_ENTER;
     CHKPV(surfaceNode_);
+    MMI_HILOGI("mouseDisplayState_:%{public}s", mouseDisplayState_ ? "true" : "false");
     if (IsPointerVisible() && mouseDisplayState_) {
         surfaceNode_->SetVisible(true);
         MMI_HILOGI("Pointer window show success");
@@ -826,7 +828,8 @@ bool PointerDrawingManager::IsPointerVisible()
         return true;
     }
     auto info = pidInfos_.back();
-    MMI_HILOGD("Visible property:%{public}zu.%{public}d-%{public}d", pidInfos_.size(), info.pid, info.visible);
+    MMI_HILOGI("Visible property:%{public}zu.%{public}d-visible:%{public}s",
+        pidInfos_.size(), info.pid, info.visible ? "true" : "false");
     return info.visible;
 }
 
@@ -867,7 +870,7 @@ bool PointerDrawingManager::GetPointerVisible(int32_t pid)
 
 int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
 {
-    CALL_DEBUG_ENTER;
+    MMI_HILOGI("visible:%{public}s", visible ? "true" : "false");
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
             pidInfos_.erase(it);
