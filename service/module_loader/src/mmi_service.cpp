@@ -329,11 +329,7 @@ void MMIService::OnStart()
             MMI_HILOGD("Set thread status flag to false");
             threadStatusFlag_ = false;
         } else {
-            MMI_HILOGE("Watchdog happened");
-            std::string warningDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 2000);
-            WATCHDOG_TASK->SendEvent(warningDescMsg, "SERVICE_WARNING");
-            std::string blockDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 1000);
-            WATCHDOG_TASK->SendEvent(blockDescMsg, "SERVICE_BLOCK");
+            MMI_HILOGE("Timeout happened");
         }
     };
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc, WATCHDOG_INTERVAL_TIME,
