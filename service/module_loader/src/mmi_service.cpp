@@ -63,8 +63,8 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIService" };
 const std::string DEF_INPUT_SEAT = "seat0";
 const std::string THREAD_NAME = "mmi-service";
-constexpr int32_t WATCHDOG_INTERVAL_TIME = 10000;
-constexpr int32_t WATCHDOG_DELAY_TIME = 15000;
+constexpr int32_t WATCHDOG_INTERVAL_TIME = 30000;
+constexpr int32_t WATCHDOG_DELAY_TIME = 40000;
 constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t UNSUBSCRIBED = -1;
 constexpr int32_t UNOBSERVED = -1;
