@@ -153,6 +153,12 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
         }
     }
     CHKPR(udsServer_, INVALID_FD);
+    if (windowInfo == nullptr) {
+        MMI_HILOGD("window info is null, pointerAction:%{public}d", pointerEvent->GetPointerAction());
+        if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_LEAVE_WINDOW) {
+            windowInfo = &lastWindowInfo_;
+        }
+    }
     if (windowInfo != nullptr) {
         MMI_HILOGD("get pid:%{public}d from idxPidMap", windowInfo->pid);
         return udsServer_->GetClientFd(windowInfo->pid);
