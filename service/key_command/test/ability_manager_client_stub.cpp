@@ -108,6 +108,5 @@ void AbilityManagerClient::SetErrCode(ErrCode err)
 {
     err_ = err;
 }
-
 }  // namespace AAFwk
 }  // namespace OHOS

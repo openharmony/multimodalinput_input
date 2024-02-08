@@ -62,6 +62,7 @@ void HdfDeviceEventManager::ConnectHDFInit()
 }
 } // namespace MMI
 } // namespace OHOS
+
 int32_t main()
 {
     int sleepSeconds = 1;

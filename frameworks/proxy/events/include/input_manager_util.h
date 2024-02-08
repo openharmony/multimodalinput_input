@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
 #ifndef INPUT_MANAGER_UTIL_H
 #define INPUT_MANAGER_UTIL_H
 
