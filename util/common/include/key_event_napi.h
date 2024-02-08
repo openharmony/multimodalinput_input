@@ -70,5 +70,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // KEY_EVENT_NAPI_H

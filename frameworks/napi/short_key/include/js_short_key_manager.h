@@ -60,5 +60,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // JS_SHORT_KEY_MANAGER_H

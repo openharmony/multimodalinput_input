@@ -603,4 +603,3 @@ void DfxHisysevent::ReportScreenCaptureGesture()
 }
 }
 }
-

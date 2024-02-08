@@ -511,6 +511,5 @@ bool EventResample::ShouldResampleTool(int32_t toolType)
             return false;
     }
 }
-
 } // namespace MMI
 } // namespace OHOS
