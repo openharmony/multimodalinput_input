@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace MMI {
-
 class AppDebugListener : public AppExecFwk::AppDebugListenerStub {
 public:
     static AppDebugListener *GetInstance();

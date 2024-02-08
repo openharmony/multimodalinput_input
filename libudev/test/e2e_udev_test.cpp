@@ -24,9 +24,7 @@
 #include "test_device.h"
 
 using namespace std::chrono_literals;
-
 using ::testing::ext::TestSize;
-
 namespace {
 constexpr auto DEVICE_MAX_DELAY = 100ms;
 constexpr auto DEVICE_DELAY_STEP = 10ms;

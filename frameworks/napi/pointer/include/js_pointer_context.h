@@ -96,5 +96,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // JS_POINTER_CONTEXT_H

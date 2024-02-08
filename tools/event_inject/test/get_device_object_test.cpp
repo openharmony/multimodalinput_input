@@ -20,7 +20,6 @@
 #include "msg_head.h"
 #include "proto.h"
 
-
 namespace OHOS {
 namespace MMI {
 namespace {

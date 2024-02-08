@@ -37,5 +37,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // JS_SHORT_KEY_CONTEXT_H

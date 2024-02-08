@@ -506,6 +506,5 @@ HWTEST_F(TwoFingerLongTouchTest, TwoFingerLongTouchTest_007, TestSize.Level1)
     ASSERT_TRUE(CreateTestJson(TEST_JSON_15));
     ASSERT_TRUE(eventKeyCommandHandler_->ParseJson(TEST_JSON));
 }
-
 } // namespace MMI
 } // namespace OHOS

@@ -30,8 +30,7 @@ public:
     void ResetEnv();
     napi_value GetDeviceIds(napi_env env, napi_value handle = nullptr);
     napi_value GetDevice(napi_env env, int32_t id, napi_value handle = nullptr);
-    napi_value SupportKeys(napi_env env, int32_t id, std::vector<int32_t> &keyCodes,
-                                   napi_value handle = nullptr);
+    napi_value SupportKeys(napi_env env, int32_t id, std::vector<int32_t> &keyCodes, napi_value handle = nullptr);
     napi_value SupportKeysSync(napi_env env, int32_t id, std::vector<int32_t> &keyCodes);
     static void SupportKeysSyncCallback(napi_env env, napi_value* result, std::vector<bool> &isSupported);
     napi_value GetKeyboardType(napi_env env, int32_t id, napi_value handle = nullptr);
@@ -51,5 +50,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // JS_INPUT_DEVICE_MANAGER_H

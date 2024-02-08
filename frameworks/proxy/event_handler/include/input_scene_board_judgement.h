@@ -31,5 +31,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // OHOS_ROSEN_MMI_SCENE_SCENE_BOARD_JUDGEMENT_H
