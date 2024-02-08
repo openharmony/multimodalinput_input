@@ -105,10 +105,6 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
 {
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent);
-    if (JsInputMonMgr.GetMonitor(id_, fingers_) == nullptr) {
-        MMI_HILOGE("Failed to process pointer event, id:%{public}d", id_);
-        return;
-    }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_MOUSE
         && pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE) {
         if (++flowCtrl_ < MOUSE_FLOW) {
@@ -121,6 +117,10 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
     std::function<void(std::shared_ptr<PointerEvent>)> callback;
     {
         std::lock_guard<std::mutex> guard(mutex_);
+        if (JsInputMonMgr.GetMonitor(id_, fingers_) == nullptr) {
+            MMI_HILOGE("Failed to process pointer event, id:%{public}d", id_);
+            return;
+        }
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
             if (JsInputMonMgr.GetMonitor(id_, fingers_)->GetTypeName() != "touch") {
                 pointerEvent->MarkProcessed();
