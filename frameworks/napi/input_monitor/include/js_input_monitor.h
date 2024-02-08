@@ -35,9 +35,7 @@ namespace OHOS {
 namespace MMI {
 using MapFun = std::map<std::string, std::function<int64_t()>>;
 
-
-class InputMonitor final : public IInputEventConsumer,
-                           public std::enable_shared_from_this<InputMonitor> {
+class InputMonitor final : public IInputEventConsumer, public std::enable_shared_from_this<InputMonitor> {
 public:
     InputMonitor() = default;
     DISALLOW_COPY_AND_MOVE(InputMonitor);

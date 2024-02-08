@@ -236,5 +236,4 @@ private:
     struct libevdev_uinput* uidev_{};
     dev_t devnum_{};
 };
-
 #endif // TEST_DEVICE_H

@@ -15,6 +15,7 @@
 
 #ifndef MMI_VECTOR2_H
 #define MMI_VECTOR2_H
+
 #include <cmath>
 
 #include "util.h"

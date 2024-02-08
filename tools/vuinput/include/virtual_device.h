@@ -15,6 +15,7 @@
 
 #ifndef VIRTUAL_DEVICE_H
 #define VIRTUAL_DEVICE_H
+
 #include "nocopyable.h"
 #include "virtual_device_config.h"
 
