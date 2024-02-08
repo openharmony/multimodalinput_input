@@ -54,5 +54,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // WINDOW_UTILS_TEST_H

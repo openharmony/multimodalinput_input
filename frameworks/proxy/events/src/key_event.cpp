@@ -17,7 +17,6 @@
 
 #include "mmi_log.h"
 
-
 using namespace OHOS::HiviewDFX;
 namespace OHOS {
 namespace MMI {

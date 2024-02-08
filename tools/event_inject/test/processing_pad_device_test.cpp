@@ -20,7 +20,6 @@
 #include "processing_keyboard_device.h"
 #include "proto.h"
 
-
 namespace OHOS {
 namespace MMI {
 namespace {

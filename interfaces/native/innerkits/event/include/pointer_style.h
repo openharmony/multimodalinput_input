@@ -15,6 +15,7 @@
 
 #ifndef POINTER_STYLE_H
 #define POINTER_STYLE_H
+
 #include <iostream>
 
 namespace OHOS {
