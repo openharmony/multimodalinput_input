@@ -14,7 +14,9 @@
  */
 
 #include "setting_datashare.h"
+
 #include <thread>
+
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
 #include "datashare_values_bucket.h"

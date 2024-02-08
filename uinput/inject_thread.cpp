@@ -16,6 +16,7 @@
 #include "inject_thread.h"
 
 #include <sys/prctl.h>
+
 namespace OHOS {
 namespace MMI {
 std::mutex InjectThread::mutex_;

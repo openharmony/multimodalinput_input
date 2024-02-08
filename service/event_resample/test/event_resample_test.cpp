@@ -568,6 +568,5 @@ HWTEST_F(EventResampleTest, EventResampleTest_006, TestSize.Level1)
     TestData testData = {.framesNum = 5, .fingerNum = 1, .evtNum = 3};
     EXPECT_TRUE(DoTest(testData, 6));
 }
-
 } // namespace MMI
 } // namespace OHOS
