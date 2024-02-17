@@ -226,7 +226,7 @@ void UDSServer::ReleaseSession(int32_t fd, epoll_event& ev)
         DfxHisysevent::OnClientDisconnect(secPtr, fd, OHOS::HiviewDFX::HiSysEvent::EventType::FAULT);
     }
     if (ev.data.ptr) {
-        free(ev.data.ptr);
+        RemoveEpollEvent(fd);
         ev.data.ptr = nullptr;
     }
     if (auto it = circleBufMap_.find(fd); it != circleBufMap_.end()) {
@@ -296,6 +296,18 @@ void UDSServer::OnEpollEvent(epoll_event& ev)
     } else if (ev.events & EPOLLIN) {
         OnEpollRecv(fd, ev);
     }
+}
+
+void UDSServer::AddEpollEvent(int32_t fd, std::shared_ptr<mmi_epoll_event> epollEvent)
+{
+    MMI_HILOGI("add %{public}d in epollEvent map", fd);
+    epollEventMap_[fd] = epollEvent;
+}
+
+void UDSServer::RemoveEpollEvent(int32_t fd)
+{
+    MMI_HILOGI("remove %{public}d in epollEvent map", fd);
+    epollEventMap_.erase(fd);
 }
 
 void UDSServer::DumpSession(const std::string &title)
