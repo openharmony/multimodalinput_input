@@ -33,10 +33,8 @@
 #include "mmi_log.h"
 
 using namespace std::literals;
-
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "MmiLibudev" };
-
 constexpr int UTIL_PATH_SIZE = 1024;
 constexpr int UTIL_LINE_SIZE = 16384;
 

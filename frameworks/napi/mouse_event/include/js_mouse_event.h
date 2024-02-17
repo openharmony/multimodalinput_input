@@ -35,5 +35,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // JS_MOUSE_EVENT

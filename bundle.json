@@ -72,8 +72,7 @@
         "data_share",
         "relational_store",
         "faultloggerd",
-        "ffrt",
-        "power_manager"
+        "ffrt"
       ],
       "third_party": [
         "cJSON",

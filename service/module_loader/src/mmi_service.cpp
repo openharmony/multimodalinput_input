@@ -63,8 +63,8 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIService" };
 const std::string DEF_INPUT_SEAT = "seat0";
 const std::string THREAD_NAME = "mmi-service";
-constexpr int32_t WATCHDOG_INTERVAL_TIME = 10000;
-constexpr int32_t WATCHDOG_DELAY_TIME = 15000;
+constexpr int32_t WATCHDOG_INTERVAL_TIME = 30000;
+constexpr int32_t WATCHDOG_DELAY_TIME = 40000;
 constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t UNSUBSCRIBED = -1;
 constexpr int32_t UNOBSERVED = -1;
@@ -329,11 +329,7 @@ void MMIService::OnStart()
             MMI_HILOGD("Set thread status flag to false");
             threadStatusFlag_ = false;
         } else {
-            MMI_HILOGE("Watchdog happened");
-            std::string warningDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 2000);
-            WATCHDOG_TASK->SendEvent(warningDescMsg, "SERVICE_WARNING");
-            std::string blockDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 1000);
-            WATCHDOG_TASK->SendEvent(blockDescMsg, "SERVICE_BLOCK");
+            MMI_HILOGE("Timeout happened");
         }
     };
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc, WATCHDOG_INTERVAL_TIME,
@@ -896,24 +892,7 @@ int32_t MMIService::OnRegisterDevListener(int32_t pid)
 {
     auto sess = GetSession(GetClientFd(pid));
     CHKPR(sess, RET_ERR);
-    InputDevMgr->AddDevListener(sess, [sess](int32_t id, const std::string &type) {
-        CALL_DEBUG_ENTER;
-        CHKPV(sess);
-        NetPacket pkt(MmiMessageId::ADD_INPUT_DEVICE_LISTENER);
-        pkt << type << id;
-        if (pkt.ChkRWError()) {
-            MMI_HILOGE("Packet write data failed");
-            return;
-        }
-        if (!sess->SendMsg(pkt)) {
-            MMI_HILOGE("Sending failed");
-            if (!sess->IsSocketValid()) {
-                MMI_HILOGE("sess fd:%{public}d pid:%{public}d is ENOSOCKET, delete it!", sess->GetFd(), sess->GetPid());
-                InputDevMgr->RemoveDevListener(sess);
-            }
-            return;
-        }
-    });
+    InputDevMgr->AddDevListener(sess);
     return RET_OK;
 }
 

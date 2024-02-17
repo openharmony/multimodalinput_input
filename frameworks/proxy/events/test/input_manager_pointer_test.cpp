@@ -60,7 +60,60 @@ constexpr int64_t POINTER_ITEM_DOWNTIME_TWO = 10001;
 constexpr int64_t POINTER_ITEM_DOWNTIME_THREE = 10003;
 constexpr int64_t POINTER_ITEM_DOWNTIME_FOUR = 10009;
 constexpr int64_t POINTER_ITEM_DOWNTIME_FIVE = 10010;
-}  // namespace
+
+HapInfoParams infoManagerTestInfoParms = {
+    .userID = 1,
+    .bundleName = "InputManagerPointerTest",
+    .instIndex = 0,
+    .appIDDesc = "test",
+    .isSystemApp = true
+};
+
+PermissionDef infoManagerTestPermDef = {
+    .permissionName = "ohos.permission.test",
+    .bundleName = "InputManagerPointerTest",
+    .grantMode = 1,
+    .availableLevel = APL_SYSTEM_CORE,
+    .label = "label",
+    .labelId = 1,
+    .description = "test pointer event",
+    .descriptionId = 1,
+};
+
+PermissionStateFull infoManagerTestState = {
+    .permissionName = "ohos.permission.test",
+    .isGeneral = true,
+    .resDeviceID = { "local" },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 1 },
+};
+
+HapPolicyParams infoManagerTestPolicyPrams = {
+    .apl = APL_SYSTEM_CORE,
+    .domain = "test.domain",
+    .permList = { infoManagerTestPermDef },
+    .permStateList = { infoManagerTestState }
+};
+} // namespace
+
+class AccessToken {
+public:
+    AccessToken()
+    {
+        currentID_ = GetSelfTokenID();
+        AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(infoManagerTestInfoParms, infoManagerTestPolicyPrams);
+        accessID_ = tokenIdEx.tokenIDEx;
+        SetSelfTokenID(accessID_);
+    }
+    ~AccessToken()
+    {
+        AccessTokenKit::DeleteToken(accessID_);
+        SetSelfTokenID(currentID_);
+    }
+private:
+    uint64_t currentID_ = 0;
+    uint64_t accessID_ = 0;
+};
 
 class InputManagerPointerTest : public testing::Test {
 public:
@@ -149,6 +202,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeav
     std::shared_ptr<PointerEvent> pointerEvent{InputManagerUtil::SetupPointerEvent014()};
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    AccessToken accessToken;
     SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
@@ -165,6 +219,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeav
     std::shared_ptr<KeyEvent> keyEvent{InputManagerUtil::SetupKeyEvent002()};
     ASSERT_NE(keyEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    AccessToken accessToken;
     SimulateInputEventUtilTest(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
@@ -181,6 +236,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeav
     std::shared_ptr<KeyEvent> keyEvent{InputManagerUtil::SetupKeyEvent003()};
     ASSERT_NE(keyEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    AccessToken accessToken;
     SimulateInputEventUtilTest(keyEvent);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
@@ -197,6 +253,7 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_MouseEventEnterAndLeav
     std::shared_ptr<PointerEvent> pointerEvent{InputManagerUtil::SetupPointerEvent015()};
     ASSERT_NE(pointerEvent, nullptr);
 #ifdef OHOS_BUILD_ENABLE_POINTER
+    AccessToken accessToken;
     SimulateInputEventUtilTest(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
@@ -753,15 +810,12 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetWindowInputEventCon
     auto pointerEvent = InputManagerUtil::SetupPointerEvent005();
     pointerEvent->AddFlag(PointerEvent::EVENT_FLAG_NO_INTERCEPT);
     ASSERT_TRUE(pointerEvent != nullptr);
+    AccessToken accessToken;
     InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     uint64_t consumerThreadId = consumer->GetConsumerThreadId();
 #ifdef OHOS_BUILD_ENABLE_POINTER
-    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        ASSERT_TRUE(runnerThreadId != consumerThreadId);
-    } else {
-        EXPECT_EQ(runnerThreadId, consumerThreadId);
-    }
+    EXPECT_EQ(runnerThreadId, consumerThreadId);
 #else
     ASSERT_TRUE(runnerThreadId != consumerThreadId);
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -796,15 +850,12 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetWindowInputEventCon
     auto keyEvent = InputManagerUtil::SetupKeyEvent001();
     ASSERT_TRUE(keyEvent != nullptr);
     keyEvent->SetKeyCode(KeyEvent::KEYCODE_A);
+    AccessToken accessToken;
     InputManager::GetInstance()->SimulateInputEvent(keyEvent);
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     uint64_t consumerThreadId = consumer->GetConsumerThreadId();
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
-    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
-        ASSERT_TRUE(runnerThreadId != consumerThreadId);
-    } else {
-        EXPECT_EQ(runnerThreadId, consumerThreadId);
-    }
+    EXPECT_EQ(runnerThreadId, consumerThreadId);
 #else
     ASSERT_TRUE(runnerThreadId != consumerThreadId);
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
@@ -1591,10 +1642,27 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetPointerSize_001, Te
 HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerColor_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t setColor = 0xA946F1;
-    ASSERT_TRUE(InputManager::GetInstance()->SetPointerColor(setColor) == RET_OK);
-    setColor = 0x000000;
-    InputManager::GetInstance()->SetPointerColor(setColor);
+    std::vector<int32_t> deviceIds;
+    auto callback = [&deviceIds] (std::vector<int32_t> ids) {
+        deviceIds = ids;
+    };
+    int32_t ret = InputManager::GetInstance()->GetDeviceIds(callback);
+    ASSERT_EQ(ret, RET_OK);
+    for (const auto& devicedId : deviceIds) {
+        std::shared_ptr<InputDevice> device;
+        auto tmpcallback = [&device] (std::shared_ptr<InputDevice> inputDevice) {
+            device = inputDevice;
+        };
+        ASSERT_EQ(InputManager::GetInstance()->GetDevice(devicedId, tmpcallback), RET_OK);
+        ASSERT_TRUE(device != nullptr);
+        if (device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {
+            int32_t setColor = 0xA946F1;
+            ASSERT_TRUE(InputManager::GetInstance()->SetPointerColor(setColor) == RET_OK);
+            setColor = 0x000000;
+            InputManager::GetInstance()->SetPointerColor(setColor);
+            break;
+        }
+    }
 }
 
 /**
@@ -1606,11 +1674,28 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetPointerColor_001, T
 HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetPointerColor_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    int32_t setColor = 0x000000;
-    ASSERT_TRUE(InputManager::GetInstance()->SetPointerColor(setColor) == RET_OK);
-    int32_t getColor = 3;
-    ASSERT_TRUE(InputManager::GetInstance()->GetPointerColor(getColor) == RET_OK);
-    ASSERT_TRUE(setColor == getColor);
+    std::vector<int32_t> deviceIds;
+    auto callback = [&deviceIds] (std::vector<int32_t> ids) {
+        deviceIds = ids;
+    };
+    int32_t ret = InputManager::GetInstance()->GetDeviceIds(callback);
+    ASSERT_EQ(ret, RET_OK);
+    for (const auto& devicedId : deviceIds) {
+        std::shared_ptr<InputDevice> device;
+        auto tmpcallback = [&device] (std::shared_ptr<InputDevice> inputDevice) {
+            device = inputDevice;
+        };
+        ASSERT_EQ(InputManager::GetInstance()->GetDevice(devicedId, tmpcallback), RET_OK);
+        ASSERT_TRUE(device != nullptr);
+        if (device->HasCapability(InputDeviceCapability::INPUT_DEV_CAP_POINTER)) {
+            int32_t setColor = 0x000000;
+            ASSERT_TRUE(InputManager::GetInstance()->SetPointerColor(setColor) == RET_OK);
+            int32_t getColor = 3;
+            ASSERT_TRUE(InputManager::GetInstance()->GetPointerColor(getColor) == RET_OK);
+            ASSERT_TRUE(setColor == getColor);
+            break;
+        }
+    }
 }
 
 /**

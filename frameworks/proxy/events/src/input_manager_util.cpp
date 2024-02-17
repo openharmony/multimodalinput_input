@@ -32,7 +32,6 @@ constexpr int32_t INDEX_FIRST = 1;
 constexpr int32_t INDEX_SECOND = 2;
 constexpr int32_t INDEX_THIRD = 3;
 constexpr int32_t MOUSE_ICON_SIZE = 64;
-constexpr int32_t POINTER_ITEM_DISPLAY_X_ONE = 25;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_TWO = 50;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_THREE = 53;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_FOUR = 200;
@@ -45,7 +44,6 @@ constexpr int32_t POINTER_ITEM_DISPLAY_X_TEN = 600;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_ELEVEN = 610;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_TWELVE = 623;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_THIRTEEN = 10;
-constexpr int32_t POINTER_ITEM_DISPLAY_X_FOURTEEN = 100;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_FIFTEEN = 40;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_SIXTEEN = 546;
 constexpr int32_t POINTER_ITEM_DISPLAY_X_SEVENTEEN = 555;
@@ -239,7 +237,7 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent006()
     item.SetPointerId(0);
     item.SetDownTime(0);
 
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_ONE);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FOUR);
     item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_FOUR);
     item.SetWindowX(POINTER_ITEM_WINDOW_X_THREE);
     item.SetWindowY(POINTER_ITEM_WINDOW_Y_FIVE);
@@ -353,12 +351,12 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent011()
 
     item.SetDownTime(0);
     item.SetPointerId(1);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_FOUR);
     item.SetWindowX(POINTER_ITEM_WINDOW_X_FOUR);
     item.SetWidth(0);
     item.SetDeviceId(1);
     item.SetHeight(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FOUR);
     item.SetTiltX(POINTER_ITEM_TITLE_X_TWO);
     item.SetTiltY(POINTER_ITEM_TITLE_Y_TWO);
     item.SetPressure(POINTER_ITEM_PRESSURE_FOUR);
@@ -395,9 +393,9 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent012()
     item.SetWindowX(POINTER_ITEM_WINDOW_X_FOUR);
     item.SetWindowY(POINTER_ITEM_WINDOW_Y_THREE);
     item.SetWidth(0);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_FOUR);
     item.SetHeight(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FOUR);
     item.SetTiltY(POINTER_ITEM_TITLE_Y_TWO);
     item.SetPressure(POINTER_ITEM_PRESSURE_FOUR);
     item.SetPointerId(1);
@@ -429,8 +427,8 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent013()
 
     item.SetPointerId(1);
     item.SetDownTime(0);
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_TWO);
-    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FOUR);
+    item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_FOUR);
     item.SetWindowX(POINTER_ITEM_WINDOW_X_FOUR);
     item.SetWindowY(POINTER_ITEM_WINDOW_Y_THREE);
     item.SetWidth(0);
@@ -451,7 +449,7 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent014()
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent->SetPointerId(0);
     PointerEvent::PointerItem item;
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FOURTEEN);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FOUR);
     item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_NINE);
     item.SetWindowX(POINTER_ITEM_WINDOW_X_ONE);
     item.SetWindowY(POINTER_ITEM_WINDOW_Y_ONE);
@@ -483,7 +481,7 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupPointerEvent015()
     item.SetDownTime(0);
     item.SetPressed(false);
 
-    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_TWO);
+    item.SetDisplayX(POINTER_ITEM_DISPLAY_X_FOUR);
     item.SetDisplayY(POINTER_ITEM_DISPLAY_Y_TWENTY);
     item.SetWindowX(POINTER_ITEM_WINDOW_X_SIX);
     item.SetWindowY(POINTER_ITEM_WINDOW_Y_SIX);
