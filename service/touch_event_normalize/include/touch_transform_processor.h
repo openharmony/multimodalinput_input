@@ -15,6 +15,7 @@
 
 #ifndef TOUCH_TRANSFORM_PROCESSOR_H
 #define TOUCH_TRANSFORM_PROCESSOR_H
+
 #include "nocopyable.h"
 #include "transform_processor.h"
 #include "fingersense_manager.h"

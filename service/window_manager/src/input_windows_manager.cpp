@@ -152,7 +152,6 @@ int32_t InputWindowsManager::GetClientFd(std::shared_ptr<PointerEvent> pointerEv
             break;
         }
     }
-    
     CHKPR(udsServer_, INVALID_FD);
     if (windowInfo != nullptr) {
         MMI_HILOGD("get pid:%{public}d from idxPidMap", windowInfo->pid);
@@ -235,6 +234,9 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> key
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (IsAncoWindow(*windowInfo)) {
         MMI_HILOGD("focusWindowId:%{public}d is anco window.", focusWindowId);
+        if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
+            SimulateKeyExt(keyEvent);
+        }
         return INVALID_PID;
     }
 #endif // OHOS_BUILD_ENABLE_ANCO
@@ -908,9 +910,9 @@ void InputWindowsManager::PrintDisplayInfo()
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         MMI_HILOGD("displayInfos,id:%{public}d,x:%{public}d,y:%{public}d,"
             "width:%{public}d,height:%{public}d,name:%{public}s,"
-            "uniq:%{public}s,direction:%{public}d",
+            "uniq:%{public}s,direction:%{public}d,displayDirection:%{public}d",
             item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
-            item.uniq.c_str(), item.direction);
+            item.uniq.c_str(), item.direction, item.displayDirection);
     }
 }
 
@@ -939,7 +941,7 @@ const DisplayInfo* InputWindowsManager::FindPhysicalDisplayInfo(const std::strin
     return nullptr;
 }
 
-void InputWindowsManager::RotateTouchScreen(DisplayInfo info, LogicalCoordinate& coord) const
+void InputWindowsManager::RotateScreen(const DisplayInfo& info, LogicalCoordinate& coord) const
 {
     const Direction direction = info.direction;
     if (direction == DIRECTION0) {
@@ -983,7 +985,7 @@ void InputWindowsManager::GetPhysicalDisplayCoord(struct libinput_event_touch* t
         .x = static_cast<int32_t>(libinput_event_touch_get_x_transformed(touch, width)),
         .y = static_cast<int32_t>(libinput_event_touch_get_y_transformed(touch, height)),
     };
-    RotateTouchScreen(info, coord);
+    RotateScreen(info, coord);
     touchInfo.point.x = coord.x;
     touchInfo.point.y = coord.y;
     touchInfo.toolRect.point.x = static_cast<int32_t>(libinput_event_touch_get_tool_x_transformed(touch, width));
@@ -1595,14 +1597,14 @@ int32_t InputWindowsManager::SetHoverScrollState(bool state)
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Set mouse hover scroll state:%{public}d", state);
     std::string name = "isEnableHoverScroll";
-    return PREFERENCES_MANAGER->SetBoolValue(name, mouseFileName, state);
+    return PreferencesMgr->SetBoolValue(name, mouseFileName, state);
 }
 
 bool InputWindowsManager::GetHoverScrollState() const
 {
     CALL_DEBUG_ENTER;
     std::string name = "isEnableHoverScroll";
-    bool state = PREFERENCES_MANAGER->GetBoolValue(name, true);
+    bool state = PreferencesMgr->GetBoolValue(name, true);
     MMI_HILOGD("Get mouse hover scroll state:%{public}d", state);
     return state;
 }
@@ -1699,8 +1701,12 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     if (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_BUTTON_UP) {
         dragFlag_ = false;
     }
-    IPointerDrawingManager::GetInstance()->DrawPointer(displayId, pointerItem.GetDisplayX(),
-        pointerItem.GetDisplayY(), dragPointerStyle_);
+    Direction direction = DIRECTION0;
+    if (physicalDisplayInfo->displayDirection == DIRECTION0) {
+        direction = physicalDisplayInfo->direction;
+    }
+    IPointerDrawingManager::GetInstance()->DrawPointer(displayId, static_cast<int32_t>(absolutionX_),
+        static_cast<int32_t>(absolutionY_), dragPointerStyle_, direction);
 
     if (captureModeInfo_.isCaptureMode && (touchWindow->id != captureModeInfo_.windowId)) {
         captureModeInfo_.isCaptureMode = false;
@@ -1958,7 +1964,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         WinInfo info = { .windowPid = touchWindow->pid, .windowId = touchWindow->id };
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
         IPointerDrawingManager::GetInstance()->DrawPointer(displayId,
-            pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerStyle);
+            pointerItem.GetDisplayX(), pointerItem.GetDisplayY(), pointerStyle, physicDisplayInfo->direction);
     } else {
         if (IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
             if (!checkExtraData) {
@@ -2257,6 +2263,39 @@ void InputWindowsManager::FindPhysicalDisplay(const DisplayInfo& displayInfo, in
         }
     }
 }
+
+void InputWindowsManager::CoordinateCorrection(int32_t width, int32_t height, int32_t &integerX, int32_t &integerY)
+{
+    if (integerX < 0) {
+        integerX = 0;
+    }
+    if (integerX >= width) {
+        integerX = width - 1;
+    }
+    if (integerY < 0) {
+        integerY = 0;
+    }
+    if (integerY >= height) {
+        integerY = height - 1;
+    }
+}
+
+void InputWindowsManager::GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height)
+{
+    if (displayInfo->displayDirection == DIRECTION0) {
+        if (displayInfo->direction == DIRECTION0 || displayInfo->direction == DIRECTION180) {
+            width = displayInfo->width;
+            height = displayInfo->height;
+        } else {
+            height = displayInfo->width;
+            width = displayInfo->height;
+        }
+    } else {
+        width = displayInfo->width;
+        height = displayInfo->height;
+    }
+}
+
 void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y)
 {
     auto displayInfo = GetPhysicalDisplay(displayId);
@@ -2271,24 +2310,26 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
         displayInfo = GetPhysicalDisplay(displayId);
         CHKPV(displayInfo);
     }
-    int32_t width = displayInfo->width;
-    int32_t height = displayInfo->height;
-    if (integerX < 0) {
-        integerX = 0;
-    }
-    if (integerX >= width) {
-        integerX = width - 1;
-    }
-    if (integerY < 0) {
-        integerY = 0;
-    }
-    if (integerY >= height) {
-        integerY = height - 1;
-    }
+    int32_t width = 0;
+    int32_t height = 0;
+    GetWidthAndHeight(displayInfo, width, height);
+    CoordinateCorrection(width, height, integerX, integerY);
     x = static_cast<double>(integerX) + (x - floor(x));
     y = static_cast<double>(integerY) + (y - floor(y));
-    mouseLocation_.physicalX = integerX;
-    mouseLocation_.physicalY = integerY;
+    absolutionX_ = x;
+    absolutionY_ = y;
+    if (displayInfo->displayDirection == DIRECTION0) {
+        LogicalCoordinate coord {
+            .x = integerX,
+            .y = integerY,
+        };
+        RotateScreen(*displayInfo, coord);
+        mouseLocation_.physicalX = coord.x;
+        mouseLocation_.physicalY = coord.y;
+    } else {
+        mouseLocation_.physicalX = integerX;
+        mouseLocation_.physicalY = integerY;
+    }
     MMI_HILOGD("Mouse Data: physicalX:%{public}d,physicalY:%{public}d, displayId:%{public}d",
         mouseLocation_.physicalX, mouseLocation_.physicalY, displayId);
 }
@@ -2414,9 +2455,9 @@ void InputWindowsManager::Dump(int32_t fd, const std::vector<std::string> &args)
     mprintf(fd, "displayInfos,num:%zu", displayGroupInfo_.displaysInfo.size());
     for (const auto &item : displayGroupInfo_.displaysInfo) {
         mprintf(fd, "\t displayInfos: id:%d | x:%d | y:%d | width:%d | height:%d | name:%s "
-                "| uniq:%s | direction:%d | displayMode:%d \t",
+                "| uniq:%s | direction:%d | displayDirection:%d | displayMode:%d \t",
                 item.id, item.x, item.y, item.width, item.height, item.name.c_str(),
-                item.uniq.c_str(), item.direction, item.displayMode);
+                item.uniq.c_str(), item.direction, item.displayDirection, item.displayMode);
     }
     mprintf(fd, "Input device and display bind info:\n%s", bindInfo_.Dumps().c_str());
 #ifdef OHOS_BUILD_ENABLE_ANCO

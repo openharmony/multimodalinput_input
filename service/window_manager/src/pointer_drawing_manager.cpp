@@ -62,6 +62,7 @@ constexpr float LOADING_CENTER_RATIO = 0.5f;
 constexpr float RUNNING_X_RATIO = 0.3f;
 constexpr float RUNNING_Y_RATIO = 0.675f;
 constexpr float INCREASE_RATIO = 1.22;
+constexpr float ROTATION_ANGLE90 = 90.f;
 constexpr int32_t MIN_POINTER_COLOR = 0x000000;
 constexpr int32_t MAX_POINTER_COLOR = 0xffffff;
 constexpr int32_t MIN_CURSOR_SIZE = 64;
@@ -83,8 +84,46 @@ PointerStyle PointerDrawingManager::GetLastMouseStyle()
     CALL_DEBUG_ENTER;
     return lastMouseStyle_;
 }
+
+void PointerDrawingManager::DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+    const PointerStyle pointerStyle, Direction direction)
+{
+    MMI_HILOGD("Pointer window move success");
+    if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_ && lastDirection_ == direction) {
+        surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
+            surfaceNode_->GetStagingProperties().GetBounds().z_,
+            surfaceNode_->GetStagingProperties().GetBounds().w_);
+        Rosen::RSTransaction::FlushImplicitTransaction();
+        MMI_HILOGD("The lastpointerStyle is equal with pointerStyle,id %{public}d size:%{public}d",
+            pointerStyle.id, pointerStyle.size);
+        return;
+    }
+    if (lastDirection_ != direction) {
+        RotateDegree(direction);
+        lastDirection_ = direction;
+    }
+    lastMouseStyle_ = pointerStyle;
+    surfaceNode_->SetVisible(false);
+    int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
+    if (ret != RET_OK) {
+        mouseIconUpdate_ = false;
+        MMI_HILOGE("Init layer failed");
+        return;
+    }
+    surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
+        surfaceNode_->GetStagingProperties().GetBounds().z_,
+        surfaceNode_->GetStagingProperties().GetBounds().w_);
+    surfaceNode_->SetVisible(true);
+    Rosen::RSTransaction::FlushImplicitTransaction();
+    UpdatePointerVisible();
+    mouseIconUpdate_ = false;
+    MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
+        displayId, physicalX, physicalY);
+    return;
+}
+
 void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
-    const PointerStyle pointerStyle)
+    const PointerStyle pointerStyle, Direction direction)
 {
     CALL_DEBUG_ENTER;
     MMI_HILOGD("Display:%{public}d,physicalX:%{public}d,physicalY:%{public}d,pointerStyle:%{public}d",
@@ -93,39 +132,14 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     lastPhysicalX_ = physicalX;
     lastPhysicalY_ = physicalY;
     currentMouseStyle_ = pointerStyle;
+    currentDirection_ = direction;
     AdjustMouseFocus(ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay), physicalX, physicalY);
 
     if (surfaceNode_ != nullptr) {
-        MMI_HILOGD("Pointer window move success");
-        if (lastMouseStyle_ == pointerStyle && !mouseIconUpdate_) {
-            surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
-                surfaceNode_->GetStagingProperties().GetBounds().z_,
-                surfaceNode_->GetStagingProperties().GetBounds().w_);
-            Rosen::RSTransaction::FlushImplicitTransaction();
-            MMI_HILOGD("The lastpointerStyle is equal with pointerStyle,id %{public}d size:%{public}d",
-                pointerStyle.id, pointerStyle.size);
-            return;
-        }
-        lastMouseStyle_ = pointerStyle;
-        surfaceNode_->SetVisible(false);
-        int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
-        if (ret != RET_OK) {
-            mouseIconUpdate_ = false;
-            MMI_HILOGE("Init layer failed");
-            return;
-        }
-        surfaceNode_->SetBounds(physicalX + displayInfo_.x, physicalY + displayInfo_.y,
-            surfaceNode_->GetStagingProperties().GetBounds().z_,
-            surfaceNode_->GetStagingProperties().GetBounds().w_);
-        surfaceNode_->SetVisible(true);
-        Rosen::RSTransaction::FlushImplicitTransaction();
-        UpdatePointerVisible();
-        mouseIconUpdate_ = false;
-        MMI_HILOGD("Leave, display:%{public}d,physicalX:%{public}d,physicalY:%{public}d",
-            displayId, physicalX, physicalY);
+        DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction);
         return;
     }
-    CreatePointerWindow(displayId, physicalX, physicalY);
+    CreatePointerWindow(displayId, physicalX, physicalY, direction);
     CHKPV(surfaceNode_);
     UpdateMouseStyle();
     int32_t ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
@@ -214,7 +228,7 @@ void PointerDrawingManager::DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle)
         Rosen::RSNode::Animate(
             protocol,
             Rosen::RSAnimationTimingCurve::LINEAR,
-            [this]() { surfaceNode_->SetRotation(0); });
+            [this]() { RotateDegree(currentDirection_); });
         MMI_HILOGD("current pointer is not loading");
         Rosen::RSTransaction::FlushImplicitTransaction();
         return;
@@ -321,6 +335,7 @@ void PointerDrawingManager::SetMouseDisplayState(bool state)
         if (mouseDisplayState_) {
             InitLayer(MOUSE_ICON(lastMouseStyle_.id));
         }
+        MMI_HILOGI("state:%{public}s", state ? "true" : "false");
         UpdatePointerVisible();
     }
 }
@@ -340,19 +355,28 @@ void PointerDrawingManager::FixCursorPosition(int32_t &physicalX, int32_t &physi
         physicalY = 0;
     }
     const int32_t cursorUnit = 16;
-    if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
+    if (displayInfo_.displayDirection == DIRECTION0) {
+        if (displayInfo_.direction == DIRECTION0 || displayInfo_.direction == DIRECTION180) {
+            if (physicalX > (displayInfo_.width - imageWidth_ / cursorUnit)) {
+                physicalX = displayInfo_.width - imageWidth_ / cursorUnit;
+            }
+            if (physicalY > (displayInfo_.height - imageHeight_ / cursorUnit)) {
+                physicalY = displayInfo_.height - imageHeight_ / cursorUnit;
+            }
+        } else {
+            if (physicalX > (displayInfo_.height - imageHeight_ / cursorUnit)) {
+                physicalX = displayInfo_.height - imageHeight_ / cursorUnit;
+            }
+            if (physicalY > (displayInfo_.width - imageWidth_ / cursorUnit)) {
+                physicalY = displayInfo_.width - imageWidth_ / cursorUnit;
+            }
+        }
+    } else {
         if (physicalX > (displayInfo_.width - imageWidth_ / cursorUnit)) {
             physicalX = displayInfo_.width - imageWidth_ / cursorUnit;
         }
         if (physicalY > (displayInfo_.height - imageHeight_ / cursorUnit)) {
             physicalY = displayInfo_.height - imageHeight_ / cursorUnit;
-        }
-    } else {
-        if (physicalX > (displayInfo_.height - imageHeight_ / cursorUnit)) {
-            physicalX = displayInfo_.height - imageHeight_ / cursorUnit;
-        }
-        if (physicalY > (displayInfo_.width - imageWidth_ / cursorUnit)) {
-            physicalY = displayInfo_.width - imageWidth_ / cursorUnit;
         }
     }
 }
@@ -363,7 +387,8 @@ void RsRemoteDiedCallback()
     isRsRemoteDied = true;
 }
 
-void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY)
+void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY,
+    Direction direction)
 {
     CALL_DEBUG_ENTER;
     CALL_INFO_TRACE;
@@ -387,7 +412,8 @@ void PointerDrawingManager::CreatePointerWindow(int32_t displayId, int32_t physi
     screenId_ = static_cast<uint64_t>(displayId);
     std::cout << "ScreenId: " << screenId_ << std::endl;
     surfaceNode_->AttachToDisplay(screenId_);
-    surfaceNode_->SetRotation(0);
+    RotateDegree(direction);
+    lastDirection_ = direction;
 
     canvasNode_ = Rosen::RSCanvasNode::Create();
     canvasNode_->SetBounds(0, 0, IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -629,7 +655,7 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
         color = MAX_POINTER_COLOR;
     }
     std::string name = "pointerColor";
-    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, MOUSE_FILE_NAME, color);
+    int32_t ret = PreferencesMgr->SetIntValue(name, MOUSE_FILE_NAME, color);
     if (ret == RET_OK) {
         MMI_HILOGD("Set pointer color successfully, color:%{public}d", color);
     }
@@ -647,7 +673,7 @@ int32_t PointerDrawingManager::GetPointerColor()
 {
     CALL_DEBUG_ENTER;
     std::string name = "pointerColor";
-    int32_t pointerColor = PREFERENCES_MANAGER->GetIntValue(name, DEFAULT_VALUE);
+    int32_t pointerColor = PreferencesMgr->GetIntValue(name, DEFAULT_VALUE);
     tempPointerColor_ = pointerColor;
     if (pointerColor == DEFAULT_VALUE) {
         pointerColor = MIN_POINTER_COLOR;
@@ -677,7 +703,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
         size = MAX_POINTER_SIZE;
     }
     std::string name = "pointerSize";
-    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, MOUSE_FILE_NAME, size);
+    int32_t ret = PreferencesMgr->SetIntValue(name, MOUSE_FILE_NAME, size);
     if (ret == RET_OK) {
         MMI_HILOGD("Set pointer size successfully, size:%{public}d", size);
     }
@@ -693,7 +719,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     int32_t physicalX = lastPhysicalX_;
     int32_t physicalY = lastPhysicalY_;
     AdjustMouseFocus(ICON_TYPE(mouseIcons_[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay), physicalX, physicalY);
-    CreatePointerWindow(displayInfo_.id, physicalX, physicalY);
+    CreatePointerWindow(displayInfo_.id, physicalX, physicalY, displayInfo_.direction);
     ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
     if (ret != RET_OK) {
         MMI_HILOGE("Init layer failed");
@@ -707,7 +733,7 @@ int32_t PointerDrawingManager::GetPointerSize()
 {
     CALL_DEBUG_ENTER;
     std::string name = "pointerSize";
-    int32_t pointerSize = PREFERENCES_MANAGER->GetIntValue(name, DEFAULT_POINTER_SIZE);
+    int32_t pointerSize = PreferencesMgr->GetIntValue(name, DEFAULT_POINTER_SIZE);
     MMI_HILOGD("Get pointer size successfully, pointerSize:%{public}d", pointerSize);
     return pointerSize;
 }
@@ -767,14 +793,18 @@ void PointerDrawingManager::DrawManager()
             MMI_HILOGE("Get pointer style failed, pointerStyleInfo is nullptr");
             return;
         }
+        Direction direction = DIRECTION0;
+        if (displayInfo_.displayDirection == DIRECTION0) {
+            direction = displayInfo_.direction;
+        }
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
-                pointerStyle);
+                pointerStyle, direction);
             WinMgr->SendPointerEvent(PointerEvent::POINTER_ACTION_MOVE);
             MMI_HILOGD("Draw manager, mouseStyle:%{public}d, last physical is initial value", pointerStyle.id);
             return;
         }
-        DrawPointer(displayInfo_.id, lastPhysicalX_, lastPhysicalY_, pointerStyle);
+        DrawPointer(displayInfo_.id, lastPhysicalX_, lastPhysicalY_, pointerStyle, direction);
         WinMgr->SendPointerEvent(PointerEvent::POINTER_ACTION_MOVE);
         MMI_HILOGD("Draw manager, mouseStyle:%{public}d", pointerStyle.id);
         return;
@@ -808,6 +838,7 @@ void PointerDrawingManager::UpdatePointerVisible()
 {
     CALL_DEBUG_ENTER;
     CHKPV(surfaceNode_);
+    MMI_HILOGI("mouseDisplayState_:%{public}s", mouseDisplayState_ ? "true" : "false");
     if (IsPointerVisible() && mouseDisplayState_) {
         surfaceNode_->SetVisible(true);
         MMI_HILOGI("Pointer window show success");
@@ -826,7 +857,8 @@ bool PointerDrawingManager::IsPointerVisible()
         return true;
     }
     auto info = pidInfos_.back();
-    MMI_HILOGD("Visible property:%{public}zu.%{public}d-%{public}d", pidInfos_.size(), info.pid, info.visible);
+    MMI_HILOGI("Visible property:%{public}zu.%{public}d-visible:%{public}s",
+        pidInfos_.size(), info.pid, info.visible ? "true" : "false");
     return info.visible;
 }
 
@@ -867,7 +899,7 @@ bool PointerDrawingManager::GetPointerVisible(int32_t pid)
 
 int32_t PointerDrawingManager::SetPointerVisible(int32_t pid, bool visible)
 {
-    CALL_DEBUG_ENTER;
+    MMI_HILOGI("visible:%{public}s", visible ? "true" : "false");
     for (auto it = pidInfos_.begin(); it != pidInfos_.end(); ++it) {
         if (it->pid == pid) {
             pidInfos_.erase(it);
@@ -928,6 +960,12 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
             it->second.iconPath.c_str(), newIconPath.c_str());
         it->second.iconPath = newIconPath;
     }
+    std::string name = "pointerColor";
+    ret = PreferencesMgr->SetIntValue(name, MOUSE_FILE_NAME, DEFAULT_VALUE);
+    if (ret != RET_OK) {
+        MMI_HILOGD("Set default color failed");
+        return RET_ERR;
+    }
     return RET_OK;
 }
 
@@ -941,7 +979,7 @@ int32_t PointerDrawingManager::SetPointerStylePreference(PointerStyle pointerSty
 {
     CALL_DEBUG_ENTER;
     std::string name = "pointerStyle";
-    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, MOUSE_FILE_NAME, pointerStyle.id);
+    int32_t ret = PreferencesMgr->SetIntValue(name, MOUSE_FILE_NAME, pointerStyle.id);
     if (ret == RET_OK) {
         MMI_HILOGD("Set pointer style successfully, style:%{public}d", pointerStyle.id);
     }
@@ -1005,11 +1043,11 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, Po
     CALL_DEBUG_ENTER;
     if (windowId == GLOBAL_WINDOW_ID) {
         std::string name = "pointerColor";
-        pointerStyle.color = PREFERENCES_MANAGER->GetIntValue(name, DEFAULT_VALUE);
+        pointerStyle.color = PreferencesMgr->GetIntValue(name, DEFAULT_VALUE);
         name = "pointerSize";
-        pointerStyle.size = PREFERENCES_MANAGER->GetIntValue(name, DEFAULT_POINTER_SIZE);
+        pointerStyle.size = PreferencesMgr->GetIntValue(name, DEFAULT_POINTER_SIZE);
         name = "pointerStyle";
-        int32_t style = PREFERENCES_MANAGER->GetIntValue(name, DEFAULT_POINTER_STYLE);
+        int32_t style = PreferencesMgr->GetIntValue(name, DEFAULT_POINTER_STYLE);
         MMI_HILOGD("Get pointer style successfully, pointerStyle:%{public}d", style);
         if (style == CURSOR_CIRCLE_STYLE) {
             pointerStyle.id = style;
@@ -1039,14 +1077,18 @@ void PointerDrawingManager::DrawPointerStyle(const PointerStyle& pointerStyle)
             surfaceNode_->AttachToDisplay(screenId_);
             Rosen::RSTransaction::FlushImplicitTransaction();
         }
+        Direction direction = DIRECTION0;
+        if (displayInfo_.displayDirection == DIRECTION0) {
+            direction = displayInfo_.direction;
+        }
         if (lastPhysicalX_ == -1 || lastPhysicalY_ == -1) {
             DrawPointer(displayInfo_.id, displayInfo_.width / CALCULATE_MIDDLE, displayInfo_.height / CALCULATE_MIDDLE,
-                pointerStyle);
+                pointerStyle, direction);
             MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", pointerStyle.id);
             return;
         }
 
-        DrawPointer(displayInfo_.id, lastPhysicalX_, lastPhysicalY_, pointerStyle);
+        DrawPointer(displayInfo_.id, lastPhysicalX_, lastPhysicalY_, pointerStyle, direction);
         MMI_HILOGD("Draw pointer style, mouseStyle:%{public}d", pointerStyle.id);
     }
 }
@@ -1116,6 +1158,13 @@ void PointerDrawingManager::InitStyle()
         {DEVELOPER_DEFINED_ICON, {ANGLE_NW, IMAGE_POINTER_DEFAULT_PATH + "Default.svg"}},
     };
     CheckMouseIconPath();
+}
+
+void PointerDrawingManager::RotateDegree(Direction direction)
+{
+    float degree = (static_cast<int>(DIRECTION0) - static_cast<int>(direction)) * ROTATION_ANGLE90;
+    surfaceNode_->SetPivot(0, 0);
+    surfaceNode_->SetRotation(degree);
 }
 } // namespace MMI
 } // namespace OHOS

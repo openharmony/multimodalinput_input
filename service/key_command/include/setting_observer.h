@@ -37,5 +37,4 @@ private:
 };
 }
 } // OHOS::MMI
-
 #endif // SETTING_OBSERVER_H
