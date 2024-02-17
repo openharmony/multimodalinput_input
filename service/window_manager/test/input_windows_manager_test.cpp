@@ -51,7 +51,7 @@ public:
             info.agentWindowId = 1;
             info.flags = 1;
             info.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-            info.pointerChangeAreas = { 1, 2, 1, 2, 1, 2, 1, 2, 1 }
+            info.pointerChangeAreas = { 1, 2, 1, 2, 1, 2, 1, 2, 1 };
             displayGroupInfo.windowsInfo.push_back(info);
         }
         for (uint32_t i = 0; i < num; i++) {
