@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 
 #include "nocopyable.h"
 
+#include "i_input_service_watcher.h"
 #include "i_multimodal_input_connect.h"
 #include "multimodalinput_ipc_interface_code.h"
 
@@ -115,6 +116,10 @@ public:
     int32_t GetTouchpadRightClickType(int32_t &type);
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
+
+    void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
+    void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
+
 private:
     MultimodalInputConnectManager() = default;
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);
@@ -122,12 +127,14 @@ private:
     bool ConnectMultimodalInputService();
     void OnDeath();
     void Clean();
+    void NotifyServiceDeath();
     void NotifyDeath();
     sptr<IMultimodalInputConnect> multimodalInputConnectService_ { nullptr };
     sptr<IRemoteObject::DeathRecipient> multimodalInputConnectRecipient_ { nullptr };
     int32_t socketFd_ { IMultimodalInputConnect::INVALID_SOCKET_FD };
     int32_t tokenType_ { -1 };
     std::mutex lock_;
+    std::set<std::shared_ptr<IInputServiceWatcher>> watchers_;
 };
 } // namespace MMI
 } // namespace OHOS
