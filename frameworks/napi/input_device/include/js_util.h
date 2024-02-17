@@ -77,5 +77,4 @@ public:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // JS_UTIL_H

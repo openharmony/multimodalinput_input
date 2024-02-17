@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef UTIL_NAPI_VALUE_H
 #define UTIL_NAPI_VALUE_H
 
@@ -49,5 +50,4 @@ std::vector<KeyEvent::KeyItem> GetNamePropertyKeyItems(
     const napi_env &env, const napi_value &object, const std::string &name);
 } // namespace MMI
 } // namespace OHOS
-
 #endif // UTIL_NAPI_VALUE_H

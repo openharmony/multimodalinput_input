@@ -15,6 +15,7 @@
 
 #ifndef VIRTUAL_SINGLE_FINGER_H
 #define VIRTUAL_SINGLE_FINGER_H
+
 #include "virtual_device.h"
 
 namespace OHOS {

@@ -15,6 +15,7 @@
 
 #ifndef VIRTUAL_KNOB_CONSUMER_CTRL_H
 #define VIRTUAL_KNOB_CONSUMER_CTRL_H
+
 #include "virtual_device.h"
 
 namespace OHOS {
