@@ -20,6 +20,7 @@
 #include <list>
 #include <memory>
 #include <set>
+#include <unordered_map>
 #include <vector>
 
 #include "nocopyable.h"
@@ -151,6 +152,17 @@ public:
     static constexpr int32_t POINTER_ACTION_TRIPTAP = 23;
 
     static constexpr int32_t POINTER_ACTION_QUADTAP = 24;
+
+    /**
+     * Indicates that the hover action.
+     *
+     * @since 11
+     */
+    static constexpr int32_t POINTER_ACTION_HOVER_MOVE = 25;
+
+    static constexpr int32_t POINTER_ACTION_HOVER_ENTER = 26;
+
+    static constexpr int32_t POINTER_ACTION_HOVER_EXIT = 27;
 
     enum AxisType {
         /**

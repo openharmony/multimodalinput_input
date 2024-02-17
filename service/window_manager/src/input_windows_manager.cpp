@@ -1680,6 +1680,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
         IPointerDrawingManager::GetInstance()->OnWindowInfo(info);
     }
     GetPointerStyle(touchWindow->pid, touchWindow->id, pointerStyle);
+    dragPointerStyle_ = pointerStyle;
     if (!touchWindow) {
         MMI_HILOGE("TouchWindow is nullptr");
         return RET_ERR;

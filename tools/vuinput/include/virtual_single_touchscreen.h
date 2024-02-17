@@ -15,6 +15,7 @@
 
 #ifndef VIRTUAL_SINGLE_TOUCHSCREEN_H
 #define VIRTUAL_SINGLE_TOUCHSCREEN_H
+
 #include "virtual_device.h"
 
 namespace OHOS {

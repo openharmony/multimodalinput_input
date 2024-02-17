@@ -15,6 +15,7 @@
 
 #ifndef VIRTUAL_GAMEPAD_H
 #define VIRTUAL_GAMEPAD_H
+
 #include "virtual_device.h"
 
 namespace OHOS {
