@@ -39,6 +39,11 @@ enum EpollEventType {
     EPOLL_EVENT_END,
 };
 
+struct mmi_epoll_event {
+    int32_t fd{ 0 };
+    EpollEventType event_type{ EPOLL_EVENT_BEGIN };
+};
+
 using MsgServerFunCallback = std::function<void(SessionPtr, NetPacket&)>;
 class UDSServer : public UDSSocket, public IUdsServer {
 public:
@@ -57,6 +62,9 @@ public:
 
     SessionPtr GetSession(int32_t fd) const;
     SessionPtr GetSessionByPid(int32_t pid) const override;
+
+    void AddEpollEvent(int32_t fd, std::shared_ptr<mmi_epoll_event> epollEvent);
+    void RemoveEpollEvent(int32_t fd);
 
 protected:
     virtual void OnConnected(SessionPtr s);
@@ -80,6 +88,7 @@ protected:
     std::map<int32_t, int32_t> idxPidMap_;
     std::map<int32_t, CircleStreamBuffer> circleBufMap_;
     std::list<std::function<void(SessionPtr)>> callbacks_;
+    std::map<int32_t, std::shared_ptr<mmi_epoll_event>> epollEventMap_;
 };
 } // namespace MMI
 } // namespace OHOS
