@@ -57,8 +57,8 @@ HWTEST_F(KeySubscriberHandlerTest, InputWindowsManagerTest_UnsubscribeKeyEvent_0
     std::shared_ptr<KeyOption> keyOption = nullptr;
     ASSERT_EQ(keySubscriberHandler.SubscribeKeyEvent(sess, -1, keyOption), -1);
     SessionPtr sessPtr = nullptr;
-    ASSERT_EQ(keySubscriberHandler.UnsubscribeKeyEvent(sessPtr, -1), -1);
-    ASSERT_EQ(keySubscriberHandler.UnsubscribeKeyEvent(sess, 1), -1);
+    ASSERT_EQ(keySubscriberHandler.UnsubscribeKeyEvent(sessPtr, -1), 0);
+    ASSERT_EQ(keySubscriberHandler.UnsubscribeKeyEvent(sess, 1), 0);
 }
 
 /**

@@ -37,6 +37,8 @@ public:
                                                  int64_t frameTime, ErrCode &status);
     std::shared_ptr<PointerEvent> GetPointerEvent();
 
+    void PrintfDeviceName();
+    
     // Microseconds per milliseconds.
     static constexpr int64_t US_PER_MS = 1000;
 
