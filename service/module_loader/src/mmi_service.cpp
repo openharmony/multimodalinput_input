@@ -147,7 +147,6 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
     ev.data.ptr = eventData;
     auto ret = EpollCtl(fd, EPOLL_CTL_ADD, ev, mmiFd_);
     if (ret < 0) {
-        free(eventData);
         eventData = nullptr;
         ev.data.ptr = nullptr;
         return ret;
