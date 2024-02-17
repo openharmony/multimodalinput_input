@@ -81,6 +81,9 @@ constexpr static libinput_interface LIBINPUT_INTERFACE = {
     },
     .close_restricted = [](int32_t fd, void *user_data)
     {
+        if (fd < 0) {
+            return;
+        }
         MMI_HILOGI("Libinput .close_restricted fd:%{public}d", fd);
         close(fd);
     },
@@ -168,6 +171,11 @@ void LibinputAdapter::ReloadDevice()
 void LibinputAdapter::OnDeviceAdded(std::string path)
 {
     CALL_DEBUG_ENTER;
+    auto pos = devices_.find(path);
+    if (pos != devices_.end()) {
+        MMI_HILOGD("Path is found");
+        return;
+    }
     libinput_device* device = libinput_path_add_device(input_, path.c_str());
     if (device != nullptr) {
         devices_[std::move(path)] = libinput_device_ref(device);

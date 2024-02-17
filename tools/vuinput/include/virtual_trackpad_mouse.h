@@ -15,6 +15,7 @@
 
 #ifndef VIRTUAL_TRACKPAD_MOUSE_H
 #define VIRTUAL_TRACKPAD_MOUSE_H
+
 #include "virtual_device.h"
 
 namespace OHOS {

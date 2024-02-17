@@ -63,8 +63,8 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMIService" };
 const std::string DEF_INPUT_SEAT = "seat0";
 const std::string THREAD_NAME = "mmi-service";
-constexpr int32_t WATCHDOG_INTERVAL_TIME = 10000;
-constexpr int32_t WATCHDOG_DELAY_TIME = 15000;
+constexpr int32_t WATCHDOG_INTERVAL_TIME = 30000;
+constexpr int32_t WATCHDOG_DELAY_TIME = 40000;
 constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t UNSUBSCRIBED = -1;
 constexpr int32_t UNOBSERVED = -1;
@@ -319,7 +319,7 @@ void MMIService::OnStart()
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InitAncoUds();
 #endif // OHOS_BUILD_ENABLE_ANCO
-    PREFERENCES_MANAGER->InitPreferences();
+    PreferencesMgr->InitPreferences();
     TimerMgr->AddTimer(WATCHDOG_INTERVAL_TIME, -1, [this]() {
         MMI_HILOGD("Set thread status flag to true");
         threadStatusFlag_ = true;
@@ -329,11 +329,7 @@ void MMIService::OnStart()
             MMI_HILOGD("Set thread status flag to false");
             threadStatusFlag_ = false;
         } else {
-            MMI_HILOGE("Watchdog happened");
-            std::string warningDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 2000);
-            WATCHDOG_TASK->SendEvent(warningDescMsg, "SERVICE_WARNING");
-            std::string blockDescMsg = WATCHDOG_TASK->GetBlockDescription(WATCHDOG_INTERVAL_TIME / 1000);
-            WATCHDOG_TASK->SendEvent(blockDescMsg, "SERVICE_BLOCK");
+            MMI_HILOGE("Timeout happened");
         }
     };
     HiviewDFX::Watchdog::GetInstance().RunPeriodicalTask("MMIService", taskFunc, WATCHDOG_INTERVAL_TIME,

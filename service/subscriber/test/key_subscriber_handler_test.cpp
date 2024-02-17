@@ -14,7 +14,6 @@
  */
 
 #include <gtest/gtest.h>
-
 #include <fstream>
 
 #include "key_subscriber_handler.h"

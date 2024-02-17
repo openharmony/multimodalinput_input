@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
 #ifndef INPUT_WINDOWS_MANAGER_H
 #define INPUT_WINDOWS_MANAGER_H
 
@@ -95,7 +96,7 @@ public:
     void AdjustDisplayCoordinate(const DisplayInfo& displayInfo, int32_t& physicalX, int32_t& physicalY) const;
     bool TouchPointToDisplayPoint(int32_t deviceId, struct libinput_event_touch* touch,
         EventTouch& touchInfo, int32_t& targetDisplayId);
-    void RotateTouchScreen(DisplayInfo info, LogicalCoordinate& coord) const;
+    void RotateScreen(const DisplayInfo& info, LogicalCoordinate& coord) const;
     bool TransformTipPoint(struct libinput_event_tablet_tool* tip, LogicalCoordinate& coord, int32_t& displayId) const;
     bool CalculateTipPoint(struct libinput_event_tablet_tool* tip,
         int32_t& targetDisplayId, LogicalCoordinate& coord) const;
@@ -108,6 +109,7 @@ public:
     bool IsInAncoWindow(const WindowInfo &window, int32_t x, int32_t y) const;
     bool IsAncoWindow(const WindowInfo &window) const;
     void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent);
+    void SimulateKeyExt(std::shared_ptr<KeyEvent> keyEvent);
     void DumpAncoWindows(std::string& out) const;
 #endif // OHOS_BUILD_ENABLE_ANCO
 
@@ -139,6 +141,8 @@ private:
         std::vector<Rect> &windowHotAreas);
     void UpdateInnerAngleArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
         std::vector<Rect> &windowHotAreas);
+    void CoordinateCorrection(int32_t width, int32_t height, int32_t &integerX, int32_t &integerY);
+    void GetWidthAndHeight(const DisplayInfo* displayInfo, int32_t &width, int32_t &height);
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     void GetPointerStyleByArea(WindowArea area, int32_t pid, int32_t winId, PointerStyle& pointerStyle);
@@ -216,6 +220,8 @@ private:
     PointerStyle lastPointerStyle_ {.id = -1};
     PointerStyle dragPointerStyle_ {.id = -1};
     MouseLocation mouseLocation_ = { -1, -1 };
+    double absolutionX_ {};
+    double absolutionY_ {};
     std::map<int32_t, WindowInfo> touchItemDownInfos_;
     std::map<int32_t, std::vector<Rect>> windowsHotAreas_;
     InputDisplayBindHelper bindInfo_;

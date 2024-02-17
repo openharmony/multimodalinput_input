@@ -48,7 +48,7 @@ public:
     DISALLOW_COPY_AND_MOVE(PointerDrawingManager);
     ~PointerDrawingManager() override = default;
     void DrawPointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
-        const PointerStyle pointerStyle) override;
+        const PointerStyle pointerStyle, Direction direction) override;
     void UpdateDisplayInfo(const DisplayInfo& displayInfo) override;
     void OnDisplayInfo(const DisplayGroupInfo& displayGroupInfo) override;
     void OnWindowInfo(const WinInfo &info) override;
@@ -78,7 +78,7 @@ public:
 private:
     void DrawLoadingPointerStyle(const MOUSE_ICON mouseStyle);
     void DrawRunningPointerAnimate(const MOUSE_ICON mouseStyle);
-    void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY);
+    void CreatePointerWindow(int32_t displayId, int32_t physicalX, int32_t physicalY, Direction direction);
     sptr<OHOS::Surface> GetLayer();
     sptr<OHOS::SurfaceBuffer> GetSurfaceBuffer(sptr<OHOS::Surface> layer) const;
     void DoDraw(uint8_t *addr, uint32_t width, uint32_t height, const MOUSE_ICON mouseStyle = MOUSE_ICON::DEFAULT);
@@ -94,6 +94,9 @@ private:
     int32_t SetPointerStylePreference(PointerStyle pointerStyle);
     void UpdateMouseStyle();
     int32_t UpdateCursorProperty(void* pixelMap);
+    void RotateDegree(Direction direction);
+    void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
+        const PointerStyle pointerStyle, Direction direction);
 
 private:
     struct PidInfo {
@@ -122,6 +125,8 @@ private:
     int32_t userIconHotSpotX_ { 0 };
     int32_t userIconHotSpotY_ { 0 };
     int32_t tempPointerColor_ { -1 };
+    Direction lastDirection_ { DIRECTION0 };
+    Direction currentDirection_ { DIRECTION0 };
 };
 } // namespace MMI
 } // namespace OHOS

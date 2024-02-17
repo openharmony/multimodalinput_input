@@ -44,7 +44,6 @@ enum JS_CALLBACK_EVENT {
 
 namespace OHOS {
 namespace MMI {
-
 class JsCommon {
 public:
     static bool TypeOf(napi_env env, napi_value value, napi_valuetype type);
