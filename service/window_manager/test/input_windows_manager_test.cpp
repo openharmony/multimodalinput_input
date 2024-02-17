@@ -51,7 +51,7 @@ public:
             info.agentWindowId = 1;
             info.flags = 1;
             info.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-            info.pointerHotAreas = {1, 2, 1, 2};
+            info.pointerChangeAreas = { 1, 2, 1, 2, 1, 2, 1, 2, 1 }
             displayGroupInfo.windowsInfo.push_back(info);
         }
         for (uint32_t i = 0; i < num; i++) {
@@ -65,7 +65,6 @@ public:
             info.name = "pp";
             info.uniq = "pp";
             info.direction = DIRECTION0;
-            info.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
             displayGroupInfo.displaysInfo.push_back(info);
         }
         WinMgr->UpdateDisplayInfo(displayGroupInfo);
@@ -156,8 +155,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayId_004, T
         info.area = {1, 1, 1, 1};
         info.defaultHotAreas = { info.area };
         info.pointerHotAreas = { info.area };
-        info.pointerChangeAreas = {1, 2, 1, 2};
         info.agentWindowId = 1;
+        info.pointerChangeAreas = { 1, 2, 1, 2, 1, 2, 1, 2, 1 };
+        info.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
         info.flags = 1;
         displayGroupInfo.windowsInfo.push_back(info);
     }
