@@ -74,11 +74,6 @@ const int32_t MAX_IPC_THREAD_NUM = 16;
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
 
-struct mmi_epoll_event {
-    int32_t fd{ 0 };
-    EpollEventType event_type{ EPOLL_EVENT_BEGIN };
-};
-
 template <class... Ts> void CheckDefineOutput(const char *fmt, Ts... args)
 {
     CHKPV(fmt);
@@ -133,25 +128,21 @@ int32_t MMIService::AddEpoll(EpollEventType type, int32_t fd)
         MMI_HILOGE("Invalid param mmiFd_");
         return RET_ERR;
     }
-    auto eventData = static_cast<mmi_epoll_event *>(malloc(sizeof(mmi_epoll_event)));
-    if (!eventData) {
-        MMI_HILOGE("Malloc failed");
-        return RET_ERR;
-    }
+    auto eventData = std::make_shared<mmi_epoll_event>();
     eventData->fd = fd;
     eventData->event_type = type;
     MMI_HILOGI("userdata:[fd:%{public}d,type:%{public}d]", eventData->fd, eventData->event_type);
 
     struct epoll_event ev = {};
     ev.events = EPOLLIN;
-    ev.data.ptr = eventData;
+    ev.data.ptr = eventData.get();
     auto ret = EpollCtl(fd, EPOLL_CTL_ADD, ev, mmiFd_);
     if (ret < 0) {
-        free(eventData);
         eventData = nullptr;
         ev.data.ptr = nullptr;
         return ret;
     }
+    AddEpollEvent(fd, eventData);
     return RET_OK;
 }
 
