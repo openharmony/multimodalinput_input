@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -476,6 +476,7 @@ void MultimodalInputConnectManager::OnDeath()
 {
     CALL_DEBUG_ENTER;
     Clean();
+    NotifyServiceDeath();
     NotifyDeath();
 }
 
@@ -494,10 +495,17 @@ void MultimodalInputConnectManager::Clean()
     }
 }
 
+void MultimodalInputConnectManager::NotifyServiceDeath()
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    for (const auto &watcher : watchers_) {
+        watcher->OnServiceDied();
+    }
+}
+
 void MultimodalInputConnectManager::NotifyDeath()
 {
     CALL_DEBUG_ENTER;
-
     int32_t retryCount = 50;
     do {
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -632,6 +640,19 @@ int32_t MultimodalInputConnectManager::GetShieldStatus(int32_t shieldMode, bool 
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
     return multimodalInputConnectService_->GetShieldStatus(shieldMode, isShield);
+}
+
+void MultimodalInputConnectManager::AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher)
+{
+    CHKPV(watcher);
+    std::lock_guard<std::mutex> guard(lock_);
+    watchers_.insert(watcher);
+}
+
+void MultimodalInputConnectManager::RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher)
+{
+    std::lock_guard<std::mutex> guard(lock_);
+    watchers_.erase(watcher);
 }
 } // namespace MMI
 } // namespace OHOS
