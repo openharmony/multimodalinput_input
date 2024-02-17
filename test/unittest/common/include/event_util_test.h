@@ -220,5 +220,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // EVENT_TEST_UTIL_H

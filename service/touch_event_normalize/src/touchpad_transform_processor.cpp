@@ -16,7 +16,6 @@
 #include "touchpad_transform_processor.h"
 
 #include <sstream>
-
 #include <linux/input.h>
 
 #include "event_log_helper.h"

@@ -15,6 +15,7 @@
 
 #ifndef MMI_VECTOR3_H
 #define MMI_VECTOR3_H
+
 #include <cmath>
 
 namespace OHOS {
@@ -266,5 +267,4 @@ inline T* Vector3<T>::GetData()
 }
 } // namespace Rosen
 } // namespace OHOS
-
 #endif // RENDER_SERVICE_CLIENT_CORE_COMMON_RS_VECTOR3_H

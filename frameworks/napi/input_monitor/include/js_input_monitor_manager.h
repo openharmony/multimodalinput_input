@@ -37,33 +37,20 @@ public:
 
     void AddMonitor(napi_env jsEnv, const std::string &typeName,
         std::vector<Rect> hotRectArea, int32_t rectTotal, napi_value callback, const int32_t fingers = 0);
-
-    void AddMonitor(napi_env jsEnv, const std::string &typeName,
-        napi_value callback, const int32_t fingers = 0);
-
+    void AddMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, const int32_t fingers = 0);
     void RemoveMonitor(napi_env jsEnv, const std::string &typeName, napi_value callback, const int32_t fingers = 0);
-
     void RemoveMonitor(napi_env jsEnv, const std::string &typeName, const int32_t fingers = 0);
-
     void RemoveMonitor(napi_env jsEnv);
-
     const std::shared_ptr<JsInputMonitor> GetMonitor(int32_t id, int32_t fingers);
-
     bool AddEnv(napi_env env, napi_callback_info cbInfo);
-
     void RemoveEnv(napi_env env);
-
     void ThrowError(napi_env env, int32_t code);
-    
     std::vector<Rect> GetHotRectAreaList(napi_env env, napi_value rectNapiValue, uint32_t rectListLength);
 
 private:
     JsInputMonitorManager() = default;
-
     bool IsExisting(napi_env env);
-
     void RemoveEnv(std::map<napi_env, napi_ref>::iterator it);
-
     void RemoveAllEnv();
 
 private:

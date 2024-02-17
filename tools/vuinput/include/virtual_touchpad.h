@@ -15,6 +15,7 @@
 
 #ifndef VIRTUAL_TOUCHPAD_H
 #define VIRTUAL_TOUCHPAD_H
+
 #include "virtual_device.h"
 
 namespace OHOS {

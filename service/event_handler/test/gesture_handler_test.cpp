@@ -170,6 +170,5 @@ HWTEST_F(GestureHandlerTest, GestureHandlerTest_GetRotateAngle_001, TestSize.Lev
     double rotateAngle = 0.0;
     ASSERT_EQ(GESTURE_HANDLER->GetRotateAngle(), rotateAngle);
 }
-
 } // namespace MMI
 } // namespace OHOS

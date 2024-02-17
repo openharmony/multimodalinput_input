@@ -34,5 +34,4 @@ private:
 };
 } // namespace MMI
 } // namespace OHOS
-
 #endif // JS_GESTURE_EVENT
