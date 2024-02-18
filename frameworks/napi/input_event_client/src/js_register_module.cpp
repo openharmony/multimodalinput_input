@@ -570,7 +570,7 @@ static int32_t HandleJoystickAxes(napi_env env, napi_value joystickHandle, std::
 
     for (uint32_t i = 0; i < arrayLength; i++) {
         napi_value axisObject;
-        if (napi_get_element(env, axesArray, i, &axisObject)!= napi_ok) {
+        if (napi_get_element(env, axesArray, i, &axisObject) != napi_ok) {
             MMI_HILOGE("Call napi_get_element failed");
             return RET_ERR;
         }
