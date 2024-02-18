@@ -31,7 +31,8 @@ class MultimodalInputConnectProxy final : public IRemoteProxy<IMultimodalInputCo
 public:
     explicit MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl);
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectProxy);
-    ~MultimodalInputConnectProxy() override = default;
+    ~MultimodalInputConnectProxy() override;
+
     int32_t AllocSocketFd(const std::string &programName, const int32_t moduleType,
         int32_t &socketFd, int32_t &tokenType) override;
     int32_t AddInputEventFilter(sptr<IEventFilter> filter, int32_t filterId, int32_t priority,
