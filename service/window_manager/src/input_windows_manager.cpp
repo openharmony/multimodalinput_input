@@ -366,7 +366,7 @@ void InputWindowsManager::UpdateCaptureMode(const DisplayGroupInfo &displayGroup
 
 void InputWindowsManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     PrintWindowGroupInfo(windowGroupInfo);
 #ifdef OHOS_BUILD_ENABLE_ANCO
     if (windowGroupInfo.windowsInfo.size() == SHELL_WINDOW_COUNT && IsAncoWindow(windowGroupInfo.windowsInfo[0])) {
