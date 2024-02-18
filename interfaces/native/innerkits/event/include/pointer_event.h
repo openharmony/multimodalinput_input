@@ -1229,6 +1229,8 @@ public:
      */
     void ClearButtonPressed();
 
+    int32_t GetPointerCount() const;
+
     /**
      * @brief Obtains all pointers in this event.
      * @return Returns all the pointer IDs.

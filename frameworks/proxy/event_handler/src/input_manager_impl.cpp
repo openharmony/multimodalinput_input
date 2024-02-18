@@ -139,7 +139,7 @@ void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInf
 
 void InputManagerImpl::UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo)
 {
-    CALL_DEBUG_ENTER;
+    CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
         MMI_HILOGE("Get mmi client is nullptr");
