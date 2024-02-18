@@ -456,13 +456,16 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
     auto deathCallback = [weakPtr](const wptr<IRemoteObject> &object) {
         auto sharedPtr = weakPtr.lock();
         if (sharedPtr != nullptr) {
-            sharedPtr->OnDeath();
+            sharedPtr->OnDeath(object);
         }
     };
 
     multimodalInputConnectRecipient_ = new (std::nothrow) MultimodalInputConnectDeathRecipient(deathCallback);
     CHKPF(multimodalInputConnectRecipient_);
-    sa->AddDeathRecipient(multimodalInputConnectRecipient_);
+    if (!sa->AddDeathRecipient(multimodalInputConnectRecipient_)) {
+        MMI_HILOGE("Failed to add death recipient");
+        return false;
+    }
     multimodalInputConnectService_ = iface_cast<IMultimodalInputConnect>(sa);
     if (multimodalInputConnectService_ == nullptr) {
         MMI_HILOGE("Get multimodalinput service failed");
@@ -472,26 +475,31 @@ bool MultimodalInputConnectManager::ConnectMultimodalInputService()
     return true;
 }
 
-void MultimodalInputConnectManager::OnDeath()
+void MultimodalInputConnectManager::OnDeath(const wptr<IRemoteObject> &remoteObj)
 {
     CALL_DEBUG_ENTER;
-    Clean();
+    Clean(remoteObj);
     NotifyServiceDeath();
     NotifyDeath();
 }
 
-void MultimodalInputConnectManager::Clean()
+void MultimodalInputConnectManager::Clean(const wptr<IRemoteObject> &remoteObj)
 {
-    CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(lock_);
     if (multimodalInputConnectService_ != nullptr) {
-        multimodalInputConnectService_.clear();
-        multimodalInputConnectService_ = nullptr;
-    }
-
-    if (multimodalInputConnectRecipient_ != nullptr) {
-        multimodalInputConnectRecipient_.clear();
+        auto serviceObj = multimodalInputConnectService_->AsObject();
+        if (serviceObj != nullptr) {
+            if (serviceObj != remoteObj.promote()) {
+                return;
+            }
+            if (multimodalInputConnectRecipient_ != nullptr) {
+                MMI_HILOGI("Remove death recipient on service death");
+                serviceObj->RemoveDeathRecipient(multimodalInputConnectRecipient_);
+            }
+        }
+        MMI_HILOGI("Reset proxy on service death");
         multimodalInputConnectRecipient_ = nullptr;
+        multimodalInputConnectService_ = nullptr;
     }
 }
 

@@ -125,8 +125,8 @@ private:
     DISALLOW_COPY_AND_MOVE(MultimodalInputConnectManager);
 
     bool ConnectMultimodalInputService();
-    void OnDeath();
-    void Clean();
+    void OnDeath(const wptr<IRemoteObject> &remoteObj);
+    void Clean(const wptr<IRemoteObject> &remoteObj);
     void NotifyServiceDeath();
     void NotifyDeath();
     sptr<IMultimodalInputConnect> multimodalInputConnectService_ { nullptr };
