@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1800,6 +1800,16 @@ int32_t InputManagerImpl::GetShieldStatus(int32_t shieldMode, bool &isShield)
         MMI_HILOGE("Get shield event interception status failed, ret:%{public}d", ret);
     }
     return ret;
+}
+
+void InputManagerImpl::AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher)
+{
+    MultimodalInputConnMgr->AddServiceWatcher(watcher);
+}
+
+void InputManagerImpl::RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher)
+{
+    MultimodalInputConnMgr->RemoveServiceWatcher(watcher);
 }
 } // namespace MMI
 } // namespace OHOS
