@@ -1947,5 +1947,29 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoveInputEventFilter_003, TestSize
     ret = InputManager::GetInstance()->RemoveInputEventFilter(filterId);
     ASSERT_EQ(ret, RET_OK);
 }
+
+#ifdef INPUT_MANAGER_TEST_ENABLE_DEMO
+class ServiceWatcher final : public IInputServiceWatcher {
+public:
+    ServiceWatcher() = default;
+    ~ServiceWatcher() = default;
+
+    void OnServiceDied() override
+    {}
+};
+
+/**
+ * @tc.name: InputManagerTest_InputServiceWatcher
+ * @tc.desc: Verify service watcher.
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerTest, InputManagerTest_InputServiceWatcher, TestSize.Level1)
+{
+    auto watcher = std::make_shared<ServiceWatcher>();
+    InputManager::GetInstance()->AddServiceWatcher(watcher);
+    InputManager::GetInstance()->RemoveServiceWatcher(watcher);
+}
+#endif // INPUT_MANAGER_TEST_ENABLE_DEMO
 }  // namespace MMI
 }  // namespace OHOS
