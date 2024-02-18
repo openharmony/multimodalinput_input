@@ -190,6 +190,7 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
         }
         if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK) {
             if (JsInputMonMgr.GetMonitor(id_, fingers_)->GetTypeName() != "joystick") {
+                MMI_HILOGE("Failed to process joystick event");
                 return;
             }
         }
@@ -1073,13 +1074,13 @@ int32_t JsInputMonitor::TransformJoystickPointerEvent(const std::shared_ptr<Poin
     CALL_DEBUG_ENTER;
     CHKPR(pointerEvent, ERROR_NULL_POINTER);
     int32_t pointerAction = pointerEvent->GetPointerAction();
-    if (!pointerAction) {
+    if (pointerAction <= 0) {
         MMI_HILOGE("GetPointerAction failed");
         return RET_ERR;
     }
     std::optional<int32_t> tempActionValue = GetJoystickAction(pointerAction);
     if (!tempActionValue) {
-        MMI_HILOGE("Get Joystick Action Value failed");
+        MMI_HILOGE("Get joystick action value failed");
         return RET_ERR;
     }
     int32_t actionValue = tempActionValue.value();
