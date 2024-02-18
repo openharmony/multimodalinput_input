@@ -83,7 +83,12 @@ int32_t ParseInputDevice(MessageParcel &reply, std::shared_ptr<InputDevice> &inp
 MultimodalInputConnectProxy::MultimodalInputConnectProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<IMultimodalInputConnect>(impl)
 {
-    MMI_HILOGD("Enter MultimodalInputConnectProxy");
+    MMI_HILOGI("Construct MMI proxy");
+}
+
+MultimodalInputConnectProxy::~MultimodalInputConnectProxy()
+{
+    MMI_HILOGI("Destruct MMI proxy");
 }
 
 int32_t MultimodalInputConnectProxy::AllocSocketFd(const std::string &programName,
