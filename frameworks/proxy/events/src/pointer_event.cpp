@@ -520,6 +520,11 @@ void PointerEvent::ClearButtonPressed()
     pressedButtons_.clear();
 }
 
+int32_t PointerEvent::GetPointerCount() const
+{
+    return static_cast<int32_t>(pointers_.size());
+}
+
 std::vector<int32_t> PointerEvent::GetPointerIds() const
 {
     std::vector<int32_t> pointerIdList;
