@@ -57,8 +57,8 @@ public:
     int32_t GetAllMmiSubscribedEvents(std::map<std::tuple<int32_t, int32_t, std::string>, int32_t> &datas);
     int32_t SetDisplayBind(int32_t deviceId, int32_t displayId, std::string &msg);
     int32_t GetWindowPid(int32_t windowId);
-    void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
-    void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
+    int32_t UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    int32_t UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
     void SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     void SetEnhanceConfig(uint8_t *cfg, uint32_t cfgLen);
@@ -187,8 +187,8 @@ private:
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();
     void PrintWindowGroupInfo();
-    void SendDisplayInfo();
-    void SendWindowInfo();
+    int32_t SendDisplayInfo();
+    int32_t SendWindowInfo();
     void SendWindowAreaInfo(WindowArea area, int32_t pid, int32_t windowId);
     bool IsValiadWindowAreas(const std::vector<WindowInfo> &windows);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT

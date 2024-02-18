@@ -52,14 +52,14 @@ int32_t InputManager::GetWindowPid(int32_t windowId)
     return InputMgrImpl.GetWindowPid(windowId);
 }
 
-void InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
+int32_t InputManager::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
-    InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
+    return InputMgrImpl.UpdateDisplayInfo(displayGroupInfo);
 }
 
-void InputManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo)
+int32_t InputManager::UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo)
 {
-    InputMgrImpl.UpdateWindowInfo(windowGroupInfo);
+    return InputMgrImpl.UpdateWindowInfo(windowGroupInfo);
 }
 
 int32_t InputManager::AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority,
