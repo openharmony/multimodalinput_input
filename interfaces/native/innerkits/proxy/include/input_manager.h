@@ -58,14 +58,14 @@ public:
      * @param displayGroupInfo Indicates the logical screen information.
      * @since 9
      */
-    void UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
+    int32_t UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo);
 
     /**
      * @brief Updates the windows information.
      * @param windowGroupInfo Indicates the window group information.
      * @since 9
      */
-    void UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
+    int32_t UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo);
 
     int32_t AddInputEventFilter(std::shared_ptr<IInputEventFilter> filter, int32_t priority, uint32_t deviceTags);
     int32_t RemoveInputEventFilter(int32_t filterId);

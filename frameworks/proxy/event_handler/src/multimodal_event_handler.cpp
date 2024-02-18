@@ -111,8 +111,7 @@ bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
     client_ = std::make_shared<MMIClient>();
     client_->SetEventHandler(eventHandler);
     client_->RegisterConnectedFunction(&OnConnected);
-    if (!(client_->Start())) {
-        client_.reset();
+    if (!client_->Start()) {
         client_ = nullptr;
         MMI_HILOGE("The client fails to start");
         return false;
