@@ -655,7 +655,7 @@ int32_t PointerDrawingManager::SetPointerColor(int32_t color)
         color = MAX_POINTER_COLOR;
     }
     std::string name = "pointerColor";
-    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, MOUSE_FILE_NAME, color);
+    int32_t ret = PreferencesMgr->SetIntValue(name, MOUSE_FILE_NAME, color);
     if (ret == RET_OK) {
         MMI_HILOGD("Set pointer color successfully, color:%{public}d", color);
     }
@@ -673,7 +673,7 @@ int32_t PointerDrawingManager::GetPointerColor()
 {
     CALL_DEBUG_ENTER;
     std::string name = "pointerColor";
-    int32_t pointerColor = PREFERENCES_MANAGER->GetIntValue(name, DEFAULT_VALUE);
+    int32_t pointerColor = PreferencesMgr->GetIntValue(name, DEFAULT_VALUE);
     tempPointerColor_ = pointerColor;
     if (pointerColor == DEFAULT_VALUE) {
         pointerColor = MIN_POINTER_COLOR;
@@ -703,7 +703,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
         size = MAX_POINTER_SIZE;
     }
     std::string name = "pointerSize";
-    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, MOUSE_FILE_NAME, size);
+    int32_t ret = PreferencesMgr->SetIntValue(name, MOUSE_FILE_NAME, size);
     if (ret == RET_OK) {
         MMI_HILOGD("Set pointer size successfully, size:%{public}d", size);
     }
@@ -733,7 +733,7 @@ int32_t PointerDrawingManager::GetPointerSize()
 {
     CALL_DEBUG_ENTER;
     std::string name = "pointerSize";
-    int32_t pointerSize = PREFERENCES_MANAGER->GetIntValue(name, DEFAULT_POINTER_SIZE);
+    int32_t pointerSize = PreferencesMgr->GetIntValue(name, DEFAULT_POINTER_SIZE);
     MMI_HILOGD("Get pointer size successfully, pointerSize:%{public}d", pointerSize);
     return pointerSize;
 }
@@ -961,7 +961,7 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
         it->second.iconPath = newIconPath;
     }
     std::string name = "pointerColor";
-    ret = PREFERENCES_MANAGER->SetIntValue(name, MOUSE_FILE_NAME, DEFAULT_VALUE);
+    ret = PreferencesMgr->SetIntValue(name, MOUSE_FILE_NAME, DEFAULT_VALUE);
     if (ret != RET_OK) {
         MMI_HILOGD("Set default color failed");
         return RET_ERR;
@@ -979,7 +979,7 @@ int32_t PointerDrawingManager::SetPointerStylePreference(PointerStyle pointerSty
 {
     CALL_DEBUG_ENTER;
     std::string name = "pointerStyle";
-    int32_t ret = PREFERENCES_MANAGER->SetIntValue(name, MOUSE_FILE_NAME, pointerStyle.id);
+    int32_t ret = PreferencesMgr->SetIntValue(name, MOUSE_FILE_NAME, pointerStyle.id);
     if (ret == RET_OK) {
         MMI_HILOGD("Set pointer style successfully, style:%{public}d", pointerStyle.id);
     }
@@ -1043,11 +1043,11 @@ int32_t PointerDrawingManager::GetPointerStyle(int32_t pid, int32_t windowId, Po
     CALL_DEBUG_ENTER;
     if (windowId == GLOBAL_WINDOW_ID) {
         std::string name = "pointerColor";
-        pointerStyle.color = PREFERENCES_MANAGER->GetIntValue(name, DEFAULT_VALUE);
+        pointerStyle.color = PreferencesMgr->GetIntValue(name, DEFAULT_VALUE);
         name = "pointerSize";
-        pointerStyle.size = PREFERENCES_MANAGER->GetIntValue(name, DEFAULT_POINTER_SIZE);
+        pointerStyle.size = PreferencesMgr->GetIntValue(name, DEFAULT_POINTER_SIZE);
         name = "pointerStyle";
-        int32_t style = PREFERENCES_MANAGER->GetIntValue(name, DEFAULT_POINTER_STYLE);
+        int32_t style = PreferencesMgr->GetIntValue(name, DEFAULT_POINTER_STYLE);
         MMI_HILOGD("Get pointer style successfully, pointerStyle:%{public}d", style);
         if (style == CURSOR_CIRCLE_STYLE) {
             pointerStyle.id = style;
