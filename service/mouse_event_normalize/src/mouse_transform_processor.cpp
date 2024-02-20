@@ -181,7 +181,7 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
         button = MouseDeviceState::LIBINPUT_BUTTON_CODE::LIBINPUT_LEFT_BUTTON_CODE;
     }
 
-    auto ret = HandleButtonValueInner(data, button);
+    auto ret = HandleButtonValueInner(data, button, type);
     if (ret != RET_OK) {
         MMI_HILOGE("The button value does not exist");
         return RET_ERR;
@@ -209,7 +209,8 @@ int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer
     return RET_OK;
 }
 
-int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_pointer *data, uint32_t button)
+int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_pointer *data, uint32_t button,
+    int32_t type)
 {
     CALL_DEBUG_ENTER;
     CHKPR(data, ERROR_NULL_POINTER);
@@ -223,7 +224,7 @@ int32_t MouseTransformProcessor::HandleButtonValueInner(struct libinput_event_po
     std::string name = "primaryButton";
     int32_t primaryButton = PreferencesMgr->GetIntValue(name, 0);
     MMI_HILOGD("Set mouse primary button:%{public}d", primaryButton);
-    if (primaryButton == RIGHT_BUTTON) {
+    if (type == LIBINPUT_EVENT_POINTER_BUTTON && primaryButton == RIGHT_BUTTON) {
         if (buttonId == PointerEvent::MOUSE_BUTTON_LEFT) {
             buttonId = PointerEvent::MOUSE_BUTTON_RIGHT;
         } else if (buttonId == PointerEvent::MOUSE_BUTTON_RIGHT) {
