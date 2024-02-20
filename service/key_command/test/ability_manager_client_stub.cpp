@@ -62,7 +62,7 @@ Want &Want::AddEntity(const std::string &entity)
     return *this;
 }
 
-Want &Want::SetParam(const std::string& key, const std::string& value)
+Want &Want::SetParam(const std::string &key, const std::string &value)
 {
     params_.emplace(key, value);
 
@@ -108,5 +108,5 @@ void AbilityManagerClient::SetErrCode(ErrCode err)
 {
     err_ = err;
 }
-}  // namespace AAFwk
-}  // namespace OHOS
+} // namespace AAFwk
+} // namespace OHOS

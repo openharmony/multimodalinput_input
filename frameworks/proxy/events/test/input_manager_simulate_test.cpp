@@ -80,7 +80,7 @@ constexpr int32_t POINTER_ITEM_WINDOW_FOUR = 600;
 constexpr double POINTER_AXIS_VALUE = 30.0;
 constexpr double POINTER_ITEM_PRESSURE_ONE = 5.0;
 constexpr double POINTER_ITEM_PRESSURE_TWO = 7.0;
-}  // namespace
+} // namespace
 
 class InputManagerSimulateTest : public testing::Test {
 public:
@@ -1500,5 +1500,5 @@ HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_004, 
 
     InputManagerUtil::TestMonitor(monitorId, pointerEvent);
 }
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS
