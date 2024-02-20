@@ -26,7 +26,7 @@ constexpr int32_t FIFTH_FINGER = 5;
 constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE = 15;
 } // namespace
 
-void DeviceBase::SetTimeToLibinputEvent(InjectEvent& injectEvent)
+void DeviceBase::SetTimeToLibinputEvent(InjectEvent &injectEvent)
 {
     struct timeval tm;
     gettimeofday(&tm, 0);
@@ -34,7 +34,7 @@ void DeviceBase::SetTimeToLibinputEvent(InjectEvent& injectEvent)
     injectEvent.event.input_event_usec = tm.tv_usec;
 }
 
-void DeviceBase::SetSynConfigReport(InputEventArray& inputEventArray, int64_t blockTime)
+void DeviceBase::SetSynConfigReport(InputEventArray &inputEventArray, int64_t blockTime)
 {
     InjectEvent injectEvent = {};
     injectEvent.blockTime = blockTime;

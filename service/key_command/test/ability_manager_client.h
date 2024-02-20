@@ -43,7 +43,7 @@ public:
     Want &SetType(const std::string &type);
     Want &AddEntity(const std::string &entity);
     // Note: We use different SetParam() signature for test
-    Want &SetParam(const std::string& key, const std::string& value);
+    Want &SetParam(const std::string &key, const std::string &value);
 
     std::string bundleName_;
     std::string abilityName_;
@@ -77,6 +77,6 @@ private:
     ErrCode err_;
 };
 
-}  // namespace AAFwk
-}  // namespace OHOS
-#endif  // ABILITY_MANAGER_CLIENT_STUB_H
+} // namespace AAFwk
+} // namespace OHOS
+#endif // ABILITY_MANAGER_CLIENT_STUB_H
