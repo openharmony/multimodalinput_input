@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,7 @@
 #include "input_monitor_manager.h"
 #endif // OHOS_BUILD_ENABLE_MONITOR
 #include "i_anr_observer.h"
+#include "i_input_service_watcher.h"
 #include "mmi_event_observer.h"
 #include "i_window_checker.h"
 #include "key_option.h"
@@ -175,6 +176,10 @@ public:
     void AppendExtraData(const ExtraData& extraData);
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
+
+    void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
+    void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
+
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackWindowGroupInfo(NetPacket &pkt);
@@ -205,6 +210,7 @@ private:
 #ifdef OHOS_BUILD_ENABLE_ANCO
     bool IsValidAncoWindow(const std::vector<WindowInfo> &windows);
 #endif // OHOS_BUILD_ENABLE_ANCO
+
 private:
     std::map<int32_t, std::tuple<sptr<IEventFilter>, int32_t, uint32_t>> eventFilterServices_;
     std::shared_ptr<MMIEventObserver> eventObserver_ { nullptr };
