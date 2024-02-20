@@ -109,7 +109,7 @@ constexpr double POINTER_ITEM_TITLE_X_THREE = 10.0;
 constexpr double POINTER_ITEM_TITLE_Y_ONE = 5.43;
 constexpr double POINTER_ITEM_TITLE_Y_TWO = 15.33;
 constexpr double POINTER_ITEM_TITLE_Y_THREE = -9.0;
-}  // namespace
+} // namespace
 
 std::shared_ptr<KeyOption> InputManagerUtil::InitOption(
     const std::set<int32_t> &preKeys, int32_t finalKey, bool isFinalKeyDown, int32_t duration)
@@ -860,5 +860,5 @@ std::shared_ptr<PointerEvent> InputManagerUtil::SetupTabletToolEvent001()
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     return pointerEvent;
 }
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS
