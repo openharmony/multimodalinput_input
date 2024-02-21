@@ -92,7 +92,7 @@ private:
 
 private:
     UDSServer *udsServer_ { nullptr };
-    int32_t targetWindowId_ { -1 };
+    std::map<int32_t, int32_t> targetWindowIds_;
 };
 } // namespace MMI
 } // namespace OHOS
