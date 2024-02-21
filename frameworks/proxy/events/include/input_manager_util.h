@@ -70,6 +70,6 @@ public:
     static void TestInterceptorId(int32_t interceptorId1, int32_t interceptorId2);
     static std::shared_ptr<PointerEvent> SetupTabletToolEvent001();
 };
-}  // namespace MMI
-}  // namespace OHOS
-#endif  // INPUT_MANAGER_UTIL_H
+} // namespace MMI
+} // namespace OHOS
+#endif // INPUT_MANAGER_UTIL_H

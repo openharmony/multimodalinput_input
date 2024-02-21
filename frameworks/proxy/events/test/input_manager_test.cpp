@@ -53,7 +53,7 @@ constexpr uint32_t SHELL_FLAGS_VALUE = 2;
 #endif  // OHOS_BUILD_ENABLE_ANCO
 
 constexpr double POINTER_ITEM_PRESSURE = 5.0;
-}  // namespace
+} // namespace
 
 class InputManagerTest : public testing::Test {
 public:
@@ -1971,5 +1971,5 @@ HWTEST_F(InputManagerTest, InputManagerTest_InputServiceWatcher, TestSize.Level1
     InputManager::GetInstance()->RemoveServiceWatcher(watcher);
 }
 #endif // INPUT_MANAGER_TEST_ENABLE_DEMO
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS
