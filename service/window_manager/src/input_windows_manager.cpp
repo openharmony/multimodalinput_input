@@ -238,7 +238,7 @@ int32_t InputWindowsManager::GetPidAndUpdateTarget(std::shared_ptr<KeyEvent> key
     }
     CHKPR(windowInfo, INVALID_PID);
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    if (IsAncoWindow(*windowInfo)) {
+    if (IsAncoWindowFocus(*windowInfo)) {
         MMI_HILOGD("focusWindowId:%{public}d is anco window.", focusWindowId);
         if (keyEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE)) {
             SimulateKeyExt(keyEvent);
