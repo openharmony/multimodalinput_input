@@ -169,7 +169,14 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
         }
     }
     if (source == PointerEvent::SOURCE_TYPE_TOUCHSCREEN && action == PointerEvent::POINTER_ACTION_DOWN) {
-        targetWindowId_ = pointerEvent->GetTargetWindowId();
+        int32_t pointerId = pointerEvent->GetPointerId();
+        PointerEvent::PointerItem pointerItem;
+        if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+            MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
+            return RET_ERR;
+        }
+        int32_t targetWindowId = pointerEvent->GetTargetWindowId();
+        targetWindowIds_[pointerId] = targetWindowId;
     }
     return RET_OK;
 }
@@ -178,24 +185,29 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent, int32_t action)
 {
-    if (action == PointerEvent::POINTER_ACTION_DOWN || targetWindowId_ < 0) {
-        MMI_HILOGD("Down event or targetWindowId_ less 0 is not need fix window id");
+    int32_t targetWindowId = -1;
+    auto iter = targetWindowIds_.find(pointerEvent->GetPointerId());
+    if (iter != targetWindowIds_.end()) {
+        targetWindowId = iter->second;
+    }
+    if (action == PointerEvent::POINTER_ACTION_DOWN || targetWindowId < 0) {
+        MMI_HILOGD("Down event or targetWindowId less 0 is not need fix window id");
         return true;
     }
-    pointerEvent->SetTargetWindowId(targetWindowId_);
-    PointerEvent::PointerItem pointerItem;
     auto pointerIds = pointerEvent->GetPointerIds();
     if (pointerIds.empty()) {
         MMI_HILOGE("GetPointerIds is empty");
         return false;
     }
-    auto id = pointerIds.front();
-    if (!pointerEvent->GetPointerItem(id, pointerItem)) {
-        MMI_HILOGE("Can't find pointer item");
+    int32_t pointerId = pointerEvent->GetPointerId();
+    PointerEvent::PointerItem pointerItem;
+    if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
+        MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return false;
     }
-    pointerItem.SetTargetWindowId(targetWindowId_);
-    pointerEvent->UpdatePointerItem(id, pointerItem);
+    pointerEvent->SetTargetWindowId(targetWindowId);
+    pointerItem.SetTargetWindowId(targetWindowId);
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     return true;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
