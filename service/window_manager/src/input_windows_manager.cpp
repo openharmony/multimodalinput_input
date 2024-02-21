@@ -851,6 +851,8 @@ void InputWindowsManager::NotifyPointerToWindow()
 
 void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo)
 {
+    std::string window;
+    window += StringPrintf("windowId:[");
     for (const auto &item : windowsInfo) {
         MMI_HILOGD("windowsInfos,id:%{public}d,pid:%{public}d,uid:%{public}d,"
             "area.x:%{public}d,area.y:%{public}d,area.width:%{public}d,area.height:%{public}d,"
@@ -869,6 +871,7 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
                 pointer.x, pointer.y, pointer.width, pointer.height);
         }
 
+        window += StringPrintf("%d,", item.id);
         std::string dump;
         dump += StringPrintf("pointChangeAreas:[");
         for (auto it : item.pointerChangeAreas) {
@@ -887,6 +890,8 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
             MMI_HILOGD("%{public}s", line.c_str());
         }
     }
+    window += StringPrintf("]\n");
+    MMI_HILOGI("%{public}s", window.c_str());
 }
 
 void InputWindowsManager::PrintWindowGroupInfo(const WindowGroupInfo &windowGroupInfo)
@@ -1949,7 +1954,11 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         lastTouchEvent_ = nullptr;
         lastTouchWindowInfo_.id = -1;
     }
-    MMI_HILOGI("pid:%{public}d,eventId:%{public}d,", touchWindow->pid, pointerEvent->GetId());
+    MMI_HILOGI("pid:%{public}d, targetWindowId:%{public}d, foucsWindowId:%{public}d, eventId:%{public}d,"
+               " displayX:%{public}d, displayY:%{public}d, windowX:%{public}d, windowY:%{public}d, width:%{public}d,"
+               " height:%{public}d,", touchWindow->pid, touchWindow->id, displayGroupInfo_.focusWindowId,
+               pointerEvent->GetId(), physicalX, physicalY, windowX, windowY, touchWindow->area.width,
+               touchWindow->area.height);
     MMI_HILOGD("logicalX:%{public}d,logicalY:%{public}d,"
                "physicalX:%{public}d,physicalY:%{public}d,windowX:%{public}d,windowY:%{public}d,"
                "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",
