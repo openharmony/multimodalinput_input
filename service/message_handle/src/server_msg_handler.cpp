@@ -188,7 +188,7 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
     int32_t targetWindowId = -1;
     auto iter = targetWindowIds_.find(pointerEvent->GetPointerId());
     if (iter != targetWindowIds_.end()) {
-        targetWindowId = iter.second;
+        targetWindowId = iter->second;
     }
     if (action == PointerEvent::POINTER_ACTION_DOWN || targetWindowId < 0) {
         MMI_HILOGD("Down event or targetWindowId less 0 is not need fix window id");
@@ -205,9 +205,9 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
         MMI_HILOGE("Can't find pointer item, pointer:%{public}d", pointerId);
         return false;
     }
-    pointerEvent->SetTargetWindowId(targetWindowId_);
-    pointerItem.SetTargetWindowId(targetWindowId_);
-    pointerEvent->UpdatePointerItem(id, pointerItem);
+    pointerEvent->SetTargetWindowId(targetWindowId);
+    pointerItem.SetTargetWindowId(targetWindowId);
+    pointerEvent->UpdatePointerItem(pointerId, pointerItem);
     return true;
 }
 #endif // OHOS_BUILD_ENABLE_TOUCH
