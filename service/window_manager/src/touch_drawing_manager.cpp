@@ -80,9 +80,6 @@ bool TouchDrawingManager::IsValidAction(const int32_t action)
 void TouchDrawingManager::UpdateDisplayInfo(const DisplayInfo& displayInfo)
 {
     CALL_DEBUG_ENTER;
-    if (displayInfo.dpi == displayInfo_.dpi) {
-        return;
-    }
     displayInfo_ = displayInfo;
     bubble_.innerCircleRadius = displayInfo.dpi * INDEPENDENT_INNER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
     bubble_.outerCircleRadius = displayInfo.dpi * INDEPENDENT_OUTER_PIXELS / DENSITY_BASELINE / CALCULATE_MIDDLE;
@@ -150,6 +147,44 @@ void TouchDrawingManager::CreateCanvasNode()
     canvasNode_->SetRotation(0);
 }
 
+void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
+    int32_t &physicalX, int32_t &physicalY)
+{
+    switch (direction) {
+        case DIRECTION0: {
+            MMI_HILOGD("direction is DIRECTION0");
+            break;
+        }
+        case DIRECTION90: {
+            int32_t temp = physicalY;
+            physicalY = width - physicalX;
+            physicalX = temp;
+            MMI_HILOGD("direction is DIRECTION90, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
+                physicalX, physicalY);
+            break;
+        }
+        case DIRECTION180: {
+            physicalX = width - physicalX;
+            physicalY = height - physicalY;
+            MMI_HILOGD("direction is DIRECTION180, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
+                physicalX, physicalY);
+            break;
+        }
+        case DIRECTION270: {
+            int32_t temp = physicalX;
+            physicalX = height - physicalY;
+            physicalY = temp;
+            MMI_HILOGD("direction is DIRECTION270, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
+                physicalX, physicalY);
+            break;
+        }
+        default: {
+            MMI_HILOGW("direction is invalid");
+            break;
+        }
+    }
+}
+
 int32_t TouchDrawingManager::DrawGraphic(const std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
@@ -179,6 +214,10 @@ int32_t TouchDrawingManager::DrawGraphic(const std::shared_ptr<PointerEvent> poi
         }
         int32_t physicalX = pointerItem.GetDisplayX();
         int32_t physicalY = pointerItem.GetDisplayY();
+        if (displayInfo_.displayDirection == DIRECTION0) {
+            GetOriginalTouchScreenCoordinates(displayInfo_.direction, displayInfo_.width,
+                displayInfo_.height, physicalX, physicalY);
+        }
         Rosen::Drawing::Point centerPt(physicalX, physicalY);
         pen_.SetWidth(bubble_.outerCircleWidth);
         canvas->AttachPen(pen_);
