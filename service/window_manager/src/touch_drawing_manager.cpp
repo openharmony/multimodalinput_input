@@ -150,31 +150,38 @@ void TouchDrawingManager::CreateCanvasNode()
 void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
     int32_t &physicalX, int32_t &physicalY)
 {
-    if (direction == DIRECTION0) {
-        MMI_HILOGD("direction is DIRECTION0");
-        return;
-    }
-    if (direction == DIRECTION90) {
-        MMI_HILOGD("direction is DIRECTION90");
-        int32_t temp = physicalY;
-        physicalY = width - physicalX;
-        physicalX = temp;
-        MMI_HILOGD("Original touch screen physicalX:%{public}d, physicalY:%{public}d", physicalX, physicalY);
-        return;
-    }
-    if (direction == DIRECTION180) {
-        MMI_HILOGD("direction is DIRECTION180");
-        physicalX = width - physicalX;
-        physicalY = height - physicalY;
-        MMI_HILOGD("Original touch screen physicalX:%{public}d, physicalY:%{public}d", physicalX, physicalY);
-        return;
-    }
-    if (direction == DIRECTION270) {
-        MMI_HILOGD("direction is DIRECTION270");
-        int32_t temp = physicalX;
-        physicalX = height - physicalY;
-        physicalY = temp;
-        MMI_HILOGD("Original touch screen physicalX:%{public}d, physicalY:%{public}d", physicalX, physicalY);
+    switch (direction) {
+        case DIRECTION0: {
+            MMI_HILOGD("direction is DIRECTION0");
+            break;
+        }
+        case DIRECTION90: {
+            int32_t temp = physicalY;
+            physicalY = width - physicalX;
+            physicalX = temp;
+            MMI_HILOGD("direction is DIRECTION90, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
+                physicalX, physicalY);
+            break;
+        }
+        case DIRECTION180: {
+            physicalX = width - physicalX;
+            physicalY = height - physicalY;
+            MMI_HILOGD("direction is DIRECTION180, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
+                physicalX, physicalY);
+            break;
+        }
+        case DIRECTION270: {
+            int32_t temp = physicalX;
+            physicalX = height - physicalY;
+            physicalY = temp;
+            MMI_HILOGD("direction is DIRECTION270, Original touch screen physicalX:%{public}d, physicalY:%{public}d",
+                physicalX, physicalY);
+            break;
+        }
+        default: {
+            MMI_HILOGW("direction is invalid");
+            break;
+        }
     }
 }
 
