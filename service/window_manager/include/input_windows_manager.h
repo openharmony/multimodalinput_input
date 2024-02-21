@@ -108,6 +108,7 @@ public:
     void UpdateDisplayInfoExt(const DisplayGroupInfo &displayGroupInfo);
     bool IsInAncoWindow(const WindowInfo &window, int32_t x, int32_t y) const;
     bool IsAncoWindow(const WindowInfo &window) const;
+    bool IsAncoWindowFocus(const WindowInfo &window) const;
     void SimulatePointerExt(std::shared_ptr<PointerEvent> pointerEvent);
     void SimulateKeyExt(std::shared_ptr<KeyEvent> keyEvent);
     void DumpAncoWindows(std::string& out) const;
