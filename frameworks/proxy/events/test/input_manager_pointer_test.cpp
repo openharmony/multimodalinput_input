@@ -1832,5 +1832,5 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetCustomCursor_005, T
         ASSERT_TRUE(false);
     }
 }
-}  // namespace MMI
-}  // namespace OHOS
+} // namespace MMI
+} // namespace OHOS

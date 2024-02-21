@@ -39,7 +39,7 @@ struct JsonParser {
     cJSON *json_ { nullptr };
 };
 
-void GetJsonData(cJSON *json, const std::string& key, std::string& val)
+void GetJsonData(cJSON *json, const std::string &key, std::string &val)
 {
     if (!cJSON_IsObject(json)) {
         MMI_HILOGE("The json is not object");
@@ -55,7 +55,7 @@ void GetJsonData(cJSON *json, const std::string& key, std::string& val)
 }
 
 template <class T>
-void GetJsonData(cJSON *json, const std::string& key, T& val)
+void GetJsonData(cJSON *json, const std::string &key, T &val)
 {
     if (!cJSON_IsObject(json)) {
         MMI_HILOGE("The json is not object");
