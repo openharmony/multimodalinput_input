@@ -47,8 +47,8 @@ PermissionDef inputDispatchControlPermDef_ = {
     .label = "label",
     .labelId = 1,
     .description = "test input agent",
-    .descriptionId = 1,
-    .availableLevel = APL_SYSTEM_CORE
+    .availableLevel = APL_SYSTEM_CORE,
+    .descriptionId = 1
 };
 
 PermissionDef infoManagerTestPermDef_ = {
@@ -58,23 +58,23 @@ PermissionDef infoManagerTestPermDef_ = {
     .label = "label",
     .labelId = 1,
     .description = "test input agent",
+    .availableLevel = APL_SYSTEM_CORE,
     .descriptionId = 1,
-    .availableLevel = APL_SYSTEM_CORE
 };
 
 PermissionStateFull infoManagerTestState_ = {
-    .grantFlags = { 1 },
-    .grantStatus = { PermissionState::PERMISSION_GRANTED },
-    .isGeneral = true,
     .permissionName = "ohos.permission.INPUT_MONITORING",
+    .isGeneral = true,
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 1 },
     .resDeviceID = { "local" }
 };
 
 PermissionStateFull inputDispatchControlPermState_ = {
-    .grantFlags = { 1 },
-    .grantStatus = { PermissionState::PERMISSION_GRANTED },
-    .isGeneral = true,
     .permissionName = "ohos.permission.INPUT_CONTROL_DISPATCHING",
+    .isGeneral = true,
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 1 },
     .resDeviceID = { "local" }
 };
 
@@ -86,8 +86,8 @@ HapPolicyParams infoManagerTestPolicyPrams_ = {
 };
 
 HapInfoParams infoManagerTestInfoParms_ = {
-    .bundleName = "inputManager_test",
     .userID = 1,
+    .bundleName = "inputManager_test",
     .instIndex = 0,
     .appIDDesc = "InputManagerTest",
     .isSystemApp = true

@@ -83,7 +83,7 @@ private:
     void HandleMotionMoveMouse(int32_t offsetX, int32_t offsetY);
     void HandlePostMoveMouse(PointerEvent::PointerItem &pointerItem);
 #endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
-    int32_t HandleButtonValueInner(struct libinput_event_pointer* data, uint32_t button);
+    int32_t HandleButtonValueInner(struct libinput_event_pointer* data, uint32_t button, int32_t type);
     void DumpInner();
     void SetDxDyForDInput(PointerEvent::PointerItem& pointerItem, struct libinput_event_pointer* data);
     int32_t GetTouchpadSpeed(void);
