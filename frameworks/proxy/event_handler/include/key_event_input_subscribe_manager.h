@@ -80,6 +80,6 @@ private:
 };
 
 #define KeyEventInputSubscribeMgr ::OHOS::Singleton<KeyEventInputSubscribeManager>::GetInstance()
-}  // namespace MMI
-}  // namespace OHOS
-#endif  // KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H
+} // namespace MMI
+} // namespace OHOS
+#endif // KEY_EVENT_INPUT_SUBSCRIBE_MANAGER_H

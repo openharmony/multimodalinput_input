@@ -31,7 +31,7 @@ namespace MMI {
 namespace {
 using namespace testing::ext;
 const char *testFileName = "/data/log.log";
-}  // namespace
+} // namespace
 
 class EventDumpTest : public testing::Test {
 public:
@@ -103,5 +103,5 @@ HWTEST_F(EventDumpTest, EventDumpTest005, TestSize.Level1) {
     // 使用Gtest提供的断言函数，判断选项个数是否为4
     EXPECT_EQ(count, 4);
 }
-}
-}
+} // namespace MMI
+} // namespace OHOS
