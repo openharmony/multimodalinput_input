@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Copyright (c) 2024 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -13,22 +13,21 @@
 
 import("../../../multimodalinput_mini.gni")
 
-config("inputmonitor_config") {
+config("joystickEvent_config") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "${mmi_path}/frameworks/napi/input_monitor/include",
-    "${mmi_path}/util/common/include",
-    "${mmi_path}/interfaces/native/innerkits/proxy/include",
-    "${mmi_path}/frameworks/napi/touch_event/include",
     "${mmi_path}/frameworks/napi/joystick_event/include",
+    "${mmi_path}/util/common/include",
+    "${mmi_path}/util/network/include",
   ]
-
-  defines = input_default_defines
 }
 
-ohos_shared_library("inputmonitor") {
-  sources = inputmonitor_sources
+ohos_shared_library("joystickevent") {
+  sources = [
+    "src/js_joystick_event.cpp",
+    "src/native_register_module.cpp",
+  ]
   stack_protector_ret = true
   sanitize = {
     integer_overflow = true
@@ -41,13 +40,10 @@ ohos_shared_library("inputmonitor") {
 
   configs = [
     "${mmi_path}:coverage_flags",
-    ":inputmonitor_config",
+    ":joystickEvent_config",
   ]
 
-  deps = [
-    "${mmi_path}/frameworks/proxy:libmmi-client",
-    "${mmi_path}/util:libmmi-util",
-  ]
+  deps = []
 
   external_deps = [
     "c_utils:utils",
