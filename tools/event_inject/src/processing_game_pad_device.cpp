@@ -21,8 +21,8 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingGamePadDevice" };
 } // namespace
 
-int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const DeviceItem& originalEvent,
-    InputEventArray& inputEventArray)
+int32_t ProcessingGamePadDevice::TransformJsonDataToInputData(const DeviceItem &originalEvent,
+    InputEventArray &inputEventArray)
 {
     CALL_DEBUG_ENTER;
     if (originalEvent.events.empty()) {

@@ -23,13 +23,13 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "GetDeviceObject" };
-bool IsKeyboardDevice(const std::string& deviceName)
+bool IsKeyboardDevice(const std::string &deviceName)
 {
     std::regex regExp("keyboard model[1-3]");
     return std::regex_match(deviceName, regExp);
 }
 
-bool IsMouseDevice(const std::string& deviceName)
+bool IsMouseDevice(const std::string &deviceName)
 {
     std::regex regExp("(knob model[1-3])|(trackpad model[1-2])");
     return std::regex_match(deviceName, regExp);
