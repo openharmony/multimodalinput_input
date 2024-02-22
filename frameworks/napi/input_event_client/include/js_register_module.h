@@ -27,6 +27,7 @@
 #include "utils/log.h"
 
 #include "define_multimodal.h"
+#include "js_joystick_event.h"
 
 enum MOUSE_CALLBACK_EVENT {
     JS_CALLBACK_MOUSE_ACTION_MOVE = 1,

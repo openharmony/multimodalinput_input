@@ -84,6 +84,7 @@ group("input_jsapi_group") {
     deps += [
       "frameworks/napi/gesture_event:gestureevent",
       "frameworks/napi/intention_code:intentioncode",
+      "frameworks/napi/joystick_event:joystickevent",
       "frameworks/napi/key_code:keycode",
       "frameworks/napi/key_event:keyevent",
       "frameworks/napi/mouse_event:mouseevent",
