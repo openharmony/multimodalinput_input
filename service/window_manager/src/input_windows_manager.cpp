@@ -816,12 +816,7 @@ void InputWindowsManager::NotifyPointerToWindow()
     CALL_INFO_TRACE;
     std::optional<WindowInfo> windowInfo;
     CHKPV(lastPointerEvent_);
-    if (lastPointerEvent_->GetPointerAction() == PointerEvent::POINTER_ACTION_MOVE &&
-        lastPointerEvent_->GetPressedButtons().empty()) {
-        windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
-    } else {
-        windowInfo = SelectWindowInfo(lastLogicX_, lastLogicY_, lastPointerEvent_);
-    }
+    windowInfo = GetWindowInfo(lastLogicX_, lastLogicY_);
     if (!windowInfo) {
         MMI_HILOGE("The windowInfo is nullptr");
         return;
