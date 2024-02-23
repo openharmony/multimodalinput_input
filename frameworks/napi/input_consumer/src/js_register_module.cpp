@@ -32,6 +32,7 @@ constexpr size_t EVENT_NAME_LEN = 64;
 constexpr size_t PRE_KEYS_SIZE = 4;
 constexpr size_t INPUT_PARAMETER_MIDDLE = 2;
 constexpr size_t INPUT_PARAMETER_MAX = 3;
+constexpr int32_t TIME_TRANS_FACTOR = 1000;
 } // namespace
 
 static Callbacks callbacks = {};
@@ -208,7 +209,7 @@ static bool MatchCombinationKeys(KeyEventMonitorInfo* monitorInfo, std::shared_p
     auto downTime = keyItem->GetDownTime();
     auto upTime = keyEvent->GetActionTime();
     auto curDurationTime = keyOption->GetFinalKeyDownDuration();
-    if (curDurationTime > 0 && (upTime - downTime >= (static_cast<int64_t>(curDurationTime) * 1000))) {
+    if (curDurationTime > 0 && (upTime - downTime >= (static_cast<int64_t>(curDurationTime) * TIME_TRANS_FACTOR))) {
         MMI_HILOGE("Skip, upTime - downTime >= duration");
         return false;
     }

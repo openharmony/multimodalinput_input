@@ -45,6 +45,7 @@ constexpr int32_t MIN_INTERVALTIME = 36;
 constexpr int32_t MAX_INTERVALTIME = 100;
 constexpr int32_t MIN_DELAYTIME = 300;
 constexpr int32_t MAX_DELAYTIME = 1000;
+constexpr int32_t TIME_TRANS_FACTOR = 1000;
 constexpr int32_t COMMENT_SUBSCRIPT = 0;
 const std::string CONFIG_ITEM_REPEAT = "Key.autorepeat";
 const std::string CONFIG_ITEM_DELAY = "Key.autorepeat.delaytime";
@@ -66,7 +67,7 @@ int64_t GetSysClockTime()
         MMI_HILOGD("clock_gettime failed:%{public}d", errno);
         return 0;
     }
-    return (ts.tv_sec * 1000 * 1000) + (ts.tv_nsec / 1000);
+    return (ts.tv_sec * TIME_TRANS_FACTOR * TIME_TRANS_FACTOR) + (ts.tv_nsec / TIME_TRANS_FACTOR);
 }
 
 int64_t GetMillisTime()

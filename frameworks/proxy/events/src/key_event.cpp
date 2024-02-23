@@ -1063,7 +1063,7 @@ std::shared_ptr<KeyEvent> KeyEvent::Clone(std::shared_ptr<KeyEvent> keyEvent)
     if (!keyEvent) {
         return nullptr;
     }
-    auto event = std::shared_ptr<KeyEvent>(new (std::nothrow) KeyEvent(*keyEvent.get()));
+    auto event = std::make_shared<KeyEvent>(*keyEvent.get());
     CHKPP(event);
     return event;
 }

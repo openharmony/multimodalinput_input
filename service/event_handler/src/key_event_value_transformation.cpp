@@ -25,6 +25,8 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeyEventValueTransformation" };
 constexpr int32_t INVALID_KEY_CODE = -1;
+constexpr int32_t MAX_KEY_ITEM = 3;
+constexpr int32_t KEY_CODE_SHIFT_BITS = 16;
 } // namespace
 
 const std::multimap<int32_t, KeyEventValueTransformation> MAP_KEY_EVENT_VALUE_TRANSFORMATION = {
@@ -499,13 +501,13 @@ const std::map<int64_t, int32_t> MAP_KEY_INTENTION = {
 
 int32_t keyItemsTransKeyIntention(const std::vector<KeyEvent::KeyItem> &items)
 {
-    if (items.size() < 1 || items.size() > 3) {
+    if (items.size() < 1 || items.size() > MAX_KEY_ITEM) {
         return KeyEvent::INTENTION_UNKNOWN;
     }
 
     int64_t keyCodes = 0;
     for (const auto &item : items) {
-        keyCodes = (keyCodes << 16) + item.GetKeyCode();
+        keyCodes = (keyCodes << KEY_CODE_SHIFT_BITS) + item.GetKeyCode();
     }
     auto iter = MAP_KEY_INTENTION.find(keyCodes);
     if (iter == MAP_KEY_INTENTION.end()) {
