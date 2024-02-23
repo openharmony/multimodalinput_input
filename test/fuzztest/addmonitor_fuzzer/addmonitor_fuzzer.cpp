@@ -26,12 +26,12 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "AddMo
 
 class InputEventConsumerTest : public IInputEventConsumer {
 public:
-    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
-    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
+    void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
     {
         MMI_HILOGD("Report pointer event success");
     };
-    virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
 };
 
 bool AddMonitorFuzzTeset(const uint8_t* data, size_t /* size */)

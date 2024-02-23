@@ -136,13 +136,15 @@ void AsyncCallbackWork(sptr<AsyncContext> asyncContext)
             }
         },
         asyncContext.GetRefPtr(), &asyncContext->work);
-    if (status != napi_ok || napi_queue_async_work_with_qos(env, asyncContext->work, napi_qos_t::napi_qos_user_initiated) != napi_ok) {
+    if (status != napi_ok || napi_queue_async_work_with_qos(env, asyncContext->work,
+        napi_qos_t::napi_qos_user_initiated) != napi_ok) {
         MMI_HILOGE("Create async work failed");
         asyncContext->DecStrongRef(nullptr);
     }
 }
 
-napi_value JsShortKeyManager::SetKeyDownDuration(napi_env env, const std::string &businessId, int32_t delay, napi_value handle)
+napi_value JsShortKeyManager::SetKeyDownDuration(napi_env env, const std::string &businessId, int32_t delay,
+    napi_value handle)
 {
     CALL_DEBUG_ENTER;
     int32_t ret = InputManager::GetInstance()->SetKeyDownDuration(businessId, delay);
