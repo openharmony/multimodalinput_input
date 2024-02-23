@@ -1086,7 +1086,7 @@ bool InputWindowsManager::IsNeedRefreshLayer(int32_t windowId)
         touchWindow->id, windowId);
     return false;
 }
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 
 void InputWindowsManager::OnSessionLost(SessionPtr session)
 {

@@ -204,7 +204,7 @@ private:
     std::thread t_;
 #ifdef OHOS_RSS_CLIENT
     std::atomic<uint64_t> tid_ = 0;
-#endif
+#endif // OHOS_RSS_CLIENT
     LibinputAdapter libinputAdapter_;
     ServerMsgHandler sMsgHandler_;
     DelegateTasks delegateTasks_;
