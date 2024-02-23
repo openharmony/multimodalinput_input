@@ -42,7 +42,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ServerMsgHandler" };
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 constexpr int32_t SECURITY_COMPONENT_SERVICE_ID = 3050;
-#endif
+#endif // OHOS_BUILD_ENABLE_SECURITY_COMPONENT
 } // namespace
 
 void ServerMsgHandler::Init(UDSServer& udsServer)

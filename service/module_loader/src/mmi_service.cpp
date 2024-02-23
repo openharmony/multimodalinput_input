@@ -21,7 +21,7 @@
 #include <sys/signalfd.h>
 #ifdef OHOS_RSS_CLIENT
 #include <unordered_map>
-#endif
+#endif // OHOS_RSS_CLIENT
 
 #include "ability_manager_client.h"
 #include "anr_manager.h"
@@ -42,7 +42,7 @@
 #include "res_sched_client.h"
 #include "res_type.h"
 #include "system_ability_definition.h"
-#endif
+#endif // OHOS_RSS_CLIENT
 
 #include "mmi_log.h"
 #include "timer_manager.h"
@@ -92,22 +92,22 @@ static void CheckDefine()
     CheckDefineOutput("ChkDefs:");
 #ifdef OHOS_BUILD_ENABLE_POINTER_DRAWING
     CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_POINTER_DRAWING");
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER_DRAWING
 #ifdef OHOS_BUILD_ENABLE_INTERCEPTOR
     CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_INTERCEPTOR");
-#endif
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_KEYBOARD");
-#endif
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 #ifdef OHOS_BUILD_ENABLE_POINTER
     CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_POINTER");
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_TOUCH");
-#endif
+#endif // OHOS_BUILD_ENABLE_TOUCH
 #ifdef OHOS_BUILD_ENABLE_MONITOR
     CheckDefineOutput("%-40s", "OHOS_BUILD_ENABLE_MONITOR");
-#endif
+#endif // OHOS_BUILD_ENABLE_MONITOR
 }
 
 MMIService::MMIService() : SystemAbility(MULTIMODAL_INPUT_CONNECT_SERVICE_ID, true) {}
@@ -295,7 +295,7 @@ void MMIService::OnStart()
     MMI_HILOGI("Add system ability listener start");
     AddSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Add system ability listener success");
-#endif
+#endif // OHOS_RSS_CLIENT
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     FINGERSENSE_WRAPPER->InitFingerSenseWrapper();
     MMI_HILOGI("Add system ability listener start");
@@ -338,7 +338,7 @@ void MMIService::OnStop()
     MMI_HILOGI("Remove system ability listener start");
     RemoveSystemAbilityListener(RES_SCHED_SYS_ABILITY_ID);
     MMI_HILOGI("Remove system ability listener success");
-#endif
+#endif // OHOS_RSS_CLIENT
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
     RemoveSystemAbilityListener(COMMON_EVENT_SERVICE_ID);
 #endif // OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
@@ -1394,7 +1394,7 @@ void MMIService::OnThread()
     MMI_HILOGI("Main worker thread start. tid:%{public}" PRId64 "", tid);
 #ifdef OHOS_RSS_CLIENT
     tid_.store(tid);
-#endif
+#endif // OHOS_RSS_CLIENT
     libinputAdapter_.ProcessPendingEvents();
     while (state_ == ServiceRunningState::STATE_RUNNING) {
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
