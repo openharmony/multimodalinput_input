@@ -22,7 +22,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif // __cplusplus
 
 /**
  * udev - library context
@@ -190,4 +190,4 @@ int udev_util_encode_string(const char *str, char *str_enc, size_t len);
 
 #ifdef __cplusplus
 } /* extern "C" */
-#endif
+#endif // __cplusplus

@@ -784,20 +784,20 @@ void InputManagerImpl::SimulateInputEvent(std::shared_ptr<PointerEvent> pointerE
 #ifndef OHOS_BUILD_ENABLE_POINTER
         MMI_HILOGW("Pointer device does not support");
         return;
-#endif
+#endif // OHOS_BUILD_ENABLE_POINTER
     }
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) {
 #ifndef OHOS_BUILD_ENABLE_TOUCH
         MMI_HILOGW("Touchscreen device does not support");
         return;
-#endif
+#endif // OHOS_BUILD_ENABLE_TOUCH
     }
 #ifndef OHOS_BUILD_ENABLE_JOYSTICK
     if (pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_JOYSTICK) {
         MMI_HILOGW("Joystick device does not support");
         return;
     }
-#endif
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
     if (MMIEventHdl.InjectPointerEvent(pointerEvent) != RET_OK) {
         MMI_HILOGE("Failed to inject pointer event");
     }
