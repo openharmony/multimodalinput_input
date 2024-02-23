@@ -365,7 +365,7 @@ PointerEvent::~PointerEvent() {}
 
 std::shared_ptr<PointerEvent> PointerEvent::Create()
 {
-    auto event = std::shared_ptr<PointerEvent>(new (std::nothrow) PointerEvent(InputEvent::EVENT_TYPE_POINTER));
+    auto event = std::make_shared<PointerEvent>(InputEvent::EVENT_TYPE_POINTER);
     CHKPP(event);
     return event;
 }
@@ -746,13 +746,9 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     }
 
     READINT32(in, sourceType_);
-
     READINT32(in, pointerAction_);
-
     READINT32(in, buttonId_);
-
     READINT32(in, fingerCount_);
-
     uint32_t axes;
     READUINT32(in, axes);
 
