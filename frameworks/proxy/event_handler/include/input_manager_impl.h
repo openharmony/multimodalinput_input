@@ -180,6 +180,7 @@ public:
     void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
 
+    int32_t MarkProcessed(int32_t eventId, int64_t actionTime);
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackWindowGroupInfo(NetPacket &pkt);
