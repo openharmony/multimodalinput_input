@@ -776,6 +776,7 @@ public:
     */
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
 
+    int32_t MarkProcessed(int32_t eventId, int64_t actionTime);
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
     /**
      * @brief Sets the enhance config of the security component.
