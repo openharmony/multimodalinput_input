@@ -50,7 +50,7 @@ constexpr int32_t INVAID_VALUE = -1;
 constexpr uint32_t MAX_WINDOW_NUMS = 15;
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr uint32_t SHELL_FLAGS_VALUE = 2;
-#endif  // OHOS_BUILD_ENABLE_ANCO
+#endif // OHOS_BUILD_ENABLE_ANCO
 
 constexpr double POINTER_ITEM_PRESSURE = 5.0;
 } // namespace
@@ -189,14 +189,14 @@ HWTEST_F(InputManagerTest, InputManagerTest_InterceptTabletToolEvent_001, TestSi
 
     pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
     TestSimulateInputEvent(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
     }
 }
-#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 
 #ifdef OHOS_BUILD_ENABLE_TOUCH
 HWTEST_F(InputManagerTest, AppendExtraData_001, TestSize.Level1)
@@ -230,7 +230,7 @@ HWTEST_F(InputManagerTest, AppendExtraData_001, TestSize.Level1)
     ASSERT_TRUE(pointerEvent != nullptr);
     SimulateInputEventUtilTest(pointerEvent);
 }
-#endif  // OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
 HWTEST_F(InputManagerTest, AppendExtraData_002, TestSize.Level1)
@@ -255,7 +255,7 @@ HWTEST_F(InputManagerTest, AppendExtraData_002, TestSize.Level1)
     ASSERT_TRUE(pointerEvent != nullptr);
     SimulateInputEventUtilTest(pointerEvent);
 }
-#endif  // OHOS_BUILD_ENABLE_POINTER
+#endif // OHOS_BUILD_ENABLE_POINTER
 
 /**
  * @tc.name: InputManagerTest_SubscribeKeyEvent_001
@@ -301,7 +301,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
     EXPECT_TRUE(subscribeId1 >= 0);
 #else
     EXPECT_TRUE(subscribeId1 < 0);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     // 电源键抬起订阅
     std::shared_ptr<KeyOption> keyOption2 = InputManagerUtil::InitOption(preKeys, KeyEvent::KEYCODE_POWER, false, 0);
@@ -314,7 +314,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_02, TestSize.Level
     EXPECT_TRUE(subscribeId2 >= 0);
 #else
     EXPECT_TRUE(subscribeId2 < 0);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
     InputManager::GetInstance()->UnsubscribeKeyEvent(subscribeId1);
@@ -394,7 +394,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SubscribeKeyEvent_04, TestSize.Level
     EXPECT_TRUE(subscribeId >= 0);
 #else
     EXPECT_TRUE(subscribeId < 0);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
@@ -448,7 +448,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoteControlAutoRepeat, TestSize.Le
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectDownEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_MILLISECONDS));
 
@@ -464,7 +464,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoteControlAutoRepeat, TestSize.Le
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectUpEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 static int32_t g_deviceIDtest = 0;
@@ -976,7 +976,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_UpdateWindowGroupInfo_005, TestSize.
     window.action = WINDOW_UPDATE_ACTION::CHANGE;
 #ifdef OHOS_BUILD_ENABLE_ANCO
     window.flags |= SHELL_FLAGS_VALUE;
-#endif  // OHOS_BUILD_ENABLE_ANCO
+#endif // OHOS_BUILD_ENABLE_ANCO
     WindowGroupInfo windowGroupInfo;
     windowGroupInfo.windowsInfo = {window};
     ASSERT_NO_FATAL_FAILURE(InputManager::GetInstance()->UpdateWindowInfo(windowGroupInfo));
@@ -1659,7 +1659,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventExt_001, TestSize.
     InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
     InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
     InputManager::GetInstance()->SimulateInputEventExt(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_ANCO
+#endif // OHOS_BUILD_ENABLE_ANCO
 }
 
 /**
@@ -1684,7 +1684,7 @@ HWTEST_F(InputManagerTest, InputManagerTest_SimulateInputEventExt_002, TestSize.
 #ifdef OHOS_BUILD_ENABLE_ANCO
     InputManager::GetInstance()->SimulateInputEventExt(injectDownEvent);
     ASSERT_EQ(injectDownEvent->GetKeyAction(), KeyEvent::KEY_ACTION_DOWN);
-#endif  // OHOS_BUILD_ENABLE_ANCO
+#endif // OHOS_BUILD_ENABLE_ANCO
 }
 
 /**
