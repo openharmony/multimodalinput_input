@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,8 +19,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "ProcessingPenDevice" };
-constexpr int32_t EV_ABS_Z_DEFAULT_VALUE = 450;
-constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE = 2114;
+constexpr int32_t EV_ABS_Z_DEFAULT_VALUE { 450 };
+constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE { 2114 };
 } // namespace
 
 int32_t ProcessingPenDevice::TransformJsonDataToInputData(const DeviceItem& penEventArrays,
