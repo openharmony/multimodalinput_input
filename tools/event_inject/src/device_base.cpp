@@ -20,7 +20,7 @@ namespace MMI {
 namespace {
 constexpr int32_t FIRST_FINGER { 1 };
 constexpr int32_t SECOND_FINGER { 2 };
-constexpr int32_t THIRD_FINGER { 3 }};
+constexpr int32_t THIRD_FINGER { 3 };
 constexpr int32_t FOURTH_FINGER { 4 };
 constexpr int32_t FIFTH_FINGER { 5 };
 constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE { 15 };
