@@ -1136,7 +1136,7 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
     auto sceneIter = pointerStyle_.find(scenePid);
     if (sceneIter == pointerStyle_.end() || sceneIter->second.find(sceneWinId) == sceneIter->second.end()) {
         pointerStyle_[scenePid] = {};
-        MMI_HILOGE("SceneBoardPid %{public}d or windowId:%{public}d  does not exist on pointerStyle_",
+        MMI_HILOGE("SceneBoardPid %{public}d or windowId:%{public}d does not exist on pointerStyle_",
             scenePid, sceneWinId);
     }
     pointerStyle_[scenePid][sceneWinId] = pointerStyle;
@@ -1894,7 +1894,7 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         }
     }
 #ifdef OHOS_BUILD_ENABLE_ANCO
-    bool isInAnco =  touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
+    bool isInAnco = touchWindow && IsInAncoWindow(*touchWindow, logicalX, logicalY);
     if (isInAnco) {
         MMI_HILOGD("Process touch screen event in Anco window, targetWindowId:%{public}d", touchWindow->id);
         bool isCompensatePointer = pointerEvent->HasFlag(InputEvent::EVENT_FLAG_SIMULATE); //&&
@@ -2096,7 +2096,7 @@ void InputWindowsManager::DispatchTouch(int32_t pointerAction)
 int32_t InputWindowsManager::UpdateTouchPadTarget(std::shared_ptr<PointerEvent> pointerEvent)
 {
     CALL_DEBUG_ENTER;
-    int32_t pointerAction =  pointerEvent->GetPointerAction();
+    int32_t pointerAction = pointerEvent->GetPointerAction();
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
     switch (pointerAction) {
         case PointerEvent::POINTER_ACTION_BUTTON_DOWN:
