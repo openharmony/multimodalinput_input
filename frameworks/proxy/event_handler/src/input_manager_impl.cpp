@@ -117,40 +117,52 @@ int32_t InputManagerImpl::GetWindowPid(int32_t windowId)
     return MultimodalInputConnMgr->GetWindowPid(windowId);
 }
 
-void InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
+int32_t InputManagerImpl::UpdateDisplayInfo(const DisplayGroupInfo &displayGroupInfo)
 {
     CALL_DEBUG_ENTER;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("Get mmi client is nullptr");
-        return;
+        MMI_HILOGE("Failed to initialize MMI client");
+        return RET_ERR;
     }
     if (displayGroupInfo.windowsInfo.empty() || displayGroupInfo.displaysInfo.empty()) {
         MMI_HILOGE("The windows info or display info is empty!");
-        return;
+        return PARAM_INPUT_INVALID;
     }
     if (!IsValiadWindowAreas(displayGroupInfo.windowsInfo)) {
-        return;
+        MMI_HILOGE("Invalid window information");
+        return PARAM_INPUT_INVALID;
     }
     displayGroupInfo_ = displayGroupInfo;
-    SendDisplayInfo();
+    int32_t ret = SendDisplayInfo();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to send display information to service");
+        return ret;
+    }
     PrintDisplayInfo();
+    return RET_OK;
 }
 
-void InputManagerImpl::UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo)
+int32_t InputManagerImpl::UpdateWindowInfo(const WindowGroupInfo &windowGroupInfo)
 {
     CALL_INFO_TRACE;
     std::lock_guard<std::mutex> guard(mtx_);
     if (!MMIEventHdl.InitClient()) {
-        MMI_HILOGE("Get mmi client is nullptr");
-        return;
+        MMI_HILOGE("Failed to initialize MMI client");
+        return RET_ERR;
     }
     if (!IsValiadWindowAreas(windowGroupInfo.windowsInfo)) {
-        return;
+        MMI_HILOGE("Invalid window information");
+        return PARAM_INPUT_INVALID;
     }
     windowGroupInfo_ = windowGroupInfo;
-    SendWindowInfo();
+    int32_t ret = SendWindowInfo();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Failed to send window information to service");
+        return ret;
+    }
     PrintWindowGroupInfo();
+    return RET_OK;
 }
 
 bool InputManagerImpl::IsValiadWindowAreas(const std::vector<WindowInfo> &windows)
@@ -467,7 +479,7 @@ int32_t InputManagerImpl::PackDisplayData(NetPacket &pkt)
         MMI_HILOGE("Packet write logical data failed");
         return RET_ERR;
     }
-    if (PackWindowInfo(pkt) == RET_ERR) {
+    if (PackWindowInfo(pkt) != RET_OK) {
         MMI_HILOGE("Packet write windows info failed");
         return RET_ERR;
     }
@@ -1155,33 +1167,39 @@ void InputManagerImpl::OnConnected()
     }
 }
 
-void InputManagerImpl::SendDisplayInfo()
+int32_t InputManagerImpl::SendDisplayInfo()
 {
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
+    CHKPR(client, RET_ERR);
     NetPacket pkt(MmiMessageId::DISPLAY_INFO);
-    if (PackDisplayData(pkt) == RET_ERR) {
+    int32_t ret = PackDisplayData(pkt);
+    if (ret != RET_OK) {
         MMI_HILOGE("Pack display info failed");
-        return;
+        return ret;
     }
     if (!client->SendMessage(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return MSG_SEND_FAIL;
     }
+    return RET_OK;
 }
 
-void InputManagerImpl::SendWindowInfo()
+int32_t InputManagerImpl::SendWindowInfo()
 {
     CALL_DEBUG_ENTER;
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
-    CHKPV(client);
+    CHKPR(client, RET_ERR);
     NetPacket pkt(MmiMessageId::WINDOW_INFO);
-    if (PackWindowGroupInfo(pkt) == RET_ERR) {
+    int32_t ret = PackWindowGroupInfo(pkt);
+    if (ret != RET_OK) {
         MMI_HILOGE("Pack window group info failed");
-        return;
+        return ret;
     }
     if (!client->SendMessage(pkt)) {
         MMI_HILOGE("Send message failed, errCode:%{public}d", MSG_SEND_FAIL);
+        return MSG_SEND_FAIL;
     }
+    return RET_OK;
 }
 
 #ifdef OHOS_BUILD_ENABLE_SECURITY_COMPONENT
