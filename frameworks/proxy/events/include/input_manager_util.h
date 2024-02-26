@@ -47,7 +47,7 @@ public:
     static std::shared_ptr<PointerEvent> SetupPointerEvent015();
 #ifdef OHOS_BUILD_ENABLE_JOYSTICK
     static std::shared_ptr<PointerEvent> SetupPointerEvent016();
-#endif  // OHOS_BUILD_ENABLE_JOYSTICK
+#endif // OHOS_BUILD_ENABLE_JOYSTICK
     static std::shared_ptr<PointerEvent> SetupMouseEvent001();
     static std::shared_ptr<PointerEvent> SetupMouseEvent002();
     static std::shared_ptr<PointerEvent> SetupTouchScreenEvent001();
