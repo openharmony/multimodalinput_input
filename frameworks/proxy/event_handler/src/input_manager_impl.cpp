@@ -1723,7 +1723,7 @@ void InputManagerImpl::SetWindowCheckerHandler(std::shared_ptr<IWindowChecker> w
     #if defined(OHOS_BUILD_ENABLE_POINTER) && defined(OHOS_BUILD_ENABLE_POINTER_DRAWING)
         CALL_DEBUG_ENTER;
         CHKPV(windowChecker);
-        MMI_HILOGD("winChecker_ is not null in  %{public}d", getpid());
+        MMI_HILOGD("winChecker_ is not null in %{public}d", getpid());
         winChecker_ = windowChecker;
     #endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_POINTER_DRAWING
     return;
