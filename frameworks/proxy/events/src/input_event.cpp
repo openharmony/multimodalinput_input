@@ -65,7 +65,7 @@ void InputEvent::Reset()
 
 std::shared_ptr<InputEvent> InputEvent::Create()
 {
-    auto event = std::make_shared<InputEvent>(InputEvent::EVENT_TYPE_BASE);
+    auto event = std::make_shared<InputEvent>(std::nothrow, InputEvent::EVENT_TYPE_BASE);
     CHKPP(event);
     return event;
 }

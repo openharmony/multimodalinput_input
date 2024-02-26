@@ -33,7 +33,7 @@ AxisEvent::~AxisEvent() {}
 
 std::shared_ptr<AxisEvent> AxisEvent::Create()
 {
-    auto event = std::make_shared<AxisEvent>(InputEvent::EVENT_TYPE_AXIS);
+    auto event = std::make_shared<AxisEvent>(std::nothrow, InputEvent::EVENT_TYPE_AXIS);
     CHKPP(event);
     return event;
 }
