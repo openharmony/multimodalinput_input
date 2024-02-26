@@ -1385,7 +1385,7 @@ int32_t MultimodalInputConnectStub::StubSetFunctionKeyState(MessageParcel &data,
     }
 
     int32_t funcKey { 0 };
-    bool enable  { false };
+    bool enable { false };
     READINT32(data, funcKey, IPC_PROXY_DEAD_OBJECT_ERR);
     READBOOL(data, enable, IPC_PROXY_DEAD_OBJECT_ERR);
     int32_t ret = SetFunctionKeyState(funcKey, enable);

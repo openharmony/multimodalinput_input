@@ -43,10 +43,10 @@ public:
 private:
     struct TimerItem {
         int32_t id { 0 };
-        int32_t intervalMs  { 0 };
-        int32_t repeatCount  { 0 };
-        int32_t callbackCount  { 0 };
-        int64_t nextCallTime  { 0 };
+        int32_t intervalMs { 0 };
+        int32_t repeatCount { 0 };
+        int32_t callbackCount { 0 };
+        int64_t nextCallTime { 0 };
         std::function<void()> callback;
     };
 private:
