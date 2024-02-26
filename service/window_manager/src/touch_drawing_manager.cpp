@@ -179,7 +179,7 @@ void TouchDrawingManager::GetOriginalTouchScreenCoordinates(Direction direction,
             break;
         }
         default: {
-            MMI_HILOGW("direction is invalid");
+            MMI_HILOGW("direction is invalid, direction:%{public}d", direction);
             break;
         }
     }
