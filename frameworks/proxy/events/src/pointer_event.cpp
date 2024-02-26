@@ -365,7 +365,7 @@ PointerEvent::~PointerEvent() {}
 
 std::shared_ptr<PointerEvent> PointerEvent::Create()
 {
-    auto event = std::make_shared<PointerEvent>(InputEvent::EVENT_TYPE_POINTER);
+    auto event = std::make_shared<PointerEvent>(std::nothrow, InputEvent::EVENT_TYPE_POINTER);
     CHKPP(event);
     return event;
 }
