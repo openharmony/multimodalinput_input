@@ -938,7 +938,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                             pointerEvent->SetActionTime((endTimeMs + BLOCK_TIME_MS) * TIME_TRANSITION);
                             pointerEvent->SetPointerAction(PointerEvent::POINTER_ACTION_UP);
                             InputManager::GetInstance()->SimulateInputEvent(pointerEvent);
-                            optind =  optind + THREE_MORE_COMMAND;
+                            optind = optind + THREE_MORE_COMMAND;
                             break;
                         }
                         case 'd': {
