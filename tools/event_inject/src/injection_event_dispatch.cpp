@@ -41,7 +41,7 @@ constexpr int32_t ARGVS_CODE_INDEX { 2 };
 constexpr int32_t JSON_FILE_PATH_INDEX { 1 };
 constexpr uint32_t INPUT_TYPE_LENGTH { 3 };
 constexpr uint16_t INPUT_TYPE_MAX { 100 };
-constexpr uint32_t INPUT_CODE_LENGTH { 6};
+constexpr uint32_t INPUT_CODE_LENGTH { 6 };
 constexpr uint32_t INPUT_VALUE_LENGTH { 11 };
 } // namespace
 
