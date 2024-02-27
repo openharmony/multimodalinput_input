@@ -1305,8 +1305,7 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
     }
     if (key->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP
         || key->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN
-        || key->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_MUTE)
-    {
+        || key->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_MUTE) {
         auto items = key->GetKeyItems();
         if (items.size() != 1) {
             return enableCombineKey_;
