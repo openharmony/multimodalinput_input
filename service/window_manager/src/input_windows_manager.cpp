@@ -1286,8 +1286,8 @@ void InputWindowsManager::InWhichHotArea(int32_t x, int32_t y, const std::vector
             MMI_HILOGE("The addition of displayMaxY overflows");
             return;
         }
-        if (((x >= item.x) && (x < displayMaxX)) &&
-            (y >= item.y) && (y < displayMaxY)) {
+        if (((x > item.x) && (x <= displayMaxX)) &&
+            (y > item.y) && (y <= displayMaxY)) {
             findFlag = true;
             pointerStyle.id = areaNum;
         }
