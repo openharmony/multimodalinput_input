@@ -1297,19 +1297,13 @@ bool KeyCommandHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> key)
     if (key->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_DOWN
         || key->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_UP) {
         auto items = key->GetKeyItems();
-        if (items.size() != 1) {
-            return enableCombineKey_;
-        }
-        return true;
+        return items.size() != 1 ? enableCombineKey_ : true;
     }
     if (key->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP
         || key->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN
         || key->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_MUTE) {
         auto items = key->GetKeyItems();
-        if (items.size() != 1) {
-            return enableCombineKey_;
-        }
-        return true;
+        return items.size() != 1 ? enableCombineKey_ : true;
     }
     return enableCombineKey_;
 }
