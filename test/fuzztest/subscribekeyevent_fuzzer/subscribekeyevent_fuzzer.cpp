@@ -29,12 +29,12 @@ constexpr int32_t DEFAULT_PREKEY_COUNT = 3;
 
 class InputEventConsumerTest : public IInputEventConsumer {
 public:
-    virtual void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
+    void OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) const override
     {
         MMI_HILOGD("Report pointer event success");
     };
-    virtual void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
-    virtual void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
+    void OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const override {};
+    void OnInputEvent(std::shared_ptr<AxisEvent> axisEvent) const override {};
 };
 
 template<class T>

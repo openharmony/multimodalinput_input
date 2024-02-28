@@ -114,7 +114,6 @@ void InputEventDataTransformation::ReadFunctionKeys(NetPacket &pkt, std::shared_
     key->SetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY, state);
     pkt >> state;
     key->SetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY, state);
-
 }
 
 int32_t InputEventDataTransformation::SwitchEventToNetPacket(
@@ -252,9 +251,6 @@ int32_t InputEventDataTransformation::Marshalling(std::shared_ptr<PointerEvent> 
 int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<PointerEvent> event, NetPacket &pkt)
 {
     CHKPR(event, ERROR_NULL_POINTER);
-
-
-
     int32_t tField;
     pkt >> tField;
     event->SetPointerAction(tField);
@@ -269,7 +265,6 @@ int32_t InputEventDataTransformation::DeserializePressedButtons(std::shared_ptr<
     pkt >> tField;
     event->SetZOrder(tField);
     SetAxisInfo(pkt, event);
-
     std::set<int32_t>::size_type nPressed;
     pkt >> nPressed;
     while (nPressed-- > 0) {

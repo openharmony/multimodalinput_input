@@ -60,7 +60,8 @@ struct KeyEventMonitorInfo {
     int32_t subscribeId{ 0 };
     std::shared_ptr<KeyOption> keyOption{ nullptr };
     std::function<void()> delCallback;
-    ~KeyEventMonitorInfo() {
+    ~KeyEventMonitorInfo()
+    {
         if (delCallback) {
             delCallback();
         }
