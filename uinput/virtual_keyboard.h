@@ -27,7 +27,7 @@ class VirtualKeyboard : public VirtualDevice {
 public:
     VirtualKeyboard();
     DISALLOW_COPY_AND_MOVE(VirtualKeyboard);
-    ~VirtualKeyboard() = default;
+    ~VirtualKeyboard() override = default;
 protected:
     const std::vector<uint32_t> &GetEventTypes() const override;
 

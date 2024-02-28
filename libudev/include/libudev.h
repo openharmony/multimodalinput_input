@@ -59,7 +59,7 @@ const char *udev_list_entry_get_value(struct udev_list_entry *list_entry);
  * Helper to iterate over all entries of a list.
  */
 #define udev_list_entry_foreach(list_entry, first_entry) \
-    for (list_entry = first_entry; list_entry != NULL; list_entry = udev_list_entry_get_next(list_entry))
+    for ((list_entry) = first_entry; (list_entry) != NULL; (list_entry) = udev_list_entry_get_next(list_entry))
 
 /**
  * udev_device access to sysfs/kernel devices

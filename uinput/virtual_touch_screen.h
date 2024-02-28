@@ -28,13 +28,13 @@ class VirtualTouchScreen : public VirtualDevice {
 public:
     VirtualTouchScreen(const uint32_t maxX, const uint32_t maxY);
     DISALLOW_COPY_AND_MOVE(VirtualTouchScreen);
-    virtual ~VirtualTouchScreen() {}
+    ~VirtualTouchScreen() override {}
 
 protected:
-    virtual const std::vector<uint32_t>& GetEventTypes() const;
-    virtual const std::vector<uint32_t>& GetKeys() const;
-    virtual const std::vector<uint32_t>& GetProperties() const;
-    virtual const std::vector<uint32_t>& GetAbs() const;
+    const std::vector<uint32_t>& GetEventTypes() const override;
+    const std::vector<uint32_t>& GetKeys() const override;
+    const std::vector<uint32_t>& GetProperties() const override;
+    const std::vector<uint32_t>& GetAbs() const override;
 };
 } // namespace MMI
 } // namespace OHOS
