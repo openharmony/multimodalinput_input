@@ -1191,7 +1191,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_013, TestSize.Level
         }
 #else
         ASSERT_TRUE(sPointerEs.empty());
-#endif  // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_POINTER && OHOS_BUILD_ENABLE_INTERCEPTOR
     }
 
     InputManagerUtil::TestInterceptorId(interceptorId1, interceptorId2);
@@ -1232,7 +1232,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_014, TestSize.Level
 #else
     EXPECT_EQ(interceptorId1, ERROR_UNSUPPORT);
     EXPECT_EQ(interceptorId2, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
@@ -1247,7 +1247,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_014, TestSize.Level
         }
 #else
         ASSERT_TRUE(sPointerEs.empty());
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
     }
 
     InputManagerUtil::TestInterceptorId(interceptorId1, interceptorId2);
@@ -1286,7 +1286,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_015, TestSize.Level
 #else
     EXPECT_EQ(interceptorId1, ERROR_UNSUPPORT);
     EXPECT_EQ(interceptorId2, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_INTERCEPTOR
     if (IsValidHandlerId(interceptorId1)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId1);
         std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
@@ -1305,7 +1305,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_015, TestSize.Level
         }
 #else
         ASSERT_TRUE(sPointerEs.empty());
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
     }
 
     if (IsValidHandlerId(interceptorId2)) {
@@ -1329,7 +1329,7 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_016, TestSize.Level
     ASSERT_NE(interceptorId, INVALID_HANDLER_ID);
 #else
     ASSERT_EQ(interceptorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
+#endif // OHOS_BUILD_ENABLE_KEYBOARD && OHOS_BUILD_ENABLE_INTERCEPTOR
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);
     }
@@ -1351,7 +1351,7 @@ HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_001, 
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t stepTime = GetSysClockTime();
@@ -1389,7 +1389,7 @@ HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_002, 
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t measureTime = GetSysClockTime();
@@ -1427,7 +1427,7 @@ HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_003, 
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t deedTime = GetSysClockTime();
@@ -1465,7 +1465,7 @@ HWTEST_F(InputManagerSimulateTest, InputManager_TouchPadSimulateInputEvent_004, 
     EXPECT_TRUE(monitorId >= MIN_HANDLER_ID);
 #else
     EXPECT_EQ(monitorId, ERROR_UNSUPPORT);
-#endif  // OHOS_BUILD_ENABLE_MONITOR
+#endif // OHOS_BUILD_ENABLE_MONITOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
 
     int64_t actionTime = GetSysClockTime();
