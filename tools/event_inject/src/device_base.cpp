@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,12 +18,12 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t FIRST_FINGER = 1;
-constexpr int32_t SECOND_FINGER = 2;
-constexpr int32_t THIRD_FINGER = 3;
-constexpr int32_t FOURTH_FINGER = 4;
-constexpr int32_t FIFTH_FINGER = 5;
-constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE = 15;
+constexpr int32_t FIRST_FINGER { 1 };
+constexpr int32_t SECOND_FINGER { 2 };
+constexpr int32_t THIRD_FINGER { 3 };
+constexpr int32_t FOURTH_FINGER { 4 };
+constexpr int32_t FIFTH_FINGER { 5 };
+constexpr int32_t EV_ABS_MISC_DEFAULT_VALUE { 15 };
 } // namespace
 
 void DeviceBase::SetTimeToLibinputEvent(InjectEvent &injectEvent)

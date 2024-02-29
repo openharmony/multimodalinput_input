@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,10 +27,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InjectionToolsHelpFunc" };
-constexpr int32_t SEND_EVENT_ARGV_COUNTS = 6;
-constexpr int32_t JSON_ARGV_COUNTS = 3;
-constexpr int32_t HELP_ARGV_COUNTS = 2;
-constexpr int32_t SHORT_OPTION_LENGTH = 2;
+constexpr int32_t SEND_EVENT_ARGV_COUNTS { 6 };
+constexpr int32_t JSON_ARGV_COUNTS { 3 };
+constexpr int32_t HELP_ARGV_COUNTS { 2 };
+constexpr int32_t SHORT_OPTION_LENGTH { 2 };
 } // namespace
 
 bool InjectionToolsHelpFunc::CheckInjectionCommand(int32_t argc, char **argv)
