@@ -746,13 +746,9 @@ bool PointerEvent::ReadFromParcel(Parcel &in)
     }
 
     READINT32(in, sourceType_);
-
     READINT32(in, pointerAction_);
-
     READINT32(in, buttonId_);
-
     READINT32(in, fingerCount_);
-
     uint32_t axes;
     READUINT32(in, axes);
 
