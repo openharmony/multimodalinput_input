@@ -24,8 +24,6 @@ namespace OHOS {
 namespace MMI {
 namespace {
 int64_t g_nextEventId = 1;
-constexpr int32_t TIME_TRANS_FACTOR = 1000;
-constexpr int32_t TIME_TRANS_FACTOR_MIC = 1000000;
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputEvent" };
 } // namespace
 
@@ -50,7 +48,7 @@ void InputEvent::Reset()
         actionTime_ = 0;
     }
     id_ = -1;
-    if (!AddInt64(ts.tv_sec * TIME_TRANS_FACTOR_MIC, ts.tv_nsec / TIME_TRANS_FACTOR, actionTime_)) {
+    if (!AddInt64(ts.tv_sec * 1000000, ts.tv_nsec / 1000, actionTime_)) {
         MMI_HILOGE("The addition of actionTime_ overflows");
         return;
     }

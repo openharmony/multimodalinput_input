@@ -38,7 +38,6 @@ constexpr int32_t MAX_PREKEYS_NUM = 4;
 constexpr int32_t MAX_SEQUENCEKEYS_NUM = 10;
 constexpr int64_t MAX_DELAY_TIME = 1000000;
 constexpr int64_t SECONDS_SYSTEM = 1000;
-constexpr int32_t TIME_TRANS_FACTOR = 1000;
 constexpr int32_t SPECIAL_KEY_DOWN_DELAY = 150;
 constexpr int32_t MAX_SHORT_KEY_DOWN_DURATION = 4000;
 constexpr int32_t MIN_SHORT_KEY_DOWN_DURATION = 0;
@@ -1364,7 +1363,7 @@ bool KeyCommandHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent, c
     auto downTime = keyItem->GetDownTime();
     MMI_HILOGD("upTime:%{public}" PRId64 ",downTime:%{public}" PRId64 ",keyDownDuration:%{public}d",
         upTime, downTime, shortcutKey.keyDownDuration);
-    if (upTime - downTime >= static_cast<int64_t>(shortcutKey.keyDownDuration) * TIME_TRANS_FACTOR) {
+    if (upTime - downTime >= static_cast<int64_t>(shortcutKey.keyDownDuration) * 1000) {
         MMI_HILOGD("Skip, upTime - downTime >= duration");
         return false;
     }

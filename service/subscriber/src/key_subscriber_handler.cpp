@@ -31,7 +31,6 @@ namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "KeySubscriberHandler" };
 constexpr uint32_t MAX_PRE_KEY_COUNT = 4;
-constexpr int32_t TIME_TRANS_FACTOR = 1000;
 } // namespace
 
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
@@ -398,7 +397,7 @@ bool KeySubscriberHandler::HandleKeyUp(const std::shared_ptr<KeyEvent> &keyEvent
         }
         auto upTime = keyEvent->GetActionTime();
         auto downTime = keyItem->GetDownTime();
-        if (upTime - downTime >= (static_cast<int64_t>(duration) * TIME_TRANS_FACTOR)) {
+        if (upTime - downTime >= (static_cast<int64_t>(duration) * 1000)) {
             MMI_HILOGE("upTime - downTime >= duration");
             continue;
         }
