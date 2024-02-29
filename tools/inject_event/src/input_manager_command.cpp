@@ -64,7 +64,6 @@ constexpr int64_t MIN_TAKTTIME_MS = 1;
 constexpr int64_t MAX_TAKTTIME_MS = 15000;
 constexpr int32_t DEFAULT_DELAY = 200;
 constexpr int32_t KNUCKLE_PARAM_SIZE = 9;
-constexpr int32_t DEFAULT_INTERVAL_TIME_MS = 100;
 enum JoystickEvent {
     JOYSTICK_BUTTON_UP,
     JOYSTICK_BUTTON_PRESS,
@@ -1006,7 +1005,7 @@ int32_t InputManagerCommand::ParseCommand(int32_t argc, char *argv[])
                                     std::cout << "input coordinate error" << std::endl;
                                     return RET_ERR;
                                 }
-                                intervalTimeMs = DEFAULT_INTERVAL_TIME_MS;
+                                intervalTimeMs = 100;
                             } else if (argc == 6) {
                                 if (!StrToInt(optarg, px1) ||
                                     !StrToInt(argv[optind], py1) ||

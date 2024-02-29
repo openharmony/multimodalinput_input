@@ -58,8 +58,6 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MMISe
 const std::string DEF_INPUT_SEAT = "seat0";
 constexpr int32_t WATCHDOG_INTERVAL_TIME = 10000;
 constexpr int32_t WATCHDOG_DELAY_TIME = 15000;
-constexpr int32_t WATCHDOG_LOAD_TIME = 2000;
-constexpr int32_t REPEAT_COUNT = 2;
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
@@ -1326,7 +1324,7 @@ void MMIService::OnSignalEvent(int32_t signalFd)
 void MMIService::AddReloadDeviceTimer()
 {
     CALL_DEBUG_ENTER;
-    TimerMgr->AddTimer(WATCHDOG_LOAD_TIME, REPEAT_COUNT, [this]() {
+    TimerMgr->AddTimer(2000, 2, [this]() {
         auto deviceIds = InputDevMgr->GetInputDeviceIds();
         if (deviceIds.empty()) {
             libinputAdapter_.ReloadDevice();

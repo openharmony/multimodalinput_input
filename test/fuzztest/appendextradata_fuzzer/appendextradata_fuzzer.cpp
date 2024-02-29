@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace MMI {
-constexpr int32_t BUFFER_SIZE = 512;
 template <class T> size_t GetObject(T &object, const uint8_t *data, size_t size)
 {
     size_t objectSize = sizeof(object);
@@ -50,7 +49,7 @@ void AppendExtraDataFuzzTest(const uint8_t *data, size_t size)
     int32_t pointerId;
     GetObject<int32_t>(pointerId, data + startPos, size - startPos);
     extraData.pointerId = pointerId;
-    std::vector<uint8_t> dataBuffer(BUFFER_SIZE, 1);
+    std::vector<uint8_t> dataBuffer(512, 1);
     extraData.buffer = dataBuffer;
     InputManager::GetInstance()->AppendExtraData(extraData);
 }

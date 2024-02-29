@@ -24,11 +24,6 @@
 namespace OHOS {
 namespace MMI {
 namespace {
-constexpr int32_t WIDTH = 20;
-constexpr int32_t HEIGTH = 20;
-constexpr int32_t INFO_WIDTH = 2;
-constexpr int32_t INFO_HEIGTH = 2;
-constexpr int32_t DPI = 240;
 using namespace testing::ext;
 } // namespace
 
@@ -40,8 +35,8 @@ public:
     {
         // 创建displayGroupInfo_
         DisplayGroupInfo displayGroupInfo;
-        displayGroupInfo.width = WIDTH;
-        displayGroupInfo.height = HEIGTH;
+        displayGroupInfo.width = 20;
+        displayGroupInfo.height = 20;
         displayGroupInfo.focusWindowId = 1;
         uint32_t num = 1;
         for (uint32_t i = 0; i < num; i++) {
@@ -61,9 +56,9 @@ public:
             info.id = 1;
             info.x =1;
             info.y = 1;
-            info.width = INFO_WIDTH;
-            info.height = INFO_HEIGTH;
-            info.dpi = DPI;
+            info.width = 2;
+            info.height = 2;
+            info.dpi = 240;
             info.name = "pp";
             info.uniq = "pp";
             info.direction = DIRECTION0;
