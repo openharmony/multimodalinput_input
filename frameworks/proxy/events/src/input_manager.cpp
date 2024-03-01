@@ -496,5 +496,10 @@ void InputManager::RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> wa
 {
     InputMgrImpl.RemoveServiceWatcher(watcher);
 }
+
+int32_t InputManager::MarkProcessed(int32_t eventId, int64_t actionTime)
+{
+    return InputMgrImpl.MarkProcessed(eventId, actionTime);
+}
 } // namespace MMI
 } // namespace OHOS

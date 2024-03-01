@@ -21,6 +21,7 @@
 #include "define_multimodal.h"
 #include "error_multimodal.h"
 
+#include "anr_handler.h"
 #include "bytrace_adapter.h"
 #include "event_filter_service.h"
 #include "mmi_client.h"
@@ -36,6 +37,7 @@ constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "Input
 constexpr size_t MAX_FILTER_NUM = 4;
 constexpr int32_t MAX_DELAY = 4000;
 constexpr int32_t MIN_DELAY = 0;
+constexpr int32_t ANR_DISPATCH = 0;
 } // namespace
 
 struct MonitorEventConsumer : public IInputEventConsumer {
@@ -1828,6 +1830,13 @@ void InputManagerImpl::AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> w
 void InputManagerImpl::RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher)
 {
     MultimodalInputConnMgr->RemoveServiceWatcher(watcher);
+}
+
+int32_t InputManagerImpl::MarkProcessed(int32_t eventId, int64_t actionTime)
+{
+    CALL_DEBUG_ENTER;
+    ANRHDL->SetLastProcessedEventId(ANR_DISPATCH, eventId, actionTime);
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS
