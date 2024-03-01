@@ -68,9 +68,9 @@ public:
     friend std::istream &operator >> (std::istream &is, BindInfo &r);
 
 private:
-    int32_t inputDeviceId_{ -1 };
+    int32_t inputDeviceId_ { -1 };
     std::string inputDeviceName_;
-    int32_t displayId_{ -1 };
+    int32_t displayId_ { -1 };
     std::string displayName_;
 };
 

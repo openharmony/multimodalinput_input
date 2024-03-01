@@ -23,7 +23,7 @@ namespace OHOS {
 namespace MMI {
 namespace {
 using namespace testing::ext;
-constexpr int32_t UID_ROOT = 0;
+constexpr int32_t UID_ROOT { 0 };
 } // namespace
 
 class UDSSessionTest : public testing::Test {
