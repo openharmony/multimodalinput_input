@@ -23,7 +23,8 @@ namespace UtilNapiError {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "UtilNapiError" };
 } // namespace
-bool GetApiError(int32_t code, NapiError& codeMsg)
+
+bool GetApiError(int32_t code, NapiError &codeMsg)
 {
     auto iter = NAPI_ERRORS.find(code);
     if (iter == NAPI_ERRORS.end()) {
@@ -33,6 +34,6 @@ bool GetApiError(int32_t code, NapiError& codeMsg)
     codeMsg = iter->second;
     return true;
 }
-} // namespace OHOS::MMI::UtilNapiError
+} // namespace UtilNapiError
 } // namespace MMI
 } // namespace OHOS
