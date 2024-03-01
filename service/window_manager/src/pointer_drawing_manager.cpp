@@ -774,7 +774,7 @@ void PointerDrawingManager::UpdatePointerDevice(bool hasPointerDevice, bool isPo
     CALL_DEBUG_ENTER;
     hasPointerDevice_ = hasPointerDevice;
     if (hasPointerDevice_) {
-        SetPointerVisible(getpid(), isPointerVisible);
+        SetPointerVisible(getpid(), isPointerVisible && IsPointerVisible());
     } else {
         DeletePointerVisible(getpid());
     }

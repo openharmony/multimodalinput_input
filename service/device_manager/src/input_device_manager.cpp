@@ -666,6 +666,12 @@ int32_t InputDeviceManager::OnEnableInputDevice(bool enable)
             }
         }
     }
+    for (auto &item : inputDevice_) {
+        if (item.second.isPointerDevice && item.second.enable) {
+            NotifyPointerDevice(true, true);
+            break;
+        }
+    }
     return RET_OK;
 }
 } // namespace MMI
