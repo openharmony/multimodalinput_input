@@ -199,7 +199,6 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
     if (enableCombineKey_) {
         return true;
     }
-
     if (key->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_DOWN
         || key->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_UP) {
         auto items = key->GetKeyItems();
@@ -217,7 +216,6 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
         }
         return true;
     }
-
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
         auto items = keyEvent->GetKeyItems();
         if (items.size() != 1) {
