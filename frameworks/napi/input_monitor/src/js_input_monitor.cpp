@@ -164,7 +164,8 @@ void InputMonitor::OnInputEvent(std::shared_ptr<PointerEvent> pointerEvent) cons
     std::function<void(std::shared_ptr<PointerEvent>)> callback;
     {
         std::lock_guard<std::mutex> guard(mutex_);
-        if (JsInputMonMgr.GetMonitor(id_, fingers_) == nullptr) {
+        auto monitor = JsInputMonMgr.GetMonitor(id_, fingers_);
+        if (monitor == nullptr) {
             MMI_HILOGE("Failed to process pointer event, id:%{public}d", id_);
             return;
         }
