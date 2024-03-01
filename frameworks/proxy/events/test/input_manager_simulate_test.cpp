@@ -132,7 +132,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_001
     injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_A);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectDownEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
     ASSERT_TRUE(injectUpEvent != nullptr);
@@ -146,7 +146,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_001
     injectUpEvent->RemoveReleasedKeyItems(kitUp);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectUpEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 /**
@@ -170,7 +170,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_002
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectDownEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 /**
@@ -194,7 +194,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_003
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectDownEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
     ASSERT_TRUE(injectUpEvent != nullptr);
@@ -207,7 +207,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_003
     injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_A);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectUpEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 /**
@@ -231,7 +231,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_004
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     TestSimulateInputEvent(injectDownEvent, TestScene::EXCEPTION_TEST);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 /**
@@ -255,7 +255,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_005
     injectDownEvent->AddPressedKeyItems(kitDown);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectDownEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 
     std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
     ASSERT_TRUE(injectUpEvent != nullptr);
@@ -269,7 +269,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_005
     injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
 #ifdef OHOS_BUILD_ENABLE_KEYBOARD
     SimulateInputEventUtilTest(injectUpEvent);
-#endif  // OHOS_BUILD_ENABLE_KEYBOARD
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
 }
 
 /**
@@ -286,7 +286,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulatePointerEvent
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
 /**
@@ -303,7 +303,7 @@ HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulatePointerEvent
     ASSERT_TRUE(pointerEvent != nullptr);
 #ifdef OHOS_BUILD_ENABLE_TOUCH
     SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_TOUCH
+#endif // OHOS_BUILD_ENABLE_TOUCH
 }
 
 /**
