@@ -203,13 +203,19 @@ bool KeySubscriberHandler::IsEnableCombineKey(const std::shared_ptr<KeyEvent> ke
     if (key->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_DOWN
         || key->GetKeyCode() == KeyEvent::KEYCODE_BRIGHTNESS_UP) {
         auto items = key->GetKeyItems();
-        return items.size() != 1 ? enableCombineKey_ : true;
+        if(items.size() != 1) {
+            return enableCombineKey_;
+        }
+        return true;
     }
     if (key->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_UP
         || key->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_DOWN
         || key->GetKeyCode() == KeyEvent::KEYCODE_VOLUME_MUTE) {
         auto items = key->GetKeyItems();
-        return items.size() != 1 ? enableCombineKey_ : true;
+        if(items.size() != 1) {
+            return enableCombineKey_;
+        }
+        return true;
     }
 
     if (keyEvent->GetKeyCode() == KeyEvent::KEYCODE_POWER && keyEvent->GetKeyAction() == KeyEvent::KEY_ACTION_UP) {
