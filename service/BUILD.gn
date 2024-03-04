@@ -231,6 +231,7 @@ ohos_shared_library("libmmi-server") {
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "image_framework:image_native",
+    "init:libbeget_proxy",
     "init:libbegetutil",
     "ipc:ipc_single",
     "napi:ace_napi",
