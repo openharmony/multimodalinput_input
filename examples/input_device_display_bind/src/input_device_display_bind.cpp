@@ -49,7 +49,8 @@ void QueryDisplayBindInfo()
         return;
     }
     std::vector<std::array<std::string, 5>> arrStrings;
-    std::array<std::string, 5> arr0 = { "No.", "Input device Id", "Input device Name", "Display id", "Display name"};
+    constexpr int32_t n = 5;
+    std::array<std::string, n> arr0 = { "No.", "Input device Id", "Input device Name", "Display id", "Display name" };
     arrStrings.push_back(arr0);
     for (size_t i = 0; i < infos.size(); ++i) {
         const auto &info = infos[i];
