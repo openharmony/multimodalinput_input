@@ -1173,11 +1173,17 @@ void MMIService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &
         int sleepSeconds = 1;
         sleep(sleepSeconds);
         uint64_t tid = tid_.load();
+        int32_t userInteraction = 2;
         std::unordered_map<std::string, std::string> payload;
         payload["uid"] = std::to_string(getuid());
         payload["pid"] = std::to_string(getpid());
+        payload["extType"] = "10002";
+        payload["tid"] = std::to_string(tid);
+        payload["isSa"] = "1";
+        payload["cgroupPrio"] = "1";
+        payload["threadName"] = "mmi_service";
         ResourceSchedule::ResSchedClient::GetInstance().ReportData(
-            ResourceSchedule::ResType::RES_TYPE_REPORT_MMI_PROCESS, tid, payload);
+            ResourceSchedule::ResType::RES_TYPE_KEY_PERF_SCENE, userInteraction, payload);
     }
 #endif // OHOS_RSS_CLIENT
 #ifdef OHOS_BUILD_ENABLE_FINGERSENSE_WRAPPER
