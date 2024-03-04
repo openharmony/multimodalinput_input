@@ -434,9 +434,9 @@ struct WindowGroupInfo {
 };
 
 struct DisplayBindInfo {
-    int32_t inputDeviceId = -1;
+    int32_t inputDeviceId { -1 };
     std::string inputDeviceName;
-    int32_t displayId = -1;
+    int32_t displayId { -1 };
     std::string displayName;
 };
 enum class WindowArea: int32_t {

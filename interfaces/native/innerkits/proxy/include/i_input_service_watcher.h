@@ -15,6 +15,7 @@
 
 #ifndef I_INPUT_SERVICE_WATCHER_H
 #define I_INPUT_SERVICE_WATCHER_H
+
 namespace OHOS {
 namespace MMI {
 class IInputServiceWatcher {

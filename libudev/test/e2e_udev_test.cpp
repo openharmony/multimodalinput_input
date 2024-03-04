@@ -28,7 +28,7 @@ using ::testing::ext::TestSize;
 namespace {
 constexpr auto DEVICE_MAX_DELAY = 100ms;
 constexpr auto DEVICE_DELAY_STEP = 10ms;
-}
+} // namespace
 
 class TestDeviceListener : public OHOS::MMI::IInputDeviceListener {
 public:
