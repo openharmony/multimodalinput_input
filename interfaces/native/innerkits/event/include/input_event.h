@@ -103,7 +103,7 @@ public:
      *
      * @since 9
      */
-    InputEvent(const InputEvent& other);
+    InputEvent(const InputEvent &other);
 
     /**
      * Virtual destructor of InputEvent

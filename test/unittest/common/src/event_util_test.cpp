@@ -23,8 +23,8 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "EventUtilTest" };
-constexpr int32_t TIME_WAIT_FOR_EVENT = 1000;
-constexpr int32_t SEC_TO_NANOSEC = 1000000000;
+constexpr int32_t TIME_WAIT_FOR_EVENT { 1000 };
+constexpr int32_t SEC_TO_NANOSEC { 1000000000 };
 } // namespace
 
 void InputEventConsumer::OnInputEvent(std::shared_ptr<KeyEvent> keyEvent) const

@@ -232,8 +232,8 @@ public:
     }
 
 private:
-    struct libevdev* evdev_{};
-    struct libevdev_uinput* uidev_{};
-    dev_t devnum_{};
+    struct libevdev* evdev_ {};
+    struct libevdev_uinput* uidev_ {};
+    dev_t devnum_ {};
 };
 #endif // TEST_DEVICE_H

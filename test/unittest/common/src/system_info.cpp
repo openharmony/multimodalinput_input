@@ -32,9 +32,9 @@ namespace MMI {
 namespace SYSTEM_INFO {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "SYSTEM_INFO" };
-constexpr int32_t LOCATION = 14;
-constexpr int32_t TIME_WAIT_FOR_OP = 1000;
-constexpr int32_t DEFAULT_PID = -1;
+constexpr int32_t LOCATION { 14 };
+constexpr int32_t TIME_WAIT_FOR_OP { 1000 };
+constexpr int32_t DEFAULT_PID { -1 };
 } // namespace
 
 inline double CHK_RATE(double rate)
