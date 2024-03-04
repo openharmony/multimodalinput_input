@@ -891,6 +891,9 @@ void InputWindowsManager::PrintWindowInfo(const std::vector<WindowInfo> &windows
 
 void InputWindowsManager::PrintWindowGroupInfo(const WindowGroupInfo &windowGroupInfo)
 {
+    if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+        return;
+    }
     MMI_HILOGD("windowsGroupInfo,focusWindowId:%{public}d,displayId:%{public}d",
         windowGroupInfo.focusWindowId, windowGroupInfo.displayId);
     PrintWindowInfo(windowGroupInfo.windowsInfo);
@@ -898,6 +901,9 @@ void InputWindowsManager::PrintWindowGroupInfo(const WindowGroupInfo &windowGrou
 
 void InputWindowsManager::PrintDisplayInfo()
 {
+    if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+        return;
+    }
     MMI_HILOGD("logicalInfo,width:%{public}d,height:%{public}d,focusWindowId:%{public}d",
         displayGroupInfo_.width, displayGroupInfo_.height, displayGroupInfo_.focusWindowId);
     MMI_HILOGD("windowsInfos,num:%{public}zu", displayGroupInfo_.windowsInfo.size());
