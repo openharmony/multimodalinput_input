@@ -845,7 +845,7 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     if (displayInfo_.displayDirection == DIRECTION0) {
         direction = displayInfo_.direction;
     }
-    AdjustMouseFocus(direction ,ICON_TYPE(mouseIcons_[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay),
+    AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay),
         physicalX, physicalY);
     CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction);
     ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
