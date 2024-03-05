@@ -226,8 +226,6 @@ private:
     PointerStyle lastPointerStyle_ {.id = -1};
     PointerStyle dragPointerStyle_ {.id = -1};
     MouseLocation mouseLocation_ = { -1, -1 };
-    double absolutionX_ {};
-    double absolutionY_ {};
     std::map<int32_t, WindowInfoEX> touchItemDownInfos_;
     std::map<int32_t, std::vector<Rect>> windowsHotAreas_;
     InputDisplayBindHelper bindInfo_;
