@@ -493,7 +493,7 @@ void InputWindowsManager::UpdateDisplayInfo(DisplayGroupInfo &displayGroupInfo)
     }
     PrintDisplayInfo();
     UpdateDisplayIdAndName();
-    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled()) {
+    if (Rosen::SceneBoardJudgement::IsSceneBoardEnabled() && InputDevMgr->HasPointerDevice()) {
         UpdatePointerChangeAreas(displayGroupInfo);
     }
 #ifdef OHOS_BUILD_ENABLE_POINTER
@@ -1469,6 +1469,12 @@ void InputWindowsManager::UpdatePointerChangeAreas(const DisplayGroupInfo &displ
             windowsHotAreas_[windowId] = windowHotAreas;
         }
     }
+}
+
+void InputWindowsManager::UpdatePointerChangeAreas(const DisplayGroupInfo &displayGroupInfo)
+{
+    CALL_DEBUG_ENTER;
+    UpdatePointerChangeAreas(displayGroupInfoTmp_);
 }
 
 void InputWindowsManager::UpdateTopBottomArea(const Rect &windowArea, std::vector<int32_t> &pointerChangeAreas,
