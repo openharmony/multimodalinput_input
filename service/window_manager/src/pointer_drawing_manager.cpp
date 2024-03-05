@@ -133,7 +133,8 @@ void PointerDrawingManager::DrawPointer(int32_t displayId, int32_t physicalX, in
     lastPhysicalY_ = physicalY;
     currentMouseStyle_ = pointerStyle;
     currentDirection_ = direction;
-    AdjustMouseFocus(ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay), physicalX, physicalY);
+    AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(pointerStyle.id)].alignmentWay),
+        physicalX, physicalY);
 
     if (surfaceNode_ != nullptr) {
         DrawMovePointer(displayId, physicalX, physicalY, pointerStyle, direction);
@@ -297,7 +298,35 @@ void PointerDrawingManager::DrawRunningPointerAnimate(const MOUSE_ICON mouseStyl
     Rosen::RSTransaction::FlushImplicitTransaction();
 }
 
-void PointerDrawingManager::AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY)
+void PointerDrawingManager::AdjustMouseFocus(Direction direction, ICON_TYPE iconType,
+    int32_t &physicalX, int32_t &physicalY)
+{
+    CALL_DEBUG_ENTER;
+    switch (direction) {
+        case DIRECTION0: {
+            AdjustMouseFocusByDirection0(iconType, physicalX, physicalY);
+            break;
+        }
+        case DIRECTION90: {
+            AdjustMouseFocusByDirection90(iconType, physicalX, physicalY);
+            break;
+        }
+        case DIRECTION180: {
+            AdjustMouseFocusByDirection180(iconType, physicalX, physicalY);
+            break;
+        }
+        case DIRECTION270: {
+            AdjustMouseFocusByDirection270(iconType, physicalX, physicalY);
+            break;
+        }
+        default: {
+            MMI_HILOGW("direction is invalid,direction:%{public}d", direction);
+            break;
+        }
+    }
+}
+
+void PointerDrawingManager::AdjustMouseFocusByDirection0(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY)
 {
     CALL_DEBUG_ENTER;
     switch (iconType) {
@@ -310,18 +339,112 @@ void PointerDrawingManager::AdjustMouseFocus(ICON_TYPE iconType, int32_t &physic
             physicalY -= imageHeight_ / CALCULATE_MIDDLE;
             break;
         }
-        case ANGLE_NW_RIGHT:{
+        case ANGLE_NW_RIGHT: {
             physicalX -= MOUSE_ICON_BAIS;
             [[fallthrough]];
         }
-        case ANGLE_NW:
+        case ANGLE_NW: {
             if (userIcon_ != nullptr && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
                 physicalX -= userIconHotSpotX_;
                 physicalY -= userIconHotSpotY_;
             }
             break;
+        }
         default: {
-            MMI_HILOGD("No need adjust mouse focus");
+            MMI_HILOGW("No need adjust mouse focus,iconType:%{public}d", iconType);
+            break;
+        }
+    }
+}
+
+void PointerDrawingManager::AdjustMouseFocusByDirection90(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY)
+{
+    CALL_DEBUG_ENTER;
+    switch (iconType) {
+        case ANGLE_SW: {
+            physicalY += imageHeight_;
+            break;
+        }
+        case ANGLE_CENTER: {
+            physicalX -= imageWidth_ / CALCULATE_MIDDLE;
+            physicalY += imageHeight_ / CALCULATE_MIDDLE;
+            break;
+        }
+        case ANGLE_NW_RIGHT: {
+            physicalX -= MOUSE_ICON_BAIS;
+            [[fallthrough]];
+        }
+        case ANGLE_NW: {
+            if (userIcon_ != nullptr && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+                physicalX -= userIconHotSpotX_;
+                physicalY += userIconHotSpotY_;
+            }
+            break;
+        }
+        default: {
+            MMI_HILOGW("No need adjust mouse focus,iconType:%{public}d", iconType);
+            break;
+        }
+    }
+}
+
+void PointerDrawingManager::AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY)
+{
+    CALL_DEBUG_ENTER;
+    switch (iconType) {
+        case ANGLE_SW: {
+            physicalY += imageHeight_;
+            break;
+        }
+        case ANGLE_CENTER: {
+            physicalX += imageWidth_ / CALCULATE_MIDDLE;
+            physicalY += imageHeight_ / CALCULATE_MIDDLE;
+            break;
+        }
+        case ANGLE_NW_RIGHT: {
+            physicalX += MOUSE_ICON_BAIS;
+            [[fallthrough]];
+        }
+        case ANGLE_NW: {
+            if (userIcon_ != nullptr && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+                physicalX += userIconHotSpotX_;
+                physicalY += userIconHotSpotY_;
+            }
+            break;
+        }
+        default: {
+            MMI_HILOGW("No need adjust mouse focus,iconType:%{public}d", iconType);
+            break;
+        }
+    }
+}
+
+void PointerDrawingManager::AdjustMouseFocusByDirection270(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY)
+{
+    CALL_DEBUG_ENTER;
+    switch (iconType) {
+        case ANGLE_SW: {
+            physicalY -= imageHeight_;
+            break;
+        }
+        case ANGLE_CENTER: {
+            physicalX += imageWidth_ / CALCULATE_MIDDLE;
+            physicalY -= imageHeight_ / CALCULATE_MIDDLE;
+            break;
+        }
+        case ANGLE_NW_RIGHT: {
+            physicalX += MOUSE_ICON_BAIS;
+            [[fallthrough]];
+        }
+        case ANGLE_NW: {
+            if (userIcon_ != nullptr && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
+                physicalX += userIconHotSpotX_;
+                physicalY -= userIconHotSpotY_;
+            }
+            break;
+        }
+        default: {
+            MMI_HILOGW("No need adjust mouse focus,iconType:%{public}d", iconType);
             break;
         }
     }
@@ -722,8 +845,13 @@ int32_t PointerDrawingManager::SetPointerSize(int32_t size)
     IMAGE_HEIGHT = (imageHeight_ / POINTER_WINDOW_INIT_SIZE + 1) * POINTER_WINDOW_INIT_SIZE;
     int32_t physicalX = lastPhysicalX_;
     int32_t physicalY = lastPhysicalY_;
-    AdjustMouseFocus(ICON_TYPE(mouseIcons_[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay), physicalX, physicalY);
-    CreatePointerWindow(displayInfo_.id, physicalX, physicalY, displayInfo_.direction);
+    Direction direction = DIRECTION0;
+    if (displayInfo_.displayDirection == DIRECTION0) {
+        direction = displayInfo_.direction;
+    }
+    AdjustMouseFocus(direction, ICON_TYPE(mouseIcons_[MOUSE_ICON(lastMouseStyle_.id)].alignmentWay),
+        physicalX, physicalY);
+    CreatePointerWindow(displayInfo_.id, physicalX, physicalY, direction);
     ret = InitLayer(MOUSE_ICON(lastMouseStyle_.id));
     if (ret != RET_OK) {
         MMI_HILOGE("Init layer failed");
@@ -1166,8 +1294,9 @@ void PointerDrawingManager::InitStyle()
 
 void PointerDrawingManager::RotateDegree(Direction direction)
 {
-    float degree = (static_cast<int>(DIRECTION0) - static_cast<int>(direction)) * ROTATION_ANGLE90;
+    CHKPV(surfaceNode_);
     surfaceNode_->SetPivot(0, 0);
+    float degree = (static_cast<int>(DIRECTION0) - static_cast<int>(direction)) * ROTATION_ANGLE90;
     surfaceNode_->SetRotation(degree);
 }
 } // namespace MMI

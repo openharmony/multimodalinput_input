@@ -40,6 +40,8 @@ public:
     DISALLOW_COPY_AND_MOVE(TouchDrawingManager);
     void TouchDrawHandler(const std::shared_ptr<PointerEvent> pointerEvent);
     void UpdateDisplayInfo(const DisplayInfo& displayInfo);
+    void GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
+        int32_t &physicalX, int32_t &physicalY);
 
 private:
     void StartTouchDraw(const std::shared_ptr<PointerEvent> pointerEvent);
@@ -47,8 +49,6 @@ private:
     void CreateCanvasNode();
     int32_t DrawGraphic(const std::shared_ptr<PointerEvent> pointerEvent);
     bool IsValidAction(const int32_t action);
-    void GetOriginalTouchScreenCoordinates(Direction direction, int32_t width, int32_t height,
-        int32_t &physicalX, int32_t &physicalY);
 
 private:
     std::shared_ptr<Rosen::RSSurfaceNode> surfaceNode_;
