@@ -320,7 +320,7 @@ void PointerDrawingManager::AdjustMouseFocus(Direction direction, ICON_TYPE icon
             break;
         }
         default: {
-            MMI_HILOGW("direction is invalid, direction:%{public}d", direction);
+            MMI_HILOGW("direction is invalid,direction:%{public}d", direction);
             break;
         }
     }
@@ -343,14 +343,15 @@ void PointerDrawingManager::AdjustMouseFocusByDirection0(ICON_TYPE iconType, int
             physicalX -= MOUSE_ICON_BAIS;
             [[fallthrough]];
         }
-        case ANGLE_NW:
+        case ANGLE_NW: {
             if (userIcon_ != nullptr && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
                 physicalX -= userIconHotSpotX_;
                 physicalY -= userIconHotSpotY_;
             }
             break;
+        }
         default: {
-            MMI_HILOGD("No need adjust mouse focus");
+            MMI_HILOGW("No need adjust mouse focus,iconType:%{public}d", iconType);
             break;
         }
     }
@@ -373,14 +374,15 @@ void PointerDrawingManager::AdjustMouseFocusByDirection90(ICON_TYPE iconType, in
             physicalX -= MOUSE_ICON_BAIS;
             [[fallthrough]];
         }
-        case ANGLE_NW:
+        case ANGLE_NW: {
             if (userIcon_ != nullptr && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
                 physicalX -= userIconHotSpotX_;
                 physicalY += userIconHotSpotY_;
             }
             break;
+        }
         default: {
-            MMI_HILOGD("No need adjust mouse focus");
+            MMI_HILOGW("No need adjust mouse focus,iconType:%{public}d", iconType);
             break;
         }
     }
@@ -403,14 +405,15 @@ void PointerDrawingManager::AdjustMouseFocusByDirection180(ICON_TYPE iconType, i
             physicalX += MOUSE_ICON_BAIS;
             [[fallthrough]];
         }
-        case ANGLE_NW:
+        case ANGLE_NW: {
             if (userIcon_ != nullptr && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
                 physicalX += userIconHotSpotX_;
                 physicalY += userIconHotSpotY_;
             }
             break;
+        }
         default: {
-            MMI_HILOGD("No need adjust mouse focus");
+            MMI_HILOGW("No need adjust mouse focus,iconType:%{public}d", iconType);
             break;
         }
     }
@@ -433,14 +436,15 @@ void PointerDrawingManager::AdjustMouseFocusByDirection270(ICON_TYPE iconType, i
             physicalX += MOUSE_ICON_BAIS;
             [[fallthrough]];
         }
-        case ANGLE_NW:
+        case ANGLE_NW: {
             if (userIcon_ != nullptr && currentMouseStyle_.id == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
                 physicalX += userIconHotSpotX_;
                 physicalY -= userIconHotSpotY_;
             }
             break;
+        }
         default: {
-            MMI_HILOGD("No need adjust mouse focus");
+            MMI_HILOGW("No need adjust mouse focus,iconType:%{public}d", iconType);
             break;
         }
     }
