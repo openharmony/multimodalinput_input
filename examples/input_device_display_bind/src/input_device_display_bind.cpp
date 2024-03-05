@@ -24,19 +24,19 @@
 
 #include "input_manager.h"
 
-const int32_t INVALID_ID = -1;
+constexpr int32_t INVALID_ID = -1;
 enum Option {
     QUERY = 'q',
     SET = 's',
     HELP = 'h'
 };
 
-void PrintHelp(const std::string title = {})
+void PrintHelp(const std::string &title = {})
 {
     std::cout << title << std::endl;
     printf("Usage\n"
         "-q     --query                             Query input device and display infomation\n"
-        "-s     --set 'inputDeivceId displayId'     Query input device and display infomation\n");
+        "-s     --set 'inputDeivceId displayId'     Set inputDeivceId and displayId of the input device\n");
 }
 
 void QueryDisplayBindInfo()
@@ -49,8 +49,8 @@ void QueryDisplayBindInfo()
         return;
     }
     std::vector<std::array<std::string, 5>> arrStrings;
-    std::array<std::string, 5> arr0 = { "No.", "Input device Id", "Input device Name", "Display id",
-        "Display name" };
+    constexpr int32_t n = 5;
+    std::array<std::string, n> arr0 = { "No.", "Input device Id", "Input device Name", "Display id", "Display name" };
     arrStrings.push_back(arr0);
     for (size_t i = 0; i < infos.size(); ++i) {
         const auto &info = infos[i];
