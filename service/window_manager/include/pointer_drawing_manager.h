@@ -67,7 +67,7 @@ public:
     void DrawPointerStyle(const PointerStyle& pointerStyle) override;
     bool IsPointerVisible() override;
     void SetPointerLocation(int32_t x, int32_t y) override;
-    void AdjustMouseFocus(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
+    void AdjustMouseFocus(Direction direction, ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
     void SetMouseDisplayState(bool state) override;
     bool GetMouseDisplayState() const override;
     int32_t SetCustomCursor(void* pixelMap, int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY) override;
@@ -97,6 +97,10 @@ private:
     void RotateDegree(Direction direction);
     void DrawMovePointer(int32_t displayId, int32_t physicalX, int32_t physicalY,
         const PointerStyle pointerStyle, Direction direction);
+    void AdjustMouseFocusByDirection0(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
+    void AdjustMouseFocusByDirection90(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
+    void AdjustMouseFocusByDirection180(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
+    void AdjustMouseFocusByDirection270(ICON_TYPE iconType, int32_t &physicalX, int32_t &physicalY);
 
 private:
     struct PidInfo {
