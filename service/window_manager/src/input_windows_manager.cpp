@@ -1471,7 +1471,7 @@ void InputWindowsManager::UpdatePointerChangeAreas(const DisplayGroupInfo &displ
     }
 }
 
-void InputWindowsManager::UpdatePointerChangeAreas(const DisplayGroupInfo &displayGroupInfo)
+void InputWindowsManager::UpdatePointerChangeAreas()
 {
     CALL_DEBUG_ENTER;
     UpdatePointerChangeAreas(displayGroupInfoTmp_);
