@@ -222,12 +222,12 @@ std::shared_ptr<PointerEvent> TouchTransformProcessor::OnEvent(struct libinput_e
     }
     pointerEvent_->SetSourceType(PointerEvent::SOURCE_TYPE_TOUCHSCREEN);
     pointerEvent_->UpdateId();
-    EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
-        pointerEvent_->GetPointerIds().size());
     auto device = InputDevMgr->GetInputDevice(pointerEvent_->GetDeviceId());
     CHKPP(device);
     MMI_HILOGI("The id:%{public}d event created by:%{public}s", pointerEvent_->GetId(), device->GetName().c_str());
     WinMgr->UpdateTargetPointer(pointerEvent_);
+    EventLogHelper::PrintEventData(pointerEvent_, pointerEvent_->GetPointerAction(),
+        pointerEvent_->GetPointerIds().size());
     WinMgr->DrawTouchGraphic(pointerEvent_);
     return pointerEvent_;
 }
