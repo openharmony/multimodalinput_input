@@ -628,6 +628,9 @@ void InputManagerImpl::PrintDisplayInfo()
 
 void InputManagerImpl::PrintWindowGroupInfo()
 {
+    if (!HiLogIsLoggable(OHOS::MMI::MMI_LOG_DOMAIN, LABEL.tag, LOG_DEBUG)) {
+        return;
+    }
     MMI_HILOGD("windowsGroupInfo,focusWindowId:%{public}d,displayId:%{public}d",
         windowGroupInfo_.focusWindowId, windowGroupInfo_.displayId);
     PrintWindowInfo(windowGroupInfo_.windowsInfo);
