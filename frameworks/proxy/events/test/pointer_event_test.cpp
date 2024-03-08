@@ -317,7 +317,6 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_005, TestSize.L
  */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_006, TestSize.Level1)
 {
-    sleep(10);
     auto inputEvent = InputEvent::Create();
     ASSERT_NE(inputEvent, nullptr);
     inputEvent->SetDeviceId(1);
