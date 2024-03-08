@@ -75,6 +75,7 @@ std::shared_ptr<PointerEvent> PointerEventTest::CreatePointEvent()
  */
 HWTEST_F(PointerEventTest, PointerEventTest_keyEventAndPointerEvent_001, TestSize.Level1)
 {
+    sleep(10);
     std::shared_ptr<PointerEvent> pointerEvent = CreatePointEvent();
     ASSERT_NE(pointerEvent, nullptr);
     std::vector<int32_t> pressedKeys { KeyEvent::KEYCODE_CTRL_LEFT };
@@ -316,6 +317,7 @@ HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_005, TestSize.L
  */
 HWTEST_F(PointerEventTest, PointerEventTest_CheckMousePointEvent_006, TestSize.Level1)
 {
+    sleep(10);
     auto inputEvent = InputEvent::Create();
     ASSERT_NE(inputEvent, nullptr);
     inputEvent->SetDeviceId(1);
