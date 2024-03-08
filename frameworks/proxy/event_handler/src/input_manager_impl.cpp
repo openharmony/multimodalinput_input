@@ -454,6 +454,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         std::lock_guard<std::mutex> guard(mtx_);
         eventHandler = eventHandler_;
         inputConsumer = consumer_;
+        lastPointerEvent_ = std::make_shared<PointerEvent>(*pointerEvent);
     }
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
@@ -1175,6 +1176,39 @@ void InputManagerImpl::OnConnected()
     int32_t ret = MultimodalInputConnMgr->SetAnrObserver();
     if (ret != RET_OK) {
         MMI_HILOGE("Set anr observer failed, ret:%{public}d", ret);
+    }
+}
+
+template<typename T>
+bool InputManagerImpl::PointerActionEvent(std::initializer_list<T> pointerActionEventList, T pointerActionEvent)
+{
+    for (const auto &it : pointerActionEventList) {
+        if (lastPointerEvent_->GetPointerAction() == it) {
+            lastPointerEvent_->SetPointerAction(pointerActionEvent);
+            PointerEvent::PointerItem item;
+            item.SetPressed(false);
+            lastPointerEvent_->UpdatePointerItem(lastPointerEvent_->GetPointerId(), item);
+            OnPointerEvent(lastPointerEvent_);
+            return true;
+        }
+    }
+    return false;
+}
+
+void InputManagerImpl::OnDisconnected()
+{
+    CALL_DEBUG_ENTER;
+    CHKPV(lastPointerEvent_);
+    std::initializer_list<int32_t> pointerActionEvent { PointerEvent::POINTER_ACTION_MOVE,
+        PointerEvent::POINTER_ACTION_DOWN };
+    std::initializer_list<int32_t> pointerActionPullEvent { PointerEvent::POINTER_ACTION_PULL_MOVE,
+        PointerEvent::POINTER_ACTION_PULL_DOWN };
+    if (PointerActionEvent(pointerActionEvent, PointerEvent::POINTER_ACTION_UP)) {
+        return;
+    }
+
+    if (PointerActionEvent(pointerActionPullEvent, PointerEvent::POINTER_ACTION_PULL_UP)) {
+        return;
     }
 }
 
