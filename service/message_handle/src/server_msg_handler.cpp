@@ -154,11 +154,16 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
 #ifdef OHOS_BUILD_ENABLE_POINTER
             auto inputEventNormalizeHandler = InputHandler->GetEventNormalizeHandler();
             CHKPR(inputEventNormalizeHandler, ERROR_NULL_POINTER);
-            if ((action < PointerEvent::POINTER_ACTION_PULL_DOWN ||
-                action > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW) &&
-                !IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
-                IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true);
+            if ((action < PointerEvent::POINTER_ACTION_PULL_DOWN) ||
+                (action > PointerEvent::POINTER_ACTION_PULL_OUT_WINDOW)) {
+                if (!IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
+                    IPointerDrawingManager::GetInstance()->SetMouseDisplayState(true);
+                }
+                if (!IPointerDrawingManager::GetInstance()->IsPointerVisible()) {
+                    IPointerDrawingManager::GetInstance()->SetPointerVisible(getpid(), true);
+                }
             }
+            UpdatePointerPos(pointerEvent);
             inputEventNormalizeHandler->HandlePointerEvent(pointerEvent);
 #endif // OHOS_BUILD_ENABLE_POINTER
             break;
@@ -168,7 +173,34 @@ int32_t ServerMsgHandler::OnInjectPointerEvent(const std::shared_ptr<PointerEven
             break;
         }
     }
-    if (source == PointerEvent::SOURCE_TYPE_TOUCHSCREEN && action == PointerEvent::POINTER_ACTION_DOWN) {
+    return SaveTargetWindowId(pointerEvent);
+}
+
+int32_t ServerMsgHandler::UpdatePointerPos(std::shared_ptr<PointerEvent> pointerEvent) const
+{
+    PointerEvent::PointerItem pointerItem;
+
+    if (!pointerEvent->GetPointerItem(pointerEvent->GetPointerId(), pointerItem)) {
+        MMI_HILOGE("Corrupted pointer event, pointer:%{public}d", pointerEvent->GetPointerId());
+        return RET_ERR;
+    }
+    int32_t displayId = pointerEvent->GetTargetDisplayId();
+    double displayX = pointerItem.GetDisplayX();
+    double displayY = pointerItem.GetDisplayY();
+
+    WinMgr->UpdateAndAdjustMouseLocation(displayId, displayX, displayY);
+    auto mouseInfo = WinMgr->GetMouseInfo();
+    pointerEvent->SetTargetDisplayId(mouseInfo.displayId);
+    pointerItem.SetDisplayX(mouseInfo.physicalX);
+    pointerItem.SetDisplayY(mouseInfo.physicalY);
+    pointerEvent->UpdatePointerItem(pointerEvent->GetPointerId(), pointerItem);
+    return RET_OK;
+}
+
+int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent)
+{
+    if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
+        (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN)) {
         int32_t pointerId = pointerEvent->GetPointerId();
         PointerEvent::PointerItem pointerItem;
         if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {

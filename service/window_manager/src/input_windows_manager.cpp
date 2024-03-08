@@ -68,6 +68,8 @@ constexpr int32_t LEFT_AREA = 7;
 #ifdef OHOS_BUILD_ENABLE_ANCO
 constexpr int32_t SHELL_WINDOW_COUNT = 1;
 #endif // OHOS_BUILD_ENABLE_ANCO
+constexpr double HALF_RATIO = 0.5;
+constexpr int32_t TWOFOLD = 2;
 const std::string bindCfgFileName = "/data/service/el1/public/multimodalinput/display_bind.cfg";
 const std::string mouseFileName = "mouse_settings.xml";
 const std::string defaultIconPath = "/system/etc/multimodalinput/mouse_icon/Default.svg";
@@ -2335,6 +2337,11 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
     CoordinateCorrection(width, height, integerX, integerY);
     x = static_cast<double>(integerX) + (x - floor(x));
     y = static_cast<double>(integerY) + (y - floor(y));
+
+    cursorPos_.displayId = displayId;
+    cursorPos_.cursorPos.x = x;
+    cursorPos_.cursorPos.y = y;
+
     if (displayInfo->displayDirection == DIRECTION0) {
         LogicalCoordinate coord {
             .x = integerX,
@@ -2347,19 +2354,46 @@ void InputWindowsManager::UpdateAndAdjustMouseLocation(int32_t& displayId, doubl
         mouseLocation_.physicalX = integerX;
         mouseLocation_.physicalY = integerY;
     }
+    mouseLocation_.displayId = displayId;
     MMI_HILOGD("Mouse Data: physicalX:%{public}d,physicalY:%{public}d, displayId:%{public}d",
         mouseLocation_.physicalX, mouseLocation_.physicalY, displayId);
 }
 
 MouseLocation InputWindowsManager::GetMouseInfo()
 {
-    if (mouseLocation_.physicalX == -1 || mouseLocation_.physicalY == -1) {
-        if (!displayGroupInfo_.displaysInfo.empty()) {
-            mouseLocation_.physicalX = displayGroupInfo_.displaysInfo[0].width / 2;
-            mouseLocation_.physicalY = displayGroupInfo_.displaysInfo[0].height / 2;
-        }
+    if ((mouseLocation_.displayId < 0) && !displayGroupInfo_.displaysInfo.empty()) {
+        const DisplayInfo &displayInfo = displayGroupInfo_.displaysInfo[0];
+        mouseLocation_.displayId = displayInfo.id;
+        mouseLocation_.physicalX = displayInfo.width / TWOFOLD;
+        mouseLocation_.physicalY = displayInfo.height / TWOFOLD;
     }
     return mouseLocation_;
+}
+
+CursorPosition InputWindowsManager::GetCursorPos()
+{
+    if ((cursorPos_.displayId < 0) && !displayGroupInfo_.displaysInfo.empty()) {
+        const DisplayInfo &displayInfo = displayGroupInfo_.displaysInfo[0];
+        cursorPos_.displayId = displayInfo.id;
+        cursorPos_.cursorPos.x = displayInfo.width * HALF_RATIO;
+        cursorPos_.cursorPos.y = displayInfo.height * HALF_RATIO;
+    }
+    return cursorPos_;
+}
+
+CursorPosition InputWindowsManager::ResetCursorPos()
+{
+    if (!displayGroupInfo_.displaysInfo.empty()) {
+        const DisplayInfo &displayInfo = displayGroupInfo_.displaysInfo[0];
+        cursorPos_.displayId = displayInfo.id;
+        cursorPos_.cursorPos.x = displayInfo.width * HALF_RATIO;
+        cursorPos_.cursorPos.y = displayInfo.height * HALF_RATIO;
+    } else {
+        cursorPos_.displayId = -1;
+        cursorPos_.cursorPos.x = 0;
+        cursorPos_.cursorPos.y = 0;
+    }
+    return cursorPos_;
 }
 #endif // OHOS_BUILD_ENABLE_POINTER
 

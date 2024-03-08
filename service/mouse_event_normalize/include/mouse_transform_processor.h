@@ -115,9 +115,6 @@ public:
     static int32_t GetTouchpadPointerSpeed(int32_t &speed);
 
 private:
-    static double absolutionX_;
-    static double absolutionY_;
-    static int32_t currentDisplayId_;
     static int32_t globalPointerSpeed_;
 
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };

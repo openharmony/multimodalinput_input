@@ -36,8 +36,19 @@
 namespace OHOS {
 namespace MMI {
 struct MouseLocation {
+    int32_t displayId { -1 };
     int32_t physicalX { 0 };
     int32_t physicalY { 0 };
+};
+
+struct Coordinate2D {
+    double x;
+    double y;
+};
+
+struct CursorPosition {
+    int32_t displayId { -1 };
+    Coordinate2D cursorPos {};
 };
 
 struct DevMode {
@@ -83,6 +94,8 @@ public:
 
 #ifdef OHOS_BUILD_ENABLE_POINTER
     MouseLocation GetMouseInfo();
+    CursorPosition GetCursorPos();
+    CursorPosition ResetCursorPos();
     void UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y);
     const DisplayGroupInfo& GetDisplayGroupInfo();
     int32_t SetHoverScrollState(bool state);
@@ -226,6 +239,7 @@ private:
     PointerStyle lastPointerStyle_ {.id = -1};
     PointerStyle dragPointerStyle_ {.id = -1};
     MouseLocation mouseLocation_ = { -1, -1 };
+    CursorPosition cursorPos_ {};
     std::map<int32_t, WindowInfoEX> touchItemDownInfos_;
     std::map<int32_t, std::vector<Rect>> windowsHotAreas_;
     InputDisplayBindHelper bindInfo_;
