@@ -662,7 +662,6 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_001, TestSize.Level
     pointerEvent->SetSourceType(PointerEvent::SOURCE_TYPE_MOUSE);
 
     auto interceptor = GetPtr<InputEventCallback>();
-    sleep(5);
     int32_t interceptorId{InputManager::GetInstance()->AddInterceptor(interceptor)};
     InputManagerUtil::TestInterceptorIdAndPointerEvent(interceptorId, pointerEvent);
 }
