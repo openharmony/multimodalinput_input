@@ -76,22 +76,6 @@ void MouseTransformProcessorTest::TearDown()
 }
 
 /**
- * @tc.name: MouseDeviceStateTest_GetPointerEvent_001
- * @tc.desc: Test GetPointerEvent
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(MouseTransformProcessorTest, MouseTransformProcessorTest_GetPointerEvent_001, TestSize.Level1)
-{
-    int32_t deviceId = 0;
-    MouseTransformProcessor processor(deviceId);
-    ASSERT_TRUE(processor.GetPointerEvent() != nullptr);
-    processor.InitAbsolution();
-    int32_t displayId = 0;
-    processor.OnDisplayLost(displayId);
-}
-
-/**
  * @tc.name: MouseTransformProcessorTest_Dump_002
  * @tc.desc: Test Dump
  * @tc.type: FUNC

@@ -49,7 +49,6 @@ constexpr int32_t DEFAULT_TOUCHPAD_SPEED = 9;
 constexpr int32_t DEFAULT_ROWS = 3;
 constexpr int32_t MIN_ROWS = 1;
 constexpr int32_t MAX_ROWS = 100;
-constexpr int32_t CALCULATE_MIDDLE = 2;
 constexpr int32_t BTN_RIGHT_MENUE_CODE = 0x118;
 constexpr int32_t RIGHT_CLICK_TYPE_MIN = 1;
 constexpr int32_t RIGHT_CLICK_TYPE_MAX = 3;
@@ -57,9 +56,6 @@ constexpr int32_t TP_RIGHT_CLICK_FINGER_CNT = 2;
 const std::string mouseFileName = "mouse_settings.xml";
 } // namespace
 
-double MouseTransformProcessor::absolutionX_ = -1.0;
-double MouseTransformProcessor::absolutionY_ = -1.0;
-int32_t MouseTransformProcessor::currentDisplayId_ = -1;
 int32_t MouseTransformProcessor::globalPointerSpeed_ = DEFAULT_SPEED;
 
 MouseTransformProcessor::MouseTransformProcessor(int32_t deviceId)
@@ -81,17 +77,15 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
     pointerEvent_->SetButtonId(buttonId_);
 
-    InitAbsolution();
-    if (currentDisplayId_ == -1) {
-        absolutionX_ = -1;
-        absolutionY_ = -1;
-        MMI_HILOGI("The currentDisplayId_ is -1");
+    CursorPosition cursorPos = WinMgr->GetCursorPos();
+    if (cursorPos.displayId < 0) {
+        MMI_HILOGE("No display");
         return RET_ERR;
     }
 
     Offset offset = {libinput_event_pointer_get_dx_unaccelerated(data),
         libinput_event_pointer_get_dy_unaccelerated(data)};
-    auto displayInfo = WinMgr->GetPhysicalDisplay(currentDisplayId_);
+    auto displayInfo = WinMgr->GetPhysicalDisplay(cursorPos.displayId);
     CHKPR(displayInfo, ERROR_NULL_POINTER);
     if (displayInfo->displayDirection == DIRECTION0) {
         CalculateOffset(displayInfo->direction, offset);
@@ -99,24 +93,24 @@ int32_t MouseTransformProcessor::HandleMotionInner(struct libinput_event_pointer
     const int32_t type = libinput_event_get_type(event);
     int32_t ret = RET_ERR;
     if (type == LIBINPUT_EVENT_POINTER_MOTION_TOUCHPAD) {
-        ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(), &absolutionX_,
-            &absolutionY_, GetTouchpadSpeed());
+        ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(),
+            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, GetTouchpadSpeed());
     } else {
-        ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(), &absolutionX_,
-            &absolutionY_, globalPointerSpeed_);
+        ret = HandleMotionAccelerate(&offset, WinMgr->GetMouseIsCaptureMode(),
+            &cursorPos.cursorPos.x, &cursorPos.cursorPos.y, globalPointerSpeed_);
     }
     if (ret != RET_OK) {
         MMI_HILOGE("Failed to handle motion correction");
         return ret;
     }
 #ifdef OHOS_BUILD_EMULATOR
-    absolutionX_ = offset.dx;
-    absolutionY_ = offset.dy;
+    cursorPos.cursorPos.x = offset.dx;
+    cursorPos.cursorPos.y = offset.dy;
 #endif // OHOS_BUILD_EMULATOR
-    WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
-    pointerEvent_->SetTargetDisplayId(currentDisplayId_);
-    MMI_HILOGD("Change coordinate: x:%{public}lf, y:%{public}lf, currentDisplayId_:%{public}d",
-        absolutionX_, absolutionY_, currentDisplayId_);
+    WinMgr->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+    pointerEvent_->SetTargetDisplayId(cursorPos.displayId);
+    MMI_HILOGD("Change coordinate: x:%{public}lf, y:%{public}lf, currentDisplayId:%{public}d",
+        cursorPos.cursorPos.x, cursorPos.cursorPos.y, cursorPos.displayId);
     return RET_OK;
 }
 
@@ -135,23 +129,6 @@ void MouseTransformProcessor::CalculateOffset(Direction direction, Offset &offse
         offset.dx = neg(offset.dy);
         offset.dy = tmp;
     }
-}
-
-void MouseTransformProcessor::InitAbsolution()
-{
-    CALL_DEBUG_ENTER;
-    if (absolutionX_ != -1 || absolutionY_ != -1 || currentDisplayId_ != -1) {
-        MMI_HILOGW("Unable to initialize coordinate information");
-        return;
-    }
-    auto displayGroupInfo = WinMgr->GetDisplayGroupInfo();
-    if (displayGroupInfo.displaysInfo.empty()) {
-        MMI_HILOGI("The displayInfo is empty");
-        return;
-    }
-    currentDisplayId_ = displayGroupInfo.displaysInfo[0].id;
-    absolutionX_ = displayGroupInfo.displaysInfo[0].width * 1.0 / CALCULATE_MIDDLE;
-    absolutionY_ = displayGroupInfo.displaysInfo[0].height * 1.0 / CALCULATE_MIDDLE;
 }
 
 int32_t MouseTransformProcessor::HandleButtonInner(struct libinput_event_pointer* data, struct libinput_event* event)
@@ -404,7 +381,7 @@ void MouseTransformProcessor::HandleAxisPostInner(PointerEvent::PointerItem &poi
     pointerEvent_->SetActionStartTime(time);
     pointerEvent_->SetPointerId(0);
     pointerEvent_->SetDeviceId(deviceId_);
-    pointerEvent_->SetTargetDisplayId(currentDisplayId_);
+    pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
 }
@@ -444,7 +421,7 @@ void MouseTransformProcessor::HandlePostInner(struct libinput_event_pointer* dat
     pointerEvent_->SetActionStartTime(time);
     pointerEvent_->SetDeviceId(deviceId_);
     pointerEvent_->SetPointerId(0);
-    pointerEvent_->SetTargetDisplayId(currentDisplayId_);
+    pointerEvent_->SetTargetDisplayId(mouseInfo.displayId);
     pointerEvent_->SetTargetWindowId(-1);
     pointerEvent_->SetAgentWindowId(-1);
 }
@@ -519,26 +496,24 @@ void MouseTransformProcessor::HandleMotionMoveMouse(int32_t offsetX, int32_t off
     CALL_DEBUG_ENTER;
     CHKPV(pointerEvent_);
     pointerEvent_->SetPointerAction(PointerEvent::POINTER_ACTION_MOVE);
-    InitAbsolution();
-    absolutionX_ += offsetX;
-    absolutionY_ += offsetY;
-    WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
+    CursorPosition cursorPos = WinMgr->GetCursorPos();
+    cursorPos.cursorPos.x += offsetX;
+    cursorPos.cursorPos.y += offsetY;
+    WinMgr->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
 }
 
 void MouseTransformProcessor::OnDisplayLost(int32_t displayId)
 {
-    if (currentDisplayId_ != displayId) {
-        currentDisplayId_ = -1;
-        absolutionX_ = -1;
-        absolutionY_ = -1;
-        InitAbsolution();
-        WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
+    CursorPosition cursorPos = WinMgr->GetCursorPos();
+    if (cursorPos.displayId != displayId) {
+        cursorPos = WinMgr->ResetCursorPos();
+        WinMgr->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
     }
 }
 
 int32_t MouseTransformProcessor::GetDisplayId()
 {
-    return currentDisplayId_;
+    return WinMgr->GetCursorPos().displayId;
 }
 
 void MouseTransformProcessor::HandlePostMoveMouse(PointerEvent::PointerItem& pointerItem)
@@ -680,21 +655,18 @@ void MouseTransformProcessor::SetDxDyForDInput(PointerEvent::PointerItem& pointe
 
 int32_t MouseTransformProcessor::SetPointerLocation(int32_t x, int32_t y)
 {
-    MMI_HILOGI("Location, x:%{public}d, y:%{public}d", x, y);
-    auto displayGroupInfo = WinMgr->GetDisplayGroupInfo();
-    if (currentDisplayId_ == -1) {
-        if (displayGroupInfo.displaysInfo.empty()) {
-            MMI_HILOGI("The displayInfo is empty");
-            return RET_ERR;
-        }
-        currentDisplayId_ = displayGroupInfo.displaysInfo[0].id;
+    MMI_HILOGI("SetPointerLocation(x:%{public}d, y:%{public}d)", x, y);
+    CursorPosition cursorPos = WinMgr->GetCursorPos();
+    if (cursorPos.displayId < 0) {
+        MMI_HILOGE("No display");
+        return RET_ERR;
     }
-    absolutionX_ = static_cast<double>(x);
-    absolutionY_ = static_cast<double>(y);
-    WinMgr->UpdateAndAdjustMouseLocation(currentDisplayId_, absolutionX_, absolutionY_);
-    int32_t physicalX = WinMgr->GetMouseInfo().physicalX;
-    int32_t physicalY = WinMgr->GetMouseInfo().physicalY;
-    IPointerDrawingManager::GetInstance()->SetPointerLocation(physicalX, physicalY);
+    cursorPos.cursorPos.x = x;
+    cursorPos.cursorPos.y = y;
+
+    WinMgr->UpdateAndAdjustMouseLocation(cursorPos.displayId, cursorPos.cursorPos.x, cursorPos.cursorPos.y);
+    auto mouseLoc = WinMgr->GetMouseInfo();
+    IPointerDrawingManager::GetInstance()->SetPointerLocation(mouseLoc.physicalX, mouseLoc.physicalY);
     return RET_OK;
 }
 

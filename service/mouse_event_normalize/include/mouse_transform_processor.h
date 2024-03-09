@@ -93,7 +93,6 @@ private:
     static int32_t GetConfigDataFromDatabase(std::string &key, int32_t &value);
 
 public:
-    static void InitAbsolution();
     static void OnDisplayLost(int32_t displayId);
     static int32_t GetDisplayId();
     static int32_t SetMousePrimaryButton(int32_t primaryButton);
@@ -115,9 +114,6 @@ public:
     static int32_t GetTouchpadPointerSpeed(int32_t &speed);
 
 private:
-    static double absolutionX_;
-    static double absolutionY_;
-    static int32_t currentDisplayId_;
     static int32_t globalPointerSpeed_;
 
     std::shared_ptr<PointerEvent> pointerEvent_ { nullptr };
