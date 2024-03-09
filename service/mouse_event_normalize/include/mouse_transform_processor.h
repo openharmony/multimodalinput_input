@@ -93,7 +93,6 @@ private:
     static int32_t GetConfigDataFromDatabase(std::string &key, int32_t &value);
 
 public:
-    static void InitAbsolution();
     static void OnDisplayLost(int32_t displayId);
     static int32_t GetDisplayId();
     static int32_t SetMousePrimaryButton(int32_t primaryButton);
