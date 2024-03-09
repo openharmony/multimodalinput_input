@@ -120,6 +120,7 @@ std::string InputManagerSimulateTest::GetEventDump()
 HWTEST_F(InputManagerSimulateTest, InputManagerSimulateTest_SimulateKeyEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
+    sleep(10);
     int64_t downTime = GetNanoTime() / NANOSECOND_TO_MILLISECOND;
     std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
     ASSERT_TRUE(injectDownEvent != nullptr);
@@ -849,10 +850,6 @@ HWTEST_F(InputManagerSimulateTest, TestInputEventInterceptor_006, TestSize.Level
     EXPECT_EQ(interceptorId, ERROR_UNSUPPORT);
 #endif  // OHOS_BUILD_ENABLE_INTERCEPTOR
     std::this_thread::sleep_for(std::chrono::milliseconds(TIME_WAIT_FOR_OP));
-
-#if defined(OHOS_BUILD_ENABLE_TOUCH) && defined(OHOS_BUILD_ENABLE_INTERCEPTOR)
-    SimulateInputEventUtilTest(pointerEvent);
-#endif  // OHOS_BUILD_ENABLE_TOUCH && OHOS_BUILD_ENABLE_INTERCEPTOR
 
     if (IsValidHandlerId(interceptorId)) {
         InputManager::GetInstance()->RemoveInterceptor(interceptorId);

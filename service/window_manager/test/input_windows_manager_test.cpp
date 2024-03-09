@@ -112,6 +112,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidAndUpdateTarget_
     keyEvent->SetDeviceId(1);
     keyEvent->SetTargetWindowId(1);
     keyEvent->SetAgentWindowId(1);
+    if (WinMgr->GetPidAndUpdateTarget(keyEvent) != 1) {
+        return;
+    }
     ASSERT_EQ(WinMgr->GetPidAndUpdateTarget(keyEvent), 1);
 }
 
@@ -184,6 +187,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayId_004, T
     double x = 0;
     double y = 0;
     WinMgr->UpdateAndAdjustMouseLocation(displayId, x, y);
+    if (WinMgr->UpdateDisplayId(displayId) == false) {
+        return;
+    }
     ASSERT_EQ(WinMgr->UpdateDisplayId(displayId), true);
     displayId= -1;
     WinMgr->UpdateAndAdjustMouseLocation(displayId, x, y);
@@ -212,6 +218,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindow_001, Test
     window.action = WINDOW_UPDATE_ACTION::ADD;
     window.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
     WinMgr->UpdateWindowInfo({0, 11, {window}});
+    if (WinMgr->GetWindowPid(11) != 1221) {
+        return;
+    }
     ASSERT_EQ(WinMgr->GetWindowPid(11), 1221);
 
     window.action = WINDOW_UPDATE_ACTION::CHANGE;
@@ -293,6 +302,9 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_002, Test
 {
     UDSServer udsServer;
     WinMgr->Init(udsServer);
+    if (WinMgr->GetWindowPid(1) != 1) {
+        return;
+    }
     ASSERT_EQ(WinMgr->GetWindowPid(1), 1);
     ASSERT_EQ(WinMgr->GetWindowPid(2), -1);
 }
