@@ -25,6 +25,7 @@
 #include "input_windows_manager.h"
 #include "ipc_skeleton.h"
 #include "mmi_log.h"
+#include "pipeline/rs_recording_canvas.h"
 #include "preferences.h"
 #include "preferences_impl.h"
 #include "preferences_errno.h"
@@ -32,11 +33,7 @@
 #include "preferences_xml_utils.h"
 #include "multimodal_input_preferences_manager.h"
 #include "util.h"
-#ifndef USE_ROSEN_DRAWING
-#include "pipeline/rs_recording_canvas.h"
-#else
-#include "recording/recording_canvas.h"
-#endif
+#include "render/rs_pixel_map_util.h"
 
 namespace OHOS {
 namespace MMI {
@@ -616,7 +613,7 @@ void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, c
     canvas.AttachPen(pen);
     if (mouseStyle == MOUSE_ICON::DEVELOPER_DEFINED_ICON) {
         MMI_HILOGD("set mouseicon by userIcon_");
-        canvas.DrawBitmap(*userIcon_, 0, 0);
+        OHOS::Rosen::RSPixelMapUtil::DrawPixelMap(canvas, *userIcon_, 0, 0);
     } else {
         std::shared_ptr<OHOS::Media::PixelMap> pixelmap;
         if (mouseStyle == MOUSE_ICON::RUNNING) {
@@ -626,7 +623,7 @@ void PointerDrawingManager::DrawPixelmap(OHOS::Rosen::Drawing::Canvas &canvas, c
         }
         CHKPV(pixelmap);
         MMI_HILOGD("set mouseicon to OHOS system");
-        canvas.DrawBitmap(*pixelmap, 0, 0);
+        OHOS::Rosen::RSPixelMapUtil::DrawPixelMap(canvas, *pixelmap, 0, 0);
     }
 }
 
