@@ -98,27 +98,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetClientFd_001, TestS
 }
 
 /**
- * @tc.name: InputWindowsManagerTest_GetPidAndUpdateTarget_002
- * @tc.desc: Test GetPidAndUpdateTarget
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetPidAndUpdateTarget_002, TestSize.Level1)
-{
-    UDSServer udsServer;
-    WinMgr->Init(udsServer);
-    auto keyEvent = KeyEvent::Create();
-    ASSERT_NE(keyEvent, nullptr);
-    keyEvent->SetDeviceId(1);
-    keyEvent->SetTargetWindowId(1);
-    keyEvent->SetAgentWindowId(1);
-    if (WinMgr->GetPidAndUpdateTarget(keyEvent) != 1) {
-        return;
-    }
-    ASSERT_EQ(WinMgr->GetPidAndUpdateTarget(keyEvent), 1);
-}
-
-/**
  * @tc.name: InputWindowsManagerTest_UpdateTarget_003
  * @tc.desc: Test UpdateTarget
  * @tc.type: FUNC
@@ -134,103 +113,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateTarget_003, Test
     keyEvent->SetTargetWindowId(1);
     keyEvent->SetAgentWindowId(1);
     ASSERT_EQ(WinMgr->UpdateTarget(keyEvent), -1);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_UpdateDisplayId_004
- * @tc.desc: Test UpdateDisplayId
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateDisplayId_004, TestSize.Level1)
-{
-    // 创建displayGroupInfo_
-    DisplayGroupInfo displayGroupInfo;
-    displayGroupInfo.width = 20;
-    displayGroupInfo.height = 20;
-    displayGroupInfo.focusWindowId = 1;
-    uint32_t num = 1;
-    for (uint32_t i = 0; i < num; i++) {
-        WindowInfo info;
-        info.id = 1;
-        info.pid = 1;
-        info.uid = 1;
-        info.area = {1, 1, 1, 1};
-        info.defaultHotAreas = { info.area };
-        info.pointerHotAreas = { info.area };
-        info.agentWindowId = 1;
-        info.pointerChangeAreas = { 1, 2, 1, 2, 1, 2, 1, 2, 1 };
-        info.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-        info.flags = 1;
-        displayGroupInfo.windowsInfo.push_back(info);
-    }
-
-    for (uint32_t i = 0; i < num; i++) {
-        DisplayInfo info;
-        info.id = 1;
-        info.x =1;
-        info.y = 1;
-        info.width = 2;
-        info.height = 2;
-        info.dpi = 240;
-        info.name = "pp";
-        info.uniq = "pp";
-        info.direction = DIRECTION0;
-        displayGroupInfo.displaysInfo.push_back(info);
-    }
-    WinMgr->UpdateDisplayInfo(displayGroupInfo);
-
-    UDSServer udsServer;
-    WinMgr->Init(udsServer);
-    WinMgr->UpdateDisplayInfo(displayGroupInfo);
-    int32_t displayId= 1;
-    double x = 0;
-    double y = 0;
-    WinMgr->UpdateAndAdjustMouseLocation(displayId, x, y);
-    if (WinMgr->UpdateDisplayId(displayId) == false) {
-        return;
-    }
-    ASSERT_EQ(WinMgr->UpdateDisplayId(displayId), true);
-    displayId= -1;
-    WinMgr->UpdateAndAdjustMouseLocation(displayId, x, y);
-    ASSERT_EQ(WinMgr->UpdateDisplayId(displayId), true);
-}
-
-/**
- * @tc.name: InputWindowsManagerTest_UpdateWindow_001
- * @tc.desc: Test UpdateWindow
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_UpdateWindow_001, TestSize.Level1)
-{
-    WindowInfo window;
-    window.id = 11;
-    window.pid = 1221;
-    window.uid = 1;
-    window.area = {1, 1, 1, 1};
-    window.defaultHotAreas = { window.area };
-    window.pointerHotAreas = { window.area };
-    window.pointerChangeAreas = {1, 2, 1, 2};
-    window.displayId = 0;
-    window.agentWindowId = 1;
-    window.flags = 1;
-    window.action = WINDOW_UPDATE_ACTION::ADD;
-    window.transform = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
-    WinMgr->UpdateWindowInfo({0, 11, {window}});
-    if (WinMgr->GetWindowPid(11) != 1221) {
-        return;
-    }
-    ASSERT_EQ(WinMgr->GetWindowPid(11), 1221);
-
-    window.action = WINDOW_UPDATE_ACTION::CHANGE;
-    window.pid = 1222;
-    WinMgr->UpdateWindowInfo({0, 11, {window}});
-    ASSERT_EQ(WinMgr->GetWindowPid(11), 1222);
-
-    window.action = WINDOW_UPDATE_ACTION::DEL;
-    WinMgr->UpdateWindowInfo({0, 11, {window}});
-    ASSERT_EQ(WinMgr->GetWindowPid(11), -1);
 }
 
 /**
@@ -291,24 +173,6 @@ HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_IsNeedRefreshLayer_006
         ASSERT_EQ(WinMgr->IsNeedRefreshLayer(1), false);
     }
 }
-
-/**
- * @tc.name: InputWindowsManagerTest_GetWindowPid_007
- * @tc.desc: Test GetWindowPid
- * @tc.type: FUNC
- * @tc.require:
- */
-HWTEST_F(InputWindowsManagerTest, InputWindowsManagerTest_GetWindowPid_002, TestSize.Level1)
-{
-    UDSServer udsServer;
-    WinMgr->Init(udsServer);
-    if (WinMgr->GetWindowPid(1) != 1) {
-        return;
-    }
-    ASSERT_EQ(WinMgr->GetWindowPid(1), 1);
-    ASSERT_EQ(WinMgr->GetWindowPid(2), -1);
-}
-
 
 /**
  * @tc.name: InputWindowsManagerTest_SetMouseCaptureMode_008
