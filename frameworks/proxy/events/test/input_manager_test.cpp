@@ -1948,6 +1948,36 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoveInputEventFilter_003, TestSize
     ASSERT_EQ(ret, RET_OK);
 }
 
+/**
+ * @tc.name: InputManager_SlideUpBrightScreenUnlockEvent_001
+ * @tc.desc: Injection interface detection
+ * @tc.type: FUNC
+ * @tc.require:AR000GJG6G
+ */
+HWTEST_F(InputManagerTest, InputManager_SlideUpBrightScreenUnlockEvent_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    auto injectDownKeyEvent = KeyEvent::Create();
+    ASSERT_NE(injectDownKeyEvent, nullptr);
+    injectDownKeyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    injectDownKeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+
+    KeyEvent::KeyItem item;
+    item.SetKeyCode(2094);
+    item.SetPressed(true);
+    item.SetDownTime(500);
+    injectDownKeyEvent->AddKeyItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownKeyEvent);
+
+    auto injectUpKeyEvent = KeyEvent::Create();
+    ASSERT_NE(injectUpKeyEvent, nullptr);
+    injectUpKeyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+    injectUpKeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    item.SetPressed(false);
+    injectUpKeyEvent->AddKeyItem(item);
+    InputManager::GetInstance()->SimulateInputEvent(injectUpKeyEvent);
+}
+
 #ifdef INPUT_MANAGER_TEST_ENABLE_DEMO
 class ServiceWatcher final : public IInputServiceWatcher {
 public:
