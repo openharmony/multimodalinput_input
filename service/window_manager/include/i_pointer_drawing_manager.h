@@ -79,7 +79,7 @@ public:
     virtual void SetMouseDisplayState(bool state) {}
     virtual bool GetMouseDisplayState() const
     {
-        return true;
+        return false;
     }
     virtual int32_t SetCustomCursor(void* pixelMap, int32_t pid, int32_t windowId, int32_t focusX, int32_t focusY)
     {
