@@ -1182,6 +1182,7 @@ void InputManagerImpl::OnConnected()
 template<typename T>
 bool InputManagerImpl::RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
 {
+    CHKPF(lastPointerEvent_);
     int32_t pointerAction = lastPointerEvent_->GetPointerAction();
     for (const auto &it : pointerActionEvents) {
         if (pointerAction == it) {
@@ -1199,18 +1200,17 @@ bool InputManagerImpl::RecoverPointerEvent(std::initializer_list<T> pointerActio
 void InputManagerImpl::OnDisconnected()
 {
     CALL_DEBUG_ENTER;
-    CHKPV(lastPointerEvent_);
-    std::initializer_list<int32_t> pointerActionEvent { PointerEvent::POINTER_ACTION_MOVE,
+    std::initializer_list<int32_t> pointerActionEvents { PointerEvent::POINTER_ACTION_MOVE,
         PointerEvent::POINTER_ACTION_DOWN };
-    std::initializer_list<int32_t> pointerActionPullEvent { PointerEvent::POINTER_ACTION_PULL_MOVE,
+    std::initializer_list<int32_t> pointerActionPullEvents { PointerEvent::POINTER_ACTION_PULL_MOVE,
         PointerEvent::POINTER_ACTION_PULL_DOWN };
-    if (RecoverPointerEvent(pointerActionEvent, PointerEvent::POINTER_ACTION_UP)) {
-        MMI_HILOGE("Up event for service exception re-sending.");
+    if (RecoverPointerEvent(pointerActionEvents, PointerEvent::POINTER_ACTION_UP)) {
+        MMI_HILOGE("Up event for service exception re-sending");
         return;
     }
 
-    if (RecoverPointerEvent(pointerActionPullEvent, PointerEvent::POINTER_ACTION_PULL_UP)) {
-        MMI_HILOGE("Pull up event for service exception re-sending.");
+    if (RecoverPointerEvent(pointerActionPullEvents, PointerEvent::POINTER_ACTION_PULL_UP)) {
+        MMI_HILOGE("Pull up event for service exception re-sending");
         return;
     }
 }
