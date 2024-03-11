@@ -1180,7 +1180,7 @@ void InputManagerImpl::OnConnected()
 }
 
 template<typename T>
-bool InputManagerImpl::PointerActionEvent(std::initializer_list<T> pointerActionEventList, T pointerActionEvent)
+bool InputManagerImpl::PointerActionEvents(std::initializer_list<T> pointerActionEventList, T pointerActionEvent)
 {
     for (const auto &it : pointerActionEventList) {
         if (lastPointerEvent_->GetPointerAction() == it) {
@@ -1203,11 +1203,11 @@ void InputManagerImpl::OnDisconnected()
         PointerEvent::POINTER_ACTION_DOWN };
     std::initializer_list<int32_t> pointerActionPullEvent { PointerEvent::POINTER_ACTION_PULL_MOVE,
         PointerEvent::POINTER_ACTION_PULL_DOWN };
-    if (PointerActionEvent(pointerActionEvent, PointerEvent::POINTER_ACTION_UP)) {
+    if (PointerActionEvents(pointerActionEvent, PointerEvent::POINTER_ACTION_UP)) {
         return;
     }
 
-    if (PointerActionEvent(pointerActionPullEvent, PointerEvent::POINTER_ACTION_PULL_UP)) {
+    if (PointerActionEvents(pointerActionPullEvent, PointerEvent::POINTER_ACTION_PULL_UP)) {
         return;
     }
 }
