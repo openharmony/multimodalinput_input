@@ -1180,10 +1180,11 @@ void InputManagerImpl::OnConnected()
 }
 
 template<typename T>
-bool InputManagerImpl::SupplyPointerActionEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
+bool InputManagerImpl::RecoverPointerActionEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
 {
+    int32_t pointerAction = pointerEvent->GetPointerAction();
     for (const auto &it : pointerActionEvents) {
-        if (lastPointerEvent_->GetPointerAction() == it) {
+        if (pointerAction == it) {
             lastPointerEvent_->SetPointerAction(pointerActionEvent);
             PointerEvent::PointerItem item;
             item.SetPressed(false);
@@ -1203,11 +1204,13 @@ void InputManagerImpl::OnDisconnected()
         PointerEvent::POINTER_ACTION_DOWN };
     std::initializer_list<int32_t> pointerActionPullEvent { PointerEvent::POINTER_ACTION_PULL_MOVE,
         PointerEvent::POINTER_ACTION_PULL_DOWN };
-    if (SupplyPointerActionEvent(pointerActionEvent, PointerEvent::POINTER_ACTION_UP)) {
+    if (RecoverPointerActionEvent(pointerActionEvent, PointerEvent::POINTER_ACTION_UP)) {
+        MMI_HILOGE("Up event for service exception re-sending.");
         return;
     }
 
-    if (SupplyPointerActionEvent(pointerActionPullEvent, PointerEvent::POINTER_ACTION_PULL_UP)) {
+    if (RecoverPointerActionEvent(pointerActionPullEvent, PointerEvent::POINTER_ACTION_PULL_UP)) {
+        MMI_HILOGE("Pull up event for service exception re-sending.");
         return;
     }
 }

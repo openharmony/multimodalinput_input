@@ -110,7 +110,7 @@ public:
     void SimulateInputEvent(std::shared_ptr<PointerEvent> pointerEvent);
     void OnConnected();
     template<typename T>
-    bool SupplyPointerActionEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent);
+    bool RecoverPointerActionEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent);
     void OnDisconnected();
 
     int32_t RegisterDevListener(std::string type, std::shared_ptr<IInputDeviceListener> listener);
