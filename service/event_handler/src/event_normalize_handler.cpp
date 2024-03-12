@@ -413,6 +413,15 @@ int32_t EventNormalizeHandler::GestureIdentify(libinput_event* event)
         MMI_HILOGD("Gesture identify failed");
         return RET_ERR;
     }
+    bool tpRotateSwitch = true;
+    if (TouchEventHdr->GetTouchpadRotateSwitch(tpRotateSwitch) != RET_OK) {
+        MMI_HILOGD("Failed to get touchpad rotate switch flag, default is true.");
+    }
+    if (!tpRotateSwitch) {
+        MMI_HILOGD("touchpad rotate switch is false");
+        return RET_ERR;
+    }
+    
     auto rotateAngle = GESTURE_HANDLER->GetRotateAngle();
 
     if (nextHandler_ == nullptr) {

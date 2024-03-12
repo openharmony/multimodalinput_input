@@ -638,6 +638,18 @@ int32_t MultimodalInputConnectManager::GetTouchpadRightClickType(int32_t &type)
     return multimodalInputConnectService_->GetTouchpadRightClickType(type);
 }
 
+int32_t MultimodalInputConnectManager::SetTouchpadRotateSwitch(bool switchFlag)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->SetTouchpadRotateSwitch(switchFlag);
+}
+
+int32_t MultimodalInputConnectManager::GetTouchpadRotateSwitch(bool &switchFlag)
+{
+    CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);
+    return multimodalInputConnectService_->GetTouchpadRotateSwitch(switchFlag);
+}
+
 int32_t MultimodalInputConnectManager::SetShieldStatus(int32_t shieldMode, bool isShield)
 {
     CHKPR(multimodalInputConnectService_, INVALID_HANDLER_ID);

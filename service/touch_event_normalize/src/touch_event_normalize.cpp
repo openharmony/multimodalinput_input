@@ -108,5 +108,15 @@ int32_t TouchEventNormalize::GetTouchpadSwipeSwitch(bool &switchFlag) const
 {
     return TouchPadTransformProcessor::GetTouchpadSwipeSwitch(switchFlag);
 }
+
+int32_t TouchEventNormalize::SetTouchpadRotateSwitch(bool switchFlag) const
+{
+    return TouchPadTransformProcessor::SetTouchpadRotateSwitch(switchFlag);
+}
+
+int32_t TouchEventNormalize::GetTouchpadRotateSwitch(bool &switchFlag) const
+{
+    return TouchPadTransformProcessor::GetTouchpadRotateSwitch(switchFlag);
+}
 } // namespace MMI
 } // namespace OHOS

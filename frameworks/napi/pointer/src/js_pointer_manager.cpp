@@ -945,5 +945,20 @@ napi_value JsPointerManager::GetTouchpadRightClickType(napi_env env, napi_value 
     int32_t ret = InputManager::GetInstance()->GetTouchpadRightClickType(type);
     return GetTouchpadInt32Data(env, handle, type, ret);
 }
+
+napi_value JsPointerManager::SetTouchpadRotateSwitch(napi_env env, bool switchFlag, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = InputManager::GetInstance()->SetTouchpadRotateSwitch(switchFlag);
+    return SetTouchpadData(env, handle, ret);
+}
+
+napi_value JsPointerManager::GetTouchpadRotateSwitch(napi_env env, napi_value handle)
+{
+    CALL_DEBUG_ENTER;
+    bool switchFlag = true;
+    int32_t ret = InputManager::GetInstance()->GetTouchpadRotateSwitch(switchFlag);
+    return GetTouchpadBoolData(env, handle, switchFlag, ret);
+}
 } // namespace MMI
 } // namespace OHOS

@@ -36,6 +36,7 @@ private:
     TouchPadTransformProcessor g_processor_ { 0 };
     bool prePinchSwitch_ { true };
     bool preSwipeSwitch_ { true };
+    bool preRotateSwitch_ { true };
 };
 
 void TouchPadTransformProcessorTest::SetUpTestCase(void)
@@ -50,12 +51,14 @@ void TouchPadTransformProcessorTest::SetUp()
 {
     g_processor_.GetTouchpadPinchSwitch(prePinchSwitch_);
     g_processor_.GetTouchpadSwipeSwitch(preSwipeSwitch_);
+    g_processor_.GetTouchpadRotateSwitch(preRotateSwitch_);
 }
 
 void TouchPadTransformProcessorTest::TearDown()
 {
     g_processor_.SetTouchpadPinchSwitch(prePinchSwitch_);
     g_processor_.SetTouchpadSwipeSwitch(preSwipeSwitch_);
+    g_processor_.SetTouchpadRotateSwitch(preRotateSwitch_);
 }
 
 /**
@@ -117,6 +120,37 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
     processor.SetTouchpadSwipeSwitch(flag);
     bool newFlag = false;
     ASSERT_TRUE(processor.GetTouchpadSwipeSwitch(flag) == RET_OK);
+    ASSERT_TRUE(flag == newFlag);
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorTest_SetTouchpadRotateSwitch_05
+ * @tc.desc: Test SetTouchpadRotateSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouchpadRotateSwitch_05, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    TouchPadTransformProcessor processor(deviceId);
+    bool flag = false;
+    ASSERT_TRUE(processor.SetTouchpadRotateSwitch(flag) == RET_OK);
+}
+
+/**
+ * @tc.name: TouchPadTransformProcessorTest_GetTouchpadRotateSwitch_06
+ * @tc.desc: Test GetTouchpadRotateSwitch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouchpadRotateSwitch_06, TestSize.Level1)
+{
+    int32_t deviceId = 6;
+    TouchPadTransformProcessor processor(deviceId);
+    bool flag = false;
+    processor.SetTouchpadRotateSwitch(flag);
+    bool newFlag = false;
+    ASSERT_TRUE(processor.GetTouchpadRotateSwitch(flag) == RET_OK);
     ASSERT_TRUE(flag == newFlag);
 }
 }
