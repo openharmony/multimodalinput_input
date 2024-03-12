@@ -114,6 +114,8 @@ public:
     int32_t GetTouchpadSwipeSwitch(bool &switchFlag);
     int32_t SetTouchpadRightClickType(int32_t type);
     int32_t GetTouchpadRightClickType(int32_t &type);
+    int32_t SetTouchpadRotateSwitch(bool switchFlag);
+    int32_t GetTouchpadRotateSwitch(bool &switchFlag);
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield);
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield);
 

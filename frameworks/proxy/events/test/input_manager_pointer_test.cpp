@@ -137,6 +137,7 @@ private:
     bool preTapSwitch_ { true };
     bool prePinchSwitch_ { true };
     bool preSwipeSwitch_ { true };
+    bool preRotateSwitch_ { true };
 };
 
 void InputManagerPointerTest::SetUpTestCase()
@@ -162,6 +163,7 @@ void InputManagerPointerTest::SetUp()
     InputManager::GetInstance()->GetTouchpadPinchSwitch(prePinchSwitch_);
     InputManager::GetInstance()->GetTouchpadSwipeSwitch(preSwipeSwitch_);
     InputManager::GetInstance()->GetTouchpadRightClickType(preRightClickType_);
+    InputManager::GetInstance()->GetTouchpadRotateSwitch(preRotateSwitch_);
     InputManager::GetInstance()->GetPointerSize(prePointerSize_);
     InputManager::GetInstance()->GetPointerColor(prePointerColor_);
 }
@@ -180,6 +182,7 @@ void InputManagerPointerTest::TearDown()
     InputManager::GetInstance()->SetTouchpadPointerSpeed(preTouchpadPointerSpeed_);
     InputManager::GetInstance()->SetTouchpadPinchSwitch(prePinchSwitch_);
     InputManager::GetInstance()->SetTouchpadSwipeSwitch(preSwipeSwitch_);
+    InputManager::GetInstance()->SetTouchpadRotateSwitch(preRotateSwitch_);
     InputManager::GetInstance()->SetTouchpadRightClickType(preRightClickType_);
     InputManager::GetInstance()->SetPointerSize(prePointerSize_);
     InputManager::GetInstance()->SetPointerColor(prePointerColor_);
@@ -1600,6 +1603,35 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadRightClickT
     int32_t newType = 1;
     ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadRightClickType(newType) == RET_OK);
     ASSERT_TRUE(type == newType);
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_SetTouchpadRotateSwitch_001
+ * @tc.desc: Set touchpad rotate switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadRotateSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool flag = false;
+    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadRotateSwitch(flag) == RET_OK);
+}
+
+/**
+ * @tc.name: InputManagerPointerTest_GetTouchpadRotateSwitch_001
+ * @tc.desc: Get touchpad rotate switch
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadRotateSwitch_001, TestSize.Level1)
+{
+    CALL_TEST_DEBUG;
+    bool flag = true;
+    InputManager::GetInstance()->SetTouchpadRotateSwitch(flag);
+    bool newFlag = true;
+    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadRotateSwitch(newFlag) == RET_OK);
+    ASSERT_TRUE(flag == newFlag);
 }
 
 /**

@@ -458,6 +458,17 @@ int32_t InputManager::GetTouchpadRightClickType(int32_t &type)
 {
     return InputMgrImpl.GetTouchpadRightClickType(type);
 }
+
+int32_t InputManager::SetTouchpadRotateSwitch(bool switchFlag)
+{
+    return InputMgrImpl.SetTouchpadRotateSwitch(switchFlag);
+}
+
+int32_t InputManager::GetTouchpadRotateSwitch(bool &switchFlag)
+{
+    return InputMgrImpl.GetTouchpadRotateSwitch(switchFlag);
+}
+
 void InputManager::SetWindowPointerStyle(WindowArea area, int32_t pid, int32_t windowId)
 {
     InputMgrImpl.SetWindowPointerStyle(area, pid, windowId);

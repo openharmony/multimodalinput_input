@@ -796,6 +796,22 @@ public:
     void AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
 
+    /**
+     * @brief Set the switch of touchpad rotate.
+     * @param switchFlag Indicates the touchpad rotate switch state.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 11
+     */
+    int32_t SetTouchpadRotateSwitch(bool switchFlag);
+
+    /**
+     * @brief Get the switch of touchpad rotate.
+     * @param switchFlag Indicates the touchpad rotate switch state.
+     * @return if success; returns a non-0 value otherwise.
+     * @since 11
+     */
+    int32_t GetTouchpadRotateSwitch(bool &switchFlag);
+
 private:
     InputManager() = default;
     DISALLOW_COPY_AND_MOVE(InputManager);
