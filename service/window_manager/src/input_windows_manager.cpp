@@ -53,6 +53,7 @@ namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "InputWindowsManager" };
 #ifdef OHOS_BUILD_ENABLE_POINTER
 constexpr int32_t DEFAULT_POINTER_STYLE = 0;
+constexpr int32_t CURSOR_CIRCLE_STYLE = 41;
 #endif // OHOS_BUILD_ENABLE_POINTER
 constexpr int32_t OUTWINDOW_HOT_AREA = 20;
 constexpr int32_t SCALE_X = 0;
@@ -1168,11 +1169,26 @@ int32_t InputWindowsManager::UpdateSceneBoardPointerStyle(int32_t pid, int32_t w
     return RET_OK;
 }
 
+void InputWindowsManager::SetGlobalDefaultPointerStyle()
+{
+    for (auto &iter : pointerStyle_) {
+        for (auto &item : iter.second) {
+            if (item.second.id == DEFAULT_POINTER_STYLE) {
+                item.second.id = globalStyle_.id;
+            } else if (item.second.id == CURSOR_CIRCLE_STYLE) {
+                item.second.id = globalStyle_.id;
+            }
+        }
+    }
+    return;
+}
+
 int32_t InputWindowsManager::SetPointerStyle(int32_t pid, int32_t windowId, PointerStyle pointerStyle)
 {
     CALL_DEBUG_ENTER;
     if (windowId == GLOBAL_WINDOW_ID) {
         globalStyle_.id = pointerStyle.id;
+        SetGlobalDefaultPointerStyle();
         MMI_HILOGD("Setting global pointer style");
         return RET_OK;
     }
