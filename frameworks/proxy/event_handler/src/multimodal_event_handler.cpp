@@ -50,6 +50,12 @@ void OnConnected(const IfMMIClient& client)
 #endif // OHOS_BUILD_ENABLE_INTERCEPTOR
 }
 
+void OnDisconnected(const IfMMIClient &client)
+{
+    CALL_DEBUG_ENTER;
+    InputMgrImpl.OnDisconnected();
+}
+
 MultimodalEventHandler::MultimodalEventHandler() {}
 MultimodalEventHandler::~MultimodalEventHandler() {}
 
@@ -111,6 +117,7 @@ bool MultimodalEventHandler::InitClient(EventHandlerPtr eventHandler)
     client_ = std::make_shared<MMIClient>();
     client_->SetEventHandler(eventHandler);
     client_->RegisterConnectedFunction(&OnConnected);
+    client_->RegisterDisconnectedFunction(&OnDisconnected);
     if (!client_->Start()) {
         client_ = nullptr;
         MMI_HILOGE("The client fails to start");
