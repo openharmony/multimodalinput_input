@@ -96,6 +96,7 @@ public:
     MouseLocation GetMouseInfo();
     CursorPosition GetCursorPos();
     CursorPosition ResetCursorPos();
+    void SetGlobalDefaultPointerStyle();
     void UpdateAndAdjustMouseLocation(int32_t& displayId, double& x, double& y);
     const DisplayGroupInfo& GetDisplayGroupInfo();
     int32_t SetHoverScrollState(bool state);
