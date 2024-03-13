@@ -1938,7 +1938,6 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
         windowX = windowXY.first;
         windowY = windowXY.second;
     }
-    MMI_HILOGD("touch event send to window:%{public}d", touchWindow->id);
     pointerEvent->SetTargetWindowId(touchWindow->id);
     pointerEvent->SetAgentWindowId(touchWindow->agentWindowId);
     pointerItem.SetDisplayX(physicalX);
@@ -1964,9 +1963,10 @@ int32_t InputWindowsManager::UpdateTouchScreenTarget(std::shared_ptr<PointerEven
     }
     MMI_HILOGI("pid:%{public}d, targetWindowId:%{public}d, foucsWindowId:%{public}d, eventId:%{public}d,"
                " displayX:%{public}d, displayY:%{public}d, windowX:%{public}d, windowY:%{public}d, width:%{public}d,"
-               " height:%{public}d,", touchWindow->pid, touchWindow->id, displayGroupInfo_.focusWindowId,
-               pointerEvent->GetId(), physicalX, physicalY, windowX, windowY, touchWindow->area.width,
-               touchWindow->area.height);
+               " height:%{public}d, area.x:%{public}d, area.y:%{public}d, flags:%{public}d, zOrder:%{public}f",
+               touchWindow->pid, touchWindow->id, displayGroupInfo_.focusWindowId, pointerEvent->GetId(), physicalX,
+               physicalY, windowX, windowY, touchWindow->area.width, touchWindow->area.height, touchWindow->area.x,
+               touchWindow->area.y, touchWindow->flags, touchWindow->zOrder);
     MMI_HILOGD("logicalX:%{public}d,logicalY:%{public}d,"
                "physicalX:%{public}d,physicalY:%{public}d,windowX:%{public}d,windowY:%{public}d,"
                "displayId:%{public}d,TargetWindowId:%{public}d,AgentWindowId:%{public}d",

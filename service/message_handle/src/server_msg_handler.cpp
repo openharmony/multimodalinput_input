@@ -200,7 +200,8 @@ int32_t ServerMsgHandler::UpdatePointerPos(std::shared_ptr<PointerEvent> pointer
 int32_t ServerMsgHandler::SaveTargetWindowId(std::shared_ptr<PointerEvent> pointerEvent)
 {
     if ((pointerEvent->GetSourceType() == PointerEvent::SOURCE_TYPE_TOUCHSCREEN) &&
-        (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN)) {
+        (pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_DOWN ||
+        pointerEvent->GetPointerAction() == PointerEvent::POINTER_ACTION_HOVER_ENTER)) {
         int32_t pointerId = pointerEvent->GetPointerId();
         PointerEvent::PointerItem pointerItem;
         if (!pointerEvent->GetPointerItem(pointerId, pointerItem)) {
@@ -223,7 +224,8 @@ bool ServerMsgHandler::FixTargetWindowId(std::shared_ptr<PointerEvent> pointerEv
         targetWindowId = iter->second;
     }
     MMI_HILOGD("TargetWindowId:%{public}d %{public}d", pointerEvent->GetTargetWindowId(), targetWindowId);
-    if (action == PointerEvent::POINTER_ACTION_DOWN || targetWindowId < 0) {
+    if (action == PointerEvent::POINTER_ACTION_HOVER_ENTER ||
+        action == PointerEvent::POINTER_ACTION_DOWN || targetWindowId < 0) {
         MMI_HILOGD("Down event or targetWindowId less 0 is not need fix window id");
         return true;
     }
