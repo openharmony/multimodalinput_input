@@ -1095,6 +1095,7 @@ int32_t PointerDrawingManager::UpdateDefaultPointerStyle(int32_t pid, int32_t wi
         MMI_HILOGD("Set default color failed");
         return RET_ERR;
     }
+    lastMouseStyle_ = style;
     return RET_OK;
 }
 
