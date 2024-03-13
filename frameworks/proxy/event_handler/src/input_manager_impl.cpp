@@ -454,6 +454,7 @@ void InputManagerImpl::OnPointerEvent(std::shared_ptr<PointerEvent> pointerEvent
         std::lock_guard<std::mutex> guard(mtx_);
         eventHandler = eventHandler_;
         inputConsumer = consumer_;
+        lastPointerEvent_ = std::make_shared<PointerEvent>(*pointerEvent);
     }
     BytraceAdapter::StartBytrace(pointerEvent, BytraceAdapter::TRACE_STOP, BytraceAdapter::POINT_DISPATCH_EVENT);
     MMIClientPtr client = MMIEventHdl.GetMMIClient();
@@ -1175,6 +1176,42 @@ void InputManagerImpl::OnConnected()
     int32_t ret = MultimodalInputConnMgr->SetAnrObserver();
     if (ret != RET_OK) {
         MMI_HILOGE("Set anr observer failed, ret:%{public}d", ret);
+    }
+}
+
+template<typename T>
+bool InputManagerImpl::RecoverPointerEvent(std::initializer_list<T> pointerActionEvents, T pointerActionEvent)
+{
+    CHKPF(lastPointerEvent_);
+    int32_t pointerAction = lastPointerEvent_->GetPointerAction();
+    for (const auto &it : pointerActionEvents) {
+        if (pointerAction == it) {
+            lastPointerEvent_->SetPointerAction(pointerActionEvent);
+            PointerEvent::PointerItem item;
+            item.SetPressed(false);
+            lastPointerEvent_->UpdatePointerItem(lastPointerEvent_->GetPointerId(), item);
+            OnPointerEvent(lastPointerEvent_);
+            return true;
+        }
+    }
+    return false;
+}
+
+void InputManagerImpl::OnDisconnected()
+{
+    CALL_DEBUG_ENTER;
+    std::initializer_list<int32_t> pointerActionEvents { PointerEvent::POINTER_ACTION_MOVE,
+        PointerEvent::POINTER_ACTION_DOWN };
+    std::initializer_list<int32_t> pointerActionPullEvents { PointerEvent::POINTER_ACTION_PULL_MOVE,
+        PointerEvent::POINTER_ACTION_PULL_DOWN };
+    if (RecoverPointerEvent(pointerActionEvents, PointerEvent::POINTER_ACTION_UP)) {
+        MMI_HILOGE("Up event for service exception re-sending");
+        return;
+    }
+
+    if (RecoverPointerEvent(pointerActionPullEvents, PointerEvent::POINTER_ACTION_PULL_UP)) {
+        MMI_HILOGE("Pull up event for service exception re-sending");
+        return;
     }
 }
 
