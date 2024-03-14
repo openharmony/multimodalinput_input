@@ -1547,8 +1547,8 @@ napi_value JsPointerContext::SetTouchpadRotateSwitch(napi_env env, napi_callback
     CHKPP(jsPointer);
     auto jsPointerMgr = jsPointer->GetJsPointerMgr();
     CHKPP(jsPointerMgr);
-    auto func = [jsPointerMgr] (napi_env env, bool switchFlag, napi_value handle) -> napi_value {
-        return jsPointerMgr->SetTouchpadRotateSwitch(env, switchFlag, handle);
+    auto func = [jsPointerMgr] (napi_env env, bool rotateSwitch, napi_value handle) -> napi_value {
+        return jsPointerMgr->SetTouchpadRotateSwitch(env, rotateSwitch, handle);
     };
     return SetTouchpadBoolData(env, info, func);
 }
