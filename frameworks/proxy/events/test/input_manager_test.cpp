@@ -1957,25 +1957,31 @@ HWTEST_F(InputManagerTest, InputManagerTest_RemoveInputEventFilter_003, TestSize
 HWTEST_F(InputManagerTest, InputManager_SlideUpBrightScreenUnlockEvent_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    auto injectDownKeyEvent = KeyEvent::Create();
-    ASSERT_NE(injectDownKeyEvent, nullptr);
-    injectDownKeyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
-    injectDownKeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    std::shared_ptr<KeyEvent> injectDownEvent = KeyEvent::Create();
+    ASSERT_NE(injectDownEvent, nullptr);
+    injectDownEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
 
-    KeyEvent::KeyItem item;
-    item.SetKeyCode(2094);
-    item.SetPressed(true);
-    item.SetDownTime(500);
-    injectDownKeyEvent->AddKeyItem(item);
-    InputManager::GetInstance()->SimulateInputEvent(injectDownKeyEvent);
+    KeyEvent::KeyItem kitDown;
+    kitDown.SetKeyCode(KeyEvent::KEYCODE_F5);
+    kitDown.SetPressed(true);
+    kitDown.SetDownTime(500);
+    injectDownEvent->SetKeyCode(KeyEvent::KEYCODE_F5);
+    injectDownEvent->SetKeyAction(KeyEvent::KEY_ACTION_DOWN);
+    injectDownEvent->AddPressedKeyItems(kitDown);
+    InputManager::GetInstance()->SimulateInputEvent(injectDownEvent);
 
-    auto injectUpKeyEvent = KeyEvent::Create();
-    ASSERT_NE(injectUpKeyEvent, nullptr);
-    injectUpKeyEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
-    injectUpKeyEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
-    item.SetPressed(false);
-    injectUpKeyEvent->AddKeyItem(item);
-    InputManager::GetInstance()->SimulateInputEvent(injectUpKeyEvent);
+    std::shared_ptr<KeyEvent> injectUpEvent = KeyEvent::Create();
+    ASSERT_NE(injectUpEvent, nullptr);
+    injectDownEvent->AddFlag(InputEvent::EVENT_FLAG_NO_INTERCEPT);
+
+    KeyEvent::KeyItem kitUp;
+    kitUp.SetKeyCode(KeyEvent::KEYCODE_F5);
+    kitUp.SetPressed(false);
+    kitUp.SetDownTime(500);
+    injectUpEvent->SetKeyCode(KeyEvent::KEYCODE_F5);
+    injectUpEvent->SetKeyAction(KeyEvent::KEY_ACTION_UP);
+    injectUpEvent->RemoveReleasedKeyItems(kitUp);
+    InputManager::GetInstance()->SimulateInputEvent(injectUpEvent);
 }
 
 #ifdef INPUT_MANAGER_TEST_ENABLE_DEMO
