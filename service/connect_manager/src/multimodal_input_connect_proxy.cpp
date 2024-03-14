@@ -1744,15 +1744,15 @@ int32_t MultimodalInputConnectProxy::GetTouchpadRightClickType(int32_t &type)
         GET_TP_RIGHT_CLICK_TYPE));
 }
 
-int32_t MultimodalInputConnectProxy::SetTouchpadRotateSwitch(bool switchFlag)
+int32_t MultimodalInputConnectProxy::SetTouchpadRotateSwitch(bool rotateSwitch)
 {
-    return SetTouchpadBoolData(switchFlag, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+    return SetTouchpadBoolData(rotateSwitch, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
         SET_TP_ROTATE_SWITCH));
 }
 
-int32_t MultimodalInputConnectProxy::GetTouchpadRotateSwitch(bool &switchFlag)
+int32_t MultimodalInputConnectProxy::GetTouchpadRotateSwitch(bool &rotateSwitch)
 {
-    return GetTouchpadBoolData(switchFlag, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
+    return GetTouchpadBoolData(rotateSwitch, static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::
         GET_TP_ROTATE_SWITCH));
 }
 

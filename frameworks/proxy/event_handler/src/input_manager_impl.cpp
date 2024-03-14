@@ -1730,12 +1730,12 @@ int32_t InputManagerImpl::GetTouchpadRightClickType(int32_t &type)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-int32_t InputManagerImpl::SetTouchpadRotateSwitch(bool switchFlag)
+int32_t InputManagerImpl::SetTouchpadRotateSwitch(bool rotateSwitch)
 {
     CALL_DEBUG_ENTER;
 #if defined OHOS_BUILD_ENABLE_POINTER
     std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MultimodalInputConnMgr->SetTouchpadRotateSwitch(switchFlag);
+    int32_t ret = MultimodalInputConnMgr->SetTouchpadRotateSwitch(rotateSwitch);
     if (ret != RET_OK) {
         MMI_HILOGE("Set the touchpad rotate switch failed, ret:%{public}d", ret);
     }
@@ -1746,12 +1746,12 @@ int32_t InputManagerImpl::SetTouchpadRotateSwitch(bool switchFlag)
 #endif // OHOS_BUILD_ENABLE_POINTER
 }
 
-int32_t InputManagerImpl::GetTouchpadRotateSwitch(bool &switchFlag)
+int32_t InputManagerImpl::GetTouchpadRotateSwitch(bool &rotateSwitch)
 {
     CALL_DEBUG_ENTER;
 #ifdef OHOS_BUILD_ENABLE_POINTER
     std::lock_guard<std::mutex> guard(mtx_);
-    int32_t ret = MultimodalInputConnMgr->GetTouchpadRotateSwitch(switchFlag);
+    int32_t ret = MultimodalInputConnMgr->GetTouchpadRotateSwitch(rotateSwitch);
     if (ret != RET_OK) {
         MMI_HILOGE("Get the touchpad rotate switch failed");
     }

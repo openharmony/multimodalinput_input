@@ -133,8 +133,8 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_SetTouch
 {
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
-    bool flag = false;
-    ASSERT_TRUE(processor.SetTouchpadRotateSwitch(flag) == RET_OK);
+    bool rotateSwitch = false;
+    ASSERT_TRUE(processor.SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
 }
 
 /**
@@ -147,11 +147,11 @@ HWTEST_F(TouchPadTransformProcessorTest, TouchPadTransformProcessorTest_GetTouch
 {
     int32_t deviceId = 6;
     TouchPadTransformProcessor processor(deviceId);
-    bool flag = false;
-    processor.SetTouchpadRotateSwitch(flag);
-    bool newFlag = false;
-    ASSERT_TRUE(processor.GetTouchpadRotateSwitch(flag) == RET_OK);
-    ASSERT_TRUE(flag == newFlag);
+    bool rotateSwitch = false;
+    processor.SetTouchpadRotateSwitch(rotateSwitch);
+    bool newRotateSwitch = false;
+    ASSERT_TRUE(processor.GetTouchpadRotateSwitch(newRotateSwitch) == RET_OK);
+    ASSERT_TRUE(rotateSwitch == newRotateSwitch);
 }
 }
 }

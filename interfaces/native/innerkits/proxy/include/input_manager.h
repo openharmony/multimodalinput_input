@@ -798,19 +798,19 @@ public:
 
     /**
      * @brief Set the switch of touchpad rotate.
-     * @param switchFlag Indicates the touchpad rotate switch state.
-     * @return if success; returns a non-0 value otherwise.
+     * @param rotateSwitch Indicates the touchpad rotate switch state.
+     * @return 0 if success; returns a non-0 value otherwise.
      * @since 11
      */
-    int32_t SetTouchpadRotateSwitch(bool switchFlag);
+    int32_t SetTouchpadRotateSwitch(bool rotateSwitch);
 
     /**
      * @brief Get the switch of touchpad rotate.
-     * @param switchFlag Indicates the touchpad rotate switch state.
-     * @return if success; returns a non-0 value otherwise.
+     * @param rotateSwitch Indicates the touchpad rotate switch state.
+     * @return 0 if success; returns a non-0 value otherwise.
      * @since 11
      */
-    int32_t GetTouchpadRotateSwitch(bool &switchFlag);
+    int32_t GetTouchpadRotateSwitch(bool &rotateSwitch);
 
 private:
     InputManager() = default;

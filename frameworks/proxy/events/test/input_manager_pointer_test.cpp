@@ -1614,8 +1614,8 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadRightClickT
 HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadRotateSwitch_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    bool flag = false;
-    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadRotateSwitch(flag) == RET_OK);
+    bool rotateSwitch = false;
+    ASSERT_TRUE(InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
 }
 
 /**
@@ -1627,11 +1627,11 @@ HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_SetTouchpadRotateSwitc
 HWTEST_F(InputManagerPointerTest, InputManagerPointerTest_GetTouchpadRotateSwitch_001, TestSize.Level1)
 {
     CALL_TEST_DEBUG;
-    bool flag = true;
-    InputManager::GetInstance()->SetTouchpadRotateSwitch(flag);
-    bool newFlag = true;
-    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadRotateSwitch(newFlag) == RET_OK);
-    ASSERT_TRUE(flag == newFlag);
+    bool rotateSwitch = true;
+    InputManager::GetInstance()->SetTouchpadRotateSwitch(rotateSwitch);
+    bool newRotateSwitch = true;
+    ASSERT_TRUE(InputManager::GetInstance()->GetTouchpadRotateSwitch(newRotateSwitch) == RET_OK);
+    ASSERT_TRUE(rotateSwitch == newRotateSwitch);
 }
 
 /**

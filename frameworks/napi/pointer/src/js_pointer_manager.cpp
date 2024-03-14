@@ -916,10 +916,10 @@ napi_value JsPointerManager::GetTouchpadPinchSwitch(napi_env env, napi_value han
     return GetTouchpadBoolData(env, handle, switchFlag, ret);
 }
 
-napi_value JsPointerManager::SetTouchpadSwipeSwitch(napi_env env, bool switchFlag, napi_value handle)
+napi_value JsPointerManager::SetTouchpadSwipeSwitch(napi_env env, bool rotateSwitch, napi_value handle)
 {
     CALL_DEBUG_ENTER;
-    int32_t ret = InputManager::GetInstance()->SetTouchpadSwipeSwitch(switchFlag);
+    int32_t ret = InputManager::GetInstance()->SetTouchpadSwipeSwitch(rotateSwitch);
     return SetTouchpadData(env, handle, ret);
 }
 
