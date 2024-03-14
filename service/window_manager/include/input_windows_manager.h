@@ -139,6 +139,10 @@ public:
     const DisplayInfo* GetPhysicalDisplay(int32_t id) const;
 #endif // OHOS_BUILD_ENABLE_POINTER || OHOS_BUILD_ENABLE_TOUCH
 
+#ifdef OHOS_BUILD_ENABLE_POINTER
+    void UpdatePointerChangeAreas();
+#endif // OHOS_BUILD_ENABLE_POINTER
+
 private:
     int32_t GetDisplayId(std::shared_ptr<InputEvent> inputEvent) const;
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
