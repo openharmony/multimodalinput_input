@@ -1885,7 +1885,7 @@ int32_t MMIService::SetTouchpadRotateSwitch(bool rotateSwitch)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&TouchEventNormalize::SetTouchpadRotateSwitch,
         TouchEventHdr, rotateSwitch));
     if (ret != RET_OK) {
-        MMI_HILOGE("Set touchpad rotate switch failed, ret: %{public}d", ret);
+        MMI_HILOGE("Set touchpad rotate switch failed, ret:%{public}d", ret);
         return ret;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER
@@ -1899,7 +1899,7 @@ int32_t MMIService::GetTouchpadRotateSwitch(bool &rotateSwitch)
     int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::ReadTouchpadRotateSwitch, this,
         std::ref(rotateSwitch)));
     if (ret != RET_OK) {
-        MMI_HILOGE("Get touchpad rotate switch failed, ret: %{public}d", ret);
+        MMI_HILOGE("Get touchpad rotate switch failed, ret:%{public}d", ret);
         return RET_ERR;
     }
 #endif // OHOS_BUILD_ENABLE_POINTER

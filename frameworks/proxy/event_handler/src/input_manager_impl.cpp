@@ -1737,7 +1737,7 @@ int32_t InputManagerImpl::SetTouchpadRotateSwitch(bool rotateSwitch)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MultimodalInputConnMgr->SetTouchpadRotateSwitch(rotateSwitch);
     if (ret != RET_OK) {
-        MMI_HILOGE("Set the touchpad rotate switch failed, ret:%{public}d", ret);
+        MMI_HILOGE("Set touchpad rotate switch failed, ret:%{public}d", ret);
     }
     return ret;
 #else
@@ -1753,7 +1753,7 @@ int32_t InputManagerImpl::GetTouchpadRotateSwitch(bool &rotateSwitch)
     std::lock_guard<std::mutex> guard(mtx_);
     int32_t ret = MultimodalInputConnMgr->GetTouchpadRotateSwitch(rotateSwitch);
     if (ret != RET_OK) {
-        MMI_HILOGE("Get the touchpad rotate switch failed");
+        MMI_HILOGE("Get touchpad rotate switch failed");
     }
     return ret;
 #else
