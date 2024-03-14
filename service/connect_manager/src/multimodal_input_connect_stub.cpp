@@ -1939,11 +1939,11 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadRotateSwitch(MessageParcel& d
     bool rotateSwitch = true;
     ret = GetTouchpadRotateSwitch(rotateSwitch);
     if (ret != RET_OK) {
-        MMI_HILOGE("Call GetTouchpadRotateSwitch failed ret:%{public}d", ret);
+        MMI_HILOGE("GetTouchpadRotateSwitch failed ret: %{public}d", ret);
         return ret;
     }
     WRITEBOOL(reply, rotateSwitch, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad rotate switch :%{public}d, ret:%{public}d", rotateSwitch, ret);
+    MMI_HILOGD("Touchpad rotate switch: %{public}d, ret: %{public}d", rotateSwitch, ret);
     return RET_OK;
 }
 
