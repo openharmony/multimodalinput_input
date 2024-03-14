@@ -541,7 +541,7 @@ int32_t TouchPadTransformProcessor::SetTouchpadRotateSwitch(bool rotateSwitch)
 {
     std::string name = "touchpadRotate";
     if (PutConfigDataToDatabase(name, rotateSwitch) != RET_OK) {
-        MMI_HILOGE("Failed to set touchpad rotate switch to mem");
+        MMI_HILOGE("PutConfigDataToDatabase failed");
         return RET_ERR;
     }
 
@@ -554,7 +554,7 @@ int32_t TouchPadTransformProcessor::GetTouchpadRotateSwitch(bool &rotateSwitch)
 {
     std::string name = "touchpadRotate";
     if (GetConfigDataFromDatabase(name, rotateSwitch) != RET_OK) {
-        MMI_HILOGE("Failed to get touchpad rotate switch from mem");
+        MMI_HILOGE("GetConfigDataFromDatabase failed");
         return RET_ERR;
     }
 
