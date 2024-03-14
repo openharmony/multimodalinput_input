@@ -121,8 +121,8 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadSwipeSwitch
  */
 HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadRotateSwitch_05, TestSize.Level1)
 {
-    bool flag = false;
-    ASSERT_TRUE(TouchEventHdr->SetTouchpadRotateSwitch(flag) == RET_OK);
+    bool rotateSwitch = false;
+    ASSERT_TRUE(TouchEventHdr->SetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
 }
 
 /**
@@ -133,11 +133,11 @@ HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_SetTouchpadRotateSwitc
  */
 HWTEST_F(TouchEventNormalizeTest, TouchEventNormalizeTest_GetTouchpadRotateSwitch_06, TestSize.Level1)
 {
-    bool flag = true;
-    TouchEventHdr->SetTouchpadRotateSwitch(flag);
-    bool newFlag = true;
-    ASSERT_TRUE(TouchEventHdr->GetTouchpadRotateSwitch(flag) == RET_OK);
-    ASSERT_TRUE(flag == newFlag);
+    bool rotateSwitch = true;
+    TouchEventHdr->SetTouchpadRotateSwitch(rotateSwitch);
+    bool newRotateSwitch = true;
+    ASSERT_TRUE(TouchEventHdr->GetTouchpadRotateSwitch(rotateSwitch) == RET_OK);
+    ASSERT_TRUE(rotateSwitch == newRotateSwitch);
 }
 }
 }

@@ -1913,13 +1913,13 @@ int32_t MultimodalInputConnectStub::StubSetTouchpadRotateSwitch(MessageParcel& d
     CALL_DEBUG_ENTER;
     int32_t ret = VerifyTouchPadSetting();
     if (ret != RET_OK) {
-        MMI_HILOGE("Verify touchpad setting failed.");
+        MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
 
-    bool switchFlag = true;
-    READBOOL(data, switchFlag, IPC_PROXY_DEAD_OBJECT_ERR);
-    ret = SetTouchpadRotateSwitch(switchFlag);
+    bool rotateSwitch = true;
+    READBOOL(data, rotateSwitch, IPC_PROXY_DEAD_OBJECT_ERR);
+    ret = SetTouchpadRotateSwitch(rotateSwitch);
     if (ret != RET_OK) {
         MMI_HILOGE("Set touchpad rotate switch failed ret:%{public}d", ret);
         return ret;
@@ -1932,18 +1932,18 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadRotateSwitch(MessageParcel& d
     CALL_DEBUG_ENTER;
     int32_t ret = VerifyTouchPadSetting();
     if (ret != RET_OK) {
-        MMI_HILOGE("Verify touchpad setting failed.");
+        MMI_HILOGE("Verify touchpad setting failed");
         return ret;
     }
 
-    bool switchFlag = true;
-    ret = GetTouchpadRotateSwitch(switchFlag);
+    bool rotateSwitch = true;
+    ret = GetTouchpadRotateSwitch(rotateSwitch);
     if (ret != RET_OK) {
         MMI_HILOGE("Call GetTouchpadRotateSwitch failed ret:%{public}d", ret);
         return ret;
     }
-    WRITEBOOL(reply, switchFlag, IPC_STUB_WRITE_PARCEL_ERR);
-    MMI_HILOGD("Touchpad rotate switch :%{public}d, ret:%{public}d", switchFlag, ret);
+    WRITEBOOL(reply, rotateSwitch, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("Touchpad rotate switch :%{public}d, ret:%{public}d", rotateSwitch, ret);
     return RET_OK;
 }
 
