@@ -404,6 +404,7 @@ void InputDeviceManager::OnInputDeviceAdded(struct libinput_device *inputDevice)
     if (IsPointerDevice(inputDevice) && !HasPointerDevice() &&
         IPointerDrawingManager::GetInstance()->GetMouseDisplayState()) {
 #ifdef OHOS_BUILD_ENABLE_POINTER
+        WinMgr->UpdatePointerChangeAreas();
         WinMgr->DispatchPointer(PointerEvent::POINTER_ACTION_ENTER_WINDOW);
 #endif // OHOS_BUILD_ENABLE_POINTER
     }
