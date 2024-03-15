@@ -20,7 +20,7 @@
 #include "oh_key_code.h"
 
 namespace {
-constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "NativeInputEventManager" };
+constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, OHOS::MMI::MMI_LOG_DOMAIN, "OHInputManager" };
 } // namespace
 
 struct Input_KeyState {
@@ -34,7 +34,7 @@ Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
     CALL_DEBUG_ENTER;
     CHKPR(keyState, INPUT_PARAMETER_ERROR);
     if (keyState->keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
-        MMI_HILOGE("key code is invalid,keyCode:%{public}d", keyState->keyCode);
+        MMI_HILOGE("keyCode is invalid,keyCode:%{public}d", keyState->keyCode);
         return INPUT_PARAMETER_ERROR;
     }
     std::vector<int32_t> pressedKeys;
@@ -46,9 +46,9 @@ Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
     } else {
         keyState->keyState = KEY_RELEASED;
     }
-    auto iterator = specialKeysState.find(keyState->keyCode);
-    if (iterator != specialKeysState.end()) {
-        if (iterator->second == 0) {
+    auto itr = specialKeysState.find(keyState->keyCode);
+    if (itr != specialKeysState.end()) {
+        if (itr->second == 0) {
             keyState->keySwitch = KEY_SWITCH_OFF;
         } else {
             keyState->keySwitch = KEY_SWITCH_ON;
@@ -63,7 +63,7 @@ struct Input_KeyState* OH_Input_CreateKeyState()
 {
     Input_KeyState* keyState = new (std::nothrow) Input_KeyState();
     if (keyState == nullptr) {
-        MMI_HILOGE("memory allocation failed");
+        MMI_HILOGE("Memory allocation failed");
     }
     return keyState;
 }
@@ -79,7 +79,7 @@ void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
 {
     CHKPV(keyState);
     if (keyCode < 0 || keyState->keyCode > KEYCODE_NUMPAD_RIGHT_PAREN) {
-        MMI_HILOGE("key code is invalid,keyCode:%{public}d", keyCode);
+        MMI_HILOGE("keyCode is invalid,keyCode:%{public}d", keyCode);
         return;
     }
     keyState->keyCode = keyCode;
