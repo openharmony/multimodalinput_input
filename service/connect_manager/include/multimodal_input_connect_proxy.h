@@ -111,6 +111,8 @@ public:
     int32_t GetTouchpadSwipeSwitch(bool &switchFlag) override;
     int32_t SetTouchpadRightClickType(int32_t type) override;
     int32_t GetTouchpadRightClickType(int32_t &type) override;
+    int32_t SetTouchpadRotateSwitch(bool rotateSwitch) override;
+    int32_t GetTouchpadRotateSwitch(bool &rotateSwitch) override;
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield) override;
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override;
 
