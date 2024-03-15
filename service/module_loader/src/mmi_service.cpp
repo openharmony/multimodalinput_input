@@ -293,7 +293,6 @@ int32_t MMIService::Init()
 void MMIService::OnStart()
 {
     CHK_PID_AND_TID();
-    IPCSkeleton::SetMaxWorkThreadNum(MAX_IPC_THREAD_NUM);
     int32_t ret = Init();
     CHKNOKRV(ret, "Init mmi_service failed");
     MMI_HILOGD("Started successfully");
