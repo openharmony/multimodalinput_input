@@ -267,6 +267,12 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_RIGHT_CLICK_TYPE):
             return StubGetTouchpadRightClickType(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::SET_TP_ROTATE_SWITCH):
+            return StubSetTouchpadRotateSwitch(data, reply);
+            break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_TP_ROTATE_SWITCH):
+            return StubGetTouchpadRotateSwitch(data, reply);
+            break;
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEYBOARD_REPEAT_DELAY):
             return StubGetKeyboardRepeatDelay(data, reply);
             break;
@@ -1899,6 +1905,45 @@ int32_t MultimodalInputConnectStub::StubGetTouchpadRightClickType(MessageParcel&
     }
     WRITEINT32(reply, type, IPC_STUB_WRITE_PARCEL_ERR);
     MMI_HILOGD("Touchpad right button menu type :%{public}d, ret:%{public}d", type, ret);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubSetTouchpadRotateSwitch(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = VerifyTouchPadSetting();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Verify touchpad setting failed");
+        return ret;
+    }
+
+    bool rotateSwitch = true;
+    READBOOL(data, rotateSwitch, IPC_PROXY_DEAD_OBJECT_ERR);
+    ret = SetTouchpadRotateSwitch(rotateSwitch);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Set touchpad rotate switch failed ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetTouchpadRotateSwitch(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = VerifyTouchPadSetting();
+    if (ret != RET_OK) {
+        MMI_HILOGE("Verify touchpad setting failed");
+        return ret;
+    }
+
+    bool rotateSwitch = true;
+    ret = GetTouchpadRotateSwitch(rotateSwitch);
+    if (ret != RET_OK) {
+        MMI_HILOGE("GetTouchpadRotateSwitch failed ret:%{public}d", ret);
+        return ret;
+    }
+    WRITEBOOL(reply, rotateSwitch, IPC_STUB_WRITE_PARCEL_ERR);
+    MMI_HILOGD("Touchpad rotate switch: %{public}d, ret:%{public}d", rotateSwitch, ret);
     return RET_OK;
 }
 

@@ -125,6 +125,8 @@ public:
     int32_t GetTouchpadSwipeSwitch(bool &switchFlag) override;
     int32_t SetTouchpadRightClickType(int32_t type) override;
     int32_t GetTouchpadRightClickType(int32_t &type) override;
+    int32_t SetTouchpadRotateSwitch(bool rotateSwitch) override;
+    int32_t GetTouchpadRotateSwitch(bool &rotateSwitch) override;
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield) override;
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override;
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override;
@@ -159,6 +161,7 @@ protected:
     int32_t ReadTouchpadPinchSwitch(bool &switchFlag);
     int32_t ReadTouchpadSwipeSwitch(bool &switchFlag);
     int32_t ReadTouchpadRightMenuType(int32_t &type);
+    int32_t ReadTouchpadRotateSwitch(bool &rotateSwitch);
 #endif // OHOS_BUILD_ENABLE_POINTER
     int32_t OnRegisterDevListener(int32_t pid);
     int32_t OnUnregisterDevListener(int32_t pid);

@@ -537,6 +537,30 @@ int32_t TouchPadTransformProcessor::GetTouchpadPinchSwitch(bool &switchFlag)
     return RET_OK;
 }
 
+int32_t TouchPadTransformProcessor::SetTouchpadRotateSwitch(bool rotateSwitch)
+{
+    std::string name = "touchpadRotate";
+    if (PutConfigDataToDatabase(name, rotateSwitch) != RET_OK) {
+        MMI_HILOGE("PutConfigDataToDatabase failed");
+        return RET_ERR;
+    }
+
+    DfxHisysevent::ReportTouchpadSettingState(DfxHisysevent::TOUCHPAD_SETTING_CODE::TOUCHPAD_ROTATE_SETTING,
+        rotateSwitch);
+    return RET_OK;
+}
+
+int32_t TouchPadTransformProcessor::GetTouchpadRotateSwitch(bool &rotateSwitch)
+{
+    std::string name = "touchpadRotate";
+    if (GetConfigDataFromDatabase(name, rotateSwitch) != RET_OK) {
+        MMI_HILOGE("GetConfigDataFromDatabase failed");
+        return RET_ERR;
+    }
+
+    return RET_OK;
+}
+
 int32_t TouchPadTransformProcessor::PutConfigDataToDatabase(std::string &key, bool value)
 {
     return PreferencesMgr->SetBoolValue(key, TOUCHPAD_FILE_NAME, value);
