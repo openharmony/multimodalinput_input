@@ -662,6 +662,13 @@ int32_t MultimodalInputConnectManager::GetShieldStatus(int32_t shieldMode, bool 
     return multimodalInputConnectService_->GetShieldStatus(shieldMode, isShield);
 }
 
+int32_t MultimodalInputConnectManager::GetKeyState(std::vector<int32_t> &pressedKeys,
+    std::map<int32_t, int32_t> &specialKeysState)
+{
+    CHKPR(multimodalInputConnectService_, RET_ERR);
+    return multimodalInputConnectService_->GetKeyState(pressedKeys, specialKeysState);
+}
+
 void MultimodalInputConnectManager::AddServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher)
 {
     CHKPV(watcher);

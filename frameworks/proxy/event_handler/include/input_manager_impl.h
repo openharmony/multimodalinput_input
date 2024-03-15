@@ -186,6 +186,8 @@ public:
     void RemoveServiceWatcher(std::shared_ptr<IInputServiceWatcher> watcher);
 
     int32_t MarkProcessed(int32_t eventId, int64_t actionTime);
+
+    int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState);
 private:
     int32_t PackWindowInfo(NetPacket &pkt);
     int32_t PackWindowGroupInfo(NetPacket &pkt);
