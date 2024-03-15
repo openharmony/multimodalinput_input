@@ -28,6 +28,10 @@ namespace OHOS {
 namespace MMI {
 namespace {
 constexpr OHOS::HiviewDFX::HiLogLabel LABEL = { LOG_CORE, MMI_LOG_DOMAIN, "MultimodalInputConnectProxy" };
+constexpr int32_t SPECIAL_KEY_SIZE = 3;
+constexpr int32_t SPECIAL_ARRAY_INDEX0 = 0;
+constexpr int32_t SPECIAL_ARRAY_INDEX1 = 1;
+constexpr int32_t SPECIAL_ARRAY_INDEX2 = 2;
 
 int32_t ParseInputDevice(MessageParcel &reply, std::shared_ptr<InputDevice> &inputDevice)
 {
@@ -1801,6 +1805,45 @@ int32_t MultimodalInputConnectProxy::GetShieldStatus(int32_t shieldMode, bool &i
         return ret;
     }
     READBOOL(reply, isShield, ERR_INVALID_VALUE);
+    return RET_OK;
+}
+
+int32_t MultimodalInputConnectProxy::GetKeyState(std::vector<int32_t> &pressedKeys,
+    std::map<int32_t, int32_t> &specialKeysState)
+{
+    CALL_DEBUG_ENTER;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(MultimodalInputConnectProxy::GetDescriptor())) {
+        MMI_HILOGE("Failed to write descriptor");
+        return RET_ERR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    sptr<IRemoteObject> remote = Remote();
+    CHKPR(remote, RET_ERR);
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEY_STATE),
+        data, reply, option);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Send request failed, ret:%{public}d", ret);
+        return ret;
+    }
+    if (!reply.ReadInt32Vector(&pressedKeys)) {
+        MMI_HILOGE("Read vector failed");
+        return RET_ERR;
+    }
+    MMI_HILOGD("pressedKeys size:%{public}zu", pressedKeys.size());
+    std::vector<int32_t> specialKeysStateTmp;
+    if (!reply.ReadInt32Vector(&specialKeysStateTmp)) {
+        MMI_HILOGE("Read vector failed");
+        return RET_ERR;
+    }
+    if (specialKeysStateTmp.size() != SPECIAL_KEY_SIZE) {
+        MMI_HILOGE("The number of special key is not three");
+        return RET_ERR;
+    }
+    specialKeysState[KeyEvent::KEYCODE_CAPS_LOCK] = specialKeysStateTmp[SPECIAL_ARRAY_INDEX0];
+    specialKeysState[KeyEvent::KEYCODE_SCROLL_LOCK] = specialKeysStateTmp[SPECIAL_ARRAY_INDEX1];
+    specialKeysState[KeyEvent::KEYCODE_NUM_LOCK] = specialKeysStateTmp[SPECIAL_ARRAY_INDEX2];
     return RET_OK;
 }
 } // namespace MMI

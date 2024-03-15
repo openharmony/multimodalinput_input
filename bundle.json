@@ -90,7 +90,8 @@
         ],
         "fwk_group": [
           "//foundation/multimodalinput/input:multimodalinput_mmi_frameworks",
-          "//foundation/multimodalinput/input:input_jsapi_group"
+          "//foundation/multimodalinput/input:input_jsapi_group",
+          "//foundation/multimodalinput/input/frameworks/native/input:oh_input_manager"
         ],
         "service_group": [
           "//foundation/multimodalinput/input:multimodalinput_mmi_service",

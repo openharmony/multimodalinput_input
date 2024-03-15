@@ -288,6 +288,9 @@ int32_t MultimodalInputConnectStub::OnRemoteRequest(uint32_t code, MessageParcel
         case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_SHIELD_STATUS):
             return StubGetShieldStatus(data, reply);
             break;
+        case static_cast<uint32_t>(MultimodalinputConnectInterfaceCode::GET_KEY_STATE):
+            return StubGetKeyState(data, reply);
+            break;
         default: {
             MMI_HILOGE("Unknown code:%{public}u, go switch default", code);
             return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -2002,6 +2005,31 @@ int32_t MultimodalInputConnectStub::StubGetShieldStatus(MessageParcel& data, Mes
     }
     WRITEBOOL(reply, state, IPC_PROXY_DEAD_OBJECT_ERR);
     return RET_OK;
+}
+
+int32_t MultimodalInputConnectStub::StubGetKeyState(MessageParcel& data, MessageParcel& reply)
+{
+    CALL_DEBUG_ENTER;
+    std::vector<int32_t> pressedKeys;
+    std::map<int32_t, int32_t> specialKeysState;
+    int32_t ret = GetKeyState(pressedKeys, specialKeysState);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Call GetKeyState failed ret:%{public}d", ret);
+        return RET_ERR;
+    }
+    if (!reply.WriteInt32Vector(pressedKeys)) {
+        MMI_HILOGE("Write pressedKeys failed");
+        return RET_ERR;
+    }
+    std::vector<int32_t> specialKeysStateTmp;
+    for (const auto &item : specialKeysState) {
+        specialKeysStateTmp.push_back(item.second);
+    }
+    if (!reply.WriteInt32Vector(specialKeysStateTmp)) {
+        MMI_HILOGE("Write specialKeysStateTmp failed");
+        return RET_ERR;
+    }
+    return ret;
 }
 } // namespace MMI
 } // namespace OHOS
