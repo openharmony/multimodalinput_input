@@ -1,0 +1,38 @@
+[
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetKeyState"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_CreateKeyState"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_DestroyKeyState"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetKeyCode"
+    },
+    { 
+        "first_introduced": "12",
+        "name": "OH_Input_GetKeyCode"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetKeyPressed"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetKeyPressed"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_SetKeySwitch"
+    },
+    {
+        "first_introduced": "12",
+        "name": "OH_Input_GetKeySwitch"
+    }
+]

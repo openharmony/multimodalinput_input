@@ -1137,6 +1137,20 @@ int32_t MMIService::CheckInjectKeyEvent(const std::shared_ptr<KeyEvent> keyEvent
     CHKPR(keyEvent, ERROR_NULL_POINTER);
     return sMsgHandler_.OnInjectKeyEvent(keyEvent);
 }
+
+int32_t MMIService::OnGetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState)
+{
+    auto keyEvent = KeyEventHdr->GetKeyEvent();
+    CHKPR(keyEvent, ERROR_NULL_POINTER);
+    pressedKeys = keyEvent->GetPressedKeys();
+    specialKeysState[KeyEvent::KEYCODE_CAPS_LOCK] =
+        static_cast<int32_t>(keyEvent->GetFunctionKey(KeyEvent::CAPS_LOCK_FUNCTION_KEY));
+    specialKeysState[KeyEvent::KEYCODE_SCROLL_LOCK] =
+        static_cast<int32_t>(keyEvent->GetFunctionKey(KeyEvent::SCROLL_LOCK_FUNCTION_KEY));
+    specialKeysState[KeyEvent::KEYCODE_NUM_LOCK] =
+        static_cast<int32_t>(keyEvent->GetFunctionKey(KeyEvent::NUM_LOCK_FUNCTION_KEY));
+    return RET_OK;
+}
 #endif // OHOS_BUILD_ENABLE_KEYBOARD
 
 #if defined(OHOS_BUILD_ENABLE_POINTER) || defined(OHOS_BUILD_ENABLE_TOUCH)
@@ -1926,6 +1940,20 @@ int32_t MMIService::GetShieldStatus(int32_t shieldMode, bool &isShield)
         MMI_HILOGE("Failed to set shield event interception status, ret:%{public}d", ret);
     }
     return ret;
+}
+
+int32_t MMIService::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState)
+{
+    CALL_DEBUG_ENTER;
+#ifdef OHOS_BUILD_ENABLE_KEYBOARD
+    int32_t ret = delegateTasks_.PostSyncTask(std::bind(&MMIService::OnGetKeyState, this, std::ref(pressedKeys),
+        std::ref(specialKeysState)));
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get pressed keys failed, return %{public}d", ret);
+        return RET_ERR;
+    }
+#endif // OHOS_BUILD_ENABLE_KEYBOARD
+    return RET_OK;
 }
 } // namespace MMI
 } // namespace OHOS

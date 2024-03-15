@@ -117,6 +117,7 @@ protected:
     int32_t StubClearWindowPointerStyle(MessageParcel& data, MessageParcel& reply);
     int32_t StubSetShieldStatus(MessageParcel& data, MessageParcel& reply);
     int32_t StubGetShieldStatus(MessageParcel& data, MessageParcel& reply);
+    int32_t StubGetKeyState(MessageParcel& data, MessageParcel& reply);
 private:
     int32_t VerifyTouchPadSetting(void);
 };

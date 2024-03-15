@@ -512,5 +512,10 @@ int32_t InputManager::MarkProcessed(int32_t eventId, int64_t actionTime)
 {
     return InputMgrImpl.MarkProcessed(eventId, actionTime);
 }
+
+int32_t InputManager::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState)
+{
+    return InputMgrImpl.GetKeyState(pressedKeys, specialKeysState);
+}
 } // namespace MMI
 } // namespace OHOS
