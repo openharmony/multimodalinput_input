@@ -115,6 +115,7 @@ public:
     int32_t GetTouchpadRotateSwitch(bool &rotateSwitch) override;
     int32_t SetShieldStatus(int32_t shieldMode, bool isShield) override;
     int32_t GetShieldStatus(int32_t shieldMode, bool &isShield) override;
+    int32_t GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState) override;
 
 private:
     static inline BrokerDelegator<MultimodalInputConnectProxy> delegator_;

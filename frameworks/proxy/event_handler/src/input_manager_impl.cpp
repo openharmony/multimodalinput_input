@@ -1917,5 +1917,16 @@ int32_t InputManagerImpl::MarkProcessed(int32_t eventId, int64_t actionTime)
     ANRHDL->SetLastProcessedEventId(ANR_DISPATCH, eventId, actionTime);
     return RET_OK;
 }
+
+int32_t InputManagerImpl::GetKeyState(std::vector<int32_t> &pressedKeys, std::map<int32_t, int32_t> &specialKeysState)
+{
+    CALL_DEBUG_ENTER;
+    int32_t ret = MultimodalInputConnMgr->GetKeyState(pressedKeys, specialKeysState);
+    if (ret != RET_OK) {
+        MMI_HILOGE("Get key state failed, ret:%{public}d", ret);
+        return ret;
+    }
+    return RET_OK;
+}
 } // namespace MMI
 } // namespace OHOS
