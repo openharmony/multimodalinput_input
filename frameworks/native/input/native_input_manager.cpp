@@ -33,6 +33,10 @@ Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
 {
     CALL_DEBUG_ENTER;
     CHKPR(keyState, INPUT_PARAMETER_ERROR);
+    if (keyState->keyCode < 0) {
+        MMI_HILOGE("key code is invalid,keyCode:%{public}d", keyState->keyCode);
+        return INPUT_PARAMETER_ERROR;
+    }
     std::vector<int32_t> pressedKeys;
     std::map<int32_t, int32_t> specialKeysState;
     OHOS::MMI::InputManager::GetInstance()->GetKeyState(pressedKeys, specialKeysState);
@@ -57,7 +61,12 @@ Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
 
 struct Input_KeyState* OH_Input_CreateKeyState()
 {
-    return new (std::nothrow) Input_KeyState();
+    Input_KeyState* keyState = new (std::nothrow) Input_KeyState();
+    if (keyState == nullptr) {
+        MMI_HILOGE("memory allocation failed");
+        return nullptr;
+    }
+    return keyState;
 }
 
 void OH_Input_DestroyKeyState(struct Input_KeyState* keyState)
@@ -70,6 +79,10 @@ void OH_Input_DestroyKeyState(struct Input_KeyState* keyState)
 void OH_Input_SetKeyCode(struct Input_KeyState* keyState, int32_t keyCode)
 {
     CHKPV(keyState);
+    if (keycode < 0) {
+        MMI_HILOGE("key code is invalid,keyCode:%{public}d", keyCode);
+        return;
+    }
     keyState->keyCode = keyCode;
 }
 

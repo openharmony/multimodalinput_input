@@ -2018,7 +2018,7 @@ int32_t MultimodalInputConnectStub::StubGetKeyState(MessageParcel& data, Message
         return RET_ERR;
     }
     if (!reply.WriteInt32Vector(pressedKeys)) {
-        MMI_HILOGE("Write keyCodes failed");
+        MMI_HILOGE("Write pressedKeys failed");
         return RET_ERR;
     }
     std::vector<int32_t> specialKeysStateTmp;
@@ -2026,7 +2026,7 @@ int32_t MultimodalInputConnectStub::StubGetKeyState(MessageParcel& data, Message
         specialKeysStateTmp.push_back(item.second);
     }
     if (!reply.WriteInt32Vector(specialKeysStateTmp)) {
-        MMI_HILOGE("Write specialKeysState failed");
+        MMI_HILOGE("Write specialKeysStateTmp failed");
         return RET_ERR;
     }
     return ret;
