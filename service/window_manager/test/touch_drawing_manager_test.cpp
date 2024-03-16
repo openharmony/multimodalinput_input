@@ -46,7 +46,7 @@ public:
         info.name = "xx";
         info.uniq = "xx";
         info.direction = DIRECTION0;
-        TOUCH_DRAWING_MANAGER->UpdateDisplayInfo(info);
+        TouchDrawingMgr->UpdateDisplayInfo(info);
     } // void SetUp(void)
 };
 
@@ -73,7 +73,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_TouchDrawHandler_001, 
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MANAGER->TouchDrawHandler(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(TouchDrawingMgr->TouchDrawHandler(pointerEvent));
 }
 
 /**
@@ -99,7 +99,7 @@ HWTEST_F(TouchDrawingManagerTest, TouchDrawingManagerTest_TouchDrawHandler_002, 
     pointerEvent->SetTargetDisplayId(0);
     pointerEvent->SetPointerId(0);
     pointerEvent->AddPointerItem(item);
-    EXPECT_NO_FATAL_FAILURE(TOUCH_DRAWING_MANAGER->TouchDrawHandler(pointerEvent));
+    EXPECT_NO_FATAL_FAILURE(TouchDrawingMgr->TouchDrawHandler(pointerEvent));
 }
 } // namespace MMI
 } // namespace OHOS

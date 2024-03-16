@@ -1741,7 +1741,7 @@ int32_t InputWindowsManager::UpdateMouseTarget(std::shared_ptr<PointerEvent> poi
     int32_t physicalY = pointerItem.GetDisplayY();
     if (physicalDisplayInfo->displayDirection == DIRECTION0) {
         direction = physicalDisplayInfo->direction;
-        TOUCH_DRAWING_MANAGER->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->width,
+        TouchDrawingMgr->GetOriginalTouchScreenCoordinates(direction, physicalDisplayInfo->width,
             physicalDisplayInfo->height, physicalX, physicalY);
     }
     IPointerDrawingManager::GetInstance()->DrawPointer(displayId, physicalX, physicalY, dragPointerStyle_, direction);
@@ -2203,8 +2203,8 @@ void InputWindowsManager::DrawTouchGraphic(std::shared_ptr<PointerEvent> pointer
     }
     auto physicDisplayInfo = GetPhysicalDisplay(displayId);
     CHKPV(physicDisplayInfo);
-    TOUCH_DRAWING_MANAGER->UpdateDisplayInfo(*physicDisplayInfo);
-    TOUCH_DRAWING_MANAGER->TouchDrawHandler(pointerEvent);
+    TouchDrawingMgr->UpdateDisplayInfo(*physicDisplayInfo);
+    TouchDrawingMgr->TouchDrawHandler(pointerEvent);
 }
 
 template <class T>

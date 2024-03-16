@@ -54,7 +54,7 @@ Input_Result OH_Input_GetKeyState(struct Input_KeyState* keyState)
             keyState->keySwitch = KEY_SWITCH_ON;
         }
     } else {
-        keyState->keySwitch = KEY_SWITCH_OFF;
+        keyState->keySwitch = KEY_DEFAULT;
     }
     return INPUT_SUCCESS;
 }
