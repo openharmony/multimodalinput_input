@@ -193,6 +193,7 @@ private:
     int32_t PackWindowGroupInfo(NetPacket &pkt);
     int32_t PackDisplayInfo(NetPacket &pkt);
     void PrintWindowInfo(const std::vector<WindowInfo> &windowsInfo);
+    void PrintForemostThreeWindowInfo(const std::vector<WindowInfo> &windowsInfo);
     void PrintDisplayInfo();
     void PrintWindowGroupInfo();
     int32_t SendDisplayInfo();
