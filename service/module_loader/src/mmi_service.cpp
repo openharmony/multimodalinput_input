@@ -69,7 +69,6 @@ constexpr int32_t REMOVE_OBSERVER = -2;
 constexpr int32_t UNSUBSCRIBED = -1;
 constexpr int32_t UNOBSERVED = -1;
 constexpr int32_t SUBSCRIBED = 1;
-const int32_t MAX_IPC_THREAD_NUM = 16;
 } // namespace
 
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(DelayedSingleton<MMIService>::GetInstance().get());
@@ -284,7 +283,6 @@ int32_t MMIService::Init()
 void MMIService::OnStart()
 {
     CHK_PID_AND_TID();
-    IPCSkeleton::SetMaxWorkThreadNum(MAX_IPC_THREAD_NUM);
     int32_t ret = Init();
     CHKNOKRV(ret, "Init mmi_service failed");
     MMI_HILOGD("Started successfully");
