@@ -1092,7 +1092,7 @@ napi_value JsPointerContext::EnterCaptureMode(napi_env env, napi_callback_info i
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        THROWERR(env, "The first parameter type is invalid");
+        THROWERR(env, "First parameter type is invalid");
         return nullptr;
     }
 
@@ -1105,7 +1105,7 @@ napi_value JsPointerContext::EnterCaptureMode(napi_env env, napi_callback_info i
         return jsPointerMgr->EnterCaptureMode(env, windowId);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        THROWERR(env, "The second parameter type is invalid");
+        THROWERR(env, "Second parameter type is invalid");
         return nullptr;
     }
     return jsPointerMgr->EnterCaptureMode(env, windowId, argv[1]);
@@ -1122,7 +1122,7 @@ napi_value JsPointerContext::LeaveCaptureMode(napi_env env, napi_callback_info i
         return nullptr;
     }
     if (!JsCommon::TypeOf(env, argv[0], napi_number)) {
-        THROWERR(env, "The first parameter type is invalid");
+        THROWERR(env, "First parameter type is invalid");
         return nullptr;
     }
 
@@ -1136,7 +1136,7 @@ napi_value JsPointerContext::LeaveCaptureMode(napi_env env, napi_callback_info i
         return jsPointerMgr->LeaveCaptureMode(env, windowId);
     }
     if (!JsCommon::TypeOf(env, argv[1], napi_function)) {
-        THROWERR(env, "The second parameter type is invalid");
+        THROWERR(env, "Second parameter type is invalid");
         return nullptr;
     }
     return jsPointerMgr->LeaveCaptureMode(env, windowId, argv[1]);
