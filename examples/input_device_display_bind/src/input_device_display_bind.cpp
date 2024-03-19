@@ -48,13 +48,13 @@ void QueryDisplayBindInfo()
         printf("Get display bind info failed.\n");
         return;
     }
-    std::vector<std::array<std::string, 5>> arrStrings;
-    constexpr int32_t n = 5;
-    std::array<std::string, n> arr0 = { "No.", "Input device Id", "Input device Name", "Display id", "Display name" };
+    constexpr int32_t len = 5;
+    std::vector<std::array<std::string, len>> arrStrings;
+    std::array<std::string, len> arr0 = { "No.", "Input device Id", "Input device Name", "Display id", "Display name" };
     arrStrings.push_back(arr0);
     for (size_t i = 0; i < infos.size(); ++i) {
         const auto &info = infos[i];
-        std::array<std::string, 5> arr;
+        std::array<std::string, len> arr;
         arr[0] = std::to_string(i + 1);
         arr[1] = (info.inputDeviceId == INVALID_ID) ? "" : std::to_string(info.inputDeviceId);
         arr[2] = info.inputDeviceName;
@@ -62,7 +62,7 @@ void QueryDisplayBindInfo()
         arr[4] = info.displayName;
         arrStrings.push_back(arr);
     }
-    std::array<size_t, 5> arrWidth{};
+    std::array<size_t, len> arrWidth{};
     for (const auto &[a, b, c, d, e] : arrStrings) {
         arrWidth[0] = std::max(arrWidth[0], a.length());
         arrWidth[1] = std::max(arrWidth[1], b.length());
