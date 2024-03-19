@@ -132,7 +132,7 @@ sptr<SettingObserver> SettingDataShare::CreateObserver(const std::string& key, S
 void SettingDataShare::ExecRegisterCb(const sptr<SettingObserver>& observer)
 {
     if (observer == nullptr) {
-        MMI_HILOGE("observer is null");
+        MMI_HILOGE("observer is nullptr");
         return;
     }
     observer->OnChange();
@@ -141,7 +141,7 @@ void SettingDataShare::ExecRegisterCb(const sptr<SettingObserver>& observer)
 ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer)
 {
     if (observer == nullptr) {
-        MMI_HILOGE("observer is null");
+        MMI_HILOGE("observer is nullptr");
         return RET_ERR;
     }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
@@ -163,7 +163,7 @@ ErrCode SettingDataShare::RegisterObserver(const sptr<SettingObserver>& observer
 ErrCode SettingDataShare::UnregisterObserver(const sptr<SettingObserver>& observer)
 {
     if (observer == nullptr) {
-        MMI_HILOGE("observer is null");
+        MMI_HILOGE("observer is nullptr");
         return RET_ERR;
     }
     std::string callingIdentity = IPCSkeleton::ResetCallingIdentity();
