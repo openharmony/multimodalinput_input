@@ -35,6 +35,7 @@ public:
     ApplicationStateObserver() {};
     ~ApplicationStateObserver() = default;
     void OnForegroundApplicationChanged(const AppExecFwk::AppStateData &appStateData) override;
+    void OnProcessStateChanged(const AppExecFwk::ProcessData &processData) override;
     std::vector<AppExecFwk::AppStateData> GetForegroundAppData();
 private:
     sptr<AppExecFwk::IAppMgr> appManager_ = nullptr;
